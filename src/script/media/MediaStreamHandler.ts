@@ -20,7 +20,7 @@
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
 import {MediaError} from '../error/MediaError';
 import {PermissionError} from '../error/PermissionError';
@@ -29,10 +29,11 @@ import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
-import type {MEDIA_STREAM_ERROR} from './MediaStreamError';
+import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 import {Runtime} from '@wireapp/commons';
+import {NoAudioInputError} from '../error/NoAudioInputError';
 
 declare global {
   interface MediaDevices {
@@ -171,6 +172,10 @@ export class MediaStreamHandler {
           error,
         );
         this.clearPermissionRequestHint(audio, video, screen);
+
+        if (audio === true && name === MEDIA_STREAM_ERROR.NOT_READABLE_ERROR) {
+          throw new NoAudioInputError(error);
+        }
 
         if (MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(name)) {
           throw new MediaError(MediaError.TYPE.MEDIA_STREAM_DEVICE, MediaError.MESSAGE.MEDIA_STREAM_DEVICE);

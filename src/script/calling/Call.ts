@@ -25,6 +25,7 @@ import type {Participant, UserId, ClientId} from './Participant';
 export type ConversationId = string;
 
 export class Call {
+  public hasWorkingAudioInput: boolean;
   public readonly conversationId: ConversationId;
   public readonly initiator: UserId;
   public readonly reason: ko.Observable<number | undefined>;
@@ -66,6 +67,7 @@ export class Call {
     this.reason = ko.observable();
     this.startedAt = ko.observable();
     this.isCbrEnabled = ko.observable(false);
+    this.hasWorkingAudioInput = true;
   }
 
   getSelfParticipant(): Participant {
