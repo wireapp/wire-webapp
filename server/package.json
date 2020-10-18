@@ -30,7 +30,7 @@
     "@types/helmet": "0.0.48",
     "@types/jasmine": "3.5.14",
     "@types/node": "~10",
-    "jasmine": "3.6.1",
+    "jasmine": "3.6.2",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-node": "9.0.0",
