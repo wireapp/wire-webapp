@@ -29,7 +29,7 @@
     "react-helmet": "6.1.0",
     "react-hot-loader": "4.12.21",
     "react-styleguidist": "11.0.8",
-    "react-test-renderer": "16.13.1",
+    "react-test-renderer": "16.14.0",
     "rimraf": "3.0.2",
     "typescript": "4.0.3",
     "webpack": "4.44.1",
