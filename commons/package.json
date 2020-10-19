@@ -45,5 +45,5 @@
     "test:project": "yarn build && yarn test",
     "test:node": "yarn build && jasmine --config=jasmine.json"
   },
-  "version": "3.8.7"
+  "version": "3.8.8"
 }
