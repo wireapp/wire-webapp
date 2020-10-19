@@ -35,6 +35,7 @@ import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {EventError} from 'src/script/error/EventError';
 import {TestFactory} from '../../helper/TestFactory';
+import {AbortHandler} from '@wireapp/api-client/dist/tcp';
 
 const testFactory = new TestFactory();
 
@@ -127,6 +128,7 @@ describe('EventRepository', () => {
     });
 
     it('should fetch last notifications ID from backend if not found in storage', async () => {
+      const abortHandler = new AbortHandler();
       const missedEventsSpy = jasmine.createSpy('missedEventsSpy');
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.MISSED_EVENTS);
       amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, missedEventsSpy);
@@ -136,7 +138,7 @@ describe('EventRepository', () => {
       expect(testFactory.event_repository.lastNotificationId()).toBeUndefined();
 
       testFactory.event_repository.connectWebSocket();
-      await testFactory.event_repository.initializeFromStream();
+      await testFactory.event_repository.initializeFromStream(abortHandler);
 
       expect(testFactory.notification_service.getLastNotificationIdFromDb).toBeDefined();
       expect(testFactory.notification_service.getNotificationsLast).toHaveBeenCalledWith(clientId);
