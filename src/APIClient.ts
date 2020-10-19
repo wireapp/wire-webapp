@@ -45,7 +45,7 @@ import {HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
 import {ObfuscationUtil} from './obfuscation/';
 import {SelfAPI} from './self/';
-import {WebSocketClient} from './tcp/';
+import {OnConnect, WebSocketClient} from './tcp/';
 import {
   TeamConversationAPI,
   FeatureAPI,
@@ -280,8 +280,8 @@ export class APIClient extends EventEmitter {
     delete this.context;
   }
 
-  public connect(onBeforeConnect?: () => Promise<void>): Promise<WebSocketClient> {
-    return this.transport.ws.connect(this.context?.clientId, onBeforeConnect);
+  public connect(onConnect?: OnConnect): Promise<WebSocketClient> {
+    return this.transport.ws.connect(this.context?.clientId, onConnect);
   }
 
   private createContext(userId: string, clientType: ClientType, clientId?: string): Context {

@@ -50,6 +50,8 @@ export class AbortHandler {
   isAborted = () => this.aborted;
 }
 
+export type OnConnect = (abortHandler: AbortHandler) => Promise<void>;
+
 export class WebSocketClient extends EventEmitter {
   private clientId?: string;
   private isRefreshingAccessToken: boolean;
@@ -132,10 +134,7 @@ export class WebSocketClient extends EventEmitter {
    * Essentially the websocket will lock before execution of this function and
    * unlocks after the execution of the handler and pushes all buffered messages.
    */
-  public async connect(
-    clientId?: string,
-    onConnect?: (abortHandler: AbortHandler) => Promise<void>,
-  ): Promise<WebSocketClient> {
+  public async connect(clientId?: string, onConnect?: OnConnect): Promise<WebSocketClient> {
     if (onConnect) {
       this.onConnect = async () => {
         this.abortHandler = new AbortHandler();
