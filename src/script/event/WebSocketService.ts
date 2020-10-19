@@ -41,10 +41,10 @@ export class WebSocketService {
     this.logger = getLogger('WebSocketService');
   }
 
-  disconnect() {
+  disconnect = () => {
     this.logger.info('Disconnecting websocket');
     this.apiClient.disconnect();
-  }
+  };
 
   /**
    * Establish the WebSocket connection.
@@ -53,25 +53,11 @@ export class WebSocketService {
    */
   async connect(onNotification: OnNotificationCallback, onBeforeConnect: () => Promise<void>): Promise<void> {
     this.apiClient.context.clientId = this.clientId;
-    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, async () => {
-      this.disconnect();
-    });
-    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, onNotification as any);
+    this.apiClient.removeListener(APIClient.TOPIC.ON_LOGOUT, this.disconnect);
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, this.disconnect);
 
-    this.logger.info(`Connecting WebSocket with clientID "${this.apiClient.clientId}"`);
-    // Note: `connect()` should only resolve after `onBeforeConnect()` is executed successfully
-    // We need to wrap this into a plain Promise because `reconnecting-websocket` doesn't give a handle
-    // to wait for the execution (connection lost on RWS constructor)
-    await new Promise((resolve, reject) =>
-      this.apiClient.connect(async () => {
-        try {
-          await onBeforeConnect();
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      }),
-    );
+    this.apiClient.transport.ws.removeAllListeners();
+    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, onNotification as any);
 
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, (state: WEBSOCKET_STATE) => {
       this.logger.info(`Websocket state change: ${WEBSOCKET_STATE[state]}`);
@@ -95,5 +81,20 @@ export class WebSocketService {
         }
       }
     });
+
+    this.logger.info(`Connecting WebSocket with clientID "${this.apiClient.clientId}"`);
+    // Note: `connect()` should only resolve after `onBeforeConnect()` is executed successfully
+    // We need to wrap this into a plain Promise because `reconnecting-websocket` doesn't give a handle
+    // to wait for the execution (connection lost on RWS constructor)
+    await new Promise((resolve, reject) =>
+      this.apiClient.connect(async () => {
+        try {
+          await onBeforeConnect();
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      }),
+    );
   }
 }
