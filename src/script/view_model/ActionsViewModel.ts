@@ -338,13 +338,14 @@ export class ActionsViewModel {
     }
   };
 
-  removeFromConversation = (conversationEntity: Conversation, userEntity: User): Promise<void> => {
+  removeFromConversation = async (conversationEntity: Conversation, userEntity: User): Promise<void> => {
     if (conversationEntity && userEntity) {
       if (userEntity.isService) {
-        return this.integrationRepository.removeService(conversationEntity, userEntity);
+        await this.integrationRepository.removeService(conversationEntity, userEntity);
+        return;
       }
 
-      return new Promise(resolve => {
+      await new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           primaryAction: {
             action: () => {
