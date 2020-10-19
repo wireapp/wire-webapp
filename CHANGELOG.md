@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.28.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.28.0...@wireapp/api-client@11.28.1) (2020-10-19)
+
+
+### Bug Fixes
+
+* **api-client:** APIClient connect onConnect param type ([#3279](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3279)) ([ccfaf10](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/ccfaf10cd5fdc0308530064c3d57069d40b0d757))
+
+
+
+
+
 # [11.28.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.27.7...@wireapp/api-client@11.28.0) (2020-10-19)
 
 
