@@ -124,7 +124,7 @@ All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/project
 #### Add new strings
 
 1. Install [Crowdin CLI v3](https://support.crowdin.com/cli-tool/)
-1. Verify you have a `keys/crowdin.yaml` in place with the [project's API Key](https://crowdin.com/project/wire-webapp/settings#api) and your [personal access token](https://crowdin.com/settings#api-key) (you may have to create one).
+1. Verify you have a `keys/crowdin.yaml` in place with the [project's API Key](https://crowdin.com/project/wire-webapp/settings#api), your [personal access token](https://crowdin.com/settings#api-key) (you may have to create one) and your [username](https://crowdin.com/settings#account).
 1. Add string variable and text to "i18n/en-US.json"
 1. Run `yarn translate:upload`
 1. Verify your string shows up on [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
@@ -137,6 +137,7 @@ Template of "keys/crowdin.yaml" (you need to create this file yourself):
 ```yaml
 api_token: your-personal-access-token-from-crowdin
 api_key: wire-webapp-api-key-from-crowdin
+username: your-crowdin-username
 ```
 
 ### Contributing

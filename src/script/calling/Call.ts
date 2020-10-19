@@ -67,6 +67,7 @@ export class Call {
     this.reason = ko.observable();
     this.startedAt = ko.observable();
     this.isCbrEnabled = ko.observable(false);
+    // TODO: Also set to "true" once new audio devices are plugged in
     this.hasWorkingAudioInput = true;
   }
 

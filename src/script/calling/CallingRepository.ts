@@ -754,7 +754,7 @@ export class CallingRepository {
 
   muteCall(call: Call, shouldMute: boolean): void {
     if (call.hasWorkingAudioInput === false) {
-      // TODO: Display audio input modal error when toggling
+      this.showNoAudioInputModal();
       return;
     }
     this.wCall.setMute(this.wUser, shouldMute ? 1 : 0);
@@ -1378,10 +1378,7 @@ export class CallingRepository {
         text: 'Okay',
       },
       secondaryAction: {
-        action: () => {
-          // TODO: Implement router to AV preferences
-        },
-        // TODO: Check with Andy why this text is not taken
+        action: () => amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV),
         text: 'Go to preferences',
       },
       text: {
