@@ -16,22 +16,25 @@
     "@types/copy": "0.3.1",
     "@types/fs-extra": "8.1.0",
     "@types/rimraf": "3.0.0",
+    "del-cli": "3.0.1",
     "jasmine": "3.5.0"
   },
   "files": [
-    "dist"
+    "src",
+    "!src/**/*.ts",
+    "!src/**/*.test.js"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "src/main/index",
   "name": "@wireapp/copy-config",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf dist",
+    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.js}\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node",
-    "test:node": "jasmine --config=jasmine.json"
+    "test:node": "yarn build && jasmine --config=jasmine.json"
   },
   "version": "1.1.2"
 }

@@ -22,8 +22,8 @@
 const path = require('path');
 const fs = require('fs-extra');
 
-const {CopyConfig} = require('../../dist');
-const utils = require('../../dist/utils');
+const {CopyConfig} = require('./');
+const utils = require('./utils');
 const TEMP_DIR = path.resolve(__dirname, '..', '..', '.temp/');
 
 describe('CopyConfig', () => {
@@ -39,7 +39,9 @@ describe('CopyConfig', () => {
         repositoryUrl: '',
       });
 
+      // @ts-ignore
       expect(copyConfig.options.externalDir.endsWith('externalDir')).toBe(true);
+      // @ts-ignore
       expect(copyConfig.options.files).toEqual({
         './spec/helpers/**': TEMP_DIR,
         './spec/helpers/test1.txt': [`${TEMP_DIR}/test1.txt`, `${TEMP_DIR}/test2.txt`],
@@ -192,6 +194,7 @@ describe('CopyConfig', () => {
         repositoryUrl: '',
       });
 
+      // @ts-ignore
       const resolvedPaths = copyConfig.getFilesFromString(copyString);
       expect(Object.keys(resolvedPaths)[0]).toBe('C:\\source');
       expect(Object.values(resolvedPaths)[0]).toBe('D:\\target');
