@@ -52,6 +52,9 @@ export class WebSocketService {
    * @returns Resolves once the WebSocket connects
    */
   async connect(onNotification: OnNotificationCallback, onBeforeConnect: () => Promise<void>): Promise<void> {
+    this.apiClient.removeAllListeners();
+    this.apiClient.transport.ws.removeAllListeners();
+
     this.apiClient.context.clientId = this.clientId;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, async () => {
       this.disconnect();
