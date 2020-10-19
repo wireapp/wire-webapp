@@ -13,9 +13,7 @@
     "karma-typescript": "5.0.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "typescript": "4.0.3",
-    "webpack": "4.44.1",
-    "webpack-cli": "3.3.12"
+    "typescript": "4.0.3"
   },
   "files": [
     "src",
@@ -27,16 +25,15 @@
   "name": "@wireapp/cbor",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor",
   "scripts": {
-    "build:browser": "webpack --progress",
     "build:node": "tsc",
-    "build": "yarn build:node && yarn build:browser",
+    "build": "yarn build:node",
     "clean": "rimraf src/main/**/*{.js,.js.map,.d.ts} .nyc_output coverage",
     "coverage": "cross-env JASMINE_CONFIG_PATH=jasmine.json istanbul cover --report html ../../node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clean && yarn build",
     "test": "yarn build && yarn test:node && yarn test:browser",
     "test:project": "yarn build && yarn test",
     "test:browser": "yarn build && karma start",
-    "test:node": "yarn dist && nyc jasmine --config=jasmine.json"
+    "test:node": "yarn build && nyc jasmine --config=jasmine.json"
   },
   "version": "4.6.16"
 }
