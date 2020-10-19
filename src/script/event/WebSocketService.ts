@@ -23,7 +23,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {Notification} from '@wireapp/api-client/dist/notification';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {WebSocketClient} from '@wireapp/api-client/dist/tcp/';
+import {WebSocketClient, OnConnect} from '@wireapp/api-client/dist/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/dist/tcp/ReconnectingWebsocket';
 
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
@@ -46,12 +46,20 @@ export class WebSocketService {
     this.apiClient.disconnect();
   };
 
+  lockWebsocket = () => {
+    this.apiClient.transport.ws.lock();
+  };
+
+  unlockWebsocket = () => {
+    this.apiClient.transport.ws.unlock();
+  };
+
   /**
    * Establish the WebSocket connection.
    * @param onNotification Function to be called on incoming notifications
    * @returns Resolves once the WebSocket connects
    */
-  async connect(onNotification: OnNotificationCallback, onBeforeConnect: () => Promise<void>): Promise<void> {
+  async connect(onNotification: OnNotificationCallback, onConnect: OnConnect): Promise<void> {
     this.apiClient.context.clientId = this.clientId;
     this.apiClient.removeListener(APIClient.TOPIC.ON_LOGOUT, this.disconnect);
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, this.disconnect);
@@ -87,9 +95,9 @@ export class WebSocketService {
     // We need to wrap this into a plain Promise because `reconnecting-websocket` doesn't give a handle
     // to wait for the execution (connection lost on RWS constructor)
     await new Promise((resolve, reject) =>
-      this.apiClient.connect(async () => {
+      this.apiClient.connect(async abortHandler => {
         try {
-          await onBeforeConnect();
+          await onConnect(abortHandler);
           resolve();
         } catch (error) {
           reject(error);
