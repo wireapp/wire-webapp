@@ -106,45 +106,39 @@ describe('WebSocketClient', () => {
       expect(onMessageSpy.calls.count()).toBe(1);
     });
 
-    it('calls "onBeforeConnect" when "onReconnect" is called', async () => {
-      const onBeforeConnectResult = jasmine.createSpy().and.returnValue(Promise.resolve());
-      const onBeforeConnect = () => {
-        expect(websocketClient.isLocked()).toBe(true);
-        return onBeforeConnectResult();
+    it('calls "onConnect" when "onReconnect" is called', async () => {
+      const onConnectResult = jasmine.createSpy().and.returnValue(Promise.resolve());
+      const onConnect = () => {
+        return onConnectResult();
       };
       const websocketClient = new WebSocketClient('url', fakeHttpClient);
       const socket = websocketClient['socket'];
       spyOn<any>(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
 
-      await websocketClient.connect(undefined, onBeforeConnect);
-      expect(websocketClient.isLocked()).toBe(false);
+      await websocketClient.connect(undefined, onConnect);
       await websocketClient['onReconnect']();
-      expect(onBeforeConnectResult.calls.count()).toBe(1);
-      expect(websocketClient.isLocked()).toBe(false);
+      expect(onConnectResult.calls.count()).toBe(1);
     });
 
-    it('emits error when "onBeforeConnect" fails during "onReconnect"', async () => {
+    it('emits error when "onConnect" fails during "onReconnect"', async () => {
       const testError = new Error('oh no!');
       let errorHandlerCalled = false;
-      const onBeforeConnectResult = jasmine.createSpy().and.returnValue(Promise.reject(testError));
+      const onConnectResult = jasmine.createSpy().and.returnValue(Promise.reject(testError));
       const onBeforeConnect = () => {
-        expect(websocketClient.isLocked()).toBe(true);
-        return onBeforeConnectResult();
+        return onConnectResult();
       };
       const websocketClient = new WebSocketClient('url', fakeHttpClient);
       const socket = websocketClient['socket'];
       spyOn<any>(socket, 'getReconnectingWebsocket').and.returnValue(fakeSocket);
 
       websocketClient.on(WebSocketClient.TOPIC.ON_ERROR, error => {
-        expect(onBeforeConnectResult.calls.count()).toBe(1);
+        expect(onConnectResult.calls.count()).toBe(1);
         expect(error).toBe(testError);
         errorHandlerCalled = true;
       });
 
       await websocketClient.connect(undefined, onBeforeConnect);
-      expect(websocketClient.isLocked()).toBe(false);
       await websocketClient['onReconnect']();
-      expect(websocketClient.isLocked()).toBe(false);
       expect(errorHandlerCalled).toBe(true);
     });
   });

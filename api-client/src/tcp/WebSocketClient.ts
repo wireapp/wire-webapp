@@ -40,6 +40,16 @@ export interface WebSocketClient {
   on(event: TOPIC.ON_STATE_CHANGE, listener: (state: WEBSOCKET_STATE) => void): this;
 }
 
+export class AbortHandler {
+  private aborted = false;
+
+  abort = () => {
+    this.aborted = true;
+  };
+
+  isAborted = () => this.aborted;
+}
+
 export class WebSocketClient extends EventEmitter {
   private clientId?: string;
   private isRefreshingAccessToken: boolean;
@@ -51,6 +61,7 @@ export class WebSocketClient extends EventEmitter {
   private isSocketLocked: boolean;
   private bufferedMessages: string[];
   private onConnect: () => Promise<void> = () => Promise.resolve();
+  private abortHandler?: AbortHandler;
 
   public static readonly TOPIC = TOPIC;
 
@@ -95,7 +106,6 @@ export class WebSocketClient extends EventEmitter {
 
   private readonly onReconnect = async () => {
     // Note: Do NOT await `onConnect` otherwise the websocket will not connect during notification stream processing
-    this.lock();
     void this.onConnect();
     return this.buildWebSocketUrl();
   };
@@ -105,6 +115,8 @@ export class WebSocketClient extends EventEmitter {
   };
 
   private readonly onClose = (event: CloseEvent) => {
+    this.abortHandler?.abort();
+    this.bufferedMessages = [];
     this.onStateChange(this.socket.getState());
   };
 
@@ -120,17 +132,19 @@ export class WebSocketClient extends EventEmitter {
    * Essentially the websocket will lock before execution of this function and
    * unlocks after the execution of the handler and pushes all buffered messages.
    */
-  public async connect(clientId?: string, onConnect?: () => Promise<void>): Promise<WebSocketClient> {
+  public async connect(
+    clientId?: string,
+    onConnect?: (abortHandler: AbortHandler) => Promise<void>,
+  ): Promise<WebSocketClient> {
     if (onConnect) {
       this.onConnect = async () => {
+        this.abortHandler = new AbortHandler();
         try {
           this.logger.info('Calling "onConnect"');
-          await onConnect();
+          await onConnect(this.abortHandler);
         } catch (error) {
-          this.logger.warn(`Error during execution of "beforeReconnect"`, error);
+          this.logger.warn(`Error during execution of "onConnect"`, error);
           this.emit(WebSocketClient.TOPIC.ON_ERROR, error);
-        } finally {
-          this.unlock();
         }
         this.onStateChange(this.socket.getState());
       };
