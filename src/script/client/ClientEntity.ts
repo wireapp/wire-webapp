@@ -22,6 +22,7 @@ import ko from 'knockout';
 
 import {zeroPadding} from 'Util/util';
 import {ClientMapper} from './ClientMapper';
+import {ClientInDB} from './ClientService';
 
 export class ClientEntity {
   static CONFIG = {
@@ -103,7 +104,7 @@ export class ClientEntity {
   /**
    * This method returns an object which can be stored in our local database.
    */
-  toJson(): Record<string, any> {
+  toJson(): ClientInDB {
     const jsonObject = JSON.parse(ko.toJSON(this));
     delete jsonObject.isSelfClient;
 
