@@ -19,7 +19,7 @@
 
 import ansiRegex = require('ansi-regex');
 import * as fs from 'fs-extra';
-import * as logdown from 'logdown';
+import logdown from 'logdown';
 import * as os from 'os';
 import * as path from 'path';
 

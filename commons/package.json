@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/jasmine": "3.5.14",
     "@types/karma": "5.0.0",
+    "del-cli": "3.0.1",
     "jasmine": "3.5.0",
     "karma": "5.1.0",
     "karma-chrome-launcher": "3.1.0",
@@ -23,25 +24,26 @@
   },
   "description": "Collection of common components that are used across Wire web applications.",
   "files": [
-    "dist"
+    "src",
+    "!src/**/*.ts"
   ],
   "keywords": [
     "commons",
     "utils"
   ],
   "license": "GPL-3.0",
-  "main": "dist/commonjs/index.js",
+  "main": "src/main/index",
   "name": "@wireapp/commons",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/commons",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf dist",
+    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js}\" \"!src/test/**/*\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node && yarn test:browser",
-    "test:browser": "karma start",
-    "test:project": "yarn dist && yarn test",
-    "test:node": "jasmine --config=jasmine.json"
+    "test:browser": "yarn build && karma start",
+    "test:project": "yarn build && yarn test",
+    "test:node": "yarn build && jasmine --config=jasmine.json"
   },
   "version": "3.8.7"
 }
