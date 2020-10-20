@@ -345,12 +345,16 @@ export class ActionsViewModel {
         return;
       }
 
-      await new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           primaryAction: {
-            action: () => {
-              this.conversationRepository.removeMember(conversationEntity, userEntity.id);
-              resolve();
+            action: async () => {
+              try {
+                await this.conversationRepository.removeMember(conversationEntity, userEntity.id);
+                resolve();
+              } catch (error) {
+                reject(error);
+              }
             },
             text: t('modalConversationRemoveAction'),
           },
@@ -362,7 +366,7 @@ export class ActionsViewModel {
       });
     }
 
-    return Promise.reject();
+    throw new Error(`Unable to remove user '${userEntity?.id}' from conversation '${conversationEntity?.id}'`);
   };
 
   /**
