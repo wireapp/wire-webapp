@@ -29,16 +29,17 @@
     "webpack-cli": "3.3.12"
   },
   "files": [
-    "dist"
+    "src",
+    "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
-  "main": "dist/commonjs/index.js",
+  "main": "src/main/index",
   "name": "@wireapp/cryptobox",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf dist/commonjs",
+    "clean": "rimraf src/main/**/*{.js,.js.map,.d.ts}",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",

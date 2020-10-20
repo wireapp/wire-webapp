@@ -23,7 +23,7 @@ import * as Proteus from '@wireapp/proteus';
 import * as sodium from 'libsodium-wrappers-sumo';
 import {store as CryptoboxStore} from '@wireapp/cryptobox';
 import {MemoryEngine} from '@wireapp/store-engine';
-import {CryptoboxCRUDStore} from '@wireapp/cryptobox/dist/commonjs/store';
+import {CryptoboxCRUDStore} from '@wireapp/cryptobox/src/main/store';
 
 const assert_serialise_deserialise = (
   localIdentity: Proteus.keys.IdentityKeyPair,
