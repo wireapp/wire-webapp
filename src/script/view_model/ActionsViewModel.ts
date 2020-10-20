@@ -345,12 +345,16 @@ export class ActionsViewModel {
         return;
       }
 
-      return new Promise(resolve => {
+      return new Promise((resolve, reject) => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           primaryAction: {
             action: async () => {
-              await this.conversationRepository.removeMember(conversationEntity, userEntity.id);
-              resolve();
+              try {
+                await this.conversationRepository.removeMember(conversationEntity, userEntity.id);
+                resolve();
+              } catch (error) {
+                reject(error);
+              }
             },
             text: t('modalConversationRemoveAction'),
           },
