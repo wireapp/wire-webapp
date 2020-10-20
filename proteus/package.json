@@ -21,10 +21,12 @@
     "webpack-cli": "3.3.12"
   },
   "files": [
-    "dist"
+    "src",
+    "!src/**/!(*.d).ts",
+    "!src/demo/**/*"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "src/main/index",
   "name": "@wireapp/proteus",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus",
   "scripts": {
@@ -32,7 +34,7 @@
     "build:node": "tsc",
     "clean": "rimraf dist",
     "dist": "yarn clean && yarn build:node",
-    "start": "node dist/index.js",
+    "start": "yarn build:node && node src/main/index.js",
     "test": "yarn test:types && yarn test:node",
     "test:node": "nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test",

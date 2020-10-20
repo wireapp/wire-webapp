@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "noImplicitAny": true,
-    "outDir": "dist",
+    "outDir": "src/main",
     "rootDir": "src/main"
   },
-  "exclude": ["dist", "node_modules", "spec", "src/demo"],
+  "exclude": ["node_modules", "spec", "src/demo"],
   "extends": "../../tsconfig.json"
 }
