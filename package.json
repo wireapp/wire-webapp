@@ -5,10 +5,10 @@
   "dependencies": {
     "@types/long": "4.0.1",
     "@types/node": "~12",
-    "@wireapp/api-client": "11.28.3",
-    "@wireapp/cryptobox": "12.2.31",
+    "@wireapp/api-client": "11.28.4",
+    "@wireapp/cryptobox": "12.2.32",
     "@wireapp/protocol-messaging": "1.25.4",
-    "@wireapp/store-engine": "4.5.12",
+    "@wireapp/store-engine": "4.5.13",
     "bazinga64": "5.7.15",
     "hash.js": "1.1.7",
     "logdown": "3.3.1",
@@ -20,7 +20,7 @@
     "@types/jasmine": "3.5.14",
     "@types/karma": "5.0.0",
     "@wireapp/commons": "3.8.8",
-    "@wireapp/store-engine-dexie": "1.3.16",
+    "@wireapp/store-engine-dexie": "1.3.17",
     "commander": "6.1.0",
     "cross-env": "7.0.2",
     "dotenv": "8.2.0",
@@ -65,5 +65,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "nyc jasmine --config=jasmine.json"
   },
-  "version": "16.12.32"
+  "version": "16.12.33"
 }
