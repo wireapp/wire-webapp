@@ -36,7 +36,7 @@ module.exports = (config: Config): void => {
         flags: ['--allow-file-access-from-files', '--no-sandbox', '--unlimited-quota-for-files'],
       },
     },
-    files: ['**/*.ts'],
+    files: ['**/!(*.d).ts'],
     frameworks: ['jasmine', 'karma-typescript'],
     logLevel: config.LOG_INFO,
     port: 9876,

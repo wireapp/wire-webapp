@@ -19,7 +19,9 @@
   },
   "description": "Provides a storage wrapper API to unify access to different storage technologies.",
   "files": [
-    "dist"
+    "src",
+    "!src/**/!(*.d).ts",
+    "!src/test/**/*"
   ],
   "keywords": [
     "generic",
@@ -29,19 +31,19 @@
     "wrapper"
   ],
   "license": "GPL-3.0",
-  "main": "dist/commonjs/index.js",
+  "main": "src/main/index",
   "name": "@wireapp/store-engine",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine",
   "scripts": {
     "build": "yarn build:node && yarn build:browser",
     "build:browser": "webpack --progress",
     "build:node": "tsc",
-    "clean": "rimraf dist",
+    "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "karma start",
     "test:project": "yarn dist && yarn test",
-    "test:node": "nyc jasmine --config=jasmine.json"
+    "test:node": "yarn build && nyc jasmine --config=jasmine.json"
   },
   "version": "4.5.12"
 }

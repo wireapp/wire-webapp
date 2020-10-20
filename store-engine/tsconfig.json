@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "outDir": "dist/commonjs",
+    "outDir": "src/main",
     "rootDir": "src/main"
   },
-  "exclude": ["dist", "karma.conf.ts", "node_modules"],
+  "exclude": ["src/**/*.test.ts", "src/test/**/*", "karma.conf.ts", "node_modules"],
   "extends": "../../tsconfig.json"
 }
