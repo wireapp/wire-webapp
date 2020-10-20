@@ -37,7 +37,7 @@ module.exports = (config: Config): void => {
         flags: ['--no-sandbox'],
       },
     },
-    files: ['**/*.ts'],
+    files: ['**/!(*.d).ts'],
     frameworks: ['jasmine', 'karma-typescript'],
     logLevel: config.LOG_INFO,
     port: 9876,

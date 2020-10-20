@@ -19,11 +19,12 @@
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-node": "8.6.2",
-    "typescript": "4.0.3",
-    "webpack": "4.44.1"
+    "typescript": "4.0.3"
   },
   "files": [
-    "dist"
+    "src",
+    "!src/**/!(*.d).ts",
+    "!src/test/**/*"
   ],
   "keywords": [
     "array",
@@ -39,19 +40,18 @@
     "string"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "src/index",
   "name": "bazinga64",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64",
   "scripts": {
-    "build": "yarn build:node && yarn build:browser",
-    "build:browser": "webpack --progress",
+    "build": "yarn build:node",
     "build:node": "tsc",
-    "clear": "rimraf dist",
-    "dist": "yarn clear && yarn build",
-    "test": "yarn test:node && yarn test:browser",
+    "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
+    "dist": "yarn clean && yarn build",
+    "test": "yarn test:browser && yarn test:node",
     "test:project": "yarn dist && yarn test",
-    "test:browser": "karma start",
-    "test:node": "nyc jasmine --config=jasmine.json"
+    "test:browser": "yarn build && karma start",
+    "test:node": "yarn build && nyc jasmine --config=jasmine.json"
   },
   "version": "5.7.14"
 }
