@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "outDir": "dist",
+    "outDir": "src",
     "rootDir": "src",
     "resolveJsonModule": true
   },

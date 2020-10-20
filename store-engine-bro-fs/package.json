@@ -8,6 +8,7 @@
     "@types/karma": "5.0.0",
     "@types/node": "~12",
     "@wireapp/store-engine": "4.5.12",
+    "del-cli": "3.0.1",
     "jasmine": "3.5.0",
     "karma": "5.1.0",
     "karma-chrome-launcher": "3.1.0",
@@ -18,11 +19,13 @@
   },
   "description": "Store Engine implementation for the browser's File and Directory Entries API.",
   "files": [
-    "dist"
+    "src",
+    "!src/**/!(*.d).ts",
+    "!src/test/**/*"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
-  "name": "@wireapp/store-engine-bro-fs",
+  "main": "src/index",
+  "name": "@wireapp/store-engine-bro-fs", 
   "peerDependencies": {
     "@wireapp/store-engine": "4.x.x"
   },
@@ -30,10 +33,10 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf dist",
+    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js}\" \"!src/test/**/*\"",
     "dist": "yarn clean && yarn build",
-    "test": "karma start",
-    "test:project": "yarn dist && yarn test"
+    "test": "yarn build && karma start",
+    "test:project": "yarn build && yarn test"
   },
   "version": "1.3.17"
 }

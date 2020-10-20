@@ -7,17 +7,19 @@
     "@types/jasmine": "3.5.14",
     "@types/node": "~12",
     "@wireapp/store-engine": "4.5.12",
+    "del-cli": "3.0.1",
     "jasmine": "3.5.0",
     "nyc": "15.1.0",
-    "rimraf": "3.0.2",
     "typescript": "4.0.3"
   },
   "description": "Store Engine implementation for Node.js' File System.",
   "files": [
-    "dist"
+    "src",
+    "!src/**/!(*.d).ts",
+    "!src/test/**/*"
   ],
   "license": "GPL-3.0",
-  "main": "dist/index.js",
+  "main": "src/index",
   "name": "@wireapp/store-engine-fs",
   "peerDependencies": {
     "@wireapp/store-engine": "4.x.x"
@@ -26,10 +28,10 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf .nyc_output coverage dist",
+    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js}\" \"!src/test/**/*\"",
     "dist": "yarn clean && yarn build",
-    "test": "nyc jasmine --config=jasmine.json",
-    "test:project": "yarn dist && yarn test"
+    "test": "yarn build && nyc jasmine --config=jasmine.json",
+    "test:project": "yarn build && yarn test"
   },
   "version": "2.2.16"
 }
