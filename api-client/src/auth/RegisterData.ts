@@ -17,22 +17,17 @@
  *
  */
 
-import {AccentColor} from '@wireapp/commons';
 import {TeamData} from '../team/team/TeamData';
-import {UserAsset} from '../user/';
+import {User} from '../user/';
 
-export interface RegisterData {
-  accent_id?: AccentColor.AccentColorID;
-  assets?: UserAsset[];
-  email?: string;
+export type RegisterData = Pick<User, 'accent_id' | 'assets' | 'email' | 'name'> & {
   email_code?: string;
   expires_in?: number; // used with "temporary guests"
   invitation_code?: string;
   label?: string;
   locale?: string;
-  name: string;
   password?: string;
   phone?: string;
   phone_code?: string;
   team?: TeamData;
-}
+};
