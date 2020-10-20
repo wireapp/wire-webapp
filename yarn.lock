@@ -1901,10 +1901,10 @@
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
 
-"@types/open-graph@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@types/open-graph/-/open-graph-0.2.0.tgz#bd042547407bc14746402e7afc75bf1b64ef017a"
-  integrity sha512-k+xscjmkzff9Qi63AEC1bv204RGIjxQcV26VJazNiDHnigcu5mtjyVdYGsnnS+zvW5PGBbVQvbf/lZ8j6lMQ6g==
+"@types/open-graph@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@types/open-graph/-/open-graph-0.2.1.tgz#8df5b19fd989dcfaf585c8424b1045917e365cd1"
+  integrity sha512-aeYCgwuHb1/EzgLTAHD9P1yOo/FzsExcKkyctp2GMNoVJ70ktnHmuWXIBUCeDprnvgD3/AqhVQTaDqtum7G4yg==
   dependencies:
     "@types/cheerio" "*"
 
