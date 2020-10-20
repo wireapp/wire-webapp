@@ -1558,10 +1558,10 @@
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.2.12.tgz#6160ae454cd89dae05adc3bb97997f488b608201"
   integrity sha512-aN5IAC8QNtSUdQzxu7lGBgYAOuU1tmRU4c9dIq5OKGf/SBVjXo+ffM2wEjudAWbgpOhy60nLoAGH1xm8fpCKFQ==
 
-"@types/cheerio@*":
-  version "0.22.13"
-  resolved "https://registry.yarnpkg.com/@types/cheerio/-/cheerio-0.22.13.tgz#5eecda091a24514185dcba99eda77e62bf6523e6"
-  integrity sha512-OZd7dCUOUkiTorf97vJKwZnSja/DmHfuBAroe1kREZZTCf/tlFecwHhsOos3uVHxeKGZDwzolIrCUApClkdLuA==
+"@types/cheerio@*", "@types/cheerio@^0.22.22":
+  version "0.22.22"
+  resolved "https://registry.yarnpkg.com/@types/cheerio/-/cheerio-0.22.22.tgz#ae71cf4ca59b8bbaf34c99af7a5d6c8894988f5f"
+  integrity sha512-05DYX4zU96IBfZFY+t3Mh88nlwSMtmmzSYaQkKN48T495VV1dkHSah6qYyDTN5ngaS0i0VonH37m+RuzSM0YiA==
   dependencies:
     "@types/node" "*"
 
@@ -1603,10 +1603,10 @@
   resolved "https://registry.yarnpkg.com/@types/emscripten/-/emscripten-1.39.3.tgz#cac2f24b4739c344c42f928a4c1af1aab245364e"
   integrity sha512-F+LPHVwVWp6bkhRq7sMdW0JsQMXd5ZuPbjwU/X6HaAtvIjRmYL2z4BCIopnBRcrzZLorVFf8gxY/GR7szLuPEw==
 
-"@types/enzyme@3.10.6":
-  version "3.10.6"
-  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.6.tgz#a34a6b09ff732be29c194dc8d786555f4717fd85"
-  integrity sha512-Jxyn2U+UfhmrE7EaeZYfV1sPA5OEDuZmg9Lxj8TxOnfCn71flf0Cn1136LWdCVYj7yapLFmUWqKCcgplWNZCJg==
+"@types/enzyme@3.10.7`":
+  version "3.10.7"
+  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.7.tgz#ebdf3b972d293095e09af479e36c772025285e3a"
+  integrity sha512-J+0wduPGAkzOvW7sr6hshGv1gBI3WXLRTczkRKzVPxLP3xAkYxZmvvagSBPw8Z452fZ8TGUxCmAXcb44yLQksw==
   dependencies:
     "@types/cheerio" "*"
     "@types/react" "*"
@@ -1824,10 +1824,10 @@
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
 
-"@types/open-graph@0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@types/open-graph/-/open-graph-0.2.0.tgz#bd042547407bc14746402e7afc75bf1b64ef017a"
-  integrity sha512-k+xscjmkzff9Qi63AEC1bv204RGIjxQcV26VJazNiDHnigcu5mtjyVdYGsnnS+zvW5PGBbVQvbf/lZ8j6lMQ6g==
+"@types/open-graph@0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@types/open-graph/-/open-graph-0.2.1.tgz#8df5b19fd989dcfaf585c8424b1045917e365cd1"
+  integrity sha512-aeYCgwuHb1/EzgLTAHD9P1yOo/FzsExcKkyctp2GMNoVJ70ktnHmuWXIBUCeDprnvgD3/AqhVQTaDqtum7G4yg==
   dependencies:
     "@types/cheerio" "*"
 
@@ -5718,11 +5718,12 @@ enzyme-shallow-equal@^1.0.1, enzyme-shallow-equal@^1.0.4:
     has "^1.0.3"
     object-is "^1.1.2"
 
-enzyme-to-json@3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/enzyme-to-json/-/enzyme-to-json-3.5.0.tgz#3d536f1e8fb50d972360014fe2bd64e6a672f7dd"
-  integrity sha512-clusXRsiaQhG7+wtyc4t7MU8N3zCOgf4eY9+CeSenYzKlFST4lxerfOvnWd4SNaToKhkuba+w6m242YpQOS7eA==
+enzyme-to-json@3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/enzyme-to-json/-/enzyme-to-json-3.6.1.tgz#d60740950bc7ca6384dfe6fe405494ec5df996bc"
+  integrity sha512-15tXuONeq5ORoZjV/bUo2gbtZrN2IH+Z6DvL35QmZyKHgbY1ahn6wcnLd9Xv9OjiwbAXiiP8MRZwbZrCv1wYNg==
   dependencies:
+    "@types/cheerio" "^0.22.22"
     lodash "^4.17.15"
     react-is "^16.12.0"
 
