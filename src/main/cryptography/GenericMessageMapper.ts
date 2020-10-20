@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/event/';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import logdown from 'logdown';
 import {

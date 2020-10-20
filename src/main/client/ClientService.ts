@@ -18,8 +18,8 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {LoginData, PreKey} from '@wireapp/api-client/dist/auth/';
-import {ClientClassification, ClientType, NewClient, RegisteredClient} from '@wireapp/api-client/dist/client/';
+import {LoginData, PreKey} from '@wireapp/api-client/src/auth/';
+import {ClientClassification, ClientType, NewClient, RegisteredClient} from '@wireapp/api-client/src/client/';
 import {CRUDEngine} from '@wireapp/store-engine';
 import {CryptographyService} from '../cryptography/';
 import {ClientInfo} from './';

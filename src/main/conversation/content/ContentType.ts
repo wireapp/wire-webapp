@@ -17,7 +17,7 @@
  *
  */
 
-import {Connection} from '@wireapp/api-client/dist/connection/';
+import {Connection} from '@wireapp/api-client/src/connection/';
 import {ClientActionType} from '../';
 import {
   AssetContent,

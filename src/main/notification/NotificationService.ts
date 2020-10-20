@@ -18,8 +18,8 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import * as Events from '@wireapp/api-client/dist/event';
-import {Notification} from '@wireapp/api-client/dist/notification/';
+import * as Events from '@wireapp/api-client/src/event';
+import {Notification} from '@wireapp/api-client/src/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {EventEmitter} from 'events';
 

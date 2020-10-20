@@ -27,11 +27,11 @@ import {
   NewOTRMessage,
   OTRRecipients,
   UserClients,
-} from '@wireapp/api-client/dist/conversation/';
-import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/dist/conversation/data/';
-import {ConversationMemberLeaveEvent} from '@wireapp/api-client/dist/event/';
-import {StatusCode} from '@wireapp/api-client/dist/http/';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user/';
+} from '@wireapp/api-client/src/conversation/';
+import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data/';
+import {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event/';
+import {StatusCode} from '@wireapp/api-client/src/http/';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {
   Asset,
   ButtonAction,

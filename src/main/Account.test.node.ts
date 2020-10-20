@@ -18,11 +18,11 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {AuthAPI, Context} from '@wireapp/api-client/dist/auth';
-import {ClientAPI, ClientType} from '@wireapp/api-client/dist/client';
-import {ConversationAPI} from '@wireapp/api-client/dist/conversation';
-import {BackendErrorLabel, StatusCode} from '@wireapp/api-client/dist/http';
-import {Notification, NotificationAPI} from '@wireapp/api-client/dist/notification';
+import {AuthAPI, Context} from '@wireapp/api-client/src/auth';
+import {ClientAPI, ClientType} from '@wireapp/api-client/src/client';
+import {ConversationAPI} from '@wireapp/api-client/src/conversation';
+import {BackendErrorLabel, StatusCode} from '@wireapp/api-client/src/http';
+import {Notification, NotificationAPI} from '@wireapp/api-client/src/notification';
 import {ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 

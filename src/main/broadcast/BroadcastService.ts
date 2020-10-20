@@ -18,8 +18,8 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {NewOTRMessage, OTRRecipients} from '@wireapp/api-client/dist/conversation/';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user/';
+import {NewOTRMessage, OTRRecipients} from '@wireapp/api-client/src/conversation/';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {ConversationService} from '../conversation/';
 import {CryptographyService} from '../cryptography/';
