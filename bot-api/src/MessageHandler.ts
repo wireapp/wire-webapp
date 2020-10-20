@@ -17,10 +17,10 @@
  *
  */
 
-import {Conversation} from '@wireapp/api-client/dist/conversation';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/dist/conversation/data';
-import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/dist/event';
-import {User} from '@wireapp/api-client/dist/user/';
+import {Conversation} from '@wireapp/api-client/src/conversation';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data';
+import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
+import {User} from '@wireapp/api-client/src/user/';
 import {Account} from '@wireapp/core';
 import {PayloadBundle, ReactionType, UserClientsMap} from '@wireapp/core/dist/conversation/';
 import {

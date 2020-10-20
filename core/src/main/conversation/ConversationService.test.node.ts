@@ -17,8 +17,8 @@
  *
  */
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/dist/client';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user';
+import {ClientType} from '@wireapp/api-client/src/client';
+import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Account} from '../Account';

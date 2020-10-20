@@ -66,14 +66,14 @@
     "src"
   ],
   "license": "GPL-3.0",
-  "main": "dist/APIClient.js",
+  "main": "src/APIClient",
   "name": "@wireapp/api-client",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client",
   "scripts": {
     "build": "yarn build:node && yarn build:browser",
     "build:browser": "webpack --config ./webpack.browser.js",
     "build:node": "tsc",
-    "clean": "rimraf dist",
+    "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
     "coverage": "istanbul cover --report html ./node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clean && yarn build",
     "start": "yarn build:node && concurrently \"tsc -w\" \"webpack -w\" \"browser-sync start -c bs-config.js\"",

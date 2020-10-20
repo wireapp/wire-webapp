@@ -19,8 +19,8 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/dist/auth/';
-import {ClientType} from '@wireapp/api-client/dist/client/';
+import {LoginData} from '@wireapp/api-client/src/auth/';
+import {ClientType} from '@wireapp/api-client/src/client/';
 import * as path from 'path';
 import {MessageData, TravisBot} from './';
 

@@ -1,6 +1,6 @@
 import {APIClient} from '@wireapp/api-client';
-import {LoginData} from '@wireapp/api-client/dist/auth';
-import {ClientType} from '@wireapp/api-client/dist/client';
+import {LoginData} from '@wireapp/api-client/src/auth';
+import {ClientType} from '@wireapp/api-client/src/client';
 import {Account} from '../main/Account';
 import {PayloadBundleType} from '../main/conversation';
 import {ButtonActionContent, ButtonActionConfirmationContent} from '../main/conversation/content';

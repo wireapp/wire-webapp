@@ -19,7 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {Runtime} from '@wireapp/commons';
-import {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
+import {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
 
 export class AccountService {
   constructor(private readonly apiClient: APIClient) {}

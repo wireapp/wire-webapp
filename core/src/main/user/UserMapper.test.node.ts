@@ -17,8 +17,8 @@
  *
  */
 
-import {Connection, ConnectionStatus} from '@wireapp/api-client/dist/connection';
-import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/dist/event';
+import {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection';
+import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/src/event';
 
 import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
 import {UserMapper} from './UserMapper';

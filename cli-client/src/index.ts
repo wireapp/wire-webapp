@@ -18,8 +18,8 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {ClientType, RegisteredClient} from '@wireapp/api-client/dist/client/';
-import {BackendErrorLabel} from '@wireapp/api-client/dist/http/';
+import {ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import {Account} from '@wireapp/core';
 import {PayloadBundleType} from '@wireapp/core/dist/conversation/';
 import {FileEngine} from '@wireapp/store-engine-fs';

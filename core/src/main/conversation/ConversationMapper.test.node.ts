@@ -23,7 +23,7 @@ import {
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
   ConversationTypingEvent,
-} from '@wireapp/api-client/dist/event';
+} from '@wireapp/api-client/src/event';
 
 import {
   CONVERSATION_TYPING,
@@ -31,7 +31,7 @@ import {
   ConversationMessageTimerUpdateData,
   ConversationRenameData,
   ConversationTypingData,
-} from '@wireapp/api-client/dist/conversation/data';
+} from '@wireapp/api-client/src/conversation/data';
 import {ConversationMapper} from './ConversationMapper';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from './message/PayloadBundle';
 
