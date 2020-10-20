@@ -7,7 +7,7 @@
     "@types/jasmine": "3.5.14",
     "@types/karma": "5.0.0",
     "@types/node": "~12",
-    "@wireapp/store-engine": "4.5.12",
+    "@wireapp/store-engine": "4.5.13",
     "del-cli": "3.0.1",
     "jasmine": "3.5.0",
     "karma": "5.1.0",
@@ -25,7 +25,7 @@
   ],
   "license": "GPL-3.0",
   "main": "src/index",
-  "name": "@wireapp/store-engine-bro-fs", 
+  "name": "@wireapp/store-engine-bro-fs",
   "peerDependencies": {
     "@wireapp/store-engine": "4.x.x"
   },
@@ -38,5 +38,5 @@
     "test": "yarn build && karma start",
     "test:project": "yarn build && yarn test"
   },
-  "version": "1.3.17"
+  "version": "1.3.18"
 }
