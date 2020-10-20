@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@1.1.3...@wireapp/copy-config@1.1.4) (2020-10-20)
+
+
+### Bug Fixes
+
+* **copy-config:** CLI path ([#3282](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/3282)) ([118eac6](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/118eac62ac65390692b5d8631eaf9448ccad6381))
+
+
+
+
+
 ## [1.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@1.1.2...@wireapp/copy-config@1.1.3) (2020-10-19)
 
 **Note:** Version bump only for package @wireapp/copy-config
