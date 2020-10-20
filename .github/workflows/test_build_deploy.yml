@@ -32,8 +32,6 @@ jobs:
           fetch-depth: 0
 
       - name: Set environment variables
-        env:
-          GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
           echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
