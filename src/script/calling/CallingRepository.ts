@@ -1375,16 +1375,15 @@ export class CallingRepository {
   private showNoAudioInputModal(): void {
     const modalOptions = {
       primaryAction: {
-        text: 'Okay',
+        text: t('modalAcknowledgeAction'),
       },
       secondaryAction: {
         action: () => amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV),
-        text: 'Go to preferences',
+        text: t('modalNoAudioInputAction'),
       },
       text: {
-        message:
-          'You can only listen to this call but not talk since Wire cannot find any audio input device connected to your system. You can plug in a device at any time or participate in the call silently. Please go to Preferences to find out more about your audio configuration.',
-        title: 'Disabled microphone',
+        message: t('modalNoAudioInputMessage'),
+        title: t('modalNoAudioInputTitle'),
       },
     };
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, modalOptions);
