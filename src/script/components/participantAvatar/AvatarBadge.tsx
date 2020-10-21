@@ -44,6 +44,7 @@ const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state}) => {
         color: '#fff',
       }}
       data-uie-name="element-avatar-user-badge-icon"
+      data-uie-value={state}
     />
   );
 };
