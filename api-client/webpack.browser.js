@@ -59,7 +59,7 @@ module.exports = {
   plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],
   resolve: {
     alias: {
-      '@wireapp/react-ui-kit': path.resolve(__dirname, '..', 'react-ui-kit', 'dist'),
+      '@wireapp/react-ui-kit': path.resolve(__dirname, '..', 'react-ui-kit', 'src'),
     },
     extensions: ['.js', '.ts', '.jsx'],
   },
