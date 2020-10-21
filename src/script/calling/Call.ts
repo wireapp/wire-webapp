@@ -25,7 +25,6 @@ import type {Participant, UserId, ClientId} from './Participant';
 export type ConversationId = string;
 
 export class Call {
-  public hasWorkingAudioInput: boolean;
   public readonly conversationId: ConversationId;
   public readonly initiator: UserId;
   public readonly reason: ko.Observable<number | undefined>;
@@ -54,7 +53,7 @@ export class Call {
     initiator: UserId,
     conversationId: ConversationId,
     conversationType: CONV_TYPE,
-    selfParticipant: Participant,
+    private readonly selfParticipant: Participant,
     callType: CALL_TYPE,
   ) {
     this.initiator = initiator;
@@ -67,8 +66,10 @@ export class Call {
     this.reason = ko.observable();
     this.startedAt = ko.observable();
     this.isCbrEnabled = ko.observable(false);
-    // TODO: Also set to "true" once new audio devices are plugged in
-    this.hasWorkingAudioInput = true;
+  }
+
+  get hasWorkingAudioInput(): boolean {
+    return !!this.selfParticipant.audioStream();
   }
 
   getSelfParticipant(): Participant {
