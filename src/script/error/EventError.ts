@@ -30,6 +30,7 @@ enum EVENT_ERROR_TYPE {
   OUTDATED_E_CALL_EVENT = 'OUTDATED_E_CALL_EVENT',
   REQUEST_FAILURE = 'REQUEST_FAILURE',
   VALIDATION_FAILED = 'VALIDATION_FAILED',
+  WEBSOCKET_DISCONNECT = 'WEBSOCKET_DISCONNECT',
 }
 
 export class EventError extends BaseError {
@@ -49,6 +50,7 @@ export class EventError extends BaseError {
       OUTDATED_E_CALL_EVENT: 'Ignoring outdated e-call event',
       REQUEST_FAILURE: 'Event related backend request failure',
       VALIDATION_FAILED: 'Event failed validation',
+      WEBSOCKET_DISCONNECT: 'Websocket disconnect during notification stream processing',
     };
   }
 
@@ -64,6 +66,7 @@ export class EventError extends BaseError {
       OUTDATED_E_CALL_EVENT: EVENT_ERROR_TYPE.OUTDATED_E_CALL_EVENT,
       REQUEST_FAILURE: EVENT_ERROR_TYPE.REQUEST_FAILURE,
       VALIDATION_FAILED: EVENT_ERROR_TYPE.VALIDATION_FAILED,
+      WEBSOCKET_DISCONNECT: EVENT_ERROR_TYPE.WEBSOCKET_DISCONNECT,
     };
   }
 }

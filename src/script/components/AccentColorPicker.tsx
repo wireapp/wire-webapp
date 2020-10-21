@@ -43,6 +43,8 @@ const AccentColorPicker: React.FunctionComponent<AccentColorPickerProps> = ({use
         return (
           <label
             key={accentColor.id}
+            data-uie-name="element-accent-color-label"
+            data-uie-value={accentColor.id}
             css={{
               '::after': {
                 ...CSS_SQUARE(isChecked ? 16 : 12),

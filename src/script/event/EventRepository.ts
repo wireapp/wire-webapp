@@ -25,6 +25,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 import type {Notification} from '@wireapp/api-client/dist/notification';
+import {AbortHandler} from '@wireapp/api-client/dist/tcp/';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -159,15 +160,17 @@ export class EventRepository {
     this.webSocketService.clientId = this.currentClient().id;
     return this.webSocketService.connect(
       notification => this.handleNotification(notification),
-      async () => {
+      async (abortHandler: AbortHandler) => {
         try {
+          this.webSocketService.lockWebsocket();
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
           amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
-          await this.initializeFromStream();
+          await this.initializeFromStream(abortHandler);
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           this.logger.info(`Done handling '${this.notificationsTotal}' notifications from the stream`);
+          this.webSocketService.unlockWebsocket();
         } catch (error) {
-          this.logger.warn('Unable to connect websocket', error);
+          this.logger.warn('Error while processing notification stream', error);
         } finally {
           amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
         }
@@ -203,8 +206,12 @@ export class EventRepository {
    * @param [limit=EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX] Max. number of notifications to retrieve from backend at once
    * @returns Resolves when all new notifications from the stream have been handled
    */
-  private async getNotifications(notificationId: string, limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX) {
-    const processNotifications = async (notifications: Notification[]) => {
+  private async getNotifications(
+    notificationId: string,
+    limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX,
+    abortHandler: AbortHandler,
+  ) {
+    const processNotifications = async (notifications: Notification[], abortHandler: AbortHandler) => {
       if (notifications.length <= 0) {
         this.logger.info(`No notifications found since '${notificationId}'`);
         return notificationId;
@@ -216,6 +223,12 @@ export class EventRepository {
       this.logger.info(`Processing '${notifications.length}' notifications`);
       for (const notification of notifications) {
         await this.handleNotification(notification);
+
+        // Abort notification stream handling due to websocket disconnect
+        // We'll start processing from the last processed notification when the websocket reconnects
+        if (abortHandler.isAborted()) {
+          throw new EventError(EventError.TYPE.WEBSOCKET_DISCONNECT, EventError.MESSAGE.WEBSOCKET_DISCONNECT);
+        }
       }
 
       notificationId = notifications[notifications.length - 1].id;
@@ -228,14 +241,14 @@ export class EventRepository {
         this.currentClient().id,
         notificationId,
       );
-      return processNotifications(notificationList);
+      return processNotifications(notificationList, abortHandler);
     } catch (errorResponse) {
       // When asking for /notifications with a `since` set to a notification ID that the backend doesn't know of (because it does not belong to our client or it is older than the lifetime of the notification stream),
       // we will receive a HTTP 404 status code with a `notifications` payload
       // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
       if (errorResponse.response?.notifications) {
         this.triggerMissedSystemEventMessageRendering();
-        return processNotifications(errorResponse.response?.notifications);
+        return processNotifications(errorResponse.response?.notifications, abortHandler);
       }
 
       const isNotFound = errorResponse.response?.status === HTTP_STATUS.NOT_FOUND;
@@ -289,10 +302,10 @@ export class EventRepository {
    * Set state for notification stream.
    * @returns Resolves when all notifications have been handled
    */
-  private async initializeFromStream() {
+  private async initializeFromStream(abortHandler: AbortHandler) {
     try {
       const {notificationId} = await this.getStreamState();
-      return this.updateFromStream(notificationId);
+      return this.updateFromStream(notificationId, abortHandler);
     } catch (error) {
       const isNoLastId = error.type === EventError.TYPE.NO_LAST_ID;
       if (isNoLastId) {
@@ -369,12 +382,13 @@ export class EventRepository {
    * @param lastNotificationId Last known notification ID to start update from
    * @returns Resolves with the total number of notifications
    */
-  private async updateFromStream(lastNotificationId: string) {
+  private async updateFromStream(lastNotificationId: string, abortHandler: AbortHandler) {
     this.notificationsTotal = 0;
     try {
       const updatedLastNotificationId = await this.getNotifications(
         lastNotificationId,
         EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL,
+        abortHandler,
       );
       if (updatedLastNotificationId) {
         this.logger.info(`ID of last notification fetched from stream is '${updatedLastNotificationId}'`);
