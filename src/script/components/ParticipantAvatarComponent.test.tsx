@@ -17,7 +17,7 @@
  *
  */
 
-import ParticipantAvatar, {AVATAR_SIZE, ParticipantAvatarProps} from './ParticipantAvatarComponent';
+import ParticipantAvatar, {AVATAR_SIZE, ParticipantAvatarProps, STATE} from './ParticipantAvatarComponent';
 import TestPage from 'Util/test/TestPage';
 import {User} from '../entity/User';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -27,16 +27,18 @@ class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
     super(ParticipantAvatar, props);
   }
 
-  getAvatar = () => this.get('.participant-avatar');
+  getUserAvatar = () => this.get('div[data-uie-name="user-avatar"]');
+  getServiceAvatar = () => this.get('div[data-uie-name="service-avatar"]');
   getInitials = () => this.get('div[data-uie-name="element-avatar-initials"]');
   getServiceIcon = () => this.get('div[data-uie-name="element-avatar-service-icon"]');
-  getUserBadgeIcon = () => this.get('div[data-uie-name="element-avatar-user-badge-icon"]');
+  getUserBadgeIcon = (state?: STATE) =>
+    this.get(`div[data-uie-name="element-avatar-user-badge-icon"]${state ? `[data-uie-value="${state}"]` : ''}`);
   getGuestExpirationCircle = () => this.get('svg[data-uie-name="element-avatar-guest-expiration-circle"]');
 
-  clickAvatar = () => this.click(this.getAvatar());
+  clickUserAvatar = () => this.click(this.getUserAvatar());
 }
 
-describe('ParticipantAvatar', () => {
+fdescribe('ParticipantAvatar', () => {
   it('executes onClick with current participant', async () => {
     const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
@@ -48,7 +50,7 @@ describe('ParticipantAvatar', () => {
       participant,
     });
 
-    participantAvatar.clickAvatar();
+    participantAvatar.clickUserAvatar();
 
     expect(participantAvatar.getProps().clickHandler).toHaveBeenCalledWith(
       participantAvatar.getProps().participant,
@@ -86,7 +88,7 @@ describe('ParticipantAvatar', () => {
       expect(participantAvatar.getInitials().text()).toBe('A');
     });
 
-    it('shows avatar badge', async () => {
+    it('does not show avatar badge in default state', async () => {
       const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
       const participant = new User('id');
       participant.name('Anton Bertha');
@@ -96,7 +98,35 @@ describe('ParticipantAvatar', () => {
         participant: participant,
       });
 
-      expect(participantAvatar.getUserBadgeIcon().exists()).toBe(true);
+      expect(participantAvatar.getUserBadgeIcon().exists()).toBe(false);
+    });
+
+    it('shows avatar badge for blocked user', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const participant = new User('id');
+      participant.name('Anton Bertha');
+      (participant as any).isBlocked = () => true;
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: participant,
+      });
+
+      expect(participantAvatar.getUserBadgeIcon(STATE.BLOCKED).exists()).toBe(true);
+    });
+
+    it('shows avatar badge for connection request', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const participant = new User('id');
+      participant.name('Anton Bertha');
+      (participant as any).isRequest = () => true;
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: participant,
+      });
+
+      expect(participantAvatar.getUserBadgeIcon(STATE.PENDING).exists()).toBe(true);
     });
   });
 
@@ -129,6 +159,35 @@ describe('ParticipantAvatar', () => {
       expect(participantAvatar.getInitials().exists()).toBe(true);
       expect(participantAvatar.getInitials().text()).toBe('AB');
     });
+
+    it('does not show avatar badge in default state', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const participant = new User('id');
+      participant.name('Anton Bertha');
+      participant.isTemporaryGuest(true);
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: participant,
+      });
+
+      expect(participantAvatar.getUserBadgeIcon().exists()).toBe(false);
+    });
+
+    it('shows avatar badge for blocked user', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const participant = new User('id');
+      participant.name('Anton Bertha');
+      participant.isTemporaryGuest(true);
+      (participant as any).isBlocked = () => true;
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: participant,
+      });
+
+      expect(participantAvatar.getUserBadgeIcon(STATE.BLOCKED).exists()).toBe(true);
+    });
   });
 
   describe('for a Service', () => {
@@ -157,6 +216,20 @@ describe('ParticipantAvatar', () => {
       });
 
       expect(participantAvatar.getInitials().exists()).toBe(false);
+    });
+
+    it('does not show avatar badge', async () => {
+      const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+      const service = new User('id');
+      service.name('Anton Bertha');
+      service.isService = true;
+
+      const participantAvatar = new ParticipantAvatarPage({
+        assetRepository: assetRepoSpy,
+        participant: service,
+      });
+
+      expect(participantAvatar.getUserBadgeIcon().exists()).toBe(false);
     });
   });
 });

@@ -43,7 +43,7 @@ export enum AVATAR_SIZE {
   XXX_SMALL = 'avatar-xxxs',
 }
 
-enum STATE {
+export enum STATE {
   BLOCKED = 'blocked',
   IGNORED = 'ignored',
   NONE = '',
@@ -259,6 +259,7 @@ const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state}) => {
         color: '#fff',
       }}
       data-uie-name="element-avatar-user-badge-icon"
+      data-uie-value={state}
     />
   );
 };
