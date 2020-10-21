@@ -76,16 +76,17 @@ const INITIALS_SIZE = {
 export interface ParticipantAvatarProps {
   assetRepository: AssetRepository;
   clickHandler?: (participant: User, target: Node) => void;
-  noBadge: boolean;
+  noBadge?: boolean;
+  noFilter?: boolean;
   participant: User;
   size?: AVATAR_SIZE;
 }
 interface AvatarImageProps {
   assetRepository: AssetRepository;
   borderRadius?: string;
-  isGrey: boolean;
+  isGrey?: boolean;
   participant: User;
-  size?: AVATAR_SIZE;
+  size: AVATAR_SIZE;
 }
 
 interface AvatarInitialsProps {
@@ -101,6 +102,7 @@ interface AvatarBorderProps {
 interface UserAvatarProps {
   assetRepository: AssetRepository;
   noBadge: boolean;
+  noFilter: boolean;
   participant: User;
   size: AVATAR_SIZE;
   state: STATE;
@@ -128,7 +130,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   participant,
   borderRadius = '50%',
   size,
-  isGrey,
+  isGrey = false,
 }) => {
   const [avatarImage, setAvatarImage] = useState('');
   let avatarLoadingBlocked = false;
@@ -287,13 +289,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
           dangerouslySetInnerHTML={{__html: SVGProvider['service-icon']?.documentElement?.innerHTML}}
         ></svg>
       </div>
-      <AvatarImage
-        assetRepository={assetRepository}
-        participant={participant}
-        borderRadius="20%"
-        size={size}
-        isGrey={false}
-      />
+      <AvatarImage assetRepository={assetRepository} participant={participant} borderRadius="20%" size={size} />
       <AvatarBorder borderRadius="20%" />
     </>
   );
@@ -304,6 +300,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
   size,
   participant,
   noBadge,
+  noFilter,
   state,
 }) => {
   const borderScale = 0.9916;
@@ -315,7 +312,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
   const borderRadius = (16 - borderWidth / 2) * borderScale;
   const timerLength = borderRadius * Math.PI * 2;
   const timerOffset = timerLength * (normalizedRemainingTime - 1);
-  const isImageGrey = [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
+  const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
 
   return (
     <>
@@ -348,8 +345,15 @@ const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
   );
 };
 
-const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({assetRepository, participant, size, noBadge, state}) => {
-  const isImageGrey = [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
+const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
+  assetRepository,
+  participant,
+  size,
+  noBadge,
+  noFilter,
+  state,
+}) => {
+  const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   return (
     <>
       <AvatarBackground backgroundColor={state === STATE.UNKNOWN ? COLOR.GRAY : undefined} />
@@ -366,6 +370,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   participant,
   clickHandler,
   noBadge = false,
+  noFilter = false,
   size = AVATAR_SIZE.LARGE,
 }) => {
   const isUser = participant instanceof User && !participant.isService && !participant.isTemporaryGuest();
@@ -419,6 +424,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
           size={size}
           assetRepository={assetRepository}
           noBadge={noBadge}
+          noFilter={noFilter}
           participant={participant}
           state={avatarState}
         />
@@ -428,6 +434,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
         <TemporaryGuestAvatar
           assetRepository={assetRepository}
           noBadge={noBadge}
+          noFilter={noFilter}
           participant={participant}
           state={avatarState}
           size={size}
@@ -441,7 +448,7 @@ export default ParticipantAvatar;
 
 registerReactComponent('participant-avatar', {
   component: ParticipantAvatar,
-  optionalParams: ['size', 'click', 'noBadge'],
+  optionalParams: ['size', 'click', 'noBadge', 'noFilter'],
   template:
-    '<span data-bind="react: {participant: ko.unwrap(participant), size, clickHandler: click, noBadge}"></span>',
+    '<span data-bind="react: {participant: ko.unwrap(participant), size, clickHandler: click, noBadge, noFilter}"></span>',
 });

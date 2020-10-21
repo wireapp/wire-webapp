@@ -642,9 +642,8 @@ const memberTemplate: string = `
       <!-- ko ifnot: message.otherUser().isService -->
         <span class="message-connected-username label-username" data-bind='text: message.otherUser().username()'></span>
       <!-- /ko -->
-      <participant-avatar class="message-connected-avatar avatar-no-badge cursor-default"
-                   data-bind="css: {'avatar-no-badge': message.otherUser().isOutgoingRequest()}"
-                   params="participant: message.otherUser, size: AVATAR_SIZE.X_LARGE"></participant-avatar>
+      <participant-avatar class="message-connected-avatar cursor-default"
+                   params="participant: message.otherUser, size: AVATAR_SIZE.X_LARGE, noBadge: message.otherUser().isOutgoingRequest()"></participant-avatar>
       <!-- ko if: message.otherUser().isOutgoingRequest() -->
         <div class="message-connected-cancel accent-text"
              data-bind="click: () => onClickCancelRequest(message),
