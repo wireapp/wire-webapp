@@ -5,10 +5,10 @@
     "noImplicitAny": false,
     "noImplicitReturns": false,
     "noUnusedLocals": false,
-    "outDir": "dist",
+    "outDir": "src",
     "rootDir": "src",
     "strict": false
   },
-  "exclude": ["dist", "node_modules"],
+  "exclude": ["node_modules", "src/**/*.test.ts", "src/**/*.test.tsx", "src/test/**/*"],
   "extends": "../../tsconfig.json"
 }
