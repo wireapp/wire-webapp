@@ -38,7 +38,7 @@ class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
   clickUserAvatar = () => this.click(this.getUserAvatar());
 }
 
-fdescribe('ParticipantAvatar', () => {
+describe('ParticipantAvatar', () => {
   it('executes onClick with current participant', async () => {
     const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
