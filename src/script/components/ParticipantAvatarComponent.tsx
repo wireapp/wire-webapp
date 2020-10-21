@@ -17,21 +17,19 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
-import {Transition} from 'react-transition-group';
-import {CSSObject} from '@emotion/serialize';
-import {COLOR} from '@wireapp/react-ui-kit';
+import React from 'react';
 
-import {getFirstChar} from 'Util/StringUtil';
-import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON, CSS_SQUARE} from 'Util/CSSMixin';
+import {CSS_SQUARE} from 'Util/CSSMixin';
 
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
 import {container} from 'tsyringe';
 import {registerReactComponent} from 'Util/ComponentUtil';
-import SVGProvider from '../auth/util/SVGProvider';
+
+import UserAvatar from './participantAvatar/UserAvatar';
+import ServiceAvatar from './participantAvatar/ServiceAvatar';
+import TemporaryGuestAvatar from './participantAvatar/TemporaryGuestAvatar';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -43,7 +41,7 @@ export enum AVATAR_SIZE {
   XXX_SMALL = 'avatar-xxxs',
 }
 
-enum STATE {
+export enum STATE {
   BLOCKED = 'blocked',
   IGNORED = 'ignored',
   NONE = '',
@@ -53,7 +51,7 @@ enum STATE {
   UNKNOWN = 'unknown',
 }
 
-const DIAMETER = {
+export const DIAMETER = {
   [AVATAR_SIZE.LARGE]: 72,
   [AVATAR_SIZE.MEDIUM]: 40,
   [AVATAR_SIZE.SMALL]: 28,
@@ -63,7 +61,7 @@ const DIAMETER = {
   [AVATAR_SIZE.XXX_SMALL]: 16,
 };
 
-const INITIALS_SIZE = {
+export const INITIALS_SIZE = {
   [AVATAR_SIZE.LARGE]: '24px',
   [AVATAR_SIZE.MEDIUM]: '16px',
   [AVATAR_SIZE.SMALL]: '11px',
@@ -81,289 +79,6 @@ export interface ParticipantAvatarProps {
   participant: User;
   size?: AVATAR_SIZE;
 }
-interface AvatarImageProps {
-  assetRepository: AssetRepository;
-  borderRadius?: string;
-  isGrey?: boolean;
-  participant: User;
-  size: AVATAR_SIZE;
-}
-
-interface AvatarInitialsProps {
-  color?: string;
-  initials: string;
-  size: AVATAR_SIZE;
-}
-
-interface AvatarBorderProps {
-  borderRadius?: string;
-}
-
-interface UserAvatarProps {
-  assetRepository: AssetRepository;
-  noBadge: boolean;
-  noFilter: boolean;
-  participant: User;
-  size: AVATAR_SIZE;
-  state: STATE;
-}
-
-interface ServiceAvatarProps {
-  assetRepository: AssetRepository;
-  participant: User;
-  size: AVATAR_SIZE;
-}
-
-interface AvatarBackgroundProps {
-  backgroundColor?: string;
-  borderRadius?: string;
-}
-
-const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
-  const isTooSmall = [AVATAR_SIZE.X_SMALL, AVATAR_SIZE.XX_SMALL, AVATAR_SIZE.XXX_SMALL].includes(size);
-  const isBadgeState = [STATE.PENDING, STATE.BLOCKED].includes(state);
-  return !isTooSmall && isBadgeState;
-};
-
-const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
-  assetRepository,
-  participant,
-  borderRadius = '50%',
-  size,
-  isGrey = false,
-}) => {
-  const [avatarImage, setAvatarImage] = useState('');
-  let avatarLoadingBlocked = false;
-  let showTransition = false;
-
-  useEffect(() => {
-    loadAvatarPicture();
-  }, [participant]);
-
-  const loadAvatarPicture = async () => {
-    if (!avatarLoadingBlocked) {
-      avatarLoadingBlocked = true;
-
-      const isSmall = size !== AVATAR_SIZE.LARGE && size !== AVATAR_SIZE.X_LARGE;
-      const loadHiRes = !isSmall && window.devicePixelRatio > 1;
-      const pictureResource: AssetRemoteData = loadHiRes
-        ? participant.mediumPictureResource()
-        : participant.previewPictureResource();
-
-      if (pictureResource) {
-        const isCached = pictureResource.downloadProgress() === 100;
-        showTransition = !isCached && !isSmall;
-        try {
-          const url = await assetRepository.getObjectUrl(pictureResource);
-          if (url) {
-            setAvatarImage(url);
-          }
-          avatarLoadingBlocked = false;
-        } catch (error) {
-          console.warn('Failed to load avatar picture.', error);
-        }
-      } else {
-        avatarLoadingBlocked = false;
-      }
-    }
-  };
-
-  const transitionImageStyles: Record<string, CSSObject> = {
-    entered: {opacity: 1, transform: 'scale(1)'},
-    entering: {opacity: 0, transform: 'scale(0.88)'},
-  };
-
-  return (
-    <Transition in={!!avatarImage} timeout={showTransition ? 700 : 0}>
-      {(state: string) => (
-        <img
-          css={{
-            ...CSS_FILL_PARENT,
-            borderRadius,
-            filter: isGrey ? 'grayscale(100%)' : 'none',
-            height: '100%',
-            objectFit: 'cover',
-            opacity: 0,
-            overflow: 'hidden',
-            transform: 'scale(0.88)',
-            transition: showTransition ? 'all 0.55s cubic-bezier(0.165, 0.84, 0.44, 1) 0.15s' : 'none',
-            width: '100%',
-            ...transitionImageStyles[state],
-          }}
-          src={avatarImage}
-        />
-      )}
-    </Transition>
-  );
-};
-
-const AvatarInitials: React.FunctionComponent<AvatarInitialsProps> = ({size, initials, color = '#fff'}) => (
-  <div
-    css={{
-      ...CSS_FILL_PARENT,
-      color,
-      fontSize: INITIALS_SIZE[size],
-      lineHeight: `${DIAMETER[size]}px`,
-      textAlign: 'center',
-      userSelect: 'none',
-    }}
-    data-uie-name="element-avatar-initials"
-  >
-    {size === AVATAR_SIZE.X_SMALL ? getFirstChar(initials) : initials}
-  </div>
-);
-
-const AvatarBackground: React.FunctionComponent<AvatarBackgroundProps> = ({
-  borderRadius = '50%',
-  backgroundColor = 'currentColor',
-}) => (
-  <div
-    css={{
-      ...CSS_FILL_PARENT,
-      backgroundColor,
-      borderRadius,
-      transform: 'scale(0.9916)',
-    }}
-  />
-);
-
-const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({borderRadius = '50%'}) => (
-  <div
-    css={{
-      ...CSS_FILL_PARENT,
-      border: '1px solid rgba(0, 0, 0, 0.08)',
-      borderRadius,
-    }}
-  />
-);
-
-interface AvatarBadgeProps {
-  state: STATE;
-}
-
-const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state}) => {
-  const icons: Record<string, string> = {
-    [STATE.PENDING]: '\\e165',
-    [STATE.BLOCKED]: '\\e104',
-  };
-  return (
-    <div
-      css={{
-        ...CSS_FILL_PARENT,
-        ...CSS_FLEX_CENTER,
-        '&::before': {
-          ...CSS_ICON(icons[state]),
-        },
-        backgroundColor: 'rgba(0, 0, 0, .56)',
-        borderRadius: '50%',
-        color: '#fff',
-      }}
-      data-uie-name="element-avatar-user-badge-icon"
-    />
-  );
-};
-
-const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetRepository, participant, size}) => {
-  return (
-    <>
-      <AvatarBackground borderRadius="20%" />
-      <div
-        css={{
-          ...CSS_FILL_PARENT,
-          alignItems: 'center',
-          borderRadius: '20%',
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-        data-uie-name="element-avatar-service-icon"
-      >
-        <svg
-          width={32}
-          height={32}
-          css={{
-            '& > path': {
-              fill: 'var(--background-fade-24)',
-            },
-            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(size) ? '100%' : '60%',
-          }}
-          dangerouslySetInnerHTML={{__html: SVGProvider['service-icon']?.documentElement?.innerHTML}}
-        ></svg>
-      </div>
-      <AvatarImage assetRepository={assetRepository} participant={participant} borderRadius="20%" size={size} />
-      <AvatarBorder borderRadius="20%" />
-    </>
-  );
-};
-
-const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
-  assetRepository,
-  size,
-  participant,
-  noBadge,
-  noFilter,
-  state,
-}) => {
-  const borderScale = 0.9916;
-  const finalBorderWidth = size === AVATAR_SIZE.X_LARGE ? 4 : 1;
-  const remainingTime = participant.expirationRemaining();
-  const normalizedRemainingTime = remainingTime / User.CONFIG.TEMPORARY_GUEST.LIFETIME;
-
-  const borderWidth = (finalBorderWidth / DIAMETER[size]) * 32;
-  const borderRadius = (16 - borderWidth / 2) * borderScale;
-  const timerLength = borderRadius * Math.PI * 2;
-  const timerOffset = timerLength * (normalizedRemainingTime - 1);
-  const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
-
-  return (
-    <>
-      <AvatarBackground />
-      <AvatarInitials color="var(--background)" size={size} initials={participant.initials()} />
-      <AvatarImage assetRepository={assetRepository} participant={participant} size={size} isGrey={isImageGrey} />
-      {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
-      {!isImageGrey && <AvatarBorder />}
-      <svg
-        css={{
-          ...CSS_FILL_PARENT,
-          position: 'absolute',
-        }}
-        data-uie-name="element-avatar-guest-expiration-circle"
-        viewBox="0 0 32 32"
-        stroke={participant.accent_color()}
-      >
-        <circle
-          cx="16"
-          cy="16"
-          transform="rotate(-90 16 16)"
-          fill="none"
-          strokeDasharray={timerLength}
-          strokeDashoffset={timerOffset}
-          r={borderRadius}
-          strokeWidth={borderWidth}
-        />
-      </svg>
-    </>
-  );
-};
-
-const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
-  assetRepository,
-  participant,
-  size,
-  noBadge,
-  noFilter,
-  state,
-}) => {
-  const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
-  return (
-    <>
-      <AvatarBackground backgroundColor={state === STATE.UNKNOWN ? COLOR.GRAY : undefined} />
-      <AvatarInitials size={size} initials={participant.initials()} />
-      <AvatarImage assetRepository={assetRepository} participant={participant} size={size} isGrey={isImageGrey} />
-      {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
-      {!isImageGrey && <AvatarBorder />}
-    </>
-  );
-};
 
 const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   assetRepository = container.resolve(AssetRepository),
