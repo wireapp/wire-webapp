@@ -17,14 +17,14 @@
  *
  */
 
-import ko from 'knockout';
-import React, {useEffect, useState, useMemo} from 'react';
+import React, {useEffect, useState} from 'react';
+import {Transition} from 'react-transition-group';
+import {CSSObject} from '@emotion/serialize';
+import {COLOR} from '@wireapp/react-ui-kit';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {createRandomUuid} from 'Util/util';
 import {getFirstChar} from 'Util/StringUtil';
+import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON, CSS_SQUARE} from 'Util/CSSMixin';
 
-import {viewportObserver} from '../ui/viewportObserver';
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
@@ -53,15 +53,6 @@ enum STATE {
   UNKNOWN = 'unknown',
 }
 
-interface ParticipantAvatarParams {
-  assetRepository: AssetRepository;
-  click: (participant: User, target: Node) => void;
-  delay?: number;
-  participant?: ko.Observable<User> | User;
-  selected?: () => any;
-  size?: AVATAR_SIZE;
-}
-
 const DIAMETER = {
   [AVATAR_SIZE.LARGE]: 72,
   [AVATAR_SIZE.MEDIUM]: 40,
@@ -71,176 +62,85 @@ const DIAMETER = {
   [AVATAR_SIZE.XX_SMALL]: 20,
   [AVATAR_SIZE.XXX_SMALL]: 16,
 };
-/*
-export class ParticipantAvatarKnockout {
-  avatarEnteredViewport: boolean;
-  avatarLoadingBlocked: boolean;
-  avatarType: ko.PureComputed<string>;
-  borderRadius: number;
-  borderWidth: number;
-  cssClasses: ko.PureComputed<string>;
-  delay: number;
-  element: JQuery<HTMLElement>;
-  initials: ko.PureComputed<string>;
-  isService: ko.PureComputed<boolean>;
-  isTemporaryGuest: ko.PureComputed<boolean>;
-  isUser: ko.PureComputed<boolean>;
-  logger: Logger;
-  onClick: (data: {participant: User}, event: Event) => void;
-  participant: ko.Observable<User>;
-  participantSubscription: ko.Subscription;
-  pictureSubscription: ko.Subscription;
-  size: AVATAR_SIZE;
-  state: ko.PureComputed<STATE>;
-  timerLength: number;
-  timerOffset: ko.PureComputed<number>;
 
-  private readonly assetRepository: AssetRepository;
+const INITIALS_SIZE = {
+  [AVATAR_SIZE.LARGE]: '24px',
+  [AVATAR_SIZE.MEDIUM]: '16px',
+  [AVATAR_SIZE.SMALL]: '11px',
+  [AVATAR_SIZE.X_LARGE]: '32px',
+  [AVATAR_SIZE.X_SMALL]: '11px',
+  [AVATAR_SIZE.XX_SMALL]: '11px',
+  [AVATAR_SIZE.XXX_SMALL]: '8px',
+};
 
-  constructor(
-    {
-      assetRepository = container.resolve(AssetRepository),
-      participant,
-      delay,
-      size,
-      selected,
-      click,
-    }: ParticipantAvatarParams,
-    componentInfo: {element: HTMLElement},
-  ) {
-    this.logger = getLogger('ParticipantAvatar');
-    this.assetRepository = assetRepository;
-
-    const isParticipantObservable = typeof participant === 'function';
-    this.participant = isParticipantObservable
-      ? (participant as ko.Observable<User>)
-      : ko.observable(participant as User);
-
-    this.delay = delay;
-    this.size = size || SIZE.LARGE;
-    this.element = $(componentInfo.element);
-    this.element.addClass(`${this.avatarType()} ${this.size}`);
-
-    const borderScale = 0.9916;
-    const finalBorderWidth = this.size === AVATAR_SIZE.X_LARGE ? 4 : 1;
-    this.borderWidth = (finalBorderWidth / ParticipantAvatar.DIAMETER[this.size]) * 32;
-    this.borderRadius = (16 - this.borderWidth / 2) * borderScale;
-    this.timerLength = this.borderRadius * Math.PI * 2;
-
-    this.timerOffset = ko.pureComputed(() => {
-      if (this.isTemporaryGuest()) {
-        const remainingTime = this.participant().expirationRemaining();
-        const normalizedRemainingTime = remainingTime / User.CONFIG.TEMPORARY_GUEST.LIFETIME;
-        return this.timerLength * (normalizedRemainingTime - 1);
-      }
-      return 0;
-    });
-
-    this.avatarLoadingBlocked = false;
-    this.avatarEnteredViewport = false;
-
-    this.dispose = this.dispose.bind(this);
-
-    this.element.attr({
-      id: createRandomUuid(),
-      'user-id': this.participant().id,
-    });
-
-    this.initials = ko.pureComputed(() => {
-      if (this.isService()) {
-        return '';
-      }
-
-      return this.element.hasClass('avatar-xs')
-        ? getFirstChar(this.participant().initials())
-        : this.participant().initials();
-    });
-
-    const _loadAvatarPicture = async () => {
-      this.element.find('.avatar-image').html('');
-      this.element.removeClass('avatar-image-loaded avatar-loading-transition');
-      if (!this.avatarLoadingBlocked) {
-        this.avatarLoadingBlocked = true;
-
-        const isSmall = this.size !== AVATAR_SIZE.LARGE && this.size !== AVATAR_SIZE.X_LARGE;
-        const loadHiRes = !isSmall && window.devicePixelRatio > 1;
-        const pictureResource: AssetRemoteData = loadHiRes
-          ? this.participant().mediumPictureResource()
-          : this.participant().previewPictureResource();
-
-        if (pictureResource) {
-          const isCached = pictureResource.downloadProgress() === 100;
-
-          try {
-            const url = await this.assetRepository.getObjectUrl(pictureResource);
-            if (url) {
-              const image = new Image();
-              image.src = url;
-              this.element.find('.avatar-image').html(image as any);
-              this.element.addClass(`avatar-image-loaded ${isCached && isSmall ? '' : 'avatar-loading-transition'}`);
-            }
-            this.avatarLoadingBlocked = false;
-          } catch (error) {
-            this.logger.warn('Failed to load avatar picture.', error);
-          }
-        } else {
-          this.avatarLoadingBlocked = false;
-        }
-      }
-    };
-
-    const _onInViewport = () => {
-      this.avatarEnteredViewport = true;
-      _loadAvatarPicture();
-    };
-
-    const _loadAvatarPictureIfVisible = () => {
-      if (this.avatarEnteredViewport) {
-        _loadAvatarPicture();
-      }
-    };
-
-    viewportObserver.onElementInViewport(componentInfo.element, _onInViewport);
-
-    this.pictureSubscription = this.participant().mediumPictureResource.subscribe(_loadAvatarPictureIfVisible);
-    this.participantSubscription = this.participant.subscribe(_loadAvatarPictureIfVisible);
-  }
-
-  dispose() {
-    viewportObserver.removeElement(this.element[0]);
-    this.participantSubscription.dispose();
-    this.pictureSubscription.dispose();
-  }
-}
-*/
 export interface ParticipantAvatarProps {
   assetRepository: AssetRepository;
   clickHandler?: (participant: User, target: Node) => void;
-  delay?: number;
+  noBadge: boolean;
+  participant: User;
+  size?: AVATAR_SIZE;
+}
+interface AvatarImageProps {
+  assetRepository: AssetRepository;
+  borderRadius?: string;
+  isGrey: boolean;
   participant: User;
   size?: AVATAR_SIZE;
 }
 
-const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
-  assetRepository = container.resolve(AssetRepository),
+interface AvatarInitialsProps {
+  color?: string;
+  initials: string;
+  size: AVATAR_SIZE;
+}
+
+interface AvatarBorderProps {
+  borderRadius?: string;
+}
+
+interface UserAvatarProps {
+  assetRepository: AssetRepository;
+  noBadge: boolean;
+  participant: User;
+  size: AVATAR_SIZE;
+  state: STATE;
+}
+
+interface ServiceAvatarProps {
+  assetRepository: AssetRepository;
+  participant: User;
+  size: AVATAR_SIZE;
+}
+
+interface AvatarBackgroundProps {
+  backgroundColor?: string;
+  borderRadius?: string;
+}
+
+const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
+  const isTooSmall = [AVATAR_SIZE.X_SMALL, AVATAR_SIZE.XX_SMALL, AVATAR_SIZE.XXX_SMALL].includes(size);
+  const isBadgeState = [STATE.PENDING, STATE.BLOCKED].includes(state);
+  return !isTooSmall && isBadgeState;
+};
+
+const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
+  assetRepository,
   participant,
-  clickHandler,
-  size = AVATAR_SIZE.LARGE,
+  borderRadius = '50%',
+  size,
+  isGrey,
 }) => {
-  const [isUser, setIsUser] = useState(false);
-  const [isService, setIsService] = useState(false);
-  const [isTemporaryGuest, setIsTemporaryGuest] = useState(false);
-  const [initials, setInitials] = useState('');
-  const [timerLength, setTimerLength] = useState(0);
-  const [timerOffset, setTimerOffset] = useState(0);
-  const [borderRadius, setBorderRadius] = useState(0);
-  const [borderWidth, setBorderWidth] = useState(0);
   const [avatarImage, setAvatarImage] = useState('');
-  const [avatarLoadingBlocked, setAvatarLoadingBlocked] = useState(false);
+  let avatarLoadingBlocked = false;
+  let showTransition = false;
+
+  useEffect(() => {
+    loadAvatarPicture();
+  }, [participant]);
 
   const loadAvatarPicture = async () => {
     if (!avatarLoadingBlocked) {
-      setAvatarLoadingBlocked(true);
+      avatarLoadingBlocked = true;
 
       const isSmall = size !== AVATAR_SIZE.LARGE && size !== AVATAR_SIZE.X_LARGE;
       const loadHiRes = !isSmall && window.devicePixelRatio > 1;
@@ -249,62 +149,230 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
         : participant.previewPictureResource();
 
       if (pictureResource) {
+        const isCached = pictureResource.downloadProgress() === 100;
+        showTransition = !isCached && !isSmall;
         try {
           const url = await assetRepository.getObjectUrl(pictureResource);
           if (url) {
             setAvatarImage(url);
           }
-          setAvatarLoadingBlocked(false);
+          avatarLoadingBlocked = false;
         } catch (error) {
           console.warn('Failed to load avatar picture.', error);
         }
       } else {
-        setAvatarLoadingBlocked(false);
+        avatarLoadingBlocked = false;
       }
     }
   };
 
-  useEffect(() => {
-    loadAvatarPicture();
-  }, [participant]);
+  const transitionImageStyles: Record<string, CSSObject> = {
+    entered: {opacity: 1, transform: 'scale(1)'},
+    entering: {opacity: 0, transform: 'scale(0.88)'},
+  };
 
-  useEffect(() => {
-    const _isUser = participant instanceof User && !participant.isService;
-    const _isService = participant instanceof ServiceEntity || participant.isService;
-    const _isTemporaryGuest = _isUser && participant.isTemporaryGuest();
+  return (
+    <Transition in={!!avatarImage} timeout={showTransition ? 700 : 0}>
+      {(state: string) => (
+        <img
+          css={{
+            ...CSS_FILL_PARENT,
+            borderRadius,
+            filter: isGrey ? 'grayscale(100%)' : 'none',
+            height: '100%',
+            objectFit: 'cover',
+            opacity: 0,
+            overflow: 'hidden',
+            transform: 'scale(0.88)',
+            transition: showTransition ? 'all 0.55s cubic-bezier(0.165, 0.84, 0.44, 1) 0.15s' : 'none',
+            width: '100%',
+            ...transitionImageStyles[state],
+          }}
+          src={avatarImage}
+        />
+      )}
+    </Transition>
+  );
+};
 
-    if (_isService) {
-      setInitials('');
-    } else if (size === AVATAR_SIZE.X_SMALL) {
-      setInitials(getFirstChar(participant.initials()));
-    } else {
-      setInitials(participant.initials());
-    }
+const AvatarInitials: React.FunctionComponent<AvatarInitialsProps> = ({size, initials, color = '#fff'}) => (
+  <div
+    css={{
+      ...CSS_FILL_PARENT,
+      color,
+      fontSize: INITIALS_SIZE[size],
+      lineHeight: `${DIAMETER[size]}px`,
+      textAlign: 'center',
+      userSelect: 'none',
+    }}
+    data-uie-name="element-avatar-initials"
+  >
+    {size === AVATAR_SIZE.X_SMALL ? getFirstChar(initials) : initials}
+  </div>
+);
 
-    const borderScale = 0.9916;
-    const finalBorderWidth = size === AVATAR_SIZE.X_LARGE ? 4 : 1;
-    const _borderWidth = (finalBorderWidth / DIAMETER[size]) * 32;
-    const _borderRadius = (16 - _borderWidth / 2) * borderScale;
-    const _timerLength = _borderRadius * Math.PI * 2;
+const AvatarBackground: React.FunctionComponent<AvatarBackgroundProps> = ({
+  borderRadius = '50%',
+  backgroundColor = 'currentColor',
+}) => (
+  <div
+    css={{
+      ...CSS_FILL_PARENT,
+      backgroundColor,
+      borderRadius,
+      transform: 'scale(0.9916)',
+    }}
+  />
+);
 
-    if (_isTemporaryGuest) {
-      const remainingTime = participant.expirationRemaining();
-      const normalizedRemainingTime = remainingTime / User.CONFIG.TEMPORARY_GUEST.LIFETIME;
-      setTimerOffset(_timerLength * (normalizedRemainingTime - 1));
-    } else {
-      setTimerOffset(0);
-    }
+const AvatarBorder: React.FunctionComponent<AvatarBorderProps> = ({borderRadius = '50%'}) => (
+  <div
+    css={{
+      ...CSS_FILL_PARENT,
+      border: '1px solid rgba(0, 0, 0, 0.08)',
+      borderRadius,
+    }}
+  />
+);
 
-    setIsUser(_isUser);
-    setIsService(_isService);
-    setIsTemporaryGuest(_isTemporaryGuest);
+interface AvatarBadgeProps {
+  state: STATE;
+}
 
-    setTimerLength(_timerLength);
-    setBorderRadius(_borderRadius);
-    setBorderWidth(_borderWidth);
-  }, [participant]);
+const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state}) => {
+  const icons: Record<string, string> = {
+    [STATE.PENDING]: '\\e165',
+    [STATE.BLOCKED]: '\\e104',
+  };
+  return (
+    <div
+      css={{
+        ...CSS_FILL_PARENT,
+        ...CSS_FLEX_CENTER,
+        '&::before': {
+          ...CSS_ICON(icons[state]),
+        },
+        backgroundColor: 'rgba(0, 0, 0, .56)',
+        borderRadius: '50%',
+        color: '#fff',
+      }}
+      data-uie-name="element-avatar-user-badge-icon"
+    />
+  );
+};
 
-  const avatarState = useMemo(() => {
+const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetRepository, participant, size}) => {
+  return (
+    <>
+      <AvatarBackground borderRadius="20%" />
+      <div
+        css={{
+          ...CSS_FILL_PARENT,
+          alignItems: 'center',
+          borderRadius: '20%',
+          display: 'flex',
+          justifyContent: 'center',
+        }}
+        data-uie-name="element-avatar-service-icon"
+      >
+        <svg
+          width={32}
+          height={32}
+          css={{
+            '& > path': {
+              fill: 'var(--background-fade-24)',
+            },
+            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(size) ? '100%' : '60%',
+          }}
+          dangerouslySetInnerHTML={{__html: SVGProvider['service-icon']?.documentElement?.innerHTML}}
+        ></svg>
+      </div>
+      <AvatarImage
+        assetRepository={assetRepository}
+        participant={participant}
+        borderRadius="20%"
+        size={size}
+        isGrey={false}
+      />
+      <AvatarBorder borderRadius="20%" />
+    </>
+  );
+};
+
+const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
+  assetRepository,
+  size,
+  participant,
+  noBadge,
+  state,
+}) => {
+  const borderScale = 0.9916;
+  const finalBorderWidth = size === AVATAR_SIZE.X_LARGE ? 4 : 1;
+  const remainingTime = participant.expirationRemaining();
+  const normalizedRemainingTime = remainingTime / User.CONFIG.TEMPORARY_GUEST.LIFETIME;
+
+  const borderWidth = (finalBorderWidth / DIAMETER[size]) * 32;
+  const borderRadius = (16 - borderWidth / 2) * borderScale;
+  const timerLength = borderRadius * Math.PI * 2;
+  const timerOffset = timerLength * (normalizedRemainingTime - 1);
+  const isImageGrey = [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
+
+  return (
+    <>
+      <AvatarBackground />
+      <AvatarInitials color="var(--background)" size={size} initials={participant.initials()} />
+      <AvatarImage assetRepository={assetRepository} participant={participant} size={size} isGrey={isImageGrey} />
+      {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
+      {!isImageGrey && <AvatarBorder />}
+      <svg
+        css={{
+          ...CSS_FILL_PARENT,
+          position: 'absolute',
+        }}
+        data-uie-name="element-avatar-guest-expiration-circle"
+        viewBox="0 0 32 32"
+        stroke={participant.accent_color()}
+      >
+        <circle
+          cx="16"
+          cy="16"
+          transform="rotate(-90 16 16)"
+          fill="none"
+          strokeDasharray={timerLength}
+          strokeDashoffset={timerOffset}
+          r={borderRadius}
+          strokeWidth={borderWidth}
+        />
+      </svg>
+    </>
+  );
+};
+
+const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({assetRepository, participant, size, noBadge, state}) => {
+  const isImageGrey = [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
+  return (
+    <>
+      <AvatarBackground backgroundColor={state === STATE.UNKNOWN ? COLOR.GRAY : undefined} />
+      <AvatarInitials size={size} initials={participant.initials()} />
+      <AvatarImage assetRepository={assetRepository} participant={participant} size={size} isGrey={isImageGrey} />
+      {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
+      {!isImageGrey && <AvatarBorder />}
+    </>
+  );
+};
+
+const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
+  assetRepository = container.resolve(AssetRepository),
+  participant,
+  clickHandler,
+  noBadge = false,
+  size = AVATAR_SIZE.LARGE,
+}) => {
+  const isUser = participant instanceof User && !participant.isService && !participant.isTemporaryGuest();
+  const isService = participant instanceof ServiceEntity || participant.isService;
+  const isTemporaryGuest = !isService && participant.isTemporaryGuest();
+
+  const avatarState = (() => {
     switch (true) {
       case isService:
         return STATE.NONE;
@@ -323,7 +391,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
       default:
         return STATE.NONE;
     }
-  }, [participant, isService]);
+  })();
 
   const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (typeof clickHandler === 'function') {
@@ -331,64 +399,39 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
     }
   };
 
-  const avatarType = useMemo(() => `${isUser ? 'user' : 'service'}-avatar`, [isUser]);
-
-  const cssClasses = useMemo(
-    () =>
-      isService
-        ? 'accent-color-service'
-        : isTemporaryGuest
-        ? 'accent-color-temporary'
-        : `accent-color-${participant.accent_id()} ${avatarState}`,
-    [avatarState, participant, isService, isTemporaryGuest],
-  );
-
   return (
     <div
-      className={`participant-avatar ${avatarType} ${size} ${cssClasses}`}
       title={participant.name()}
-      data-uie-name={avatarType}
+      data-uie-name={`${isUser ? 'user' : 'service'}-avatar`}
       onClick={onClick}
-      data-bind="attr: {delay: delay}"
+      css={{
+        ...CSS_SQUARE(DIAMETER[size]),
+        color: isService ? '#fff' : isTemporaryGuest ? 'var(--background-fade-8)' : participant.accent_color(),
+        display: 'inline-block',
+        overflow: 'hidden',
+        position: 'relative',
+        transform: 'translateZ(0)',
+        userSelect: 'none',
+      }}
     >
-      <div className="avatar-background" />
       {isUser && (
-        <div className="avatar-initials" data-uie-name="element-avatar-initials">
-          {initials}
-        </div>
+        <UserAvatar
+          size={size}
+          assetRepository={assetRepository}
+          noBadge={noBadge}
+          participant={participant}
+          state={avatarState}
+        />
       )}
-      {isService && (
-        <div className="avatar-service-placeholder" data-uie-name="element-avatar-service-icon">
-          <svg
-            width={32}
-            height={32}
-            dangerouslySetInnerHTML={{__html: SVGProvider['service-icon']?.documentElement?.innerHTML}}
-          ></svg>
-        </div>
-      )}
-      <div className="avatar-image avatar-image-loaded">
-        {avatarImage && <img className="avatar-image" src={avatarImage} />}
-      </div>
-      {isUser && <div className="avatar-badge" data-uie-name="element-avatar-user-badge-icon" />}
-      <div className="avatar-border" />
+      {isService && <ServiceAvatar assetRepository={assetRepository} size={size} participant={participant} />}
       {isTemporaryGuest && (
-        <svg
-          className="avatar-temporary-guest-border"
-          data-uie-name="element-avatar-guest-expiration-circle"
-          viewBox="0 0 32 32"
-          stroke={participant.accent_color()}
-        >
-          <circle
-            cx="16"
-            cy="16"
-            transform="rotate(-90 16 16)"
-            fill="none"
-            strokeDasharray={timerLength}
-            strokeDashoffset={timerOffset}
-            r={borderRadius}
-            strokeWidth={borderWidth}
-          />
-        </svg>
+        <TemporaryGuestAvatar
+          assetRepository={assetRepository}
+          noBadge={noBadge}
+          participant={participant}
+          state={avatarState}
+          size={size}
+        />
       )}
     </div>
   );
@@ -398,6 +441,7 @@ export default ParticipantAvatar;
 
 registerReactComponent('participant-avatar', {
   component: ParticipantAvatar,
-  optionalParams: ['size', 'click'],
-  template: '<span data-bind="react: {participant: ko.unwrap(participant), size: size, clickHandler: click}"></span>',
+  optionalParams: ['size', 'click', 'noBadge'],
+  template:
+    '<span data-bind="react: {participant: ko.unwrap(participant), size, clickHandler: click, noBadge}"></span>',
 });
