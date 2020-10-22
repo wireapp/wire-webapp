@@ -60,6 +60,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
       const isSmall = size !== AVATAR_SIZE.LARGE && size !== AVATAR_SIZE.X_LARGE;
       const loadHiRes = !isSmall && window.devicePixelRatio > 1;
+      console.info('loadHiRes', loadHiRes, window.devicePixelRatio);
       const pictureResource: AssetRemoteData = loadHiRes
         ? participant.mediumPictureResource()
         : participant.previewPictureResource();
