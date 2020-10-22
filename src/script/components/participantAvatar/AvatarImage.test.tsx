@@ -45,11 +45,13 @@ describe('AvatarImage', () => {
       downloadProgress: () => 0,
     } as AssetRemoteData);
 
-    new AvatarImagePage({
+    const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
       participant: participant,
       size: AVATAR_SIZE.LARGE,
     });
+
+    avatarImage.update();
 
     await act(() =>
       waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.mediumPictureResource())),
@@ -66,11 +68,13 @@ describe('AvatarImage', () => {
       downloadProgress: () => 0,
     } as AssetRemoteData);
 
-    new AvatarImagePage({
+    const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
       participant: participant,
       size: AVATAR_SIZE.SMALL,
     });
+
+    avatarImage.update();
 
     await act(() =>
       waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.previewPictureResource())),
@@ -84,11 +88,13 @@ describe('AvatarImage', () => {
     const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
     const participant = new User('id');
 
-    new AvatarImagePage({
+    const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
       participant: participant,
       size: AVATAR_SIZE.LARGE,
     });
+
+    avatarImage.update();
 
     await act(() => waitFor(() => expect(assetRepoSpy.getObjectUrl).not.toHaveBeenCalled()));
   });
