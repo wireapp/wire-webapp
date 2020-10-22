@@ -29,11 +29,13 @@ import AvatarImage from './AvatarImage';
 import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
+import AvatarWrapper from './AvatarWrapper';
 
 export interface UserAvatarProps {
   assetRepository: AssetRepository;
   noBadge?: boolean;
   noFilter?: boolean;
+  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
   size: AVATAR_SIZE;
   state: STATE;
@@ -52,16 +54,23 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   noBadge,
   noFilter,
   state,
+  onClick,
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   return (
-    <>
+    <AvatarWrapper
+      uieName="user-avatar"
+      color={participant.accent_color()}
+      title={participant.name()}
+      size={size}
+      onClick={onClick}
+    >
       <AvatarBackground backgroundColor={state === STATE.UNKNOWN ? COLOR.GRAY : undefined} />
       <AvatarInitials size={size} initials={participant.initials()} />
       <AvatarImage assetRepository={assetRepository} participant={participant} size={size} isGrey={isImageGrey} />
       {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
       {!isImageGrey && <AvatarBorder />}
-    </>
+    </AvatarWrapper>
   );
 };
 

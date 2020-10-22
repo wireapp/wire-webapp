@@ -28,6 +28,7 @@ import AvatarImage from './AvatarImage';
 import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
+import AvatarWrapper from './AvatarWrapper';
 import {UserAvatarProps, shouldShowBadge} from './UserAvatar';
 
 const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
@@ -37,6 +38,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
   noBadge,
   noFilter,
   state,
+  onClick,
 }) => {
   const borderScale = 0.9916;
   const finalBorderWidth = size === AVATAR_SIZE.X_LARGE ? 4 : 1;
@@ -50,7 +52,13 @@ const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
 
   return (
-    <>
+    <AvatarWrapper
+      uieName="guest-avatar"
+      color="rgba(50,54,57,0.08)"
+      title={participant.name()}
+      size={size}
+      onClick={onClick}
+    >
       <AvatarBackground />
       <AvatarInitials color="var(--background)" size={size} initials={participant.initials()} />
       <AvatarImage assetRepository={assetRepository} participant={participant} size={size} isGrey={isImageGrey} />
@@ -76,7 +84,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
           strokeWidth={borderWidth}
         />
       </svg>
-    </>
+    </AvatarWrapper>
   );
 };
 

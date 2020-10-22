@@ -29,17 +29,19 @@ import SVGProvider from '../../auth/util/SVGProvider';
 import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
 import AvatarImage from './AvatarImage';
+import AvatarWrapper from './AvatarWrapper';
 import {AVATAR_SIZE} from '../ParticipantAvatarComponent';
 
 export interface ServiceAvatarProps {
   assetRepository: AssetRepository;
+  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
   size: AVATAR_SIZE;
 }
 
-const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetRepository, participant, size}) => {
+const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetRepository, participant, size, onClick}) => {
   return (
-    <>
+    <AvatarWrapper uieName="service-avatar" color="#fff" title={participant.name()} size={size} onClick={onClick}>
       <AvatarBackground borderRadius="20%" />
       <div
         css={{
@@ -64,7 +66,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
       </div>
       <AvatarImage assetRepository={assetRepository} participant={participant} borderRadius="20%" size={size} />
       <AvatarBorder borderRadius="20%" />
-    </>
+    </AvatarWrapper>
   );
 };
 

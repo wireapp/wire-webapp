@@ -19,8 +19,6 @@
 
 import React from 'react';
 
-import {CSS_SQUARE} from 'Util/CSSMixin';
-
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -119,44 +117,35 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
     }
   };
 
-  return (
-    <div
-      title={participant.name()}
-      data-uie-name={`${isUser ? 'user' : 'service'}-avatar`}
-      onClick={onClick}
-      css={{
-        ...CSS_SQUARE(DIAMETER[size]),
-        color: isService ? '#fff' : isTemporaryGuest ? 'rgba(50,54,57,0.08)' : participant.accent_color(),
-        display: 'inline-block',
-        overflow: 'hidden',
-        position: 'relative',
-        transform: 'translateZ(0)',
-        userSelect: 'none',
-      }}
-    >
-      {isUser && (
-        <UserAvatar
-          size={size}
-          assetRepository={assetRepository}
-          noBadge={noBadge}
-          noFilter={noFilter}
-          participant={participant}
-          state={avatarState}
-        />
-      )}
-      {isService && <ServiceAvatar assetRepository={assetRepository} size={size} participant={participant} />}
-      {isTemporaryGuest && (
-        <TemporaryGuestAvatar
-          assetRepository={assetRepository}
-          noBadge={noBadge}
-          noFilter={noFilter}
-          participant={participant}
-          state={avatarState}
-          size={size}
-        />
-      )}
-    </div>
-  );
+  if (isUser) {
+    return (
+      <UserAvatar
+        size={size}
+        assetRepository={assetRepository}
+        noBadge={noBadge}
+        noFilter={noFilter}
+        participant={participant}
+        state={avatarState}
+        onClick={onClick}
+      />
+    );
+  }
+
+  if (isTemporaryGuest) {
+    return (
+      <TemporaryGuestAvatar
+        assetRepository={assetRepository}
+        noBadge={noBadge}
+        noFilter={noFilter}
+        participant={participant}
+        state={avatarState}
+        size={size}
+        onClick={onClick}
+      />
+    );
+  }
+
+  return <ServiceAvatar assetRepository={assetRepository} size={size} participant={participant} onClick={onClick} />;
 };
 
 export default ParticipantAvatar;

@@ -140,7 +140,7 @@ ko.components.register('conversation-list-cell', {
         <!-- /ko -->
         <!-- ko if: !isGroup && users().length -->
           <div class="avatar-halo">
-            <participant-avatar params="participant: users()[0], size: AVATAR_SIZE.XXX_SMALL"></participant-avatar>
+            <participant-avatar params="participant: users()[0], size: AVATAR_SIZE.SMALL"></participant-avatar>
           </div>
         <!-- /ko -->
       </div>
