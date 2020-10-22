@@ -25,7 +25,7 @@
   "description": "Collection of common components that are used across Wire web applications.",
   "files": [
     "src",
-    "!src/**/*.ts"
+    "!src/**/!(*.d).ts"
   ],
   "keywords": [
     "commons",
