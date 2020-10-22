@@ -134,9 +134,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   if (isTemporaryGuest) {
     return (
       <TemporaryGuestAvatar
-        assetRepository={assetRepository}
         noBadge={noBadge}
-        noFilter={noFilter}
         participant={participant}
         state={avatarState}
         size={size}
