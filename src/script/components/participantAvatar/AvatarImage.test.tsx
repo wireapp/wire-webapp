@@ -41,9 +41,10 @@ describe('AvatarImage', () => {
     };
     const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
     const participant = new User('id');
-    participant.mediumPictureResource({
+    const resource = {
       downloadProgress: () => 0,
-    } as AssetRemoteData);
+    } as AssetRemoteData;
+    participant.mediumPictureResource(resource);
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
@@ -53,9 +54,7 @@ describe('AvatarImage', () => {
 
     avatarImage.update();
 
-    await act(() =>
-      waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.mediumPictureResource())),
-    );
+    await act(() => waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource)));
   });
 
   it('fetches preview avatar image for small avatars', async () => {
