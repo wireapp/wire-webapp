@@ -17,24 +17,7 @@
  *
  */
 
-import {PromiseFn, PromiseQueue} from 'Util/PromiseQueue';
+import {mount} from 'enzyme';
+import React from 'react';
 
-export class MessageSender {
-  private readonly sendingQueue: PromiseQueue;
-
-  constructor() {
-    this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
-  }
-
-  get queuedMessages(): number {
-    return this.sendingQueue.getLength();
-  }
-
-  queueMessage<T>(sendingFunction: PromiseFn<T>): Promise<T> {
-    return this.sendingQueue.push(sendingFunction);
-  }
-
-  pauseQueue(pauseState: boolean): void {
-    this.sendingQueue.pause(pauseState);
-  }
-}
+export const mountComponent = (component: React.ReactElement) => mount(component);

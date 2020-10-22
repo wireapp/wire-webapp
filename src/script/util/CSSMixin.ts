@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,16 @@
  *
  */
 
-import {PromiseFn, PromiseQueue} from 'Util/PromiseQueue';
+import {CSSObject} from '@emotion/serialize';
 
-export class MessageSender {
-  private readonly sendingQueue: PromiseQueue;
+export const CSS_ABSOLUTE_CENTER: CSSObject = {
+  left: '50%',
+  position: 'absolute',
+  top: '50%',
+  transform: 'translate(-50%, -50%)',
+};
 
-  constructor() {
-    this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
-  }
-
-  get queuedMessages(): number {
-    return this.sendingQueue.getLength();
-  }
-
-  queueMessage<T>(sendingFunction: PromiseFn<T>): Promise<T> {
-    return this.sendingQueue.push(sendingFunction);
-  }
-
-  pauseQueue(pauseState: boolean): void {
-    this.sendingQueue.pause(pauseState);
-  }
-}
+export const CSS_SQUARE: (size: number | string) => CSSObject = size => ({
+  height: size,
+  width: size,
+});

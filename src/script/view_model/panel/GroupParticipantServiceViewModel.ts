@@ -82,7 +82,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   }
 
   clickOnAdd(): void {
-    this.integrationRepository.addService(this.activeConversation(), this.selectedService(), 'conversation_details');
+    this.integrationRepository.addService(this.activeConversation(), this.selectedService());
     this.onGoToRoot();
   }
 

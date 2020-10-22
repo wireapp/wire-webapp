@@ -74,6 +74,8 @@ import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
+import type {MessageRepository} from '../conversation/MessageRepository';
+import {NoAudioInputError} from '../error/NoAudioInputError';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -122,6 +124,7 @@ export class CallingRepository {
   constructor(
     private readonly apiClient: APIClient,
     private readonly conversationRepository: ConversationRepository,
+    private readonly messageRepository: MessageRepository,
     private readonly eventRepository: EventRepository,
     private readonly userRepository: UserRepository,
     private readonly mediaStreamHandler: MediaStreamHandler,
@@ -261,7 +264,7 @@ export class CallingRepository {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients: UserClients = await this.conversationRepository.create_recipients(conversationId);
+      const localClients: UserClients = await this.messageRepository.create_recipients(conversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -298,7 +301,7 @@ export class CallingRepository {
       });
       const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId);
       eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-      await this.conversationRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
+      await this.messageRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
 
       type Clients = {clientid: string; userid: string}[];
 
@@ -494,13 +497,13 @@ export class CallingRepository {
   //##############################################################################
 
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<boolean> {
-    const recipients = await this.conversationRepository.create_recipients(conversationId, false, [userId]);
+    const recipients = await this.messageRepository.create_recipients(conversationId, false, [userId]);
     const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse
       ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
       : ConversationRepository.CONSENT_TYPE.OUTGOING_CALL;
-    return this.conversationRepository.grantMessage(eventInfoEntity, consentType);
+    return this.messageRepository.grantMessage(eventInfoEntity, consentType);
   }
 
   private abortCall(conversationId: string): void {
@@ -631,6 +634,7 @@ export class CallingRepository {
     conversationType: CONV_TYPE,
     callType: CALL_TYPE,
   ): Promise<void | Call> {
+    this.logger.log(`Starting a call of type "${callType}" in conversation ID "${conversationId}"...`);
     try {
       await this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING);
       conversationType =
@@ -713,8 +717,9 @@ export class CallingRepository {
     }
   };
 
-  async answerCall(call: Call, callType: CALL_TYPE): Promise<void> {
+  async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
     try {
+      callType ??= call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
       await this.checkConcurrentJoinedCall(call.conversationId, CALL_STATE.INCOMING);
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
@@ -723,6 +728,11 @@ export class CallingRepository {
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
       await this.pushClients(call.conversationId);
+
+      if (Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && call.conversationType === CONV_TYPE.CONFERENCE) {
+        this.wCall.setMute(this.wUser, 1);
+      }
+
       this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
 
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
@@ -742,7 +752,12 @@ export class CallingRepository {
     this.wCall.end(this.wUser, conversationId);
   };
 
-  muteCall(conversationId: ConversationId, shouldMute: boolean): void {
+  muteCall(call: Call, shouldMute: boolean): void {
+    if (call.hasWorkingAudioInput === false) {
+      this.wCall.setMute(this.wUser, 1);
+      this.showNoAudioInputModal();
+      return;
+    }
     this.wCall.setMute(this.wUser, shouldMute ? 1 : 0);
   }
 
@@ -754,12 +769,21 @@ export class CallingRepository {
     return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
   }
 
-  private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery): void {
-    const validStateWithoutCamera = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED];
-    if (call && !validStateWithoutCamera.includes(call.state())) {
-      this.leaveCall(call.conversationId);
+  private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error): void {
+    if (error instanceof NoAudioInputError) {
+      this.muteCall(call, true);
+      return;
     }
-    if (call?.state() !== CALL_STATE.ANSWERED) {
+
+    const validStateWithoutCamera = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED];
+
+    if (call && !validStateWithoutCamera.includes(call.state())) {
+      this.showNoCameraModal();
+      this.leaveCall(call.conversationId);
+      return;
+    }
+
+    if (call.state() !== CALL_STATE.ANSWERED) {
       if (requestedStreams.camera) {
         this.showNoCameraModal();
       }
@@ -897,7 +921,7 @@ export class CallingRepository {
         }
 
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-        return this.conversationRepository.sendCallingMessage(eventInfoEntity, conversationId);
+        return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
       })
       .catch(() => this.abortCall(conversationId));
 
@@ -1159,7 +1183,7 @@ export class CallingRepository {
       } catch (error) {
         this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);
-        this.handleMediaStreamError(call, missingStreams);
+        this.handleMediaStreamError(call, missingStreams, error);
         return selfParticipant.getMediaStream();
       }
     })();
@@ -1345,6 +1369,23 @@ export class CallingRepository {
       });
       this.logger.warn(`Tried to join a second call while calling in conversation '${activeCall.conversationId}'.`);
     });
+  }
+
+  private showNoAudioInputModal(): void {
+    const modalOptions = {
+      primaryAction: {
+        text: t('modalAcknowledgeAction'),
+      },
+      secondaryAction: {
+        action: () => amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV),
+        text: t('modalNoAudioInputAction'),
+      },
+      text: {
+        message: t('modalNoAudioInputMessage'),
+        title: t('modalNoAudioInputTitle'),
+      },
+    };
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, modalOptions);
   }
 
   private showNoCameraModal(): void {

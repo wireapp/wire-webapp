@@ -50,6 +50,7 @@ import {TeamRepository} from 'src/script/team/TeamRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {ConversationService} from 'src/script/conversation/ConversationService';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {SelfService} from 'src/script/self/SelfService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -273,25 +274,36 @@ export class TestFactory {
       this.storage_service,
     );
 
-    const propertiesRepository = new PropertiesRepository(
+    this.propertyRepository = new PropertiesRepository(
       new PropertiesService(container.resolve(APIClientSingleton).getClient()),
       new SelfService(container.resolve(APIClientSingleton).getClient()),
     );
 
     const assetRepository = container.resolve(AssetRepository);
 
-    this.conversation_repository = new ConversationRepository(
-      this.conversation_service,
-      assetRepository,
+    this.conversation_repository = null;
+    this.message_repository = new MessageRepository(
       this.client_repository,
-      this.connection_repository,
+      () => this.conversation_repository,
       this.cryptography_repository,
       this.event_repository,
-      new LinkPreviewRepository(assetRepository, propertiesRepository),
+      new MessageSender(),
+      this.propertyRepository,
+      serverTimeHandler,
+      this.user_repository,
+      this.team_repository,
+      this.conversation_service,
+      new LinkPreviewRepository(assetRepository, this.propertyRepository),
+      this.assetRepository,
+    );
+    this.conversation_repository = new ConversationRepository(
+      this.conversation_service,
+      () => this.message_repository,
+      this.connection_repository,
+      this.event_repository,
       this.team_repository,
       this.user_repository,
       this.propertyRepository,
-      new MessageSender(),
       serverTimeHandler,
     );
 
@@ -306,8 +318,9 @@ export class TestFactory {
     this.calling_repository = new CallingRepository(
       container.resolve(APIClientSingleton).getClient(),
       this.conversation_repository,
-      this.user_repository,
+      this.message_repository,
       this.event_repository,
+      this.user_repository,
       new MediaRepository(new PermissionRepository()).streamHandler,
       serverTimeHandler,
     );

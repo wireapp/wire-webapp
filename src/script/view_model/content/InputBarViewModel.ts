@@ -57,6 +57,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Asset} from 'src/script/entity/message/Asset';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
+import {MessageRepository} from 'src/script/conversation/MessageRepository';
 
 type DraftMessage = {
   mentions: MentionEntity[];
@@ -125,6 +126,7 @@ export class InputBarViewModel {
     private readonly searchRepository: SearchRepository,
     private readonly storageRepository: StorageRepository,
     private readonly userRepository: UserRepository,
+    private readonly messageRepository: MessageRepository,
   ) {
     this.shadowInput = null;
     this.textarea = null;
@@ -424,7 +426,7 @@ export class InputBarViewModel {
       : undefined;
 
     if (replyMessageId) {
-      draftMessage.replyEntityPromise = this.conversationRepository.getMessageInConversationById(
+      draftMessage.replyEntityPromise = this.messageRepository.getMessageInConversationById(
         conversationEntity,
         replyMessageId,
         false,
@@ -509,7 +511,7 @@ export class InputBarViewModel {
   clickToPing = (): void => {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
-      this.conversationRepository.sendKnock(this.conversationEntity()).then(() => {
+      this.messageRepository.sendKnock(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
@@ -526,7 +528,7 @@ export class InputBarViewModel {
       this.currentMentions(newMentions);
 
       if (messageEntity.quote()) {
-        this.conversationRepository
+        this.messageRepository
           .getMessageInConversationById(this.conversationEntity(), messageEntity.quote().messageId)
           .then(quotedMessage => this.replyMessageEntity(quotedMessage));
       }
@@ -783,7 +785,7 @@ export class InputBarViewModel {
     const conversationEntity = this.conversationEntity();
     const replyMessageEntity = this.replyMessageEntity();
     this._generateQuote(replyMessageEntity).then(quoteEntity => {
-      this.conversationRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
+      this.messageRepository.sendGif(conversationEntity, gifUrl, tag, quoteEntity);
       this.cancelMessageEditing(true);
     });
   };
@@ -810,7 +812,7 @@ export class InputBarViewModel {
 
     const mentionEntities = this.currentMentions.slice(0);
     this._generateQuote(replyMessageEntity).then(quoteEntity => {
-      this.conversationRepository.sendTextWithLinkPreview(
+      this.messageRepository.sendTextWithLinkPreview(
         this.conversationEntity(),
         messageText,
         mentionEntities,
@@ -825,10 +827,10 @@ export class InputBarViewModel {
     this.cancelMessageEditing();
 
     if (!messageText.length) {
-      return this.conversationRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
+      return this.messageRepository.deleteMessageForEveryone(this.conversationEntity(), messageEntity);
     }
 
-    this.conversationRepository
+    this.messageRepository
       .sendMessageEdit(this.conversationEntity(), messageText, messageEntity, mentionEntities)
       .catch(error => {
         if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
@@ -852,7 +854,7 @@ export class InputBarViewModel {
         }
       }
 
-      this.conversationRepository.upload_images(this.conversationEntity(), images);
+      this.messageRepository.upload_images(this.conversationEntity(), images);
     }
   };
 
@@ -891,7 +893,7 @@ export class InputBarViewModel {
         }
       }
 
-      this.conversationRepository.upload_files(this.conversationEntity(), files);
+      this.messageRepository.upload_files(this.conversationEntity(), files);
     }
   };
 

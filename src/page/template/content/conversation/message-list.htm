@@ -27,6 +27,7 @@
           isSelfTemporaryGuest: selfUser().isTemporaryGuest(),
           isLastDeliveredMessage: isLastDeliveredMessage(message),
           conversationRepository: conversationRepository,
+          messageRepository: messageRepository,
           onContentUpdated: adjustScroll,
           onClickAvatar: showUserDetails,
           onClickImage: show_detail,

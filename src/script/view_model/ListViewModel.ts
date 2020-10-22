@@ -17,7 +17,7 @@
  *
  */
 
-import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+import {CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
@@ -194,6 +194,7 @@ export class ListViewModel {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => this.webappLoaded(true));
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
+    amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, this.openPreferencesAudioVideo);
     amplify.subscribe(WebAppEvents.SEARCH.SHOW, this.openStartUI);
     amplify.subscribe(WebAppEvents.SHORTCUT.NEXT, this.goToNext);
     amplify.subscribe(WebAppEvents.SHORTCUT.PREV, this.goToPrevious);
@@ -216,8 +217,7 @@ export class ListViewModel {
         },
       });
     } else {
-      const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-      this.callingRepository.answerCall(call, callType);
+      this.callingRepository.answerCall(call);
     }
   };
 
@@ -285,7 +285,7 @@ export class ListViewModel {
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 
-  openPreferencesDevices = (deviceEntity: ClientEntity): void => {
+  openPreferencesDevices = (deviceEntity?: ClientEntity): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
 
     if (deviceEntity) {
@@ -294,6 +294,21 @@ export class ListViewModel {
     }
 
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
+  };
+
+  openPreferencesAbout = (): void => {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ABOUT);
+  };
+
+  openPreferencesAudioVideo = (): void => {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_AV);
+  };
+
+  openPreferencesOptions = (): void => {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_OPTIONS);
   };
 
   openStartUI = (): void => {

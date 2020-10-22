@@ -128,6 +128,7 @@ import {DebugUtil} from 'Util/DebugUtil';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {Runtime} from '@wireapp/commons';
+import {MessageRepository} from '../conversation/MessageRepository';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -262,17 +263,28 @@ class App {
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
-      repositories.asset,
-      repositories.client,
+      () => repositories.message,
       repositories.connection,
-      repositories.cryptography,
       repositories.event,
-      new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.team,
       repositories.user,
       repositories.properties,
-      sendingMessageQueue,
       serverTimeHandler,
+    );
+
+    repositories.message = new MessageRepository(
+      repositories.client,
+      () => repositories.conversation,
+      repositories.cryptography,
+      repositories.event,
+      sendingMessageQueue,
+      repositories.properties,
+      serverTimeHandler,
+      repositories.user,
+      repositories.team,
+      this.service.conversation,
+      new LinkPreviewRepository(repositories.asset, repositories.properties),
+      repositories.asset,
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -299,13 +311,14 @@ class App {
     repositories.broadcast = new BroadcastRepository(
       new BroadcastService(this.apiClient),
       repositories.client,
-      repositories.conversation,
+      repositories.message,
       repositories.cryptography,
       sendingMessageQueue,
     );
     repositories.calling = new CallingRepository(
       this.apiClient,
       repositories.conversation,
+      repositories.message,
       repositories.event,
       repositories.user,
       repositories.media.streamHandler,
@@ -447,6 +460,7 @@ class App {
       await userRepository.loadUsers();
 
       await eventRepository.connectWebSocket();
+      eventRepository.watchNetworkStatus();
       const notificationsCount = eventRepository.notificationsTotal;
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
@@ -456,7 +470,6 @@ class App {
       await conversationRepository.initialize_conversations();
       loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
-      this._watchOnlineStatus();
       const clientEntities = await clientRepository.updateClientsForSelf();
 
       loadingView.updateProgress(99);
@@ -504,22 +517,6 @@ class App {
     }
   }
 
-  /**
-   * Behavior when internet connection is re-established.
-   */
-  onInternetConnectionGained(): void {
-    this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
-  }
-
-  /**
-   * Reflect internet connection loss in the UI.
-   */
-  onInternetConnectionLost(): void {
-    this.logger.warn('Internet connection lost');
-    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
-  }
-
   private _appInitFailure(error: BaseError, isReload: boolean) {
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
     if (Runtime.isDesktopApp()) {
@@ -559,7 +556,7 @@ class App {
       }
     }
 
-    if (navigator.onLine) {
+    if (navigator.onLine === true) {
       switch (type) {
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
@@ -581,8 +578,8 @@ class App {
       }
     }
 
-    this.logger.warn('No connectivity. Trigger reload on regained connectivity.', error);
-    this._watchOnlineStatus();
+    this.logger.warn("No internet connectivity. Refreshing the page to show the browser's offline page...", error);
+    window.location.reload();
   }
 
   /**
@@ -705,6 +702,11 @@ class App {
 
     const router = new Router({
       '/conversation/:conversationId': conversationId => mainView.content.showConversation(conversationId),
+      '/preferences/about': () => mainView.list.openPreferencesAbout(),
+      '/preferences/account': () => mainView.list.openPreferencesAccount(),
+      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
+      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
+      '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId': userId => {
         mainView.content.userModal.showUser(userId, () => router.navigate('/'));
       },
@@ -740,15 +742,6 @@ class App {
 
       this.repository.notification.clearNotifications();
     });
-  }
-
-  /**
-   * Subscribe to 'navigator.onLine' related events.
-   */
-  private _watchOnlineStatus(): void {
-    this.logger.info('Watching internet connectivity status');
-    $(window).on('offline', this.onInternetConnectionLost.bind(this));
-    $(window).on('online', this.onInternetConnectionGained.bind(this));
   }
 
   //##############################################################################

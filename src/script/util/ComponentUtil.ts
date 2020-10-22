@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,26 @@
  *
  */
 
-import {PromiseFn, PromiseQueue} from 'Util/PromiseQueue';
+import ko from 'knockout';
 
-export class MessageSender {
-  private readonly sendingQueue: PromiseQueue;
-
-  constructor() {
-    this.sendingQueue = new PromiseQueue({name: 'MessageSender', paused: true});
-  }
-
-  get queuedMessages(): number {
-    return this.sendingQueue.getLength();
-  }
-
-  queueMessage<T>(sendingFunction: PromiseFn<T>): Promise<T> {
-    return this.sendingQueue.push(sendingFunction);
-  }
-
-  pauseQueue(pauseState: boolean): void {
-    this.sendingQueue.pause(pauseState);
-  }
+export function registerReactComponent(
+  name: string,
+  {
+    template,
+    component,
+    optionalParams = [],
+  }: {component: React.ComponentType; optionalParams?: string[]; template: string},
+) {
+  ko.components.register(name, {
+    template: template,
+    viewModel: function (knockoutParams: Record<string, any>) {
+      optionalParams.forEach(param => {
+        if (!knockoutParams.hasOwnProperty(param)) {
+          knockoutParams[param] = null;
+        }
+      });
+      Object.assign(this, knockoutParams);
+      this.reactComponent = component;
+    },
+  });
 }

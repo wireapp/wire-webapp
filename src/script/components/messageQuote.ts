@@ -27,15 +27,15 @@ import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {ConversationError} from '../error/ConversationError';
 import type {Conversation} from '../entity/Conversation';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {User} from '../entity/User';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 interface MessageQuoteParams {
   conversation: ko.Observable<Conversation>;
-  conversationRepository: ConversationRepository;
   focusMessage: (id: string) => void;
   handleClickOnMessage: (message: ContentMessage, event: Event) => boolean;
+  messageRepository: MessageRepository;
   quote: ko.Observable<QuoteEntity>;
   selfId: ko.Observable<string>;
   showDetail: (message: ContentMessage, event: UIEvent) => void;
@@ -61,7 +61,7 @@ class MessageQuote {
 
   constructor({
     conversation,
-    conversationRepository,
+    messageRepository,
     focusMessage,
     handleClickOnMessage,
     quote,
@@ -102,7 +102,7 @@ class MessageQuote {
     });
 
     if (!this.error() && quote().messageId) {
-      conversationRepository
+      messageRepository
         .getMessageInConversationById(conversation(), quote().messageId, true, true)
         .then(message => {
           this.quotedMessage(message);
