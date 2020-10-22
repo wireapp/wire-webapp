@@ -33,7 +33,7 @@ class AvatarImagePage extends TestPage<AvatarImageProps> {
 }
 
 describe('AvatarImage', () => {
-  fit('fetches full avatar image for large avatars', async () => {
+  it('fetches full avatar image for large avatars', async () => {
     const assetRepoSpy = {
       getObjectUrl: jasmine.createSpy(),
     };
