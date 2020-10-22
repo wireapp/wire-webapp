@@ -23,6 +23,8 @@ import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
+import {act} from 'react-dom/test-utils';
+import {waitFor} from '@testing-library/react';
 
 class AvatarImagePage extends TestPage<AvatarImageProps> {
   constructor(props?: AvatarImageProps) {
@@ -34,9 +36,8 @@ class AvatarImagePage extends TestPage<AvatarImageProps> {
 
 describe('AvatarImage', () => {
   it('fetches full avatar image for large avatars', async () => {
-    const assetUrl = 'assetUrl';
     const assetRepoSpy = {
-      getObjectUrl: jasmine.createSpy().and.returnValue(assetUrl),
+      getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
     const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
     const participant = new User('id');
@@ -50,14 +51,16 @@ describe('AvatarImage', () => {
       size: AVATAR_SIZE.LARGE,
     });
 
-    expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.mediumPictureResource());
-    expect(avatarImage.getImage().props().src).toEqual(assetUrl);
+    avatarImage.update();
+
+    await act(() =>
+      waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.mediumPictureResource())),
+    );
   });
 
   it('fetches preview avatar image for small avatars', async () => {
-    const assetUrl = 'assetUrl';
     const assetRepoSpy = {
-      getObjectUrl: jasmine.createSpy().and.returnValue(assetUrl),
+      getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
     const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
     const participant = new User('id');
@@ -71,14 +74,16 @@ describe('AvatarImage', () => {
       size: AVATAR_SIZE.SMALL,
     });
 
-    expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.previewPictureResource());
-    expect(avatarImage.getImage().props().src).toEqual(assetUrl);
+    avatarImage.update();
+
+    await act(() =>
+      waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(participant.previewPictureResource())),
+    );
   });
 
   it('does not try to fetch non-existent avatar', async () => {
-    const assetUrl = 'assetUrl';
     const assetRepoSpy = {
-      getObjectUrl: jasmine.createSpy().and.returnValue(assetUrl),
+      getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
     const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
     const participant = new User('id');
@@ -89,7 +94,8 @@ describe('AvatarImage', () => {
       size: AVATAR_SIZE.LARGE,
     });
 
-    expect(assetRepoSpy.getObjectUrl).not.toHaveBeenCalled();
-    expect(avatarImage.getImage().props().src).toEqual('');
+    avatarImage.update();
+
+    await act(() => waitFor(() => expect(assetRepoSpy.getObjectUrl).not.toHaveBeenCalled()));
   });
 });
