@@ -59,11 +59,11 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   return (
     <AvatarWrapper
-      data-uie-name="user-avatar"
       color={participant.accent_color()}
       title={participant.name()}
       size={size}
       onClick={onClick}
+      data-uie-name="element-avatar-user"
     >
       <AvatarBackground backgroundColor={state === STATE.UNKNOWN ? COLOR.GRAY : undefined} />
       <AvatarInitials size={size} initials={participant.initials()} />

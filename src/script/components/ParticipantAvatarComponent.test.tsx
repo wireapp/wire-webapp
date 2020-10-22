@@ -17,7 +17,7 @@
  *
  */
 
-import ParticipantAvatar, {ParticipantAvatarProps, STATE} from './ParticipantAvatarComponent';
+import ParticipantAvatar, {ParticipantAvatarProps} from './ParticipantAvatarComponent';
 import TestPage from 'Util/test/TestPage';
 import {User} from '../entity/User';
 import {AssetRepository} from '../assets/AssetRepository';
@@ -27,15 +27,13 @@ class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
     super(ParticipantAvatar, props);
   }
 
-  getUserAvatar = () => this.get('div[data-uie-name="user-avatar"]');
-  getServiceAvatar = () => this.get('div[data-uie-name="service-avatar"]');
-  getInitials = () => this.get('div[data-uie-name="element-avatar-initials"]');
-  getServiceIcon = () => this.get('div[data-uie-name="element-avatar-service-icon"]');
-  getUserBadgeIcon = (state?: STATE) =>
-    this.get(`div[data-uie-name="element-avatar-user-badge-icon"]${state ? `[data-uie-value="${state}"]` : ''}`);
-  getGuestExpirationCircle = () => this.get('svg[data-uie-name="element-avatar-guest-expiration-circle"]');
+  getUserParticpantAvatar = () => this.get('div[data-uie-name="user-avatar"]');
+  getServiceParticipantAvatar = () => this.get('div[data-uie-name="service-avatar"]');
+  getTemporaryGuestAvatar = () => this.get('div[data-uie-name="element-avatar-temporary-guest"]');
+  getServiceAvatar = () => this.get('div[data-uie-name="element-avatar-service"]');
+  getUserAvatar = () => this.get('div[data-uie-name="element-avatar-user"]');
 
-  clickUserAvatar = () => this.click(this.getUserAvatar());
+  clickUserAvatar = () => this.click(this.getUserParticpantAvatar());
 }
 
 describe('ParticipantAvatar', () => {
@@ -56,5 +54,46 @@ describe('ParticipantAvatar', () => {
       participantAvatar.getProps().participant,
       jasmine.anything(),
     );
+  });
+
+  it('renders temporary guest avatar', async () => {
+    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+    const participant = new User('id');
+    participant.name('Anton Bertha');
+    participant.isTemporaryGuest(true);
+
+    const participantAvatar = new ParticipantAvatarPage({
+      assetRepository: assetRepoSpy,
+      participant,
+    });
+
+    expect(participantAvatar.getTemporaryGuestAvatar().exists()).toBe(true);
+  });
+
+  it('renders service avatar', async () => {
+    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+    const participant = new User('id');
+    participant.name('Anton Bertha');
+    participant.isService = true;
+
+    const participantAvatar = new ParticipantAvatarPage({
+      assetRepository: assetRepoSpy,
+      participant,
+    });
+
+    expect(participantAvatar.getServiceAvatar().exists()).toBe(true);
+  });
+
+  it('renders user avatar', async () => {
+    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
+    const participant = new User('id');
+    participant.name('Anton Bertha');
+
+    const participantAvatar = new ParticipantAvatarPage({
+      assetRepository: assetRepoSpy,
+      participant,
+    });
+
+    expect(participantAvatar.getUserAvatar().exists()).toBe(true);
   });
 });
