@@ -27,7 +27,7 @@ class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
     super(ParticipantAvatar, props);
   }
 
-  getUserParticpantAvatar = () => this.get('div[data-uie-name="user-avatar"]');
+  getUserParticpantAvatar = () => this.get('div[data-uie-name="element-avatar-user"]');
   getServiceParticipantAvatar = () => this.get('div[data-uie-name="service-avatar"]');
   getTemporaryGuestAvatar = () => this.get('div[data-uie-name="element-avatar-temporary-guest"]');
   getServiceAvatar = () => this.get('div[data-uie-name="element-avatar-service"]');
