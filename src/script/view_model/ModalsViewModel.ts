@@ -244,7 +244,7 @@ export class ModalsViewModel {
         break;
       }
       case Types.CONFIRM: {
-        content.secondaryAction = {...content.secondaryAction, text: t('modalConfirmSecondary')};
+        content.secondaryAction = {text: t('modalConfirmSecondary'), ...content.secondaryAction};
         break;
       }
       case Types.INPUT:

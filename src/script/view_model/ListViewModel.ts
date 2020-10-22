@@ -194,6 +194,7 @@ export class ListViewModel {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => this.webappLoaded(true));
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
+    amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, this.openPreferencesAudioVideo);
     amplify.subscribe(WebAppEvents.SEARCH.SHOW, this.openStartUI);
     amplify.subscribe(WebAppEvents.SHORTCUT.NEXT, this.goToNext);
     amplify.subscribe(WebAppEvents.SHORTCUT.PREV, this.goToPrevious);
@@ -284,7 +285,7 @@ export class ListViewModel {
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 
-  openPreferencesDevices = (deviceEntity: ClientEntity): void => {
+  openPreferencesDevices = (deviceEntity?: ClientEntity): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
 
     if (deviceEntity) {
@@ -293,6 +294,21 @@ export class ListViewModel {
     }
 
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
+  };
+
+  openPreferencesAbout = (): void => {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ABOUT);
+  };
+
+  openPreferencesAudioVideo = (): void => {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_AV);
+  };
+
+  openPreferencesOptions = (): void => {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_OPTIONS);
   };
 
   openStartUI = (): void => {

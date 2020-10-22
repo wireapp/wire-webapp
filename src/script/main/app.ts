@@ -702,6 +702,11 @@ class App {
 
     const router = new Router({
       '/conversation/:conversationId': conversationId => mainView.content.showConversation(conversationId),
+      '/preferences/about': () => mainView.list.openPreferencesAbout(),
+      '/preferences/account': () => mainView.list.openPreferencesAccount(),
+      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
+      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
+      '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId': userId => {
         mainView.content.userModal.showUser(userId, () => router.navigate('/'));
       },

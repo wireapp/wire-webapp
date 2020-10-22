@@ -75,6 +75,7 @@ import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {NoAudioInputError} from '../error/NoAudioInputError';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -633,6 +634,7 @@ export class CallingRepository {
     conversationType: CONV_TYPE,
     callType: CALL_TYPE,
   ): Promise<void | Call> {
+    this.logger.log(`Starting a call of type "${callType}" in conversation ID "${conversationId}"...`);
     try {
       await this.checkConcurrentJoinedCall(conversationId, CALL_STATE.OUTGOING);
       conversationType =
@@ -750,7 +752,12 @@ export class CallingRepository {
     this.wCall.end(this.wUser, conversationId);
   };
 
-  muteCall(conversationId: ConversationId, shouldMute: boolean): void {
+  muteCall(call: Call, shouldMute: boolean): void {
+    if (call.hasWorkingAudioInput === false) {
+      this.wCall.setMute(this.wUser, 1);
+      this.showNoAudioInputModal();
+      return;
+    }
     this.wCall.setMute(this.wUser, shouldMute ? 1 : 0);
   }
 
@@ -762,12 +769,21 @@ export class CallingRepository {
     return this.mediaStreamHandler.requestMediaStream(audio, camera, screen, isGroup);
   }
 
-  private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery): void {
-    const validStateWithoutCamera = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED];
-    if (call && !validStateWithoutCamera.includes(call.state())) {
-      this.leaveCall(call.conversationId);
+  private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error): void {
+    if (error instanceof NoAudioInputError) {
+      this.muteCall(call, true);
+      return;
     }
-    if (call?.state() !== CALL_STATE.ANSWERED) {
+
+    const validStateWithoutCamera = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED];
+
+    if (call && !validStateWithoutCamera.includes(call.state())) {
+      this.showNoCameraModal();
+      this.leaveCall(call.conversationId);
+      return;
+    }
+
+    if (call.state() !== CALL_STATE.ANSWERED) {
       if (requestedStreams.camera) {
         this.showNoCameraModal();
       }
@@ -1167,7 +1183,7 @@ export class CallingRepository {
       } catch (error) {
         this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);
-        this.handleMediaStreamError(call, missingStreams);
+        this.handleMediaStreamError(call, missingStreams, error);
         return selfParticipant.getMediaStream();
       }
     })();
@@ -1353,6 +1369,23 @@ export class CallingRepository {
       });
       this.logger.warn(`Tried to join a second call while calling in conversation '${activeCall.conversationId}'.`);
     });
+  }
+
+  private showNoAudioInputModal(): void {
+    const modalOptions = {
+      primaryAction: {
+        text: t('modalAcknowledgeAction'),
+      },
+      secondaryAction: {
+        action: () => amplify.publish(WebAppEvents.PREFERENCES.SHOW_AV),
+        text: t('modalNoAudioInputAction'),
+      },
+      text: {
+        message: t('modalNoAudioInputMessage'),
+        title: t('modalNoAudioInputTitle'),
+      },
+    };
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, modalOptions);
   }
 
   private showNoCameraModal(): void {

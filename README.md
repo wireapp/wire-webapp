@@ -123,21 +123,33 @@ All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/project
 
 #### Add new strings
 
+**Info:**
+
+- To download translations we use Crowdin API v1, and you need to setup your [username](https://crowdin.com/settings#account) and [api_key](https://crowdin.com/settings#api-key) (Account API key).
+- To upload translations we use Crowdin CLI v3, and you will need to setup [project_identifier](https://crowdin.com/project/wire-webapp/settings#api) and [api_token](https://crowdin.com/settings#api-key) (Personal Access Token).
+
+**Setup:**
+
+Create a `keys/crowdin.yaml` in this repository and add the following entries:
+
+```yaml
+api_key: your-account-api-key
+api_token: your-personal-access-token
+project_identifier: wire-webapp
+username: your-username
+```
+
+**Usage:**
+
 1. Install [Crowdin CLI v3](https://support.crowdin.com/cli-tool/)
-1. Verify you have a `keys/crowdin.yaml` in place with the [project's API Key](https://crowdin.com/project/wire-webapp/settings#api) and your [personal access token](https://crowdin.com/settings#api-key) (you may have to create one).
+1. Verify you have a `keys/crowdin.yaml` in place
+1. Run `yarn translate:download`
 1. Add string variable and text to "i18n/en-US.json"
 1. Run `yarn translate:upload`
 1. Verify your string shows up on [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
 1. Add translation on Crowdin
 1. Approve translation on Crowdin
 1. Run `yarn translate:download`
-
-Template of "keys/crowdin.yaml" (you need to create this file yourself):
-
-```yaml
-api_token: your-personal-access-token-from-crowdin
-api_key: wire-webapp-api-key-from-crowdin
-```
 
 ### Contributing
 
