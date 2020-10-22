@@ -97,7 +97,7 @@
 
       <!-- ko if: isActivatedAccount() -->
         <label class="preferences-account-picture-button" for="self-upload-file-input" data-bind="attr: {title: t('tooltipPreferencesPicture')}">
-          <participant-avatar params="participant: selfUser, size: AVATAR_SIZE.X_LARGE"></participant-avatar>
+          <participant-avatar class="see-through" params="participant: selfUser, size: AVATAR_SIZE.X_LARGE"></participant-avatar>
           <input id="self-upload-file-input"
                  type="file"
                  data-bind="attr: {accept: Config.PROFILE_IMAGE.FILE_TYPES.join(',')}, file_select: clickOnChangePicture"

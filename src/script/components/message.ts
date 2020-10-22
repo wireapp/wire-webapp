@@ -371,7 +371,7 @@ const normalTemplate: string = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="cursor-pointer" params="participant: message.user, click: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
@@ -551,7 +551,7 @@ const pingTemplate: string = `
 const deleteTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
-      <participant-avatar class="sender-avatar" params="participant: message.user, click: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
+      <participant-avatar class="cursor-pointer" params="participant: message.user, click: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
