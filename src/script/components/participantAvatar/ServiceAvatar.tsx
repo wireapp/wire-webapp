@@ -34,7 +34,7 @@ import {AVATAR_SIZE} from '../ParticipantAvatarComponent';
 
 export interface ServiceAvatarProps {
   assetRepository: AssetRepository;
-  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
   size: AVATAR_SIZE;
 }

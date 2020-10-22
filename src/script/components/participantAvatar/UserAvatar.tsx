@@ -35,7 +35,7 @@ export interface UserAvatarProps {
   assetRepository: AssetRepository;
   noBadge?: boolean;
   noFilter?: boolean;
-  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
   size: AVATAR_SIZE;
   state: STATE;
