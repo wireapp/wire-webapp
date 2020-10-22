@@ -33,6 +33,7 @@ export interface AvatarImageProps {
   assetRepository: AssetRepository;
   backgroundColor?: string;
   borderRadius?: string;
+  devicePixelRatio?: number;
   isGrey?: boolean;
   participant: User;
   size: AVATAR_SIZE;
@@ -45,6 +46,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   isGrey = false,
   participant,
   size,
+  devicePixelRatio = window.devicePixelRatio,
 }) => {
   const [avatarImage, setAvatarImage] = useState('');
   const [showTransition, setShowTransition] = useState(false);
@@ -59,8 +61,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
       setAvatarLoadingBlocked(true);
 
       const isSmall = size !== AVATAR_SIZE.LARGE && size !== AVATAR_SIZE.X_LARGE;
-      const loadHiRes = !isSmall && window.devicePixelRatio > 1;
-      console.info('loadHiRes', loadHiRes, window.devicePixelRatio);
+      const loadHiRes = !isSmall && devicePixelRatio > 1;
       const pictureResource: AssetRemoteData = loadHiRes
         ? participant.mediumPictureResource()
         : participant.previewPictureResource();
