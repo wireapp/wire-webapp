@@ -52,13 +52,12 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
         data-uie-name="element-avatar-service-icon"
       >
         <svg
-          width={32}
-          height={32}
+          viewBox="0 0 32 32"
           css={{
             '& > path': {
-              fill: 'var(--background-fade-24)',
+              fill: 'rgba(141, 152, 159, 0.24)',
             },
-            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(size) ? '100%' : '60%',
+            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(size) ? '32px' : '60%',
           }}
           dangerouslySetInnerHTML={{__html: SVGProvider['service-icon']?.documentElement?.innerHTML}}
         ></svg>

@@ -126,7 +126,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
       onClick={onClick}
       css={{
         ...CSS_SQUARE(DIAMETER[size]),
-        color: isService ? '#fff' : isTemporaryGuest ? 'var(--background-fade-8)' : participant.accent_color(),
+        color: isService ? '#fff' : isTemporaryGuest ? 'rgba(50,54,57,0.08)' : participant.accent_color(),
         display: 'inline-block',
         overflow: 'hidden',
         position: 'relative',
