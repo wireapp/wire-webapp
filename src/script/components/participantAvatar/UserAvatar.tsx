@@ -57,6 +57,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   onClick,
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
+  const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
   return (
     <AvatarWrapper
       color={participant.accent_color()}
@@ -65,9 +66,15 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       onClick={onClick}
       data-uie-name="element-avatar-user"
     >
-      <AvatarBackground backgroundColor={state === STATE.UNKNOWN ? COLOR.GRAY : undefined} />
+      <AvatarBackground backgroundColor={backgroundColor} />
       <AvatarInitials size={size} initials={participant.initials()} />
-      <AvatarImage assetRepository={assetRepository} participant={participant} size={size} isGrey={isImageGrey} />
+      <AvatarImage
+        assetRepository={assetRepository}
+        participant={participant}
+        size={size}
+        isGrey={isImageGrey}
+        backgroundColor={backgroundColor}
+      />
       {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
       {!isImageGrey && <AvatarBorder />}
     </AvatarWrapper>

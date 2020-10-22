@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import React from 'react';
 
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
@@ -43,7 +44,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
   return (
     <AvatarWrapper
       color="#fff"
-      title={participant.name()}
+      title={ko.unwrap(participant.name)}
       size={size}
       onClick={onClick}
       data-uie-name="element-avatar-service"

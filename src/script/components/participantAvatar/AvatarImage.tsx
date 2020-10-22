@@ -31,6 +31,7 @@ import {AVATAR_SIZE} from '../ParticipantAvatarComponent';
 
 export interface AvatarImageProps {
   assetRepository: AssetRepository;
+  backgroundColor?: string;
   borderRadius?: string;
   isGrey?: boolean;
   participant: User;
@@ -39,14 +40,15 @@ export interface AvatarImageProps {
 
 const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   assetRepository,
-  participant,
+  backgroundColor = 'currentColor',
   borderRadius = '50%',
-  size,
   isGrey = false,
+  participant,
+  size,
 }) => {
   const [avatarImage, setAvatarImage] = useState('');
-  let avatarLoadingBlocked = false;
-  let showTransition = false;
+  const [showTransition, setShowTransition] = useState(false);
+  const [avatarLoadingBlocked, setAvatarLoadingBlocked] = useState(false);
 
   useEffect(() => {
     loadAvatarPicture();
@@ -54,7 +56,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
   const loadAvatarPicture = async () => {
     if (!avatarLoadingBlocked) {
-      avatarLoadingBlocked = true;
+      setAvatarLoadingBlocked(true);
 
       const isSmall = size !== AVATAR_SIZE.LARGE && size !== AVATAR_SIZE.X_LARGE;
       const loadHiRes = !isSmall && window.devicePixelRatio > 1;
@@ -64,47 +66,50 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
       if (pictureResource) {
         const isCached = pictureResource.downloadProgress() === 100;
-        showTransition = !isCached && !isSmall;
+        setShowTransition(!isCached && !isSmall);
         try {
           const url = await assetRepository.getObjectUrl(pictureResource);
           if (url) {
             setAvatarImage(url);
           }
-          avatarLoadingBlocked = false;
+          setAvatarLoadingBlocked(false);
         } catch (error) {
           console.warn('Failed to load avatar picture.', error);
         }
       } else {
-        avatarLoadingBlocked = false;
+        setAvatarLoadingBlocked(false);
       }
     }
   };
 
   const transitionImageStyles: Record<string, CSSObject> = {
     entered: {opacity: 1, transform: 'scale(1)'},
-    entering: {opacity: 0, transform: 'scale(0.88)'},
+    entering: {opacity: 1, transform: 'scale(1)'},
   };
 
   return (
     <Transition in={!!avatarImage} timeout={showTransition ? 700 : 0}>
-      {(state: string) => (
-        <img
-          css={{
-            ...CSS_FILL_PARENT,
-            borderRadius,
-            filter: isGrey ? 'grayscale(100%)' : 'none',
-            height: '100%',
-            objectFit: 'cover',
-            opacity: 0,
-            overflow: 'hidden',
-            transform: 'scale(0.88)',
-            transition: showTransition ? 'all 0.55s cubic-bezier(0.165, 0.84, 0.44, 1) 0.15s' : 'none',
-            width: '100%',
-            ...transitionImageStyles[state],
-          }}
-          src={avatarImage}
-        />
-      )}
+      {(state: string) => {
+        return (
+          <img
+            css={{
+              ...CSS_FILL_PARENT,
+              backgroundColor,
+              borderRadius,
+              filter: isGrey ? 'grayscale(100%)' : 'none',
+              height: '100%',
+              objectFit: 'cover',
+              opacity: 0,
+              overflow: 'hidden',
+              transform: 'scale(0.88)',
+              transition: showTransition ? 'all 0.55s cubic-bezier(0.165, 0.84, 0.44, 1) 0.15s' : 'none',
+              width: '100%',
+              ...transitionImageStyles[state],
+            }}
+            src={avatarImage}
+          />
+        );
+      }}
     </Transition>
   );
 };
