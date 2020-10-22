@@ -32,8 +32,8 @@ import AvatarBorder from './AvatarBorder';
 
 export interface UserAvatarProps {
   assetRepository: AssetRepository;
-  noBadge: boolean;
-  noFilter: boolean;
+  noBadge?: boolean;
+  noFilter?: boolean;
   participant: User;
   size: AVATAR_SIZE;
   state: STATE;
