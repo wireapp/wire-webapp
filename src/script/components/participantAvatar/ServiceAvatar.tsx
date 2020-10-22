@@ -41,7 +41,7 @@ export interface ServiceAvatarProps {
 
 const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetRepository, participant, size, onClick}) => {
   return (
-    <AvatarWrapper uieName="service-avatar" color="#fff" title={participant.name()} size={size} onClick={onClick}>
+    <AvatarWrapper data-uie-name="service-avatar" color="#fff" title={participant.name()} size={size} onClick={onClick}>
       <AvatarBackground borderRadius="20%" />
       <div
         css={{

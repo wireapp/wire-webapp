@@ -53,7 +53,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
 
   return (
     <AvatarWrapper
-      uieName="guest-avatar"
+      data-uie-name="guest-avatar"
       color="rgba(50,54,57,0.08)"
       title={participant.name()}
       size={size}

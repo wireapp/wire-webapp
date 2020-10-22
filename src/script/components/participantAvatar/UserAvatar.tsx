@@ -59,7 +59,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   return (
     <AvatarWrapper
-      uieName="user-avatar"
+      data-uie-name="user-avatar"
       color={participant.accent_color()}
       title={participant.name()}
       size={size}

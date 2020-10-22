@@ -24,24 +24,11 @@ import {DIAMETER, AVATAR_SIZE} from '../ParticipantAvatarComponent';
 
 export interface AvatarWrapperProps extends React.ComponentProps<'div'> {
   color: string;
-  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   size: AVATAR_SIZE;
-  title: string;
-  uieName: string;
 }
 
-const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({
-  uieName,
-  color,
-  title,
-  size,
-  onClick,
-  children,
-}) => (
+const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({color, size, ...props}) => (
   <div
-    title={title}
-    data-uie-name={uieName}
-    onClick={onClick}
     css={{
       ...CSS_SQUARE(DIAMETER[size]),
       color,
@@ -51,9 +38,8 @@ const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({
       transform: 'translateZ(0)',
       userSelect: 'none',
     }}
-  >
-    {children}
-  </div>
+    {...props}
+  />
 );
 
 export default AvatarWrapper;
