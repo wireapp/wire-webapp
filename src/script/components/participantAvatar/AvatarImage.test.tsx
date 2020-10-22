@@ -35,7 +35,7 @@ class AvatarImagePage extends TestPage<AvatarImageProps> {
 }
 
 describe('AvatarImage', () => {
-  fit('fetches full avatar image for large avatars', async () => {
+  it('fetches full avatar image for large avatars', async () => {
     const assetRepoSpy = {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
@@ -49,6 +49,29 @@ describe('AvatarImage', () => {
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
       devicePixelRatio: 2,
+      participant: participant,
+      size: AVATAR_SIZE.LARGE,
+    });
+
+    avatarImage.update();
+
+    await act(() => waitFor(() => expect(assetRepoSpy.getObjectUrl).toHaveBeenCalledWith(resource)));
+  });
+
+  it('fetches preview avatar image for low pixel ratio devices', async () => {
+    const assetRepoSpy = {
+      getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
+    };
+    const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
+    const participant = new User('id');
+    const resource = {
+      downloadProgress: () => 0,
+    } as AssetRemoteData;
+    participant.previewPictureResource(resource);
+
+    const avatarImage = new AvatarImagePage({
+      assetRepository: assetRepo,
+      devicePixelRatio: 1,
       participant: participant,
       size: AVATAR_SIZE.LARGE,
     });
