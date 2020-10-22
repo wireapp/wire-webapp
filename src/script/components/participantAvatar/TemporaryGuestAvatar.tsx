@@ -24,19 +24,24 @@ import {User} from '../../entity/User';
 
 import {AVATAR_SIZE, STATE, DIAMETER} from '../ParticipantAvatarComponent';
 import AvatarBackground from './AvatarBackground';
-import AvatarImage from './AvatarImage';
 import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
-import {UserAvatarProps, shouldShowBadge} from './UserAvatar';
+import {shouldShowBadge} from './UserAvatar';
 
-const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
-  assetRepository,
+export interface TemporaryGuestAvatarProps {
+  noBadge?: boolean;
+  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  participant: User;
+  size: AVATAR_SIZE;
+  state: STATE;
+}
+
+const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> = ({
   size,
   participant,
   noBadge,
-  noFilter,
   state,
   onClick,
 }) => {
@@ -49,7 +54,6 @@ const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
   const borderRadius = (16 - borderWidth / 2) * borderScale;
   const timerLength = borderRadius * Math.PI * 2;
   const timerOffset = timerLength * (normalizedRemainingTime - 1);
-  const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
 
   return (
     <AvatarWrapper
@@ -61,9 +65,8 @@ const TemporaryGuestAvatar: React.FunctionComponent<UserAvatarProps> = ({
     >
       <AvatarBackground />
       <AvatarInitials color="var(--background)" size={size} initials={participant.initials()} />
-      <AvatarImage assetRepository={assetRepository} participant={participant} size={size} isGrey={isImageGrey} />
       {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
-      {!isImageGrey && <AvatarBorder />}
+      <AvatarBorder />
       <svg
         css={{
           ...CSS_FILL_PARENT,
