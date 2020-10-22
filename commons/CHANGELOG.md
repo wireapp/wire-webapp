@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.8.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.8.8...@wireapp/commons@3.8.9) (2020-10-22)
+
+
+### Bug Fixes
+
+* **commons,copy-config:** Publish .d.ts files to npm ([#3291](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3291)) ([ad3ed3c](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/ad3ed3c5400e9be02f2671aaa43deb0e8d884ca9))
+
+
+
+
+
 ## [3.8.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@3.8.7...@wireapp/commons@3.8.8) (2020-10-19)
 
 **Note:** Version bump only for package @wireapp/commons
