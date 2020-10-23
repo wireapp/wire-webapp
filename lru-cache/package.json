@@ -2,28 +2,28 @@
   "description": "Least Recently Used (LRU) Cache for JavaScript and TypeScript.",
   "devDependencies": {
     "@types/jasmine": "3.5.14",
+    "copyfiles": "2.4.0",
     "cross-env": "7.0.2",
     "jasmine": "3.5.0",
+    "make-dir-cli": "2.0.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "typescript": "4.0.3",
-    "webpack": "4.44.1",
-    "webpack-cli": "3.3.12"
+    "typescript": "4.0.3"
   },
   "files": [
-    "dist"
+    "src",
+    "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
-  "main": "dist/commonjs/LRUCache.js",
+  "main": "src/LRUCache",
   "name": "@wireapp/lru-cache",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache",
   "scripts": {
-    "build": "yarn build:node && yarn build:browser",
-    "build:browser": "webpack --progress",
+    "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf .nyc_output coverage dist",
+    "clean": "rimraf src/**/*{.js,.js.map,.d.ts} .nyc_output coverage .tmp",
     "dist": "yarn clean && yarn build",
-    "test": "nyc jasmine --config=jasmine.json"
+    "test": "make-dir .tmp && copyfiles -f \"src/!(*.d).ts\" .tmp && nyc --exclude src jasmine --config=jasmine.json && rimraf .tmp"
   },
   "version": "3.7.3"
 }
