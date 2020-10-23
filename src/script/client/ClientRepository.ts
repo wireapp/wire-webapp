@@ -37,15 +37,15 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
+import {ClientState} from './ClientState';
 
 export class ClientRepository {
   readonly clientService: ClientService;
   readonly cryptographyRepository: CryptographyRepository;
   selfUser: ko.Observable<User>;
   logger: Logger;
-  clients: ko.PureComputed<any[]>;
-  currentClient: ko.Observable<ClientEntity>;
-  isTemporaryClient: ko.PureComputed<boolean>;
+  // currentClient: ko.Observable<ClientEntity>;
 
   static get CONFIG() {
     return {
@@ -57,16 +57,17 @@ export class ClientRepository {
     return 'local_identity';
   }
 
-  constructor(clientService: ClientService, cryptographyRepository: CryptographyRepository) {
+  constructor(
+    clientService: ClientService,
+    cryptographyRepository: CryptographyRepository,
+    private readonly clientState = container.resolve(ClientState),
+  ) {
     this.clientService = clientService;
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
     this.logger = getLogger('ClientRepository');
 
-    this.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
-    this.currentClient = ko.observable();
-
-    this.isTemporaryClient = ko.pureComputed(() => this.currentClient()?.isTemporary());
+    this.clientState.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
@@ -90,7 +91,7 @@ export class ClientRepository {
    * @returns Resolves when the temporary client was deleted on the backend
    */
   private deleteTemporaryClient(): Promise<void> {
-    return this.clientService.deleteTemporaryClient(this.currentClient().id);
+    return this.clientService.deleteTemporaryClient(this.clientState.currentClient().id);
   }
 
   /**
@@ -148,9 +149,9 @@ export class ClientRepository {
         }
 
         const currentClient = ClientMapper.mapClient(clientPayload, true);
-        this.currentClient(currentClient);
-        this.logger.info(`Loaded local client '${currentClient.id}'`, this.currentClient());
-        return this.currentClient();
+        this.clientState.currentClient(currentClient);
+        this.logger.info(`Loaded local client '${currentClient.id}'`, this.clientState.currentClient());
+        return this.clientState.currentClient();
       });
   }
 
@@ -252,7 +253,7 @@ export class ClientRepository {
       .then(clientEntity => this.getClientByIdFromBackend(clientEntity.id))
       .then(clientPayload => {
         this.logger.info(`Client with ID '${clientPayload.id}' (${clientPayload.type}) validated on backend`);
-        return this.currentClient;
+        return this.clientState.currentClient;
       })
       .catch(error => {
         const clientNotValidated = error.type === ClientError.TYPE.NO_VALID_CLIENT;
@@ -269,8 +270,8 @@ export class ClientRepository {
    * @returns Type of current client
    */
   private loadCurrentClientType(): ClientType.PERMANENT | ClientType.TEMPORARY {
-    if (this.currentClient()) {
-      return this.currentClient().type;
+    if (this.clientState.currentClient()) {
+      return this.clientState.currentClient().type;
     }
     const isPermanent = loadValue(StorageKey.AUTH.PERSIST);
     const type = isPermanent ? ClientType.PERMANENT : ClientType.TEMPORARY;
@@ -293,19 +294,19 @@ export class ClientRepository {
     await this.deleteClientFromDb(this.selfUser().id, clientId);
     this.selfUser().remove_client(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
-    return this.clients();
+    return this.clientState.clients();
   }
 
   removeLocalClient(): void {
     this.cryptographyRepository.storageRepository.deleteCryptographyStores().then(() => {
-      const shouldClearData = this.currentClient().isTemporary();
+      const shouldClearData = this.clientState.currentClient().isTemporary();
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
     });
   }
 
   async logoutClient(): Promise<void> {
-    if (this.currentClient()) {
-      if (this.isTemporaryClient()) {
+    if (this.clientState.currentClient()) {
+      if (this.clientState.isTemporaryClient()) {
         await this.deleteTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
@@ -381,10 +382,10 @@ export class ClientRepository {
    * @returns Type of current client is permanent
    */
   isCurrentClientPermanent(): boolean {
-    if (!this.currentClient()) {
+    if (!this.clientState.currentClient()) {
       throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
-    return Runtime.isDesktopApp() || this.currentClient().isPermanent();
+    return Runtime.isDesktopApp() || this.clientState.currentClient().isPermanent();
   }
 
   /**
@@ -433,7 +434,7 @@ export class ClientRepository {
 
             delete clientsFromBackend[clientId];
 
-            if (this.currentClient() && this.isCurrentClient(userId, clientId)) {
+            if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
               this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
               this.removeClient(userId, clientId);
             }
@@ -458,7 +459,7 @@ export class ClientRepository {
         for (const clientId in clientsFromBackend) {
           const clientPayload = clientsFromBackend[clientId];
 
-          if (this.currentClient() && this.isCurrentClient(userId, clientId)) {
+          if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
             continue;
           }
 
@@ -493,7 +494,7 @@ export class ClientRepository {
    * @returns Is the client the current local client
    */
   private isCurrentClient(userId: string, clientId: string): boolean {
-    if (!this.currentClient()) {
+    if (!this.clientState.currentClient()) {
       throw new ClientError(ClientError.TYPE.CLIENT_NOT_SET, ClientError.MESSAGE.CLIENT_NOT_SET);
     }
     if (!userId) {
@@ -502,7 +503,7 @@ export class ClientRepository {
     if (!clientId) {
       throw new ClientError(ClientError.TYPE.NO_CLIENT_ID, ClientError.MESSAGE.NO_CLIENT_ID);
     }
-    return userId === this.selfUser().id && clientId === this.currentClient().id;
+    return userId === this.selfUser().id && clientId === this.clientState.currentClient().id;
   }
 
   //##############################################################################
@@ -548,7 +549,7 @@ export class ClientRepository {
       return;
     }
 
-    const isCurrentClient = clientId === this.currentClient().id;
+    const isCurrentClient = clientId === this.clientState.currentClient().id;
     if (isCurrentClient) {
       return this.removeLocalClient();
     }
