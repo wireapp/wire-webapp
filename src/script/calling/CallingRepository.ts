@@ -753,8 +753,7 @@ export class CallingRepository {
   };
 
   muteCall(call: Call, shouldMute: boolean): void {
-    if (call.hasWorkingAudioInput === false) {
-      this.wCall.setMute(this.wUser, 1);
+    if (call.hasWorkingAudioInput === false && this.isMuted()) {
       this.showNoAudioInputModal();
       return;
     }
@@ -772,6 +771,7 @@ export class CallingRepository {
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error): void {
     if (error instanceof NoAudioInputError) {
       this.muteCall(call, true);
+      this.showNoAudioInputModal();
       return;
     }
 
