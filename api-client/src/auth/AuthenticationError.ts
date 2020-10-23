@@ -17,10 +17,12 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../http/';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '../http/';
 
 export class AuthenticationError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: StatusCode) {
+  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: HTTP_STATUS) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'AuthenticationError';
@@ -28,7 +30,7 @@ export class AuthenticationError extends BackendError {
 }
 
 export class LoginTooFrequentError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.CLIENT_ERROR, code = StatusCode.TOO_MANY_REQUESTS) {
+  constructor(message: string, label = BackendErrorLabel.CLIENT_ERROR, code = HTTP_STATUS.TOO_MANY_REQUESTS) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'LoginTooFrequentError';
@@ -36,7 +38,7 @@ export class LoginTooFrequentError extends AuthenticationError {
 }
 
 export class InvalidCredentialsError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = StatusCode.FORBIDDEN) {
+  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = HTTP_STATUS.FORBIDDEN) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvalidCredentialsError';
@@ -44,7 +46,7 @@ export class InvalidCredentialsError extends AuthenticationError {
 }
 
 export class SuspendedAccountError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.SUSPENDED_ACCOUNT, code = StatusCode.FORBIDDEN) {
+  constructor(message: string, label = BackendErrorLabel.SUSPENDED_ACCOUNT, code = HTTP_STATUS.FORBIDDEN) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'SuspendedAccountError';
@@ -52,7 +54,7 @@ export class SuspendedAccountError extends AuthenticationError {
 }
 
 export class IdentifierExistsError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.KEY_EXISTS, code = StatusCode.CONFLICT) {
+  constructor(message: string, label = BackendErrorLabel.KEY_EXISTS, code = HTTP_STATUS.CONFLICT) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'IdentifierExistsError';
@@ -60,7 +62,7 @@ export class IdentifierExistsError extends AuthenticationError {
 }
 
 export class TokenExpiredError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = StatusCode.FORBIDDEN) {
+  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = HTTP_STATUS.FORBIDDEN) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'TokenExpiredError';
@@ -68,7 +70,7 @@ export class TokenExpiredError extends AuthenticationError {
 }
 
 export class InvalidTokenError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = StatusCode.FORBIDDEN) {
+  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = HTTP_STATUS.FORBIDDEN) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvalidTokenError';
@@ -76,7 +78,7 @@ export class InvalidTokenError extends AuthenticationError {
 }
 
 export class MissingCookieError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = StatusCode.FORBIDDEN) {
+  constructor(message: string, label = BackendErrorLabel.INVALID_CREDENTIALS, code = HTTP_STATUS.FORBIDDEN) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'MissingCookieError';
@@ -84,7 +86,7 @@ export class MissingCookieError extends AuthenticationError {
 }
 
 export class InvalidPhoneNumberError extends AuthenticationError {
-  constructor(message: string, label = SyntheticErrorLabel.INVALID_PHONE_NUMBER, code = StatusCode.BAD_REQUEST) {
+  constructor(message: string, label = SyntheticErrorLabel.INVALID_PHONE_NUMBER, code = HTTP_STATUS.BAD_REQUEST) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvalidPhoneNumberError';
@@ -92,7 +94,7 @@ export class InvalidPhoneNumberError extends AuthenticationError {
 }
 
 export class ForbiddenPhoneNumberError extends AuthenticationError {
-  constructor(message: string, label = SyntheticErrorLabel.FORBIDDEN_PHONE_NUMBER, code = StatusCode.FORBIDDEN) {
+  constructor(message: string, label = SyntheticErrorLabel.FORBIDDEN_PHONE_NUMBER, code = HTTP_STATUS.FORBIDDEN) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ForbiddenPhoneNumberError';
@@ -100,7 +102,7 @@ export class ForbiddenPhoneNumberError extends AuthenticationError {
 }
 
 export class PasswordExistsError extends AuthenticationError {
-  constructor(message: string, label = BackendErrorLabel.PASSWORD_EXISTS, code = StatusCode.UNAUTHORIZED) {
+  constructor(message: string, label = BackendErrorLabel.PASSWORD_EXISTS, code = HTTP_STATUS.UNAUTHORIZED) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'PasswordExistsError';

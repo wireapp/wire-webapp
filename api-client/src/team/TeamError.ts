@@ -17,10 +17,12 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../http/';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '../http/';
 
 export class TeamError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: StatusCode) {
+  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: HTTP_STATUS) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ConversationError';
@@ -31,7 +33,7 @@ export class InviteEmailInUseError extends TeamError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.INVITE_EMAIL_EXISTS,
-    code: StatusCode = StatusCode.CONFLICT,
+    code: HTTP_STATUS = HTTP_STATUS.CONFLICT,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
@@ -43,7 +45,7 @@ export class InvalidInvitationCodeError extends TeamError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.INVALID_INVITATION_CODE,
-    code: StatusCode = StatusCode.BAD_REQUEST,
+    code: HTTP_STATUS = HTTP_STATUS.BAD_REQUEST,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
@@ -55,7 +57,7 @@ export class ServiceNotFoundError extends TeamError {
   constructor(
     message: string,
     label: BackendErrorLabel | SyntheticErrorLabel = SyntheticErrorLabel.SERVICE_NOT_FOUND,
-    code: StatusCode = StatusCode.NOT_FOUND,
+    code: HTTP_STATUS = HTTP_STATUS.NOT_FOUND,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);

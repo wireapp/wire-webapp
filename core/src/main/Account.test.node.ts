@@ -17,11 +17,12 @@
  *
  */
 
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {APIClient} from '@wireapp/api-client';
 import {AuthAPI, Context} from '@wireapp/api-client/src/auth';
 import {ClientAPI, ClientType} from '@wireapp/api-client/src/client';
 import {ConversationAPI} from '@wireapp/api-client/src/conversation';
-import {BackendErrorLabel, StatusCode} from '@wireapp/api-client/src/http';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Notification, NotificationAPI} from '@wireapp/api-client/src/notification';
 import {ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
@@ -63,22 +64,22 @@ describe('Account', () => {
       .reply((uri, body: any) => {
         if (body.password === 'wrong') {
           return [
-            StatusCode.FORBIDDEN,
+            HTTP_STATUS.FORBIDDEN,
             JSON.stringify({
-              code: StatusCode.FORBIDDEN,
+              code: HTTP_STATUS.FORBIDDEN,
               label: 'invalid-credentials',
               message: 'Authentication failed.',
             }),
           ];
         }
-        return [StatusCode.OK, JSON.stringify(accessTokenData)];
+        return [HTTP_STATUS.OK, JSON.stringify(accessTokenData)];
       });
 
-    nock(MOCK_BACKEND.rest).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(StatusCode.OK, undefined);
+    nock(MOCK_BACKEND.rest).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(HTTP_STATUS.OK, undefined);
 
-    nock(MOCK_BACKEND.rest).post(AuthAPI.URL.ACCESS).reply(StatusCode.OK, accessTokenData);
+    nock(MOCK_BACKEND.rest).post(AuthAPI.URL.ACCESS).reply(HTTP_STATUS.OK, accessTokenData);
 
-    nock(MOCK_BACKEND.rest).post(ClientAPI.URL.CLIENTS).reply(StatusCode.OK, {id: CLIENT_ID});
+    nock(MOCK_BACKEND.rest).post(ClientAPI.URL.CLIENTS).reply(HTTP_STATUS.OK, {id: CLIENT_ID});
 
     nock(MOCK_BACKEND.rest)
       .post(
@@ -87,23 +88,23 @@ describe('Account', () => {
         ),
       )
       .query({ignore_missing: false})
-      .reply(StatusCode.OK)
+      .reply(HTTP_STATUS.OK)
       .persist();
 
     nock(MOCK_BACKEND.rest)
       .get(`${NotificationAPI.URL.NOTIFICATION}/${NotificationAPI.URL.LAST}`)
       .query({client: CLIENT_ID})
-      .reply(StatusCode.OK, {});
+      .reply(HTTP_STATUS.OK, {});
 
     nock(MOCK_BACKEND.rest)
       .get(NotificationAPI.URL.NOTIFICATION)
       .query({client: CLIENT_ID, size: 10000})
-      .reply(StatusCode.OK, {has_more: false, notifications: []})
+      .reply(HTTP_STATUS.OK, {has_more: false, notifications: []})
       .persist();
 
     nock(MOCK_BACKEND.rest)
       .get(ClientAPI.URL.CLIENTS)
-      .reply(StatusCode.OK, [{id: CLIENT_ID}]);
+      .reply(HTTP_STATUS.OK, [{id: CLIENT_ID}]);
   });
 
   describe('"createText"', () => {
@@ -175,7 +176,7 @@ describe('Account', () => {
 
         fail('Should not be logged in');
       } catch (error) {
-        expect(error.code).toBe(StatusCode.FORBIDDEN);
+        expect(error.code).toBe(HTTP_STATUS.FORBIDDEN);
         expect(error.label).toBe(BackendErrorLabel.INVALID_CREDENTIALS);
       }
     });

@@ -17,10 +17,12 @@
  *
  */
 
-import {BackendError, BackendErrorLabel, StatusCode} from '../http/';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
+import {BackendError, BackendErrorLabel} from '../http/';
 
 export class ConversationError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
+  constructor(message: string, label: BackendErrorLabel, code: HTTP_STATUS) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ConversationError';
@@ -31,7 +33,7 @@ export class ConversationIsUnknownError extends ConversationError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.CLIENT_ERROR,
-    code: StatusCode = StatusCode.BAD_REQUEST,
+    code: HTTP_STATUS = HTTP_STATUS.BAD_REQUEST,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
@@ -43,7 +45,7 @@ export class ConversationOperationError extends ConversationError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.INVALID_OPERATION,
-    code: StatusCode = StatusCode.FORBIDDEN,
+    code: HTTP_STATUS = HTTP_STATUS.FORBIDDEN,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
