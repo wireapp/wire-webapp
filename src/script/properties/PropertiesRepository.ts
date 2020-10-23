@@ -70,7 +70,6 @@ export class PropertiesRepository {
       enable_debugging: false,
       settings: {
         call: {
-          enable_sft_calling: false,
           enable_vbr_encoding: true,
         },
         emoji: {
@@ -87,6 +86,7 @@ export class PropertiesRepository {
         privacy: {
           improve_wire: undefined,
           report_errors: undefined,
+          telemetry_sharing: undefined,
         },
         sound: {
           alerts: AudioPreference.ALL,
@@ -103,18 +103,23 @@ export class PropertiesRepository {
   checkPrivacyPermission(): Promise<void> {
     const isCheckConsentDisabled = !Config.getConfig().FEATURE.CHECK_CONSENT;
     const isPrivacyPreferenceSet = this.getPreference(PROPERTIES_TYPE.PRIVACY) !== undefined;
+    const isTelemetryPreferenceSet = this.getPreference(PROPERTIES_TYPE.TELEMETRY_SHARING) !== undefined;
     const isTeamAccount = this.selfUser().inTeam();
     const enablePrivacy = () => {
       this.savePreference(PROPERTIES_TYPE.PRIVACY, true);
       this.publishProperties();
     };
 
+    if (!isTelemetryPreferenceSet && isTeamAccount) {
+      this.savePreference(PROPERTIES_TYPE.TELEMETRY_SHARING, true);
+      this.publishProperties();
+    }
+
     if (isCheckConsentDisabled || isPrivacyPreferenceSet) {
       return Promise.resolve();
     }
 
     if (isTeamAccount) {
-      enablePrivacy();
       return Promise.resolve();
     }
 
@@ -307,14 +312,14 @@ export class PropertiesRepository {
       case PROPERTIES_TYPE.PRIVACY:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.PRIVACY, updatedPreference);
         break;
+      case PROPERTIES_TYPE.TELEMETRY_SHARING:
+        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.TELEMETRY_SHARING, updatedPreference);
+        break;
       case PROPERTIES_TYPE.SOUND_ALERTS:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, updatedPreference);
         break;
       case PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING:
         amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, updatedPreference);
-        break;
-      case PROPERTIES_TYPE.CALL.ENABLE_SFT_CALLING:
-        amplify.publish(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_SFT_CALLING, updatedPreference);
         break;
       default:
         throw new Error(`Failed to update preference of unhandled type '${propertiesType}'`);

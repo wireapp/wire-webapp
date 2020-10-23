@@ -19,24 +19,25 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import {EventRecord} from '../../storage/EventRecord';
+import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
 
 export class ServiceMiddleware {
-  /**
-   * Construct a new ServiceMiddleware.
-   *
-   * @param {ConversationRepository} conversationRepository Repository to handle conversation related tasks
-   * @param {UserRepository} userRepository Repository to handle user related tasks
-   */
-  constructor(conversationRepository, userRepository) {
+  private readonly userRepository: UserRepository;
+  private readonly conversationRepository: ConversationRepository;
+  private readonly logger: Logger;
+
+  constructor(conversationRepository: ConversationRepository, userRepository: UserRepository) {
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
     this.logger = getLogger('ServiceMiddleware');
   }
 
-  processEvent(event) {
+  processEvent(event: EventRecord): Promise<EventRecord> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
         return this._process1To1ConversationCreationEvent(event);
@@ -49,38 +50,35 @@ export class ServiceMiddleware {
     }
   }
 
-  _processMemberJoinEvent(event) {
+  private async _processMemberJoinEvent(event: EventRecord) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, data: eventData} = event;
     const selfUserId = this.userRepository.self().id;
     const containsSelfUser = eventData.user_ids.includes(selfUserId);
 
-    const getUsersPromise = containsSelfUser
-      ? this.conversationRepository
+    const userIds = containsSelfUser
+      ? await this.conversationRepository
           .get_conversation_by_id(conversationId)
           .then(conversationEntity => conversationEntity.participating_user_ids())
-      : Promise.resolve(eventData.user_ids);
+      : eventData.user_ids;
 
-    return getUsersPromise
-      .then(userIds => this._containsService(userIds))
-      .then(hasService => (hasService ? this._decorateWithHasServiceFlag(event) : event));
+    const hasService = await this._containsService(userIds);
+    return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
-  _process1To1ConversationCreationEvent(event) {
+  private async _process1To1ConversationCreationEvent(event: EventRecord) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
-    return this._containsService(event.data.userIds).then(hasService => {
-      return hasService ? this._decorateWithHasServiceFlag(event) : event;
-    });
+    const hasService = await this._containsService(event.data.userIds);
+    return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
-  _containsService(userIds) {
-    return this.userRepository.getUsersById(userIds).then(userEntities => {
-      return userEntities.some(userEntity => userEntity.isService);
-    });
+  private async _containsService(userIds: string[]) {
+    const userEntities = await this.userRepository.getUsersById(userIds);
+    return userEntities.some(userEntity => userEntity.isService);
   }
 
-  _decorateWithHasServiceFlag(event) {
+  private _decorateWithHasServiceFlag(event: EventRecord) {
     const updatedData = {...event.data, has_service: true};
     return {...event, data: updatedData};
   }

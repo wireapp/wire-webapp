@@ -82,7 +82,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
   }
 
   clickOnAdd(): void {
-    this.integrationRepository.addService(this.activeConversation(), this.selectedService(), 'conversation_details');
+    this.integrationRepository.addService(this.activeConversation(), this.selectedService());
     this.onGoToRoot();
   }
 
@@ -103,7 +103,7 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this._showService(this.selectedParticipant());
   }
 
-  _showService = async (entity: User): Promise<void> => {
+  private readonly _showService = async (entity: User): Promise<void> => {
     const serviceEntity = await this.integrationRepository.getServiceFromUser(entity);
     this.selectedService(serviceEntity);
     this.integrationRepository.addProviderNameToParticipant(serviceEntity);

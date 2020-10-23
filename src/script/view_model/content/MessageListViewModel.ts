@@ -48,6 +48,8 @@ import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PanelViewModel} from '../PanelViewModel';
+import type {MessageRepository} from 'src/script/conversation/MessageRepository';
+
 /*
  * Message list rendering view model.
  *
@@ -58,7 +60,7 @@ export class MessageListViewModel {
   private readonly logger: Logger;
   readonly actionsViewModel: ActionsViewModel;
   readonly selfUser: ko.Observable<User>;
-  readonly focusedMessage: ko.Observable<any>;
+  readonly focusedMessage: ko.Observable<string>;
   readonly conversation: ko.Observable<Conversation>;
   readonly verticallyCenterMessage: ko.PureComputed<boolean>;
   private readonly conversationLoaded: ko.Observable<boolean>;
@@ -75,6 +77,7 @@ export class MessageListViewModel {
     private readonly integrationRepository: IntegrationRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
+    private readonly messageRepository: MessageRepository,
   ) {
     this.mainViewModel = mainViewModel;
     this.logger = getLogger('MessageListViewModel');
@@ -112,7 +115,7 @@ export class MessageListViewModel {
           Object.values(groupedMessages).forEach(readMessagesBatch => {
             const {conversation, message: firstMessage} = readMessagesBatch.pop();
             const otherMessages = readMessagesBatch.map(({message}) => message);
-            this.conversationRepository.sendReadReceipt(conversation, firstMessage, otherMessages);
+            this.messageRepository.sendReadReceipt(conversation, firstMessage, otherMessages);
           });
           this.readMessagesBuffer.removeAll();
         }
@@ -329,7 +332,7 @@ export class MessageListViewModel {
     if (lastMessage) {
       if (!this.isLastReceivedMessage(lastMessage, this.conversation())) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
-        this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage, 0);
+        this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage);
       } else if (document.hasFocus()) {
         // if the message is the last of the conversation and the app is in the foreground, then we update the last read timestamp of the conversation
         this.updateConversationLastRead(this.conversation(), lastMessage);
@@ -344,10 +347,7 @@ export class MessageListViewModel {
 
     if (!messageIsLoaded) {
       const conversationEntity = this.conversation();
-      const messageEntity = await this.conversationRepository.getMessageInConversationById(
-        conversationEntity,
-        messageId,
-      );
+      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
       conversationEntity.remove_messages();
       this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity);
     }
@@ -387,11 +387,7 @@ export class MessageListViewModel {
 
     messageEntity.is_resetting_session(true);
     try {
-      await this.conversationRepository.reset_session(
-        messageEntity.from,
-        messageEntity.client_id,
-        this.conversation().id,
-      );
+      await this.messageRepository.reset_session(messageEntity.from, messageEntity.client_id, this.conversation().id);
       resetProgress();
     } catch (error) {
       this.logger.warn('Error while trying to reset_session', error);
@@ -469,7 +465,7 @@ export class MessageListViewModel {
   };
 
   clickOnLike = (messageEntity: ContentMessage): void => {
-    this.conversationRepository.toggle_like(this.conversation(), messageEntity);
+    this.messageRepository.toggle_like(this.conversation(), messageEntity);
   };
 
   clickOnInvitePeople = (): void => {
@@ -549,17 +545,23 @@ export class MessageListViewModel {
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
     if (needsUpdate && this.isLastReceivedMessage(messageEntity, conversationEntity)) {
       conversationEntity.setTimestamp(lastKnownTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
-      this.conversationRepository.markAsRead(conversationEntity);
+      this.messageRepository.markAsRead(conversationEntity);
     }
   };
 
-  handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent) => {
-    const emailTarget: HTMLAnchorElement = (event.target as HTMLElement).closest('[data-email-link]');
+  handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent): boolean => {
+    if (event.which === 3) {
+      // Default browser behavior on right click
+      return true;
+    }
+
+    const emailTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-email-link]');
     if (emailTarget) {
       safeMailOpen(emailTarget.href);
       return false;
     }
-    const linkTarget: HTMLAnchorElement = (event.target as HTMLElement).closest('[data-md-link]');
+
+    const linkTarget = (event.target as HTMLElement).closest<HTMLAnchorElement>('[data-md-link]');
     if (linkTarget) {
       const href = linkTarget.href;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -576,9 +578,12 @@ export class MessageListViewModel {
       });
       return false;
     }
+
     const hasMentions = messageEntity instanceof Text && messageEntity.mentions().length;
-    const mentionElement = hasMentions && (event.target as HTMLElement).closest('.message-mention');
-    const userId = mentionElement && (mentionElement as any).dataset.userId;
+    const mentionElement = hasMentions
+      ? (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention')
+      : undefined;
+    const userId = mentionElement?.dataset.userId;
 
     if (userId) {
       (async () => {

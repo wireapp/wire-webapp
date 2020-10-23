@@ -24,7 +24,6 @@ import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import * as trackingHelpers from '../tracking/Helpers';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import type {CallingRepository} from '../calling/CallingRepository';
@@ -44,8 +43,6 @@ import 'Components/calling/chooseScreen';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {ModalsViewModel} from './ModalsViewModel';
 import {t} from 'Util/LocalizerUtil';
-import {EventName} from '../tracking/EventName';
-import {Segmantation} from '../tracking/Segmentation';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -150,19 +147,6 @@ export class CallingViewModel {
     };
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
-      const segmentations = {
-        [Segmantation.CALL.VIDEO]: callType === CALL_TYPE.VIDEO,
-        [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-        [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
-      };
-
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.INITIATED_CALL, segmentations);
       const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
       this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
         if (!call) {
@@ -177,19 +161,6 @@ export class CallingViewModel {
       if (shouldRing) {
         ring(call);
       }
-      const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
-      const guests = conversationEntity.participating_user_ets().filter(user => user.isGuest()).length;
-      const wirelessGuests = conversationEntity.participating_user_ets().filter(user => user.isTemporaryGuest()).length;
-      const segmentations = {
-        [Segmantation.CALL.VIDEO]: call.initialType === CALL_TYPE.VIDEO,
-        [Segmantation.CONVERSATION.EPHEMERAL_MESSAGE]: !!conversationEntity.globalMessageTimer(),
-        [Segmantation.CONVERSATION.GUESTS]: guests,
-        [Segmantation.CONVERSATION.SERVICES]: conversationEntity.hasService(),
-        [Segmantation.CONVERSATION.SIZE]: conversationEntity.participating_user_ets().length,
-        [Segmantation.CONVERSATION.TYPE]: trackingHelpers.getConversationType(conversationEntity),
-        [Segmantation.CONVERSATION.WIRELESS_GUESTS]: wirelessGuests,
-      };
-      amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.RECIEVED_CALL, segmentations);
     });
 
     this.callActions = {
@@ -209,8 +180,7 @@ export class CallingViewModel {
             },
           });
         } else {
-          const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-          this.callingRepository.answerCall(call, callType);
+          this.callingRepository.answerCall(call);
         }
       },
       leave: (call: Call) => {
@@ -235,7 +205,7 @@ export class CallingViewModel {
         this.callingRepository.toggleCamera(call);
       },
       toggleMute: (call: Call, muteState: boolean) => {
-        this.callingRepository.muteCall(call.conversationId, muteState);
+        this.callingRepository.muteCall(call, muteState);
       },
       toggleScreenshare: async (call: Call): Promise<void> => {
         if (call.getSelfParticipant().sharesScreen()) {

@@ -138,6 +138,7 @@ export class ContentViewModel {
       repositories.search,
       repositories.storage,
       repositories.user,
+      repositories.message,
     );
     this.groupCreation = new GroupCreationViewModel(
       repositories.conversation,
@@ -154,6 +155,7 @@ export class ContentViewModel {
       repositories.team,
       repositories.client,
       repositories.cryptography,
+      repositories.message,
     );
     this.messageList = new MessageListViewModel(
       mainViewModel,
@@ -161,6 +163,7 @@ export class ContentViewModel {
       repositories.integration,
       repositories.serverTime,
       repositories.user,
+      repositories.message,
     );
     this.titleBar = new TitleBarViewModel(
       mainViewModel.calling,
@@ -195,6 +198,7 @@ export class ContentViewModel {
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
+      repositories.message,
     );
     this.preferencesDevices = new PreferencesDevicesViewModel(
       mainViewModel,
@@ -239,7 +243,7 @@ export class ContentViewModel {
       }
     });
 
-    this.userRepository.connect_requests.subscribe(requests => {
+    this.userRepository.connectRequests.subscribe(requests => {
       const isStateRequests = this.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
       if (isStateRequests && !requests.length) {
         this.showConversation(this.conversationRepository.getMostRecentConversation());
@@ -253,12 +257,12 @@ export class ContentViewModel {
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  _initSubscriptions() {
+  private _initSubscriptions() {
     amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this.switchContent);
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.showConversation);
   }
 
-  _shiftContent(contentSelector: string): void {
+  private _shiftContent(contentSelector: string): void {
     const incomingCssClass = 'content-animation-incoming-horizontal-left';
 
     $(contentSelector)
@@ -397,7 +401,7 @@ export class ContentViewModel {
   private readonly checkContentAvailability = (state: string) => {
     const isStateRequests = state === ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isStateRequests) {
-      const hasConnectRequests = !!this.userRepository.connect_requests().length;
+      const hasConnectRequests = !!this.userRepository.connectRequests().length;
       if (!hasConnectRequests) {
         return ContentViewModel.STATE.WATERMARK;
       }

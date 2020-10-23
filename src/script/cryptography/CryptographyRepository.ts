@@ -42,9 +42,6 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
-import {RaygunStatic} from 'raygun4js';
-
-declare const Raygun: RaygunStatic;
 
 export interface SignalingKeys {
   enckey: string;
@@ -134,7 +131,7 @@ export class CryptographyRepository {
 
   /**
    * Get the fingerprint of the local identity.
-   * @returns {string} Fingerprint of local identity public key
+   * @returns Fingerprint of local identity public key
    */
   getLocalFingerprint() {
     return this.formatFingerprint(this.cryptobox.identity.public_key.fingerprint());
@@ -182,8 +179,8 @@ export class CryptographyRepository {
 
   /**
    * Get a pre-key for each client in the user client map.
-   * @param {Object} recipients User client map to request pre-keys for
-   * @returns {Promise} Resolves with a map of pre-keys for the requested clients
+   * @param recipients User client map to request pre-keys for
+   * @returns Resolves with a map of pre-keys for the requested clients
    */
   getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
     return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
@@ -224,9 +221,9 @@ export class CryptographyRepository {
    * Construct a session ID.
    *
    * @todo Make public
-   * @param {string} userId User ID for the remote participant
-   * @param {string} clientId Client ID of the remote participant
-   * @returns {string} Session ID
+   * @param userId User ID for the remote participant
+   * @param clientId Client ID of the remote participant
+   * @returns Session ID
    */
   private constructSessionId(userId: string, clientId: string): string {
     return `${userId}@${clientId}`;
@@ -312,6 +309,9 @@ export class CryptographyRepository {
 
     try {
       const genericMessage = await this.decryptEvent(event);
+      this.logger.info(
+        `Decrypted message with ID '${genericMessage.messageId}' for conversation '${event.conversation}'`,
+      );
       const mappedMessage = await this.cryptographyMapper.mapGenericMessage(genericMessage, event);
       return mappedMessage;
     } catch (error) {
@@ -331,7 +331,6 @@ export class CryptographyRepository {
   ): Promise<CryptoboxSession | void> {
     try {
       if (!preKey) {
-        Raygun.send(new Error('Failed to create session: No pre-key found'));
         this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
       } else {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
@@ -340,7 +339,6 @@ export class CryptographyRepository {
         return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
-      Raygun.send(new Error(`Failed to create session: ${error.message}`));
       const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
       this.logger.warn(message, error);
     }
@@ -354,7 +352,7 @@ export class CryptographyRepository {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
-          messagePayload.recipients[userId] = messagePayload.recipients[userId] || {};
+          messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
             const sessionId = this.constructSessionId(userId, clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
@@ -410,7 +408,7 @@ export class CryptographyRepository {
       if (cipherText) {
         messagePayload.recipients[userId][clientId] = cipherText;
       } else {
-        missingRecipients[userId] = missingRecipients[userId] || [];
+        missingRecipients[userId] ||= [];
         missingRecipients[userId].push(clientId);
       }
     });
@@ -526,7 +524,7 @@ export class CryptographyRepository {
   }
 
   /**
-   * Report decryption error to Localytics and stack traces to Raygun.
+   * Report decryption error to Countly.
    *
    * @param Error error Error from event decryption
    */
@@ -537,16 +535,5 @@ export class CryptographyRepository {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
       cause: (error as AxiosError).code || error.message,
     });
-
-    const customData = {
-      clientLocalClass: this.currentClient().class,
-      clientLocalType: this.currentClient().type,
-      errorCode: (error as AxiosError).code,
-      eventType: eventType,
-    };
-
-    const raygunError = new Error(`Decryption failed: ${(error as AxiosError).code || error.message}`);
-    raygunError.stack = error.stack;
-    Raygun.send(raygunError, customData);
   }
 }

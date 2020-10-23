@@ -50,7 +50,7 @@ describe('AssetRepository', () => {
       const conversation_id = createRandomUuid();
       const asset_id = createRandomUuid();
       remote_data = AssetRemoteData.v1(conversation_id, asset_id);
-      spyOn(assetRepository, '_loadBuffer').and.returnValue(
+      spyOn(assetRepository as any, 'loadBuffer').and.returnValue(
         Promise.resolve({buffer: video_bytes.buffer, mimeType: video_type}),
       );
     });
@@ -71,7 +71,7 @@ describe('AssetRepository', () => {
       const conversation_id = createRandomUuid();
       const asset_id = createRandomUuid();
       remote_data = AssetRemoteData.v2(conversation_id, asset_id, new Uint8Array(keyBytes), new Uint8Array(sha256));
-      spyOn(assetRepository, '_loadBuffer').and.returnValue(
+      spyOn(assetRepository as any, 'loadBuffer').and.returnValue(
         Promise.resolve({buffer: cipherText, mimeType: video_type}),
       );
     });

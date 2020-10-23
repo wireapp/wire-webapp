@@ -21,54 +21,63 @@
 
 import https from 'https';
 import * as path from 'path';
-import fs from 'fs';
+import fs from 'fs-extra';
 import AdmZip from 'adm-zip';
 
-// @ts-ignore
-import sortJson from 'sort-json';
-
-const root = path.resolve(__dirname, '..');
-const destinationPath = path.resolve(root, 'src/i18n');
-const zipPath = path.resolve(root, 'temp/i18n/wire-webapp.zip');
+const rootDir = path.resolve(__dirname, '..');
+const destinationPath = path.join(rootDir, 'src/i18n');
+const zipDir = path.join(rootDir, 'temp/i18n');
+const zipPath = path.join(zipDir, 'wire-webapp.zip');
 
 // https://crowdin.com/project/wire-webapp/settings#api
-const getProjectAPIKey = () => {
-  const crowdinYaml = path.join(root, 'keys/crowdin.yaml');
+const getProjectAuthentication = () => {
+  const crowdinYaml = path.join(rootDir, 'keys/crowdin.yaml');
   const crowdinYamlContent = fs.readFileSync(crowdinYaml, 'utf8');
-  const keyRegex = /api_key: ([0-9a-f]+)/;
-  return crowdinYamlContent.match(keyRegex)[1];
+  const keyRegex = /api_key: ["']?([0-9a-f]+)["']?/;
+  const usernameRegex = /username: ["']?(.+)["']?/;
+  return {
+    apiKey: (crowdinYamlContent.match(keyRegex) || [])[1],
+    username: (crowdinYamlContent.match(usernameRegex) || [])[1],
+  };
 };
 
-const projectAPIKey = getProjectAPIKey();
+const {apiKey: accountApiKey, username} = getProjectAuthentication();
 
+// Crowdin API v1: https://support.crowdin.com/api/api-integration-setup/
 const CROWDIN_API = 'https://api.crowdin.com/api/project/wire-webapp';
 
 const CROWDIN_URL = {
-  DOWNLOAD: `${CROWDIN_API}/download/all.zip?key=${projectAPIKey}`,
-  EXPORT: `${CROWDIN_API}/export?key=${projectAPIKey}&json`,
+  DOWNLOAD: `${CROWDIN_API}/download/all.zip?login=${username}&account-key=${accountApiKey}`,
+  EXPORT: `${CROWDIN_API}/export?login=${username}&account-key=${accountApiKey}&json`,
 };
 
-function fetchUpdates() {
+function fetchUpdates(): Promise<void> {
   console.info('Building translations ...');
 
   return new Promise((resolve, reject) => {
     https.get(CROWDIN_URL.EXPORT, response => {
-      if (response.statusCode < 200 || response.statusCode > 299) {
-        reject(`Failed to export, status code: ${response.statusCode}`);
+      if (!response.statusCode) {
+        return reject(new Error('Failed to export, no status code'));
+      } else if (response.statusCode < 200 || response.statusCode > 299) {
+        return reject(new Error(`Failed to export, status code: ${response.statusCode}`));
       }
-      response.on('data', resolve);
-      response.on('error', reject);
+      response.on('data', () => resolve());
+      response.on('error', error => reject(error));
     });
   });
 }
 
-function download() {
+async function download(): Promise<void> {
   console.info('Downloading built translations ...');
 
-  return new Promise((resolve, reject) => {
+  await fs.ensureDir(zipDir);
+
+  await new Promise((resolve, reject) => {
     https.get(CROWDIN_URL.DOWNLOAD, response => {
-      if (response.statusCode < 200 || response.statusCode > 299) {
-        reject(`Failed to download, status code: ${response.statusCode}`);
+      if (!response.statusCode) {
+        return reject(new Error('Failed to export, no status code'));
+      } else if (response.statusCode < 200 || response.statusCode > 299) {
+        return reject(new Error(`Failed to export, status code: ${response.statusCode}`));
       }
 
       response.on('error', reject);
@@ -78,13 +87,18 @@ function download() {
 
       response.pipe(writeStream);
 
+      writeStream.on('error', error => reject(error));
+
       writeStream.on('finish', () => {
+        console.info('Extracting zip file ...');
         const zip = new AdmZip(zipPath);
         zip.getEntries().forEach(entry => {
           if (!entry.isDirectory) {
+            console.info(`Writing ${path.join(destinationPath, entry.name)} ...`);
             zip.extractEntryTo(entry, destinationPath, false, true);
           }
         });
+        console.info('Deleting zip file ...');
         fs.unlinkSync(zipPath);
         resolve();
       });
@@ -92,13 +106,8 @@ function download() {
   });
 }
 
-function sortTranslationJson() {
-  return fs.readdirSync(destinationPath).forEach(filename => sortJson.overwrite(path.join(destinationPath, filename)));
-}
-
 fetchUpdates()
   .then(download)
-  .then(sortTranslationJson)
   .catch(error => {
     console.error(error);
     process.exit(1);

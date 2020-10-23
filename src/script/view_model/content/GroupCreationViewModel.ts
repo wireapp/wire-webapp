@@ -26,13 +26,10 @@ import {t} from 'Util/LocalizerUtil';
 import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import * as trackingHelpers from '../../tracking/Helpers';
-import {EventName} from '../../tracking/EventName';
 import {ACCESS_STATE, TEAM} from '../../conversation/AccessState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {TeamRepository} from '../../team/TeamRepository';
 import {UserRepository} from '../../user/UserRepository';
-import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {SearchRepository} from '../../search/SearchRepository';
 
@@ -43,7 +40,7 @@ export class GroupCreationViewModel {
   isShown: ko.Observable<boolean>;
   state: ko.Observable<string>;
   private isCreatingConversation: boolean;
-  private groupCreationSource: GroupCreationSource;
+  groupCreationSource: GroupCreationSource;
   nameError: ko.Observable<string>;
   nameInput: ko.Observable<string>;
   selectedContacts: ko.ObservableArray<User>;
@@ -105,7 +102,7 @@ export class GroupCreationViewModel {
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
         if (!this.isTeam()) {
-          return this.userRepository.connected_users();
+          return this.userRepository.connectedUsers();
         }
 
         if (this.isGuestRoom()) {
@@ -162,9 +159,6 @@ export class GroupCreationViewModel {
     if (userEntity) {
       this.selectedContacts.push(userEntity);
     }
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_GROUP_CREATION, {
-      method: this.groupCreationSource,
-    });
   };
 
   clickOnBack = (): void => {
@@ -200,8 +194,6 @@ export class GroupCreationViewModel {
         this.isShown(false);
 
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
-
-        this._trackGroupCreation(conversationEntity);
       } catch (error) {
         this.isCreatingConversation = false;
         throw error;
@@ -227,10 +219,6 @@ export class GroupCreationViewModel {
       return this.nameError(t('groupCreationPreferencesErrorNameShort'));
     }
 
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.OPENED_SELECT_PARTICIPANTS, {
-      method: this.groupCreationSource,
-    });
-
     this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
   };
 
@@ -243,60 +231,5 @@ export class GroupCreationViewModel {
     this.selectedContacts([]);
     this.state(GroupCreationViewModel.STATE.DEFAULT);
     this.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
-  };
-
-  _trackGroupCreation = (conversationEntity?: Conversation): void => {
-    if (!conversationEntity) {
-      return;
-    }
-    this._trackGroupCreationSucceeded(conversationEntity);
-    this._trackAddParticipants(conversationEntity);
-  };
-
-  _trackGroupCreationSucceeded = (conversationEntity: Conversation): void => {
-    const segmentations: {
-      is_allow_guests?: boolean;
-      method: GroupCreationSource;
-      with_participants: boolean;
-    } = {
-      method: this.groupCreationSource,
-      with_participants: !!this.selectedContacts().length,
-    };
-
-    const isTeamConversation = !!conversationEntity.team_id;
-    if (isTeamConversation) {
-      segmentations.is_allow_guests = !conversationEntity.isTeamOnly();
-    }
-
-    const eventName = EventName.CONVERSATION.GROUP_CREATION_SUCCEEDED;
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, eventName, segmentations);
-  };
-
-  _trackAddParticipants = (conversationEntity: Conversation): void => {
-    let segmentations: {
-      guest_num?: number;
-      is_allow_guests?: boolean;
-      method: GroupCreationSource;
-      temporary_guest_num?: number;
-      user_num: number;
-    } = {
-      method: 'create',
-      user_num: conversationEntity.getNumberOfParticipants(),
-    };
-
-    const isTeamConversation = !!conversationEntity.team_id;
-    if (isTeamConversation) {
-      const participants = trackingHelpers.getParticipantTypes(conversationEntity.participating_user_ets(), true);
-
-      segmentations = {
-        ...segmentations,
-        guest_num: participants.guests,
-        is_allow_guests: conversationEntity.isGuestRoom(),
-        temporary_guest_num: participants.temporaryGuests,
-        user_num: participants.users,
-      };
-    }
-
-    amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.CONVERSATION.ADD_PARTICIPANTS, segmentations);
   };
 }

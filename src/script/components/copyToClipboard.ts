@@ -24,10 +24,10 @@ class CopyToClipboard {
     this.text = params.text;
   }
 
-  onClick(viewModel: CopyToClipboard, event: JQuery.Event): void {
+  onClick(viewModel: CopyToClipboard, event: JQuery.Event<HTMLElement, KeyboardEvent>): void {
     if (window.getSelection) {
       const selectionRange = document.createRange();
-      selectionRange.selectNode(event.currentTarget as Node);
+      selectionRange.selectNode(event.currentTarget);
       window.getSelection().removeAllRanges();
       window.getSelection().addRange(selectionRange);
     }

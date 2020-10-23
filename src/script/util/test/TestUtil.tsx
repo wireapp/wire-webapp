@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2019 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,7 @@
  *
  */
 
-importScripts('jszip.min.js');
+import {mount} from 'enzyme';
+import React from 'react';
 
-self.addEventListener('message', async event => {
-  try {
-    const archive = await JSZip.loadAsync(event.data);
-    const files = {};
-    for (const fileName in archive.files) {
-      files[fileName] = await archive.files[fileName].async('uint8array');
-    }
-    self.postMessage(files);
-  } catch (error) {
-    self.postMessage({error: error.message});
-  }
-
-  return self.close();
-});
+export const mountComponent = (component: React.ReactElement) => mount(component);

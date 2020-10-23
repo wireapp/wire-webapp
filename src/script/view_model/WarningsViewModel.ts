@@ -23,13 +23,13 @@ import {amplify} from 'amplify';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {Environment} from 'Util/Environment';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {afterRender} from 'Util/util';
 
 import {Config, Configuration} from '../Config';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
+import {Runtime} from '@wireapp/commons';
 
 export class WarningsViewModel {
   elementId: 'warnings';
@@ -40,7 +40,7 @@ export class WarningsViewModel {
   name: ko.Observable<string>;
   warningDimmed: ko.PureComputed<boolean>;
   brandName: string;
-  browser: typeof Environment.browser;
+  Runtime: typeof Runtime;
   isDesktop: boolean;
   type: typeof WarningsViewModel.TYPE;
   lifeCycleRefresh: string;
@@ -90,8 +90,7 @@ export class WarningsViewModel {
     // Array of warning banners
     this.warnings = ko.observableArray();
     this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
-    this.browser = Environment.browser;
-    this.isDesktop = Environment.desktop;
+    this.Runtime = Runtime;
     this.type = WarningsViewModel.TYPE;
     this.Config = Config.getConfig();
 
@@ -134,9 +133,8 @@ export class WarningsViewModel {
   /**
    * Close warning.
    * @note Used to close a warning banner by clicking the close button
-   * @returns {undefined} No return value
    */
-  closeWarning = () => {
+  closeWarning = (): void => {
     const warningToClose = this.visibleWarning();
     this.dismissWarning(warningToClose);
 

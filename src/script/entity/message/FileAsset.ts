@@ -41,6 +41,8 @@ export class FileAsset extends Asset {
   public meta: Partial<AssetMetaData>;
   public readonly status: ko.Observable<AssetTransferState>;
   public readonly upload_failed_reason: ko.Observable<ProtobufAsset.NotUploaded>;
+  public conversationId: string;
+  public correlation_id: string;
 
   constructor(id?: string) {
     super(id);
@@ -57,7 +59,7 @@ export class FileAsset extends Asset {
     // contains asset meta data as object
     this.meta = {};
 
-    // asset url, instance of an otr asset this has to be decrypted
+    // asset URL, instance of an OTR asset this has to be decrypted
     this.original_resource = ko.observable();
     this.preview_resource = ko.observable();
 

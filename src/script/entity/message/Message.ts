@@ -35,18 +35,14 @@ import type {CallMessage} from './CallMessage';
 import type {ContentMessage} from './ContentMessage';
 import type {FileAsset} from './FileAsset';
 import type {CompositeMessage} from './CompositeMessage';
-import {MemberMessage} from './MemberMessage';
-import {SystemMessage} from './SystemMessage';
-import {VerificationMessage} from './VerificationMessage';
-import {LegalHoldMessage} from './LegalHoldMessage';
-import {DecryptErrorMessage} from './DecryptErrorMessage';
-import {PingMessage} from './PingMessage';
-import {LinkPreview} from './LinkPreview';
-
-export interface ReadReceipt {
-  time: string;
-  userId: string;
-}
+import type {MemberMessage} from './MemberMessage';
+import type {SystemMessage} from './SystemMessage';
+import type {VerificationMessage} from './VerificationMessage';
+import type {LegalHoldMessage} from './LegalHoldMessage';
+import type {DecryptErrorMessage} from './DecryptErrorMessage';
+import type {PingMessage} from './PingMessage';
+import type {LinkPreview} from './LinkPreview';
+import type {ReadReceipt} from '../../storage/EventRecord';
 
 export class Message {
   private messageTimerStarted: boolean;
@@ -65,10 +61,10 @@ export class Message {
   public readonly ephemeral_remaining: ko.Observable<number>;
   public readonly ephemeral_started: ko.Observable<number>;
   public readonly ephemeral_status: ko.Computed<EphemeralStatusType>;
-  public readonly expectsReadConfirmation: boolean;
+  public expectsReadConfirmation: boolean;
   public readonly headerSenderName: ko.PureComputed<string>;
   public readonly isObfuscated: ko.PureComputed<boolean>;
-  public readonly legalHoldStatus?: LegalHoldStatus;
+  public legalHoldStatus?: LegalHoldStatus;
   public readonly status: ko.Observable<StatusType>;
   public readonly timestamp_affects_order: ko.PureComputed<boolean>;
   public readonly timestamp: ko.Observable<number>;
@@ -392,7 +388,7 @@ export class Message {
     );
   }
 
-  // Start the ephemeral timer for the message.
+  /** Start the ephemeral timer for the message. */
   startMessageTimer = (timeOffset: number): void => {
     if (this.messageTimerStarted) {
       return;
@@ -413,7 +409,7 @@ export class Message {
   /**
    * Update the status of a message.
    * @param updated_status New status of message
-   * @returns Returns the new status on a successful update, otherwise "false"
+   * @returns Returns the new status on a successful update, `false` otherwise
    */
   update_status(updated_status: StatusType): StatusType | false {
     if (this.status() >= StatusType.SENT) {

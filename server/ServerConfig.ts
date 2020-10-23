@@ -1,4 +1,4 @@
-import type {IHelmetContentSecurityPolicyDirectives} from 'helmet';
+import {ContentSecurityPolicyOptions} from 'helmet/dist/middlewares/content-security-policy';
 
 export interface ServerConfig {
   CLIENT: {
@@ -16,6 +16,7 @@ export interface ServerConfig {
       APPLOCK_SCHEDULED_TIMEOUT: number;
       APPLOCK_UNFOCUS_TIMEOUT: number;
       CHECK_CONSENT: boolean;
+      CONFERENCE_AUTO_MUTE: boolean;
       DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
       ENABLE_ACCOUNT_REGISTRATION: boolean;
       ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
@@ -29,7 +30,6 @@ export interface ServerConfig {
     MAX_GROUP_PARTICIPANTS: number;
     MAX_VIDEO_PARTICIPANTS: number;
     NEW_PASSWORD_MINIMUM_LENGTH: number;
-    RAYGUN_API_KEY: string;
     URL: {
       ACCOUNT_BASE: string;
       MOBILE_BASE: string;
@@ -48,6 +48,7 @@ export interface ServerConfig {
         SCREEN_ACCESS_DENIED: string;
       };
       TEAMS_BASE: string;
+      TEAMS_CREATE: string;
       TERMS_OF_USE_PERSONAL: string;
       TERMS_OF_USE_TEAMS: string;
       WEBSITE_BASE: string;
@@ -60,7 +61,7 @@ export interface ServerConfig {
   SERVER: {
     APP_BASE: string;
     CACHE_DURATION_SECONDS: number;
-    CSP: IHelmetContentSecurityPolicyDirectives;
+    CSP: ContentSecurityPolicyOptions['directives'];
     DEVELOPMENT?: boolean;
     ENFORCE_HTTPS: boolean;
     ENVIRONMENT: string;

@@ -19,22 +19,26 @@
 
 import {Confirmation} from '@wireapp/protocol-messaging';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 
 import {StatusType} from '../../message/StatusType';
 import {ClientEvent} from '../Client';
+import type {UserRepository} from '../../user/UserRepository';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {EventService} from '../EventService';
+import type {EventRecord} from '../../storage/EventRecord';
 
 export class ReceiptsMiddleware {
-  /**
-   * Construct a new ReadReceiptMiddleware.
-   * This class is responsible for parsing incoming confirmation messages
-   * It will update original messages when a confirmation is received
-   *
-   * @param {EventService} eventService Repository that handles events
-   * @param {UserRepository} userRepository Repository that handles users
-   * @param {ConversationRepository} conversationRepository  Repository for conversation interactions
-   */
-  constructor(eventService, userRepository, conversationRepository) {
+  private readonly eventService: EventService;
+  private readonly userRepository: UserRepository;
+  private readonly conversationRepository: ConversationRepository;
+  private readonly logger: Logger;
+
+  constructor(
+    eventService: EventService,
+    userRepository: UserRepository,
+    conversationRepository: ConversationRepository,
+  ) {
     this.eventService = eventService;
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
@@ -43,11 +47,8 @@ export class ReceiptsMiddleware {
 
   /**
    * Handles incoming (and injected outgoing) events.
-   *
-   * @param {Object} event event in the DB format
-   * @returns {Promise<Object>} event - the original event
    */
-  processEvent(event) {
+  processEvent(event: EventRecord): Promise<EventRecord> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
       case ClientEvent.CONVERSATION.KNOCK:
@@ -65,7 +66,7 @@ export class ReceiptsMiddleware {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
         return this.eventService
           .loadEvents(event.conversation, messageIds)
-          .then(originalEvents => {
+          .then((originalEvents: EventRecord[]) => {
             originalEvents.forEach(originalEvent => this._updateConfirmationStatus(originalEvent, event));
             this.logger.info(
               `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
@@ -81,24 +82,27 @@ export class ReceiptsMiddleware {
     }
   }
 
-  isMyMessage(originalEvent) {
+  isMyMessage(originalEvent: EventRecord): boolean {
     return this.userRepository.self() && this.userRepository.self().id === originalEvent.from;
   }
 
-  _updateConfirmationStatus(originalEvent, confirmationEvent) {
+  private _updateConfirmationStatus(
+    originalEvent: EventRecord,
+    confirmationEvent: EventRecord,
+  ): Promise<EventRecord | void> {
     const status = confirmationEvent.data.status;
     const currentReceipts = originalEvent.read_receipts || [];
 
     // I shouldn't receive this read receipt
     if (!this.isMyMessage(originalEvent)) {
-      return;
+      return Promise.resolve();
     }
 
     const hasReadMessage =
       status === StatusType.SEEN && currentReceipts.some(({userId}) => confirmationEvent.from === userId);
     if (hasReadMessage) {
       // if the user is already among the readers of the message, nothing more to do
-      return;
+      return Promise.resolve();
     }
     const commonUpdates = {status};
     const readReceiptUpdate =

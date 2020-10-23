@@ -53,6 +53,7 @@ import './asset/linkPreviewAsset';
 import './asset/locationAsset';
 import './asset/videoAsset';
 import './asset/messageButton';
+import type {MessageRepository} from '../conversation/MessageRepository';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -62,6 +63,7 @@ interface MessageParams {
   isMarked: ko.Observable<boolean>;
   isSelfTemporaryGuest: ko.Observable<boolean>;
   message: ContentMessage;
+  messageRepository: MessageRepository;
   onClickAvatar: (user: User) => void;
   onClickCancelRequest: (message: ContentMessage) => void;
   onClickImage: (message: ContentMessage, event: UIEvent) => void;
@@ -87,6 +89,7 @@ class Message {
   contextMenuEntries: ko.PureComputed<ContextMenuEntry[]>;
   conversation: ko.Observable<Conversation>;
   conversationRepository: ConversationRepository;
+  messageRepository: MessageRepository;
   EphemeralStatusType: typeof EphemeralStatusType;
   hasReadReceiptsTurnedOn: boolean;
   includesOnlyEmojis: (text: string) => boolean;
@@ -137,6 +140,7 @@ class Message {
       onLike,
       onMessageMarked,
       conversationRepository,
+      messageRepository,
       actionsViewModel,
     }: MessageParams,
     componentInfo: {element: HTMLElement},
@@ -175,6 +179,7 @@ class Message {
     );
 
     this.conversationRepository = conversationRepository;
+    this.messageRepository = messageRepository;
     this.EphemeralStatusType = EphemeralStatusType;
     this.StatusType = StatusType;
 
@@ -295,7 +300,7 @@ class Message {
   clickButton(message: CompositeMessage, buttonId: string) {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
       message.waitingButtonId(buttonId);
-      this.conversationRepository.sendButtonAction(this.conversation(), message, buttonId);
+      this.messageRepository.sendButtonAction(this.conversation(), message, buttonId);
     }
   }
 
@@ -384,7 +389,7 @@ const normalTemplate: string = `
         conversation: conversation,
         quote: message.quote(),
         selfId: selfId,
-        conversationRepository: conversationRepository,
+        messageRepository: messageRepository,
         showDetail: onClickImage,
         focusMessage: onClickTimestamp,
         handleClickOnMessage: onClickMessage,
@@ -403,7 +408,7 @@ const normalTemplate: string = `
       <!-- /ko -->
       <!-- ko if: asset.is_text() -->
         <!-- ko if: asset.should_render_text -->
-          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {click: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
+          <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {mousedown: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: $parent.message"></link-preview-asset>

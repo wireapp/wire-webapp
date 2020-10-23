@@ -17,224 +17,92 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
+import {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import type {Notification} from '@wireapp/api-client/dist/notification';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {appendParameter} from 'Util/UrlUtil';
+import {WebSocketClient, OnConnect} from '@wireapp/api-client/dist/tcp/';
+import {WEBSOCKET_STATE} from '@wireapp/api-client/dist/tcp/ReconnectingWebsocket';
 
-import {AuthRepository} from '../auth/AuthRepository';
-import type {BackendClient} from '../service/BackendClient';
-import {StorageKey} from '../storage/StorageKey';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
-enum CHANGE_TRIGGER {
-  CLEANUP = 'CHANGE_TRIGGER.CLEANUP',
-  CLOSE = 'CHANGE_TRIGGER.CLOSE',
-  ERROR = 'CHANGE_TRIGGER.ERROR',
-  LOGOUT = 'CHANGE_TRIGGER.LOGOUT',
-  OFFLINE = 'CHANGE_TRIGGER.OFFLINE',
-  ONLINE = 'CHANGE_TRIGGER.ONLINE',
-  PAGE_NAVIGATION = 'CHANGE_TRIGGER.PAGE_NAVIGATION',
-  PING_INTERVAL = 'CHANGE_TRIGGER.PING_INTERVAL',
-  READY_STATE = 'CHANGE_TRIGGER.READY_STATE',
-  WARNING_BAR = 'CHANGE_TRIGGER.WARNING_BAR',
-}
-
-export type OnNotificationCallback = (data: string) => void;
+export type OnNotificationCallback = (data: Notification) => void;
 
 export class WebSocketService {
   private readonly apiClient: APIClient;
-  private readonly backendClient: BackendClient;
-  private readonly clientId?: string;
   private readonly logger: Logger;
-  private connectionUrl: string;
-  private hasAlreadySentUnansweredPing: boolean;
-  private onNotification?: OnNotificationCallback;
-  private pendingReconnectTrigger?: CHANGE_TRIGGER;
-  private pingIntervalId?: number;
-  private reconnectCount: number;
-  private reconnectTimeoutId?: number;
-  private socket: WebSocket;
 
-  static get CHANGE_TRIGGER(): typeof CHANGE_TRIGGER {
-    return CHANGE_TRIGGER;
-  }
+  public clientId?: string;
 
-  static get CONFIG() {
-    return {
-      PING_INTERVAL: TIME_IN_MILLIS.SECOND * 5,
-      RECONNECT_INTERVAL: TIME_IN_MILLIS.SECOND * 15,
-    };
-  }
-
-  constructor(apiClient: APIClient, backendClient: BackendClient) {
+  constructor(apiClient: APIClient) {
     this.apiClient = apiClient;
-    this.backendClient = backendClient;
     this.logger = getLogger('WebSocketService');
-
-    this.clientId = undefined;
-    this.connectionUrl = '';
-    this.socket = undefined;
-
-    this.onNotification = undefined;
-
-    this.pingIntervalId = undefined;
-    this.hasAlreadySentUnansweredPing = false;
-
-    this.reconnectTimeoutId = undefined;
-    this.reconnectCount = 0;
-
-    this.pendingReconnectTrigger = undefined;
-
-    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED, this.pendingReconnect.bind(this));
   }
+
+  disconnect = () => {
+    this.logger.info('Disconnecting websocket');
+    this.apiClient.disconnect();
+  };
+
+  lockWebsocket = () => {
+    this.apiClient.transport.ws.lock();
+  };
+
+  unlockWebsocket = () => {
+    this.apiClient.transport.ws.unlock();
+  };
 
   /**
    * Establish the WebSocket connection.
    * @param onNotification Function to be called on incoming notifications
    * @returns Resolves once the WebSocket connects
    */
-  connect(onNotification: OnNotificationCallback): Promise<void> {
-    this.onNotification = onNotification;
+  async connect(onNotification: OnNotificationCallback, onConnect: OnConnect): Promise<void> {
+    this.apiClient.context.clientId = this.clientId;
+    this.apiClient.removeListener(APIClient.TOPIC.ON_LOGOUT, this.disconnect);
+    this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, this.disconnect);
 
-    return new Promise(resolve => {
-      this.connectionUrl = `${this.backendClient.webSocketUrl}/await?access_token=${this.apiClient['accessTokenStore'].accessToken?.access_token}`;
-      if (this.clientId) {
-        this.connectionUrl = appendParameter(this.connectionUrl, `client=${this.clientId}`);
-      }
+    this.apiClient.transport.ws.removeAllListeners();
+    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, onNotification as any);
 
-      const wrongSocketType = typeof this.socket === 'object';
-      if (wrongSocketType) {
-        this.reset(CHANGE_TRIGGER.CLEANUP);
-      }
-
-      this.socket = new WebSocket(this.connectionUrl);
-      this.socket.binaryType = 'blob';
-
-      // http://stackoverflow.com/a/27828483/451634
-      delete (this.socket as any).URL;
-
-      this.socket.onopen = () => {
-        this.logger.info(`Connected WebSocket to: ${this.backendClient.webSocketUrl}/await`);
-        this.pingIntervalId = window.setInterval(this.sendPing, WebSocketService.CONFIG.PING_INTERVAL);
-        resolve();
-      };
-
-      this.socket.onerror = event => {
-        this.logger.error('WebSocket connection error.', event);
-        this.reset(CHANGE_TRIGGER.ERROR, true);
-        // We need to assume an invalid access token
-        // so we fetch any endpoint in order to get a new access token for the api-client.
-        this.apiClient.self.api.getSelf();
-      };
-
-      this.socket.onclose = event => {
-        this.logger.warn('Closed WebSocket connection', event);
-        this.reset(CHANGE_TRIGGER.CLOSE, true);
-      };
-
-      this.socket.onmessage = event => {
-        if (event.data instanceof Blob) {
-          const blobReader = new FileReader();
-          blobReader.onload = () => {
-            if (blobReader.result === 'pong') {
-              this.hasAlreadySentUnansweredPing = false;
-              amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
-            } else {
-              this.onNotification(JSON.parse(blobReader.result.toString()));
-            }
-          };
-          blobReader.readAsText(event.data);
+    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, (state: WEBSOCKET_STATE) => {
+      this.logger.info(`Websocket state change: ${WEBSOCKET_STATE[state]}`);
+      switch (state) {
+        case WEBSOCKET_STATE.CONNECTING: {
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
+          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          return;
         }
-      };
-    });
-  }
-
-  /**
-   * Reconnect WebSocket after access token has been refreshed.
-   */
-  pendingReconnect(): void {
-    if (this.pendingReconnectTrigger) {
-      this.logger.info(`Reconnecting WebSocket (TRIGGER: ${this.pendingReconnectTrigger}) after access token refresh`);
-      this.reconnect(this.pendingReconnectTrigger);
-      this.pendingReconnectTrigger = undefined;
-    }
-  }
-
-  /**
-   * Try to re-establish the WebSocket connection.
-   */
-  reconnect(trigger: CHANGE_TRIGGER): Promise<void> {
-    if (!loadValue(StorageKey.AUTH.ACCESS_TOKEN.EXPIRATION)) {
-      this.logger.info(`Access token has to be refreshed before reconnecting the WebSocket triggered by '${trigger}'`);
-      this.pendingReconnectTrigger = trigger;
-      amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, AuthRepository.ACCESS_TOKEN_TRIGGER.WEB_SOCKET);
-    }
-
-    this.reconnectCount++;
-    const reconnect = () => {
-      this.logger.info(`Trying to re-establish WebSocket connection. Try #${this.reconnectCount}`);
-      return this.connect(this.onNotification).then(() => {
-        this.reconnectCount = 0;
-        this.logger.info(`Reconnect to WebSocket triggered by '${trigger}'`);
-        return this.reconnected();
-      });
-    };
-
-    const isFirstReconnectAttempt = this.reconnectCount === 1;
-    if (isFirstReconnectAttempt) {
-      return reconnect();
-    }
-    this.reconnectTimeoutId = window.setTimeout(() => reconnect(), WebSocketService.CONFIG.RECONNECT_INTERVAL);
-    return Promise.resolve();
-  }
-
-  /**
-   * Behavior when WebSocket connection is re-established after a connection drop.
-   */
-  reconnected(): void {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
-    this.logger.warn('Re-established WebSocket connection.');
-    amplify.publish(WebAppEvents.CONNECTION.ONLINE);
-  }
-
-  /**
-   * Reset the WebSocket connection.
-   * @param reconnect Re-establish the WebSocket connection
-   */
-  reset(trigger: CHANGE_TRIGGER, reconnect: boolean = false): void {
-    if (this.socket?.onclose) {
-      this.logger.info(`WebSocket reset triggered by '${trigger}'`);
-      this.socket.onerror = undefined;
-      this.socket.onclose = undefined;
-      this.socket.close();
-      window.clearInterval(this.pingIntervalId);
-      window.clearTimeout(this.reconnectTimeoutId);
-      this.hasAlreadySentUnansweredPing = false;
-    }
-
-    if (reconnect) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
-      this.reconnect(trigger);
-    }
-  }
-
-  sendPing = () => {
-    const isReadyStateOpen = this.socket.readyState === 1;
-    if (isReadyStateOpen) {
-      if (this.hasAlreadySentUnansweredPing) {
-        this.logger.warn('Ping interval check failed');
-        return this.reconnect(CHANGE_TRIGGER.PING_INTERVAL);
+        case WEBSOCKET_STATE.CLOSING: {
+          return;
+        }
+        case WEBSOCKET_STATE.CLOSED: {
+          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
+          return;
+        }
+        case WEBSOCKET_STATE.OPEN: {
+          amplify.publish(WebAppEvents.CONNECTION.ONLINE);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+        }
       }
-      this.hasAlreadySentUnansweredPing = true;
-      return this.socket.send('ping');
-    }
+    });
 
-    this.logger.warn(`WebSocket connection is closed. Current ready state: ${this.socket.readyState}`);
-    this.reconnect(CHANGE_TRIGGER.READY_STATE);
-  };
+    this.logger.info(`Connecting WebSocket with clientID "${this.apiClient.clientId}"`);
+    // Note: `connect()` should only resolve after `onBeforeConnect()` is executed successfully
+    // We need to wrap this into a plain Promise because `reconnecting-websocket` doesn't give a handle
+    // to wait for the execution (connection lost on RWS constructor)
+    await new Promise((resolve, reject) =>
+      this.apiClient.connect(async abortHandler => {
+        try {
+          await onConnect(abortHandler);
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      }),
+    );
+  }
 }

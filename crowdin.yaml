@@ -2,7 +2,6 @@ project_id: 342359
 base_path: .
 
 files:
-  -
-    source: 'src/i18n/en-US.json'
-    translation: '%locale%.json'
+  - source: '/src/i18n/en-US.json'
+    translation: '/src/i18n/%locale%.json'
     update_option: 'update_as_unapproved'

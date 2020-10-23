@@ -131,10 +131,10 @@ export class AudioRepository {
     return this.play(audioId, true);
   }
 
-  private playAudio(audioElement: HTMLAudioElement, playInLoop: boolean = false): Promise<void> {
+  private async playAudio(audioElement: HTMLAudioElement, playInLoop: boolean = false): Promise<void> {
     if (!audioElement.paused) {
       // element already playing, nothing to do
-      return Promise.resolve();
+      return;
     }
 
     audioElement.loop = playInLoop;
@@ -143,30 +143,25 @@ export class AudioRepository {
       audioElement.currentTime = 0;
     }
 
-    const playPromise = audioElement.play();
-
-    return playPromise || Promise.resolve();
+    return audioElement.play();
   }
 
-  play(audioId: AudioType, playInLoop: boolean = false): Promise<void> {
+  async play(audioId: AudioType, playInLoop: boolean = false): Promise<void> {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement) {
       this.logger.error(`Failed to play '${audioId}': sound not found`);
-      return Promise.resolve();
+      return;
     }
 
     switch (this.canPlaySound(audioId)) {
       case AUDIO_PLAY_PERMISSION.ALLOWED:
-        return this.playAudio(audioElement, playInLoop)
-          .then(() => {
-            this.logger.info(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
-          })
-          .catch(error => {
-            if (error) {
-              this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
-              throw error;
-            }
-          });
+        try {
+          await this.playAudio(audioElement, playInLoop);
+          this.logger.info(`Playing sound '${audioId}' (loop: '${playInLoop}')`);
+        } catch (error) {
+          this.logger.error(`Failed to play sound '${audioId}': ${error.message}`);
+          throw error;
+        }
 
       case AUDIO_PLAY_PERMISSION.DISALLOWED_BY_MUTE_STATE:
         this.logger.debug(`Playing '${audioId}' was disallowed by mute state`);
@@ -176,7 +171,6 @@ export class AudioRepository {
         this.logger.debug(`Playing '${audioId}' was disallowed because of user's preferences`);
         break;
     }
-    return Promise.resolve();
   }
 
   setAudioPreference(audioPreference: AudioPreference): void {

@@ -35,6 +35,7 @@ import {ClientEntity} from '../../client/ClientEntity';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
 import {getLogger, Logger} from 'Util/Logger';
+import type {MessageRepository} from 'src/script/conversation/MessageRepository';
 
 export class PreferencesDeviceDetailsViewModel {
   private readonly logger: Logger;
@@ -60,6 +61,7 @@ export class PreferencesDeviceDetailsViewModel {
     private readonly clientRepository: ClientRepository,
     private readonly conversationRepository: ConversationRepository,
     private readonly cryptographyRepository: CryptographyRepository,
+    private readonly messageRepository: MessageRepository,
   ) {
     this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;
@@ -82,7 +84,7 @@ export class PreferencesDeviceDetailsViewModel {
     });
   }
 
-  _updateFingerprint = async (): Promise<void> => {
+  private readonly _updateFingerprint = async (): Promise<void> => {
     this.fingerprint([]);
     try {
       const fingerprint = await this.cryptographyRepository.getRemoteFingerprint(this.selfUser().id, this.device().id);
@@ -102,7 +104,7 @@ export class PreferencesDeviceDetailsViewModel {
 
     try {
       const selfConversationId = this.conversationRepository.self_conversation().id;
-      await this.conversationRepository.reset_session(this.selfUser().id, this.device().id, selfConversationId);
+      await this.messageRepository.reset_session(this.selfUser().id, this.device().id, selfConversationId);
       window.setTimeout(() => {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);
       }, MotionDuration.LONG);

@@ -103,7 +103,7 @@ export class SearchRepository {
       const uniqueValues = Array.from(new Set(values));
       const matchWeight = uniqueValues.reduce((weight, value, index) => {
         const propertyWeight = 10 * index + 1;
-        const propertyMatchWeight = this._matches(term, termSlug, excludedEmojis, value);
+        const propertyMatchWeight = this.matches(term, termSlug, excludedEmojis, value);
         return weight + propertyMatchWeight * propertyWeight;
       }, 0);
 
@@ -120,7 +120,7 @@ export class SearchRepository {
       .map(result => result.user);
   }
 
-  _matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value?: string): number {
+  private matches(term: string, termSlug: string, excludedChars?: Record<string, string>, value?: string): number {
     const isStrictMatch = (value || '').toLowerCase().startsWith(term.toLowerCase());
     if (isStrictMatch) {
       // if the pattern matches the raw text, give the maximum value to the match

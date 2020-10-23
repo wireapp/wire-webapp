@@ -78,8 +78,8 @@ export const getManageServicesUrl = (utmSource?: string): string =>
   getTeamSettingsUrl(URL_PATH.MANAGE_SERVICES, utmSource);
 export const getManageTeamUrl = (utmSource?: string): string => getTeamSettingsUrl(URL_PATH.MANAGE_TEAM, utmSource);
 
-export const getCreateTeamUrl = (pkCampaign?: string): string =>
-  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && getWebsiteUrl(URL_PATH.CREATE_TEAM, pkCampaign);
+export const getCreateTeamUrl = (): string =>
+  Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION && Config.getConfig().URL.TEAMS_CREATE;
 export const getPrivacyHowUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_HOW);
 export const getPrivacyWhyUrl = (): string => getWebsiteUrl(URL_PATH.PRIVACY_WHY);
 export const getSupportUsernameUrl = (): string => getWebsiteUrl(URL_PATH.SUPPORT_USERNAME);

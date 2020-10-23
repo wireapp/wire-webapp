@@ -23,7 +23,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Environment} from 'Util/Environment';
 import {Declension, t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {getUserName} from 'Util/SanitizationUtil';
@@ -60,6 +59,7 @@ import {ContentViewModel} from '../view_model/ContentViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {AssetRepository} from '../assets/AssetRepository';
 import {container} from 'tsyringe';
+import {Runtime} from '@wireapp/commons';
 
 export interface Multitasking {
   autoMinimize?: ko.Observable<boolean>;
@@ -152,11 +152,10 @@ export class NotificationRepository {
     this.selfUser = this.userRepository.self;
   }
 
-  __test__assignEnvironment(data: any): void {
-    Object.assign(Environment, data);
-  }
-
-  setContentViewModelStates(state: () => string, multitasking: {isMinimized: () => false}): void {
+  setContentViewModelStates(
+    state: () => string,
+    multitasking: {isMinimized: ko.Observable<boolean> | (() => false)},
+  ): void {
     this.contentViewModelState = {multitasking, state};
   }
 
@@ -179,19 +178,19 @@ export class NotificationRepository {
       return isPermitted;
     }
 
-    if (!Environment.browser.supports.notifications) {
+    if (!Runtime.isSupportingNotifications()) {
       return this.updatePermissionState(PermissionState.UNSUPPORTED);
     }
 
-    if (Environment.browser.supports.permissions) {
+    if (Runtime.isSupportingPermissions()) {
       const notificationState = this.permissionRepository.getPermissionState(PermissionType.NOTIFICATIONS);
       const shouldRequestPermission = notificationState === PermissionStatusState.PROMPT;
-      return shouldRequestPermission ? this._requestPermission() : this.checkPermissionState();
+      return shouldRequestPermission ? this.requestPermission() : this.checkPermissionState();
     }
 
     const currentPermission = window.Notification.permission as PermissionState;
     const shouldRequestPermission = currentPermission === PermissionState.DEFAULT;
-    return shouldRequestPermission ? this._requestPermission() : this.updatePermissionState(currentPermission);
+    return shouldRequestPermission ? this.requestPermission() : this.updatePermissionState(currentPermission);
   }
 
   /**
@@ -243,7 +242,7 @@ export class NotificationRepository {
     return Promise.resolve();
   }
 
-  // Remove notifications from the queue that are no longer unread
+  /** Remove notifications from the queue that are no longer unread */
   removeReadNotifications(): void {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data || {};
@@ -592,7 +591,7 @@ export class NotificationRepository {
       }
     }
 
-    const isMacOsWrapper = Environment.electron && Environment.os.mac;
+    const isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
     return Promise.resolve(isMacOsWrapper ? '' : NotificationRepository.CONFIG.ICON_URL);
   }
 
@@ -731,10 +730,9 @@ export class NotificationRepository {
    * Plays the sound from the audio repository.
    *
    * @param messageEntity Message entity
-   * @param No return value
    */
   private notifySound(messageEntity: Message): void {
-    const muteSound = !document.hasFocus() && Environment.browser.firefox && Environment.os.mac;
+    const muteSound = !document.hasFocus() && Runtime.isFirefox() && Runtime.isMacOS();
     const isFromSelf = messageEntity.user().isMe;
     const shouldPlaySound = !muteSound && !isFromSelf;
 
@@ -754,7 +752,7 @@ export class NotificationRepository {
   }
 
   // Request browser permission for notifications.
-  private async _requestPermission(): Promise<void> {
+  private async requestPermission(): Promise<void> {
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
@@ -808,7 +806,7 @@ export class NotificationRepository {
     // The in-app notification settings should be ignored for alerts (which are composite messages for now)
     const preferenceIsNone =
       this.notificationsPreference() === NotificationPreference.NONE && !messageEntity.isComposite();
-    const supportsNotification = Environment.browser.supports.notifications;
+    const supportsNotification = Runtime.isSupportingNotifications();
 
     const hideNotification =
       activeConversation || messageFromSelf || permissionDenied || preferenceIsNone || !supportsNotification;
@@ -820,7 +818,6 @@ export class NotificationRepository {
    * Sending the notification.
    *
    * @param notificationContent Content of notification
-   * @returns No return value
    */
   private showNotification(notificationContent: NotificationContent): void {
     amplify.publish(WebAppEvents.NOTIFICATION.SHOW, notificationContent);
@@ -831,7 +828,6 @@ export class NotificationRepository {
    * Sending the browser notification.
    *
    * @param notificationContent Content of notification
-   * @param No return value
    */
   private showNotificationInBrowser(notificationContent: NotificationContent): void {
     /*

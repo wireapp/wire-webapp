@@ -25,7 +25,6 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {EventName} from '../tracking/EventName';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
 import type {Conversation} from '../entity/Conversation';
@@ -78,9 +77,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
               if (changeToTeamOnly) {
                 conversationEntity.accessCode(undefined);
               }
-
-              const attribute = {is_allow_guests: changeToGuestRoom};
-              amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.ALLOW_GUESTS, attribute);
             })
             .catch(() => {
               const messageString = changeToGuestRoom
@@ -116,7 +112,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
         const accessCode = response && response.data;
         if (accessCode) {
           this.conversationMapper.mapAccessCode(conversationEntity, accessCode);
-          amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_CREATED);
         }
       })
       .catch(() => this._showModal(t('modalConversationGuestOptionsRequestCodeMessage')));
@@ -127,25 +122,24 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       .deleteConversationCode(conversationEntity.id)
       .then(() => {
         conversationEntity.accessCode(undefined);
-        amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.GUEST_ROOMS.LINK_REVOKED);
       })
       .catch(() => this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage')));
   }
 
-  _mapConversationAccessState(conversationEntity: Conversation, eventJson: any): void {
+  private _mapConversationAccessState(conversationEntity: Conversation, eventJson: any): void {
     const {access: accessModes, access_role: accessRole} = eventJson.data;
     this.conversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
   }
 
-  _resetConversationAccessCode(conversationEntity: Conversation): void {
+  private _resetConversationAccessCode(conversationEntity: Conversation): void {
     conversationEntity.accessCode(undefined);
   }
 
-  _updateConversationAccessCode(conversationEntity: Conversation, eventJson: any): void {
+  private _updateConversationAccessCode(conversationEntity: Conversation, eventJson: any): void {
     this.conversationMapper.mapAccessCode(conversationEntity, eventJson.data);
   }
 
-  _showModal(message: string): void {
+  private _showModal(message: string): void {
     const modalOptions = {text: {message}};
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, modalOptions);
   }

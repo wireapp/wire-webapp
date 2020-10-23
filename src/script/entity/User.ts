@@ -270,7 +270,7 @@ export class User {
     }
   }
 
-  _setRemainingExpirationTime(expirationTime: number): void {
+  private _setRemainingExpirationTime(expirationTime: number): void {
     const remainingTime = clamp(expirationTime - Date.now(), 0, User.CONFIG.TEMPORARY_GUEST.LIFETIME);
     const remainingMinutes = Math.ceil(remainingTime / TIME_IN_MILLIS.MINUTE);
 

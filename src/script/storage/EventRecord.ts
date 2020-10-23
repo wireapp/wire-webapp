@@ -17,15 +17,37 @@
  *
  */
 
+export interface ReadReceipt {
+  time: string;
+  userId: string;
+}
+
 export interface EventRecord {
   category: number;
+  client?: {time: string};
+  connection?: {lastUpdate: string};
+  content?: string;
   conversation: string;
   data: any;
+  edited_time?: string;
+  ephemeral_expires?: number;
+  ephemeral_started?: string;
+  ephemeral_time?: string;
+  error_code?: string;
   from: string;
   from_client_id?: string;
   id: string;
-  primary_key: number;
+  mentions?: string[];
+  message?: string;
+  previews?: string[];
+  primary_key: string;
+  reactions: Record<string, string>;
+  read_receipts?: ReadReceipt[];
+  selected_button_id?: string;
   status?: number;
   time: string;
+  timestamp?: number;
   type: string;
+  version?: number;
+  waiting_button_id?: string;
 }

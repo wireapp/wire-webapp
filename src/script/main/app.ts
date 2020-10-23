@@ -24,8 +24,10 @@ import ko from 'knockout';
 import platform from 'platform';
 import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import type {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {checkIndexedDb, createRandomUuid, isTemporaryClientAndNonPersistent} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -50,7 +52,6 @@ import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
 import {StorageRepository} from '../storage/StorageRepository';
 import {StorageKey} from '../storage/StorageKey';
-import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -67,13 +68,12 @@ import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
 import {ConversationService} from '../conversation/ConversationService';
 
-import {BackendClient} from '../service/BackendClient';
 import {SingleInstanceHandler} from './SingleInstanceHandler';
 
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
-import {MainViewModel} from '../view_model/MainViewModel';
+import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
 
@@ -120,12 +120,17 @@ import {ConnectionService} from '../connection/ConnectionService';
 import {TeamService} from '../team/TeamService';
 import {SearchService} from '../search/SearchService';
 import {CryptographyService} from '../cryptography/CryptographyService';
-import {AccessTokenError} from '../error/AccessTokenError';
+import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenError';
 import {ClientError} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
+import {DebugUtil} from 'Util/DebugUtil';
+import type {BaseError} from '../error/BaseError';
+import type {User} from '../entity/User';
+import {Runtime} from '@wireapp/commons';
+import {MessageRepository} from '../conversation/MessageRepository';
 
-function doRedirect(signOutReason) {
+function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
 
   const isImmediateSignOutReason = App.CONFIG.SIGN_OUT_REASONS.IMMEDIATE.includes(signOutReason);
@@ -138,6 +143,24 @@ function doRedirect(signOutReason) {
 }
 
 class App {
+  apiClient: APIClient;
+  logger: Logger;
+  appContainer: HTMLElement;
+  service: {
+    asset: AssetService;
+    conversation: ConversationService;
+    event: EventService | EventServiceNoCompound;
+    integration: IntegrationService;
+    notification: NotificationService;
+    storage: StorageService;
+    webSocket: WebSocketService;
+  };
+  repository: ViewModelRepositories = {} as ViewModelRepositories;
+  debug: DebugUtil;
+  util: {debug: DebugUtil};
+  singleInstanceHandler: SingleInstanceHandler;
+  applock: AppLockViewModel;
+
   static get CONFIG() {
     return {
       COOKIES_CHECK: {
@@ -156,16 +179,13 @@ class App {
   }
 
   /**
-   * Construct a new app.
-   * @param {APIClient} apiClient Configured backend client
-   * @param {BackendClient} backendClient Configured backend client
-   * @param {Element} appContainer DOM element that will hold the app
-   * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
+   * @param apiClient Configured backend client
+   * @param appContainer DOM element that will hold the app
+   * @param encryptedEngine Encrypted database handler
    */
-  constructor(apiClient, backendClient, appContainer, encryptedEngine) {
+  constructor(apiClient: APIClient, appContainer: HTMLElement, encryptedEngine?: SQLeetEngine) {
     this.apiClient = apiClient;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
-    this.backendClient = backendClient;
     this.logger = getLogger('App');
     this.appContainer = appContainer;
 
@@ -196,10 +216,10 @@ class App {
 
   /**
    * Create all app repositories.
-   * @returns {Object} All repositories
+   * @returns All repositories
    */
-  _setupRepositories() {
-    const repositories = {};
+  private _setupRepositories() {
+    const repositories: ViewModelRepositories = {} as ViewModelRepositories;
     const selfService = new SelfService(this.apiClient);
     const sendingMessageQueue = new MessageSender();
 
@@ -243,17 +263,28 @@ class App {
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
-      repositories.asset,
-      repositories.client,
+      () => repositories.message,
       repositories.connection,
-      repositories.cryptography,
       repositories.event,
-      new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.team,
       repositories.user,
       repositories.properties,
-      sendingMessageQueue,
       serverTimeHandler,
+    );
+
+    repositories.message = new MessageRepository(
+      repositories.client,
+      () => repositories.conversation,
+      repositories.cryptography,
+      repositories.event,
+      sendingMessageQueue,
+      repositories.properties,
+      serverTimeHandler,
+      repositories.user,
+      repositories.team,
+      this.service.conversation,
+      new LinkPreviewRepository(repositories.asset, repositories.properties),
+      repositories.asset,
     );
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
@@ -280,14 +311,14 @@ class App {
     repositories.broadcast = new BroadcastRepository(
       new BroadcastService(this.apiClient),
       repositories.client,
-      repositories.conversation,
+      repositories.message,
       repositories.cryptography,
       sendingMessageQueue,
-      repositories.user,
     );
     repositories.calling = new CallingRepository(
       this.apiClient,
       repositories.conversation,
+      repositories.message,
       repositories.event,
       repositories.user,
       repositories.media.streamHandler,
@@ -313,12 +344,12 @@ class App {
 
   /**
    * Create all app services.
-   * @param {SQLeetEngine} [encryptedEngine] Encrypted database handler
-   * @returns {Object} All services
+   * @param Encrypted database handler
+   * @returns All services
    */
-  _setupServices(encryptedEngine) {
+  private _setupServices(encryptedEngine: SQLeetEngine) {
     const storageService = new StorageService(encryptedEngine);
-    const eventService = Environment.browser.edge
+    const eventService = Runtime.isEdge()
       ? new EventServiceNoCompound(storageService)
       : new EventService(storageService);
 
@@ -329,18 +360,17 @@ class App {
       integration: new IntegrationService(this.apiClient),
       notification: new NotificationService(this.apiClient, storageService),
       storage: storageService,
-      webSocket: new WebSocketService(this.apiClient, this.backendClient),
+      webSocket: new WebSocketService(this.apiClient),
     };
   }
 
   /**
    * Subscribe to amplify events.
-   * @returns {undefined} No return value
    */
-  _subscribeToEvents() {
+  private _subscribeToEvents() {
     amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
-    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async source => {
+    amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
       this.logger.info(`Access token refresh triggered by "${source}"...`);
       const apiClient = container.resolve(APIClientSingleton).getClient();
       try {
@@ -365,10 +395,14 @@ class App {
    *   Any failure in the Promise chain will result in a logout.
    * @todo Check if we really need to logout the user in all these error cases or how to recover from them
    *
-   * @param {boolean} [isReload=_isReload()] App init after page reload
-   * @returns {undefined} No return value
+   * @param App init after page reload
    */
   async initApp() {
+    // add body information
+    const osCssClass = Runtime.isMacOS() ? 'os-mac' : 'os-pc';
+    const platformCssClass = Runtime.isDesktopApp() ? 'platform-electron' : 'platform-web';
+    document.body.classList.add(osCssClass, platformCssClass);
+
     const isReload = this._isReload();
     this.logger.debug(`App init starts (isReload: '${isReload}')`);
     new ThemeViewModel(this.repository.properties);
@@ -410,7 +444,6 @@ class App {
 
       await teamRepository.initTeam();
 
-      eventRepository.connectWebSocket();
       const conversationEntities = await conversationRepository.getConversations();
       const connectionEntities = await connectionRepository.getConnections();
       loadingView.updateProgress(25, t('initReceivedUserData'));
@@ -426,16 +459,17 @@ class App {
 
       await userRepository.loadUsers();
 
-      const notificationsCount = await eventRepository.initializeFromStream();
+      await eventRepository.connectWebSocket();
+      eventRepository.watchNetworkStatus();
+      const notificationsCount = eventRepository.notificationsTotal;
 
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
-      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.improve_wire);
+      eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
       await conversationRepository.initialize_conversations();
       loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
-      this._watchOnlineStatus();
       const clientEntities = await clientRepository.updateClientsForSelf();
 
       loadingView.updateProgress(99);
@@ -461,7 +495,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository.isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
-        startNewVersionPolling(Environment.version(false, true), this.update.bind(this));
+        startNewVersionPolling(Environment.version(false), this.update.bind(this));
       }
       audioRepository.init(true);
       conversationRepository.cleanup_conversations();
@@ -474,9 +508,8 @@ class App {
 
   /**
    * Initialize ServiceWorker if supported.
-   * @returns {undefined} No return value
    */
-  initServiceWorker() {
+  initServiceWorker(): void {
     if (navigator.serviceWorker) {
       navigator.serviceWorker
         .register(`/sw.js?${Environment.version(false)}`)
@@ -484,32 +517,9 @@ class App {
     }
   }
 
-  /**
-   * Behavior when internet connection is re-established.
-   * @returns {undefined} No return value
-   */
-  onInternetConnectionGained() {
-    this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.CONNECTION_REGAINED).then(() => {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
-      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
-      this.repository.event.reconnectWebSocket(WebSocketService.CHANGE_TRIGGER.ONLINE);
-    });
-  }
-
-  /**
-   * Reflect internet connection loss in the UI.
-   * @returns {undefined} No return value
-   */
-  onInternetConnectionLost() {
-    this.logger.warn('Internet connection lost');
-    this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.OFFLINE);
-    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
-  }
-
-  _appInitFailure(error, isReload) {
+  private _appInitFailure(error: BaseError, isReload: boolean) {
     let logMessage = `Could not initialize app version '${Environment.version(false)}'`;
-    if (Environment.desktop) {
+    if (Runtime.isDesktopApp()) {
       logMessage += ` - Electron '${platform.os.family}' '${Environment.version()}'`;
     }
     this.logger.warn(`${logMessage}: ${error.message}`, {error});
@@ -528,7 +538,7 @@ class App {
     if (isReload) {
       const isSessionExpired = [AccessTokenError.TYPE.REQUEST_FORBIDDEN, AccessTokenError.TYPE.NOT_FOUND_IN_CACHE];
 
-      if (isSessionExpired.includes(type)) {
+      if (isSessionExpired.includes(type as ACCESS_TOKEN_ERROR_TYPE)) {
         this.logger.warn(`Session expired on page reload: ${message}`, error);
         return this._redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
       }
@@ -541,15 +551,12 @@ class App {
       }
 
       if (isAccessTokenError) {
-        this.logger.warn('Connectivity issues. Trigger reload on regained connectivity.', error);
-        const triggerSource = isAccessTokenError
-          ? BackendClient.CONNECTIVITY_CHECK_TRIGGER.ACCESS_TOKEN_RETRIEVAL
-          : BackendClient.CONNECTIVITY_CHECK_TRIGGER.APP_INIT_RELOAD;
-        return this.backendClient.executeOnConnectivity(triggerSource).then(() => window.location.reload());
+        this.logger.warn('Connectivity issues. Trigger reload.', error);
+        return window.location.reload();
       }
     }
 
-    if (navigator.onLine) {
+    if (navigator.onLine === true) {
       switch (type) {
         case AccessTokenError.TYPE.NOT_FOUND_IN_CACHE:
         case AccessTokenError.TYPE.RETRIES_EXCEEDED:
@@ -564,8 +571,6 @@ class App {
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
-          } else {
-            Raygun.send(error);
           }
 
           return this.logout(SIGN_OUT_REASON.APP_INIT, false);
@@ -573,16 +578,16 @@ class App {
       }
     }
 
-    this.logger.warn('No connectivity. Trigger reload on regained connectivity.', error);
-    this._watchOnlineStatus();
+    this.logger.warn("No internet connectivity. Refreshing the page to show the browser's offline page...", error);
+    window.location.reload();
   }
 
   /**
    * Check whether we need to set different user information (picture, username).
-   * @param {User} userEntity Self user entity
-   * @returns {User} Checked user entity
+   * @param userEntity Self user entity
+   * @returns Checked user entity
    */
-  _checkUserInformation(userEntity) {
+  private _checkUserInformation(userEntity: User) {
     if (userEntity.hasActivatedIdentity()) {
       if (!userEntity.mediumPictureResource()) {
         this.repository.user.setDefaultPicture();
@@ -597,7 +602,7 @@ class App {
 
   /**
    * Initiate the self user by getting it from the backend.
-   * @returns {Promise<User>} Resolves with the self user entity
+   * @returns Resolves with the self user entity
    */
   async _initiateSelfUser() {
     const userEntity = await this.repository.user.getSelf();
@@ -613,18 +618,18 @@ class App {
     }
 
     await this.service.storage.init(userEntity.id);
-    await this.repository.client.init(userEntity);
+    this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
-    await this._checkUserInformation(userEntity);
+    this._checkUserInformation(userEntity);
 
     return userEntity;
   }
 
   /**
    * Initiate the current client of the self user.
-   * @returns {Promise<Client>} Resolves with the local client entity
+   * @returns Resolves with the local client entity
    */
-  _initiateSelfUserClients() {
+  private _initiateSelfUserClients() {
     return this.repository.client
       .getValidLocalClient()
       .then(clientObservable => {
@@ -637,19 +642,15 @@ class App {
 
   /**
    * Handle URL params.
-   * @private
-   * @returns {undefined} No return value
    */
-  _handleUrlParams() {
+  private _handleUrlParams(): void {
     // Currently no URL params to be handled
   }
 
   /**
    * Check whether the page has been reloaded.
-   * @private
-   * @returns {boolean} `true` if it is a page refresh
    */
-  _isReload() {
+  private _isReload() {
     const NAVIGATION_TYPE_RELOAD = 1;
     return window.performance.navigation.type === NAVIGATION_TYPE_RELOAD;
   }
@@ -660,9 +661,9 @@ class App {
 
   /**
    * Check that this is the single instance tab of the app.
-   * @returns {void} Resolves when page is the first tab
+   * @returns Resolves when page is the first tab
    */
-  _registerSingleInstance() {
+  private _registerSingleInstance(): void {
     const instanceId = createRandomUuid();
 
     if (this.singleInstanceHandler.registerInstance(instanceId)) {
@@ -671,7 +672,7 @@ class App {
     throw new AuthError(AuthError.TYPE.MULTIPLE_TABS, AuthError.MESSAGE.MULTIPLE_TABS);
   }
 
-  _registerSingleInstanceCleaning() {
+  private _registerSingleInstanceCleaning() {
     $(window).on('beforeunload', () => {
       this.singleInstanceHandler.deregisterInstance();
     });
@@ -679,9 +680,8 @@ class App {
 
   /**
    * Hide the loading spinner and show the application UI.
-   * @returns {undefined} No return value
    */
-  _showInterface() {
+  private _showInterface() {
     const mainView = new MainViewModel(this.repository);
     ko.applyBindings(mainView, this.appContainer);
 
@@ -696,12 +696,17 @@ class App {
       mainView.list.showTakeover();
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity);
-    } else if (this.repository.user.connect_requests().length) {
+    } else if (this.repository.user.connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     const router = new Router({
       '/conversation/:conversationId': conversationId => mainView.content.showConversation(conversationId),
+      '/preferences/about': () => mainView.list.openPreferencesAbout(),
+      '/preferences/account': () => mainView.list.openPreferencesAccount(),
+      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
+      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
+      '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId': userId => {
         mainView.content.userModal.showUser(userId, () => router.navigate('/'));
       },
@@ -717,12 +722,11 @@ class App {
 
   /**
    * Subscribe to 'beforeunload' to stop calls and disconnect the WebSocket.
-   * @returns {undefined} No return value
    */
-  _subscribeToUnloadEvents() {
+  private _subscribeToUnloadEvents(): void {
     $(window).on('unload', () => {
       this.logger.info("'window.onunload' was triggered, so we will disconnect from the backend.");
-      this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.PAGE_NAVIGATION);
+      this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
       if (this.repository.user.isActivatedAccount()) {
@@ -740,16 +744,6 @@ class App {
     });
   }
 
-  /**
-   * Subscribe to 'navigator.onLine' related events.
-   * @returns {undefined} No return value
-   */
-  _watchOnlineStatus() {
-    this.logger.info('Watching internet connectivity status');
-    $(window).on('offline', this.onInternetConnectionLost.bind(this));
-    $(window).on('online', this.onInternetConnectionGained.bind(this));
-  }
-
   //##############################################################################
   // Lifecycle
   //##############################################################################
@@ -757,11 +751,10 @@ class App {
   /**
    * Logs the user out on the backend and deletes cached data.
    *
-   * @param {SIGN_OUT_REASON} signOutReason Cause for logout
-   * @param {boolean} clearData Keep data in database
-   * @returns {undefined} No return value
+   * @param signOutReason Cause for logout
+   * @param clearData Keep data in database
    */
-  logout(signOutReason, clearData) {
+  logout(signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void {
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
@@ -769,7 +762,7 @@ class App {
 
     const _logout = async () => {
       // Disconnect from our backend, end tracking and clear cached data
-      this.repository.event.disconnectWebSocket(WebSocketService.CHANGE_TRIGGER.LOGOUT);
+      this.repository.event.disconnectWebSocket();
 
       // Clear Local Storage (but don't delete the cookie label if you were logged in with a permanent client)
       const keysToKeep = [StorageKey.AUTH.SHOW_LOGIN];
@@ -848,13 +841,13 @@ class App {
 
   /**
    * Refresh the web app or desktop wrapper
-   * @returns {undefined} No return value
    */
-  refresh() {
+  refresh(): void {
     this.logger.info('Refresh to update started');
-    if (Environment.desktop) {
+    if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
-      return amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+      amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+      return;
     }
 
     window.location.reload();
@@ -863,61 +856,31 @@ class App {
 
   /**
    * Notify about found update
-   * @returns {undefined} No return value
    */
-  update() {
+  update(): void {
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
   }
 
   /**
    * Redirect to the login page after internet connectivity has been verified.
-   * @param {SIGN_OUT_REASON} signOutReason Redirect triggered by session expiration
-   * @returns {undefined} No return value
+   * @param signOutReason Redirect triggered by session expiration
    */
-  _redirectToLogin(signOutReason) {
+  private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
-    this.backendClient.executeOnConnectivity(BackendClient.CONNECTIVITY_CHECK_TRIGGER.LOGIN_REDIRECT).then(() => {
-      const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-      const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
-      if (isLeavingGuestRoom) {
-        return window.location.replace(getWebsiteUrl());
-      }
+    const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
+    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
+    if (isLeavingGuestRoom) {
+      return window.location.replace(getWebsiteUrl());
+    }
 
-      doRedirect(signOutReason);
-    });
+    doRedirect(signOutReason);
   }
 
   //##############################################################################
   // Debugging
   //##############################################################################
 
-  /**
-   * Disable debugging on any environment.
-   * @returns {undefined} No return value
-   */
-  disableDebugging() {
-    Config.getConfig().LOGGER.OPTIONS.domains['app.wire.com'] = () => 0;
-    this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, false);
-  }
-
-  /**
-   * Enable debugging on any environment.
-   * @returns {undefined} No return value
-   */
-  enableDebugging() {
-    Config.getConfig().LOGGER.OPTIONS.domains['app.wire.com'] = () => 300;
-    this.repository.properties.savePreference(PROPERTIES_TYPE.ENABLE_DEBUGGING, true);
-  }
-
-  /**
-   * Report call telemetry to Raygun for analysis.
-   * @returns {undefined} No return value
-   */
-  reportCall() {
-    this.repository.calling.reportCall();
-  }
-
-  _publishGlobals() {
+  private _publishGlobals() {
     window.z.userPermission = ko.observable({});
     ko.pureComputed(() => {
       const selfUser = this.repository.user.self();
@@ -936,19 +899,14 @@ $(async () => {
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
     const apiClient = container.resolve(APIClientSingleton).getClient();
-    const backendClient = container.resolve(BackendClient);
-    backendClient.setSettings({
-      restUrl: Config.getConfig().BACKEND_REST,
-      webSocketUrl: Config.getConfig().BACKEND_WS,
-    });
-    const shouldPersist = loadValue(StorageKey.AUTH.PERSIST);
+    const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
       const engine = await StorageService.getUninitializedEngine();
-      wire.app = new App(apiClient, backendClient, appContainer, engine);
+      window.wire.app = new App(apiClient, appContainer, engine);
     } else {
-      wire.app = new App(apiClient, backendClient, appContainer);
+      window.wire.app = new App(apiClient, appContainer);
     }
   }
 });

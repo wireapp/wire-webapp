@@ -20,7 +20,7 @@
 import type {CookiesStatic} from 'js-cookie';
 
 import {QUERY_KEY} from '../../route';
-import {isFirefox, isPwaSupportedBrowser, isSupportedBrowser} from '../../Runtime';
+import {Runtime} from '@wireapp/commons';
 import {hasURLParameter} from '../../util/urlUtil';
 import type {ThunkAction} from '../reducer';
 import {RuntimeActionCreator} from './creator/';
@@ -28,9 +28,12 @@ import {RuntimeActionCreator} from './creator/';
 export class RuntimeAction {
   checkSupportedBrowser = (): ThunkAction<void> => {
     return (dispatch, getState, {getConfig}) => {
+      const isPwaSupportedBrowser = () => {
+        return Runtime.isMobileOS() || Runtime.isSafari();
+      };
       const pwaAware = hasURLParameter(QUERY_KEY.PWA_AWARE);
       const isPwaEnabled = getConfig().URL.MOBILE_BASE && pwaAware && isPwaSupportedBrowser();
-      if (isSupportedBrowser() || isPwaEnabled) {
+      if (Runtime.isWebappSupportedBrowser() || isPwaEnabled) {
         dispatch(RuntimeActionCreator.confirmSupportedBrowser());
       }
     };
@@ -91,7 +94,7 @@ export class RuntimeAction {
       return Promise.reject(new Error('IndexedDB not supported'));
     }
 
-    if (isFirefox()) {
+    if (Runtime.isFirefox()) {
       let dbOpenRequest: IDBOpenDBRequest;
 
       try {

@@ -118,7 +118,7 @@ export class ConversationListViewModel {
     this.selfAvailability = ko.pureComputed(() => this.selfUser() && this.selfUser().availability());
     this.selfUserName = ko.pureComputed(() => this.selfUser() && this.selfUser().name());
 
-    this.connectRequests = this.userRepository.connect_requests;
+    this.connectRequests = this.userRepository.connectRequests;
     this.connectRequestsText = ko.pureComputed(() => {
       const reqCount = this.connectRequests().length;
       const hasMultipleRequests = reqCount > 1;
@@ -220,7 +220,7 @@ export class ConversationListViewModel {
     this._initSubscriptions();
   }
 
-  _initSubscriptions = (): void => {
+  private readonly _initSubscriptions = (): void => {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.onWebappLoaded);
     amplify.subscribe(WebAppEvents.SHORTCUT.START, this.clickOnPeopleButton);
     amplify.subscribe(WebAppEvents.CONTENT.EXPAND_FOLDER, this.expandFolder);

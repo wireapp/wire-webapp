@@ -19,7 +19,7 @@
 
 import 'url-search-params-polyfill';
 
-import {Environment} from 'Util/Environment';
+import {Runtime} from '@wireapp/commons';
 import {formatString} from 'Util/StringUtil';
 
 interface IFrameOptions {
@@ -35,7 +35,6 @@ interface IFrameOptions {
 
 /**
  * Create an iFrame.
- * @private
  * @param options Settings to be used to create the iFrame
  * @returns HTML string
  */
@@ -58,7 +57,7 @@ const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
     options.class = 'iframe-container';
   }
 
-  if (Environment.desktop) {
+  if (Runtime.isDesktopApp()) {
     options.allowfullscreen = '';
   }
 
@@ -76,7 +75,6 @@ const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
 /**
  * Appends an iFrame.
  *
- * @private
  * @param link Link element
  * @param message Message containing the link
  * @param iFrame HTML text of the iFrame
@@ -90,7 +88,6 @@ const _appendIFrame = (link: HTMLAnchorElement, message: string, iFrame: string)
 /**
  * Find search parameters in a string
  *
- * @private
  * @param params String where we should find the parameters
  */
 const _getParameters = (params: string): string => params.substr(params.indexOf('?'), params.length).replace(/^\?/, '');

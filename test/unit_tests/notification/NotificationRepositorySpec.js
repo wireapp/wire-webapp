@@ -26,7 +26,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
-import {Environment} from 'Util/Environment';
 import {truncate} from 'Util/StringUtil';
 
 import 'src/script/localization/Localizer';
@@ -58,6 +57,7 @@ import {MentionEntity} from 'src/script/message/MentionEntity';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 import {TestFactory} from '../../helper/TestFactory';
+import {Runtime} from '@wireapp/commons';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -108,8 +108,8 @@ describe('NotificationRepository', () => {
       // Mocks
       document.hasFocus = () => false;
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
-      Environment.browser.supports.notifications = true;
-      testFactory.notification_repository.__test__assignEnvironment(Environment);
+      jasmine.getEnv().allowRespy(true);
+      spyOn(Runtime, 'isSupportingNotifications').and.returnValue(true);
       spyOn(testFactory.notification_repository.assetRepository, 'generateAssetUrl').and.returnValue(
         Promise.resolve('/image/logo/notification.png'),
       );
@@ -220,9 +220,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if the browser does not support them', () => {
-      Environment.browser.supports.notifications = false;
-      testFactory.notification_repository.__test__assignEnvironment(Environment);
-
+      spyOn(Runtime, 'isSupportingNotifications').and.returnValue(false);
       return testFactory.notification_repository.notify(message_et, undefined, conversation_et).then(() => {
         expect(testFactory.notification_repository.showNotification).not.toHaveBeenCalled();
       });

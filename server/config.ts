@@ -19,11 +19,12 @@
 
 import * as dotenv from 'dotenv-extended';
 import * as fs from 'fs-extra';
-import type {IHelmetContentSecurityPolicyDirectives as HelmetCSP} from 'helmet';
+import {ContentSecurityPolicyOptions} from 'helmet/dist/middlewares/content-security-policy';
 import * as logdown from 'logdown';
 import * as path from 'path';
 
 import type {ServerConfig} from './ServerConfig';
+type ContentSecurityPolicyDirectives = ContentSecurityPolicyOptions['directives'];
 
 const nodeEnvironment = process.env.NODE_ENV || 'production';
 
@@ -35,7 +36,7 @@ const VERSION_FILE = path.join(__dirname, 'version');
 
 dotenv.load();
 
-const defaultCSP: HelmetCSP = {
+const defaultCSP: ContentSecurityPolicyDirectives = {
   connectSrc: [
     "'self'",
     'blob:',
@@ -94,8 +95,8 @@ function parseCommaSeparatedList(list: string = ''): string[] {
   return cleanedList.split(',');
 }
 
-function mergedCSP(): HelmetCSP {
-  const csp: HelmetCSP = {
+function mergedCSP(): ContentSecurityPolicyDirectives {
+  const csp: ContentSecurityPolicyDirectives = {
     connectSrc: [
       ...defaultCSP.connectSrc,
       process.env.BACKEND_REST,
@@ -115,7 +116,7 @@ function mergedCSP(): HelmetCSP {
     workerSrc: [...defaultCSP.workerSrc, ...parseCommaSeparatedList(process.env.CSP_EXTRA_WORKER_SRC)],
   };
   return Object.entries(csp)
-    .filter(([key, value]) => !!value.length)
+    .filter(([key, value]) => !!Array.from(value).length)
     .reduce((accumulator, [key, value]) => ({...accumulator, [key]: value}), {});
 }
 
@@ -141,6 +142,7 @@ const config: ServerConfig = {
         ? Number(process.env.FEATURE_APPLOCK_UNFOCUS_TIMEOUT)
         : null,
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT != 'false',
+      CONFERENCE_AUTO_MUTE: process.env.FEATURE_CONFERENCE_AUTO_MUTE == 'true',
       DEFAULT_LOGIN_TEMPORARY_CLIENT: process.env.FEATURE_DEFAULT_LOGIN_TEMPORARY_CLIENT == 'true',
       ENABLE_ACCOUNT_REGISTRATION: process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION != 'false',
       ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY:
@@ -156,7 +158,6 @@ const config: ServerConfig = {
     MAX_VIDEO_PARTICIPANTS: (process.env.MAX_VIDEO_PARTICIPANTS && Number(process.env.MAX_VIDEO_PARTICIPANTS)) || 4,
     NEW_PASSWORD_MINIMUM_LENGTH:
       (process.env.NEW_PASSWORD_MINIMUM_LENGTH && Number(process.env.NEW_PASSWORD_MINIMUM_LENGTH)) || 8,
-    RAYGUN_API_KEY: process.env.RAYGUN_API_KEY,
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
       MOBILE_BASE: process.env.URL_MOBILE_BASE,
@@ -175,6 +176,7 @@ const config: ServerConfig = {
         SCREEN_ACCESS_DENIED: process.env.URL_SUPPORT_SCREEN_ACCESS_DENIED,
       },
       TEAMS_BASE: process.env.URL_TEAMS_BASE,
+      TEAMS_CREATE: process.env.URL_TEAMS_CREATE,
       TERMS_OF_USE_PERSONAL: process.env.URL_TERMS_OF_USE_PERSONAL,
       TERMS_OF_USE_TEAMS: process.env.URL_TERMS_OF_USE_TEAMS,
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,

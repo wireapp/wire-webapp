@@ -17,14 +17,13 @@
  *
  */
 
-import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+import {CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
-import {Environment} from 'Util/Environment';
 import {isEscapeKey} from 'Util/KeyboardUtil';
 
 import {ArchiveViewModel} from './list/ArchiveViewModel';
@@ -52,6 +51,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import type {AssetRemoteData} from '../assets/AssetRemoteData';
+import {Runtime} from '@wireapp/commons';
 
 export class ListViewModel {
   readonly preferences: PreferencesListViewModel;
@@ -135,14 +135,14 @@ export class ListViewModel {
           ContentViewModel.STATE.PREFERENCES_AV,
         ];
 
-        if (!Environment.desktop) {
+        if (!Runtime.isDesktopApp()) {
           preferenceItems.push(ContentViewModel.STATE.PREFERENCES_ABOUT);
         }
 
         return preferenceItems;
       }
 
-      const hasConnectRequests = !!this.userRepository.connect_requests().length;
+      const hasConnectRequests = !!this.userRepository.connectRequests().length;
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
       return states.concat(this.conversationRepository.conversations_unarchived());
     });
@@ -189,11 +189,12 @@ export class ListViewModel {
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  _initSubscriptions = () => {
+  private readonly _initSubscriptions = () => {
     amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, this.openConversations);
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => this.webappLoaded(true));
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT, this.openPreferencesAccount);
     amplify.subscribe(WebAppEvents.PREFERENCES.MANAGE_DEVICES, this.openPreferencesDevices);
+    amplify.subscribe(WebAppEvents.PREFERENCES.SHOW_AV, this.openPreferencesAudioVideo);
     amplify.subscribe(WebAppEvents.SEARCH.SHOW, this.openStartUI);
     amplify.subscribe(WebAppEvents.SHORTCUT.NEXT, this.goToNext);
     amplify.subscribe(WebAppEvents.SHORTCUT.PREV, this.goToPrevious);
@@ -216,8 +217,7 @@ export class ListViewModel {
         },
       });
     } else {
-      const callType = call.getSelfParticipant().sharesCamera() ? call.initialType : CALL_TYPE.NORMAL;
-      this.callingRepository.answerCall(call, callType);
+      this.callingRepository.answerCall(call);
     }
   };
 
@@ -285,7 +285,7 @@ export class ListViewModel {
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 
-  openPreferencesDevices = (deviceEntity: ClientEntity): void => {
+  openPreferencesDevices = (deviceEntity?: ClientEntity): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
 
     if (deviceEntity) {
@@ -294,6 +294,21 @@ export class ListViewModel {
     }
 
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
+  };
+
+  openPreferencesAbout = (): void => {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ABOUT);
+  };
+
+  openPreferencesAudioVideo = (): void => {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_AV);
+  };
+
+  openPreferencesOptions = (): void => {
+    this.switchList(ListViewModel.STATE.PREFERENCES);
+    return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_OPTIONS);
   };
 
   openStartUI = (): void => {
