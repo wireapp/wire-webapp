@@ -167,7 +167,7 @@ export class ClientService {
    * @param clientPayload Client payload
    * @returns Resolves with the client payload stored in database
    */
-  saveClientRecord(primaryKey: string, clientPayload: ClientRecord): Promise<ClientRecord> {
+  saveClientInDb(primaryKey: string, clientPayload: ClientRecord): Promise<ClientRecord> {
     if (!clientPayload.meta) {
       clientPayload.meta = {};
     }
@@ -187,7 +187,7 @@ export class ClientService {
    * @param changes Incremental update changes of the client JSON
    * @returns Number of updated records (1 if an object was updated, otherwise 0)
    */
-  updateClientRecord(primaryKey: string, changes: Partial<ClientRecord>): Promise<number> {
+  updateClientInDb(primaryKey: string, changes: Partial<ClientRecord>): Promise<number> {
     return this.storageService.update(this.CLIENT_STORE_NAME, primaryKey, changes);
   }
 }

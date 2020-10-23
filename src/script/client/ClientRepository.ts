@@ -181,9 +181,9 @@ export class ClientRepository {
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  saveClientRecord(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
+  saveClientInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
     const primaryKey = this.constructPrimaryKey(userId, clientPayload.id);
-    return this.clientService.saveClientRecord(primaryKey, clientPayload);
+    return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
   /**
@@ -199,7 +199,7 @@ export class ClientRepository {
     const primaryKey = this.constructPrimaryKey(userId, clientId);
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
-    return this.clientService.updateClientRecord(primaryKey, changes);
+    return this.clientService.updateClientInDb(primaryKey, changes);
   }
 
   /**
@@ -228,7 +228,7 @@ export class ClientRepository {
       is_verified: false,
       primary_key: this.constructPrimaryKey(userId, clientPayload.id),
     };
-    return this.saveClientRecord(userId, clientPayload);
+    return this.saveClientInDb(userId, clientPayload);
   }
 
   //##############################################################################
@@ -444,7 +444,7 @@ export class ClientRepository {
             // Locally known client changed on backend
             if (wasUpdated) {
               this.logger.info(`Updating client '${clientId}' of user '${userId}' locally`);
-              promises.push(this.saveClientRecord(userId, client));
+              promises.push(this.saveClientInDb(userId, client));
               continue;
             }
 
