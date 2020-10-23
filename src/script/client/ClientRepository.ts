@@ -35,10 +35,11 @@ import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
-import type {ClientInDB, ClientService} from './ClientService';
+import type {ClientService} from './ClientService';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
+import {ClientRecord} from '../storage';
 
 export class ClientRepository {
   private readonly logger: Logger;
@@ -180,9 +181,9 @@ export class ClientRepository {
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  saveClientInDb(userId: string, clientPayload: ClientInDB): Promise<ClientInDB> {
+  saveClientRecord(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
     const primaryKey = this.constructPrimaryKey(userId, clientPayload.id);
-    return this.clientService.saveClientInDb(primaryKey, clientPayload);
+    return this.clientService.saveClientRecord(primaryKey, clientPayload);
   }
 
   /**
@@ -194,11 +195,11 @@ export class ClientRepository {
    * @param changes New values which should be updated on the client
    * @returns Number of updated records
    */
-  private updateClientInDb(userId: string, clientId: string, changes: Partial<ClientInDB>): Promise<number> {
+  private updateClientRecord(userId: string, clientId: string, changes: Partial<ClientRecord>): Promise<number> {
     const primaryKey = this.constructPrimaryKey(userId, clientId);
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
-    return this.clientService.updateClientInDb(primaryKey, changes);
+    return this.clientService.updateClientRecord(primaryKey, changes);
   }
 
   /**
@@ -210,7 +211,7 @@ export class ClientRepository {
    * @returns Resolves when the verification state has been updated
    */
   async verifyClient(userId: string, clientEntity: ClientEntity, isVerified: boolean): Promise<void> {
-    await this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}});
+    await this.updateClientRecord(userId, clientEntity.id, {meta: {is_verified: isVerified}});
     clientEntity.meta.isVerified(isVerified);
     amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
   }
@@ -222,12 +223,12 @@ export class ClientRepository {
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  private updateClientSchemaInDb(userId: string, clientPayload: ClientInDB): Promise<ClientInDB> {
+  private updateClientSchemaInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
     clientPayload.meta = {
       is_verified: false,
       primary_key: this.constructPrimaryKey(userId, clientPayload.id),
     };
-    return this.saveClientInDb(userId, clientPayload);
+    return this.saveClientRecord(userId, clientPayload);
   }
 
   //##############################################################################
@@ -358,7 +359,7 @@ export class ClientRepository {
     return clientsData;
   }
 
-  private async getClientByUserIdFromDb(requestedUserId: string): Promise<ClientInDB[]> {
+  private async getClientByUserIdFromDb(requestedUserId: string): Promise<ClientRecord[]> {
     const clients = await this.clientService.loadAllClientsFromDb();
     return clients.filter(client => {
       const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
@@ -414,7 +415,7 @@ export class ClientRepository {
     publish: boolean = true,
   ): Promise<ClientEntity[]> {
     const clientsFromBackend: Record<string, RegisteredClient | PublicClient> = {};
-    const clientsStoredInDb: ClientInDB[] = [];
+    const clientsStoredInDb: ClientRecord[] = [];
     const isSelfUser = userId === this.selfUser().id;
 
     for (const client of clientsData) {
@@ -443,7 +444,7 @@ export class ClientRepository {
             // Locally known client changed on backend
             if (wasUpdated) {
               this.logger.info(`Updating client '${clientId}' of user '${userId}' locally`);
-              promises.push(this.saveClientInDb(userId, client));
+              promises.push(this.saveClientRecord(userId, client));
               continue;
             }
 
