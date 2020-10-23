@@ -24,6 +24,5 @@ export * from './ConnectionState';
 export * from './ContentType';
 export * from './HttpClient';
 export * from './NetworkError';
-export * from './StatusCode';
 export * from './RequestProgressHandler';
 export * from './RequestCancelable';

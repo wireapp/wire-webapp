@@ -20,7 +20,7 @@
 import axios from 'axios';
 
 import {HttpClient} from './HttpClient';
-import {StatusCode} from './StatusCode';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {BackendErrorLabel} from './BackendErrorLabel';
 
 describe('HttpClient', () => {
@@ -39,7 +39,7 @@ describe('HttpClient', () => {
       const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
       const requestSpy = spyOn(axios, 'request');
       // eslint-disable-next-line prefer-promise-reject-errors
-      requestSpy.and.returnValue(Promise.reject({response: {status: StatusCode.UNAUTHORIZED}}));
+      requestSpy.and.returnValue(Promise.reject({response: {status: HTTP_STATUS.UNAUTHORIZED}}));
       client.refreshAccessToken = () => {
         requestSpy.and.returnValue(Promise.resolve());
         return Promise.resolve(mockedAccessTokenStore.accessToken.access_token);
@@ -65,8 +65,8 @@ describe('HttpClient', () => {
         // eslint-disable-next-line prefer-promise-reject-errors
         Promise.reject({
           response: {
-            data: {code: StatusCode.FORBIDDEN, label: BackendErrorLabel.INVALID_CREDENTIALS, message: 'Token expired'},
-            status: StatusCode.FORBIDDEN,
+            data: {code: HTTP_STATUS.FORBIDDEN, label: BackendErrorLabel.INVALID_CREDENTIALS, message: 'Token expired'},
+            status: HTTP_STATUS.FORBIDDEN,
           },
         }),
       );
@@ -94,11 +94,11 @@ describe('HttpClient', () => {
         Promise.reject({
           response: {
             data: {
-              code: StatusCode.FORBIDDEN,
+              code: HTTP_STATUS.FORBIDDEN,
               label: BackendErrorLabel.INVALID_CREDENTIALS,
               message: 'Invalid token',
             },
-            status: StatusCode.FORBIDDEN,
+            status: HTTP_STATUS.FORBIDDEN,
           },
         }),
       );
@@ -131,11 +131,11 @@ describe('HttpClient', () => {
       Promise.reject({
         response: {
           data: {
-            code: StatusCode.FORBIDDEN,
+            code: HTTP_STATUS.FORBIDDEN,
             label: BackendErrorLabel.INVALID_CREDENTIALS,
             message: 'Missing cookie',
           },
-          status: StatusCode.FORBIDDEN,
+          status: HTTP_STATUS.FORBIDDEN,
         },
       }),
     );
