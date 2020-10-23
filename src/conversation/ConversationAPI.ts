@@ -93,14 +93,21 @@ export class ConversationAPI {
   }
 
   /**
-   * Remove bot from conversation.
-   * @param conversationId The conversation ID to remove the bot from
-   * @param botId The ID of the bot to be removed from the conversation
+   * @deprecated Use `deleteService()` instead.
    */
-  public async deleteBot(conversationId: string, botId: string): Promise<void> {
+  public deleteBot(conversationId: string, serviceId: string): Promise<void> {
+    return this.deleteService(conversationId, serviceId);
+  }
+
+  /**
+   * Remove service from conversation.
+   * @param conversationId The conversation ID to remove the service from
+   * @param serviceId The ID of the service to be removed from the conversation
+   */
+  public async deleteService(conversationId: string, serviceId: string): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}/${botId}`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.BOTS}/${serviceId}`,
     };
 
     await this.client.sendJSON(config);
@@ -337,12 +344,19 @@ export class ConversationAPI {
   }
 
   /**
-   * Add a bot to an existing conversation.
-   * @param conversationId ID of the conversation to add bots to
-   * @param providerId ID of the bot provider
+   * @deprecated Use `postService()` instead.
+   */
+  public postBot(conversationId: string, providerId: string, serviceId: string): Promise<ConversationMemberJoinEvent> {
+    return this.postService(conversationId, providerId, serviceId);
+  }
+
+  /**
+   * Add a service to an existing conversation.
+   * @param conversationId ID of the conversation to add services to
+   * @param providerId ID of the service provider
    * @param serviceId ID of the service provider
    */
-  public async postBot(
+  public async postService(
     conversationId: string,
     providerId: string,
     serviceId: string,

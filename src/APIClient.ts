@@ -35,6 +35,7 @@ import {
 } from './auth/';
 import {CookieStore} from './auth/CookieStore';
 import {BroadcastAPI} from './broadcast/';
+import {ServicesAPI} from './services';
 import {ClientAPI, ClientType} from './client/';
 import {Config} from './Config';
 import {ConnectionAPI} from './connection/';
@@ -96,6 +97,7 @@ export class APIClient extends EventEmitter {
   public giphy: {api: GiphyAPI};
   public notification: {api: NotificationAPI};
   public self: {api: SelfAPI};
+  public services: {api: ServicesAPI};
   public serviceProvider: {api: ServiceProviderAPI};
   public teams: {
     conversation: {api: TeamConversationAPI};
@@ -165,6 +167,9 @@ export class APIClient extends EventEmitter {
     };
     this.auth = {
       api: new AuthAPI(this.transport.http),
+    };
+    this.services = {
+      api: new ServicesAPI(this.transport.http),
     };
     this.broadcast = {
       api: new BroadcastAPI(this.transport.http),
@@ -262,7 +267,7 @@ export class APIClient extends EventEmitter {
 
     const user = await this.auth.api.postRegister(userAccount);
 
-    await this.createContext(user.id, clientType);
+    this.createContext(user.id, clientType);
 
     return this.init(clientType, CookieStore.getCookie());
   }
