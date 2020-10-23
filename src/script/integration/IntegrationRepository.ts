@@ -19,8 +19,8 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import type {Observable, ObservableArray, PureComputed} from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import type {ConversationMemberJoinEvent} from '@wireapp/api-client/dist/event';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -37,14 +37,16 @@ import type {IntegrationService} from './IntegrationService';
 import {ServiceEntity} from './ServiceEntity';
 import {ServiceTag} from './ServiceTag';
 import {ConversationError} from '../error/ConversationError';
+import {ProviderEntity} from './ProviderEntity';
+import {MemberLeaveEvent} from '../conversation/EventBuilder';
 
 export class IntegrationRepository {
   private readonly conversationRepository: ConversationRepository;
   private readonly integrationService: IntegrationService;
   private readonly logger: Logger;
   private readonly teamRepository: TeamRepository;
-  public readonly isTeam: PureComputed<boolean>;
-  public readonly services: ObservableArray<ServiceEntity>;
+  public readonly isTeam: ko.PureComputed<boolean>;
+  public readonly services: ko.ObservableArray<ServiceEntity>;
 
   /**
    * Trim query string for search.
@@ -78,26 +80,26 @@ export class IntegrationRepository {
    * Get provider name for entity.
    * @param entity Service or user to add provider name to
    */
-  addProviderNameToParticipant(entity: ServiceEntity): Promise<ServiceEntity>;
-  addProviderNameToParticipant(entity: User): Promise<User>;
-  addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User> {
+  async addProviderNameToParticipant(entity: ServiceEntity): Promise<ServiceEntity | ProviderEntity>;
+  async addProviderNameToParticipant(entity: User): Promise<User | ProviderEntity>;
+  async addProviderNameToParticipant(entity: ServiceEntity | User): Promise<ServiceEntity | User | ProviderEntity> {
     const shouldUpdateProviderName = !!entity.providerName() && !entity.providerName().trim();
 
-    return shouldUpdateProviderName
-      ? this.getProviderById(entity.providerId).then(providerEntity => {
-          entity.providerName(providerEntity.name);
-          return entity;
-        })
-      : Promise.resolve(entity);
+    if (shouldUpdateProviderName) {
+      const providerEntity = await this.getProviderById(entity.providerId);
+      entity.providerName(providerEntity.name);
+    }
+
+    return entity;
   }
 
   /**
    * Get ServiceEntity for entity.
    * @param entity Service or user to resolve to ServiceEntity
    */
-  getServiceFromUser(entity: ServiceEntity | User): Promise<ServiceEntity> {
+  async getServiceFromUser(entity: ServiceEntity | User): Promise<ServiceEntity> {
     if (entity instanceof ServiceEntity) {
-      return Promise.resolve(entity);
+      return entity;
     }
     const {providerId, serviceId} = entity;
     return this.getServiceById(providerId, serviceId);
@@ -110,7 +112,10 @@ export class IntegrationRepository {
    * @param serviceEntity Service to be added to conversation
    * @param method Method used to add service
    */
-  addService(conversationEntity: Conversation, serviceEntity: ServiceEntity, method: string): Promise<any> {
+  addService(
+    conversationEntity: Conversation,
+    serviceEntity: ServiceEntity,
+  ): Promise<ConversationMemberJoinEvent | void> {
     const {id: serviceId, name, providerId} = serviceEntity;
     this.logger.info(`Adding service '${name}' to conversation '${conversationEntity.id}'`, serviceEntity);
 
@@ -123,28 +128,31 @@ export class IntegrationRepository {
    * @param serviceEntity Information about service to be added
    * @returns Resolves when conversation with the integration was created
    */
-  create1to1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
-    return this.conversationRepository
-      .createGroupConversation([], undefined, ACCESS_STATE.TEAM.GUEST_ROOM)
-      .then(conversationEntity => {
-        if (conversationEntity) {
-          return this.addService(conversationEntity, serviceEntity, 'start_ui').then(() => conversationEntity);
-        }
+  async create1to1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
+    try {
+      const conversationEntity = await this.conversationRepository.createGroupConversation(
+        [],
+        undefined,
+        ACCESS_STATE.TEAM.GUEST_ROOM,
+      );
 
-        throw new ConversationError(
-          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-        );
-      })
-      .catch(error => {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          text: {
-            message: t('modalIntegrationUnavailableMessage'),
-            title: t('modalIntegrationUnavailableHeadline'),
-          },
-        });
-        throw error;
+      if (conversationEntity) {
+        return this.addService(conversationEntity, serviceEntity).then(() => conversationEntity);
+      }
+
+      throw new ConversationError(
+        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+        ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+      );
+    } catch (error) {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: t('modalIntegrationUnavailableMessage'),
+          title: t('modalIntegrationUnavailableHeadline'),
+        },
       });
+      throw error;
+    }
   }
 
   /**
@@ -152,7 +160,7 @@ export class IntegrationRepository {
    * @param serviceEntity Service entity for whom to get the conversation
    * @returns Resolves with the conversation with requested service
    */
-  get1To1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
+  async get1To1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
     const matchingConversationEntity = this.conversationRepository.conversations().find(conversationEntity => {
       if (!conversationEntity.is1to1()) {
         // Disregard conversations that are not 1:1
@@ -182,41 +190,32 @@ export class IntegrationRepository {
       return isExpectedServiceId && isExpectedProviderId;
     });
 
-    return matchingConversationEntity
-      ? Promise.resolve(matchingConversationEntity)
-      : this.create1to1ConversationWithService(serviceEntity);
+    return matchingConversationEntity || this.create1to1ConversationWithService(serviceEntity);
   }
 
-  getProviderById(providerId: string): Promise<any> {
-    return this.integrationService.getProvider(providerId).then(providerData => {
-      if (providerData) {
-        return IntegrationMapper.mapProviderFromObject(providerData);
-      }
-      return undefined;
-    });
+  async getProviderById(providerId: string): Promise<ProviderEntity | undefined> {
+    const providerData = await this.integrationService.getProvider(providerId);
+    return providerData ? IntegrationMapper.mapProviderFromObject(providerData) : undefined;
   }
 
-  getServiceById(providerId: string, serviceId: string): Promise<any> {
-    return this.integrationService.getService(providerId, serviceId).then(serviceData => {
-      if (serviceData) {
-        return IntegrationMapper.mapServiceFromObject(serviceData);
-      }
-      return undefined;
-    });
+  async getServiceById(providerId: string, serviceId: string): Promise<ServiceEntity | undefined> {
+    const serviceData = await this.integrationService.getService(providerId, serviceId);
+    if (serviceData) {
+      return IntegrationMapper.mapServiceFromObject(serviceData);
+    }
+    return undefined;
   }
 
-  getServices(tags: ServiceTag | ServiceTag[], start: string): Promise<ServiceEntity[]> {
+  async getServices(tags: ServiceTag | ServiceTag[], start: string): Promise<ServiceEntity[]> {
     const tagsArray = Array.isArray(tags) ? tags.slice(0, 3) : [ServiceTag.INTEGRATION];
 
-    return this.integrationService.getServices(tagsArray.join(','), start).then(({services: servicesData}) => {
-      return IntegrationMapper.mapServicesFromArray(servicesData);
-    });
+    const {services: servicesData} = await this.integrationService.getServices(tagsArray.join(','), start);
+    return IntegrationMapper.mapServicesFromArray(servicesData);
   }
 
-  getServicesByProvider(providerId: string): Promise<ServiceEntity[]> {
-    return this.integrationService.getProviderServices(providerId).then(servicesData => {
-      return IntegrationMapper.mapServicesFromArray(servicesData);
-    });
+  async getServicesByProvider(providerId: string): Promise<ServiceEntity[]> {
+    const servicesData = await this.integrationService.getProviderServices(providerId);
+    return IntegrationMapper.mapServicesFromArray(servicesData);
   }
 
   /**
@@ -225,28 +224,27 @@ export class IntegrationRepository {
    * @param conversationEntity Conversation to remove service from
    * @param userEntity Service user to be removed from the conversation
    */
-  removeService(conversationEntity: Conversation, userEntity: User): Promise<any> {
+  removeService(conversationEntity: Conversation, userEntity: User): Promise<MemberLeaveEvent> {
     const {id: userId} = userEntity;
-
     return this.conversationRepository.removeService(conversationEntity, userId);
   }
 
-  searchForServices(query: string, queryObservable: Observable<string>): Promise<void> {
+  async searchForServices(query: string, queryObservable: ko.Observable<string>): Promise<void> {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
-    return this.teamRepository
-      .getWhitelistedServices(this.teamRepository.team().id)
-      .then((serviceEntities: ServiceEntity[]) => {
-        const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
-        if (isCurrentQuery) {
-          serviceEntities = serviceEntities
-            .filter(serviceEntity => compareTransliteration(serviceEntity.name, normalizedQuery))
-            .sort((serviceA, serviceB) => {
-              return sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
-            });
-          this.services(serviceEntities);
-        }
-      })
-      .catch((error: Error) => this.logger.error(`Error searching for services: ${error.message}`, error));
+    try {
+      let serviceEntities = await this.teamRepository.getWhitelistedServices(this.teamRepository.team().id);
+      const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
+      if (isCurrentQuery) {
+        serviceEntities = serviceEntities
+          .filter(serviceEntity => compareTransliteration(serviceEntity.name, normalizedQuery))
+          .sort((serviceA, serviceB) => {
+            return sortByPriority(serviceA.name, serviceB.name, normalizedQuery);
+          });
+        this.services(serviceEntities);
+      }
+    } catch (error) {
+      return this.logger.error(`Error searching for services: ${error.message}`, error);
+    }
   }
 }
