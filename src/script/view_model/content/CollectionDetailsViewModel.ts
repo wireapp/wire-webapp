@@ -128,7 +128,12 @@ export class CollectionDetailsViewModel {
   }
 
   clickOnImage(messageEntity: ContentMessage) {
-    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.items(), 'collection');
+    amplify.publish(
+      WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW,
+      messageEntity.id,
+      this.conversationEntity(),
+      'collection',
+    );
   }
 
   shouldShowHeader(messageEntity: ContentMessage) {

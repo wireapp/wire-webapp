@@ -14,7 +14,7 @@
       <footer class="detail-view-footer" data-bind="let: {message: messageEntity(), conversation: conversationEntity()}">
         <!-- ko if: message.isReactable() && !conversation.removed_from_conversation() -->
           <span class="detail-view-action-button" data-bind="click: clickOnLike" data-uie-name="do-like-fullscreen-picture">
-            <span data-bind="css: isLiked() ? 'icon-liked text-red' : 'icon-like'"></span>
+            <span data-bind="css: message.is_liked() ? 'icon-liked text-red' : 'icon-like'"></span>
             <span data-bind="text: t('conversationContextMenuLike')"></span>
           </span>
         <!-- /ko -->

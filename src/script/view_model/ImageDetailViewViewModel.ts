@@ -33,6 +33,8 @@ import type {Conversation} from '../entity/Conversation';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {MediumImage} from '../entity/message/MediumImage';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {MessageCategory} from '../message/MessageCategory';
+import {Message} from '../entity/message/Message';
 
 export class ImageDetailViewViewModel {
   elementId: 'detail-view';
@@ -44,7 +46,6 @@ export class ImageDetailViewViewModel {
   conversationEntity: ko.Observable<Conversation>;
   items: ko.ObservableArray<ContentMessage>;
   messageEntity: ko.Observable<ContentMessage>;
-  isLiked: ko.PureComputed<boolean>;
 
   constructor(
     mainViewModel: MainViewModel,
@@ -63,7 +64,7 @@ export class ImageDetailViewViewModel {
 
     this.conversationEntity = ko.observable();
     this.items = ko.observableArray();
-    this.messageEntity = ko.observable().extend({notify: 'always'});
+    this.messageEntity = ko.observable();
     this.messageEntity.subscribe(messageEntity => {
       if (messageEntity) {
         const conversationId = messageEntity.conversation_id;
@@ -76,9 +77,7 @@ export class ImageDetailViewViewModel {
       }
     });
 
-    this.isLiked = ko.pureComputed(() => false);
-
-    amplify.subscribe(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, this.show);
+    amplify.subscribe(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, this.newShow);
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
@@ -101,23 +100,7 @@ export class ImageDetailViewViewModel {
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
   };
 
-  show = (messageEntity: ContentMessage, messageEntities: ContentMessage[], source: string) => {
-    this.items(messageEntities);
-    this.messageEntity(messageEntity);
-    this.isLiked = messageEntity.is_liked;
-    this.source = source;
-
-    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
-
-    if (!this.imageModal) {
-      this.imageModal = new Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
-    }
-
-    this.imageModal.show();
-
-    this.loadImage();
+  private readonly addKeyListeners = () => {
     $(document).on('keydown.lightbox', keyboardEvent => {
       switch (keyboardEvent.key) {
         case KEY.ESC: {
@@ -143,9 +126,53 @@ export class ImageDetailViewViewModel {
     });
   };
 
+  show = (messageEntity: ContentMessage, messageEntities: ContentMessage[], source: string) => {
+    this.items(messageEntities);
+    this.messageEntity(messageEntity);
+    this.source = source;
+
+    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
+
+    if (!this.imageModal) {
+      this.imageModal = new Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
+    }
+
+    this.imageModal.show();
+
+    this.loadImage();
+    this.addKeyListeners();
+  };
+
+  newShow = async (messageId: string, conversation: Conversation, source: string) => {
+    this.conversationEntity(conversation);
+    const items: Message[] = (
+      await this.conversationRepository.get_events_for_category(conversation, MessageCategory.IMAGE)
+    ).filter(item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF));
+    this.items(items as ContentMessage[]);
+    const message = items.find(({id}) => id === messageId) ?? items[0];
+    this.messageEntity(message as ContentMessage);
+    this.source = source;
+
+    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
+
+    if (!this.imageModal) {
+      this.imageModal = new Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
+    }
+
+    this.imageModal.show();
+
+    this.loadImage();
+    this.addKeyListeners();
+  };
+
   messageAdded = (messageEntity: ContentMessage) => {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
-    if (isCurrentConversation) {
+    const isImage = messageEntity.category & MessageCategory.IMAGE && !(messageEntity.category & MessageCategory.GIF);
+    if (isCurrentConversation && isImage) {
       this.items.push(messageEntity);
     }
   };

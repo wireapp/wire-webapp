@@ -158,6 +158,11 @@ export class CollectionViewModel {
   }
 
   clickOnImage(messageEntity: ContentMessage) {
-    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.images(), 'collection');
+    amplify.publish(
+      WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW,
+      messageEntity.id,
+      this.conversationEntity(),
+      'collection',
+    );
   }
 }

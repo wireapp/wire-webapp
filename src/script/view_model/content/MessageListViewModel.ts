@@ -399,17 +399,7 @@ export class MessageListViewModel {
     if (messageEntity.is_expired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
       return;
     }
-
-    const items: Message[] = await this.conversationRepository.get_events_for_category(
-      this.conversation(),
-      MessageCategory.IMAGE,
-    );
-    const messageEntities = items.filter(
-      item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF),
-    );
-    const [imageMessageEntity] = messageEntities.filter(item => item.id === messageEntity.id);
-
-    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
+    amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity.id, this.conversation());
   };
 
   get_timestamp_class = (messageEntity: ContentMessage): string => {
