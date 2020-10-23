@@ -45,7 +45,6 @@ export class ClientRepository {
   readonly cryptographyRepository: CryptographyRepository;
   selfUser: ko.Observable<User>;
   logger: Logger;
-  // currentClient: ko.Observable<ClientEntity>;
 
   static get CONFIG() {
     return {
