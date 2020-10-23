@@ -17,7 +17,7 @@
     "@types/webpack": "4.41.22",
     "@wireapp/store-engine": "4.5.13",
     "babel-loader": "8.1.0",
-    "bazinga64": "5.7.15",
+    "bazinga64": "5.7.16",
     "del-cli": "3.0.1",
     "jasmine": "3.5.0",
     "karma": "5.1.0",
@@ -49,5 +49,5 @@
     "test": "yarn build && karma start",
     "test:project": "yarn build && yarn test"
   },
-  "version": "1.3.24"
+  "version": "1.3.25"
 }
