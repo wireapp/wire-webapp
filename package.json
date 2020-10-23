@@ -6,7 +6,7 @@
     "@types/long": "4.0.1",
     "@types/node": "~12",
     "@wireapp/api-client": "11.29.0",
-    "@wireapp/cryptobox": "12.2.33",
+    "@wireapp/cryptobox": "12.2.34",
     "@wireapp/protocol-messaging": "1.25.4",
     "@wireapp/store-engine": "4.5.13",
     "bazinga64": "5.7.15",
@@ -69,5 +69,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "nyc jasmine --config=jasmine.json"
   },
-  "version": "16.12.40"
+  "version": "16.12.41"
 }
