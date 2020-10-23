@@ -39,11 +39,125 @@ export interface AssetResponse {
 
 export class AssetAPI {
   private static readonly ASSET_V3_URL = '/assets/v3';
+  private static readonly ASSET_SERVICE_URL = '/bot/assets';
   private static readonly ASSET_V2_URL = '/otr/assets';
   private static readonly ASSET_V2_CONVERSATION_URL = '/conversations';
   private static readonly ASSET_V1_URL = '/assets';
 
   constructor(private readonly client: HttpClient) {}
+
+  private async getAssetShared(
+    assetUrl: string,
+    token?: string | null,
+    forceCaching: boolean = false,
+    progressCallback?: ProgressCallback,
+  ): Promise<RequestCancelable<AssetResponse>> {
+    if (token && !isValidToken(token)) {
+      throw new TypeError(`Expected token "${token.substr(0, 5)}..." (redacted) to be base64 encoded string.`);
+    }
+
+    const cancelSource = axios.CancelToken.source();
+    const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
+      method: 'get',
+      onDownloadProgress: handleProgressEvent(progressCallback),
+      onUploadProgress: handleProgressEvent(progressCallback),
+      params: {},
+      responseType: 'arraybuffer',
+      url: assetUrl,
+    };
+
+    if (token) {
+      config.params.asset_token = token;
+    }
+
+    if (forceCaching) {
+      config.params.forceCaching = forceCaching;
+    }
+
+    const handleRequest = async (): Promise<AssetResponse> => {
+      try {
+        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+        return {
+          buffer: response.data,
+          mimeType: response.headers['content-type'],
+        };
+      } catch (error) {
+        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Asset download got cancelled.');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      response: handleRequest(),
+    };
+  }
+
+  private async postAssetShared(
+    assetBaseUrl: string,
+    asset: Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+    customAssetUrl?: string,
+  ): Promise<RequestCancelable<AssetUploadData>> {
+    const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
+
+    const metadata = JSON.stringify({
+      public: true,
+      retention: AssetRetentionPolicy.PERSISTENT,
+      ...options,
+    });
+
+    let body = '';
+
+    body += `--${BOUNDARY}\r\n`;
+    body += 'Content-Type: application/json;charset=utf-8\r\n';
+    body += `Content-length: ${metadata.length}\r\n`;
+    body += '\r\n';
+    body += `${metadata}\r\n`;
+
+    body += `--${BOUNDARY}\r\n`;
+    body += 'Content-Type: application/octet-stream\r\n';
+    body += `Content-length: ${asset.length}\r\n`;
+    body += `Content-MD5: ${base64MD5FromBuffer(asset.buffer)}\r\n`;
+    body += '\r\n';
+
+    const footer = `\r\n--${BOUNDARY}--\r\n`;
+
+    const cancelSource = axios.CancelToken.source();
+
+    const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
+      data: concatToBuffer(body, asset, footer),
+      headers: {
+        'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
+      },
+      method: 'post',
+      onDownloadProgress: handleProgressEvent(progressCallback),
+      onUploadProgress: handleProgressEvent(progressCallback),
+      url: assetBaseUrl,
+    };
+
+    const handleRequest = async (): Promise<AssetUploadData> => {
+      try {
+        const response = await this.client.sendRequest<AssetUploadData>(config);
+        return response.data;
+      } catch (error) {
+        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Asset upload got cancelled.');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      response: handleRequest(),
+    };
+  }
 
   async getAssetV1(
     assetId: string,
@@ -149,7 +263,7 @@ export class AssetAPI {
     };
   }
 
-  async getAssetV3(
+  getAssetV3(
     assetId: string,
     token?: string | null,
     forceCaching: boolean = false,
@@ -159,107 +273,39 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    if (token && !isValidToken(token)) {
-      throw new TypeError(`Expected token "${token.substr(0, 5)}..." (redacted) to be base64 encoded string.`);
-    }
-
-    const cancelSource = axios.CancelToken.source();
-    const config: AxiosRequestConfig = {
-      cancelToken: cancelSource.token,
-      method: 'get',
-      onDownloadProgress: handleProgressEvent(progressCallback),
-      onUploadProgress: handleProgressEvent(progressCallback),
-      params: {},
-      responseType: 'arraybuffer',
-      url: `${AssetAPI.ASSET_V3_URL}/${assetId}`,
-    };
-
-    if (token) {
-      config.params.asset_token = token;
-    }
-    if (forceCaching) {
-      config.params.forceCaching = forceCaching;
-    }
-
-    const handleRequest = async (): Promise<AssetResponse> => {
-      try {
-        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
-        return {
-          buffer: response.data,
-          mimeType: response.headers['content-type'],
-        };
-      } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
-          throw new RequestCancellationError('Asset download got cancelled.');
-        }
-        throw error;
-      }
-    };
-
-    return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
-      response: handleRequest(),
-    };
+    const assetBaseUrl = `${AssetAPI.ASSET_V3_URL}/${assetId}`;
+    return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
   }
 
-  async postAsset(
+  getServiceAsset(
+    assetId: string,
+    token?: string | null,
+    forceCaching: boolean = false,
+    progressCallback?: ProgressCallback,
+  ): Promise<RequestCancelable<AssetResponse>> {
+    if (!isValidUUID(assetId)) {
+      throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
+    }
+
+    const assetBaseUrl = `${AssetAPI.ASSET_SERVICE_URL}/${assetId}`;
+    return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
+  }
+
+  postAsset(
     asset: Uint8Array,
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
   ): Promise<RequestCancelable<AssetUploadData>> {
-    const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
+    const assetBaseUrl = AssetAPI.ASSET_V3_URL;
+    return this.postAssetShared(assetBaseUrl, asset, options, progressCallback);
+  }
 
-    const metadata = JSON.stringify({
-      public: true,
-      retention: AssetRetentionPolicy.PERSISTENT,
-      ...options,
-    });
-
-    let body = '';
-
-    body += `--${BOUNDARY}\r\n`;
-    body += 'Content-Type: application/json;charset=utf-8\r\n';
-    body += `Content-length: ${metadata.length}\r\n`;
-    body += '\r\n';
-    body += `${metadata}\r\n`;
-
-    body += `--${BOUNDARY}\r\n`;
-    body += 'Content-Type: application/octet-stream\r\n';
-    body += `Content-length: ${asset.length}\r\n`;
-    body += `Content-MD5: ${base64MD5FromBuffer(asset.buffer)}\r\n`;
-    body += '\r\n';
-
-    const footer = `\r\n--${BOUNDARY}--\r\n`;
-
-    const cancelSource = axios.CancelToken.source();
-
-    const config: AxiosRequestConfig = {
-      cancelToken: cancelSource.token,
-      data: concatToBuffer(body, asset, footer),
-      headers: {
-        'Content-Type': `multipart/mixed; boundary=${BOUNDARY}`,
-      },
-      method: 'post',
-      onDownloadProgress: handleProgressEvent(progressCallback),
-      onUploadProgress: handleProgressEvent(progressCallback),
-      url: AssetAPI.ASSET_V3_URL,
-    };
-
-    const handleRequest = async (): Promise<AssetUploadData> => {
-      try {
-        const response = await this.client.sendRequest<AssetUploadData>(config);
-        return response.data;
-      } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
-          throw new RequestCancellationError('Asset upload got cancelled.');
-        }
-        throw error;
-      }
-    };
-
-    return {
-      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
-      response: handleRequest(),
-    };
+  postServiceAsset(
+    asset: Uint8Array,
+    options?: AssetOptions,
+    progressCallback?: ProgressCallback,
+  ): Promise<RequestCancelable<AssetUploadData>> {
+    const assetBaseUrl = AssetAPI.ASSET_SERVICE_URL;
+    return this.postAssetShared(assetBaseUrl, asset, options, progressCallback);
   }
 }
