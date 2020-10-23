@@ -23,7 +23,6 @@ import {CSSObject} from '@emotion/serialize';
 
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
-import {User} from '../../entity/User';
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetRepository} from '../../assets/AssetRepository';
 
@@ -35,7 +34,8 @@ export interface AvatarImageProps {
   borderRadius?: string;
   devicePixelRatio?: number;
   isGrey?: boolean;
-  participant: User;
+  mediumPicture: AssetRemoteData;
+  previewPicture: AssetRemoteData;
   size: AVATAR_SIZE;
 }
 
@@ -44,7 +44,8 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   backgroundColor = 'currentColor',
   borderRadius = '50%',
   isGrey = false,
-  participant,
+  previewPicture,
+  mediumPicture,
   size,
   devicePixelRatio = window.devicePixelRatio,
 }) => {
@@ -54,7 +55,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
   useEffect(() => {
     loadAvatarPicture();
-  }, [participant]);
+  }, [previewPicture, mediumPicture, size]);
 
   const loadAvatarPicture = async () => {
     if (!avatarLoadingBlocked) {
@@ -62,9 +63,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
       const isSmall = size !== AVATAR_SIZE.LARGE && size !== AVATAR_SIZE.X_LARGE;
       const loadHiRes = !isSmall && devicePixelRatio > 1;
-      const pictureResource: AssetRemoteData = loadHiRes
-        ? participant.mediumPictureResource()
-        : participant.previewPictureResource();
+      const pictureResource: AssetRemoteData = loadHiRes ? mediumPicture : previewPicture;
 
       if (pictureResource) {
         const isCached = pictureResource.downloadProgress() === 100;

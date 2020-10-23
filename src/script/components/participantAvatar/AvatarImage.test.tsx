@@ -49,7 +49,8 @@ describe('AvatarImage', () => {
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
       devicePixelRatio: 2,
-      participant: participant,
+      mediumPicture: participant.mediumPictureResource(),
+      previewPicture: participant.previewPictureResource(),
       size: AVATAR_SIZE.LARGE,
     });
 
@@ -72,7 +73,8 @@ describe('AvatarImage', () => {
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
       devicePixelRatio: 1,
-      participant: participant,
+      mediumPicture: participant.mediumPictureResource(),
+      previewPicture: participant.previewPictureResource(),
       size: AVATAR_SIZE.LARGE,
     });
 
@@ -94,7 +96,8 @@ describe('AvatarImage', () => {
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
       devicePixelRatio: 2,
-      participant: participant,
+      mediumPicture: participant.mediumPictureResource(),
+      previewPicture: participant.previewPictureResource(),
       size: AVATAR_SIZE.SMALL,
     });
 
@@ -114,7 +117,8 @@ describe('AvatarImage', () => {
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
-      participant: participant,
+      mediumPicture: participant.mediumPictureResource(),
+      previewPicture: participant.previewPictureResource(),
       size: AVATAR_SIZE.LARGE,
     });
 

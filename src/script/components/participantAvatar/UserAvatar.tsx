@@ -70,10 +70,11 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       <AvatarInitials size={size} initials={participant.initials()} />
       <AvatarImage
         assetRepository={assetRepository}
-        participant={participant}
         size={size}
         isGrey={isImageGrey}
         backgroundColor={backgroundColor}
+        previewPicture={participant.previewPictureResource()}
+        mediumPicture={participant.mediumPictureResource()}
       />
       {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
       {!isImageGrey && <AvatarBorder />}

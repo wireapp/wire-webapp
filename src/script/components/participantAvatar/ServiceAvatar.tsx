@@ -71,7 +71,13 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
           dangerouslySetInnerHTML={{__html: SVGProvider['service-icon']?.documentElement?.innerHTML}}
         ></svg>
       </div>
-      <AvatarImage assetRepository={assetRepository} participant={participant} borderRadius="20%" size={size} />
+      <AvatarImage
+        assetRepository={assetRepository}
+        previewPicture={participant.previewPictureResource()}
+        mediumPicture={participant.mediumPictureResource()}
+        borderRadius="20%"
+        size={size}
+      />
       <AvatarBorder borderRadius="20%" />
     </AvatarWrapper>
   );
