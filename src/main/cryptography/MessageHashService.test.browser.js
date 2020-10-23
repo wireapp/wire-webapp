@@ -21,7 +21,7 @@
 
 /* eslint-disable no-magic-numbers */
 
-const {MessageHashService} = require('@wireapp/core/dist/cryptography/');
+const {MessageHashService} = require('@wireapp/core/src/main/cryptography/');
 
 describe('MessageHashService', () => {
   describe('"getHash"', () => {

@@ -21,9 +21,9 @@
 const bazinga64 = require('bazinga64');
 const Proteus = require('@wireapp/proteus');
 const {Cryptobox} = require('@wireapp/cryptobox');
-const {CryptographyService} = require('@wireapp/core/dist/cryptography/');
+const {CryptographyService} = require('@wireapp/core/src/main/cryptography/');
 const {MemoryEngine} = require('@wireapp/store-engine');
-const {decryptAsset, encryptAsset} = require('@wireapp/core/dist/cryptography/AssetCryptography.browser');
+const {decryptAsset, encryptAsset} = require('@wireapp/core/src/main/cryptography/AssetCryptography.browser');
 
 async function createEngine(storeName) {
   const engine = new MemoryEngine();

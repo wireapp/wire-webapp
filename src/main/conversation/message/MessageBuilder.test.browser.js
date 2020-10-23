@@ -17,7 +17,7 @@
  *
  */
 
-const {MessageBuilder} = require('@wireapp/core/dist/conversation/message/MessageBuilder');
+const {MessageBuilder} = require('@wireapp/core/src/main/conversation/message/MessageBuilder');
 
 describe('createId', () => {
   it('creates a random ID.', () => {
