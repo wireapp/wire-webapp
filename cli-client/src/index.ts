@@ -21,7 +21,7 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import {Account} from '@wireapp/core';
-import {PayloadBundleType} from '@wireapp/core/dist/conversation/';
+import {PayloadBundleType} from '@wireapp/core/src/main/conversation/';
 import {FileEngine} from '@wireapp/store-engine-fs';
 import {AxiosError} from 'axios';
 import program from 'commander';

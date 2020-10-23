@@ -22,7 +22,7 @@ import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data';
 import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
 import {User} from '@wireapp/api-client/src/user/';
 import {Account} from '@wireapp/core';
-import {PayloadBundle, ReactionType, UserClientsMap} from '@wireapp/core/dist/conversation/';
+import {PayloadBundle, ReactionType, UserClientsMap} from '@wireapp/core/src/main/conversation/';
 import {
   ButtonActionConfirmationContent,
   CallingContent,
@@ -32,8 +32,8 @@ import {
   LinkPreviewContent,
   LocationContent,
   MentionContent,
-} from '@wireapp/core/dist/conversation/content/';
-import {QuotableMessage} from '@wireapp/core/dist/conversation/message/OtrMessage';
+} from '@wireapp/core/src/main/conversation/content/';
+import {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {Asset, Confirmation, Text} from '@wireapp/protocol-messaging';
 
 export abstract class MessageHandler {

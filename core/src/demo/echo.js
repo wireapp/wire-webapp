@@ -30,7 +30,7 @@ const path = require('path');
 const logdown = require('logdown');
 
 const {Account} = require('@wireapp/core');
-const {PayloadBundleType} = require('@wireapp/core/dist/conversation/');
+const {PayloadBundleType} = require('@wireapp/core/src/main/conversation/');
 const {APIClient} = require('@wireapp/api-client');
 const {WebSocketClient} = require('@wireapp/api-client/src/tcp/');
 const {ClientType} = require('@wireapp/api-client/src/client/ClientType');

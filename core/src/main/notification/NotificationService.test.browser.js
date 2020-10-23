@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {NotificationService} from '@wireapp/core/dist/notification/';
+import {NotificationService} from '@wireapp/core/src/main/notification/';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import Dexie from 'dexie';
 import UUID from 'uuidjs';

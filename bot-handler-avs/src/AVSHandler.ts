@@ -18,7 +18,7 @@
  */
 
 import {MessageHandler} from '@wireapp/bot-api';
-import type {PayloadBundle} from '@wireapp/core/dist/conversation/';
+import type {PayloadBundle} from '@wireapp/core/src/main/conversation/';
 import type {Call} from './Call';
 import {
   CALL_TYPE,
@@ -32,7 +32,7 @@ import {
   WcallParticipantChangedHandler,
 } from '@wireapp/avs';
 import axios from 'axios';
-import type {CallMessage} from '@wireapp/core/dist/conversation/message/OtrMessage';
+import type {CallMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 
 const wrtc = require('wrtc');
 

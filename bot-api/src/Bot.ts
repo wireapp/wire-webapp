@@ -21,7 +21,7 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client/';
 import {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
 import {Account} from '@wireapp/core';
-import {PayloadBundle, PayloadBundleType, UserClientsMap} from '@wireapp/core/dist/conversation/';
+import {PayloadBundle, PayloadBundleType, UserClientsMap} from '@wireapp/core/src/main/conversation/';
 import {CRUDEngine} from '@wireapp/store-engine';
 import logdown from 'logdown';
 import UUID from 'uuidjs';
