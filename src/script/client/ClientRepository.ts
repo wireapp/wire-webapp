@@ -20,13 +20,16 @@
 import ko from 'knockout';
 import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client/';
 import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/dist/event';
+import {Runtime} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 import {murmurhash3} from 'Util/util';
+
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -36,16 +39,16 @@ import type {ClientService} from './ClientService';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
-import {Runtime} from '@wireapp/commons';
+import {ClientRecord} from '../storage';
 
 export class ClientRepository {
-  readonly clientService: ClientService;
-  readonly cryptographyRepository: CryptographyRepository;
-  selfUser: ko.Observable<User>;
-  logger: Logger;
-  clients: ko.PureComputed<any[]>;
-  currentClient: ko.Observable<ClientEntity>;
-  isTemporaryClient: ko.PureComputed<boolean>;
+  private readonly logger: Logger;
+  private readonly isTemporaryClient: ko.PureComputed<boolean>;
+  public clients: ko.PureComputed<ClientEntity[]>;
+  public selfUser: ko.Observable<User>;
+  public readonly clientService: ClientService;
+  public readonly cryptographyRepository: CryptographyRepository;
+  public currentClient: ko.Observable<ClientEntity>;
 
   static get CONFIG() {
     return {
@@ -178,7 +181,7 @@ export class ClientRepository {
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  saveClientInDb(userId: string, clientPayload: any): Promise<any> {
+  saveClientInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
     const primaryKey = this.constructPrimaryKey(userId, clientPayload.id);
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
@@ -192,7 +195,7 @@ export class ClientRepository {
    * @param changes New values which should be updated on the client
    * @returns Number of updated records
    */
-  private updateClientInDb(userId: string, clientId: string, changes: Record<string, any>): Promise<number> {
+  private updateClientInDb(userId: string, clientId: string, changes: Partial<ClientRecord>): Promise<number> {
     const primaryKey = this.constructPrimaryKey(userId, clientId);
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
@@ -220,7 +223,7 @@ export class ClientRepository {
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  private updateClientSchemaInDb(userId: string, clientPayload: any): Promise<any> {
+  private updateClientSchemaInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
     clientPayload.meta = {
       is_verified: false,
       primary_key: this.constructPrimaryKey(userId, clientPayload.id),
@@ -288,7 +291,7 @@ export class ClientRepository {
    * @param password Password entered by user
    * @returns Resolves with the remaining user devices
    */
-  async deleteClient(clientId: string, password: string): Promise<any> {
+  async deleteClient(clientId: string, password: string): Promise<ClientEntity[]> {
     await this.clientService.deleteClient(clientId, password);
     await this.deleteClientFromDb(this.selfUser().id, clientId);
     this.selfUser().remove_client(clientId);
@@ -356,7 +359,7 @@ export class ClientRepository {
     return clientsData;
   }
 
-  private async getClientByUserIdFromDb(requestedUserId: string): Promise<any[]> {
+  private async getClientByUserIdFromDb(requestedUserId: string): Promise<ClientRecord[]> {
     const clients = await this.clientService.loadAllClientsFromDb();
     return clients.filter(client => {
       const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
@@ -368,7 +371,7 @@ export class ClientRepository {
    * Retrieves meta information about all other locally known clients of the self user.
    * @returns Resolves with all locally known clients except the current one
    */
-  async getClientsForSelf(): Promise<any[]> {
+  async getClientsForSelf(): Promise<ClientEntity[]> {
     this.logger.info('Retrieving all clients of the self user from database');
     const clientsData = await this.getClientByUserIdFromDb(this.selfUser().id);
     const clientEntities = ClientMapper.mapClients(clientsData, true);
@@ -412,7 +415,7 @@ export class ClientRepository {
     publish: boolean = true,
   ): Promise<ClientEntity[]> {
     const clientsFromBackend: Record<string, RegisteredClient | PublicClient> = {};
-    const clientsStoredInDb: ClientEntity[] = [];
+    const clientsStoredInDb: ClientRecord[] = [];
     const isSelfUser = userId === this.selfUser().id;
 
     for (const client of clientsData) {
@@ -514,17 +517,17 @@ export class ClientRepository {
    *
    * @param eventJson JSON data for event
    */
-  private onUserEvent(eventJson: any): void {
+  private onUserEvent(eventJson: UserClientAddEvent | UserClientRemoveEvent): void {
     const type = eventJson.type;
 
     const isClientAdd = type === USER_EVENT.CLIENT_ADD;
     if (isClientAdd) {
-      return this.onClientAdd(eventJson);
+      return this.onClientAdd(eventJson as UserClientAddEvent);
     }
 
     const isClientRemove = type === USER_EVENT.CLIENT_REMOVE;
     if (isClientRemove) {
-      this.onClientRemove(eventJson);
+      this.onClientRemove(eventJson as UserClientRemoveEvent);
     }
   }
 

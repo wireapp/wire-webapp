@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,13 @@
  *
  */
 
-export * from './ClientRecord';
-export * from './EventRecord';
-export * from './StorageKey';
-export * from './StorageRepository';
-export * from './StorageSchemata';
-export * from './StorageService';
+import type {ClientClassification} from '@wireapp/api-client/dist/client';
+
+export interface ClientRecord {
+  class: ClientClassification | '?';
+  id: string;
+  meta?: {
+    is_verified?: boolean;
+    primary_key?: string;
+  };
+}
