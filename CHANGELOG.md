@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.30.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.29.1...@wireapp/api-client@11.30.0) (2020-10-23)
+
+
+### Features
+
+* **api-client:** Add Services API ([#3187](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3187)) ([0a81f81](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/0a81f81f71aca1aa5a40627edc14ce4e0aca63b4))
+
+
+
+
+
 ## [11.29.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.29.0...@wireapp/api-client@11.29.1) (2020-10-23)
 
 **Note:** Version bump only for package @wireapp/api-client
