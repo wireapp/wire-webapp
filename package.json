@@ -22,7 +22,7 @@
     "@types/karma": "5.0.0",
     "@wireapp/commons": "3.8.9",
     "@wireapp/store-engine-dexie": "1.3.17",
-    "commander": "6.1.0",
+    "commander": "6.2.0",
     "cross-env": "7.0.2",
     "del-cli": "3.0.1",
     "dotenv": "8.2.0",
