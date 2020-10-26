@@ -44,6 +44,8 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
+          echo "GITHUB_ENV ="
+          cat $GITHUB_ENV
           echo -e "BRANCH_NAME = ${BRANCH_NAME}"
           echo -e "TAG = ${TAG}"
           echo -e "TITLE = ${TITLE}"
