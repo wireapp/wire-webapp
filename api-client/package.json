@@ -48,7 +48,7 @@
     "karma-webpack": "4.0.2",
     "nock": "13.0.4",
     "nyc": "15.1.0",
-    "react": "16.13.1",
+    "react": "17.0.1",
     "react-dom": "16.13.1",
     "react-hot-loader": "4.12.21",
     "rimraf": "3.0.2",
