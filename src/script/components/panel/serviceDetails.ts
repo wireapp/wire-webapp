@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 
 interface ComponentParams {

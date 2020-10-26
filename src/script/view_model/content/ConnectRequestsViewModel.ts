@@ -21,7 +21,7 @@ import ko from 'knockout';
 import {scrollToBottom} from 'Util/scroll-helpers';
 import {isLastItem} from 'Util/ArrayUtil';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {MainViewModel} from '../MainViewModel';
 import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';

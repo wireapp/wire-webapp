@@ -24,7 +24,7 @@ import {clamp} from 'Util/NumberUtil';
 import {noop} from 'Util/util';
 import {KEY, isEnterKey} from 'Util/KeyboardUtil';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {User} from '../entity/User';
 
 interface MentionSuggestionsParams {

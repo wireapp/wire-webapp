@@ -23,7 +23,7 @@ import {debounce, escape} from 'underscore';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {formatDateShort} from 'Util/TimeUtil';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
 import type {Message} from '../entity/message/Message';
 import type {ContentMessage} from '../entity/message/ContentMessage';

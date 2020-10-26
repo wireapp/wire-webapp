@@ -26,7 +26,7 @@ import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
 import 'Components/calling/fullscreenVideoCall';

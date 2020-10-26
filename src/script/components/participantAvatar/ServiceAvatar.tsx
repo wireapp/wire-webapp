@@ -31,7 +31,7 @@ import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
 import AvatarImage from './AvatarImage';
 import AvatarWrapper from './AvatarWrapper';
-import {AVATAR_SIZE} from '../ParticipantAvatarComponent';
+import {AVATAR_SIZE} from '../ParticipantAvatar';
 
 export interface ServiceAvatarProps {
   assetRepository: AssetRepository;

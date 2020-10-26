@@ -21,7 +21,7 @@ import UserAvatar, {UserAvatarProps} from './UserAvatar';
 import TestPage from 'Util/test/TestPage';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {AVATAR_SIZE, STATE} from '../ParticipantAvatarComponent';
+import {AVATAR_SIZE, STATE} from '../ParticipantAvatar';
 
 class UserAvatarPage extends TestPage<UserAvatarProps> {
   constructor(props?: UserAvatarProps) {

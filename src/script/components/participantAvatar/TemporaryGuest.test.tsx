@@ -22,7 +22,7 @@ import TestPage from 'Util/test/TestPage';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {UserAvatarProps} from './UserAvatar';
-import {AVATAR_SIZE, STATE} from '../ParticipantAvatarComponent';
+import {AVATAR_SIZE, STATE} from '../ParticipantAvatar';
 
 class TemporaryGuestAvatarPage extends TestPage<UserAvatarProps> {
   constructor(props?: UserAvatarProps) {

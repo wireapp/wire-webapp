@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {noop} from 'Util/util';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 
 import 'Components/list/participantItem';
 import type {ServiceEntity} from '../integration/ServiceEntity';

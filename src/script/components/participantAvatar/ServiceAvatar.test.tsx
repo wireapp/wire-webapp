@@ -21,7 +21,7 @@ import ServiceAvatar, {ServiceAvatarProps} from './ServiceAvatar';
 import TestPage from 'Util/test/TestPage';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 
 class ServiceAvatarPage extends TestPage<ServiceAvatarProps> {
   constructor(props?: ServiceAvatarProps) {

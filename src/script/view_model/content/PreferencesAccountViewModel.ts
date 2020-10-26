@@ -44,7 +44,7 @@ import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';

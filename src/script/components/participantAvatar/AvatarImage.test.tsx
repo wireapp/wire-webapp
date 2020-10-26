@@ -21,7 +21,7 @@ import AvatarImage, {AvatarImageProps} from './AvatarImage';
 import TestPage from 'Util/test/TestPage';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {act} from 'react-dom/test-utils';
 import {waitFor} from '@testing-library/react';

@@ -17,7 +17,7 @@
  *
  */
 
-import ParticipantAvatar, {ParticipantAvatarProps} from './ParticipantAvatarComponent';
+import ParticipantAvatar, {ParticipantAvatarProps} from './ParticipantAvatar';
 import TestPage from 'Util/test/TestPage';
 import {User} from '../entity/User';
 import {AssetRepository} from '../assets/AssetRepository';

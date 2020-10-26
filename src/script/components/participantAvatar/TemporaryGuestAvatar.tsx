@@ -22,7 +22,7 @@ import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
 import {User} from '../../entity/User';
 
-import {AVATAR_SIZE, STATE, DIAMETER} from '../ParticipantAvatarComponent';
+import {AVATAR_SIZE, STATE, DIAMETER} from '../ParticipantAvatar';
 import AvatarBackground from './AvatarBackground';
 import AvatarInitials from './AvatarInitials';
 import AvatarBadge from './AvatarBadge';

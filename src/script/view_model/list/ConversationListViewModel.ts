@@ -25,7 +25,7 @@ import 'Components/list/groupedConversations';
 import ko from 'knockout';
 import {amplify} from 'amplify';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';

@@ -34,7 +34,7 @@ import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import type {VerificationMessage} from '../entity/message/VerificationMessage';
 import {StatusType} from '../message/StatusType';
 import type {Text} from '../entity/message/Text';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatarComponent';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import type {ActionsViewModel} from '../view_model/ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
