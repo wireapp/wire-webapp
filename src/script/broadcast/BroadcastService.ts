@@ -17,15 +17,13 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/dist/conversation';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class BroadcastService {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   /**
    * Post an encrypted message to broadcast it.

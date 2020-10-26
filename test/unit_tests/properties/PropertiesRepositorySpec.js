@@ -21,13 +21,13 @@ import {container} from 'tsyringe';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
-import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {APIClient} from 'src/script/service/APIClientSingleton';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
 
   beforeEach(() => {
-    const apiClient = container.resolve(APIClientSingleton).getClient();
+    const apiClient = container.resolve(APIClient);
     const propertiesService = new PropertiesService(apiClient);
     const selfService = new SelfService(apiClient);
     propertiesRepository = new PropertiesRepository(propertiesService, selfService);

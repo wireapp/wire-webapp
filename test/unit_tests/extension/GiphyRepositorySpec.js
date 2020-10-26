@@ -22,7 +22,7 @@ import {StatusCodes as HTTP_STATUS, ReasonPhrases as HTTP_MESSAGE} from 'http-st
 
 import {GiphyRepository} from 'src/script/extension/GiphyRepository';
 import {GiphyService} from 'src/script/extension/GiphyService';
-import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {APIClient} from 'src/script/service/APIClientSingleton';
 import {Config} from 'src/script/Config';
 
 describe('Giphy Repository', () => {
@@ -34,7 +34,7 @@ describe('Giphy Repository', () => {
   beforeEach(() => {
     server = sinon.fakeServer.create();
 
-    giphyService = new GiphyService(container.resolve(APIClientSingleton).getClient());
+    giphyService = new GiphyService(container.resolve(APIClient));
     giphyRepository = new GiphyRepository(giphyService);
 
     spyOn(giphyService, 'getRandom').and.callThrough();

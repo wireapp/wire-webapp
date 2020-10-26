@@ -19,14 +19,14 @@
 
 import type {Context} from '@wireapp/api-client/dist/auth';
 import {ClientType} from '@wireapp/api-client/dist/client';
-import type {APIClient} from '@wireapp/api-client';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 import {StorageKey} from '../storage/StorageKey';
+import {APIClient} from '../service/APIClientSingleton';
 
 export class AuthRepository {
-  private readonly apiClient: APIClient;
   private readonly logger: Logger;
 
   static get ACCESS_TOKEN_TRIGGER(): {
@@ -45,8 +45,7 @@ export class AuthRepository {
     };
   }
 
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
+  constructor(private readonly apiClient = container.resolve(APIClient)) {
     this.logger = getLogger('AuthRepository');
   }
 

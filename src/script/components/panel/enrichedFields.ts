@@ -25,7 +25,7 @@ import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import type {User} from '../../entity/User';
-import {APIClientSingleton} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/APIClientSingleton';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 
 interface ComponentParams {
@@ -42,7 +42,7 @@ class EnrichedFields {
     const {
       user,
       onFieldsLoaded = noop,
-      richProfileRepository = new RichProfileRepository(container.resolve(APIClientSingleton).getClient()),
+      richProfileRepository = new RichProfileRepository(container.resolve(APIClient)),
     } = params;
     this.richProfileRepository = richProfileRepository;
     this.fields = ko.observable([]);

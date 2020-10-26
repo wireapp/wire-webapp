@@ -17,16 +17,14 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {Consent, Self} from '@wireapp/api-client/dist/self';
 import type {UserUpdate} from '@wireapp/api-client/dist/user';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class SelfService {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   deleteSelf(password?: string): Promise<void> {
     return this.apiClient.self.api.deleteSelf({password});
