@@ -59,7 +59,7 @@
     "@babel/preset-typescript": "7.12.1",
     "@emotion/babel-preset-css-prop": "10.0.27",
     "@formatjs/cli": "2.13.2",
-    "@hot-loader/react-dom": "16.13.0",
+    "@hot-loader/react-dom": "16.14.0",
     "@testing-library/react": "11.1.0",
     "@types/adm-zip": "0.4.33",
     "@types/dexie-batch": "0.4.1",
