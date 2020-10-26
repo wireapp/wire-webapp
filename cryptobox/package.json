@@ -12,7 +12,7 @@
   "devDependencies": {
     "@types/karma": "5.0.0",
     "@wireapp/store-engine-fs": "2.2.17",
-    "browser-sync": "2.26.12",
+    "browser-sync": "2.26.13",
     "cpx": "1.5.0",
     "cross-env": "7.0.2",
     "jasmine": "3.5.0",
