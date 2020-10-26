@@ -22,7 +22,6 @@ import React from 'react';
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
-import {container} from 'tsyringe';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 import UserAvatar from './participantAvatar/UserAvatar';
@@ -79,7 +78,7 @@ export interface ParticipantAvatarProps {
 }
 
 const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
-  assetRepository = container.resolve(AssetRepository),
+  assetRepository,
   participant,
   clickHandler,
   noBadge = false,
@@ -150,7 +149,8 @@ export default ParticipantAvatar;
 
 registerReactComponent('participant-avatar', {
   component: ParticipantAvatar,
+  injected: {assetRepository: AssetRepository},
   optionalParams: ['size', 'click', 'noBadge', 'noFilter'],
   template:
-    '<span data-bind="react: {participant: ko.unwrap(participant), size, clickHandler: click, noBadge, noFilter}"></span>',
+    '<span data-bind="react: {assetRepository, participant: ko.unwrap(participant), size, clickHandler: click, noBadge, noFilter}"></span>',
 });
