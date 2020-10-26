@@ -303,7 +303,6 @@ class App {
     ]);
     repositories.backup = new BackupRepository(
       new BackupService(this.service.storage),
-      repositories.client,
       repositories.connection,
       repositories.conversation,
       repositories.user,
@@ -637,7 +636,7 @@ class App {
         this.repository.event.currentClient = clientObservable;
         return this.repository.client.getClientsForSelf();
       })
-      .then(() => this.repository.client.currentClient());
+      .then(() => this.repository.client['clientState'].currentClient());
   }
 
   /**

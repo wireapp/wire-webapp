@@ -97,7 +97,6 @@ export class TestFactory {
 
     this.backup_repository = new BackupRepository(
       this.backup_service,
-      this.client_repository,
       this.connection_repository,
       this.conversation_repository,
       this.user_repository,
@@ -164,7 +163,7 @@ export class TestFactory {
     currentClient.time = '2016-10-07T16:01:42.133Z';
     currentClient.type = 'temporary';
 
-    this.client_repository.currentClient(currentClient);
+    this.client_repository['clientState'].currentClient(currentClient);
 
     return this.client_repository;
   }

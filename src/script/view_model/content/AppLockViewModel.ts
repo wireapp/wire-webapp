@@ -32,6 +32,8 @@ import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import type {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
 import type {User} from '../../entity/User';
+import {container} from 'tsyringe';
+import {ClientState} from '../../client/ClientState';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -91,7 +93,11 @@ export class AppLockViewModel {
   unlockError: ko.Observable<string>;
   wipeError: ko.Observable<string>;
 
-  constructor(private readonly clientRepository: ClientRepository, selfUser: ko.Observable<User>) {
+  constructor(
+    private readonly clientRepository: ClientRepository,
+    selfUser: ko.Observable<User>,
+    private readonly clientState = container.resolve(ClientState),
+  ) {
     this.localStorage = window.localStorage;
     this.state = ko.observable(APPLOCK_STATE.NONE);
     this.state.subscribe(() => this.stopObserver(), null, 'beforeChange');
@@ -268,7 +274,7 @@ export class AppLockViewModel {
     const password = (form[0] as HTMLInputElement).value;
     try {
       this.isLoading(true);
-      const currentClientId = this.clientRepository.currentClient().id;
+      const currentClientId = this.clientState.currentClient().id;
       await this.clientRepository.clientService.deleteClient(currentClientId, password);
       this.localStorage.removeItem(this.storageKey());
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);

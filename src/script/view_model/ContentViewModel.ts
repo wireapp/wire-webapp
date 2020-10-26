@@ -203,7 +203,6 @@ export class ContentViewModel {
     this.preferencesDevices = new PreferencesDevicesViewModel(
       mainViewModel,
       this,
-      repositories.client,
       repositories.cryptography,
       repositories.user,
     );

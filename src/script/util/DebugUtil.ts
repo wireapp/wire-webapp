@@ -39,6 +39,8 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserId} from '../calling/Participant';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {ClientState} from '../client/ClientState';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -63,7 +65,7 @@ export class DebugUtil {
   /** Used by QA test automation. */
   public readonly Dexie: typeof Dexie;
 
-  constructor(repositories: ViewModelRepositories) {
+  constructor(repositories: ViewModelRepositories, private readonly clientState = container.resolve(ClientState)) {
     this.$ = $;
     this.Dexie = Dexie;
 
@@ -152,7 +154,7 @@ export class DebugUtil {
     messageId: string,
     conversationId: string = this.conversationRepository.active_conversation().id,
   ): Promise<void> {
-    const clientId = this.clientRepository.currentClient().id;
+    const clientId = this.clientState.currentClient().id;
     const userId = this.userRepository.self().id;
 
     const isOTRMessage = (notification: BackendEvent) => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
@@ -210,7 +212,7 @@ export class DebugUtil {
   }
 
   async exportCryptobox(): Promise<void> {
-    const clientId = this.clientRepository.currentClient().id;
+    const clientId = this.clientState.currentClient().id;
     const userId = this.userRepository.self().id;
     const fileName = `cryptobox-${userId}-${clientId}.json`;
     const cryptobox = await this.cryptographyRepository.cryptobox.serialize();
