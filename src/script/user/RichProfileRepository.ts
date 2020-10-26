@@ -17,15 +17,13 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {RichInfo} from '@wireapp/api-client/dist/user/';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class RichProfileRepository {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   getUserRichProfile(userId: string): Promise<RichInfo> {
     return this.apiClient.user.api.getRichInfo(userId);

@@ -17,10 +17,7 @@
  *
  */
 
-import {container} from 'tsyringe';
-
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
-import {APIClient} from 'src/script/service/APIClientSingleton';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -28,7 +25,7 @@ describe('RichProfileRepository', () => {
   let richProfileRepository;
 
   beforeEach(() => {
-    richProfileRepository = new RichProfileRepository(container.resolve(APIClient));
+    richProfileRepository = new RichProfileRepository();
   });
 
   describe('getUserRichProfile', () => {
