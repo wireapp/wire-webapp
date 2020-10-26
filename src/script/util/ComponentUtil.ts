@@ -29,7 +29,7 @@ export function registerReactComponent(
     injected = {},
   }: {
     component: React.ComponentType;
-    injected: Record<string, InjectionToken>;
+    injected?: Record<string, InjectionToken>;
     optionalParams?: string[];
     template: string;
   },
