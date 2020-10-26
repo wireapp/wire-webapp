@@ -3,7 +3,7 @@
     "@types/node": "~12"
   },
   "devDependencies": {
-    "@types/jasmine": "3.5.14",
+    "@types/jasmine": "3.6.0",
     "@types/karma": "5.0.0",
     "jasmine": "3.5.0",
     "karma": "5.1.0",
