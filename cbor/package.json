@@ -2,38 +2,26 @@
   "description": "Implementation of Concise Binary Object Representation (CBOR) data format (RFC7049).",
   "devDependencies": {
     "@types/jasmine": "3.6.0",
-    "@types/karma": "5.0.0",
     "@types/node": "~12",
     "cross-env": "7.0.2",
-    "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.5.0",
-    "karma": "5.1.0",
-    "karma-chrome-launcher": "3.1.0",
-    "karma-jasmine": "3.1.1",
-    "karma-typescript": "5.0.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "typescript": "4.0.3"
   },
   "files": [
     "src",
-    "!src/demo",
     "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
-  "main": "src/main/index",
+  "main": "src/index",
   "name": "@wireapp/cbor",
   "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cbor",
   "scripts": {
-    "build:node": "tsc",
-    "build": "yarn build:node",
-    "clean": "rimraf src/main/**/*{.js,.js.map,.d.ts} .nyc_output coverage",
-    "coverage": "cross-env JASMINE_CONFIG_PATH=jasmine.json istanbul cover --report html ../../node_modules/jasmine/bin/jasmine.js",
+    "build": "tsc",
+    "clean": "rimraf src/**/*{.js,.js.map,.d.ts} .nyc_output coverage",
     "dist": "yarn clean && yarn build",
-    "test": "yarn build && yarn test:node && yarn test:browser",
-    "test:project": "yarn build && yarn test",
-    "test:browser": "yarn build && karma start",
-    "test:node": "yarn build && nyc jasmine --config=jasmine.json"
+    "test": "nyc --nycrc-path=../../nyc.config.js jasmine --config=jasmine.json"
   },
   "version": "4.6.17"
 }

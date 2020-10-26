@@ -17,9 +17,7 @@
  *
  */
 
-/* eslint-disable no-magic-numbers */
-
-import * as CBOR from '@wireapp/cbor';
+import * as CBOR from '../';
 
 describe('CBOR.Decoder', () => {
   const is_hex = (str: string): boolean => typeof str === 'string' && /^[0-9a-f]+$/i.test(str) && str.length % 2 === 0;

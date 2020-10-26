@@ -17,9 +17,7 @@
  *
  */
 
-/* eslint-disable no-magic-numbers */
-
-import * as CBOR from '@wireapp/cbor';
+import * as CBOR from '../';
 
 describe('CBOR.Encoder', () => {
   const to_hex = (bytes: Uint8Array): string => {

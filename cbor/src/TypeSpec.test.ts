@@ -17,12 +17,10 @@
  *
  */
 
-/* eslint-disable no-magic-numbers */
-
-import * as CBOR from '@wireapp/cbor';
+import * as CBOR from '../';
 
 describe('CBOR.Type', () => {
-  describe('"major"', () => {
+  describe('major', () => {
     it('detects types by numbers', () => {
       expect(CBOR.Type.major(CBOR.Type.UINT8)).toBe(0);
       expect(CBOR.Type.major(CBOR.Type.UINT16)).toBe(0);
