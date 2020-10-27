@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,18 @@
  *
  */
 
-export * from './ClientRecord';
-export * from './EventRecord';
-export * from './StorageKey';
-export * from './StorageRepository';
-export * from './StorageSchemata';
-export * from './StorageService';
+import ko from 'knockout';
+import {singleton} from 'tsyringe';
+import {ClientEntity} from './ClientEntity';
+
+@singleton()
+export class ClientState {
+  clients: ko.PureComputed<ClientEntity[]>;
+  currentClient: ko.Observable<ClientEntity>;
+  isTemporaryClient: ko.PureComputed<boolean>;
+
+  constructor() {
+    this.currentClient = ko.observable();
+    this.isTemporaryClient = ko.pureComputed(() => this.currentClient()?.isTemporary());
+  }
+}

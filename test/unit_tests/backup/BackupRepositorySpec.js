@@ -66,7 +66,7 @@ describe('BackupRepository', () => {
 
       const metaDescription = backupRepository.createMetaData();
 
-      expect(metaDescription.client_id).toBe(testFactory.client_repository.currentClient().id);
+      expect(metaDescription.client_id).toBe(testFactory.client_repository['clientState'].currentClient().id);
       expect(metaDescription.creation_time).toBe(freezedTime.toISOString());
       expect(metaDescription.platform).toBe('Web');
       expect(metaDescription.user_id).toBe(testFactory.user_repository.self().id);

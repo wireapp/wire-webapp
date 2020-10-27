@@ -17,6 +17,7 @@
  *
  */
 
+import {ClientRecord} from '../storage';
 import {ClientEntity} from './ClientEntity';
 
 export class ClientMapper {
@@ -73,9 +74,9 @@ export class ClientMapper {
    * @param updatePayload JSON possibly containing updates
    * @returns Contains the client and whether there was a change
    */
-  static updateClient<T extends Record<string, any>, U extends T>(
+  static updateClient<T extends ClientRecord>(
     clientData: T,
-    updatePayload: U,
+    updatePayload: Partial<T>,
   ): {client: T; wasUpdated: boolean} {
     let containsUpdate = false;
 

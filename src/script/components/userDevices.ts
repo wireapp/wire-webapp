@@ -37,6 +37,8 @@ import {getPrivacyHowUrl, getPrivacyWhyUrl, getPrivacyPolicyUrl} from '../extern
 import {MotionDuration} from '../motion/MotionDuration';
 import 'Components/deviceCard';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {ClientState} from '../client/ClientState';
 
 export interface UserDevicesHistory {
   current: ko.PureComputed<UserDevicesState>;
@@ -48,6 +50,7 @@ export interface UserDevicesHistory {
 
 interface UserDevicesParams {
   clientRepository: ClientRepository;
+  clientState?: ClientState;
   conversationRepository: ConversationRepository;
   cryptographyRepository: CryptographyRepository;
   history: UserDevicesHistory;
@@ -169,8 +172,9 @@ ko.components.register('user-devices', {
     userEntity,
     history,
     noPadding = false,
+    clientState = container.resolve(ClientState),
   }: UserDevicesParams): void {
-    this.selfClient = clientRepository.currentClient;
+    this.selfClient = clientState.currentClient;
     this.clientEntities = ko.observableArray();
     this.noPadding = noPadding;
 

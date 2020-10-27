@@ -1448,7 +1448,7 @@ export class MessageRepository {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
-    const sender = this.clientRepository.currentClient().id;
+    const sender = this.clientRepository['clientState'].currentClient().id;
     try {
       await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
     } catch (axiosError) {

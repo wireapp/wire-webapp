@@ -312,7 +312,7 @@ describe('EventRepository', () => {
       const ownClientId = 'f180a823bf0d1204';
       const client = new ClientEntity();
       client.id = ownClientId;
-      testFactory.client_repository.currentClient(client);
+      testFactory.client_repository['clientState'].currentClient(client);
 
       // Create Cryptobox for testing
       const someEngine = new MemoryEngine();

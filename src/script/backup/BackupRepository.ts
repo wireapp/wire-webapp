@@ -22,7 +22,6 @@ import type Dexie from 'dexie';
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation, SerializedConversation} from '../entity/Conversation';
@@ -39,6 +38,8 @@ import {
   IncompatiblePlatformError,
   InvalidMetaDataError,
 } from './Error';
+import {container} from 'tsyringe';
+import {ClientState} from '../client/ClientState';
 
 export interface Metadata {
   client_id: string;
@@ -57,7 +58,6 @@ export interface FileDescriptor {
 
 export class BackupRepository {
   private readonly backupService: BackupService;
-  private readonly clientRepository: ClientRepository;
   private readonly connectionRepository: ConnectionRepository;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
@@ -77,15 +77,14 @@ export class BackupRepository {
 
   constructor(
     backupService: BackupService,
-    clientRepository: ClientRepository,
     connectionRepository: ConnectionRepository,
     conversationRepository: ConversationRepository,
     userRepository: UserRepository,
+    private readonly clientState = container.resolve(ClientState),
   ) {
     this.logger = getLogger('BackupRepository');
 
     this.backupService = backupService;
-    this.clientRepository = clientRepository;
     this.connectionRepository = connectionRepository;
     this.conversationRepository = conversationRepository;
     this.userRepository = userRepository;
@@ -107,7 +106,7 @@ export class BackupRepository {
 
   public createMetaData(): Metadata {
     return {
-      client_id: this.clientRepository.currentClient().id,
+      client_id: this.clientState.currentClient().id,
       creation_time: new Date().toISOString(),
       platform: 'Web',
       user_handle: this.userRepository.self().username(),

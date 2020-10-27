@@ -21,6 +21,8 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/'
 import ko from 'knockout';
 
 import {zeroPadding} from 'Util/util';
+
+import {ClientRecord} from '../storage';
 import {ClientMapper} from './ClientMapper';
 
 export class ClientEntity {
@@ -103,7 +105,7 @@ export class ClientEntity {
   /**
    * This method returns an object which can be stored in our local database.
    */
-  toJson(): Record<string, any> {
+  toJson(): ClientRecord {
     const jsonObject = JSON.parse(ko.toJSON(this));
     delete jsonObject.isSelfClient;
 

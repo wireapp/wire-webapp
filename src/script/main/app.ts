@@ -303,7 +303,6 @@ class App {
     ]);
     repositories.backup = new BackupRepository(
       new BackupService(this.service.storage),
-      repositories.client,
       repositories.connection,
       repositories.conversation,
       repositories.user,
@@ -637,7 +636,7 @@ class App {
         this.repository.event.currentClient = clientObservable;
         return this.repository.client.getClientsForSelf();
       })
-      .then(() => this.repository.client.currentClient());
+      .then(() => this.repository.client['clientState'].currentClient());
   }
 
   /**
@@ -702,6 +701,11 @@ class App {
 
     const router = new Router({
       '/conversation/:conversationId': conversationId => mainView.content.showConversation(conversationId),
+      '/preferences/about': () => mainView.list.openPreferencesAbout(),
+      '/preferences/account': () => mainView.list.openPreferencesAccount(),
+      '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
+      '/preferences/devices': () => mainView.list.openPreferencesDevices(),
+      '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId': userId => {
         mainView.content.userModal.showUser(userId, () => router.navigate('/'));
       },
