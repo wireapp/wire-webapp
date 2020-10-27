@@ -37,6 +37,7 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import {noop} from 'Util/util';
+import type {RegisterData} from '@wireapp/api-client/src/auth';
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
@@ -142,7 +143,7 @@ const ConversationJoin = ({
           expires_in: expiresIn,
           name,
         };
-        await doRegisterWireless(registrationData, {
+        await doRegisterWireless(registrationData as RegisterData, {
           shouldInitializeClient: !isPwaEnabled,
         });
         const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode);

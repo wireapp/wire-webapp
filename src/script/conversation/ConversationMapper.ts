@@ -323,7 +323,7 @@ export class ConversationMapper {
         const noOthers = !mergedConversation.others || !mergedConversation.others.length;
         if (isGroup || noOthers) {
           mergedConversation.others = othersStates
-            .filter(otherState => otherState.status === ConversationStatus.CURRENT_MEMBER)
+            .filter(otherState => (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number))
             .map(otherState => otherState.id);
         }
 
