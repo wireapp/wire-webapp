@@ -31,7 +31,7 @@ import {RootState, bindActionCreators} from '../module/reducer';
 import {AnyAction, Dispatch} from 'redux';
 import {connect} from 'react-redux';
 import SVGProvider from '../util/SVGProvider';
-import {SVGIcon} from '@wireapp/react-ui-kit/dist/Icon/SVGIcon';
+import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 

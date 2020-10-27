@@ -20,8 +20,8 @@
 import {ClientType} from '@wireapp/api-client/src/client/index';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {UrlUtil} from '@wireapp/commons';
-import {pathWithParams} from '@wireapp/commons/dist/commonjs/util/UrlUtil';
-import {PATTERN, isValidEmail} from '@wireapp/commons/dist/commonjs/util/ValidationUtil';
+import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
+import {PATTERN, isValidEmail} from '@wireapp/commons/src/main/util/ValidationUtil';
 import {
   ArrowIcon,
   Checkbox,
