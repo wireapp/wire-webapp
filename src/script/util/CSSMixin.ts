@@ -47,12 +47,8 @@ export const CSS_FLEX_CENTER: CSSObject = {
 
 export const CSS_ICON: (code: string, iconSize?: string | number) => CSSObject = (code, iconSize = '16px') => ({
   MozOsxFontSmoothing: 'grayscale',
-
-  /* Better Font Rendering =========== */
   WebkitFontSmoothing: 'antialiased',
-
   content: `'${code}'`,
-
   fontFamily: 'Wire',
   fontSize: iconSize,
   fontStyle: 'normal',
