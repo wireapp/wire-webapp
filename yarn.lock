@@ -2153,6 +2153,24 @@
     tough-cookie "4.0.0"
     ws "7.3.1"
 
+"@wireapp/api-client@11.30.4":
+  version "11.30.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.30.4.tgz#d71d7b8daff68e70d3ee1e1ec5b407114badcc29"
+  integrity sha512-NSnD6e3APb4VEJI3HfYdbLkdBv6He47Z/DNsP6U9uOktKjYyTrCTf4fBSIO3Sc5eSQVLCI7njNac99BsPXDBCA==
+  dependencies:
+    "@types/node" "~12"
+    "@types/spark-md5" "3.0.2"
+    "@types/tough-cookie" "4.0.0"
+    "@wireapp/commons" "3.8.10"
+    "@wireapp/priority-queue" "1.6.11"
+    axios "0.20.0"
+    http-status-codes "2.1.4"
+    logdown "3.3.1"
+    reconnecting-websocket "4.4.0"
+    spark-md5 "3.0.1"
+    tough-cookie "4.0.0"
+    ws "7.3.1"
+
 "@wireapp/avs@6.4.14":
   version "6.4.14"
   resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-6.4.14.tgz#2c4b450cf769e4cc31afea5257d749a58926936c"
@@ -2240,6 +2258,15 @@
   version "1.6.10"
   resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.10.tgz#d9226e3142005973db0893189b638ce0ff0a608c"
   integrity sha512-PoBKfXAEM+zB/r8RjQ8ZdCt1LzfO4sRgEpufjrbGMrHWT/9vR/LswSXI19UYfvM+dWFVzShqN+DB5GgxF3jnmg==
+  dependencies:
+    "@types/node" "~12"
+    logdown "3.3.1"
+    uuidjs "4.2.6"
+
+"@wireapp/priority-queue@1.6.11":
+  version "1.6.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.11.tgz#aac98e4353bfa60431534a45ff0c45dbe7baf636"
+  integrity sha512-qVee7t9EKhU5LCslK61T0U12tFNS0CzTpbhxHxCcbl4H6zxVQtMCVf0m4tND24cjP8/tR3XODrl4nK1gzgtHug==
   dependencies:
     "@types/node" "~12"
     logdown "3.3.1"
