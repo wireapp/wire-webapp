@@ -76,7 +76,7 @@ export class AuthAPI {
   public async postLogin(loginData: LoginData): Promise<AccessTokenData> {
     const login = {
       ...loginData,
-      clientType: undefined,
+      clientType: undefined as any,
       password: loginData.password ? String(loginData.password) : undefined,
     };
 
