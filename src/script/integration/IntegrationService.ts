@@ -17,15 +17,13 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {Provider, Service} from '@wireapp/api-client/dist/team/service';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class IntegrationService {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   getProvider(providerId: string): Promise<Provider> {
     return this.apiClient.teams.service.api.getProvider(providerId);

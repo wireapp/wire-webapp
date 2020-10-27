@@ -17,14 +17,12 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class PropertiesService {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   /**
    * Clear all properties store for the user.

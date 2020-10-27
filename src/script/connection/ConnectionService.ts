@@ -17,15 +17,13 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {Connection, ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class ConnectionService {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   /**
    * Retrieves a list of connections to other users.

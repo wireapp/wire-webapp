@@ -23,7 +23,8 @@ import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
 import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
-import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
+import {APIClient} from 'src/script/service/APIClientSingleton';
+
 import {LinkPreviewError} from 'src/script/error/LinkPreviewError';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 
@@ -31,8 +32,8 @@ describe('LinkPreviewRepository', () => {
   let link_preview_repository = null;
 
   beforeEach(() => {
-    const apiClient = container.resolve(APIClientSingleton).getClient();
-    const assetService = new AssetService(container.resolve(APIClientSingleton).getClient());
+    const apiClient = container.resolve(APIClient);
+    const assetService = new AssetService(container.resolve(APIClient));
     const assetRepository = new AssetRepository(assetService);
     const propertiesRepository = new PropertiesRepository(new PropertiesService(apiClient), new SelfService(apiClient));
     link_preview_repository = new LinkPreviewRepository(assetRepository, propertiesRepository);

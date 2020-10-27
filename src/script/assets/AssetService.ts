@@ -17,20 +17,15 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
 import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
 import {AssetOptions, AssetUploadData} from '@wireapp/api-client/dist/asset';
 import {singleton, container} from 'tsyringe';
 import {legacyAsset, assetV3, isValidApiPath} from 'Util/ValidationUtil';
-import {APIClientSingleton} from '../service/APIClientSingleton';
+import {APIClient} from '../service/APIClientSingleton';
 
 @singleton()
 export class AssetService {
-  private readonly apiClient: APIClient;
-
-  constructor() {
-    this.apiClient = container.resolve(APIClientSingleton).getClient();
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   async generateAssetUrl(assetId: string, conversationId: string, forceCaching: boolean): Promise<string> {
     legacyAsset(assetId, conversationId);

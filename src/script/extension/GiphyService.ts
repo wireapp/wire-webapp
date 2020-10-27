@@ -17,20 +17,18 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {
   GiphySearchOptions,
   GiphyMultipleResult,
   GiphyResult,
   GiphyTrendingOptions,
 } from '@wireapp/api-client/dist/giphy';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class GiphyService {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   /**
    * Get GIFs for an ID
