@@ -21,14 +21,14 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {Confirmation, LegalHoldStatus, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
-import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   CONVERSATION_EVENT,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
-} from '@wireapp/api-client/dist/event';
+} from '@wireapp/api-client/src/event';
 import {
   DefaultConversationRoleName as DefaultRole,
   CONVERSATION_ACCESS_ROLE,
@@ -36,8 +36,8 @@ import {
   CONVERSATION_TYPE,
   NewConversation,
   Conversation as BackendConversation,
-} from '@wireapp/api-client/dist/conversation';
-import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/dist/conversation/data';
+} from '@wireapp/api-client/src/conversation';
+import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';

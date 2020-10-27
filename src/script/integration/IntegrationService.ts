@@ -18,7 +18,7 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
-import type {Provider, Service} from '@wireapp/api-client/dist/team/service';
+import type {Provider, Service} from '@wireapp/api-client/src/team/service';
 
 export class IntegrationService {
   private readonly apiClient: APIClient;

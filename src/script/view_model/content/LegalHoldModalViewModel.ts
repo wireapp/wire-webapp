@@ -17,7 +17,7 @@
  *
  */
 
-import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/team/legalhold';
+import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 

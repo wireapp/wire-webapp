@@ -17,7 +17,7 @@
  *
  */
 
-import type {TeamInvitation} from '@wireapp/api-client/dist/team';
+import type {TeamInvitation} from '@wireapp/api-client/src/team';
 
 import {INVITATION_ACTION, InvitationActions} from '../action/creator/';
 

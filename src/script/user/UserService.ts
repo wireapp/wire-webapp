@@ -18,7 +18,7 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
-import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 
 import {Logger, getLogger} from 'Util/Logger';
 

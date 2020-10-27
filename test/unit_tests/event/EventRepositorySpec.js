@@ -22,7 +22,7 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Proteus from '@wireapp/proteus';
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
@@ -35,7 +35,7 @@ import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {EventError} from 'src/script/error/EventError';
 import {TestFactory} from '../../helper/TestFactory';
-import {AbortHandler} from '@wireapp/api-client/dist/tcp';
+import {AbortHandler} from '@wireapp/api-client/src/tcp';
 
 const testFactory = new TestFactory();
 

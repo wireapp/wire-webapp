@@ -18,10 +18,10 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
-import type {NotificationList} from '@wireapp/api-client/dist/notification/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
-import type {Notification} from '@wireapp/api-client/dist/notification';
-import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
+import type {NotificationList} from '@wireapp/api-client/src/notification/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+import type {Notification} from '@wireapp/api-client/src/notification';
+import {DatabaseKeys} from '@wireapp/core/src/main/notification/NotificationDatabaseRepository';
 
 import {Logger, getLogger} from 'Util/Logger';
 

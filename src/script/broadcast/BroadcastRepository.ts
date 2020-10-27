@@ -20,7 +20,7 @@
 import type {GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {NewOTRMessage} from '@wireapp/api-client/dist/conversation';
+import type {NewOTRMessage} from '@wireapp/api-client/src/conversation';
 
 import {Logger, getLogger} from 'Util/Logger';
 import type {ClientRepository} from '../client/ClientRepository';

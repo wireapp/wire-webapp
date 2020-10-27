@@ -18,7 +18,7 @@
  */
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import {ClientType} from '@wireapp/api-client/dist/client/';
+import {ClientType} from '@wireapp/api-client/src/client/';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import Dexie from 'dexie';

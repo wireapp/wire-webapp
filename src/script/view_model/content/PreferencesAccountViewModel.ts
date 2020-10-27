@@ -21,8 +21,8 @@ import {Availability, Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {WebappProperties} from '@wireapp/api-client/dist/user/data';
-import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
+import {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import {ChangeEvent} from 'react';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -60,7 +60,7 @@ import {HistoryExportViewModel} from './HistoryExportViewModel';
 import {ClientRepository} from '../../client/ClientRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {TeamRepository} from '../../team/TeamRepository';
-import {AccentColorID} from '@wireapp/commons/dist/commonjs/util/AccentColor';
+import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
 import {TeamEntity} from '../../team/TeamEntity';
 import type {ClientEntity} from 'src/script/client/ClientEntity';
 

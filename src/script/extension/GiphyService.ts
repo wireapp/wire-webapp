@@ -23,7 +23,7 @@ import type {
   GiphyMultipleResult,
   GiphyResult,
   GiphyTrendingOptions,
-} from '@wireapp/api-client/dist/giphy';
+} from '@wireapp/api-client/src/giphy';
 
 export class GiphyService {
   private readonly apiClient: APIClient;

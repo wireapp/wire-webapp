@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/dist/conversation';
+import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/src/conversation';
 
 import {Logger, getLogger} from 'Util/Logger';
 import type {Conversation} from '../entity/Conversation';

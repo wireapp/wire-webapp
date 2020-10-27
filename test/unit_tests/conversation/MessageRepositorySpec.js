@@ -17,17 +17,17 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {createRandomUuid} from 'Util/util';
 import {TestFactory} from '../../helper/TestFactory';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {UserGenerator} from '../../helper/UserGenerator';
