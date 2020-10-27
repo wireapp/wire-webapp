@@ -2153,10 +2153,10 @@
     tough-cookie "4.0.0"
     ws "7.3.1"
 
-"@wireapp/api-client@11.30.4":
-  version "11.30.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.30.4.tgz#d71d7b8daff68e70d3ee1e1ec5b407114badcc29"
-  integrity sha512-NSnD6e3APb4VEJI3HfYdbLkdBv6He47Z/DNsP6U9uOktKjYyTrCTf4fBSIO3Sc5eSQVLCI7njNac99BsPXDBCA==
+"@wireapp/api-client@11.30.5":
+  version "11.30.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-11.30.5.tgz#53809e5936057679368238edd44bc108e2df376d"
+  integrity sha512-B8p0jW1FzHNpVzkkyX190E2xsfbFb/aD8ZQ5qG3V8s1mlGBnkyJ9+hpi1AG8NTtihLH50AQifrzfI34g0Ky3cA==
   dependencies:
     "@types/node" "~12"
     "@types/spark-md5" "3.0.2"
