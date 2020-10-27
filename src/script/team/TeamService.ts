@@ -17,19 +17,17 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {LegalHoldMemberData} from '@wireapp/api-client/src/team/legalhold/';
 import type {MemberData, Members} from '@wireapp/api-client/src/team/member/';
 import type {Services} from '@wireapp/api-client/src/team/service/';
 import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
 import type {TeamChunkData, TeamData} from '@wireapp/api-client/src/team/team/';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class TeamService {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   getTeamConversationRoles(teamId: string): Promise<ConversationRolesList> {
     return this.apiClient.teams.conversation.api.getRoles(teamId);

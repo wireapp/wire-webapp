@@ -17,23 +17,22 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
 import type {User} from '../entity/User';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import type {StorageService} from '../storage/StorageService';
+import {APIClient} from '../service/APIClientSingleton';
 
 export class UserService {
-  private readonly apiClient: APIClient;
   private readonly logger: Logger;
   private readonly storageService: StorageService;
   private readonly USER_STORE_NAME: string;
 
-  constructor(apiClient: APIClient, storageService: StorageService) {
-    this.apiClient = apiClient;
+  constructor(storageService: StorageService, private readonly apiClient = container.resolve(APIClient)) {
     this.logger = getLogger('UserService');
     this.storageService = storageService;
 

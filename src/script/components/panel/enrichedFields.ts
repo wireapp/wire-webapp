@@ -19,13 +19,11 @@
 
 import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import ko from 'knockout';
-import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
 import type {User} from '../../entity/User';
-import {APIClientSingleton} from '../../service/APIClientSingleton';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 
 interface ComponentParams {
@@ -39,11 +37,7 @@ class EnrichedFields {
   readonly richProfileRepository: RichProfileRepository;
 
   constructor(params: ComponentParams, element: HTMLElement) {
-    const {
-      user,
-      onFieldsLoaded = noop,
-      richProfileRepository = new RichProfileRepository(container.resolve(APIClientSingleton).getClient()),
-    } = params;
+    const {user, onFieldsLoaded = noop, richProfileRepository = new RichProfileRepository()} = params;
     this.richProfileRepository = richProfileRepository;
     this.fields = ko.observable([]);
     ko.computed(

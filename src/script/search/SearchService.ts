@@ -17,15 +17,13 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {SearchResult} from '@wireapp/api-client/src/user';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class SearchService {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   async getContacts(query: string, numberOfRequestedUser: number): Promise<SearchResult> {
     const request = await this.apiClient.user.api.getSearchContacts(query, numberOfRequestedUser);

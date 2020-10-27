@@ -17,19 +17,16 @@
  *
  */
 
-import {container} from 'tsyringe';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {SelfService} from 'src/script/self/SelfService';
-import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
 
   beforeEach(() => {
-    const apiClient = container.resolve(APIClientSingleton).getClient();
-    const propertiesService = new PropertiesService(apiClient);
-    const selfService = new SelfService(apiClient);
+    const propertiesService = new PropertiesService();
+    const selfService = new SelfService();
     propertiesRepository = new PropertiesRepository(propertiesService, selfService);
   });
 
