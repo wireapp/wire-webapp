@@ -23,7 +23,6 @@ import https from 'https';
 import * as path from 'path';
 import fs from 'fs-extra';
 import AdmZip from 'adm-zip';
-import sortJson from 'sort-json';
 
 const rootDir = path.resolve(__dirname, '..');
 const destinationPath = path.join(rootDir, 'src/i18n');
@@ -42,13 +41,14 @@ const getProjectAuthentication = () => {
   };
 };
 
-const {apiKey: projectAPIKey, username: projectUsername} = getProjectAuthentication();
+const {apiKey: accountApiKey, username} = getProjectAuthentication();
 
+// Crowdin API v1: https://support.crowdin.com/api/api-integration-setup/
 const CROWDIN_API = 'https://api.crowdin.com/api/project/wire-webapp';
 
 const CROWDIN_URL = {
-  DOWNLOAD: `${CROWDIN_API}/download/all.zip?login=${projectUsername}&account-key=${projectAPIKey}`,
-  EXPORT: `${CROWDIN_API}/export?login=${projectUsername}&account-key=${projectAPIKey}&json`,
+  DOWNLOAD: `${CROWDIN_API}/download/all.zip?login=${username}&account-key=${accountApiKey}`,
+  EXPORT: `${CROWDIN_API}/export?login=${username}&account-key=${accountApiKey}&json`,
 };
 
 function fetchUpdates(): Promise<void> {
@@ -106,14 +106,8 @@ async function download(): Promise<void> {
   });
 }
 
-async function sortTranslationJson(): Promise<void> {
-  const filenames = await fs.readdir(destinationPath);
-  filenames.forEach(filename => sortJson.overwrite(path.join(destinationPath, filename)));
-}
-
 fetchUpdates()
   .then(download)
-  .then(sortTranslationJson)
   .catch(error => {
     console.error(error);
     process.exit(1);

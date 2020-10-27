@@ -19,7 +19,13 @@
 
 import {AudioType} from './AudioType';
 
-const audioPlayingType: {MUTED: AudioType[]; NONE: AudioType[]; SOME: AudioType[]} = {
+interface AudioPlayingType {
+  MUTED: AudioType[];
+  NONE: AudioType[];
+  SOME: AudioType[];
+}
+
+const audioPlayingType: AudioPlayingType = {
   MUTED: [],
   NONE: [],
   SOME: [],

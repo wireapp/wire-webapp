@@ -46,7 +46,7 @@ Alternatively, you can test specific parts of the app:
 
 Bypass Chrome's security restrictions for local development:
 
-1. Add the following entry to your hosts file: `127.0.0.1 local.zinfra.io`
+1. Add the following entries to your hosts file: `127.0.0.1 local.wire.com` (to connect with production backend) and `127.0.0.1 local.zinfra.io` (to connect with staging backend)
 1. Restart your Chrome browser with flags: `--disable-web-security --ignore-certificate-errors --user-data-dir=...`
 1. Run `yarn start`
 
@@ -55,7 +55,7 @@ Host file location:
 - On macOS / Linux the hosts file can be found at: `/etc/hosts`
 - On Windows 10 the hosts file can be found at: `%WINDIR%\system32\drivers\etc\hosts`
 
-Optional: If your browser does not trust the certificate from "local.zinfra.io":
+Optional: If your browser does not trust the certificate from "local.wire.com" or "local.zinfra.io":
 
 1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest)
 1. Set `CAROOT` env variable to `./server/certificate`
@@ -123,21 +123,33 @@ All Wire translations are crowdsourced via [Crowdin](https://crowdin.com/project
 
 #### Add new strings
 
+**Info:**
+
+- To download translations we use Crowdin API v1, and you need to setup your [username](https://crowdin.com/settings#account) and [api_key](https://crowdin.com/settings#api-key) (Account API key).
+- To upload translations we use Crowdin CLI v3, and you will need to setup [project_identifier](https://crowdin.com/project/wire-webapp/settings#api) and [api_token](https://crowdin.com/settings#api-key) (Personal Access Token).
+
+**Setup:**
+
+Create a `keys/crowdin.yaml` in this repository and add the following entries:
+
+```yaml
+api_key: your-account-api-key
+api_token: your-personal-access-token
+project_identifier: wire-webapp
+username: your-username
+```
+
+**Usage:**
+
 1. Install [Crowdin CLI v3](https://support.crowdin.com/cli-tool/)
-1. Verify you have a `keys/crowdin.yaml` in place with the [project's API Key](https://crowdin.com/project/wire-webapp/settings#api) and your [personal access token](https://crowdin.com/settings#api-key) (you may have to create one).
+1. Verify you have a `keys/crowdin.yaml` in place
+1. Run `yarn translate:download`
 1. Add string variable and text to "i18n/en-US.json"
 1. Run `yarn translate:upload`
 1. Verify your string shows up on [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
 1. Add translation on Crowdin
 1. Approve translation on Crowdin
 1. Run `yarn translate:download`
-
-Template of "keys/crowdin.yaml" (you need to create this file yourself):
-
-```yaml
-api_token: your-personal-access-token-from-crowdin
-api_key: wire-webapp-api-key-from-crowdin
-```
 
 ### Contributing
 

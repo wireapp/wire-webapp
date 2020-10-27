@@ -35,8 +35,10 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {getPrivacyHowUrl, getPrivacyWhyUrl, getPrivacyPolicyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
-
 import 'Components/deviceCard';
+import type {MessageRepository} from '../conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {ClientState} from '../client/ClientState';
 
 export interface UserDevicesHistory {
   current: ko.PureComputed<UserDevicesState>;
@@ -48,9 +50,11 @@ export interface UserDevicesHistory {
 
 interface UserDevicesParams {
   clientRepository: ClientRepository;
+  clientState?: ClientState;
   conversationRepository: ConversationRepository;
   cryptographyRepository: CryptographyRepository;
   history: UserDevicesHistory;
+  messageRepository: MessageRepository;
   noPadding?: boolean;
   userEntity: ko.Observable<User>;
 }
@@ -164,11 +168,13 @@ ko.components.register('user-devices', {
     clientRepository,
     conversationRepository,
     cryptographyRepository,
+    messageRepository,
     userEntity,
     history,
     noPadding = false,
+    clientState = container.resolve(ClientState),
   }: UserDevicesParams): void {
-    this.selfClient = clientRepository.currentClient;
+    this.selfClient = clientState.currentClient;
     this.clientEntities = ko.observableArray();
     this.noPadding = noPadding;
 
@@ -245,7 +251,7 @@ ko.components.register('user-devices', {
         ? conversationRepository.self_conversation().id
         : conversationRepository.active_conversation().id;
       this.isResettingSession(true);
-      conversationRepository
+      messageRepository
         .reset_session(userEntity().id, this.selectedClient().id, conversationId)
         .then(_resetProgress)
         .catch(_resetProgress);

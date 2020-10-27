@@ -89,37 +89,31 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     this.videoTime(this.videoElement.currentTime);
   }
 
-  onError(_component: VideoAssetComponent, jqueryEvent: JQueryMouseEventObject): void {
+  onError(_component: VideoAssetComponent, jqueryEvent: JQuery.Event<HTMLElement, MouseEvent>): void {
     this.videoPlaybackError(true);
     this.logger.error('Video cannot be played', jqueryEvent);
   }
 
-  onPlayButtonClicked = (): void => {
+  onPlayButtonClicked = async (): Promise<void> => {
     this.displaySmall(false);
     if (this.videoSrc()) {
-      if (this.videoElement) {
-        this.videoElement.play();
-      }
+      this.videoElement?.play();
     } else {
       this.asset.status(AssetTransferState.DOWNLOADING);
-      this.assetRepository
-        .load(this.asset.original_resource())
-        .then(blob => {
-          this.videoSrc(window.URL.createObjectURL(blob));
-          if (this.videoElement) {
-            this.videoElement.play();
-          }
-          this.showBottomControls(true);
-        })
-        .catch(error => this.logger.error('Failed to load video asset ', error))
-        .finally(() => this.asset.status(AssetTransferState.UPLOADED));
+      try {
+        const blob = await this.assetRepository.load(this.asset.original_resource());
+        this.videoSrc(window.URL.createObjectURL(blob));
+        this.videoElement?.play();
+        this.showBottomControls(true);
+      } catch (error) {
+        this.logger.error('Failed to load video asset ', error);
+      }
+      this.asset.status(AssetTransferState.UPLOADED);
     }
   };
 
   onPauseButtonClicked = (): void => {
-    if (this.videoElement) {
-      this.videoElement.pause();
-    }
+    this.videoElement?.pause();
   };
 
   onVideoPlaying(): void {

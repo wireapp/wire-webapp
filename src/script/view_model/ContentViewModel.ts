@@ -138,6 +138,7 @@ export class ContentViewModel {
       repositories.search,
       repositories.storage,
       repositories.user,
+      repositories.message,
     );
     this.groupCreation = new GroupCreationViewModel(
       repositories.conversation,
@@ -154,6 +155,7 @@ export class ContentViewModel {
       repositories.team,
       repositories.client,
       repositories.cryptography,
+      repositories.message,
     );
     this.messageList = new MessageListViewModel(
       mainViewModel,
@@ -161,6 +163,7 @@ export class ContentViewModel {
       repositories.integration,
       repositories.serverTime,
       repositories.user,
+      repositories.message,
     );
     this.titleBar = new TitleBarViewModel(
       mainViewModel.calling,
@@ -195,11 +198,11 @@ export class ContentViewModel {
       repositories.client,
       repositories.conversation,
       repositories.cryptography,
+      repositories.message,
     );
     this.preferencesDevices = new PreferencesDevicesViewModel(
       mainViewModel,
       this,
-      repositories.client,
       repositories.cryptography,
       repositories.user,
     );

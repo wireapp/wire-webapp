@@ -27,7 +27,7 @@ import type {NotificationService} from '../event/NotificationService';
 
 import '../Config';
 
-import 'Components/accentColorPicker';
+import 'Components/AccentColorPicker';
 import 'Components/asset/assetHeader';
 import 'Components/asset/controls/audioSeekBar';
 import 'Components/asset/controls/mediaButton';
@@ -97,6 +97,7 @@ declare global {
           APPLOCK_SCHEDULED_TIMEOUT: number;
           APPLOCK_UNFOCUS_TIMEOUT: number;
           CHECK_CONSENT: boolean;
+          CONFERENCE_AUTO_MUTE: boolean;
           DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
           ENABLE_ACCOUNT_REGISTRATION: boolean;
           ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
@@ -108,7 +109,6 @@ declare global {
           SHOW_LOADING_INFORMATION: boolean;
         };
         MAX_GROUP_PARTICIPANTS: number;
-        MAX_SFT_VIDEO_PARTICIPANTS: number;
         MAX_VIDEO_PARTICIPANTS: number;
         NEW_PASSWORD_MINIMUM_LENGTH: number;
         URL: {
