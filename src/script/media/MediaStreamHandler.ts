@@ -173,7 +173,10 @@ export class MediaStreamHandler {
         );
         this.clearPermissionRequestHint(audio, video, screen);
 
-        if (audio === true && name === MEDIA_STREAM_ERROR.NOT_READABLE_ERROR) {
+        if (
+          audio === true &&
+          [MEDIA_STREAM_ERROR.NOT_READABLE_ERROR, MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR].includes(name)
+        ) {
           throw new NoAudioInputError(error);
         }
 
