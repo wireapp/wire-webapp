@@ -44,7 +44,7 @@ import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
@@ -90,7 +90,7 @@ export class PreferencesAccountViewModel {
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
-  ParticipantAvatar: typeof ParticipantAvatar;
+  AVATAR_SIZE: typeof AVATAR_SIZE;
   isMacOsWrapper: boolean;
   manageTeamUrl: string;
   createTeamUrl: string;
@@ -178,7 +178,7 @@ export class PreferencesAccountViewModel {
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
     this.optionResetAppLock = isAppLockEnabled();
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
     this.manageTeamUrl = getManageTeamUrl('client_settings');
