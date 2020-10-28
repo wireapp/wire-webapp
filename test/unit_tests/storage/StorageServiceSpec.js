@@ -17,13 +17,15 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {StorageSchemata, StorageService} from 'src/script/storage/';
 import {StorageError} from 'src/script/error/StorageError';
 
 describe('StorageRepository', () => {
   describe('save', () => {
     it('does not save "null" values', () => {
-      const storageService = new StorageService();
+      const storageService = container.resolve(StorageService);
       return storageService
         .save(StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
         .then(fail)

@@ -68,6 +68,9 @@ import {SearchService} from 'src/script/search/SearchService';
 import {AssetRepository} from '../../src/script/assets/AssetRepository';
 
 export class TestFactory {
+  constructor() {
+    container.clearInstances();
+  }
   /**
    * @returns {Promise<AuthRepository>} The authentication repository.
    */
@@ -80,7 +83,8 @@ export class TestFactory {
    * @returns {Promise<StorageRepository>} The storage repository.
    */
   async exposeStorageActors() {
-    this.storage_service = new StorageService();
+    container.registerInstance(StorageService, new StorageService());
+    this.storage_service = container.resolve(StorageService);
     if (!this.storage_service.db) {
       this.storage_service.init(entities.user.john_doe.id, false);
     }
@@ -178,7 +182,7 @@ export class TestFactory {
     this.event_service = new EventService(this.storage_service);
     this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
     this.notification_service = new NotificationService(this.storage_service);
-    this.conversation_service = new ConversationService(this.event_service, this.storage_service);
+    this.conversation_service = new ConversationService(this.event_service);
 
     this.event_repository = new EventRepository(
       this.event_service,
@@ -255,7 +259,7 @@ export class TestFactory {
     await this.exposeTeamActors();
     await this.exposeEventActors();
 
-    this.conversation_service = new ConversationService(this.event_service, this.storage_service);
+    this.conversation_service = new ConversationService(this.event_service);
 
     this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 

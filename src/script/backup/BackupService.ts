@@ -19,6 +19,7 @@
 
 import type Dexie from 'dexie';
 import DexieBatch from 'dexie-batch';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
@@ -26,7 +27,6 @@ import {StorageSchemata, StorageService} from '../storage';
 
 export class BackupService {
   private readonly logger: Logger;
-  private readonly storageService: StorageService;
 
   static get CONFIG() {
     return {
@@ -35,9 +35,8 @@ export class BackupService {
     };
   }
 
-  constructor(storageService: StorageService) {
+  constructor(private readonly storageService = container.resolve(StorageService)) {
     this.logger = getLogger('BackupService');
-    this.storageService = storageService;
   }
 
   public async exportTable(table: Dexie.Table<any, string>, onProgress: (batch: any[]) => void): Promise<void> {

@@ -17,6 +17,8 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {
   EventService,
   Includes,
@@ -35,7 +37,7 @@ type DateComparator = (dateA: Date, dateB: Date) => boolean;
 // TODO: This function can be removed once Microsoft Edge's IndexedDB supports compound indices:
 // - https://developer.microsoft.com/en-us/microsoft-edge/platform/status/indexeddbarraysandmultientrysupport/
 export class EventServiceNoCompound extends EventService {
-  constructor(storageService: StorageService) {
+  constructor(storageService = container.resolve(StorageService)) {
     super(storageService);
   }
 

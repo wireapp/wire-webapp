@@ -230,13 +230,13 @@ class App {
     repositories.giphy = new GiphyRepository(new GiphyService());
     repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
     repositories.serverTime = serverTimeHandler;
-    repositories.storage = new StorageRepository(this.service.storage);
+    repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository(new CryptographyService(), repositories.storage);
-    repositories.client = new ClientRepository(new ClientService(this.service.storage), repositories.cryptography);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
-      new UserService(this.service.storage),
+      new UserService(),
       repositories.asset,
       selfService,
       repositories.client,
@@ -297,7 +297,7 @@ class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new BackupRepository(
-      new BackupService(this.service.storage),
+      new BackupService(),
       repositories.connection,
       repositories.conversation,
       repositories.user,
@@ -341,17 +341,16 @@ class App {
    * @returns All services
    */
   private _setupServices(encryptedEngine: SQLeetEngine) {
-    const storageService = new StorageService(encryptedEngine);
-    const eventService = Runtime.isEdge()
-      ? new EventServiceNoCompound(storageService)
-      : new EventService(storageService);
+    container.registerInstance(StorageService, new StorageService(encryptedEngine));
+    const storageService = container.resolve(StorageService);
+    const eventService = Runtime.isEdge() ? new EventServiceNoCompound() : new EventService();
 
     return {
       asset: container.resolve(AssetService),
-      conversation: new ConversationService(eventService, storageService),
+      conversation: new ConversationService(eventService),
       event: eventService,
       integration: new IntegrationService(),
-      notification: new NotificationService(storageService),
+      notification: new NotificationService(),
       storage: storageService,
       webSocket: new WebSocketService(),
     };
@@ -609,7 +608,7 @@ class App {
       }
     }
 
-    await this.service.storage.init(userEntity.id);
+    await container.resolve(StorageService).init(userEntity.id);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
     this._checkUserInformation(userEntity);
