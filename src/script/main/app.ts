@@ -36,7 +36,6 @@ import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {APIClient} from '@wireapp/api-client';
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
@@ -114,7 +113,7 @@ import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {loadValue} from 'Util/StorageUtil';
-import {APIClientSingleton} from '../service/APIClientSingleton';
+import {APIClient} from '../service/APIClientSingleton';
 import {ClientService} from '../client/ClientService';
 import {ConnectionService} from '../connection/ConnectionService';
 import {TeamService} from '../team/TeamService';
@@ -143,7 +142,6 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 }
 
 class App {
-  apiClient: APIClient;
   logger: Logger;
   appContainer: HTMLElement;
   service: {
@@ -179,12 +177,15 @@ class App {
   }
 
   /**
-   * @param apiClient Configured backend client
    * @param appContainer DOM element that will hold the app
    * @param encryptedEngine Encrypted database handler
+   * @param apiClient Configured backend client
    */
-  constructor(apiClient: APIClient, appContainer: HTMLElement, encryptedEngine?: SQLeetEngine) {
-    this.apiClient = apiClient;
+  constructor(
+    appContainer: HTMLElement,
+    encryptedEngine?: SQLeetEngine,
+    private readonly apiClient = container.resolve(APIClient),
+  ) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
     this.appContainer = appContainer;
@@ -220,35 +221,29 @@ class App {
    */
   private _setupRepositories() {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
-    const selfService = new SelfService(this.apiClient);
+    const selfService = new SelfService();
     const sendingMessageQueue = new MessageSender();
 
     repositories.asset = container.resolve(AssetRepository);
     repositories.audio = new AudioRepository();
-    repositories.auth = new AuthRepository(this.apiClient);
-    repositories.giphy = new GiphyRepository(new GiphyService(this.apiClient));
-    repositories.properties = new PropertiesRepository(new PropertiesService(this.apiClient), selfService);
+    repositories.auth = new AuthRepository();
+    repositories.giphy = new GiphyRepository(new GiphyService());
+    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository(this.service.storage);
 
-    repositories.cryptography = new CryptographyRepository(
-      new CryptographyService(this.apiClient),
-      repositories.storage,
-    );
-    repositories.client = new ClientRepository(
-      new ClientService(this.apiClient, this.service.storage),
-      repositories.cryptography,
-    );
+    repositories.cryptography = new CryptographyRepository(new CryptographyService(), repositories.storage);
+    repositories.client = new ClientRepository(new ClientService(this.service.storage), repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
-      new UserService(this.apiClient, this.service.storage),
+      new UserService(this.service.storage),
       repositories.asset,
       selfService,
       repositories.client,
       serverTimeHandler,
       repositories.properties,
     );
-    repositories.connection = new ConnectionRepository(new ConnectionService(this.apiClient), repositories.user);
+    repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
     repositories.event = new EventRepository(
       this.service.event,
       this.service.notification,
@@ -256,8 +251,8 @@ class App {
       repositories.cryptography,
       serverTimeHandler,
     );
-    repositories.search = new SearchRepository(new SearchService(this.apiClient), repositories.user);
-    repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user, repositories.asset);
+    repositories.search = new SearchRepository(new SearchService(), repositories.user);
+    repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
     repositories.eventTracker = new EventTrackingRepository();
 
     repositories.conversation = new ConversationRepository(
@@ -302,14 +297,13 @@ class App {
       repositories.conversation,
     );
     repositories.broadcast = new BroadcastRepository(
-      new BroadcastService(this.apiClient),
+      new BroadcastService(),
       repositories.client,
       repositories.message,
       repositories.cryptography,
       sendingMessageQueue,
     );
     repositories.calling = new CallingRepository(
-      this.apiClient,
       repositories.conversation,
       repositories.message,
       repositories.event,
@@ -347,12 +341,12 @@ class App {
 
     return {
       asset: container.resolve(AssetService),
-      conversation: new ConversationService(this.apiClient, eventService, storageService),
+      conversation: new ConversationService(eventService, storageService),
       event: eventService,
-      integration: new IntegrationService(this.apiClient),
-      notification: new NotificationService(this.apiClient, storageService),
+      integration: new IntegrationService(),
+      notification: new NotificationService(storageService),
       storage: storageService,
-      webSocket: new WebSocketService(this.apiClient),
+      webSocket: new WebSocketService(),
     };
   }
 
@@ -364,9 +358,8 @@ class App {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
     amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
       this.logger.info(`Access token refresh triggered by "${source}"...`);
-      const apiClient = container.resolve(APIClientSingleton).getClient();
       try {
-        await apiClient.transport.http.refreshAccessToken();
+        await this.apiClient.transport.http.refreshAccessToken();
         amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
         this.logger.info(`Refreshed access token.`);
       } catch (error) {
@@ -890,15 +883,14 @@ $(async () => {
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
-    const apiClient = container.resolve(APIClientSingleton).getClient();
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
       const engine = await StorageService.getUninitializedEngine();
-      window.wire.app = new App(apiClient, appContainer, engine);
+      window.wire.app = new App(appContainer, engine);
     } else {
-      window.wire.app = new App(apiClient, appContainer);
+      window.wire.app = new App(appContainer);
     }
   }
 });

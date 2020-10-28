@@ -63,7 +63,6 @@ import {MediaRepository} from 'src/script/media/MediaRepository';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {AuthRepository} from 'src/script/auth/AuthRepository';
 import {ClientService} from 'src/script/client/ClientService';
-import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
@@ -75,7 +74,7 @@ export class TestFactory {
    * @returns {Promise<AuthRepository>} The authentication repository.
    */
   async exposeAuthActors() {
-    this.auth_repository = new AuthRepository(container.resolve(APIClientSingleton).getClient());
+    this.auth_repository = new AuthRepository();
     return this.auth_repository;
   }
 
@@ -116,7 +115,7 @@ export class TestFactory {
     const storageRepository = await this.exposeStorageActors();
     const currentClient = new ClientEntity(true);
     currentClient.id = entities.clients.john_doe.permanent.id;
-    this.cryptography_service = new CryptographyService(container.resolve(APIClientSingleton).getClient());
+    this.cryptography_service = new CryptographyService();
 
     this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
     this.cryptography_repository.currentClient = ko.observable(currentClient);
@@ -150,7 +149,7 @@ export class TestFactory {
     user.name(entities.user.john_doe.name);
     user.phone(entities.user.john_doe.phone);
 
-    this.client_service = new ClientService(container.resolve(APIClientSingleton).getClient(), this.storage_service);
+    this.client_service = new ClientService(this.storage_service);
     this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, new ClientState());
     this.client_repository.init(user);
 
@@ -178,18 +177,11 @@ export class TestFactory {
     await this.exposeCryptographyActors();
     await this.exposeUserActors();
 
-    this.web_socket_service = new WebSocketService(container.resolve(APIClientSingleton).getClient());
+    this.web_socket_service = new WebSocketService();
     this.event_service = new EventService(this.storage_service);
     this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
-    this.notification_service = new NotificationService(
-      container.resolve(APIClientSingleton).getClient(),
-      this.storage_service,
-    );
-    this.conversation_service = new ConversationService(
-      container.resolve(APIClientSingleton).getClient(),
-      this.event_service,
-      this.storage_service,
-    );
+    this.notification_service = new NotificationService(this.storage_service);
+    this.conversation_service = new ConversationService(this.event_service, this.storage_service);
 
     this.event_repository = new EventRepository(
       this.event_service,
@@ -211,17 +203,14 @@ export class TestFactory {
     await this.exposeClientActors();
     this.assetRepository = new AssetRepository();
 
-    this.connection_service = new ConnectionService(container.resolve(APIClientSingleton).getClient());
-    this.user_service = new UserService(container.resolve(APIClientSingleton).getClient(), this.storage_service);
-    this.propertyRepository = new PropertiesRepository(
-      new PropertiesService(container.resolve(APIClientSingleton).getClient()),
-      new SelfService(container.resolve(APIClientSingleton).getClient()),
-    );
+    this.connection_service = new ConnectionService();
+    this.user_service = new UserService(this.storage_service);
+    this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
     this.user_repository = new UserRepository(
       this.user_service,
       this.assetRepository,
-      new SelfService(container.resolve(APIClientSingleton).getClient()),
+      new SelfService(),
       this.client_repository,
       serverTimeHandler,
       this.propertyRepository,
@@ -238,7 +227,7 @@ export class TestFactory {
    */
   async exposeConnectionActors() {
     await this.exposeUserActors();
-    this.connection_service = new ConnectionService(container.resolve(APIClientSingleton).getClient());
+    this.connection_service = new ConnectionService();
 
     this.connection_repository = new ConnectionRepository(this.connection_service, this.user_repository);
 
@@ -250,7 +239,7 @@ export class TestFactory {
    */
   async exposeSearchActors() {
     await this.exposeUserActors();
-    this.search_service = new SearchService(container.resolve(APIClientSingleton).getClient());
+    this.search_service = new SearchService();
     this.search_repository = new SearchRepository(this.search_service, this.user_repository);
 
     return this.search_repository;
@@ -258,7 +247,7 @@ export class TestFactory {
 
   async exposeTeamActors() {
     await this.exposeUserActors();
-    this.team_service = new TeamService(container.resolve(APIClientSingleton).getClient());
+    this.team_service = new TeamService();
     this.team_repository = new TeamRepository(
       this.team_service,
       this.user_repository,
@@ -276,16 +265,9 @@ export class TestFactory {
     await this.exposeTeamActors();
     await this.exposeEventActors();
 
-    this.conversation_service = new ConversationService(
-      container.resolve(APIClientSingleton).getClient(),
-      this.event_service,
-      this.storage_service,
-    );
+    this.conversation_service = new ConversationService(this.event_service, this.storage_service);
 
-    this.propertyRepository = new PropertiesRepository(
-      new PropertiesService(container.resolve(APIClientSingleton).getClient()),
-      new SelfService(container.resolve(APIClientSingleton).getClient()),
-    );
+    this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
     const assetRepository = container.resolve(AssetRepository);
 
@@ -326,7 +308,6 @@ export class TestFactory {
   async exposeCallingActors() {
     await this.exposeConversationActors();
     this.calling_repository = new CallingRepository(
-      container.resolve(APIClientSingleton).getClient(),
       this.conversation_repository,
       this.message_repository,
       this.event_repository,

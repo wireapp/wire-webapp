@@ -17,7 +17,6 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
@@ -42,6 +41,7 @@ import type {
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
 } from '@wireapp/api-client/dist/event';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
@@ -51,15 +51,18 @@ import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import type {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {APIClient} from '../service/APIClientSingleton';
 
 export class ConversationService {
-  private readonly apiClient: APIClient;
   private readonly eventService: EventService;
   private readonly logger: Logger;
   private readonly storageService: StorageService;
 
-  constructor(apiClient: APIClient, eventService: EventService, storageService: StorageService) {
-    this.apiClient = apiClient;
+  constructor(
+    eventService: EventService,
+    storageService: StorageService,
+    private readonly apiClient = container.resolve(APIClient),
+  ) {
     this.eventService = eventService;
     this.storageService = storageService;
     this.logger = getLogger('ConversationService');

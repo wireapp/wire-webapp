@@ -19,7 +19,6 @@
 
 import axios, {AxiosError} from 'axios';
 import {Runtime} from '@wireapp/commons';
-import type {APIClient} from '@wireapp/api-client';
 import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
 import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
 import type {ClientMismatch, UserClients} from '@wireapp/api-client/dist/conversation';
@@ -43,6 +42,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -76,6 +76,7 @@ import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {NoAudioInputError} from '../error/NoAudioInputError';
+import {APIClient} from '../service/APIClientSingleton';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -122,13 +123,13 @@ export class CallingRepository {
   }
 
   constructor(
-    private readonly apiClient: APIClient,
     private readonly conversationRepository: ConversationRepository,
     private readonly messageRepository: MessageRepository,
     private readonly eventRepository: EventRepository,
     private readonly userRepository: UserRepository,
     private readonly mediaStreamHandler: MediaStreamHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly apiClient = container.resolve(APIClient),
   ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);

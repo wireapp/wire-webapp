@@ -17,17 +17,15 @@
  *
  */
 
-import {container} from 'tsyringe';
-
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
-import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
+
 import {createRandomUuid} from 'Util/util';
 
 describe('RichProfileRepository', () => {
   let richProfileRepository;
 
   beforeEach(() => {
-    richProfileRepository = new RichProfileRepository(container.resolve(APIClientSingleton).getClient());
+    richProfileRepository = new RichProfileRepository();
   });
 
   describe('getUserRichProfile', () => {
