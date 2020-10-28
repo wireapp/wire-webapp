@@ -172,9 +172,13 @@ export class MediaStreamHandler {
           error,
         );
         this.clearPermissionRequestHint(audio, video, screen);
-
+        /**
+         * We only want handle errors on pure audio calls here. Video calling errors will be handled in a separate case.
+         * @see https://wearezeta.atlassian.net/browse/WEBAPP-7128
+         */
         if (
           audio === true &&
+          video !== true &&
           [MEDIA_STREAM_ERROR.NOT_READABLE_ERROR, MEDIA_STREAM_ERROR.NOT_ALLOWED_ERROR].includes(name)
         ) {
           throw new NoAudioInputError(error);
