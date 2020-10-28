@@ -23,9 +23,10 @@ import {isLastItem} from 'Util/ArrayUtil';
 
 import {ParticipantAvatar} from 'Components/participantAvatar';
 import {MainViewModel} from '../MainViewModel';
-import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 export class ConnectRequestsViewModel {
   actionsViewModel: ActionsViewModel;
@@ -33,9 +34,12 @@ export class ConnectRequestsViewModel {
   ParticipantAvatar: typeof ParticipantAvatar;
   shouldUpdateScrollbar: ko.Computed<User[]>;
 
-  constructor(private readonly mainViewModel: MainViewModel, private readonly userRepository: UserRepository) {
+  constructor(
+    private readonly mainViewModel: MainViewModel,
+    private readonly userState = container.resolve(UserState),
+  ) {
     this.actionsViewModel = this.mainViewModel.actions;
-    this.connectRequests = this.userRepository.connectRequests;
+    this.connectRequests = this.userState.connectRequests;
     this.ParticipantAvatar = ParticipantAvatar;
 
     this.shouldUpdateScrollbar = ko.computed(() => this.connectRequests()).extend({notify: 'always', rateLimit: 500});

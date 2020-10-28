@@ -89,6 +89,8 @@ import {MemberMessage} from '../entity/message/MemberMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import type {EventRecord} from '../storage';
 import {MessageRepository} from './MessageRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {reject_fn: (error: ConversationError) => void; resolve_fn: (conversation: Conversation) => void};
@@ -155,6 +157,7 @@ export class ConversationRepository {
     private readonly userRepository: UserRepository,
     private readonly propertyRepository: PropertiesRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.eventService = eventRepository.eventService;
 
@@ -175,7 +178,7 @@ export class ConversationRepository {
     this.team = this.teamRepository.team;
     this.teamMembers = this.teamRepository.teamMembers;
 
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
 
     this.blockNotificationHandling = ko.observable(true);
     this.fetching_conversations = {};
@@ -221,7 +224,7 @@ export class ConversationRepository {
 
     this.connectedUsers = ko.pureComputed(() => {
       const inviterId = this.teamRepository.memberInviters()[this.selfUser().id];
-      const inviter = inviterId ? this.userRepository.users().find(({id}) => id === inviterId) : null;
+      const inviter = inviterId ? this.userState.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
       const selfTeamId = this.selfUser().teamId;
       for (const conversation of this.conversations()) {
@@ -236,7 +239,7 @@ export class ConversationRepository {
       return connectedUsers;
     });
 
-    this.userRepository.directlyConnectedUsers = this.connectedUsers;
+    this.userState.directlyConnectedUsers = this.connectedUsers;
 
     this.conversationLabelRepository = new ConversationLabelRepository(
       this.conversations,

@@ -27,7 +27,8 @@ import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {TeamRepository} from 'src/script/team/TeamRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 export class PreferencesOptionsViewModel {
   isActivatedAccount: ko.PureComputed<boolean>;
@@ -43,9 +44,9 @@ export class PreferencesOptionsViewModel {
   constructor(
     private readonly propertiesRepository: PropertiesRepository,
     private readonly teamRepository: TeamRepository,
-    private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isTeam = this.teamRepository.isTeam;
 
     this.optionAudio = ko.observable();

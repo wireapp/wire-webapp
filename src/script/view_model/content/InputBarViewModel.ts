@@ -48,7 +48,6 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {StorageRepository} from 'src/script/storage';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {EmojiInputViewModel} from './EmojiInputViewModel';
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -58,6 +57,8 @@ import {Asset} from 'src/script/entity/message/Asset';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 type DraftMessage = {
   mentions: MentionEntity[];
@@ -125,8 +126,8 @@ export class InputBarViewModel {
     private readonly conversationRepository: ConversationRepository,
     private readonly searchRepository: SearchRepository,
     private readonly storageRepository: StorageRepository,
-    private readonly userRepository: UserRepository,
     private readonly messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.shadowInput = null;
     this.textarea = null;
@@ -137,7 +138,7 @@ export class InputBarViewModel {
     this.selectionEnd = ko.observable(0);
 
     this.conversationEntity = this.conversationRepository.active_conversation;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
 
     this.conversationHasFocus = ko.observable(true).extend({notify: 'always'});
 

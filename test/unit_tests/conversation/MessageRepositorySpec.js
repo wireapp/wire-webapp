@@ -254,6 +254,7 @@ describe('MessageRepository', () => {
       messageEntityToDelete.user(userEntity);
       conversationEntity.add_message(messageEntityToDelete);
 
+      spyOn(testFactory.conversation_repository, 'selfUser').and.returnValue(userEntity);
       spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
         Promise.resolve(conversationEntity),
       );
@@ -268,8 +269,12 @@ describe('MessageRepository', () => {
 
   describe('updateAllClients', () => {
     it(`updates a conversation's legal hold status when it discovers during message sending that a legal hold client got removed from a participant`, async () => {
+      const selfUser = UserGenerator.getRandomUser();
       const conversationPartner = UserGenerator.getRandomUser();
-      testFactory.user_repository.users.push(conversationPartner);
+      testFactory.user_repository.userState.users.push(conversationPartner);
+
+      spyOn(testFactory.message_repository, 'selfUser').and.returnValue(selfUser);
+      spyOn(testFactory.conversation_repository, 'selfUser').and.returnValue(selfUser);
 
       const conversationJsonFromDb = {
         accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
@@ -326,7 +331,8 @@ describe('MessageRepository', () => {
 
       const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromDb])[0];
       conversationEntity.participating_user_ets.push(conversationPartner);
-      conversationEntity.selfUser(testFactory.user_repository.self());
+      conversationEntity.selfUser(selfUser);
+
       // Legal hold status is "on" because our conversation partner has a legal hold client
       expect(conversationEntity.hasLegalHold()).toBe(true);
 

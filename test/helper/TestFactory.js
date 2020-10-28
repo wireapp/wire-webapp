@@ -66,7 +66,9 @@ import {ClientService} from 'src/script/client/ClientService';
 import {APIClientSingleton} from 'src/script/service/APIClientSingleton';
 import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
-import {AssetRepository} from '../../src/script/assets/AssetRepository';
+import {AssetRepository} from 'src/script/assets/AssetRepository';
+import {UserState} from 'src/script/user/UserState';
+import {ClientState} from 'src/script/client/ClientState';
 
 export class TestFactory {
   /**
@@ -99,7 +101,8 @@ export class TestFactory {
       this.backup_service,
       this.connection_repository,
       this.conversation_repository,
-      this.user_repository,
+      this.client_repository.clientState,
+      this.user_repository.userState,
     );
 
     return this.backup_repository;
@@ -148,7 +151,7 @@ export class TestFactory {
     user.phone(entities.user.john_doe.phone);
 
     this.client_service = new ClientService(container.resolve(APIClientSingleton).getClient(), this.storage_service);
-    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository);
+    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, new ClientState());
     this.client_repository.init(user);
 
     const currentClient = new ClientEntity();
@@ -194,7 +197,7 @@ export class TestFactory {
       this.web_socket_service,
       this.cryptography_repository,
       serverTimeHandler,
-      this.user_repository,
+      this.user_repository.userState,
     );
     this.event_repository.currentClient = ko.observable(this.cryptography_repository.currentClient());
 
@@ -222,8 +225,10 @@ export class TestFactory {
       this.client_repository,
       serverTimeHandler,
       this.propertyRepository,
+      new UserState(),
     );
-    this.user_repository.saveUser(this.client_repository.selfUser(), true);
+
+    this.user_repository.userState.self(this.client_repository.selfUser());
 
     return this.user_repository;
   }
@@ -254,7 +259,12 @@ export class TestFactory {
   async exposeTeamActors() {
     await this.exposeUserActors();
     this.team_service = new TeamService(container.resolve(APIClientSingleton).getClient());
-    this.team_repository = new TeamRepository(this.team_service, this.user_repository, this.assetRepository);
+    this.team_repository = new TeamRepository(
+      this.team_service,
+      this.user_repository,
+      this.assetRepository,
+      this.user_repository.userState,
+    );
     return this.team_repository;
   }
 
@@ -293,6 +303,7 @@ export class TestFactory {
       this.conversation_service,
       new LinkPreviewRepository(assetRepository, this.propertyRepository),
       this.assetRepository,
+      this.user_repository.userState,
     );
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
@@ -303,6 +314,7 @@ export class TestFactory {
       this.user_repository,
       this.propertyRepository,
       serverTimeHandler,
+      this.user_repository.userState,
     );
 
     return this.conversation_repository;
@@ -337,7 +349,7 @@ export class TestFactory {
       this.calling_repository,
       this.conversation_repository,
       new PermissionRepository(),
-      this.user_repository,
+      this.user_repository.userState,
     );
 
     return this.notification_repository;
@@ -348,7 +360,7 @@ export class TestFactory {
    */
   async exposeTrackingActors() {
     await this.exposeTeamActors();
-    this.tracking_repository = new EventTrackingRepository(this.team_repository, this.user_repository);
+    this.tracking_repository = new EventTrackingRepository(this.user_repository.userState);
 
     return this.tracking_repository;
   }

@@ -50,10 +50,11 @@ import type {EventService} from './EventService';
 import type {WebSocketService} from './WebSocketService';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {UserRepository} from '../user/UserRepository';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {EventRecord} from '../storage';
 import type {NotificationService} from './NotificationService';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
 
 export class EventRepository {
   logger: Logger;
@@ -106,7 +107,7 @@ export class EventRepository {
     private readonly webSocketService: WebSocketService,
     private readonly cryptographyRepository: CryptographyRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
-    private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.logger = getLogger('EventRepository');
 
@@ -468,7 +469,7 @@ export class EventRepository {
     }
 
     const {conversation: conversationId, id = 'ID not specified', type} = event;
-    const inSelfConversation = conversationId === this.userRepository.self().id;
+    const inSelfConversation = conversationId === this.userState.self().id;
     if (!inSelfConversation) {
       this.logger.info(`Injected event ID '${id}' of type '${type}' with source '${source}'`, event);
       return this.handleEvent(event, source);
@@ -691,7 +692,7 @@ export class EventRepository {
 
       case AssetTransferState.UPLOAD_FAILED: {
         // case of both failed or canceled upload
-        const fromOther = newEvent.from !== this.userRepository.self().id;
+        const fromOther = newEvent.from !== this.userState.self().id;
         const selfCancel = !fromOther && newEvent.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
         // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
         const shouldDeleteEvent = fromOther || selfCancel;

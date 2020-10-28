@@ -32,17 +32,19 @@ import type {ConversationRepository} from 'src/script/conversation/ConversationR
 import type {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import type {SearchRepository} from 'src/script/search/SearchRepository';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
-import type {UserRepository} from 'src/script/user/UserRepository';
 import type {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import type {User} from 'src/script/entity/User';
 import {PanelViewModel} from '../PanelViewModel';
+import {UserState} from '../../user/UserState';
+import {container} from 'tsyringe';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
+  private readonly userState: UserState;
+
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
-  userRepository: UserRepository;
   MotionDuration: typeof MotionDuration;
   logger: Logger;
   isTeam: ko.PureComputed<boolean>;
@@ -74,18 +76,19 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
   constructor(params: PanelViewModelProps) {
     super(params);
 
-    const {conversation, integration, search, team, user} = params.repositories;
+    this.userState = container.resolve(UserState);
+
+    const {conversation, integration, search, team} = params.repositories;
     this.conversationRepository = conversation;
     this.integrationRepository = integration;
     this.searchRepository = search;
     this.teamRepository = team;
-    this.userRepository = user;
     this.MotionDuration = MotionDuration;
 
     this.logger = getLogger('AddParticipantsViewModel');
 
     this.isTeam = this.teamRepository.isTeam;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
     this.services = this.integrationRepository.services;
     this.teamUsers = this.teamRepository.teamUsers;
     this.teamMembers = this.teamRepository.teamMembers;
@@ -123,7 +126,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
       if (this.isTeam()) {
         userEntities = this.isTeamOnly() ? this.teamMembers().sort(sortUsersByPriority) : this.teamUsers();
       } else {
-        userEntities = this.userRepository.connectedUsers();
+        userEntities = this.userState.connectedUsers();
       }
 
       return userEntities.filter(userEntity => {

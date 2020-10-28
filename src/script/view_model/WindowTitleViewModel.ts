@@ -29,7 +29,8 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {UserRepository} from '../user/UserRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
 
 export class WindowTitleViewModel {
   contentState: ko.Observable<string>;
@@ -42,8 +43,8 @@ export class WindowTitleViewModel {
 
   constructor(
     mainViewModel: MainViewModel,
-    readonly userRepository: UserRepository,
     readonly conversationRepository: ConversationRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.contentState = mainViewModel.content.state;
     this.logger = getLogger('WindowTitleViewModel');
@@ -62,7 +63,7 @@ export class WindowTitleViewModel {
 
     ko.computed(() => {
       if (this.updateWindowTitle()) {
-        const connectionRequests = this.userRepository.connectRequests().length;
+        const connectionRequests = this.userState.connectRequests().length;
 
         const unreadConversations = this.conversationRepository
           .conversations_unarchived()

@@ -23,24 +23,23 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {StatusType} from '../../message/StatusType';
 import {ClientEvent} from '../Client';
-import type {UserRepository} from '../../user/UserRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {EventService} from '../EventService';
 import type {EventRecord} from '../../storage/EventRecord';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 export class ReceiptsMiddleware {
   private readonly eventService: EventService;
-  private readonly userRepository: UserRepository;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
 
   constructor(
     eventService: EventService,
-    userRepository: UserRepository,
     conversationRepository: ConversationRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.eventService = eventService;
-    this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
     this.logger = getLogger('ReadReceiptMiddleware');
   }
@@ -83,7 +82,7 @@ export class ReceiptsMiddleware {
   }
 
   isMyMessage(originalEvent: EventRecord): boolean {
-    return this.userRepository.self() && this.userRepository.self().id === originalEvent.from;
+    return this.userState.self() && this.userState.self().id === originalEvent.from;
   }
 
   private _updateConfirmationStatus(

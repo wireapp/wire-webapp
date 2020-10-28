@@ -63,6 +63,8 @@ import {TeamRepository} from '../../team/TeamRepository';
 import {AccentColorID} from '@wireapp/commons/dist/commonjs/util/AccentColor';
 import {TeamEntity} from '../../team/TeamEntity';
 import type {ClientEntity} from 'src/script/client/ClientEntity';
+import {UserState} from '../../user/UserState';
+import {container} from 'tsyringe';
 
 export class PreferencesAccountViewModel {
   logger: Logger;
@@ -124,6 +126,7 @@ export class PreferencesAccountViewModel {
     private readonly propertiesRepository: PropertiesRepository,
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.logger = getLogger('PreferencesAccountViewModel');
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
@@ -131,8 +134,8 @@ export class PreferencesAccountViewModel {
     this.brandName = Config.getConfig().BRAND_NAME;
     this.isCountlyEnabled = !!Config.getConfig().COUNTLY_API_KEY;
 
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
-    this.selfUser = this.userRepository.self;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
+    this.selfUser = this.userState.self;
     this.Config = PreferencesAccountViewModel.CONFIG;
     this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
