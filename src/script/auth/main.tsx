@@ -19,6 +19,7 @@
 
 // Polyfill "Object.entries" & "Object.values"
 import 'core-js/es7/object';
+import 'core-js/es7/reflect';
 import * as cookieStore from 'js-cookie';
 import React from 'react';
 import * as ReactDOM from 'react-dom';
