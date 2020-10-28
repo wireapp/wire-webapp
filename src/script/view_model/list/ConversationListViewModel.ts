@@ -25,7 +25,7 @@ import 'Components/list/groupedConversations';
 import ko from 'knockout';
 import {amplify} from 'amplify';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -69,7 +69,7 @@ export class ConversationListViewModel {
   readonly showConnectRequests: ko.PureComputed<boolean>;
   readonly selfAvailability: ko.PureComputed<Availability.Type>;
   readonly getConversationUrl: (conversationId: string) => string;
-  readonly participantAvatarSize: typeof ParticipantAvatar.SIZE.SMALL;
+  readonly participantAvatarSize: typeof AVATAR_SIZE.SMALL;
   readonly getIsVisibleFunc: () => (() => boolean) | ((top: number, bottom: number) => boolean);
   private readonly logger: Logger;
   private readonly selfUser: ko.PureComputed<User>;
@@ -96,7 +96,7 @@ export class ConversationListViewModel {
     private readonly propertiesRepository: PropertiesRepository,
     private readonly userState = container.resolve(UserState),
   ) {
-    this.participantAvatarSize = ParticipantAvatar.SIZE.SMALL;
+    this.participantAvatarSize = AVATAR_SIZE.SMALL;
 
     this.contentViewModel = mainViewModel.content;
     this.callingViewModel = mainViewModel.calling;

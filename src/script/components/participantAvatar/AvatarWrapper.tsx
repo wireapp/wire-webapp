@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,21 +17,29 @@
  *
  */
 
-import {container} from 'tsyringe';
+import React from 'react';
 
-import {StorageSchemata, StorageService} from 'src/script/storage/';
-import {StorageError} from 'src/script/error/StorageError';
+import {CSS_SQUARE} from 'Util/CSSMixin';
+import {DIAMETER, AVATAR_SIZE} from '../ParticipantAvatar';
 
-describe('StorageRepository', () => {
-  describe('save', () => {
-    it('does not save "null" values', () => {
-      const storageService = container.resolve(StorageService);
-      return storageService
-        .save(StorageSchemata.OBJECT_STORE.AMPLIFY, 'primary_key', null)
-        .then(fail)
-        .catch(error => {
-          expect(error.type).toEqual(StorageError.TYPE.NO_DATA);
-        });
-    });
-  });
-});
+export interface AvatarWrapperProps extends React.ComponentProps<'div'> {
+  color: string;
+  size: AVATAR_SIZE;
+}
+
+const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({color, size, ...props}) => (
+  <div
+    css={{
+      ...CSS_SQUARE(DIAMETER[size]),
+      color,
+      display: 'inline-block',
+      overflow: 'hidden',
+      position: 'relative',
+      transform: 'translateZ(0)',
+      userSelect: 'none',
+    }}
+    {...props}
+  />
+);
+
+export default AvatarWrapper;

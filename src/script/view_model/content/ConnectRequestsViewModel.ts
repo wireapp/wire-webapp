@@ -21,7 +21,7 @@ import ko from 'knockout';
 import {scrollToBottom} from 'Util/scroll-helpers';
 import {isLastItem} from 'Util/ArrayUtil';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {MainViewModel} from '../MainViewModel';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
@@ -31,7 +31,7 @@ import {UserState} from '../../user/UserState';
 export class ConnectRequestsViewModel {
   actionsViewModel: ActionsViewModel;
   connectRequests: ko.Computed<User[]>;
-  ParticipantAvatar: typeof ParticipantAvatar;
+  AVATAR_SIZE: typeof AVATAR_SIZE;
   shouldUpdateScrollbar: ko.Computed<User[]>;
 
   constructor(
@@ -40,7 +40,7 @@ export class ConnectRequestsViewModel {
   ) {
     this.actionsViewModel = this.mainViewModel.actions;
     this.connectRequests = this.userState.connectRequests;
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.shouldUpdateScrollbar = ko.computed(() => this.connectRequests()).extend({notify: 'always', rateLimit: 500});
   }

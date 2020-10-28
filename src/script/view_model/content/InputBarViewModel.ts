@@ -29,7 +29,7 @@ import {afterRender, formatBytes} from 'Util/util';
 import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
 import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 
 import {ModalsViewModel} from '../ModalsViewModel';
 
@@ -78,7 +78,7 @@ export class InputBarViewModel {
   private textarea: HTMLTextAreaElement;
   private readonly selectionStart: ko.Observable<number>;
   private readonly selectionEnd: ko.Observable<number>;
-  readonly participantAvatarSize = ParticipantAvatar.SIZE.X_SMALL;
+  readonly participantAvatarSize = AVATAR_SIZE.X_SMALL;
   readonly conversationEntity: ko.Observable<Conversation>;
   readonly selfUser: ko.Observable<User>;
   private readonly conversationHasFocus: ko.Observable<boolean>;
