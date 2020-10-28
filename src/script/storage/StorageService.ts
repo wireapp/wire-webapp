@@ -22,6 +22,7 @@ import {ClientType} from '@wireapp/api-client/dist/client/';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import Dexie from 'dexie';
+import {singleton} from 'tsyringe';
 
 import {getEphemeralValue} from 'Util/ephemeralValueStore';
 import {Logger, getLogger} from 'Util/Logger';
@@ -49,6 +50,7 @@ enum DEXIE_CRUD_EVENT {
   UPDATING = 'updating',
 }
 
+@singleton()
 export class StorageService {
   // Quickfix to use table name index; can be removed once we have proper db instance typings: https://dexie.org/docs/Typescript#create-a-subclass
   public db?: Dexie & DexieObservable & {[tableName: string]: any};
