@@ -48,6 +48,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
       size={size}
       onClick={onClick}
       data-uie-name="element-avatar-service"
+      data-uie-value={participant.id}
     >
       <AvatarBackground borderRadius="20%" />
       <div
