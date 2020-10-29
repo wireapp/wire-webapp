@@ -17,12 +17,10 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {UserState} from '../../user/UserState';
 import {container} from 'tsyringe';
-
 import {getLogger, Logger} from 'Util/Logger';
-
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import {EventRecord} from '../../storage/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';

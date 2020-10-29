@@ -17,8 +17,8 @@
  *
  */
 
-import type {Consent, Self} from '@wireapp/api-client/dist/self';
-import type {UserUpdate} from '@wireapp/api-client/dist/user';
+import type {Consent, Self} from '@wireapp/api-client/src/self';
+import type {UserUpdate} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

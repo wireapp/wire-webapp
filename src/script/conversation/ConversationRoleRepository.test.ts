@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationRole, DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
+import {ConversationRole, DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation';
 
 import {createRandomUuid} from 'Util/util';
 

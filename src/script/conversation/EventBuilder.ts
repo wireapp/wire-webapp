@@ -18,7 +18,7 @@
  */
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';

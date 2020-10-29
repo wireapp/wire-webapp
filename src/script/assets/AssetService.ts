@@ -17,8 +17,8 @@
  *
  */
 
-import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/dist/http';
-import {AssetOptions, AssetUploadData} from '@wireapp/api-client/dist/asset';
+import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/src/http';
+import {AssetOptions, AssetUploadData} from '@wireapp/api-client/src/asset';
 import {singleton, container} from 'tsyringe';
 import {legacyAsset, assetV3, isValidApiPath} from 'Util/ValidationUtil';
 import {APIClient} from '../service/APIClientSingleton';

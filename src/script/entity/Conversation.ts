@@ -23,7 +23,7 @@ import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-mes
 import {debounce, Cancelable} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {STATE as CALL_STATE} from '@wireapp/avs';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';

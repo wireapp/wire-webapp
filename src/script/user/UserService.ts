@@ -17,7 +17,7 @@
  *
  */
 
-import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';

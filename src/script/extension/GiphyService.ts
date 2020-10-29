@@ -22,7 +22,7 @@ import type {
   GiphyMultipleResult,
   GiphyResult,
   GiphyTrendingOptions,
-} from '@wireapp/api-client/dist/giphy';
+} from '@wireapp/api-client/src/giphy';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

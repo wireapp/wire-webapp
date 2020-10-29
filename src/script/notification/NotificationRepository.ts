@@ -17,7 +17,7 @@
  *
  */
 
-import {NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';

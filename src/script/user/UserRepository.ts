@@ -18,13 +18,13 @@
  */
 
 import type {AccentColor} from '@wireapp/commons';
-import type {PublicClient} from '@wireapp/api-client/dist/client';
-import type {BackendError} from '@wireapp/api-client/dist/http';
+import type {PublicClient} from '@wireapp/api-client/src/client';
+import type {BackendError} from '@wireapp/api-client/src/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
-import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/dist/self';
-import {USER_EVENT} from '@wireapp/api-client/dist/event';
-import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/dist/user';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self';
+import {USER_EVENT} from '@wireapp/api-client/src/event';
+import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/src/user';
 import {amplify} from 'amplify';
 import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';

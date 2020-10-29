@@ -17,7 +17,7 @@
  *
  */
 
-import type {RichInfoField} from '@wireapp/api-client/dist/user/RichInfo';
+import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';

@@ -17,7 +17,7 @@
  *
  */
 
-import {AudioPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {AudioPreference, WebappProperties} from '@wireapp/api-client/src/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';

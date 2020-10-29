@@ -19,8 +19,8 @@
 
 import ko from 'knockout';
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
-import type {ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/dist/event';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import type {ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/src/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';

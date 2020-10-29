@@ -18,8 +18,8 @@
  */
 
 import * as faker from 'faker';
-import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
-import {UserAssetType} from '@wireapp/api-client/dist/user';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+import {UserAssetType} from '@wireapp/api-client/src/user';
 
 import type {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';

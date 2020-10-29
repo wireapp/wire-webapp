@@ -19,12 +19,12 @@
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {Notification} from '@wireapp/api-client/dist/notification';
+import type {Notification} from '@wireapp/api-client/src/notification';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {WebSocketClient, OnConnect} from '@wireapp/api-client/dist/tcp/';
-import {WEBSOCKET_STATE} from '@wireapp/api-client/dist/tcp/ReconnectingWebsocket';
+import {WebSocketClient, OnConnect} from '@wireapp/api-client/src/tcp/';
+import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 
 import {APIClient} from '../service/APIClientSingleton';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';

@@ -18,10 +18,10 @@
  */
 
 import {amplify} from 'amplify';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {Availability} from '@wireapp/protocol-messaging';
-import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {NotificationPreference} from '@wireapp/api-client/src/user/data';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';

@@ -39,11 +39,11 @@ import {
   Asset as ProtobufAsset,
   LinkPreview,
 } from '@wireapp/protocol-messaging';
-import {RequestCancellationError} from '@wireapp/api-client/dist/user';
-import {ReactionType} from '@wireapp/core/dist/conversation';
+import {RequestCancellationError} from '@wireapp/api-client/src/user';
+import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/dist/conversation';
+import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
@@ -95,7 +95,7 @@ import {EventService} from '../event/EventService';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {MentionEntity} from '../message/MentionEntity';
-import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/dist/conversation/content';
+import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
 import {roundLogarithmic} from 'Util/NumberUtil';

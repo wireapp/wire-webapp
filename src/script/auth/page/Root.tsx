@@ -17,7 +17,7 @@
  *
  */
 
-import {pathWithParams} from '@wireapp/commons/dist/commonjs/util/UrlUtil';
+import {pathWithParams} from '@wireapp/commons/src/main/util/UrlUtil';
 import {StyledApp, Loading, ContainerXS} from '@wireapp/react-ui-kit';
 import React, {useEffect} from 'react';
 import {IntlProvider} from 'react-intl';

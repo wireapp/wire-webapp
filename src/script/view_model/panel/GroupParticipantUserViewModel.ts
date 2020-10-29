@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';

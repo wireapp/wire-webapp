@@ -17,12 +17,12 @@
  *
  */
 
-import * as Events from '@wireapp/api-client/dist/event';
-import {ConnectionState, HttpClient} from '@wireapp/api-client/dist/http';
-import type {Notification} from '@wireapp/api-client/dist/notification';
-import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/dist/conversation/';
-import type {UserUpdateMessage} from '@wireapp/core/dist/conversation/message/UserMessage';
-import {UserMapper} from '@wireapp/core/dist/user/UserMapper';
+import * as Events from '@wireapp/api-client/src/event';
+import {ConnectionState, HttpClient} from '@wireapp/api-client/src/http';
+import type {Notification} from '@wireapp/api-client/src/notification';
+import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
+import type {UserUpdateMessage} from '@wireapp/core/src/main/conversation/message/UserMessage';
+import {UserMapper} from '@wireapp/core/src/main/user/UserMapper';
 
 import {getLogger} from 'Util/Logger';
 import type {ThunkAction} from '../../module/reducer';
