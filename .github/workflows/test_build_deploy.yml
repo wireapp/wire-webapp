@@ -225,7 +225,7 @@ jobs:
         if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
         run: yarn changelog
 
-      - name: Create GitHub production release draft
+      - name: Create GitHub production release
         id: create_release_production
         if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
         uses: actions/create-release@v1
@@ -235,7 +235,7 @@ jobs:
           tag_name: ${{env.TAG}}
           release_name: ${{env.TAG}}
           body_path: ./CHANGELOG.md
-          draft: true
+          draft: false
           prerelease: false
 
       - name: Create GitHub staging release draft
