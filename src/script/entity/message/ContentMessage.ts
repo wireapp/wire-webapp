@@ -34,7 +34,7 @@ import {Text as TextAsset} from './Text';
 import {AssetRepository} from '../../assets/AssetRepository';
 
 export class ContentMessage extends Message {
-  private readonly isLikedProvisional: ko.Observable<boolean>;
+  private readonly isLikedProvisional: ko.Observable<boolean | null>;
   public readonly reactions_user_ets: ko.ObservableArray<User>;
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage>;
   public readonly is_liked: ko.PureComputed<boolean>;
@@ -72,15 +72,15 @@ export class ContentMessage extends Message {
     this.is_liked = ko.pureComputed({
       read: () => {
         const isLikedProvisional = this.isLikedProvisional();
-        const reactionsUserEts = this.reactions_user_ets();
         if (isLikedProvisional !== null) {
-          this.isLikedProvisional(null);
+          (this.isLikedProvisional as any).silentUpdate(null);
           return isLikedProvisional;
         }
+        const reactionsUserEts = this.reactions_user_ets();
         return reactionsUserEts.some(user => user.isMe);
       },
-      write: value => {
-        return this.isLikedProvisional(value);
+      write: (value: boolean) => {
+        this.isLikedProvisional(value);
       },
     });
     this.other_likes = ko.pureComputed(() => this.reactions_user_ets().filter(user_et => !user_et.isMe));

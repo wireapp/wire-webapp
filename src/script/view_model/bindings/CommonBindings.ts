@@ -35,6 +35,14 @@ import {Runtime} from '@wireapp/commons';
 
 type KOEvent<T = Event> = JQuery.Event & {currentTarget: Element; originalEvent: T};
 
+(ko.observable.fn as any).silentUpdate = function (value: any) {
+  this.notifySubscribers = function () {};
+  this(value);
+  this.notifySubscribers = function () {
+    ko.subscribable.fn.notifySubscribers.apply(this, arguments);
+  };
+};
+
 /**
  * Use it on the drop area.
  */

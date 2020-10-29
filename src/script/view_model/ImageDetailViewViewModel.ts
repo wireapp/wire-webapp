@@ -236,10 +236,10 @@ export class ImageDetailViewViewModel {
   };
 
   private readonly iterateImage = (reverse: boolean) => {
-    const messageEntity = iterateItem(this.items(), this.messageEntity(), reverse);
+    const nextMessageEntity = iterateItem(this.items(), this.messageEntity(), reverse);
 
-    if (messageEntity) {
-      this.messageEntity(messageEntity);
+    if (nextMessageEntity) {
+      this.messageEntity(nextMessageEntity);
       this.loadImage();
     }
   };
