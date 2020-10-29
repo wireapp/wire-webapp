@@ -65,6 +65,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       size={size}
       onClick={onClick}
       data-uie-name="element-avatar-user"
+      data-uie-value={participant.id}
     >
       <AvatarBackground backgroundColor={backgroundColor} />
       <AvatarInitials size={size} initials={participant.initials()} />

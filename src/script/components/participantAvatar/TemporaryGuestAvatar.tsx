@@ -62,6 +62,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
       size={size}
       onClick={onClick}
       data-uie-name="element-avatar-temporary-guest"
+      data-uie-value={participant.id}
     >
       <AvatarBackground />
       <AvatarInitials color="var(--background)" size={size} initials={participant.initials()} />
