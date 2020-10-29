@@ -18,6 +18,7 @@
  */
 
 import type {Dexie} from 'dexie';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -50,7 +51,7 @@ export const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
 export class EventService {
   logger: Logger;
 
-  constructor(public readonly storageService: StorageService) {
+  constructor(public readonly storageService = container.resolve(StorageService)) {
     this.logger = getLogger('EventService');
   }
 

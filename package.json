@@ -32,6 +32,7 @@
     "react-redux": "7.2.1",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
+    "react-transition-group": "4.4.1",
     "redux": "4.0.5",
     "redux-logdown": "1.0.4",
     "redux-thunk": "2.3.0",
@@ -80,6 +81,7 @@
     "@types/react-redux": "7.1.9",
     "@types/react-router": "5.1.8",
     "@types/react-router-dom": "5.1.6",
+    "@types/react-transition-group": "4.4.0",
     "@types/redux-mock-store": "1.0.2",
     "@types/sdp-transform": "2.4.4",
     "@types/simplebar": "5.1.1",
@@ -232,5 +234,5 @@
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts"
   },
-  "version": "0.1.0"
+  "version": "0.2.0"
 }

@@ -18,9 +18,10 @@
  */
 
 import {Logger, getLogger} from 'Util/Logger';
+import {container} from 'tsyringe';
 
 import {StorageSchemata} from '../storage/StorageSchemata';
-import type {StorageService} from './StorageService';
+import {StorageService} from './StorageService';
 import {StorageError} from '../error/StorageError';
 
 type AmplifyRecord = {key: string; value: string};
@@ -28,7 +29,6 @@ type AmplifyRecord = {key: string; value: string};
 export class StorageRepository {
   private readonly AMPLIFY_STORE_NAME: string;
   private readonly logger: Logger;
-  public readonly storageService: StorageService;
 
   static get CONFIG() {
     return {
@@ -42,8 +42,7 @@ export class StorageRepository {
     };
   }
 
-  constructor(storageService: StorageService) {
-    this.storageService = storageService;
+  constructor(public readonly storageService = container.resolve(StorageService)) {
     this.logger = getLogger('StorageRepository');
     this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }

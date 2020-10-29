@@ -34,11 +34,12 @@ import {MediaType} from '../../media/MediaType';
 import {MediaRepository} from '../../media/MediaRepository';
 import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {MediaConstraintsHandler} from '../../media/MediaConstraintsHandler';
-import {UserRepository} from '../../user/UserRepository';
 import {Call} from '../../calling/Call';
 import {DeviceIds, Devices, DeviceSupport, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
@@ -92,17 +93,17 @@ export class PreferencesAVViewModel {
 
   constructor(
     mediaRepository: MediaRepository,
-    private readonly userRepository: UserRepository,
     private readonly propertiesRepository: PropertiesRepository,
     private readonly callingRepository: CallingRepository,
     callbacks: CallBacksType,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.stopActiveMediaSource = callbacks.stopActiveMediaSource;
     this.replaceActiveMediaSource = callbacks.replaceActiveMediaSource;
 
     this.logger = getLogger('PreferencesAVViewModel');
 
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
 
     this.devicesHandler = mediaRepository.devicesHandler;
     this.availableDevices = this.devicesHandler.availableDevices;
@@ -123,7 +124,7 @@ export class PreferencesAVViewModel {
     this.hasNoneOrOneVideoInput = ko.pureComputed(() => this.availableDevices.videoInput().length < 2);
     this.supportsConferenceCalling = callingRepository.supportsConferenceCalling;
 
-    const selfUser = this.userRepository.self;
+    const selfUser = this.userState.self;
     this.isTemporaryGuest = ko.pureComputed(() => selfUser() && selfUser().isTemporaryGuest());
 
     this.audioContext = undefined;
@@ -347,7 +348,7 @@ export class PreferencesAVViewModel {
       const callLog = [messageLog.join('\r\n')];
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
 
-      const selfUserId = this.userRepository.self().id;
+      const selfUserId = this.userState.self().id;
       const truncatedId = selfUserId.substr(0, PreferencesAVViewModel.CONFIG.OBFUSCATION_TRUNCATE_TO);
       const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
       const filename = `${sanitizedBrandName}-${truncatedId}-Calling_${getCurrentDate()}.log`;

@@ -43,6 +43,7 @@ describe('PreferenceNotificationRepository', () => {
   });
 
   it('adds new notification when read receipt settings are changed', () => {
+    amplify.unsubscribeAll(WebAppEvents.USER.EVENT_FROM_BACKEND);
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
 
     amplify.publish(WebAppEvents.USER.EVENT_FROM_BACKEND, {
@@ -59,6 +60,7 @@ describe('PreferenceNotificationRepository', () => {
   });
 
   it('adds new notification when new device is added for self user', () => {
+    amplify.unsubscribeAll(WebAppEvents.USER.CLIENT_ADDED);
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = {};
 
@@ -72,6 +74,7 @@ describe('PreferenceNotificationRepository', () => {
   });
 
   it('ignores new device notification if not from the self user', () => {
+    amplify.unsubscribeAll(WebAppEvents.USER.CLIENT_ADDED);
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = {};
 

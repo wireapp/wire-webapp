@@ -29,13 +29,14 @@ import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {IntegrationRepository} from '../integration/IntegrationRepository';
-import type {UserRepository} from '../user/UserRepository';
 import type {User} from '../entity/User';
 import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {Message} from '../entity/message/Message';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
   modalsViewModel: ModalsViewModel;
@@ -46,8 +47,8 @@ export class ActionsViewModel {
     private readonly connectionRepository: ConnectionRepository,
     private readonly conversationRepository: ConversationRepository,
     private readonly integrationRepository: IntegrationRepository,
-    private readonly userRepository: UserRepository,
     private readonly messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.modalsViewModel = mainViewModel.modals;
   }
@@ -154,7 +155,7 @@ export class ActionsViewModel {
   };
 
   deleteClient = (clientEntity: ClientEntity) => {
-    const isSSO = this.userRepository.self().isSingleSignOn;
+    const isSSO = this.userState.self().isSingleSignOn;
     const isTemporary = clientEntity.isTemporary();
     if (isSSO || isTemporary) {
       // Temporary clients and clients of SSO users don't require a password to be removed
@@ -263,7 +264,7 @@ export class ActionsViewModel {
             if (clearContent) {
               this.conversationRepository.clear_conversation(conversationEntity, true);
             } else {
-              this.conversationRepository.removeMember(conversationEntity, this.userRepository.self().id);
+              this.conversationRepository.removeMember(conversationEntity, this.userState.self().id);
             }
             resolve();
           },

@@ -44,7 +44,7 @@ import {ConsentValue} from '../../user/ConsentValue';
 import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
 import {nameFromType} from '../../user/AvailabilityMapper';
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
@@ -63,6 +63,8 @@ import {TeamRepository} from '../../team/TeamRepository';
 import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
 import {TeamEntity} from '../../team/TeamEntity';
 import type {ClientEntity} from 'src/script/client/ClientEntity';
+import {UserState} from '../../user/UserState';
+import {container} from 'tsyringe';
 
 export class PreferencesAccountViewModel {
   logger: Logger;
@@ -90,7 +92,7 @@ export class PreferencesAccountViewModel {
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
-  ParticipantAvatar: typeof ParticipantAvatar;
+  AVATAR_SIZE: typeof AVATAR_SIZE;
   isMacOsWrapper: boolean;
   manageTeamUrl: string;
   createTeamUrl: string;
@@ -124,6 +126,7 @@ export class PreferencesAccountViewModel {
     private readonly propertiesRepository: PropertiesRepository,
     private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.logger = getLogger('PreferencesAccountViewModel');
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
@@ -131,8 +134,8 @@ export class PreferencesAccountViewModel {
     this.brandName = Config.getConfig().BRAND_NAME;
     this.isCountlyEnabled = !!Config.getConfig().COUNTLY_API_KEY;
 
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
-    this.selfUser = this.userRepository.self;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
+    this.selfUser = this.userState.self;
     this.Config = PreferencesAccountViewModel.CONFIG;
     this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
@@ -178,7 +181,7 @@ export class PreferencesAccountViewModel {
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
     this.optionResetAppLock = isAppLockEnabled();
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
     this.manageTeamUrl = getManageTeamUrl('client_settings');

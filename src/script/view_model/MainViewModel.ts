@@ -59,6 +59,8 @@ import type {AuthRepository} from '../auth/AuthRepository';
 import type {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
 
 export interface ViewModelRepositories {
   asset: AssetRepository;
@@ -104,6 +106,7 @@ export class MainViewModel {
   selfUser: ko.Observable<User>;
   title: WindowTitleViewModel;
   userRepository: UserRepository;
+  private readonly userState: UserState;
   warnings: WarningsViewModel;
 
   static get CONFIG() {
@@ -143,6 +146,8 @@ export class MainViewModel {
     this.userRepository = repositories.user;
     this.logger = getLogger('MainViewModel');
 
+    this.userState = container.resolve(UserState);
+
     this.modals = modals;
 
     this.multitasking = {
@@ -151,7 +156,7 @@ export class MainViewModel {
       resetMinimize: ko.observable(false),
     };
 
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
 
     this.isPanelOpen = ko.observable(false);
 
@@ -161,7 +166,6 @@ export class MainViewModel {
       repositories.connection,
       repositories.conversation,
       repositories.integration,
-      repositories.user,
       repositories.message,
     );
 
@@ -186,7 +190,7 @@ export class MainViewModel {
       repositories.asset,
       repositories.message,
     );
-    this.title = new WindowTitleViewModel(this, repositories.user, repositories.conversation);
+    this.title = new WindowTitleViewModel(this, repositories.conversation);
     this.favicon = new FaviconViewModel(amplify);
     this.warnings = new WarningsViewModel();
 

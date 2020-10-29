@@ -31,7 +31,6 @@ import {APIClient} from '../service/APIClientSingleton';
 
 export class NotificationService {
   private readonly logger: Logger;
-  private readonly storageService: StorageService;
   private readonly AMPLIFY_STORE_NAME: string;
 
   static get CONFIG() {
@@ -42,8 +41,10 @@ export class NotificationService {
     };
   }
 
-  constructor(storageService: StorageService, private readonly apiClient = container.resolve(APIClient)) {
-    this.storageService = storageService;
+  constructor(
+    private readonly storageService = container.resolve(StorageService),
+    private readonly apiClient = container.resolve(APIClient),
+  ) {
     this.logger = getLogger('NotificationService');
     this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }

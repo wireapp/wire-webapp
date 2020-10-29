@@ -28,6 +28,8 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {ListViewModel} from '../ListViewModel';
 import type {User} from '../../entity/User';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 export class TakeoverViewModel {
   readonly brandName: string;
@@ -40,9 +42,10 @@ export class TakeoverViewModel {
     private readonly listViewModel: ListViewModel,
     private readonly userRepository: UserRepository,
     private readonly conversationRepository: ConversationRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.listViewModel = listViewModel;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
 
     this.name = ko.pureComputed(() => (this.selfUser() ? this.selfUser().name() : ''));
     this.username = ko.pureComputed(() => (this.selfUser() ? this.selfUser().username() : ''));
@@ -63,7 +66,7 @@ export class TakeoverViewModel {
         return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
       }
 
-      if (this.userRepository.connectRequests().length) {
+      if (this.userState.connectRequests().length) {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
       }
     } catch (error) {

@@ -144,8 +144,8 @@ export class User {
 
     this.username = ko.observable('');
 
-    this.previewPictureResource = ko.observable();
-    this.mediumPictureResource = ko.observable();
+    this.previewPictureResource = ko.observable().extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 100}});
+    this.mediumPictureResource = ko.observable().extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 100}});
 
     this.connection = ko.observable(new ConnectionEntity());
 

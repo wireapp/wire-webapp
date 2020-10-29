@@ -22,8 +22,9 @@ import ko from 'knockout';
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
-import type {UserRepository} from '../../user/UserRepository';
 import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 export class InviteModalViewModel {
   inviteMessage: ko.PureComputed<string>;
@@ -32,13 +33,13 @@ export class InviteModalViewModel {
   brandName: string;
   isVisible: ko.Observable<boolean>;
 
-  constructor(userRepository: UserRepository) {
+  constructor(private readonly userState = container.resolve(UserState)) {
     this.isVisible = ko.observable(false);
     this.brandName = Config.getConfig().BRAND_NAME;
 
     this.inviteMessage = ko.pureComputed(() => {
-      if (userRepository.self()) {
-        const username = userRepository.self().username();
+      if (this.userState.self()) {
+        const username = this.userState.self().username();
         return username
           ? t('inviteMessage', {brandName: Config.getConfig().BRAND_NAME, username: `@${username}`})
           : t('inviteMessageNoEmail', Config.getConfig().BRAND_NAME);

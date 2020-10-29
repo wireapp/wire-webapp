@@ -27,7 +27,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {Conversation, SerializedConversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
 import {StorageSchemata} from '../storage/StorageSchemata';
-import type {UserRepository} from '../user/UserRepository';
 import {BackupService} from './BackupService';
 import {WebWorker} from '../util/worker';
 import {
@@ -40,6 +39,7 @@ import {
 } from './Error';
 import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
+import {UserState} from '../user/UserState';
 
 export interface Metadata {
   client_id: string;
@@ -61,7 +61,6 @@ export class BackupRepository {
   private readonly connectionRepository: ConnectionRepository;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  private readonly userRepository: UserRepository;
   private canceled: boolean;
 
   static get CONFIG() {
@@ -79,15 +78,14 @@ export class BackupRepository {
     backupService: BackupService,
     connectionRepository: ConnectionRepository,
     conversationRepository: ConversationRepository,
-    userRepository: UserRepository,
     private readonly clientState = container.resolve(ClientState),
+    private readonly userState = container.resolve(UserState),
   ) {
     this.logger = getLogger('BackupRepository');
 
     this.backupService = backupService;
     this.connectionRepository = connectionRepository;
     this.conversationRepository = conversationRepository;
-    this.userRepository = userRepository;
 
     this.canceled = false;
   }
@@ -109,9 +107,9 @@ export class BackupRepository {
       client_id: this.clientState.currentClient().id,
       creation_time: new Date().toISOString(),
       platform: 'Web',
-      user_handle: this.userRepository.self().username(),
-      user_id: this.userRepository.self().id,
-      user_name: this.userRepository.self().name(),
+      user_handle: this.userState.self().username(),
+      user_id: this.userState.self().id,
+      user_name: this.userState.self().name(),
       version: this.backupService.getDatabaseVersion(),
     };
   }
