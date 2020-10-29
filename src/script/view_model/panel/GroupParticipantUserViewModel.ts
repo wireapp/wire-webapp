@@ -30,7 +30,6 @@ import 'Components/panel/userDetails';
 
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {TeamRepository} from '../../team/TeamRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -39,14 +38,18 @@ import {PanelViewModel} from '../PanelViewModel';
 import type {PanelParams} from '../PanelViewModel';
 import {ClientEvent} from '../../event/Client';
 import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
+import {UserState} from '../../user/UserState';
+import {container} from 'tsyringe';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
-  userRepository: UserRepository;
+  private readonly userState: UserState;
+
   actionsViewModel: ActionsViewModel;
   teamRepository: TeamRepository;
   conversationRepository: ConversationRepository;
   conversationRoleRepository: ConversationRoleRepository;
   logger: Logger;
+  isActivatedAccount: ko.PureComputed<boolean>;
   selectedParticipant: ko.Observable<User>;
   isSelfVerified: ko.PureComputed<boolean>;
   canChangeRole: ko.PureComputed<boolean>;
@@ -54,9 +57,10 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
   constructor(params: PanelViewModelProps) {
     super(params);
 
+    this.userState = container.resolve(UserState);
+
     const {mainViewModel, repositories} = params;
 
-    this.userRepository = repositories.user;
     this.actionsViewModel = mainViewModel.actions;
     this.teamRepository = repositories.team;
     this.conversationRepository = repositories.conversation;
@@ -64,8 +68,9 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
 
     this.logger = getLogger('GroupParticipantUserViewModel');
 
+    this.isActivatedAccount = this.userState.isActivatedAccount;
     this.selectedParticipant = ko.observable(undefined);
-    this.isSelfVerified = ko.pureComputed(() => repositories.user.self()?.is_verified());
+    this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
 
     this.canChangeRole = ko.pureComputed(
       () =>

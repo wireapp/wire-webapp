@@ -100,6 +100,8 @@ import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import type {EventRecord} from '../storage';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -129,6 +131,7 @@ export class MessageRepository {
     private readonly conversation_service: ConversationService,
     private readonly link_repository: LinkPreviewRepository,
     private readonly assetRepository: AssetRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.eventService = eventRepository.eventService;
     this.event_mapper = new EventMapper();
@@ -136,7 +139,7 @@ export class MessageRepository {
 
     this.isTeam = this.teamRepository.isTeam;
     this.team = this.teamRepository.team;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
     this.selfConversation = ko.pureComputed(() =>
       this.conversationRepositoryProvider().find_conversation_by_id(this.selfUser()?.id),
     );

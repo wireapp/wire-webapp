@@ -250,11 +250,10 @@ class App {
       this.service.webSocket,
       repositories.cryptography,
       serverTimeHandler,
-      repositories.user,
     );
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
     repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
-    repositories.eventTracker = new EventTrackingRepository(repositories.user);
+    repositories.eventTracker = new EventTrackingRepository();
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
@@ -285,23 +284,14 @@ class App {
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
     const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
 
-    const readReceiptMiddleware = new ReceiptsMiddleware(
-      this.service.event,
-      repositories.user,
-      repositories.conversation,
-    );
+    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, repositories.conversation);
 
     repositories.event.setEventProcessMiddlewares([
       serviceMiddleware.processEvent.bind(serviceMiddleware),
       quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
-    repositories.backup = new BackupRepository(
-      new BackupService(),
-      repositories.connection,
-      repositories.conversation,
-      repositories.user,
-    );
+    repositories.backup = new BackupRepository(new BackupService(), repositories.connection, repositories.conversation);
     repositories.broadcast = new BroadcastRepository(
       new BroadcastService(),
       repositories.client,
@@ -327,9 +317,8 @@ class App {
       repositories.calling,
       repositories.conversation,
       repositories.permission,
-      repositories.user,
     );
-    repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
+    repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     repositories.conversation.leaveCall = repositories.calling.leaveCall;
     return repositories;
@@ -420,10 +409,10 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       await authRepository.init();
       await this._initiateSelfUser();
-      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository.self().name()));
+      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository['userState'].self().name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
-      const selfUser = userRepository.self();
+      const selfUser = userRepository['userState'].self();
       callingRepository.initAvs(selfUser, clientEntity.id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
@@ -468,7 +457,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
-      userRepository.self().devices(clientEntities);
+      userRepository['userState'].self().devices(clientEntities);
       this.logger.info('App pre-loading completed');
       await this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
@@ -476,15 +465,15 @@ class App {
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      this.applock = new AppLockViewModel(clientRepository, userRepository.self);
+      this.applock = new AppLockViewModel(clientRepository, userRepository['userState'].self);
 
       loadingView.removeFromView();
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
       modals.ready();
-      showInitialModal(userRepository.self().availability());
+      showInitialModal(userRepository['userState'].self().availability());
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-      if (userRepository.isActivatedAccount()) {
+      if (userRepository['userState'].isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false), this.update.bind(this));
       }
@@ -681,13 +670,13 @@ class App {
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
 
     this.logger.info('Showing application UI');
-    if (this.repository.user.isTemporaryGuest()) {
+    if (this.repository.user['userState'].isTemporaryGuest()) {
       mainView.list.showTemporaryGuest();
     } else if (this.repository.user.shouldChangeUsername()) {
       mainView.list.showTakeover();
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity);
-    } else if (this.repository.user.connectRequests().length) {
+    } else if (this.repository.user['userState'].connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
@@ -720,7 +709,7 @@ class App {
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
-      if (this.repository.user.isActivatedAccount()) {
+      if (this.repository.user['userState'].isActivatedAccount()) {
         if (this.service.storage.isTemporaryAndNonPersistent) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
@@ -772,7 +761,7 @@ class App {
         keysToKeep.push(StorageKey.AUTH.PERSIST);
       }
 
-      const selfUser = this.repository.user.self();
+      const selfUser = this.repository.user['userState'].self();
       if (selfUser) {
         const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
 
@@ -859,7 +848,7 @@ class App {
   private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
+    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
     if (isLeavingGuestRoom) {
       return window.location.replace(getWebsiteUrl());
     }
@@ -874,7 +863,7 @@ class App {
   private _publishGlobals() {
     window.z.userPermission = ko.observable({});
     ko.pureComputed(() => {
-      const selfUser = this.repository.user.self();
+      const selfUser = this.repository.user['userState'].self();
       return selfUser && selfUser.teamRole();
     }).subscribe(role => window.z.userPermission(UserPermission.generatePermissionHelpers(role)));
   }

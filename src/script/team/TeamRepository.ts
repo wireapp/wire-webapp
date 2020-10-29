@@ -56,6 +56,8 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
 import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
 
 export interface AccountInfo {
   accentID: number;
@@ -85,7 +87,12 @@ export class TeamRepository {
   readonly teamService: TeamService;
   readonly teamSize: ko.PureComputed<number>;
 
-  constructor(teamService: TeamService, userRepository: UserRepository, assetRepository: AssetRepository) {
+  constructor(
+    teamService: TeamService,
+    userRepository: UserRepository,
+    assetRepository: AssetRepository,
+    private readonly userState = container.resolve(UserState),
+  ) {
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
@@ -93,7 +100,7 @@ export class TeamRepository {
     this.assetRepository = assetRepository;
     this.userRepository = userRepository;
 
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
 
     this.team = ko.observable();
 
@@ -113,7 +120,7 @@ export class TeamRepository {
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
     this.teamUsers = ko.pureComputed(() => {
       return this.teamMembers()
-        .concat(this.userRepository.connectedUsers())
+        .concat(this.userState.connectedUsers())
         .filter((item, index, array) => array.indexOf(item) === index)
         .sort(sortUsersByPriority);
     });
@@ -122,9 +129,9 @@ export class TeamRepository {
 
     this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
 
-    this.userRepository.isTeam = this.isTeam;
-    this.userRepository.teamMembers = this.teamMembers;
-    this.userRepository.teamUsers = this.teamUsers;
+    this.userState.isTeam = this.isTeam;
+    this.userState.teamMembers = this.teamMembers;
+    this.userState.teamUsers = this.teamUsers;
     this.userRepository.getTeamMembersFromUsers = this.getTeamMembersFromUsers;
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));

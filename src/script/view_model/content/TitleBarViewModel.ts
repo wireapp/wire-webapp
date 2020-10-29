@@ -33,9 +33,10 @@ import {CallingViewModel} from '../CallingViewModel';
 import {PanelViewModel} from '../PanelViewModel';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {UserRepository} from '../../user/UserRepository';
 import {Conversation} from '../../entity/Conversation';
 import {Call} from '../../calling/Call';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 // Parent: ContentViewModel
 export class TitleBarViewModel {
@@ -56,7 +57,7 @@ export class TitleBarViewModel {
     readonly contentViewModel: ContentViewModel,
     private readonly callingRepository: CallingRepository,
     private readonly conversationRepository: ConversationRepository,
-    private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.contentViewModel = contentViewModel;
 
@@ -69,7 +70,7 @@ export class TitleBarViewModel {
     this.ConversationVerificationState = ConversationVerificationState;
 
     this.joinedCall = this.callingRepository.joinedCall;
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && !!this.joinedCall();

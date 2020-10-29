@@ -29,9 +29,10 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 import {ACCESS_STATE, TEAM} from '../../conversation/AccessState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {TeamRepository} from '../../team/TeamRepository';
-import {UserRepository} from '../../user/UserRepository';
 import {User} from '../../entity/User';
 import {SearchRepository} from '../../search/SearchRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 
@@ -71,7 +72,7 @@ export class GroupCreationViewModel {
     private readonly conversationRepository: ConversationRepository,
     searchRepository: SearchRepository,
     private readonly teamRepository: TeamRepository,
-    private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.isTeam = this.teamRepository.isTeam;
     this.maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
@@ -102,7 +103,7 @@ export class GroupCreationViewModel {
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
         if (!this.isTeam()) {
-          return this.userRepository.connectedUsers();
+          return this.userState.connectedUsers();
         }
 
         if (this.isGuestRoom()) {

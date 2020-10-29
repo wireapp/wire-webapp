@@ -49,6 +49,8 @@ import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PanelViewModel} from '../PanelViewModel';
 import type {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 /*
  * Message list rendering view model.
@@ -78,12 +80,13 @@ export class MessageListViewModel {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.mainViewModel = mainViewModel;
     this.logger = getLogger('MessageListViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
     this.focusedMessage = ko.observable(null);
 
     this.conversation = ko.observable(new Conversation());
