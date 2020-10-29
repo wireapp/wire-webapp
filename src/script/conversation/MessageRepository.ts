@@ -88,8 +88,6 @@ import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {MessageSender} from '../message/MessageSender';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {ContentMessage} from '../entity/message/ContentMessage';
-import {TeamEntity} from '../team/TeamEntity';
-import {User} from '../entity/User';
 import {EventService} from '../event/EventService';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
@@ -113,9 +111,6 @@ export class MessageRepository {
   public readonly clientMismatchHandler: ClientMismatchHandler;
   private readonly blockNotificationHandling: ko.Observable<boolean>;
 
-  private readonly isTeam: ko.PureComputed<boolean>;
-  private readonly selfUser: ko.Observable<User>;
-  private readonly team: ko.Observable<TeamEntity>;
   private readonly selfConversation: ko.PureComputed<Conversation>;
 
   constructor(
@@ -137,11 +132,8 @@ export class MessageRepository {
     this.event_mapper = new EventMapper();
     this.logger = getLogger('MessageRepository');
 
-    this.isTeam = this.teamState.isTeam;
-    this.team = this.teamState.team;
-    this.selfUser = this.userState.self;
     this.selfConversation = ko.pureComputed(() =>
-      this.conversationRepositoryProvider().find_conversation_by_id(this.selfUser()?.id),
+      this.conversationRepositoryProvider().find_conversation_by_id(this.userState.self()?.id),
     );
 
     this.clientMismatchHandler = new ClientMismatchHandler(
@@ -451,7 +443,7 @@ export class MessageRepository {
     let genericMessage: GenericMessage;
 
     await this.getMessageInConversationById(conversationEntity, messageId);
-    const retention = this.assetRepository.getAssetRetention(this.selfUser(), conversationEntity);
+    const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversationEntity);
     const options = {
       expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
       legalHoldStatus: conversationEntity.legalHoldStatus(),
@@ -1263,9 +1255,9 @@ export class MessageRepository {
       return false;
     }
 
-    if (this.isTeam()) {
+    if (this.teamState.isTeam()) {
       const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(
-        id => id !== this.selfUser().id,
+        id => id !== this.userState.self().id,
       );
       const userIdsWithoutClients = [];
       for (const recipientId of allRecipientsBesideSelf) {
@@ -1282,7 +1274,7 @@ export class MessageRepository {
         const isDeleted = user?.deleted === true;
 
         if (isDeleted) {
-          await this.conversationRepositoryProvider().teamMemberLeave(this.team().id, user.id);
+          await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, user.id);
         }
       }
     }
@@ -1315,7 +1307,7 @@ export class MessageRepository {
           conversationId,
           legalHoldStatus: updatedLocalLegalHoldStatus,
           timestamp: numericTimestamp,
-          userId: this.selfUser().id,
+          userId: this.userState.self().id,
         });
       }
 
@@ -1350,7 +1342,7 @@ export class MessageRepository {
       conversationEntity.needsLegalHoldApproval = false;
       return showLegalHoldWarning(conversationEntity, conversationDegraded);
     } else if (shouldShowLegalHoldWarning) {
-      conversationEntity.needsLegalHoldApproval = !this.selfUser().isOnLegalHold() && isLegalHoldMessageType;
+      conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
     }
     if (!conversationDegraded) {
       return false;
@@ -1459,7 +1451,7 @@ export class MessageRepository {
       if (error.missing) {
         const remoteUserClients = error.missing as Recipients;
         const localUserClients = await this.create_recipients(conversationEntity.id);
-        const selfId = this.selfUser().id;
+        const selfId = this.userState.self().id;
 
         const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
           if (userId === selfId) {
@@ -1741,7 +1733,7 @@ export class MessageRepository {
         break;
     }
     if (actionType) {
-      const selfUserTeamId = this.selfUser().teamId;
+      const selfUserTeamId = this.userState.self().teamId;
       const participants = conversationEntity.participating_user_ets();
       const guests = participants.filter(user => user.isGuest()).length;
       const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;

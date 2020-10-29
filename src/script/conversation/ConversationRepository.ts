@@ -79,7 +79,6 @@ import {UserRepository} from '../user/UserRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {ContentMessage} from '../entity/message/ContentMessage';
-import {TeamEntity} from '../team/TeamEntity';
 import {User} from '../entity/User';
 import {EventService} from '../event/EventService';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
@@ -114,7 +113,6 @@ export class ConversationRepository {
   private readonly logger: Logger;
   private readonly receiving_queue: PromiseQueue;
   private readonly sorted_conversations: ko.PureComputed<Conversation[]>;
-  private readonly teamMembers: ko.PureComputed<User[]>;
   public readonly active_conversation: ko.Observable<Conversation>;
   public readonly connectedUsers: ko.PureComputed<User[]>;
   public readonly conversationLabelRepository: ConversationLabelRepository;
@@ -123,11 +121,8 @@ export class ConversationRepository {
   public readonly conversations_unarchived: ko.ObservableArray<Conversation>;
   public readonly conversations: ko.ObservableArray<Conversation>;
   public readonly filtered_conversations: ko.PureComputed<Conversation[]>;
-  public readonly isTeam: ko.PureComputed<boolean>;
   public readonly self_conversation: ko.PureComputed<Conversation>;
-  public readonly selfUser: ko.Observable<User>;
   public readonly stateHandler: ConversationStateHandler;
-  public readonly team: ko.Observable<TeamEntity>;
   public readonly verificationStateHandler: ConversationVerificationStateHandler;
 
   static get CONFIG() {
@@ -171,16 +166,12 @@ export class ConversationRepository {
       this,
       this.eventRepository,
       this.serverTimeHandler,
+      this.userState,
     );
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
 
-    this.isTeam = this.teamState.isTeam;
-    this.isTeam.subscribe(() => this.mapGuestStatusSelf());
-    this.team = this.teamState.team;
-    this.teamMembers = this.teamState.teamMembers;
-
-    this.selfUser = this.userState.self;
+    this.teamState.isTeam.subscribe(() => this.mapGuestStatusSelf());
 
     this.blockNotificationHandling = ko.observable(true);
     this.fetching_conversations = {};
@@ -191,7 +182,7 @@ export class ConversationRepository {
       }
     });
 
-    this.self_conversation = ko.pureComputed(() => this.find_conversation_by_id(this.selfUser()?.id));
+    this.self_conversation = ko.pureComputed(() => this.find_conversation_by_id(this.userState.self()?.id));
 
     this.filtered_conversations = ko.pureComputed(() => {
       return this.conversations().filter(conversationEntity => {
@@ -225,10 +216,10 @@ export class ConversationRepository {
     });
 
     this.connectedUsers = ko.pureComputed(() => {
-      const inviterId = this.teamState.memberInviters()[this.selfUser().id];
+      const inviterId = this.teamState.memberInviters()[this.userState.self().id];
       const inviter = inviterId ? this.userState.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
-      const selfTeamId = this.selfUser().teamId;
+      const selfTeamId = this.userState.self().teamId;
       for (const conversation of this.conversations()) {
         for (const user of conversation.participating_user_ets()) {
           const isNotService = !user.isService;
@@ -358,10 +349,10 @@ export class ConversationRepository {
       ...options,
     };
 
-    if (this.team().id) {
+    if (this.teamState.team().id) {
       payload.team = {
         managed: false,
-        teamid: this.team().id,
+        teamid: this.teamState.team().id,
       };
 
       if (accessState) {
@@ -545,7 +536,7 @@ export class ConversationRepository {
 
       const addCreationMessage = !conversationEntity.hasCreationMessage;
       if (addCreationMessage) {
-        this.addCreationMessage(conversationEntity, this.selfUser().isTemporaryGuest());
+        this.addCreationMessage(conversationEntity, this.userState.self().isTemporaryGuest());
       }
     }
     return mappedMessageEntities;
@@ -560,8 +551,10 @@ export class ConversationRepository {
     conversationEntity.hasCreationMessage = true;
 
     if (conversationEntity.inTeam()) {
-      const allTeamMembersParticipate = this.teamMembers().length
-        ? this.teamMembers().every(teamMember => conversationEntity.participating_user_ids().includes(teamMember.id))
+      const allTeamMembersParticipate = this.teamState.teamMembers().length
+        ? this.teamState
+            .teamMembers()
+            .every(teamMember => conversationEntity.participating_user_ids().includes(teamMember.id))
         : false;
 
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
@@ -755,7 +748,7 @@ export class ConversationRepository {
 
   deleteConversation(conversationEntity: Conversation) {
     this.conversation_service
-      .deleteConversation(this.team().id, conversationEntity.id)
+      .deleteConversation(this.teamState.team().id, conversationEntity.id)
       .then(() => {
         this.deleteConversationLocally(conversationEntity.id, true);
       })
@@ -804,7 +797,7 @@ export class ConversationRepository {
 
   get_all_users_in_conversation(conversation_id: string) {
     return this.get_conversation_by_id(conversation_id).then(conversationEntity =>
-      [this.selfUser()].concat(conversationEntity.participating_user_ets()),
+      [this.userState.self()].concat(conversationEntity.participating_user_ets()),
     );
   }
 
@@ -921,7 +914,7 @@ export class ConversationRepository {
    * @returns Resolves with the conversation with requested user
    */
   async get1To1Conversation(userEntity: User): Promise<Conversation | undefined> {
-    const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.selfUser().teamId;
+    const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.userState.self().teamId;
 
     if (inCurrentTeam) {
       const matchingConversationEntity = this.conversations().find(conversationEntity => {
@@ -1111,7 +1104,7 @@ export class ConversationRepository {
     );
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
-      conversationEntity.selfUser(this.selfUser());
+      conversationEntity.selfUser(this.userState.self());
       conversationEntity.setStateChangePersistence(true);
     });
 
@@ -1121,15 +1114,15 @@ export class ConversationRepository {
   private mapGuestStatusSelf() {
     this.filtered_conversations().forEach(conversationEntity => this._mapGuestStatusSelf(conversationEntity));
 
-    if (this.isTeam()) {
-      this.selfUser().inTeam(true);
-      this.selfUser().isTeamMember(true);
+    if (this.teamState.isTeam()) {
+      this.userState.self().inTeam(true);
+      this.userState.self().isTeamMember(true);
     }
   }
 
   private _mapGuestStatusSelf(conversationEntity: Conversation) {
     const conversationTeamId = conversationEntity.team_id;
-    const selfTeamId = this.team() && this.team().id;
+    const selfTeamId = this.teamState.team() && this.teamState.team().id;
     const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
     conversationEntity.isGuest(isConversationGuest);
   }
@@ -1307,7 +1300,7 @@ export class ConversationRepository {
     this._clear_conversation(conversationEntity);
 
     if (leaveConversation) {
-      this.removeMember(conversationEntity, this.selfUser().id);
+      this.removeMember(conversationEntity, this.userState.self().id);
     }
 
     if (isActiveConversation) {
@@ -1316,9 +1309,9 @@ export class ConversationRepository {
   }
 
   async leaveGuestRoom(): Promise<void> {
-    if (this.selfUser().isTemporaryGuest()) {
+    if (this.userState.self().isTemporaryGuest()) {
       const conversationEntity = this.getMostRecentConversation(true);
-      await this.conversation_service.deleteMembers(conversationEntity.id, this.selfUser().id);
+      await this.conversation_service.deleteMembers(conversationEntity.id, this.userState.self().id);
     }
   }
 
@@ -1459,7 +1452,7 @@ export class ConversationRepository {
 
     try {
       await this.conversation_service.update_member_properties(conversationEntity.id, payload);
-      const response = {data: payload, from: this.selfUser().id};
+      const response = {data: payload, from: this.userState.self().id};
       this.onMemberUpdate(conversationEntity, response);
 
       const {otr_muted: muted, otr_muted_ref: mutedRef, otr_muted_status: mutedStatus} = payload;
@@ -1544,7 +1537,7 @@ export class ConversationRepository {
     await updatePromise;
     const response = {
       data: payload,
-      from: this.selfUser().id,
+      from: this.userState.self().id,
     };
     this.onMemberUpdate(conversationEntity, response);
   }
@@ -1782,7 +1775,7 @@ export class ConversationRepository {
     const {from: sender, id, type, time} = eventJson;
 
     if (sender) {
-      const allParticipantIds = conversationEntity.participating_user_ids().concat(this.selfUser().id);
+      const allParticipantIds = conversationEntity.participating_user_ids().concat(this.userState.self().id);
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
       if (isFromUnknownUser) {
@@ -2158,7 +2151,7 @@ export class ConversationRepository {
     const eventData = eventJson.data;
 
     eventData.user_ids.forEach((userId: string) => {
-      const isSelfUser = userId === this.selfUser().id;
+      const isSelfUser = userId === this.userState.self().id;
       const isParticipatingUser = conversationEntity.participating_user_ids().includes(userId);
       if (!isSelfUser && !isParticipatingUser) {
         conversationEntity.participating_user_ids.push(userId);
@@ -2166,7 +2159,7 @@ export class ConversationRepository {
     });
 
     // Self user joins again
-    const selfUserRejoins = eventData.user_ids.includes(this.selfUser().id);
+    const selfUserRejoins = eventData.user_ids.includes(this.userState.self().id);
     if (selfUserRejoins) {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
@@ -2195,15 +2188,15 @@ export class ConversationRepository {
     eventJson: EventJson,
   ): Promise<{conversationEntity: Conversation; messageEntity: Message} | undefined> {
     const {data: eventData, from} = eventJson;
-    const isFromSelf = from === this.selfUser().id;
-    const removesSelfUser = eventData.user_ids.includes(this.selfUser().id);
+    const isFromSelf = from === this.userState.self().id;
+    const removesSelfUser = eventData.user_ids.includes(this.userState.self().id);
     const selfLeavingClearedConversation = isFromSelf && removesSelfUser && conversationEntity.is_cleared();
 
     if (removesSelfUser) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
       this.leaveCall(conversationEntity.id);
-      if (this.selfUser().isTemporaryGuest()) {
-        eventJson.from = this.selfUser().id;
+      if (this.userState.self().isTemporaryGuest()) {
+        eventJson.from = this.userState.self().id;
       }
     }
 
@@ -2265,7 +2258,7 @@ export class ConversationRepository {
       );
     }
 
-    const isFromSelf = !this.selfUser() || from === this.selfUser().id;
+    const isFromSelf = !this.userState.self() || from === this.userState.self().id;
     if (!isFromSelf) {
       throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
     }
@@ -2298,7 +2291,7 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onAssetAdd(conversationEntity: Conversation, event: EventJson) {
-    const fromSelf = event.from === this.selfUser().id;
+    const fromSelf = event.from === this.userState.self().id;
 
     const isRemoteFailure = !fromSelf && event.data.status === AssetTransferState.UPLOAD_FAILED;
     const isLocalCancel = fromSelf && event.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
@@ -2359,7 +2352,7 @@ export class ConversationRepository {
           throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
         }
 
-        const isFromSelf = from === this.selfUser().id;
+        const isFromSelf = from === this.userState.self().id;
         if (!isFromSelf) {
           return this.addDeleteMessage(conversationEntity.id, eventId, time, deletedMessageEntity);
         }
@@ -2394,7 +2387,7 @@ export class ConversationRepository {
         );
       }
 
-      const isFromSelf = !this.selfUser() || from === this.selfUser().id;
+      const isFromSelf = !this.userState.self() || from === this.userState.self().id;
       if (!isFromSelf) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
@@ -2519,7 +2512,7 @@ export class ConversationRepository {
           return this.messageRepositoryProvider().deleteMessage(conversationEntity, messageEntity);
         }
 
-        const userIds = conversationEntity.isGroup() ? [this.selfUser().id, messageEntity.from] : undefined;
+        const userIds = conversationEntity.isGroup() ? [this.userState.self().id, messageEntity.from] : undefined;
         return this.messageRepositoryProvider().deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
       });
     }
@@ -2611,7 +2604,7 @@ export class ConversationRepository {
   ) {
     const {data: event_data, from} = eventJson;
 
-    const messageFromSelf = messageEntity.from === this.selfUser().id;
+    const messageFromSelf = messageEntity.from === this.userState.self().id;
     if (messageFromSelf && event_data.reaction) {
       const userEntity = await this.userRepository.getUserById(from);
       const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);

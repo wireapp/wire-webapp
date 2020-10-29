@@ -254,7 +254,7 @@ describe('MessageRepository', () => {
       messageEntityToDelete.user(userEntity);
       conversationEntity.add_message(messageEntityToDelete);
 
-      spyOn(testFactory.conversation_repository, 'selfUser').and.returnValue(userEntity);
+      spyOn(testFactory.user_repository.userState, 'self').and.returnValue(userEntity);
       spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
         Promise.resolve(conversationEntity),
       );
@@ -273,8 +273,7 @@ describe('MessageRepository', () => {
       const conversationPartner = UserGenerator.getRandomUser();
       testFactory.user_repository.userState.users.push(conversationPartner);
 
-      spyOn(testFactory.message_repository, 'selfUser').and.returnValue(selfUser);
-      spyOn(testFactory.conversation_repository, 'selfUser').and.returnValue(selfUser);
+      spyOn(testFactory.user_repository.userState, 'self').and.returnValue(selfUser);
 
       const conversationJsonFromDb = {
         accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
