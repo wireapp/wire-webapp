@@ -148,7 +148,7 @@ export class ContentViewModel {
       repositories.storage,
       repositories.message,
     );
-    this.groupCreation = new GroupCreationViewModel(repositories.conversation, repositories.search);
+    this.groupCreation = new GroupCreationViewModel(repositories.conversation, repositories.search, repositories.team);
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.serviceModal = new ServiceModalViewModel(repositories.integration, mainViewModel.actions);
     this.inviteModal = new InviteModalViewModel();

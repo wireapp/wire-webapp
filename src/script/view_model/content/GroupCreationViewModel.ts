@@ -33,6 +33,7 @@ import {SearchRepository} from '../../search/SearchRepository';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import {TeamRepository} from 'src/script/team/TeamRepository';
 
 type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 
@@ -58,7 +59,6 @@ export class GroupCreationViewModel {
   shouldUpdateScrollbar: ko.Computed<User[]>;
   maxNameLength: number;
   maxSize: number;
-  searchRepository: SearchRepository;
 
   static get STATE() {
     return {
@@ -69,15 +69,15 @@ export class GroupCreationViewModel {
   }
 
   constructor(
-    private readonly conversationRepository: ConversationRepository,
-    searchRepository: SearchRepository,
+    public readonly conversationRepository: ConversationRepository,
+    public readonly searchRepository: SearchRepository,
+    public readonly teamRepository: TeamRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
     this.isTeam = this.teamState.isTeam;
     this.maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
     this.maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
-    this.searchRepository = searchRepository;
 
     this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
