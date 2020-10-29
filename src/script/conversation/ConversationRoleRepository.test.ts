@@ -34,18 +34,19 @@ describe('ConversationRoleRepository', () => {
   beforeEach(async () => {
     await testFactory.exposeConversationActors();
     roleRepository = new ConversationRoleRepository(
-      testFactory.conversation_repository,
       testFactory.team_repository,
       testFactory.conversation_service,
+      testFactory.user_repository['userState'],
+      testFactory.team_repository['teamState'],
     );
   });
 
   describe('constructor', () => {
     it('knows if you are in a team', () => {
-      expect(roleRepository.isTeam()).toBe(false);
+      expect(roleRepository['teamState'].isTeam()).toBe(false);
       testFactory.team_repository['teamState'].team(new TeamEntity(createRandomUuid()));
 
-      expect(roleRepository.isTeam()).toBeTrue();
+      expect(roleRepository['teamState'].isTeam()).toBeTrue();
     });
   });
 

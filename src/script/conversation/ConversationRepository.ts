@@ -249,11 +249,7 @@ export class ConversationRepository {
       propertyRepository.propertiesService,
     );
 
-    this.conversationRoleRepository = new ConversationRoleRepository(
-      this,
-      this.teamRepository,
-      this.conversation_service,
-    );
+    this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversation_service);
     this.leaveCall = noop;
   }
 
