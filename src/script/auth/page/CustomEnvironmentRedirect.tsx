@@ -18,7 +18,7 @@
  */
 
 import {ContainerXS, FlexBox, COLOR, Text} from '@wireapp/react-ui-kit';
-import {SVGIcon} from '@wireapp/react-ui-kit/dist/Icon/SVGIcon';
+import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 import {UrlUtil} from '@wireapp/commons';
 import React, {useState, useEffect} from 'react';
 import {useIntl} from 'react-intl';

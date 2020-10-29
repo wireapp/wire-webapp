@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {getLogger, Logger} from 'Util/Logger';
-import {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {WebappProperties} from '@wireapp/api-client/src/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';

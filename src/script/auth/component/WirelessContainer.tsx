@@ -22,7 +22,7 @@ import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {cookiePolicyStrings, footerStrings} from '../../strings';
 import {EXTERNAL_ROUTE} from '../externalRoute';
-import {SVGIcon} from '@wireapp/react-ui-kit/dist/Icon/SVGIcon';
+import {SVGIcon} from '@wireapp/react-ui-kit/src/Icon/SVGIcon';
 import SVGProvider from '../util/SVGProvider';
 import {Config} from '../../Config';
 

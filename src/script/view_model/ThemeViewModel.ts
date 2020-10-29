@@ -21,7 +21,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
-import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 
 const THEMES_CLASS_PREFIX = 'theme-';
 

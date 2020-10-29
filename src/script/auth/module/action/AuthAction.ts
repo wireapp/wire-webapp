@@ -17,13 +17,13 @@
  *
  */
 
-import type {DomainData} from '@wireapp/api-client/dist/account/DomainData';
-import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/dist/auth';
-import {ClientType} from '@wireapp/api-client/dist/client/index';
+import type {DomainData} from '@wireapp/api-client/src/account/DomainData';
+import type {LoginData, RegisterData, SendLoginCode} from '@wireapp/api-client/src/auth';
+import {ClientType} from '@wireapp/api-client/src/client/index';
 import type {Account} from '@wireapp/core';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-import {LowDiskSpaceError} from '@wireapp/store-engine/dist/commonjs/engine/error/';
+import {LowDiskSpaceError} from '@wireapp/store-engine/src/main/engine/error/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {isTemporaryClientAndNonPersistent} from 'Util/util';

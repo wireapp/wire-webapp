@@ -17,7 +17,7 @@
  *
  */
 
-import {PasswordExistsError} from '@wireapp/api-client/dist/auth';
+import {PasswordExistsError} from '@wireapp/api-client/src/auth';
 import {ReactWrapper} from 'enzyme';
 import {createMemoryHistory} from 'history';
 import React from 'react';

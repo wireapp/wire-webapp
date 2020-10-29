@@ -17,9 +17,9 @@
  *
  */
 
-import type {MemberData, TeamData} from '@wireapp/api-client/dist/team/';
-import type {TeamUpdateData} from '@wireapp/api-client/dist/team/data';
-import type {PermissionsData} from '@wireapp/api-client/dist/team/member/PermissionsData';
+import type {MemberData, TeamData} from '@wireapp/api-client/src/team/';
+import type {TeamUpdateData} from '@wireapp/api-client/src/team/data';
+import type {PermissionsData} from '@wireapp/api-client/src/team/member/PermissionsData';
 
 import {Logger, getLogger} from 'Util/Logger';
 

@@ -17,7 +17,7 @@
  *
  */
 
-import type {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/dist/conversation';
+import type {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/src/conversation';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

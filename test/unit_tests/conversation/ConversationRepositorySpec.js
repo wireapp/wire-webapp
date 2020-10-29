@@ -17,10 +17,10 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {createRandomUuid} from 'Util/util';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';

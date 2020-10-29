@@ -36,7 +36,7 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
 import {ListViewModel} from '../ListViewModel';
-import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {MainViewModel} from '../MainViewModel';
 import type {CallingViewModel} from '../CallingViewModel';
 import type {CallingRepository} from '../../calling/CallingRepository';

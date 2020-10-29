@@ -20,8 +20,7 @@
 import type {GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/dist/conversation';
-
+import type {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
 import {BackendClientError} from '../error/BackendClientError';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import {Logger, getLogger} from 'Util/Logger';

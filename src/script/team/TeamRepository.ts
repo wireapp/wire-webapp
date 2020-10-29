@@ -19,10 +19,10 @@
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
-import type {TeamData} from '@wireapp/api-client/dist/team/team/TeamData';
+import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
+import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
-import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
+import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -31,7 +31,7 @@ import type {
   TeamMemberLeaveEvent,
   TeamMemberUpdateEvent,
   TeamUpdateEvent,
-} from '@wireapp/api-client/dist/event';
+} from '@wireapp/api-client/src/event';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';

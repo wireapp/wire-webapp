@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/dist/user/data';
+import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/src/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';

@@ -25,12 +25,12 @@ import type {
   ConversationCode,
   NewConversation,
   NewOTRMessage,
-} from '@wireapp/api-client/dist/conversation';
+} from '@wireapp/api-client/src/conversation';
 import type {
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
-} from '@wireapp/api-client/dist/conversation/data';
+} from '@wireapp/api-client/src/conversation/data';
 import type {
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -40,7 +40,7 @@ import type {
   ConversationMessageTimerUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
-} from '@wireapp/api-client/dist/event';
+} from '@wireapp/api-client/src/event';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
