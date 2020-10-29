@@ -83,7 +83,6 @@ import {ClientRepository} from '../client/ClientRepository';
 import {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
-import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {MessageSender} from '../message/MessageSender';
@@ -102,6 +101,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import type {EventRecord} from '../storage';
 import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
+import {TeamState} from '../team/TeamState';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -127,18 +127,18 @@ export class MessageRepository {
     private readonly propertyRepository: PropertiesRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
-    private readonly teamRepository: TeamRepository,
     private readonly conversation_service: ConversationService,
     private readonly link_repository: LinkPreviewRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.eventService = eventRepository.eventService;
     this.event_mapper = new EventMapper();
     this.logger = getLogger('MessageRepository');
 
-    this.isTeam = this.teamRepository.isTeam;
-    this.team = this.teamRepository.team;
+    this.isTeam = this.teamState.isTeam;
+    this.team = this.teamState.team;
     this.selfUser = this.userState.self;
     this.selfConversation = ko.pureComputed(() =>
       this.conversationRepositoryProvider().find_conversation_by_id(this.selfUser()?.id),

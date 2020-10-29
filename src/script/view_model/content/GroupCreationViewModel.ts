@@ -28,11 +28,11 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {ACCESS_STATE, TEAM} from '../../conversation/AccessState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {TeamRepository} from '../../team/TeamRepository';
 import {User} from '../../entity/User';
 import {SearchRepository} from '../../search/SearchRepository';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 
@@ -71,10 +71,10 @@ export class GroupCreationViewModel {
   constructor(
     private readonly conversationRepository: ConversationRepository,
     searchRepository: SearchRepository,
-    private readonly teamRepository: TeamRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
-    this.isTeam = this.teamRepository.isTeam;
+    this.isTeam = this.teamState.isTeam;
     this.maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
     this.maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
     this.searchRepository = searchRepository;
@@ -107,10 +107,10 @@ export class GroupCreationViewModel {
         }
 
         if (this.isGuestRoom()) {
-          return this.teamRepository.teamUsers();
+          return this.teamState.teamUsers();
         }
 
-        return this.teamRepository.teamMembers().sort(sortUsersByPriority);
+        return this.teamState.teamMembers().sort(sortUsersByPriority);
       }
       return [];
     });

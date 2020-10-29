@@ -40,9 +40,11 @@ import {ClientEvent} from '../../event/Client';
 import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
 import {UserState} from '../../user/UserState';
 import {container} from 'tsyringe';
+import {TeamState} from '../../team/TeamState';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
   private readonly userState: UserState;
+  private readonly teamState: TeamState;
 
   actionsViewModel: ActionsViewModel;
   teamRepository: TeamRepository;
@@ -58,6 +60,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     super(params);
 
     this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
 
     const {mainViewModel, repositories} = params;
 
@@ -139,8 +142,8 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     }
 
     this.selectedParticipant(userEntity);
-    if (this.teamRepository.isTeam()) {
-      this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [userEntity.id], true);
+    if (this.teamState.isTeam()) {
+      this.teamRepository.updateTeamMembersByIds(this.teamState.team(), [userEntity.id], true);
     }
     if (userEntity.isTemporaryGuest()) {
       userEntity.checkGuestExpiration();

@@ -62,22 +62,22 @@ const defaultMemberRole: ConversationRole = {
 
 export class ConversationRoleRepository {
   readonly conversationRoles: Record<string, ConversationRole[]>;
-  readonly conversationService: ConversationService;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly logger: Logger;
   readonly selfUser: ko.Observable<User>;
   readonly team: ko.Observable<TeamEntity>;
-  readonly teamRepository: TeamRepository;
   teamRoles: ConversationRole[];
 
-  constructor(conversationRepository: ConversationRepository) {
+  constructor(
+    conversationRepository: ConversationRepository,
+    private readonly teamRepository: TeamRepository,
+    private readonly conversationService: ConversationService,
+  ) {
     this.conversationRoles = {};
     this.teamRoles = [defaultAdminRole, defaultMemberRole];
     this.isTeam = conversationRepository.isTeam;
     this.team = conversationRepository.team;
     this.selfUser = conversationRepository.selfUser;
-    this.conversationService = conversationRepository.conversation_service;
-    this.teamRepository = conversationRepository.teamRepository;
     this.logger = getLogger('ConversationRepository');
   }
 

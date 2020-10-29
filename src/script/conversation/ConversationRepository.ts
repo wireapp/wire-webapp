@@ -75,7 +75,6 @@ import {ConversationRoleRepository} from './ConversationRoleRepository';
 import {ConversationError} from '../error/ConversationError';
 import {ConversationService} from './ConversationService';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
-import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
@@ -91,6 +90,8 @@ import type {EventRecord} from '../storage';
 import {MessageRepository} from './MessageRepository';
 import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
+import {TeamState} from '../team/TeamState';
+import {TeamRepository} from '../team/TeamRepository';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {reject_fn: (error: ConversationError) => void; resolve_fn: (conversation: Conversation) => void};
@@ -149,15 +150,16 @@ export class ConversationRepository {
   }
 
   constructor(
-    public readonly conversation_service: ConversationService,
+    private readonly conversation_service: ConversationService,
     private readonly messageRepositoryProvider: () => MessageRepository,
     private readonly connectionRepository: ConnectionRepository,
     private readonly eventRepository: EventRepository,
-    public readonly teamRepository: TeamRepository,
+    private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
     private readonly propertyRepository: PropertiesRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.eventService = eventRepository.eventService;
 
@@ -173,10 +175,10 @@ export class ConversationRepository {
     this.active_conversation = ko.observable();
     this.conversations = ko.observableArray([]);
 
-    this.isTeam = this.teamRepository.isTeam;
+    this.isTeam = this.teamState.isTeam;
     this.isTeam.subscribe(() => this.mapGuestStatusSelf());
-    this.team = this.teamRepository.team;
-    this.teamMembers = this.teamRepository.teamMembers;
+    this.team = this.teamState.team;
+    this.teamMembers = this.teamState.teamMembers;
 
     this.selfUser = this.userState.self;
 
@@ -223,7 +225,7 @@ export class ConversationRepository {
     });
 
     this.connectedUsers = ko.pureComputed(() => {
-      const inviterId = this.teamRepository.memberInviters()[this.selfUser().id];
+      const inviterId = this.teamState.memberInviters()[this.selfUser().id];
       const inviter = inviterId ? this.userState.users().find(({id}) => id === inviterId) : null;
       const connectedUsers = inviter ? [inviter] : [];
       const selfTeamId = this.selfUser().teamId;
@@ -247,7 +249,11 @@ export class ConversationRepository {
       propertyRepository.propertiesService,
     );
 
-    this.conversationRoleRepository = new ConversationRoleRepository(this);
+    this.conversationRoleRepository = new ConversationRoleRepository(
+      this,
+      this.teamRepository,
+      this.conversation_service,
+    );
     this.leaveCall = noop;
   }
 
@@ -795,7 +801,7 @@ export class ConversationRepository {
    */
   find_conversation_by_id(conversation_id: string) {
     // we prevent access to local conversation if the team is deleted
-    return this.teamRepository.isTeamDeleted()
+    return this.teamState.isTeamDeleted()
       ? undefined
       : this.conversations().find(conversation => conversation.id === conversation_id);
   }

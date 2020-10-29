@@ -46,9 +46,11 @@ import 'Components/panel/panelActions';
 import {PanelViewModel} from '../PanelViewModel';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 export class ConversationDetailsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;
+  private readonly teamState: TeamState;
 
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
@@ -105,6 +107,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     const {mainViewModel, repositories} = params;
 
     this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
 
     const {conversation, integration, search, team} = repositories;
     this.conversationRepository = conversation;
@@ -119,7 +122,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.logger = getLogger('ConversationDetailsViewModel');
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
-    this.isTeam = this.teamRepository.isTeam;
+    this.isTeam = this.teamState.isTeam;
 
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
 
@@ -472,8 +475,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   };
 
   initView(): void {
-    if (this.teamRepository.isTeam() && this.isSingleUserMode(this.activeConversation())) {
-      this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [this.firstParticipant().id], true);
+    if (this.teamState.isTeam() && this.isSingleUserMode(this.activeConversation())) {
+      this.teamRepository.updateTeamMembersByIds(this.teamState.team(), [this.firstParticipant().id], true);
     }
   }
 }

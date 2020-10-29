@@ -68,6 +68,7 @@ import {SearchService} from 'src/script/search/SearchService';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {UserState} from 'src/script/user/UserState';
 import {ClientState} from 'src/script/client/ClientState';
+import {TeamState} from 'src/script/team/TeamState';
 
 export class TestFactory {
   constructor() {
@@ -257,6 +258,7 @@ export class TestFactory {
       this.user_repository,
       this.assetRepository,
       this.user_repository.userState,
+      new TeamState(this.user_repository.userState),
     );
     return this.team_repository;
   }
@@ -285,11 +287,11 @@ export class TestFactory {
       this.propertyRepository,
       serverTimeHandler,
       this.user_repository,
-      this.team_repository,
       this.conversation_service,
       new LinkPreviewRepository(assetRepository, this.propertyRepository),
       this.assetRepository,
       this.user_repository.userState,
+      this.team_repository.teamState,
     );
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
@@ -301,6 +303,7 @@ export class TestFactory {
       this.propertyRepository,
       serverTimeHandler,
       this.user_repository.userState,
+      this.team_repository.teamState,
     );
 
     return this.conversation_repository;
