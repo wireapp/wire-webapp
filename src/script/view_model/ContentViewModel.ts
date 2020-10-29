@@ -58,6 +58,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
+import {TeamState} from '../team/TeamState';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -67,6 +68,7 @@ interface ShowConversationOptions {
 
 export class ContentViewModel {
   private readonly userState: UserState;
+  private readonly teamState: TeamState;
 
   collection: CollectionViewModel;
   collectionDetails: CollectionDetailsViewModel;
@@ -119,6 +121,7 @@ export class ContentViewModel {
 
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
 
     this.elementId = 'center-column';
     this.mainViewModel = mainViewModel;
@@ -145,7 +148,7 @@ export class ContentViewModel {
       repositories.storage,
       repositories.message,
     );
-    this.groupCreation = new GroupCreationViewModel(repositories.conversation, repositories.search, repositories.team);
+    this.groupCreation = new GroupCreationViewModel(repositories.conversation, repositories.search);
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.serviceModal = new ServiceModalViewModel(repositories.integration, mainViewModel.actions);
     this.inviteModal = new InviteModalViewModel();
@@ -178,7 +181,6 @@ export class ContentViewModel {
       repositories.conversation,
       repositories.preferenceNotification,
       repositories.properties,
-      repositories.team,
       repositories.user,
     );
     this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.properties, repositories.calling, {
@@ -193,7 +195,7 @@ export class ContentViewModel {
       repositories.message,
     );
     this.preferencesDevices = new PreferencesDevicesViewModel(mainViewModel, this, repositories.cryptography);
-    this.preferencesOptions = new PreferencesOptionsViewModel(repositories.properties, repositories.team);
+    this.preferencesOptions = new PreferencesOptionsViewModel(repositories.properties);
 
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
@@ -233,7 +235,7 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
-    if (repositories.team.supportsLegalHold()) {
+    if (this.teamState.supportsLegalHold()) {
       this.legalHoldModal.showRequestModal();
     }
     ko.applyBindings(this, document.getElementById(this.elementId));

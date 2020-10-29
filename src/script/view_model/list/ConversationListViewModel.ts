@@ -42,7 +42,6 @@ import type {CallingViewModel} from '../CallingViewModel';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
-import type {TeamRepository} from '../../team/TeamRepository';
 import type {PropertiesRepository} from '../../properties/PropertiesRepository';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
@@ -50,6 +49,7 @@ import type {EventRepository} from '../../event/EventRepository';
 import type {Availability} from '@wireapp/protocol-messaging';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 export class ConversationListViewModel {
   readonly startTooltip: string;
@@ -92,9 +92,9 @@ export class ConversationListViewModel {
     readonly callingRepository: CallingRepository,
     readonly conversationRepository: ConversationRepository,
     private readonly preferenceNotificationRepository: PreferenceNotificationRepository,
-    private readonly teamRepository: TeamRepository,
     private readonly propertiesRepository: PropertiesRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.participantAvatarSize = AVATAR_SIZE.SMALL;
 
@@ -111,7 +111,7 @@ export class ConversationListViewModel {
 
     this.isOnLegalHold = ko.pureComputed(() => this.selfUser().isOnLegalHold());
     this.hasPendingLegalHold = ko.pureComputed(() => this.selfUser().hasPendingLegalHold());
-    this.isTeam = this.teamRepository.isTeam;
+    this.isTeam = this.teamState.isTeam;
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.getConversationUrl = generateConversationUrl;
 

@@ -31,20 +31,20 @@ import {MotionDuration} from '../../motion/MotionDuration';
 import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import type {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
 import type {SearchRepository} from 'src/script/search/SearchRepository';
-import type {TeamRepository} from 'src/script/team/TeamRepository';
 import type {ServiceEntity} from 'src/script/integration/ServiceEntity';
 import type {User} from 'src/script/entity/User';
 import {PanelViewModel} from '../PanelViewModel';
 import {UserState} from '../../user/UserState';
 import {container} from 'tsyringe';
+import {TeamState} from '../../team/TeamState';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;
+  private readonly teamState: TeamState;
 
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
   searchRepository: SearchRepository;
-  teamRepository: TeamRepository;
   MotionDuration: typeof MotionDuration;
   logger: Logger;
   isTeam: ko.PureComputed<boolean>;
@@ -77,21 +77,21 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     super(params);
 
     this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
 
-    const {conversation, integration, search, team} = params.repositories;
+    const {conversation, integration, search} = params.repositories;
     this.conversationRepository = conversation;
     this.integrationRepository = integration;
     this.searchRepository = search;
-    this.teamRepository = team;
     this.MotionDuration = MotionDuration;
 
     this.logger = getLogger('AddParticipantsViewModel');
 
-    this.isTeam = this.teamRepository.isTeam;
+    this.isTeam = this.teamState.isTeam;
     this.selfUser = this.userState.self;
     this.services = this.integrationRepository.services;
-    this.teamUsers = this.teamRepository.teamUsers;
-    this.teamMembers = this.teamRepository.teamMembers;
+    this.teamUsers = this.teamState.teamUsers;
+    this.teamMembers = this.teamState.teamMembers;
 
     this.isInitialServiceSearch = ko.observable(true);
     this.searchInput = ko.observable('');

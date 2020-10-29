@@ -53,8 +53,12 @@ import type {AssetRemoteData} from '../assets/AssetRemoteData';
 import {Runtime} from '@wireapp/commons';
 import {UserState} from '../user/UserState';
 import {container} from 'tsyringe';
+import {TeamState} from '../team/TeamState';
 
 export class ListViewModel {
+  private readonly userState: UserState;
+  private readonly teamState: TeamState;
+
   readonly preferences: PreferencesListViewModel;
   readonly takeover: TakeoverViewModel;
   readonly temporaryGuest: TemporaryGuestViewModel;
@@ -65,7 +69,6 @@ export class ListViewModel {
   readonly state: ko.Observable<string>;
   readonly lastUpdate: ko.Observable<number>;
   private readonly elementId: 'left-column';
-  private readonly userState: UserState;
 
   private readonly conversationRepository: ConversationRepository;
   private readonly callingRepository: CallingRepository;
@@ -100,6 +103,7 @@ export class ListViewModel {
 
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
 
     this.elementId = 'left-column';
     this.conversationRepository = repositories.conversation;
@@ -111,7 +115,7 @@ export class ListViewModel {
     this.panelViewModel = mainViewModel.panel;
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
-    this.isProAccount = this.teamRepository.isTeam;
+    this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
 
     this.ModalType = ListViewModel.MODAL_TYPE;
@@ -160,7 +164,6 @@ export class ListViewModel {
       repositories.calling,
       repositories.conversation,
       repositories.preferenceNotification,
-      repositories.team,
       repositories.properties,
     );
     this.preferences = new PreferencesListViewModel(this.contentViewModel, this, repositories.calling);

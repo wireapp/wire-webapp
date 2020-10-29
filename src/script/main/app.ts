@@ -275,7 +275,6 @@ class App {
       repositories.properties,
       serverTimeHandler,
       repositories.user,
-      repositories.team,
       this.service.conversation,
       new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.asset,

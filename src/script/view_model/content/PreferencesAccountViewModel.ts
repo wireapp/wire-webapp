@@ -59,12 +59,12 @@ import {UserError} from '../../error/UserError';
 import {HistoryExportViewModel} from './HistoryExportViewModel';
 import {ClientRepository} from '../../client/ClientRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {TeamRepository} from '../../team/TeamRepository';
 import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
 import {TeamEntity} from '../../team/TeamEntity';
 import type {ClientEntity} from 'src/script/client/ClientEntity';
 import {UserState} from '../../user/UserState';
 import {container} from 'tsyringe';
+import {TeamState} from '../../team/TeamState';
 
 export class PreferencesAccountViewModel {
   logger: Logger;
@@ -124,9 +124,9 @@ export class PreferencesAccountViewModel {
     private readonly conversationRepository: ConversationRepository,
     private readonly preferenceNotificationRepository: PreferenceNotificationRepository,
     private readonly propertiesRepository: PropertiesRepository,
-    private readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('PreferencesAccountViewModel');
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
@@ -163,9 +163,9 @@ export class PreferencesAccountViewModel {
     this.nameSaved = ko.observable();
     this.usernameSaved = ko.observable();
 
-    this.isTeam = this.teamRepository.isTeam;
-    this.team = this.teamRepository.team;
-    this.teamName = ko.pureComputed(() => t('preferencesAccountTeam', this.teamRepository.teamName()));
+    this.isTeam = this.teamState.isTeam;
+    this.team = this.teamState.team;
+    this.teamName = ko.pureComputed(() => t('preferencesAccountTeam', this.teamState.teamName()));
 
     this.optionPrivacy = ko.observable();
     this.optionPrivacy.subscribe(privacyPreference => {
