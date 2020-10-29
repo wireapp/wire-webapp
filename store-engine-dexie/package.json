@@ -6,7 +6,7 @@
     "@types/jasmine": "3.6.0",
     "@types/karma": "5.0.0",
     "@types/node": "~12",
-    "@wireapp/store-engine": "4.5.15",
+    "@wireapp/store-engine": "4.5.16",
     "del-cli": "3.0.1",
     "jasmine": "3.5.0",
     "karma": "5.1.0",
@@ -38,5 +38,5 @@
     "test": "yarn build && karma start",
     "test:project": "yarn build && yarn test"
   },
-  "version": "1.3.19"
+  "version": "1.3.20"
 }
