@@ -7,8 +7,8 @@
     "@types/node": "~12",
     "@types/spark-md5": "3.0.2",
     "@types/tough-cookie": "4.0.0",
-    "@wireapp/commons": "3.8.10",
-    "@wireapp/priority-queue": "1.6.11",
+    "@wireapp/commons": "3.8.11",
+    "@wireapp/priority-queue": "1.6.12",
     "axios": "0.20.0",
     "http-status-codes": "2.1.4",
     "logdown": "3.3.1",
@@ -29,9 +29,9 @@
     "@types/react": "16.9.19",
     "@types/react-dom": "16.9.8",
     "@types/ws": "7.2.6",
-    "@wireapp/react-ui-kit": "7.37.13",
-    "@wireapp/store-engine": "4.5.15",
-    "@wireapp/store-engine-fs": "2.2.19",
+    "@wireapp/react-ui-kit": "7.37.14",
+    "@wireapp/store-engine": "4.5.16",
+    "@wireapp/store-engine-fs": "2.2.20",
     "babel-loader": "8.1.0",
     "browser-sync": "2.26.13",
     "concurrently": "5.3.0",
@@ -85,5 +85,5 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* nyc jasmine --config=jasmine.json",
     "watch": "webpack-dev-server --config webpack.browser.js"
   },
-  "version": "11.30.5"
+  "version": "11.30.6"
 }
