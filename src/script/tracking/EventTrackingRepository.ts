@@ -53,6 +53,7 @@ export class EventTrackingRepository {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
         COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_DEVICE_ID',
+        COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID: 'COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID',
         COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_OLD_DEVICE_ID',
         DISABLED_DOMAINS: ['localhost'],
       },
@@ -80,14 +81,22 @@ export class EventTrackingRepository {
 
   migrateDeviceId = async (newId: string) => {
     try {
+      let stopOnFinish = false;
+      if (!this.isProductReportingActivated) {
+        await this.startProductReporting(this.countlyDeviceId);
+        stopOnFinish = true;
+      }
       Countly.change_id(newId, true);
       storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY, newId);
       this.logger.info(`Countly tracking id has been changed from ${this.countlyDeviceId} to ${newId}`);
       this.countlyDeviceId = newId;
+      if (stopOnFinish) {
+        this.stopProductReporting();
+      }
     } catch (error) {
       this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
       storeValue(
-        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID,
         this.countlyDeviceId,
       );
     }
@@ -97,18 +106,25 @@ export class EventTrackingRepository {
     const previousCountlyDeviceId = loadValue<string>(
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
-    const oldCountlyDeviceId = loadValue<string>(
+    const unSyncedCountlyDeviceId = loadValue<string>(
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
 
-    if (oldCountlyDeviceId) {
-      this.messageRepository.sendCountlySync(this.countlyDeviceId);
-      this.migrateDeviceId(oldCountlyDeviceId);
-      resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
+    if (unSyncedCountlyDeviceId) {
+      try {
+        this.messageRepository.sendCountlySync(this.countlyDeviceId);
+        resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
+      } catch (error) {
+        this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+      }
     }
 
     if (previousCountlyDeviceId) {
       this.countlyDeviceId = previousCountlyDeviceId;
+      const oldCountlyTrackingId = loadValue<string>(
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID,
+      );
+      this.migrateDeviceId(oldCountlyTrackingId);
     } else {
       this.countlyDeviceId = createRandomUuid();
       storeValue(
@@ -119,10 +135,7 @@ export class EventTrackingRepository {
         this.messageRepository.sendCountlySync(this.countlyDeviceId);
       } catch (error) {
         this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
-        storeValue(
-          EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
-          this.countlyDeviceId,
-        );
+        storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY, true);
       }
     }
 
@@ -155,7 +168,7 @@ export class EventTrackingRepository {
     this.unsubscribeFromProductTrackingEvents();
   }
 
-  private async startProductReporting(): Promise<void> {
+  private async startProductReporting(trackingId?: string): Promise<void> {
     if (!window.wire.env.COUNTLY_API_KEY || this.isProductReportingActivated) {
       return;
     }
@@ -164,7 +177,7 @@ export class EventTrackingRepository {
     Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
       debug: !Environment.frontend.isProduction(),
-      device_id: this.countlyDeviceId,
+      device_id: trackingId || this.countlyDeviceId,
       url: 'https://countly.wire.com/',
       use_session_cookie: false,
     });
