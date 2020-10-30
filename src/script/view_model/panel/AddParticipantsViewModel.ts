@@ -37,14 +37,17 @@ import {PanelViewModel} from '../PanelViewModel';
 import {UserState} from '../../user/UserState';
 import {container} from 'tsyringe';
 import {TeamState} from '../../team/TeamState';
+import {TeamRepository} from 'src/script/team/TeamRepository';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;
   private readonly teamState: TeamState;
 
+  teamRepository: TeamRepository;
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
   searchRepository: SearchRepository;
+
   MotionDuration: typeof MotionDuration;
   logger: Logger;
   isTeam: ko.PureComputed<boolean>;
@@ -79,7 +82,8 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
 
-    const {conversation, integration, search} = params.repositories;
+    const {conversation, integration, search, team} = params.repositories;
+    this.teamRepository = team;
     this.conversationRepository = conversation;
     this.integrationRepository = integration;
     this.searchRepository = search;
