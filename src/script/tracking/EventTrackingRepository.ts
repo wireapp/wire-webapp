@@ -118,10 +118,12 @@ export class EventTrackingRepository {
 
     if (previousCountlyDeviceId) {
       this.countlyDeviceId = previousCountlyDeviceId;
-      const oldCountlyTrackingId = loadValue<string>(
+      const notMigratedCountlyTrackingId = loadValue<string>(
         EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID,
       );
-      this.migrateDeviceId(oldCountlyTrackingId);
+      if (notMigratedCountlyTrackingId) {
+        this.migrateDeviceId(notMigratedCountlyTrackingId);
+      }
     } else {
       this.countlyDeviceId = createRandomUuid();
       storeValue(
