@@ -29,20 +29,21 @@ import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
 import type {UserRepository} from '../user/UserRepository';
-import {loadValue, storeValue} from 'Util/StorageUtil';
+import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {EventName} from './EventName';
+import type {MessageRepository} from '../conversation/MessageRepository';
+import {ClientEvent} from '../event/Client';
 
 const Countly = require('countly-sdk-web');
 
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
   private sendAppOpenEvent: boolean = true;
-  private readonly countlyDeviceId: string;
+  private countlyDeviceId: string;
   private readonly logger: Logger;
-  private readonly userRepository: UserRepository;
   isErrorReportingActivated: boolean;
 
   static get CONFIG() {
@@ -51,22 +52,56 @@ export class EventTrackingRepository {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
         COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_DEVICE_ID',
+        COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_OLD_DEVICE_ID',
         DISABLED_DOMAINS: ['localhost'],
       },
     };
   }
 
-  constructor(userRepository: UserRepository) {
+  constructor(private readonly userRepository: UserRepository, private readonly messageRepository: MessageRepository) {
     this.logger = getLogger('EventTrackingRepository');
-
-    this.userRepository = userRepository;
 
     this.isErrorReportingActivated = false;
     this.isProductReportingActivated = false;
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
+  }
 
+  onUserEvent = (eventJson: any, source: EventSource) => {
+    const type = eventJson.type;
+    if (type !== ClientEvent.USER.DATA_TRANSFER) {
+      return;
+    }
+    this.migrateDeviceId(eventJson.data.trackingIdentifier);
+  };
+
+  migrateDeviceId = async (newId: string) => {
+    try {
+      Countly.change_id(newId, true);
+      storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY, newId);
+      this.logger.info(`Countly tracking id has been changed from ${this.countlyDeviceId} to ${newId}`);
+      this.countlyDeviceId = newId;
+    } catch (error) {
+      this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+      storeValue(
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY,
+        this.countlyDeviceId,
+      );
+    }
+  };
+
+  async init(telemetrySharing: boolean | undefined): Promise<void> {
     const previousCountlyDeviceId = loadValue<string>(
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
+    const oldCountlyDeviceId = loadValue<string>(
+      EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY,
+    );
+
+    if (oldCountlyDeviceId) {
+      this.messageRepository.sendCountlySync(this.countlyDeviceId);
+      this.migrateDeviceId(oldCountlyDeviceId);
+      resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY);
+    }
 
     if (previousCountlyDeviceId) {
       this.countlyDeviceId = previousCountlyDeviceId;
@@ -76,10 +111,17 @@ export class EventTrackingRepository {
         EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
         this.countlyDeviceId,
       );
+      try {
+        this.messageRepository.sendCountlySync(this.countlyDeviceId);
+      } catch (error) {
+        this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+        storeValue(
+          EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY,
+          this.countlyDeviceId,
+        );
+      }
     }
-  }
 
-  async init(telemetrySharing: boolean | undefined): Promise<void> {
     const isTeam = this.userRepository.isTeam();
     if (!isTeam) {
       return; // Countly should not be enabled for non-team users

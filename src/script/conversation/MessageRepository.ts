@@ -38,6 +38,7 @@ import {
   Text,
   Asset as ProtobufAsset,
   LinkPreview,
+  DataTransfer,
 } from '@wireapp/protocol-messaging';
 import {RequestCancellationError} from '@wireapp/api-client/dist/user';
 import {ReactionType} from '@wireapp/core/dist/conversation';
@@ -1524,6 +1525,32 @@ export class MessageRepository {
       this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
     } catch (error) {
       const errorMessage = 'Failed to update last read timestamp';
+      this.logger.error(`${errorMessage}: ${error.message}`, error);
+    }
+  }
+
+  /**
+   * Sends a message to backend to sync countly id across other clients
+   *
+   * @param countlyId Countly new ID
+   */
+  public async sendCountlySync(countlyId: string) {
+    const protoDataTransfer = new DataTransfer({
+      trackingIdentifier: {
+        identifier: countlyId,
+      },
+    });
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.DATA_TRANSFER]: protoDataTransfer,
+      messageId: createRandomUuid(),
+    });
+
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.selfConversation().id);
+    try {
+      await this.sendGenericMessageToConversation(eventInfoEntity);
+      this.logger.info(`Sent countly sync message with ID ${countlyId}`);
+    } catch (error) {
+      const errorMessage = `Failed to send countly sync message with ID ${countlyId}`;
       this.logger.error(`${errorMessage}: ${error.message}`, error);
     }
   }
