@@ -17,7 +17,6 @@
  *
  */
 
-import ko from 'knockout';
 import {amplify} from 'amplify';
 import {
   Asset,
@@ -101,6 +100,7 @@ import type {EventRecord} from '../storage';
 import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
+import {ConversationState} from './ConversationState';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -110,9 +110,7 @@ export class MessageRepository {
   private readonly eventService: EventService;
   private readonly event_mapper: EventMapper;
   public readonly clientMismatchHandler: ClientMismatchHandler;
-  private readonly blockNotificationHandling: ko.Observable<boolean>;
-
-  private readonly selfConversation: ko.PureComputed<Conversation>;
+  private isBlockingNotificationHandling: boolean;
 
   constructor(
     private readonly clientRepository: ClientRepository,
@@ -128,14 +126,12 @@ export class MessageRepository {
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
-    this.eventService = eventRepository.eventService;
-    this.event_mapper = new EventMapper();
     this.logger = getLogger('MessageRepository');
 
-    this.selfConversation = ko.pureComputed(() =>
-      this.conversationRepositoryProvider().find_conversation_by_id(this.userState.self()?.id),
-    );
+    this.eventService = eventRepository.eventService;
+    this.event_mapper = new EventMapper();
 
     this.clientMismatchHandler = new ClientMismatchHandler(
       this.conversationRepositoryProvider,
@@ -143,7 +139,7 @@ export class MessageRepository {
       this.userRepository,
     );
 
-    this.blockNotificationHandling = ko.observable(true);
+    this.isBlockingNotificationHandling = true;
 
     this.initSubscriptions();
   }
@@ -162,14 +158,12 @@ export class MessageRepository {
   private setNotificationHandlingState(handlingState: NOTIFICATION_HANDLING_STATE) {
     const updatedHandlingState = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    if (this.blockNotificationHandling() !== updatedHandlingState) {
-      this.blockNotificationHandling(updatedHandlingState);
+    if (this.isBlockingNotificationHandling !== updatedHandlingState) {
+      this.isBlockingNotificationHandling = updatedHandlingState;
       this.logger.info(
-        `Block message sending: ${this.blockNotificationHandling()} (${
-          this.messageSender.queuedMessages
-        } items in queue)`,
+        `Block message sending: ${this.isBlockingNotificationHandling} (${this.messageSender.queuedMessages} items in queue)`,
       );
-      this.messageSender.pauseQueue(this.blockNotificationHandling());
+      this.messageSender.pauseQueue(this.isBlockingNotificationHandling);
     }
   }
 
@@ -1002,7 +996,7 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.selfConversation().id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
       await this.sendGenericMessageToConversation(eventInfoEntity);
       return this._delete_message_by_id(conversationEntity, messageEntity.id);
     } catch (error) {
@@ -1030,7 +1024,7 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.selfConversation().id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
       this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
         this.logger.info(`Cleared conversation '${conversationEntity.id}' on '${new Date(timestamp).toISOString()}'`);
       });
@@ -1108,7 +1102,7 @@ export class MessageRepository {
    */
   private cancel_asset_upload(messageId: string) {
     this.sendAssetUploadFailed(
-      this.conversationRepositoryProvider().active_conversation(),
+      this.conversationState.activeConversation(),
       messageId,
       ProtobufAsset.NotUploaded.CANCELLED,
     );
@@ -1160,7 +1154,7 @@ export class MessageRepository {
    * @returns Resolves with a user client map
    */
   async create_recipients(conversation_id: string, skip_own_clients = false, user_ids: string[] = null) {
-    const userEntities = await this.conversationRepositoryProvider().get_all_users_in_conversation(conversation_id);
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id);
     const recipients: Recipients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
@@ -1289,9 +1283,7 @@ export class MessageRepository {
 
     // Legal Hold
     if (!skipLegalHold) {
-      const conversationEntity = this.conversationRepositoryProvider().find_conversation_by_id(
-        eventInfoEntity.conversationId,
-      );
+      const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
       const localLegalHoldStatus = conversationEntity.legalHoldStatus();
       await this.updateAllClients(conversationEntity, !isMessageEdit);
       const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
@@ -1513,7 +1505,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.selfConversation().id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);

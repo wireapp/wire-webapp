@@ -51,6 +51,7 @@ import {PanelViewModel} from '../PanelViewModel';
 import type {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 /*
  * Message list rendering view model.
@@ -81,6 +82,7 @@ export class MessageListViewModel {
     private readonly userRepository: UserRepository,
     private readonly messageRepository: MessageRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.mainViewModel = mainViewModel;
     this.logger = getLogger('MessageListViewModel');
@@ -366,7 +368,7 @@ export class MessageListViewModel {
 
   showUserDetails = (userEntity: User): void => {
     userEntity = ko.unwrap(userEntity);
-    const conversationEntity = this.conversationRepository.active_conversation();
+    const conversationEntity = this.conversationState.activeConversation();
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
     if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
@@ -462,7 +464,7 @@ export class MessageListViewModel {
   };
 
   clickOnCancelRequest = (messageEntity: MemberMessage): void => {
-    const conversationEntity = this.conversationRepository.active_conversation();
+    const conversationEntity = this.conversationState.activeConversation();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   };

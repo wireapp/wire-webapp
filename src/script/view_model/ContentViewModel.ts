@@ -59,6 +59,7 @@ import type {Message} from '../entity/message/Message';
 import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
+import {ConversationState} from '../conversation/ConversationState';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -69,6 +70,7 @@ interface ShowConversationOptions {
 export class ContentViewModel {
   private readonly userState: UserState;
   private readonly teamState: TeamState;
+  private readonly conversationState: ConversationState;
 
   collection: CollectionViewModel;
   collectionDetails: CollectionDetailsViewModel;
@@ -122,6 +124,7 @@ export class ContentViewModel {
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
+    this.conversationState = container.resolve(ConversationState);
 
     this.elementId = 'center-column';
     this.mainViewModel = mainViewModel;
@@ -167,13 +170,7 @@ export class ContentViewModel {
       repositories.user,
       repositories.message,
     );
-    this.titleBar = new TitleBarViewModel(
-      mainViewModel.calling,
-      mainViewModel.panel,
-      this,
-      repositories.calling,
-      repositories.conversation,
-    );
+    this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
     this.preferencesAbout = new PreferencesAboutViewModel();
     this.preferencesAccount = new PreferencesAccountViewModel(
@@ -190,7 +187,6 @@ export class ContentViewModel {
     this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
       mainViewModel,
       repositories.client,
-      repositories.conversation,
       repositories.cryptography,
       repositories.message,
     );
@@ -295,7 +291,7 @@ export class ContentViewModel {
             ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
           );
         }
-        const isActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
+        const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
         const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
         const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
 
@@ -312,7 +308,7 @@ export class ContentViewModel {
         this.mainViewModel.list.openConversations();
 
         if (!isActiveConversation) {
-          this.conversationRepository.active_conversation(conversationEntity);
+          this.conversationState.activeConversation(conversationEntity);
         }
 
         const messageEntity = openFirstSelfMention
@@ -330,7 +326,7 @@ export class ContentViewModel {
         unarchivePromise.then(() => {
           this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
             this.showContent(ContentViewModel.STATE.CONVERSATION);
-            this.previousConversation = this.conversationRepository.active_conversation();
+            this.previousConversation = this.conversationState.activeConversation();
             if (openNotificationSettings) {
               this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
             }
@@ -372,7 +368,7 @@ export class ContentViewModel {
         this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
       }
       const previousId = this.previousConversation && this.previousConversation.id;
-      const repoHasConversation = this.conversationRepository.conversations().some(({id}) => id === previousId);
+      const repoHasConversation = this.conversationState.conversations().some(({id}) => id === previousId);
 
       if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
         return this.showConversation(this.previousConversation);
@@ -428,7 +424,7 @@ export class ContentViewModel {
       const collectionStates = [ContentViewModel.STATE.COLLECTION, ContentViewModel.STATE.COLLECTION_DETAILS];
       const isCollectionState = collectionStates.includes(newContentState);
       if (!isCollectionState) {
-        this.conversationRepository.active_conversation(null);
+        this.conversationState.activeConversation(null);
       }
 
       return this.messageList.release_conversation(undefined);

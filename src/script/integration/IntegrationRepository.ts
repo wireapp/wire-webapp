@@ -41,6 +41,7 @@ import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
 import {container} from 'tsyringe';
 import {TeamState} from '../team/TeamState';
+import {ConversationState} from '../conversation/ConversationState';
 
 export class IntegrationRepository {
   private readonly logger: Logger;
@@ -64,13 +65,9 @@ export class IntegrationRepository {
     private readonly conversationRepository: ConversationRepository,
     private readonly teamRepository: TeamRepository,
     private readonly teamState = container.resolve(TeamState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.logger = getLogger('IntegrationRepository');
-
-    this.integrationService = integrationService;
-
-    this.conversationRepository = conversationRepository;
-    this.teamRepository = teamRepository;
 
     this.isTeam = this.teamState.isTeam;
     this.services = ko.observableArray([]);
@@ -161,7 +158,7 @@ export class IntegrationRepository {
    * @returns Resolves with the conversation with requested service
    */
   async get1To1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
-    const matchingConversationEntity = this.conversationRepository.conversations().find(conversationEntity => {
+    const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
       if (!conversationEntity.is1to1()) {
         // Disregard conversations that are not 1:1
         return false;

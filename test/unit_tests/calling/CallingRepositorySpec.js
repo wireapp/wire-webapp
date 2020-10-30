@@ -186,7 +186,7 @@ describe('CallingRepository', () => {
   describe('incoming call', () => {
     it('creates and stores a new call when an incoming call arrives', done => {
       spyOn(callingRepository.messageRepository, 'grantMessage').and.returnValue(Promise.resolve());
-      spyOn(callingRepository.conversationRepository, 'find_conversation_by_id').and.returnValue(new Conversation());
+      spyOn(callingRepository.conversationState, 'findConversation').and.returnValue(new Conversation());
       const event = {
         content: {
           props: {
@@ -231,7 +231,6 @@ xdescribe('E2E audio call', () => {
   const eventRepository = {injectEvent: () => {}};
 
   const client = new CallingRepository(
-    undefined,
     conversationRepository,
     messageRepository,
     eventRepository,

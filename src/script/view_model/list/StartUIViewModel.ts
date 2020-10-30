@@ -47,6 +47,7 @@ import type {Conversation} from '../../entity/Conversation';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 export class StartUIViewModel {
   readonly brandName: string;
@@ -110,6 +111,7 @@ export class StartUIViewModel {
     private readonly userRepository: UserRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.logger = getLogger('StartUIViewModel');
     this.alreadyClickedOnContact = {};
@@ -154,11 +156,11 @@ export class StartUIViewModel {
       }
 
       if (this.showOnlyConnectedUsers()) {
-        return this.conversationRepository.connectedUsers();
+        return this.conversationState.connectedUsers();
       }
 
       if (this.isTeam()) {
-        const connectedUsers = this.conversationRepository.connectedUsers();
+        const connectedUsers = this.conversationState.connectedUsers();
         const teamUsersWithoutPartners = this.teamState
           .teamUsers()
           .filter(user => connectedUsers.includes(user) || this.teamRepository.isSelfConnectedTo(user.id));
@@ -389,15 +391,13 @@ export class StartUIViewModel {
 
     const allLocalUsers = this.isTeam() ? this.teamState.teamUsers() : this.userState.connectedUsers();
 
-    const localSearchSources = this.showOnlyConnectedUsers()
-      ? this.conversationRepository.connectedUsers()
-      : allLocalUsers;
+    const localSearchSources = this.showOnlyConnectedUsers() ? this.conversationState.connectedUsers() : allLocalUsers;
 
     const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
     const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
     const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
-    const connectedUsers = this.conversationRepository.connectedUsers();
+    const connectedUsers = this.conversationState.connectedUsers();
     const filteredResults = contactResults.filter(
       user =>
         connectedUsers.includes(user) ||

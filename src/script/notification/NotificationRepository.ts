@@ -60,6 +60,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {UserState} from '../user/UserState';
+import {ConversationState} from '../conversation/ConversationState';
 
 export interface Multitasking {
   autoMinimize?: ko.Observable<boolean>;
@@ -126,6 +127,7 @@ export class NotificationRepository {
     conversationRepository: ConversationRepository,
     permissionRepository: PermissionRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.assetRepository = container.resolve(AssetRepository);
     this.callingRepository = callingRepository;
@@ -791,7 +793,7 @@ export class NotificationRepository {
    */
   private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
     const inActiveConversation = conversationEntity
-      ? this.conversationRepository.is_active_conversation(conversationEntity)
+      ? this.conversationState.isActiveConversation(conversationEntity)
       : false;
     const inConversationView = this.contentViewModelState.state() === ContentViewModel.STATE.CONVERSATION;
     const inMaximizedCall =

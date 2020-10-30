@@ -33,6 +33,7 @@ import {validateHandle} from '../user/UserHandleGenerator';
 import 'Components/list/participantItem';
 import {UserState} from '../user/UserState';
 import {container} from 'tsyringe';
+import {ConversationState} from '../conversation/ConversationState';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -47,6 +48,7 @@ interface UserListParams {
   click: (userEntity: User, event: MouseEvent) => void;
   conversation: ko.Observable<Conversation>;
   conversationRepository: ConversationRepository;
+  conversationState?: ConversationState;
   filter: ko.Observable<string>;
   highlightedUsers: () => User[];
   infos: Record<string, string>;
@@ -144,7 +146,11 @@ ko.components.register('user-list', {
     selfFirst = true,
     noSelfInteraction = false,
     userState = container.resolve(UserState),
+    conversationState = container.resolve(ConversationState),
   }: UserListParams): void {
+    this.userState = userState;
+    this.conversationState = conversationState;
+
     this.filter = filter;
     this.mode = mode;
     this.teamRepository = teamRepository;
@@ -201,7 +207,7 @@ ko.components.register('user-list', {
 
     // Filter all list items if a filter is provided
     const filteredUserEntities = ko.pureComputed(() => {
-      const connectedUsers = conversationRepository.connectedUsers();
+      const connectedUsers = this.conversationState.connectedUsers();
       let resultUsers = userEntities();
       const normalizedQuery = SearchRepository.normalizeQuery(filter());
       if (normalizedQuery) {

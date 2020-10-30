@@ -42,6 +42,7 @@ import type {MessageRepository} from '../conversation/MessageRepository';
 import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
+import {ConversationState} from '../conversation/ConversationState';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -70,6 +71,7 @@ export class DebugUtil {
     repositories: ViewModelRepositories,
     private readonly clientState = container.resolve(ClientState),
     private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.$ = $;
     this.Dexie = Dexie;
@@ -142,7 +144,7 @@ export class DebugUtil {
 
   getLastMessagesFromDatabase(
     amount = 10,
-    conversationId = this.conversationRepository.active_conversation().id,
+    conversationId = this.conversationState.activeConversation().id,
   ): EventRecord[] {
     if (this.storageRepository.storageService.db) {
       return this.storageRepository.storageService.db[StorageSchemata.OBJECT_STORE.EVENTS].toArray(
@@ -157,7 +159,7 @@ export class DebugUtil {
 
   async haveISentThisMessageToMyOtherClients(
     messageId: string,
-    conversationId: string = this.conversationRepository.active_conversation().id,
+    conversationId: string = this.conversationState.activeConversation().id,
   ): Promise<void> {
     const clientId = this.clientState.currentClient().id;
     const userId = this.userState.self().id;

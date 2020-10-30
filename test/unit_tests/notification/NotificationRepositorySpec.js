@@ -228,7 +228,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if the browser tab has focus and conversation is active', () => {
-      testFactory.conversation_repository.active_conversation(conversation_et);
+      testFactory.conversation_repository.conversationState.activeConversation(conversation_et);
       document.hasFocus = () => true;
       testFactory.calling_repository.joinedCall = () => true;
 

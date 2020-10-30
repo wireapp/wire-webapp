@@ -107,7 +107,7 @@ describe('ConversationRepository', () => {
     server.restore();
     storage_service.clearStores();
     jQuery.ajax.restore();
-    testFactory.conversation_repository.conversations.removeAll();
+    testFactory.conversation_repository.conversationState.conversations.removeAll();
   });
 
   describe('checkLegalHoldStatus', () => {
@@ -210,11 +210,14 @@ describe('ConversationRepository', () => {
 
       return testFactory.conversation_repository.saveConversation(self_conversation_et).then(() => {
         expect(
-          _find_conversation(self_conversation_et, testFactory.conversation_repository.conversations),
+          _find_conversation(self_conversation_et, testFactory.conversation_repository.conversationState.conversations),
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(self_conversation_et, testFactory.conversation_repository.filtered_conversations),
+          _find_conversation(
+            self_conversation_et,
+            testFactory.conversation_repository.conversationState.filtered_conversations,
+          ),
         ).toBeUndefined();
       });
     });
@@ -224,11 +227,17 @@ describe('ConversationRepository', () => {
 
       return testFactory.conversation_repository.saveConversation(blocked_conversation_et).then(() => {
         expect(
-          _find_conversation(blocked_conversation_et, testFactory.conversation_repository.conversations),
+          _find_conversation(
+            blocked_conversation_et,
+            testFactory.conversation_repository.conversationState.conversations,
+          ),
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(blocked_conversation_et, testFactory.conversation_repository.filtered_conversations),
+          _find_conversation(
+            blocked_conversation_et,
+            testFactory.conversation_repository.conversationState.filtered_conversations,
+          ),
         ).toBeUndefined();
       });
     });
@@ -241,11 +250,17 @@ describe('ConversationRepository', () => {
 
       return testFactory.conversation_repository.saveConversation(cancelled_conversation_et).then(() => {
         expect(
-          _find_conversation(cancelled_conversation_et, testFactory.conversation_repository.conversations),
+          _find_conversation(
+            cancelled_conversation_et,
+            testFactory.conversation_repository.conversationState.conversations,
+          ),
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(cancelled_conversation_et, testFactory.conversation_repository.filtered_conversations),
+          _find_conversation(
+            cancelled_conversation_et,
+            testFactory.conversation_repository.conversationState.filtered_conversations,
+          ),
         ).toBeUndefined();
       });
     });
@@ -255,18 +270,24 @@ describe('ConversationRepository', () => {
 
       return testFactory.conversation_repository.saveConversation(pending_conversation_et).then(() => {
         expect(
-          _find_conversation(pending_conversation_et, testFactory.conversation_repository.conversations),
+          _find_conversation(
+            pending_conversation_et,
+            testFactory.conversation_repository.conversationState.conversations,
+          ),
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(pending_conversation_et, testFactory.conversation_repository.filtered_conversations),
+          _find_conversation(
+            pending_conversation_et,
+            testFactory.conversation_repository.conversationState.filtered_conversations,
+          ),
         ).toBeUndefined();
       });
     });
   });
 
   describe('get1To1Conversation', () => {
-    beforeEach(() => testFactory.conversation_repository.conversations([]));
+    beforeEach(() => testFactory.conversation_repository.conversationState.conversations([]));
 
     it('finds an existing 1:1 conversation within a team', () => {
       // prettier-ignore
@@ -300,7 +321,7 @@ describe('ConversationRepository', () => {
 
       const conversationMapper = testFactory.conversation_repository.conversationMapper;
       const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation]);
-      testFactory.conversation_repository.conversations.push(newConversationEntity);
+      testFactory.conversation_repository.conversationState.conversations.push(newConversationEntity);
 
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members.others[0].id;
@@ -472,7 +493,7 @@ describe('ConversationRepository', () => {
 
     it('should map a connection to a new conversation', () => {
       connectionEntity.status(ConnectionStatus.ACCEPTED);
-      testFactory.conversation_repository.conversations.removeAll();
+      testFactory.conversation_repository.conversationState.conversations.removeAll();
 
       return testFactory.conversation_repository.mapConnection(connectionEntity).then(_conversation => {
         expect(testFactory.conversation_repository.fetchConversationById).toHaveBeenCalled();
@@ -487,11 +508,14 @@ describe('ConversationRepository', () => {
       return testFactory.conversation_repository.mapConnection(connectionEntity).then(_conversation => {
         expect(_conversation.connection()).toBe(connectionEntity);
         expect(
-          _find_conversation(_conversation, testFactory.conversation_repository.conversations),
+          _find_conversation(_conversation, testFactory.conversation_repository.conversationState.conversations),
         ).not.toBeUndefined();
 
         expect(
-          _find_conversation(_conversation, testFactory.conversation_repository.filtered_conversations),
+          _find_conversation(
+            _conversation,
+            testFactory.conversation_repository.conversationState.filtered_conversations,
+          ),
         ).toBeUndefined();
       });
     });
@@ -650,19 +674,21 @@ describe('ConversationRepository', () => {
           .fetchConversationById(conversation_id)
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
-            testFactory.conversation_repository.active_conversation(fetched_conversation);
+            testFactory.conversation_repository.conversationState.activeConversation(fetched_conversation);
             return testFactory.conversation_repository.handleConversationEvent(upload_start);
           })
           .then(() => {
-            const number_of_messages = Object.keys(testFactory.conversation_repository.active_conversation().messages())
-              .length;
+            const number_of_messages = Object.keys(
+              testFactory.conversation_repository.conversationState.activeConversation().messages(),
+            ).length;
 
             expect(number_of_messages).toBe(1);
             return testFactory.conversation_repository.handleConversationEvent(upload_failed);
           })
           .then(() => {
-            const number_of_messages = Object.keys(testFactory.conversation_repository.active_conversation().messages())
-              .length;
+            const number_of_messages = Object.keys(
+              testFactory.conversation_repository.conversationState.activeConversation().messages(),
+            ).length;
 
             expect(number_of_messages).toBe(1);
           });
@@ -978,45 +1004,47 @@ describe('ConversationRepository', () => {
         spyOn(conversationEntity, 'remove_message_by_id');
 
         const conversationRepository = testFactory.conversation_repository;
-        spyOn(conversationRepository, 'find_conversation_by_id').and.returnValue(conversationEntity);
+        spyOn(conversationRepository.conversationState, 'findConversation').and.returnValue(conversationEntity);
 
         conversationRepository.deleteLocalMessageEntity({oldObj: deletedMessagePayload});
 
-        expect(conversationRepository.find_conversation_by_id).toHaveBeenCalledWith(deletedMessagePayload.conversation);
+        expect(conversationRepository.conversationState.findConversation).toHaveBeenCalledWith(
+          deletedMessagePayload.conversation,
+        );
         expect(conversationEntity.remove_message_by_id).toHaveBeenCalledWith(deletedMessagePayload.id);
       });
     });
   });
 
-  describe('find_conversation_by_id', () => {
+  describe('findConversation', () => {
     let conversationRepository;
     const conversationIds = ['40b05b5f-d906-4276-902c-3fa16af3b2bd', '3dd5a837-a7a5-40c6-b6c9-b1ab155e1e55'];
     beforeEach(() => {
       conversationRepository = testFactory.conversation_repository;
 
       const conversationEntities = conversationIds.map(id => new Conversation(id));
-      conversationRepository.conversations(conversationEntities);
+      conversationRepository.conversationState.conversations(conversationEntities);
     });
 
     afterEach(() => {
-      conversationRepository.conversations([]);
+      conversationRepository.conversationState.conversations([]);
     });
 
     it('does not return any conversation if team is marked for deletion', () => {
-      spyOn(conversationRepository.teamRepository.teamState, 'isTeamDeleted').and.returnValue(false);
+      spyOn(conversationRepository.teamState, 'isTeamDeleted').and.returnValue(false);
       conversationIds.forEach(conversationId => {
-        expect(conversationRepository.find_conversation_by_id(conversationId)).toBeDefined();
+        expect(conversationRepository.conversationState.findConversation(conversationId)).toBeDefined();
       });
 
-      conversationRepository.teamRepository.teamState.isTeamDeleted.and.returnValue(true);
+      conversationRepository.teamState.isTeamDeleted.and.returnValue(true);
       conversationIds.forEach(conversationId => {
-        expect(conversationRepository.find_conversation_by_id(conversationId)).not.toBeDefined();
+        expect(conversationRepository.conversationState.findConversation(conversationId)).not.toBeDefined();
       });
     });
 
     it('returns the conversation if present in the local conversations', () => {
       conversationIds.forEach(conversationId => {
-        expect(conversationRepository.find_conversation_by_id(conversationId)).toBeDefined();
+        expect(conversationRepository.conversationState.findConversation(conversationId)).toBeDefined();
       });
 
       const inexistentConversationIds = [
@@ -1024,7 +1052,7 @@ describe('ConversationRepository', () => {
         'eece4e13-41d4-4ea8-9aa3-383a710a5137',
       ];
       inexistentConversationIds.forEach(conversationId => {
-        expect(conversationRepository.find_conversation_by_id(conversationId)).not.toBeDefined();
+        expect(conversationRepository.conversationState.findConversation(conversationId)).not.toBeDefined();
       });
     });
   });
@@ -1095,15 +1123,15 @@ describe('ConversationRepository', () => {
     });
 
     it('should know all users participating in a conversation (including the self user)', () => {
-      const [, dudes] = testFactory.conversation_repository.conversations();
-      return testFactory.conversation_repository.get_all_users_in_conversation(dudes.id).then(user_ets => {
+      const [, dudes] = testFactory.conversation_repository.conversationState.conversations();
+      return testFactory.conversation_repository.getAllUsersInConversation(dudes.id).then(user_ets => {
         expect(user_ets.length).toBe(3);
-        expect(testFactory.conversation_repository.conversations().length).toBe(4);
+        expect(testFactory.conversation_repository.conversationState.conversations().length).toBe(4);
       });
     });
 
     it('should generate a user-client-map including users with clients', () => {
-      const [, dudes] = testFactory.conversation_repository.conversations();
+      const [, dudes] = testFactory.conversation_repository.conversationState.conversations();
       const user_ets = dudes.participating_user_ets();
 
       return testFactory.message_repository.create_recipients(dudes.id).then(recipients => {
@@ -1177,7 +1205,7 @@ describe('ConversationRepository', () => {
       testFactory.conversation_repository.saveConversation(deletedGroup);
       await testFactory.conversation_repository.checkForDeletedConversations();
 
-      expect(testFactory.conversation_repository.conversations().length).toBe(2);
+      expect(testFactory.conversation_repository.conversationState.conversations().length).toBe(2);
     });
   });
 

@@ -129,7 +129,7 @@ describe('MessageRepository', () => {
   describe('sendTextWithLinkPreview', () => {
     xit('sends ephemeral message (within the range [1 second, 1 year])', async () => {
       const conversation = generate_conversation();
-      testFactory.conversation_repository.conversations([conversation]);
+      testFactory.conversation_repository.conversationState.conversations([conversation]);
 
       const inBoundValues = [1000, 5000, 12341234, 31536000000];
       const outOfBoundValues = [1, 999, 31536000001, 31557600000];

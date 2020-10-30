@@ -39,7 +39,7 @@ describe('ClientMismatchHandler', () => {
     });
   });
 
-  afterEach(() => testFactory.conversation_repository.conversations.removeAll());
+  afterEach(() => testFactory.conversation_repository.conversationState.conversations.removeAll());
 
   describe('onClientMismatch', () => {
     let clientMismatch = undefined;
