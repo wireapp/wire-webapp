@@ -95,10 +95,7 @@ export class EventTrackingRepository {
       }
     } catch (error) {
       this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
-      storeValue(
-        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID,
-        this.countlyDeviceId,
-      );
+      storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID, newId);
     }
   };
 
@@ -106,11 +103,11 @@ export class EventTrackingRepository {
     const previousCountlyDeviceId = loadValue<string>(
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
-    const unSyncedCountlyDeviceId = loadValue<string>(
+    const unsyncedCountlyDeviceId = loadValue<string>(
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
 
-    if (unSyncedCountlyDeviceId) {
+    if (unsyncedCountlyDeviceId) {
       try {
         this.messageRepository.sendCountlySync(this.countlyDeviceId);
         resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
