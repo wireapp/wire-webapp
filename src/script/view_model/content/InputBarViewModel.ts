@@ -59,6 +59,7 @@ import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 type DraftMessage = {
   mentions: MentionEntity[];
@@ -128,6 +129,7 @@ export class InputBarViewModel {
     private readonly storageRepository: StorageRepository,
     private readonly messageRepository: MessageRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.shadowInput = null;
     this.textarea = null;
@@ -137,7 +139,7 @@ export class InputBarViewModel {
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
 
-    this.conversationEntity = this.conversationRepository.active_conversation;
+    this.conversationEntity = this.conversationState.activeConversation;
     this.selfUser = this.userState.self;
 
     this.conversationHasFocus = ko.observable(true).extend({notify: 'always'});

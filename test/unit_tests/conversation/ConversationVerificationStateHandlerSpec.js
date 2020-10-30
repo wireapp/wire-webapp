@@ -82,7 +82,7 @@ describe('ConversationVerificationStateHandler', () => {
       conversationC.selfUser(selfUserEntity);
       conversationC.verification_state(ConversationVerificationState.VERIFIED);
 
-      conversationRepository.conversations.removeAll();
+      conversationRepository.conversationState.conversations.removeAll();
       return Promise.all([
         conversationRepository.saveConversation(conversationAB),
         conversationRepository.saveConversation(conversationB),

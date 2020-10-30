@@ -24,6 +24,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ListViewModel} from '../ListViewModel';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {Conversation} from 'src/script/entity/Conversation';
+import {ConversationState} from '../../conversation/ConversationState';
+import {container} from 'tsyringe';
 
 export class ArchiveViewModel {
   readonly listViewModel: ListViewModel;
@@ -32,11 +34,16 @@ export class ArchiveViewModel {
   readonly shouldUpdateScrollbar: ko.Computed<number>;
   readonly onJoinCall: Function;
 
-  constructor(listViewModel: ListViewModel, conversationRepository: ConversationRepository, onJoinCall: Function) {
+  constructor(
+    listViewModel: ListViewModel,
+    conversationRepository: ConversationRepository,
+    onJoinCall: Function,
+    private readonly conversationState = container.resolve(ConversationState),
+  ) {
     this.listViewModel = listViewModel;
     this.conversationRepository = conversationRepository;
 
-    this.archivedConversations = this.conversationRepository.conversations_archived;
+    this.archivedConversations = this.conversationState.conversations_archived;
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.listViewModel.lastUpdate())

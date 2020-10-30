@@ -69,6 +69,7 @@ import {AssetRepository} from 'src/script/assets/AssetRepository';
 import {UserState} from 'src/script/user/UserState';
 import {ClientState} from 'src/script/client/ClientState';
 import {TeamState} from 'src/script/team/TeamState';
+import {ConversationState} from 'src/script/conversation/ConversationState';
 
 export class TestFactory {
   constructor() {
@@ -278,6 +279,8 @@ export class TestFactory {
     const assetRepository = container.resolve(AssetRepository);
 
     this.conversation_repository = null;
+    const conversationState = new ConversationState(this.user_repository.userState, this.team_repository.teamState);
+
     this.message_repository = new MessageRepository(
       this.client_repository,
       () => this.conversation_repository,
@@ -292,6 +295,7 @@ export class TestFactory {
       this.assetRepository,
       this.user_repository.userState,
       this.team_repository.teamState,
+      conversationState,
     );
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
@@ -304,6 +308,7 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository.userState,
       this.team_repository.teamState,
+      conversationState,
     );
 
     return this.conversation_repository;
@@ -315,12 +320,12 @@ export class TestFactory {
   async exposeCallingActors() {
     await this.exposeConversationActors();
     this.calling_repository = new CallingRepository(
-      this.conversation_repository,
       this.message_repository,
       this.event_repository,
       this.user_repository,
       new MediaRepository(new PermissionRepository()).streamHandler,
       serverTimeHandler,
+      this.conversation_repository.conversationState,
     );
 
     return this.calling_repository;
@@ -338,6 +343,7 @@ export class TestFactory {
       this.conversation_repository,
       new PermissionRepository(),
       this.user_repository.userState,
+      this.conversation_repository.conversationState,
     );
 
     return this.notification_repository;

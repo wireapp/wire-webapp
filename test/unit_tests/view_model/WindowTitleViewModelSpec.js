@@ -51,7 +51,8 @@ describe('WindowTitleViewModel', () => {
             state: ko.observable(ContentViewModel.STATE.CONVERSATION),
           },
         },
-        conversationRepository,
+        testFactory.user_repository.userState,
+        conversationRepository.conversationState,
       );
     });
   });
@@ -72,7 +73,7 @@ describe('WindowTitleViewModel', () => {
       const selected_conversation = new Conversation(createRandomUuid());
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(CONVERSATION_TYPE.REGULAR);
-      title_view_model.conversationRepository.active_conversation(selected_conversation);
+      title_view_model.conversationState.activeConversation(selected_conversation);
 
       const expected_title = `${selected_conversation.name()} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -91,8 +92,8 @@ describe('WindowTitleViewModel', () => {
       conversationEntity.type(CONVERSATION_TYPE.REGULAR);
       conversationEntity.selfUser(new User(createRandomUuid()));
 
-      title_view_model.conversationRepository.conversations_unarchived.push(conversationEntity);
-      title_view_model.conversationRepository.active_conversation(conversationEntity);
+      title_view_model.conversationState.conversations_unarchived.push(conversationEntity);
+      title_view_model.conversationState.activeConversation(conversationEntity);
       title_view_model.initiateTitleUpdates();
 
       const expected_title = `(1) ${conversationEntity.name()} · ${suffix}`;
@@ -108,7 +109,7 @@ describe('WindowTitleViewModel', () => {
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(CONVERSATION_TYPE.REGULAR);
       selected_conversation.selfUser(selfUserEntity);
-      title_view_model.conversationRepository.active_conversation(selected_conversation);
+      title_view_model.conversationState.activeConversation(selected_conversation);
 
       const muted_conversation = new Conversation(createRandomUuid());
       muted_conversation.mutedState(NOTIFICATION_STATE.NOTHING);
@@ -117,12 +118,12 @@ describe('WindowTitleViewModel', () => {
       muted_conversation.selfUser(selfUserEntity);
 
       // Add conversations to conversation repository
-      expect(title_view_model.conversationRepository.conversations_unarchived().length).toBe(0);
+      expect(title_view_model.conversationState.conversations_unarchived().length).toBe(0);
 
-      title_view_model.conversationRepository.conversations_unarchived.push(selected_conversation);
-      title_view_model.conversationRepository.conversations_unarchived.push(muted_conversation);
+      title_view_model.conversationState.conversations_unarchived.push(selected_conversation);
+      title_view_model.conversationState.conversations_unarchived.push(muted_conversation);
 
-      expect(title_view_model.conversationRepository.conversations_unarchived().length).toBe(2);
+      expect(title_view_model.conversationState.conversations_unarchived().length).toBe(2);
 
       // Check title when there are no messages
       title_view_model.initiateTitleUpdates();
@@ -261,8 +262,8 @@ describe('WindowTitleViewModel', () => {
         done();
       });
 
-      title_view_model.conversationRepository.conversations_unarchived.push(conversationEntity);
-      title_view_model.conversationRepository.active_conversation(conversationEntity);
+      title_view_model.conversationState.conversations_unarchived.push(conversationEntity);
+      title_view_model.conversationState.activeConversation(conversationEntity);
 
       title_view_model.initiateTitleUpdates();
     });

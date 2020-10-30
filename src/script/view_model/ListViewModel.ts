@@ -54,10 +54,12 @@ import {Runtime} from '@wireapp/commons';
 import {UserState} from '../user/UserState';
 import {container} from 'tsyringe';
 import {TeamState} from '../team/TeamState';
+import {ConversationState} from '../conversation/ConversationState';
 
 export class ListViewModel {
   private readonly userState: UserState;
   private readonly teamState: TeamState;
+  private readonly conversationState: ConversationState;
 
   readonly preferences: PreferencesListViewModel;
   readonly takeover: TakeoverViewModel;
@@ -104,6 +106,7 @@ export class ListViewModel {
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
+    this.conversationState = container.resolve(ConversationState);
 
     this.elementId = 'left-column';
     this.conversationRepository = repositories.conversation;
@@ -151,7 +154,7 @@ export class ListViewModel {
 
       const hasConnectRequests = !!this.userState.connectRequests().length;
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
-      return states.concat(this.conversationRepository.conversations_unarchived());
+      return states.concat(this.conversationState.conversations_unarchived());
     });
 
     // Nested view models
@@ -241,7 +244,7 @@ export class ListViewModel {
     const isStateRequests = this.contentViewModel.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
     const activeConversationItem = isStateRequests
       ? ContentViewModel.STATE.CONNECTION_REQUESTS
-      : this.conversationRepository.active_conversation();
+      : this.conversationState.activeConversation();
 
     const nextItem = iterateItem(this.visibleListItems(), activeConversationItem, reverse);
 
@@ -512,7 +515,7 @@ export class ListViewModel {
     Context.from(event, entries, 'conversation-list-options-menu');
   };
 
-  clickToArchive = (conversationEntity = this.conversationRepository.active_conversation()): void => {
+  clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (this.isActivatedAccount()) {
       this.actionsViewModel.archiveConversation(conversationEntity);
     }
@@ -533,7 +536,7 @@ export class ListViewModel {
     this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
   };
 
-  clickToClear = (conversationEntity = this.conversationRepository.active_conversation()): void => {
+  clickToClear = (conversationEntity = this.conversationState.activeConversation()): void => {
     this.actionsViewModel.clearConversation(conversationEntity);
   };
 
@@ -541,17 +544,17 @@ export class ListViewModel {
     this.actionsViewModel.leaveConversation(conversationEntity);
   };
 
-  clickToToggleMute = (conversationEntity = this.conversationRepository.active_conversation()): void => {
+  clickToToggleMute = (conversationEntity = this.conversationState.activeConversation()): void => {
     this.actionsViewModel.toggleMuteConversation(conversationEntity);
   };
 
-  clickToOpenNotificationSettings = (conversationEntity = this.conversationRepository.active_conversation()): void => {
+  clickToOpenNotificationSettings = (conversationEntity = this.conversationState.activeConversation()): void => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
   };
 
   clickToUnarchive = (conversationEntity: Conversation): void => {
     this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
-      if (!this.conversationRepository.conversations_archived().length) {
+      if (!this.conversationState.conversations_archived().length) {
         this.switchList(ListViewModel.STATE.CONVERSATIONS);
       }
     });
@@ -559,7 +562,7 @@ export class ListViewModel {
 
   private readonly shouldHideConversation = (conversationEntity: Conversation): boolean => {
     const isStateConversations = this.state() === ListViewModel.STATE.CONVERSATIONS;
-    const isActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
+    const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
 
     return isStateConversations && isActiveConversation;
   };

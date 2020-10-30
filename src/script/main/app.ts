@@ -299,7 +299,6 @@ class App {
       sendingMessageQueue,
     );
     repositories.calling = new CallingRepository(
-      repositories.conversation,
       repositories.message,
       repositories.event,
       repositories.user,

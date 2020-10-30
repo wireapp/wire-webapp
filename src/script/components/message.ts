@@ -54,11 +54,13 @@ import './asset/locationAsset';
 import './asset/videoAsset';
 import './asset/messageButton';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {ConversationState} from '../conversation/ConversationState';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
   conversation: ko.Observable<Conversation>;
   conversationRepository: ConversationRepository;
+  conversationState?: ConversationState;
   isLastDeliveredMessage: ko.Observable<boolean>;
   isMarked: ko.Observable<boolean>;
   isSelfTemporaryGuest: ko.Observable<boolean>;
@@ -83,6 +85,8 @@ interface MessageParams {
 }
 
 class Message {
+  private readonly conversationState: ConversationState;
+
   accentColor: ko.PureComputed<string>;
   actionsViewModel: ActionsViewModel;
   assetSubscription: ko.Subscription;
@@ -142,9 +146,11 @@ class Message {
       conversationRepository,
       messageRepository,
       actionsViewModel,
+      conversationState = container.resolve(ConversationState),
     }: MessageParams,
     componentInfo: {element: HTMLElement},
   ) {
+    this.conversationState = conversationState;
     this.message = message;
     this.conversation = conversation;
 
@@ -326,7 +332,7 @@ class Message {
   }
 
   showLegalHold = () => {
-    amplify.publish(SHOW_LEGAL_HOLD_MODAL, this.conversationRepository.active_conversation());
+    amplify.publish(SHOW_LEGAL_HOLD_MODAL, this.conversationState.activeConversation());
   };
 
   showContextMenu(event: MouseEvent) {

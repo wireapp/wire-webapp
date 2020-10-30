@@ -50,6 +50,7 @@ import type {Availability} from '@wireapp/protocol-messaging';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 export class ConversationListViewModel {
   readonly startTooltip: string;
@@ -95,6 +96,7 @@ export class ConversationListViewModel {
     private readonly propertiesRepository: PropertiesRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.participantAvatarSize = AVATAR_SIZE.SMALL;
 
@@ -131,8 +133,8 @@ export class ConversationListViewModel {
       return this.contentState() === ContentViewModel.STATE.CONNECTION_REQUESTS;
     });
 
-    this.archivedConversations = this.conversationRepository.conversations_archived;
-    this.unarchivedConversations = this.conversationRepository.conversations_unarchived;
+    this.archivedConversations = this.conversationState.conversations_archived;
+    this.unarchivedConversations = this.conversationState.conversations_unarchived;
 
     this.noConversations = ko.pureComputed(() => {
       return !this.unarchivedConversations().length && !this.connectRequests().length;
@@ -168,7 +170,7 @@ export class ConversationListViewModel {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.INTERFACE.VIEW_FOLDERS, !showRecentConversations);
     });
 
-    this.conversationRepository.active_conversation.subscribe(activeConversation => {
+    this.conversationState.activeConversation.subscribe(activeConversation => {
       if (!activeConversation) {
         return;
       }
@@ -253,7 +255,7 @@ export class ConversationListViewModel {
     if (!call) {
       return false;
     }
-    const conversation = this.conversationRepository.find_conversation_by_id(conversationId);
+    const conversation = this.conversationState.findConversation(conversationId);
     return (
       !conversation.removed_from_conversation() &&
       call.state() === CALL_STATE.INCOMING &&
@@ -278,7 +280,7 @@ export class ConversationListViewModel {
       ContentViewModel.STATE.CONVERSATION,
     ];
 
-    const isSelectedConversation = this.conversationRepository.is_active_conversation(conversationEntity);
+    const isSelectedConversation = this.conversationState.isActiveConversation(conversationEntity);
     const isExpectedState = expectedStates.includes(this.contentState());
 
     return isSelectedConversation && isExpectedState;

@@ -29,20 +29,20 @@ import {EventRecord} from '../storage';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {Conversation} from '../entity/Conversation';
-import type {ConversationRepository} from './ConversationRepository';
 import type {EventRepository} from '../event/EventRepository';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
+import {ConversationState} from './ConversationState';
 
 export class ConversationVerificationStateHandler {
   private readonly logger: Logger;
 
   constructor(
-    private readonly conversationRepository: ConversationRepository,
     private readonly eventRepository: EventRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.logger = getLogger('ConversationVerificationStateHandler');
 
@@ -198,7 +198,7 @@ export class ConversationVerificationStateHandler {
    * @returns Array of objects containing the conversation entities and matching user IDs
    */
   private getActiveConversationsWithUsers(userIds: string[]): {conversationEntity: Conversation; userIds: string[]}[] {
-    return this.conversationRepository
+    return this.conversationState
       .filtered_conversations()
       .map((conversationEntity: Conversation) => {
         if (!conversationEntity.removed_from_conversation()) {

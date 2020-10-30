@@ -28,6 +28,8 @@ import {ConversationRepository} from '../../conversation/ConversationRepository'
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {CollectionDetailsViewModel} from './CollectionDetailsViewModel';
 import {Conversation} from '../../entity/Conversation';
+import {ConversationState} from '../../conversation/ConversationState';
+import {container} from 'tsyringe';
 
 export class CollectionViewModel {
   collectionDetails: CollectionDetailsViewModel;
@@ -38,7 +40,11 @@ export class CollectionViewModel {
   links: ko.ObservableArray<ContentMessage>;
   searchInput: ko.Observable<string>;
 
-  constructor(contentViewModel: ContentViewModel, private readonly conversationRepository: ConversationRepository) {
+  constructor(
+    contentViewModel: ContentViewModel,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly conversationState = container.resolve(ConversationState),
+  ) {
     this.addedToView = this.addedToView.bind(this);
     this.clickOnMessage = this.clickOnMessage.bind(this);
     this.itemAdded = this.itemAdded.bind(this);
@@ -109,7 +115,7 @@ export class CollectionViewModel {
     [this.images, this.files, this.links, this.audio].forEach(array => array.removeAll());
   }
 
-  setConversation(conversationEntity = this.conversationRepository.active_conversation()) {
+  setConversation(conversationEntity = this.conversationState.activeConversation()) {
     if (conversationEntity) {
       this.conversationEntity(conversationEntity);
 

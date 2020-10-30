@@ -172,7 +172,6 @@ export class MainViewModel {
     this.panel = new PanelViewModel(this, repositories);
     this.calling = new CallingViewModel(
       repositories.calling,
-      repositories.conversation,
       repositories.audio,
       repositories.media.devicesHandler,
       repositories.media.streamHandler,
@@ -190,7 +189,7 @@ export class MainViewModel {
       repositories.asset,
       repositories.message,
     );
-    this.title = new WindowTitleViewModel(this, repositories.conversation);
+    this.title = new WindowTitleViewModel(this);
     this.favicon = new FaviconViewModel(amplify);
     this.warnings = new WarningsViewModel();
 
