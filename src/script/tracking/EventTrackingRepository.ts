@@ -60,8 +60,8 @@ export class EventTrackingRepository {
   }
 
   constructor(
-    private readonly userState = container.resolve(UserState),
     private readonly messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.logger = getLogger('EventTrackingRepository');
 
