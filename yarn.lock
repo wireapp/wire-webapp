@@ -8025,18 +8025,18 @@ iterable-to-stream@^1.0.1:
   resolved "https://registry.yarnpkg.com/iterable-to-stream/-/iterable-to-stream-1.0.1.tgz#37e86baacf6b1a0e9233dad4eb526d0423d08bf3"
   integrity sha512-O62gD5ADMUGtJoOoM9U6LQ7i4byPXUNoHJ6mqsmkQJcom331ZJGDApWgDESWyBMEHEJRjtHozgIiTzYo9RU4UA==
 
-jasmine-core@^3.5.0, jasmine-core@~3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.5.0.tgz#132c23e645af96d85c8bca13c8758b18429fc1e4"
-  integrity sha512-nCeAiw37MIMA9w9IXso7bRaLl+c/ef3wnxsoSAlYrzS+Ot0zTG6nU8G/cIfGkqpkjX2wNaIW9RFG0TwIFnG6bA==
+jasmine-core@^3.5.0, jasmine-core@~3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/jasmine-core/-/jasmine-core-3.6.0.tgz#491f3bb23941799c353ceb7a45b38a950ebc5a20"
+  integrity sha512-8uQYa7zJN8hq9z+g8z1bqCfdC8eoDAeVnM5sfqs7KHv9/ifoJ500m018fpFc7RDaO6SWCLCXwo/wPSNcdYTgcw==
 
-jasmine@3.5.0:
-  version "3.5.0"
-  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-3.5.0.tgz#7101eabfd043a1fc82ac24e0ab6ec56081357f9e"
-  integrity sha512-DYypSryORqzsGoMazemIHUfMkXM7I7easFaxAvNM3Mr6Xz3Fy36TupTrAOxZWN8MVKEU5xECv22J4tUQf3uBzQ==
+jasmine@3.6.2:
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/jasmine/-/jasmine-3.6.2.tgz#a8df3fc92f2ef322bcdafb890f744f3ff5751e86"
+  integrity sha512-Uc0o2MRnC8TS1MjDrB8jE1umKEo2mflzGvdg0Ncs+yuLtOJ+uz/Wz8VmGsNGtuASr8+E0LDgPkOpvdoC76m5WQ==
   dependencies:
-    glob "^7.1.4"
-    jasmine-core "~3.5.0"
+    glob "^7.1.6"
+    jasmine-core "~3.6.0"
 
 jest-worker@^24.9.0:
   version "24.9.0"
