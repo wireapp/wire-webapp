@@ -53,7 +53,7 @@ export class EventTrackingRepository {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
         COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_DEVICE_ID',
-        COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_OLD_DEVICE_ID',
+        COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_OLD_DEVICE_ID',
         DISABLED_DOMAINS: ['localhost'],
       },
     };
@@ -87,7 +87,7 @@ export class EventTrackingRepository {
     } catch (error) {
       this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
       storeValue(
-        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY,
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
         this.countlyDeviceId,
       );
     }
@@ -98,13 +98,13 @@ export class EventTrackingRepository {
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
     const oldCountlyDeviceId = loadValue<string>(
-      EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY,
+      EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
 
     if (oldCountlyDeviceId) {
       this.messageRepository.sendCountlySync(this.countlyDeviceId);
       this.migrateDeviceId(oldCountlyDeviceId);
-      resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY);
+      resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
     }
 
     if (previousCountlyDeviceId) {
@@ -120,7 +120,7 @@ export class EventTrackingRepository {
       } catch (error) {
         this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
         storeValue(
-          EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_OLD_DEVICE_ID_LOCAL_STORAGE_KEY,
+          EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
           this.countlyDeviceId,
         );
       }
