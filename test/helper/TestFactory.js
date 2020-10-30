@@ -65,9 +65,15 @@ import {AuthRepository} from 'src/script/auth/AuthRepository';
 import {ClientService} from 'src/script/client/ClientService';
 import {TeamService} from 'src/script/team/TeamService';
 import {SearchService} from 'src/script/search/SearchService';
-import {AssetRepository} from '../../src/script/assets/AssetRepository';
+import {AssetRepository} from 'src/script/assets/AssetRepository';
+import {UserState} from 'src/script/user/UserState';
+import {ClientState} from 'src/script/client/ClientState';
+import {TeamState} from 'src/script/team/TeamState';
 
 export class TestFactory {
+  constructor() {
+    container.clearInstances();
+  }
   /**
    * @returns {Promise<AuthRepository>} The authentication repository.
    */
@@ -80,7 +86,8 @@ export class TestFactory {
    * @returns {Promise<StorageRepository>} The storage repository.
    */
   async exposeStorageActors() {
-    this.storage_service = new StorageService();
+    container.registerInstance(StorageService, new StorageService());
+    this.storage_service = container.resolve(StorageService);
     if (!this.storage_service.db) {
       this.storage_service.init(entities.user.john_doe.id, false);
     }
@@ -98,7 +105,8 @@ export class TestFactory {
       this.backup_service,
       this.connection_repository,
       this.conversation_repository,
-      this.user_repository,
+      this.client_repository.clientState,
+      this.user_repository.userState,
     );
 
     return this.backup_repository;
@@ -147,7 +155,7 @@ export class TestFactory {
     user.phone(entities.user.john_doe.phone);
 
     this.client_service = new ClientService(this.storage_service);
-    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository);
+    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, new ClientState());
     this.client_repository.init(user);
 
     const currentClient = new ClientEntity();
@@ -178,7 +186,7 @@ export class TestFactory {
     this.event_service = new EventService(this.storage_service);
     this.event_service_no_compound = new EventServiceNoCompound(this.storage_service);
     this.notification_service = new NotificationService(this.storage_service);
-    this.conversation_service = new ConversationService(this.event_service, this.storage_service);
+    this.conversation_service = new ConversationService(this.event_service);
 
     this.event_repository = new EventRepository(
       this.event_service,
@@ -186,7 +194,7 @@ export class TestFactory {
       this.web_socket_service,
       this.cryptography_repository,
       serverTimeHandler,
-      this.user_repository,
+      this.user_repository.userState,
     );
     this.event_repository.currentClient = ko.observable(this.cryptography_repository.currentClient());
 
@@ -211,8 +219,10 @@ export class TestFactory {
       this.client_repository,
       serverTimeHandler,
       this.propertyRepository,
+      new UserState(),
     );
-    this.user_repository.saveUser(this.client_repository.selfUser(), true);
+
+    this.user_repository.userState.self(this.client_repository.selfUser());
 
     return this.user_repository;
   }
@@ -243,7 +253,13 @@ export class TestFactory {
   async exposeTeamActors() {
     await this.exposeUserActors();
     this.team_service = new TeamService();
-    this.team_repository = new TeamRepository(this.team_service, this.user_repository, this.assetRepository);
+    this.team_repository = new TeamRepository(
+      this.team_service,
+      this.user_repository,
+      this.assetRepository,
+      this.user_repository.userState,
+      new TeamState(this.user_repository.userState),
+    );
     return this.team_repository;
   }
 
@@ -255,7 +271,7 @@ export class TestFactory {
     await this.exposeTeamActors();
     await this.exposeEventActors();
 
-    this.conversation_service = new ConversationService(this.event_service, this.storage_service);
+    this.conversation_service = new ConversationService(this.event_service);
 
     this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
@@ -271,10 +287,11 @@ export class TestFactory {
       this.propertyRepository,
       serverTimeHandler,
       this.user_repository,
-      this.team_repository,
       this.conversation_service,
       new LinkPreviewRepository(assetRepository, this.propertyRepository),
       this.assetRepository,
+      this.user_repository.userState,
+      this.team_repository.teamState,
     );
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
@@ -285,6 +302,8 @@ export class TestFactory {
       this.user_repository,
       this.propertyRepository,
       serverTimeHandler,
+      this.user_repository.userState,
+      this.team_repository.teamState,
     );
 
     return this.conversation_repository;
@@ -318,7 +337,7 @@ export class TestFactory {
       this.calling_repository,
       this.conversation_repository,
       new PermissionRepository(),
-      this.user_repository,
+      this.user_repository.userState,
     );
 
     return this.notification_repository;
@@ -329,7 +348,7 @@ export class TestFactory {
    */
   async exposeTrackingActors() {
     await this.exposeTeamActors();
-    this.tracking_repository = new EventTrackingRepository(this.user_repository, this.message_repository);
+    this.tracking_repository = new EventTrackingRepository(this.user_repository.userState, this.message_repository);
 
     return this.tracking_repository;
   }

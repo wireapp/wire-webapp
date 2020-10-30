@@ -21,9 +21,10 @@ import ko from 'knockout';
 
 import {ContentViewModel} from '../ContentViewModel';
 import {ListViewModel} from '../ListViewModel';
-import type {UserRepository} from 'src/script/user/UserRepository';
 import type {CallingRepository} from 'src/script/calling/CallingRepository';
 import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 export class PreferencesListViewModel {
   contentState: ko.Observable<string>;
@@ -39,15 +40,14 @@ export class PreferencesListViewModel {
   constructor(
     private readonly contentViewModel: ContentViewModel,
     private readonly listViewModel: ListViewModel,
-    private readonly userRepository: UserRepository,
     callingRepository: CallingRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.listViewModel = listViewModel;
-    this.userRepository = userRepository;
 
     this.contentViewModel = contentViewModel;
     this.contentState = this.contentViewModel.state;
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isDesktop = Runtime.isDesktopApp();
 
     this.supportsCalling = callingRepository.supportsCalling;

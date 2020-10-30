@@ -17,13 +17,12 @@
  *
  */
 
-import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ConversationRolesList} from '@wireapp/api-client/dist/conversation/ConversationRole';
-import type {TeamData} from '@wireapp/api-client/dist/team/team/TeamData';
+import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
+import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
-import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
+import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -32,14 +31,13 @@ import type {
   TeamMemberLeaveEvent,
   TeamMemberUpdateEvent,
   TeamUpdateEvent,
-} from '@wireapp/api-client/dist/event';
+} from '@wireapp/api-client/src/event';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
-import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
@@ -56,6 +54,9 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
 import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
+import {TeamState} from './TeamState';
 
 export interface AccountInfo {
   accentID: number;
@@ -68,24 +69,19 @@ export interface AccountInfo {
 }
 
 export class TeamRepository {
-  public readonly isTeamDeleted: ko.Observable<boolean>;
   private readonly logger: Logger;
-  public readonly memberInviters: ko.Observable<any>;
-  private readonly memberRoles: ko.Observable<any>;
-  public readonly supportsLegalHold: ko.Observable<boolean>;
+  readonly teamService: TeamService;
   private readonly teamMapper: TeamMapper;
-  readonly teamMembers: ko.PureComputed<User[]>;
-  public readonly teamName: ko.PureComputed<string>;
-  readonly teamUsers: ko.PureComputed<User[]>;
   private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
-  readonly isTeam: ko.PureComputed<boolean>;
-  readonly selfUser: ko.Observable<User>;
-  readonly team: ko.Observable<TeamEntity>;
-  readonly teamService: TeamService;
-  readonly teamSize: ko.PureComputed<number>;
 
-  constructor(teamService: TeamService, userRepository: UserRepository, assetRepository: AssetRepository) {
+  constructor(
+    teamService: TeamService,
+    userRepository: UserRepository,
+    assetRepository: AssetRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
+  ) {
     this.logger = getLogger('TeamRepository');
 
     this.teamMapper = new TeamMapper();
@@ -93,39 +89,15 @@ export class TeamRepository {
     this.assetRepository = assetRepository;
     this.userRepository = userRepository;
 
-    this.selfUser = this.userRepository.self;
-
-    this.team = ko.observable();
-
-    this.isTeam = ko.pureComputed(() => !!this.team()?.id);
-    this.isTeamDeleted = ko.observable(false);
-
-    /** Note: this does not include the self user */
-    this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
-    this.memberRoles = ko.observable({});
-    this.memberInviters = ko.observable({});
+    this.userRepository.getTeamMembersFromUsers = this.getTeamMembersFromUsers;
+    this.teamState.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
 
     this.isSelfConnectedTo = userId => {
-      return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
+      return (
+        this.teamState.memberRoles()[userId] !== ROLE.PARTNER ||
+        this.teamState.memberInviters()[userId] === this.userState.self().id
+      );
     };
-
-    this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.selfUser().name()));
-    this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
-    this.teamUsers = ko.pureComputed(() => {
-      return this.teamMembers()
-        .concat(this.userRepository.connectedUsers())
-        .filter((item, index, array) => array.indexOf(item) === index)
-        .sort(sortUsersByPriority);
-    });
-
-    this.supportsLegalHold = ko.observable(false);
-
-    this.teamMembers.subscribe(() => this.userRepository.mapGuestStatus());
-
-    this.userRepository.isTeam = this.isTeam;
-    this.userRepository.teamMembers = this.teamMembers;
-    this.userRepository.teamUsers = this.teamUsers;
-    this.userRepository.getTeamMembersFromUsers = this.getTeamMembersFromUsers;
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
@@ -136,16 +108,19 @@ export class TeamRepository {
   };
 
   isExternal = (userId: string): boolean => {
-    return this.memberRoles()[userId] === ROLE.PARTNER;
+    return this.teamState.memberRoles()[userId] === ROLE.PARTNER;
   };
 
   isSelfConnectedTo = (userId: string): boolean => {
-    return this.memberRoles()[userId] !== ROLE.PARTNER || this.memberInviters()[userId] === this.selfUser().id;
+    return (
+      this.teamState.memberRoles()[userId] !== ROLE.PARTNER ||
+      this.teamState.memberInviters()[userId] === this.userState.self().id
+    );
   };
 
   initTeam = async (): Promise<void> => {
     const team = await this.getTeam();
-    if (this.selfUser().teamId) {
+    if (this.userState.self().teamId) {
       await this.updateTeamMembers(team);
     }
     this.scheduleFetchTeamInfo();
@@ -162,11 +137,11 @@ export class TeamRepository {
   };
 
   getTeam = async (): Promise<TeamEntity> => {
-    const selfTeamId = this.selfUser().teamId;
+    const selfTeamId = this.userState.self().teamId;
     const teamData = selfTeamId ? await this.getTeamById() : await this.getBindingTeam();
 
-    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.team()) : new TeamEntity();
-    this.team(teamEntity);
+    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
+    this.teamState.team(teamEntity);
     if (selfTeamId) {
       await this.getSelfMember(selfTeamId);
     }
@@ -181,8 +156,8 @@ export class TeamRepository {
   }
 
   async getSelfMember(teamId: string): Promise<TeamMemberEntity> {
-    const memberEntity = await this.getTeamMember(teamId, this.selfUser().id);
-    this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions);
+    const memberEntity = await this.getTeamMember(teamId, this.userState.self().id);
+    this.teamMapper.mapRole(this.userState.self(), memberEntity.permissions);
     return memberEntity;
   }
 
@@ -194,19 +169,19 @@ export class TeamRepository {
   }
 
   getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
-    const selfTeamId = this.selfUser().teamId;
+    const selfTeamId = this.userState.self().teamId;
     if (!selfTeamId) {
       return;
     }
-    const knownMemberIds = this.teamMembers().map(member => member.id);
+    const knownMemberIds = this.teamState.teamMembers().map(member => member.id);
     const teamUsers = users.filter(user => user.teamId === selfTeamId);
     const newTeamMembers = teamUsers.filter(user => !knownMemberIds.includes(user.id));
     const newTeamMemberIds = newTeamMembers.map(({id}) => id);
-    await this.updateTeamMembersByIds(this.team(), newTeamMemberIds, true);
+    await this.updateTeamMembersByIds(this.teamState.team(), newTeamMemberIds, true);
   };
 
   async filterExternals(users: User[]): Promise<User[]> {
-    const teamId = this.team()?.id;
+    const teamId = this.teamState.team()?.id;
     if (!teamId) {
       return users;
     }
@@ -218,7 +193,7 @@ export class TeamRepository {
   }
 
   getTeamConversationRoles(): Promise<ConversationRolesList> {
-    return this.teamService.getTeamConversationRoles(this.team().id);
+    return this.teamService.getTeamConversationRoles(this.teamState.team().id);
   }
 
   async getWhitelistedServices(teamId: string): Promise<ServiceEntity[]> {
@@ -268,7 +243,9 @@ export class TeamRepository {
   async sendAccountInfo(isDesktop?: false): Promise<void>;
   async sendAccountInfo(isDesktop = Runtime.isDesktopApp()): Promise<AccountInfo | void> {
     if (isDesktop) {
-      const imageResource = this.isTeam() ? this.team().getIconResource() : this.selfUser().previewPictureResource();
+      const imageResource = this.teamState.isTeam()
+        ? this.teamState.team().getIconResource()
+        : this.userState.self().previewPictureResource();
       let imageDataUrl;
 
       if (imageResource) {
@@ -277,18 +254,18 @@ export class TeamRepository {
       }
 
       const accountInfo: AccountInfo = {
-        accentID: this.selfUser().accent_id(),
-        name: this.teamName(),
+        accentID: this.userState.self().accent_id(),
+        name: this.teamState.teamName(),
         picture: imageDataUrl?.toString(),
-        teamID: this.team() ? this.team().id : undefined,
-        teamRole: this.selfUser().teamRole(),
-        userID: this.selfUser().id,
+        teamID: this.teamState.team() ? this.teamState.team().id : undefined,
+        teamRole: this.userState.self().teamRole(),
+        userID: this.userState.self().id,
       };
 
       const [majorVersion, minorVersion] = (Environment.version(true) || '').split('.');
 
       if (Number(majorVersion) >= 3 && Number(minorVersion) >= 20) {
-        accountInfo.availability = this.selfUser().availability();
+        accountInfo.availability = this.userState.self().availability();
       }
 
       this.logger.info('Publishing account info', accountInfo);
@@ -308,17 +285,17 @@ export class TeamRepository {
     memberIds = mappedMembers.map(member => member.userId);
 
     if (!append) {
-      this.memberRoles({});
-      this.memberInviters({});
+      this.teamState.memberRoles({});
+      this.teamState.memberInviters({});
     }
     this.updateMemberRoles(mappedMembers);
 
-    const selfId = this.selfUser().id;
+    const selfId = this.userState.self().id;
     const includesSelfId = memberIds.includes(selfId);
     if (includesSelfId) {
       memberIds = memberIds.filter(id => id !== selfId);
       const selfMember = mappedMembers.find(({userId}) => userId === selfId);
-      this.teamMapper.mapRole(this.selfUser(), selfMember.permissions);
+      this.teamMapper.mapRole(this.userState.self(), selfMember.permissions);
     }
 
     const userEntities = await this.userRepository.getUsersById(memberIds);
@@ -334,16 +311,16 @@ export class TeamRepository {
   async updateTeamMembers(teamEntity: TeamEntity): Promise<void> {
     const teamMembers = await this.getAllTeamMembers(teamEntity.id);
     if (teamMembers) {
-      this.memberRoles({});
-      this.memberInviters({});
+      this.teamState.memberRoles({});
+      this.teamState.memberInviters({});
       this.updateMemberRoles(teamMembers);
 
       const memberIds = teamMembers
         .filter(memberEntity => {
-          const isSelfUser = memberEntity.userId === this.selfUser().id;
+          const isSelfUser = memberEntity.userId === this.userState.self().id;
 
           if (isSelfUser) {
-            this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions);
+            this.teamMapper.mapRole(this.userState.self(), memberEntity.permissions);
           }
 
           return !isSelfUser;
@@ -356,7 +333,7 @@ export class TeamRepository {
   }
 
   private addUserToTeam(userEntity: User): void {
-    const members = this.team().members;
+    const members = this.teamState.team().members;
 
     if (!members().find(member => member.id === userEntity.id)) {
       members.push(userEntity);
@@ -364,7 +341,7 @@ export class TeamRepository {
   }
 
   private getTeamById(): Promise<TeamData> {
-    return this.teamService.getTeamById(this.selfUser().teamId);
+    return this.teamService.getTeamById(this.userState.self().teamId);
   }
 
   private getBindingTeam(): Promise<TeamData | void> {
@@ -379,8 +356,8 @@ export class TeamRepository {
 
   private onDelete(eventJson: TeamDeleteEvent | TeamMemberLeaveEvent): void {
     const {team: teamId} = eventJson;
-    if (this.isTeam() && this.team().id === teamId) {
-      this.isTeamDeleted(true);
+    if (this.teamState.isTeam() && this.teamState.team().id === teamId) {
+      this.teamState.isTeamDeleted(true);
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 50);
@@ -399,8 +376,8 @@ export class TeamRepository {
       data: {user: userId},
       team: teamId,
     } = eventJson;
-    const isLocalTeam = this.team().id === teamId;
-    const isOtherUser = this.selfUser().id !== userId;
+    const isLocalTeam = this.teamState.team().id === teamId;
+    const isOtherUser = this.userState.self().id !== userId;
 
     if (isLocalTeam && isOtherUser) {
       this.userRepository.getUserById(userId).then(userEntity => this.addUserToTeam(userEntity));
@@ -414,15 +391,15 @@ export class TeamRepository {
       team: teamId,
       time,
     } = eventJson;
-    const isLocalTeam = this.team().id === teamId;
+    const isLocalTeam = this.teamState.team().id === teamId;
 
     if (isLocalTeam) {
-      const isSelfUser = this.selfUser().id === userId;
+      const isSelfUser = this.userState.self().id === userId;
       if (isSelfUser) {
         return this.onDelete(eventJson);
       }
 
-      this.team().members.remove(member => member.id === userId);
+      this.teamState.team().members.remove(member => member.id === userId);
       amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time).toISOString());
     }
   }
@@ -432,12 +409,12 @@ export class TeamRepository {
       data: {permissions, user: userId},
       team: teamId,
     } = eventJson;
-    const isLocalTeam = this.team().id === teamId;
-    const isSelfUser = this.selfUser().id === userId;
+    const isLocalTeam = this.teamState.team().id === teamId;
+    const isSelfUser = this.userState.self().id === userId;
 
     if (isLocalTeam && isSelfUser) {
       const memberEntity = permissions ? {permissions} : await this.getTeamMember(teamId, userId);
-      this.teamMapper.mapRole(this.selfUser(), memberEntity.permissions);
+      this.teamMapper.mapRole(this.userState.self(), memberEntity.permissions);
       await this.sendAccountInfo();
     }
     if (isLocalTeam && !isSelfUser) {
@@ -451,17 +428,17 @@ export class TeamRepository {
     const memberRoles = memberArray.reduce((accumulator, member) => {
       accumulator[member.userId] = member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID;
       return accumulator;
-    }, this.memberRoles());
+    }, this.teamState.memberRoles());
 
     const memberInvites = memberArray.reduce((accumulator, member) => {
       accumulator[member.userId] = member.invitedBy;
       return accumulator;
-    }, this.memberInviters());
+    }, this.teamState.memberInviters());
 
     const supportsLegalHold = memberArray.some(member => member.hasOwnProperty('legalholdStatus'));
-    this.supportsLegalHold(supportsLegalHold);
-    this.memberRoles(memberRoles);
-    this.memberInviters(memberInvites);
+    this.teamState.supportsLegalHold(supportsLegalHold);
+    this.teamState.memberRoles(memberRoles);
+    this.teamState.memberInviters(memberInvites);
   }
 
   private onUnhandled(eventJson: TeamEvent): void {
@@ -471,8 +448,8 @@ export class TeamRepository {
   private onUpdate(eventJson: TeamUpdateEvent): void {
     const {data: teamData, team: teamId} = eventJson;
 
-    if (this.team().id === teamId) {
-      this.teamMapper.updateTeamFromObject(teamData, this.team());
+    if (this.teamState.team().id === teamId) {
+      this.teamMapper.updateTeamFromObject(teamData, this.teamState.team());
       this.sendAccountInfo();
     }
   }

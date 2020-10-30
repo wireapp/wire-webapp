@@ -17,7 +17,7 @@
  *
  */
 
-import type {ClientClassification} from '@wireapp/api-client/dist/client';
+import type {ClientClassification} from '@wireapp/api-client/src/client';
 
 export interface ClientRecord {
   class: ClientClassification | '?';

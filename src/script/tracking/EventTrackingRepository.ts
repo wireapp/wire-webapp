@@ -28,7 +28,6 @@ import {URLParameter} from '../auth/URLParameter';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
-import type {UserRepository} from '../user/UserRepository';
 import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
@@ -36,6 +35,8 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {EventName} from './EventName';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {ClientEvent} from '../event/Client';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
 
 const Countly = require('countly-sdk-web');
 
@@ -58,7 +59,10 @@ export class EventTrackingRepository {
     };
   }
 
-  constructor(private readonly userRepository: UserRepository, private readonly messageRepository: MessageRepository) {
+  constructor(
+    private readonly userState = container.resolve(UserState),
+    private readonly messageRepository: MessageRepository,
+  ) {
     this.logger = getLogger('EventTrackingRepository');
 
     this.isErrorReportingActivated = false;
@@ -122,7 +126,7 @@ export class EventTrackingRepository {
       }
     }
 
-    const isTeam = this.userRepository.isTeam();
+    const isTeam = this.userState.isTeam();
     if (!isTeam) {
       return; // Countly should not be enabled for non-team users
     }
@@ -207,11 +211,11 @@ export class EventTrackingRepository {
   }
 
   private getUserType(): 'member' | 'external' | 'wireless' {
-    if (this.userRepository.self().teamRole() === TEAM_ROLE.PARTNER) {
+    if (this.userState.self().teamRole() === TEAM_ROLE.PARTNER) {
       return 'external';
     }
 
-    if (this.userRepository.self().isGuest()) {
+    if (this.userState.self().isGuest()) {
       return 'wireless';
     }
 
@@ -221,10 +225,10 @@ export class EventTrackingRepository {
   private trackProductReportingEvent(eventName: string, customSegmentations?: any): void {
     if (this.isProductReportingActivated === true) {
       const userData = {
-        [UserData.IS_TEAM]: this.userRepository.isTeam(),
-        [UserData.CONTACTS]: roundLogarithmic(this.userRepository.numberOfContacts(), 6),
-        [UserData.TEAM_SIZE]: roundLogarithmic(this.userRepository.teamMembers().length, 6),
-        [UserData.TEAM_ID]: this.userRepository.self().teamId,
+        [UserData.IS_TEAM]: this.userState.isTeam(),
+        [UserData.CONTACTS]: roundLogarithmic(this.userState.numberOfContacts(), 6),
+        [UserData.TEAM_SIZE]: roundLogarithmic(this.userState.teamMembers().length, 6),
+        [UserData.TEAM_ID]: this.userState.self().teamId,
         [UserData.USER_TYPE]: this.getUserType(),
       };
       Object.entries(userData).forEach(entry => {

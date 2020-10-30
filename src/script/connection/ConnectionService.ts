@@ -17,7 +17,7 @@
  *
  */
 
-import type {Connection, ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import type {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

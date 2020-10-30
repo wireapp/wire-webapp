@@ -31,6 +31,8 @@ import {viewportObserver} from '../ui/viewportObserver';
 import {validateHandle} from '../user/UserHandleGenerator';
 
 import 'Components/list/participantItem';
+import {UserState} from '../user/UserState';
+import {container} from 'tsyringe';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -61,6 +63,7 @@ interface UserListParams {
   teamRepository: TeamRepository;
   truncate: boolean;
   user: ko.Observable<User[]>;
+  userState?: UserState;
 }
 
 const listTemplate = (data: string, uieName: string = ''): string => `
@@ -140,6 +143,7 @@ ko.components.register('user-list', {
     showEmptyAdmin = false,
     selfFirst = true,
     noSelfInteraction = false,
+    userState = container.resolve(UserState),
   }: UserListParams): void {
     this.filter = filter;
     this.mode = mode;
@@ -150,8 +154,8 @@ ko.components.register('user-list', {
     this.isSelectEnabled = typeof selectedUsers === 'function';
     this.noUnderline = noUnderline;
     this.arrow = arrow;
-    this.selfInTeam = teamRepository.selfUser().inTeam();
-    this.isSelfVerified = teamRepository.selfUser().is_verified;
+    this.selfInTeam = userState.self().inTeam();
+    this.isSelfVerified = userState.self().is_verified;
     this.showRoles = ko.pureComputed(() => !!conversation);
     this.showEmptyAdmin = showEmptyAdmin;
     this.noSelfInteraction = noSelfInteraction;
@@ -185,7 +189,7 @@ ko.components.register('user-list', {
      */
     async function fetchMembersFromBackend(query: string, isHandle: boolean, ignoreMembers: User[]) {
       const resultUsers = await searchRepository.search_by_name(query, isHandle);
-      const selfTeamId = teamRepository.selfUser().teamId;
+      const selfTeamId = userState.self().teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
       const ignoreIds = ignoreMembers.map(member => member.id);
       const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));

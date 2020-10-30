@@ -45,15 +45,20 @@ import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {CallingRepository} from '../calling/CallingRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
-import type {UserRepository} from '../user/UserRepository';
 import type {ActionsViewModel} from './ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import type {AssetRemoteData} from '../assets/AssetRemoteData';
 import {Runtime} from '@wireapp/commons';
+import {UserState} from '../user/UserState';
+import {container} from 'tsyringe';
+import {TeamState} from '../team/TeamState';
 
 export class ListViewModel {
+  private readonly userState: UserState;
+  private readonly teamState: TeamState;
+
   readonly preferences: PreferencesListViewModel;
   readonly takeover: TakeoverViewModel;
   readonly temporaryGuest: TemporaryGuestViewModel;
@@ -64,10 +69,10 @@ export class ListViewModel {
   readonly state: ko.Observable<string>;
   readonly lastUpdate: ko.Observable<number>;
   private readonly elementId: 'left-column';
+
   private readonly conversationRepository: ConversationRepository;
   private readonly callingRepository: CallingRepository;
   private readonly teamRepository: TeamRepository;
-  private readonly userRepository: UserRepository;
   private readonly actionsViewModel: ActionsViewModel;
   private readonly contentViewModel: ContentViewModel;
   private readonly panelViewModel: PanelViewModel;
@@ -97,19 +102,21 @@ export class ListViewModel {
   }
 
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
+    this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
+
     this.elementId = 'left-column';
     this.conversationRepository = repositories.conversation;
     this.callingRepository = repositories.calling;
     this.teamRepository = repositories.team;
-    this.userRepository = repositories.user;
 
     this.actionsViewModel = mainViewModel.actions;
     this.contentViewModel = mainViewModel.content;
     this.panelViewModel = mainViewModel.panel;
 
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
-    this.isProAccount = this.teamRepository.isTeam;
-    this.selfUser = this.userRepository.self;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
+    this.isProAccount = this.teamState.isTeam;
+    this.selfUser = this.userState.self;
 
     this.ModalType = ListViewModel.MODAL_TYPE;
 
@@ -142,7 +149,7 @@ export class ListViewModel {
         return preferenceItems;
       }
 
-      const hasConnectRequests = !!this.userRepository.connectRequests().length;
+      const hasConnectRequests = !!this.userState.connectRequests().length;
       const states: (string | Conversation)[] = hasConnectRequests ? [ContentViewModel.STATE.CONNECTION_REQUESTS] : [];
       return states.concat(this.conversationRepository.conversations_unarchived());
     });
@@ -157,16 +164,9 @@ export class ListViewModel {
       repositories.calling,
       repositories.conversation,
       repositories.preferenceNotification,
-      repositories.team,
-      repositories.user,
       repositories.properties,
     );
-    this.preferences = new PreferencesListViewModel(
-      this.contentViewModel,
-      this,
-      repositories.user,
-      repositories.calling,
-    );
+    this.preferences = new PreferencesListViewModel(this.contentViewModel, this, repositories.calling);
     this.start = new StartUIViewModel(
       mainViewModel,
       this,
@@ -177,12 +177,7 @@ export class ListViewModel {
       repositories.user,
     );
     this.takeover = new TakeoverViewModel(this, repositories.user, repositories.conversation);
-    this.temporaryGuest = new TemporaryGuestViewModel(
-      mainViewModel,
-      repositories.user,
-      repositories.calling,
-      repositories.team,
-    );
+    this.temporaryGuest = new TemporaryGuestViewModel(mainViewModel, repositories.calling, repositories.team);
 
     this._initSubscriptions();
 

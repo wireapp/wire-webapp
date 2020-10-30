@@ -56,7 +56,7 @@ describe('ConversationVerificationStateHandler', () => {
       selfUserEntity.isMe = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
-      spyOn(conversationRepository, 'selfUser').and.returnValue(selfUserEntity);
+      spyOn(conversationRepository.userState, 'self').and.returnValue(selfUserEntity);
 
       userA = new User(createRandomUuid());
       userB = new User(createRandomUuid());

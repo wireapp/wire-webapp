@@ -95,6 +95,7 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
+      spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue({id: 'self-id'});
       spyOn(testFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
       spyOn(testFactory.cryptography_repository, 'encryptGenericMessage').and.returnValue(Promise.resolve(payload));
       spyOn(testFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
@@ -120,6 +121,7 @@ describe('ClientMismatchHandler', () => {
     });
 
     it('should add missing clients to the payload', () => {
+      spyOn(testFactory.event_repository.userState, 'self').and.returnValue({id: 'self-id'});
       spyOn(testFactory.user_repository, 'getClientsByUserId').and.callFake(clientId => {
         return Promise.resolve([
           {class: 'desktop', id: clientId},

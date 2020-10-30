@@ -27,11 +27,12 @@ import {ModalsViewModel} from '../ModalsViewModel';
 import {Config} from '../../Config';
 import type {MainViewModel} from '../MainViewModel';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import type {UserRepository} from '../../user/UserRepository';
 import type {CallingViewModel} from '../CallingViewModel';
 import type {User} from '../../entity/User';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 export class TemporaryGuestViewModel {
   readonly multitasking: Multitasking;
@@ -41,13 +42,13 @@ export class TemporaryGuestViewModel {
 
   constructor(
     mainViewModel: MainViewModel,
-    private readonly userRepository: UserRepository,
     readonly callingRepository: CallingRepository,
     readonly teamRepository: TeamRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.multitasking = mainViewModel.multitasking;
     this.callingViewModel = mainViewModel.calling;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
     this.isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   }
 

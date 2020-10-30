@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 
 import {t, setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
@@ -51,7 +51,6 @@ describe('WindowTitleViewModel', () => {
             state: ko.observable(ContentViewModel.STATE.CONVERSATION),
           },
         },
-        testFactory.user_repository,
         conversationRepository,
       );
     });
@@ -215,7 +214,7 @@ describe('WindowTitleViewModel', () => {
 
     it('shows the number of connection requests when viewing the inbox', () => {
       title_view_model.contentState(ContentViewModel.STATE.CONNECTION_REQUESTS);
-      title_view_model.userRepository.connectRequests = ko.observableArray([]);
+      title_view_model.userState.connectRequests = ko.observableArray([]);
 
       const firstConnectedUser = new User(createRandomUuid());
       const secondConnectedUser = new User(createRandomUuid());
@@ -239,7 +238,7 @@ describe('WindowTitleViewModel', () => {
       title_view_model.initiateTitleUpdates();
 
       tests.forEach(({connections, expected}) => {
-        title_view_model.userRepository.connectRequests(connections);
+        title_view_model.userState.connectRequests(connections);
         jasmine.clock().tick(WindowTitleViewModel.TITLE_DEBOUNCE);
 
         expect(window.document.title).toBe(expected);

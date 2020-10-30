@@ -33,7 +33,7 @@ import {actionRoot} from '../module/action';
 import waitForExpect from 'wait-for-expect';
 import {createMemoryHistory} from 'history';
 import {ROUTE} from '../route';
-import {ClientType} from '@wireapp/api-client/dist/client';
+import {ClientType} from '@wireapp/api-client/src/client';
 import {BackendError} from '../module/action/BackendError';
 
 class LoginPage {

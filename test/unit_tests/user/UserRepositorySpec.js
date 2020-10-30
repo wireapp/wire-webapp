@@ -40,7 +40,7 @@ describe('UserRepository', () => {
   });
 
   afterEach(() => {
-    testFactory.user_repository.users.removeAll();
+    testFactory.user_repository.userState.users.removeAll();
     server.restore();
   });
 
@@ -171,7 +171,7 @@ describe('UserRepository', () => {
       });
 
       afterEach(() => {
-        testFactory.user_repository.users.removeAll();
+        testFactory.user_repository.userState.users.removeAll();
       });
 
       it('should find an existing user', () => {
@@ -188,7 +188,7 @@ describe('UserRepository', () => {
     });
 
     describe('saveUser', () => {
-      afterEach(() => testFactory.user_repository.users.removeAll());
+      afterEach(() => testFactory.user_repository.userState.users.removeAll());
 
       it('saves a user', () => {
         const user = new User();
@@ -196,8 +196,8 @@ describe('UserRepository', () => {
 
         testFactory.user_repository.saveUser(user);
 
-        expect(testFactory.user_repository.users().length).toBe(1);
-        expect(testFactory.user_repository.users()[0]).toBe(user);
+        expect(testFactory.user_repository.userState.users().length).toBe(1);
+        expect(testFactory.user_repository.userState.users()[0]).toBe(user);
       });
 
       it('saves self user', () => {
@@ -206,9 +206,9 @@ describe('UserRepository', () => {
 
         testFactory.user_repository.saveUser(user, true);
 
-        expect(testFactory.user_repository.users().length).toBe(1);
-        expect(testFactory.user_repository.users()[0]).toBe(user);
-        expect(testFactory.user_repository.self()).toBe(user);
+        expect(testFactory.user_repository.userState.users().length).toBe(1);
+        expect(testFactory.user_repository.userState.users()[0]).toBe(user);
+        expect(testFactory.user_repository.userState.self()).toBe(user);
       });
     });
 
@@ -217,7 +217,7 @@ describe('UserRepository', () => {
       let userJohnDoe = null;
 
       beforeEach(() => {
-        testFactory.user_repository.users.removeAll();
+        testFactory.user_repository.userState.users.removeAll();
         userJaneRoe = new User(entities.user.jane_roe.id);
         userJohnDoe = new User(entities.user.john_doe.id);
 
@@ -233,7 +233,7 @@ describe('UserRepository', () => {
         spyOn(testFactory.client_repository, 'getAllClientsFromDb').and.returnValue(Promise.resolve(recipients));
       });
 
-      afterEach(() => testFactory.user_repository.users.removeAll());
+      afterEach(() => testFactory.user_repository.userState.users.removeAll());
 
       it('assigns all available clients to the users', () => {
         return testFactory.user_repository.assignAllClients().then(() => {

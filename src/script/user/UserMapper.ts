@@ -17,8 +17,8 @@
  *
  */
 
-import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
-import type {Self as APIClientSelf} from '@wireapp/api-client/dist/self';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+import type {Self as APIClientSelf} from '@wireapp/api-client/src/self';
 
 import {joaatHash} from 'Util/Crypto';
 import {Logger, getLogger} from 'Util/Logger';

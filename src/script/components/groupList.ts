@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {Conversation} from '../entity/Conversation';
 import {generateConversationUrl} from '../router/routeGenerator';
 
@@ -31,13 +31,13 @@ interface GroupListViewModelParams {
 class GroupListViewModel {
   groups: ko.ObservableArray<Conversation[]>;
   onSelect: (group: Conversation) => void;
-  ParticipantAvatar: typeof ParticipantAvatar;
+  AVATAR_SIZE: typeof AVATAR_SIZE;
   readonly getConversationUrl: (conversationId: string) => string;
 
   constructor(params: GroupListViewModelParams) {
     this.groups = params.groups;
     this.onSelect = params.click;
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
     this.getConversationUrl = generateConversationUrl;
   }
 }
@@ -49,7 +49,7 @@ ko.components.register('group-list', {
       <div class="search-list-item" data-bind="link_to: getConversationUrl(group.id), click: () => onSelect(group), attr: {'data-uie-uid': group.id, 'data-uie-value': group.display_name}" data-uie-name="item-group">
         <div class="search-list-item-image">
           <!-- ko if: group.is1to1() -->
-            <participant-avatar params="participant: group.participating_user_ets()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+            <participant-avatar params="participant: group.participating_user_ets()[0], size: AVATAR_SIZE.SMALL"></participant-avatar>
           <!-- /ko -->
           <!-- ko ifnot: group.is1to1() -->
             <group-avatar params="users: group.participating_user_ets()"></group-avatar>

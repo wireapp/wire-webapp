@@ -18,10 +18,10 @@
  */
 
 import {amplify} from 'amplify';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {Availability} from '@wireapp/protocol-messaging';
-import {NotificationPreference} from '@wireapp/api-client/dist/user/data';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {NotificationPreference} from '@wireapp/api-client/src/user/data';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/LocalizerUtil';
@@ -76,7 +76,7 @@ describe('NotificationRepository', () => {
   const contentViewModelState = {};
 
   beforeEach(() => {
-    return testFactory.exposeNotificationActors().then(() => {
+    return testFactory.exposeNotificationActors().then(notificationRepository => {
       amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
       // Create entities
@@ -88,6 +88,7 @@ describe('NotificationRepository', () => {
       selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
+      notificationRepository.selfUser(selfUserEntity);
 
       // Notification
       const title = conversation_et.display_name();
@@ -318,7 +319,7 @@ describe('NotificationRepository', () => {
 
     it('filters all notifications (but composite) if user is "away"', () => {
       spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
-        return {...testFactory.user_repository.self(), availability: () => Availability.Type.AWAY};
+        return {...testFactory.user_repository['userState'].self(), availability: () => Availability.Type.AWAY};
       });
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
@@ -337,7 +338,7 @@ describe('NotificationRepository', () => {
 
     it('filters content and ping messages when user is "busy"', () => {
       spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
-        return {...testFactory.user_repository.self(), availability: () => Availability.Type.BUSY};
+        return {...testFactory.user_repository['userState'].self(), availability: () => Availability.Type.BUSY};
       });
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
@@ -356,7 +357,7 @@ describe('NotificationRepository', () => {
 
     it('it allows mentions, calls and composite when user is "busy"', () => {
       spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
-        return {...testFactory.user_repository.self(), availability: () => Availability.Type.BUSY};
+        return {...testFactory.user_repository['userState'].self(), availability: () => Availability.Type.BUSY};
       });
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 

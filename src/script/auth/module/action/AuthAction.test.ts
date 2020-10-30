@@ -18,7 +18,7 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/dist/client';
+import {ClientType} from '@wireapp/api-client/src/client';
 import type {TypeUtil} from '@wireapp/commons';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 

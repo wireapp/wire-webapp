@@ -17,7 +17,7 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/dist/client/index';
+import {RegisteredClient} from '@wireapp/api-client/src/client/index';
 import {
   COLOR,
   ContainerXS,

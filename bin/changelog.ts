@@ -24,7 +24,7 @@ simpleGit.tags(
       repoUrl: pkg.repository.url.replace('.git', ''),
       tag: `${latestProductionTag}...${currentProductionTag}`,
     });
-    console.info(`Changelog size: ${changelog.length}`);
+    console.info(`Generating changelog with commits from "${latestProductionTag}" to "${currentProductionTag}".`);
     fs.outputFileSync(outputPath, changelog, 'utf8');
     console.info(`Wrote file to: ${outputPath}`);
   },

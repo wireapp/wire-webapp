@@ -25,7 +25,7 @@ import 'Components/list/groupedConversations';
 import ko from 'knockout';
 import {amplify} from 'amplify';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
@@ -36,19 +36,20 @@ import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
 import {ListViewModel} from '../ListViewModel';
-import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {MainViewModel} from '../MainViewModel';
 import type {CallingViewModel} from '../CallingViewModel';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
-import type {TeamRepository} from '../../team/TeamRepository';
-import type {UserRepository} from '../../user/UserRepository';
 import type {PropertiesRepository} from '../../properties/PropertiesRepository';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import type {EventRepository} from '../../event/EventRepository';
 import type {Availability} from '@wireapp/protocol-messaging';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 export class ConversationListViewModel {
   readonly startTooltip: string;
@@ -68,7 +69,7 @@ export class ConversationListViewModel {
   readonly showConnectRequests: ko.PureComputed<boolean>;
   readonly selfAvailability: ko.PureComputed<Availability.Type>;
   readonly getConversationUrl: (conversationId: string) => string;
-  readonly participantAvatarSize: typeof ParticipantAvatar.SIZE.SMALL;
+  readonly participantAvatarSize: typeof AVATAR_SIZE.SMALL;
   readonly getIsVisibleFunc: () => (() => boolean) | ((top: number, bottom: number) => boolean);
   private readonly logger: Logger;
   private readonly selfUser: ko.PureComputed<User>;
@@ -91,11 +92,11 @@ export class ConversationListViewModel {
     readonly callingRepository: CallingRepository,
     readonly conversationRepository: ConversationRepository,
     private readonly preferenceNotificationRepository: PreferenceNotificationRepository,
-    private readonly teamRepository: TeamRepository,
-    private readonly userRepository: UserRepository,
     private readonly propertiesRepository: PropertiesRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
-    this.participantAvatarSize = ParticipantAvatar.SIZE.SMALL;
+    this.participantAvatarSize = AVATAR_SIZE.SMALL;
 
     this.contentViewModel = mainViewModel.content;
     this.callingViewModel = mainViewModel.calling;
@@ -110,15 +111,15 @@ export class ConversationListViewModel {
 
     this.isOnLegalHold = ko.pureComputed(() => this.selfUser().isOnLegalHold());
     this.hasPendingLegalHold = ko.pureComputed(() => this.selfUser().hasPendingLegalHold());
-    this.isTeam = this.teamRepository.isTeam;
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.isTeam = this.teamState.isTeam;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
     this.getConversationUrl = generateConversationUrl;
 
-    this.selfUser = ko.pureComputed(() => this.userRepository.self && this.userRepository.self());
+    this.selfUser = ko.pureComputed(() => this.userState.self && this.userState.self());
     this.selfAvailability = ko.pureComputed(() => this.selfUser() && this.selfUser().availability());
     this.selfUserName = ko.pureComputed(() => this.selfUser() && this.selfUser().name());
 
-    this.connectRequests = this.userRepository.connectRequests;
+    this.connectRequests = this.userState.connectRequests;
     this.connectRequestsText = ko.pureComputed(() => {
       const reqCount = this.connectRequests().length;
       const hasMultipleRequests = reqCount > 1;

@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ConversationMemberJoinEvent} from '@wireapp/api-client/dist/event';
+import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -39,12 +39,11 @@ import {ServiceTag} from './ServiceTag';
 import {ConversationError} from '../error/ConversationError';
 import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
+import {container} from 'tsyringe';
+import {TeamState} from '../team/TeamState';
 
 export class IntegrationRepository {
-  private readonly conversationRepository: ConversationRepository;
-  private readonly integrationService: IntegrationService;
   private readonly logger: Logger;
-  private readonly teamRepository: TeamRepository;
   public readonly isTeam: ko.PureComputed<boolean>;
   public readonly services: ko.ObservableArray<ServiceEntity>;
 
@@ -61,9 +60,10 @@ export class IntegrationRepository {
   }
 
   constructor(
-    integrationService: IntegrationService,
-    conversationRepository: ConversationRepository,
-    teamRepository: TeamRepository,
+    private readonly integrationService: IntegrationService,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly teamRepository: TeamRepository,
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('IntegrationRepository');
 
@@ -72,7 +72,7 @@ export class IntegrationRepository {
     this.conversationRepository = conversationRepository;
     this.teamRepository = teamRepository;
 
-    this.isTeam = this.teamRepository.isTeam;
+    this.isTeam = this.teamState.isTeam;
     this.services = ko.observableArray([]);
   }
 
@@ -233,7 +233,7 @@ export class IntegrationRepository {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
     try {
-      let serviceEntities = await this.teamRepository.getWhitelistedServices(this.teamRepository.team().id);
+      let serviceEntities = await this.teamRepository.getWhitelistedServices(this.teamState.team().id);
       const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
       if (isCurrentQuery) {
         serviceEntities = serviceEntities

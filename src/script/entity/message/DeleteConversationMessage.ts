@@ -17,7 +17,7 @@
  *
  */
 
-import {TEAM_EVENT} from '@wireapp/api-client/dist/event/TeamEvent';
+import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 
 import {t} from 'Util/LocalizerUtil';
 

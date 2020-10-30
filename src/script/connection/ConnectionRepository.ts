@@ -17,10 +17,10 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
-import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/dist/event';
-import type {BackendEventType} from '@wireapp/api-client/dist/event/BackendEvent';
-import type {UserConnectionData} from '@wireapp/api-client/dist/user/data';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
+import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/src/event';
+import type {BackendEventType} from '@wireapp/api-client/src/event/BackendEvent';
+import type {UserConnectionData} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';

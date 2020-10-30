@@ -40,11 +40,11 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {RequestCancellationError} from '@wireapp/api-client/dist/user';
-import {ReactionType} from '@wireapp/core/dist/conversation';
+import {RequestCancellationError} from '@wireapp/api-client/src/user';
+import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/dist/conversation';
+import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
@@ -84,23 +84,23 @@ import {ClientRepository} from '../client/ClientRepository';
 import {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
-import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {MessageSender} from '../message/MessageSender';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {ContentMessage} from '../entity/message/ContentMessage';
-import {TeamEntity} from '../team/TeamEntity';
-import {User} from '../entity/User';
 import {EventService} from '../event/EventService';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {MentionEntity} from '../message/MentionEntity';
-import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/dist/conversation/content';
+import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import type {EventRecord} from '../storage';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
+import {TeamState} from '../team/TeamState';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -112,9 +112,6 @@ export class MessageRepository {
   public readonly clientMismatchHandler: ClientMismatchHandler;
   private readonly blockNotificationHandling: ko.Observable<boolean>;
 
-  private readonly isTeam: ko.PureComputed<boolean>;
-  private readonly selfUser: ko.Observable<User>;
-  private readonly team: ko.Observable<TeamEntity>;
   private readonly selfConversation: ko.PureComputed<Conversation>;
 
   constructor(
@@ -126,20 +123,18 @@ export class MessageRepository {
     private readonly propertyRepository: PropertiesRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
-    private readonly teamRepository: TeamRepository,
     private readonly conversation_service: ConversationService,
     private readonly link_repository: LinkPreviewRepository,
     private readonly assetRepository: AssetRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.eventService = eventRepository.eventService;
     this.event_mapper = new EventMapper();
     this.logger = getLogger('MessageRepository');
 
-    this.isTeam = this.teamRepository.isTeam;
-    this.team = this.teamRepository.team;
-    this.selfUser = this.userRepository.self;
     this.selfConversation = ko.pureComputed(() =>
-      this.conversationRepositoryProvider().find_conversation_by_id(this.selfUser()?.id),
+      this.conversationRepositoryProvider().find_conversation_by_id(this.userState.self()?.id),
     );
 
     this.clientMismatchHandler = new ClientMismatchHandler(
@@ -449,7 +444,7 @@ export class MessageRepository {
     let genericMessage: GenericMessage;
 
     await this.getMessageInConversationById(conversationEntity, messageId);
-    const retention = this.assetRepository.getAssetRetention(this.selfUser(), conversationEntity);
+    const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversationEntity);
     const options = {
       expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
       legalHoldStatus: conversationEntity.legalHoldStatus(),
@@ -1261,9 +1256,9 @@ export class MessageRepository {
       return false;
     }
 
-    if (this.isTeam()) {
+    if (this.teamState.isTeam()) {
       const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(
-        id => id !== this.selfUser().id,
+        id => id !== this.userState.self().id,
       );
       const userIdsWithoutClients = [];
       for (const recipientId of allRecipientsBesideSelf) {
@@ -1280,7 +1275,7 @@ export class MessageRepository {
         const isDeleted = user?.deleted === true;
 
         if (isDeleted) {
-          await this.conversationRepositoryProvider().teamMemberLeave(this.team().id, user.id);
+          await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, user.id);
         }
       }
     }
@@ -1313,7 +1308,7 @@ export class MessageRepository {
           conversationId,
           legalHoldStatus: updatedLocalLegalHoldStatus,
           timestamp: numericTimestamp,
-          userId: this.selfUser().id,
+          userId: this.userState.self().id,
         });
       }
 
@@ -1348,7 +1343,7 @@ export class MessageRepository {
       conversationEntity.needsLegalHoldApproval = false;
       return showLegalHoldWarning(conversationEntity, conversationDegraded);
     } else if (shouldShowLegalHoldWarning) {
-      conversationEntity.needsLegalHoldApproval = !this.selfUser().isOnLegalHold() && isLegalHoldMessageType;
+      conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
     }
     if (!conversationDegraded) {
       return false;
@@ -1457,7 +1452,7 @@ export class MessageRepository {
       if (error.missing) {
         const remoteUserClients = error.missing as Recipients;
         const localUserClients = await this.create_recipients(conversationEntity.id);
-        const selfId = this.selfUser().id;
+        const selfId = this.userState.self().id;
 
         const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
           if (userId === selfId) {
@@ -1765,7 +1760,7 @@ export class MessageRepository {
         break;
     }
     if (actionType) {
-      const selfUserTeamId = this.selfUser().teamId;
+      const selfUserTeamId = this.userState.self().teamId;
       const participants = conversationEntity.participating_user_ets();
       const guests = participants.filter(user => user.isGuest()).length;
       const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
