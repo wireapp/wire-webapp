@@ -1532,7 +1532,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.selfConversation().id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       this.logger.info(`Sent countly sync message with ID ${countlyId}`);
