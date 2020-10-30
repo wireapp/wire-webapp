@@ -33,7 +33,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {MediumImage} from '../entity/message/MediumImage';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {MessageCategory} from '../message/MessageCategory';
+import {isNonGifImage, MessageCategory} from '../message/MessageCategory';
 import {Message} from '../entity/message/Message';
 
 export class ImageDetailViewViewModel {
@@ -44,7 +44,7 @@ export class ImageDetailViewViewModel {
   imageSrc: ko.Observable<string>;
   imageVisible: ko.Observable<boolean>;
   conversationEntity: ko.Observable<Conversation>;
-  items: ko.ObservableArray<ContentMessage>;
+  items: ko.ObservableArray<string>;
   messageEntity: ko.Observable<ContentMessage>;
 
   constructor(
@@ -77,7 +77,7 @@ export class ImageDetailViewViewModel {
       }
     });
 
-    amplify.subscribe(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, this.newShow);
+    amplify.subscribe(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, this.show);
 
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
@@ -126,31 +126,12 @@ export class ImageDetailViewViewModel {
     });
   };
 
-  show = (messageEntity: ContentMessage, messageEntities: ContentMessage[], source: string) => {
-    this.items(messageEntities);
-    this.messageEntity(messageEntity);
-    this.source = source;
-
-    amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
-
-    if (!this.imageModal) {
-      this.imageModal = new Modal('#detail-view', this.hideCallback, this.beforeHideCallback);
-    }
-
-    this.imageModal.show();
-
-    this.loadImage();
-    this.addKeyListeners();
-  };
-
-  newShow = async (messageId: string, conversation: Conversation, source: string) => {
+  show = async (messageId: string, conversation: Conversation, source: string) => {
     this.conversationEntity(conversation);
     const items: Message[] = (
       await this.conversationRepository.get_events_for_category(conversation, MessageCategory.IMAGE)
-    ).filter(item => item.category & MessageCategory.IMAGE && !(item.category & MessageCategory.GIF));
-    this.items(items as ContentMessage[]);
+    ).filter(isNonGifImage);
+    this.items(items.map(({id}) => id));
     const message = items.find(({id}) => id === messageId) ?? items[0];
     this.messageEntity(message as ContentMessage);
     this.source = source;
@@ -169,11 +150,10 @@ export class ImageDetailViewViewModel {
     this.addKeyListeners();
   };
 
-  messageAdded = (messageEntity: ContentMessage) => {
-    const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
-    const isImage = messageEntity.category & MessageCategory.IMAGE && !(messageEntity.category & MessageCategory.GIF);
-    if (isCurrentConversation && isImage) {
-      this.items.push(messageEntity);
+  messageAdded = (message: ContentMessage) => {
+    const isCurrentConversation = this.conversationEntity().id === message.conversation_id;
+    if (isCurrentConversation && isNonGifImage(message)) {
+      this.items.push(message.id);
     }
   };
 
@@ -189,7 +169,7 @@ export class ImageDetailViewViewModel {
         return this.imageModal.hide();
       }
 
-      this.items.remove(messageEntity => messageEntity.id === messageId);
+      this.items.remove(id => id === messageId);
     }
   };
 
@@ -235,11 +215,15 @@ export class ImageDetailViewViewModel {
     this.iterateImage(false);
   };
 
-  private readonly iterateImage = (reverse: boolean) => {
-    const nextMessageEntity = iterateItem(this.items(), this.messageEntity(), reverse);
+  private readonly iterateImage = async (reverse: boolean) => {
+    const nextMessageId = iterateItem(this.items(), this.messageEntity().id, reverse);
 
-    if (nextMessageEntity) {
-      this.messageEntity(nextMessageEntity);
+    if (nextMessageId) {
+      const message = await this.messageRepository.getMessageInConversationById(
+        this.conversationEntity(),
+        nextMessageId,
+      );
+      this.messageEntity(message);
       this.loadImage();
     }
   };

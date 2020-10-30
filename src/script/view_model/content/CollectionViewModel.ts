@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {MessageCategory} from '../../message/MessageCategory';
+import {isNonGifImage, MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
@@ -122,10 +122,7 @@ export class CollectionViewModel {
   private _populateItems(messageEntities: ContentMessage[]) {
     messageEntities.forEach((messageEntity: ContentMessage) => {
       if (!messageEntity.is_expired()) {
-        // TODO: create binary map helper
-        const isImage = messageEntity.category & MessageCategory.IMAGE;
-        const isGif = messageEntity.category & MessageCategory.GIF;
-        if (isImage && !isGif) {
+        if (isNonGifImage(messageEntity)) {
           return this.images.push(messageEntity);
         }
 

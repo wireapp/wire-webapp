@@ -17,6 +17,8 @@
  *
  */
 
+import {Message} from '../entity/message/Message';
+
 /** Enum for different message categories */
 export enum MessageCategory {
   AUDIO = 1 << 10,
@@ -36,3 +38,6 @@ export enum MessageCategory {
   UNDEFINED = 1 << 0,
   VIDEO = 1 << 11,
 }
+
+export const isNonGifImage = ({category}: Message) =>
+  category & MessageCategory.IMAGE && !(category & MessageCategory.GIF);

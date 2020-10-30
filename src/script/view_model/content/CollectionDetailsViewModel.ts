@@ -25,7 +25,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {MessageCategory} from '../../message/MessageCategory';
+import {isNonGifImage, MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 import {Conversation} from '../../entity/Conversation';
 import {ContentMessage} from '../../entity/message/ContentMessage';
@@ -71,9 +71,7 @@ export class CollectionDetailsViewModel {
     if (isCurrentConversation) {
       switch (this.template()) {
         case 'images': {
-          const isImage = messageEntity.category & MessageCategory.IMAGE;
-          const isGif = messageEntity.category & MessageCategory.GIF;
-          if (isImage && !isGif) {
+          if (isNonGifImage(messageEntity)) {
             this.items.push(messageEntity);
           }
           break;
