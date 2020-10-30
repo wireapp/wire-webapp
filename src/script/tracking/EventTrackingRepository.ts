@@ -28,11 +28,13 @@ import {URLParameter} from '../auth/URLParameter';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
-import {loadValue, storeValue} from 'Util/StorageUtil';
+import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {EventName} from './EventName';
+import type {MessageRepository} from '../conversation/MessageRepository';
+import {ClientEvent} from '../event/Client';
 import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 
@@ -41,7 +43,7 @@ const Countly = require('countly-sdk-web');
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean;
   private sendAppOpenEvent: boolean = true;
-  private readonly countlyDeviceId: string;
+  private countlyDeviceId: string;
   private readonly logger: Logger;
   isErrorReportingActivated: boolean;
 
@@ -51,33 +53,91 @@ export class EventTrackingRepository {
         API_KEY: window.wire.env.ANALYTICS_API_KEY,
         CLIENT_TYPE: 'desktop',
         COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_DEVICE_ID',
+        COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID: 'COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID',
+        COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_OLD_DEVICE_ID',
         DISABLED_DOMAINS: ['localhost'],
       },
     };
   }
 
-  constructor(private readonly userState = container.resolve(UserState)) {
+  constructor(
+    private readonly messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
+  ) {
     this.logger = getLogger('EventTrackingRepository');
 
     this.isErrorReportingActivated = false;
     this.isProductReportingActivated = false;
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
+  }
 
+  onUserEvent = (eventJson: any, source: EventSource) => {
+    const type = eventJson.type;
+    if (type !== ClientEvent.USER.DATA_TRANSFER) {
+      return;
+    }
+    this.migrateDeviceId(eventJson.data.trackingIdentifier);
+  };
+
+  migrateDeviceId = async (newId: string) => {
+    try {
+      let stopOnFinish = false;
+      if (!this.isProductReportingActivated) {
+        await this.startProductReporting(this.countlyDeviceId);
+        stopOnFinish = true;
+      }
+      Countly.change_id(newId, true);
+      storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY, newId);
+      this.logger.info(`Countly tracking id has been changed from ${this.countlyDeviceId} to ${newId}`);
+      this.countlyDeviceId = newId;
+      if (stopOnFinish) {
+        this.stopProductReporting();
+      }
+    } catch (error) {
+      this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+      storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID, newId);
+    }
+  };
+
+  async init(telemetrySharing: boolean | undefined): Promise<void> {
     const previousCountlyDeviceId = loadValue<string>(
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
+    const unsyncedCountlyDeviceId = loadValue<string>(
+      EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
+    );
+
+    if (unsyncedCountlyDeviceId) {
+      try {
+        this.messageRepository.sendCountlySync(this.countlyDeviceId);
+        resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
+      } catch (error) {
+        this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+      }
+    }
 
     if (previousCountlyDeviceId) {
       this.countlyDeviceId = previousCountlyDeviceId;
+      const notMigratedCountlyTrackingId = loadValue<string>(
+        EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID,
+      );
+      if (notMigratedCountlyTrackingId) {
+        this.migrateDeviceId(notMigratedCountlyTrackingId);
+      }
     } else {
       this.countlyDeviceId = createRandomUuid();
       storeValue(
         EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY,
         this.countlyDeviceId,
       );
+      try {
+        this.messageRepository.sendCountlySync(this.countlyDeviceId);
+      } catch (error) {
+        this.logger.info(`Failed to send new countly tracking id to other devices ${error}`);
+        storeValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY, true);
+      }
     }
-  }
 
-  async init(telemetrySharing: boolean | undefined): Promise<void> {
     const isTeam = this.userState.isTeam();
     if (!isTeam) {
       return; // Countly should not be enabled for non-team users
@@ -107,7 +167,7 @@ export class EventTrackingRepository {
     this.unsubscribeFromProductTrackingEvents();
   }
 
-  private async startProductReporting(): Promise<void> {
+  private async startProductReporting(trackingId?: string): Promise<void> {
     if (!window.wire.env.COUNTLY_API_KEY || this.isProductReportingActivated) {
       return;
     }
@@ -116,7 +176,7 @@ export class EventTrackingRepository {
     Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
       debug: !Environment.frontend.isProduction(),
-      device_id: this.countlyDeviceId,
+      device_id: trackingId || this.countlyDeviceId,
       url: 'https://countly.wire.com/',
       use_session_cookie: false,
     });

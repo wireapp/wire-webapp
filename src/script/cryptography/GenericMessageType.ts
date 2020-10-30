@@ -27,6 +27,7 @@ export enum GENERIC_MESSAGE_TYPE {
   CLIENT_ACTION = 'clientAction',
   COMPOSITE_MESSAGE = 'composite',
   CONFIRMATION = 'confirmation',
+  DATA_TRANSFER = 'dataTransfer',
   DELETED = 'deleted',
   EDITED = 'edited',
   EPHEMERAL = 'ephemeral',

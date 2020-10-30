@@ -253,7 +253,6 @@ class App {
     );
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
     repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
-    repositories.eventTracker = new EventTrackingRepository();
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
@@ -279,6 +278,8 @@ class App {
       new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.asset,
     );
+
+    repositories.eventTracker = new EventTrackingRepository(repositories.message);
 
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
     const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
