@@ -146,7 +146,7 @@
     "less": "3.12.2",
     "lint-staged": "10.4.2",
     "load-grunt-tasks": "5.1.0",
-    "node-sass": "4.14.1",
+    "node-sass": "5.0.0",
     "postcss-cssnext": "3.1.0",
     "postcss-import": "12.0.1",
     "postcss-scss": "3.0.2",
