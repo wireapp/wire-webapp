@@ -1137,12 +1137,12 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@formatjs/cli@2.13.2":
-  version "2.13.2"
-  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-2.13.2.tgz#08402f07eb6c6cb626ccd33e304012f30c1fb345"
-  integrity sha512-o0jY7AmaXIHugiV35xhKeNYQ9pzTi0O+stfZqY0+Sqb3MFk6oLz/K5ExvnXHvf3soiCOat4UhzAxHSR9T0QWwQ==
+"@formatjs/cli@2.13.5":
+  version "2.13.5"
+  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-2.13.5.tgz#833892bfa01df1c6f1eab438585a10675a553b09"
+  integrity sha512-t4dWNXjguodNL2xYWCnVqXjm36QNkMUMQPbYvILIjgLxoQSqY5/t9qgF1QwAFt6zhMPzvrw+FRdO9dBYupRcvQ==
   dependencies:
-    "@formatjs/ts-transformer" "^2.11.3"
+    "@formatjs/ts-transformer" "^2.12.0"
     "@types/json-stable-stringify" "^1.0.32"
     "@types/lodash" "^4.14.150"
     "@types/loud-rejection" "^2.0.0"
@@ -1151,7 +1151,7 @@
     commander "^6.1.0"
     fast-glob "^3.2.4"
     fs-extra "^9.0.0"
-    intl-messageformat-parser "^6.0.10"
+    intl-messageformat-parser "^6.0.11"
     json-stable-stringify "^1.0.1"
     lodash "^4.17.15"
     loud-rejection "^2.2.0"
@@ -1162,6 +1162,13 @@
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.2.5.tgz#5a61ac1990ff2df8d1348ab12e186c1ca2a2bd71"
   integrity sha512-k0fqS3LBNOHueAoMdgig8Ni6TchsH+zbzWBzX2gTFm50X9mxHwnuXdCk0XLlCIbvgVVlzcO254Men/mHAheMbg==
+  dependencies:
+    tslib "^2.0.1"
+
+"@formatjs/ecma402-abstract@^1.2.6":
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.2.6.tgz#8929525dcb49af31f348fcb4789263743872b57f"
+  integrity sha512-5/wUWuOFEaZeHhDvc+xgkFZxjYcij9/CjyUHngTfWhx+NwYqo8/xusVYv9SnTYDHAahek3OSCP93tzcv4M+7Xw==
   dependencies:
     tslib "^2.0.1"
 
@@ -1203,12 +1210,12 @@
     intl-messageformat-parser "^6.0.10"
     tslib "^2.0.1"
 
-"@formatjs/ts-transformer@^2.11.3":
-  version "2.11.3"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.11.3.tgz#9d253ba4681f1654dddbfb43e453d0692f8c85c9"
-  integrity sha512-nt51rmoeDnORFXGkJGX3tpC1oYY6WDkJTpOCCsYkRxWxmgY1kT5v8wckNB/CvBmz4egFNShr1iRNDa7o+EsKZA==
+"@formatjs/ts-transformer@^2.12.0":
+  version "2.12.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.12.0.tgz#71bb3d1af3e818996211b36231d1b753859f46f9"
+  integrity sha512-bi7XVicXTPHMEK4vapp29wJQnBHt9IrNW5QREiBPR5NF52EGvuVQeLmfU17nnojnHf4+X0PoamW7Sr0WPTtmWA==
   dependencies:
-    intl-messageformat-parser "^6.0.10"
+    intl-messageformat-parser "^6.0.11"
     tslib "^2.0.1"
     typescript "^4.0"
 
@@ -7421,12 +7428,12 @@ interpret@~1.1.0:
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.1.0.tgz#7ed1b1410c6a0e0f78cf95d3b8440c63f78b8614"
   integrity sha1-ftGxQQxqDg94z5XTuEQMY/eLhhQ=
 
-intl-messageformat-parser@^6.0.10:
-  version "6.0.10"
-  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-6.0.10.tgz#6202bd4e9b59eaa5bf34d4db2ef8c2af46d40037"
-  integrity sha512-xURB8PchDsdLEpedzPLzBmGCK996FPBl3yLQIUxcM3EAA3TdhXPArX6GY4LVXQNeq8V4WtwmgxaJOKtdOpA8pg==
+intl-messageformat-parser@^6.0.10, intl-messageformat-parser@^6.0.11:
+  version "6.0.11"
+  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-6.0.11.tgz#b5769990f9eb8c015ef726cf4d782a9445544993"
+  integrity sha512-0avgk5LN8KGpH6CC8OsDAttzkTtR/6Oy50dYaUpbulnNUDrSxPFMc79IJRktN8PT+HwOzhk26vvfJHXyPdf6ZA==
   dependencies:
-    "@formatjs/ecma402-abstract" "^1.2.5"
+    "@formatjs/ecma402-abstract" "^1.2.6"
     tslib "^2.0.1"
 
 intl-messageformat@^9.3.11:
