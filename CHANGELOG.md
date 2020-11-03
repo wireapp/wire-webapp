@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.30.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.30.6...@wireapp/api-client@11.30.7) (2020-11-03)
+
+
+### Bug Fixes
+
+* **api-client:** Optional User assets attribute ([#3321](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3321)) ([db0950a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/db0950ab7992918292cc2f0374e00f5823932174))
+
+
+
+
+
 ## [11.30.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.30.5...@wireapp/api-client@11.30.6) (2020-10-29)
 
 **Note:** Version bump only for package @wireapp/api-client
