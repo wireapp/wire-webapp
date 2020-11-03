@@ -32,7 +32,6 @@ import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 import {Config} from '../../Config';
 import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
-import {MessageCategory} from '../../message/MessageCategory';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {UserError} from '../../error/UserError';
 import {MemberMessage} from '../../entity/message/MemberMessage';
