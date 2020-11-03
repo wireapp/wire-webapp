@@ -24,7 +24,7 @@ import {UserAsset} from '../user/';
 
 export interface User {
   accent_id?: AccentColor.AccentColorID;
-  assets: UserAsset[];
+  assets?: UserAsset[];
   deleted?: boolean;
   email?: string;
   expires_at?: string;
