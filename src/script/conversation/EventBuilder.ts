@@ -339,7 +339,7 @@ export const EventBuilder = {
     };
   },
 
-  buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number | string): ErrorEvent {
+  buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number): ErrorEvent {
     const {conversation: conversationId, data: eventData, from, time} = event;
 
     return {
