@@ -33,6 +33,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {MediumImage} from '../entity/message/MediumImage';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {MessageCategory} from '../message/MessageCategory';
 
 export class ImageDetailViewViewModel {
   elementId: 'detail-view';
@@ -141,7 +142,8 @@ export class ImageDetailViewViewModel {
 
   messageAdded = (messageEntity: ContentMessage) => {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
-    if (isCurrentConversation) {
+    const isImage = messageEntity.category & MessageCategory.IMAGE && !(messageEntity.category & MessageCategory.GIF);
+    if (isCurrentConversation && isImage) {
       this.items.push(messageEntity);
     }
   };
