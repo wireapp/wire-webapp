@@ -173,7 +173,7 @@ describe('MediaDevicesHandler', () => {
       const devicesHandler = new MediaDevicesHandler();
 
       setTimeout(() => {
-        expect(devicesHandler.availableDevices.audioInput().length).withContext('Available microphones').toEqual(1);
+        expect(devicesHandler.availableDevices.audioInput().length).toEqual(1);
       });
     });
 
@@ -184,14 +184,14 @@ describe('MediaDevicesHandler', () => {
 
       const devicesHandler = new MediaDevicesHandler();
 
-      expect(realWorldTestSetup.cameras.length).withContext('Unfiltered cameras').toEqual(2);
-      expect(realWorldTestSetup.microphones.length).withContext('Unfiltered microphones').toEqual(5);
-      expect(realWorldTestSetup.speakers.length).withContext('Unfiltered speakers').toEqual(7);
+      expect(realWorldTestSetup.cameras.length).toEqual(2);
+      expect(realWorldTestSetup.microphones.length).toEqual(5);
+      expect(realWorldTestSetup.speakers.length).toEqual(7);
 
       setTimeout(() => {
-        expect(devicesHandler.availableDevices.videoInput().length).withContext('Filtered cameras').toEqual(2);
-        expect(devicesHandler.availableDevices.audioInput().length).withContext('Filtered microphones').toEqual(3);
-        expect(devicesHandler.availableDevices.audioOutput().length).withContext('Filtered speakers').toEqual(4);
+        expect(devicesHandler.availableDevices.videoInput().length).toEqual(2);
+        expect(devicesHandler.availableDevices.audioInput().length).toEqual(3);
+        expect(devicesHandler.availableDevices.audioOutput().length).toEqual(4);
       });
     });
   });
@@ -204,18 +204,18 @@ describe('MediaDevicesHandler', () => {
 
       const devicesHandler = new MediaDevicesHandler();
       setTimeout(() => {
-        expect(navigator.mediaDevices.enumerateDevices).withContext('Initial enumeration').toHaveBeenCalledTimes(1);
-        expect(devicesHandler.availableDevices.videoInput()).withContext('Initial cameras').toEqual(fakeWorldTestSetup.cameras);
-        expect(devicesHandler.availableDevices.audioOutput()).withContext('Initial speakers').toEqual(fakeWorldTestSetup.speakers);
+        expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(1);
+        expect(devicesHandler.availableDevices.videoInput()).toEqual(fakeWorldTestSetup.cameras);
+        expect(devicesHandler.availableDevices.audioOutput()).toEqual(fakeWorldTestSetup.speakers);
 
         const newCameras = [{deviceId: 'newcamera', kind: MediaDeviceType.VIDEO_INPUT}];
         navigator.mediaDevices.enumerateDevices.and.returnValue(Promise.resolve(newCameras));
         navigator.mediaDevices.ondevicechange();
 
         setTimeout(() => {
-          expect(navigator.mediaDevices.enumerateDevices).withContext('Updated enumeration').toHaveBeenCalledTimes(2);
-          expect(devicesHandler.availableDevices.videoInput()).withContext('Updated cameras').toEqual(newCameras);
-          expect(devicesHandler.availableDevices.audioOutput()).withContext('Updated speakers').toEqual([]);
+          expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(2);
+          expect(devicesHandler.availableDevices.videoInput()).toEqual(newCameras);
+          expect(devicesHandler.availableDevices.audioOutput()).toEqual([]);
           done();
         });
       });

@@ -105,9 +105,9 @@ describe('ClientRepository', () => {
       spyOn(clientService, 'loadClientFromDb').and.returnValue(
         Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT),
       );
-      const backendError = new Error();
+      const backendError = new Error('not found locally');
       backendError.code = HTTP_STATUS.NOT_FOUND;
-      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.callFake(() => Promise.reject(backendError));
 
       return testFactory.client_repository
         .getValidLocalClient()
@@ -122,9 +122,9 @@ describe('ClientRepository', () => {
       const clientService = testFactory.client_repository.clientService;
       spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
       spyOn(testFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
-      const backendError = new Error();
+      const backendError = new Error('not found on backend');
       backendError.response = {status: HTTP_STATUS.NOT_FOUND};
-      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.callFake(() => Promise.reject(backendError));
 
       return testFactory.client_repository
         .getValidLocalClient()

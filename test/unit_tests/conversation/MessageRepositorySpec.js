@@ -127,7 +127,7 @@ describe('MessageRepository', () => {
   });
 
   describe('sendTextWithLinkPreview', () => {
-    xit('sends ephemeral message (within the range [1 second, 1 year])', async () => {
+    it.skip('sends ephemeral message (within the range [1 second, 1 year])', async () => {
       const conversation = generate_conversation();
       testFactory.conversation_repository.conversationState.conversations([conversation]);
 

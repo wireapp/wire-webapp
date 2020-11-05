@@ -76,14 +76,14 @@ jobs:
 
       - name: Test
         if: env.DISTRIBUTION == 'wire'
-        run: yarn test
+        run: yarn test --coverage
 
       - name: Monitor coverage
         if: github.event_name == 'pull_request' && env.DISTRIBUTION == 'wire'
         uses: slavcodev/coverage-monitor-action@1.2.0
         with:
           github_token: ${{github.token}}
-          clover_file: 'docs/coverage/clover.xml'
+          clover_file: 'coverage/clover.xml'
           threshold_alert: ${{env.TEST_COVERAGE_FAIL_THRESHOLD}}
           threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
 

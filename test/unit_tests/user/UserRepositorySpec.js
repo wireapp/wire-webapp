@@ -28,6 +28,9 @@ import {ClientMapper} from 'src/script/client/ClientMapper';
 import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
 
+// eslint-disable-next-line no-undef
+jest.mock('Components/icons');
+
 describe('UserRepository', () => {
   let server = null;
   const testFactory = new TestFactory();
@@ -44,7 +47,7 @@ describe('UserRepository', () => {
     server.restore();
   });
 
-  describe('Account preferences ', () => {
+  describe('Account preferences', () => {
     beforeEach(() => {
       spyOn(testFactory.user_repository.propertyRepository, 'publishProperties').and.callFake(properties => {
         return properties;

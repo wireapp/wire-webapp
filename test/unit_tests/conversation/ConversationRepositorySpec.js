@@ -164,17 +164,16 @@ describe('ConversationRepository', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      const missingClientsError = new Error();
-      missingClientsError.deleted = {};
-      missingClientsError.missing = {
-        [conversationPartner.id]: ['1e66e04948938c2c', '53761bec3f10a6d9', 'a9c8c385737b14fe'],
-      };
-      missingClientsError.redundant = {};
-      missingClientsError.time = new Date().toISOString();
-
-      spyOn(testFactory.conversation_service, 'post_encrypted_message').and.returnValue(
-        Promise.reject(missingClientsError),
-      );
+      spyOn(testFactory.conversation_repository.conversation_service, 'post_encrypted_message').and.callFake(() => {
+        const missingClientsError = new Error('Fake missing client error');
+        missingClientsError.deleted = {};
+        missingClientsError.missing = {
+          [conversationPartner.id]: ['1e66e04948938c2c', '53761bec3f10a6d9', 'a9c8c385737b14fe'],
+        };
+        missingClientsError.redundant = {};
+        missingClientsError.time = new Date().toISOString();
+        return Promise.reject(missingClientsError);
+      });
 
       spyOn(testFactory.client_service, 'getClientsByUserId').and.returnValue(
         Promise.resolve([
@@ -193,14 +192,15 @@ describe('ConversationRepository', () => {
         ]),
       );
 
-      spyOn(testFactory.conversation_repository, 'injectLegalHoldMessage').and.callFake(({legalHoldStatus}) => {
-        expect(legalHoldStatus).toBe(LegalHoldStatus.ENABLED);
-      });
-
+      const injectLegalHoldMessageSpy = spyOn(testFactory.conversation_repository, 'injectLegalHoldMessage');
       await testFactory.conversation_repository.saveConversation(conversationEntity);
       await testFactory.conversation_repository.checkLegalHoldStatus(conversationEntity, eventJson);
 
-      expect(testFactory.conversation_repository.injectLegalHoldMessage).toHaveBeenCalledTimes(1);
+      expect(injectLegalHoldMessageSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          legalHoldStatus: LegalHoldStatus.ENABLED,
+        }),
+      );
     });
   });
 

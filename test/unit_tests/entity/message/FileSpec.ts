@@ -22,29 +22,40 @@
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 
 describe('FileAsset', () => {
-  /** @type {FileAsset} */
-  let file;
-
-  beforeEach(() => {
-    file = new FileAsset();
-  });
-
+  /**
+   * TODO: These tests don't make much sense since they are testing the browser implementation
+   * instead it should be tested that the FileAsset is behaving correctly on `canPlayType` return values.
+   */
   describe('is_video', () => {
     it('should treat mp4 as video file', () => {
-      file.file_type = 'video/mp4';
+      const file = new FileAsset();
 
+      file.file_type = 'video/mp4';
+      jest
+        .spyOn(document, 'createElement')
+        .mockImplementationOnce(() => (({canPlayType: () => 'yes'} as unknown) as HTMLElement));
       expect(file.is_video()).toBeTruthy();
     });
 
     it('should not treat images as video file', () => {
+      const file = new FileAsset();
+
       file.file_type = 'image/jpg';
-
+      jest
+        .spyOn(document, 'createElement')
+        .mockImplementationOnce(() => (({canPlayType: () => ''} as unknown) as HTMLElement));
       expect(file.is_video()).toBeFalsy();
+
       file.file_type = 'image/png';
-
+      jest
+        .spyOn(document, 'createElement')
+        .mockImplementationOnce(() => (({canPlayType: () => ''} as unknown) as HTMLElement));
       expect(file.is_video()).toBeFalsy();
-      file.file_type = 'image/gif';
 
+      file.file_type = 'image/gif';
+      jest
+        .spyOn(document, 'createElement')
+        .mockImplementationOnce(() => (({canPlayType: () => ''} as unknown) as HTMLElement));
       expect(file.is_video()).toBeFalsy();
     });
   });

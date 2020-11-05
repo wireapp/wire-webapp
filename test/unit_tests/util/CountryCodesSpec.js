@@ -31,11 +31,11 @@ describe('CountryCodes', () => {
   });
 
   describe('getCountryByCode', () => {
-    it('returns the most populated country for country code ', () => {
+    it('returns the most populated country for country code', () => {
       expect(getCountryByCode(49)).toBe('DE');
     });
 
-    it('returns the most populated country for country code ', () => {
+    it('returns the most populated country for country code', () => {
       expect(getCountryByCode(7)).toBe('RU');
     });
 

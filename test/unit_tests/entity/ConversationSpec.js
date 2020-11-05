@@ -450,7 +450,9 @@ describe('Conversation', () => {
       const reference_iso_date = new Date(referenceTimestamp).toISOString();
 
       expect(conversation_et.get_next_iso_date(referenceTimestamp)).toBe(reference_iso_date);
-      expect(conversation_et.get_next_iso_date('foo')).toBeGreaterThan(reference_iso_date);
+      expect(new Date(conversation_et.get_next_iso_date('foo')).getTime()).toBeGreaterThan(
+        new Date(reference_iso_date).getTime(),
+      );
 
       const last_server_timestamp = referenceTimestamp + 10000;
       conversation_et.last_server_timestamp(last_server_timestamp);

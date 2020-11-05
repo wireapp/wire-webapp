@@ -24,7 +24,7 @@ import 'core-js/es7/reflect';
 import {container} from 'tsyringe';
 import ko from 'knockout';
 
-import 'src/script/main/globals';
+// import 'src/script/main/globals';
 
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
@@ -70,6 +70,7 @@ import {UserState} from 'src/script/user/UserState';
 import {ClientState} from 'src/script/client/ClientState';
 import {TeamState} from 'src/script/team/TeamState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
+import {AssetService} from 'src/script/assets/AssetService';
 
 export class TestFactory {
   constructor() {
@@ -207,7 +208,7 @@ export class TestFactory {
    */
   async exposeUserActors() {
     await this.exposeClientActors();
-    this.assetRepository = new AssetRepository();
+    this.assetRepository = new AssetRepository(new AssetService());
 
     this.connection_service = new ConnectionService();
     this.user_service = new UserService(this.storage_service);

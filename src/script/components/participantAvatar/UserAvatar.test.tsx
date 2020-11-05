@@ -23,6 +23,8 @@ import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {AVATAR_SIZE, STATE} from '../ParticipantAvatar';
 
+jest.mock('../../auth/util/SVGProvider');
+
 class UserAvatarPage extends TestPage<UserAvatarProps> {
   constructor(props?: UserAvatarProps) {
     super(UserAvatar, props);

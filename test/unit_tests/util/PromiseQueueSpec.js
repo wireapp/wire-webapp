@@ -71,20 +71,33 @@ describe('PromiseQueue', () => {
       }, 25);
     });
 
-    it('processes promises even when one of them rejects', () => {
-      const resolvingPromise = () => Promise.resolve();
-
+    it('continues to process the queue even when a prior promise rejects', async () => {
+      /**
+       * Prevents Jest from failing due to unhandled promise rejection.
+       * Adds a catch to the promise but doesn't await its execution.
+       * @see https://github.com/facebook/jest/issues/9210
+       * @param {Promise} promise Promise to handle
+       *
+       * @returns {Promise} The handled promise
+       */
+      function hideUnhandledPromise(promise) {
+        promise.catch(() => {});
+        return promise;
+      }
+      const resolvingPromiseSpy = jest.fn().mockImplementation(() => Promise.resolve());
       const rejectingPromise = () => Promise.reject(new Error('Unit test error'));
 
       const queue = new PromiseQueue({name: 'TestQueue'});
-      queue.push(rejectingPromise);
-      return queue.push(resolvingPromise);
+      hideUnhandledPromise(queue.push(rejectingPromise));
+
+      await queue.push(resolvingPromiseSpy);
+      expect(resolvingPromiseSpy).toHaveBeenCalled();
     });
 
-    it('processes promises even when one of them times out (with retries)', () => {
+    it('processes promises even when one of them times out (with retries)', async () => {
       let counter = 0;
 
-      const resolvingPromise = () => Promise.resolve(counter++);
+      const resolvingPromiseSpy = jest.fn().mockImplementation(() => Promise.resolve(counter++));
 
       const timeout_promise = function () {
         return new Promise(resolve => {
@@ -96,7 +109,9 @@ describe('PromiseQueue', () => {
 
       const queue = new PromiseQueue({name: 'TestQueue', timeout: 100});
       queue.push(timeout_promise);
-      return queue.push(resolvingPromise);
+      await queue.push(resolvingPromiseSpy);
+
+      expect(resolvingPromiseSpy).toHaveBeenCalled();
     });
   });
 });

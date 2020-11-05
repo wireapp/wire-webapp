@@ -41,16 +41,12 @@ describe('ValidationUtil', () => {
       expect(actual).toBe(true);
     });
 
-    it('detects an invalid asset below v3', done => {
+    it('detects an invalid asset below v3', async () => {
       const assetId = createRandomUuid();
       const conversationId = 'e13f9940-819c-477b-9391-b04234ae84af"*';
-      try {
+      expect(() => {
         legacyAsset(assetId, conversationId);
-      } catch (error) {
-        expect(error).toEqual(jasmine.any(ValidationUtilError));
-        return done();
-      }
-      done.fail('Detection failed');
+      }).toThrow(jasmine.any(ValidationUtilError));
     });
   });
 
@@ -72,29 +68,21 @@ describe('ValidationUtil', () => {
       expect(actual).toBe(true);
     });
 
-    it('detects an invalid v3 asset (assetKey)', done => {
+    it('detects an invalid v3 asset (assetKey)', async () => {
       const assetKey = `3-6-${createRandomUuid()}`;
 
-      try {
+      expect(() => {
         assetV3(assetKey);
-      } catch (error) {
-        expect(error).toEqual(jasmine.any(ValidationUtilError));
-        return done();
-      }
-      done.fail('Detection failed');
+      }).toThrow(jasmine.any(ValidationUtilError));
     });
 
-    it('detects an invalid v3 asset (assetToken)', done => {
+    it('detects an invalid v3 asset (assetToken)', async () => {
       const assetKey = `3-1-${createRandomUuid()}`;
       const assetToken = 'a3wAY4%$@#$@%)!@-pOe==';
 
-      try {
+      expect(() => {
         assetV3(assetKey, assetToken);
-      } catch (error) {
-        expect(error).toEqual(jasmine.any(ValidationUtilError));
-        return done();
-      }
-      done.fail('Detection failed');
+      }).toThrow(jasmine.any(ValidationUtilError));
     });
   });
 
@@ -175,15 +163,12 @@ describe('ValidationUtil', () => {
       });
     });
 
-    it('detects a invalid API path', done => {
+    it('detects a invalid API path', async () => {
       const path = '../../../search/contacts';
-      try {
+
+      expect(() => {
         isValidApiPath(path);
-      } catch (error) {
-        expect(error).toEqual(jasmine.any(ValidationUtilError));
-        return done();
-      }
-      done.fail('Detection failed');
+      }).toThrow(jasmine.any(ValidationUtilError));
     });
   });
 

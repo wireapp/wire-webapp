@@ -266,7 +266,15 @@ describe('EventRepository', () => {
       });
     });
 
-    it('accepts "conversation.voice-channel-deactivate" (missed call) events', () => {
+    it('accepts "conversation.voice-channel-deactivate" (missed call) events', async () => {
+      const eventServiceSpy = {
+        loadEvent: jest.fn().mockImplementation(() => Promise.resolve()),
+        saveEvent: jest.fn().mockImplementation(() => Promise.resolve({data: 'dummy content'})),
+      };
+      const eventRepo = new EventRepository(eventServiceSpy);
+      eventRepo.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      jest.spyOn(eventRepo, 'distributeEvent').mockImplementation(() => Promise.resolve());
+
       /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
@@ -277,11 +285,10 @@ describe('EventRepository', () => {
         type: 'conversation.voice-channel-deactivate',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
+      await eventRepo.handleEvent(event);
 
-      return testFactory.event_repository.handleEvent(event).then(() => {
-        expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
-        expect(testFactory.event_repository.distributeEvent).toHaveBeenCalled();
-      });
+      expect(eventServiceSpy.saveEvent).toHaveBeenCalled();
+      expect(eventRepo.distributeEvent).toHaveBeenCalled();
     });
 
     it('accepts plain decryption error events', () => {
@@ -587,7 +594,7 @@ describe('EventRepository', () => {
           time: '2017-09-06T09:43:36.528Z',
         };
 
-        spyOn(testFactory.event_repository['userState'], 'self').and.returnValue({id: assetAddEvent.from});
+        // spyOn(testFactory.event_repository['userState'], 'self').and.returnValue({id: assetAddEvent.from});
         loadEventSpy.and.returnValue(Promise.resolve(assetAddEvent));
         deleteEventSpy.and.returnValue(Promise.resolve());
 

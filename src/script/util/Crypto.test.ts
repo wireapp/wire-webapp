@@ -17,12 +17,12 @@
  *
  */
 
-import {joaatHash} from 'Util/Crypto';
+import {joaatHash} from './Crypto';
 
 describe('Crypto', () => {
   describe(`Jenkins' one-at-a-time hash`, () => {
     /* eslint-disable sort-keys-fix/sort-keys-fix */
-    const sample = {
+    const sample: {[uuid: string]: number} = {
       '25f79335-6a5b-410e-90ea-653bd18b66da': 348398396,
       'b88a6d46-b2ae-4122-8022-d6ed66a25f09': 1021700091,
       'e50759ee-d32b-438f-bdbd-2605f48773e6': 1241303210,

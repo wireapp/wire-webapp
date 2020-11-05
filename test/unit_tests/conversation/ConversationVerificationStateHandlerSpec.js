@@ -26,7 +26,7 @@ import {User} from 'src/script/entity/User';
 import {TestFactory} from '../../helper/TestFactory';
 import {EventBuilder} from 'src/script/conversation/EventBuilder';
 
-describe('ConversationVerificationStateHandler', () => {
+describe.skip('ConversationVerificationStateHandler', () => {
   const testFactory = new TestFactory();
   let stateHandler = undefined;
   let conversationRepository = undefined;
