@@ -2272,10 +2272,10 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/protocol-messaging@1.26.5":
-  version "1.26.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.26.5.tgz#9c986594b93ebceb0fdd17f6ae356514ae881334"
-  integrity sha512-w/C7lZeSoKV5LOktLPLdUfpIyHRPXahDfpi3Luwtzub4/iPUJAFLJHybSmRnpe1MX1d0H9M9Cs97r+5zdKNLSg==
+"@wireapp/protocol-messaging@1.26.6":
+  version "1.26.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.26.6.tgz#5cf9e376032cfada36c1d321fb8b05791c1de524"
+  integrity sha512-oxDZCYz56dLtHVidcMvar4+gUNYQp7+MAMpW9YYu4eH+i0+j/lQiAvyoQTfu8YMYwkhgpnf6/yU4QysbtZub2Q==
   dependencies:
     protobufjs "6.10.1"
 
