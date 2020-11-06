@@ -84,6 +84,7 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
       try {
         const blob = await this.assetRepository.load(this.asset.original_resource());
         this.audioSrc(window.URL.createObjectURL(blob));
+        ko.tasks.runEarly();
         this.audioElement?.play();
       } catch (error) {
         this.logger.error('Failed to load audio asset ', error);
