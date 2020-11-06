@@ -97,7 +97,7 @@ describe('BackupRepository', () => {
       const eventsStr = await zip.files[BackupRepository.CONFIG.FILENAME.EVENTS].async('string');
       const events = JSON.parse(eventsStr);
       expect(events).toEqual(messages);
-    }, 10000);
+    });
 
     // TODO: [JEST] Shim WebWorkers
     it.skip('ignores verification events in the backup', async () => {

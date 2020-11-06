@@ -197,7 +197,6 @@ describe('QuotedMessageMiddleware', () => {
       jest.useFakeTimers();
 
       return quotedMessageMiddleware.processEvent(event).then(() => {
-        // jasmine.clock().tick();
         jest.advanceTimersByTime(1);
 
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(

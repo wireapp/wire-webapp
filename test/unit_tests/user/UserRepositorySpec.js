@@ -28,9 +28,6 @@ import {ClientMapper} from 'src/script/client/ClientMapper';
 import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
 
-// eslint-disable-next-line no-undef
-jest.mock('Components/icons');
-
 describe('UserRepository', () => {
   let server = null;
   const testFactory = new TestFactory();

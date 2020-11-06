@@ -24,8 +24,6 @@ import 'core-js/es7/reflect';
 import {container} from 'tsyringe';
 import ko from 'knockout';
 
-// import 'src/script/main/globals';
-
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {User} from 'src/script/entity/User';

@@ -97,7 +97,6 @@ describe('ClientMismatchHandler', () => {
       );
     });
 
-    // TODO: Discuss testcase with Benny
     it('should add missing clients to the payload', async () => {
       const conversation = new Conversation(createRandomUuid());
       const userRepositorySpy = {
