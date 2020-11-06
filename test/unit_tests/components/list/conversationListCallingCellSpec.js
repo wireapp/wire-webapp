@@ -43,11 +43,13 @@ describe('conversationListCallingCell', () => {
       isMuted: () => false,
       supportsScreenSharing: () => true,
     };
+    const conversation = new Conversation();
+    conversation.participating_user_ets([new User('id')]);
     defaultParams = {
       call: new Call(),
       callActions: {},
       callingRepository: mockedCallingRepository,
-      conversation: () => new Conversation(),
+      conversation: () => conversation,
       hasAccessToCamera: () => true,
       multitasking: {isMinimized: () => false},
       videoGrid: () => ({grid: []}),

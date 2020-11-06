@@ -93,6 +93,7 @@ describe('TeamRepository', () => {
 
   describe('getTeam()', () => {
     it('returns the binding team entity', () => {
+      spyOn(team_repository.userState, 'self').and.returnValue({id: 'self-id'});
       return team_repository.getTeam().then(team_et => {
         const [team_data] = teams_data.teams;
 
@@ -114,10 +115,14 @@ describe('TeamRepository', () => {
 
   describe('sendAccountInfo', () => {
     it(`doesn't crash when there is no team logo`, async () => {
-      expect(team_repository.isTeam()).toBe(true);
+      expect(team_repository.teamState.isTeam()).toBe(true);
 
-      team_repository.selfUser().getIconResource = async () => ({
-        load: async () => undefined,
+      spyOn(team_repository.userState, 'self').and.returnValue({
+        accent_id: () => 2,
+        teamRole: () => 'z.team.TeamRole.ROLE.NONE',
+        getIconResource: async () => ({
+          load: async () => undefined,
+        }),
       });
 
       const accountInfo = await team_repository.sendAccountInfo(true);

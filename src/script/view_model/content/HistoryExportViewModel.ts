@@ -33,7 +33,8 @@ import {CancelError} from '../../backup/Error';
 
 import 'Components/loadingBar';
 import {BackupRepository} from '../../backup/BackupRepository';
-import {UserRepository} from '../../user/UserRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 export class HistoryExportViewModel {
   private readonly logger: Logger;
@@ -63,7 +64,10 @@ export class HistoryExportViewModel {
     };
   }
 
-  constructor(private readonly backupRepository: BackupRepository, private readonly userRepository: UserRepository) {
+  constructor(
+    private readonly backupRepository: BackupRepository,
+    private readonly userState = container.resolve(UserState),
+  ) {
     this.logger = getLogger('HistoryExportViewModel');
 
     this.hasError = ko.observable(false);
@@ -127,7 +131,7 @@ export class HistoryExportViewModel {
   };
 
   downloadArchiveFile = (): void => {
-    const userName = this.userRepository.self().username();
+    const userName = this.userState.self().username();
     const fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
     const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
     const filename = `${sanitizedBrandName}-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;

@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {noop} from 'Util/util';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 
 import 'Components/list/participantItem';
 import type {ServiceEntity} from '../integration/ServiceEntity';
@@ -65,7 +65,7 @@ class ServiceList {
     this.isCompactMode = this.mode === ServiceList.MODE.COMPACT;
     this.isDefaultMode = this.mode === ServiceList.MODE.DEFAULT;
 
-    this.avatarSize = this.isCompactMode ? ParticipantAvatar.SIZE.LARGE : ParticipantAvatar.SIZE.SMALL;
+    this.avatarSize = this.isCompactMode ? AVATAR_SIZE.LARGE : AVATAR_SIZE.SMALL;
 
     this.cssClasses = ko.pureComputed(() => (this.isCompactMode ? 'search-list-sm' : 'search-list-lg'));
   }

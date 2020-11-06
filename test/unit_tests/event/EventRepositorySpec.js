@@ -22,7 +22,7 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import {GenericMessage, Text, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Proteus from '@wireapp/proteus';
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event';
 
 import {createRandomUuid, arrayToBase64} from 'Util/util';
 
@@ -35,7 +35,7 @@ import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {EventError} from 'src/script/error/EventError';
 import {TestFactory} from '../../helper/TestFactory';
-import {AbortHandler} from '@wireapp/api-client/dist/tcp';
+import {AbortHandler} from '@wireapp/api-client/src/tcp';
 
 const testFactory = new TestFactory();
 
@@ -312,7 +312,7 @@ describe('EventRepository', () => {
       const ownClientId = 'f180a823bf0d1204';
       const client = new ClientEntity();
       client.id = ownClientId;
-      testFactory.client_repository.currentClient(client);
+      testFactory.client_repository['clientState'].currentClient(client);
 
       // Create Cryptobox for testing
       const someEngine = new MemoryEngine();
@@ -574,7 +574,7 @@ describe('EventRepository', () => {
         // cancel from an other user
         'other-user-id',
         // cancel from the self user
-        testFactory.event_repository.userRepository.self().id,
+        testFactory.user_repository['userState'].self().id,
       ];
 
       const loadEventSpy = spyOn(testFactory.event_service, 'loadEvent');
@@ -587,6 +587,7 @@ describe('EventRepository', () => {
           time: '2017-09-06T09:43:36.528Z',
         };
 
+        spyOn(testFactory.event_repository['userState'], 'self').and.returnValue({id: assetAddEvent.from});
         loadEventSpy.and.returnValue(Promise.resolve(assetAddEvent));
         deleteEventSpy.and.returnValue(Promise.resolve());
 
@@ -624,7 +625,7 @@ describe('EventRepository', () => {
         time: '2017-09-06T09:43:36.528Z',
       };
 
-      spyOn(testFactory.user_repository, 'self').and.returnValue({id: assetAddEvent.from});
+      spyOn(testFactory.event_repository['userState'], 'self').and.returnValue({id: assetAddEvent.from});
       spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
       spyOn(testFactory.event_service, 'updateEventAsUploadFailed').and.returnValue(
         Promise.resolve(assetUploadFailedEvent),

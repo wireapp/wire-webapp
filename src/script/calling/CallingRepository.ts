@@ -19,10 +19,9 @@
 
 import axios, {AxiosError} from 'axios';
 import {Runtime} from '@wireapp/commons';
-import type {APIClient} from '@wireapp/api-client';
-import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
-import type {CallConfigData} from '@wireapp/api-client/dist/account/CallConfigData';
-import type {ClientMismatch, UserClients} from '@wireapp/api-client/dist/conversation';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
+import type {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation';
 import {
   CALL_TYPE,
   CONV_TYPE,
@@ -43,6 +42,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -76,6 +76,8 @@ import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {NoAudioInputError} from '../error/NoAudioInputError';
+import {APIClient} from '../service/APIClientSingleton';
+import {ConversationState} from '../conversation/ConversationState';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -122,13 +124,13 @@ export class CallingRepository {
   }
 
   constructor(
-    private readonly apiClient: APIClient,
-    private readonly conversationRepository: ConversationRepository,
     private readonly messageRepository: MessageRepository,
     private readonly eventRepository: EventRepository,
     private readonly userRepository: UserRepository,
     private readonly mediaStreamHandler: MediaStreamHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly apiClient = container.resolve(APIClient),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.activeCalls = ko.observableArray();
     this.isMuted = ko.observable(false);
@@ -381,7 +383,7 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.activeCalls.push(call);
-    const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
       conversation.call(call);
     }
@@ -394,7 +396,7 @@ export class CallingRepository {
     if (index !== -1) {
       this.activeCalls.splice(index, 1);
     }
-    const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
       conversation.call(null);
     }
@@ -618,7 +620,7 @@ export class CallingRepository {
   //##############################################################################
 
   toggleState(withVideo: boolean): void {
-    const conversationEntity: Conversation | undefined = this.conversationRepository.active_conversation();
+    const conversationEntity: Conversation | undefined = this.conversationState.activeConversation();
     if (conversationEntity) {
       const isActiveCall = this.findCall(conversationEntity.id);
       const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
@@ -753,8 +755,7 @@ export class CallingRepository {
   };
 
   muteCall(call: Call, shouldMute: boolean): void {
-    if (call.hasWorkingAudioInput === false) {
-      this.wCall.setMute(this.wUser, 1);
+    if (call.hasWorkingAudioInput === false && this.isMuted()) {
       this.showNoAudioInputModal();
       return;
     }
@@ -772,6 +773,7 @@ export class CallingRepository {
   private handleMediaStreamError(call: Call, requestedStreams: MediaStreamQuery, error: Error): void {
     if (error instanceof NoAudioInputError) {
       this.muteCall(call, true);
+      this.showNoAudioInputModal();
       return;
     }
 
@@ -1024,7 +1026,7 @@ export class CallingRepository {
     shouldRing: number,
     conversationType: CONV_TYPE,
   ) => {
-    const conversationEntity = this.conversationRepository.find_conversation_by_id(conversationId);
+    const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;
     }
@@ -1277,7 +1279,7 @@ export class CallingRepository {
     call: Call,
     customSegmentations: Record<string, any> = {},
   ) => {
-    const conversationEntity = this.conversationRepository.find_conversation_by_id(call.conversationId);
+    const conversationEntity = this.conversationState.findConversation(call.conversationId);
     const participants = conversationEntity.participating_user_ets();
     const selfUserTeamId = call.getSelfParticipant().user.id;
     const guests = participants.filter(user => user.isGuest()).length;

@@ -44,6 +44,10 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {Conversation} from '../../entity/Conversation';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 export class StartUIViewModel {
   readonly brandName: string;
@@ -105,19 +109,22 @@ export class StartUIViewModel {
     readonly searchRepository: SearchRepository,
     readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
-    this.alreadyClickedOnContact = {};
     this.logger = getLogger('StartUIViewModel');
+    this.alreadyClickedOnContact = {};
     this.brandName = Config.getConfig().BRAND_NAME;
     this.UserlistMode = UserlistMode;
 
     this.actionsViewModel = this.mainViewModel.actions;
 
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
 
-    this.isTeam = this.teamRepository.isTeam;
-    this.teamName = this.teamRepository.teamName;
-    this.teamSize = this.teamRepository.teamSize;
+    this.isTeam = this.teamState.isTeam;
+    this.teamName = this.teamState.teamName;
+    this.teamSize = this.teamState.teamSize;
 
     this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
     this.isVisible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.START_UI);
@@ -149,19 +156,19 @@ export class StartUIViewModel {
       }
 
       if (this.showOnlyConnectedUsers()) {
-        return this.conversationRepository.connectedUsers();
+        return this.conversationState.connectedUsers();
       }
 
       if (this.isTeam()) {
-        const connectedUsers = this.conversationRepository.connectedUsers();
-        const teamUsersWithoutPartners = this.teamRepository
+        const connectedUsers = this.conversationState.connectedUsers();
+        const teamUsersWithoutPartners = this.teamState
           .teamUsers()
           .filter(user => connectedUsers.includes(user) || this.teamRepository.isSelfConnectedTo(user.id));
 
         return teamUsersWithoutPartners;
       }
 
-      return this.userRepository.connectedUsers();
+      return this.userState.connectedUsers();
     });
 
     this.matchedUsers = ko.observableArray([]);
@@ -382,17 +389,15 @@ export class StartUIViewModel {
     const trimmedQuery = query.trim();
     const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
 
-    const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connectedUsers();
+    const allLocalUsers = this.isTeam() ? this.teamState.teamUsers() : this.userState.connectedUsers();
 
-    const localSearchSources = this.showOnlyConnectedUsers()
-      ? this.conversationRepository.connectedUsers()
-      : allLocalUsers;
+    const localSearchSources = this.showOnlyConnectedUsers() ? this.conversationState.connectedUsers() : allLocalUsers;
 
     const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
     const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
     const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
-    const connectedUsers = this.conversationRepository.connectedUsers();
+    const connectedUsers = this.conversationState.connectedUsers();
     const filteredResults = contactResults.filter(
       user =>
         connectedUsers.includes(user) ||

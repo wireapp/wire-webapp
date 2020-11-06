@@ -25,13 +25,14 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ContentViewModel} from '../ContentViewModel';
 import {sortUserDevices} from 'Components/userDevices';
 import {MainViewModel} from '../MainViewModel';
-import {ClientRepository} from '../../client/ClientRepository';
 import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {UserRepository} from '../../user/UserRepository';
 import {User} from '../../entity/User';
 import {ClientEntity} from '../../client/ClientEntity';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PreferencesDeviceDetailsViewModel} from './PreferencesDeviceDetailsViewModel';
+import {container} from 'tsyringe';
+import {ClientState} from '../../client/ClientState';
+import {UserState} from '../../user/UserState';
 
 export class PreferencesDevicesViewModel {
   private readonly actionsViewModel: ActionsViewModel;
@@ -47,25 +48,23 @@ export class PreferencesDevicesViewModel {
   constructor(
     mainViewModel: MainViewModel,
     contentViewModel: ContentViewModel,
-    private readonly clientRepository: ClientRepository,
     private readonly cryptographyRepository: CryptographyRepository,
-    private readonly userRepository: UserRepository,
+    private readonly clientState = container.resolve(ClientState),
+    private readonly userState = container.resolve(UserState),
   ) {
     this.actionsViewModel = mainViewModel.actions;
     this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
-    this.currentClient = this.clientRepository.currentClient;
+    this.currentClient = this.clientState.currentClient;
     this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
 
     this.activationDate = ko.observable();
     // all clients except the current client
     this.devices = ko.pureComputed(() => {
-      const clients = this.clientRepository
-        .clients()
-        .filter(clientEntity => clientEntity.id !== this.currentClient().id);
+      const clients = this.clientState.clients().filter(clientEntity => clientEntity.id !== this.currentClient().id);
       return sortUserDevices(clients);
     });
     this.localFingerprint = ko.observableArray([]);
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
     this.isSSO = ko.pureComputed(() => this.selfUser() && this.selfUser().isSingleSignOn);
   }
 

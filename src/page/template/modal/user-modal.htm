@@ -14,7 +14,7 @@
         <panel-user-details params="participant: user, isSelfVerified: isSelfVerified"></panel-user-details>
         <enriched-fields params="user: user"></enriched-fields>
         <user-actions
-          params="user: user, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: userRepository.isActivatedAccount()"
+          params="user: user, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: isActivatedAccount()"
         ></user-actions>
       <!-- /ko -->
       <!-- ko if: !user() && !userNotFound()  -->

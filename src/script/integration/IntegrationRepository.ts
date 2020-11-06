@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ConversationMemberJoinEvent} from '@wireapp/api-client/dist/event';
+import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -39,12 +39,12 @@ import {ServiceTag} from './ServiceTag';
 import {ConversationError} from '../error/ConversationError';
 import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
+import {container} from 'tsyringe';
+import {TeamState} from '../team/TeamState';
+import {ConversationState} from '../conversation/ConversationState';
 
 export class IntegrationRepository {
-  private readonly conversationRepository: ConversationRepository;
-  private readonly integrationService: IntegrationService;
   private readonly logger: Logger;
-  private readonly teamRepository: TeamRepository;
   public readonly isTeam: ko.PureComputed<boolean>;
   public readonly services: ko.ObservableArray<ServiceEntity>;
 
@@ -61,18 +61,15 @@ export class IntegrationRepository {
   }
 
   constructor(
-    integrationService: IntegrationService,
-    conversationRepository: ConversationRepository,
-    teamRepository: TeamRepository,
+    private readonly integrationService: IntegrationService,
+    private readonly conversationRepository: ConversationRepository,
+    private readonly teamRepository: TeamRepository,
+    private readonly teamState = container.resolve(TeamState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.logger = getLogger('IntegrationRepository');
 
-    this.integrationService = integrationService;
-
-    this.conversationRepository = conversationRepository;
-    this.teamRepository = teamRepository;
-
-    this.isTeam = this.teamRepository.isTeam;
+    this.isTeam = this.teamState.isTeam;
     this.services = ko.observableArray([]);
   }
 
@@ -161,7 +158,7 @@ export class IntegrationRepository {
    * @returns Resolves with the conversation with requested service
    */
   async get1To1ConversationWithService(serviceEntity: ServiceEntity): Promise<Conversation> {
-    const matchingConversationEntity = this.conversationRepository.conversations().find(conversationEntity => {
+    const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
       if (!conversationEntity.is1to1()) {
         // Disregard conversations that are not 1:1
         return false;
@@ -233,7 +230,7 @@ export class IntegrationRepository {
     const normalizedQuery = IntegrationRepository.normalizeQuery(query);
 
     try {
-      let serviceEntities = await this.teamRepository.getWhitelistedServices(this.teamRepository.team().id);
+      let serviceEntities = await this.teamRepository.getWhitelistedServices(this.teamState.team().id);
       const isCurrentQuery = normalizedQuery === IntegrationRepository.normalizeQuery(queryObservable());
       if (isCurrentQuery) {
         serviceEntities = serviceEntities

@@ -17,25 +17,20 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 import {singleton} from 'tsyringe';
 
 import {Config} from '../Config';
 
 @singleton()
-export class APIClientSingleton {
-  private readonly apiClient: APIClient;
+export class APIClient extends APIClientUnconfigured {
   constructor() {
-    this.apiClient = new APIClient({
+    super({
       urls: {
         name: 'backend',
         rest: Config.getConfig().BACKEND_REST,
         ws: Config.getConfig().BACKEND_WS,
       },
     });
-  }
-
-  public getClient(): APIClient {
-    return this.apiClient;
   }
 }

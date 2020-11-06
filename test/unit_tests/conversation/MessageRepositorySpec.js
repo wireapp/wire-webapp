@@ -17,17 +17,17 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {createRandomUuid} from 'Util/util';
 import {TestFactory} from '../../helper/TestFactory';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {UserGenerator} from '../../helper/UserGenerator';
@@ -129,7 +129,7 @@ describe('MessageRepository', () => {
   describe('sendTextWithLinkPreview', () => {
     xit('sends ephemeral message (within the range [1 second, 1 year])', async () => {
       const conversation = generate_conversation();
-      testFactory.conversation_repository.conversations([conversation]);
+      testFactory.conversation_repository.conversationState.conversations([conversation]);
 
       const inBoundValues = [1000, 5000, 12341234, 31536000000];
       const outOfBoundValues = [1, 999, 31536000001, 31557600000];
@@ -254,6 +254,7 @@ describe('MessageRepository', () => {
       messageEntityToDelete.user(userEntity);
       conversationEntity.add_message(messageEntityToDelete);
 
+      spyOn(testFactory.user_repository.userState, 'self').and.returnValue(userEntity);
       spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
         Promise.resolve(conversationEntity),
       );
@@ -268,8 +269,11 @@ describe('MessageRepository', () => {
 
   describe('updateAllClients', () => {
     it(`updates a conversation's legal hold status when it discovers during message sending that a legal hold client got removed from a participant`, async () => {
+      const selfUser = UserGenerator.getRandomUser();
       const conversationPartner = UserGenerator.getRandomUser();
-      testFactory.user_repository.users.push(conversationPartner);
+      testFactory.user_repository.userState.users.push(conversationPartner);
+
+      spyOn(testFactory.user_repository.userState, 'self').and.returnValue(selfUser);
 
       const conversationJsonFromDb = {
         accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
@@ -326,7 +330,8 @@ describe('MessageRepository', () => {
 
       const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromDb])[0];
       conversationEntity.participating_user_ets.push(conversationPartner);
-      conversationEntity.selfUser(testFactory.user_repository.self());
+      conversationEntity.selfUser(selfUser);
+
       // Legal hold status is "on" because our conversation partner has a legal hold client
       expect(conversationEntity.hasLegalHold()).toBe(true);
 

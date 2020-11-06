@@ -56,6 +56,10 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {UserRepository} from '../user/UserRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
+import {TeamState} from '../team/TeamState';
+import {ConversationState} from '../conversation/ConversationState';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -64,6 +68,10 @@ interface ShowConversationOptions {
 }
 
 export class ContentViewModel {
+  private readonly userState: UserState;
+  private readonly teamState: TeamState;
+  private readonly conversationState: ConversationState;
+
   collection: CollectionViewModel;
   collectionDetails: CollectionDetailsViewModel;
   connectRequests: ConnectRequestsViewModel;
@@ -114,6 +122,10 @@ export class ContentViewModel {
   }
 
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
+    this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
+    this.conversationState = container.resolve(ConversationState);
+
     this.elementId = 'center-column';
     this.mainViewModel = mainViewModel;
     this.conversationRepository = repositories.conversation;
@@ -127,7 +139,7 @@ export class ContentViewModel {
     // Nested view models
     this.collectionDetails = new CollectionDetailsViewModel();
     this.collection = new CollectionViewModel(this, repositories.conversation);
-    this.connectRequests = new ConnectRequestsViewModel(mainViewModel, repositories.user);
+    this.connectRequests = new ConnectRequestsViewModel(mainViewModel);
     this.emojiInput = new EmojiInputViewModel(repositories.properties);
     this.giphy = new GiphyViewModel(repositories.giphy);
     this.inputBar = new InputBarViewModel(
@@ -137,20 +149,13 @@ export class ContentViewModel {
       repositories.conversation,
       repositories.search,
       repositories.storage,
-      repositories.user,
       repositories.message,
     );
-    this.groupCreation = new GroupCreationViewModel(
-      repositories.conversation,
-      repositories.search,
-      repositories.team,
-      repositories.user,
-    );
+    this.groupCreation = new GroupCreationViewModel(repositories.conversation, repositories.search, repositories.team);
     this.userModal = new UserModalViewModel(repositories.user, mainViewModel.actions);
     this.serviceModal = new ServiceModalViewModel(repositories.integration, mainViewModel.actions);
-    this.inviteModal = new InviteModalViewModel(repositories.user);
+    this.inviteModal = new InviteModalViewModel();
     this.legalHoldModal = new LegalHoldModalViewModel(
-      repositories.user,
       repositories.conversation,
       repositories.team,
       repositories.client,
@@ -165,55 +170,30 @@ export class ContentViewModel {
       repositories.user,
       repositories.message,
     );
-    this.titleBar = new TitleBarViewModel(
-      mainViewModel.calling,
-      mainViewModel.panel,
-      this,
-      repositories.calling,
-      repositories.conversation,
-      repositories.user,
-    );
+    this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
-    this.preferencesAbout = new PreferencesAboutViewModel(repositories.user);
+    this.preferencesAbout = new PreferencesAboutViewModel();
     this.preferencesAccount = new PreferencesAccountViewModel(
       repositories.client,
       repositories.conversation,
       repositories.preferenceNotification,
       repositories.properties,
-      repositories.team,
       repositories.user,
     );
-    this.preferencesAV = new PreferencesAVViewModel(
-      repositories.media,
-      repositories.user,
-      repositories.properties,
-      repositories.calling,
-      {
-        replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
-        stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
-      },
-    );
+    this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.properties, repositories.calling, {
+      replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
+      stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
+    });
     this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
       mainViewModel,
       repositories.client,
-      repositories.conversation,
       repositories.cryptography,
       repositories.message,
     );
-    this.preferencesDevices = new PreferencesDevicesViewModel(
-      mainViewModel,
-      this,
-      repositories.client,
-      repositories.cryptography,
-      repositories.user,
-    );
-    this.preferencesOptions = new PreferencesOptionsViewModel(
-      repositories.properties,
-      repositories.team,
-      repositories.user,
-    );
+    this.preferencesDevices = new PreferencesDevicesViewModel(mainViewModel, this, repositories.cryptography);
+    this.preferencesOptions = new PreferencesOptionsViewModel(repositories.properties);
 
-    this.historyExport = new HistoryExportViewModel(repositories.backup, repositories.user);
+    this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
     this.previousState = undefined;
@@ -244,7 +224,7 @@ export class ContentViewModel {
       }
     });
 
-    this.userRepository.connectRequests.subscribe(requests => {
+    this.userState.connectRequests.subscribe(requests => {
       const isStateRequests = this.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
       if (isStateRequests && !requests.length) {
         this.showConversation(this.conversationRepository.getMostRecentConversation());
@@ -252,7 +232,7 @@ export class ContentViewModel {
     });
 
     this._initSubscriptions();
-    if (repositories.team.supportsLegalHold()) {
+    if (this.teamState.supportsLegalHold()) {
       this.legalHoldModal.showRequestModal();
     }
     ko.applyBindings(this, document.getElementById(this.elementId));
@@ -312,7 +292,7 @@ export class ContentViewModel {
             ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
           );
         }
-        const isActiveConversation = this.conversationRepository.is_active_conversation(conversationEntity);
+        const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
         const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
         const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
 
@@ -329,7 +309,7 @@ export class ContentViewModel {
         this.mainViewModel.list.openConversations();
 
         if (!isActiveConversation) {
-          this.conversationRepository.active_conversation(conversationEntity);
+          this.conversationState.activeConversation(conversationEntity);
         }
 
         const messageEntity = openFirstSelfMention
@@ -347,7 +327,7 @@ export class ContentViewModel {
         unarchivePromise.then(() => {
           this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
             this.showContent(ContentViewModel.STATE.CONVERSATION);
-            this.previousConversation = this.conversationRepository.active_conversation();
+            this.previousConversation = this.conversationState.activeConversation();
             if (openNotificationSettings) {
               this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
             }
@@ -389,7 +369,7 @@ export class ContentViewModel {
         this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
       }
       const previousId = this.previousConversation && this.previousConversation.id;
-      const repoHasConversation = this.conversationRepository.conversations().some(({id}) => id === previousId);
+      const repoHasConversation = this.conversationState.conversations().some(({id}) => id === previousId);
 
       if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
         return this.showConversation(this.previousConversation);
@@ -402,7 +382,7 @@ export class ContentViewModel {
   private readonly checkContentAvailability = (state: string) => {
     const isStateRequests = state === ContentViewModel.STATE.CONNECTION_REQUESTS;
     if (isStateRequests) {
-      const hasConnectRequests = !!this.userRepository.connectRequests().length;
+      const hasConnectRequests = !!this.userState.connectRequests().length;
       if (!hasConnectRequests) {
         return ContentViewModel.STATE.WATERMARK;
       }
@@ -445,7 +425,7 @@ export class ContentViewModel {
       const collectionStates = [ContentViewModel.STATE.COLLECTION, ContentViewModel.STATE.COLLECTION_DETAILS];
       const isCollectionState = collectionStates.includes(newContentState);
       if (!isCollectionState) {
-        this.conversationRepository.active_conversation(null);
+        this.conversationState.activeConversation(null);
       }
 
       return this.messageList.release_conversation(undefined);

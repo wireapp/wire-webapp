@@ -46,7 +46,7 @@ Alternatively, you can test specific parts of the app:
 
 Bypass Chrome's security restrictions for local development:
 
-1. Add the following entry to your hosts file: `127.0.0.1 local.zinfra.io`
+1. Add the following entries to your hosts file: `127.0.0.1 local.wire.com` (to connect with production backend) and `127.0.0.1 local.zinfra.io` (to connect with staging backend)
 1. Restart your Chrome browser with flags: `--disable-web-security --ignore-certificate-errors --user-data-dir=...`
 1. Run `yarn start`
 
@@ -55,7 +55,7 @@ Host file location:
 - On macOS / Linux the hosts file can be found at: `/etc/hosts`
 - On Windows 10 the hosts file can be found at: `%WINDIR%\system32\drivers\etc\hosts`
 
-Optional: If your browser does not trust the certificate from "local.zinfra.io":
+Optional: If your browser does not trust the certificate from "local.wire.com" or "local.zinfra.io":
 
 1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest)
 1. Set `CAROOT` env variable to `./server/certificate`

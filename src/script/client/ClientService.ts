@@ -17,17 +17,17 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import type {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client';
+import type {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/src/client';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {StorageService} from '../storage';
+import type {ClientRecord} from '../storage';
+import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {APIClient} from '../service/APIClientSingleton';
 
 export class ClientService {
-  private readonly apiClient: APIClient;
-  private readonly storageService: StorageService;
   private readonly logger: Logger;
   private readonly CLIENT_STORE_NAME: string;
 
@@ -39,9 +39,10 @@ export class ClientService {
     return '/users';
   }
 
-  constructor(apiClient: APIClient, storageService: StorageService) {
-    this.apiClient = apiClient;
-    this.storageService = storageService;
+  constructor(
+    private readonly storageService = container.resolve(StorageService),
+    private readonly apiClient = container.resolve(APIClient),
+  ) {
     this.logger = getLogger('ClientService');
 
     this.CLIENT_STORE_NAME = StorageSchemata.OBJECT_STORE.CLIENTS;
@@ -129,7 +130,7 @@ export class ClientService {
    * Load all clients we have stored in the database.
    * @returns Resolves with all the clients payloads
    */
-  loadAllClientsFromDb(): Promise<any[]> {
+  loadAllClientsFromDb(): Promise<ClientRecord[]> {
     return this.storageService.getAll(this.CLIENT_STORE_NAME);
   }
 
@@ -138,7 +139,7 @@ export class ClientService {
    * @param primaryKey Primary key used to find a client in the database
    * @returns Resolves with the client's payload or the primary key if not found
    */
-  async loadClientFromDb(primaryKey: string): Promise<object | string> {
+  async loadClientFromDb(primaryKey: string): Promise<ClientRecord | string> {
     let clientRecord;
 
     if (this.storageService.db) {
@@ -148,7 +149,7 @@ export class ClientService {
         .equals(primaryKey)
         .first();
     } else {
-      clientRecord = await this.storageService.load(this.CLIENT_STORE_NAME, primaryKey);
+      clientRecord = await this.storageService.load<ClientRecord>(this.CLIENT_STORE_NAME, primaryKey);
     }
 
     if (clientRecord === undefined) {
@@ -167,7 +168,7 @@ export class ClientService {
    * @param clientPayload Client payload
    * @returns Resolves with the client payload stored in database
    */
-  saveClientInDb(primaryKey: string, clientPayload: Record<string, any>): Promise<any> {
+  saveClientInDb(primaryKey: string, clientPayload: ClientRecord): Promise<ClientRecord> {
     if (!clientPayload.meta) {
       clientPayload.meta = {};
     }
@@ -187,7 +188,7 @@ export class ClientService {
    * @param changes Incremental update changes of the client JSON
    * @returns Number of updated records (1 if an object was updated, otherwise 0)
    */
-  updateClientInDb(primaryKey: string, changes: object): Promise<number> {
+  updateClientInDb(primaryKey: string, changes: Partial<ClientRecord>): Promise<number> {
     return this.storageService.update(this.CLIENT_STORE_NAME, primaryKey, changes);
   }
 }

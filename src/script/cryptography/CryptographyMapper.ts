@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {
   Asset,
   Availability,
@@ -26,6 +26,7 @@ import {
   Cleared,
   Composite,
   Confirmation,
+  DataTransfer,
   External,
   GenericMessage,
   IAsset,
@@ -203,6 +204,11 @@ export class CryptographyMapper {
         specificContent = this._mapButtonActionConfirmation(
           genericMessage.buttonActionConfirmation as ButtonActionConfirmation,
         );
+        break;
+      }
+
+      case GENERIC_MESSAGE_TYPE.DATA_TRANSFER: {
+        specificContent = this._mapDataTransfer(genericMessage.dataTransfer as DataTransfer);
         break;
       }
 
@@ -527,6 +533,15 @@ export class CryptographyMapper {
         last_read_timestamp: lastRead.lastReadTimestamp.toString(),
       },
       type: CONVERSATION_EVENT.MEMBER_UPDATE,
+    };
+  }
+
+  _mapDataTransfer(dataTransfer: DataTransfer) {
+    return {
+      data: {
+        trackingIdentifier: dataTransfer.trackingIdentifier.identifier,
+      },
+      type: ClientEvent.USER.DATA_TRANSFER,
     };
   }
 

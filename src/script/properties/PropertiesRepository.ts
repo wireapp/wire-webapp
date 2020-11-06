@@ -21,8 +21,8 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
-import {ConsentType} from '@wireapp/api-client/dist/self';
+import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data';
+import {ConsentType} from '@wireapp/api-client/src/self';
 
 import {Environment} from 'Util/Environment';
 import {t} from 'Util/LocalizerUtil';

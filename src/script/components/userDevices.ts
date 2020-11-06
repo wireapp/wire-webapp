@@ -21,7 +21,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import type Dexie from 'dexie';
 import ko from 'knockout';
-import {ClientClassification} from '@wireapp/api-client/dist/client';
+import {ClientClassification} from '@wireapp/api-client/src/client';
 
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
@@ -30,13 +30,15 @@ import {capitalizeFirstChar} from 'Util/StringUtil';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {getPrivacyHowUrl, getPrivacyWhyUrl, getPrivacyPolicyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
 import 'Components/deviceCard';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {ClientState} from '../client/ClientState';
+import {ConversationState} from '../conversation/ConversationState';
 
 export interface UserDevicesHistory {
   current: ko.PureComputed<UserDevicesState>;
@@ -48,7 +50,8 @@ export interface UserDevicesHistory {
 
 interface UserDevicesParams {
   clientRepository: ClientRepository;
-  conversationRepository: ConversationRepository;
+  clientState?: ClientState;
+  conversationState?: ConversationState;
   cryptographyRepository: CryptographyRepository;
   history: UserDevicesHistory;
   messageRepository: MessageRepository;
@@ -163,14 +166,18 @@ ko.components.register('user-devices', {
   `,
   viewModel: function ({
     clientRepository,
-    conversationRepository,
     cryptographyRepository,
     messageRepository,
     userEntity,
     history,
     noPadding = false,
+    clientState = container.resolve(ClientState),
+    conversationState = container.resolve(ConversationState),
   }: UserDevicesParams): void {
-    this.selfClient = clientRepository.currentClient;
+    this.clientState = clientState;
+    this.conversationState = conversationState;
+
+    this.selfClient = clientState.currentClient;
     this.clientEntities = ko.observableArray();
     this.noPadding = noPadding;
 
@@ -244,8 +251,8 @@ ko.components.register('user-devices', {
     this.clickToResetSession = () => {
       const _resetProgress = () => window.setTimeout(() => this.isResettingSession(false), MotionDuration.LONG);
       const conversationId = userEntity().isMe
-        ? conversationRepository.self_conversation().id
-        : conversationRepository.active_conversation().id;
+        ? conversationState.self_conversation().id
+        : conversationState.activeConversation().id;
       this.isResettingSession(true);
       messageRepository
         .reset_session(userEntity().id, this.selectedClient().id, conversationId)

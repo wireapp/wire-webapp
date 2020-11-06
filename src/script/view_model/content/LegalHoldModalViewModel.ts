@@ -17,7 +17,7 @@
  *
  */
 
-import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/team/legalhold';
+import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -33,8 +33,9 @@ import type {CryptographyRepository} from 'src/script/cryptography/CryptographyR
 import type {Conversation} from 'src/script/entity/Conversation';
 import type {User} from 'src/script/entity/User';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
-import type {UserRepository} from 'src/script/user/UserRepository';
 import type {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {UserState} from '../../user/UserState';
+import {container} from 'tsyringe';
 
 export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
 export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';
@@ -62,12 +63,12 @@ export class LegalHoldModalViewModel {
   conversationId: string;
 
   constructor(
-    public userRepository: UserRepository,
     public conversationRepository: ConversationRepository,
     public teamRepository: TeamRepository,
     public clientRepository: ClientRepository,
     public cryptographyRepository: CryptographyRepository,
     public messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.isVisible = ko.observable(false);
     this.showRequest = ko.observable(false);
@@ -116,7 +117,7 @@ export class LegalHoldModalViewModel {
     if (showLoading) {
       setModalParams(true);
     }
-    const selfUser = this.userRepository.self();
+    const selfUser = this.userState.self();
     this.requiresPassword(!selfUser.isSingleSignOn);
     if (!selfUser.inTeam()) {
       setModalParams(false);
@@ -166,7 +167,7 @@ export class LegalHoldModalViewModel {
     if (this.disableSubmit()) {
       return;
     }
-    const selfUser = this.userRepository.self();
+    const selfUser = this.userState.self();
     this.requestError('');
     this.isSendingApprove(true);
     try {
@@ -202,7 +203,7 @@ export class LegalHoldModalViewModel {
     }
     this.showRequest(false);
     if (conversation === undefined) {
-      this.users([this.userRepository.self()]);
+      this.users([this.userState.self()]);
       this.isSelfInfo(true);
       this.isLoading(false);
       this.isVisible(true);
@@ -214,7 +215,7 @@ export class LegalHoldModalViewModel {
     this.isLoading(true);
     this.isVisible(true);
     await this.messageRepository.updateAllClients(conversation, false);
-    const allUsers = await this.conversationRepository.get_all_users_in_conversation(conversation.id);
+    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation.id);
     const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
     if (!legalHoldUsers.length) {
       this.isVisible(false);

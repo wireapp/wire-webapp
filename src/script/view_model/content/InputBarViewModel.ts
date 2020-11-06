@@ -29,7 +29,7 @@ import {afterRender, formatBytes} from 'Util/util';
 import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
 import {renderMessage} from 'Util/messageRenderer';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 
 import {ModalsViewModel} from '../ModalsViewModel';
 
@@ -48,7 +48,6 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {SearchRepository} from 'src/script/search/SearchRepository';
 import {StorageRepository} from 'src/script/storage';
-import {UserRepository} from 'src/script/user/UserRepository';
 import {EmojiInputViewModel} from './EmojiInputViewModel';
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -58,6 +57,9 @@ import {Asset} from 'src/script/entity/message/Asset';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 type DraftMessage = {
   mentions: MentionEntity[];
@@ -77,7 +79,7 @@ export class InputBarViewModel {
   private textarea: HTMLTextAreaElement;
   private readonly selectionStart: ko.Observable<number>;
   private readonly selectionEnd: ko.Observable<number>;
-  readonly participantAvatarSize = ParticipantAvatar.SIZE.X_SMALL;
+  readonly participantAvatarSize = AVATAR_SIZE.X_SMALL;
   readonly conversationEntity: ko.Observable<Conversation>;
   readonly selfUser: ko.Observable<User>;
   private readonly conversationHasFocus: ko.Observable<boolean>;
@@ -125,8 +127,9 @@ export class InputBarViewModel {
     private readonly conversationRepository: ConversationRepository,
     private readonly searchRepository: SearchRepository,
     private readonly storageRepository: StorageRepository,
-    private readonly userRepository: UserRepository,
     private readonly messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.shadowInput = null;
     this.textarea = null;
@@ -136,8 +139,8 @@ export class InputBarViewModel {
     this.selectionStart = ko.observable(0);
     this.selectionEnd = ko.observable(0);
 
-    this.conversationEntity = this.conversationRepository.active_conversation;
-    this.selfUser = this.userRepository.self;
+    this.conversationEntity = this.conversationState.activeConversation;
+    this.selfUser = this.userState.self;
 
     this.conversationHasFocus = ko.observable(true).extend({notify: 'always'});
 

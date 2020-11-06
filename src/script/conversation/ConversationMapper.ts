@@ -26,14 +26,14 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
-} from '@wireapp/api-client/dist/conversation';
+} from '@wireapp/api-client/src/conversation';
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation, SerializedConversation} from '../entity/Conversation';
 import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
-import {Conversation as ConversationBackendData} from '@wireapp/api-client/dist/conversation/';
+import {Conversation as ConversationBackendData} from '@wireapp/api-client/src/conversation/';
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {
@@ -323,7 +323,7 @@ export class ConversationMapper {
         const noOthers = !mergedConversation.others || !mergedConversation.others.length;
         if (isGroup || noOthers) {
           mergedConversation.others = othersStates
-            .filter(otherState => otherState.status === ConversationStatus.CURRENT_MEMBER)
+            .filter(otherState => (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number))
             .map(otherState => otherState.id);
         }
 

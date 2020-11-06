@@ -19,8 +19,9 @@
 import ko from 'knockout';
 import {Config, Configuration} from '../../Config';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../externalRoute';
-import {UserRepository} from '../../user/UserRepository';
 import {User} from '../../entity/User';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
 
 export class PreferencesAboutViewModel {
   private readonly selfUser: ko.Observable<User>;
@@ -29,8 +30,8 @@ export class PreferencesAboutViewModel {
   readonly privacyPolicyUrl: string;
   readonly termsOfUseUrl: ko.PureComputed<string>;
 
-  constructor(private readonly userRepository: UserRepository) {
-    this.selfUser = this.userRepository.self;
+  constructor(private readonly userState = container.resolve(UserState)) {
+    this.selfUser = this.userState.self;
     this.Config = Config.getConfig();
 
     this.websiteUrl = URL.WEBSITE;

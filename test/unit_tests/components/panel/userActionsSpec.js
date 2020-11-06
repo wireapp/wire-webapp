@@ -17,7 +17,7 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {instantiateComponent} from '../../../helper/knockoutHelpers';
 
 import {User} from 'src/script/entity/User';
