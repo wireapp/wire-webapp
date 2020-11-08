@@ -9351,10 +9351,10 @@ nan@^2.12.1, nan@^2.13.2, nan@^2.14.0:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
 
-nanoid@^3.1.12:
-  version "3.1.12"
-  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.12.tgz#6f7736c62e8d39421601e4a0c77623a97ea69654"
-  integrity sha512-1qstj9z5+x491jfiC4Nelk+f8XBad7LN20PmyWINJEMRSf3wcAjAWysw1qaA8z6NSKe2sjq1hRSDpBH5paCb6A==
+nanoid@^3.1.16:
+  version "3.1.16"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.16.tgz#b21f0a7d031196faf75314d7c65d36352beeef64"
+  integrity sha512-+AK8MN0WHji40lj8AEuwLOvLSbWYApQpre/aFJZD71r43wVRLrOYS4FmJOPQYon1TqB462RzrrxlfA74XRES8w==
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -10804,12 +10804,12 @@ postcss-sass@^0.4.4:
     gonzales-pe "^4.3.0"
     postcss "^7.0.21"
 
-postcss-scss@3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/postcss-scss/-/postcss-scss-3.0.2.tgz#b43afd45b49dfeb9f6266a0c7b29faf0941d18bd"
-  integrity sha512-gR31pETUW0nHKbciPh/2CU+HI3phdgT5Zw/9Z2Wq/hX1G54PmydF965Hx8X6ZDldrFgMuQageNJfk00V+U8YRQ==
+postcss-scss@3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/postcss-scss/-/postcss-scss-3.0.4.tgz#74ce30ec9de615b41aeab1249e7557698e372e73"
+  integrity sha512-BAkBZ35aXhCeBRmliHylYqTN1PvNJyh9aBPQHUmk9SdDdbk7n3GExm7cQivDckOgJpB+agyig9TwRAmf6WnvfA==
   dependencies:
-    postcss "^8.1.0"
+    postcss "^8.1.6"
 
 postcss-scss@^2.1.1:
   version "2.1.1"
@@ -10930,14 +10930,14 @@ postcss@^7.0.0, postcss@^7.0.1, postcss@^7.0.14, postcss@^7.0.17, postcss@^7.0.2
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@^8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.1.0.tgz#1be330c7f6971d49726059b9f51785f45273fa70"
-  integrity sha512-d3RppIo1DI66oHxA1vdckr5qciQbMIrHvyzuvp2cLJHOLwJHg7X9ncrfw2Ri6Sgiwv/GoXtOwEHJ9E9VSRxXWQ==
+postcss@^8.1.6:
+  version "8.1.6"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.1.6.tgz#b022ba2cfb8701da234d073ed3128c5a384c35ff"
+  integrity sha512-JuifSl4h8dJ70SiMXKjzCxhalE6p2TnMHuq9G8ftyXj2jg6SXzqCsEuxMj9RkmJoO5D+Z9YrWunNkxqpRT02qg==
   dependencies:
     colorette "^1.2.1"
     line-column "^1.0.2"
-    nanoid "^3.1.12"
+    nanoid "^3.1.16"
     source-map "^0.6.1"
 
 prebuild-install@^5.3.2:
