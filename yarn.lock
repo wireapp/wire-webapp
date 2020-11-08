@@ -4268,10 +4268,10 @@ cosmiconfig@^5.0.0, cosmiconfig@^5.2.0:
     js-yaml "^3.13.1"
     parse-json "^4.0.0"
 
-countly-sdk-web@20.4.0:
-  version "20.4.0"
-  resolved "https://registry.yarnpkg.com/countly-sdk-web/-/countly-sdk-web-20.4.0.tgz#00e618ef4caf588ec4dc8dfcc4b6a76362eeb328"
-  integrity sha512-O3Hi7nRom9iih9j1/9rqd222AsvZgH+C/z1rPfMw9M0gJFtQ13Yo2JLxI+5sKWvkQ2ISCyQPpRWc5uaeLw7gRA==
+countly-sdk-web@20.11.0:
+  version "20.11.0"
+  resolved "https://registry.yarnpkg.com/countly-sdk-web/-/countly-sdk-web-20.11.0.tgz#864b947692065244e7927d41270d0197980da698"
+  integrity sha512-v4ph2qy3OZsA6aiyVujc6SP9WKDs+jbabqGuwRy6ie5X0IBLwtPWwAU6WZnYfBGnURP2iIBvX3JpZUgmg8S6Zg==
 
 cpr@3.0.1:
   version "3.0.1"
