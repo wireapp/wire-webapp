@@ -36,8 +36,7 @@ const distributionParam = process.argv[2];
 const stageParam = process.argv[3];
 const suffix = distributionParam ? `-${distributionParam}` : '';
 const stage = stageParam ? `-${stageParam}` : '';
-const buildCounter = process.env.TRAVIS_BUILD_NUMBER || 'BUILD_NUMBER';
-const commitSha = process.env.TRAVIS_COMMIT || 'COMMIT_ID';
+const commitSha = process.env.GITHUB_SHA || 'COMMIT_ID';
 const commitShaLength = 7;
 const commitShortSha = commitSha.substring(0, commitShaLength - 1);
 const configurationEntry = suffix
@@ -54,7 +53,7 @@ const configVersion = dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp${suffix}`;
 
-const dockerImageTag = `${repository}:${buildCounter}-${pkg.version}-${commitShortSha}-${configVersion}${stage}`;
+const dockerImageTag = `${repository}:${pkg.version}-${commitShortSha}-${configVersion}${stage}`;
 const dockerImageStageTag = stageParam ? `${repository}:${stageParam}` : '';
 
 const dockerCommands = [
