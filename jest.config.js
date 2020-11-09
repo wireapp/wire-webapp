@@ -38,11 +38,6 @@ module.exports = {
   testEnvironmentOptions: {
     resources: 'usable', // For <img>.src the package `canvas` is needed as well
   },
-  testPathIgnorePatterns: [
-    '<rootDir>/test/index.test.js',
-    '<rootDir>/test/main.test.js',
-    '<rootDir>/server',
-    '<rootDir>/webpack.config.test.js',
-  ],
+  testPathIgnorePatterns: ['<rootDir>/test/index.test.js', '<rootDir>/test/main.test.js', '<rootDir>/server'],
   testRegex: '(test|Spec)\\.[tj]sx?$',
 };

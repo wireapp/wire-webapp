@@ -46,7 +46,7 @@ describe('ValidationUtil', () => {
       const conversationId = 'e13f9940-819c-477b-9391-b04234ae84af"*';
       expect(() => {
         legacyAsset(assetId, conversationId);
-      }).toThrow(jasmine.any(ValidationUtilError));
+      }).toThrow(ValidationUtilError);
     });
   });
 
@@ -73,7 +73,7 @@ describe('ValidationUtil', () => {
 
       expect(() => {
         assetV3(assetKey);
-      }).toThrow(jasmine.any(ValidationUtilError));
+      }).toThrow(ValidationUtilError);
     });
 
     it('detects an invalid v3 asset (assetToken)', async () => {
@@ -82,7 +82,7 @@ describe('ValidationUtil', () => {
 
       expect(() => {
         assetV3(assetKey, assetToken);
-      }).toThrow(jasmine.any(ValidationUtilError));
+      }).toThrow(ValidationUtilError);
     });
   });
 
@@ -168,7 +168,7 @@ describe('ValidationUtil', () => {
 
       expect(() => {
         isValidApiPath(path);
-      }).toThrow(jasmine.any(ValidationUtilError));
+      }).toThrow(ValidationUtilError);
     });
   });
 
