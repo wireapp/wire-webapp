@@ -42,6 +42,8 @@ import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
 import {ConversationError} from 'src/script/error/ConversationError';
 
+jest.deepUnmock('axios');
+
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
 
@@ -797,7 +799,7 @@ describe('ConversationRepository', () => {
 
       afterEach(() => conversation_et.remove_messages());
 
-      it('should not delete message if user is not matching', done => {
+      it('should not delete message if user is not matching', async () => {
         const message_delete_event = {
           conversation: conversation_et.id,
           data: {
@@ -812,17 +814,14 @@ describe('ConversationRepository', () => {
         spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 
         expect(conversation_et.getMessage(message_et.id)).toBeDefined();
-        testFactory.conversation_repository
-          .handleConversationEvent(message_delete_event)
-          .then(done.fail)
-          .catch(error => {
-            expect(error).toEqual(jasmine.any(ConversationError));
-            expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
-            expect(testFactory.conversation_repository.onMessageDeleted).toHaveBeenCalled();
-            expect(conversation_et.getMessage(message_et.id)).toBeDefined();
-            expect(testFactory.conversation_repository.addDeleteMessage).not.toHaveBeenCalled();
-            done();
-          });
+        await expect(
+          testFactory.conversation_repository.handleConversationEvent(message_delete_event),
+        ).rejects.toMatchObject({
+          type: ConversationError.TYPE.WRONG_USER,
+        });
+        expect(testFactory.conversation_repository.onMessageDeleted).toHaveBeenCalled();
+        expect(conversation_et.getMessage(message_et.id)).toBeDefined();
+        expect(testFactory.conversation_repository.addDeleteMessage).not.toHaveBeenCalled();
       });
 
       it('should delete message if user is self', () => {
@@ -918,7 +917,7 @@ describe('ConversationRepository', () => {
         });
       });
 
-      it('should not hide message if sender is not self user', done => {
+      it('should not hide message if sender is not self user', async () => {
         const messageHiddenEvent = {
           conversation: conversation_et.id,
           data: {
@@ -935,16 +934,13 @@ describe('ConversationRepository', () => {
 
         spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 
-        testFactory.conversation_repository
-          .handleConversationEvent(messageHiddenEvent)
-          .then(done.fail)
-          .catch(error => {
-            expect(error).toEqual(jasmine.any(ConversationError));
-            expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
-            expect(testFactory.conversation_repository.onMessageHidden).toHaveBeenCalled();
-            expect(conversation_et.getMessage(messageId)).toBeDefined();
-            done();
-          });
+        await expect(
+          testFactory.conversation_repository.handleConversationEvent(messageHiddenEvent),
+        ).rejects.toMatchObject({
+          type: ConversationError.TYPE.WRONG_USER,
+        });
+        expect(testFactory.conversation_repository.onMessageHidden).toHaveBeenCalled();
+        expect(conversation_et.getMessage(messageId)).toBeDefined();
       });
 
       it('should hide message if sender is self user', () => {

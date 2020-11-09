@@ -160,14 +160,34 @@ describe('BackupRepository', () => {
     });
 
     it('successfully imports a backup', async () => {
-      function removePrimaryKey(message) {
-        return {
-          ...message,
-          primary_key: undefined,
-        };
-      }
-
-      const metadataArray = [backupRepository.createMetaData(), {...backupRepository.createMetaData(), version: 15}];
+      const backupRepo = new BackupRepository(
+        {
+          getDatabaseVersion: () => 15,
+          importEntities: jest.fn(),
+        }, //  BackupService
+        {
+          connectionEntities: jest.fn().mockImplementation(() => []),
+        }, //  ConnectionRepository
+        {
+          checkForDeletedConversations: jest.fn(),
+          map_connections: jest.fn(),
+          updateConversationStates: jest.fn().mockImplementation(conversations => conversations),
+          updateConversations: jest.fn(),
+        }, //  ConversationRepository
+        {
+          currentClient: jest.fn().mockImplementation(() => ({
+            id: 'client-id',
+          })),
+        }, //  ClientState
+        {
+          self: jest.fn().mockImplementation(() => ({
+            id: 'self-id',
+            name: jest.fn().mockImplementation(() => 'selfName'),
+            username: jest.fn().mockImplementation(() => 'selfUsername'),
+          })),
+        }, //  UserState
+      );
+      const metadataArray = [backupRepo.createMetaData(), {...backupRepo.createMetaData(), version: 15}];
 
       const archives = metadataArray.map(metadata => {
         const archive = new JSZip();
@@ -184,18 +204,13 @@ describe('BackupRepository', () => {
           files[fileName] = await archive.files[fileName].async('uint8array');
         }
 
-        await backupRepository.importHistory(files, noop, noop);
+        await backupRepo.importHistory(files, noop, noop);
 
-        const conversationsData = await testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS);
-        expect(conversationsData.length).toEqual(1);
-        const [conversationData] = conversationsData;
-
-        expect(conversationData.name).toEqual(conversation.name);
-        expect(conversationData.id).toEqual(conversation.id);
-
-        const events = await testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
-        expect(events.length).toEqual(messages.length);
-        expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
+        expect(backupRepo.conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
+        expect(backupRepo.backupService.importEntities).toHaveBeenCalledWith(
+          StorageSchemata.OBJECT_STORE.EVENTS,
+          messages,
+        );
       }
     });
   });

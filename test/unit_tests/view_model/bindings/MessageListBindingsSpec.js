@@ -34,14 +34,11 @@ describe('messageListBindings', () => {
     scrollingTests.forEach(({expectedCalls, initialScroll, scrollTop}) => {
       it('calls params functions when scroll hits top and bottom', () => {
         const context = {
-          onHitBottom: () => {},
-          onHitTop: () => {},
-          onInit: () => {},
+          onHitBottom: jest.fn(),
+          onHitTop: jest.fn(),
+          onInit: jest.fn(),
         };
 
-        spyOn(context, 'onHitTop');
-        spyOn(context, 'onHitBottom');
-        spyOn(context, 'onInit');
         const boundElement = `<div style='height: 10px; overflow: scroll' class="scroll" data-bind="{infinite_scroll: {onHitTop, onHitBottom, onInit}}">
         <div style="height: ${contentHeight}px;"></div>
       </div>`;

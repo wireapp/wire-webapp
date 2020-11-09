@@ -31,6 +31,8 @@ require('src/script/util/test/mock/ResponseMock');
 require('src/script/util/test/mock/SVGProviderMock');
 require('src/script/util/test/mock/WebRTCMock');
 
+jest.mock('axios');
+
 require('test/api/payloads');
 
 const Adapter = require('enzyme-adapter-react-16');
