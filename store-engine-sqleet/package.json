@@ -31,8 +31,8 @@
   "description": "Store Engine implementation for SQLite 3 (WebAssembly) with encryption.",
   "files": [
     "src",
-    "!src/**/!(*.d).ts",
-    "!src/test/**/*"
+    "!src/**/*.test.*",
+    "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
   "main": "src/index",
@@ -44,7 +44,7 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js,websql-worker.js}\" \"!src/test/**/*\"",
+    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js,websql-worker.js}\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn build && karma start",
     "test:project": "yarn build && yarn test"

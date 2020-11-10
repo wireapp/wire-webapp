@@ -20,8 +20,9 @@
   "description": "Provides a storage wrapper API to unify access to different storage technologies.",
   "files": [
     "src",
+    "!src/**/*.test.*",
     "!src/**/!(*.d).ts",
-    "!src/test/**/*"
+    "!src/main/test"
   ],
   "keywords": [
     "generic",
