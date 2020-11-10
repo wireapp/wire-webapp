@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.31.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.30.9...@wireapp/api-client@11.31.0) (2020-11-10)
+
+
+### Features
+
+* **api-client:** Trace requests to `/self` ([#3323](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3323)) ([a1028fe](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/a1028fe449a14e57102ef83aaa1a8a794b7ead33))
+
+
+
+
+
 ## [11.30.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.30.8...@wireapp/api-client@11.30.9) (2020-11-10)
 
 
