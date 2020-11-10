@@ -19,11 +19,10 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {HttpClient} from '../http/';
+import {HttpClient, TraceState} from '../http/';
 import {ChangePassword, Delete, Self} from '../self/';
 import {UserUpdate} from '../user/';
 import {Consent} from './Consent';
-import {TraceState} from '../tcp/TraceContext';
 
 export class SelfAPI {
   constructor(private readonly client: HttpClient) {}
