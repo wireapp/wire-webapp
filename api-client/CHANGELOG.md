@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.32.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.31.0...@wireapp/api-client@11.32.0) (2020-11-10)
+
+
+### Features
+
+* **api-client:** Export trace context ([786370c](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/786370c14587a22328bdbd60d91f190d9d7b0cc9))
+
+
+
+
+
 # [11.31.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.30.9...@wireapp/api-client@11.31.0) (2020-11-10)
 
 
