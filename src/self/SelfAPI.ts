@@ -23,6 +23,7 @@ import {HttpClient} from '../http/';
 import {ChangePassword, Delete, Self} from '../self/';
 import {UserUpdate} from '../user/';
 import {Consent} from './Consent';
+import {TraceState} from '../TraceContext';
 
 export class SelfAPI {
   constructor(private readonly client: HttpClient) {}
@@ -124,12 +125,15 @@ export class SelfAPI {
    * Get your profile
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/self
    */
-  public async getSelf(): Promise<Self> {
+  public async getSelf(traceStates: TraceState[] = []): Promise<Self> {
+    traceStates.push({position: 'SelfAPI.getSelf', vendor: 'api-client'});
     const config: AxiosRequestConfig = {
+      headers: {
+        tracestate: traceStates.map(state => `${state.vendor}=${state.position}`).join(','),
+      },
       method: 'get',
       url: SelfAPI.URL.SELF,
     };
-
     const response = await this.client.sendJSON<Self>(config);
     return response.data;
   }

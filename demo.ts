@@ -49,7 +49,7 @@ logger.log(`Using "process.env.WIRE_CONVERSATION_ID": ${WIRE_CONVERSATION_ID}`);
 
 async function createContext(storeEngine: CRUDEngine, apiClient: APIClient, loginData: LoginData): Promise<Context> {
   try {
-    const {expiration, zuid} = await storeEngine.read(AUTH_TABLE_NAME, AUTH_COOKIE_KEY);
+    const {expiration, zuid} = await storeEngine.read<Cookie>(AUTH_TABLE_NAME, AUTH_COOKIE_KEY);
     const cookie = new Cookie(zuid, expiration);
     logger.log(`Found cookie "${zuid}".`);
     logger.log('Logging in with EXISTING cookie...');
