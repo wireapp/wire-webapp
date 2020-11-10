@@ -48,7 +48,7 @@
   "files": [
     "src",
     "!src/**/!(*.d).ts",
-    "!src/**/*.test.ts",
+    "!src/**/*.test.*",
     "!src/**/*.tsx",
     "!src/test"
   ],
