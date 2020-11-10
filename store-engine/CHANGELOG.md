@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.5.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@4.5.16...@wireapp/store-engine@4.5.17) (2020-11-10)
+
+
+### Bug Fixes
+
+* Don't publish test files ([#3320](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/issues/3320)) ([8248b19](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/commit/8248b194033242123f023355d67230afcfe6ede8))
+
+
+
+
+
 ## [4.5.16](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine/compare/@wireapp/store-engine@4.5.15...@wireapp/store-engine@4.5.16) (2020-10-29)
 
 **Note:** Version bump only for package @wireapp/store-engine

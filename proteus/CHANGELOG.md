@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.8.26](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.8.25...@wireapp/proteus@9.8.26) (2020-11-10)
+
+
+### Bug Fixes
+
+* Don't publish test files ([#3320](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/3320)) ([8248b19](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/8248b194033242123f023355d67230afcfe6ede8))
+
+
+
+
+
 ## [9.8.25](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.8.24...@wireapp/proteus@9.8.25) (2020-10-29)
 
 **Note:** Version bump only for package @wireapp/proteus

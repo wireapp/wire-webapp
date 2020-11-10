@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.21](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/compare/@wireapp/store-engine-fs@2.2.20...@wireapp/store-engine-fs@2.2.21) (2020-11-10)
+
+
+### Bug Fixes
+
+* Don't publish test files ([#3320](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/issues/3320)) ([8248b19](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/commit/8248b194033242123f023355d67230afcfe6ede8))
+
+
+
+
+
 ## [2.2.20](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/compare/@wireapp/store-engine-fs@2.2.19...@wireapp/store-engine-fs@2.2.20) (2020-10-29)
 
 **Note:** Version bump only for package @wireapp/store-engine-fs

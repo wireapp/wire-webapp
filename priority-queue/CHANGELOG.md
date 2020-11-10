@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.6.12...@wireapp/priority-queue@1.6.13) (2020-11-10)
+
+
+### Bug Fixes
+
+* Don't publish test files ([#3320](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/3320)) ([8248b19](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/8248b194033242123f023355d67230afcfe6ede8))
+
+
+
+
+
 ## [1.6.12](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.6.11...@wireapp/priority-queue@1.6.12) (2020-10-29)
 
 **Note:** Version bump only for package @wireapp/priority-queue

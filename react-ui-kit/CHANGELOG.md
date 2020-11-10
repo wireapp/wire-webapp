@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.37.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.37.14...@wireapp/react-ui-kit@7.37.15) (2020-11-10)
+
+
+### Bug Fixes
+
+* Don't publish test files ([#3320](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3320)) ([8248b19](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/8248b194033242123f023355d67230afcfe6ede8))
+
+
+
+
+
 ## [7.37.14](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.37.13...@wireapp/react-ui-kit@7.37.14) (2020-10-29)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit

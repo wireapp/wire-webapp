@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.21](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@1.3.20...@wireapp/store-engine-dexie@1.3.21) (2020-11-10)
+
+
+### Bug Fixes
+
+* Don't publish test files ([#3320](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/issues/3320)) ([8248b19](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/commit/8248b194033242123f023355d67230afcfe6ede8))
+
+
+
+
+
 ## [1.3.20](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-dexie/compare/@wireapp/store-engine-dexie@1.3.19...@wireapp/store-engine-dexie@1.3.20) (2020-10-29)
 
 **Note:** Version bump only for package @wireapp/store-engine-dexie

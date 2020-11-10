@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.7.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.7.6...@wireapp/lru-cache@3.7.7) (2020-11-10)
+
+
+### Bug Fixes
+
+* Don't publish test files ([#3320](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/issues/3320)) ([8248b19](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/commit/8248b194033242123f023355d67230afcfe6ede8))
+
+
+
+
+
 ## [3.7.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.7.5...@wireapp/lru-cache@3.7.6) (2020-10-29)
 
 **Note:** Version bump only for package @wireapp/lru-cache
