@@ -19,7 +19,7 @@
 
 import type {AccentColor} from '@wireapp/commons';
 import type {PublicClient} from '@wireapp/api-client/src/client';
-import type {BackendError} from '@wireapp/api-client/src/http';
+import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self';
@@ -455,9 +455,10 @@ export class UserRepository {
   /**
    * Get self user from backend.
    */
-  async getSelf(): Promise<User> {
+  async getSelf(traceStates: TraceState[]): Promise<User> {
     try {
-      const userData = await this.selfService.getSelf();
+      traceStates.push({position: 'UserRepository.getSelf', vendor: 'webapp'});
+      const userData = await this.selfService.getSelf(traceStates);
       const response = this.upgradePictureAsset(userData);
       const userEntity = this.userMapper.mapSelfUserFromJson(response);
       this.saveUser(userEntity, true);
