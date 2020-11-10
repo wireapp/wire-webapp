@@ -19,10 +19,7 @@
 
 import ko from 'knockout';
 
-import {afterRender} from 'Util/util';
-
 import type {Participant} from '../calling/Participant';
-import {VideoFillMode} from '../calling/Participant';
 import type {Grid} from '../calling/videoGridHandler';
 
 interface GroupVideoGripParams {
@@ -34,7 +31,6 @@ interface GroupVideoGripParams {
 
 class GroupVideoGrid {
   private readonly grid: ko.PureComputed<Grid>;
-  private readonly videoParticipants: ko.PureComputed<Participant[]>;
   private readonly minimized: boolean;
   public readonly muted: ko.Observable<boolean>;
   public readonly selfParticipant: Participant;
@@ -45,16 +41,13 @@ class GroupVideoGrid {
     rootElement: HTMLElement,
   ) {
     this.selfParticipant = ko.unwrap(selfParticipant);
-    this.scaleVideos = this.scaleVideos.bind(this, rootElement);
     this.grid = grid;
     this.muted = muted;
-    this.videoParticipants = ko.pureComputed(() => this.grid().grid.filter(participant => !!participant));
 
     this.minimized = minimized;
     // scale videos when the grid is updated (on the next rendering cycle)
     const gridSubscription = this.grid.subscribe(newGrid => {
       this.setRowsAndColumns(rootElement, newGrid.grid.length);
-      afterRender(this.scaleVideos);
     });
     this.setRowsAndColumns(rootElement, grid().grid.length);
     this.dispose = () => gridSubscription.dispose();
@@ -72,49 +65,18 @@ class GroupVideoGrid {
     const gridElementsCount = this.grid().grid.filter(participant => !!participant).length;
     return this.minimized && gridElementsCount > 1;
   }
-
-  toggleContain(element: HTMLVideoElement, videoFillMode: VideoFillMode): void {
-    element.classList.toggle('group-video-grid__element-video--contain', videoFillMode === VideoFillMode.CONTAIN);
-  }
-
-  scaleVideos(rootElement: HTMLElement): void {
-    const gridElements = Array.from(rootElement.querySelectorAll('.group-video-grid__element'));
-    gridElements.forEach((element: HTMLElement) => {
-      const videoElement = element.querySelector('video');
-      const {userId, clientId} = element.dataset;
-      const participant = this.videoParticipants().find(participant => participant.doesMatchIds(userId, clientId));
-      if (!participant) {
-        return;
-      }
-      if (participant.videoFillMode() === VideoFillMode.UNSET) {
-        participant.videoFillMode(participant.sharesScreen() ? VideoFillMode.CONTAIN : VideoFillMode.COVER);
-      }
-      afterRender(() => this.toggleContain(videoElement, participant.videoFillMode()));
-    });
-  }
-
-  doubleClickedOnVideo = (_: GroupVideoGrid, event: MouseEvent): void => {
-    const target = event.currentTarget as HTMLElement;
-    const childVideo = target.querySelector('video');
-    const {userId, clientId} = target.dataset;
-    const participant = this.videoParticipants().find(participant => participant.doesMatchIds(userId, clientId));
-    const isContain = participant.videoFillMode() === VideoFillMode.CONTAIN;
-    participant.videoFillMode(isContain ? VideoFillMode.COVER : VideoFillMode.CONTAIN);
-    this.toggleContain(childVideo, participant.videoFillMode());
-  };
 }
 
 ko.components.register('group-video-grid', {
   template: `
     <div class="group-video">
       <div class="group-video-grid" data-bind="
-        foreach: {data: grid().grid, as: 'participant', noChildContext: true, afterRender: scaleVideos},
+        foreach: {data: grid().grid, as: 'participant', noChildContext: true},
         css: {'group-video-grid--black-background': hasBlackBackground()}"
       >
         <!-- ko if: participant -->
           <div class="group-video-grid__element" data-bind="
-              attr: {'data-user-id': participant.user.id, 'data-client-id': participant.clientId},
-              event: {dblclick: doubleClickedOnVideo}"
+              attr: {'data-user-id': participant.user.id, 'data-client-id': participant.clientId}"
             data-uie-name="item-grid"
           >
             <video class="group-video-grid__element-video" autoplay playsinline
