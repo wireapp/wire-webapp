@@ -18,4 +18,3 @@
  */
 
 export * from './WebSocketClient';
-export * from './TraceContext';
