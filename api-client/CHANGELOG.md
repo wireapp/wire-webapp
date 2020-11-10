@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.30.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.30.7...@wireapp/api-client@11.30.8) (2020-11-10)
+
+
+### Bug Fixes
+
+* **api-client,core:** Browser shim paths ([#3322](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3322)) ([3ace557](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3ace557dee75974ac127565ee98930158d464905))
+
+
+
+
+
 ## [11.30.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.30.6...@wireapp/api-client@11.30.7) (2020-11-03)
 
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.12.51](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.12.50...@wireapp/core@16.12.51) (2020-11-10)
+
+
+### Bug Fixes
+
+* **api-client,core:** Browser shim paths ([#3322](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3322)) ([3ace557](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3ace557dee75974ac127565ee98930158d464905))
+
+
+
+
+
 ## [16.12.50](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@16.12.49...@wireapp/core@16.12.50) (2020-11-03)
 
 **Note:** Version bump only for package @wireapp/core
