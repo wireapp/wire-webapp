@@ -23,7 +23,7 @@ import {HttpClient} from '../http/';
 import {ChangePassword, Delete, Self} from '../self/';
 import {UserUpdate} from '../user/';
 import {Consent} from './Consent';
-import {TraceState} from '../TraceContext';
+import {TraceState} from '../tcp/TraceContext';
 
 export class SelfAPI {
   constructor(private readonly client: HttpClient) {}
