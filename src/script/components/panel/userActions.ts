@@ -161,7 +161,7 @@ class UserActions {
           click: () =>
             actionsViewModel.sendConnectionRequest(user()).then(() => {
               // Hotfix for https://wearezeta.atlassian.net/browse/SQCORE-143
-              window.setTimeout(() => onAction(Actions.SEND_REQUEST), 30);
+              window.setTimeout(() => onAction(Actions.SEND_REQUEST), 100);
             }),
           icon: 'plus-icon',
           identifier: 'do-send-request',
