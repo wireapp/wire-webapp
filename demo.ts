@@ -33,6 +33,7 @@ import {
   LoginData,
 } from './src/auth';
 import {ClientType} from './src/client';
+import {Config} from './src/Config';
 import {WebSocketClient} from './src/tcp';
 
 require('dotenv').config();
@@ -63,7 +64,7 @@ async function createContext(storeEngine: CRUDEngine, apiClient: APIClient, logi
 }
 
 if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION_ID) {
-  const login = {
+  const login: LoginData = {
     clientType: ClientType.PERMANENT,
     email: WIRE_EMAIL,
     password: WIRE_PASSWORD,
@@ -77,12 +78,11 @@ if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION_ID) {
     const storeEngine = new FileEngine(storagePath, storeOptions);
     await storeEngine.init(storagePath, storeOptions);
 
-    const config = {
-      store: storeEngine,
+    const apiConfig: Config = {
       urls: APIClient.BACKEND.PRODUCTION,
     };
 
-    const apiClient = new APIClient(config);
+    const apiClient = new APIClient(apiConfig);
 
     apiClient.on(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, async (accessToken: AccessTokenData) => {
       await storeEngine.updateOrCreate(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken);

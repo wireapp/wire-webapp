@@ -25,6 +25,53 @@ yarn add @wireapp/api-client
 
 ### Usage
 
+#### Wire Backend
+
+```ts
+import {APIClient} from '@wireapp/api-client';
+import {LoginData} from '@wireapp/api-client/src/auth/';
+import {ClientType} from '@wireapp/api-client/src/client';
+
+const credentials: LoginData = {
+  clientType: ClientType.TEMPORARY,
+  email: 'user@wire.com',
+  password: 'top-secret',
+};
+
+const apiClient = new APIClient();
+
+apiClient.login(credentials);
+```
+
+#### Custom Backend
+
+```ts
+import {APIClient} from '@wireapp/api-client';
+import {Config} from '@wireapp/api-client/src/Config';
+import {LoginData} from '@wireapp/api-client/src/auth/';
+import {ClientType} from '@wireapp/api-client/src/client';
+
+const credentials: LoginData = {
+  clientType: ClientType.TEMPORARY,
+  email: 'user@wire.com',
+  password: 'top-secret',
+};
+
+const apiConfig: Config = {
+  urls: {
+    name: 'My custom backend',
+    rest: 'https://backend-rest.domain.com',
+    ws: 'wss://backend-websocket.domain.com',
+  },
+};
+
+const apiClient = new APIClient(apiConfig);
+
+apiClient.login(credentials);
+```
+
+### Examples
+
 **Browser**
 
 - [index.html](index.html)

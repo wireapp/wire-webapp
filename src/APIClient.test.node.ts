@@ -37,7 +37,7 @@ describe('APIClient', () => {
     user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
   };
 
-  describe('"constructor"', () => {
+  describe('constructor', () => {
     it('constructs a client with production backend and StoreEngine by default', () => {
       const client = new APIClient();
       expect(client.transport.http['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.rest);
@@ -57,7 +57,7 @@ describe('APIClient', () => {
     });
   });
 
-  describe('"login"', () => {
+  describe('login', () => {
     accessTokenData = {
       access_token:
         'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
@@ -161,7 +161,7 @@ describe('APIClient', () => {
     });
   });
 
-  describe('"logout"', () => {
+  describe('logout', () => {
     beforeEach(() => {
       nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(200);
     });
@@ -204,7 +204,7 @@ describe('APIClient', () => {
     });
   });
 
-  describe('"register"', () => {
+  describe('register', () => {
     const registerData = {
       accent_id: 0,
       assets: [],

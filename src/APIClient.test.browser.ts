@@ -23,7 +23,7 @@ import {APIClient} from './APIClient';
 import {ClientType} from './client';
 
 describe('Client', () => {
-  describe('"connect"', () => {
+  describe('connect', () => {
     it('processes WebSocket messages when executed in a web browser.', async () => {
       const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
       const accessTokenData = {
