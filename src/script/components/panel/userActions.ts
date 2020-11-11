@@ -158,7 +158,11 @@ class UserActions {
           return this.isNotMe() && isNotConnectedUser && canConnect;
         },
         item: {
-          click: () => actionsViewModel.sendConnectionRequest(user()).then(() => onAction(Actions.SEND_REQUEST)),
+          click: () =>
+            actionsViewModel.sendConnectionRequest(user()).then(() => {
+              // Hotfix for https://wearezeta.atlassian.net/browse/SQCORE-143
+              window.setTimeout(() => onAction(Actions.SEND_REQUEST), 30);
+            }),
           icon: 'plus-icon',
           identifier: 'do-send-request',
           label: t('groupParticipantActionSendRequest'),
