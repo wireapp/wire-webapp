@@ -42,7 +42,7 @@ describe('ClientRepository', () => {
 
   beforeEach(() => testFactory.storage_repository.clearStores());
 
-  describe('getClientsByUserId', () =>
+  describe('getClientsByUserId', () => {
     it('maps client entities from client payloads by the backend', async () => {
       const client = new ClientEntity();
       client.id = clientId;
@@ -62,7 +62,8 @@ describe('ClientRepository', () => {
 
       const clientEntities = await testFactory.client_repository.getClientsByUserId(entities.user.john_doe.id);
       expect(clientEntities.length).toBe(allClients.length);
-    }));
+    });
+  });
 
   describe('getValidLocalClient', () => {
     const clientPayloadServer = {
