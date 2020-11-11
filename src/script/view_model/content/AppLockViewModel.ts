@@ -34,6 +34,7 @@ import {Config} from '../../Config';
 import type {User} from '../../entity/User';
 import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
+import {TeamState} from '../../team/TeamState';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -97,7 +98,9 @@ export class AppLockViewModel {
     private readonly clientRepository: ClientRepository,
     selfUser: ko.Observable<User>,
     private readonly clientState = container.resolve(ClientState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
+    console.info('####', this.teamState, this.teamState.teamFeatures());
     this.localStorage = window.localStorage;
     this.state = ko.observable(APPLOCK_STATE.NONE);
     this.state.subscribe(() => this.stopObserver(), null, 'beforeChange');

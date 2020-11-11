@@ -23,6 +23,7 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 import {User} from '../entity/User';
 import {UserState} from '../user/UserState';
 import {TeamEntity} from './TeamEntity';
+import {FeatureList} from './TeamService';
 
 @singleton()
 export class TeamState {
@@ -31,6 +32,7 @@ export class TeamState {
   public readonly memberRoles: ko.Observable<any>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
+  public readonly teamFeatures: ko.Observable<FeatureList>;
   readonly teamMembers: ko.PureComputed<User[]>;
   readonly teamUsers: ko.PureComputed<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
@@ -47,6 +49,7 @@ export class TeamState {
     this.teamMembers = ko.pureComputed(() => (this.isTeam() ? this.team().members() : []));
     this.memberRoles = ko.observable({});
     this.memberInviters = ko.observable({});
+    this.teamFeatures = ko.observable();
 
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.userState.self().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));

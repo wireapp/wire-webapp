@@ -26,6 +26,17 @@ import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
 
+// TODO: Remove that and use the one from api-client
+export interface FeatureList {
+  'app-lock': {
+    config: {
+      enforce_app_lock: boolean;
+      inactivity_timeout_secs: number;
+    };
+    status: 'enabled' | 'disabled';
+  };
+}
+
 export class TeamService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
@@ -63,5 +74,17 @@ export class TeamService {
 
   getWhitelistedServices(teamId: string): Promise<Services> {
     return this.apiClient.teams.service.api.getTeamServices(teamId);
+  }
+
+  getAllTeamFeatures(teamId: string): Promise<FeatureList> {
+    return Promise.resolve({
+      'app-lock': {
+        config: {
+          enforce_app_lock: true,
+          inactivity_timeout_secs: 15,
+        },
+        status: 'enabled',
+      },
+    });
   }
 }
