@@ -455,7 +455,7 @@ export class UserRepository {
   /**
    * Get self user from backend.
    */
-  async getSelf(traceStates: TraceState[]): Promise<User> {
+  async getSelf(traceStates: TraceState[] = []): Promise<User> {
     try {
       traceStates.push({position: 'UserRepository.getSelf', vendor: 'webapp'});
       const userData = await this.selfService.getSelf(traceStates);
