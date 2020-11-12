@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-import {CONV_TYPE} from '@wireapp/avs';
 
 import {sortUsersByPriority} from 'Util/StringUtil';
 
