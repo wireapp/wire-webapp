@@ -32,7 +32,6 @@ export interface Grid {
 }
 
 export function getGrid(call: Call): ko.PureComputed<Grid> {
-  const showThumbnail = call.conversationType === CONV_TYPE.ONEONONE;
   return ko.pureComputed(() => {
     let inGridParticipants: Participant[];
     let thumbnailParticipant: Participant | null;
@@ -41,7 +40,7 @@ export function getGrid(call: Call): ko.PureComputed<Grid> {
       .getRemoteParticipants()
       .filter(participant => participant.hasActiveVideo())
       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
-    if (showThumbnail && remoteVideoParticipants.length === 1) {
+    if (remoteVideoParticipants.length === 1) {
       inGridParticipants = remoteVideoParticipants;
       thumbnailParticipant = selfParticipant?.hasActiveVideo() ? selfParticipant : null;
     } else {
