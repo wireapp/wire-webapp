@@ -375,7 +375,7 @@ export class ActionsViewModel {
    * @param showConversation Should we open the new conversation?
    * @returns Resolves when the connection request was successfully created
    */
-  sendConnectionRequest = (userEntity: User, showConversation?: boolean): Promise<void> => {
+  sendConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> => {
     if (!userEntity) {
       return Promise.reject();
     }

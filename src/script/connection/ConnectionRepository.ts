@@ -178,7 +178,7 @@ export class ConnectionRepository {
    * @param showConversation Should we open the new conversation?
    * @returns Promise that resolves when the connection request was successfully created
    */
-  public async createConnection(userEntity: User, showConversation: boolean = false): Promise<void> {
+  public async createConnection(userEntity: User, showConversation: boolean): Promise<void> {
     try {
       const response = await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
