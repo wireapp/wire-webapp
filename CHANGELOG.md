@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.38.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.37.15...@wireapp/react-ui-kit@7.38.0) (2020-11-13)
+
+
+### Features
+
+* **react-ui-kit:** Switch component ([#3325](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3325)) ([54ac4b4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/54ac4b425edc221bff61811caa4e958b1eb959a3))
+
+
+
+
+
 ## [7.37.15](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.37.14...@wireapp/react-ui-kit@7.37.15) (2020-11-10)
 
 
