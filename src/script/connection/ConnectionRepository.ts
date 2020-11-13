@@ -117,7 +117,7 @@ export class ConnectionRepository {
     await this.updateConnection(connectionEntity);
     const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
     if (shouldUpdateUser) {
-      this.userRepository.updateUserById(connectionEntity.userId);
+      await this.userRepository.updateUserById(connectionEntity.userId);
     }
     this.sendNotification(connectionEntity, source, previousStatus);
     amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);

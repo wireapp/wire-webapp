@@ -949,10 +949,10 @@ export class ConversationRepository {
    *
    * @note If there is no conversation it will request it from the backend
    * @param connectionEntity Connections
-   * @param show_conversation Open the new conversation
+   * @param showConversation Open the new conversation
    * @returns Resolves when connection was mapped return value
    */
-  private mapConnection(connectionEntity: ConnectionEntity, show_conversation = false) {
+  private mapConnection(connectionEntity: ConnectionEntity, showConversation: boolean) {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -973,7 +973,7 @@ export class ConversationRepository {
         }
 
         this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {
-          if (show_conversation) {
+          if (showConversation) {
             amplify.publish(WebAppEvents.CONVERSATION.SHOW, updatedConversationEntity);
           }
 
@@ -1013,7 +1013,7 @@ export class ConversationRepository {
    */
   map_connections(connectionEntities: ConnectionEntity[]) {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
+    connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity, false));
   }
 
   /**
