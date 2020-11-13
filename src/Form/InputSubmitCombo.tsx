@@ -39,6 +39,7 @@ export const InputSubmitCombo = ({children, ...props}: InputSubmitComboProps) =>
         '&:focus': {
           boxShadow: 'none',
         },
+        boxShadow: 'none',
         flexGrow: 1,
         margin: '0 8px 0 0',
         padding: '0 0 0 16px',

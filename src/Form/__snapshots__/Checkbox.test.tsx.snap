@@ -26,7 +26,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   background: rgb(61,61,61);
   border: none;
   border-radius: 4px;
-  box-shadow: none;
+  box-shadow: 0 0 0 1px #bac8d1;
   caret-color: #0c78ba;
   color: #fff;
   font-weight: 300;
@@ -62,7 +62,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 .emotion-0:invalid:not(:focus) {
-  box-shadow: none;
+  box-shadow: 0 0 0 1px #bac8d1;
 }
 
 .emotion-1 {
@@ -173,7 +173,7 @@ exports[`"Checkbox" renders 1`] = `
   background: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: none;
+  box-shadow: 0 0 0 1px #bac8d1;
   caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
@@ -209,7 +209,7 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .emotion-0:invalid:not(:focus) {
-  box-shadow: none;
+  box-shadow: 0 0 0 1px #bac8d1;
 }
 
 .emotion-1 {
@@ -320,7 +320,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
   background: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: none;
+  box-shadow: 0 0 0 1px #bac8d1;
   caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
@@ -356,7 +356,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .emotion-0:invalid:not(:focus) {
-  box-shadow: none;
+  box-shadow: 0 0 0 1px #bac8d1;
 }
 
 .emotion-1 {
@@ -467,7 +467,7 @@ exports[`"Checkbox" renders disabled 1`] = `
   background: rgba(127,136,142,0.16000000000000003);
   border: none;
   border-radius: 4px;
-  box-shadow: none;
+  box-shadow: 0 0 0 1px #bac8d1;
   caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
@@ -503,7 +503,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .emotion-0:invalid:not(:focus) {
-  box-shadow: none;
+  box-shadow: 0 0 0 1px #bac8d1;
 }
 
 .emotion-1 {

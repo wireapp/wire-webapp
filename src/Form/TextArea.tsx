@@ -57,13 +57,13 @@ export const textAreaStyle: <T>(theme: Theme, props: TextAreaProps<T>) => Object
     },
     '&:invalid': !markInvalid
       ? {
-          boxShadow: 'none',
+          boxShadow: `0 0 0 1px ${COLOR.GRAY}`,
         }
       : {},
     background: disabled ? theme.Input.backgroundColorDisabled : theme.Input.backgroundColor,
     border: 'none',
     borderRadius: '4px',
-    boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : 'none',
+    boxShadow: markInvalid ? `0 0 0 1px ${COLOR.RED}` : `0 0 0 1px ${COLOR.GRAY}`,
     caretColor: COLOR.BLUE,
     color: theme.general.color,
     fontWeight: 300,
