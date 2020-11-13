@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.39.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.38.0...@wireapp/react-ui-kit@7.39.0) (2020-11-13)
+
+
+### Features
+
+* **react-ui-kit:** Default border around inputs ([#3327](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3327)) ([bfe08fa](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/bfe08fa076dce1c37f0145e74fda719dd23424bb))
+
+
+
+
+
 # [7.38.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.37.15...@wireapp/react-ui-kit@7.38.0) (2020-11-13)
 
 
