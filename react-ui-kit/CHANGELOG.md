@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.40.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.39.0...@wireapp/react-ui-kit@7.40.0) (2020-11-13)
+
+
+### Features
+
+* **react-ui-kit:** New Checkbox design ([#3326](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3326)) ([fef691b](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/fef691b58ef7611d88a98df89c707190d1f0f118))
+
+
+
+
+
 # [7.39.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.38.0...@wireapp/react-ui-kit@7.39.0) (2020-11-13)
 
 
