@@ -19,7 +19,7 @@ import {Column, Columns, Checkbox, CheckboxLabel, Link} from '@wireapp/react-ui-
       <Checkbox id="ToULink" defaultChecked={true}>
         <CheckboxLabel>
           {'ToU '}
-          <Link href="#">{'component link'}</Link>
+          <Link href="#">{'Component link'}</Link>
           {' text '}
           <a href="#">{'plain link'}</a>
         </CheckboxLabel>

@@ -16,6 +16,60 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   justify-content: flex-start;
 }
 
+.emotion-1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  opacity: 1;
+}
+
+.wireinput:checked + .emotion-1::before {
+  background: #0c78ba url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+}
+
+.wireinput:focus + .emotion-1::before {
+  border-color: #0c78ba;
+}
+
+.emotion-1::before {
+  background: #fff;
+  border: 1px solid #bac8d1;
+  border-radius: 4px;
+  box-sizing: border-box;
+  content: "";
+  display: inline-block;
+  height: 16px;
+  margin: 4px 8px 0 -16px;
+  opacity: 1;
+  width: 16px;
+}
+
+.emotion-1 a {
+  color: #0c78ba;
+  display: inline;
+  font-size: 16px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
+  cursor: pointer;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  -webkit-transition: all 0.24s;
+  transition: all 0.24s;
+}
+
+.emotion-1 a:hover {
+  color: rgb(10,101,156);
+}
+
+.emotion-1 a:visited,
+.emotion-1 a:link,
+.emotion-1 a:active {
+  color: #0c78ba;
+}
+
 .emotion-3 {
   background: #000;
   -webkit-transition: background 0.15s;
@@ -63,59 +117,6 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 
 .emotion-0:invalid:not(:focus) {
   box-shadow: 0 0 0 1px #bac8d1;
-}
-
-.emotion-1 {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  opacity: 1;
-}
-
-.wireinput:checked + .emotion-1::before {
-  background: #000 url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
-}
-
-.wireinput:focus + .emotion-1::before {
-  border-color: #0c78ba;
-}
-
-.emotion-1::before {
-  border: 2px solid #fff;
-  border-radius: 4px;
-  box-sizing: border-box;
-  content: "";
-  display: inline-block;
-  height: 16px;
-  margin: 0 8px 0 -16px;
-  opacity: 1;
-  width: 16px;
-}
-
-.emotion-1 a {
-  color: #fff;
-  display: inline;
-  font-size: 11px;
-  font-weight: 600;
-  opacity: 1;
-  text-align: left;
-  text-transform: uppercase;
-  cursor: pointer;
-  -webkit-text-decoration: none;
-  text-decoration: none;
-  -webkit-transition: all 0.24s;
-  transition: all 0.24s;
-}
-
-.emotion-1 a:hover {
-  color: rgb(214,214,214);
-}
-
-.emotion-1 a:visited,
-.emotion-1 a:link,
-.emotion-1 a:active {
-  color: #fff;
 }
 
 <div
@@ -221,7 +222,7 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #000 url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0c78ba url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
@@ -229,25 +230,26 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .emotion-1::before {
-  border: 2px solid rgb(52,56,59);
+  background: #fff;
+  border: 1px solid #bac8d1;
   border-radius: 4px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
   height: 16px;
-  margin: 0 8px 0 -16px;
+  margin: 4px 8px 0 -16px;
   opacity: 1;
   width: 16px;
 }
 
 .emotion-1 a {
-  color: rgb(52,56,59);
+  color: #0c78ba;
   display: inline;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 300;
   opacity: 1;
   text-align: left;
-  text-transform: uppercase;
+  text-transform: none;
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -256,13 +258,13 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .emotion-1 a:hover {
-  color: rgb(44,47,50);
+  color: rgb(10,101,156);
 }
 
 .emotion-1 a:visited,
 .emotion-1 a:link,
 .emotion-1 a:active {
-  color: rgb(52,56,59);
+  color: #0c78ba;
 }
 
 <div
@@ -368,7 +370,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #000 url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0c78ba url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
@@ -376,25 +378,26 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .emotion-1::before {
-  border: 2px solid #e02020;
+  background: #fff;
+  border: 1px solid #e02020;
   border-radius: 4px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
   height: 16px;
-  margin: 0 8px 0 -16px;
+  margin: 4px 8px 0 -16px;
   opacity: 1;
   width: 16px;
 }
 
 .emotion-1 a {
-  color: rgb(52,56,59);
+  color: #0c78ba;
   display: inline;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 300;
   opacity: 1;
   text-align: left;
-  text-transform: uppercase;
+  text-transform: none;
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -403,13 +406,13 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .emotion-1 a:hover {
-  color: rgb(44,47,50);
+  color: rgb(10,101,156);
 }
 
 .emotion-1 a:visited,
 .emotion-1 a:link,
 .emotion-1 a:active {
-  color: rgb(52,56,59);
+  color: #0c78ba;
 }
 
 <div
@@ -515,7 +518,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #000 url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0c78ba url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
@@ -523,25 +526,26 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .emotion-1::before {
-  border: 2px solid rgb(52,56,59);
+  background: #fff;
+  border: 1px solid #bac8d1;
   border-radius: 4px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
   height: 16px;
-  margin: 0 8px 0 -16px;
+  margin: 4px 8px 0 -16px;
   opacity: 0.56;
   width: 16px;
 }
 
 .emotion-1 a {
-  color: rgb(52,56,59);
+  color: #0c78ba;
   display: inline;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 300;
   opacity: 1;
   text-align: left;
-  text-transform: uppercase;
+  text-transform: none;
   cursor: pointer;
   -webkit-text-decoration: none;
   text-decoration: none;
@@ -550,13 +554,13 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .emotion-1 a:hover {
-  color: rgb(44,47,50);
+  color: rgb(10,101,156);
 }
 
 .emotion-1 a:visited,
 .emotion-1 a:link,
 .emotion-1 a:active {
-  color: rgb(52,56,59);
+  color: #0c78ba;
 }
 
 <div
@@ -605,13 +609,13 @@ exports[`"CheckboxLabel" renders 1`] = `
   opacity: 1;
   text-align: left;
   text-transform: none;
-  color: rgb(141,152,159);
+  color: rgb(52,56,59);
   display: inline;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 300;
   opacity: 1;
   text-align: left;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .emotion-0 a {

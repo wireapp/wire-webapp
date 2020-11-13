@@ -21,7 +21,7 @@
 import {jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
-import {Text, TextProps, linkStyle, textStyle} from '../Text';
+import {Text, TextProps, textStyle, textLinkStyle} from '../Text';
 import {filterProps} from '../util';
 import {INPUT_CLASSNAME, Input, InputProps} from './Input';
 
@@ -39,24 +39,25 @@ const StyledLabel = (props: StyledLabelProps) => {
     <label
       css={theme => ({
         [`.${INPUT_CLASSNAME}:checked + &::before`]: {
-          background: `#000 url('data:image/svg+xml; utf8, ${checkSvg}') no-repeat center`,
+          background: `${COLOR.BLUE} url('data:image/svg+xml; utf8, ${checkSvg}') no-repeat center`,
         },
         [`.${INPUT_CLASSNAME}:focus + &::before`]: {
           borderColor: COLOR.BLUE,
         },
         '&::before': {
-          border: props.markInvalid ? `2px solid ${COLOR.RED}` : `2px solid ${theme.general.color}`,
+          background: COLOR.WHITE,
+          border: props.markInvalid ? `1px solid ${COLOR.RED}` : `1px solid ${COLOR.GRAY}`,
           borderRadius: '4px',
           boxSizing: 'border-box',
           content: '""',
           display: 'inline-block',
           height: '16px',
-          margin: '0 8px 0 -16px',
+          margin: '4px 8px 0 -16px',
           opacity: props.disabled ? 0.56 : 1,
           width: '16px',
         },
         a: {
-          ...linkStyle(theme, {}),
+          ...textLinkStyle(theme, {}),
         },
         display: 'flex',
         opacity: props.disabled ? 0.56 : 1,
@@ -105,20 +106,11 @@ export const Checkbox: React.FC<CheckboxProps<HTMLInputElement>> = React.forward
 
 export type CheckboxLabelProps<T = HTMLSpanElement> = TextProps<T>;
 
-export const CheckboxLabel = ({
-  bold = true,
-  color = COLOR.GRAY_DARKEN_24,
-  fontSize = '11px',
-  textTransform = 'uppercase',
-  ...props
-}: CheckboxLabelProps) => (
+export const CheckboxLabel = ({color = COLOR.TEXT, ...props}: CheckboxLabelProps) => (
   <Text
     css={theme => ({
       ...textStyle(theme, {
-        bold,
         color,
-        fontSize,
-        textTransform,
         ...props,
       }),
       a: {
