@@ -27,7 +27,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: none;
-  caret-color: #2391d3;
+  caret-color: #0c78ba;
   color: #fff;
   font-weight: 300;
   height: 56px;
@@ -58,7 +58,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #2391d3;
+  box-shadow: 0 0 0 1px #0c78ba;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -78,7 +78,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 .wireinput:focus + .emotion-1::before {
-  border-color: #2391d3;
+  border-color: #0c78ba;
 }
 
 .emotion-1::before {
@@ -174,7 +174,7 @@ exports[`"Checkbox" renders 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: none;
-  caret-color: #2391d3;
+  caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -205,7 +205,7 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #2391d3;
+  box-shadow: 0 0 0 1px #0c78ba;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -225,7 +225,7 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .wireinput:focus + .emotion-1::before {
-  border-color: #2391d3;
+  border-color: #0c78ba;
 }
 
 .emotion-1::before {
@@ -321,7 +321,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: none;
-  caret-color: #2391d3;
+  caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -352,7 +352,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #2391d3;
+  box-shadow: 0 0 0 1px #0c78ba;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -372,11 +372,11 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .wireinput:focus + .emotion-1::before {
-  border-color: #2391d3;
+  border-color: #0c78ba;
 }
 
 .emotion-1::before {
-  border: 2px solid #fb0807;
+  border: 2px solid #e02020;
   border-radius: 4px;
   box-sizing: border-box;
   content: "";
@@ -468,7 +468,7 @@ exports[`"Checkbox" renders disabled 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: none;
-  caret-color: #2391d3;
+  caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -499,7 +499,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #2391d3;
+  box-shadow: 0 0 0 1px #0c78ba;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -519,7 +519,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .wireinput:focus + .emotion-1::before {
-  border-color: #2391d3;
+  border-color: #0c78ba;
 }
 
 .emotion-1::before {

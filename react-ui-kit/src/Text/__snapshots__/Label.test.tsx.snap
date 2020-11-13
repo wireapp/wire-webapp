@@ -13,7 +13,7 @@ exports[`"Label" renders (dark theme) 1`] = `
 }
 
 .emotion-0:focus-within {
-  color: #2391d3;
+  color: #0c78ba;
 }
 
 .emotion-1 {
@@ -52,7 +52,7 @@ exports[`"Label" renders 1`] = `
 }
 
 .emotion-0:focus-within {
-  color: #2391d3;
+  color: #0c78ba;
 }
 
 <div
