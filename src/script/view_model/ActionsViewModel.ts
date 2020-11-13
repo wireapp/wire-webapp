@@ -377,9 +377,6 @@ export class ActionsViewModel {
    * @returns Resolves when the connection request was successfully created
    */
   sendConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> => {
-    if (!userEntity) {
-      return Promise.reject();
-    }
     return this.connectionRepository.createConnection(userEntity, showConversation);
   };
 

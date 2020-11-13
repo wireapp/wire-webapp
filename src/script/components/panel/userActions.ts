@@ -95,7 +95,7 @@ class UserActions {
       },
     };
 
-    const selfLeaveConversation: UserAction = {
+    const leaveConversation: UserAction = {
       condition: () => {
         return (
           this.isMe() &&
@@ -211,7 +211,7 @@ class UserActions {
 
     const allItems: UserAction[] = [
       openSelfProfile,
-      selfLeaveConversation,
+      leaveConversation,
       openConversation,
       acceptConnectionRequest,
       ignoreConnectionRequest,
