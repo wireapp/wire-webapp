@@ -300,13 +300,14 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
-  open1to1Conversation = (userEntity: User): Promise<void> => {
+  open1to1Conversation = async (userEntity: User): Promise<void> => {
     if (!userEntity) {
       return Promise.reject();
     }
-    return this.conversationRepository
-      .get1To1Conversation(userEntity)
-      .then(conversationEntity => this.openConversation(conversationEntity));
+    const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
+    if (typeof conversationEntity !== 'boolean') {
+      this.openConversation(conversationEntity);
+    }
   };
 
   open1to1ConversationWithService = (serviceEntity: ServiceEntity): Promise<void> => {
@@ -410,7 +411,9 @@ export class ActionsViewModel {
               .then(() => this.conversationRepository.get1To1Conversation(userEntity))
               .then(conversationEntity => {
                 resolve();
-                return this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+                if (typeof conversationEntity !== 'boolean') {
+                  this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+                }
               });
           },
           text: t('modalUserUnblockAction'),

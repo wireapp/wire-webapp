@@ -627,7 +627,7 @@ export class ConversationRepository {
    */
   private async onUnblockUser(user_et: User): Promise<void> {
     const conversationEntity = await this.get1To1Conversation(user_et);
-    if (conversationEntity) {
+    if (typeof conversationEntity !== 'boolean') {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
     }
   }
@@ -849,7 +849,7 @@ export class ConversationRepository {
    * @param userEntity User entity for whom to get the conversation
    * @returns Resolves with the conversation with requested user
    */
-  async get1To1Conversation(userEntity: User): Promise<Conversation | undefined> {
+  async get1To1Conversation(userEntity: User): Promise<Conversation | boolean> {
     const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.userState.self().teamId;
 
     if (inCurrentTeam) {
@@ -875,16 +875,18 @@ export class ConversationRepository {
         return userEntity.id === userId;
       });
 
-      return matchingConversationEntity
-        ? Promise.resolve(matchingConversationEntity)
-        : this.createGroupConversation([userEntity]);
+      if (matchingConversationEntity) {
+        return matchingConversationEntity;
+      }
+      return this.createGroupConversation([userEntity]);
     }
 
     const conversationId = userEntity.connection().conversationId;
     try {
       const conversationEntity = await this.get_conversation_by_id(conversationId);
       conversationEntity.connection(userEntity.connection());
-      return this.updateParticipatingUserEntities(conversationEntity);
+      this.updateParticipatingUserEntities(conversationEntity);
+      return conversationEntity;
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (!isConversationNotFound) {
@@ -1114,18 +1116,18 @@ export class ConversationRepository {
    * @param updateGuests Update conversation guests
    * @returns Resolves when users have been updated
    */
-  async updateParticipatingUserEntities(conversationEntity?: Conversation, offline = false, updateGuests = false) {
-    if (conversationEntity) {
-      const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
-      userEntities.sort(sortUsersByPriority);
-      conversationEntity.participating_user_ets(userEntities);
+  async updateParticipatingUserEntities(
+    conversationEntity: Conversation,
+    offline = false,
+    updateGuests = false,
+  ): Promise<void> {
+    const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
+    userEntities.sort(sortUsersByPriority);
+    conversationEntity.participating_user_ets(userEntities);
 
-      if (updateGuests) {
-        conversationEntity.updateGuests();
-      }
+    if (updateGuests) {
+      conversationEntity.updateGuests();
     }
-
-    return conversationEntity;
   }
 
   //##############################################################################
