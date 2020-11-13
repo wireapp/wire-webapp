@@ -15,7 +15,7 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
-  background-color: #2391d3;
+  background-color: #0c78ba;
   border: 0;
   border-radius: 8px;
   cursor: pointer;
@@ -36,7 +36,7 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
 
 .emotion-0:hover,
 .emotion-0:focus {
-  background-color: rgb(33,136,198);
+  background-color: rgb(11,113,175);
   -webkit-text-decoration: none;
   text-decoration: none;
 }
@@ -79,7 +79,7 @@ exports[`"ButtonLink" renders 1`] = `
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
-  background-color: #2391d3;
+  background-color: #0c78ba;
   border: 0;
   border-radius: 8px;
   cursor: pointer;
@@ -100,7 +100,7 @@ exports[`"ButtonLink" renders 1`] = `
 
 .emotion-0:hover,
 .emotion-0:focus {
-  background-color: rgb(33,136,198);
+  background-color: rgb(11,113,175);
   -webkit-text-decoration: none;
   text-decoration: none;
 }
@@ -161,7 +161,7 @@ exports[`"ButtonLink" renders in loading state 1`] = `
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
-  background-color: #2391d3;
+  background-color: #0c78ba;
   border: 0;
   border-radius: 8px;
   cursor: pointer;
@@ -182,7 +182,7 @@ exports[`"ButtonLink" renders in loading state 1`] = `
 
 .emotion-1:hover,
 .emotion-1:focus {
-  background-color: rgb(33,136,198);
+  background-color: rgb(11,113,175);
   -webkit-text-decoration: none;
   text-decoration: none;
 }

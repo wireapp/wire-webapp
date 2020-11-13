@@ -59,7 +59,7 @@ exports[`"Line" renders with color 1`] = `
 
 .emotion-0 {
   border: none;
-  border-bottom: 1px solid #fb0807;
+  border-bottom: 1px solid #e02020;
   margin-bottom: 16px;
   margin-top: 16px;
 }
@@ -69,7 +69,7 @@ exports[`"Line" renders with color 1`] = `
 >
   <hr
     className="emotion-0"
-    color="#fb0807"
+    color="#e02020"
   >
     Line
   </hr>

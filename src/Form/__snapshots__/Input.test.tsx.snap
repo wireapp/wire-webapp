@@ -12,7 +12,7 @@ exports[`"Input" renders 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: none;
-  caret-color: #2391d3;
+  caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -43,7 +43,7 @@ exports[`"Input" renders 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #2391d3;
+  box-shadow: 0 0 0 1px #0c78ba;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -71,7 +71,7 @@ exports[`"Input" renders as disabled 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: none;
-  caret-color: #2391d3;
+  caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -102,7 +102,7 @@ exports[`"Input" renders as disabled 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #2391d3;
+  box-shadow: 0 0 0 1px #0c78ba;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -130,8 +130,8 @@ exports[`"Input" renders as invalid 1`] = `
   background: #fff;
   border: none;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px #fb0807;
-  caret-color: #2391d3;
+  box-shadow: 0 0 0 1px #e02020;
+  caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -162,7 +162,7 @@ exports[`"Input" renders as invalid 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #2391d3;
+  box-shadow: 0 0 0 1px #0c78ba;
 }
 
 <div
@@ -186,7 +186,7 @@ exports[`"Input" renders with placeholderTextTransform 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: none;
-  caret-color: #2391d3;
+  caret-color: #0c78ba;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -217,7 +217,7 @@ exports[`"Input" renders with placeholderTextTransform 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #2391d3;
+  box-shadow: 0 0 0 1px #0c78ba;
 }
 
 .emotion-0:invalid:not(:focus) {
