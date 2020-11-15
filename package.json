@@ -157,7 +157,7 @@
     "redux-devtools-extension": "2.13.8",
     "redux-logger": "3.0.6",
     "redux-mock-store": "1.5.4",
-    "simple-git": "2.21.0",
+    "simple-git": "2.22.0",
     "sinon": "9.2.1",
     "snabbdom": "2.1.0",
     "stylelint": "13.7.2",
