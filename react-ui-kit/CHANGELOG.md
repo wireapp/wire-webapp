@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.40.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.40.0...@wireapp/react-ui-kit@7.40.1) (2020-11-16)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Prevent border in InputSubmitCombo ([#3328](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3328)) ([a7fa53e](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/a7fa53ee520294c1b177d270175940ca046676fc))
+
+
+
+
+
 # [7.40.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.39.0...@wireapp/react-ui-kit@7.40.0) (2020-11-13)
 
 
