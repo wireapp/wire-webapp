@@ -431,7 +431,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
-      conversationRepository.map_connections(connectionRepository.connectionEntities());
+      await conversationRepository.map_connections(connectionRepository.connectionEntities());
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
