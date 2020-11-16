@@ -21,7 +21,6 @@
 import {jsx} from '@emotion/core';
 import {INPUT_CLASSNAME, InputProps, inputStyle} from './Input';
 import {COLOR} from '../Identity';
-import {Label} from '../Text';
 
 export type InputSubmitComboProps<T = HTMLDivElement> = InputProps<T>;
 
@@ -36,7 +35,7 @@ export const InputSubmitCombo = ({children, ...props}: InputSubmitComboProps) =>
         boxShadow: `0 0 0 1px ${COLOR.BLUE}`,
       },
       [`.${INPUT_CLASSNAME}`]: {
-        '&:focus': {
+        '&:focus, &:invalid:not(:focus)': {
           boxShadow: 'none',
         },
         boxShadow: 'none',
