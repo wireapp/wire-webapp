@@ -32,6 +32,7 @@ export * from './CloseIcon';
 export * from './DeviceIcon';
 export * from './DownloadIcon';
 export * from './EditIcon';
+export * from './EnterIcon';
 export * from './FileIcon';
 export * from './GifIcon';
 export * from './GroupIcon';
