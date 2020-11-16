@@ -952,7 +952,7 @@ export class ConversationRepository {
    * @param showConversation Open the new conversation
    * @returns Resolves when connection was mapped return value
    */
-  private async mapConnection(connectionEntity: ConnectionEntity, showConversation: boolean): Promise<void> {
+  private mapConnection(connectionEntity: ConnectionEntity, showConversation: boolean): Promise<Conversation | void> {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -962,7 +962,7 @@ export class ConversationRepository {
         }
         return conversationEntity;
       })
-      .then(async conversationEntity => {
+      .then(conversationEntity => {
         if (!conversationEntity) {
           return undefined;
         }
@@ -972,16 +972,15 @@ export class ConversationRepository {
           conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
         }
 
-        await this.updateParticipatingUserEntities(conversationEntity);
+        this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {
+          if (showConversation) {
+            amplify.publish(WebAppEvents.CONVERSATION.SHOW, updatedConversationEntity);
+          }
+
+          this.conversationState.conversations.notifySubscribers();
+        });
 
         return conversationEntity;
-      })
-      .then(updatedConversationEntity => {
-        if (showConversation) {
-          amplify.publish(WebAppEvents.CONVERSATION.SHOW, updatedConversationEntity);
-        }
-
-        this.conversationState.conversations.notifySubscribers();
       })
       .catch(error => {
         const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
