@@ -110,7 +110,7 @@ export class ConnectionRepository {
       connectionEntity = this.connectionMapper.mapConnectionFromJson(connectionData);
     }
 
-    await this.updateConnection(connectionEntity);
+    await this.updateConnections([connectionEntity]);
     const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
     if (shouldUpdateUser) {
       await this.userRepository.updateUserById(connectionEntity.userId);
@@ -239,24 +239,15 @@ export class ConnectionRepository {
   }
 
   /**
-   * Update user matching a given connection.
-   * @returns Promise that resolves when the connection have been updated
-   */
-  private async updateConnection(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
-    this.connectionEntities.push(connectionEntity);
-    const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
-    return userEntity.connection(connectionEntity);
-  }
-
-  /**
    * Update users matching the given connections.
    * @returns Promise that resolves when all connections have been updated
    */
   private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
-    if (!connectionEntities.length) {
-      throw new ConnectionError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
-    }
-    this.connectionEntities.push(...connectionEntities);
+    const conversationIds = this.connectionEntities().map(connection => connection.conversationId);
+    const newConnections = connectionEntities.filter(
+      connectionEntity => !conversationIds.includes(connectionEntity.conversationId),
+    );
+    this.connectionEntities.push(...newConnections);
     await this.userRepository.updateUsersFromConnections(connectionEntities);
     return this.connectionEntities();
   }
