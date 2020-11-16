@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.41.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.40.1...@wireapp/react-ui-kit@7.41.0) (2020-11-16)
+
+
+### Features
+
+* **react-ui-kit:** Add LockIcon ([#3329](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3329)) ([96c260b](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/96c260bbefe24a4c3d8069b8a8a83da07dff6ef6))
+
+
+
+
+
 ## [7.40.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.40.0...@wireapp/react-ui-kit@7.40.1) (2020-11-16)
 
 
