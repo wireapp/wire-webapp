@@ -98,14 +98,10 @@ export class ConnectionRepository {
     source: EventSource,
     showConversation: boolean,
   ): Promise<void> {
-    if (!eventJson) {
-      throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
-    }
-
     const connectionData = eventJson.connection;
 
     let connectionEntity = this.getConnectionByUserId(connectionData.to);
-    let previousStatus: ConnectionStatus = null;
+    let previousStatus: ConnectionStatus | null;
 
     if (connectionEntity) {
       previousStatus = connectionEntity.status();
@@ -114,12 +110,12 @@ export class ConnectionRepository {
       connectionEntity = this.connectionMapper.mapConnectionFromJson(connectionData);
     }
 
-    await this.updateConnection(connectionEntity);
+    await this.updateConnections([connectionEntity]);
     const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
     if (shouldUpdateUser) {
       await this.userRepository.updateUserById(connectionEntity.userId);
     }
-    this.sendNotification(connectionEntity, source, previousStatus);
+    await this.sendNotification(connectionEntity, source, previousStatus);
     amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
   }
 
@@ -243,27 +239,15 @@ export class ConnectionRepository {
   }
 
   /**
-   * Update user matching a given connection.
-   * @returns Promise that resolves when the connection have been updated
-   */
-  private async updateConnection(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
-    if (!connectionEntity) {
-      throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
-    }
-    this.connectionEntities.push(connectionEntity);
-    const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
-    return userEntity.connection(connectionEntity);
-  }
-
-  /**
    * Update users matching the given connections.
    * @returns Promise that resolves when all connections have been updated
    */
   private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
-    if (!connectionEntities.length) {
-      throw new ConnectionError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
-    }
-    this.connectionEntities.push(...connectionEntities);
+    const conversationIds = this.connectionEntities().map(connection => connection.conversationId);
+    const newConnections = connectionEntities.filter(
+      connectionEntity => !conversationIds.includes(connectionEntity.conversationId),
+    );
+    this.connectionEntities.push(...newConnections);
     await this.userRepository.updateUsersFromConnections(connectionEntities);
     return this.connectionEntities();
   }
@@ -308,11 +292,11 @@ export class ConnectionRepository {
    * @param source Source of event
    * @param previousStatus Previous connection status
    */
-  private sendNotification(
+  private async sendNotification(
     connectionEntity: ConnectionEntity,
     source: EventSource,
     previousStatus: ConnectionStatus,
-  ): void {
+  ): Promise<void> {
     // We accepted the connection request or unblocked the user
     const expectedPreviousStatus = [ConnectionStatus.BLOCKED, ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
@@ -321,21 +305,20 @@ export class ConnectionRepository {
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
-      this.userRepository.getUserById(connectionEntity.userId).then(userEntity => {
-        const messageEntity = new MemberMessage();
-        messageEntity.user(userEntity);
+      const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
+      const messageEntity = new MemberMessage();
+      messageEntity.user(userEntity);
 
-        if (connectionEntity.isConnected()) {
-          const statusWasSent = previousStatus === ConnectionStatus.SENT;
-          messageEntity.memberMessageType = statusWasSent
-            ? SystemMessageType.CONNECTION_ACCEPTED
-            : SystemMessageType.CONNECTION_CONNECTED;
-        } else if (connectionEntity.isIncomingRequest()) {
-          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
-        }
+      if (connectionEntity.isConnected()) {
+        const statusWasSent = previousStatus === ConnectionStatus.SENT;
+        messageEntity.memberMessageType = statusWasSent
+          ? SystemMessageType.CONNECTION_ACCEPTED
+          : SystemMessageType.CONNECTION_CONNECTED;
+      } else if (connectionEntity.isIncomingRequest()) {
+        messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
+      }
 
-        amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
-      });
+      amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
     }
   }
 }

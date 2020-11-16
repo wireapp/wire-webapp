@@ -245,14 +245,14 @@ export class UserRepository {
   /**
    * Update users matching the given connections.
    */
-  async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
+  async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<void> {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
-      const connectionEntity_1 = connectionEntities.find(({userId}) => userId === userEntity.id);
-      userEntity.connection(connectionEntity_1);
+      const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
+      userEntity.connection(connectionEntity);
     });
-    return this.assignAllClients();
+    await this.assignAllClients();
   }
 
   /**
