@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.42.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.41.0...@wireapp/react-ui-kit@7.42.0) (2020-11-16)
+
+
+### Features
+
+* **react-ui-kit:** Add EnterIcon ([#3330](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3330)) ([e4d1972](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/e4d1972caa6f3244369b289758246d61a887ac0d))
+
+
+
+
+
 # [7.41.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.40.1...@wireapp/react-ui-kit@7.41.0) (2020-11-16)
 
 
