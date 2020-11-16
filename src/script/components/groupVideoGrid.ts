@@ -36,7 +36,7 @@ class GroupVideoGrid {
   public readonly muted: ko.Observable<boolean>;
   public readonly selfParticipant: Participant;
   public readonly dispose: () => void;
-  private readonly maximizedParticipant: ko.Observable<Participant>;
+  private readonly maximizedParticipant: ko.Observable<Participant | null>;
   private readonly rootElement: HTMLElement;
 
   constructor(
