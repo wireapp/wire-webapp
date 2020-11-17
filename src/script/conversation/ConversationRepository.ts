@@ -952,7 +952,7 @@ export class ConversationRepository {
    * @param showConversation Open the new conversation
    * @returns Resolves when connection was mapped return value
    */
-  private mapConnection(connectionEntity: ConnectionEntity, showConversation: boolean) {
+  private mapConnection(connectionEntity: ConnectionEntity, showConversation: boolean): Promise<Conversation | void> {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -1011,9 +1011,11 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param connectionEntities Connections entities
    */
-  map_connections(connectionEntities: ConnectionEntity[]) {
+  async map_connections(connectionEntities: ConnectionEntity[]): Promise<void> {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity, false));
+    for (const connectionEntity of connectionEntities) {
+      await this.mapConnection(connectionEntity, false);
+    }
   }
 
   /**
