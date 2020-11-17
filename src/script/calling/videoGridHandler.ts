@@ -38,19 +38,20 @@ export function getGrid(call: Call): ko.PureComputed<Grid> {
     const remoteParticipants = call
       .getRemoteParticipants()
       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+    const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
     if (remoteParticipants.length === 1) {
-      inGridParticipants = remoteParticipants;
+      inGridParticipants = remoteVideoParticipants;
       thumbnailParticipant = selfParticipant?.hasActiveVideo() ? selfParticipant : null;
     } else {
       inGridParticipants = selfParticipant?.hasActiveVideo()
-        ? [selfParticipant, ...remoteParticipants]
-        : remoteParticipants;
+        ? [selfParticipant, ...remoteVideoParticipants]
+        : remoteVideoParticipants;
       thumbnailParticipant = null;
     }
 
     return {
       grid: inGridParticipants,
-      hasRemoteVideo: remoteParticipants.length > 0,
+      hasRemoteVideo: remoteVideoParticipants.length > 0,
       thumbnail: thumbnailParticipant,
     };
   });
