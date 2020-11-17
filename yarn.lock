@@ -2263,6 +2263,13 @@
   dependencies:
     protobufjs "6.8.8"
 
+"@wireapp/protocol-messaging@1.26.6":
+  version "1.26.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.26.6.tgz#5cf9e376032cfada36c1d321fb8b05791c1de524"
+  integrity sha512-oxDZCYz56dLtHVidcMvar4+gUNYQp7+MAMpW9YYu4eH+i0+j/lQiAvyoQTfu8YMYwkhgpnf6/yU4QysbtZub2Q==
+  dependencies:
+    protobufjs "6.10.1"
+
 "@wireapp/react-ui-kit@7.37.6":
   version "7.37.6"
   resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.37.6.tgz#c5997ec291c20edf1c72ac42f7b96a5ed4e61398"

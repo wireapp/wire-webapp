@@ -259,7 +259,7 @@ class App {
     );
     repositories.search = new SearchRepository(new SearchService(this.apiClient), repositories.user);
     repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user, repositories.asset);
-    repositories.eventTracker = new EventTrackingRepository(repositories.user);
+    repositories.eventTracker = new EventTrackingRepository(repositories.user, repositories.message);
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
