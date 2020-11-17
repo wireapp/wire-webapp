@@ -55,7 +55,7 @@ export class ServiceMiddleware {
   }
 
   private async _processMemberJoinEvent(event: EventRecord) {
-    this.logger.info(`Preprocessing event of type '${event.type}'`);
+    this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, data: eventData} = event;
     const selfUserId = this.userState.self().id;
@@ -72,7 +72,7 @@ export class ServiceMiddleware {
   }
 
   private async _process1To1ConversationCreationEvent(event: EventRecord) {
-    this.logger.info(`Preprocessing event of type '${event.type}'`);
+    this.logger.info(`Preprocessing event of type ${event.type}`);
     const hasService = await this._containsService(event.data.userIds);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
