@@ -48,6 +48,7 @@ export enum CONVERSATION {
 
 export enum USER {
   AVAILABILITY = 'user.availability',
+  DATA_TRANSFER = 'user.data-transfer',
 }
 
 export const ClientEvent = {
