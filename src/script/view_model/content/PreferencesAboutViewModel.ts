@@ -27,7 +27,7 @@ export class PreferencesAboutViewModel {
   private readonly selfUser: ko.Observable<User>;
   readonly Config: Configuration;
   readonly websiteUrl: string;
-  readonly privacyPolicyUrl: string;
+  privacyPolicyUrl: string;
   readonly termsOfUseUrl: ko.PureComputed<string>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
