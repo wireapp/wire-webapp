@@ -1011,9 +1011,9 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param connectionEntities Connections entities
    */
-  map_connections(connectionEntities: ConnectionEntity[]) {
+  map_connections(connectionEntities: ConnectionEntity[]): Promise<void | Conversation>[] {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity, false));
+    return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity, false));
   }
 
   /**
