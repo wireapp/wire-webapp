@@ -171,6 +171,9 @@ describe('BackupRepository', () => {
     });
 
     it('successfully imports a backup', async () => {
+      spyOn(backupRepository.conversationRepository, 'updateConversations').and.callFake(async () => {});
+      spyOn(backupRepository.conversationRepository, 'checkForDeletedConversations').and.callFake(async () => {});
+
       function removePrimaryKey(message) {
         return {
           ...message,
@@ -178,7 +181,7 @@ describe('BackupRepository', () => {
         };
       }
 
-      const metadataArray = [backupRepository.createMetaData(), {...backupRepository.createMetaData(), version: 15}];
+      const metadataArray = [{...backupRepository.createMetaData(), version: 15}];
 
       const archives = metadataArray.map(metadata => {
         const archive = new JSZip();
@@ -195,6 +198,9 @@ describe('BackupRepository', () => {
           files[fileName] = await archive.files[fileName].async('uint8array');
         }
 
+        const messagesBeforeImport = await testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
+        expect(messagesBeforeImport.length).toBe(0);
+
         await backupRepository.importHistory(files, noop, noop);
 
         const conversationsData = await testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS);
@@ -205,6 +211,8 @@ describe('BackupRepository', () => {
         expect(conversationData.id).toEqual(conversation.id);
 
         const events = await testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
+        const messagesAfterImport = await testFactory.storage_service.getAll(StorageSchemata.OBJECT_STORE.EVENTS);
+        expect(messagesAfterImport.length).toBe(messages.length);
         expect(events.length).toEqual(messages.length);
         expect(events.map(removePrimaryKey)).toEqual(messages.map(removePrimaryKey));
       }
