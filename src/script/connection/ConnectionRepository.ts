@@ -119,7 +119,7 @@ export class ConnectionRepository {
     if (shouldUpdateUser) {
       await this.userRepository.updateUserById(connectionEntity.userId);
     }
-    this.sendNotification(connectionEntity, source, previousStatus);
+    await this.sendNotification(connectionEntity, source, previousStatus);
     amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
   }
 
@@ -308,11 +308,11 @@ export class ConnectionRepository {
    * @param source Source of event
    * @param previousStatus Previous connection status
    */
-  private sendNotification(
+  private async sendNotification(
     connectionEntity: ConnectionEntity,
     source: EventSource,
     previousStatus: ConnectionStatus,
-  ): void {
+  ): Promise<void> {
     // We accepted the connection request or unblocked the user
     const expectedPreviousStatus = [ConnectionStatus.BLOCKED, ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
@@ -321,21 +321,20 @@ export class ConnectionRepository {
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
-      this.userRepository.getUserById(connectionEntity.userId).then(userEntity => {
-        const messageEntity = new MemberMessage();
-        messageEntity.user(userEntity);
+      const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
+      const messageEntity = new MemberMessage();
+      messageEntity.user(userEntity);
 
-        if (connectionEntity.isConnected()) {
-          const statusWasSent = previousStatus === ConnectionStatus.SENT;
-          messageEntity.memberMessageType = statusWasSent
-            ? SystemMessageType.CONNECTION_ACCEPTED
-            : SystemMessageType.CONNECTION_CONNECTED;
-        } else if (connectionEntity.isIncomingRequest()) {
-          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
-        }
+      if (connectionEntity.isConnected()) {
+        const statusWasSent = previousStatus === ConnectionStatus.SENT;
+        messageEntity.memberMessageType = statusWasSent
+          ? SystemMessageType.CONNECTION_ACCEPTED
+          : SystemMessageType.CONNECTION_CONNECTED;
+      } else if (connectionEntity.isIncomingRequest()) {
+        messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
+      }
 
-        amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
-      });
+      amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
     }
   }
 }
