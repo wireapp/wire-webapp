@@ -113,7 +113,6 @@ export class AppLockViewModel {
     private readonly clientState = container.resolve(ClientState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    console.info('#### team state', this.teamState.teamFeatures()['app-lock']);
     this.localStorage = window.localStorage;
     this.state = ko.observable(APPLOCK_STATE.NONE);
     this.state.subscribe(() => this.stopObserver(), null, 'beforeChange');

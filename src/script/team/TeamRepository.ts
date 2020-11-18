@@ -123,7 +123,6 @@ export class TeamRepository {
     if (this.userState.self().teamId) {
       await this.updateTeamMembers(team);
       this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures(team.id));
-      console.info('###', '`init`Team');
     }
     this.scheduleFetchTeamInfo();
   };
