@@ -373,11 +373,10 @@ export class ActionsViewModel {
 
   /**
    * @param userEntity User to connect to
-   * @param showConversation Should we open the new conversation?
    * @returns Resolves when the connection request was successfully created
    */
-  sendConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> => {
-    return this.connectionRepository.createConnection(userEntity, showConversation);
+  sendConnectionRequest = (userEntity: User): Promise<void> => {
+    return this.connectionRepository.createConnection(userEntity);
   };
 
   toggleMuteConversation = (conversationEntity: Conversation): void => {

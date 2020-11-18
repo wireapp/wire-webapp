@@ -162,7 +162,7 @@ class UserActions {
       },
       item: {
         click: async () => {
-          await actionsViewModel.sendConnectionRequest(user(), false);
+          await actionsViewModel.sendConnectionRequest(user());
           onAction(Actions.SEND_REQUEST);
         },
         icon: 'plus-icon',

@@ -175,14 +175,13 @@ export class ConnectionRepository {
    * Create a connection request.
    *
    * @param userEntity User to connect to
-   * @param showConversation Should we open the new conversation?
    * @returns Promise that resolves when the connection request was successfully created
    */
-  public async createConnection(userEntity: User, showConversation: boolean): Promise<void> {
+  public async createConnection(userEntity: User): Promise<void> {
     try {
       const response = await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
-      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
+      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, false);
     } catch (error) {
       this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
     }

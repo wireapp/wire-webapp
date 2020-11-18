@@ -271,7 +271,7 @@ export class ConversationRepository {
 
   /**
    * Create a group conversation.
-   * @note Do not include the requestor among the users
+   * @note Do not include the requester among the users
    *
    * @param userEntities Users (excluding the creator) to be part of the conversation
    * @param groupName Name for the conversation
@@ -952,7 +952,7 @@ export class ConversationRepository {
    * @param showConversation Open the new conversation
    * @returns Resolves when connection was mapped return value
    */
-  private mapConnection(connectionEntity: ConnectionEntity, showConversation: boolean) {
+  private mapConnection(connectionEntity: ConnectionEntity, showConversation: boolean): Promise<void | Conversation> {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
