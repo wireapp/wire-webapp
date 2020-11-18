@@ -275,7 +275,7 @@ export class TestFactory {
 
     this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
-    const assetRepository = container.resolve(AssetRepository);
+    const assetRepository = new AssetRepository(new AssetService());
 
     this.conversation_repository = null;
     const conversationState = new ConversationState(this.user_repository.userState, this.team_repository.teamState);
