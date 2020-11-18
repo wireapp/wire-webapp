@@ -24,9 +24,7 @@ import type {UserConnectionData} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
-
 import {Logger, getLogger} from 'Util/Logger';
-
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import type {User} from '../entity/User';
@@ -120,7 +118,14 @@ export class ConnectionRepository {
       await this.userRepository.updateUserById(connectionEntity.userId);
     }
     await this.sendNotification(connectionEntity, source, previousStatus);
-    amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
+    if (showConversation) {
+      /**
+       * The `amplify.publish` invocation will trigger the connection entity mapping which in the end creates a new conversation entity.
+       * There are cases (https://wearezeta.atlassian.net/browse/SQCORE-143) where we want to trigger the conversation creation elsewhere.
+       * TODO: Remove `amplify.publish` and return a Conversation entity (based on a connection), so that the caller can use it (in UI, etc.).
+       */
+      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
+    }
   }
 
   /**

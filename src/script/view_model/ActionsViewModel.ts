@@ -301,9 +301,6 @@ export class ActionsViewModel {
   };
 
   open1to1Conversation = async (userEntity: User): Promise<void> => {
-    if (!userEntity) {
-      return Promise.reject();
-    }
     const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
     if (typeof conversationEntity !== 'boolean') {
       this.openConversation(conversationEntity);
