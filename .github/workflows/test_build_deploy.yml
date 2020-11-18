@@ -76,7 +76,7 @@ jobs:
 
       - name: Test
         if: env.DISTRIBUTION == 'wire'
-        run: yarn test:app --coverage --detectOpenHandles --forceExit
+        run: yarn test --coverage --detectOpenHandles --forceExit
 
       - name: Monitor coverage
         if: github.event_name == 'pull_request' && env.DISTRIBUTION == 'wire'
