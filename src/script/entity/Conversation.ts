@@ -162,7 +162,7 @@ export class Conversation {
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
-  public readonly status: ko.Observable<ConversationStatus>;
+  public status: ko.Observable<ConversationStatus>;
   public team_id: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;
