@@ -104,7 +104,7 @@ ko.components.register('group-video-grid', {
             <video class="group-video-grid__element-video" autoplay playsinline
               data-bind="
                 sourceStream: participant.videoStream(),
-                css: {'group-video-grid__element-video--contain': participant.sharesScreen(), mirror: participant === selfParticipant && participant.sharesCamera()}">
+                css: {'group-video-grid__element-video--contain': !!maximizedParticipant() || participant.sharesScreen(), mirror: participant === selfParticipant && participant.sharesCamera()}">
             </video>
             <!-- ko if: !minimized -->
               <div class="group-video-grid__element__label">
