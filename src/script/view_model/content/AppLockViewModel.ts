@@ -47,28 +47,41 @@ export enum APPLOCK_STATE {
 
 const APP_LOCK_STORAGE = 'app_lock';
 
-const getTimeout = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') => {
-  const queryTimeout = parseInt(UrlUtil.getURLParameter(queryName), 10);
-  const configTimeout = Config.getConfig().FEATURE && Config.getConfig().FEATURE[configName];
-  const isNotFinite = (value: number) => !Number.isFinite(value);
-  if (isNotFinite(queryTimeout) && isNotFinite(configTimeout)) {
-    return null;
+const getInactivityTimeout = () => {
+  const teamState = container.resolve(TeamState);
+  const appLock = teamState.teamFeatures()['app-lock'];
+  if (appLock.status === 'enabled') {
+    return appLock.config.inactivity_timeout_secs;
   }
-  if (isNotFinite(queryTimeout)) {
-    return configTimeout;
-  }
-  if (isNotFinite(configTimeout)) {
-    return queryTimeout;
-  }
-  return Math.min(queryTimeout, configTimeout);
+  return null;
 };
 
-const getUnfocusAppLockTimeoutInMillis = () => getTimeout(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
-const getScheduledAppLockTimeoutInMillis = () =>
+const getTimeout = (queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') => {
+  const queryTimeout = parseInt(UrlUtil.getURLParameter(queryName), 10);
+  const backendTimeout = getInactivityTimeout();
+  const configTimeout = Config.getConfig().FEATURE && Config.getConfig().FEATURE[configName];
+
+  console.info('###', queryTimeout, configTimeout, backendTimeout);
+
+  if (Number.isFinite(queryTimeout)) {
+    return queryTimeout;
+  }
+  if (Number.isFinite(backendTimeout)) {
+    return backendTimeout;
+  }
+  if (Number.isFinite(configTimeout)) {
+    return configTimeout;
+  }
+  return null;
+};
+
+const getUnfocusAppLockTimeoutInSeconds = () =>
+  getTimeout(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
+const getScheduledAppLockTimeoutInSeconds = () =>
   getTimeout(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT, 'APPLOCK_SCHEDULED_TIMEOUT');
 
-const isUnfocusAppLockEnabled = () => getUnfocusAppLockTimeoutInMillis() !== null;
-const isScheduledAppLockEnabled = () => getScheduledAppLockTimeoutInMillis() !== null;
+const isUnfocusAppLockEnabled = () => getUnfocusAppLockTimeoutInSeconds() !== null;
+const isScheduledAppLockEnabled = () => getScheduledAppLockTimeoutInSeconds() !== null;
 
 export const isAppLockEnabled = () => isUnfocusAppLockEnabled() || isScheduledAppLockEnabled();
 
@@ -100,7 +113,7 @@ export class AppLockViewModel {
     private readonly clientState = container.resolve(ClientState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    console.info('####', this.teamState, this.teamState.teamFeatures());
+    console.info('#### team state', this.teamState.teamFeatures()['app-lock']);
     this.localStorage = window.localStorage;
     this.state = ko.observable(APPLOCK_STATE.NONE);
     this.state.subscribe(() => this.stopObserver(), null, 'beforeChange');
@@ -224,13 +237,13 @@ export class AppLockViewModel {
   };
 
   startAppLockTimeout = () => {
-    this.unfocusTimeoutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeoutInMillis() * 1000);
+    this.unfocusTimeoutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeoutInSeconds() * 1000);
   };
 
   startScheduledTimeout = () => {
     if (isScheduledAppLockEnabled()) {
       window.clearTimeout(this.scheduledTimeoutId);
-      this.scheduledTimeoutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeoutInMillis() * 1000);
+      this.scheduledTimeoutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeoutInSeconds() * 1000);
     }
   };
 
