@@ -594,6 +594,7 @@ describe('EventRepository', () => {
           time: '2017-09-06T09:43:36.528Z',
         };
 
+        // FIXME: Already spied on
         // spyOn(testFactory.event_repository['userState'], 'self').and.returnValue({id: assetAddEvent.from});
         loadEventSpy.and.returnValue(Promise.resolve(assetAddEvent));
         deleteEventSpy.and.returnValue(Promise.resolve());
