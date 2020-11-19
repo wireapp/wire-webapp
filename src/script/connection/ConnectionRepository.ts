@@ -130,11 +130,10 @@ export class ConnectionRepository {
   /**
    * Accept a connection request.
    * @param userEntity User to update connection with
-   * @param showConversation Show new conversation on success
    * @returns Promise that resolves when the connection request was accepted
    */
-  public acceptRequest(userEntity: User, showConversation: boolean = false): Promise<void> {
-    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
+  public acceptRequest(userEntity: User): Promise<void> {
+    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED, true);
   }
 
   /**

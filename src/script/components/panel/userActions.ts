@@ -126,8 +126,10 @@ class UserActions {
     const acceptConnectionRequest: UserAction = {
       condition: () => this.isNotMe() && user().isIncomingRequest(),
       item: {
-        click: () =>
-          actionsViewModel.acceptConnectionRequest(user(), true).then(() => onAction(Actions.ACCEPT_REQUEST)),
+        click: async () => {
+          await actionsViewModel.acceptConnectionRequest(user());
+          onAction(Actions.ACCEPT_REQUEST);
+        },
         icon: 'check-icon',
         identifier: 'do-accept-request',
         label: t('groupParticipantActionIncomingRequest'),

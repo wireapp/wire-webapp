@@ -53,12 +53,8 @@ export class ActionsViewModel {
     this.modalsViewModel = mainViewModel.modals;
   }
 
-  acceptConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> => {
-    if (!userEntity) {
-      return Promise.reject();
-    }
-
-    return this.connectionRepository.acceptRequest(userEntity, showConversation);
+  acceptConnectionRequest = (userEntity: User): Promise<void> => {
+    return this.connectionRepository.acceptRequest(userEntity);
   };
 
   archiveConversation = (conversationEntity: Conversation): Promise<void> => {
