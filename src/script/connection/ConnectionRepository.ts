@@ -79,7 +79,7 @@ export class ConnectionRepository {
 
       const isUserConnection = eventType === USER_EVENT.CONNECTION;
       if (isUserConnection) {
-        this.onUserConnection(eventJson, source, false, true);
+        this.onUserConnection(eventJson, source);
       }
     }
   }
@@ -89,14 +89,8 @@ export class ConnectionRepository {
    *
    * @param eventJson JSON data of 'user.connection' event
    * @param source Source of event
-   * @param showConversation Should the new conversation be opened?
    */
-  private async onUserConnection(
-    eventJson: UserConnectionData,
-    source: EventSource,
-    showConversation: boolean,
-    createConversationIfNeeded: boolean,
-  ): Promise<void> {
+  private async onUserConnection(eventJson: UserConnectionData, source: EventSource): Promise<void> {
     if (!eventJson) {
       throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
@@ -119,10 +113,6 @@ export class ConnectionRepository {
       await this.userRepository.updateUserById(connectionEntity.userId);
     }
     await this.sendNotification(connectionEntity, source, previousStatus);
-
-    if (createConversationIfNeeded === true) {
-      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
-    }
   }
 
   /**
@@ -131,7 +121,7 @@ export class ConnectionRepository {
    * @returns Promise that resolves when the connection request was accepted
    */
   public acceptRequest(userEntity: User): Promise<void> {
-    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED, true);
+    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED);
   }
 
   /**
@@ -147,7 +137,7 @@ export class ConnectionRepository {
     hideConversation: boolean = false,
     nextConversationEntity?: Conversation,
   ): Promise<void> {
-    await this.updateStatus(userEntity, ConnectionStatus.BLOCKED, false);
+    await this.updateStatus(userEntity, ConnectionStatus.BLOCKED);
     if (hideConversation) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
     }
@@ -166,7 +156,7 @@ export class ConnectionRepository {
     hideConversation: boolean = false,
     nextConversationEntity: Conversation,
   ): Promise<void> {
-    await this.updateStatus(userEntity, ConnectionStatus.CANCELLED, false);
+    await this.updateStatus(userEntity, ConnectionStatus.CANCELLED);
     if (hideConversation) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
     }
@@ -182,7 +172,7 @@ export class ConnectionRepository {
     try {
       const response = await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
-      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, false, false);
+      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {
       this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
     }
@@ -228,18 +218,17 @@ export class ConnectionRepository {
    * @returns Promise that resolves when an incoming connection request was ignored
    */
   public ignoreRequest(userEntity: User): Promise<void> {
-    return this.updateStatus(userEntity, ConnectionStatus.IGNORED, false);
+    return this.updateStatus(userEntity, ConnectionStatus.IGNORED);
   }
 
   /**
    * Unblock a user.
    *
    * @param userEntity User to unblock
-   * @param showConversation Show new conversation on success
    * @returns Promise that resolves when a user was unblocked
    */
-  public unblockUser(userEntity: User, showConversation: boolean = true): Promise<void> {
-    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
+  public unblockUser(userEntity: User): Promise<void> {
+    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED);
   }
 
   /**
@@ -272,19 +261,9 @@ export class ConnectionRepository {
    * Update the status of a connection.
    * @param userEntity User to update connection with
    * @param connectionStatus Connection status
-   * @param showConversation Show conversation on success
    * @returns Promise that resolves when the connection status was updated
    */
-  private async updateStatus(
-    userEntity: User,
-    connectionStatus: ConnectionStatus,
-    showConversation: boolean,
-  ): Promise<void> {
-    if (!userEntity || !connectionStatus) {
-      this.logger.error('Missing parameter to update connection');
-      return Promise.reject(new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER));
-    }
-
+  private async updateStatus(userEntity: User, connectionStatus: ConnectionStatus): Promise<void> {
     const currentStatus = userEntity.connection().status();
     if (currentStatus === connectionStatus) {
       this.logger.error(`Connection status change to '${connectionStatus}' for '${userEntity.id}' is no change`);
@@ -294,7 +273,7 @@ export class ConnectionRepository {
     try {
       const response = await this.connectionService.putConnections(userEntity.id, connectionStatus);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
-      return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation, true);
+      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {
       const logMessage = `Connection change from '${currentStatus}' to '${connectionStatus}' failed`;
       this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${error.message}`, error);

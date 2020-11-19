@@ -383,20 +383,15 @@ export class ActionsViewModel {
 
   /**
    * @param userEntity User to unblock
-   * @param showConversation Show new conversation on success
    * @returns Resolves when the user was unblocked
    */
-  unblockUser = (userEntity: User, showConversation?: boolean): Promise<void> => {
-    if (!userEntity) {
-      return Promise.reject();
-    }
-
+  unblockUser = (userEntity: User): Promise<void> => {
     return new Promise(resolve => {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         primaryAction: {
           action: () => {
             this.connectionRepository
-              .unblockUser(userEntity, showConversation)
+              .unblockUser(userEntity)
               .then(() => this.conversationRepository.get1To1Conversation(userEntity))
               .then(conversationEntity => {
                 resolve();
