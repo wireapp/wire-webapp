@@ -32,7 +32,7 @@ export interface GroupVideoGripProps {
   selfParticipant: Participant;
 }
 
-interface RowsAndColumns {
+interface RowsAndColumns extends CSSProperties {
   '--columns': number;
   '--rows': number;
 }
@@ -76,7 +76,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
       <div
         className="group-video-grid"
         css={{'group-video-grid--black-background': hasBlackBackground()}}
-        style={rowsAndColumns as CSSProperties}
+        style={rowsAndColumns}
         data-uie-name="grids-wrapper"
       >
         {participants.map(participant => (
