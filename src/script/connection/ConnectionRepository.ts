@@ -95,6 +95,7 @@ export class ConnectionRepository {
     eventJson: UserConnectionData,
     source: EventSource,
     showConversation: boolean,
+    doNotCreateConversation?: boolean,
   ): Promise<void> {
     if (!eventJson) {
       throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -118,14 +119,12 @@ export class ConnectionRepository {
       await this.userRepository.updateUserById(connectionEntity.userId);
     }
     await this.sendNotification(connectionEntity, source, previousStatus);
-    if (showConversation) {
-      /**
-       * The `amplify.publish` invocation will trigger the connection entity mapping which in the end creates a new conversation entity.
-       * There are cases (https://wearezeta.atlassian.net/browse/SQCORE-143) where we want to trigger the conversation creation elsewhere.
-       * TODO: Remove `amplify.publish` and return a Conversation entity (based on a connection), so that the caller can use it (in UI, etc.).
-       */
-      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
+
+    if (doNotCreateConversation === true) {
+      return;
     }
+
+    amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
   }
 
   /**
@@ -186,7 +185,7 @@ export class ConnectionRepository {
     try {
       const response = await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
-      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, false);
+      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, false, true);
     } catch (error) {
       this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
     }
