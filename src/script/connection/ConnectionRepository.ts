@@ -91,10 +91,6 @@ export class ConnectionRepository {
    * @param source Source of event
    */
   private async onUserConnection(eventJson: UserConnectionData, source: EventSource): Promise<void> {
-    if (!eventJson) {
-      throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
-    }
-
     const connectionData = eventJson.connection;
 
     let connectionEntity = this.getConnectionByUserId(connectionData.to);
@@ -260,22 +256,17 @@ export class ConnectionRepository {
   /**
    * Update the status of a connection.
    * @param userEntity User to update connection with
-   * @param connectionStatus Connection status
+   * @param newStatus Connection status
    * @returns Promise that resolves when the connection status was updated
    */
-  private async updateStatus(userEntity: User, connectionStatus: ConnectionStatus): Promise<void> {
+  private async updateStatus(userEntity: User, newStatus: ConnectionStatus): Promise<void> {
     const currentStatus = userEntity.connection().status();
-    if (currentStatus === connectionStatus) {
-      this.logger.error(`Connection status change to '${connectionStatus}' for '${userEntity.id}' is no change`);
-      return Promise.reject(new ConnectionError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER));
-    }
-
     try {
-      const response = await this.connectionService.putConnections(userEntity.id, connectionStatus);
+      const response = await this.connectionService.putConnections(userEntity.id, newStatus);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {
-      const logMessage = `Connection change from '${currentStatus}' to '${connectionStatus}' failed`;
+      const logMessage = `Connection change from '${currentStatus}' to '${newStatus}' failed`;
       this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${error.message}`, error);
     }
   }

@@ -297,8 +297,13 @@ export class ActionsViewModel {
   };
 
   open1to1Conversation = async (userEntity: User): Promise<void> => {
+    /**
+     * The `open1to1Conversation` function can create an instance of the conversation entity.
+     * TODO: It should never create an entity and only find/use existing conversation entities (which have been created beforehand).
+     * @see https://wearezeta.atlassian.net/browse/SQCORE-143
+     */
     const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
-    if (typeof conversationEntity !== 'boolean') {
+    if (conversationEntity) {
       this.openConversation(conversationEntity);
     }
   };
@@ -320,17 +325,15 @@ export class ActionsViewModel {
   };
 
   private readonly openConversation = (conversationEntity?: Conversation): void => {
-    if (conversationEntity) {
-      if (conversationEntity.is_archived()) {
-        this.conversationRepository.unarchiveConversation(conversationEntity, true);
-      }
-
-      if (conversationEntity.is_cleared()) {
-        conversationEntity.cleared_timestamp(0);
-      }
-
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+    if (conversationEntity.is_archived()) {
+      this.conversationRepository.unarchiveConversation(conversationEntity, true);
     }
+
+    if (conversationEntity.is_cleared()) {
+      conversationEntity.cleared_timestamp(0);
+    }
+
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   };
 
   removeFromConversation = async (conversationEntity: Conversation, userEntity: User): Promise<void> => {

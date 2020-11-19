@@ -65,16 +65,12 @@ export class UserModalViewModel {
 
   onUserAction = (userAction: Actions): void => {
     switch (userAction) {
-      case Actions.UNBLOCK:
       case Actions.ACCEPT_REQUEST:
       case Actions.SEND_REQUEST:
-        /**
-         * The `open1to1Conversation` can create an instance of the conversation entity.
-         * TODO: It should never create an entity and only find/use existing conversation entities (which have been created beforehand).
-         * @see https://wearezeta.atlassian.net/browse/SQCORE-143
-         */
+      case Actions.UNBLOCK: {
         this.actionsViewModel.open1to1Conversation(this.user());
         break;
+      }
     }
     this.hide();
   };

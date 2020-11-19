@@ -849,7 +849,7 @@ export class ConversationRepository {
    * @param userEntity User entity for whom to get the conversation
    * @returns Resolves with the conversation with requested user
    */
-  async get1To1Conversation(userEntity: User): Promise<Conversation | boolean> {
+  async get1To1Conversation(userEntity: User): Promise<Conversation | false> {
     const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.userState.self().teamId;
 
     if (inCurrentTeam) {
@@ -892,7 +892,7 @@ export class ConversationRepository {
       if (!isConversationNotFound) {
         throw error;
       }
-      return undefined;
+      return false;
     }
   }
 
