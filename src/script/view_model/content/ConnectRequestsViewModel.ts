@@ -52,8 +52,7 @@ export class ConnectRequestsViewModel {
   };
 
   clickOnAccept = (userEntity: User): void => {
-    const showConversation = this.connectRequests().length === 1;
-    this.actionsViewModel.acceptConnectionRequest(userEntity, showConversation);
+    this.actionsViewModel.acceptConnectionRequest(userEntity);
   };
 
   clickOnIgnore = (userEntity: User): void => {
