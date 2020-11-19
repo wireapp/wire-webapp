@@ -116,7 +116,10 @@ class UserActions {
     const openConversation: UserAction = {
       condition: () => this.isNotMe() && (user().isConnected() || user().isTeamMember()),
       item: {
-        click: () => actionsViewModel.open1to1Conversation(user()).then(() => onAction(Actions.OPEN_CONVERSATION)),
+        click: async () => {
+          await actionsViewModel.open1to1Conversation(user());
+          onAction(Actions.OPEN_CONVERSATION);
+        },
         icon: 'message-icon',
         identifier: 'go-conversation',
         label: t('groupParticipantActionOpenConversation'),

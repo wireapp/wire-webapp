@@ -79,7 +79,7 @@ export class ConnectionRepository {
 
       const isUserConnection = eventType === USER_EVENT.CONNECTION;
       if (isUserConnection) {
-        this.onUserConnection(eventJson, source, false);
+        this.onUserConnection(eventJson, source, false, true);
       }
     }
   }
@@ -95,7 +95,7 @@ export class ConnectionRepository {
     eventJson: UserConnectionData,
     source: EventSource,
     showConversation: boolean,
-    doNotCreateConversation?: boolean,
+    createConversationIfNeeded: boolean,
   ): Promise<void> {
     if (!eventJson) {
       throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -120,11 +120,9 @@ export class ConnectionRepository {
     }
     await this.sendNotification(connectionEntity, source, previousStatus);
 
-    if (doNotCreateConversation === true) {
-      return;
+    if (createConversationIfNeeded === true) {
+      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
     }
-
-    amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
   }
 
   /**
@@ -184,7 +182,7 @@ export class ConnectionRepository {
     try {
       const response = await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
-      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, false, true);
+      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, false, false);
     } catch (error) {
       this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
     }
@@ -296,7 +294,7 @@ export class ConnectionRepository {
     try {
       const response = await this.connectionService.putConnections(userEntity.id, connectionStatus);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
-      return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
+      return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation, true);
     } catch (error) {
       const logMessage = `Connection change from '${currentStatus}' to '${connectionStatus}' failed`;
       this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${error.message}`, error);
