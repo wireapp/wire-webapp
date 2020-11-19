@@ -66,6 +66,7 @@ export class UserModalViewModel {
   onUserAction = (userAction: Actions): void => {
     switch (userAction) {
       case Actions.UNBLOCK:
+      case Actions.ACCEPT_REQUEST:
       case Actions.SEND_REQUEST:
         /**
          * The `open1to1Conversation` can create an instance of the conversation entity.
