@@ -324,7 +324,7 @@ export class ActionsViewModel {
     return Promise.resolve().then(() => this.openConversation(conversationEntity));
   };
 
-  private readonly openConversation = (conversationEntity?: Conversation): void => {
+  private readonly openConversation = (conversationEntity: Conversation): void => {
     if (conversationEntity.is_archived()) {
       this.conversationRepository.unarchiveConversation(conversationEntity, true);
     }
