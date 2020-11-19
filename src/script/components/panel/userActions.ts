@@ -189,7 +189,10 @@ class UserActions {
     const unblockUser: UserAction = {
       condition: () => this.isNotMe() && user().isBlocked(),
       item: {
-        click: () => actionsViewModel.unblockUser(user()).then(() => onAction(Actions.UNBLOCK)),
+        click: async () => {
+          await actionsViewModel.unblockUser(user());
+          onAction(Actions.UNBLOCK);
+        },
         icon: 'block-icon',
         identifier: 'do-unblock',
         label: t('groupParticipantActionUnblock'),

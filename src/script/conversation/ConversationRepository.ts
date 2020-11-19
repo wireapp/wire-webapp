@@ -949,10 +949,9 @@ export class ConversationRepository {
    *
    * @note If there is no conversation it will request it from the backend
    * @param connectionEntity Connections
-   * @param showConversation Open the new conversation
    * @returns Resolves when connection was mapped return value
    */
-  private mapConnection(connectionEntity: ConnectionEntity, showConversation: boolean): Promise<void | Conversation> {
+  private mapConnection(connectionEntity: ConnectionEntity): Promise<void> {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -972,15 +971,10 @@ export class ConversationRepository {
           conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
         }
 
-        this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {
-          if (showConversation) {
-            amplify.publish(WebAppEvents.CONVERSATION.SHOW, updatedConversationEntity);
-          }
-
-          this.conversationState.conversations.notifySubscribers();
-        });
-
-        return conversationEntity;
+        return this.updateParticipatingUserEntities(conversationEntity);
+      })
+      .then(() => {
+        return this.conversationState.conversations.notifySubscribers();
       })
       .catch(error => {
         const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
@@ -1011,9 +1005,9 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param connectionEntities Connections entities
    */
-  map_connections(connectionEntities: ConnectionEntity[]): Promise<void | Conversation>[] {
+  map_connections(connectionEntities: ConnectionEntity[]): Promise<void>[] {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity, false));
+    return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
 
   /**
