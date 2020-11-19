@@ -44,7 +44,7 @@ const calculateRowsAndColumns = (totalCount: number): RowsAndColumns => {
 };
 
 const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
-  minimized,
+  minimized = false,
   grid,
   muted = false,
   selfParticipant,
