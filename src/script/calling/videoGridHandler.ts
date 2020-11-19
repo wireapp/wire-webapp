@@ -39,7 +39,7 @@ export function getGrid(call: Call): ko.PureComputed<Grid> {
       .getRemoteParticipants()
       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
     const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
-    if (remoteParticipants.length === 1) {
+    if (remoteParticipants.length === 1 && remoteVideoParticipants.length === 1) {
       inGridParticipants = remoteVideoParticipants;
       thumbnailParticipant = selfParticipant?.hasActiveVideo() ? selfParticipant : null;
     } else {

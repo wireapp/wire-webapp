@@ -42,6 +42,7 @@ export default class TestPage<T> {
     this.update();
   };
   click = (element: ReactWrapper) => this.do(() => element.simulate('click'));
+  doubleClick = (element: ReactWrapper) => this.do(() => element.simulate('dblclick'));
   changeValue = (element: ReactWrapper, value: any) => this.do(() => element.simulate('change', {target: {value}}));
   changeFiles = (element: ReactWrapper, files: File[]) => this.do(() => element.simulate('change', {target: {files}}));
   submit = (element: ReactWrapper) => this.do(() => element.simulate('submit'));
