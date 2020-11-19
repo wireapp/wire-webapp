@@ -951,7 +951,7 @@ export class ConversationRepository {
    * @param connectionEntity Connections
    * @returns Resolves when connection was mapped return value
    */
-  private mapConnection(connectionEntity: ConnectionEntity): Promise<void> {
+  private mapConnection(connectionEntity: ConnectionEntity): Promise<void | Conversation> {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -973,8 +973,9 @@ export class ConversationRepository {
 
         return this.updateParticipatingUserEntities(conversationEntity);
       })
-      .then(() => {
-        return this.conversationState.conversations.notifySubscribers();
+      .then(updatedConversationEntity => {
+        this.conversationState.conversations.notifySubscribers();
+        return updatedConversationEntity;
       })
       .catch(error => {
         const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
@@ -1005,7 +1006,7 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param connectionEntities Connections entities
    */
-  map_connections(connectionEntities: ConnectionEntity[]): Promise<void>[] {
+  map_connections(connectionEntities: ConnectionEntity[]): Promise<Conversation | void>[] {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
     return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
@@ -1114,7 +1115,7 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     offline = false,
     updateGuests = false,
-  ): Promise<void> {
+  ): Promise<Conversation> {
     const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
     userEntities.sort(sortUsersByPriority);
     conversationEntity.participating_user_ets(userEntities);
@@ -1122,6 +1123,8 @@ export class ConversationRepository {
     if (updateGuests) {
       conversationEntity.updateGuests();
     }
+
+    return conversationEntity;
   }
 
   //##############################################################################
