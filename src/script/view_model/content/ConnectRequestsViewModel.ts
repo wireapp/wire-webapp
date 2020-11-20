@@ -51,8 +51,9 @@ export class ConnectRequestsViewModel {
     }
   };
 
-  clickOnAccept = (userEntity: User): void => {
-    this.actionsViewModel.acceptConnectionRequest(userEntity);
+  clickOnAccept = async (userEntity: User): Promise<void> => {
+    await this.actionsViewModel.acceptConnectionRequest(userEntity);
+    this.actionsViewModel.open1to1Conversation(userEntity);
   };
 
   clickOnIgnore = (userEntity: User): void => {
