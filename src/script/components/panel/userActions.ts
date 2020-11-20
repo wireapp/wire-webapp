@@ -31,6 +31,7 @@ import type {Conversation} from '../../entity/Conversation';
 import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
 
 export enum Actions {
+  ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',
   BLOCK = 'UserActions.BLOCK',
   CANCEL_REQUEST = 'UserActions.CANCEL_REQUEST',
   IGNORE_REQUEST = 'UserActions.IGNORE_REQUEST',
@@ -133,7 +134,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.acceptConnectionRequest(user());
-          actionsViewModel.open1to1Conversation(user());
+          onAction(Actions.ACCEPT_REQUEST);
         },
         icon: 'check-icon',
         identifier: 'do-accept-request',
@@ -176,7 +177,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.sendConnectionRequest(user());
-          actionsViewModel.open1to1Conversation(user());
+          onAction(Actions.SEND_REQUEST);
         },
         icon: 'plus-icon',
         identifier: 'do-send-request',
