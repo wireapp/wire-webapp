@@ -27,6 +27,7 @@ import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
+import {Conversation} from 'src/script/entity/Conversation';
 
 export class ConnectRequestsViewModel {
   actionsViewModel: ActionsViewModel;
@@ -51,9 +52,8 @@ export class ConnectRequestsViewModel {
     }
   };
 
-  clickOnAccept = async (userEntity: User): Promise<void> => {
-    const conversationEntity = await this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
-    this.actionsViewModel.open1to1Conversation(conversationEntity);
+  clickOnAccept = async (userEntity: User): Promise<Conversation> => {
+    return this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
   };
 
   clickOnIgnore = (userEntity: User): void => {
