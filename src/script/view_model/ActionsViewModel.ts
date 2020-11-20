@@ -72,9 +72,6 @@ export class ActionsViewModel {
    * @returns Resolves when the user was blocked
    */
   blockUser = (userEntity: User, hideConversation?: boolean, nextConversationEntity?: Conversation): Promise<void> => {
-    if (!userEntity) {
-      return Promise.reject();
-    }
     // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
     return new Promise(resolve => {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {

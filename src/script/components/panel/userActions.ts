@@ -78,7 +78,7 @@ class UserActions {
     conversationRoleRepository,
   }: UserInputParams) {
     this.isSelfActivated = ko.unwrap(isSelfActivated);
-    this.isMe = ko.computed(() => user()?.isMe);
+    this.isMe = ko.computed(() => user().isMe);
     this.isNotMe = ko.computed(() => !this.isMe() && this.isSelfActivated);
 
     const openSelfProfile: UserAction = {
@@ -105,7 +105,10 @@ class UserActions {
         );
       },
       item: {
-        click: () => actionsViewModel.leaveConversation(conversation()).then(() => onAction(Actions.LEAVE)),
+        click: async () => {
+          await actionsViewModel.leaveConversation(conversation());
+          onAction(Actions.LEAVE);
+        },
         icon: 'leave-icon',
         identifier: 'do-leave',
         label: t('groupParticipantActionLeave'),
@@ -141,7 +144,10 @@ class UserActions {
     const ignoreConnectionRequest: UserAction = {
       condition: () => this.isNotMe() && user().isIncomingRequest(),
       item: {
-        click: () => actionsViewModel.ignoreConnectionRequest(user()).then(() => onAction(Actions.IGNORE_REQUEST)),
+        click: async () => {
+          await actionsViewModel.ignoreConnectionRequest(user());
+          onAction(Actions.IGNORE_REQUEST);
+        },
         icon: 'close-icon',
         identifier: 'do-ignore-request',
         label: t('groupParticipantActionIgnoreRequest'),
@@ -151,7 +157,10 @@ class UserActions {
     const cancelConnectionRequest: UserAction = {
       condition: () => this.isNotMe() && user().isOutgoingRequest(),
       item: {
-        click: () => actionsViewModel.cancelConnectionRequest(user()).then(() => onAction(Actions.CANCEL_REQUEST)),
+        click: async () => {
+          await actionsViewModel.cancelConnectionRequest(user());
+          onAction(Actions.CANCEL_REQUEST);
+        },
         icon: 'undo-icon',
         identifier: 'do-cancel-request',
         label: t('groupParticipantActionCancelRequest'),
@@ -167,7 +176,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.sendConnectionRequest(user());
-          onAction(Actions.SEND_REQUEST);
+          actionsViewModel.open1to1Conversation(user());
         },
         icon: 'plus-icon',
         identifier: 'do-send-request',
@@ -178,7 +187,10 @@ class UserActions {
     const blockUser: UserAction = {
       condition: () => this.isNotMe() && (user().isConnected() || user().isRequest()),
       item: {
-        click: () => actionsViewModel.blockUser(user()).then(() => onAction(Actions.BLOCK)),
+        click: async () => {
+          await actionsViewModel.blockUser(user());
+          onAction(Actions.BLOCK);
+        },
         icon: 'block-icon',
         identifier: 'do-block',
         label: t('groupParticipantActionBlock'),
@@ -208,8 +220,10 @@ class UserActions {
           .some(id => user().id === id) &&
         conversationRoleRepository.canRemoveParticipants(conversation()),
       item: {
-        click: () =>
-          actionsViewModel.removeFromConversation(conversation(), user()).then(() => onAction(Actions.REMOVE)),
+        click: async () => {
+          await actionsViewModel.removeFromConversation(conversation(), user());
+          onAction(Actions.REMOVE);
+        },
         icon: 'minus-icon',
         identifier: 'do-remove',
         label: t('groupParticipantActionRemove'),
