@@ -47,7 +47,7 @@ interface UserInputParams {
   conversation: ko.Observable<Conversation> | (() => null);
   conversationRoleRepository: ConversationRoleRepository;
   isSelfActivated: ko.Observable<boolean>;
-  onAction: (action: Actions) => void;
+  onAction: (action: Actions, showConversation: boolean) => void;
   user: ko.Observable<User>;
 }
 
@@ -80,13 +80,14 @@ class UserActions {
     this.isSelfActivated = ko.unwrap(isSelfActivated);
     this.isMe = ko.computed(() => user().isMe);
     this.isNotMe = ko.computed(() => !this.isMe() && this.isSelfActivated);
+    const switchTo1on1Conversation = !conversation();
 
     const openSelfProfile: UserAction = {
       condition: () => this.isMe(),
       item: {
         click: () => {
           amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
-          onAction(Actions.OPEN_PROFILE);
+          onAction(Actions.OPEN_PROFILE, false);
         },
         icon: 'profile-icon',
         identifier: 'go-profile',
@@ -107,7 +108,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.leaveConversation(conversation());
-          onAction(Actions.LEAVE);
+          onAction(Actions.LEAVE, false);
         },
         icon: 'leave-icon',
         identifier: 'do-leave',
@@ -115,13 +116,11 @@ class UserActions {
       },
     };
 
-    const openConversation: UserAction = {
+    const open1To1Conversation: UserAction = {
       condition: () => this.isNotMe() && (user().isConnected() || user().isTeamMember()),
       item: {
         click: async () => {
-          const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(user());
-          await actionsViewModel.open1to1Conversation(conversationEntity);
-          onAction(Actions.OPEN_CONVERSATION);
+          onAction(Actions.OPEN_CONVERSATION, true);
         },
         icon: 'message-icon',
         identifier: 'go-conversation',
@@ -134,7 +133,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.acceptConnectionRequest(user());
-          onAction(Actions.ACCEPT_REQUEST);
+          onAction(Actions.ACCEPT_REQUEST, switchTo1on1Conversation);
         },
         icon: 'check-icon',
         identifier: 'do-accept-request',
@@ -147,7 +146,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.ignoreConnectionRequest(user());
-          onAction(Actions.IGNORE_REQUEST);
+          onAction(Actions.IGNORE_REQUEST, false);
         },
         icon: 'close-icon',
         identifier: 'do-ignore-request',
@@ -160,7 +159,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.cancelConnectionRequest(user());
-          onAction(Actions.CANCEL_REQUEST);
+          onAction(Actions.CANCEL_REQUEST, false);
         },
         icon: 'undo-icon',
         identifier: 'do-cancel-request',
@@ -177,7 +176,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.sendConnectionRequest(user());
-          onAction(Actions.SEND_REQUEST);
+          onAction(Actions.SEND_REQUEST, switchTo1on1Conversation);
         },
         icon: 'plus-icon',
         identifier: 'do-send-request',
@@ -190,7 +189,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.blockUser(user());
-          onAction(Actions.BLOCK);
+          onAction(Actions.BLOCK, false);
         },
         icon: 'block-icon',
         identifier: 'do-block',
@@ -203,7 +202,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.unblockUser(user());
-          onAction(Actions.UNBLOCK);
+          onAction(Actions.UNBLOCK, switchTo1on1Conversation);
         },
         icon: 'block-icon',
         identifier: 'do-unblock',
@@ -223,7 +222,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.removeFromConversation(conversation(), user());
-          onAction(Actions.REMOVE);
+          onAction(Actions.REMOVE, false);
         },
         icon: 'minus-icon',
         identifier: 'do-remove',
@@ -234,7 +233,7 @@ class UserActions {
     const allItems: UserAction[] = [
       openSelfProfile,
       leaveConversation,
-      openConversation,
+      open1To1Conversation,
       acceptConnectionRequest,
       ignoreConnectionRequest,
       cancelConnectionRequest,
