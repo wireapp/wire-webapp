@@ -84,6 +84,9 @@ export enum BackendErrorLabel {
   NO_MANAGED_CONVERSATION = 'no-managed-team-conv',
   NO_ADD_TO_MANAGED = 'no-add-to-managed',
 
+  // Feature errors
+  APP_LOCK_INVALID_TIMEOUT = 'inactivity-timeout-too-low',
+
   // Payment errors
   EXPIRED_CARD = 'expired_card',
 

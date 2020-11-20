@@ -18,5 +18,6 @@
  */
 
 export * from './FeatureAPI';
-export * from './FeatureStatus';
-export * from './IdentityProviderStatus';
+export * from './Feature';
+export * from './FeatureList';
+export * from './FeatureError';
