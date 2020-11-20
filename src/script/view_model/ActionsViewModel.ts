@@ -293,16 +293,16 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
-  open1to1Conversation = async (userEntity: User): Promise<void> => {
-    /**
-     * The `open1to1Conversation` function can create an instance of the conversation entity.
-     * TODO: It should never create an entity and only find/use existing conversation entities (which have been created beforehand).
-     * @see https://wearezeta.atlassian.net/browse/SQCORE-143
-     */
+  getOrCreate1to1Conversation = async (userEntity: User): Promise<Conversation> => {
     const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
     if (conversationEntity) {
-      this.openConversation(conversationEntity);
+      return conversationEntity;
     }
+    throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.id}".`);
+  };
+
+  open1to1Conversation = async (conversationEntity: Conversation): Promise<void> => {
+    return this.openConversation(conversationEntity);
   };
 
   open1to1ConversationWithService = (serviceEntity: ServiceEntity): Promise<void> => {

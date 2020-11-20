@@ -22,7 +22,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
-import {noop} from 'Util/util';
 
 import './panelActions';
 import type {User} from '../../entity/User';
@@ -74,7 +73,7 @@ class UserActions {
     user,
     conversation = () => null,
     actionsViewModel,
-    onAction = noop,
+    onAction,
     isSelfActivated,
     conversationRoleRepository,
   }: UserInputParams) {
@@ -120,7 +119,8 @@ class UserActions {
       condition: () => this.isNotMe() && (user().isConnected() || user().isTeamMember()),
       item: {
         click: async () => {
-          await actionsViewModel.open1to1Conversation(user());
+          const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(user());
+          await actionsViewModel.open1to1Conversation(conversationEntity);
           onAction(Actions.OPEN_CONVERSATION);
         },
         icon: 'message-icon',
