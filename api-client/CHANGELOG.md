@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.34.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.33.7...@wireapp/api-client@11.34.0) (2020-11-20)
+
+
+### Features
+
+* **api-client:** Add AppLock to TeamFeatureAPI ([#3324](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3324)) ([e50fa54](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/e50fa5430f3866af84ebaf9f80facbe70caba053))
+
+
+
+
+
 ## [11.33.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.33.6...@wireapp/api-client@11.33.7) (2020-11-16)
 
 **Note:** Version bump only for package @wireapp/api-client
