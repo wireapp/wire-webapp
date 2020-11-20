@@ -17,11 +17,25 @@
  *
  */
 
-export interface PropertyData {
-  properties: {
-    features?: {
-      digital_signature_enabled?: boolean;
-    };
-  };
-  version: number;
+export enum FeatureStatus {
+  DISABLED = 'disabled',
+  ENABLED = 'enabled',
 }
+
+export interface FeatureWithoutConfig {
+  status: FeatureStatus;
+}
+
+export interface FeatureConfig {}
+export interface Feature<T extends FeatureConfig> {
+  config: T;
+  status: FeatureStatus;
+}
+export interface FeatureAppLockConfig extends FeatureConfig {
+  enforceAppLock: boolean;
+  inactivityTimeoutSecs: number;
+}
+
+export type FeatureAppLock = Feature<FeatureAppLockConfig>;
+export type FeatureDigitalSignature = FeatureWithoutConfig;
+export type FeatureSSO = FeatureWithoutConfig;
