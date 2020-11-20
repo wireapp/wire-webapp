@@ -65,7 +65,6 @@ export class UserModalViewModel {
 
   onUserAction = (userAction: Actions): void => {
     switch (userAction) {
-      case Actions.ACCEPT_REQUEST:
       case Actions.SEND_REQUEST:
       case Actions.UNBLOCK: {
         this.actionsViewModel.open1to1Conversation(this.user());
