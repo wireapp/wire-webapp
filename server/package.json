@@ -28,7 +28,7 @@
     "@types/fs-extra": "8.1.1",
     "@types/hbs": "4.0.1",
     "@types/helmet": "4.0.0",
-    "@types/jasmine": "3.6.1",
+    "@types/jasmine": "3.6.2",
     "@types/node": "~10",
     "jasmine": "3.6.3",
     "nyc": "15.1.0",
