@@ -133,6 +133,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.acceptConnectionRequest(user());
+          await actionsViewModel.getOrCreate1to1Conversation(user());
           onAction(Actions.ACCEPT_REQUEST, true);
         },
         icon: 'check-icon',
