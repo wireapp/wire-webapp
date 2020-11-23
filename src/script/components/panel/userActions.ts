@@ -47,7 +47,7 @@ interface UserInputParams {
   conversation: ko.Observable<Conversation> | (() => null);
   conversationRoleRepository: ConversationRoleRepository;
   isSelfActivated: ko.Observable<boolean>;
-  onAction: (action: Actions, showConversation: boolean) => void;
+  onAction: (action: Actions) => void;
   user: ko.Observable<User>;
 }
 
@@ -82,12 +82,19 @@ class UserActions {
     this.isNotMe = ko.computed(() => !this.isMe() && this.isSelfActivated);
     const switchTo1on1Conversation = !conversation();
 
+    const create1to1Conversation = async (userEntity: User, showConversation: boolean): Promise<void> => {
+      const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
+      if (showConversation) {
+        await actionsViewModel.open1to1Conversation(conversationEntity);
+      }
+    };
+
     const openSelfProfile: UserAction = {
       condition: () => this.isMe(),
       item: {
         click: () => {
           amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
-          onAction(Actions.OPEN_PROFILE, false);
+          onAction(Actions.OPEN_PROFILE);
         },
         icon: 'profile-icon',
         identifier: 'go-profile',
@@ -108,7 +115,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.leaveConversation(conversation());
-          onAction(Actions.LEAVE, false);
+          onAction(Actions.LEAVE);
         },
         icon: 'leave-icon',
         identifier: 'do-leave',
@@ -120,7 +127,8 @@ class UserActions {
       condition: () => this.isNotMe() && (user().isConnected() || user().isTeamMember()),
       item: {
         click: async () => {
-          onAction(Actions.OPEN_CONVERSATION, true);
+          await create1to1Conversation(user(), true);
+          onAction(Actions.OPEN_CONVERSATION);
         },
         icon: 'message-icon',
         identifier: 'go-conversation',
@@ -133,8 +141,8 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.acceptConnectionRequest(user());
-          await actionsViewModel.getOrCreate1to1Conversation(user());
-          onAction(Actions.ACCEPT_REQUEST, true);
+          await create1to1Conversation(user(), true);
+          onAction(Actions.ACCEPT_REQUEST);
         },
         icon: 'check-icon',
         identifier: 'do-accept-request',
@@ -147,7 +155,8 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.ignoreConnectionRequest(user());
-          onAction(Actions.IGNORE_REQUEST, false);
+          await create1to1Conversation(user(), false);
+          onAction(Actions.IGNORE_REQUEST);
         },
         icon: 'close-icon',
         identifier: 'do-ignore-request',
@@ -160,7 +169,8 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.cancelConnectionRequest(user());
-          onAction(Actions.CANCEL_REQUEST, false);
+          await create1to1Conversation(user(), false);
+          onAction(Actions.CANCEL_REQUEST);
         },
         icon: 'undo-icon',
         identifier: 'do-cancel-request',
@@ -177,8 +187,8 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.sendConnectionRequest(user());
-          await actionsViewModel.getOrCreate1to1Conversation(user());
-          onAction(Actions.SEND_REQUEST, switchTo1on1Conversation);
+          await create1to1Conversation(user(), switchTo1on1Conversation);
+          onAction(Actions.SEND_REQUEST);
         },
         icon: 'plus-icon',
         identifier: 'do-send-request',
@@ -191,7 +201,8 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.blockUser(user());
-          onAction(Actions.BLOCK, false);
+          await create1to1Conversation(user(), false);
+          onAction(Actions.BLOCK);
         },
         icon: 'block-icon',
         identifier: 'do-block',
@@ -204,7 +215,8 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.unblockUser(user());
-          onAction(Actions.UNBLOCK, switchTo1on1Conversation);
+          await create1to1Conversation(user(), switchTo1on1Conversation);
+          onAction(Actions.UNBLOCK);
         },
         icon: 'block-icon',
         identifier: 'do-unblock',
@@ -224,7 +236,8 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.removeFromConversation(conversation(), user());
-          onAction(Actions.REMOVE, false);
+          await create1to1Conversation(user(), false);
+          onAction(Actions.REMOVE);
         },
         icon: 'minus-icon',
         identifier: 'do-remove',

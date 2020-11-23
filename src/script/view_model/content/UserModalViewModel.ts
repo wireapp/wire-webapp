@@ -63,19 +63,7 @@ export class UserModalViewModel {
     this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
   }
 
-  onUserAction = async (userAction: Actions, switchTo1on1Conversation: boolean): Promise<void> => {
-    switch (userAction) {
-      case Actions.OPEN_CONVERSATION:
-      case Actions.ACCEPT_REQUEST:
-      case Actions.SEND_REQUEST:
-      case Actions.UNBLOCK: {
-        if (switchTo1on1Conversation) {
-          const conversationEntity = await this.actionsViewModel.getOrCreate1to1Conversation(this.user());
-          this.actionsViewModel.open1to1Conversation(conversationEntity);
-        }
-        break;
-      }
-    }
+  onUserAction = (action: Actions): void => {
     this.hide();
   };
 
