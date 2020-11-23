@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.34.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.34.0...@wireapp/api-client@11.34.1) (2020-11-23)
+
+
+### Bug Fixes
+
+* **api-client:** Adjust feature app-lock URL and key ([#3332](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3332)) ([51f84b4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/51f84b4b60b82e9d31cc115cc9dd9b477acfff29))
+
+
+
+
+
 # [11.34.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.33.7...@wireapp/api-client@11.34.0) (2020-11-20)
 
 
