@@ -68,7 +68,7 @@
     "@types/faker": "5.1.4",
     "@types/generate-changelog": "1.8.0",
     "@types/highlight.js": "10.1.0",
-    "@types/jasmine": "3.6.1",
+    "@types/jasmine": "3.6.2",
     "@types/js-cookie": "2.2.6",
     "@types/keyboardjs": "2.5.0",
     "@types/libsodium-wrappers-sumo": "0.7.4",
