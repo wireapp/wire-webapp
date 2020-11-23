@@ -133,7 +133,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.acceptConnectionRequest(user());
-          onAction(Actions.ACCEPT_REQUEST, switchTo1on1Conversation);
+          onAction(Actions.ACCEPT_REQUEST, true);
         },
         icon: 'check-icon',
         identifier: 'do-accept-request',
