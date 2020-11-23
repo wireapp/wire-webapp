@@ -40,7 +40,9 @@ jobs:
           echo "COMMITTER=${{github.event.head_commit.committer.name}}" >> $GITHUB_ENV
 
       - name: Set TITLE
-        run: echo "TITLE=${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}" >> $GITHUB_ENV
+        env:
+          PR_TITLE: ${{github.event.pull_request.title}}
+        run: echo "TITLE=$PR_TITLE || $PR_LAST_COMMIT_MESSAGE" >> $GITHUB_ENV
 
       - name: Print environment variables
         env:
