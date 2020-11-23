@@ -176,6 +176,7 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.sendConnectionRequest(user());
+          await actionsViewModel.getOrCreate1to1Conversation(user());
           onAction(Actions.SEND_REQUEST, switchTo1on1Conversation);
         },
         icon: 'plus-icon',
