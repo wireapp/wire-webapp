@@ -52,8 +52,7 @@ export class ConnectRequestsViewModel {
 
   clickOnAccept = async (userEntity: User): Promise<void> => {
     await this.actionsViewModel.acceptConnectionRequest(userEntity);
-    const conversationEntity = await this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
-    this.actionsViewModel.open1to1Conversation(conversationEntity);
+    await this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
   };
 
   clickOnIgnore = (userEntity: User): void => {
