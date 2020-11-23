@@ -53,6 +53,7 @@ export class ConnectRequestsViewModel {
   };
 
   clickOnAccept = async (userEntity: User): Promise<Conversation> => {
+    await this.actionsViewModel.acceptConnectionRequest(userEntity);
     return this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
   };
 

@@ -69,8 +69,8 @@ export class UserModalViewModel {
       case Actions.ACCEPT_REQUEST:
       case Actions.SEND_REQUEST:
       case Actions.UNBLOCK: {
-        const conversationEntity = await this.actionsViewModel.getOrCreate1to1Conversation(this.user());
         if (switchTo1on1Conversation) {
+          const conversationEntity = await this.actionsViewModel.getOrCreate1to1Conversation(this.user());
           this.actionsViewModel.open1to1Conversation(conversationEntity);
         }
         break;
