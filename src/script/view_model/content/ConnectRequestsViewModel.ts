@@ -20,14 +20,12 @@
 import ko from 'knockout';
 import {scrollToBottom} from 'Util/scroll-helpers';
 import {isLastItem} from 'Util/ArrayUtil';
-
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {MainViewModel} from '../MainViewModel';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
 import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
-import {Conversation} from 'src/script/entity/Conversation';
 
 export class ConnectRequestsViewModel {
   actionsViewModel: ActionsViewModel;
@@ -52,9 +50,10 @@ export class ConnectRequestsViewModel {
     }
   };
 
-  clickOnAccept = async (userEntity: User): Promise<Conversation> => {
+  clickOnAccept = async (userEntity: User): Promise<void> => {
     await this.actionsViewModel.acceptConnectionRequest(userEntity);
-    return this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
+    const conversationEntity = await this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
+    this.actionsViewModel.open1to1Conversation(conversationEntity);
   };
 
   clickOnIgnore = (userEntity: User): void => {
