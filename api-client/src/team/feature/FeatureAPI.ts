@@ -28,7 +28,7 @@ export class FeatureAPI {
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
-    APPLOCK: 'applock',
+    APPLOCK: 'app-lock',
     DIGITAL_SIGNATURES: 'digital-signatures',
     FEATURES: 'features',
     SSO: 'sso',
