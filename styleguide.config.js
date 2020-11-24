@@ -10,7 +10,7 @@ function resolve(...paths) {
 
 module.exports = {
   title: `React UI Kit v${packageJson.version}`,
-  serverPort: 8080,
+  serverPort: 8090,
   skipComponentsWithoutExample: true,
   sections: [
     {
