@@ -155,7 +155,6 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.ignoreConnectionRequest(user());
-          await create1to1Conversation(user(), false);
           onAction(Actions.IGNORE_REQUEST);
         },
         icon: 'close-icon',
@@ -236,7 +235,6 @@ class UserActions {
       item: {
         click: async () => {
           await actionsViewModel.removeFromConversation(conversation(), user());
-          await create1to1Conversation(user(), false);
           onAction(Actions.REMOVE);
         },
         icon: 'minus-icon',
