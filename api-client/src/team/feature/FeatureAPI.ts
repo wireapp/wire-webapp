@@ -28,8 +28,8 @@ export class FeatureAPI {
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
-    APPLOCK: 'app-lock',
-    DIGITAL_SIGNATURES: 'digital-signatures',
+    APPLOCK: 'appLock',
+    DIGITAL_SIGNATURES: 'digitalSignatures',
     FEATURES: 'features',
     SSO: 'sso',
     TEAMS: '/teams',
@@ -38,7 +38,7 @@ export class FeatureAPI {
   public async getAllFeatures(teamId: string): Promise<FeatureList> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/`,
     };
 
     const response = await this.client.sendJSON<FeatureList>(config);
