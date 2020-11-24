@@ -65,16 +65,16 @@ export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpo
   {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
 ) => ({
   ...textStyle(theme, {block, color, noWrap, textTransform, ...props}),
-  fontSize: '24px',
+  fontSize: '20px',
   fontWeight: 700,
-  lineHeight: '32px',
+  lineHeight: '28px',
   marginBottom: '24px',
-  marginTop: '48px',
+  marginTop: '32px',
   [media[QueryKeys.MOBILE]]: {
-    fontSize: '20px',
-    lineHeight: '28px',
+    fontSize: '18px',
+    lineHeight: '26px',
     marginBottom: '20px',
-    marginTop: '44px',
+    marginTop: '26px',
   },
 });
 
