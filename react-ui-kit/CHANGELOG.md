@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.42.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.42.0...@wireapp/react-ui-kit@7.42.1) (2020-11-24)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust ChevronIcon rotation values ([#3342](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3342)) ([6df35bf](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/6df35bfcaa7433ee455ce89053552d67500409a1))
+* **react-ui-kit:** Update headings ([#3341](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3341)) ([94fd5f6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/94fd5f6a2affe84ebc0e7b12e7c0738990ad5469))
+
+
+
+
+
 # [7.42.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.41.0...@wireapp/react-ui-kit@7.42.0) (2020-11-16)
 
 
