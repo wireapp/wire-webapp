@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.11.69](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.11.68...@wireapp/bot-api@7.11.69) (2020-11-25)
+
+
+### Bug Fixes
+
+* **bot-api:** Migrate tests to TypeScript ([#3345](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/3345)) ([39f757f](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/39f757fb95898b081e39cb681885143283604c3b))
+
+
+
+
+
 ## [7.11.68](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.11.67...@wireapp/bot-api@7.11.68) (2020-11-25)
 
 
