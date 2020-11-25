@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.11.70](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.11.69...@wireapp/bot-api@7.11.70) (2020-11-25)
+
+
+### Bug Fixes
+
+* **bot-api:** Keep compiled code from test run for release ([#3346](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/3346)) ([4bd63d5](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/4bd63d5ef8d85a23542d0bafa926ba544ec04e08))
+
+
+
+
+
 ## [7.11.69](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.11.68...@wireapp/bot-api@7.11.69) (2020-11-25)
 
 
