@@ -23,7 +23,7 @@
   "files": [
     "src",
     "!src/**/!(*.d).ts",
-    "!src/demo"
+    "!src/demo/**/*"
   ],
   "license": "GPL-3.0",
   "main": "src/main/index",

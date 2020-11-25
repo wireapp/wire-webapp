@@ -50,7 +50,7 @@
   "files": [
     "src",
     "!src/**/!(*.d).ts",
-    "!src/**/*.test.*",
+    "!src/**/*.test.ts",
     "!src/**/*.tsx",
     "!src/test"
   ],

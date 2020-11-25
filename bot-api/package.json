@@ -16,7 +16,6 @@
   "files": [
     "src",
     "!src/demo",
-    "!src/**/*.test.*",
     "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",

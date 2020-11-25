@@ -20,8 +20,8 @@
   "description": "Store Engine implementation for the browser's File and Directory Entries API.",
   "files": [
     "src",
-    "!src/**/*.test.*",
-    "!src/**/!(*.d).ts"
+    "!src/**/!(*.d).ts",
+    "!src/test/**/*"
   ],
   "license": "GPL-3.0",
   "main": "src/index",
@@ -33,7 +33,7 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js}\"",
+    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js}\" \"!src/test/**/*\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn build && karma start",
     "test:project": "yarn build && yarn test"
