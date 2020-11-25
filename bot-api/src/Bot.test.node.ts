@@ -17,11 +17,11 @@
  *
  */
 
-const {Bot} = require('@wireapp/bot-api');
-const {ClientType} = require('@wireapp/api-client/src/client/');
+import {Bot} from '@wireapp/bot-api';
+import {ClientType} from '@wireapp/api-client/src/client/';
 
 describe('Bot', () => {
-  let bot;
+  let bot: Bot;
 
   const credentials = {
     email: 'email@example.com',
@@ -40,8 +40,8 @@ describe('Bot', () => {
 
       const bot2 = new Bot(credentials, config);
 
-      expect(bot.config).not.toEqual(jasmine.objectContaining(config));
-      expect(bot2.config).toEqual(jasmine.objectContaining(config));
+      expect(bot['config']).not.toEqual(jasmine.objectContaining(config));
+      expect(bot2['config']).toEqual(jasmine.objectContaining(config));
     });
   });
 });

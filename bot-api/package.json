@@ -5,6 +5,7 @@
     "uuidjs": "4.2.6"
   },
   "devDependencies": {
+    "@types/jasmine": "3.6.0",
     "cross-env": "7.0.2",
     "del-cli": "3.0.1",
     "dotenv-defaults": "2.0.1",
@@ -26,11 +27,11 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js}\"",
-    "demo:admin": "ts-node -r tsconfig-paths/register src/demo/admin.ts",
+    "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
+    "demo:admin": "ts-node src/demo/admin.ts",
     "dist": "yarn clean && yarn build",
     "test": "yarn build && yarn test:node && yarn clean",
-    "test:node": "jasmine --config=jasmine.json",
+    "test:node": "nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },
   "version": "7.11.68"
