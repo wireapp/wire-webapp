@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.34.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.34.3...@wireapp/api-client@11.34.4) (2020-11-25)
+
+
+### Bug Fixes
+
+* **bot-api:** Publish source files on npm ([#3343](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3343)) ([4aba0ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4aba0eec2d70e7ecafe6937f88d40f0e94a02c93))
+
+
+
+
+
 ## [11.34.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.34.2...@wireapp/api-client@11.34.3) (2020-11-24)
 
 **Note:** Version bump only for package @wireapp/api-client
