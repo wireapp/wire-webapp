@@ -17,7 +17,7 @@
  *
  */
 
-import {RecursivePartial} from '@wireapp/commons/dist/commonjs/util/TypeUtil';
+import {RecursivePartial} from '@wireapp/commons/src/main/util/TypeUtil';
 import {StyledApp} from '@wireapp/react-ui-kit';
 import {mount} from 'enzyme';
 import {History, createMemoryHistory} from 'history';

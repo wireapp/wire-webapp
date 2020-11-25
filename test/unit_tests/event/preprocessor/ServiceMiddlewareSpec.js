@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ClientEvent} from 'src/script/event/Client';
@@ -44,6 +44,7 @@ describe('ServiceMiddleware', () => {
           type: CONVERSATION_EVENT.MEMBER_JOIN,
         };
 
+        spyOn(serviceMiddleware['userState'], 'self').and.returnValue({id: 'self-id'});
         const userEntities = [{}, {isService: true}];
         spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve(userEntities));
 
@@ -60,7 +61,7 @@ describe('ServiceMiddleware', () => {
           type: CONVERSATION_EVENT.MEMBER_JOIN,
         };
 
-        spyOn(testFactory.user_repository, 'self').and.returnValue({id: 'self-id'});
+        spyOn(serviceMiddleware['userState'], 'self').and.returnValue({id: 'self-id'});
         const conversation = new Conversation();
         spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
           Promise.resolve(conversation),
@@ -80,7 +81,7 @@ describe('ServiceMiddleware', () => {
           },
           type: CONVERSATION_EVENT.MEMBER_JOIN,
         };
-
+        spyOn(serviceMiddleware['userState'], 'self').and.returnValue({id: 'self-id'});
         spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve([{}, {}]));
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {

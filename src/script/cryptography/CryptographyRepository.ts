@@ -21,13 +21,13 @@ import ko from 'knockout';
 import type {AxiosError} from 'axios';
 import {amplify} from 'amplify';
 import {error as StoreEngineError} from '@wireapp/store-engine';
-import type {UserPreKeyBundleMap} from '@wireapp/api-client/dist/user';
-import type {UserClients, NewOTRMessage} from '@wireapp/api-client/dist/conversation';
+import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
+import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {PreKey as BackendPreKey} from '@wireapp/api-client/dist/auth/';
+import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -481,8 +481,9 @@ export class CryptographyRepository {
     error: AxiosError | CryptographyError | ProteusErrors.DecryptError,
     event: EventRecord,
   ) {
-    // Get error information
-    const errorCode = (error as AxiosError).code || CryptographyRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
+    const errorCode = (error as AxiosError).code
+      ? parseInt((error as AxiosError).code, 10)
+      : CryptographyRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
 
     const {data: eventData, from: remoteUserId, time: formattedTime} = event;
 
@@ -518,22 +519,14 @@ export class CryptographyRepository {
       `Failed to decrypt event from client '${remoteClientId}' of user '${remoteUserId}' (${formattedTime}).\nError Code: '${errorCode}'\nError Message: ${error.message}`,
       error,
     );
-    this.reportDecryptionFailure(error, event);
+    this.reportDecryptionFailure(errorCode);
 
     return EventBuilder.buildUnableToDecrypt(event, error, errorCode);
   }
 
-  /**
-   * Report decryption error to Countly.
-   *
-   * @param Error error Error from event decryption
-   */
-  private reportDecryptionFailure(
-    error: AxiosError | CryptographyError | ProteusErrors.DecryptError,
-    {type: eventType}: {type: string},
-  ): void {
+  private reportDecryptionFailure(errorCode: number): void {
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.E2EE.FAILED_MESSAGE_DECRYPTION, {
-      cause: (error as AxiosError).code || error.message,
+      cause: errorCode,
     });
   }
 }

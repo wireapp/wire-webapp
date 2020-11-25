@@ -29,13 +29,14 @@ import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
 import {MainViewModel} from '../MainViewModel';
 import {ClientRepository} from '../../client/ClientRepository';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import {ClientEntity} from '../../client/ClientEntity';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
 import {getLogger, Logger} from 'Util/Logger';
 import type {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {ConversationState} from '../../conversation/ConversationState';
 
 export class PreferencesDeviceDetailsViewModel {
   private readonly logger: Logger;
@@ -59,9 +60,9 @@ export class PreferencesDeviceDetailsViewModel {
   constructor(
     mainViewModel: MainViewModel,
     private readonly clientRepository: ClientRepository,
-    private readonly conversationRepository: ConversationRepository,
     private readonly cryptographyRepository: CryptographyRepository,
     private readonly messageRepository: MessageRepository,
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;
@@ -103,7 +104,7 @@ export class PreferencesDeviceDetailsViewModel {
     this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING);
 
     try {
-      const selfConversationId = this.conversationRepository.self_conversation().id;
+      const selfConversationId = this.conversationState.self_conversation().id;
       await this.messageRepository.reset_session(this.selfUser().id, this.device().id, selfConversationId);
       window.setTimeout(() => {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);

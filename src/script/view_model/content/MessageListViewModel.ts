@@ -49,6 +49,9 @@ import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PanelViewModel} from '../PanelViewModel';
 import type {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 /*
  * Message list rendering view model.
@@ -78,12 +81,14 @@ export class MessageListViewModel {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.mainViewModel = mainViewModel;
     this.logger = getLogger('MessageListViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
     this.focusedMessage = ko.observable(null);
 
     this.conversation = ko.observable(new Conversation());
@@ -200,15 +205,11 @@ export class MessageListViewModel {
     conversationEntity: Conversation,
     messageEntity: Message,
   ): Promise<ContentMessage[]> => {
-    const _conversationEntity = await this.conversationRepository.updateParticipatingUserEntities(
-      conversationEntity,
-      false,
-      true,
-    );
+    await this.conversationRepository.updateParticipatingUserEntities(conversationEntity, false, true);
 
     return messageEntity
-      ? this.conversationRepository.getMessagesWithOffset(_conversationEntity, messageEntity)
-      : this.conversationRepository.getPrecedingMessages(_conversationEntity);
+      ? this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity)
+      : this.conversationRepository.getPrecedingMessages(conversationEntity);
   };
 
   private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
@@ -363,7 +364,7 @@ export class MessageListViewModel {
 
   showUserDetails = (userEntity: User): void => {
     userEntity = ko.unwrap(userEntity);
-    const conversationEntity = this.conversationRepository.active_conversation();
+    const conversationEntity = this.conversationState.activeConversation();
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
     if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
@@ -459,7 +460,7 @@ export class MessageListViewModel {
   };
 
   clickOnCancelRequest = (messageEntity: MemberMessage): void => {
-    const conversationEntity = this.conversationRepository.active_conversation();
+    const conversationEntity = this.conversationState.activeConversation();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   };

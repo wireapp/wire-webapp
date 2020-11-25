@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {RECEIPT_MODE} from '@wireapp/api-client/dist/conversation/data/';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -36,7 +36,6 @@ import {ConversationRepository} from '../../conversation/ConversationRepository'
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';
 import type {SearchRepository} from '../../search/SearchRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
-import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {User} from '../../entity/User';
@@ -45,13 +44,18 @@ import type {Conversation} from '../../entity/Conversation';
 import 'Components/receiptModeToggle';
 import 'Components/panel/panelActions';
 import {PanelViewModel} from '../PanelViewModel';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 export class ConversationDetailsViewModel extends BasePanelViewModel {
+  private readonly userState: UserState;
+  private readonly teamState: TeamState;
+
   conversationRepository: ConversationRepository;
   integrationRepository: IntegrationRepository;
   searchRepository: SearchRepository;
   teamRepository: TeamRepository;
-  userRepository: UserRepository;
   ConversationRepository: typeof ConversationRepository;
   actionsViewModel: ActionsViewModel;
   logger: Logger;
@@ -102,12 +106,14 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     const {mainViewModel, repositories} = params;
 
-    const {conversation, integration, search, team, user} = repositories;
+    this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
+
+    const {conversation, integration, search, team} = repositories;
     this.conversationRepository = conversation;
     this.integrationRepository = integration;
     this.searchRepository = search;
     this.teamRepository = team;
-    this.userRepository = user;
 
     this.ConversationRepository = ConversationRepository;
 
@@ -115,8 +121,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.logger = getLogger('ConversationDetailsViewModel');
 
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
-    this.isTeam = this.teamRepository.isTeam;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
+    this.isTeam = this.teamState.isTeam;
 
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
 
@@ -124,7 +130,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.userParticipants = ko.observableArray();
     this.showAllUsersCount = ko.observable(0);
     this.selectedService = ko.observable();
-    this.isSelfVerified = ko.pureComputed(() => user.self()?.is_verified());
+    this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
 
     const roleRepository = this.conversationRepository.conversationRoleRepository;
 
@@ -469,8 +475,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   };
 
   initView(): void {
-    if (this.teamRepository.isTeam() && this.isSingleUserMode(this.activeConversation())) {
-      this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [this.firstParticipant().id], true);
+    if (this.teamState.isTeam() && this.isSingleUserMode(this.activeConversation())) {
+      this.teamRepository.updateTeamMembersByIds(this.teamState.team(), [this.firstParticipant().id], true);
     }
   }
 }

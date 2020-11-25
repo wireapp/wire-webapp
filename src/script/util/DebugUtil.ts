@@ -17,8 +17,8 @@
  *
  */
 
-import type {BackendEvent, ConversationEvent, ConversationOtrMessageAddEvent} from '@wireapp/api-client/dist/event';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import type {BackendEvent, ConversationEvent, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {util as ProteusUtil} from '@wireapp/proteus';
 import {getLogger, Logger} from 'Util/Logger';
 import Dexie from 'dexie';
@@ -26,7 +26,7 @@ import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
-import type {Notification} from '@wireapp/api-client/dist/notification/';
+import type {Notification} from '@wireapp/api-client/src/notification/';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {CallingRepository} from '../calling/CallingRepository';
 import {ClientRepository} from '../client/ClientRepository';
@@ -41,6 +41,8 @@ import {UserId} from '../calling/Participant';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
+import {UserState} from '../user/UserState';
+import {ConversationState} from '../conversation/ConversationState';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -65,7 +67,12 @@ export class DebugUtil {
   /** Used by QA test automation. */
   public readonly Dexie: typeof Dexie;
 
-  constructor(repositories: ViewModelRepositories, private readonly clientState = container.resolve(ClientState)) {
+  constructor(
+    repositories: ViewModelRepositories,
+    private readonly clientState = container.resolve(ClientState),
+    private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
+  ) {
     this.$ = $;
     this.Dexie = Dexie;
 
@@ -85,7 +92,7 @@ export class DebugUtil {
 
   /** Used by QA test automation. */
   blockAllConnections(): Promise<void[]> {
-    const blockUsers = this.userRepository.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
+    const blockUsers = this.userState.users().map(userEntity => this.connectionRepository.blockUser(userEntity));
     return Promise.all(blockUsers);
   }
 
@@ -137,7 +144,7 @@ export class DebugUtil {
 
   getLastMessagesFromDatabase(
     amount = 10,
-    conversationId = this.conversationRepository.active_conversation().id,
+    conversationId = this.conversationState.activeConversation().id,
   ): EventRecord[] {
     if (this.storageRepository.storageService.db) {
       return this.storageRepository.storageService.db[StorageSchemata.OBJECT_STORE.EVENTS].toArray(
@@ -152,10 +159,10 @@ export class DebugUtil {
 
   async haveISentThisMessageToMyOtherClients(
     messageId: string,
-    conversationId: string = this.conversationRepository.active_conversation().id,
+    conversationId: string = this.conversationState.activeConversation().id,
   ): Promise<void> {
     const clientId = this.clientState.currentClient().id;
-    const userId = this.userRepository.self().id;
+    const userId = this.userState.self().id;
 
     const isOTRMessage = (notification: BackendEvent) => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     const isInCurrentConversation = (notification: ConversationEvent) => notification.conversation === conversationId;
@@ -203,7 +210,7 @@ export class DebugUtil {
       user,
     };
 
-    const logMessage = `Hey ${this.userRepository.self().name()}, this is for you:`;
+    const logMessage = `Hey ${this.userState.self().name()}, this is for you:`;
     this.logger.warn(logMessage, debugInformation);
     this.logger.warn(`Conversation: ${debugInformation.conversation.name()}`, debugInformation.conversation);
     this.logger.warn(`From: ${debugInformation.user.name()}`, debugInformation.user);
@@ -213,7 +220,7 @@ export class DebugUtil {
 
   async exportCryptobox(): Promise<void> {
     const clientId = this.clientState.currentClient().id;
-    const userId = this.userRepository.self().id;
+    const userId = this.userState.self().id;
     const fileName = `cryptobox-${userId}-${clientId}.json`;
     const cryptobox = await this.cryptographyRepository.cryptobox.serialize();
     downloadText(JSON.stringify(cryptobox), fileName);

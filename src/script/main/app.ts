@@ -36,7 +36,6 @@ import {Environment} from 'Util/Environment';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
-import {APIClient} from '@wireapp/api-client';
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
@@ -114,7 +113,7 @@ import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
 import {loadValue} from 'Util/StorageUtil';
-import {APIClientSingleton} from '../service/APIClientSingleton';
+import {APIClient} from '../service/APIClientSingleton';
 import {ClientService} from '../client/ClientService';
 import {ConnectionService} from '../connection/ConnectionService';
 import {TeamService} from '../team/TeamService';
@@ -143,7 +142,6 @@ function doRedirect(signOutReason: SIGN_OUT_REASON) {
 }
 
 class App {
-  apiClient: APIClient;
   logger: Logger;
   appContainer: HTMLElement;
   service: {
@@ -179,12 +177,15 @@ class App {
   }
 
   /**
-   * @param apiClient Configured backend client
    * @param appContainer DOM element that will hold the app
    * @param encryptedEngine Encrypted database handler
+   * @param apiClient Configured backend client
    */
-  constructor(apiClient: APIClient, appContainer: HTMLElement, encryptedEngine?: SQLeetEngine) {
-    this.apiClient = apiClient;
+  constructor(
+    appContainer: HTMLElement,
+    encryptedEngine?: SQLeetEngine,
+    private readonly apiClient = container.resolve(APIClient),
+  ) {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () => this.logout(SIGN_OUT_REASON.NOT_SIGNED_IN, false));
     this.logger = getLogger('App');
     this.appContainer = appContainer;
@@ -220,46 +221,38 @@ class App {
    */
   private _setupRepositories() {
     const repositories: ViewModelRepositories = {} as ViewModelRepositories;
-    const selfService = new SelfService(this.apiClient);
+    const selfService = new SelfService();
     const sendingMessageQueue = new MessageSender();
 
     repositories.asset = container.resolve(AssetRepository);
     repositories.audio = new AudioRepository();
-    repositories.auth = new AuthRepository(this.apiClient);
-    repositories.giphy = new GiphyRepository(new GiphyService(this.apiClient));
-    repositories.properties = new PropertiesRepository(new PropertiesService(this.apiClient), selfService);
+    repositories.auth = new AuthRepository();
+    repositories.giphy = new GiphyRepository(new GiphyService());
+    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
     repositories.serverTime = serverTimeHandler;
-    repositories.storage = new StorageRepository(this.service.storage);
+    repositories.storage = new StorageRepository();
 
-    repositories.cryptography = new CryptographyRepository(
-      new CryptographyService(this.apiClient),
-      repositories.storage,
-    );
-    repositories.client = new ClientRepository(
-      new ClientService(this.apiClient, this.service.storage),
-      repositories.cryptography,
-    );
+    repositories.cryptography = new CryptographyRepository(new CryptographyService(), repositories.storage);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
-      new UserService(this.apiClient, this.service.storage),
+      new UserService(),
       repositories.asset,
       selfService,
       repositories.client,
       serverTimeHandler,
       repositories.properties,
     );
-    repositories.connection = new ConnectionRepository(new ConnectionService(this.apiClient), repositories.user);
+    repositories.connection = new ConnectionRepository(new ConnectionService(), repositories.user);
     repositories.event = new EventRepository(
       this.service.event,
       this.service.notification,
       this.service.webSocket,
       repositories.cryptography,
       serverTimeHandler,
-      repositories.user,
     );
-    repositories.search = new SearchRepository(new SearchService(this.apiClient), repositories.user);
-    repositories.team = new TeamRepository(new TeamService(this.apiClient), repositories.user, repositories.asset);
-    repositories.eventTracker = new EventTrackingRepository(repositories.user);
+    repositories.search = new SearchRepository(new SearchService(), repositories.user);
+    repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
 
     repositories.conversation = new ConversationRepository(
       this.service.conversation,
@@ -281,42 +274,32 @@ class App {
       repositories.properties,
       serverTimeHandler,
       repositories.user,
-      repositories.team,
       this.service.conversation,
       new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.asset,
     );
 
+    repositories.eventTracker = new EventTrackingRepository(repositories.message);
+
     const serviceMiddleware = new ServiceMiddleware(repositories.conversation, repositories.user);
     const quotedMessageMiddleware = new QuotedMessageMiddleware(this.service.event);
 
-    const readReceiptMiddleware = new ReceiptsMiddleware(
-      this.service.event,
-      repositories.user,
-      repositories.conversation,
-    );
+    const readReceiptMiddleware = new ReceiptsMiddleware(this.service.event, repositories.conversation);
 
     repositories.event.setEventProcessMiddlewares([
       serviceMiddleware.processEvent.bind(serviceMiddleware),
       quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
-    repositories.backup = new BackupRepository(
-      new BackupService(this.service.storage),
-      repositories.connection,
-      repositories.conversation,
-      repositories.user,
-    );
+    repositories.backup = new BackupRepository(new BackupService(), repositories.connection, repositories.conversation);
     repositories.broadcast = new BroadcastRepository(
-      new BroadcastService(this.apiClient),
+      new BroadcastService(),
       repositories.client,
       repositories.message,
       repositories.cryptography,
       sendingMessageQueue,
     );
     repositories.calling = new CallingRepository(
-      this.apiClient,
-      repositories.conversation,
       repositories.message,
       repositories.event,
       repositories.user,
@@ -333,9 +316,8 @@ class App {
       repositories.calling,
       repositories.conversation,
       repositories.permission,
-      repositories.user,
     );
-    repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user.self);
+    repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     repositories.conversation.leaveCall = repositories.calling.leaveCall;
     return repositories;
@@ -347,19 +329,18 @@ class App {
    * @returns All services
    */
   private _setupServices(encryptedEngine: SQLeetEngine) {
-    const storageService = new StorageService(encryptedEngine);
-    const eventService = Runtime.isEdge()
-      ? new EventServiceNoCompound(storageService)
-      : new EventService(storageService);
+    container.registerInstance(StorageService, new StorageService(encryptedEngine));
+    const storageService = container.resolve(StorageService);
+    const eventService = Runtime.isEdge() ? new EventServiceNoCompound() : new EventService();
 
     return {
       asset: container.resolve(AssetService),
-      conversation: new ConversationService(this.apiClient, eventService, storageService),
+      conversation: new ConversationService(eventService),
       event: eventService,
-      integration: new IntegrationService(this.apiClient),
-      notification: new NotificationService(this.apiClient, storageService),
+      integration: new IntegrationService(),
+      notification: new NotificationService(),
       storage: storageService,
-      webSocket: new WebSocketService(this.apiClient),
+      webSocket: new WebSocketService(),
     };
   }
 
@@ -371,9 +352,8 @@ class App {
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
     amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
       this.logger.info(`Access token refresh triggered by "${source}"...`);
-      const apiClient = container.resolve(APIClientSingleton).getClient();
       try {
-        await apiClient.transport.http.refreshAccessToken();
+        await this.apiClient.transport.http.refreshAccessToken();
         amplify.publish(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEWED);
         this.logger.info(`Refreshed access token.`);
       } catch (error) {
@@ -427,11 +407,11 @@ class App {
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       await authRepository.init();
-      await this._initiateSelfUser();
-      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository.self().name()));
+      await this.initiateSelfUser();
+      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository['userState'].self().name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
-      const selfUser = userRepository.self();
+      const selfUser = userRepository['userState'].self();
       callingRepository.initAvs(selfUser, clientEntity.id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
@@ -451,7 +431,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
-      conversationRepository.map_connections(connectionRepository.connectionEntities());
+      await Promise.all(conversationRepository.map_connections(connectionRepository.connectionEntities()));
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
@@ -476,7 +456,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
       telemetry.timeStep(AppInitTimingsStep.APP_PRE_LOADED);
 
-      userRepository.self().devices(clientEntities);
+      userRepository['userState'].self().devices(clientEntities);
       this.logger.info('App pre-loading completed');
       await this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
@@ -484,15 +464,15 @@ class App {
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      this.applock = new AppLockViewModel(clientRepository, userRepository.self);
+      this.applock = new AppLockViewModel(clientRepository, userRepository['userState'].self);
 
       loadingView.removeFromView();
       telemetry.report();
       amplify.publish(WebAppEvents.LIFECYCLE.LOADED);
       modals.ready();
-      showInitialModal(userRepository.self().availability());
+      showInitialModal(userRepository['userState'].self().availability());
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
-      if (userRepository.isActivatedAccount()) {
+      if (userRepository['userState'].isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
         startNewVersionPolling(Environment.version(false), this.update.bind(this));
       }
@@ -603,8 +583,8 @@ class App {
    * Initiate the self user by getting it from the backend.
    * @returns Resolves with the self user entity
    */
-  async _initiateSelfUser() {
-    const userEntity = await this.repository.user.getSelf();
+  private async initiateSelfUser() {
+    const userEntity = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
     this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 
@@ -616,7 +596,7 @@ class App {
       }
     }
 
-    await this.service.storage.init(userEntity.id);
+    await container.resolve(StorageService).init(userEntity.id);
     this.repository.client.init(userEntity);
     await this.repository.properties.init(userEntity);
     this._checkUserInformation(userEntity);
@@ -689,13 +669,13 @@ class App {
     const conversationEntity = this.repository.conversation.getMostRecentConversation();
 
     this.logger.info('Showing application UI');
-    if (this.repository.user.isTemporaryGuest()) {
+    if (this.repository.user['userState'].isTemporaryGuest()) {
       mainView.list.showTemporaryGuest();
     } else if (this.repository.user.shouldChangeUsername()) {
       mainView.list.showTakeover();
     } else if (conversationEntity) {
       mainView.content.showConversation(conversationEntity);
-    } else if (this.repository.user.connectRequests().length) {
+    } else if (this.repository.user['userState'].connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
@@ -728,7 +708,7 @@ class App {
       this.repository.event.disconnectWebSocket();
       this.repository.calling.destroy();
 
-      if (this.repository.user.isActivatedAccount()) {
+      if (this.repository.user['userState'].isActivatedAccount()) {
         if (this.service.storage.isTemporaryAndNonPersistent) {
           this.logout(SIGN_OUT_REASON.CLIENT_REMOVED, true);
         } else {
@@ -780,7 +760,7 @@ class App {
         keysToKeep.push(StorageKey.AUTH.PERSIST);
       }
 
-      const selfUser = this.repository.user.self();
+      const selfUser = this.repository.user['userState'].self();
       if (selfUser) {
         const cookieLabelKey = this.repository.client.constructCookieLabelKey(selfUser.email() || selfUser.phone());
 
@@ -867,7 +847,7 @@ class App {
   private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
     this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
-    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user.isTemporaryGuest();
+    const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
     if (isLeavingGuestRoom) {
       return window.location.replace(getWebsiteUrl());
     }
@@ -882,7 +862,7 @@ class App {
   private _publishGlobals() {
     window.z.userPermission = ko.observable({});
     ko.pureComputed(() => {
-      const selfUser = this.repository.user.self();
+      const selfUser = this.repository.user['userState'].self();
       return selfUser && selfUser.teamRole();
     }).subscribe(role => window.z.userPermission(UserPermission.generatePermissionHelpers(role)));
   }
@@ -897,15 +877,14 @@ $(async () => {
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
-    const apiClient = container.resolve(APIClientSingleton).getClient();
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
     } else if (isTemporaryClientAndNonPersistent(shouldPersist)) {
       const engine = await StorageService.getUninitializedEngine();
-      window.wire.app = new App(apiClient, appContainer, engine);
+      window.wire.app = new App(appContainer, engine);
     } else {
-      window.wire.app = new App(apiClient, appContainer);
+      window.wire.app = new App(appContainer);
     }
   }
 });

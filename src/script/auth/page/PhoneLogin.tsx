@@ -22,8 +22,8 @@ import {
   InvalidPhoneNumberError,
   LoginData,
   PasswordExistsError,
-} from '@wireapp/api-client/dist/auth';
-import {ClientType} from '@wireapp/api-client/dist/client/index';
+} from '@wireapp/api-client/src/auth';
+import {ClientType} from '@wireapp/api-client/src/client/index';
 import {
   ArrowIcon,
   COLOR,

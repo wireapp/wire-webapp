@@ -17,23 +17,23 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import type {Consent, Self} from '@wireapp/api-client/dist/self';
-import type {UserUpdate} from '@wireapp/api-client/dist/user';
+import type {Consent, Self} from '@wireapp/api-client/src/self';
+import type {UserUpdate} from '@wireapp/api-client/src/user';
+import type {TraceState} from '@wireapp/api-client/src/http';
+import {container} from 'tsyringe';
+
+import {APIClient} from '../service/APIClientSingleton';
 
 export class SelfService {
-  private readonly apiClient: APIClient;
-
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
   deleteSelf(password?: string): Promise<void> {
     return this.apiClient.self.api.deleteSelf({password});
   }
 
-  getSelf(): Promise<Self> {
-    return this.apiClient.self.api.getSelf();
+  getSelf(traceStates: TraceState[]): Promise<Self> {
+    traceStates.push({position: 'SelfService.getSelf', vendor: 'webapp'});
+    return this.apiClient.self.api.getSelf(traceStates);
   }
 
   async getSelfConsent(): Promise<Consent[]> {

@@ -23,7 +23,7 @@ import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-mes
 import {debounce, Cancelable} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {STATE as CALL_STATE} from '@wireapp/avs';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -162,7 +162,7 @@ export class Conversation {
   public readonly showNotificationsEverything: ko.PureComputed<boolean>;
   public readonly showNotificationsMentionsAndReplies: ko.PureComputed<boolean>;
   public readonly showNotificationsNothing: ko.PureComputed<boolean>;
-  public readonly status: ko.Observable<ConversationStatus>;
+  public status: ko.Observable<ConversationStatus>;
   public team_id: string;
   public readonly type: ko.Observable<CONVERSATION_TYPE>;
   public readonly unreadState: ko.PureComputed<UnreadState>;

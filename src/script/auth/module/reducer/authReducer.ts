@@ -17,11 +17,11 @@
  *
  */
 
-import type {SSOSettings} from '@wireapp/api-client/dist/account/SSOSettings';
-import type {LoginData} from '@wireapp/api-client/dist/auth';
-import {ClientType} from '@wireapp/api-client/dist/client';
-import type {TeamData} from '@wireapp/api-client/dist/team';
-import type {UserAsset} from '@wireapp/api-client/dist/user';
+import type {SSOSettings} from '@wireapp/api-client/src/account/SSOSettings';
+import type {LoginData} from '@wireapp/api-client/src/auth';
+import {ClientType} from '@wireapp/api-client/src/client';
+import type {TeamData} from '@wireapp/api-client/src/team';
+import type {UserAsset} from '@wireapp/api-client/src/user';
 
 import {Config} from '../../../Config';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';

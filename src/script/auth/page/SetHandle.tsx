@@ -17,7 +17,7 @@
  *
  */
 
-import {ConsentType} from '@wireapp/api-client/dist/self/index';
+import {ConsentType} from '@wireapp/api-client/src/self/index';
 import {
   ArrowIcon,
   ContainerXS,

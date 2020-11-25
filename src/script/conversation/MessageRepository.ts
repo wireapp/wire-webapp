@@ -17,7 +17,6 @@
  *
  */
 
-import ko from 'knockout';
 import {amplify} from 'amplify';
 import {
   Asset,
@@ -38,12 +37,13 @@ import {
   Text,
   Asset as ProtobufAsset,
   LinkPreview,
+  DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {RequestCancellationError} from '@wireapp/api-client/dist/user';
-import {ReactionType} from '@wireapp/core/dist/conversation';
+import {RequestCancellationError} from '@wireapp/api-client/src/user';
+import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/dist/conversation';
+import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
@@ -83,23 +83,24 @@ import {ClientRepository} from '../client/ClientRepository';
 import {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
-import {TeamRepository} from '../team/TeamRepository';
 import {UserRepository} from '../user/UserRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {MessageSender} from '../message/MessageSender';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {ContentMessage} from '../entity/message/ContentMessage';
-import {TeamEntity} from '../team/TeamEntity';
-import {User} from '../entity/User';
 import {EventService} from '../event/EventService';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {MentionEntity} from '../message/MentionEntity';
-import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/dist/conversation/content';
+import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import type {EventRecord} from '../storage';
+import {container} from 'tsyringe';
+import {UserState} from '../user/UserState';
+import {TeamState} from '../team/TeamState';
+import {ConversationState} from './ConversationState';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -109,12 +110,7 @@ export class MessageRepository {
   private readonly eventService: EventService;
   private readonly event_mapper: EventMapper;
   public readonly clientMismatchHandler: ClientMismatchHandler;
-  private readonly blockNotificationHandling: ko.Observable<boolean>;
-
-  private readonly isTeam: ko.PureComputed<boolean>;
-  private readonly selfUser: ko.Observable<User>;
-  private readonly team: ko.Observable<TeamEntity>;
-  private readonly selfConversation: ko.PureComputed<Conversation>;
+  private isBlockingNotificationHandling: boolean;
 
   constructor(
     private readonly clientRepository: ClientRepository,
@@ -125,21 +121,17 @@ export class MessageRepository {
     private readonly propertyRepository: PropertiesRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
-    private readonly teamRepository: TeamRepository,
     private readonly conversation_service: ConversationService,
     private readonly link_repository: LinkPreviewRepository,
     private readonly assetRepository: AssetRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
-    this.eventService = eventRepository.eventService;
-    this.event_mapper = new EventMapper();
     this.logger = getLogger('MessageRepository');
 
-    this.isTeam = this.teamRepository.isTeam;
-    this.team = this.teamRepository.team;
-    this.selfUser = this.userRepository.self;
-    this.selfConversation = ko.pureComputed(() =>
-      this.conversationRepositoryProvider().find_conversation_by_id(this.selfUser()?.id),
-    );
+    this.eventService = eventRepository.eventService;
+    this.event_mapper = new EventMapper();
 
     this.clientMismatchHandler = new ClientMismatchHandler(
       this.conversationRepositoryProvider,
@@ -147,7 +139,7 @@ export class MessageRepository {
       this.userRepository,
     );
 
-    this.blockNotificationHandling = ko.observable(true);
+    this.isBlockingNotificationHandling = true;
 
     this.initSubscriptions();
   }
@@ -166,14 +158,12 @@ export class MessageRepository {
   private setNotificationHandlingState(handlingState: NOTIFICATION_HANDLING_STATE) {
     const updatedHandlingState = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
-    if (this.blockNotificationHandling() !== updatedHandlingState) {
-      this.blockNotificationHandling(updatedHandlingState);
+    if (this.isBlockingNotificationHandling !== updatedHandlingState) {
+      this.isBlockingNotificationHandling = updatedHandlingState;
       this.logger.info(
-        `Block message sending: ${this.blockNotificationHandling()} (${
-          this.messageSender.queuedMessages
-        } items in queue)`,
+        `Block message sending: ${this.isBlockingNotificationHandling} (${this.messageSender.queuedMessages} items in queue)`,
       );
-      this.messageSender.pauseQueue(this.blockNotificationHandling());
+      this.messageSender.pauseQueue(this.isBlockingNotificationHandling);
     }
   }
 
@@ -448,7 +438,7 @@ export class MessageRepository {
     let genericMessage: GenericMessage;
 
     await this.getMessageInConversationById(conversationEntity, messageId);
-    const retention = this.assetRepository.getAssetRetention(this.selfUser(), conversationEntity);
+    const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversationEntity);
     const options = {
       expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
       legalHoldStatus: conversationEntity.legalHoldStatus(),
@@ -1006,7 +996,7 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.selfConversation().id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
       await this.sendGenericMessageToConversation(eventInfoEntity);
       return this._delete_message_by_id(conversationEntity, messageEntity.id);
     } catch (error) {
@@ -1034,7 +1024,7 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.selfConversation().id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
       this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
         this.logger.info(`Cleared conversation '${conversationEntity.id}' on '${new Date(timestamp).toISOString()}'`);
       });
@@ -1112,7 +1102,7 @@ export class MessageRepository {
    */
   private cancel_asset_upload(messageId: string) {
     this.sendAssetUploadFailed(
-      this.conversationRepositoryProvider().active_conversation(),
+      this.conversationState.activeConversation(),
       messageId,
       ProtobufAsset.NotUploaded.CANCELLED,
     );
@@ -1164,7 +1154,7 @@ export class MessageRepository {
    * @returns Resolves with a user client map
    */
   async create_recipients(conversation_id: string, skip_own_clients = false, user_ids: string[] = null) {
-    const userEntities = await this.conversationRepositoryProvider().get_all_users_in_conversation(conversation_id);
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id);
     const recipients: Recipients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
@@ -1260,9 +1250,9 @@ export class MessageRepository {
       return false;
     }
 
-    if (this.isTeam()) {
+    if (this.teamState.isTeam()) {
       const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(
-        id => id !== this.selfUser().id,
+        id => id !== this.userState.self().id,
       );
       const userIdsWithoutClients = [];
       for (const recipientId of allRecipientsBesideSelf) {
@@ -1279,7 +1269,7 @@ export class MessageRepository {
         const isDeleted = user?.deleted === true;
 
         if (isDeleted) {
-          await this.conversationRepositoryProvider().teamMemberLeave(this.team().id, user.id);
+          await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, user.id);
         }
       }
     }
@@ -1293,9 +1283,7 @@ export class MessageRepository {
 
     // Legal Hold
     if (!skipLegalHold) {
-      const conversationEntity = this.conversationRepositoryProvider().find_conversation_by_id(
-        eventInfoEntity.conversationId,
-      );
+      const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
       const localLegalHoldStatus = conversationEntity.legalHoldStatus();
       await this.updateAllClients(conversationEntity, !isMessageEdit);
       const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
@@ -1312,7 +1300,7 @@ export class MessageRepository {
           conversationId,
           legalHoldStatus: updatedLocalLegalHoldStatus,
           timestamp: numericTimestamp,
-          userId: this.selfUser().id,
+          userId: this.userState.self().id,
         });
       }
 
@@ -1347,7 +1335,7 @@ export class MessageRepository {
       conversationEntity.needsLegalHoldApproval = false;
       return showLegalHoldWarning(conversationEntity, conversationDegraded);
     } else if (shouldShowLegalHoldWarning) {
-      conversationEntity.needsLegalHoldApproval = !this.selfUser().isOnLegalHold() && isLegalHoldMessageType;
+      conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
     }
     if (!conversationDegraded) {
       return false;
@@ -1456,7 +1444,7 @@ export class MessageRepository {
       if (error.missing) {
         const remoteUserClients = error.missing as Recipients;
         const localUserClients = await this.create_recipients(conversationEntity.id);
-        const selfId = this.selfUser().id;
+        const selfId = this.userState.self().id;
 
         const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
           if (userId === selfId) {
@@ -1517,13 +1505,39 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.selfConversation().id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
       this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
     } catch (error) {
       const errorMessage = 'Failed to update last read timestamp';
+      this.logger.error(`${errorMessage}: ${error.message}`, error);
+    }
+  }
+
+  /**
+   * Sends a message to backend to sync countly id across other clients
+   *
+   * @param countlyId Countly new ID
+   */
+  public async sendCountlySync(countlyId: string) {
+    const protoDataTransfer = new DataTransfer({
+      trackingIdentifier: {
+        identifier: countlyId,
+      },
+    });
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.DATA_TRANSFER]: protoDataTransfer,
+      messageId: createRandomUuid(),
+    });
+
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+    try {
+      await this.sendGenericMessageToConversation(eventInfoEntity);
+      this.logger.info(`Sent countly sync message with ID ${countlyId}`);
+    } catch (error) {
+      const errorMessage = `Failed to send countly sync message with ID ${countlyId}`;
       this.logger.error(`${errorMessage}: ${error.message}`, error);
     }
   }
@@ -1738,7 +1752,7 @@ export class MessageRepository {
         break;
     }
     if (actionType) {
-      const selfUserTeamId = this.selfUser().teamId;
+      const selfUserTeamId = this.userState.self().teamId;
       const participants = conversationEntity.participating_user_ets();
       const guests = participants.filter(user => user.isGuest()).length;
       const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;

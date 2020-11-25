@@ -17,7 +17,7 @@
  *
  */
 
-import {NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -54,12 +54,13 @@ import type {User} from '../entity/User';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {PermissionRepository} from '../permission/PermissionRepository';
-import type {UserRepository} from '../user/UserRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {AssetRepository} from '../assets/AssetRepository';
 import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
+import {UserState} from '../user/UserState';
+import {ConversationState} from '../conversation/ConversationState';
 
 export interface Multitasking {
   autoMinimize?: ko.Observable<boolean>;
@@ -99,7 +100,6 @@ export class NotificationRepository {
   private readonly permissionRepository: PermissionRepository;
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState>;
   private readonly selfUser: ko.Observable<User>;
-  private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
 
   static get CONFIG() {
@@ -120,19 +120,19 @@ export class NotificationRepository {
    * @param callingRepository Repository for all call interactions
    * @param conversationRepository Repository for all conversation interactions
    * @param permissionRepository Repository for all permission interactions
-   * @param userRepository Repository for users
+   * @param userState Repository for users
    */
   constructor(
     callingRepository: CallingRepository,
     conversationRepository: ConversationRepository,
     permissionRepository: PermissionRepository,
-    userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.assetRepository = container.resolve(AssetRepository);
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
-    this.userRepository = userRepository;
     this.contentViewModelState = {multitasking: {isMinimized: () => false}, state: () => false};
 
     this.logger = getLogger('NotificationRepository');
@@ -149,7 +149,7 @@ export class NotificationRepository {
     });
 
     this.permissionState = this.permissionRepository.permissionState[PermissionType.NOTIFICATIONS];
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
   }
 
   setContentViewModelStates(
@@ -793,7 +793,7 @@ export class NotificationRepository {
    */
   private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
     const inActiveConversation = conversationEntity
-      ? this.conversationRepository.is_active_conversation(conversationEntity)
+      ? this.conversationState.isActiveConversation(conversationEntity)
       : false;
     const inConversationView = this.contentViewModelState.state() === ContentViewModel.STATE.CONVERSATION;
     const inMaximizedCall =

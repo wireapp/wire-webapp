@@ -17,7 +17,7 @@
  *
  */
 
-import type {TeamData} from '@wireapp/api-client/dist/team';
+import type {TeamData} from '@wireapp/api-client/src/team';
 
 import type {RootState} from '../reducer';
 import type {RegistrationDataState} from '../reducer/authReducer';

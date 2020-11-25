@@ -1,0 +1,58 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: '/app-config'
+    schedule:
+      interval: daily
+      time: '01:00'
+    open-pull-requests-limit: 99
+    reviewers:
+      - lipis
+    assignees:
+      - lipis
+    labels:
+      - "type: chore \U0001F9F9"
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '01:00'
+    open-pull-requests-limit: 99
+    reviewers:
+      - lipis
+    assignees:
+      - lipis
+    labels:
+      - "type: chore \U0001F9F9"
+    ignore:
+      - dependency-name: core-js
+        versions:
+          - '>= 3.a'
+          - '< 4'
+      - dependency-name: webrtc-adapter
+        versions:
+          - '>= 7.a'
+          - '< 8'
+  - package-ecosystem: npm
+    directory: '/server'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '01:00'
+    open-pull-requests-limit: 99
+    reviewers:
+      - lipis
+    assignees:
+      - lipis
+    labels:
+      - "type: chore \U0001F9F9"
+    ignore:
+      - dependency-name: geolite2
+        versions:
+          - '>= 3.a'
+          - '< 4'
+      - dependency-name: '@types/node'
+        versions:
+          - '>= 9.a'
+          - '< 10'

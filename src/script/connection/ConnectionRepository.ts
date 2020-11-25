@@ -17,16 +17,14 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
-import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/dist/event';
-import type {BackendEventType} from '@wireapp/api-client/dist/event/BackendEvent';
-import type {UserConnectionData} from '@wireapp/api-client/dist/user/data';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
+import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/src/event';
+import type {BackendEventType} from '@wireapp/api-client/src/event/BackendEvent';
+import type {UserConnectionData} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
-
 import {Logger, getLogger} from 'Util/Logger';
-
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import type {User} from '../entity/User';
@@ -91,17 +89,8 @@ export class ConnectionRepository {
    *
    * @param eventJson JSON data of 'user.connection' event
    * @param source Source of event
-   * @param showConversation Should the new conversation be opened?
    */
-  private async onUserConnection(
-    eventJson: UserConnectionData,
-    source: EventSource,
-    showConversation?: boolean,
-  ): Promise<void> {
-    if (!eventJson) {
-      throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
-    }
-
+  private async onUserConnection(eventJson: UserConnectionData, source: EventSource): Promise<void> {
     const connectionData = eventJson.connection;
 
     let connectionEntity = this.getConnectionByUserId(connectionData.to);
@@ -117,20 +106,18 @@ export class ConnectionRepository {
     await this.updateConnection(connectionEntity);
     const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
     if (shouldUpdateUser) {
-      this.userRepository.updateUserById(connectionEntity.userId);
+      await this.userRepository.updateUserById(connectionEntity.userId);
     }
-    this.sendNotification(connectionEntity, source, previousStatus);
-    amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity, showConversation);
+    await this.sendNotification(connectionEntity, source, previousStatus);
   }
 
   /**
    * Accept a connection request.
    * @param userEntity User to update connection with
-   * @param showConversation Show new conversation on success
    * @returns Promise that resolves when the connection request was accepted
    */
-  public acceptRequest(userEntity: User, showConversation: boolean = false): Promise<void> {
-    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
+  public acceptRequest(userEntity: User): Promise<void> {
+    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED);
   }
 
   /**
@@ -175,14 +162,13 @@ export class ConnectionRepository {
    * Create a connection request.
    *
    * @param userEntity User to connect to
-   * @param showConversation Should we open the new conversation?
    * @returns Promise that resolves when the connection request was successfully created
    */
-  public async createConnection(userEntity: User, showConversation: boolean = false): Promise<void> {
+  public async createConnection(userEntity: User): Promise<void> {
     try {
       const response = await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
-      return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
+      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {
       this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
     }
@@ -235,11 +221,10 @@ export class ConnectionRepository {
    * Unblock a user.
    *
    * @param userEntity User to unblock
-   * @param showConversation Show new conversation on success
    * @returns Promise that resolves when a user was unblocked
    */
-  public unblockUser(userEntity: User, showConversation = true): Promise<void> {
-    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED, showConversation);
+  public unblockUser(userEntity: User): Promise<void> {
+    return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED);
   }
 
   /**
@@ -271,32 +256,17 @@ export class ConnectionRepository {
   /**
    * Update the status of a connection.
    * @param userEntity User to update connection with
-   * @param connectionStatus Connection status
-   * @param showConversation Show conversation on success
+   * @param newStatus Connection status
    * @returns Promise that resolves when the connection status was updated
    */
-  private async updateStatus(
-    userEntity: User,
-    connectionStatus: ConnectionStatus,
-    showConversation = false,
-  ): Promise<void> {
-    if (!userEntity || !connectionStatus) {
-      this.logger.error('Missing parameter to update connection');
-      return Promise.reject(new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER));
-    }
-
+  private async updateStatus(userEntity: User, newStatus: ConnectionStatus): Promise<void> {
     const currentStatus = userEntity.connection().status();
-    if (currentStatus === connectionStatus) {
-      this.logger.error(`Connection status change to '${connectionStatus}' for '${userEntity.id}' is no change`);
-      return Promise.reject(new ConnectionError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER));
-    }
-
     try {
-      const response = await this.connectionService.putConnections(userEntity.id, connectionStatus);
+      const response = await this.connectionService.putConnections(userEntity.id, newStatus);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
-      return this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED, showConversation);
+      await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {
-      const logMessage = `Connection change from '${currentStatus}' to '${connectionStatus}' failed`;
+      const logMessage = `Connection change from '${currentStatus}' to '${newStatus}' failed`;
       this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${error.message}`, error);
     }
   }
@@ -308,11 +278,11 @@ export class ConnectionRepository {
    * @param source Source of event
    * @param previousStatus Previous connection status
    */
-  private sendNotification(
+  private async sendNotification(
     connectionEntity: ConnectionEntity,
     source: EventSource,
     previousStatus: ConnectionStatus,
-  ): void {
+  ): Promise<void> {
     // We accepted the connection request or unblocked the user
     const expectedPreviousStatus = [ConnectionStatus.BLOCKED, ConnectionStatus.PENDING];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
@@ -321,21 +291,20 @@ export class ConnectionRepository {
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
-      this.userRepository.getUserById(connectionEntity.userId).then(userEntity => {
-        const messageEntity = new MemberMessage();
-        messageEntity.user(userEntity);
+      const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
+      const messageEntity = new MemberMessage();
+      messageEntity.user(userEntity);
 
-        if (connectionEntity.isConnected()) {
-          const statusWasSent = previousStatus === ConnectionStatus.SENT;
-          messageEntity.memberMessageType = statusWasSent
-            ? SystemMessageType.CONNECTION_ACCEPTED
-            : SystemMessageType.CONNECTION_CONNECTED;
-        } else if (connectionEntity.isIncomingRequest()) {
-          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
-        }
+      if (connectionEntity.isConnected()) {
+        const statusWasSent = previousStatus === ConnectionStatus.SENT;
+        messageEntity.memberMessageType = statusWasSent
+          ? SystemMessageType.CONNECTION_ACCEPTED
+          : SystemMessageType.CONNECTION_CONNECTED;
+      } else if (connectionEntity.isIncomingRequest()) {
+        messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
+      }
 
-        amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
-      });
+      amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, messageEntity, connectionEntity);
     }
   }
 }

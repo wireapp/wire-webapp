@@ -20,7 +20,7 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
-import {USER_EVENT} from '@wireapp/api-client/dist/event';
+import {USER_EVENT} from '@wireapp/api-client/src/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';

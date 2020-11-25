@@ -24,7 +24,7 @@ import {AssetRemoteData} from './AssetRemoteData';
 import {AssetRepository, AssetUploadOptions} from './AssetRepository';
 import {EventMapper} from '../conversation/EventMapper';
 import {ValidationUtilError} from 'Util/ValidationUtil';
-import {AssetUploadData} from '@wireapp/api-client/dist/asset';
+import {AssetUploadData} from '@wireapp/api-client/src/asset';
 
 describe('AssetRepository', () => {
   let assetRepository: AssetRepository;

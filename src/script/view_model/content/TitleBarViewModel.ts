@@ -32,10 +32,11 @@ import {ContentViewModel} from '../ContentViewModel';
 import {CallingViewModel} from '../CallingViewModel';
 import {PanelViewModel} from '../PanelViewModel';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {UserRepository} from '../../user/UserRepository';
 import {Conversation} from '../../entity/Conversation';
 import {Call} from '../../calling/Call';
+import {container} from 'tsyringe';
+import {UserState} from '../../user/UserState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 // Parent: ContentViewModel
 export class TitleBarViewModel {
@@ -55,8 +56,8 @@ export class TitleBarViewModel {
     private readonly panelViewModel: PanelViewModel,
     readonly contentViewModel: ContentViewModel,
     private readonly callingRepository: CallingRepository,
-    private readonly conversationRepository: ConversationRepository,
-    private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.contentViewModel = contentViewModel;
 
@@ -65,11 +66,11 @@ export class TitleBarViewModel {
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), TIME_IN_MILLIS.SECOND);
 
-    this.conversationEntity = this.conversationRepository.active_conversation;
+    this.conversationEntity = this.conversationState.activeConversation;
     this.ConversationVerificationState = ConversationVerificationState;
 
     this.joinedCall = this.callingRepository.joinedCall;
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && !!this.joinedCall();

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,26 @@
  *
  */
 
-import {instantiateComponent} from '../../helper/knockoutHelpers';
+import React from 'react';
+import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
-import {User} from 'src/script/entity/User';
-import 'src/script/components/participantAvatar';
+export interface AvatarBackgroundProps {
+  backgroundColor?: string;
+  borderRadius?: string;
+}
 
-describe('participant-avatar', () => {
-  it("displays user's initials if no avatar is defined", () => {
-    const testInitials = 'PA';
-    const viewModel = {participant: new User()};
-    spyOn(viewModel.participant, 'initials').and.returnValue(testInitials);
-    return instantiateComponent('participant-avatar', viewModel).then(domContainer => {
-      expect(domContainer.querySelector('.avatar-initials').innerText).toBe(testInitials);
-    });
-  });
-});
+const AvatarBackground: React.FunctionComponent<AvatarBackgroundProps> = ({
+  borderRadius = '50%',
+  backgroundColor = 'currentColor',
+}) => (
+  <div
+    css={{
+      ...CSS_FILL_PARENT,
+      backgroundColor,
+      borderRadius,
+      transform: 'scale(0.9916)',
+    }}
+  />
+);
+
+export default AvatarBackground;
