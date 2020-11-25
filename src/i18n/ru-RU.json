@@ -627,7 +627,7 @@
   "modalConnectCancelSecondary": "Нет",
   "modalConversationClearAction": "Удалить",
   "modalConversationClearHeadline": "Удалить контент?",
-  "modalConversationClearMessage": "Это очистит историю бесед на всех ваших устройствах.",
+  "modalConversationClearMessage": "Это действие очистит историю бесед на всех ваших устройствах.",
   "modalConversationClearOption": "Также покинуть беседу",
   "modalConversationDeleteErrorHeadline": "Группа не удалена",
   "modalConversationDeleteErrorMessage": "Произошла ошибка при попытке удалить группу {{name}}. Попытайтесь снова, пожалуйста.",
