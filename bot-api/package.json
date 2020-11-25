@@ -30,7 +30,7 @@
     "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
     "demo:admin": "ts-node src/demo/admin.ts",
     "dist": "yarn clean && yarn build",
-    "test": "yarn build && yarn test:node && yarn clean",
+    "test": "yarn build && yarn test:node",
     "test:node": "nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test"
   },
