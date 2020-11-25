@@ -27,7 +27,6 @@ import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
 
-// TODO: Remove that and use the one from api-client
 export class TeamService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
 
