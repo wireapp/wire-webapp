@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.11.68](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.11.67...@wireapp/bot-api@7.11.68) (2020-11-25)
+
+
+### Bug Fixes
+
+* **bot-api:** Publish source files on npm ([#3343](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/issues/3343)) ([4aba0ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/commit/4aba0eec2d70e7ecafe6937f88d40f0e94a02c93))
+
+
+
+
+
 ## [7.11.67](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api/compare/@wireapp/bot-api@7.11.66...@wireapp/bot-api@7.11.67) (2020-11-24)
 
 **Note:** Version bump only for package @wireapp/bot-api

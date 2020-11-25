@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.8.27](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.8.26...@wireapp/proteus@9.8.27) (2020-11-25)
+
+
+### Bug Fixes
+
+* **bot-api:** Publish source files on npm ([#3343](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/3343)) ([4aba0ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/4aba0eec2d70e7ecafe6937f88d40f0e94a02c93))
+
+
+
+
+
 ## [9.8.26](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.8.25...@wireapp/proteus@9.8.26) (2020-11-10)
 
 

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@1.1.7...@wireapp/copy-config@1.1.8) (2020-11-25)
+
+
+### Bug Fixes
+
+* **bot-api:** Publish source files on npm ([#3343](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/3343)) ([4aba0ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/4aba0eec2d70e7ecafe6937f88d40f0e94a02c93))
+
+
+
+
+
 ## [1.1.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@1.1.6...@wireapp/copy-config@1.1.7) (2020-11-24)
 
 **Note:** Version bump only for package @wireapp/copy-config
