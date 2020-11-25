@@ -271,7 +271,7 @@ export class ConversationRepository {
 
   /**
    * Create a group conversation.
-   * @note Do not include the requestor among the users
+   * @note Do not include the requester among the users
    *
    * @param userEntities Users (excluding the creator) to be part of the conversation
    * @param groupName Name for the conversation
@@ -849,7 +849,7 @@ export class ConversationRepository {
    * @param userEntity User entity for whom to get the conversation
    * @returns Resolves with the conversation with requested user
    */
-  async get1To1Conversation(userEntity: User): Promise<Conversation | boolean> {
+  async get1To1Conversation(userEntity: User): Promise<Conversation | false> {
     const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.userState.self().teamId;
 
     if (inCurrentTeam) {
@@ -892,7 +892,7 @@ export class ConversationRepository {
       if (!isConversationNotFound) {
         throw error;
       }
-      return undefined;
+      return false;
     }
   }
 
@@ -949,10 +949,9 @@ export class ConversationRepository {
    *
    * @note If there is no conversation it will request it from the backend
    * @param connectionEntity Connections
-   * @param showConversation Open the new conversation
    * @returns Resolves when connection was mapped return value
    */
-  private mapConnection(connectionEntity: ConnectionEntity, showConversation: boolean) {
+  private mapConnection(connectionEntity: ConnectionEntity): Promise<void | Conversation> {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -972,15 +971,11 @@ export class ConversationRepository {
           conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
         }
 
-        this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {
-          if (showConversation) {
-            amplify.publish(WebAppEvents.CONVERSATION.SHOW, updatedConversationEntity);
-          }
-
-          this.conversationState.conversations.notifySubscribers();
-        });
-
-        return conversationEntity;
+        return this.updateParticipatingUserEntities(conversationEntity);
+      })
+      .then(updatedConversationEntity => {
+        this.conversationState.conversations.notifySubscribers();
+        return updatedConversationEntity;
       })
       .catch(error => {
         const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
@@ -1011,9 +1006,9 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param connectionEntities Connections entities
    */
-  map_connections(connectionEntities: ConnectionEntity[]) {
+  map_connections(connectionEntities: ConnectionEntity[]): Promise<Conversation | void>[] {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity, false));
+    return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
 
   /**
@@ -1120,7 +1115,7 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     offline = false,
     updateGuests = false,
-  ): Promise<void> {
+  ): Promise<Conversation> {
     const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
     userEntities.sort(sortUsersByPriority);
     conversationEntity.participating_user_ets(userEntities);
@@ -1128,6 +1123,8 @@ export class ConversationRepository {
     if (updateGuests) {
       conversationEntity.updateGuests();
     }
+
+    return conversationEntity;
   }
 
   //##############################################################################

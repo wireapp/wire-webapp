@@ -262,10 +262,10 @@
     "@types/qs" "*"
     "@types/range-parser" "*"
 
-"@types/express-sitemap-xml@1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-1.1.0.tgz#e1d37ed36158b8e824e4abb66b027b7b98c8018d"
-  integrity sha512-QTdXYdPz7sbpfeYtOCC1A1cq7fWdr2MCMTufZC7rLKHqzeh1yhR6ujNGWIxPZKpeeZA5UYLf/3C5x1+jZWSDTw==
+"@types/express-sitemap-xml@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-1.1.1.tgz#be4c20cd458e8d22cd742db34623100579cc1c49"
+  integrity sha512-D0zeqqRNrZnmYZxnWJLvZzMSVv13+AmsBOQUg9iDBOVPbYqCDwCFp52x/DxBwLVpUSAOFpbiFmue+U5NsmHB1A==
   dependencies:
     "@types/express" "*"
 
@@ -314,10 +314,10 @@
   dependencies:
     helmet "*"
 
-"@types/jasmine@3.6.1":
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.6.1.tgz#f8b95def0016411c58c7adb4791dff29bc62992c"
-  integrity sha512-eeSCVhBsgwHNS1FmaMu4zrLxfykCTWJMLFZv7lmyrZQjw7foUUXoPu4GukSN9v7JvUw7X+/aDH3kCaymirBSTg==
+"@types/jasmine@3.6.2":
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/@types/jasmine/-/jasmine-3.6.2.tgz#02f64450016f7de70f145d698be311136d7c6374"
+  integrity sha512-AzfesNFLvOs6Q1mHzIsVJXSeUnqVh4ZHG8ngygKJfbkcSLwzrBVm/LKa+mR8KrOfnWtUL47112gde1MC0IXqpQ==
 
 "@types/mime@*":
   version "2.0.1"
@@ -2586,10 +2586,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@4.0.5:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.5.tgz#ae9dddfd1069f1cb5beb3ef3b2170dd7c1332389"
-  integrity sha512-ywmr/VrTVCmNTJ6iV2LwIrfG1P+lv6luD8sUJs+2eI9NLGigaN+nUQc13iHqisq7bra9lnmUSYqbJvegraBOPQ==
+typescript@4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.2.tgz#6369ef22516fe5e10304aae5a5c4862db55380e9"
+  integrity sha512-thGloWsGH3SOxv1SoY7QojKi0tc+8FnOmiarEGMbd/lar7QOEd3hvlx3Fp5y6FlDUGl9L+pd4n2e+oToGMmhRQ==
 
 typpy@2.3.11:
   version "2.3.11"

@@ -271,10 +271,10 @@ export class BackupRepository {
 
     const importedEntities = await this.importHistoryConversations(conversationEntities, progressCallback);
     await this.importHistoryEvents(eventEntities, progressCallback);
-    this.conversationRepository.updateConversations(importedEntities);
-    this.conversationRepository.map_connections(this.connectionRepository.connectionEntities());
+    await this.conversationRepository.updateConversations(importedEntities);
+    await Promise.all(this.conversationRepository.map_connections(this.connectionRepository.connectionEntities()));
     // doesn't need to be awaited
-    this.conversationRepository.checkForDeletedConversations();
+    void this.conversationRepository.checkForDeletedConversations();
   }
 
   private async importHistoryConversations(

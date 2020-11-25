@@ -53,12 +53,8 @@ export class ActionsViewModel {
     this.modalsViewModel = mainViewModel.modals;
   }
 
-  acceptConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> => {
-    if (!userEntity) {
-      return Promise.reject();
-    }
-
-    return this.connectionRepository.acceptRequest(userEntity, showConversation);
+  acceptConnectionRequest = (userEntity: User): Promise<void> => {
+    return this.connectionRepository.acceptRequest(userEntity);
   };
 
   archiveConversation = (conversationEntity: Conversation): Promise<void> => {
@@ -76,9 +72,6 @@ export class ActionsViewModel {
    * @returns Resolves when the user was blocked
    */
   blockUser = (userEntity: User, hideConversation?: boolean, nextConversationEntity?: Conversation): Promise<void> => {
-    if (!userEntity) {
-      return Promise.reject();
-    }
     // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
     return new Promise(resolve => {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -300,14 +293,16 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
-  open1to1Conversation = async (userEntity: User): Promise<void> => {
-    if (!userEntity) {
-      return Promise.reject();
-    }
+  getOrCreate1to1Conversation = async (userEntity: User): Promise<Conversation> => {
     const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
-    if (typeof conversationEntity !== 'boolean') {
-      this.openConversation(conversationEntity);
+    if (conversationEntity) {
+      return conversationEntity;
     }
+    throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.id}".`);
+  };
+
+  open1to1Conversation = async (conversationEntity: Conversation): Promise<void> => {
+    return this.openConversation(conversationEntity);
   };
 
   open1to1ConversationWithService = (serviceEntity: ServiceEntity): Promise<void> => {
@@ -326,18 +321,16 @@ export class ActionsViewModel {
     return Promise.resolve().then(() => this.openConversation(conversationEntity));
   };
 
-  private readonly openConversation = (conversationEntity?: Conversation): void => {
-    if (conversationEntity) {
-      if (conversationEntity.is_archived()) {
-        this.conversationRepository.unarchiveConversation(conversationEntity, true);
-      }
-
-      if (conversationEntity.is_cleared()) {
-        conversationEntity.cleared_timestamp(0);
-      }
-
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+  private readonly openConversation = (conversationEntity: Conversation): void => {
+    if (conversationEntity.is_archived()) {
+      this.conversationRepository.unarchiveConversation(conversationEntity, true);
     }
+
+    if (conversationEntity.is_cleared()) {
+      conversationEntity.cleared_timestamp(0);
+    }
+
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   };
 
   removeFromConversation = async (conversationEntity: Conversation, userEntity: User): Promise<void> => {
@@ -373,11 +366,10 @@ export class ActionsViewModel {
 
   /**
    * @param userEntity User to connect to
-   * @param showConversation Should we open the new conversation?
    * @returns Resolves when the connection request was successfully created
    */
-  sendConnectionRequest = (userEntity: User, showConversation: boolean): Promise<void> => {
-    return this.connectionRepository.createConnection(userEntity, showConversation);
+  sendConnectionRequest = (userEntity: User): Promise<void> => {
+    return this.connectionRepository.createConnection(userEntity);
   };
 
   toggleMuteConversation = (conversationEntity: Conversation): void => {
@@ -391,20 +383,15 @@ export class ActionsViewModel {
 
   /**
    * @param userEntity User to unblock
-   * @param showConversation Show new conversation on success
    * @returns Resolves when the user was unblocked
    */
-  unblockUser = (userEntity: User, showConversation?: boolean): Promise<void> => {
-    if (!userEntity) {
-      return Promise.reject();
-    }
-
+  unblockUser = (userEntity: User): Promise<void> => {
     return new Promise(resolve => {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         primaryAction: {
           action: () => {
             this.connectionRepository
-              .unblockUser(userEntity, showConversation)
+              .unblockUser(userEntity)
               .then(() => this.conversationRepository.get1To1Conversation(userEntity))
               .then(conversationEntity => {
                 resolve();
