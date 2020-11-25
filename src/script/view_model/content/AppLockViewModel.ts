@@ -50,6 +50,7 @@ const APP_LOCK_STORAGE = 'app_lock';
 const getInactivityTimeout = () => {
   const teamState = container.resolve(TeamState);
   const appLock = teamState.teamFeatures()['app-lock'];
+  console.log('#### appLock', appLock);
   if (appLock.status === 'enabled') {
     return appLock.config.inactivity_timeout_secs;
   }
