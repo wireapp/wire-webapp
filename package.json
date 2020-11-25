@@ -64,7 +64,6 @@
   "description": "Wire API Client to send and receive data.",
   "files": [
     "src",
-    "!src/**/*.test.*",
     "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
