@@ -14,8 +14,9 @@
   },
   "files": [
     "src",
+    "!src/**/*.test.*",
     "!src/**/!(*.d).ts",
-    "!src/test/**/*"
+    "!src/test"
   ],
   "keywords": [
     "array",

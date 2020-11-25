@@ -21,8 +21,8 @@
   },
   "files": [
     "src",
-    "!src/**/!(*.d).ts",
-    "!src/**/*.test.js"
+    "!src/**/*.test.*",
+    "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
   "main": "src/main/index",

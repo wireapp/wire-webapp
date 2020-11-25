@@ -12,6 +12,7 @@
   },
   "files": [
     "src",
+    "!src/**/*.test.*",
     "!src/**/!(*.d).ts"
   ],
   "license": "GPL-3.0",
