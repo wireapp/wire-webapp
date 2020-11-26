@@ -913,10 +913,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@wireapp/commons@3.8.7":
-  version "3.8.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.7.tgz#e4d6e8eba9115d9e209aa4d1a800f485e48fb6d9"
-  integrity sha512-l/pQJqtUwR8ADyBvHXdZpmnjTRqvSDVaHbeUETojVAO8X+uc/GCdL4hpicoLHMXkz1eMTGok8St6V4n2ntMpzg==
+"@wireapp/commons@3.8.14":
+  version "3.8.14"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-3.8.14.tgz#76c1856044b8c938aff7ee4de8e6cbc8254df6da"
+  integrity sha512-R61YfKrUcgFoJs/1g8ukNSIP+bAQAU7s0LVoL4XXdB5n+BcRlTWKogavAJ9ISgmFKwomTBsXLnlmsL6+DmGfTw==
   dependencies:
     "@types/fs-extra" "8.1.0"
     "@types/node" "~12"
