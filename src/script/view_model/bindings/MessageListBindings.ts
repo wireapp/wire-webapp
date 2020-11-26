@@ -118,13 +118,14 @@ ko.bindingHandlers.infinite_scroll = {
       }
     };
 
-    const onMouseWheel = ({currentTarget: element}: {currentTarget: HTMLElement}) => {
+    const onMouseWheel = ({currentTarget, deltaY}: WheelEvent) => {
+      const element = currentTarget as HTMLElement;
       const isScrollable = element.scrollHeight > element.clientHeight;
       if (isScrollable) {
         // if the element is scrollable, the scroll event will take the relay
         return true;
       }
-      const isScrollingUp = (event as any).deltaY > 0;
+      const isScrollingUp = deltaY > 0;
       if (isScrollingUp) {
         return onHitTop();
       }
@@ -132,11 +133,11 @@ ko.bindingHandlers.infinite_scroll = {
     };
 
     scrollingElement.addEventListener('scroll', onScroll);
-    $(scrollingElement).on('mousewheel', onMouseWheel);
+    scrollingElement.addEventListener('wheel', onMouseWheel);
 
     ko.utils.domNodeDisposal.addDisposeCallback(scrollingElement, () => {
       scrollingElement.removeEventListener('scroll', onScroll);
-      $(scrollingElement).off('mousewheel', onMouseWheel);
+      scrollingElement.removeEventListener('wheel', onMouseWheel);
     });
   },
 };

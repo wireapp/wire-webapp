@@ -1,8 +1,9 @@
 {
   "env": {
-    "jasmine": true
+    "jasmine": true,
+    "jest/globals": true
   },
-  "extends": ["@wireapp/eslint-config"],
+  "extends": ["@wireapp/eslint-config", "plugin:jest/recommended"],
   "globals": {
     "$": true,
     "amplify": true,
@@ -13,7 +14,8 @@
     "payload": true,
     "sinon": true,
     "wire": true,
-    "z": true
+    "z": true,
+    "RTCAudioSource": true
   },
   "ignorePatterns": [".git/", "docs/", "node_modules/", "resource/", "server/bin/", "server/dist/", "server/node_modules/", "src/ext/", "src/script/localization/**/webapp*.js", "src/worker/"],
   "overrides": [
@@ -37,6 +39,11 @@
   ],
   "rules": {
     "id-length": "off",
-    "no-magic-numbers": "off"
+    "no-magic-numbers": "off",
+    "jest/no-jasmine-globals": "off",
+    "jest/no-identical-title": "warn",
+    "jest/no-done-callback": "warn",
+    "jest/no-disabled-tests": "warn",
+    "jest/no-conditional-expect": "warn"
   }
 }

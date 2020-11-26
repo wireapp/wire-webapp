@@ -671,7 +671,7 @@ export class ConversationRepository {
    * @note To reduce the number of backend calls we merge the user IDs of all conversations first.
    * @param conversationEntities Array of conversation entities to be updated
    */
-  public async updateConversations(conversationEntities: Conversation[]) {
+  public async updateConversations(conversationEntities: Conversation[]): Promise<void> {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
     const userIds = flatten(mapOfUserIds);
 

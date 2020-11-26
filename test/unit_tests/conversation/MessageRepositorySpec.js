@@ -127,7 +127,7 @@ describe('MessageRepository', () => {
   });
 
   describe('sendTextWithLinkPreview', () => {
-    xit('sends ephemeral message (within the range [1 second, 1 year])', async () => {
+    it.skip('sends ephemeral message (within the range [1 second, 1 year])', async () => {
       const conversation = generate_conversation();
       testFactory.conversation_repository.conversationState.conversations([conversation]);
 
@@ -228,21 +228,18 @@ describe('MessageRepository', () => {
       spyOn(testFactory.message_repository, 'sendGenericMessage').and.returnValue(Promise.resolve());
     });
 
-    it('should not delete other users messages', done => {
+    it('should not delete other users messages', async () => {
       const user_et = new User();
       user_et.isMe = false;
       const message_to_delete_et = new Message(createRandomUuid());
       message_to_delete_et.user(user_et);
       conversationEntity.add_message(message_to_delete_et);
 
-      testFactory.message_repository
-        .deleteMessageForEveryone(conversationEntity, message_to_delete_et)
-        .then(done.fail)
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(ConversationError));
-          expect(error.type).toBe(ConversationError.TYPE.WRONG_USER);
-          done();
-        });
+      await expect(
+        testFactory.message_repository.deleteMessageForEveryone(conversationEntity, message_to_delete_et),
+      ).rejects.toMatchObject({
+        type: ConversationError.TYPE.WRONG_USER,
+      });
     });
 
     it('should send delete and deletes message for own messages', () => {

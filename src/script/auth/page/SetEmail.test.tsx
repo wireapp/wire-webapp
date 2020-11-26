@@ -32,6 +32,8 @@ import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {History} from 'history';
 
+jest.mock('../util/SVGProvider');
+
 class SetEmailPage {
   private readonly driver: ReactWrapper;
 
@@ -67,18 +69,14 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getEmailInput().exists()).withContext('Email input should be present').toBe(true);
+    expect(setEmailPage.getEmailInput().exists()).toBe(true);
 
-    expect(setEmailPage.getVerifyEmailButton().exists()).withContext('Submit button should be present').toBe(true);
+    expect(setEmailPage.getVerifyEmailButton().exists()).toBe(true);
 
-    expect(setEmailPage.getVerifyEmailButton().props().disabled)
-      .withContext('Submit button should be disabled')
-      .toBe(true);
+    expect(setEmailPage.getVerifyEmailButton().props().disabled).toBe(true);
     setEmailPage.enterEmail('e');
 
-    expect(setEmailPage.getVerifyEmailButton().props().disabled)
-      .withContext('Submit button should be enabled')
-      .toBe(false);
+    expect(setEmailPage.getVerifyEmailButton().props().disabled).toBe(false);
   });
 
   it('handles invalid email', async () => {
@@ -93,7 +91,7 @@ describe('SetEmail', () => {
       }),
     );
 
-    expect(setEmailPage.getErrorMessage().exists()).withContext('Shows no error').toBe(false);
+    expect(setEmailPage.getErrorMessage().exists()).toBe(false);
 
     setEmailPage.enterEmail('e');
     setEmailPage.clickVerifyEmailButton();
@@ -101,9 +99,7 @@ describe('SetEmail', () => {
     await waitForExpect(() => {
       setEmailPage.update();
 
-      expect(setEmailPage.getErrorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH).exists())
-        .withContext('Shows invalid email error')
-        .toBe(true);
+      expect(setEmailPage.getErrorMessage(ValidationError.FIELD.EMAIL.TYPE_MISMATCH).exists()).toBe(true);
     });
   });
 
@@ -126,6 +122,6 @@ describe('SetEmail', () => {
     setEmailPage.enterEmail(` ${email} `);
     setEmailPage.clickVerifyEmailButton();
 
-    expect(actionRoot.selfAction.doSetEmail).withContext('action was called').toHaveBeenCalledWith(email);
+    expect(actionRoot.selfAction.doSetEmail).toHaveBeenCalledWith(email);
   });
 });

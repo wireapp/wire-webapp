@@ -58,9 +58,9 @@ describe('WindowTitleViewModel', () => {
   });
 
   describe('initiateTitleUpdates', () => {
-    beforeEach(() => jasmine.clock().install());
+    beforeEach(() => jest.useFakeTimers());
 
-    afterEach(() => jasmine.clock().uninstall());
+    afterEach(() => jest.useRealTimers());
 
     it('sets a default title when there is an unknown state', () => {
       title_view_model.contentState('invalid or unknown');
@@ -240,7 +240,7 @@ describe('WindowTitleViewModel', () => {
 
       tests.forEach(({connections, expected}) => {
         title_view_model.userState.connectRequests(connections);
-        jasmine.clock().tick(WindowTitleViewModel.TITLE_DEBOUNCE);
+        jest.advanceTimersByTime(WindowTitleViewModel.TITLE_DEBOUNCE);
 
         expect(window.document.title).toBe(expected);
       });

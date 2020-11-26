@@ -263,6 +263,7 @@ describe('renderMessage', () => {
         return mentionEntity;
       });
 
+      // eslint-disable-next-line jest/valid-title
       it(testCase, () => {
         const result = renderMessage(text, 'self-id', mentionEntities);
 
