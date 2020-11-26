@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.43.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.42.3...@wireapp/react-ui-kit@7.43.0) (2020-11-26)
+
+
+### Features
+
+* **react-ui-kit:** Add TrashCross, Sign & RecordBold icons ([#3347](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3347)) ([448e4b1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/448e4b15934adf3502f8efe61e47da1f7728ba52))
+
+
+
+
+
 ## [7.42.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.42.2...@wireapp/react-ui-kit@7.42.3) (2020-11-25)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
