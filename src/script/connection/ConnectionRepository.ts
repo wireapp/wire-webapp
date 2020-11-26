@@ -24,11 +24,10 @@ import type {UserConnectionData} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import type {User} from '../entity/User';
-import {BaseError} from '../error/BaseError';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 import {SystemMessageType} from '../message/SystemMessageType';
@@ -36,7 +35,6 @@ import type {UserRepository} from '../user/UserRepository';
 import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
 import type {ConnectionService} from './ConnectionService';
-import {ConnectionError} from '../error/ConnectionError';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -246,10 +244,7 @@ export class ConnectionRepository {
    * @returns Promise that resolves when all connections have been updated
    */
   private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
-    if (!connectionEntities.length) {
-      throw new ConnectionError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
-    }
-    this.connectionEntities.push(...connectionEntities);
+    connectionEntities.forEach(connectionEntity => this.addConnectionEntity(connectionEntity));
     await this.userRepository.updateUsersFromConnections(connectionEntities);
     return this.connectionEntities();
   }
