@@ -227,15 +227,16 @@ export class ConnectionRepository {
     return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED);
   }
 
+  addConnectionEntity(connectionEntity: ConnectionEntity): void {
+    this.connectionEntities.push(connectionEntity);
+  }
+
   /**
    * Update user matching a given connection.
    * @returns Promise that resolves when the connection have been updated
    */
   private async updateConnection(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
-    if (!connectionEntity) {
-      throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
-    }
-    this.connectionEntities.push(connectionEntity);
+    this.addConnectionEntity(connectionEntity);
     const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
     return userEntity.connection(connectionEntity);
   }

@@ -55,7 +55,7 @@ describe('ConnectionRepository', () => {
       userEntity = new User(userId);
       userEntity.connection(connectionEntity);
 
-      connectionRepository.connectionEntities.push(connectionEntity);
+      connectionRepository.addConnectionEntity(connectionEntity);
       spyOn(connectionRepository, 'updateStatus').and.returnValue(Promise.resolve());
     });
 
@@ -83,11 +83,11 @@ describe('ConnectionRepository', () => {
     beforeEach(() => {
       firstConnectionEntity = new ConnectionEntity();
       firstConnectionEntity.conversationId = createRandomUuid();
-      connectionRepository.connectionEntities.push(firstConnectionEntity);
+      connectionRepository.addConnectionEntity(firstConnectionEntity);
 
       secondConnectionEntity = new ConnectionEntity();
       secondConnectionEntity.conversationId = createRandomUuid();
-      connectionRepository.connectionEntities.push(secondConnectionEntity);
+      connectionRepository.addConnectionEntity(secondConnectionEntity);
     });
 
     it('should return the expected connection for the given conversation id', () => {

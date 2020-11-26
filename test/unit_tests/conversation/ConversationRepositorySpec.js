@@ -770,7 +770,7 @@ describe('ConversationRepository', () => {
         const connectionEntity = new ConnectionEntity();
         connectionEntity.conversationId = conversation_et.id;
         connectionEntity.status(ConnectionStatus.PENDING);
-        testFactory.connection_repository.connectionEntities.push(connectionEntity);
+        testFactory.connection_repository.addConnectionEntity(connectionEntity);
 
         spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 
