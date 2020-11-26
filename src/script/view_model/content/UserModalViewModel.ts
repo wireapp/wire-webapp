@@ -63,13 +63,7 @@ export class UserModalViewModel {
     this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
   }
 
-  onUserAction = (userAction: Actions): void => {
-    switch (userAction) {
-      case Actions.UNBLOCK:
-      case Actions.SEND_REQUEST:
-        this.actionsViewModel.open1to1Conversation(this.user());
-        break;
-    }
+  onUserAction = (action: Actions): void => {
     this.hide();
   };
 
