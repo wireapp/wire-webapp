@@ -21,8 +21,8 @@
 import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-export const EnterIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={24} realHeight={18} {...props}>
-    <path d="M11.643 7l-1.5 1.4 2.786 2.6H2v2h10.929l-2.786 2.6 1.5 1.4L17 12l-5.357-5zM21.8 19H13v2h8.8c1.21 0 2.2-.9 2.2-2V5c0-1.1-.99-2-2.2-2H13v2h8.8v14z" />
+export const TrashCrossIcon = (props: SVGIconProps) => (
+  <SVGIcon realWidth={20} realHeight={18} {...props}>
+    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4h-3.5z" />
   </SVGIcon>
 );

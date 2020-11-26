@@ -53,6 +53,7 @@ import {
   PlusIcon,
   ProfileIcon,
   RecordIcon,
+  RecordBoldIcon,
   RecordPendingIcon,
   ReloadIcon,
   ScreenshareIcon,
@@ -60,11 +61,13 @@ import {
   ServicesIcon,
   SettingsIcon,
   SpeakerIcon,
+  ShowIcon,
+  SignIcon,
   TeamIcon,
   TimedIcon,
   TrashIcon,
+  TrashCrossIcon,
   HideIcon,
-  ShowIcon,
   TriangleIcon,
   TwitterIcon,
   WireIcon,
@@ -109,6 +112,7 @@ const icons = [
   PlusIcon,
   ProfileIcon,
   RecordIcon,
+  RecordBoldIcon,
   RecordPendingIcon,
   ReloadIcon,
   ScreenshareIcon,
@@ -116,12 +120,14 @@ const icons = [
   ServicesIcon,
   SettingsIcon,
   SpeakerIcon,
+  ShowIcon,
+  SignIcon,
   TeamIcon,
   TimedIcon,
   TrashIcon,
+  TrashCrossIcon,
   TriangleIcon,
   HideIcon,
-  ShowIcon,
   WireIcon,
 ];
 
@@ -148,7 +154,7 @@ const brandIcons = [
     }}
   >
     {icons.map((Icon, index) => (
-      <span key={index} title={Icon.name}>
+      <span key={index} title={Icon.name} style={{border: '1px solid gray'}}>
         <Icon height={32} width={32} />
       </span>
     ))}

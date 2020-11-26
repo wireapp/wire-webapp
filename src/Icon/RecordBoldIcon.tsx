@@ -21,8 +21,28 @@
 import {jsx} from '@emotion/core';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-export const EnterIcon = (props: SVGIconProps) => (
-  <SVGIcon realWidth={24} realHeight={18} {...props}>
-    <path d="M11.643 7l-1.5 1.4 2.786 2.6H2v2h10.929l-2.786 2.6 1.5 1.4L17 12l-5.357-5zM21.8 19H13v2h8.8c1.21 0 2.2-.9 2.2-2V5c0-1.1-.99-2-2.2-2H13v2h8.8v14z" />
+export const RecordBoldIcon = ({color, ...props}: SVGIconProps) => (
+  <SVGIcon realWidth={20} realHeight={18} color={color} {...props}>
+    <path fill="none" d="M0 0H24V24H0z" />
+    <circle
+      fill="none"
+      cx="10"
+      cy="10"
+      r="9"
+      css={theme => ({
+        stroke: theme.general.color || color,
+      })}
+      strokeWidth="2"
+    />
+    <circle
+      cx="10"
+      cy="10"
+      r="4"
+      css={theme => ({
+        fill: theme.general.color || color,
+        stroke: theme.general.color || color,
+      })}
+      strokeWidth="2"
+    />
   </SVGIcon>
 );
