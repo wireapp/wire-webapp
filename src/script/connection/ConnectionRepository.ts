@@ -41,7 +41,7 @@ export class ConnectionRepository {
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
   private readonly connectionMapper: ConnectionMapper;
-  public readonly connectionEntities: ko.ObservableArray<ConnectionEntity>;
+  public readonly connectionEntities: ko.Observable<{[userId: string]: ConnectionEntity}>;
 
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
@@ -56,7 +56,7 @@ export class ConnectionRepository {
     this.logger = getLogger('ConnectionRepository');
 
     this.connectionMapper = new ConnectionMapper();
-    this.connectionEntities = ko.observableArray([]);
+    this.connectionEntities = ko.observable({});
 
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
@@ -176,7 +176,7 @@ export class ConnectionRepository {
    * Get a connection for a user ID.
    */
   private getConnectionByUserId(userId: string): ConnectionEntity {
-    return this.connectionEntities().find(connectionEntity => connectionEntity.userId === userId);
+    return this.connectionEntities()[userId];
   }
 
   /**
@@ -185,7 +185,9 @@ export class ConnectionRepository {
    * @returns User connection entity
    */
   getConnectionByConversationId(conversationId: string): ConnectionEntity {
-    return this.connectionEntities().find(connectionEntity => connectionEntity.conversationId === conversationId);
+    const connectionEntities = Object.values(this.connectionEntities());
+    const match = connectionEntities.find(connectionEntity => connectionEntity.conversationId === conversationId);
+    return match ? this.getConnectionByUserId(match.userId) : undefined;
   }
 
   /**
@@ -199,7 +201,9 @@ export class ConnectionRepository {
     try {
       const connectionData = await this.connectionService.getConnections();
       const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
-      return newConnectionEntities.length ? this.updateConnections(newConnectionEntities) : this.connectionEntities();
+      return newConnectionEntities.length
+        ? this.updateConnections(newConnectionEntities)
+        : Object.values(this.connectionEntities());
     } catch (error) {
       this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
       throw error;
@@ -226,7 +230,7 @@ export class ConnectionRepository {
   }
 
   addConnectionEntity(connectionEntity: ConnectionEntity): void {
-    this.connectionEntities.push(connectionEntity);
+    this.connectionEntities()[connectionEntity.userId] = connectionEntity;
   }
 
   /**
@@ -246,7 +250,7 @@ export class ConnectionRepository {
   private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
     connectionEntities.forEach(connectionEntity => this.addConnectionEntity(connectionEntity));
     await this.userRepository.updateUsersFromConnections(connectionEntities);
-    return this.connectionEntities();
+    return Object.values(this.connectionEntities());
   }
 
   /**
