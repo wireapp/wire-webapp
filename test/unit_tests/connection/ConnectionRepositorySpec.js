@@ -40,7 +40,7 @@ describe('ConnectionRepository', () => {
   });
 
   afterEach(() => {
-    connectionRepository.connectionEntities.removeAll();
+    connectionRepository.connectionEntities({});
     server.restore();
   });
 
@@ -55,7 +55,7 @@ describe('ConnectionRepository', () => {
       userEntity = new User(userId);
       userEntity.connection(connectionEntity);
 
-      connectionRepository.connectionEntities.push(connectionEntity);
+      connectionRepository.addConnectionEntity(connectionEntity);
       spyOn(connectionRepository, 'updateStatus').and.returnValue(Promise.resolve());
     });
 
@@ -83,11 +83,13 @@ describe('ConnectionRepository', () => {
     beforeEach(() => {
       firstConnectionEntity = new ConnectionEntity();
       firstConnectionEntity.conversationId = createRandomUuid();
-      connectionRepository.connectionEntities.push(firstConnectionEntity);
+      firstConnectionEntity.userId = createRandomUuid();
+      connectionRepository.addConnectionEntity(firstConnectionEntity);
 
       secondConnectionEntity = new ConnectionEntity();
       secondConnectionEntity.conversationId = createRandomUuid();
-      connectionRepository.connectionEntities.push(secondConnectionEntity);
+      secondConnectionEntity.userId = createRandomUuid();
+      connectionRepository.addConnectionEntity(secondConnectionEntity);
     });
 
     it('should return the expected connection for the given conversation id', () => {
@@ -101,28 +103,21 @@ describe('ConnectionRepository', () => {
   });
 
   describe('getConnections', () => {
-    it('should return the connected users', async () => {
+    it('de-duplicates connection requests', async () => {
+      const connectionRequest = {
+        conversation: '45c8f986-6c8f-465b-9ac9-bd5405e8c944',
+        from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+        last_update: '2015-01-07T16:08:36.537Z',
+        message: `Hi Jane Doe,\nLet's connect.\nJohn Doe`,
+        status: ConnectionStatus.ACCEPTED,
+        to: '7025598b-ffac-4993-8a81-af3f35b7147f',
+      };
+
       const connectionServiceSpy = {
-        getConnections: jest.fn().mockImplementation(() =>
-          Promise.resolve([
-            {
-              conversation: '45c8f986-6c8f-465b-9ac9-bd5405e8c944',
-              from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
-              last_update: '2015-01-07T16:08:36.537Z',
-              message: `Hi Jane Doe,\nLet's connect.\nJohn Doe`,
-              status: ConnectionStatus.ACCEPTED,
-              to: '7025598b-ffac-4993-8a81-af3f35b7147f',
-            },
-            {
-              conversation: '45c8f986-6c8f-465b-9ac9-bd5405e8c944',
-              from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
-              last_update: '2015-01-07T16:08:36.537Z',
-              message: `Hi Jane Doe,\nLet's connect.\nJohn Doe`,
-              status: ConnectionStatus.ACCEPTED,
-              to: '7025598b-ffac-4993-8a81-af3f35b7147f',
-            },
-          ]),
-        ),
+        getConnections: jest.fn().mockImplementation(() => {
+          // Return request and duplicate
+          return Promise.resolve([connectionRequest, connectionRequest]);
+        }),
       };
 
       const userRepoSpy = {
@@ -132,11 +127,11 @@ describe('ConnectionRepository', () => {
       const connectionRepo = new ConnectionRepository(connectionServiceSpy, userRepoSpy);
 
       await connectionRepo.getConnections();
-      expect(connectionRepo.connectionEntities().length).toBe(2);
-      const [firstConnectionEntity, secondConnectionEntity] = connectionRepo.connectionEntities();
 
-      expect(firstConnectionEntity.status()).toEqual(ConnectionStatus.ACCEPTED);
-      expect(secondConnectionEntity.conversationId).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
+      const connectionEntities = Object.values(connectionRepo.connectionEntities());
+      expect(connectionEntities.length).toBe(1);
+      expect(connectionEntities[0].status()).toEqual(connectionRequest.status);
+      expect(connectionEntities[0].conversationId).toEqual(connectionRequest.conversation);
     });
   });
 });
