@@ -789,7 +789,7 @@ export class MessageRepository {
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
 
     try {
-      const response = await this.sendGenericMessage(eventInfoEntity);
+      const response = await this.sendGenericMessage(eventInfoEntity, false);
       this.logger.info(`Sent info about session reset to client '${clientId}' of user '${userId}'`);
       return response;
     } catch (error) {
@@ -851,7 +851,7 @@ export class MessageRepository {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
 
-        return this.sendGenericMessage(eventInfoEntity);
+        return this.sendGenericMessage(eventInfoEntity, false);
       });
     });
   }
@@ -962,7 +962,7 @@ export class MessageRepository {
         return this.create_recipients(conversationId, false, userIds).then(recipients => {
           const options = {precondition, recipients};
           const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-          this.sendGenericMessage(eventInfoEntity);
+          this.sendGenericMessage(eventInfoEntity, false);
         });
       });
       return this._delete_message_by_id(conversationEntity, messageId);
@@ -1092,7 +1092,7 @@ export class MessageRepository {
     return this.messageSender.queueMessage(async () => {
       const recipients = await this.create_recipients(eventInfoEntity.conversationId);
       eventInfoEntity.updateOptions({recipients});
-      return this.sendGenericMessage(eventInfoEntity);
+      return this.sendGenericMessage(eventInfoEntity, false);
     });
   }
 
@@ -1175,9 +1175,9 @@ export class MessageRepository {
    * @param skipLegalHold Skip the legal hold detection
    * @returns Resolves when the message was sent
    */
-  private async sendGenericMessage(eventInfoEntity: EventInfoEntity, skipLegalHold = false): Promise<ClientMismatch> {
+  private async sendGenericMessage(eventInfoEntity: EventInfoEntity, skipLegalHold: boolean): Promise<ClientMismatch> {
     try {
-      await this.grantOutgoingMessage(eventInfoEntity, undefined, skipLegalHold);
+      await this.grantOutgoingMessage(eventInfoEntity, null, false, skipLegalHold);
       const sendAsExternal = await this.shouldSendAsExternal(eventInfoEntity);
       if (sendAsExternal) {
         return this.sendExternalGenericMessage(eventInfoEntity);
@@ -1241,8 +1241,9 @@ export class MessageRepository {
 
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
-    userIds: string[],
-    skipLegalHold = false,
+    userIds: string[] | null,
+    skipUpdateClients: boolean,
+    skipLegalHold: boolean,
   ): Promise<boolean> {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
@@ -1285,7 +1286,9 @@ export class MessageRepository {
     if (!skipLegalHold) {
       const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
       const localLegalHoldStatus = conversationEntity.legalHoldStatus();
-      await this.updateAllClients(conversationEntity, !isMessageEdit);
+      if (!skipUpdateClients) {
+        await this.updateAllClients(conversationEntity, !isMessageEdit);
+      }
       const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
 
       const {genericMessage} = eventInfoEntity;
@@ -1558,7 +1561,7 @@ export class MessageRepository {
             eventInfoEntity.updateOptions({recipients});
             return eventInfoEntity;
           });
-      return recipientsPromise.then(infoEntity => this.sendGenericMessage(infoEntity));
+      return recipientsPromise.then(infoEntity => this.sendGenericMessage(infoEntity, false));
     });
   }
 
@@ -1660,7 +1663,7 @@ export class MessageRepository {
       this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
       return response;
     } catch (axiosError) {
-      const error = axiosError.response?.data;
+      const error: ClientMismatch & BackendClientError = axiosError.response?.data;
       const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
       if (isUnknownClient) {
         this.clientRepository.removeLocalClient();
@@ -1678,7 +1681,9 @@ export class MessageRepository {
       );
 
       const userIds = Object.keys(error.missing);
-      await this.grantOutgoingMessage(eventInfoEntity, userIds);
+      // We can skip updating all clients in `grantOutgoingMessage`
+      // because we already updated them in `onClientMismatch`:  ⤵️
+      await this.grantOutgoingMessage(eventInfoEntity, userIds, true, false);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
