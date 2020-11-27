@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [11.34.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.34.6...@wireapp/api-client@11.34.7) (2020-11-27)
+
+
+### Bug Fixes
+
+* **api-client:** Adopting backend routing fix for /features endpoint ([5509b2e](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/5509b2e5c4a75e941d4a6518ce24452a6b4d3d70))
+
+
+
+
+
 ## [11.34.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.34.5...@wireapp/api-client@11.34.6) (2020-11-26)
 
 **Note:** Version bump only for package @wireapp/api-client
