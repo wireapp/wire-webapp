@@ -248,7 +248,11 @@ export class ConnectionRepository {
    * @returns Promise that resolves when all connections have been updated
    */
   private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
-    connectionEntities.forEach(connectionEntity => this.addConnectionEntity(connectionEntity));
+    const updatedConnections = connectionEntities.reduce((allConnections, connectionEntity) => {
+      allConnections[connectionEntity.userId] = connectionEntity;
+      return allConnections;
+    }, this.connectionEntities());
+    this.connectionEntities(updatedConnections);
     await this.userRepository.updateUsersFromConnections(connectionEntities);
     return Object.values(this.connectionEntities());
   }
