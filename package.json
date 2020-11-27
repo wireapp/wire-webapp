@@ -86,5 +86,5 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* nyc jasmine --config=jasmine.json",
     "watch": "webpack-dev-server --config webpack.browser.js"
   },
-  "version": "11.34.7"
+  "version": "11.35.0"
 }

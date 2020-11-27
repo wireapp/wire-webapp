@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [11.35.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.34.7...@wireapp/api-client@11.35.0) (2020-11-27)
+
+
+### Features
+
+* **api-client:** Add federated pre-key fetching ([#3348](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3348)) ([26aa4aa](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/26aa4aacc15008bb2784b18b3ddc01591be7f67a))
+
+
+
+
+
 ## [11.34.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.34.6...@wireapp/api-client@11.34.7) (2020-11-27)
 
 
