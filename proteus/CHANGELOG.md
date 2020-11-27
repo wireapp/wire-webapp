@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.8.29](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.8.28...@wireapp/proteus@9.8.29) (2020-11-27)
+
+
+### Bug Fixes
+
+* **proteus:** Convert SessionTag to string only once ([#3350](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/3350)) ([1b08f04](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/1b08f0403e83e3f687d7d8082dcc4f4caae88d3c))
+
+
+
+
+
 ## [9.8.28](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.8.27...@wireapp/proteus@9.8.28) (2020-11-25)
 
 **Note:** Version bump only for package @wireapp/proteus
