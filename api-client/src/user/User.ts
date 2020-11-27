@@ -22,6 +22,11 @@ import {AccentColor} from '@wireapp/commons';
 import {ServiceRef} from '../conversation/';
 import {UserAsset} from '../user/';
 
+export interface QualifiedUser {
+  domain: string;
+  id: string;
+}
+
 export interface User {
   accent_id?: AccentColor.AccentColorID;
   assets?: UserAsset[];
