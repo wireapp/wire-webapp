@@ -34,6 +34,8 @@ import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {History} from 'history';
 
+jest.mock('../util/SVGProvider');
+
 class PhoneLoginPage {
   private readonly driver: ReactWrapper;
 
@@ -65,16 +67,16 @@ describe('PhoneLogin', () => {
       }),
     );
 
-    expect(phoneLoginPage.getPhoneInput().exists()).withContext('phone number input is present').toBe(true);
+    expect(phoneLoginPage.getPhoneInput().exists()).toBe(true);
 
-    expect(phoneLoginPage.getCountryCodeInput().exists()).withContext('country code input is present').toBe(true);
+    expect(phoneLoginPage.getCountryCodeInput().exists()).toBe(true);
 
-    expect(phoneLoginPage.getLoginButton().exists()).withContext('login button is present').toBe(true);
+    expect(phoneLoginPage.getLoginButton().exists()).toBe(true);
 
-    expect(phoneLoginPage.getLoginButton().props().disabled).withContext('login button is disabled').toBe(true);
+    expect(phoneLoginPage.getLoginButton().props().disabled).toBe(true);
     phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1'}});
 
-    expect(phoneLoginPage.getLoginButton().props().disabled).withContext('login button is not disabled').toBe(false);
+    expect(phoneLoginPage.getLoginButton().props().disabled).toBe(false);
   });
 
   it('has an option to navigate back', async () => {
@@ -92,13 +94,11 @@ describe('PhoneLogin', () => {
       history,
     );
 
-    expect(phoneLoginPage.getBackButton().exists()).withContext('back button is present').toBe(true);
+    expect(phoneLoginPage.getBackButton().exists()).toBe(true);
     phoneLoginPage.getBackButton().simulate('click');
 
     await waitForExpect(() => {
-      expect(historyPushSpy)
-        .withContext('Navigation to email login was triggered')
-        .toHaveBeenCalledWith(ROUTE.LOGIN as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.LOGIN as any);
     });
   });
 
@@ -123,17 +123,13 @@ describe('PhoneLogin', () => {
     phoneLoginPage.getCountryCodeInput().simulate('change', {target: {value: '+0'}});
     phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1111111'}});
 
-    expect(phoneLoginPage.getLoginButton().props().disabled).withContext('login button is not disabled').toBe(false);
+    expect(phoneLoginPage.getLoginButton().props().disabled).toBe(false);
     phoneLoginPage.getLoginButton().simulate('click');
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doSendPhoneLoginCode)
-        .withContext('action for sending login code was called')
-        .toHaveBeenCalled();
+      expect(actionRoot.authAction.doSendPhoneLoginCode).toHaveBeenCalled();
 
-      expect(historyPushSpy)
-        .withContext('Navigation to verify phone code page was triggered')
-        .toHaveBeenCalledWith(ROUTE.VERIFY_PHONE_CODE as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.VERIFY_PHONE_CODE as any);
     });
   });
 
@@ -159,15 +155,13 @@ describe('PhoneLogin', () => {
     phoneLoginPage.getCountryCodeInput().simulate('change', {target: {value: '+0'}});
     phoneLoginPage.getPhoneInput().simulate('change', {target: {value: '1111111'}});
 
-    expect(phoneLoginPage.getLoginButton().props().disabled).withContext('login button is not disabled').toBe(false);
+    expect(phoneLoginPage.getLoginButton().props().disabled).toBe(false);
     phoneLoginPage.getLoginButton().simulate('click');
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doSendPhoneLoginCode).withContext('action was called').toHaveBeenCalled();
+      expect(actionRoot.authAction.doSendPhoneLoginCode).toHaveBeenCalled();
 
-      expect(historyPushSpy)
-        .withContext('navigation to verify phone code page was triggered')
-        .toHaveBeenCalledWith(ROUTE.CHECK_PASSWORD as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.CHECK_PASSWORD as any);
     });
   });
 });

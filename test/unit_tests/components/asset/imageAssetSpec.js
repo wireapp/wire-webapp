@@ -64,7 +64,7 @@ describe('image-asset', () => {
 
     spyOn(window.URL, 'createObjectURL').and.returnValue('/image-url');
 
-    instantiateComponent('image-asset', params)
+    return instantiateComponent('image-asset', params)
       .then(domContainer => {
         expect(window.URL.createObjectURL).toHaveBeenCalled();
         const img = domContainer.querySelector('img');

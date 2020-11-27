@@ -204,15 +204,11 @@ export class MessageListViewModel {
     conversationEntity: Conversation,
     messageEntity: Message,
   ): Promise<ContentMessage[]> => {
-    const _conversationEntity = await this.conversationRepository.updateParticipatingUserEntities(
-      conversationEntity,
-      false,
-      true,
-    );
+    await this.conversationRepository.updateParticipatingUserEntities(conversationEntity, false, true);
 
     return messageEntity
-      ? this.conversationRepository.getMessagesWithOffset(_conversationEntity, messageEntity)
-      : this.conversationRepository.getPrecedingMessages(_conversationEntity);
+      ? this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity)
+      : this.conversationRepository.getPrecedingMessages(conversationEntity);
   };
 
   private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {

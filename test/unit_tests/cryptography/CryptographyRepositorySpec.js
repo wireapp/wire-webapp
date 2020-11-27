@@ -195,11 +195,9 @@ describe('CryptographyRepository', () => {
 
       expect(decrypted.data.content).toBe(plainText);
 
-      try {
-        await testFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
-      } catch (error) {
-        expect(error.type).toBe(CryptographyError.TYPE.UNHANDLED_TYPE);
-      }
+      await expect(testFactory.cryptography_repository.handleEncryptedEvent(mockedEvent)).rejects.toMatchObject({
+        type: CryptographyError.TYPE.UNHANDLED_TYPE,
+      });
     });
 
     it('detects a session reset request', () => {

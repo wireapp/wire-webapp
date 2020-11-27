@@ -71,7 +71,7 @@ describe('message', () => {
 
   it('displays a message', () => {
     return instantiateComponent('message', defaultParams).then(domContainer => {
-      expect(domContainer.querySelector('.text').innerText).toBe(textValue);
+      expect(domContainer.querySelector('.text').innerHTML).toBe(`<span>${textValue}</span>`);
     });
   });
 

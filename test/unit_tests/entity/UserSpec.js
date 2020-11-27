@@ -59,7 +59,7 @@ describe('User', () => {
     });
   });
 
-  describe('addClient', () =>
+  describe('addClient', () => {
     it('accepts clients which are no duplicates', () => {
       const first_client = new ClientEntity();
       first_client.id = '5021d77752286cac';
@@ -73,9 +73,10 @@ describe('User', () => {
       user_et.addClient(second_client);
 
       expect(user_et.devices().length).toBe(2);
-    }));
+    });
+  });
 
-  describe('accent_color', () =>
+  describe('accent_color', () => {
     it('can change the accent color', () => {
       const userEntity = new User();
       userEntity.accent_id(ACCENT_ID.BLUE);
@@ -91,5 +92,6 @@ describe('User', () => {
       userEntity.accent_id(undefined);
 
       expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[ACCENT_ID.BLUE]);
-    }));
+    });
+  });
 });

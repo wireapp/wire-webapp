@@ -18,6 +18,7 @@
  */
 
 import {startNewVersionPolling, stopNewVersionPolling} from 'src/script/lifecycle/newVersionHandler';
+import 'src/script/util/test/mock/fetchMock';
 
 describe('newVersionHandler', () => {
   afterEach(stopNewVersionPolling);
@@ -32,19 +33,19 @@ describe('newVersionHandler', () => {
     });
 
     it('polls the server every 3 hours', () => {
-      jasmine.clock().install();
+      jest.useFakeTimers();
       spyOn(window, 'fetch').and.returnValue(Promise.resolve(new Response()));
 
       startNewVersionPolling('', () => {});
 
-      jasmine.clock().tick(6 * 60 * 60 * 1000);
+      jest.advanceTimersByTime(6 * 60 * 60 * 1000);
 
       expect(window.fetch).toHaveBeenCalledTimes(2);
-      jasmine.clock().uninstall();
+      jest.useRealTimers();
     });
 
     it('warns the app if a new version is available', done => {
-      jasmine.clock().install();
+      jest.useFakeTimers();
       const testData = {
         callback: currentVersion => {},
         currentVersion: '2019-03-04',
@@ -56,8 +57,8 @@ describe('newVersionHandler', () => {
 
       startNewVersionPolling(testData.currentVersion, testData.callback);
 
-      jasmine.clock().tick(4 * 60 * 60 * 1000);
-      jasmine.clock().uninstall();
+      jest.advanceTimersByTime(4 * 60 * 60 * 1000);
+      jest.useRealTimers();
 
       setTimeout(() => {
         expect(testData.callback).toHaveBeenCalledWith(testData.response.version);

@@ -81,17 +81,16 @@ describe('SanitizationUtil', () => {
   });
 
   describe('safeWindowOpen', () => {
-    let newWindow = undefined;
-    afterEach(() => {
-      if (newWindow) {
-        newWindow.close();
-      }
-    });
-
     it('does not contain a reference to the opening tab', () => {
-      newWindow = safeWindowOpen('https://wire.com/');
+      const mockedWindow = {
+        focus: jest.fn(),
+        opener: 'remove me',
+      };
+      jest.spyOn(window, 'open').mockImplementation(() => mockedWindow);
+      const newWindow = safeWindowOpen('https://wire.com/');
 
       expect(newWindow.opener).toBeNull();
+      expect(newWindow.focus).toHaveBeenCalled();
     });
   });
 });

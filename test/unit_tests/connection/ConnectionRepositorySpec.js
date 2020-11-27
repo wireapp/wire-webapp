@@ -19,15 +19,12 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
 import {createRandomUuid} from 'Util/util';
-
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
+import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 
 describe('ConnectionRepository', () => {
   let server = undefined;
@@ -68,7 +65,7 @@ describe('ConnectionRepository', () => {
       });
     });
 
-    it('it switches the conversation if requested', () => {
+    it('switches the conversation if requested', () => {
       const amplifySpy = jasmine.createSpy('conversation_show');
       amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
@@ -104,27 +101,42 @@ describe('ConnectionRepository', () => {
   });
 
   describe('getConnections', () => {
-    // [update 16/08/2018] flaky test reenabled (on probation). Could be removed if fails again
-    it('should return the connected users', () => {
-      server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/connections?size=500`, [
-        HTTP_STATUS.OK,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(payload.connections.get),
-      ]);
+    it('should return the connected users', async () => {
+      const connectionServiceSpy = {
+        getConnections: jest.fn().mockImplementation(() =>
+          Promise.resolve([
+            {
+              conversation: '45c8f986-6c8f-465b-9ac9-bd5405e8c944',
+              from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+              last_update: '2015-01-07T16:08:36.537Z',
+              message: `Hi Jane Doe,\nLet's connect.\nJohn Doe`,
+              status: ConnectionStatus.ACCEPTED,
+              to: '7025598b-ffac-4993-8a81-af3f35b7147f',
+            },
+            {
+              conversation: '45c8f986-6c8f-465b-9ac9-bd5405e8c944',
+              from: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+              last_update: '2015-01-07T16:08:36.537Z',
+              message: `Hi Jane Doe,\nLet's connect.\nJohn Doe`,
+              status: ConnectionStatus.ACCEPTED,
+              to: '7025598b-ffac-4993-8a81-af3f35b7147f',
+            },
+          ]),
+        ),
+      };
 
-      server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/users?ids=${entities.user.jane_roe.id}`, [
-        HTTP_STATUS.OK,
-        {'Content-Type': 'application/json'},
-        JSON.stringify(payload.users.get.many),
-      ]);
+      const userRepoSpy = {
+        updateUsersFromConnections: jest.fn(),
+      };
 
-      return connectionRepository.getConnections().then(() => {
-        expect(connectionRepository.connectionEntities().length).toBe(2);
-        const [firstConnectionEntity, secondConnectionEntity] = connectionRepository.connectionEntities();
+      const connectionRepo = new ConnectionRepository(connectionServiceSpy, userRepoSpy);
 
-        expect(firstConnectionEntity.status()).toEqual(ConnectionStatus.ACCEPTED);
-        expect(secondConnectionEntity.conversationId).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
-      });
+      await connectionRepo.getConnections();
+      expect(connectionRepo.connectionEntities().length).toBe(2);
+      const [firstConnectionEntity, secondConnectionEntity] = connectionRepo.connectionEntities();
+
+      expect(firstConnectionEntity.status()).toEqual(ConnectionStatus.ACCEPTED);
+      expect(secondConnectionEntity.conversationId).toEqual('45c8f986-6c8f-465b-9ac9-bd5405e8c944');
     });
   });
 });

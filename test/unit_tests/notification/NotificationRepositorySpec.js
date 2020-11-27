@@ -355,7 +355,7 @@ describe('NotificationRepository', () => {
       });
     });
 
-    it('it allows mentions, calls and composite when user is "busy"', () => {
+    it('allows mentions, calls and composite when user is "busy"', () => {
       spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
         return {...testFactory.user_repository['userState'].self(), availability: () => Availability.Type.BUSY};
       });

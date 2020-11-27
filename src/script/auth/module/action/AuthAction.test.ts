@@ -120,15 +120,14 @@ describe('AuthAction', () => {
       apiClient: mockedApiClient as TypeUtil.RecursivePartial<APIClient>,
       core: mockedCore,
     })({});
-    try {
-      await store.dispatch(actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password}));
-      fail('TOO_MANY_CLIENTS error was not thrown');
-    } catch (error) {
-      expect(error.label).withContext('Error is of type TOO_MANY_CLIENTS').toEqual(BackendError.LABEL.TOO_MANY_CLIENTS);
 
-      expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
-      expect(spies.doInitializeClient.calls.count()).toEqual(1);
-    }
+    await expect(
+      store.dispatch(actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password})),
+    ).rejects.toMatchObject({
+      label: BackendError.LABEL.TOO_MANY_CLIENTS,
+    });
+    expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.successfulLogin()]);
+    expect(spies.doInitializeClient.calls.count()).toEqual(1);
   });
 
   it('handles failed authentication', async () => {
@@ -153,19 +152,17 @@ describe('AuthAction', () => {
       apiClient: {},
       core: mockedCore,
     })();
-    try {
-      await store.dispatch(
+    await expect(
+      store.dispatch(
         actionRoot.authAction.doLoginPlain({clientType: ClientType.PERMANENT, email, password: 'password'}),
-      );
-      fail();
-    } catch (expectedError) {
-      expect(expectedError).toBeDefined();
-      expect(expectedError.message).toEqual(backendError.message);
-      expect(expectedError.code).toEqual(backendError.code);
-      expect(expectedError.label).toEqual(backendError.label);
-      expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.failedLogin(backendError)]);
-      expect(spies.generateClientPayload.calls.count()).toEqual(1);
-    }
+      ),
+    ).rejects.toMatchObject({
+      code: backendError.code,
+      label: backendError.label,
+      message: backendError.message,
+    });
+    expect(store.getActions()).toEqual([AuthActionCreator.startLogin(), AuthActionCreator.failedLogin(backendError)]);
+    expect(spies.generateClientPayload.calls.count()).toEqual(1);
   });
 
   it('handles failed logout', async () => {
@@ -222,14 +219,11 @@ describe('AuthAction', () => {
     const store = mockStoreFactory({
       apiClient: mockedApiClient,
     })({});
-    try {
-      await store.dispatch(actionRoot.authAction.doSendPhoneLoginCode({phone: phoneNumber}));
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([
-        AuthActionCreator.startSendPhoneLoginCode(),
-        AuthActionCreator.failedSendPhoneLoginCode(error),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.authAction.doSendPhoneLoginCode({phone: phoneNumber}))).rejects.toThrow();
+    expect(store.getActions()).toEqual([
+      AuthActionCreator.startSendPhoneLoginCode(),
+      AuthActionCreator.failedSendPhoneLoginCode(error),
+    ]);
   });
 
   it('validates SSO code', async () => {
@@ -266,11 +260,8 @@ describe('AuthAction', () => {
     const store = mockStoreFactory({
       apiClient: mockedApiClient,
     })({});
-    try {
-      await store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode));
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedNotFoundError)]);
-    }
+    await expect(store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode))).rejects.toThrow();
+    expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedNotFoundError)]);
   });
 
   it('handles failed request for phone login code (server error)', async () => {
@@ -291,11 +282,8 @@ describe('AuthAction', () => {
     const store = mockStoreFactory({
       apiClient: mockedApiClient,
     })({});
-    try {
-      await store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode));
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedServerError)]);
-    }
+    await expect(store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode))).rejects.toThrow();
+    expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedServerError)]);
   });
 
   it('handles failed request for phone login code (generic error)', async () => {
@@ -316,10 +304,7 @@ describe('AuthAction', () => {
     const store = mockStoreFactory({
       apiClient: mockedApiClient,
     })({});
-    try {
-      await store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode));
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedGenericError)]);
-    }
+    await expect(store.dispatch(actionRoot.authAction.validateSSOCode(ssoCode))).rejects.toThrow();
+    expect(store.getActions()).toEqual([AuthActionCreator.failedLogin(expectedGenericError)]);
   });
 });

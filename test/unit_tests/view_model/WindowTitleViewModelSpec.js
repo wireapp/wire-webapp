@@ -58,9 +58,9 @@ describe('WindowTitleViewModel', () => {
   });
 
   describe('initiateTitleUpdates', () => {
-    beforeEach(() => jasmine.clock().install());
+    beforeEach(() => jest.useFakeTimers());
 
-    afterEach(() => jasmine.clock().uninstall());
+    afterEach(() => jest.useRealTimers());
 
     it('sets a default title when there is an unknown state', () => {
       title_view_model.contentState('invalid or unknown');
@@ -215,7 +215,7 @@ describe('WindowTitleViewModel', () => {
 
     it('shows the number of connection requests when viewing the inbox', () => {
       title_view_model.contentState(ContentViewModel.STATE.CONNECTION_REQUESTS);
-      title_view_model.userState.connectRequests = ko.observableArray([]);
+      title_view_model.userState.connectRequests = ko.observableArray();
 
       const firstConnectedUser = new User(createRandomUuid());
       const secondConnectedUser = new User(createRandomUuid());
@@ -241,8 +241,7 @@ describe('WindowTitleViewModel', () => {
       tests.forEach(({connections, expected}) => {
         title_view_model.userState.connectRequests(connections);
         ko.tasks.runEarly();
-        jasmine.clock().tick(WindowTitleViewModel.TITLE_DEBOUNCE);
-
+        jest.advanceTimersByTime(WindowTitleViewModel.TITLE_DEBOUNCE);
         expect(window.document.title).toBe(expected);
       });
     });

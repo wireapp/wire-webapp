@@ -69,14 +69,10 @@ describe('InvitationAction', () => {
       languageState: {...initialLanguageState},
       selfState: {...initialSelfState},
     });
-    try {
-      await store.dispatch(actionRoot.invitationAction.invite({email}));
-      fail();
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([
-        InvitationActionCreator.startAddInvite(),
-        InvitationActionCreator.failedAddInvite(error),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.invitationAction.invite({email}))).rejects.toThrow();
+    expect(store.getActions()).toEqual([
+      InvitationActionCreator.startAddInvite(),
+      InvitationActionCreator.failedAddInvite(error),
+    ]);
   });
 });

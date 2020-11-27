@@ -18,11 +18,8 @@
  */
 
 import ko from 'knockout';
-
 import {noop} from 'Util/util';
-
 import {Actions} from 'Components/panel/userActions';
-
 import {Config} from '../../Config';
 import type {User} from '../../entity/User';
 import type {UserRepository} from '../../user/UserRepository';
@@ -66,13 +63,7 @@ export class UserModalViewModel {
     this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
   }
 
-  onUserAction = (userAction: string): void => {
-    switch (userAction) {
-      case Actions.UNBLOCK:
-      case Actions.SEND_REQUEST:
-        this.actionsViewModel.open1to1Conversation(this.user());
-        break;
-    }
+  onUserAction = (action: Actions): void => {
     this.hide();
   };
 

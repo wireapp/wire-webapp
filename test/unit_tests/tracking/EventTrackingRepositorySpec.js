@@ -30,7 +30,7 @@ describe('EventTrackingRepository', () => {
   });
 
   describe('Initialization', () => {
-    xit('enables error reporting, user analytics and subscribes to analytics events', () => {
+    it.skip('enables error reporting, user analytics and subscribes to analytics events', () => {
       spyOn(testFactory.tracking_repository, 'startErrorReporting').and.callThrough();
       spyOn(testFactory.tracking_repository, 'subscribeToProductEvents').and.callThrough();
 
@@ -68,7 +68,7 @@ describe('EventTrackingRepository', () => {
       });
     });
 
-    xit('allows changing initial tracking properties', () => {
+    it.skip('allows changing initial tracking properties', () => {
       expect(testFactory.tracking_repository.isErrorReportingActivated).toBe(false);
       expect(testFactory.tracking_repository.isProductReportingActivated).toBe(false);
       testFactory.tracking_repository.trackProductReportingEvent = jasmine.createSpy('trackProductReportingEvent');
@@ -98,14 +98,14 @@ describe('EventTrackingRepository', () => {
       return testFactory.tracking_repository.init(true);
     });
 
-    xit('immediately reports events', () => {
+    it.skip('immediately reports events', () => {
       amplify.publish(WebAppEvents.ANALYTICS.EVENT, 'i_am_an_event');
 
       expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalled();
       expect(testFactory.tracking_repository.trackProductReportingEvent).toHaveBeenCalledTimes(1);
     });
 
-    xit('allows additional parameters for events', () => {
+    it.skip('allows additional parameters for events', () => {
       const event_name = 'Article View';
       const segmentations = {
         'Page Name': 'Baseball Headlines',

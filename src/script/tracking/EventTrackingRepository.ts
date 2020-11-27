@@ -54,6 +54,7 @@ export class EventTrackingRepository {
         CLIENT_TYPE: 'desktop',
         COUNTLY_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_DEVICE_ID',
         COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID: 'COUNTLY_FAILED_TO_MIGRATE_DEVICE_ID',
+        COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY: 'COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY',
         COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY: 'COUNTLY_OLD_DEVICE_ID',
         DISABLED_DOMAINS: ['localhost'],
       },
@@ -106,6 +107,9 @@ export class EventTrackingRepository {
     const unsyncedCountlyDeviceId = loadValue<string>(
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY,
     );
+    const hasAtLeastSyncedOnce = loadValue<string>(
+      EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
+    );
 
     if (unsyncedCountlyDeviceId) {
       try {
@@ -123,6 +127,20 @@ export class EventTrackingRepository {
       );
       if (notMigratedCountlyTrackingId) {
         this.migrateDeviceId(notMigratedCountlyTrackingId);
+      }
+      if (!hasAtLeastSyncedOnce) {
+        try {
+          await this.messageRepository.sendCountlySync(this.countlyDeviceId);
+          storeValue(
+            EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
+            true,
+          );
+        } catch (error) {
+          storeValue(
+            EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
+            false,
+          );
+        }
       }
     } else {
       this.countlyDeviceId = createRandomUuid();

@@ -40,7 +40,9 @@ jobs:
           echo "COMMITTER=${{github.event.head_commit.committer.name}}" >> $GITHUB_ENV
 
       - name: Set TITLE
-        run: echo "TITLE=${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}" >> $GITHUB_ENV
+        env:
+          PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
+        run: echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
 
       - name: Print environment variables
         env:
@@ -76,14 +78,14 @@ jobs:
 
       - name: Test
         if: env.DISTRIBUTION == 'wire'
-        run: yarn test
+        run: yarn test --coverage --detectOpenHandles --forceExit
 
       - name: Monitor coverage
         if: github.event_name == 'pull_request' && env.DISTRIBUTION == 'wire'
         uses: slavcodev/coverage-monitor-action@1.2.0
         with:
           github_token: ${{github.token}}
-          clover_file: 'docs/coverage/clover.xml'
+          clover_file: 'coverage/clover.xml'
           threshold_alert: ${{env.TEST_COVERAGE_FAIL_THRESHOLD}}
           threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
 

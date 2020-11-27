@@ -29,8 +29,8 @@ import './fullscreenVideoCall';
 describe('fullscreenVideoCall', () => {
   let domContainer: Element;
   let call: Call;
+
   beforeEach(() => {
-    jasmine.clock().install();
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User();
@@ -55,22 +55,24 @@ describe('fullscreenVideoCall', () => {
 
     return instantiateComponent('fullscreen-video-call', params).then((container: Element) => {
       domContainer = container;
+      jest.useFakeTimers('modern');
     });
   });
 
-  afterEach(() => jasmine.clock().uninstall());
+  afterEach(() => jest.useRealTimers());
 
   it('shows the available screens', () => {
     expect(domContainer.querySelector('.video-controls__button')).not.toBe(null);
   });
 
   it('shows the calling timer', () => {
+    const now = Date.now();
+    jest.setSystemTime(now);
     call.startedAt(Date.now());
     ko.tasks.runEarly();
-    expect((domContainer.querySelector('.video-timer') as HTMLElement).innerText).toBe('00:00');
-    jasmine.clock().mockDate();
-    jasmine.clock().tick(1001);
+    expect((domContainer.querySelector('.video-timer') as HTMLElement).innerHTML).toEqual('00:00');
+    jest.advanceTimersByTime(1001);
     ko.tasks.runEarly();
-    expect((domContainer.querySelector('.video-timer') as HTMLElement).innerText).toBe('00:01');
+    expect((domContainer.querySelector('.video-timer') as HTMLElement).innerHTML).toEqual('00:01');
   });
 });
