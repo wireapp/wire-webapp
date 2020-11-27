@@ -38,7 +38,7 @@ export class FeatureAPI {
   public async getAllFeatures(teamId: string): Promise<FeatureList> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/`,
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}`,
     };
 
     const response = await this.client.sendJSON<FeatureList>(config);
