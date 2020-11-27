@@ -59,6 +59,7 @@ export class Session {
   pending_prekey: [number, PublicKey] | null;
   session_states: IntermediateSessionState;
   session_tag: SessionTag;
+  session_tag_name: string;
 
   constructor(
     localIdentity: IdentityKeyPair,
@@ -73,6 +74,7 @@ export class Session {
     this.remote_identity = remoteIdentity;
     this.session_states = sessionStates;
     this.session_tag = sessionTag;
+    this.session_tag_name = sessionTag.toString();
     this.version = version;
     this.counter = 0;
   }
@@ -156,15 +158,17 @@ export class Session {
   }
 
   private _insert_session_state(sessionTag: SessionTag, state: SessionState): void {
-    if (this.session_states.hasOwnProperty(sessionTag.toString())) {
-      this.session_states[sessionTag.toString()].state = state;
+    const sessionTagName = sessionTag.toString();
+
+    if (this.session_states.hasOwnProperty(sessionTagName)) {
+      this.session_states[sessionTagName].state = state;
     } else {
       if (this.counter >= Number.MAX_SAFE_INTEGER) {
         this.session_states = {};
         this.counter = 0;
       }
 
-      this.session_states[sessionTag.toString()] = {
+      this.session_states[sessionTagName] = {
         idx: this.counter,
         state,
         tag: sessionTag,
@@ -172,8 +176,9 @@ export class Session {
       this.counter++;
     }
 
-    if (this.session_tag.toString() !== sessionTag.toString()) {
+    if (this.session_tag_name !== sessionTagName) {
       this.session_tag = sessionTag;
+      this.session_tag_name = sessionTagName;
     }
 
     const obj_size = (obj: IntermediateSessionState) => Object.keys(obj).length;
@@ -189,7 +194,7 @@ export class Session {
 
   private _evict_oldest_session_state(): void {
     const oldest = Object.keys(this.session_states)
-      .filter(obj => obj.toString() !== this.session_tag.toString())
+      .filter(sessionTagName => sessionTagName.toString() !== this.session_tag_name)
       .reduce((lowest, obj) => {
         return this.session_states[obj].idx < this.session_states[lowest].idx ? obj.toString() : lowest;
       });
@@ -206,7 +211,7 @@ export class Session {
    * @param plaintext The plaintext which needs to be encrypted
    */
   async encrypt(plaintext: string | Uint8Array): Promise<Envelope> {
-    const session_state = this.session_states[this.session_tag.toString()];
+    const session_state = this.session_states[this.session_tag_name];
 
     if (!session_state) {
       throw new ProteusError(
@@ -329,10 +334,11 @@ export class Session {
     }
 
     encoder.u8(5);
-    encoder.object(Object.keys(this.session_states).length);
+    const sessionStatesIndices = Object.keys(this.session_states);
+    encoder.object(sessionStatesIndices.length);
 
-    for (const index in this.session_states) {
-      const state = this.session_states[index];
+    for (const sessionStatesIndex of sessionStatesIndices) {
+      const state = this.session_states[sessionStatesIndex];
       state.tag.encode(encoder);
       state.state.encode(encoder);
     }

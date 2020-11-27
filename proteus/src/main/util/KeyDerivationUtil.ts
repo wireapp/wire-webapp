@@ -35,7 +35,7 @@ export function hkdf(
   info: Uint8Array | string,
   length: number,
 ): Uint8Array {
-  const convertType = (value: string | Uint8Array) => {
+  const convertType = (value: Uint8Array | string) => {
     if (typeof value === 'string') {
       return sodium.from_string(value);
     }
