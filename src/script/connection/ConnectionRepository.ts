@@ -186,8 +186,7 @@ export class ConnectionRepository {
    */
   getConnectionByConversationId(conversationId: string): ConnectionEntity {
     const connectionEntities = Object.values(this.connectionEntities());
-    const match = connectionEntities.find(connectionEntity => connectionEntity.conversationId === conversationId);
-    return match ? this.getConnectionByUserId(match.userId) : undefined;
+    return connectionEntities.find(connectionEntity => connectionEntity.conversationId === conversationId);
   }
 
   /**
