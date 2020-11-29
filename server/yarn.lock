@@ -2082,10 +2082,10 @@ expect@^26.6.2:
     jest-message-util "^26.6.2"
     jest-regex-util "^26.0.0"
 
-express-sitemap-xml@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/express-sitemap-xml/-/express-sitemap-xml-2.0.0.tgz#190b4993458007a61b4747a66e3a723121a207f6"
-  integrity sha512-7yluJFHjUWeZbg5mdQPIEj0x3FPVQFyZY76spYidFkYJYExSICZjsd+gaElUv/4bh2R+hrnytGOIU8rsp+7+Fw==
+express-sitemap-xml@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/express-sitemap-xml/-/express-sitemap-xml-3.0.0.tgz#b97db01f126fec01edfbb8fecee24a2b474b3d88"
+  integrity sha512-5cim7WY3g5C2HpK0sJAS749PSEhCV/NtQzdkdor1PzTdTHqS405h/obWJy6rz4UpU+s07+awK9uRQTIbZyQCsQ==
   dependencies:
     p-memoize "^4.0.1"
     xmlbuilder "^15.1.1"
