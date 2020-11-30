@@ -94,7 +94,7 @@
     "@wireapp/copy-config": "1.1.6",
     "@wireapp/eslint-config": "1.8.0",
     "@wireapp/prettier-config": "0.3.0",
-    "adm-zip": "0.5.0",
+    "adm-zip": "0.5.1",
     "autoprefixer": "9.8.6",
     "babel-eslint": "10.1.0",
     "babel-loader": "8.2.1",
