@@ -42,7 +42,7 @@
     "switch-path": "1.2.0",
     "tsyringe": "4.3.0",
     "uint32": "0.2.1",
-    "underscore": "1.11.0",
+    "underscore": "1.12.0",
     "url-search-params-polyfill": "8.1.0",
     "use-react-router": "1.0.7",
     "uuidjs": "4.2.6",
