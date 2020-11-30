@@ -161,7 +161,7 @@
     "svg-inline-loader": "0.8.2",
     "terser-webpack-plugin": "4.2.3",
     "text-encoding": "0.7.0",
-    "ts-jest": "26.4.3",
+    "ts-jest": "26.4.4",
     "ts-node": "9.0.0",
     "tsc-watch": "4.2.9",
     "typescript": "4.0.5",
