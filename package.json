@@ -5,7 +5,7 @@
     "@wireapp/core": "16.12.55",
     "@wireapp/protocol-messaging": "1.26.6",
     "@wireapp/react-ui-kit": "7.37.15",
-    "@wireapp/store-engine-dexie": "1.3.21",
+    "@wireapp/store-engine-dexie": "1.3.23",
     "@wireapp/store-engine-sqleet": "1.3.30",
     "@wireapp/webapp-events": "0.9.0",
     "amplify": "git+https://git@github.com/wireapp/amplify",
