@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.44.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.43.0...@wireapp/react-ui-kit@7.44.0) (2020-11-30)
+
+
+### Features
+
+* **react-ui-kit:** Remove uppercase textTransform from Button ([#3355](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3355)) ([42b5208](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/42b5208da44e1f220a1dd0a88fce7f2999ec7ab5))
+
+
+
+
+
 # [7.43.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.42.3...@wireapp/react-ui-kit@7.43.0) (2020-11-26)
 
 
