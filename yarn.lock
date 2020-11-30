@@ -1180,12 +1180,12 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@formatjs/cli@2.13.13":
-  version "2.13.13"
-  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-2.13.13.tgz#011c4719bef4d076325a1a4d6a8b25b51c96dc91"
-  integrity sha512-soUig6IuvUxiztzZbS66Umhy/RTHUnd1+VdT/UVuOMCFZ/Mhug/hXQFi+cQ0KcNVKeaj0D77MXNccahaebkPYQ==
+"@formatjs/cli@2.13.15":
+  version "2.13.15"
+  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-2.13.15.tgz#6aa53c01ce28e87067e39845dd7fbd0eb1e09de4"
+  integrity sha512-QyCS7hbge5VJ5lFNTrk1zvUW6Um+6gnKd+Vz7aSPr3fWvTBz3xfmdhacoHbC5dtJdiQOPCwX9x1Yy9VjnVfUAw==
   dependencies:
-    "@formatjs/ts-transformer" "2.12.8"
+    "@formatjs/ts-transformer" "2.12.10"
     "@types/json-stable-stringify" "^1.0.32"
     "@types/lodash" "^4.14.150"
     "@types/loud-rejection" "^2.0.0"
@@ -1194,7 +1194,7 @@
     commander "^6.1.0"
     fast-glob "^3.2.4"
     fs-extra "^9.0.0"
-    intl-messageformat-parser "6.0.17"
+    intl-messageformat-parser "6.0.18"
     json-stable-stringify "^1.0.1"
     lodash "^4.17.15"
     loud-rejection "^2.2.0"
@@ -1255,12 +1255,12 @@
     intl-messageformat-parser "6.0.18"
     tslib "^2.0.1"
 
-"@formatjs/ts-transformer@2.12.8":
-  version "2.12.8"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.12.8.tgz#5e1415bcb8ceb725f22dd6263b8b9900dd80df9b"
-  integrity sha512-gu1Nj1tNXM1yO5PKQtaT+/bedzbQGQrj+u2hrTeZN3Mto1+ofAEdF3/cB131ba9rKTQiG3eCoxByWNuQkvTxFA==
+"@formatjs/ts-transformer@2.12.10":
+  version "2.12.10"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-2.12.10.tgz#4f8758ea89e2536239b573da98f99454a4952ebf"
+  integrity sha512-H8mtPQcyXxLo3GJGkNVj3ZlmebeqxQfVTIvGsdpE1oXKZ/SxKqvC7ZeHlbZUyXUEiRwdJ4Hfsgw1QzsmTJnicw==
   dependencies:
-    intl-messageformat-parser "6.0.17"
+    intl-messageformat-parser "6.0.18"
     tslib "^2.0.1"
     typescript "^4.0"
 
@@ -7702,14 +7702,6 @@ intersection-observer@0.11.0:
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/intersection-observer/-/intersection-observer-0.11.0.tgz#f4ea067070326f68393ee161cc0a2ca4c0040c6f"
   integrity sha512-KZArj2QVnmdud9zTpKf279m2bbGfG+4/kn16UU0NL3pTVl52ZHiJ9IRNSsnn6jaHrL9EGLFM5eWjTx2fz/+zoQ==
-
-intl-messageformat-parser@6.0.17:
-  version "6.0.17"
-  resolved "https://registry.yarnpkg.com/intl-messageformat-parser/-/intl-messageformat-parser-6.0.17.tgz#8861294d54184cae2dc950f512c97784fac22c40"
-  integrity sha512-YLzTGKk+tXm0tuEuaATJjVl4C9HNjwC4VslrWQI9vQez1z7czbdmbNQD4ftXiAMLy/Pla+UxyH4jZt9UzI8Y4w==
-  dependencies:
-    "@formatjs/ecma402-abstract" "1.5.0"
-    tslib "^2.0.1"
 
 intl-messageformat-parser@6.0.18:
   version "6.0.18"
