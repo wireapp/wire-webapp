@@ -10,7 +10,7 @@ exports[`"Button" renders (dark theme) 1`] = `
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
   background-color: #0c78ba;
   border: 0;
@@ -71,7 +71,7 @@ exports[`"Button" renders 1`] = `
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
   background-color: #0c78ba;
   border: 0;
@@ -126,7 +126,7 @@ exports[`"Button" renders as block 1`] = `
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
   background-color: #0c78ba;
   border: 0;
@@ -205,7 +205,7 @@ exports[`"Button" renders in loading state 1`] = `
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
   background-color: #0c78ba;
   border: 0;
@@ -297,7 +297,7 @@ exports[`"Button" renders when disabled 1`] = `
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
-  text-transform: uppercase;
+  text-transform: none;
   white-space: nowrap;
   background-color: #0c78ba;
   border: 0;

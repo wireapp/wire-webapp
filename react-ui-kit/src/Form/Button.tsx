@@ -45,7 +45,7 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => ObjectInte
     color = COLOR.WHITE,
     fontSize = '16px',
     noWrap = true,
-    textTransform = 'uppercase',
+    textTransform = 'none',
     truncate = true,
     ...props
   },
