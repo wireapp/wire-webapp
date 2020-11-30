@@ -55,15 +55,18 @@ export class ClientMismatchHandler {
     clientMismatch: ClientMismatch,
     payload?: NewOTRMessage,
   ): Promise<NewOTRMessage> {
-    const {deleted, missing, redundant} = clientMismatch;
+    const {deleted: deletedRecipients, missing: missingRecipients, redundant: redundantRecipients} = clientMismatch;
     // Note: Broadcast messages have an empty conversation ID
-    const conversationEntity: Conversation | undefined =
-      eventInfoEntity.conversationId !== ''
-        ? await this.conversationRepositoryProvider().get_conversation_by_id(eventInfoEntity.conversationId)
-        : undefined;
-    await this.handleRedundant(redundant, conversationEntity, payload);
-    await this.handleDeleted(deleted, conversationEntity, payload);
-    return this.handleMissing(missing, eventInfoEntity, conversationEntity, payload);
+    let conversationEntity: Conversation;
+
+    if (eventInfoEntity.conversationId !== '') {
+      conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(
+        eventInfoEntity.conversationId,
+      );
+    }
+    await this.handleRedundant(redundantRecipients, conversationEntity, payload);
+    await this.handleDeleted(deletedRecipients, conversationEntity, payload);
+    return this.handleMissing(missingRecipients, eventInfoEntity, conversationEntity, payload);
   }
 
   /**

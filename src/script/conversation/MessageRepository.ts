@@ -1631,7 +1631,7 @@ export class MessageRepository {
   private async sendEncryptedMessage(
     eventInfoEntity: EventInfoEntity,
     payload: NewOTRMessage,
-  ): Promise<ClientMismatch> {
+  ): Promise<ClientMismatch | undefined> {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;
     let messageType = eventInfoEntity.getType();
@@ -1663,27 +1663,31 @@ export class MessageRepository {
       this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
       return response;
     } catch (axiosError) {
-      const error: ClientMismatch & BackendClientError = axiosError.response?.data;
-      const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
+      const clientMismatchError: ClientMismatch & BackendClientError = axiosError.response?.data;
+      const isUnknownClient = clientMismatchError?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
       if (isUnknownClient) {
+        this.logger.warn(`Detected unknown client. Removing and signing out ...`);
         this.clientRepository.removeLocalClient();
         return undefined;
       }
 
-      if (!error?.missing) {
-        throw error;
+      if (!clientMismatchError?.missing) {
+        throw clientMismatchError;
       }
 
       const payloadWithMissingClients = await this.clientMismatchHandler.onClientMismatch(
         eventInfoEntity,
-        error,
+        clientMismatchError,
         payload,
       );
 
-      const userIds = Object.keys(error.missing);
-      // We can skip updating all clients in `grantOutgoingMessage`
-      // because we already updated them in `onClientMismatch`:  ⤵️
-      await this.grantOutgoingMessage(eventInfoEntity, userIds, true, false);
+      const missingUserIds = Object.keys(clientMismatchError.missing);
+
+      // We can skip updating missing clients in `grantOutgoingMessage()`
+      // because we already updated them in `onClientMismatch()`.
+      const skipClientsUpdate = !!missingUserIds.length;
+
+      await this.grantOutgoingMessage(eventInfoEntity, missingUserIds, skipClientsUpdate, false);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
