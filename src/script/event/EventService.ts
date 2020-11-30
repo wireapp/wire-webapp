@@ -321,7 +321,7 @@ export class EventService {
    *
    * @param event JSON event to be stored
    */
-  async replaceEvent(event: EventRecord): Promise<EventRecord> {
+  async replaceEvent<T extends Partial<EventRecord>>(event: T): Promise<T> {
     await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
     return event;
   }
@@ -384,26 +384,19 @@ export class EventService {
    * @param primaryKey event's primary key
    * @param updates Updates to perform on the message.
    */
-  updateEvent(primaryKey: string, updates: any): Promise<any> {
-    return Promise.resolve(primaryKey).then(key => {
-      const hasChanges = updates && !!Object.keys(updates).length;
-      if (!hasChanges) {
-        throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
-      }
-
-      const hasVersionedUpdates = !!updates.version;
-      if (hasVersionedUpdates) {
-        const error = new ConversationError(
-          ConversationError.TYPE.WRONG_CHANGE,
-          ConversationError.MESSAGE.WRONG_CHANGE,
-        );
-        error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
-        throw error;
-      }
-
-      const identifiedUpdates = {...updates, primary_key: key};
-      return this.replaceEvent(identifiedUpdates);
-    });
+  updateEvent<T extends Partial<EventRecord>>(primaryKey: string, updates: T): Promise<T & {primary_key: string}> {
+    const hasChanges = updates && !!Object.keys(updates).length;
+    if (!hasChanges) {
+      throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
+    }
+    const hasVersionedUpdates = !!updates.version;
+    if (hasVersionedUpdates) {
+      const error = new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
+      error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
+      throw error;
+    }
+    const identifiedUpdates = {...updates, primary_key: primaryKey};
+    return this.replaceEvent(identifiedUpdates);
   }
 
   /**
@@ -412,45 +405,43 @@ export class EventService {
    * @param primaryKey Event primary key
    * @param changes Changes to update message with
    */
-  async updateEventSequentially(primaryKey: string, changes: Partial<EventRecord> = {}): Promise<number> {
-    return Promise.resolve().then(() => {
-      const hasVersionedChanges = !!changes.version;
-      if (!hasVersionedChanges) {
-        throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
-      }
+  updateEventSequentially(primaryKey: string, changes: Partial<EventRecord> = {}): Promise<number> {
+    const hasVersionedChanges = !!changes.version;
+    if (!hasVersionedChanges) {
+      throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
+    }
 
-      if (this.storageService.db) {
-        // Create a DB transaction to avoid concurrent sequential update.
-        // TODO: The Dexie typing is wrong here, as it indeed does accept the table name as a string as the second parameter
-        return this.storageService.db.transaction(
-          'rw',
-          // @ts-ignore: Wrong typing in Dexie
-          StorageSchemata.OBJECT_STORE.EVENTS,
-          async () => {
-            const record = (await this.storageService.load(
-              StorageSchemata.OBJECT_STORE.EVENTS,
-              primaryKey,
-            )) as EventRecord;
-            if (!record) {
-              throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
-            }
-            const databaseVersion = record.version || 1;
-            const isSequentialUpdate = changes.version === databaseVersion + 1;
-            if (isSequentialUpdate) {
-              return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
-            }
-            const logMessage = 'Failed sequential database update';
-            const logObject = {
-              databaseVersion: databaseVersion,
-              updateVersion: changes.version,
-            };
-            this.logger.error(logMessage, logObject);
-            throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
-          },
-        );
-      }
-      return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
-    });
+    if (this.storageService.db) {
+      // Create a DB transaction to avoid concurrent sequential update.
+      // TODO: The Dexie typing is wrong here, as it indeed does accept the table name as a string as the second parameter
+      return this.storageService.db.transaction(
+        'rw',
+        // @ts-ignore: Wrong typing in Dexie
+        StorageSchemata.OBJECT_STORE.EVENTS,
+        async () => {
+          const record = (await this.storageService.load(
+            StorageSchemata.OBJECT_STORE.EVENTS,
+            primaryKey,
+          )) as EventRecord;
+          if (!record) {
+            throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
+          }
+          const databaseVersion = record.version || 1;
+          const isSequentialUpdate = changes.version === databaseVersion + 1;
+          if (isSequentialUpdate) {
+            return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
+          }
+          const logMessage = 'Failed sequential database update';
+          const logObject = {
+            databaseVersion: databaseVersion,
+            updateVersion: changes.version,
+          };
+          this.logger.error(logMessage, logObject);
+          throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
+        },
+      );
+    }
+    return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
   }
 
   /**

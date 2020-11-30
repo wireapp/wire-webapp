@@ -17,6 +17,8 @@
  *
  */
 
+import {StatusType} from '../message/StatusType';
+
 export interface ReadReceipt {
   time: string;
   userId: string;
@@ -30,8 +32,8 @@ export interface EventRecord {
   conversation: string;
   data: any;
   edited_time?: string;
-  ephemeral_expires?: number;
-  ephemeral_started?: string;
+  ephemeral_expires?: boolean | string | number;
+  ephemeral_started?: number;
   ephemeral_time?: string;
   error_code?: string;
   from: string;
@@ -44,7 +46,8 @@ export interface EventRecord {
   reactions: Record<string, string>;
   read_receipts?: ReadReceipt[];
   selected_button_id?: string;
-  status?: number;
+  server_time?: string;
+  status?: StatusType;
   time: string;
   timestamp?: number;
   type: string;
