@@ -27,6 +27,7 @@ import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';
 
 const testEventServiceClass = (testedServiceName, className) => {
+  // eslint-disable-next-line jest/valid-title
   describe(className, () => {
     const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
     const senderId = '8b497692-7a38-4a5d-8287-e3d1006577d6';
@@ -204,12 +205,9 @@ const testEventServiceClass = (testedServiceName, className) => {
       });
 
       it('fails if the upperbound is not a Date', async () => {
-        try {
-          await testFactory[testedServiceName].loadFollowingEvents(conversationId, 'not a date', 2, false);
-          fail('should have thrown');
-        } catch (error) {
-          expect(error.message).toContain("must be of type 'Date'");
-        }
+        await expect(
+          testFactory[testedServiceName].loadFollowingEvents(conversationId, 'not a date', 2, false),
+        ).rejects.toThrow("must be of type 'Date'");
       });
 
       it('accepts timestamps in the future', () => {
@@ -345,9 +343,9 @@ const testEventServiceClass = (testedServiceName, className) => {
       /* eslint-disable sort-keys-fix/sort-keys-fix */
       it("doesn't do anything if initial event is not found", () => {
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
-        spyOn(testFactory.storage_service, 'update');
-        testFactory.event_service.updateEventAsUploadSucceeded(12, {}).then(() => {
-          expect(testFactory.storage_repository.update).not.toHaveBeenCalled();
+        const updateSpy = spyOn(testFactory.storage_service, 'update');
+        return testFactory.event_service.updateEventAsUploadSucceeded(12, {}).then(() => {
+          expect(updateSpy).not.toHaveBeenCalled();
         });
       });
 
@@ -382,9 +380,9 @@ const testEventServiceClass = (testedServiceName, className) => {
       /* eslint-disable sort-keys-fix/sort-keys-fix */
       it("doesn't do anything if initial event is not found", () => {
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
-        spyOn(testFactory.storage_service, 'update');
-        testFactory.event_service.updateEventAsUploadFailed(12, {}).then(() => {
-          expect(testFactory.storage_repository.update).not.toHaveBeenCalled();
+        const updateSpy = spyOn(testFactory.storage_service, 'update');
+        return testFactory.event_service.updateEventAsUploadFailed(12, {}).then(() => {
+          expect(updateSpy).not.toHaveBeenCalled();
         });
       });
 
@@ -395,14 +393,16 @@ const testEventServiceClass = (testedServiceName, className) => {
         };
         const reason = AssetTransferState.UPLOAD_FAILED;
         spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
-        spyOn(testFactory.storage_service, 'update').and.callFake((storeName, primaryKey, updates) => {
-          expect(updates.data.reason).toEqual(reason);
-          expect(updates.data.status).toEqual(AssetTransferState.UPLOAD_FAILED);
-          expect(updates.data.content).toEqual(initialEvent.data.content);
-          return Promise.resolve(undefined);
-        });
+        const updateSpy = spyOn(testFactory.storage_service, 'update').and.callFake(
+          (storeName, primaryKey, updates) => {
+            expect(updates.data.reason).toEqual(reason);
+            expect(updates.data.status).toEqual(AssetTransferState.UPLOAD_FAILED);
+            expect(updates.data.content).toEqual(initialEvent.data.content);
+            return Promise.resolve(undefined);
+          },
+        );
         return testFactory.event_service.updateEventAsUploadFailed(12, reason).then(() => {
-          expect(testFactory.storage_service.update).toHaveBeenCalled();
+          expect(updateSpy).toHaveBeenCalled();
         });
       });
     });
@@ -627,4 +627,5 @@ const testEventServiceClass = (testedServiceName, className) => {
   });
 };
 
+// eslint-disable-next-line jest/no-export
 export {testEventServiceClass};

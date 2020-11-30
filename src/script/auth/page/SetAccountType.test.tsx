@@ -30,6 +30,8 @@ import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {History} from 'history';
 
+jest.mock('../util/SVGProvider');
+
 class SetAccountTypePage {
   private readonly driver: ReactWrapper;
 
@@ -71,7 +73,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.getIndexRedirect().exists()).withContext('Redirect is rendered').toBe(true);
+      expect(accountTypePage.getIndexRedirect().exists()).toBe(true);
     });
   });
 
@@ -96,7 +98,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.getLogo().exists()).withContext('logo is shown').toBe(true);
+      expect(accountTypePage.getLogo().exists()).toBe(true);
     });
 
     it('shows an option to create a private account', () => {
@@ -111,9 +113,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.getPersonalAccountButton().exists())
-        .withContext('personal account button is shown')
-        .toBe(true);
+      expect(accountTypePage.getPersonalAccountButton().exists()).toBe(true);
     });
 
     it('shows an option to create a team', () => {
@@ -128,7 +128,7 @@ describe('when visiting the set account type page', () => {
         }),
       );
 
-      expect(accountTypePage.clickTeamAccountButton().exists()).withContext('team account button is shown').toBe(true);
+      expect(accountTypePage.clickTeamAccountButton().exists()).toBe(true);
     });
   });
 });

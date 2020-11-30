@@ -38,13 +38,15 @@ describe('ConversationEphemeralHandler', () => {
         {expected: null, value: null},
       ];
 
-      return testedTimers.map(timerDesc => {
-        const conversationEntity = new Conversation();
-        const event = {data: {message_timer: timerDesc.value}};
-        return conversationEphemeralHandler._updateEphemeralTimer(conversationEntity, event).then(() => {
-          expect(conversationEntity.globalMessageTimer()).toBe(timerDesc.expected);
-        });
-      });
+      return Promise.all(
+        testedTimers.map(timerDesc => {
+          const conversationEntity = new Conversation();
+          const event = {data: {message_timer: timerDesc.value}};
+          return conversationEphemeralHandler._updateEphemeralTimer(conversationEntity, event).then(() => {
+            expect(conversationEntity.globalMessageTimer()).toBe(timerDesc.expected);
+          });
+        }),
+      );
     });
   });
 });

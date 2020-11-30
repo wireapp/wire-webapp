@@ -407,7 +407,7 @@ class App {
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
       await authRepository.init();
-      await this._initiateSelfUser();
+      await this.initiateSelfUser();
       loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository['userState'].self().name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
@@ -431,7 +431,9 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
-      conversationRepository.map_connections(connectionRepository.connectionEntities());
+      await Promise.all(
+        conversationRepository.map_connections(Object.values(connectionRepository.connectionEntities())),
+      );
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();
@@ -583,8 +585,8 @@ class App {
    * Initiate the self user by getting it from the backend.
    * @returns Resolves with the self user entity
    */
-  async _initiateSelfUser() {
-    const userEntity = await this.repository.user.getSelf();
+  private async initiateSelfUser() {
+    const userEntity = await this.repository.user.getSelf([{position: 'App.initiateSelfUser', vendor: 'webapp'}]);
 
     this.logger.info(`Loaded self user with ID '${userEntity.id}'`);
 

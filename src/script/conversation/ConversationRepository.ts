@@ -271,7 +271,7 @@ export class ConversationRepository {
 
   /**
    * Create a group conversation.
-   * @note Do not include the requestor among the users
+   * @note Do not include the requester among the users
    *
    * @param userEntities Users (excluding the creator) to be part of the conversation
    * @param groupName Name for the conversation
@@ -627,7 +627,7 @@ export class ConversationRepository {
    */
   private async onUnblockUser(user_et: User): Promise<void> {
     const conversationEntity = await this.get1To1Conversation(user_et);
-    if (conversationEntity) {
+    if (typeof conversationEntity !== 'boolean') {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
     }
   }
@@ -671,7 +671,7 @@ export class ConversationRepository {
    * @note To reduce the number of backend calls we merge the user IDs of all conversations first.
    * @param conversationEntities Array of conversation entities to be updated
    */
-  public async updateConversations(conversationEntities: Conversation[]) {
+  public async updateConversations(conversationEntities: Conversation[]): Promise<void> {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
     const userIds = flatten(mapOfUserIds);
 
@@ -849,7 +849,7 @@ export class ConversationRepository {
    * @param userEntity User entity for whom to get the conversation
    * @returns Resolves with the conversation with requested user
    */
-  async get1To1Conversation(userEntity: User): Promise<Conversation | undefined> {
+  async get1To1Conversation(userEntity: User): Promise<Conversation | false> {
     const inCurrentTeam = userEntity.inTeam() && userEntity.teamId === this.userState.self().teamId;
 
     if (inCurrentTeam) {
@@ -875,22 +875,24 @@ export class ConversationRepository {
         return userEntity.id === userId;
       });
 
-      return matchingConversationEntity
-        ? Promise.resolve(matchingConversationEntity)
-        : this.createGroupConversation([userEntity]);
+      if (matchingConversationEntity) {
+        return matchingConversationEntity;
+      }
+      return this.createGroupConversation([userEntity]);
     }
 
     const conversationId = userEntity.connection().conversationId;
     try {
       const conversationEntity = await this.get_conversation_by_id(conversationId);
       conversationEntity.connection(userEntity.connection());
-      return this.updateParticipatingUserEntities(conversationEntity);
+      this.updateParticipatingUserEntities(conversationEntity);
+      return conversationEntity;
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (!isConversationNotFound) {
         throw error;
       }
-      return undefined;
+      return false;
     }
   }
 
@@ -947,10 +949,9 @@ export class ConversationRepository {
    *
    * @note If there is no conversation it will request it from the backend
    * @param connectionEntity Connections
-   * @param show_conversation Open the new conversation
    * @returns Resolves when connection was mapped return value
    */
-  private mapConnection(connectionEntity: ConnectionEntity, show_conversation = false) {
+  private mapConnection(connectionEntity: ConnectionEntity): Promise<void | Conversation> {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -970,15 +971,11 @@ export class ConversationRepository {
           conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
         }
 
-        this.updateParticipatingUserEntities(conversationEntity).then(updatedConversationEntity => {
-          if (show_conversation) {
-            amplify.publish(WebAppEvents.CONVERSATION.SHOW, updatedConversationEntity);
-          }
-
-          this.conversationState.conversations.notifySubscribers();
-        });
-
-        return conversationEntity;
+        return this.updateParticipatingUserEntities(conversationEntity);
+      })
+      .then(updatedConversationEntity => {
+        this.conversationState.conversations.notifySubscribers();
+        return updatedConversationEntity;
       })
       .catch(error => {
         const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
@@ -1009,9 +1006,9 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param connectionEntities Connections entities
    */
-  map_connections(connectionEntities: ConnectionEntity[]) {
+  map_connections(connectionEntities: ConnectionEntity[]): Promise<Conversation | void>[] {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
-    connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
+    return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
 
   /**
@@ -1114,15 +1111,17 @@ export class ConversationRepository {
    * @param updateGuests Update conversation guests
    * @returns Resolves when users have been updated
    */
-  async updateParticipatingUserEntities(conversationEntity?: Conversation, offline = false, updateGuests = false) {
-    if (conversationEntity) {
-      const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
-      userEntities.sort(sortUsersByPriority);
-      conversationEntity.participating_user_ets(userEntities);
+  async updateParticipatingUserEntities(
+    conversationEntity: Conversation,
+    offline = false,
+    updateGuests = false,
+  ): Promise<Conversation> {
+    const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
+    userEntities.sort(sortUsersByPriority);
+    conversationEntity.participating_user_ets(userEntities);
 
-      if (updateGuests) {
-        conversationEntity.updateGuests();
-      }
+    if (updateGuests) {
+      conversationEntity.updateGuests();
     }
 
     return conversationEntity;

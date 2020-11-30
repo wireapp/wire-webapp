@@ -194,15 +194,15 @@ describe('QuotedMessageMiddleware', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      jasmine.clock().install();
+      jest.useFakeTimers();
 
       return quotedMessageMiddleware.processEvent(event).then(() => {
-        jasmine.clock().tick();
+        jest.advanceTimersByTime(1);
 
         expect(quotedMessageMiddleware.eventService.replaceEvent).toHaveBeenCalledWith(
           jasmine.objectContaining({data: jasmine.objectContaining({quote: {message_id: 'new-id'}})}),
         );
-        jasmine.clock().uninstall();
+        jest.useRealTimers();
       });
     });
 

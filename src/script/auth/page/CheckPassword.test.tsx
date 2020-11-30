@@ -35,6 +35,8 @@ import {AnyAction} from 'redux';
 import {History} from 'history';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
+jest.mock('../util/SVGProvider');
+
 class CheckPasswordPage {
   private readonly driver: ReactWrapper;
 
@@ -70,17 +72,11 @@ describe('CheckPassword', () => {
       }),
     );
 
-    expect(checkPasswordPage.getPasswordInput().exists()).withContext('password input is present').toBe(true);
-
-    expect(checkPasswordPage.getLoginButton().exists()).withContext('submit button is present').toBe(true);
-
-    expect(checkPasswordPage.getLoginButton().props().disabled).withContext('submit button is disabled').toBe(true);
-
+    expect(checkPasswordPage.getPasswordInput().exists()).toBe(true);
+    expect(checkPasswordPage.getLoginButton().exists()).toBe(true);
+    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(true);
     checkPasswordPage.enterPassword('e');
-
-    expect(checkPasswordPage.getLoginButton().props().disabled)
-      .withContext('submit button should be enabled')
-      .toBe(false);
+    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(false);
   });
 
   it('navigates to the history page on valid password', async () => {
@@ -103,18 +99,13 @@ describe('CheckPassword', () => {
 
     checkPasswordPage.enterPassword('e');
 
-    expect(checkPasswordPage.getLoginButton().props().disabled)
-      .withContext('submit button should be enabled')
-      .toBe(false);
+    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(false);
 
     checkPasswordPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin).withContext('action was called').toHaveBeenCalled();
-
-      expect(historyPushSpy)
-        .withContext('navigation to history page was triggered')
-        .toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+      expect(actionRoot.authAction.doLogin).toHaveBeenCalled();
+      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
     });
   });
 
@@ -135,21 +126,17 @@ describe('CheckPassword', () => {
 
     checkPasswordPage.enterPassword('e');
 
-    expect(checkPasswordPage.getLoginButton().props().disabled)
-      .withContext('submit button should be enabled')
-      .toBe(false);
+    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(false);
 
     checkPasswordPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin).withContext('action was called').toHaveBeenCalledTimes(1);
+      expect(actionRoot.authAction.doLogin).toHaveBeenCalledTimes(1);
     });
     await waitForExpect(() => {
       checkPasswordPage.update();
 
-      expect(checkPasswordPage.getErrorMessage(BackendError.LABEL.INVALID_CREDENTIALS).exists())
-        .withContext('Shows invalid credentials error')
-        .toBe(true);
+      expect(checkPasswordPage.getErrorMessage(BackendError.LABEL.INVALID_CREDENTIALS).exists()).toBe(true);
     });
   });
 
@@ -174,18 +161,14 @@ describe('CheckPassword', () => {
 
     checkPasswordPage.enterPassword('e');
 
-    expect(checkPasswordPage.getLoginButton().props().disabled)
-      .withContext('submit button should be enabled')
-      .toBe(false);
+    expect(checkPasswordPage.getLoginButton().props().disabled).toBe(false);
 
     checkPasswordPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin).withContext('action was called').toHaveBeenCalled();
+      expect(actionRoot.authAction.doLogin).toHaveBeenCalled();
 
-      expect(historyPushSpy)
-        .withContext('navigation to too many clients page was triggered')
-        .toHaveBeenCalledWith(ROUTE.CLIENTS as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.CLIENTS as any);
     });
   });
 });

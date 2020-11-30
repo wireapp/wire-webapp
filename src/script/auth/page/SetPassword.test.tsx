@@ -31,6 +31,8 @@ import {ThunkDispatch} from 'redux-thunk';
 import {AnyAction} from 'redux';
 import {History} from 'history';
 
+jest.mock('../util/SVGProvider');
+
 class SetPasswordPage {
   private readonly driver: ReactWrapper;
 
@@ -66,18 +68,14 @@ describe('SetPassword', () => {
       }),
     );
 
-    expect(setPasswordPage.getPasswordInput().exists()).withContext('password input should be present').toBe(true);
+    expect(setPasswordPage.getPasswordInput().exists()).toBe(true);
 
-    expect(setPasswordPage.getSetPasswordButton().exists()).withContext('submit button should be present').toBe(true);
+    expect(setPasswordPage.getSetPasswordButton().exists()).toBe(true);
 
-    expect(setPasswordPage.getSetPasswordButton().props().disabled)
-      .withContext('submit button should be disabled')
-      .toBe(true);
+    expect(setPasswordPage.getSetPasswordButton().props().disabled).toBe(true);
     setPasswordPage.enterPassword('e');
 
-    expect(setPasswordPage.getSetPasswordButton().props().disabled)
-      .withContext('submit button should be enabled')
-      .toBe(false);
+    expect(setPasswordPage.getSetPasswordButton().props().disabled).toBe(false);
   });
 
   it('handles invalid password', async () => {
@@ -92,7 +90,7 @@ describe('SetPassword', () => {
       }),
     );
 
-    expect(setPasswordPage.getErrorMessage().exists()).withContext('Shows no error').toBe(false);
+    expect(setPasswordPage.getErrorMessage().exists()).toBe(false);
 
     setPasswordPage.enterPassword('e');
     setPasswordPage.clickSetPasswordButton();
@@ -100,9 +98,7 @@ describe('SetPassword', () => {
     await waitForExpect(() => {
       setPasswordPage.update();
 
-      expect(setPasswordPage.getErrorMessage(ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH).exists())
-        .withContext('Shows invalid password error')
-        .toBe(true);
+      expect(setPasswordPage.getErrorMessage(ValidationError.FIELD.PASSWORD.PATTERN_MISMATCH).exists()).toBe(true);
     });
   });
 });

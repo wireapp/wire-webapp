@@ -20,7 +20,7 @@
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {categoryFromEvent} from 'src/script/message/MessageCategorization';
 
-describe('', () => {
+describe('MessageCategorization', () => {
   describe('categoryFromEvent', () => {
     it('malformed events should have category of type UNDEFINED', () => {
       expect(categoryFromEvent()).toBe(MessageCategory.UNDEFINED);
