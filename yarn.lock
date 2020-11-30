@@ -389,16 +389,7 @@
     "@babel/helper-plugin-utils" "^7.10.4"
     "@babel/plugin-syntax-numeric-separator" "^7.10.4"
 
-"@babel/plugin-proposal-object-rest-spread@7.11.0":
-  version "7.11.0"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-object-rest-spread/-/plugin-proposal-object-rest-spread-7.11.0.tgz#bd81f95a1f746760ea43b6c2d3d62b11790ad0af"
-  integrity sha512-wzch41N4yztwoRw0ak+37wxwJM2oiIiy6huGCoqkvSTA9acYWcPfn9Y4aJqmFFJ70KTJUu29f3DQ43uJ9HXzEA==
-  dependencies:
-    "@babel/helper-plugin-utils" "^7.10.4"
-    "@babel/plugin-syntax-object-rest-spread" "^7.8.0"
-    "@babel/plugin-transform-parameters" "^7.10.4"
-
-"@babel/plugin-proposal-object-rest-spread@^7.12.1":
+"@babel/plugin-proposal-object-rest-spread@7.12.1", "@babel/plugin-proposal-object-rest-spread@^7.12.1":
   version "7.12.1"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-object-rest-spread/-/plugin-proposal-object-rest-spread-7.12.1.tgz#def9bd03cea0f9b72283dac0ec22d289c7691069"
   integrity sha512-s6SowJIjzlhx8o7lsFx5zmY4At6CTtDvgNQDdPzkBQucle58A6b/TTeEBYtyDgmcXjUTM+vE8YOGHZzzbc/ioA==
@@ -759,7 +750,7 @@
     "@babel/helper-plugin-utils" "^7.10.4"
     "@babel/helper-replace-supers" "^7.12.1"
 
-"@babel/plugin-transform-parameters@^7.10.4", "@babel/plugin-transform-parameters@^7.12.1":
+"@babel/plugin-transform-parameters@^7.12.1":
   version "7.12.1"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-parameters/-/plugin-transform-parameters-7.12.1.tgz#d2e963b038771650c922eff593799c96d853255d"
   integrity sha512-xq9C5EQhdPK23ZeCdMxl8bbRnAgHFrw5EOC3KJUsSylZqdkCaFEXxGSBuTSObOpiiHHNyb82es8M1QYgfQGfNg==
@@ -2683,14 +2674,14 @@
   dependencies:
     dexie "2.0.4"
 
-"@wireapp/store-engine-sqleet@1.3.30":
-  version "1.3.30"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.30.tgz#77d4e778f8cbebdf11c02f459c0e5d2d9ed77a3c"
-  integrity sha512-ItmvqycD/q2KDOFFvQco52g0iCUafa/MYLg3OXl72yptJtkzGYRn0EKAXkCYqbirhHXuq3NygrEe+C1anufg6g==
+"@wireapp/store-engine-sqleet@1.3.33":
+  version "1.3.33"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.33.tgz#b5dd5214981e0130493931d65ff14c0a699cc72c"
+  integrity sha512-b2wxnc0IGiF3QGHFqv5Dq668WYKF7B6wdBkyCi0ZXJAXVS7n7FD9F7/fZnTD0blvUalBijipvYKR5ULrhAx8Ag==
   dependencies:
     "@babel/core" "7.9.0"
     "@babel/plugin-proposal-class-properties" "7.10.4"
-    "@babel/plugin-proposal-object-rest-spread" "7.11.0"
+    "@babel/plugin-proposal-object-rest-spread" "7.12.1"
     "@babel/plugin-proposal-optional-chaining" "7.12.1"
     "@babel/preset-typescript" "7.10.4"
     "@wireapp/websql" "0.0.17"
