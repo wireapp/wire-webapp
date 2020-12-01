@@ -56,9 +56,9 @@ export class ClientMismatchHandler {
     payload?: NewOTRMessage,
   ): Promise<NewOTRMessage> {
     const {deleted: deletedRecipients, missing: missingRecipients, redundant: redundantRecipients} = clientMismatch;
-    // Note: Broadcast messages have an empty conversation ID
     let conversationEntity: Conversation;
 
+    // Note: Broadcast messages have an empty conversation ID
     if (eventInfoEntity.conversationId !== '') {
       conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(
         eventInfoEntity.conversationId,
