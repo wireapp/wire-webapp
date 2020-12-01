@@ -1657,7 +1657,7 @@ export class MessageRepository {
         payload,
         options.precondition,
       );
-      this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
+      await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
       return response;
     } catch (axiosError) {
       const error = axiosError.response?.data;
@@ -1677,13 +1677,16 @@ export class MessageRepository {
         payload,
       );
 
-      const userIds = Object.keys(error.missing);
-      await this.grantOutgoingMessage(eventInfoEntity, userIds);
+      const missedUserIds = Object.keys(error.missing);
+      await this.grantOutgoingMessage(eventInfoEntity, missedUserIds);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
       );
-      return this.conversation_service.post_encrypted_message(conversationId, payloadWithMissingClients, true);
+      if (payloadWithMissingClients) {
+        return this.conversation_service.post_encrypted_message(conversationId, payloadWithMissingClients, true);
+      }
+      return this.conversation_service.post_encrypted_message(conversationId, payload, true);
     }
   }
 

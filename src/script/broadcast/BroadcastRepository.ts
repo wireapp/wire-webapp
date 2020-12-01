@@ -126,8 +126,8 @@ export class BroadcastRepository {
 
     return this.broadcastService
       .postBroadcastMessage(payload, eventInfoEntity.options.precondition)
-      .then(response => {
-        this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
+      .then(async response => {
+        await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
       })
       .catch(axiosError => {
@@ -144,7 +144,10 @@ export class BroadcastRepository {
         return this.clientMismatchHandler.onClientMismatch(eventInfoEntity, error, payload).then(updatedPayload => {
           this.logger.info(`Updated '${messageType}' message as broadcast`, updatedPayload);
           eventInfoEntity.forceSending();
-          return this.sendEncryptedMessage(eventInfoEntity, updatedPayload);
+          if (updatedPayload) {
+            return this.sendEncryptedMessage(eventInfoEntity, updatedPayload);
+          }
+          return this.sendEncryptedMessage(eventInfoEntity, payload);
         });
       });
   }
