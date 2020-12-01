@@ -1129,7 +1129,7 @@ export class MessageRepository {
   private async updateMessageAsSent(
     conversationEntity: Conversation,
     eventJson: ConversationEvent,
-    isoDate: string | number | Date,
+    isoDate: string,
   ): Promise<Pick<Partial<EventRecord>, 'status' | 'time'> | void> {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
@@ -1138,7 +1138,7 @@ export class MessageRepository {
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {
-          changes.time = isoDate.toString();
+          changes.time = isoDate;
           messageEntity.timestamp(timestamp);
           conversationEntity.update_timestamp_server(timestamp, true);
           conversationEntity.updateTimestamps(messageEntity);
