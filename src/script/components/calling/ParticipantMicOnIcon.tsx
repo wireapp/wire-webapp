@@ -21,13 +21,7 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
   ...props
 }) => {
   return (
-    <span
-      css={css`
-        animation: ${fadeAnimation} 1s ease infinite alternate;
-      `}
-      className={className}
-      {...props}
-    >
+    <span css={{animation: `${fadeAnimation} 1s ease infinite alternate`}} className={className} {...props}>
       <svg
         css={{
           '> path': {
