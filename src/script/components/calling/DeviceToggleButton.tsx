@@ -52,7 +52,7 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
               : 'device-toggle-button-indicator-dot'
           }
           css={{'device-toggle-button-indicator-dot-active': device === currentDevice}}
-        ></span>
+        />
       ))}
     </div>
   );
