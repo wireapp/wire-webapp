@@ -1,5 +1,5 @@
 import React from 'react';
-import {css, keyframes} from '@emotion/core';
+import {keyframes} from '@emotion/core';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import SVGProvider from '../../auth/util/SVGProvider';
 
