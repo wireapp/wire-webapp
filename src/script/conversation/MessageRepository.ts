@@ -789,7 +789,7 @@ export class MessageRepository {
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
 
     try {
-      const response = await this.sendGenericMessage(eventInfoEntity);
+      const response = await this.sendGenericMessage(eventInfoEntity, true);
       this.logger.info(`Sent info about session reset to client '${clientId}' of user '${userId}'`);
       return response;
     } catch (error) {
@@ -850,8 +850,7 @@ export class MessageRepository {
       return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
-
-        return this.sendGenericMessage(eventInfoEntity);
+        return this.sendGenericMessage(eventInfoEntity, true);
       });
     });
   }
@@ -881,7 +880,7 @@ export class MessageRepository {
     linkPreviews: LinkPreview[],
     expectsReadConfirmation: boolean,
     legalHoldStatus: LegalHoldStatus,
-  ) {
+  ): Text {
     const protoText = new Text({content: textMessage, expectsReadConfirmation, legalHoldStatus});
 
     if (mentionEntities && mentionEntities.length) {
@@ -962,7 +961,7 @@ export class MessageRepository {
         return this.create_recipients(conversationId, false, userIds).then(recipients => {
           const options = {precondition, recipients};
           const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-          this.sendGenericMessage(eventInfoEntity);
+          this.sendGenericMessage(eventInfoEntity, true);
         });
       });
       return this._delete_message_by_id(conversationEntity, messageId);
@@ -1058,7 +1057,7 @@ export class MessageRepository {
         const recipients = await this.create_recipients(conversationEntity.id, true, [messageEntity.from]);
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
-        await this.sendGenericMessage(eventInfoEntity, true);
+        await this.sendGenericMessage(eventInfoEntity, false);
       } catch (error) {
         messageEntity.waitingButtonId(undefined);
         return messageEntity.setButtonError(buttonId, t('buttonActionError'));
@@ -1092,7 +1091,7 @@ export class MessageRepository {
     return this.messageSender.queueMessage(async () => {
       const recipients = await this.create_recipients(eventInfoEntity.conversationId);
       eventInfoEntity.updateOptions({recipients});
-      return this.sendGenericMessage(eventInfoEntity);
+      return this.sendGenericMessage(eventInfoEntity, true);
     });
   }
 
@@ -1168,16 +1167,9 @@ export class MessageRepository {
     return recipients;
   }
 
-  /**
-   * Sends a generic message to a conversation.
-   *
-   * @param eventInfoEntity Info about event
-   * @param skipLegalHold Skip the legal hold detection
-   * @returns Resolves when the message was sent
-   */
-  private async sendGenericMessage(eventInfoEntity: EventInfoEntity, skipLegalHold = false): Promise<ClientMismatch> {
+  private async sendGenericMessage(eventInfoEntity: EventInfoEntity, checkLegalHold: boolean): Promise<ClientMismatch> {
     try {
-      await this.grantOutgoingMessage(eventInfoEntity, undefined, skipLegalHold);
+      await this.grantOutgoingMessage(eventInfoEntity, undefined, checkLegalHold);
       const sendAsExternal = await this.shouldSendAsExternal(eventInfoEntity);
       if (sendAsExternal) {
         return this.sendExternalGenericMessage(eventInfoEntity);
@@ -1242,7 +1234,7 @@ export class MessageRepository {
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
     userIds: string[],
-    skipLegalHold = false,
+    checkLegalHold: boolean,
   ): Promise<boolean> {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
@@ -1282,7 +1274,7 @@ export class MessageRepository {
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
 
     // Legal Hold
-    if (!skipLegalHold) {
+    if (checkLegalHold) {
       const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
       const localLegalHoldStatus = conversationEntity.legalHoldStatus();
       await this.updateAllClients(conversationEntity, !isMessageEdit);
@@ -1309,14 +1301,14 @@ export class MessageRepository {
 
       return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
     }
-    return this.grantMessage(eventInfoEntity, consentType, userIds);
+    return this.grantMessage(eventInfoEntity, consentType, userIds, false);
   }
 
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
     consentType: string,
-    userIds: string[] = null,
-    shouldShowLegalHoldWarning = false,
+    userIds: string[],
+    shouldShowLegalHoldWarning: boolean,
   ): Promise<boolean> {
     const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(
       eventInfoEntity.conversationId,
@@ -1558,7 +1550,7 @@ export class MessageRepository {
             eventInfoEntity.updateOptions({recipients});
             return eventInfoEntity;
           });
-      return recipientsPromise.then(infoEntity => this.sendGenericMessage(infoEntity));
+      return recipientsPromise.then(infoEntity => this.sendGenericMessage(infoEntity, true));
     });
   }
 
@@ -1678,7 +1670,7 @@ export class MessageRepository {
       );
 
       const missedUserIds = Object.keys(error.missing);
-      await this.grantOutgoingMessage(eventInfoEntity, missedUserIds);
+      await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
