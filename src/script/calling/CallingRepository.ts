@@ -505,7 +505,7 @@ export class CallingRepository {
     const consentType = isResponse
       ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
       : ConversationRepository.CONSENT_TYPE.OUTGOING_CALL;
-    return this.messageRepository.grantMessage(eventInfoEntity, consentType);
+    return this.messageRepository.grantMessage(eventInfoEntity, consentType, [], false);
   }
 
   private abortCall(conversationId: string): void {
