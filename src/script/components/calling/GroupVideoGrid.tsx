@@ -24,6 +24,7 @@ import type {Grid} from '../../calling/videoGridHandler';
 import type {Participant} from '../../calling/Participant';
 import Video from './Video';
 import {t} from '../../util/LocalizerUtil';
+import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 
 export interface GroupVideoGripProps {
   grid: Grid;
@@ -93,7 +94,8 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               srcObject={participant.videoStream()}
               css={{
                 'group-video-grid__element-video--contain': !!maximizedParticipant || participant.sharesScreen(),
-                mirror: participant === selfParticipant && participant.sharesCamera(),
+                transform:
+                  participant === selfParticipant && participant.sharesCamera() ? 'rotateY(180deg)' : 'initial',
               }}
             />
             {!minimized && (
@@ -106,12 +108,11 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                     ></svg>
                   </span>
                 ) : (
-                  <span className="group-video-grid__element__label__icon">
-                    <svg
-                      viewBox="0 0 16 16"
-                      dangerouslySetInnerHTML={{__html: SVGProvider['mic-on-icon']?.documentElement?.innerHTML}}
-                    ></svg>
-                  </span>
+                  <ParticipantMicOnIcon
+                    isActive={participant.isActivelySpeaking()}
+                    activeColor={participant.user.accent_color()}
+                    className="group-video-grid__element__label__icon"
+                  />
                 )}
                 <span className="group-video-grid__element__label__name">{participant.user.name()}</span>
               </div>
@@ -147,7 +148,8 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             data-uie-name="self-video-thumbnail"
             css={{
               'group-video__thumbnail--minimized': minimized,
-              mirror: grid.thumbnail.hasActiveVideo() && !grid.thumbnail.sharesScreen(),
+              transform:
+                grid.thumbnail.hasActiveVideo() && !grid.thumbnail.sharesScreen() ? 'rotateY(180deg)' : 'initial',
             }}
             srcObject={grid.thumbnail.videoStream()}
           />

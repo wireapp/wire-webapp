@@ -24,6 +24,16 @@ import type {Participant, UserId, ClientId} from './Participant';
 
 export type ConversationId = string;
 
+interface ActiveSpeaker {
+  audio_level: number;
+  clientid: string;
+  userid: string;
+}
+
+interface ActiveSpeakers {
+  audio_levels: ActiveSpeaker[];
+}
+
 export class Call {
   public readonly conversationId: ConversationId;
   public readonly initiator: UserId;
@@ -74,6 +84,27 @@ export class Call {
 
   getSelfParticipant(): Participant {
     return this.participants().find(({user, clientId}) => user.isMe && this.selfClientId === clientId);
+  }
+
+  setActiveSpeakers(activeSpeakers: ActiveSpeakers): void {
+    const activeParticipants: {[clientId: string]: ActiveSpeaker} = {};
+    activeSpeakers.audio_levels.forEach(speaker => {
+      activeParticipants[speaker.clientid] = speaker;
+    });
+    this.participants().forEach(participant => {
+      const activeSpeakerParticipant = activeParticipants[participant.clientId];
+      if (activeSpeakerParticipant) {
+        participant.audioLevel(activeSpeakerParticipant.audio_level);
+        participant.isActivelySpeaking(true);
+        return;
+      }
+      participant.audioLevel(0);
+      participant.isActivelySpeaking(false);
+    });
+  }
+
+  getActiveSpeakers(): Participant[] {
+    return this.participants().filter(p => p.isActivelySpeaking());
   }
 
   addParticipant(participant: Participant): void {
