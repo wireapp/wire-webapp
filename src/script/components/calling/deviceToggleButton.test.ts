@@ -59,9 +59,8 @@ describe('deviceToggleButton', () => {
     const deviceToggleButton = new DeviceToggleButtonPage(props);
 
     const button = deviceToggleButton.getButton();
-    if (!button) {
-      fail('button was not found');
-    }
+
+    expect(button.exists()).toBe(true);
 
     deviceToggleButton.clickOnButton();
 
