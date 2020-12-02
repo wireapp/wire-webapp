@@ -37,6 +37,7 @@ import type {Conversation} from '../../entity/Conversation';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import {Config} from 'src/script/Config';
 
 export interface FullscreenVideoCallProps {
   call: Call;
@@ -126,6 +127,24 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       window.clearInterval(callDurationUpdateInterval);
     };
   }, [call.startedAt()]);
+
+  useEffect(() => {
+    let minimizeTimeout: number;
+    const effect = () => {
+      minimizeTimeout = undefined;
+      if (!videoGrid.hasRemoteVideo && multitasking.autoMinimize()) {
+        minimizeTimeout = window.setTimeout(() => {
+          if (!isChoosingScreen) {
+            multitasking.isMinimized(true);
+          }
+        }, FullscreenVideoCallConfig.AUTO_MINIMIZE_TIMEOUT);
+      }
+    };
+    effect();
+    return () => {
+      window.clearTimeout(minimizeTimeout);
+    };
+  }, [videoGrid]);
 
   return (
     <React.Fragment>
