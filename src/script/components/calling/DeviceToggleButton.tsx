@@ -37,11 +37,20 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
   };
 
   return (
-    <div className="device-toggle-button-indicator" onClick={selectNextDevice}>
+    <div
+      className="device-toggle-button-indicator"
+      data-uie-name="device-toggle-button-indicator"
+      onClick={selectNextDevice}
+    >
       {devices.map(device => (
         <span
           key={device}
           className="device-toggle-button-indicator-dot"
+          data-uie-name={
+            device === currentDevice
+              ? 'device-toggle-button-indicator-dot-active'
+              : 'device-toggle-button-indicator-dot'
+          }
           css={{'device-toggle-button-indicator-dot-active': device === currentDevice}}
         ></span>
       ))}
