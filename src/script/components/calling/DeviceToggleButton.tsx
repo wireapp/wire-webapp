@@ -41,6 +41,10 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
       className="device-toggle-button-indicator"
       data-uie-name="device-toggle-button-indicator"
       onClick={selectNextDevice}
+      css={{
+        display: 'flex',
+        marginTop: 8,
+      }}
     >
       {devices.map(device => (
         <span
@@ -51,7 +55,15 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
               ? 'device-toggle-button-indicator-dot-active'
               : 'device-toggle-button-indicator-dot'
           }
-          css={{'device-toggle-button-indicator-dot-active': device === currentDevice}}
+          css={{
+            '&:not(:last-child)': {marginRight: 8},
+            backgroundColor: device === currentDevice ? 'currentColor' : 'var(--foreground-fade-24)',
+            borderRadius: '50%',
+            color: '#fff',
+            display: 'inline-block',
+            height: 8,
+            width: 8,
+          }}
         />
       ))}
     </div>
