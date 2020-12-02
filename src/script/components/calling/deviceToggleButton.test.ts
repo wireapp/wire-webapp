@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,46 +17,53 @@
  *
  */
 
-import ko from 'knockout';
+import DeviceToggleButton, {DeviceToggleButtonProps} from './DeviceToggleButton';
+import TestPage from 'Util/test/TestPage';
 
-import {instantiateComponent} from '../../../../test/helper/knockoutHelpers';
-import './deviceToggleButton';
+class DeviceToggleButtonPage extends TestPage<DeviceToggleButtonProps> {
+  constructor(props?: DeviceToggleButtonProps) {
+    super(DeviceToggleButton, props);
+  }
+
+  getDots = () => this.get('span[data-uie-name="device-toggle-button-indicator-dot"]');
+  getActiveDot = () => this.get('span[data-uie-value="active"]');
+  getButton = () => this.get('div[data-uie-name="device-toggle-button-indicator"]');
+
+  clickOnButton = () => this.click(this.getButton());
+}
 
 describe('deviceToggleButton', () => {
-  it('shows the available devices and highlight the current active device', () => {
+  it('shows the available devices and highlight the current active device', async () => {
     const devices = ['first', 'second'];
-    const params = {
-      currentDevice: ko.observable(devices[0]),
-      devices: ko.observable(devices),
+    const deviceToggleButton = new DeviceToggleButtonPage({
+      currentDevice: devices[0],
+      devices: devices,
       onChooseDevice: () => {},
-    };
-
-    return instantiateComponent('device-toggle-button', params).then((domContainer: Element) => {
-      const dots = domContainer.querySelectorAll('.device-toggle-button-indicator-dot');
-
-      expect(dots.length).toBe(devices.length);
-      const activeDot = domContainer.querySelector('.device-toggle-button-indicator-dot-active');
-
-      expect(activeDot).not.toBe(null);
     });
+
+    const dots = deviceToggleButton.getDots();
+
+    expect(dots.length).toBe(devices.length);
+
+    const activeDot = deviceToggleButton.getActiveDot();
+
+    expect(activeDot.exists()).toBe(true);
+    expect(activeDot).not.toBe(null);
   });
 
   it('switches to next device when clicked', () => {
     const devices = ['first', 'second'];
-    const params = {
-      currentDevice: ko.observable(devices[0]),
-      devices: ko.observable(devices),
-      onChooseDevice: jasmine.createSpy('chooseDevice'),
+    const props = {
+      currentDevice: devices[0],
+      devices: devices,
+      onChooseDevice: jest.fn(),
     };
+    const deviceToggleButton = new DeviceToggleButtonPage(props);
 
-    return instantiateComponent('device-toggle-button', params).then((domContainer: Element) => {
-      const button = domContainer.querySelector('.device-toggle-button-indicator') as HTMLButtonElement;
-      if (!button) {
-        fail('button was not found');
-      }
-      button.click();
+    expect(deviceToggleButton.getButton().exists()).toBe(true);
 
-      expect(params.onChooseDevice).toHaveBeenCalled();
-    });
+    deviceToggleButton.clickOnButton();
+
+    expect(props.onChooseDevice).toHaveBeenCalled();
   });
 });

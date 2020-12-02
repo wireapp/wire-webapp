@@ -30,7 +30,7 @@ import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../med
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
 
-import 'Components/calling/deviceToggleButton';
+import 'Components/calling/DeviceToggleButton';
 
 interface Params {
   call: Call;
