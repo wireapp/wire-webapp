@@ -257,6 +257,7 @@ export class CallingRepository {
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
     wCall.setReqClientsHandler(wUser, this.requestClients);
+    wCall.setActiveSpeakerHandler(wUser, this.updateActiveSpeakers);
 
     return wUser;
   }
@@ -1191,6 +1192,20 @@ export class CallingRepository {
     })();
 
     return this.mediaStreamQuery;
+  };
+
+  private readonly updateActiveSpeakers = (wuser: number, conversationId: string, rawJson: string) => {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return;
+    }
+
+    const activeSpeakers = JSON.parse(rawJson);
+    if (!activeSpeakers) {
+      return;
+    }
+
+    call.setActiveSpeakers(activeSpeakers);
   };
 
   private readonly updateParticipantStream = (
