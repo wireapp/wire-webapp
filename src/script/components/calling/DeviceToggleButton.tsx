@@ -50,11 +50,8 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
         <span
           key={device}
           className="device-toggle-button-indicator-dot"
-          data-uie-name={
-            device === currentDevice
-              ? 'device-toggle-button-indicator-dot-active'
-              : 'device-toggle-button-indicator-dot'
-          }
+          data-uie-name="device-toggle-button-indicator-dot"
+          data-uie-value={device === currentDevice ? 'active' : 'inactive'}
           css={{
             '&:not(:last-child)': {marginRight: 8},
             backgroundColor: device === currentDevice ? 'currentColor' : 'var(--foreground-fade-24)',
