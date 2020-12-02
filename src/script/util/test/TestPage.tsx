@@ -51,5 +51,6 @@ export default class TestPage<T> {
   keyCodeDown = (element: ReactWrapper, keyCode: number) => this.do(() => element.simulate('keydown', {keyCode}));
 
   update = () => this.driver.update();
+  setProps = (props: T) => this.driver.setProps(props);
   debug = (element?: ReactWrapper) => console.info((element ? element : this.driver).debug());
 }

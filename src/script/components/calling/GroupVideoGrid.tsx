@@ -18,6 +18,8 @@
  */
 
 import React, {useState, CSSProperties} from 'react';
+import {css} from '@emotion/core';
+
 import {registerReactComponent} from 'Util/ComponentUtil';
 import SVGProvider from '../../auth/util/SVGProvider';
 import type {Grid} from '../../calling/videoGridHandler';
@@ -76,7 +78,13 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     <div className="group-video">
       <div
         className="group-video-grid"
-        css={{'group-video-grid--black-background': hasBlackBackground()}}
+        css={
+          hasBlackBackground()
+            ? css`
+                background-color: #000;
+              `
+            : undefined
+        }
         style={rowsAndColumns}
         data-uie-name="grids-wrapper"
       >
@@ -93,7 +101,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               playsInline
               srcObject={participant.videoStream()}
               css={{
-                'group-video-grid__element-video--contain': !!maximizedParticipant || participant.sharesScreen(),
+                objectFit: !!maximizedParticipant || participant.sharesScreen() ? 'contain' : 'initial',
                 transform:
                   participant === selfParticipant && participant.sharesCamera() ? 'rotateY(180deg)' : 'initial',
               }}
@@ -125,7 +133,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                 </div>
                 <div
                   className="group-video-grid__pause-overlay__label"
-                  css={{'group-video-grid__pause-overlay__label--minimized': minimized}}
+                  css={{fontsize: minimized ? 11 : 14}}
                   data-uie-name="status-video-paused"
                 >
                   {t('videoCallPaused')}
@@ -138,7 +146,17 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
       {grid.thumbnail && grid.thumbnail.videoStream() && !maximizedParticipant && (
         <div
           className="group-video__thumbnail"
-          css={{'group-video__thumbnail--minimized': minimized}}
+          css={
+            minimized
+              ? css`
+                  top: unset;
+                  right: 8px;
+                  bottom: 8px;
+                  width: 80px;
+                  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+                `
+              : undefined
+          }
           data-uie-name="self-video-thumbnail-wrapper"
         >
           <Video
@@ -147,7 +165,6 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             playsInline
             data-uie-name="self-video-thumbnail"
             css={{
-              'group-video__thumbnail--minimized': minimized,
               transform:
                 grid.thumbnail.hasActiveVideo() && !grid.thumbnail.sharesScreen() ? 'rotateY(180deg)' : 'initial',
             }}
