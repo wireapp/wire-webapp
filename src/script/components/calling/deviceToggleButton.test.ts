@@ -33,7 +33,7 @@ class DeviceToggleButtonPage extends TestPage<DeviceToggleButtonProps> {
 }
 
 describe('deviceToggleButton', () => {
-  it('renders video grids', async () => {
+  it('shows the available devices and highlight the current active device', async () => {
     const devices = ['first', 'second'];
     const deviceToggleButton = new DeviceToggleButtonPage({
       currentDevice: devices[0],
