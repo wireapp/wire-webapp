@@ -37,7 +37,6 @@ import type {Conversation} from '../../entity/Conversation';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
-import {Config} from 'src/script/Config';
 
 export interface FullscreenVideoCallProps {
   call: Call;
