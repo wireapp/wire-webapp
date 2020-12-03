@@ -194,7 +194,7 @@ describe('ConversationRepository', () => {
         ]),
       );
 
-      const injectLegalHoldMessageSpy = spyOn(testFactory.conversation_repository, 'injectLegalHoldMessage');
+      const injectLegalHoldMessageSpy = spyOn(testFactory.conversation_repository, 'injectLegalHoldSystemMessage');
       await testFactory.conversation_repository.saveConversation(conversationEntity);
       await testFactory.conversation_repository.checkLegalHoldStatus(conversationEntity, eventJson);
 
