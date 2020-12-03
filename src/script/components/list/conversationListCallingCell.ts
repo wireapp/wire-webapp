@@ -29,7 +29,7 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
-import 'Components/calling/fullscreenVideoCall';
+import 'Components/calling/FullscreenVideoCall.tsx';
 import 'Components/calling/GroupVideoGrid';
 import 'Components/list/participantItem';
 import type {Call} from '../../calling/Call';

@@ -18,15 +18,15 @@
  */
 
 import React from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
-
+import {css, SerializedStyles} from '@emotion/core';
 export interface DeviceToggleButtonProps {
   currentDevice: string;
   devices: string[];
   onChooseDevice: (deviceId: string) => void;
+  styles?: SerializedStyles;
 }
 
-const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, devices, onChooseDevice}) => {
+const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, devices, onChooseDevice, styles}) => {
   const selectNextDevice = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -38,39 +38,44 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
 
   return (
     <div
-      className="device-toggle-button-indicator"
-      data-uie-name="device-toggle-button-indicator"
-      onClick={selectNextDevice}
-      css={{
-        display: 'flex',
-        marginTop: 8,
-      }}
+      css={css`
+        align-items: center;
+        flex-direction: column;
+        color: #fff;
+        cursor: pointer;
+        display: inline-flex;
+        ${styles};
+      `}
     >
-      {devices.map(device => (
-        <span
-          key={device}
-          className="device-toggle-button-indicator-dot"
-          data-uie-name="device-toggle-button-indicator-dot"
-          data-uie-value={device === currentDevice ? 'active' : 'inactive'}
-          css={{
-            '&:not(:last-child)': {marginRight: 8},
-            backgroundColor: device === currentDevice ? 'currentColor' : 'var(--foreground-fade-24)',
-            borderRadius: '50%',
-            color: '#fff',
-            display: 'inline-block',
-            height: 8,
-            width: 8,
-          }}
-        />
-      ))}
+      <div
+        className="device-toggle-button-indicator"
+        data-uie-name="device-toggle-button-indicator"
+        onClick={selectNextDevice}
+        css={{
+          display: 'flex',
+          marginTop: 8,
+        }}
+      >
+        {devices.map(device => (
+          <span
+            key={device}
+            className="device-toggle-button-indicator-dot"
+            data-uie-name="device-toggle-button-indicator-dot"
+            data-uie-value={device === currentDevice ? 'active' : 'inactive'}
+            css={{
+              '&:not(:last-child)': {marginRight: 8},
+              backgroundColor: device === currentDevice ? 'currentColor' : 'var(--foreground-fade-24)',
+              borderRadius: '50%',
+              color: '#fff',
+              display: 'inline-block',
+              height: 8,
+              width: 8,
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 };
 
 export default DeviceToggleButton;
-
-registerReactComponent('device-toggle-button', {
-  component: DeviceToggleButton,
-  template:
-    '<div data-bind="react: {currentDevice: ko.unwrap(currentDevice), devices: ko.unwrap(devices), onChooseDevice}"></div>',
-});
