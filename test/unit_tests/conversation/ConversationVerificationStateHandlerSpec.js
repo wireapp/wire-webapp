@@ -44,7 +44,7 @@ describe('ConversationVerificationStateHandler', () => {
 
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(_conversation_repository => {
-      spyOn(testFactory.event_repository, 'injectEvent').and.returnValue(undefined);
+      jest.spyOn(testFactory.event_repository, 'injectEvent').mockReturnValue(undefined);
       conversationRepository = _conversation_repository;
       stateHandler = conversationRepository.verificationStateHandler;
 
@@ -56,7 +56,7 @@ describe('ConversationVerificationStateHandler', () => {
       selfUserEntity.isMe = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
-      spyOn(conversationRepository.userState, 'self').and.returnValue(selfUserEntity);
+      jest.spyOn(conversationRepository.userState, 'self').mockReturnValue(selfUserEntity);
 
       userA = new User(createRandomUuid());
       userB = new User(createRandomUuid());
@@ -94,7 +94,7 @@ describe('ConversationVerificationStateHandler', () => {
   describe('onClientAdd', () => {
     it('should change state to DEGRADED if new unverified client was added', () => {
       const degradedEvent = {type: 'degraded'};
-      spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
+      jest.spyOn(EventBuilder, 'buildDegraded').mockReturnValue(degradedEvent);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
@@ -115,7 +115,7 @@ describe('ConversationVerificationStateHandler', () => {
     });
 
     it('should not change VERIFIED state if new verified client was added', () => {
-      spyOn(EventBuilder, 'buildAllVerified');
+      jest.spyOn(EventBuilder, 'buildAllVerified');
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
@@ -141,8 +141,8 @@ describe('ConversationVerificationStateHandler', () => {
     it('should change state from DEGRADED to VERIFIED if last unverified client was removed', () => {
       const degradedEvent = {type: 'degraded'};
       const verifiedEvent = {type: 'verified'};
-      spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
-      spyOn(EventBuilder, 'buildAllVerified').and.returnValue(verifiedEvent);
+      jest.spyOn(EventBuilder, 'buildDegraded').mockReturnValue(degradedEvent);
+      jest.spyOn(EventBuilder, 'buildAllVerified').mockReturnValue(verifiedEvent);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
@@ -175,8 +175,8 @@ describe('ConversationVerificationStateHandler', () => {
     it('should change state from DEGRADED to VERIFIED if last unverified client was removed by other user', () => {
       const degradedEvent = {type: 'degraded'};
       const verifiedEvent = {type: 'verified'};
-      spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
-      spyOn(EventBuilder, 'buildAllVerified').and.returnValue(verifiedEvent);
+      jest.spyOn(EventBuilder, 'buildDegraded').mockReturnValue(degradedEvent);
+      jest.spyOn(EventBuilder, 'buildAllVerified').mockReturnValue(verifiedEvent);
 
       const new_client = new ClientEntity();
       new_client.meta.isVerified(false);
@@ -204,7 +204,7 @@ describe('ConversationVerificationStateHandler', () => {
   describe('onMemberJoined', () => {
     it('should change state to DEGRADED if new user with unverified client was added to conversation', () => {
       const degradedEvent = {type: 'degraded'};
-      spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
+      jest.spyOn(EventBuilder, 'buildDegraded').mockReturnValue(degradedEvent);
 
       const new_user = new User(createRandomUuid());
       const new_client_b = new ClientEntity();
@@ -223,7 +223,7 @@ describe('ConversationVerificationStateHandler', () => {
     });
 
     it('should not change state if new user with verified client was added to conversation', () => {
-      spyOn(EventBuilder, 'buildDegraded');
+      jest.spyOn(EventBuilder, 'buildDegraded');
 
       const new_user = new User(createRandomUuid());
       const new_client_b = new ClientEntity();
