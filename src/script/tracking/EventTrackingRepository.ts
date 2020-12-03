@@ -74,10 +74,9 @@ export class EventTrackingRepository {
 
   onUserEvent = (eventJson: any, source: EventSource) => {
     const type = eventJson.type;
-    if (type !== ClientEvent.USER.DATA_TRANSFER) {
-      return;
+    if (type === ClientEvent.USER.DATA_TRANSFER && this.userState.isTeam()) {
+      this.migrateDeviceId(eventJson.data.trackingIdentifier);
     }
-    this.migrateDeviceId(eventJson.data.trackingIdentifier);
   };
 
   migrateDeviceId = async (newId: string) => {
@@ -193,6 +192,7 @@ export class EventTrackingRepository {
 
     Countly.init({
       app_key: window.wire.env.COUNTLY_API_KEY,
+      app_version: Config.getConfig().VERSION,
       debug: !Environment.frontend.isProduction(),
       device_id: trackingId || this.countlyDeviceId,
       url: 'https://countly.wire.com/',
@@ -279,6 +279,7 @@ export class EventTrackingRepository {
         segmentation,
       });
 
+      // NOTE: This log is required by QA
       this.logger.info(`Reporting custom data for product event ${eventName}@${JSON.stringify(userData)}`);
       this.logger.info(`Reporting product event ${eventName}@${JSON.stringify(segmentation)}`);
     }
