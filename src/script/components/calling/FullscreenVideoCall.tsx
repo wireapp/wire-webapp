@@ -113,7 +113,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   useEffect(() => {
     const startedAt = call.startedAt();
-    console.info('startedAt', call.startedAt());
     let callDurationUpdateInterval: number;
     if (startedAt) {
       const updateTimer = () => {
@@ -130,155 +129,146 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   useEffect(() => {
     let minimizeTimeout: number;
-    const effect = () => {
-      minimizeTimeout = undefined;
-      if (!videoGrid.hasRemoteVideo && multitasking.autoMinimize()) {
-        minimizeTimeout = window.setTimeout(() => {
-          if (!isChoosingScreen) {
-            multitasking.isMinimized(true);
-          }
-        }, FullscreenVideoCallConfig.AUTO_MINIMIZE_TIMEOUT);
-      }
-    };
-    effect();
+    minimizeTimeout = undefined;
+    if (!videoGrid.hasRemoteVideo && multitasking.autoMinimize()) {
+      minimizeTimeout = window.setTimeout(() => {
+        if (!isChoosingScreen) {
+          multitasking.isMinimized(true);
+        }
+      }, FullscreenVideoCallConfig.AUTO_MINIMIZE_TIMEOUT);
+    }
     return () => {
       window.clearTimeout(minimizeTimeout);
     };
   }, [videoGrid]);
 
   return (
-    <React.Fragment>
-      <div id="video-calling" className="video-calling" ref={wrapperRef}>
-        <div id="video-element-remote" className="video-element-remote">
-          <GroupVideoGrid grid={videoGrid} muted={isMuted} selfParticipant={call.getSelfParticipant()} />
+    <div id="video-calling" className="video-calling" ref={wrapperRef}>
+      <div id="video-element-remote" className="video-element-remote">
+        <GroupVideoGrid grid={videoGrid} muted={isMuted} selfParticipant={call.getSelfParticipant()} />
+      </div>
+
+      {!isChoosingScreen && <div className="video-element-overlay hide-controls-hidden"></div>}
+
+      <div id="video-title" className="video-title hide-controls-hidden">
+        <div className="video-remote-name">{conversation.display_name()}</div>
+        <div data-uie-name="video-timer" className="video-timer label-xs">
+          {callDuration}
         </div>
+      </div>
 
-        {!isChoosingScreen && <div className="video-element-overlay hide-controls-hidden"></div>}
-
-        <div id="video-title" className="video-title hide-controls-hidden">
-          <div className="video-remote-name">{conversation.display_name()}</div>
-          <div data-uie-name="video-timer" className="video-timer label-xs">
-            {callDuration}
+      {!isChoosingScreen && (
+        <div id="video-controls" className="video-controls hide-controls-hidden">
+          <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
+            {t('videoCallOverlayFitVideoLabel')}
           </div>
-        </div>
-
-        {!isChoosingScreen && (
-          <div id="video-controls" className="video-controls hide-controls-hidden">
-            <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
-              {t('videoCallOverlayFitVideoLabel')}
+          <div className="video-controls__wrapper">
+            <div className="video-controls__button" onClick={minimize} data-uie-name="do-call-controls-video-minimize">
+              {hasUnreadMessages ? (
+                <svg
+                  css={{
+                    marginRight: '-2px',
+                    marginTop: '-2px',
+                  }}
+                  width={16}
+                  height={16}
+                  viewBox="0 0 16 16"
+                  dangerouslySetInnerHTML={{__html: SVGProvider['message-unread-icon']?.documentElement?.innerHTML}}
+                />
+              ) : (
+                <svg
+                  width={16}
+                  height={16}
+                  viewBox="0 0 16 16"
+                  dangerouslySetInnerHTML={{__html: SVGProvider['message-icon']?.documentElement?.innerHTML}}
+                />
+              )}
+              <div className="video-controls__button__label">{t('videoCallOverlayConversations')}</div>
             </div>
-            <div className="video-controls__wrapper">
+
+            <div
+              className="video-controls__button"
+              data-uie-value={!isMuted ? 'inactive' : 'active'}
+              onClick={() => callActions.toggleMute(call, !isMuted)}
+              css={isMuted ? videoControlActiveStyles : undefined}
+              data-uie-name="do-call-controls-video-call-mute"
+            >
+              <svg
+                width={16}
+                height={16}
+                viewBox="0 0 16 16"
+                dangerouslySetInnerHTML={{__html: SVGProvider['mic-off-icon']?.documentElement?.innerHTML}}
+              />
+              <div className="video-controls__button__label">{t('videoCallOverlayMute')}</div>
+            </div>
+
+            {showToggleVideo && (
               <div
                 className="video-controls__button"
-                onClick={minimize}
-                data-uie-name="do-call-controls-video-minimize"
+                data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
+                onClick={() => callActions.toggleCamera(call)}
+                css={selfSharesCamera ? videoControlActiveStyles : undefined}
+                data-uie-name="do-call-controls-toggle-video"
               >
-                {hasUnreadMessages ? (
-                  <svg
-                    css={{
-                      marginRight: '-2px',
-                      marginTop: '-2px',
-                    }}
-                    width={16}
-                    height={16}
-                    viewBox="0 0 16 16"
-                    dangerouslySetInnerHTML={{__html: SVGProvider['message-unread-icon']?.documentElement?.innerHTML}}
+                <svg
+                  width={16}
+                  height={12}
+                  viewBox="0 0 16 12"
+                  dangerouslySetInnerHTML={{__html: SVGProvider['camera-icon']?.documentElement?.innerHTML}}
+                />
+                {showSwitchCamera ? (
+                  <DeviceToggleButton
+                    styles={css`
+                      position: absolute;
+                      bottom: -16px;
+                      left: 50%;
+                      transform: translateX(-50%);
+                    `}
+                    currentDevice={currentCameraDevice}
+                    devices={availableCameras}
+                    onChooseDevice={deviceId => switchCameraSource(call, deviceId)}
                   />
                 ) : (
-                  <svg
-                    width={16}
-                    height={16}
-                    viewBox="0 0 16 16"
-                    dangerouslySetInnerHTML={{__html: SVGProvider['message-icon']?.documentElement?.innerHTML}}
-                  />
+                  <div className="video-controls__button__label">{t('videoCallOverlayVideo')}</div>
                 )}
-                <div className="video-controls__button__label">{t('videoCallOverlayConversations')}</div>
               </div>
+            )}
 
-              <div
-                className="video-controls__button"
-                data-uie-value={!isMuted ? 'inactive' : 'active'}
-                onClick={() => callActions.toggleMute(call, !isMuted)}
-                css={isMuted ? videoControlActiveStyles : undefined}
-                data-uie-name="do-call-controls-video-call-mute"
-              >
-                <svg
-                  width={16}
-                  height={16}
-                  viewBox="0 0 16 16"
-                  dangerouslySetInnerHTML={{__html: SVGProvider['mic-off-icon']?.documentElement?.innerHTML}}
-                />
-                <div className="video-controls__button__label">{t('videoCallOverlayMute')}</div>
-              </div>
+            <div
+              className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
+              data-tooltip={t('videoCallScreenShareNotSupported')}
+              css={!canShareScreen ? videoControlDisabledStyles : videoControlActiveStyles}
+              onClick={() => callActions.toggleScreenshare(call)}
+              data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
+              data-uie-enabled={canShareScreen ? 'true' : 'false'}
+              data-uie-name="do-toggle-screen"
+            >
+              <svg
+                width={16}
+                height={16}
+                viewBox="0 0 16 16"
+                dangerouslySetInnerHTML={{__html: SVGProvider['screenshare-icon']?.documentElement?.innerHTML}}
+              />
+              <div className="video-controls__button__label">{t('videoCallOverlayShareScreen')}</div>
+            </div>
 
-              {showToggleVideo && (
-                <div
-                  className="video-controls__button"
-                  data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
-                  onClick={() => callActions.toggleCamera(call)}
-                  css={selfSharesCamera ? videoControlActiveStyles : undefined}
-                  data-uie-name="do-call-controls-toggle-video"
-                >
-                  <svg
-                    width={16}
-                    height={12}
-                    viewBox="0 0 16 12"
-                    dangerouslySetInnerHTML={{__html: SVGProvider['camera-icon']?.documentElement?.innerHTML}}
-                  />
-                  {showSwitchCamera ? (
-                    <DeviceToggleButton
-                      styles={css`
-                        position: absolute;
-                        bottom: -16px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                      `}
-                      currentDevice={currentCameraDevice}
-                      devices={availableCameras}
-                      onChooseDevice={deviceId => switchCameraSource(call, deviceId)}
-                    />
-                  ) : (
-                    <div className="video-controls__button__label">{t('videoCallOverlayVideo')}</div>
-                  )}
-                </div>
-              )}
-
-              <div
-                className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
-                data-tooltip={t('videoCallScreenShareNotSupported')}
-                css={!canShareScreen ? videoControlDisabledStyles : videoControlActiveStyles}
-                onClick={() => callActions.toggleScreenshare(call)}
-                data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
-                data-uie-enabled={canShareScreen ? 'true' : 'false'}
-                data-uie-name="do-toggle-screen"
-              >
-                <svg
-                  width={16}
-                  height={16}
-                  viewBox="0 0 16 16"
-                  dangerouslySetInnerHTML={{__html: SVGProvider['screenshare-icon']?.documentElement?.innerHTML}}
-                />
-                <div className="video-controls__button__label">{t('videoCallOverlayShareScreen')}</div>
-              </div>
-
-              <div
-                className="video-controls__button video-controls__button--red"
-                onClick={() => callActions.leave(call)}
-                data-uie-name="do-call-controls-video-call-cancel"
-              >
-                <svg
-                  width={20}
-                  height={8}
-                  viewBox="0 0 20 8"
-                  dangerouslySetInnerHTML={{__html: SVGProvider['hangup-icon']?.documentElement?.innerHTML}}
-                />
-                <div className="video-controls__button__label">{t('videoCallOverlayHangUp')}</div>
-              </div>
+            <div
+              className="video-controls__button video-controls__button--red"
+              onClick={() => callActions.leave(call)}
+              data-uie-name="do-call-controls-video-call-cancel"
+            >
+              <svg
+                width={20}
+                height={8}
+                viewBox="0 0 20 8"
+                dangerouslySetInnerHTML={{__html: SVGProvider['hangup-icon']?.documentElement?.innerHTML}}
+              />
+              <div className="video-controls__button__label">{t('videoCallOverlayHangUp')}</div>
             </div>
           </div>
-        )}
-      </div>
-    </React.Fragment>
+        </div>
+      )}
+    </div>
   );
 };
 
