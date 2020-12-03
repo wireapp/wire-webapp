@@ -143,7 +143,7 @@ describe('ConversationRepository', () => {
       conversationEntity.selfUser(selfUser);
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 
-      expect(conversationEntity._isInitialized()).toBe(true);
+      expect(conversationEntity.hasInitializedUsers()).toBe(true);
       expect(conversationEntity.hasLegalHold()).toBe(false);
       expect(conversationEntity.participating_user_ets().length).toBe(1);
 
