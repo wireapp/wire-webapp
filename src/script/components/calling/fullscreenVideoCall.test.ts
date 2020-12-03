@@ -99,11 +99,9 @@ describe('fullscreenVideoCall', () => {
     const fullscreenVideoCall = new FullscreenVideoCallPage(props);
     const now = Date.now();
 
-    act(() => {
-      jest.setSystemTime(now);
-      props.call.startedAt(Date.now());
-      fullscreenVideoCall.setProps(props);
-    });
+    jest.setSystemTime(now);
+    props.call.startedAt(Date.now());
+    fullscreenVideoCall.setProps(props);
 
     expect(fullscreenVideoCall.getVideoTimer().text()).toEqual('00:00');
 
