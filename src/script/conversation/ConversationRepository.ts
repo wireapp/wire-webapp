@@ -223,7 +223,10 @@ export class ConversationRepository {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState.bind(this));
     amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
     amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.onUnblockUser.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage.bind(this));
+    amplify.subscribe(
+      WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE,
+      this.injectLegalHoldSystemMessage.bind(this),
+    );
 
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity.bind(this));
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity.bind(this));
@@ -1552,7 +1555,7 @@ export class ConversationRepository {
   // Send Generic Messages
   //##############################################################################
 
-  async injectLegalHoldMessage({
+  async injectLegalHoldSystemMessage({
     conversationEntity,
     conversationId,
     userId,
@@ -1566,16 +1569,13 @@ export class ConversationRepository {
     legalHoldStatus: LegalHoldStatus;
     timestamp: number;
     userId: string;
-  }) {
-    if (typeof legalHoldStatus === 'undefined') {
-      return;
-    }
+  }): Promise<void> {
     if (!timestamp) {
       const conversation = conversationEntity || this.conversationState.findConversation(conversationId);
       const servertime = this.serverTimeHandler.toServerTimestamp();
       timestamp = conversation.get_latest_timestamp(servertime);
     }
-    const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
+    const legalHoldUpdateMessage = EventBuilder.buildLegalHoldSystemMessage(
       conversationId || conversationEntity.id,
       userId,
       timestamp,
@@ -1759,7 +1759,7 @@ export class ConversationRepository {
       time: isoTimestamp,
     } = eventJson;
 
-    await this.injectLegalHoldMessage({
+    await this.injectLegalHoldSystemMessage({
       beforeTimestamp: true,
       conversationId,
       legalHoldStatus: messageLegalHoldStatus,
@@ -1767,13 +1767,13 @@ export class ConversationRepository {
       userId,
     });
 
-    await this.messageRepositoryProvider().updateAllClients(conversationEntity);
+    await this.messageRepositoryProvider().updateAllClients(conversationEntity, true);
 
     if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
       return conversationEntity;
     }
 
-    await this.injectLegalHoldMessage({
+    await this.injectLegalHoldSystemMessage({
       conversationId,
       legalHoldStatus: conversationEntity.legalHoldStatus(),
       timestamp: isoTimestamp,

@@ -74,7 +74,7 @@ import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
 import {StatusType} from '../message/StatusType';
 import {BackendClientError} from '../error/BackendClientError';
-import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
+import {showLegalHoldWarningModal} from '../legal-hold/LegalHoldWarning';
 import {ConversationError} from '../error/ConversationError';
 import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
@@ -1287,7 +1287,7 @@ export class MessageRepository {
 
       if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
         const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
-        await this.conversationRepositoryProvider().injectLegalHoldMessage({
+        await this.conversationRepositoryProvider().injectLegalHoldSystemMessage({
           beforeTimestamp: true,
           conversationId,
           legalHoldStatus: updatedLocalLegalHoldStatus,
@@ -1325,7 +1325,7 @@ export class MessageRepository {
     const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
     if (conversationEntity.needsLegalHoldApproval) {
       conversationEntity.needsLegalHoldApproval = false;
-      return showLegalHoldWarning(conversationEntity, conversationDegraded);
+      return showLegalHoldWarningModal(conversationEntity, conversationDegraded);
     } else if (shouldShowLegalHoldWarning) {
       conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
     }
@@ -1424,9 +1424,9 @@ export class MessageRepository {
     });
   }
 
-  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage = true) {
+  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean): Promise<void> {
     if (blockSystemMessage) {
-      conversationEntity.blockLegalHoldMessage = true;
+      conversationEntity.blockLegalHoldSystemMessage = true;
     }
     const sender = this.clientRepository['clientState'].currentClient().id;
     try {
@@ -1475,7 +1475,7 @@ export class MessageRepository {
       }
     }
     if (blockSystemMessage) {
-      conversationEntity.blockLegalHoldMessage = false;
+      conversationEntity.blockLegalHoldSystemMessage = false;
     }
   }
 
@@ -1554,15 +1554,8 @@ export class MessageRepository {
     });
   }
 
-  /**
-   * Estimate whether message should be send as type external.
-   *
-   * @param eventInfoEntity Info about event
-   * @returns Is payload likely to be too big so that we switch to type external?
-   */
-  private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
+  private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity): Promise<boolean> {
     const {conversationId, genericMessage} = eventInfoEntity;
-
     const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(conversationId);
     const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;

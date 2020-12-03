@@ -29,10 +29,10 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {OPEN_CONVERSATION_DETAILS} from '../view_model/PanelViewModel';
 import {ConversationError} from '../error/ConversationError';
 
-export const showLegalHoldWarning = (
+export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,
-  verifyDevices: boolean = false,
-): Promise<boolean> => {
+  conversationDegraded: boolean,
+): Promise<true> => {
   return new Promise((resolve, reject) => {
     const secondaryAction = [
       {
@@ -40,7 +40,7 @@ export const showLegalHoldWarning = (
         text: t('legalHoldWarningSecondaryInformation'),
       },
     ];
-    if (verifyDevices) {
+    if (conversationDegraded) {
       secondaryAction.push({
         action: () => amplify.publish(OPEN_CONVERSATION_DETAILS),
         text: t('legalHoldWarningSecondaryVerify'),
@@ -58,7 +58,7 @@ export const showLegalHoldWarning = (
       preventClose: true,
       primaryAction: {
         action: () => {
-          if (verifyDevices) {
+          if (conversationDegraded) {
             conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
           }
           resolve(true);

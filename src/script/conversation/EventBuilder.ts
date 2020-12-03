@@ -239,7 +239,7 @@ export const EventBuilder = {
     };
   },
 
-  buildLegalHoldMessage(
+  buildLegalHoldSystemMessage(
     conversationId: string,
     userId: string,
     timestamp: number,

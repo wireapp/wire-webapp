@@ -103,7 +103,7 @@ export class Conversation {
   private readonly mutedTimestamp: ko.Observable<number>;
   private readonly publishPersistState: (() => void) & Cancelable;
   private shouldPersistStateChanges: boolean;
-  public blockLegalHoldMessage: boolean;
+  public blockLegalHoldSystemMessage: boolean;
   public hasCreationMessage: boolean;
   public needsLegalHoldApproval: boolean;
   public readonly accessCode: ko.Observable<string>;
@@ -282,7 +282,7 @@ export class Conversation {
     this.is_archived = this.archivedState;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
     this.is_verified = ko.pureComputed(() => {
-      if (!this._isInitialized()) {
+      if (!this.hasInitializedUsers()) {
         return undefined;
       }
 
@@ -292,9 +292,9 @@ export class Conversation {
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
 
     this.hasLegalHold = ko.computed(() => {
-      const isInitialized = this._isInitialized();
-      const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
-      if (isInitialized) {
+      const hasInitializedUsers = this.hasInitializedUsers();
+      const hasLegalHold = hasInitializedUsers && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
+      if (hasInitializedUsers) {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
       }
       if (!hasLegalHold) {
@@ -303,10 +303,13 @@ export class Conversation {
       return hasLegalHold;
     });
 
-    this.blockLegalHoldMessage = false;
+    this.blockLegalHoldSystemMessage = false;
 
     this.legalHoldStatus.subscribe(legalHoldStatus => {
-      if (!this.blockLegalHoldMessage && this._isInitialized()) {
+      if (this.blockLegalHoldSystemMessage) {
+        return;
+      }
+      if (this.hasInitializedUsers()) {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
           conversationEntity: this,
           legalHoldStatus,
@@ -487,7 +490,7 @@ export class Conversation {
     this._initSubscriptions();
   }
 
-  private _isInitialized() {
+  private hasInitializedUsers(): boolean {
     const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
     return Boolean(this.selfUser() && hasMappedUsers);
   }
