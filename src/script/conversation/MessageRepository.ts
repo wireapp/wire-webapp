@@ -1424,7 +1424,7 @@ export class MessageRepository {
     });
   }
 
-  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage = true) {
+  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean) {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
