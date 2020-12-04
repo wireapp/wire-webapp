@@ -83,8 +83,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   videoGrid,
   videoInput,
 }) => {
-  const selfSharesScreen = call.getSelfParticipant().sharesScreen;
-  const selfSharesCamera = call.getSelfParticipant().sharesCamera;
+  const selfSharesScreen = call.getSelfParticipant().sharesScreen();
+  const selfSharesCamera = call.getSelfParticipant().sharesCamera();
   const currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput();
   const switchCameraSource = (call: Call, deviceId: string) => callActions.switchCameraInput(call, deviceId);
   const minimize = () => multitasking.isMinimized(true);
@@ -94,8 +94,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const availableCameras = videoInput.map(
     device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id,
   );
-  const showSwitchCamera = selfSharesCamera() && availableCameras.length > 1;
-
+  const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
   const wrapperRef = useRef<HTMLDivElement>(null);
   useHideElement(wrapperRef, FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
@@ -236,7 +235,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             <div
               className={`video-controls__button ${!canShareScreen ? 'with-tooltip with-tooltip--top' : ''}`}
               data-tooltip={t('videoCallScreenShareNotSupported')}
-              css={!canShareScreen ? videoControlDisabledStyles : videoControlActiveStyles}
+              css={
+                !canShareScreen ? videoControlDisabledStyles : selfSharesScreen ? videoControlActiveStyles : undefined
+              }
               onClick={() => callActions.toggleScreenshare(call)}
               data-uie-value={selfSharesScreen ? 'active' : 'inactive'}
               data-uie-enabled={canShareScreen ? 'true' : 'false'}
