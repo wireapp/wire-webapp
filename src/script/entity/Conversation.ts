@@ -34,7 +34,6 @@ import {ConversationVerificationState} from '../conversation/ConversationVerific
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
-import {HIDE_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import {ConversationError} from '../error/ConversationError';
 import type {User} from './User';
 import type {ContentMessage} from './message/ContentMessage';
@@ -44,6 +43,7 @@ import type {SystemMessage} from './message/SystemMessage';
 import {Config} from '../Config';
 import type {Call} from '../calling/Call';
 import {ConversationRecord} from '../storage/ConversationRecord';
+import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface UnreadState {
   allEvents: Message[];
@@ -271,7 +271,7 @@ export class Conversation {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
       }
       if (!hasLegalHold) {
-        amplify.publish(HIDE_LEGAL_HOLD_MODAL, this.id);
+        amplify.publish(LegalHoldModalViewModel.HIDE_DETAILS, this.id);
       }
       return hasLegalHold;
     });
