@@ -38,8 +38,8 @@ describe('media-button', () => {
 
   it('displays the media buttons if the media is uploaded', () => {
     const params = {...defaultParams, transferState: ko.observable(AssetTransferState.UPLOADED)};
-    spyOn(params, 'play');
-    spyOn(params, 'pause');
+    jest.spyOn(params, 'play');
+    jest.spyOn(params, 'pause');
     return instantiateComponent('media-button', params).then(domContainer => {
       const playButton = domContainer.querySelector('[data-uie-name=do-play-media]');
       const pauseButton = domContainer.querySelector('[data-uie-name=do-pause-media]');
