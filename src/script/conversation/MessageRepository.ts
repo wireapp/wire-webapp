@@ -1235,11 +1235,11 @@ export class MessageRepository {
     eventInfoEntity: EventInfoEntity,
     userIds: string[],
     checkLegalHold: boolean,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
-      return true;
+      return;
     }
 
     if (this.teamState.isTeam()) {
@@ -1298,10 +1298,10 @@ export class MessageRepository {
       const shouldShowLegalHoldWarning =
         haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
 
-      return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+      await this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
     }
 
-    return this.grantMessage(eventInfoEntity, consentType, userIds, false);
+    await this.grantMessage(eventInfoEntity, consentType, userIds, false);
   }
 
   async grantMessage(
@@ -1309,7 +1309,7 @@ export class MessageRepository {
     consentType: string,
     userIds: string[],
     shouldShowLegalHoldWarning: boolean,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(
       eventInfoEntity.conversationId,
     );
@@ -1326,12 +1326,12 @@ export class MessageRepository {
     if (conversationEntity.needsLegalHoldApproval) {
       conversationEntity.needsLegalHoldApproval = false;
       await showLegalHoldWarningModal(conversationEntity, conversationDegraded);
-      return true;
+      return;
     } else if (shouldShowLegalHoldWarning) {
       conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
     }
     if (!conversationDegraded) {
-      return false;
+      return;
     }
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
@@ -1409,7 +1409,7 @@ export class MessageRepository {
                 action: () => {
                   sendAnyway = true;
                   conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-                  resolve(true);
+                  resolve();
                 },
                 text: actionString,
               },
