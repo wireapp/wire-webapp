@@ -73,7 +73,6 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   };
 
   const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(p => !!p);
-
   return (
     <div className="group-video">
       <div
@@ -94,6 +93,10 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             className="group-video-grid__element"
             onDoubleClick={() => doubleClickedOnVideo(participant.user.id, participant.clientId)}
             data-uie-name="item-grid"
+            css={{
+              border: participant.isActivelySpeaking() ? `2px solid ${selfParticipant.user.accent_color()}` : 'initial',
+              boxSizing: 'border-box',
+            }}
           >
             <Video
               className="group-video-grid__element-video"
@@ -101,7 +104,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               playsInline
               srcObject={participant.videoStream()}
               css={{
-                objectFit: !!maximizedParticipant || participant.sharesScreen() ? 'contain' : 'initial',
+                objectFit: !!maximizedParticipant || participant.sharesScreen() ? 'contain' : 'cover',
                 transform:
                   participant === selfParticipant && participant.sharesCamera() ? 'rotateY(180deg)' : 'initial',
               }}
@@ -118,7 +121,6 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                 ) : (
                   <ParticipantMicOnIcon
                     isActive={participant.isActivelySpeaking()}
-                    activeColor={participant.user.accent_color()}
                     className="group-video-grid__element__label__icon"
                   />
                 )}

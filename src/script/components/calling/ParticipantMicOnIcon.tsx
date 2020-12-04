@@ -2,6 +2,8 @@ import React from 'react';
 import {keyframes} from '@emotion/core';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import SVGProvider from '../../auth/util/SVGProvider';
+import {UserState} from '../../user/UserState';
+import {container} from 'tsyringe';
 
 const fadeAnimation = keyframes`
   0%   { opacity: 0; }
@@ -9,23 +11,18 @@ const fadeAnimation = keyframes`
 `;
 
 interface ParticipantMicOnIconProps {
-  activeColor?: string;
   className?: string;
   isActive?: boolean;
 }
 
-const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
-  className,
-  isActive = false,
-  activeColor = '#fff',
-  ...props
-}) => {
+const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({className, isActive = false, ...props}) => {
+  const userState = container.resolve(UserState);
   return (
     <span css={{animation: `${fadeAnimation} 1s ease infinite alternate`}} className={className} {...props}>
       <svg
         css={{
           '> path': {
-            fill: isActive ? `${activeColor} !important` : '#fff',
+            fill: isActive ? `${userState.self().accent_color()} !important` : '#fff',
           },
         }}
         viewBox="0 0 16 16"
@@ -39,6 +36,6 @@ export default ParticipantMicOnIcon;
 
 registerReactComponent('participant-mic-on-icon', {
   component: ParticipantMicOnIcon,
-  optionalParams: ['activeColor', 'className', 'isActive'],
-  template: '<span data-bind="react: {activeColor: ko.unwrap(activeColor), className, isActive}"></span>',
+  optionalParams: ['className', 'isActive'],
+  template: '<span data-bind="react: {className, isActive}"></span>',
 });
