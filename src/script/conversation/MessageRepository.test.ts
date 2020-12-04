@@ -202,7 +202,7 @@ describe('MessageRepository', () => {
 
     it('should return false for small payload', () => {
       const smallConversationEntity = generate_conversation();
-      smallConversationEntity.participating_user_ids([`0`, `1`]);
+      smallConversationEntity.participating_user_ids(['0', '1']);
 
       return testFactory.conversation_repository
         .saveConversation(smallConversationEntity)
