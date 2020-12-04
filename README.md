@@ -144,8 +144,15 @@ username: your-username
 1. Install [Crowdin CLI v3](https://support.crowdin.com/cli-tool/)
 1. Verify you have a `keys/crowdin.yaml` in place
 1. Run `yarn translate:download`
-1. Add string variable and text to "i18n/en-US.json"
+1. Add string variable to "src/script/strings.ts" (source for the React part of our app) and text to "i18n/en-US.json" (source for the Knockout part of our app)
+1. Create a PR and merge it after approval. When the PR gets merged, our CI will take care of uploading the english texts to Crowdin.
+
+If our CI pipeline is broken, you still have the option to upload new strings manually. For this case do the following:
+
 1. Run `yarn translate:upload`
+
+Once translations are uploaded on Crowdin, our (and external) translators can translate the new strings on Crowdin. There is a script that will run to create PRs with translation updates. As an alternative, translations can be downloaded the following way:
+
 1. Verify your string shows up on [Crowdin project: wire-webapp](https://crowdin.com/translate/wire-webapp/1224/en-en)
 1. Add translation on Crowdin
 1. Approve translation on Crowdin
