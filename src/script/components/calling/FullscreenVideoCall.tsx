@@ -169,9 +169,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     marginRight: '-2px',
                     marginTop: '-2px',
                   }}
-                  width={16}
-                  height={16}
-                  viewBox="0 0 16 16"
+                  width={18}
+                  height={18}
+                  viewBox="0 0 18 18"
                   dangerouslySetInnerHTML={{__html: SVGProvider['message-unread-icon']?.documentElement?.innerHTML}}
                 />
               ) : (
