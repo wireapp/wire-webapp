@@ -1239,7 +1239,7 @@ export class MessageRepository {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
-      return false;
+      return true;
     }
 
     if (this.teamState.isTeam()) {
@@ -1266,8 +1266,6 @@ export class MessageRepository {
       }
     }
 
-    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
@@ -1275,6 +1273,7 @@ export class MessageRepository {
 
     // Legal Hold
     if (checkLegalHold) {
+      const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
       const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
       const localLegalHoldStatus = conversationEntity.legalHoldStatus();
       await this.updateAllClients(conversationEntity, !isMessageEdit);
@@ -1301,6 +1300,7 @@ export class MessageRepository {
 
       return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
     }
+
     return this.grantMessage(eventInfoEntity, consentType, userIds, false);
   }
 
@@ -1563,7 +1563,6 @@ export class MessageRepository {
    */
   private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
     const {conversationId, genericMessage} = eventInfoEntity;
-
     const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(conversationId);
     const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;

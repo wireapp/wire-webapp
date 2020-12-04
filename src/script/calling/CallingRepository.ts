@@ -498,14 +498,14 @@ export class CallingRepository {
   // Inbound call events
   //##############################################################################
 
-  private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<boolean> {
+  private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<void> {
     const recipients = await this.messageRepository.create_recipients(conversationId, false, [userId]);
     const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse
       ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
       : ConversationRepository.CONSENT_TYPE.OUTGOING_CALL;
-    return this.messageRepository.grantMessage(eventInfoEntity, consentType, [], false);
+    await this.messageRepository.grantMessage(eventInfoEntity, consentType, [], false);
   }
 
   private abortCall(conversationId: string): void {
@@ -542,7 +542,7 @@ export class CallingRepository {
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
 
-    let validatedPromise = Promise.resolve(true);
+    let validatedPromise = Promise.resolve();
 
     switch (content.type) {
       case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
@@ -907,7 +907,7 @@ export class CallingRepository {
     const needsVerification = [CALL_MESSAGE_TYPE.SETUP, CALL_MESSAGE_TYPE.GROUP_START].includes(type);
     const validationPromise = needsVerification
       ? this.verificationPromise(conversationId, userId, resp)
-      : Promise.resolve(true);
+      : Promise.resolve();
     validationPromise
       .then(() => {
         let options: MessageSendingOptions;
