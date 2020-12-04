@@ -282,7 +282,7 @@ export class Conversation {
     this.is_archived = this.archivedState;
     this.is_cleared = ko.pureComputed(() => this.last_event_timestamp() <= this.cleared_timestamp());
     this.is_verified = ko.pureComputed(() => {
-      if (!this._isInitialized()) {
+      if (!this.hasInitializedUsers()) {
         return undefined;
       }
 
@@ -292,7 +292,7 @@ export class Conversation {
     this.legalHoldStatus = ko.observable(LegalHoldStatus.DISABLED);
 
     this.hasLegalHold = ko.computed(() => {
-      const isInitialized = this._isInitialized();
+      const isInitialized = this.hasInitializedUsers();
       const hasLegalHold = isInitialized && this.allUserEntities.some(userEntity => userEntity.isOnLegalHold());
       if (isInitialized) {
         this.legalHoldStatus(hasLegalHold ? LegalHoldStatus.ENABLED : LegalHoldStatus.DISABLED);
@@ -306,7 +306,7 @@ export class Conversation {
     this.blockLegalHoldMessage = false;
 
     this.legalHoldStatus.subscribe(legalHoldStatus => {
-      if (!this.blockLegalHoldMessage && this._isInitialized()) {
+      if (!this.blockLegalHoldMessage && this.hasInitializedUsers()) {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
           conversationEntity: this,
           legalHoldStatus,
@@ -487,7 +487,7 @@ export class Conversation {
     this._initSubscriptions();
   }
 
-  private _isInitialized() {
+  private hasInitializedUsers() {
     const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
     return Boolean(this.selfUser() && hasMappedUsers);
   }

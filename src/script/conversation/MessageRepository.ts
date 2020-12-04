@@ -74,7 +74,7 @@ import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
 import {StatusType} from '../message/StatusType';
 import {BackendClientError} from '../error/BackendClientError';
-import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
+import {showLegalHoldWarningModal} from '../legal-hold/LegalHoldWarning';
 import {ConversationError} from '../error/ConversationError';
 import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
@@ -1325,7 +1325,8 @@ export class MessageRepository {
     const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
     if (conversationEntity.needsLegalHoldApproval) {
       conversationEntity.needsLegalHoldApproval = false;
-      return showLegalHoldWarning(conversationEntity, conversationDegraded);
+      await showLegalHoldWarningModal(conversationEntity, conversationDegraded);
+      return true;
     } else if (shouldShowLegalHoldWarning) {
       conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
     }
@@ -1424,7 +1425,7 @@ export class MessageRepository {
     });
   }
 
-  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean) {
+  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean): Promise<void> {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
