@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {createRandomUuid} from 'Util/util';
-import {TestFactory} from '../../helper/TestFactory';
+import {TestFactory} from '../../../test/helper/TestFactory';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
@@ -30,7 +30,7 @@ import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {UserGenerator} from '../../helper/UserGenerator';
+import {UserGenerator} from '../../../test/helper/UserGenerator';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {ClientEvent} from 'src/script/event/Client';

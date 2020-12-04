@@ -1767,7 +1767,7 @@ export class ConversationRepository {
       userId,
     });
 
-    await this.messageRepositoryProvider().updateAllClients(conversationEntity);
+    await this.messageRepositoryProvider().updateAllClients(conversationEntity, true);
 
     if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
       return conversationEntity;
