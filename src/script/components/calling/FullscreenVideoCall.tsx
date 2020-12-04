@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 
-import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import SVGProvider from '../../auth/util/SVGProvider';
 import useHideElement from '../../hooks/useHideElement';
@@ -37,6 +37,7 @@ import type {Conversation} from '../../entity/Conversation';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import Duration from './Duration';
 
 export interface FullscreenVideoCallProps {
   call: Call;
@@ -107,24 +108,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     };
   }, []);
 
-  const [callDuration, setCallDuration] = useState('');
-
-  useEffect(() => {
-    const startedAt = call.startedAt();
-    let callDurationUpdateInterval: number;
-    if (startedAt) {
-      const updateTimer = () => {
-        const time = Math.floor((Date.now() - startedAt) / 1000);
-        setCallDuration(formatSeconds(time));
-      };
-      updateTimer();
-      callDurationUpdateInterval = window.setInterval(updateTimer, 1000);
-    }
-    return () => {
-      window.clearInterval(callDurationUpdateInterval);
-    };
-  }, [call.startedAt()]);
-
   useEffect(() => {
     let minimizeTimeout: number;
     minimizeTimeout = undefined;
@@ -151,7 +134,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       <div id="video-title" className="video-title hide-controls-hidden">
         <div className="video-remote-name">{conversation.display_name()}</div>
         <div data-uie-name="video-timer" className="video-timer label-xs">
-          {callDuration}
+          <Duration startedAt={call.startedAt()} />
         </div>
       </div>
 
