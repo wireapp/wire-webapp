@@ -30,17 +30,13 @@ import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-
 import {UNSPLASH_URL} from '../externalRoute';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {User} from '../entity/User';
-
 import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
