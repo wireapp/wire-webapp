@@ -30,27 +30,19 @@ import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-
 import {UNSPLASH_URL} from '../externalRoute';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {User} from '../entity/User';
-
 import {ClientEvent} from '../event/Client';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {
-  HIDE_REQUEST_MODAL,
-  SHOW_LEGAL_HOLD_MODAL,
-  SHOW_REQUEST_MODAL,
-} from '../view_model/content/LegalHoldModalViewModel';
+import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {protoFromType, valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';
@@ -290,7 +282,7 @@ export class UserRepository {
         amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
         const isSelfUser = userId === this.userState.self().id;
         if (isSelfUser) {
-          amplify.publish(SHOW_LEGAL_HOLD_MODAL);
+          amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
         }
       } else if (publishClient) {
         amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
@@ -353,7 +345,7 @@ export class UserRepository {
   private onLegalHoldRequestCanceled(eventJson: any): void {
     if (this.userState.self().id === eventJson.id) {
       this.userState.self().hasPendingLegalHold(false);
-      amplify.publish(HIDE_REQUEST_MODAL);
+      amplify.publish(LegalHoldModalViewModel.HIDE_DETAILS);
     } else {
       /*
        * TODO:
@@ -381,7 +373,7 @@ export class UserRepository {
       clientId,
       last_prekey,
     );
-    amplify.publish(SHOW_REQUEST_MODAL, fingerprint);
+    amplify.publish(LegalHoldModalViewModel.SHOW_REQUEST, fingerprint);
   }
 
   /**

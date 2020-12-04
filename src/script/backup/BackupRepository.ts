@@ -24,7 +24,7 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {Conversation, SerializedConversation} from '../entity/Conversation';
+import type {Conversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {BackupService} from './BackupService';
@@ -40,6 +40,7 @@ import {
 import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
+import {ConversationRecord} from '../storage/ConversationRecord';
 
 export interface Metadata {
   client_id: string;
@@ -288,7 +289,7 @@ export class BackupRepository {
 
     const entityChunks = chunk(conversationEntities, BackupService.CONFIG.BATCH_SIZE);
 
-    const importConversationChunk = async (conversationChunk: SerializedConversation[]): Promise<void> => {
+    const importConversationChunk = async (conversationChunk: ConversationRecord[]): Promise<void> => {
       const importedConversationEntities = await this.conversationRepository.updateConversationStates(
         conversationChunk,
       );

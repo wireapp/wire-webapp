@@ -74,7 +74,7 @@ import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
 import {StatusType} from '../message/StatusType';
 import {BackendClientError} from '../error/BackendClientError';
-import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
+import {showLegalHoldWarningModal} from '../legal-hold/LegalHoldWarning';
 import {ConversationError} from '../error/ConversationError';
 import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
@@ -1235,11 +1235,11 @@ export class MessageRepository {
     eventInfoEntity: EventInfoEntity,
     userIds: string[],
     checkLegalHold: boolean,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
-      return false;
+      return;
     }
 
     if (this.teamState.isTeam()) {
@@ -1266,8 +1266,6 @@ export class MessageRepository {
       }
     }
 
-    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
@@ -1275,6 +1273,7 @@ export class MessageRepository {
 
     // Legal Hold
     if (checkLegalHold) {
+      const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
       const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
       const localLegalHoldStatus = conversationEntity.legalHoldStatus();
       await this.updateAllClients(conversationEntity, !isMessageEdit);
@@ -1301,6 +1300,7 @@ export class MessageRepository {
 
       return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
     }
+
     return this.grantMessage(eventInfoEntity, consentType, userIds, false);
   }
 
@@ -1309,7 +1309,7 @@ export class MessageRepository {
     consentType: string,
     userIds: string[],
     shouldShowLegalHoldWarning: boolean,
-  ): Promise<boolean> {
+  ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(
       eventInfoEntity.conversationId,
     );
@@ -1325,12 +1325,13 @@ export class MessageRepository {
     const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
     if (conversationEntity.needsLegalHoldApproval) {
       conversationEntity.needsLegalHoldApproval = false;
-      return showLegalHoldWarning(conversationEntity, conversationDegraded);
+      await showLegalHoldWarningModal(conversationEntity, conversationDegraded);
+      return;
     } else if (shouldShowLegalHoldWarning) {
       conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
     }
     if (!conversationDegraded) {
-      return false;
+      return;
     }
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
@@ -1408,7 +1409,7 @@ export class MessageRepository {
                 action: () => {
                   sendAnyway = true;
                   conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-                  resolve(true);
+                  resolve();
                 },
                 text: actionString,
               },
@@ -1424,7 +1425,7 @@ export class MessageRepository {
     });
   }
 
-  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean) {
+  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean): Promise<void> {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
@@ -1562,7 +1563,6 @@ export class MessageRepository {
    */
   private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
     const {conversationId, genericMessage} = eventInfoEntity;
-
     const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(conversationId);
     const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
