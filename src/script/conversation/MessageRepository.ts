@@ -1298,10 +1298,10 @@ export class MessageRepository {
       const shouldShowLegalHoldWarning =
         haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
 
-      await this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+      return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
     }
 
-    await this.grantMessage(eventInfoEntity, consentType, userIds, false);
+    return this.grantMessage(eventInfoEntity, consentType, userIds, false);
   }
 
   async grantMessage(
