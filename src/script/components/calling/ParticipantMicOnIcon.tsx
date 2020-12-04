@@ -24,6 +24,7 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({className, i
           '> path': {
             fill: isActive ? `${userState.self().accent_color()} !important` : '#fff',
           },
+          width: 16,
         }}
         viewBox="0 0 16 16"
         dangerouslySetInnerHTML={{__html: SVGProvider['mic-on-icon']?.documentElement?.innerHTML}}
