@@ -20,21 +20,17 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {debounce, Cancelable} from 'underscore';
+import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {STATE as CALL_STATE} from '@wireapp/avs';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
-
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationStatus} from '../conversation/ConversationStatus';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
-
 import {ClientRepository} from '../client/ClientRepository';
 import {StatusType} from '../message/StatusType';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
@@ -47,6 +43,7 @@ import type {Message} from './message/Message';
 import type {SystemMessage} from './message/SystemMessage';
 import {Config} from '../Config';
 import type {Call} from '../calling/Call';
+import {ConversationRecord} from '../storage/ConversationRecord';
 
 interface UnreadState {
   allEvents: Message[];
@@ -67,30 +64,6 @@ enum TIMESTAMP_TYPE {
   MUTED = 'mutedTimestamp',
 }
 
-export interface SerializedConversation {
-  archived_state: boolean;
-  archived_timestamp: number;
-  cleared_timestamp: number;
-  ephemeral_timer: number;
-  global_message_timer: number;
-  id: string;
-  is_guest: boolean;
-  is_managed: boolean;
-  last_event_timestamp: number;
-  last_read_timestamp: number;
-  last_server_timestamp: number;
-  legal_hold_status: LegalHoldStatus;
-  muted_state: boolean | number;
-  muted_timestamp: number;
-  name: string;
-  others: string[];
-  receipt_mode?: Confirmation.Type;
-  status: ConversationStatus;
-  team_id: string;
-  type: CONVERSATION_TYPE;
-  verification_state: ConversationVerificationState;
-}
-
 export class Conversation {
   [key: string]: any;
   public readonly archivedState: ko.Observable<boolean>;
@@ -105,7 +78,7 @@ export class Conversation {
   private shouldPersistStateChanges: boolean;
   public blockLegalHoldMessage: boolean;
   public hasCreationMessage: boolean;
-  public needsLegalHoldApproval: boolean;
+  public needsLegalHoldApproval: boolean = false;
   public readonly accessCode: ko.Observable<string>;
   public readonly accessState: ko.Observable<string>;
   public readonly archivedTimestamp: ko.Observable<number>;
@@ -926,13 +899,14 @@ export class Conversation {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
   };
 
-  hasActiveCall = (): boolean => this.call()?.state() === CALL_STATE.MEDIA_ESTAB;
-
-  serialize(): SerializedConversation {
+  serialize(): ConversationRecord {
     return {
+      accessModes: this.accessModes,
+      accessRole: this.accessRole,
       archived_state: this.archivedState(),
       archived_timestamp: this.archivedTimestamp(),
       cleared_timestamp: this.cleared_timestamp(),
+      creator: this.creator,
       ephemeral_timer: this.localMessageTimer(),
       global_message_timer: this.globalMessageTimer(),
       id: this.id,
@@ -947,6 +921,7 @@ export class Conversation {
       name: this.name(),
       others: this.participating_user_ids(),
       receipt_mode: this.receiptMode(),
+      roles: this.roles(),
       status: this.status(),
       team_id: this.team_id,
       type: this.type(),
