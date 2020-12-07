@@ -398,14 +398,24 @@ export const afterRender = (callback: TimerHandler): number =>
  */
 export const noop = (): void => {};
 
-export function throttle(func: Function, wait = 100) {
-  let timer: number;
-  return function (...args: any[]) {
-    if (timer === null) {
-      timer = window.setTimeout(() => {
-        func.apply(this, args);
-        timer = null;
-      }, wait);
+export function throttle(callback: Function, wait: number, immediate = false) {
+  let timeout: number | null = null;
+  let initialCall = true;
+
+  return function () {
+    const callNow = immediate && initialCall;
+    const next = () => {
+      callback.apply(this, arguments);
+      timeout = null;
+    };
+
+    if (callNow) {
+      initialCall = false;
+      next();
+    }
+
+    if (!timeout) {
+      timeout = window.setTimeout(next, wait);
     }
   };
 }

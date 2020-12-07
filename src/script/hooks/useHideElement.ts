@@ -1,8 +1,7 @@
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {throttle} from 'Util/util';
 
-const useHideElement = (elementRef: React.MutableRefObject<HTMLElement>, timeout: number, skipClass?: string) => {
-  const element = elementRef.current;
+const useHideElement = (element: HTMLElement, timeout: number, skipClass?: string) => {
   useEffect(() => {
     console.info('element', element);
     let hide_timeout: number = undefined;
@@ -55,7 +54,7 @@ const useHideElement = (elementRef: React.MutableRefObject<HTMLElement>, timeout
     return () => {
       window.clearTimeout(hide_timeout);
     };
-  }, [elementRef.current]);
+  }, [element]);
 };
 
 export default useHideElement;
