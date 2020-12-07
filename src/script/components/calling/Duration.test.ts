@@ -38,16 +38,12 @@ describe('Duration', () => {
   afterEach(() => jest.useRealTimers());
 
   it('shows correct timer', async () => {
-    const props = {
-      startedAt: 0,
-    } as DurationProps;
-
-    const Duration = new DurationPage(props);
-
     const now = Date.now();
+    const Duration = new DurationPage({
+      startedAt: now,
+    });
+
     jest.setSystemTime(now);
-    props.startedAt = Date.now();
-    Duration.setProps(props);
 
     expect(Duration.getText()).toEqual('00:00');
 
