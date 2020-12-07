@@ -18,12 +18,12 @@
  */
 
 const expressSitemapXml = require('express-sitemap-xml');
-import * as express from 'express';
+import express from 'express';
 import * as hbs from 'hbs';
-import * as helmet from 'helmet';
+import helmet from 'helmet';
 import * as http from 'http';
 import * as https from 'https';
-import * as nocache from 'nocache';
+import nocache from 'nocache';
 import * as path from 'path';
 import * as fs from 'fs';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
