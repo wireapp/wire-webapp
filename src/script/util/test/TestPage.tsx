@@ -34,6 +34,7 @@ export default class TestPage<T> {
   getProps = () => this.props;
 
   get = (selector: string) => this.driver.find(selector);
+  getText = () => this.driver.text();
 
   private readonly do = (action: Function) => {
     act(() => {
