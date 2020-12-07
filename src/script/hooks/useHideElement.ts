@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import throttle from 'lodash.throttle';
+import {throttle} from 'Util/util';
 
 const useHideElement = (elementRef: React.MutableRefObject<HTMLElement>, timeout: number, skipClass?: string) => {
   const element = elementRef.current;
