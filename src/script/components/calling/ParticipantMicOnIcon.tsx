@@ -20,6 +20,8 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({className, i
   return (
     <span css={{animation: `${fadeAnimation} 1s ease infinite alternate`}} className={className} {...props}>
       <svg
+        data-uie-name={'mic-icon-on'}
+        data-uie-active={isActive ? 'active' : 'inactive'}
         css={{
           '> path': {
             fill: isActive ? `${userState.self().accent_color()} !important` : '#fff',

@@ -114,6 +114,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                 {participant.isMuted() ? (
                   <span className="group-video-grid__element__label__icon">
                     <svg
+                      data-uie-name="mic-icon-off"
                       viewBox="0 0 16 16"
                       dangerouslySetInnerHTML={{__html: SVGProvider['mic-off-icon']?.documentElement?.innerHTML}}
                     ></svg>
@@ -176,6 +177,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             <div className="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
               <span>
                 <svg
+                  data-uie-name="mic-icon-off"
                   viewBox="0 0 16 16"
                   dangerouslySetInnerHTML={{__html: SVGProvider['mic-off-icon']?.documentElement?.innerHTML}}
                 ></svg>
