@@ -72,7 +72,7 @@ async function download(): Promise<void> {
 
   await fs.ensureDir(zipDir);
 
-  await new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     https.get(CROWDIN_URL.DOWNLOAD, response => {
       if (!response.statusCode) {
         return reject(new Error('Failed to export, no status code'));

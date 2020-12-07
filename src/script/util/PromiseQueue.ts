@@ -58,7 +58,7 @@ export class PromiseQueue {
   }
 
   constructor(options?: PromiseQueueOptions) {
-    const loggerName = `PromiseQueue${name ? ` (${name})` : ''}`;
+    const loggerName = `PromiseQueue`;
     this.logger = getLogger(loggerName);
 
     this.blocked = false;

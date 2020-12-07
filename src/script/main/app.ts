@@ -431,7 +431,9 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversationEntities.length, 50);
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
-      await Promise.all(conversationRepository.map_connections(connectionRepository.connectionEntities()));
+      await Promise.all(
+        conversationRepository.map_connections(Object.values(connectionRepository.connectionEntities())),
+      );
       this._subscribeToUnloadEvents();
 
       await conversationRepository.conversationRoleRepository.loadTeamRoles();

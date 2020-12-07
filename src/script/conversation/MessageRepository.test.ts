@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {createRandomUuid} from 'Util/util';
-import {TestFactory} from '../../helper/TestFactory';
+import {TestFactory} from '../../../test/helper/TestFactory';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
@@ -28,9 +28,9 @@ import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
+import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {UserGenerator} from '../../helper/UserGenerator';
+import {UserGenerator} from '../../../test/helper/UserGenerator';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {ClientEvent} from 'src/script/event/Client';
@@ -41,11 +41,13 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
+import * as sinon from 'sinon';
+import {amplify} from 'amplify';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
 
-  let server = null;
+  let server: sinon.SinonFakeServer;
 
   const generate_conversation = (
     conversation_type = CONVERSATION_TYPE.REGULAR,
@@ -66,7 +68,6 @@ describe('MessageRepository', () => {
   beforeEach(() => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
-    sinon.spy(jQuery, 'ajax');
 
     return testFactory.exposeConversationActors().then(conversation_repository => {
       amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
@@ -75,12 +76,11 @@ describe('MessageRepository', () => {
 
   afterEach(() => {
     server.restore();
-    jQuery.ajax.restore();
   });
 
   describe('asset upload', () => {
-    let messageEntity = null;
-    let conversationEntity = null;
+    let messageEntity: ContentMessage;
+    let conversationEntity: Conversation;
 
     beforeEach(() => {
       conversationEntity = generate_conversation(CONVERSATION_TYPE.REGULAR);
@@ -117,7 +117,7 @@ describe('MessageRepository', () => {
       return testFactory.message_repository.onAssetUploadComplete(conversationEntity, event).then(() => {
         expect(testFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
 
-        const [firstAsset] = messageEntity.assets();
+        const firstAsset = messageEntity.assets()[0] as FileAsset;
 
         expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
         expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
@@ -176,8 +176,8 @@ describe('MessageRepository', () => {
       const largeConversationEntity = generate_conversation();
       largeConversationEntity.participating_user_ids(
         Array(128)
-          .fill()
-          .map((x, i) => i),
+          .fill(undefined)
+          .map((x, i) => i.toString()),
       );
 
       return testFactory.conversation_repository
@@ -195,14 +195,14 @@ describe('MessageRepository', () => {
           const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
           return testFactory.message_repository.shouldSendAsExternal(eventInfoEntity);
         })
-        .then(shouldSendAsExternal => {
+        .then((shouldSendAsExternal: boolean) => {
           expect(shouldSendAsExternal).toBeTruthy();
         });
     });
 
     it('should return false for small payload', () => {
       const smallConversationEntity = generate_conversation();
-      smallConversationEntity.participating_user_ids([0, 1]);
+      smallConversationEntity.participating_user_ids(['0', '1']);
 
       return testFactory.conversation_repository
         .saveConversation(smallConversationEntity)
@@ -215,14 +215,14 @@ describe('MessageRepository', () => {
           const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
           return testFactory.message_repository.shouldSendAsExternal(eventInfoEntity);
         })
-        .then(shouldSendAsExternal => {
+        .then((shouldSendAsExternal: boolean) => {
           expect(shouldSendAsExternal).toBeFalsy();
         });
     });
   });
 
   describe('deleteMessageForEveryone', () => {
-    let conversationEntity = null;
+    let conversationEntity: Conversation;
     beforeEach(() => {
       conversationEntity = generate_conversation(CONVERSATION_TYPE.REGULAR);
       spyOn(testFactory.message_repository, 'sendGenericMessage').and.returnValue(Promise.resolve());
@@ -251,7 +251,7 @@ describe('MessageRepository', () => {
       messageEntityToDelete.user(userEntity);
       conversationEntity.add_message(messageEntityToDelete);
 
-      spyOn(testFactory.user_repository.userState, 'self').and.returnValue(userEntity);
+      spyOn(testFactory.user_repository['userState'], 'self').and.returnValue(userEntity);
       spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
         Promise.resolve(conversationEntity),
       );
@@ -268,9 +268,9 @@ describe('MessageRepository', () => {
     it(`updates a conversation's legal hold status when it discovers during message sending that a legal hold client got removed from a participant`, async () => {
       const selfUser = UserGenerator.getRandomUser();
       const conversationPartner = UserGenerator.getRandomUser();
-      testFactory.user_repository.userState.users.push(conversationPartner);
+      testFactory.user_repository['userState'].users.push(conversationPartner);
 
-      spyOn(testFactory.user_repository.userState, 'self').and.returnValue(selfUser);
+      spyOn(testFactory.user_repository['userState'], 'self').and.returnValue(selfUser);
 
       const conversationJsonFromDb = {
         accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
@@ -298,7 +298,7 @@ describe('MessageRepository', () => {
         team_id: createRandomUuid(),
         type: CONVERSATION_TYPE.REGULAR,
         verification_state: ConversationVerificationState.UNVERIFIED,
-      };
+      } as ConversationDatabaseData;
 
       const clientsPayload = [
         {
@@ -334,23 +334,22 @@ describe('MessageRepository', () => {
 
       await testFactory.conversation_repository.saveConversation(conversationEntity);
 
-      const missingClientsError = new Error();
-      missingClientsError.deleted = {
-        // Legal hold client got removed
-        [conversationPartner.id]: ['53761bec3f10a6d9'],
-      };
-      missingClientsError.missing = {};
-      missingClientsError.redundant = {};
-      missingClientsError.time = new Date().toISOString();
-
       spyOn(testFactory.conversation_service, 'post_encrypted_message').and.returnValue(
-        Promise.reject(missingClientsError),
+        Promise.reject({
+          deleted: {
+            // Legal hold client got removed
+            [conversationPartner.id]: ['53761bec3f10a6d9'],
+          },
+          missing: {},
+          redundant: {},
+          time: new Date().toISOString(),
+        }),
       );
 
       spyOn(testFactory.client_repository, 'removeClient').and.returnValue(Promise.resolve());
 
       // Start client discovery of conversation participants
-      await testFactory.message_repository.updateAllClients(conversationEntity);
+      await testFactory.message_repository.updateAllClients(conversationEntity, true);
 
       expect(conversationEntity.hasLegalHold()).toBe(false);
     });

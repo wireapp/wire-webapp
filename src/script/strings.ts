@@ -227,7 +227,7 @@ export const chooseHandleStrings = defineMessages({
     id: 'chooseHandle.headline',
   },
   subhead: {
-    defaultMessage: 'Usernames help people find you.',
+    defaultMessage: 'Your username helps people find you.',
     id: 'chooseHandle.subhead',
   },
 });

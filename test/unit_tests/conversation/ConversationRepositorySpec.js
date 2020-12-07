@@ -143,7 +143,7 @@ describe('ConversationRepository', () => {
       conversationEntity.selfUser(selfUser);
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 
-      expect(conversationEntity._isInitialized()).toBe(true);
+      expect(conversationEntity.hasInitializedUsers()).toBe(true);
       expect(conversationEntity.hasLegalHold()).toBe(false);
       expect(conversationEntity.participating_user_ets().length).toBe(1);
 
@@ -770,7 +770,7 @@ describe('ConversationRepository', () => {
         const connectionEntity = new ConnectionEntity();
         connectionEntity.conversationId = conversation_et.id;
         connectionEntity.status(ConnectionStatus.PENDING);
-        testFactory.connection_repository.connectionEntities.push(connectionEntity);
+        testFactory.connection_repository.addConnectionEntity(connectionEntity);
 
         spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 

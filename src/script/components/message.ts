@@ -35,7 +35,6 @@ import type {VerificationMessage} from '../entity/message/VerificationMessage';
 import {StatusType} from '../message/StatusType';
 import type {Text} from '../entity/message/Text';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import type {ActionsViewModel} from '../view_model/ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
@@ -55,6 +54,7 @@ import './asset/videoAsset';
 import './asset/messageButton';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {ConversationState} from '../conversation/ConversationState';
+import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -332,7 +332,7 @@ class Message {
   }
 
   showLegalHold = () => {
-    amplify.publish(SHOW_LEGAL_HOLD_MODAL, this.conversationState.activeConversation());
+    amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS, this.conversationState.activeConversation());
   };
 
   showContextMenu(event: MouseEvent) {
