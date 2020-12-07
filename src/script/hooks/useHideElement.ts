@@ -1,13 +1,17 @@
 import React, {useEffect} from 'react';
+import throttle from 'lodash.throttle';
 
 const useHideElement = (elementRef: React.MutableRefObject<HTMLElement>, timeout: number, skipClass?: string) => {
   const element = elementRef.current;
   useEffect(() => {
     let hide_timeout: number = undefined;
+    let isMouseIn: boolean = false;
+
     const effect = () => {
       if (!element) {
         return;
       }
+
       const startTimer = () => {
         hide_timeout = window.setTimeout(() => {
           element.classList.add('hide-controls');
@@ -15,18 +19,22 @@ const useHideElement = (elementRef: React.MutableRefObject<HTMLElement>, timeout
       };
 
       element.onmouseenter = () => {
+        isMouseIn = true;
         element.classList.remove('hide-controls');
       };
 
       element.onmouseleave = () => {
+        isMouseIn = false;
         if (document.hasFocus()) {
           return element.classList.add('hide-controls');
         }
       };
 
-      element.onmousemove = ({target}: MouseEvent) => {
+      element.onmousemove = throttle(({target}: MouseEvent) => {
+        if (!isMouseIn) {
+          return;
+        }
         window.clearTimeout(hide_timeout);
-
         element.classList.remove('hide-controls');
 
         let node = target as Element;
@@ -37,7 +45,7 @@ const useHideElement = (elementRef: React.MutableRefObject<HTMLElement>, timeout
           node = node.parentNode as Element;
         }
         startTimer();
-      };
+      }, 500);
 
       startTimer();
     };
