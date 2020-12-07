@@ -398,16 +398,14 @@ export const afterRender = (callback: TimerHandler): number =>
  */
 export const noop = (): void => {};
 
-/**
- * https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_throttle
- */
-export function throttle(func: Function, timeFrame: number) {
-  let lastTime = 0;
-  return function () {
-    const now = Date.now();
-    if (now - lastTime >= timeFrame) {
-      func();
-      lastTime = now;
+export function throttle(func: Function, wait = 100) {
+  let timer: number;
+  return function (...args: any[]) {
+    if (timer === null) {
+      timer = window.setTimeout(() => {
+        func.apply(this, args);
+        timer = null;
+      }, wait);
     }
   };
 }

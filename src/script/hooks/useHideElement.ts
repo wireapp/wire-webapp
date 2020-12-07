@@ -4,6 +4,7 @@ import {throttle} from 'Util/util';
 const useHideElement = (elementRef: React.MutableRefObject<HTMLElement>, timeout: number, skipClass?: string) => {
   const element = elementRef.current;
   useEffect(() => {
+    console.info('element', element);
     let hide_timeout: number = undefined;
     let isMouseIn: boolean = false;
 
