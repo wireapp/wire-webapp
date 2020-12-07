@@ -30,11 +30,15 @@ export const getFirstChar = (string: string): string => [...string][0]; // the d
  * @param bytes bytes to convert
  * @returns bytes as hex string
  */
-export const bytesToHex = (bytes: number[]): string => {
+export const bytesToHex = (bytes: number[] | Uint8Array): string => {
   const hexBase = 16;
   const padIndex = 2;
   return Array.from(bytes, byte => byte.toString(hexBase).padStart(padIndex, '0')).join('');
 };
+
+export function uuidToBytes(uuid: string): Uint8Array {
+  return new TextEncoder().encode(uuid.replace(/-/g, ''));
+}
 
 export const capitalizeFirstChar = (string = ''): string => `${string.charAt(0).toUpperCase()}${string.substring(1)}`;
 

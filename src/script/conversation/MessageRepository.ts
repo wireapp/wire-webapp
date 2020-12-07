@@ -39,18 +39,22 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
+import {IClientEntry, IUserEntry, NewOtrMessage} from '@wireapp/protocol-messaging/web/otr';
+import Long from 'long';
 import {RequestCancellationError} from '@wireapp/api-client/src/user';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
+import {NewOTRMessage, ClientMismatch, OTRRecipients} from '@wireapp/api-client/src/conversation';
+
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference} from 'Util/ArrayUtil';
-import {arrayToBase64, createRandomUuid, loadUrlBlob} from 'Util/util';
+import {createRandomUuid, loadUrlBlob} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {capitalizeFirstChar} from 'Util/StringUtil';
+import {capitalizeFirstChar, uuidToBytes} from 'Util/StringUtil';
+
 import {encryptAesAsset} from '../assets/AssetCrypto';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
@@ -1596,7 +1600,7 @@ export class MessageRepository {
         options.recipients,
         genericMessageExternal,
       );
-      payload.data = await arrayToBase64(encryptedAsset.cipherText);
+      payload.data = new Uint8Array(encryptedAsset.cipherText);
       payload.native_push = options.nativePush;
       return this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
@@ -1619,7 +1623,7 @@ export class MessageRepository {
    */
   private async sendEncryptedMessage(
     eventInfoEntity: EventInfoEntity,
-    payload: NewOTRMessage,
+    payload: NewOTRMessage<Uint8Array>,
   ): Promise<ClientMismatch> {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;
@@ -1643,10 +1647,43 @@ export class MessageRepository {
       );
     }
 
+    function buildProtobuf(
+      recipients: OTRRecipients<Uint8Array>,
+      nativePush: boolean,
+      reportMissing?: string[],
+    ): NewOtrMessage {
+      const userEntries: IUserEntry[] = Object.entries(recipients).map(([userId, otrClientMap]) => {
+        const clients: IClientEntry[] = Object.entries(otrClientMap).map(([clientId, payload]) => {
+          return {
+            client: {
+              client: Long.fromString(clientId, 16),
+            },
+            text: payload,
+          };
+        });
+
+        return {
+          clients,
+          user: {
+            uuid: uuidToBytes(userId),
+          },
+        };
+      });
+
+      return NewOtrMessage.create({
+        nativePush,
+        recipients: userEntries,
+        reportMissing: [...reportMissing].map(userId => ({uuid: uuidToBytes(userId)})),
+        sender: {
+          client: Long.fromString(payload.sender, 16),
+        },
+      });
+    }
+
     try {
-      const response = await this.conversation_service.post_encrypted_message(
+      const response = await this.conversation_service.postEncryptedProtobufMessage(
         conversationId,
-        payload,
+        buildProtobuf(payload.recipients, payload.native_push, payload.report_missing),
         options.precondition,
       );
       await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
@@ -1676,9 +1713,21 @@ export class MessageRepository {
         payloadWithMissingClients,
       );
       if (payloadWithMissingClients) {
-        return this.conversation_service.post_encrypted_message(conversationId, payloadWithMissingClients, true);
+        return this.conversation_service.postEncryptedProtobufMessage(
+          conversationId,
+          buildProtobuf(
+            payloadWithMissingClients.recipients,
+            payloadWithMissingClients.native_push,
+            payloadWithMissingClients.report_missing,
+          ),
+          true,
+        );
       }
-      return this.conversation_service.post_encrypted_message(conversationId, payload, true);
+      return this.conversation_service.postEncryptedProtobufMessage(
+        conversationId,
+        buildProtobuf(payload.recipients, payload.native_push, payload.report_missing),
+        true,
+      );
     }
   }
 

@@ -20,15 +20,16 @@
 import {
   bytesToHex,
   compareTransliteration,
-  startsWith,
-  includesString,
-  getRandomChar,
-  truncate,
   formatString,
+  getRandomChar,
+  includesString,
+  obfuscate,
   removeLineBreaks,
   sortByPriority,
+  startsWith,
+  truncate,
   utf8ToUtf16BE,
-  obfuscate,
+  uuidToBytes,
 } from 'Util/StringUtil';
 
 describe('StringUtil', () => {
@@ -203,6 +204,17 @@ describe('StringUtil', () => {
       const result = utf8ToUtf16BE(string);
 
       expect(result).toEqual(expected);
+    });
+  });
+
+  describe('uuidToBytes', () => {
+    it('converts a UUID to bytes', () => {
+      // Example taken from https://en.wikipedia.org/wiki/Universally_unique_identifier#Encoding
+      const uuid = '00112233-4455-6677-8899-aabbccddeeff';
+      // prettier-ignore
+      const expected = new ArrayBuffer([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff])
+      const actual = uuidToBytes(uuid);
+      expect(expected).toEqual(actual);
     });
   });
 });

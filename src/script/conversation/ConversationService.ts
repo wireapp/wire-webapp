@@ -26,6 +26,7 @@ import type {
   NewConversation,
   NewOTRMessage,
 } from '@wireapp/api-client/src/conversation';
+import {NewOtrMessage as ProtobufOTRMessage} from '@wireapp/protocol-messaging/web/otr';
 import type {
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
@@ -44,6 +45,7 @@ import type {
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
+import {uuidToBytes} from 'Util/StringUtil';
 
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
@@ -309,7 +311,7 @@ export class ConversationService {
    */
   post_encrypted_message(
     conversationId: string,
-    payload: NewOTRMessage,
+    payload: NewOTRMessage<string>,
     preconditionOption?: boolean | string[],
   ): Promise<ClientMismatch> {
     const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
@@ -320,6 +322,47 @@ export class ConversationService {
     }
 
     return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, ignoreMissing);
+  }
+
+  /**
+   * Post an encrypted message to a conversation.
+   *
+   * @note If "recipients" are not specified you will receive a list of all missing OTR recipients (user-client-map).
+   * @note Options for the precondition check on missing clients are:
+   * - `false` - all clients
+   * - `Array<string>` - only clients of listed users
+   * - `true` - force sending
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrMessage
+   * @example How to send "recipients" payload
+   * "recipients": {
+   *   "<user-id>": {
+   *     "<client-id>": "<base64-encoded-encrypted-content>"
+   *   }
+   * }
+   *
+   * @param conversationId ID of conversation to send message in
+   * @param payload Payload to be posted
+   * @returns Promise that resolves when the message was sent
+   */
+  postEncryptedProtobufMessage(
+    conversationId: string,
+    payload: ProtobufOTRMessage,
+    preconditionOption?: boolean | string[],
+  ): Promise<ClientMismatch> {
+    const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
+    const ignoreMissing = preconditionOption === true ? true : undefined;
+
+    if (reportMissing) {
+      payload.reportMissing = reportMissing.map(userId => ({uuid: uuidToBytes(userId)}));
+    }
+
+    return this.apiClient.conversation.api.postOTRProtobufMessage(
+      payload.sender.client.toString(16),
+      conversationId,
+      payload,
+      ignoreMissing,
+    );
   }
 
   /**
