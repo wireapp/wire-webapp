@@ -87,15 +87,21 @@ export class Call {
   }
 
   setActiveSpeakers(activeSpeakers: ActiveSpeakers): void {
-    const activeParticipants: {[clientId: string]: ActiveSpeaker} = {};
-    activeSpeakers.audio_levels.forEach(speaker => {
-      activeParticipants[speaker.clientid] = speaker;
+    const activeParticipants: {[clientId: string]: ActiveSpeaker & {isTopActiveSpeaker?: boolean}} = {};
+    activeSpeakers.audio_levels.forEach((speaker, index) => {
+      if (index !== 0) {
+        activeParticipants[speaker.clientid] = speaker;
+      }
+      activeParticipants[speaker.clientid] = {...speaker, isTopActiveSpeaker: true};
     });
     this.participants().forEach(participant => {
       const activeSpeakerParticipant = activeParticipants[participant.clientId];
       if (activeSpeakerParticipant) {
         participant.audioLevel(activeSpeakerParticipant.audio_level);
         participant.isActivelySpeaking(true);
+        if (activeSpeakerParticipant.isTopActiveSpeaker) {
+          participant.isTopActiveSpeaker = true;
+        }
         return;
       }
       participant.audioLevel(0);
