@@ -3,7 +3,6 @@ import {throttle} from 'Util/util';
 
 const useHideElement = (element: HTMLElement, timeout: number, skipClass?: string) => {
   useEffect(() => {
-    console.info('element', element);
     let hide_timeout: number = undefined;
     let isMouseIn: boolean = false;
 
