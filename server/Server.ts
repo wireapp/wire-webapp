@@ -19,13 +19,13 @@
 
 const expressSitemapXml = require('express-sitemap-xml');
 import express from 'express';
-import * as hbs from 'hbs';
+import fs from 'fs';
+import hbs from 'hbs';
 import helmet from 'helmet';
-import * as http from 'http';
-import * as https from 'https';
+import http from 'http';
+import https from 'https';
 import nocache from 'nocache';
-import * as path from 'path';
-import * as fs from 'fs';
+import path from 'path';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {HealthCheckRoute} from './routes/_health/HealthRoute';

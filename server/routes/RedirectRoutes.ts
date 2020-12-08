@@ -17,7 +17,7 @@
  *
  */
 
-import * as express from 'express';
+import express from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import type {ServerConfig} from '../ServerConfig';
