@@ -1336,7 +1336,7 @@ export class MessageRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds ||= conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
+      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
 
       return this.userRepository
         .getUsersById(userIds)
