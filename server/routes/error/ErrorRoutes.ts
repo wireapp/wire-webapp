@@ -17,8 +17,8 @@
  *
  */
 
-import * as express from 'express';
-import * as logdown from 'logdown';
+import express from 'express';
+import logdown from 'logdown';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {formatDate} from '../../util/TimeUtil';

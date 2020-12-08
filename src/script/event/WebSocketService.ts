@@ -92,7 +92,7 @@ export class WebSocketService {
     // Note: `connect()` should only resolve after `onBeforeConnect()` is executed successfully
     // We need to wrap this into a plain Promise because `reconnecting-websocket` doesn't give a handle
     // to wait for the execution (connection lost on RWS constructor)
-    await new Promise((resolve, reject) =>
+    await new Promise<void>((resolve, reject) =>
       this.apiClient.connect(async abortHandler => {
         try {
           await onConnect(abortHandler);

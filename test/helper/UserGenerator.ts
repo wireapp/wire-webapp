@@ -27,7 +27,7 @@ import {UserMapper} from '../../src/script/user/UserMapper';
 import {createRandomUuid} from 'Util/util';
 
 export class UserGenerator {
-  static getRandomUser(): User | void {
+  static getRandomUser(): User {
     const template: APIClientUser = {
       accent_id: Math.floor(Math.random() * 7 + 1),
       assets: [

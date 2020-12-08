@@ -49,7 +49,7 @@ import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
 import {EventBuilder} from '../conversation/EventBuilder';
-import {Conversation, SerializedConversation} from '../entity/Conversation';
+import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
 import {ConversationStateHandler} from './ConversationStateHandler';
@@ -91,6 +91,7 @@ import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {TeamRepository} from '../team/TeamRepository';
 import {ConversationState} from './ConversationState';
+import {ConversationRecord} from '../storage/ConversationRecord';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {reject_fn: (error: ConversationError) => void; resolve_fn: (conversation: Conversation) => void};
@@ -407,10 +408,10 @@ export class ConversationRepository {
     return this.conversationState.conversations();
   }
 
-  public async updateConversationStates(conversationsDatas: SerializedConversation[]) {
+  public async updateConversationStates(conversationsDatas: ConversationRecord[]) {
     const handledConversationEntities: Conversation[] = [];
 
-    const unknownConversations: SerializedConversation[] = [];
+    const unknownConversations: ConversationRecord[] = [];
     conversationsDatas.forEach(conversationData => {
       const localEntity = this.conversationState.conversations().find(({id}) => id === conversationData.id);
 
@@ -1767,7 +1768,7 @@ export class ConversationRepository {
       userId,
     });
 
-    await this.messageRepositoryProvider().updateAllClients(conversationEntity);
+    await this.messageRepositoryProvider().updateAllClients(conversationEntity, true);
 
     if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
       return conversationEntity;
