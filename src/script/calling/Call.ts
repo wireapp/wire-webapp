@@ -103,6 +103,7 @@ export class Call {
       }
       participant.audioLevel(0);
       participant.isActivelySpeaking(false);
+      participant.isTopActiveSpeaker = false;
     });
   }
 
