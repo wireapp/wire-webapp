@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {css} from '@emotion/core';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -96,7 +96,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id,
   );
   const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [wrapperRef, setWrapperRefRef] = useState<HTMLElement | null>(null);
+  const onRefChange = useCallback(node => setWrapperRefRef(node), []);
   useHideElement(wrapperRef, FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
@@ -124,7 +125,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   }, [videoGrid]);
 
   return (
-    <div id="video-calling" className="video-calling" ref={wrapperRef}>
+    <div id="video-calling" className="video-calling" ref={onRefChange}>
       <div id="video-element-remote" className="video-element-remote">
         <GroupVideoGrid grid={videoGrid} muted={isMuted} selfParticipant={call.getSelfParticipant()} />
       </div>
