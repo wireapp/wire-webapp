@@ -12,19 +12,29 @@ const fadeAnimation = keyframes`
 
 interface ParticipantMicOnIconProps {
   className?: string;
+  color?: string;
   isActive?: boolean;
 }
 
-const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({className, isActive = false, ...props}) => {
+const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
+  className,
+  isActive = false,
+  color = '#fff',
+  ...props
+}) => {
   const userState = container.resolve(UserState);
   return (
-    <span css={{animation: `${fadeAnimation} 1s ease infinite alternate`}} className={className} {...props}>
+    <span
+      css={{animation: isActive ? `${fadeAnimation} 1s ease infinite alternate` : 'initial'}}
+      className={className}
+      {...props}
+    >
       <svg
-        data-uie-name={'mic-icon-on'}
+        data-uie-name="mic-icon-on"
         data-uie-active={isActive ? 'active' : 'inactive'}
         css={{
           '> path': {
-            fill: isActive ? `${userState.self().accent_color()} !important` : '#fff',
+            fill: isActive ? `${userState.self().accent_color()} !important` : color,
           },
           width: 16,
         }}
@@ -39,6 +49,6 @@ export default ParticipantMicOnIcon;
 
 registerReactComponent('participant-mic-on-icon', {
   component: ParticipantMicOnIcon,
-  optionalParams: ['className', 'isActive'],
-  template: '<span data-bind="react: {className, isActive}"></span>',
+  optionalParams: ['className', 'isActive', 'color'],
+  template: '<span data-bind="react: {className, isActive, color}"></span>',
 });

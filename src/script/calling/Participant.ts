@@ -35,6 +35,7 @@ export class Participant {
   public startedScreenSharingAt: ko.Observable<number>;
   public isActivelySpeaking: ko.Observable<boolean>;
   public audioLevel: ko.Observable<number>;
+  public isTopActiveSpeaker: boolean = false;
 
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
