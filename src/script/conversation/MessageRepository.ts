@@ -1255,6 +1255,33 @@ export class MessageRepository {
     }
   }
 
+  private async shouldShowLegalHoldWarning(eventInfoEntity: EventInfoEntity) {
+    const messageType = eventInfoEntity.getType();
+    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
+    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
+    const localLegalHoldStatus = conversationEntity.legalHoldStatus();
+    await this.updateAllClients(conversationEntity, !isMessageEdit);
+    const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
+
+    const {genericMessage} = eventInfoEntity;
+    (genericMessage as any)[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
+
+    const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
+
+    if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
+      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
+      await this.conversationRepositoryProvider().injectLegalHoldMessage({
+        beforeTimestamp: true,
+        conversationId,
+        legalHoldStatus: updatedLocalLegalHoldStatus,
+        timestamp: numericTimestamp,
+        userId: this.userState.self().id,
+      });
+    }
+
+    return haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
+  }
+
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
     userIds: string[],
@@ -1281,37 +1308,13 @@ export class MessageRepository {
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
 
-    // Legal Hold
+    let shouldShowLegalHoldWarning: boolean = false;
+
     if (checkLegalHold) {
-      const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-      const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
-      const localLegalHoldStatus = conversationEntity.legalHoldStatus();
-      await this.updateAllClients(conversationEntity, !isMessageEdit);
-      const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
-
-      const {genericMessage} = eventInfoEntity;
-      (genericMessage as any)[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
-
-      const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
-
-      if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
-        const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
-        await this.conversationRepositoryProvider().injectLegalHoldMessage({
-          beforeTimestamp: true,
-          conversationId,
-          legalHoldStatus: updatedLocalLegalHoldStatus,
-          timestamp: numericTimestamp,
-          userId: this.userState.self().id,
-        });
-      }
-
-      const shouldShowLegalHoldWarning =
-        haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
-
-      return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+      shouldShowLegalHoldWarning = await this.shouldShowLegalHoldWarning(eventInfoEntity);
     }
 
-    return this.grantMessage(eventInfoEntity, consentType, userIds, false);
+    return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
   }
 
   async grantMessage(
