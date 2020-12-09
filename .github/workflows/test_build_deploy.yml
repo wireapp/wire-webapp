@@ -31,6 +31,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: 'Use latest Node.js v12'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
       - name: Set environment variables
         run: |
           echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
