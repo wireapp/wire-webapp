@@ -43,6 +43,7 @@ import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
 import * as sinon from 'sinon';
 import {amplify} from 'amplify';
+import {MessageRepository} from './MessageRepository';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
@@ -352,6 +353,30 @@ describe('MessageRepository', () => {
       await testFactory.message_repository.updateAllClients(conversationEntity, true);
 
       expect(conversationEntity.hasLegalHold()).toBe(false);
+    });
+  });
+
+  describe('getOtherUsersWithoutClients', () => {
+    it('returns a list of user ids (excluding ourselves) for which we need to fetch client information', () => {
+      const genericMessage = new GenericMessage({
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({
+          content: 'Hello, World!',
+        }),
+        messageId: createRandomUuid(),
+      });
+
+      const selfUserId = 'ce1a2792-fb51-4977-a8e5-7a1dd8f2bb0b';
+      const otherUserId = '6f88716b-1383-44da-9d57-45b51cc64d90';
+
+      const eventInfoEntity = new EventInfoEntity(genericMessage, '3da298fd-0ed4-4e51-863c-bfd2f5b9089b', {
+        nativePush: true,
+        precondition: false,
+        recipients: {[otherUserId]: [], [selfUserId]: []},
+      });
+
+      const userIdsWithoutClients = MessageRepository.getOtherUsersWithoutClients(eventInfoEntity, selfUserId);
+      expect(userIdsWithoutClients.length).toBe(1);
+      expect(userIdsWithoutClients[0]).toBe('6f88716b-1383-44da-9d57-45b51cc64d90');
     });
   });
 });
