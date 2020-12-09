@@ -24,7 +24,7 @@ import {CSS_SQUARE, CSS_FLEX_CENTER} from 'Util/CSSMixin';
 import type {User} from '../../entity/User';
 
 export interface GroupAvatarProps {
-  isLight: boolean;
+  isLight?: boolean;
   users: User[];
 }
 
