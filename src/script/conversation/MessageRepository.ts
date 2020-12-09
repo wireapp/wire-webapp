@@ -1245,7 +1245,7 @@ export class MessageRepository {
     return userIdsWithoutClients;
   }
 
-  async triggerTeamMemberLeaveChecks(users: APIClientUser[]) {
+  async triggerTeamMemberLeaveChecks(users: APIClientUser[]): Promise<void> {
     for (const user of users) {
       // Since this is a bare API client user we use `.deleted`
       const isDeleted = user.deleted === true;
@@ -1255,7 +1255,7 @@ export class MessageRepository {
     }
   }
 
-  private async shouldShowLegalHoldWarning(eventInfoEntity: EventInfoEntity) {
+  private async shouldShowLegalHoldWarning(eventInfoEntity: EventInfoEntity): Promise<boolean> {
     const messageType = eventInfoEntity.getType();
     const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
     const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
