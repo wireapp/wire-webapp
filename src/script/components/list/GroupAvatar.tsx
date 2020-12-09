@@ -19,23 +19,55 @@
 
 import React from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {CSS_SQUARE, CSS_FLEX_CENTER} from 'Util/CSSMixin';
 
 import type {User} from '../../entity/User';
 
 export interface GroupAvatarProps {
+  isLight: boolean;
   users: User[];
 }
 
-const GroupAvatar: React.FC<GroupAvatarProps> = ({users}) => {
+const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false}) => {
   const slicedUsers = users.slice(0, 4);
 
   return (
-    <div className="group-avatar-box-wrapper" data-uie-name="group-avatar-box-wrapper">
-      {slicedUsers.map(user => (
-        <div key={user.id} className="group-avatar-box" css={{color: user.accent_color()}}>
-          {Array.from(user.initials())[0]}
-        </div>
-      ))}
+    <div
+      css={{
+        ...CSS_SQUARE(32),
+        border: isLight ? '1px solid var(--background-fade-8)' : '1px solid hsla(0, 0%, 100%, 0.12)',
+        borderRadius: 6,
+      }}
+    >
+      <div
+        css={{
+          ...CSS_SQUARE(28),
+          backgroundColor: isLight ? 'var(--background-fade-16)' : 'rgba(0, 0, 0, 0.4)',
+          borderRadius: 4,
+          display: 'flex',
+          flexWrap: 'wrap',
+          margin: 1,
+          overflow: 'hidden',
+        }}
+        data-uie-name="group-avatar-box-wrapper"
+      >
+        {slicedUsers.map(user => (
+          <div
+            key={user.id}
+            className="group-avatar-box"
+            css={{
+              ...CSS_FLEX_CENTER,
+              ...CSS_SQUARE(14),
+              color: user.accent_color(),
+              flex: '0 0 auto',
+              fontSize: 9,
+              fontWeight: 900,
+            }}
+          >
+            {Array.from(user.initials())[0]}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -44,5 +76,6 @@ export default GroupAvatar;
 
 registerReactComponent('group-avatar', {
   component: GroupAvatar,
-  template: '<div class="group-avatar" data-bind="react: {users: ko.unwrap(users)}"></div>',
+  optionalParams: ['isLight'],
+  template: '<div data-bind="react: {users: ko.unwrap(users), isLight}"></div>',
 });
