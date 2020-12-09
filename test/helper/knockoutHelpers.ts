@@ -19,20 +19,23 @@
 
 import ko from 'knockout';
 
-export function instantiateComponent(componentName, params = {}) {
+export function instantiateComponent(componentName: string, params = {}) {
   const paramsStr = `{${Object.keys(params).join(',')}}`;
   const html = `<div data-bind="component: {name: '${componentName}', params: ${paramsStr}}"></div>`;
   return bindHtml(html, params);
 }
 
-export function bindHtml(htmlStr, context = {}) {
-  const destination = document.body;
-  ko.cleanNode(destination);
-  destination.innerHTML = htmlStr; // eslint-disable-line no-unsanitized/property
-  ko.applyBindings(context, destination);
+export function bindHtml(htmlStr: string, context = {}): Promise<HTMLDivElement> {
+  const knockoutRoot = document.createElement('div');
+  knockoutRoot.id = 'knockoutRoot';
+  document.body.appendChild(knockoutRoot);
+
+  ko.cleanNode(knockoutRoot);
+  knockoutRoot.innerHTML = htmlStr; // eslint-disable-line no-unsanitized/property
+  ko.applyBindings(context, knockoutRoot);
   return new Promise(resolve => {
     setImmediate(() => {
-      resolve(destination);
+      resolve(knockoutRoot);
     });
   });
 }

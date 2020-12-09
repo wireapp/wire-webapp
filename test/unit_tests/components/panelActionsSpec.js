@@ -35,7 +35,7 @@ describe('panel-actions', () => {
       const mainActionLabel = domContainer.querySelector(mainActionLabelSelector);
       const mainAction = domContainer.querySelector('[data-uie-name=test]');
 
-      expect(mainActionLabel.innerText).toBe(params.items()[0].label);
+      expect(mainActionLabel.innerHTML).toBe(params.items()[0].label);
       expect(mainAction).not.toBe(null);
 
       mainAction.click();
@@ -57,7 +57,7 @@ describe('panel-actions', () => {
       const mainAction = domContainer.querySelector('[data-uie-name=main]');
       const secondaryAction = domContainer.querySelector('[data-uie-name=secondary]');
 
-      expect(mainActionLabel.innerText).toBe(params.items()[0].label);
+      expect(mainActionLabel.innerHTML).toBe(params.items()[0].label);
       expect(mainAction).not.toBe(null);
       expect(secondaryAction).not.toBe(null);
     });

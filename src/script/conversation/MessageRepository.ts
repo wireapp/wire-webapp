@@ -69,12 +69,12 @@ import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {buildMetadata, isVideo, isImage, isAudio} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
 import {StatusType} from '../message/StatusType';
 import {BackendClientError} from '../error/BackendClientError';
-import {showLegalHoldWarning} from '../legal-hold/LegalHoldWarning';
+import {showLegalHoldWarningModal} from '../legal-hold/LegalHoldWarning';
 import {ConversationError} from '../error/ConversationError';
 import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
@@ -789,7 +789,7 @@ export class MessageRepository {
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
 
     try {
-      const response = await this.sendGenericMessage(eventInfoEntity);
+      const response = await this.sendGenericMessage(eventInfoEntity, true);
       this.logger.info(`Sent info about session reset to client '${clientId}' of user '${userId}'`);
       return response;
     } catch (error) {
@@ -850,8 +850,7 @@ export class MessageRepository {
       return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
-
-        return this.sendGenericMessage(eventInfoEntity);
+        return this.sendGenericMessage(eventInfoEntity, true);
       });
     });
   }
@@ -881,7 +880,7 @@ export class MessageRepository {
     linkPreviews: LinkPreview[],
     expectsReadConfirmation: boolean,
     legalHoldStatus: LegalHoldStatus,
-  ) {
+  ): Text {
     const protoText = new Text({content: textMessage, expectsReadConfirmation, legalHoldStatus});
 
     if (mentionEntities && mentionEntities.length) {
@@ -962,7 +961,7 @@ export class MessageRepository {
         return this.create_recipients(conversationId, false, userIds).then(recipients => {
           const options = {precondition, recipients};
           const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-          this.sendGenericMessage(eventInfoEntity);
+          this.sendGenericMessage(eventInfoEntity, true);
         });
       });
       return this._delete_message_by_id(conversationEntity, messageId);
@@ -1058,7 +1057,7 @@ export class MessageRepository {
         const recipients = await this.create_recipients(conversationEntity.id, true, [messageEntity.from]);
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
-        await this.sendGenericMessage(eventInfoEntity, true);
+        await this.sendGenericMessage(eventInfoEntity, false);
       } catch (error) {
         messageEntity.waitingButtonId(undefined);
         return messageEntity.setButtonError(buttonId, t('buttonActionError'));
@@ -1092,7 +1091,7 @@ export class MessageRepository {
     return this.messageSender.queueMessage(async () => {
       const recipients = await this.create_recipients(eventInfoEntity.conversationId);
       eventInfoEntity.updateOptions({recipients});
-      return this.sendGenericMessage(eventInfoEntity);
+      return this.sendGenericMessage(eventInfoEntity, true);
     });
   }
 
@@ -1168,16 +1167,9 @@ export class MessageRepository {
     return recipients;
   }
 
-  /**
-   * Sends a generic message to a conversation.
-   *
-   * @param eventInfoEntity Info about event
-   * @param skipLegalHold Skip the legal hold detection
-   * @returns Resolves when the message was sent
-   */
-  private async sendGenericMessage(eventInfoEntity: EventInfoEntity, skipLegalHold = false): Promise<ClientMismatch> {
+  private async sendGenericMessage(eventInfoEntity: EventInfoEntity, checkLegalHold: boolean): Promise<ClientMismatch> {
     try {
-      await this.grantOutgoingMessage(eventInfoEntity, undefined, skipLegalHold);
+      await this.grantOutgoingMessage(eventInfoEntity, undefined, checkLegalHold);
       const sendAsExternal = await this.shouldSendAsExternal(eventInfoEntity);
       if (sendAsExternal) {
         return this.sendExternalGenericMessage(eventInfoEntity);
@@ -1242,12 +1234,12 @@ export class MessageRepository {
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
     userIds: string[],
-    skipLegalHold = false,
-  ): Promise<boolean> {
+    checkLegalHold: boolean,
+  ): Promise<void> {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
     if (allowedMessageTypes.includes(messageType)) {
-      return false;
+      return;
     }
 
     if (this.teamState.isTeam()) {
@@ -1274,15 +1266,14 @@ export class MessageRepository {
       }
     }
 
-    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
     const consentType = isCallingMessage
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
 
     // Legal Hold
-    if (!skipLegalHold) {
+    if (checkLegalHold) {
+      const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
       const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
       const localLegalHoldStatus = conversationEntity.legalHoldStatus();
       await this.updateAllClients(conversationEntity, !isMessageEdit);
@@ -1309,15 +1300,16 @@ export class MessageRepository {
 
       return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
     }
-    return this.grantMessage(eventInfoEntity, consentType, userIds);
+
+    return this.grantMessage(eventInfoEntity, consentType, userIds, false);
   }
 
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
     consentType: string,
-    userIds: string[] = null,
-    shouldShowLegalHoldWarning = false,
-  ): Promise<boolean> {
+    userIds: string[],
+    shouldShowLegalHoldWarning: boolean,
+  ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(
       eventInfoEntity.conversationId,
     );
@@ -1333,17 +1325,18 @@ export class MessageRepository {
     const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
     if (conversationEntity.needsLegalHoldApproval) {
       conversationEntity.needsLegalHoldApproval = false;
-      return showLegalHoldWarning(conversationEntity, conversationDegraded);
+      await showLegalHoldWarningModal(conversationEntity, conversationDegraded);
+      return;
     } else if (shouldShowLegalHoldWarning) {
       conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
     }
     if (!conversationDegraded) {
-      return false;
+      return;
     }
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds ||= conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
+      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
 
       return this.userRepository
         .getUsersById(userIds)
@@ -1359,10 +1352,10 @@ export class MessageRepository {
           if (hasMultipleUsers) {
             titleString = t('modalConversationNewDeviceHeadlineMany', titleSubstitutions);
           } else {
-            const [userEntity_1] = userEntities;
+            const [firstUser] = userEntities;
 
-            if (userEntity_1) {
-              titleString = userEntity_1.isMe
+            if (firstUser) {
+              titleString = firstUser.isMe
                 ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
                 : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
             } else {
@@ -1374,7 +1367,7 @@ export class MessageRepository {
 
               const error = new Error('Failed to grant outgoing message');
 
-              reject(error);
+              return reject(error);
             }
           }
 
@@ -1398,33 +1391,35 @@ export class MessageRepository {
             }
           }
 
+          const options: ModalOptions = {
+            close: () => {
+              if (!sendAnyway) {
+                reject(
+                  new ConversationError(
+                    ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+                    ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
+                  ),
+                );
+              }
+            },
+            primaryAction: {
+              action: () => {
+                sendAnyway = true;
+                conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+                resolve();
+              },
+              text: actionString,
+            },
+            text: {
+              message: messageString,
+              title: titleString,
+            },
+          };
+
           amplify.publish(
             WebAppEvents.WARNING.MODAL,
             ModalsViewModel.TYPE.CONFIRM,
-            {
-              close: () => {
-                if (!sendAnyway) {
-                  reject(
-                    new ConversationError(
-                      ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-                      ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-                    ),
-                  );
-                }
-              },
-              primaryAction: {
-                action: () => {
-                  sendAnyway = true;
-                  conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-                  resolve(true);
-                },
-                text: actionString,
-              },
-              text: {
-                message: messageString,
-                title: titleString,
-              },
-            },
+            options,
             `degraded-${eventInfoEntity.conversationId}`,
           );
         })
@@ -1432,7 +1427,7 @@ export class MessageRepository {
     });
   }
 
-  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage = true) {
+  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean): Promise<void> {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
@@ -1558,7 +1553,7 @@ export class MessageRepository {
             eventInfoEntity.updateOptions({recipients});
             return eventInfoEntity;
           });
-      return recipientsPromise.then(infoEntity => this.sendGenericMessage(infoEntity));
+      return recipientsPromise.then(infoEntity => this.sendGenericMessage(infoEntity, true));
     });
   }
 
@@ -1570,7 +1565,6 @@ export class MessageRepository {
    */
   private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
     const {conversationId, genericMessage} = eventInfoEntity;
-
     const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(conversationId);
     const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
@@ -1657,7 +1651,7 @@ export class MessageRepository {
         payload,
         options.precondition,
       );
-      this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
+      await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
       return response;
     } catch (axiosError) {
       const error = axiosError.response?.data;
@@ -1677,13 +1671,16 @@ export class MessageRepository {
         payload,
       );
 
-      const userIds = Object.keys(error.missing);
-      await this.grantOutgoingMessage(eventInfoEntity, userIds);
+      const missedUserIds = Object.keys(error.missing);
+      await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
       );
-      return this.conversation_service.post_encrypted_message(conversationId, payloadWithMissingClients, true);
+      if (payloadWithMissingClients) {
+        return this.conversation_service.post_encrypted_message(conversationId, payloadWithMissingClients, true);
+      }
+      return this.conversation_service.post_encrypted_message(conversationId, payload, true);
     }
   }
 

@@ -28,7 +28,7 @@ describe('copy-to-clipboard', () => {
     return instantiateComponent('copy-to-clipboard', params).then(domContainer => {
       const element = domContainer.querySelector('.copy-to-clipboard');
 
-      expect(element.innerText).toBe(params.text());
+      expect(element.innerHTML).toBe(params.text());
     });
   });
 

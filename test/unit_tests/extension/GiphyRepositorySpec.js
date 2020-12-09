@@ -25,6 +25,8 @@ import {GiphyService} from 'src/script/extension/GiphyService';
 import {APIClient} from 'src/script/service/APIClientSingleton';
 import {Config} from 'src/script/Config';
 
+jest.deepUnmock('axios');
+
 describe('Giphy Repository', () => {
   let server = null;
 

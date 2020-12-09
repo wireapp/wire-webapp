@@ -23,7 +23,7 @@ import {instantiateComponent} from '../../../../test/helper/knockoutHelpers';
 import './chooseScreen';
 
 describe('chooseScreen', () => {
-  it('shows the available screens', () => {
+  it('shows the available screens', async () => {
     const screens = [
       {id: 'screen:first', thumbnail: {toDataURL: () => 'first screen'}},
       {id: 'screen:second', thumbnail: {toDataURL: () => 'second screen'}},
@@ -39,10 +39,10 @@ describe('chooseScreen', () => {
       windows: ko.observable(windows),
     };
 
-    return instantiateComponent('choose-screen', params).then((domContainer: Element) => {
-      const screenItems = domContainer.querySelectorAll('.choose-screen-list-item');
+    window.t = jest.fn().mockImplementation((value: string) => value);
 
-      expect(screenItems.length).toBe(screens.length + windows.length);
-    });
+    const domContainer = await instantiateComponent('choose-screen', params);
+    const screenItems = domContainer.querySelectorAll('.choose-screen-list-item');
+    expect(screenItems.length).toBe(screens.length + windows.length);
   });
 });

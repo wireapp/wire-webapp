@@ -181,7 +181,7 @@
   "callStateOutgoing": "呼び出し中...",
   "chooseHandle.handlePlaceholder": "ユーザー名",
   "chooseHandle.headline": "ユーザー名を設定",
-  "chooseHandle.subhead": "ユーザー名は他のユーザがあなたを見つけるのに役立ちます。",
+  "chooseHandle.subhead": "Your username helps people find you.",
   "clientItem.passwordPlaceholder": "パスワード",
   "clientManager.headline": "デバイスの削除",
   "clientManager.logout": "ログアウト",

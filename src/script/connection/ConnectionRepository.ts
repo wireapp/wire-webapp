@@ -24,11 +24,10 @@ import type {UserConnectionData} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import type {User} from '../entity/User';
-import {BaseError} from '../error/BaseError';
 import {EventRepository} from '../event/EventRepository';
 import type {EventSource} from '../event/EventSource';
 import {SystemMessageType} from '../message/SystemMessageType';
@@ -36,14 +35,13 @@ import type {UserRepository} from '../user/UserRepository';
 import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
 import type {ConnectionService} from './ConnectionService';
-import {ConnectionError} from '../error/ConnectionError';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
   private readonly connectionMapper: ConnectionMapper;
-  public readonly connectionEntities: ko.ObservableArray<ConnectionEntity>;
+  public readonly connectionEntities: ko.Observable<{[userId: string]: ConnectionEntity}>;
 
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
@@ -58,7 +56,7 @@ export class ConnectionRepository {
     this.logger = getLogger('ConnectionRepository');
 
     this.connectionMapper = new ConnectionMapper();
-    this.connectionEntities = ko.observableArray([]);
+    this.connectionEntities = ko.observable({});
 
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
   }
@@ -178,7 +176,7 @@ export class ConnectionRepository {
    * Get a connection for a user ID.
    */
   private getConnectionByUserId(userId: string): ConnectionEntity {
-    return this.connectionEntities().find(connectionEntity => connectionEntity.userId === userId);
+    return this.connectionEntities()[userId];
   }
 
   /**
@@ -187,7 +185,8 @@ export class ConnectionRepository {
    * @returns User connection entity
    */
   getConnectionByConversationId(conversationId: string): ConnectionEntity {
-    return this.connectionEntities().find(connectionEntity => connectionEntity.conversationId === conversationId);
+    const connectionEntities = Object.values(this.connectionEntities());
+    return connectionEntities.find(connectionEntity => connectionEntity.conversationId === conversationId);
   }
 
   /**
@@ -201,7 +200,9 @@ export class ConnectionRepository {
     try {
       const connectionData = await this.connectionService.getConnections();
       const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
-      return newConnectionEntities.length ? this.updateConnections(newConnectionEntities) : this.connectionEntities();
+      return newConnectionEntities.length
+        ? this.updateConnections(newConnectionEntities)
+        : Object.values(this.connectionEntities());
     } catch (error) {
       this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
       throw error;
@@ -227,15 +228,16 @@ export class ConnectionRepository {
     return this.updateStatus(userEntity, ConnectionStatus.ACCEPTED);
   }
 
+  addConnectionEntity(connectionEntity: ConnectionEntity): void {
+    this.connectionEntities()[connectionEntity.userId] = connectionEntity;
+  }
+
   /**
    * Update user matching a given connection.
    * @returns Promise that resolves when the connection have been updated
    */
   private async updateConnection(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
-    if (!connectionEntity) {
-      throw new ConnectionError(BaseError.TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
-    }
-    this.connectionEntities.push(connectionEntity);
+    this.addConnectionEntity(connectionEntity);
     const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
     return userEntity.connection(connectionEntity);
   }
@@ -245,12 +247,13 @@ export class ConnectionRepository {
    * @returns Promise that resolves when all connections have been updated
    */
   private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
-    if (!connectionEntities.length) {
-      throw new ConnectionError(BaseError.TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
-    }
-    this.connectionEntities.push(...connectionEntities);
+    const updatedConnections = connectionEntities.reduce((allConnections, connectionEntity) => {
+      allConnections[connectionEntity.userId] = connectionEntity;
+      return allConnections;
+    }, this.connectionEntities());
+    this.connectionEntities(updatedConnections);
     await this.userRepository.updateUsersFromConnections(connectionEntities);
-    return this.connectionEntities();
+    return Object.values(this.connectionEntities());
   }
 
   /**

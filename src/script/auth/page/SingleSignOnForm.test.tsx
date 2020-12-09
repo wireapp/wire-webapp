@@ -85,19 +85,13 @@ describe('SingleSignOnForm', () => {
       {doLogin, initialCode},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('code input exists').toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().props().value)
-      .withContext('code input has initial code value')
-      .toEqual(initialCode);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().props().value).toEqual(initialCode);
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().props().disabled)
-      .withContext('code input is disabled when prefilled')
-      .toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().props().disabled).toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled)
-      .withContext('submit button is enabled')
-      .toEqual(false);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toEqual(false);
   });
 
   it('successfully logs into account with SSO code', async () => {
@@ -128,26 +122,20 @@ describe('SingleSignOnForm', () => {
       history,
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('code input exists').toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(code);
     singleSignOnFormPage.clickSubmitButton();
 
-    expect(actionRoot.authAction.validateSSOCode)
-      .withContext('validateSSOCode function was called')
-      .toHaveBeenCalledTimes(1);
+    expect(actionRoot.authAction.validateSSOCode).toHaveBeenCalledTimes(1);
 
     await waitForExpect(() => {
-      expect(doLogin).withContext('external login function was called').toHaveBeenCalledTimes(1);
+      expect(doLogin).toHaveBeenCalledTimes(1);
     });
 
-    expect(actionRoot.authAction.doFinalizeSSOLogin)
-      .withContext('doFinalizeSSOLogin function was called')
-      .toHaveBeenCalledTimes(1);
+    expect(actionRoot.authAction.doFinalizeSSOLogin).toHaveBeenCalledTimes(1);
 
-    expect(historyPushSpy)
-      .withContext('navigation to history page was triggered')
-      .toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+    expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
   });
 
   it('shows invalid code or email error', async () => {
@@ -170,19 +158,19 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('Code input exists').toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is disabled').toBe(true);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(code);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is enabled').toBe(false);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(false);
 
     singleSignOnFormPage.clickSubmitButton();
 
-    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH).exists())
-      .withContext(`Error "${ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH}" message exists`)
-      .toBe(true);
+    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_EMAIL_CODE.PATTERN_MISMATCH).exists()).toBe(
+      true,
+    );
   });
 
   it('disallows email when domain discovery is disabled', async () => {
@@ -205,19 +193,17 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('code/email input exists').toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is disabled').toBe(true);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(email);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is enabled').toBe(false);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(false);
 
     singleSignOnFormPage.clickSubmitButton();
 
-    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH).exists())
-      .withContext(`Error "${ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH}" message exists`)
-      .toBe(true);
+    expect(singleSignOnFormPage.getErrorMessage(ValidationError.FIELD.SSO_CODE.PATTERN_MISMATCH).exists()).toBe(true);
   });
 
   it('successfully redirects with registered domain and permanent client', async () => {
@@ -249,22 +235,20 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('Email input exists').toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is disabled').toBe(true);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(email);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is enabled').toBe(false);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(false);
 
     singleSignOnFormPage.clickSubmitButton();
 
-    expect(actionRoot.authAction.doGetDomainInfo).withContext('domain data got fetched').toHaveBeenCalledTimes(1);
+    expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
 
     await waitForExpect(() => {
-      expect(actionRoot.navigationAction.doNavigate)
-        .withContext('navigates to expected host')
-        .toHaveBeenCalledWith(expectedHost);
+      expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
     });
   });
 
@@ -297,23 +281,21 @@ describe('SingleSignOnForm', () => {
       {doLogin: () => Promise.reject()},
     );
 
-    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).withContext('Email input exists').toBe(true);
+    expect(singleSignOnFormPage.getCodeOrEmailInput().exists()).toBe(true);
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is disabled').toBe(true);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(true);
 
     singleSignOnFormPage.enterCodeOrEmail(email);
     singleSignOnFormPage.getTemporaryCheckbox().simulate('change', {target: {checked: true}});
 
-    expect(singleSignOnFormPage.getSubmitButton().props().disabled).withContext('Submit button is enabled').toBe(false);
+    expect(singleSignOnFormPage.getSubmitButton().props().disabled).toBe(false);
 
     singleSignOnFormPage.clickSubmitButton();
 
-    expect(actionRoot.authAction.doGetDomainInfo).withContext('domain data got fetched').toHaveBeenCalledTimes(1);
+    expect(actionRoot.authAction.doGetDomainInfo).toHaveBeenCalledTimes(1);
 
     await waitForExpect(() => {
-      expect(actionRoot.navigationAction.doNavigate)
-        .withContext('navigates to expected host')
-        .toHaveBeenCalledWith(expectedHost);
+      expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
     });
   });
 });

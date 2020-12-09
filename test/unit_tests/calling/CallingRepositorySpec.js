@@ -19,7 +19,6 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON} from '@wireapp/avs';
-
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {Participant} from 'src/script/calling/Participant';
@@ -127,7 +126,8 @@ describe('CallingRepository', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
-      const audioTrack = silence();
+      const source = new RTCAudioSource();
+      const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
       selfParticipant.audioStream(selfMediaStream);
       spyOn(selfParticipant, 'getMediaStream').and.callThrough();
@@ -146,7 +146,8 @@ describe('CallingRepository', () => {
     it('asks only once for mediastream when queried multiple times', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
-      const audioTrack = silence();
+      const source = new RTCAudioSource();
+      const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
       spyOn(callingRepository.mediaStreamHandler, 'requestMediaStream').and.returnValue(
         Promise.resolve(selfMediaStream),
@@ -182,11 +183,48 @@ describe('CallingRepository', () => {
       expect(selfParticipant.releaseVideoStream).toHaveBeenCalledTimes(1);
     });
   });
+});
 
+describe('CallingRepository ISO', () => {
   describe('incoming call', () => {
-    it('creates and stores a new call when an incoming call arrives', done => {
-      spyOn(callingRepository.messageRepository, 'grantMessage').and.returnValue(Promise.resolve());
-      spyOn(callingRepository.conversationState, 'findConversation').and.returnValue(new Conversation());
+    let avsUser;
+    let avsCall;
+
+    afterEach(() => {
+      return avsCall && avsCall.destroy(avsUser);
+    });
+
+    it('creates and stores a new call when an incoming call arrives', async done => {
+      const selfUser = new User(createRandomUuid());
+      selfUser.isMe = true;
+      selfUser.clientId = createRandomUuid();
+
+      const conversation = new Conversation(createRandomUuid());
+
+      const callingRepo = new CallingRepository(
+        {
+          grantMessage: jest.fn(),
+        }, // MessageRepository
+        {
+          injectEvent: jest.fn(),
+        }, // EventRepository
+        {}, // UserRepository
+        {}, // MediaStreamHandler
+        {
+          toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
+        }, // ServerTimeHandler
+        {}, // APIClient
+        {
+          findConversation: jest.fn().mockImplementation(() => conversation),
+          participating_user_ets: jest.fn(),
+        }, //ConversationState
+      );
+
+      const avs = await callingRepo.initAvs(selfUser, selfUser.clientId);
+      // provide global handle for cleanup
+      avsUser = avs.wUser;
+      avsCall = avs.wCall;
+
       const event = {
         content: {
           props: {
@@ -200,7 +238,7 @@ describe('CallingRepository', () => {
           type: 'SETUP',
           version: '3.0',
         },
-        conversation: 'cfc6b551-2c5b-42ca-bbf1-6b954f0639f8',
+        conversation: conversation.id,
         from: 'fdbbf5e8-b1e8-474f-b63c-f007df2b4338',
         id: '89fb35d3-01c4-45f3-9a5b-7fbde558b6b2',
         sender: 'dddb4f5068e8c98b',
@@ -208,20 +246,19 @@ describe('CallingRepository', () => {
         type: 'call.e-call',
       };
 
-      expect(callingRepository.activeCalls().length).toBe(0);
-      amplify.publish(WebAppEvents.CALL.EVENT_FROM_BACKEND, event);
-      setTimeout(() => {
-        expect(callingRepository.activeCalls().length).toBe(1);
+      expect(callingRepo.activeCalls().length).toBe(0);
 
-        expect(callingRepository.activeCalls()[0].initiator).toBe(event.from);
-        expect(callingRepository.activeCalls()[0].conversationId).toBe(event.conversation);
+      callingRepo.onIncomingCall(call => {
+        expect(callingRepo.activeCalls().length).toBe(1);
+
         done();
       });
+      await callingRepo.onCallEvent(event);
     });
   });
 });
 
-xdescribe('E2E audio call', () => {
+describe.skip('E2E audio call', () => {
   const conversationRepository = {
     find_conversation_by_id: () => new Conversation(),
   };
@@ -243,8 +280,12 @@ xdescribe('E2E audio call', () => {
 
   beforeAll(() => {
     spyOn(client, 'fetchConfig').and.returnValue(Promise.resolve({ice_servers: []}));
-    spyOn(client, 'getCallMediaStream').and.returnValue(Promise.resolve(new MediaStream([silence()])));
-    spyOn(client, 'getMediaStream').and.returnValue(Promise.resolve(new MediaStream([silence()])));
+    spyOn(client, 'getCallMediaStream').and.returnValue(
+      Promise.resolve(new MediaStream([new RTCAudioSource().createTrack()])),
+    );
+    spyOn(client, 'getMediaStream').and.returnValue(
+      Promise.resolve(new MediaStream([new RTCAudioSource().createTrack()])),
+    );
     spyOn(client, 'onCallEvent').and.callThrough();
     spyOn(client, 'updateParticipantStream').and.callThrough();
     spyOn(client, 'incomingCallCallback').and.callFake(call => {
@@ -341,16 +382,6 @@ xdescribe('E2E audio call', () => {
     wCall.start(remoteWuser, 'conv-1', CALL_TYPE.AUDIO, CONV_TYPE.ONEONONE, 0);
   });
 });
-
-function silence() {
-  const ctx = new AudioContext();
-  const oscillator = ctx.createOscillator();
-  oscillator.type = 'sine'; // this is the default - also square, sawtooth, triangle
-  oscillator.frequency.value = 100; // Hz
-  oscillator.start(0);
-  const dst = oscillator.connect(ctx.createMediaStreamDestination());
-  return dst.stream.getAudioTracks()[0];
-}
 
 function extractAudioStats(stats) {
   const audioStats = [];

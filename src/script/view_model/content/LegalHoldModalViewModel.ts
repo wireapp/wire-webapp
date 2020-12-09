@@ -20,13 +20,10 @@
 import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
 import {t} from 'Util/LocalizerUtil';
-
 import type {ClientRepository} from 'src/script/client/ClientRepository';
 import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import type {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
@@ -37,12 +34,12 @@ import type {MessageRepository} from 'src/script/conversation/MessageRepository'
 import {UserState} from '../../user/UserState';
 import {container} from 'tsyringe';
 
-export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
-export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';
-export const SHOW_LEGAL_HOLD_MODAL = 'LegalHold.showLegalHoldModal';
-export const HIDE_LEGAL_HOLD_MODAL = 'LegalHold.hideLegalHoldModal';
-
 export class LegalHoldModalViewModel {
+  static SHOW_REQUEST = 'LegalHold.showRequestModal';
+  static HIDE_REQUEST = 'LegalHold.hideRequestModal';
+  static SHOW_DETAILS = 'LegalHold.showLegalHoldModal';
+  static HIDE_DETAILS = 'LegalHold.hideLegalHoldModal';
+
   isVisible: ko.Observable<boolean>;
   isSelfInfo: ko.Observable<boolean>;
   users: ko.Observable<User[]>;
@@ -100,10 +97,12 @@ export class LegalHoldModalViewModel {
       this.isLoading(false);
     };
     this.disableSubmit = ko.pureComputed(() => this.requiresPassword() && this.passwordValue().length < 1);
-    amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
-    amplify.subscribe(HIDE_REQUEST_MODAL, this.hideModal);
-    amplify.subscribe(SHOW_LEGAL_HOLD_MODAL, this.showUsers);
-    amplify.subscribe(HIDE_LEGAL_HOLD_MODAL, this.hideLegalHoldModal);
+    amplify.subscribe(LegalHoldModalViewModel.SHOW_REQUEST, (fingerprint?: string[]) =>
+      this.showRequestModal(false, fingerprint),
+    );
+    amplify.subscribe(LegalHoldModalViewModel.HIDE_REQUEST, this.hideModal);
+    amplify.subscribe(LegalHoldModalViewModel.SHOW_DETAILS, this.showUsers);
+    amplify.subscribe(LegalHoldModalViewModel.HIDE_DETAILS, this.hideLegalHoldModal);
   }
 
   showRequestModal = async (showLoading?: boolean, fingerprint?: string[]) => {
