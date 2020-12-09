@@ -230,7 +230,7 @@ jobs:
 
       - name: Generate changelog
         if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
-        run: yarn changelog
+        run: yarn changelog:ci
 
       - name: Create GitHub production release
         id: create_release_production
