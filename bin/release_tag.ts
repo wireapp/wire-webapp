@@ -55,7 +55,7 @@ logger.state.isEnabled = true;
 
 const exec = (command: string): string => execSync(command, {stdio: 'pipe'}).toString().trim();
 
-if (!isDryRun) {
+if (isDryRun) {
   logger.info('Note: Dry run enabled.');
 }
 
