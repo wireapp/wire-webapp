@@ -26,6 +26,8 @@ import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {act} from 'react-dom/test-utils';
 import {waitFor} from '@testing-library/react';
 
+jest.mock('../../auth/util/SVGProvider');
+
 class AvatarImagePage extends TestPage<AvatarImageProps> {
   constructor(props?: AvatarImageProps) {
     super(AvatarImage, props);

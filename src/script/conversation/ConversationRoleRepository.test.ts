@@ -46,7 +46,7 @@ describe('ConversationRoleRepository', () => {
       expect(roleRepository['teamState'].isTeam()).toBe(false);
       testFactory.team_repository['teamState'].team(new TeamEntity(createRandomUuid()));
 
-      expect(roleRepository['teamState'].isTeam()).toBeTrue();
+      expect(roleRepository['teamState'].isTeam()).toBe(true);
     });
   });
 
@@ -96,7 +96,7 @@ describe('ConversationRoleRepository', () => {
 
       let canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);
 
-      expect(canAddParticipants).toBeFalse();
+      expect(canAddParticipants).toBe(false);
 
       conversationEntity.roles({
         [userEntity.id]: DefaultRole.WIRE_ADMIN,
@@ -104,7 +104,7 @@ describe('ConversationRoleRepository', () => {
 
       canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);
 
-      expect(canAddParticipants).toBeTrue();
+      expect(canAddParticipants).toBe(true);
     });
   });
 });

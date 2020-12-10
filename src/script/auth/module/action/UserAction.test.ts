@@ -53,14 +53,10 @@ describe('UserAction', () => {
       actions: mockedActions,
       apiClient: mockedApiClient,
     })({});
-    try {
-      await store.dispatch(actionRoot.userAction.doSendActivationCode(email));
-      fail();
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([
-        UserActionCreator.startSendActivationCode(),
-        UserActionCreator.failedSendActivationCode(error),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.userAction.doSendActivationCode(email))).rejects.toThrow();
+    expect(store.getActions()).toEqual([
+      UserActionCreator.startSendActivationCode(),
+      UserActionCreator.failedSendActivationCode(error),
+    ]);
   });
 });

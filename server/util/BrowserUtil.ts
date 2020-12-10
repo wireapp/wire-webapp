@@ -18,7 +18,7 @@
  */
 
 import {CommonConfig} from '@wireapp/commons';
-import * as useragent from 'express-useragent';
+import useragent from 'express-useragent';
 
 interface ParsedUserAgent {
   agent: string;

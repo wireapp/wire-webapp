@@ -45,13 +45,14 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {Conversation as ConversationEntity, SerializedConversation} from '../entity/Conversation';
+import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
+import {ConversationRecord} from '../storage/ConversationRecord';
 
 export class ConversationService {
   private readonly eventService: EventService;
@@ -398,11 +399,9 @@ export class ConversationService {
    * @param conversations Conversation entity
    * @returns Resolves with a list of conversation records
    */
-  async save_conversations_in_db(
-    conversations: ConversationEntity[] | SerializedConversation[],
-  ): Promise<ConversationEntity[] | SerializedConversation[]> {
+  async save_conversations_in_db(conversations: ConversationRecord[]): Promise<ConversationRecord[]> {
     if (this.storageService.db) {
-      const keys = (conversations as ConversationEntity[]).map(conversation => conversation.id);
+      const keys = conversations.map(conversation => conversation.id);
       await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
     } else {
       for (const conversation of conversations) {

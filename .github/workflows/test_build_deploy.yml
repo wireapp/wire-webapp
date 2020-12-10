@@ -31,6 +31,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: 'Use latest Node.js v12'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
       - name: Set environment variables
         run: |
           echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
@@ -78,14 +83,14 @@ jobs:
 
       - name: Test
         if: env.DISTRIBUTION == 'wire'
-        run: yarn test
+        run: yarn test --coverage --detectOpenHandles --forceExit
 
       - name: Monitor coverage
         if: github.event_name == 'pull_request' && env.DISTRIBUTION == 'wire'
         uses: slavcodev/coverage-monitor-action@1.2.0
         with:
           github_token: ${{github.token}}
-          clover_file: 'docs/coverage/clover.xml'
+          clover_file: 'coverage/clover.xml'
           threshold_alert: ${{env.TEST_COVERAGE_FAIL_THRESHOLD}}
           threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
 
@@ -225,7 +230,7 @@ jobs:
 
       - name: Generate changelog
         if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
-        run: yarn changelog
+        run: yarn changelog:ci
 
       - name: Create GitHub production release
         id: create_release_production

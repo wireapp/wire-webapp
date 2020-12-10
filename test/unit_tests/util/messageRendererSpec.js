@@ -263,6 +263,7 @@ describe('renderMessage', () => {
         return mentionEntity;
       });
 
+      // eslint-disable-next-line jest/valid-title
       it(testCase, () => {
         const result = renderMessage(text, 'self-id', mentionEntities);
 
@@ -378,7 +379,7 @@ describe('Markdown for code snippets', () => {
 
   it('renders escaped TypeScript code blocks', () => {
     const expected =
-      '<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> greetings = (name: <span class="hljs-built_in">string</span>): <span class="hljs-function"><span class="hljs-params">string</span> =&gt;</span> {\n  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;\n};\n<span class="hljs-built_in">console</span>.log(greetings(<span class="hljs-string">&#x27;world&#x27;</span>));\n</code></pre>';
+      '<pre><code class="lang-typescript"><span class="hljs-keyword">const</span> greetings = (<span class="hljs-attribute">name</span>: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">string</span> =&gt; {\n  <span class="hljs-keyword">return</span> <span class="hljs-string">`Hello, <span class="hljs-subst">${name}</span>!`</span>;\n};\n<span class="hljs-built_in">console</span>.log(greetings(<span class="hljs-string">&#x27;world&#x27;</span>));\n</code></pre>';
     expect(
       renderMessage(
         "```typescript\nconst greetings = (name: string): string => {\n  return `Hello, ${name}!`;\n};\nconsole.log(greetings('world'));\n```",

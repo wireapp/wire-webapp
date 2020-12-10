@@ -61,15 +61,11 @@ describe('ConversationAction', () => {
       apiClient: mockedApiClient,
       core: mockedCore,
     })({});
-    try {
-      await store.dispatch(actionRoot.conversationAction.doCheckConversationCode(key, code));
-      fail();
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([
-        ConversationActionCreator.startConversationCodeCheck(),
-        ConversationActionCreator.failedConversationCodeCheck(error),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.conversationAction.doCheckConversationCode(key, code))).rejects.toThrow();
+    expect(store.getActions()).toEqual([
+      ConversationActionCreator.startConversationCodeCheck(),
+      ConversationActionCreator.failedConversationCodeCheck(error),
+    ]);
   });
 
   it('joins conversation by code', async () => {
@@ -110,14 +106,10 @@ describe('ConversationAction', () => {
       apiClient: mockedApiClient,
       core: mockedCore,
     })({});
-    try {
-      await store.dispatch(actionRoot.conversationAction.doJoinConversationByCode(key, code));
-      fail();
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([
-        ConversationActionCreator.startJoinConversationByCode(),
-        ConversationActionCreator.failedJoinConversationByCode(error),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.conversationAction.doJoinConversationByCode(key, code))).rejects.toThrow();
+    expect(store.getActions()).toEqual([
+      ConversationActionCreator.startJoinConversationByCode(),
+      ConversationActionCreator.failedJoinConversationByCode(error),
+    ]);
   });
 });

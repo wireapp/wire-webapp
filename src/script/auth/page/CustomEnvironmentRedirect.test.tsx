@@ -30,6 +30,8 @@ import {AnyAction} from 'redux';
 import {History} from 'history';
 import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 
+jest.mock('../util/SVGProvider');
+
 class CustomEnvironmentRedirectPage {
   private readonly driver: ReactWrapper;
 
@@ -56,11 +58,12 @@ function createMockedURLSearchParams(value: string) {
 }
 describe('CustomEnvironmentRedirect', () => {
   it('redirects to the given url after some time', async () => {
+    jest.useFakeTimers();
+
     const expectedHost = 'http://localhost:8080?test=true&clienttype=permanent&sso_auto_login=true';
     const originalURLSearchParams = window.URLSearchParams;
     window.URLSearchParams = createMockedURLSearchParams(expectedHost);
     spyOn(actionRoot.navigationAction, 'doNavigate').and.returnValue(() => {});
-    jasmine.clock().install();
     new CustomEnvironmentRedirectPage(
       mockStoreFactory()({
         ...initialRootState,
@@ -72,15 +75,13 @@ describe('CustomEnvironmentRedirect', () => {
       }),
     );
 
-    jasmine.clock().tick(1000);
-    expect(actionRoot.navigationAction.doNavigate).withContext('did not navigate too early').toHaveBeenCalledTimes(0);
-    jasmine.clock().tick(5000);
+    jest.advanceTimersByTime(1000);
+    expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledTimes(0);
+    jest.advanceTimersByTime(5000);
 
-    expect(actionRoot.navigationAction.doNavigate)
-      .withContext('navigates to expected host')
-      .toHaveBeenCalledWith(expectedHost);
+    expect(actionRoot.navigationAction.doNavigate).toHaveBeenCalledWith(expectedHost);
 
-    jasmine.clock().uninstall();
+    jest.useRealTimers();
     window.URLSearchParams = originalURLSearchParams;
   });
 });

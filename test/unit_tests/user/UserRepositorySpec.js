@@ -24,8 +24,8 @@ import {ConsentValue} from 'src/script/user/ConsentValue';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {User} from 'src/script/entity/User';
 import {EventRepository} from 'src/script/event/EventRepository';
+import {UserRepository} from 'src/script/user/UserRepository';
 import {ClientMapper} from 'src/script/client/ClientMapper';
-import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('UserRepository', () => {
@@ -44,7 +44,7 @@ describe('UserRepository', () => {
     server.restore();
   });
 
-  describe('Account preferences ', () => {
+  describe('Account preferences', () => {
     beforeEach(() => {
       spyOn(testFactory.user_repository.propertyRepository, 'publishProperties').and.callFake(properties => {
         return properties;
@@ -212,7 +212,7 @@ describe('UserRepository', () => {
       });
     });
 
-    describe('ssignAllClients', () => {
+    describe('assignAllClients', () => {
       let userJaneRoe = null;
       let userJohnDoe = null;
 
@@ -248,59 +248,84 @@ describe('UserRepository', () => {
     });
 
     describe('verifyUsernames', () => {
-      it('resolves with username when username is not taken', () => {
+      it('resolves with username when username is not taken', async () => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${Config.getConfig().BACKEND_REST}/users/handles`, [
-          HTTP_STATUS.OK,
-          {'Content-Type': 'application/json'},
-          JSON.stringify(usernames),
-        ]);
+        const userRepo = new UserRepository(
+          {
+            checkUserHandles: jest.fn().mockImplementation(() => Promise.resolve(usernames)),
+          }, // UserService
+          {}, // AssetRepository,
+          {}, // SelfService,
+          {}, // ClientRepository,
+          {}, // ServerTimeHandler,
+          {}, // PropertiesRepository,
+          {}, // UserState
+        );
 
-        return testFactory.user_repository.verifyUsernames(usernames).then(_usernames => {
-          expect(_usernames).toEqual(usernames);
-        });
+        const _usernames = await userRepo.verifyUsernames(usernames);
+        expect(_usernames).toEqual(usernames);
       });
 
-      it('rejects when username is taken', () => {
+      it('returns empty array when username is taken', async () => {
         const usernames = ['john_doe'];
-        server.respondWith('POST', `${Config.getConfig().BACKEND_REST}/users/handles`, [
-          HTTP_STATUS.OK,
-          {'Content-Type': 'application/json'},
-          JSON.stringify([]),
-        ]);
+        const userRepo = new UserRepository(
+          {
+            checkUserHandles: jest.fn().mockImplementation(() => Promise.resolve([])),
+          }, // UserService
+          {}, // AssetRepository,
+          {}, // SelfService,
+          {}, // ClientRepository,
+          {}, // ServerTimeHandler,
+          {}, // PropertiesRepository,
+          {}, // UserState
+        );
 
-        return testFactory.user_repository.verifyUsernames(usernames).then(_usernames => {
-          expect(_usernames.length).toBe(0);
-        });
+        const _usernames = await userRepo.verifyUsernames(usernames);
+        expect(_usernames.length).toBe(0);
       });
     });
 
     describe('verify_username', () => {
-      it('resolves with username when username is not taken', () => {
-        const username = 'john_doe';
-        server.respondWith('HEAD', `${Config.getConfig().BACKEND_REST}/users/handles/${username}`, [
-          HTTP_STATUS.NOT_FOUND,
-          {},
-          '',
-        ]);
+      it('resolves with username when username is not taken', async () => {
+        const expectedUsername = 'john_doe';
+        const notFoundError = new Error('not found');
+        notFoundError.response = {status: HTTP_STATUS.NOT_FOUND};
+        const userRepo = new UserRepository(
+          {
+            checkUserHandle: jest.fn().mockImplementation(() => Promise.reject(notFoundError)),
+          }, // UserService
+          {}, // AssetRepository,
+          {}, // SelfService,
+          {}, // ClientRepository,
+          {}, // ServerTimeHandler,
+          {}, // PropertiesRepository,
+          {}, // UserState
+        );
 
-        return testFactory.user_repository.verifyUsername(username).then(_username => {
-          expect(_username).toBe(username);
-        });
+        const actualUsername = await userRepo.verifyUsername(expectedUsername);
+        expect(actualUsername).toBe(expectedUsername);
       });
 
-      it('rejects when username is taken', done => {
+      it('rejects when username is taken', async () => {
         const username = 'john_doe';
-        server.respondWith('HEAD', `${Config.getConfig().BACKEND_REST}/users/handles/${username}`, [
-          HTTP_STATUS.OK,
-          {},
-          '',
-        ]);
 
-        testFactory.user_repository
-          .verifyUsername(username)
-          .then(done.fail)
-          .catch(() => done());
+        const userRepo = new UserRepository(
+          {
+            checkUserHandle: jest.fn().mockImplementation(() => Promise.resolve()),
+          }, // UserService
+          {}, // AssetRepository,
+          {}, // SelfService,
+          {}, // ClientRepository,
+          {}, // ServerTimeHandler,
+          {}, // PropertiesRepository,
+          {}, // UserState
+        );
+
+        await expect(userRepo.verifyUsername(username)).rejects.toMatchObject({
+          message: 'User related backend request failure',
+          name: 'UserError',
+          type: 'REQUEST_FAILURE',
+        });
       });
     });
   });

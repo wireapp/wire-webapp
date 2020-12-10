@@ -155,7 +155,7 @@ export class ActionsViewModel {
       return this.clientRepository.deleteClient(clientEntity.id, undefined);
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>(resolve => {
       const expectedErrors = {
         [BackendClientError.LABEL.BAD_REQUEST]: t('BackendError.LABEL.BAD_REQUEST'),
         [BackendClientError.LABEL.INVALID_CREDENTIALS]: t('BackendError.LABEL.INVALID_CREDENTIALS'),

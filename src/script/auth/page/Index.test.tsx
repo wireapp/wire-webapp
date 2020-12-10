@@ -34,6 +34,8 @@ import waitForExpect from 'wait-for-expect';
 import {ROUTE} from '../route';
 import {initialAuthState} from '../module/reducer/authReducer';
 
+jest.mock('../util/SVGProvider');
+
 class IndexPage {
   private readonly driver: ReactWrapper;
 
@@ -68,7 +70,7 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getLogo().exists()).withContext('Logo is visible').toBe(true);
+    expect(indexPage.getLogo().exists()).toBe(true);
   });
 
   it('redirects to SSO login if default SSO code is set', async () => {
@@ -96,9 +98,7 @@ describe('when visiting the index page', () => {
     );
 
     await waitForExpect(() => {
-      expect(historyPushSpy)
-        .withContext('Navigation to login page was triggered')
-        .toHaveBeenCalledWith(`${ROUTE.SSO}/wire-${defaultSSOCode}` as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(`${ROUTE.SSO}/wire-${defaultSSOCode}` as any);
     });
   });
 
@@ -114,11 +114,9 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getWelcomeText().exists()).withContext('Welcome text is visible').toBe(true);
+    expect(indexPage.getWelcomeText().exists()).toBe(true);
 
-    expect(indexPage.getWelcomeText().text())
-      .withContext('Welcome text contains default backend name')
-      .toContain(Config.getConfig().BRAND_NAME);
+    expect(indexPage.getWelcomeText().text()).toContain(Config.getConfig().BRAND_NAME);
   });
 
   it('shows the welcome text with custom backend name', () => {
@@ -140,11 +138,9 @@ describe('when visiting the index page', () => {
       }),
     );
 
-    expect(indexPage.getWelcomeText().exists()).withContext('Welcome text is visible').toBe(true);
+    expect(indexPage.getWelcomeText().exists()).toBe(true);
 
-    expect(indexPage.getWelcomeText().text())
-      .withContext('Welcome text contains custom backend name')
-      .toContain(customBackendName);
+    expect(indexPage.getWelcomeText().text()).toContain(customBackendName);
   });
 
   it('navigates to login page when clicking login button', async () => {
@@ -163,13 +159,11 @@ describe('when visiting the index page', () => {
       history,
     );
 
-    expect(indexPage.getLoginButton().exists()).withContext('login button is visible').toBe(true);
+    expect(indexPage.getLoginButton().exists()).toBe(true);
     indexPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(historyPushSpy)
-        .withContext('Navigation to login page was triggered')
-        .toHaveBeenCalledWith(ROUTE.LOGIN as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.LOGIN as any);
     });
   });
 
@@ -195,13 +189,11 @@ describe('when visiting the index page', () => {
       history,
     );
 
-    expect(indexPage.getSSOLoginButton().exists()).withContext('SSO login button is visible').toBe(true);
+    expect(indexPage.getSSOLoginButton().exists()).toBe(true);
     indexPage.clickSSOLoginButton();
 
     await waitForExpect(() => {
-      expect(historyPushSpy)
-        .withContext('Navigation to SSO login page was triggered')
-        .toHaveBeenCalledWith(ROUTE.SSO as any);
+      expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.SSO as any);
     });
   });
 
@@ -226,9 +218,7 @@ describe('when visiting the index page', () => {
         }),
       );
 
-      expect(indexPage.getCreateAccountButton().exists())
-        .withContext('create account button is not visible')
-        .toBe(false);
+      expect(indexPage.getCreateAccountButton().exists()).toBe(false);
     });
   });
 
@@ -257,13 +247,11 @@ describe('when visiting the index page', () => {
         history,
       );
 
-      expect(indexPage.getCreateAccountButton().exists()).withContext('create account button is visible').toBe(true);
+      expect(indexPage.getCreateAccountButton().exists()).toBe(true);
       indexPage.clickCreateAccountButton();
 
       await waitForExpect(() => {
-        expect(historyPushSpy)
-          .withContext('Navigation to set account type page was triggered')
-          .toHaveBeenCalledWith(ROUTE.SET_ACCOUNT_TYPE as any);
+        expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.SET_ACCOUNT_TYPE as any);
       });
     });
   });
@@ -290,7 +278,7 @@ describe('when visiting the index page', () => {
         }),
       );
 
-      expect(indexPage.getSSOLoginButton().exists()).withContext('SSO login button is not visible').toBe(false);
+      expect(indexPage.getSSOLoginButton().exists()).toBe(false);
     });
   });
 
@@ -321,9 +309,7 @@ describe('when visiting the index page', () => {
       );
 
       await waitForExpect(() => {
-        expect(historyPushSpy)
-          .withContext('Navigation to email login page was triggered')
-          .toHaveBeenCalledWith(ROUTE.LOGIN as any);
+        expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.LOGIN as any);
       });
     });
   });

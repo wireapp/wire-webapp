@@ -24,6 +24,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "outDir": "src/script/auth",
+    // Must be in sync with jest.config.js >> moduleNameMapper
     "paths": {
       "Components/*": ["./src/script/components/*"],
       "I18n/*": ["./src/i18n/*"],
