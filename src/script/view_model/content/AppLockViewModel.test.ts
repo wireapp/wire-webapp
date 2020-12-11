@@ -110,7 +110,6 @@ describe('AppLockViewModel', () => {
 
       expect(appLock.state()).toBe(APPLOCK_STATE.SETUP);
       appLock.setupPassphrase(passphrase);
-      appLock.setupPassphraseRepeat(passphrase);
       await appLock.onSetCode();
 
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);

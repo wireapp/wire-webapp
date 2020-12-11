@@ -41,6 +41,7 @@ export enum APPLOCK_STATE {
   LOCKED = 'applock.locked',
   NONE = 'applock.none',
   SETUP = 'applock.setup',
+  SETUP_CHANGE = 'applock.setup_change',
   WIPE_CONFIRM = 'applock.wipe-confirm',
   WIPE_PASSWORD = 'applock.wipe-password',
 }
@@ -49,8 +50,7 @@ const APP_LOCK_STORAGE = 'app_lock';
 
 const getInactivityTimeout = () => {
   const teamState = container.resolve(TeamState);
-  const appLock = teamState.teamFeatures()['app-lock'];
-  console.log('#### appLock', appLock);
+  const appLock = teamState.teamFeatures()['appLock'];
   if (appLock.status === 'enabled') {
     return appLock.config.inactivity_timeout_secs;
   }
@@ -90,17 +90,26 @@ export class AppLockViewModel {
   appObserver: MutationObserver;
   headerText: ko.PureComputed<string>;
   isLoading: ko.Observable<boolean>;
-  isSetupPasswordAValid: ko.PureComputed<boolean>;
+  isSetupPassphraseLength: ko.PureComputed<boolean>;
+  isSetupPassphraseLower: ko.PureComputed<boolean>;
+  isSetupPassphraseUpper: ko.PureComputed<boolean>;
+  isSetupPassphraseDigit: ko.PureComputed<boolean>;
+  isSetupPassphraseSpecial: ko.PureComputed<boolean>;
+  isSetupPassphraseValid: ko.PureComputed<boolean>;
   isSetupPasswordBValid: ko.PureComputed<boolean>;
   isVisible: ko.Observable<boolean>;
   localStorage: Storage;
   modalObserver: MutationObserver;
   passwordRegex: RegExp;
+  passwordRegexLength: RegExp;
+  passwordRegexLower: RegExp;
+  passwordRegexUpper: RegExp;
+  passwordRegexDigit: RegExp;
+  passwordRegexSpecial: RegExp;
   scheduledTimeout: number;
   scheduledTimeoutId: number;
   minPasswordLength: number;
   setupPassphrase: ko.Observable<string>;
-  setupPassphraseRepeat: ko.Observable<string>;
   state: ko.Observable<APPLOCK_STATE>;
   storageKey: ko.PureComputed<string>;
   unfocusTimeout: number;
@@ -137,6 +146,8 @@ export class AppLockViewModel {
 
     this.headerText = ko.pureComputed(() => {
       switch (this.state()) {
+        case APPLOCK_STATE.SETUP_CHANGE:
+          return t('modalAppLockSetupChangeTitle');
         case APPLOCK_STATE.SETUP:
           return t('modalAppLockSetupTitle');
         case APPLOCK_STATE.LOCKED:
@@ -151,15 +162,21 @@ export class AppLockViewModel {
           return '';
       }
     });
+
+    this.passwordRegexLength = new RegExp(`^.{${this.minPasswordLength},}$`);
+    this.passwordRegexLower = new RegExp(/(?=.*[a-z])/);
+    this.passwordRegexUpper = new RegExp(/(?=.*[A-Z])/);
+    this.passwordRegexDigit = new RegExp(/(?=.*[0-9])/);
+    this.passwordRegexSpecial = new RegExp(/(?=.*[!@#$%^&*(),.?":{}|<>])/);
+
     this.passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(this.minPasswordLength));
     this.setupPassphrase = ko.observable('');
-    this.setupPassphraseRepeat = ko.observable('');
-    this.isSetupPasswordAValid = ko.pureComputed(() => this.passwordRegex.test(this.setupPassphrase()));
-    this.isSetupPasswordBValid = ko.pureComputed(
-      () =>
-        this.passwordRegex.test(this.setupPassphraseRepeat()) &&
-        this.setupPassphraseRepeat() === this.setupPassphrase(),
-    );
+    this.isSetupPassphraseValid = ko.pureComputed(() => this.passwordRegex.test(this.setupPassphrase()));
+    this.isSetupPassphraseLength = ko.pureComputed(() => this.passwordRegexLength.test(this.setupPassphrase()));
+    this.isSetupPassphraseLower = ko.pureComputed(() => this.passwordRegexLower.test(this.setupPassphrase()));
+    this.isSetupPassphraseUpper = ko.pureComputed(() => this.passwordRegexUpper.test(this.setupPassphrase()));
+    this.isSetupPassphraseDigit = ko.pureComputed(() => this.passwordRegexDigit.test(this.setupPassphrase()));
+    this.isSetupPassphraseSpecial = ko.pureComputed(() => this.passwordRegexSpecial.test(this.setupPassphrase()));
     this.unlockError = ko.observable('');
     this.wipeError = ko.observable('');
     this.appObserver = new MutationObserver(mutationRecords => {
@@ -205,7 +222,6 @@ export class AppLockViewModel {
   onClosed = () => {
     this.state(APPLOCK_STATE.NONE);
     this.setupPassphrase('');
-    this.setupPassphraseRepeat('');
   };
 
   handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent) => {
@@ -267,12 +283,10 @@ export class AppLockViewModel {
   };
 
   onSetCode = async () => {
-    if (this.setupPassphrase() === this.setupPassphraseRepeat()) {
-      this.stopObserver();
-      await this.setCode(this.setupPassphrase());
-      this.isVisible(false);
-      this.startScheduledTimeout();
-    }
+    this.stopObserver();
+    await this.setCode(this.setupPassphrase());
+    this.isVisible(false);
+    this.startScheduledTimeout();
   };
 
   clearUnlockError = () => {
@@ -313,6 +327,7 @@ export class AppLockViewModel {
   onClickWipe = () => this.state(APPLOCK_STATE.WIPE_CONFIRM);
   onClickWipeConfirm = () => this.state(APPLOCK_STATE.WIPE_PASSWORD);
 
+  isSetupChange = () => this.state() === APPLOCK_STATE.SETUP_CHANGE;
   isSetupScreen = () => this.state() === APPLOCK_STATE.SETUP;
   isLockScreen = () => this.state() === APPLOCK_STATE.LOCKED;
   isForgotScreen = () => this.state() === APPLOCK_STATE.FORGOT;

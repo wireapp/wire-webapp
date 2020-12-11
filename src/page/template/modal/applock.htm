@@ -11,29 +11,37 @@
           data-bind="html: t('modalAppLockSetupMessage', {}, {br: '<br>'})"
           data-uie-name="label-applock-set-text"
         ></div>
+        <div
+          class="modal__text modal__label"
+          data-bind="text: t('modalAppLockPasscode')"
+          data-uie-name="label-applock-unlock-text"
+        ></div>
         <input
           class="modal__input"
           type="password"
-          data-bind="textInput: setupPassphrase, css:{'modal__input--valid': isSetupPasswordAValid()}, attr: {placeholder: t('modalAppLockSetupPlaceholder'), 'data-uie-status': isSetupPasswordAValid() ? 'valid' : 'invalid'}"
+          data-bind="textInput: setupPassphrase, attr: {'data-uie-status': isSetupPassphraseValid() ? 'valid' : 'invalid'}"
           data-uie-name="input-applock-set-a"
           autocomplete="new-password"
         />
-        <input
-          class="modal__input modal__input--validate"
-          type="password"
-          data-bind="textInput: setupPassphraseRepeat, css:{'modal__input--valid': isSetupPasswordBValid()}, attr: {placeholder: t('modalAppLockSetupSecondPlaceholder'), 'data-uie-status': isSetupPasswordBValid() ? 'valid' : 'invalid'}"
-          data-uie-name="input-applock-set-b"
-          autocomplete="new-password"
-        />
-        <div
-          class="modal__info text-background"
-          data-bind="text: t('modalAppLockSetupInfo', minPasswordLength)"
-          data-uie-name="label-applock-set-info"
-        ></div>
+        <div class="modal__passcode__info" data-bind="css:{'modal__passcode__info--valid': isSetupPassphraseLength()}">
+          At least 8 charcters long
+        </div>
+        <div class="modal__passcode__info" data-bind="css:{'modal__passcode__info--valid': isSetupPassphraseLower()}">
+          A lowercase letter
+        </div>
+        <div class="modal__passcode__info" data-bind="css:{'modal__passcode__info--valid': isSetupPassphraseUpper()}">
+          An uppercase letter
+        </div>
+        <div class="modal__passcode__info" data-bind="css:{'modal__passcode__info--valid': isSetupPassphraseDigit()}">
+          A digit
+        </div>
+        <div class="modal__passcode__info" data-bind="css:{'modal__passcode__info--valid': isSetupPassphraseSpecial()}">
+          A special character
+        </div>
         <div class="modal__buttons">
           <button
             type="submit"
-            data-bind="enable: isSetupPasswordBValid(), text: t('modalAppLockSetupAcceptButton')"
+            data-bind="enable: isSetupPassphraseValid(), text: t('modalAppLockSetupAcceptButton')"
             class="modal__button modal__button--primary modal__button--full"
             data-uie-name="do-action"
           ></button>
@@ -44,30 +52,29 @@
       <!-- ko if: isLockScreen() -->
       <form data-bind="submit: onUnlock, template: {afterRender: startObserver}">
         <div
-          class="modal__text"
-          data-bind="text: t('modalAppLockLockedMessage')"
+          class="modal__text modal__label"
+          data-bind="text: t('modalAppLockPasscode')"
           data-uie-name="label-applock-unlock-text"
         ></div>
         <input
           class="modal__input"
           type="password"
-          data-bind="event: {'keydown': clearUnlockError}, attr: {placeholder: t('modalAppLockLockedPlaceholder'), id: Math.random().toString(), name:Math.random().toString()}"
+          data-bind="event: {'keydown': clearUnlockError}, attr: {id: Math.random().toString(), name:Math.random().toString()}"
           data-uie-name="input-applock-unlock"
           autocomplete="new-password"
         />
-        <div style="display: flex">
-          <div
-            style="flex-grow: 1"
-            class="modal__input__error"
-            data-bind="text: unlockError()"
-            data-uie-name="label-applock-unlock-error"
-          ></div>
-          <div
-            class="modal__cta modal__cta--input"
-            data-bind="click: onClickForgot, text: t('modalAppLockLockedForgotCTA')"
-            data-uie-name="go-forgot-passphrase"
-          ></div>
-        </div>
+        <div
+          class="modal__input__error"
+          data-bind="text: unlockError()"
+          data-uie-name="label-applock-unlock-error"
+        ></div>
+
+        <div
+          class="modal__cta"
+          data-bind="click: onClickForgot, text: t('modalAppLockLockedForgotCTA')"
+          data-uie-name="go-forgot-passphrase"
+        ></div>
+
         <div class="modal__buttons">
           <button
             type="submit"
