@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/chai": "4.2.12",
+    "@types/chai": "4.2.14",
     "@types/ed2curve": "0.2.2",
     "@types/libsodium-wrappers-sumo": "0.7.4",
     "@types/node": "~12",
