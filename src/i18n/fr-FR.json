@@ -470,7 +470,7 @@
   "index.createPersonalAccount": "Discussions privées avec vos groupes d’amis et votre famille",
   "index.createTeam": "Collaboration sécurisée pour les entreprises, institutions et organisations professionnelles",
   "index.enterprise": "Connexion Entreprise",
-  "index.login": "Log in",
+  "index.login": "Se connecter",
   "index.loginInfo": "Vous avez déjà un compte ?",
   "index.ssoLogin": "Se connecter via SSO",
   "index.welcome": "Bienvenue sur {brandName}",
