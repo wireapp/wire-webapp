@@ -22,6 +22,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
@@ -57,16 +58,15 @@ import {Asset} from 'src/script/entity/message/Asset';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {ConversationState} from '../../conversation/ConversationState';
 
-type DraftMessage = {
+interface DraftMessage {
   mentions: MentionEntity[];
   reply: ContentMessage;
   replyEntityPromise?: Promise<ContentMessage>;
   text: string;
-};
+}
 
 interface Draft {
   mentions: MentionEntity[];

@@ -21,20 +21,21 @@ import ko from 'knockout';
 import {Asset} from '@wireapp/protocol-messaging';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/src/asset';
+import {AssetUploadData} from '@wireapp/api-client/src/asset';
+import {singleton, container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {AssetService} from './AssetService';
 import {loadFileBuffer, loadImage, downloadBlob} from 'Util/util';
 import {WebWorker} from 'Util/worker';
-import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/src/asset';
+import {ValidationUtilError} from 'Util/ValidationUtil';
+
+import {AssetService} from './AssetService';
 import {Conversation} from '../entity/Conversation';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {encryptAesAsset, EncryptedAsset, decryptAesAsset} from './AssetCrypto';
-import {AssetUploadData} from '@wireapp/api-client/src/asset';
 import {AssetRemoteData} from './AssetRemoteData';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
-import {ValidationUtilError} from 'Util/ValidationUtil';
-import {singleton, container} from 'tsyringe';
 import type {User} from '../entity/User';
 import {FileAsset} from '../entity/message/FileAsset';
 import {AssetTransferState} from './AssetTransferState';

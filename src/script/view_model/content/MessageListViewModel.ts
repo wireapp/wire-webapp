@@ -22,6 +22,7 @@ import {groupBy} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
@@ -49,7 +50,6 @@ import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PanelViewModel} from '../PanelViewModel';
 import type {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {ConversationState} from '../../conversation/ConversationState';
 

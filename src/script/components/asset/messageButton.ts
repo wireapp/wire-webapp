@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {noop} from 'Util/util';
+
 import type {CompositeMessage} from '../../entity/message/CompositeMessage';
 
 interface MessageButtonProps {

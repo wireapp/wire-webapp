@@ -21,6 +21,7 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
@@ -39,7 +40,6 @@ import type {PanelParams} from '../PanelViewModel';
 import {ClientEvent} from '../../event/Client';
 import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
 import {UserState} from '../../user/UserState';
-import {container} from 'tsyringe';
 import {TeamState} from '../../team/TeamState';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {

@@ -25,11 +25,17 @@ import {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import {ChangeEvent} from 'react';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
+import {container} from 'tsyringe';
+import {Logger, Runtime} from '@wireapp/commons';
 
+import 'Components/availabilityState';
+import {getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import {isKey, KEY} from 'Util/KeyboardUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {loadValue} from 'Util/StorageUtil';
 
 import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
@@ -48,22 +54,15 @@ import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
-import {Logger, Runtime} from '@wireapp/commons';
-import {getLogger} from 'Util/Logger';
-
-import 'Components/availabilityState';
 import {isAppLockEnabled} from './AppLockViewModel';
-import {loadValue} from 'Util/StorageUtil';
 import {StorageKey} from '../../storage';
 import {UserError} from '../../error/UserError';
 import {HistoryExportViewModel} from './HistoryExportViewModel';
 import {ClientRepository} from '../../client/ClientRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
 import {TeamEntity} from '../../team/TeamEntity';
 import type {ClientEntity} from 'src/script/client/ClientEntity';
 import {UserState} from '../../user/UserState';
-import {container} from 'tsyringe';
 import {TeamState} from '../../team/TeamState';
 
 export class PreferencesAccountViewModel {

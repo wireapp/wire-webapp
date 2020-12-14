@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {isRemovalAction} from 'Util/KeyboardUtil';
+
 import type {User} from '../entity/User';
 
 interface UserInputParams {

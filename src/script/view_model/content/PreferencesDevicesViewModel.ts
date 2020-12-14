@@ -22,6 +22,8 @@ import {formatTimestamp} from 'Util/TimeUtil';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
+
 import {ContentViewModel} from '../ContentViewModel';
 import {sortUserDevices} from 'Components/userDevices';
 import {MainViewModel} from '../MainViewModel';
@@ -30,7 +32,6 @@ import {User} from '../../entity/User';
 import {ClientEntity} from '../../client/ClientEntity';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PreferencesDeviceDetailsViewModel} from './PreferencesDeviceDetailsViewModel';
-import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 import {UserState} from '../../user/UserState';
 

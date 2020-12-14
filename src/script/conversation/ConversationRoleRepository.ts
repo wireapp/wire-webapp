@@ -18,6 +18,7 @@
  */
 
 import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/src/conversation';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import type {Conversation} from '../entity/Conversation';
@@ -25,7 +26,6 @@ import type {User} from '../entity/User';
 import type {TeamRepository} from '../team/TeamRepository';
 import type {ConversationService} from './ConversationService';
 import {UserState} from '../user/UserState';
-import {container} from 'tsyringe';
 import {TeamState} from '../team/TeamState';
 
 export enum Permissions {

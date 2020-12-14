@@ -20,11 +20,11 @@
 import ko from 'knockout';
 import type SimpleBar from 'simplebar';
 
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {clamp} from 'Util/NumberUtil';
 import {noop} from 'Util/util';
 import {KEY, isEnterKey} from 'Util/KeyboardUtil';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {User} from '../entity/User';
 
 interface MentionSuggestionsParams {

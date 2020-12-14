@@ -20,8 +20,11 @@
 import type {BackendEvent, ConversationEvent, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {util as ProteusUtil} from '@wireapp/proteus';
-import {getLogger, Logger} from 'Util/Logger';
 import Dexie from 'dexie';
+import {container} from 'tsyringe';
+
+import {getLogger, Logger} from 'Util/Logger';
+
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
 import {StorageSchemata} from '../storage/StorageSchemata';
@@ -39,7 +42,6 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserId} from '../calling/Participant';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';

@@ -26,6 +26,7 @@ import ko from 'knockout';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import type {Notification} from '@wireapp/api-client/src/notification';
 import {AbortHandler} from '@wireapp/api-client/src/tcp/';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -53,7 +54,6 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {EventRecord} from '../storage';
 import type {NotificationService} from './NotificationService';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 
 export class EventRepository {

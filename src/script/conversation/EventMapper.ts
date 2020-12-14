@@ -523,7 +523,7 @@ export class EventMapper {
     const messageEntity = new CompositeMessage();
     const assets: (Asset | FileAsset | Text | MediumImage)[] = await Promise.all(
       eventData.items.map(
-        async (item: {button: {id: string; text: string}; text: any}): Promise<void | Button | Text> => {
+        async (item: {button: {id: string; text: string}; text: EventRecord}): Promise<void | Button | Text> => {
           if (item.button) {
             return new Button(item.button.id, item.button.text);
           }

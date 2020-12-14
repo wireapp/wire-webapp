@@ -20,6 +20,7 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 
@@ -31,7 +32,6 @@ import type {CallingViewModel} from '../CallingViewModel';
 import type {User} from '../../entity/User';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
 import type {Multitasking} from '../../notification/NotificationRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class TemporaryGuestViewModel {

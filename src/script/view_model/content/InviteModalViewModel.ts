@@ -18,12 +18,12 @@
  */
 
 import ko from 'knockout';
+import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../../Config';
-import {Runtime} from '@wireapp/commons';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class InviteModalViewModel {

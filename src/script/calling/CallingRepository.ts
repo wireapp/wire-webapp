@@ -57,7 +57,7 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {ConversationRepository} from '../conversation/ConversationRepository';
-import {EventBuilder} from '../conversation/EventBuilder';
+import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
@@ -536,7 +536,7 @@ export class CallingRepository {
   /**
    * Handle incoming calling events from backend.
    */
-  async onCallEvent(event: any, source: string): Promise<void> {
+  async onCallEvent(event: CallingEvent, source: string): Promise<void> {
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);

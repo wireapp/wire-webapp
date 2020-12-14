@@ -44,6 +44,9 @@ import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
+import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
+import {container} from 'tsyringe';
+
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
@@ -51,6 +54,8 @@ import {getDifference} from 'Util/ArrayUtil';
 import {arrayToBase64, createRandomUuid, loadUrlBlob} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {capitalizeFirstChar} from 'Util/StringUtil';
+import {roundLogarithmic} from 'Util/NumberUtil';
+
 import {encryptAesAsset} from '../assets/AssetCrypto';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
@@ -92,12 +97,9 @@ import {EventService} from '../event/EventService';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {MentionEntity} from '../message/MentionEntity';
-import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Text as TextAsset} from '../entity/message/Text';
-import {roundLogarithmic} from 'Util/NumberUtil';
-import type {EventRecord} from '../storage';
-import {container} from 'tsyringe';
+import type {AssetRecord, EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
@@ -467,7 +469,7 @@ export class MessageRepository {
     const {uploaded: assetData} = conversationEntity.messageTimer()
       ? genericMessage.ephemeral.asset
       : genericMessage.asset;
-    const data = {
+    const data: AssetRecord = {
       key: assetData.assetId,
       otr_key: assetData.otrKey,
       sha256: assetData.sha256,

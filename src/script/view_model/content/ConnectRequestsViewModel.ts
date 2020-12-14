@@ -18,13 +18,15 @@
  */
 
 import ko from 'knockout';
+import {container} from 'tsyringe';
+
 import {scrollToBottom} from 'Util/scroll-helpers';
 import {isLastItem} from 'Util/ArrayUtil';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+
 import {MainViewModel} from '../MainViewModel';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class ConnectRequestsViewModel {

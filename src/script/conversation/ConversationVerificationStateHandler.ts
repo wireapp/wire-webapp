@@ -20,6 +20,7 @@
 import {amplify} from 'amplify';
 import {intersection} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
@@ -31,7 +32,6 @@ import type {ClientEntity} from '../client/ClientEntity';
 import type {Conversation} from '../entity/Conversation';
 import type {EventRepository} from '../event/EventRepository';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {ConversationState} from './ConversationState';
 

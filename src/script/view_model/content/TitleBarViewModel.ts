@@ -21,6 +21,7 @@ import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -34,7 +35,6 @@ import {PanelViewModel} from '../PanelViewModel';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {Conversation} from '../../entity/Conversation';
 import {Call} from '../../calling/Call';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {ConversationState} from '../../conversation/ConversationState';
 

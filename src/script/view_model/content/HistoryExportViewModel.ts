@@ -18,22 +18,22 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
-import {amplify} from 'amplify';
-import ko from 'knockout';
+import 'Components/loadingBar';
 
 import {ContentViewModel} from '../ContentViewModel';
 import {Config} from '../../Config';
 
 import {CancelError} from '../../backup/Error';
 
-import 'Components/loadingBar';
 import {BackupRepository} from '../../backup/BackupRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class HistoryExportViewModel {

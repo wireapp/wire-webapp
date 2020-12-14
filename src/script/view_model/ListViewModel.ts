@@ -21,6 +21,8 @@ import {CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {iterateItem} from 'Util/ArrayUtil';
@@ -50,9 +52,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import type {AssetRemoteData} from '../assets/AssetRemoteData';
-import {Runtime} from '@wireapp/commons';
 import {UserState} from '../user/UserState';
-import {container} from 'tsyringe';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 
