@@ -17,22 +17,29 @@ For clarity, if you compile the open source software that we make available from
 No license is granted to the Wire trademark and its associated logos, all of which will continue to be owned exclusively by Wire Swiss GmbH. Any use of the Wire trademark and/or its associated logos is expressly prohibited without the express prior written consent of Wire Swiss GmbH.
 
 # How to build the open source client
+
 Prerequisites:
+
 1. Install [Node.js](https://nodejs.org/)
 1. Install [Yarn](https://yarnpkg.com)
 
 ## 1. Fetching dependencies and configurations
 
 1. Run `yarn`
-  - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
+
+- This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
+
 1. Rename `.env.localhost` to `.env` in order to configure the application. This configuration can override/extend the configuration from the previous step.
 
 ## 2. Build & run
+
 ### Production
+
 1. Run `yarn build:prod`
 1. Run `cd server && yarn start:prod`
 
 ### Development
+
 1. Run `yarn start` and Wire's web app will be available at: https://localhost:8081/auth/
 1. Use a browser with disabled web security (`−−disable−web−security` in Chrome) to circumvent CORS issues when connecting to our backend from localhost
 
