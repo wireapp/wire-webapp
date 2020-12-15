@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+
 import {ClientEvent} from './Client';
 
 export const EventTypeHandling = {

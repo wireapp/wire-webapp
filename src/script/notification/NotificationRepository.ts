@@ -22,6 +22,8 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
+import {Runtime} from '@wireapp/commons';
 
 import {Declension, t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -57,8 +59,6 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {AssetRepository} from '../assets/AssetRepository';
-import {container} from 'tsyringe';
-import {Runtime} from '@wireapp/commons';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 

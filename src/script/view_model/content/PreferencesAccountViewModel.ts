@@ -30,40 +30,38 @@ import {container} from 'tsyringe';
 import {Logger, Runtime} from '@wireapp/commons';
 
 import 'Components/availabilityState';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {getLogger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import {isKey, KEY} from 'Util/KeyboardUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import {loadValue} from 'Util/StorageUtil';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {t} from 'Util/LocalizerUtil';
 
-import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
-import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-
-import {modals, ModalsViewModel} from '../ModalsViewModel';
-import {User} from '../../entity/User';
-
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
 import {ConsentValue} from '../../user/ConsentValue';
-import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
-import {UserRepository} from '../../user/UserRepository';
-import {nameFromType} from '../../user/AvailabilityMapper';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
-import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
-import {isAppLockEnabled} from './AppLockViewModel';
-import {StorageKey} from '../../storage';
-import {UserError} from '../../error/UserError';
-import {HistoryExportViewModel} from './HistoryExportViewModel';
-import {ClientRepository} from '../../client/ClientRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
+import {HistoryExportViewModel} from './HistoryExportViewModel';
+import {isAppLockEnabled} from './AppLockViewModel';
+import {modals, ModalsViewModel} from '../ModalsViewModel';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {nameFromType} from '../../user/AvailabilityMapper';
+import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {StorageKey} from '../../storage';
 import {TeamEntity} from '../../team/TeamEntity';
-import type {ClientEntity} from 'src/script/client/ClientEntity';
-import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import {User} from '../../entity/User';
+import {UserError} from '../../error/UserError';
+import {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
+import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
+import type {ClientEntity} from '../../client/ClientEntity';
 
 export class PreferencesAccountViewModel {
   logger: Logger;

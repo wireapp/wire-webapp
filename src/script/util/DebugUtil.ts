@@ -18,6 +18,7 @@
  */
 
 import type {BackendEvent, ConversationEvent, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
+import type {Notification} from '@wireapp/api-client/src/notification/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {util as ProteusUtil} from '@wireapp/proteus';
 import Dexie from 'dexie';
@@ -29,7 +30,6 @@ import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
-import type {Notification} from '@wireapp/api-client/src/notification/';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {CallingRepository} from '../calling/CallingRepository';
 import {ClientRepository} from '../client/ClientRepository';

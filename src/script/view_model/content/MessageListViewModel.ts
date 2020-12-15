@@ -17,41 +17,41 @@
  *
  */
 
-import $ from 'jquery';
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
+import $ from 'jquery';
 import ko from 'knockout';
-import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
+import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
+import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
 import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
-import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 
-import {Config} from '../../Config';
-import {Conversation} from '../../entity/Conversation';
-import {ModalsViewModel} from '../ModalsViewModel';
-import {MessageCategory} from '../../message/MessageCategory';
-import {MotionDuration} from '../../motion/MotionDuration';
-import {UserError} from '../../error/UserError';
-import {MemberMessage} from '../../entity/message/MemberMessage';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {User} from '../../entity/User';
-import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
-import {Message} from '../../entity/message/Message';
-import {Text} from '../../entity/message/Text';
-import {MainViewModel} from '../MainViewModel';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {IntegrationRepository} from '../../integration/IntegrationRepository';
-import {ServerTimeHandler} from '../../time/serverTimeHandler';
-import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
-import {PanelViewModel} from '../PanelViewModel';
-import type {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {UserState} from '../../user/UserState';
+import {Config} from '../../Config';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {Conversation} from '../../entity/Conversation';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ConversationState} from '../../conversation/ConversationState';
+import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
+import {IntegrationRepository} from '../../integration/IntegrationRepository';
+import {MainViewModel} from '../MainViewModel';
+import {MemberMessage} from '../../entity/message/MemberMessage';
+import {Message} from '../../entity/message/Message';
+import {MessageCategory} from '../../message/MessageCategory';
+import {ModalsViewModel} from '../ModalsViewModel';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {PanelViewModel} from '../PanelViewModel';
+import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {Text} from '../../entity/message/Text';
+import {User} from '../../entity/User';
+import {UserError} from '../../error/UserError';
+import {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
+import type {MessageRepository} from '../../conversation/MessageRepository';
 
 /*
  * Message list rendering view model.

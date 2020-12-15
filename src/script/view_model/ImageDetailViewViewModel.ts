@@ -22,18 +22,18 @@ import {KEY} from 'Util/KeyboardUtil';
 import {formatLocale} from 'Util/TimeUtil';
 import ko from 'knockout';
 import {amplify} from 'amplify';
-
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {MessageCategory} from '../message/MessageCategory';
 import {Modal} from '../ui/Modal';
-import type {MainViewModel} from './MainViewModel';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {AssetRepository} from '../assets/AssetRepository';
 import type {ActionsViewModel} from './ActionsViewModel';
-import type {Conversation} from '../entity/Conversation';
+import type {AssetRepository} from '../assets/AssetRepository';
 import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {Conversation} from '../entity/Conversation';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {MainViewModel} from './MainViewModel';
 import type {MediumImage} from '../entity/message/MediumImage';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {MessageCategory} from '../message/MessageCategory';
 
 export class ImageDetailViewViewModel {
   elementId: 'detail-view';

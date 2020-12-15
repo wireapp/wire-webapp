@@ -21,6 +21,7 @@ import {container} from 'tsyringe';
 import ko from 'knockout';
 
 import {alias} from 'Util/util';
+
 import {AssetRepository} from '../../assets/AssetRepository';
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 

@@ -17,26 +17,26 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import ko from 'knockout';
 import {container} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
 import {formatTimestamp} from 'Util/TimeUtil';
-
-import {Config} from '../../Config';
-import {MotionDuration} from '../../motion/MotionDuration';
-import {ContentViewModel} from '../ContentViewModel';
-import {MainViewModel} from '../MainViewModel';
-import {ClientRepository} from '../../client/ClientRepository';
-import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {ClientEntity} from '../../client/ClientEntity';
-import {ActionsViewModel} from '../ActionsViewModel';
-import {User} from '../../entity/User';
 import {getLogger, Logger} from 'Util/Logger';
-import type {MessageRepository} from '../../conversation/MessageRepository';
+import {t} from 'Util/LocalizerUtil';
+
+import {ActionsViewModel} from '../ActionsViewModel';
+import {ClientEntity} from '../../client/ClientEntity';
+import {ClientRepository} from '../../client/ClientRepository';
+import {Config} from '../../Config';
+import {ContentViewModel} from '../ContentViewModel';
 import {ConversationState} from '../../conversation/ConversationState';
+import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import {MainViewModel} from '../MainViewModel';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {User} from '../../entity/User';
+import type {MessageRepository} from '../../conversation/MessageRepository';
 
 export class PreferencesDeviceDetailsViewModel {
   private readonly logger: Logger;

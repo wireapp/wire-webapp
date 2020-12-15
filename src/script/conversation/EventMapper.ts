@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
-import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
+import {LinkPreview, ITweet, Mention} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -61,7 +61,6 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
-import type {ITweet} from '@wireapp/protocol-messaging';
 import type {LinkPreviewMetaDataType} from '../links/LinkPreviewMetaDataType';
 import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 

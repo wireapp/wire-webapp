@@ -21,6 +21,7 @@ import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wir
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
+
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import type {TeamRepository} from '../team/TeamRepository';

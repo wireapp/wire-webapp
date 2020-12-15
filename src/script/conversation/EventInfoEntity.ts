@@ -18,6 +18,7 @@
  */
 
 import type {GenericMessage, IGenericMessage} from '@wireapp/protocol-messaging';
+
 import type {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {Recipients} from '../cryptography/CryptographyRepository';
 

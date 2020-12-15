@@ -18,21 +18,26 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
-import {createRandomUuid} from 'Util/util';
-import {TestFactory} from '../../../test/helper/TestFactory';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+import * as sinon from 'sinon';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {createRandomUuid} from 'Util/util';
+
+import {TestFactory} from '../../../test/helper/TestFactory';
+import {UserGenerator} from '../../../test/helper/UserGenerator';
+
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {UserGenerator} from '../../../test/helper/UserGenerator';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {ClientEvent} from 'src/script/event/Client';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
@@ -41,8 +46,6 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
-import * as sinon from 'sinon';
-import {amplify} from 'amplify';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();

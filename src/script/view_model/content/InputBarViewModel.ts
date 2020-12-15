@@ -17,49 +17,46 @@
  *
  */
 
-import {escape} from 'underscore';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import ko from 'knockout';
+import {Availability} from '@wireapp/protocol-messaging';
 import {container} from 'tsyringe';
+import {escape} from 'underscore';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
 import {afterRender, formatBytes} from 'Util/util';
 import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
-import {renderMessage} from 'Util/messageRenderer';
-import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
+import {renderMessage} from 'Util/messageRenderer';
+import {t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
 
-import {ModalsViewModel} from '../ModalsViewModel';
-
-import {StorageKey} from '../../storage/StorageKey';
-
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {MessageHasher} from '../../message/MessageHasher';
+import {Asset} from '../../entity/message/Asset';
+import {AssetRepository} from '../../assets/AssetRepository';
+import {Config} from '../../Config';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {Conversation} from '../../entity/Conversation';
+import {ConversationError} from '../../error/ConversationError';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {ConversationState} from '../../conversation/ConversationState';
+import {EmojiInputViewModel} from './EmojiInputViewModel';
+import {EventRepository} from '../../event/EventRepository';
+import {FileAsset} from '../../entity/message/FileAsset';
+import {MediumImage} from '../../entity/message/MediumImage';
 import {MentionEntity} from '../../message/MentionEntity';
-
+import {MessageHasher} from '../../message/MessageHasher';
+import {MessageRepository} from '../../conversation/MessageRepository';
+import {ModalsViewModel} from '../ModalsViewModel';
+import {QuoteEntity} from '../../message/QuoteEntity';
+import {SearchRepository} from '../../search/SearchRepository';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import {Config} from '../../Config';
-import {ConversationError} from '../../error/ConversationError';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {StorageRepository} from 'src/script/storage';
-import {EmojiInputViewModel} from './EmojiInputViewModel';
-import {User} from 'src/script/entity/User';
-import {Conversation} from 'src/script/entity/Conversation';
-import {Text} from 'src/script/entity/message/Text';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Asset} from 'src/script/entity/message/Asset';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {StorageKey} from '../../storage/StorageKey';
+import {StorageRepository} from '../../storage';
+import {Text} from '../../entity/message/Text';
+import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
-import {ConversationState} from '../../conversation/ConversationState';
 
 interface DraftMessage {
   mentions: MentionEntity[];

@@ -27,12 +27,12 @@ import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {createRandomUuid} from 'Util/util';
 import {roundLogarithmic} from 'Util/NumberUtil';
+import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
-import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
 import {EventName} from './EventName';
