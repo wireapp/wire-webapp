@@ -2781,10 +2781,10 @@
   dependencies:
     protobufjs "6.8.8"
 
-"@wireapp/protocol-messaging@1.27.1":
-  version "1.27.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.27.1.tgz#f2173a22c0088d5b5df75617a4ab85e4201916dc"
-  integrity sha512-/EYBIpZHONNV90tajVuuo3i+RzDKG2oVBeI9aOIVneWgHJyWvb50pjLc/nnJ9N5vCoPtyZS1fy/JLuN7miDbwA==
+"@wireapp/protocol-messaging@1.28.0":
+  version "1.28.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.28.0.tgz#24c1d78ddc1d29d72d3e5a288af7d9467274354f"
+  integrity sha512-IFo7NLrMWdOtjtce2hbI0oofCzDiXfLxufUZ+mChFH5tCVnPlhk/9jYhyojrpJug57NMEWvPEc0YuaVrP//iVg==
   dependencies:
     protobufjs "6.10.2"
 
