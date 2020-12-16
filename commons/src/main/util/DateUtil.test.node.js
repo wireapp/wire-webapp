@@ -19,6 +19,9 @@
 
 const {DateUtil} = require('@wireapp/commons');
 
+/**
+ * @testEnvironment node
+ */
 describe('DateUtil', () => {
   describe('isoFormat', () => {
     it('formats a valid date into the expected format', () => {

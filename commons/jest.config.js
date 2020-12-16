@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,11 @@
  *
  */
 
-const pkg = require('./package.json');
-const webpack = require('webpack');
-
-const projectName = pkg.name.replace('@wireapp/', '');
-
 module.exports = {
-  devtool: 'source-map',
-  entry: {
-    [`${projectName}.test`]: `${__dirname}/src/main/index.test.browser.js`,
-    [projectName]: `${__dirname}/${pkg.main}`,
-  },
-  externals: {
-    'fs-extra': '{}',
-  },
-  mode: 'production',
-  node: {
-    fs: 'empty',
-    path: 'empty',
-  },
-  output: {
-    filename: '[name].bundle.js',
-    library: 'commons',
-    path: `${__dirname}/dist`,
-    publicPath: '/',
-  },
-  plugins: [new webpack.BannerPlugin(`${pkg.name} v${pkg.version}`)],
+  preset: 'ts-jest',
+  setupFilesAfterEnv: [],
+  testEnvironment: 'jsdom',
+  testPathIgnorePatterns: ['node_modules'],
+  testRegex: '.*.test(.browser|.node).[jt]s$',
+  verbose: true,
 };

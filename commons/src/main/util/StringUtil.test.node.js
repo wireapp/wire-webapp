@@ -19,6 +19,9 @@
 
 const {StringUtil} = require('@wireapp/commons');
 
+/**
+ * @testEnvironment node
+ */
 describe('StringUtil', () => {
   describe('"capitalize"', () => {
     it('does not lowercase other characters', () => {

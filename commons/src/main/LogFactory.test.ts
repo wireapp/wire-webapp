@@ -17,10 +17,10 @@
  *
  */
 
-const {LogFactory} = require('@wireapp/commons');
-const fs = require('fs-extra');
-const path = require('path');
-const os = require('os');
+import {LogFactory} from '@wireapp/commons';
+import fs from 'fs-extra';
+import path from 'path';
+import os from 'os';
 
 describe('LogFactory', () => {
   describe('createLoggerName', () => {
@@ -39,14 +39,14 @@ describe('LogFactory', () => {
     it('sets a different color for every new logger', () => {
       const firstLogger = LogFactory.getLogger('FirstLogger');
       const secondLogger = LogFactory.getLogger('SecondLogger');
-      expect(firstLogger.opts.prefixColor).not.toBe(secondLogger.opts.prefixColor);
+      expect((firstLogger as any).opts.prefixColor).not.toBe((secondLogger as any).opts.prefixColor);
     });
 
     it('supports namespaces', () => {
       const name = 'LogFactory';
       const namespace = 'OurCompany';
       const logger = LogFactory.getLogger(name, {namespace});
-      expect(logger.opts.prefix.startsWith(namespace)).toBe(true);
+      expect((logger as any).opts.prefix.startsWith(namespace)).toBe(true);
     });
 
     it('supports namespaces and separators', () => {
@@ -54,7 +54,7 @@ describe('LogFactory', () => {
       const namespace = 'OurCompany';
       const separator = '-';
       const logger = LogFactory.getLogger('LogFactory', {namespace, separator});
-      expect(logger.opts.prefix).toBe(`${namespace}${separator}${name}`);
+      expect((logger as any).opts.prefix).toBe(`${namespace}${separator}${name}`);
     });
   });
 

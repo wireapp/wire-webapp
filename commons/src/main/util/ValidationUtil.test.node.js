@@ -19,6 +19,9 @@
 
 const {ValidationUtil} = require('@wireapp/commons');
 
+/**
+ * @testEnvironment node
+ */
 describe('isUUIDv4', () => {
   it('recognizes correct UUIDv4 strings', () => {
     expect(ValidationUtil.isUUIDv4('22087638-0b00-4e0d-864d-37c08041a2cf')).toBe(true);

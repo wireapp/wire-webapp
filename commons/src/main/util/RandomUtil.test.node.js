@@ -19,6 +19,9 @@
 
 const {RandomUtil} = require('@wireapp/commons');
 
+/**
+ * @testEnvironment node
+ */
 describe('RandomUtil', () => {
   describe('"randomInt"', () => {
     it('respects limit', () => {

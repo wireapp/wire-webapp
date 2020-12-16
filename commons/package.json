@@ -10,16 +10,11 @@
     "url-search-params-polyfill": "8.1.0"
   },
   "devDependencies": {
-    "@types/jasmine": "3.6.0",
-    "@types/karma": "5.0.0",
+    "@types/jest": "26.0.17",
     "del-cli": "3.0.1",
-    "jasmine": "3.5.0",
-    "karma": "5.1.0",
-    "karma-chrome-launcher": "3.1.0",
-    "karma-jasmine": "3.1.1",
-    "karma-jasmine-diff-reporter": "2.0.0",
-    "karma-typescript": "5.0.3",
+    "jest": "26.6.3",
     "rimraf": "3.0.2",
+    "ts-jest": "26.4.4",
     "typescript": "4.0.3"
   },
   "description": "Collection of common components that are used across Wire web applications.",
@@ -41,10 +36,9 @@
     "build:node": "tsc",
     "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js}\" \"!src/test/**/*\"",
     "dist": "yarn clean && yarn build",
-    "test": "yarn test:node && yarn test:browser",
-    "test:browser": "yarn build && karma start",
-    "test:project": "yarn build && yarn test",
-    "test:node": "yarn build && jasmine --config=jasmine.json"
+    "test": "yarn jest",
+    "test:coverage": "yarn test --coverage",
+    "test:watch": "yarn test --watch"
   },
   "version": "3.8.14"
 }
