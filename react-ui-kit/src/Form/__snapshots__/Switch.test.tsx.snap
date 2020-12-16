@@ -1,7 +1,31 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`"Switch" renders (dark theme) 1`] = `
+.emotion-4 {
+  display: inline-block;
+  position: relative;
+  text-align: left;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+  width: 42px;
+}
+
 .emotion-0 {
+  display: none;
+}
+
+.emotion-3 {
+  border-radius: 20px;
+  cursor: pointer;
+  display: block;
+  margin: 0;
+  overflow: hidden;
+}
+
+.emotion-1 {
   display: block;
   margin-left: -100%;
   -webkit-transition: margin 0.1s ease-in 0s;
@@ -9,19 +33,19 @@ exports[`"Switch" renders (dark theme) 1`] = `
   width: 200%;
 }
 
-.emotion-0:after {
+.emotion-1:after {
   content: " ";
   padding-right: 10px;
   text-align: right;
 }
 
-.emotion-0:before {
+.emotion-1:before {
   content: " ";
   padding-left: 10px;
 }
 
-.emotion-0:before,
-.emotion-0:after {
+.emotion-1:before,
+.emotion-1:after {
   background-color: #d2d2d2;
   box-sizing: border-box;
   display: block;
@@ -32,71 +56,50 @@ exports[`"Switch" renders (dark theme) 1`] = `
   width: 50%;
 }
 
-.emotion-1 {
+.emotion-2 {
+  background: #fff;
+  border-radius: 100%;
+  bottom: 0;
+  box-shadow: 0px 0px 2px -1px gray;
+  display: block;
+  height: 23px;
+  margin: 1px;
+  position: absolute;
+  right: 17px;
+  top: 0;
+  -webkit-transition: all 0.15s ease-in 0s;
+  transition: all 0.15s ease-in 0s;
+  width: 23px;
+}
+
+.emotion-5 {
   background: #000;
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 <div
-  className="emotion-1"
+  className="emotion-5"
 >
   <div
-    style={
-      Object {
-        "display": "inline-block",
-        "position": "relative",
-        "textAlign": "left",
-        "userSelect": "none",
-        "verticalAlign": "middle",
-        "width": "42px",
-      }
-    }
+    className="emotion-4"
   >
     <input
       checked={false}
+      className="emotion-0"
       id="3"
       onChange={[Function]}
-      style={
-        Object {
-          "display": "none",
-        }
-      }
       type="checkbox"
     />
     <label
+      className="emotion-3"
       htmlFor="3"
-      style={
-        Object {
-          "borderRadius": "20px",
-          "cursor": "pointer",
-          "display": "block",
-          "margin": 0,
-          "overflow": "hidden",
-        }
-      }
     >
       <span
-        className="emotion-0"
+        className="emotion-1"
       />
       <span
-        style={
-          Object {
-            "background": "#fff",
-            "borderRadius": "100%",
-            "bottom": 0,
-            "boxShadow": "0px 0px 2px -1px gray",
-            "display": "block",
-            "height": "23px",
-            "margin": "1px",
-            "opacity": undefined,
-            "position": "absolute",
-            "right": "17px",
-            "top": 0,
-            "transition": "all 0.15s ease-in 0s",
-            "width": "23px",
-          }
-        }
+        className="emotion-2"
       />
     </label>
   </div>
@@ -104,13 +107,37 @@ exports[`"Switch" renders (dark theme) 1`] = `
 `;
 
 exports[`"Switch" renders checked 1`] = `
-.emotion-1 {
+.emotion-5 {
   background: rgb(247,248,250);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
+.emotion-4 {
+  display: inline-block;
+  position: relative;
+  text-align: left;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+  width: 42px;
+}
+
 .emotion-0 {
+  display: none;
+}
+
+.emotion-3 {
+  border-radius: 20px;
+  cursor: pointer;
+  display: block;
+  margin: 0;
+  overflow: hidden;
+}
+
+.emotion-1 {
   display: block;
   margin-left: 0;
   -webkit-transition: margin 0.1s ease-in 0s;
@@ -118,19 +145,19 @@ exports[`"Switch" renders checked 1`] = `
   width: 200%;
 }
 
-.emotion-0:after {
+.emotion-1:after {
   content: " ";
   padding-right: 10px;
   text-align: right;
 }
 
-.emotion-0:before {
+.emotion-1:before {
   content: " ";
   padding-left: 10px;
 }
 
-.emotion-0:before,
-.emotion-0:after {
+.emotion-1:before,
+.emotion-1:after {
   background-color: #0c78ba;
   box-sizing: border-box;
   display: block;
@@ -141,65 +168,44 @@ exports[`"Switch" renders checked 1`] = `
   width: 50%;
 }
 
+.emotion-2 {
+  background: #fff;
+  border-radius: 100%;
+  bottom: 0;
+  box-shadow: 0px 0px 2px -1px gray;
+  display: block;
+  height: 23px;
+  margin: 1px;
+  position: absolute;
+  right: 0px;
+  top: 0;
+  -webkit-transition: all 0.15s ease-in 0s;
+  transition: all 0.15s ease-in 0s;
+  width: 23px;
+}
+
 <div
-  className="emotion-1"
+  className="emotion-5"
 >
   <div
-    style={
-      Object {
-        "display": "inline-block",
-        "position": "relative",
-        "textAlign": "left",
-        "userSelect": "none",
-        "verticalAlign": "middle",
-        "width": "42px",
-      }
-    }
+    className="emotion-4"
   >
     <input
       checked={true}
+      className="emotion-0"
       id="2"
       onChange={[Function]}
-      style={
-        Object {
-          "display": "none",
-        }
-      }
       type="checkbox"
     />
     <label
+      className="emotion-3"
       htmlFor="2"
-      style={
-        Object {
-          "borderRadius": "20px",
-          "cursor": "pointer",
-          "display": "block",
-          "margin": 0,
-          "overflow": "hidden",
-        }
-      }
     >
       <span
-        className="emotion-0"
+        className="emotion-1"
       />
       <span
-        style={
-          Object {
-            "background": "#fff",
-            "borderRadius": "100%",
-            "bottom": 0,
-            "boxShadow": "0px 0px 2px -1px gray",
-            "display": "block",
-            "height": "23px",
-            "margin": "1px",
-            "opacity": undefined,
-            "position": "absolute",
-            "right": "0px",
-            "top": 0,
-            "transition": "all 0.15s ease-in 0s",
-            "width": "23px",
-          }
-        }
+        className="emotion-2"
       />
     </label>
   </div>
@@ -207,13 +213,36 @@ exports[`"Switch" renders checked 1`] = `
 `;
 
 exports[`"Switch" renders disabled 1`] = `
-.emotion-1 {
+.emotion-5 {
   background: rgb(247,248,250);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
+.emotion-4 {
+  display: inline-block;
+  position: relative;
+  text-align: left;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+  width: 42px;
+}
+
 .emotion-0 {
+  display: none;
+}
+
+.emotion-3 {
+  border-radius: 20px;
+  display: block;
+  margin: 0;
+  overflow: hidden;
+}
+
+.emotion-1 {
   display: block;
   margin-left: -100%;
   -webkit-transition: margin 0.1s ease-in 0s;
@@ -221,19 +250,19 @@ exports[`"Switch" renders disabled 1`] = `
   width: 200%;
 }
 
-.emotion-0:after {
+.emotion-1:after {
   content: " ";
   padding-right: 10px;
   text-align: right;
 }
 
-.emotion-0:before {
+.emotion-1:before {
   content: " ";
   padding-left: 10px;
 }
 
-.emotion-0:before,
-.emotion-0:after {
+.emotion-1:before,
+.emotion-1:after {
   background-color: rgb(228,228,228);
   box-sizing: border-box;
   display: block;
@@ -244,66 +273,46 @@ exports[`"Switch" renders disabled 1`] = `
   width: 50%;
 }
 
+.emotion-2 {
+  background: #fff;
+  border-radius: 100%;
+  bottom: 0;
+  box-shadow: 0px 0px 2px -1px gray;
+  display: block;
+  height: 23px;
+  margin: 1px;
+  opacity: 0.7;
+  position: absolute;
+  right: 17px;
+  top: 0;
+  -webkit-transition: all 0.15s ease-in 0s;
+  transition: all 0.15s ease-in 0s;
+  width: 23px;
+}
+
 <div
-  className="emotion-1"
+  className="emotion-5"
 >
   <div
-    style={
-      Object {
-        "display": "inline-block",
-        "position": "relative",
-        "textAlign": "left",
-        "userSelect": "none",
-        "verticalAlign": "middle",
-        "width": "42px",
-      }
-    }
+    className="emotion-4"
   >
     <input
       checked={false}
+      className="emotion-0"
       disabled={true}
       id="4"
       onChange={[Function]}
-      style={
-        Object {
-          "display": "none",
-        }
-      }
       type="checkbox"
     />
     <label
+      className="emotion-3"
       htmlFor="4"
-      style={
-        Object {
-          "borderRadius": "20px",
-          "cursor": "",
-          "display": "block",
-          "margin": 0,
-          "overflow": "hidden",
-        }
-      }
     >
       <span
-        className="emotion-0"
+        className="emotion-1"
       />
       <span
-        style={
-          Object {
-            "background": "#fff",
-            "borderRadius": "100%",
-            "bottom": 0,
-            "boxShadow": "0px 0px 2px -1px gray",
-            "display": "block",
-            "height": "23px",
-            "margin": "1px",
-            "opacity": 0.7,
-            "position": "absolute",
-            "right": "17px",
-            "top": 0,
-            "transition": "all 0.15s ease-in 0s",
-            "width": "23px",
-          }
-        }
+        className="emotion-2"
       />
     </label>
   </div>
@@ -311,13 +320,37 @@ exports[`"Switch" renders disabled 1`] = `
 `;
 
 exports[`"Switch" renders unchecked 1`] = `
-.emotion-1 {
+.emotion-5 {
   background: rgb(247,248,250);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
+.emotion-4 {
+  display: inline-block;
+  position: relative;
+  text-align: left;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  vertical-align: middle;
+  width: 42px;
+}
+
 .emotion-0 {
+  display: none;
+}
+
+.emotion-3 {
+  border-radius: 20px;
+  cursor: pointer;
+  display: block;
+  margin: 0;
+  overflow: hidden;
+}
+
+.emotion-1 {
   display: block;
   margin-left: -100%;
   -webkit-transition: margin 0.1s ease-in 0s;
@@ -325,19 +358,19 @@ exports[`"Switch" renders unchecked 1`] = `
   width: 200%;
 }
 
-.emotion-0:after {
+.emotion-1:after {
   content: " ";
   padding-right: 10px;
   text-align: right;
 }
 
-.emotion-0:before {
+.emotion-1:before {
   content: " ";
   padding-left: 10px;
 }
 
-.emotion-0:before,
-.emotion-0:after {
+.emotion-1:before,
+.emotion-1:after {
   background-color: #d2d2d2;
   box-sizing: border-box;
   display: block;
@@ -348,65 +381,44 @@ exports[`"Switch" renders unchecked 1`] = `
   width: 50%;
 }
 
+.emotion-2 {
+  background: #fff;
+  border-radius: 100%;
+  bottom: 0;
+  box-shadow: 0px 0px 2px -1px gray;
+  display: block;
+  height: 23px;
+  margin: 1px;
+  position: absolute;
+  right: 17px;
+  top: 0;
+  -webkit-transition: all 0.15s ease-in 0s;
+  transition: all 0.15s ease-in 0s;
+  width: 23px;
+}
+
 <div
-  className="emotion-1"
+  className="emotion-5"
 >
   <div
-    style={
-      Object {
-        "display": "inline-block",
-        "position": "relative",
-        "textAlign": "left",
-        "userSelect": "none",
-        "verticalAlign": "middle",
-        "width": "42px",
-      }
-    }
+    className="emotion-4"
   >
     <input
       checked={false}
+      className="emotion-0"
       id="1"
       onChange={[Function]}
-      style={
-        Object {
-          "display": "none",
-        }
-      }
       type="checkbox"
     />
     <label
+      className="emotion-3"
       htmlFor="1"
-      style={
-        Object {
-          "borderRadius": "20px",
-          "cursor": "pointer",
-          "display": "block",
-          "margin": 0,
-          "overflow": "hidden",
-        }
-      }
     >
       <span
-        className="emotion-0"
+        className="emotion-1"
       />
       <span
-        style={
-          Object {
-            "background": "#fff",
-            "borderRadius": "100%",
-            "bottom": 0,
-            "boxShadow": "0px 0px 2px -1px gray",
-            "display": "block",
-            "height": "23px",
-            "margin": "1px",
-            "opacity": undefined,
-            "position": "absolute",
-            "right": "17px",
-            "top": 0,
-            "transition": "all 0.15s ease-in 0s",
-            "width": "23px",
-          }
-        }
+        className="emotion-2"
       />
     </label>
   </div>
