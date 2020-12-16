@@ -18,14 +18,14 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
 import {TextProps, filterTextProps, textStyle} from './Text';
 
 export type TitleProps<T = HTMLDivElement> = TextProps<T>;
 
-const titleStyle: <T>(theme: Theme, props: TitleProps<T>) => ObjectInterpolation<undefined> = (
+const titleStyle: <T>(theme: Theme, props: TitleProps<T>) => CSSObject = (
   theme,
   {block = true, center = true, fontSize = '32px', color = COLOR.GRAY, bold = true, ...props},
 ) => ({

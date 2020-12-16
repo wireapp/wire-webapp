@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
@@ -27,7 +27,7 @@ import {noop} from '../util';
 
 export type OverlayWrapperProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-export const overlayWrapperStyle: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = () => ({
+export const overlayWrapperStyle: <T>(props: OverlayWrapperProps<T>) => CSSObject = () => ({
   bottom: 0,
   display: 'flex',
   left: 0,
@@ -67,7 +67,7 @@ export const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
 
 export type OverlayBackgroundProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-export const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = () => ({
+export const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => CSSObject = () => ({
   animation: `${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW}ms ${EASE.QUART}`,
   background: 'rgba(0, 0, 0, 0.88)',
   height: '100vh',

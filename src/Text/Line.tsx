@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {GUTTER} from '../Layout/sizes';
@@ -27,9 +27,7 @@ export interface LineProps<T = HTMLHRElement> extends React.HTMLProps<T> {
   color?: string;
 }
 
-export const lineStyle: <T>(props: LineProps<T>) => ObjectInterpolation<undefined> = ({
-  color = COLOR.GRAY_LIGHTEN_72,
-}) => ({
+export const lineStyle: <T>(props: LineProps<T>) => CSSObject = ({color = COLOR.GRAY_LIGHTEN_72}) => ({
   border: 'none',
   borderBottom: `1px solid ${color}`,
   marginBottom: `${GUTTER}px`,

@@ -19,7 +19,7 @@
 
 /** @jsx jsx */
 import React from 'react';
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import {QueryKeys, media} from '../mediaQueries';
 import {filterProps} from '../util';
 import {GUTTER} from './sizes';
@@ -32,7 +32,7 @@ export const filterColumnsProps = (props: ColumnsProps) => {
   return filterProps(props, ['query']);
 };
 
-const columnsStyle: <T>(props: ColumnsProps<T>) => ObjectInterpolation<undefined> = ({query = QueryKeys.MOBILE}) => ({
+const columnsStyle: <T>(props: ColumnsProps<T>) => CSSObject = ({query = QueryKeys.MOBILE}) => ({
   display: 'flex',
   marginLeft: `-${GUTTER}px`,
   [media[query]]: {flexDirection: 'column'},
@@ -42,7 +42,7 @@ export const Columns = (props: ColumnsProps) => <div css={columnsStyle(props)} {
 
 export type ColumnProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-const columnStyle: <T>(props: ColumnProps<T>) => ObjectInterpolation<undefined> = props => ({
+const columnStyle: <T>(props: ColumnProps<T>) => CSSObject = props => ({
   display: 'block',
   flexBasis: '0',
   flexGrow: 1,

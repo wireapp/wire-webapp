@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR, Opacity, Slide, YAxisMovement} from '../../Identity';
 import {DURATION} from '../../Identity/motions';
@@ -29,10 +29,10 @@ import {MENU_LINK_CLASSNAME} from './MenuLink';
 
 export type DesktopStyledHeaderSubMenuProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-const desktopStyledHeaderSubMenuStyle: (
-  theme: Theme,
-  props: DesktopStyledHeaderSubMenuProps,
-) => ObjectInterpolation<undefined> = (theme, props) => ({
+const desktopStyledHeaderSubMenuStyle: (theme: Theme, props: DesktopStyledHeaderSubMenuProps) => CSSObject = (
+  theme,
+  props,
+) => ({
   alignItems: 'left',
   backgroundColor: COLOR.tint(theme.general.backgroundColor, 0.16),
   borderRadius: '8px',
@@ -74,9 +74,7 @@ export interface MobileStyledHeaderSubMenuProps<T = HTMLSpanElement> extends Rea
   open?: boolean;
 }
 
-const mobileStyledHeaderSubMenuStyle: (
-  props: MobileStyledHeaderSubMenuProps,
-) => ObjectInterpolation<undefined> = props => ({
+const mobileStyledHeaderSubMenuStyle: (props: MobileStyledHeaderSubMenuProps) => CSSObject = props => ({
   '*': {
     fontWeight: 200,
   },

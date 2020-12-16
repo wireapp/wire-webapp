@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import Color from 'color';
 import {COLOR} from '../../Identity';
 import {defaultTransition} from '../../Identity/motions';
@@ -28,10 +28,7 @@ import {Theme} from '../Theme';
 
 type MenuSubLinkProps<T = HTMLDivElement> = TextProps<T>;
 
-export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => ObjectInterpolation<undefined> = (
-  theme,
-  props,
-) => ({
+export const menuSubLinkStyle: <T>(theme: Theme, props: MenuSubLinkProps<T>) => CSSObject = (theme, props) => ({
   ...textStyle(theme, props),
   '&:hover': {
     color: Color(theme.general.color).mix(Color(COLOR.BLACK), 0.16).toString(),

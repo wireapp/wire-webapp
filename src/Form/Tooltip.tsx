@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {filterProps} from '../util';
@@ -32,7 +32,7 @@ interface ToolTipProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   text?: string;
 }
 
-const tooltipStyle: <T>(props: ToolTipProps<T>) => ObjectInterpolation<undefined> = ({
+const tooltipStyle: <T>(props: ToolTipProps<T>) => CSSObject = ({
   disabled = false,
   bottom = false,
   left = false,

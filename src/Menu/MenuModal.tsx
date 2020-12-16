@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity/';
 import {ANIMATION, DURATION, EASE} from '../Identity/motions';
@@ -26,7 +26,7 @@ import {QueryKeys, media} from '../mediaQueries';
 import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyle} from '../Modal/Overlay';
 import {noop} from '../util';
 
-const menuModalWrapperStyle: <T>(props: OverlayWrapperProps<T>) => ObjectInterpolation<undefined> = props => ({
+const menuModalWrapperStyle: <T>(props: OverlayWrapperProps<T>) => CSSObject = props => ({
   ...overlayBackgroundStyle(props),
   alignItems: 'flex-end',
   alignSelf: 'flex-end',
@@ -78,7 +78,7 @@ const MenuModalContent = (props: React.HTMLProps<HTMLUListElement>) => (
   />
 );
 
-const modalBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => ObjectInterpolation<undefined> = props => ({
+const modalBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => CSSObject = props => ({
   ...overlayBackgroundStyle(props),
   background: 'rgba(50, 54, 57, 0.4)',
 });

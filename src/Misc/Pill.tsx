@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx, keyframes} from '@emotion/core';
+import {CSSObject, jsx, keyframes} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {DURATION, EASE} from '../Identity/motions';
@@ -36,7 +36,7 @@ export enum PILL_TYPE {
   warning = 'WARNING',
 }
 
-export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => ObjectInterpolation<undefined> = (
+export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => CSSObject = (
   theme,
   {active = false, type = null},
 ) => {

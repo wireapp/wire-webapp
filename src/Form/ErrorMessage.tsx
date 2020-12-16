@@ -18,14 +18,14 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
 import {Text, TextProps, linkStyle, textStyle} from '../Text';
 
 type ErrorMessageProps<T = HTMLSpanElement> = TextProps<T>;
 
-export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) => ObjectInterpolation<undefined> = (
+export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) => CSSObject = (
   theme,
   {bold = false, center = true, color = COLOR.RED, fontSize = '11px', textTransform = 'none', ...props},
 ) => ({

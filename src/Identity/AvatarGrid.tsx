@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {AvatarProps} from '../Identity/';
 import {IsInViewport} from '../Misc/';
@@ -35,7 +35,7 @@ interface Props<T = HTMLDivElement> extends React.HTMLProps<T> {
   size?: number;
 }
 
-const avatarGridStyle: <T>(props: Props<T>) => ObjectInterpolation<undefined> = ({
+const avatarGridStyle: <T>(props: Props<T>) => CSSObject = ({
   borderWidth,
   size,
   backgroundColor = COLOR.GRAY_DARKEN_48,
