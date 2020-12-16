@@ -49,7 +49,7 @@ export const Switch = ({
   name,
 }: SwitchProps) => (
   <div
-    style={{
+    css={{
       display: 'inline-block',
       position: 'relative',
       textAlign: 'left',
@@ -66,11 +66,11 @@ export const Switch = ({
         name={name}
         onChange={event => onToggle(event.target.checked)}
         type="checkbox"
-        style={{display: 'none'}}
+        css={{display: 'none'}}
       />
       <label
         htmlFor={id}
-        style={{
+        css={{
           borderRadius: '20px',
           cursor: disabled || showLoading ? '' : 'pointer',
           display: 'block',
@@ -122,7 +122,7 @@ export const Switch = ({
           />
         ) : (
           <span
-            style={{
+            css={{
               background: COLOR.WHITE,
               borderRadius: '100%',
               bottom: 0,

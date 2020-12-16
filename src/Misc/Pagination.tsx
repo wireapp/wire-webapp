@@ -87,7 +87,7 @@ export const Pagination: React.SFC<PaginationProps> = ({
 
   return (
     <FlexBox align="flex-end" data-uie-name="element-pagination" {...props}>
-      <div style={{flexBasis: 100}}>
+      <div css={{flexBasis: 100}}>
         {!isFirstPage && (
           <Link block onClick={() => goPage(currentPage - 1)} data-uie-name="go-previous-page">
             <PreviousPageComponent />
@@ -95,12 +95,12 @@ export const Pagination: React.SFC<PaginationProps> = ({
         )}
       </div>
       <div
-        style={{alignItems: 'flex-end', display: 'flex', flexDirection: 'row', margin: '0 auto'}}
+        css={{alignItems: 'flex-end', display: 'flex', flexDirection: 'row', margin: '0 auto'}}
         data-uie-name="list-pages"
       >
         {renderPageList()}
       </div>
-      <div style={{display: 'flex', flexBasis: 100, justifyContent: 'flex-end'}}>
+      <div css={{display: 'flex', flexBasis: 100, justifyContent: 'flex-end'}}>
         {!isLastPage && (
           <Link block onClick={() => goPage(currentPage + 1)} data-uie-name="go-next-page">
             <NextPageComponent />

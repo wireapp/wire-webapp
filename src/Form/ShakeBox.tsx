@@ -63,6 +63,6 @@ export const ShakeBox: React.RefForwardingComponent<ShakeBoxProps> = React.forwa
 
     useEffect(() => () => cancelAnimationFrame(requestAnimationId), []);
 
-    return <div style={{transform: `translateX(${offset}px)`}}>{children}</div>;
+    return <div css={{transform: `translateX(${offset}px)`}}>{children}</div>;
   },
 );

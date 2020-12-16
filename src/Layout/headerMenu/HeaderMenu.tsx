@@ -44,12 +44,12 @@ export const HeaderMenu = ({children, logoElement = null, centerElement = null, 
   const closeMenu = () => setIsOpen(false);
 
   return (
-    <div style={{height: '64px'}} {...props} data-uie-name="element-header-menu">
+    <div css={{height: '64px'}} {...props} data-uie-name="element-header-menu">
       <MenuContent open={isOpen}>
-        <div style={{alignSelf: 'center', display: 'flex', zIndex: 2}} onClick={closeMenu}>
+        <div css={{alignSelf: 'center', display: 'flex', zIndex: 2}} onClick={closeMenu}>
           {logoElement}
         </div>
-        <div style={{alignSelf: 'center', display: 'flex'}}>{centerElement}</div>
+        <div css={{alignSelf: 'center', display: 'flex'}}>{centerElement}</div>
         <MenuOpenButton
           onClick={toggleMenu}
           open={isOpen}
