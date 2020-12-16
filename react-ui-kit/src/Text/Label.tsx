@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import {Theme} from '../Layout';
 import {LinkProps, linkStyle} from './Link';
 import {TextProps, filterTextProps, textStyle} from './Text';
@@ -28,7 +28,7 @@ export interface LabelProps<T = HTMLSpanElement> extends TextProps<T> {
   markInvalid?: boolean;
 }
 
-const labelStyle: <T>(theme: Theme, props: LabelProps<T>) => ObjectInterpolation<undefined> = (
+const labelStyle: <T>(theme: Theme, props: LabelProps<T>) => CSSObject = (
   theme,
   {markInvalid, bold = false, color = theme.general.color, fontSize = '12px', ...props},
 ) => ({
@@ -46,10 +46,7 @@ export const Label = (props: LabelProps) => (
 
 export type LabelLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
 
-const labelLinkStyle: <T>(theme, props: LabelLinkProps<T>) => ObjectInterpolation<undefined> = (
-  theme,
-  {fontSize = '12px', ...props},
-) => ({
+const labelLinkStyle: <T>(theme, props: LabelLinkProps<T>) => CSSObject = (theme, {fontSize = '12px', ...props}) => ({
   ...linkStyle(theme, {fontSize, ...props}),
 });
 

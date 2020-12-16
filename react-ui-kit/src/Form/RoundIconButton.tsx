@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
@@ -28,10 +28,7 @@ import {ButtonProps, buttonStyle, filterButtonProps} from './Button';
 
 export interface RoundIconButtonProps<T = HTMLButtonElement> extends ButtonProps<T> {}
 
-export const roundIconButtonStyle: <T>(
-  theme: Theme,
-  props: RoundIconButtonProps<T>,
-) => ObjectInterpolation<undefined> = (theme, props) => ({
+export const roundIconButtonStyle: <T>(theme: Theme, props: RoundIconButtonProps<T>) => CSSObject = (theme, props) => ({
   ...buttonStyle(theme, props),
   alignItems: 'center',
   borderRadius: '50%',

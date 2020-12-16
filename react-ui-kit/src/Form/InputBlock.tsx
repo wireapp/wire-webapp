@@ -19,14 +19,14 @@
 
 /** @jsx jsx */
 import React from 'react';
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {INPUT_CLASSNAME} from './Input';
 import {INPUT_SUBMIT_COMBO_CLASSNAME} from './InputSubmitCombo';
 
 export type InputBlockProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-const inputBlockStyle: (props: InputBlockProps) => ObjectInterpolation<undefined> = props => ({
+const inputBlockStyle: (props: InputBlockProps) => CSSObject = props => ({
   backgroundColor: COLOR.GRAY_LIGHTEN_88,
   borderRadius: '4px',
   boxShadow: `inset 16px 16px 0 ${COLOR.WHITE}, inset -16px -16px 0 ${COLOR.WHITE}`,

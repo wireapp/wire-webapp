@@ -19,7 +19,7 @@
 
 /** @jsx jsx */
 import React from 'react';
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import {QueryKeys, media} from '../../mediaQueries';
 import {filterProps} from '../../util';
 import {Theme} from '../Theme';
@@ -28,10 +28,7 @@ export interface MenuItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;
 }
 
-export const menuItemsStyle: <T>(theme: Theme, props: MenuItemsProps<T>) => ObjectInterpolation<undefined> = (
-  theme,
-  props,
-) => ({
+export const menuItemsStyle: <T>(theme: Theme, props: MenuItemsProps<T>) => CSSObject = (theme, props) => ({
   alignSelf: 'center',
   display: 'flex',
   justifySelf: 'end',

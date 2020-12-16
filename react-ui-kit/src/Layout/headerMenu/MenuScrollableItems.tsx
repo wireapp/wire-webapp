@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {QueryKeys, media} from '../../mediaQueries';
 
@@ -26,9 +26,7 @@ export interface MenuScrollableItemsProps<T = HTMLDivElement> extends React.HTML
   open?: boolean;
 }
 
-export const menuScrollableItemsStyle: <T>(
-  props: MenuScrollableItemsProps<T>,
-) => ObjectInterpolation<undefined> = props => ({
+export const menuScrollableItemsStyle: <T>(props: MenuScrollableItemsProps<T>) => CSSObject = props => ({
   alignItems: 'center',
   alignSelf: 'center',
   display: 'flex',

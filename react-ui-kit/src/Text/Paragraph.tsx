@@ -18,14 +18,14 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 import {TextProps, filterTextProps, textStyle} from './Text';
 
 export type ParagraphProps<T = HTMLParagraphElement> = TextProps<T>;
 
-export const paragraphStyle: <T>(theme: Theme, props: ParagraphProps<T>) => ObjectInterpolation<undefined> = (
+export const paragraphStyle: <T>(theme: Theme, props: ParagraphProps<T>) => CSSObject = (
   theme,
   {block = true, ...props},
 ) => ({
@@ -40,7 +40,7 @@ export const Paragraph = (props: ParagraphProps) => (
 
 export type LeadProps<T = HTMLParagraphElement> = TextProps<T>;
 
-export const leadStyle: <T>(theme: Theme, props: LeadProps<T>) => ObjectInterpolation<undefined> = (
+export const leadStyle: <T>(theme: Theme, props: LeadProps<T>) => CSSObject = (
   theme,
   {block = true, center = true, fontSize = '24px', ...props},
 ) => ({

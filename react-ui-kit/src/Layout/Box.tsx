@@ -18,13 +18,13 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
 
 export type BoxProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-export const boxStyle: <T>(props: BoxProps<T>) => ObjectInterpolation<undefined> = props => ({
+export const boxStyle: <T>(props: BoxProps<T>) => CSSObject = props => ({
   border: `2px solid ${COLOR.GRAY_LIGHTEN_72}`,
   borderRadius: '8px',
   padding: '16px 32px',

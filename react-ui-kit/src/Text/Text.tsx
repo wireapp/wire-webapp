@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {TextTransformProperty} from 'csstype';
 import {Theme} from '../Layout';
@@ -52,7 +52,7 @@ export const filterTextProps = (props: TextProps) => {
   ]);
 };
 
-export const textStyle: <T>(theme: Theme, props: TextProps<T>) => ObjectInterpolation<undefined> = (
+export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
   theme,
   {
     block = false,

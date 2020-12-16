@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 import {TextProps, filterTextProps, textStyle} from './Text';
@@ -41,7 +41,7 @@ export const Heading = ({level, ...props}: HeadingProps) => {
   }
 };
 
-export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
+export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
   {block = true, color = theme.general.color, level = '1', noWrap = false, textTransform = 'none', ...props},
 ) => ({
@@ -60,7 +60,7 @@ export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpo
 
 export const H1 = (props: HeadingProps) => <h1 css={theme => h1Style(theme, props)} {...filterTextProps(props)} />;
 
-export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
+export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
   {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
 ) => ({
@@ -80,7 +80,7 @@ export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpo
 
 export const H2 = (props: HeadingProps) => <h2 css={theme => h2Style(theme, props)} {...filterTextProps(props)} />;
 
-export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
+export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
   {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
 ) => ({
@@ -92,7 +92,7 @@ export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpo
 
 export const H3 = (props: HeadingProps) => <h3 css={theme => h3Style(theme, props)} {...filterTextProps(props)} />;
 
-export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => ObjectInterpolation<undefined> = (
+export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   theme,
   {block = true, color = theme.general.color, noWrap = false, textTransform = 'none', ...props},
 ) => ({

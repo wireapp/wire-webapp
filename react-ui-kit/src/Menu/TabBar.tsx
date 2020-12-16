@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
 import {COLOR} from '../Identity';
 import {Theme} from '../Layout';
@@ -27,7 +27,7 @@ import {filterProps} from '../util';
 
 export type TabBarProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-const tabBarStyle: <T>(props: TabBarProps<T>) => ObjectInterpolation<undefined> = ({}) => {
+const tabBarStyle: <T>(props: TabBarProps<T>) => CSSObject = ({}) => {
   return {
     display: 'flex',
     width: '100%',
@@ -46,7 +46,7 @@ export interface TabBarItemProps<T = HTMLSpanElement> extends TextProps<T> {
   active: boolean;
 }
 
-const tabBarItemStyle: <T>(theme: Theme, props: TabBarItemProps<T>) => ObjectInterpolation<undefined> = (
+const tabBarItemStyle: <T>(theme: Theme, props: TabBarItemProps<T>) => CSSObject = (
   theme,
   {
     block = true,

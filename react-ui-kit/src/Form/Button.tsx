@@ -18,7 +18,7 @@
  */
 
 /** @jsx jsx */
-import {ObjectInterpolation, jsx} from '@emotion/core';
+import {CSSObject, jsx} from '@emotion/core';
 import {COLOR} from '../Identity';
 import {defaultTransition} from '../Identity/motions';
 import {Theme} from '../Layout';
@@ -33,7 +33,7 @@ export interface ButtonProps<T = HTMLButtonElement> extends TextProps<T> {
   showLoading?: boolean;
 }
 
-export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => ObjectInterpolation<undefined> = (
+export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject = (
   theme,
   {
     backgroundColor = COLOR.BLUE,
