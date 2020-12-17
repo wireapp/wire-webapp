@@ -20,7 +20,7 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
-import {TextTransformProperty} from 'csstype';
+import {Property} from 'csstype';
 import {Theme} from '../Layout';
 import {filterProps} from '../util';
 
@@ -33,7 +33,7 @@ export interface TextProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
   light?: boolean;
   muted?: boolean;
   noWrap?: boolean;
-  textTransform?: TextTransformProperty;
+  textTransform?: Property.TextTransform;
   truncate?: boolean;
 }
 
