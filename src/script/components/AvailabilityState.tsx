@@ -49,10 +49,12 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   const isAvailable = availability === Availability.Type.AVAILABLE;
   const isAway = availability === Availability.Type.AWAY;
   const isBusy = availability === Availability.Type.BUSY;
+
   return (
     <React.Fragment>
       {isAvailable && (
         <NamedIcon
+          className="availability-state-icon"
           name="availability-available-icon"
           width={10}
           height={10}
@@ -64,6 +66,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
       {isAway && (
         <NamedIcon
+          className="availability-state-icon"
           name="availability-away-icon"
           width={10}
           height={10}
@@ -75,6 +78,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
       {isBusy && (
         <NamedIcon
+          className="availability-state-icon"
           name="availability-busy-icon"
           width={10}
           height={10}
@@ -86,6 +90,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
       {label && (
         <div
+          className="availability-state-label"
           css={theme ? {color: 'var(--accent-color)', userSelect: 'none'} : {userSelect: 'none'}}
           data-uie-name="status-label"
         >
@@ -121,5 +126,5 @@ registerReactComponent('availability-state', {
   component: AvailabilityState,
   optionalParams: ['showArrow', 'theme'],
   template:
-    '<span class="availability-state" data-bind="react: {availability: ko.unwrap(availability), label, showArrow, theme}"></span>',
+    '<span class="availability-state" data-bind="react: {availability: ko.unwrap(availability), label: ko.unwrap(label), showArrow, theme: ko.unwrap(theme)}"></span>',
 });
