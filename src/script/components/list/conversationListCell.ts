@@ -28,7 +28,7 @@ import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 import {viewportObserver} from '../../ui/viewportObserver';
 
-import 'Components/availabilityState';
+import 'Components/AvailabilityState';
 import type {User} from '../../entity/User';
 
 interface ConversationListCellProps {
