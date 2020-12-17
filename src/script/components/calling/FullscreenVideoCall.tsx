@@ -25,7 +25,6 @@ import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {registerReactComponent} from 'Util/ComponentUtil';
-import SVGProvider from '../../auth/util/SVGProvider';
 import useHideElement from '../../hooks/useHideElement';
 import {t} from '../../util/LocalizerUtil';
 import GroupVideoGrid from './GroupVideoGrid';
@@ -38,6 +37,7 @@ import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../med
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import Duration from './Duration';
+import NamedIcon from 'Components/NamedIcon';
 
 export interface FullscreenVideoCallProps {
   call: Call;
@@ -147,23 +147,17 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           <div className="video-controls__wrapper">
             <div className="video-controls__button" onClick={minimize} data-uie-name="do-call-controls-video-minimize">
               {hasUnreadMessages ? (
-                <svg
+                <NamedIcon
+                  name="message-unread-icon"
                   css={{
                     marginRight: '-2px',
                     marginTop: '-2px',
                   }}
                   width={18}
                   height={18}
-                  viewBox="0 0 18 18"
-                  dangerouslySetInnerHTML={{__html: SVGProvider['message-unread-icon']?.documentElement?.innerHTML}}
                 />
               ) : (
-                <svg
-                  width={16}
-                  height={16}
-                  viewBox="0 0 16 16"
-                  dangerouslySetInnerHTML={{__html: SVGProvider['message-icon']?.documentElement?.innerHTML}}
-                />
+                <NamedIcon name="message-icon" width={16} height={16} />
               )}
               <div className="video-controls__button__label">{t('videoCallOverlayConversations')}</div>
             </div>
@@ -175,12 +169,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               css={isMuted ? videoControlActiveStyles : undefined}
               data-uie-name="do-call-controls-video-call-mute"
             >
-              <svg
-                width={16}
-                height={16}
-                viewBox="0 0 16 16"
-                dangerouslySetInnerHTML={{__html: SVGProvider['mic-off-icon']?.documentElement?.innerHTML}}
-              />
+              <NamedIcon name="mic-off-icon" width={16} height={16} />
               <div className="video-controls__button__label">{t('videoCallOverlayMute')}</div>
             </div>
 
@@ -192,12 +181,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 css={selfSharesCamera ? videoControlActiveStyles : undefined}
                 data-uie-name="do-call-controls-toggle-video"
               >
-                <svg
-                  width={16}
-                  height={12}
-                  viewBox="0 0 16 12"
-                  dangerouslySetInnerHTML={{__html: SVGProvider['camera-icon']?.documentElement?.innerHTML}}
-                />
+                <NamedIcon name="camera-icon" width={16} height={12} />
                 {showSwitchCamera ? (
                   <DeviceToggleButton
                     styles={css`
@@ -227,12 +211,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               data-uie-enabled={canShareScreen ? 'true' : 'false'}
               data-uie-name="do-toggle-screen"
             >
-              <svg
-                width={16}
-                height={16}
-                viewBox="0 0 16 16"
-                dangerouslySetInnerHTML={{__html: SVGProvider['screenshare-icon']?.documentElement?.innerHTML}}
-              />
+              <NamedIcon name="screenshare-icon" width={16} height={16} />
               <div className="video-controls__button__label">{t('videoCallOverlayShareScreen')}</div>
             </div>
 
@@ -241,12 +220,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               onClick={() => callActions.leave(call)}
               data-uie-name="do-call-controls-video-call-cancel"
             >
-              <svg
-                width={20}
-                height={8}
-                viewBox="0 0 20 8"
-                dangerouslySetInnerHTML={{__html: SVGProvider['hangup-icon']?.documentElement?.innerHTML}}
-              />
+              <NamedIcon name="hangup-icon" width={20} height={8} />
               <div className="video-controls__button__label">{t('videoCallOverlayHangUp')}</div>
             </div>
           </div>
