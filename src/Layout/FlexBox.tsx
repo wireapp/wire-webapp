@@ -19,14 +19,14 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
-import {FlexWrapProperty} from 'csstype';
+import {Property} from 'csstype';
 import React from 'react';
 import {filterProps} from '../util';
 
 export interface FlexBoxProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   align?: string;
   column?: boolean;
-  flexWrap?: FlexWrapProperty;
+  flexWrap?: Property.FlexWrap;
   justify?: string;
 }
 
