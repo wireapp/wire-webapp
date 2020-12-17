@@ -27,7 +27,7 @@
     "@types/jasmine": "3.6.0",
     "@types/karma": "5.0.0",
     "@types/ws": "7.2.6",
-    "@wireapp/react-ui-kit": "7.44.2",
+    "@wireapp/react-ui-kit": "7.44.3",
     "@wireapp/store-engine": "4.5.19",
     "@wireapp/store-engine-fs": "2.2.23",
     "babel-loader": "8.1.0",
@@ -84,5 +84,5 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* nyc jasmine --config=jasmine.json",
     "watch": "webpack-dev-server --config webpack.browser.js"
   },
-  "version": "11.35.3"
+  "version": "11.35.4"
 }
