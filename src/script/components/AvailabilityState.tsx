@@ -25,7 +25,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import NamedIcon from './NamedIcon';
 
-interface AvailabilityStateProps {
+export interface AvailabilityStateProps {
   availability: Availability.Type;
   label: string;
   showArrow?: boolean;
@@ -100,6 +100,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
       {showArrow && (
         <span
+          data-uie-name="availability-arrow"
           css={{
             '&::before': {
               borderLeft: '4px solid transparent',
