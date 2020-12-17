@@ -28,7 +28,7 @@ import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {viewportObserver} from '../../ui/viewportObserver';
 
-import 'Components/availabilityState';
+import 'Components/AvailabilityState';
 import {Participant} from '../../calling/Participant';
 
 interface ParticipantItemParams {

@@ -51,7 +51,7 @@ import {ContentViewModel} from '../ContentViewModel';
 import {Logger, Runtime} from '@wireapp/commons';
 import {getLogger} from 'Util/Logger';
 
-import 'Components/availabilityState';
+import 'Components/AvailabilityState';
 import {isAppLockEnabled} from './AppLockViewModel';
 import {loadValue} from 'Util/StorageUtil';
 import {StorageKey} from '../../storage';
