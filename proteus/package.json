@@ -12,6 +12,7 @@
   "devDependencies": {
     "@types/jasmine": "3.6.0",
     "chai": "4.2.0",
+    "del-cli": "3.0.1",
     "jasmine": "3.5.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
@@ -32,7 +33,7 @@
   "scripts": {
     "benchmark": "ts-node -r tsconfig-paths/register src/demo/benchmark.ts",
     "build:node": "tsc",
-    "clean": "rimraf dist",
+    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/demo/**/*\"",
     "dist": "yarn clean && yarn build:node",
     "start": "yarn build:node && node src/main/index.js",
     "test": "yarn test:types && yarn test:node",
