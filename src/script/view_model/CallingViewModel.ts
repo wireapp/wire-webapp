@@ -196,7 +196,6 @@ export class CallingViewModel {
         this.callingRepository.rejectCall(call.conversationId);
       },
       setVideoSpeakersActiveTab: (tab: string) => {
-        console.info('bardia setVideoSpeakersActiveTab tab', tab);
         this.videoSpeakersActiveTab(tab);
       },
       startAudio: (conversationEntity: Conversation): void => {
