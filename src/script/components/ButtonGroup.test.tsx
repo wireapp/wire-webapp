@@ -45,12 +45,11 @@ describe('ButtonGroup', () => {
   });
 
   it('changes active button on click', async () => {
-    let currentItem = 'all';
     const props = {
-      currentItem,
+      currentItem: 'all',
       items: ['all', 'active'],
-      onChangeItem: () => {
-        currentItem = 'active';
+      onChangeItem: (currentItem: string) => {
+        buttonGroup.setProps({...props, currentItem});
       },
     };
 
@@ -60,8 +59,6 @@ describe('ButtonGroup', () => {
     expect(buttonGroup.getActiveButton().text()).toBe('all');
 
     buttonGroup.clickOnInactiveButton();
-    buttonGroup.setProps({...props, currentItem});
-
     expect(buttonGroup.getActiveButton().text()).toBe('active');
   });
 });
