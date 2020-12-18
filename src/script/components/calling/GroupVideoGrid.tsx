@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useState, CSSProperties} from 'react';
+import React, {useState, useEffect, CSSProperties} from 'react';
 import {css} from '@emotion/core';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
@@ -64,15 +64,19 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   const doubleClickedOnVideo = (userId: string, clientId: string) => {
     if (maximizedParticipant !== null) {
       setMaximizedParticipant(null);
-      setRowsAndColumns(calculateRowsAndColumns(grid.grid.length));
       return;
     }
     const participant = videoParticipants.find(participant => participant.doesMatchIds(userId, clientId));
     setMaximizedParticipant(participant);
-    setRowsAndColumns(calculateRowsAndColumns(1));
   };
 
   const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(p => !!p);
+
+  useEffect(() => {
+    setRowsAndColumns(calculateRowsAndColumns(participants.length));
+  }, [participants.length]);
+
+  console.info('bardia video grid re-render videoParticipants', videoParticipants);
   return (
     <div className="group-video">
       <div
