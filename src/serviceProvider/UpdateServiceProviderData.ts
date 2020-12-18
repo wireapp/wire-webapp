@@ -17,6 +17,6 @@
  *
  */
 
-import {NewServiceProvider} from './NewServiceProvider';
+import type {NewServiceProvider} from './NewServiceProvider';
 
 export type UpdateServiceProviderData = Partial<Omit<NewServiceProvider, 'email' | 'password'>>;

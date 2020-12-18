@@ -17,10 +17,10 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http/';
-import {
+import type {HttpClient} from '../../http/';
+import type {
   PaymentBillingData,
   PaymentData,
   PaymentDataUpdate,

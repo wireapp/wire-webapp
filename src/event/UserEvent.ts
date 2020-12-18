@@ -17,7 +17,7 @@
  *
  */
 
-import {
+import type {
   UserActivateData,
   UserClientAddData,
   UserClientRemoveData,

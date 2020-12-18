@@ -17,11 +17,11 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
-import {NewTeamData, TeamChunkData, TeamData} from '../';
-import {HttpClient} from '../../http/';
-import {UpdateTeamData} from './UpdateTeamData';
+import type {NewTeamData, TeamChunkData, TeamData} from '../';
+import type {HttpClient} from '../../http/';
+import type {UpdateTeamData} from './UpdateTeamData';
 
 export class TeamAPI {
   constructor(private readonly client: HttpClient) {}

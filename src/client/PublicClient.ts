@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification} from './ClientClassification';
+import type {ClientClassification} from './ClientClassification';
 
 export interface PublicClient {
   class: ClientClassification;

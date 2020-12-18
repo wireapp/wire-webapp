@@ -17,12 +17,12 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
-
-import {HttpClient} from '../../http/';
-import {MemberData, Members} from '../member/';
-import {TeamAPI} from '../team/TeamAPI';
+import type {AxiosRequestConfig} from 'axios';
 import {ArrayUtil} from '@wireapp/commons';
+
+import {TeamAPI} from '../team/TeamAPI';
+import type {HttpClient} from '../../http/';
+import type {MemberData, Members} from '../member/';
 
 export class MemberAPI {
   // Maximum 1600 due to "413 Request Entity Too Large" response

@@ -20,8 +20,6 @@
 import {EventEmitter} from 'events';
 import logdown from 'logdown';
 
-import {AccountAPI} from './account/AccountAPI';
-import {AssetAPI} from './asset/';
 import {
   AccessTokenData,
   AccessTokenStore,
@@ -30,26 +28,26 @@ import {
   Cookie,
   InvalidTokenError,
   LoginData,
-  RegisterData,
   MissingCookieError,
+  RegisterData,
 } from './auth/';
-import {CookieStore} from './auth/CookieStore';
+import {AccountAPI} from './account/AccountAPI';
+import {AssetAPI} from './asset/';
+import {Backend} from './env/';
 import {BroadcastAPI} from './broadcast/';
-import {ServicesAPI} from './services';
 import {ClientAPI, ClientType} from './client/';
-import {Config} from './Config';
 import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
-import {Backend} from './env/';
+import {CookieStore} from './auth/CookieStore';
 import {GiphyAPI} from './giphy/';
 import {HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
 import {ObfuscationUtil} from './obfuscation/';
-import {ServiceProviderAPI} from './serviceProvider';
-import {SelfAPI} from './self/';
 import {OnConnect, WebSocketClient} from './tcp/';
+import {SelfAPI} from './self/';
+import {ServiceProviderAPI} from './serviceProvider';
+import {ServicesAPI} from './services';
 import {
-  TeamConversationAPI,
   FeatureAPI,
   IdentityProviderAPI,
   LegalHoldAPI,
@@ -57,9 +55,11 @@ import {
   PaymentAPI,
   ServiceAPI,
   TeamAPI,
+  TeamConversationAPI,
   TeamInvitationAPI,
 } from './team/';
 import {UserAPI} from './user/';
+import type {Config} from './Config';
 
 const {version}: {version: string} = require('../package.json');
 

@@ -17,11 +17,11 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
-import {PreKeyBundle} from '../auth/';
-import {NewClient, RegisteredClient, UpdatedClient} from '../client/';
-import {HttpClient} from '../http/';
+import type {PreKeyBundle} from '../auth/';
+import type {NewClient, RegisteredClient, UpdatedClient} from '../client/';
+import type {HttpClient} from '../http/';
 
 export class ClientAPI {
   constructor(private readonly client: HttpClient) {}

@@ -17,7 +17,7 @@
  *
  */
 
-import {DefaultConversationRoleName, MutedStatus, ServiceRef} from './';
+import type {DefaultConversationRoleName, MutedStatus, ServiceRef} from './';
 
 export interface Member {
   /**

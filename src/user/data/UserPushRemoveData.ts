@@ -17,7 +17,7 @@
  *
  */
 
-import {UserPushTokenProvider} from './UserPushTokenProvider';
+import type {UserPushTokenProvider} from './UserPushTokenProvider';
 
 export interface UserPushRemoveData {
   token: {

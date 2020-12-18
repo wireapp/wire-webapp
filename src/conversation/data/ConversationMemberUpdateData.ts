@@ -17,8 +17,8 @@
  *
  */
 
-import {MutedStatus} from '../MutedStatus';
-import {DefaultConversationRoleName} from '../';
+import type {MutedStatus} from '../MutedStatus';
+import type {DefaultConversationRoleName} from '../';
 
 export interface ConversationMemberUpdateData extends Partial<ConversationOtherMemberUpdateData> {
   /** Whether the conversation with this user is hidden */

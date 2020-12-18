@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType} from '../client/';
+import type {ClientType} from '../client/';
 
 export interface Context {
   clientId?: string;

@@ -17,13 +17,14 @@
  *
  */
 
-import {AxiosRequestConfig, AxiosResponse} from 'axios';
+import type {AxiosRequestConfig, AxiosResponse} from 'axios';
 import logdown from 'logdown';
 import {Cookie as ToughCookie} from 'tough-cookie';
+
 import {Cookie} from '../../auth/';
-import {CookieStore} from '../../auth/CookieStore';
-import {HttpClient} from '../../http/';
 import {ObfuscationUtil} from '../../obfuscation/';
+import {CookieStore} from '../../auth/CookieStore';
+import type {HttpClient} from '../../http/';
 
 const logger = logdown('@wireapp/api-client/shims/node/cookie', {
   logger: console,

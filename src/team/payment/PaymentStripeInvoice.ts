@@ -17,7 +17,7 @@
  *
  */
 
-import {SupportedCurrency} from './SupportedCurrency';
+import type {SupportedCurrency} from './SupportedCurrency';
 
 // https://stripe.com/docs/api#invoice_object
 export interface PaymentStripeInvoice {

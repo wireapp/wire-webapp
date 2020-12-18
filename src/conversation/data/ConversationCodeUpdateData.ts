@@ -17,6 +17,6 @@
  *
  */
 
-import {ConversationCode} from '../ConversationCode';
+import type {ConversationCode} from '../ConversationCode';
 
 export type ConversationCodeUpdateData = Required<ConversationCode>;

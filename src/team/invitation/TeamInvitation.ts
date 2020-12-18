@@ -17,7 +17,7 @@
  *
  */
 
-import {Role} from '../member';
+import type {Role} from '../member';
 
 export interface TeamInvitation {
   created_at: string;

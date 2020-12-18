@@ -17,9 +17,9 @@
  *
  */
 
-import {Cookie as ToughCookie} from 'tough-cookie';
+import type {Cookie as ToughCookie} from 'tough-cookie';
 
-import {AccessTokenData} from '../auth';
+import type {AccessTokenData} from '../auth';
 
 const obfuscationLengthLimit = 20;
 
