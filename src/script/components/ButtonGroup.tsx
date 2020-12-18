@@ -61,12 +61,14 @@ const buttonGroupItemActiveStyles: CSSObject = {
 
 const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onChangeItem}) => {
   return (
-    <div css={{...buttonGroupWrapperStyles, ...style}}>
+    <div css={{...buttonGroupWrapperStyles, ...style}} data-uie-name="button-group-wrapper">
       {items.map(item => (
         <div
           key={item}
           css={item === currentItem ? buttonGroupItemActiveStyles : buttonGroupItemStyles}
           onClick={() => onChangeItem(item)}
+          data-uie-name="button-group-item"
+          data-uie-value={item === currentItem ? 'active' : 'inactive'}
         >
           {item}
         </div>
