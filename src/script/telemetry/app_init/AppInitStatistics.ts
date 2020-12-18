@@ -40,7 +40,7 @@ export class AppInitStatistics {
   constructor() {
     this.logger = getLogger('AppInitStatistics');
     this.statistics = {};
-    amplify.subscribe(WebAppEvents.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests.bind(this));
+    amplify.subscribe(WebAppEvents.TELEMETRY.BACKEND_REQUESTS, this.update_backend_requests);
   }
 
   add(statistic: AppInitStatisticsValue, value: string | number, bucket_size?: number): void {
@@ -61,7 +61,7 @@ export class AppInitStatistics {
     this.logger.debug('App initialization statistics', this.statistics);
   }
 
-  update_backend_requests(number_of_requests: number): void {
+  update_backend_requests = (number_of_requests: number): void => {
     this.statistics[AppInitStatisticsValue.BACKEND_REQUESTS] = number_of_requests;
-  }
+  };
 }

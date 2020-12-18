@@ -30,7 +30,6 @@ class MediaParser {
   embeds: ((link: HTMLAnchorElement, message: string, themeColor: string) => string)[];
 
   constructor() {
-    this.renderMediaEmbeds = this.renderMediaEmbeds.bind(this);
     this.showEmbed = true;
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.showEmbed = settings.previews.send;
@@ -51,14 +50,14 @@ class MediaParser {
    * @param themeColor Accent color to be applied to the embed
    * @returns Message with rendered media embeds
    */
-  renderMediaEmbeds(message: string, themeColor: string): string {
+  renderMediaEmbeds = (message: string, themeColor: string): string => {
     if (this.showEmbed) {
       getLinksFromHtml<HTMLAnchorElement>(message).forEach(link => {
         this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
       });
     }
     return message;
-  }
+  };
 }
 
 export const mediaParser = new MediaParser();

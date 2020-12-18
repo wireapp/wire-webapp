@@ -39,8 +39,6 @@ export class TimedMessagesViewModel extends BasePanelViewModel {
   constructor(params: PanelViewModelProps) {
     super(params);
 
-    this.timedMessageChange = this.timedMessageChange.bind(this);
-
     this.conversationRepository = params.repositories.conversation;
 
     this.currentMessageTimer = ko.observable(0);
@@ -79,14 +77,14 @@ export class TimedMessagesViewModel extends BasePanelViewModel {
     });
   }
 
-  timedMessageChange(_: TimedMessagesViewModel, event: KeyboardEvent): void {
+  timedMessageChange = (_: TimedMessagesViewModel, event: KeyboardEvent): void => {
     if (this.activeConversation()) {
       const timer = parseInt((event.target as HTMLInputElement).value, 10);
       const finalTimer = timer === 0 ? null : timer;
       this.activeConversation().globalMessageTimer(finalTimer);
       this.conversationRepository.updateConversationMessageTimer(this.activeConversation(), finalTimer);
     }
-  }
+  };
 
   getElementId(): string {
     return 'timed-messages';

@@ -115,16 +115,16 @@ export class SingleInstanceHandler {
     return singleInstanceCookie?.appInstanceId === this.instanceId;
   }
 
-  private _checkSingleInstance(): void {
+  private readonly _checkSingleInstance = (): void => {
     if (!this._isSingleRunningInstance()) {
       // warn listeners if the app has started in another instance
       this.onOtherInstanceStarted();
     }
-  }
+  };
 
   private _startSingleInstanceCheck(): void {
     this._stopSingleInstanceCheck();
-    checkIntervalId = window.setInterval(this._checkSingleInstance.bind(this), CONFIG.INTERVAL);
+    checkIntervalId = window.setInterval(this._checkSingleInstance, CONFIG.INTERVAL);
   }
 
   private _stopSingleInstanceCheck(): void {

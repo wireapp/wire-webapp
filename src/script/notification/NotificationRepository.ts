@@ -160,11 +160,11 @@ export class NotificationRepository {
   }
 
   subscribeToEvents(): void {
-    amplify.subscribe(WebAppEvents.NOTIFICATION.NOTIFY, this.notify.bind(this));
-    amplify.subscribe(WebAppEvents.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState.bind(this));
-    amplify.subscribe(WebAppEvents.NOTIFICATION.REMOVE_READ, this.removeReadNotifications.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty.bind(this));
+    amplify.subscribe(WebAppEvents.NOTIFICATION.NOTIFY, this.notify);
+    amplify.subscribe(WebAppEvents.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState);
+    amplify.subscribe(WebAppEvents.NOTIFICATION.REMOVE_READ, this.removeReadNotifications);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty);
   }
 
   /**
@@ -210,11 +210,11 @@ export class NotificationRepository {
    * Display browser notification and play sound notification.
    * @returns Resolves when notification has been handled
    */
-  notify(
+  notify = (
     messageEntity: ContentMessage,
     connectionEntity: ConnectionEntity,
     conversationEntity: Conversation,
-  ): Promise<void> {
+  ): Promise<void> => {
     const isUserAway = this.selfUser().availability() === Availability.Type.AWAY;
     const isComposite = messageEntity.isComposite();
 
@@ -240,7 +240,7 @@ export class NotificationRepository {
     }
 
     return Promise.resolve();
-  }
+  };
 
   /** Remove notifications from the queue that are no longer unread */
   removeReadNotifications(): void {
@@ -261,24 +261,24 @@ export class NotificationRepository {
     });
   }
 
-  updatedProperties(properties: WebappProperties): void {
+  updatedProperties = (properties: WebappProperties): void => {
     const notificationPreference = properties.settings.notifications;
     return this.notificationsPreference(notificationPreference);
-  }
+  };
 
-  updatedNotificationsProperty(notificationPreference: NotificationPreference): void {
+  updatedNotificationsProperty = (notificationPreference: NotificationPreference): void => {
     return this.notificationsPreference(notificationPreference);
-  }
+  };
 
   /**
    * Set the permission state.
    * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
-  updatePermissionState(permissionState: PermissionState | PermissionStatusState): Promise<boolean> {
+  updatePermissionState = (permissionState: PermissionState | PermissionStatusState): Promise<boolean> => {
     this.permissionState(permissionState);
     return this.checkPermissionState();
-  }
+  };
 
   /**
    * Creates the notification body for calls.

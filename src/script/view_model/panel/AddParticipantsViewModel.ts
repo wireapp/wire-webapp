@@ -146,7 +146,6 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     );
 
     this.searchInput.subscribe(this.searchServices);
-    this.clickOnSelectService = this.clickOnSelectService.bind(this);
 
     this.manageServicesUrl = getManageServicesUrl('client_landing');
   }
@@ -164,13 +163,13 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.searchServices();
   }
 
-  clickOnSelectService(serviceEntity: ServiceEntity): void {
+  clickOnSelectService = (serviceEntity: ServiceEntity): void => {
     this.selectedService(serviceEntity);
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
       addMode: true,
       entity: serviceEntity,
     });
-  }
+  };
 
   clickToAddParticipants(): void {
     this.addMembers();

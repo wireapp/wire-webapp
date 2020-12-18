@@ -76,7 +76,7 @@ export class PreferencesOptionsViewModel {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
     this.updateProperties(this.propertiesRepository.properties);
 
     this.AudioPreference = AudioPreference;

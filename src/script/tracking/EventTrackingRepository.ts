@@ -216,18 +216,18 @@ export class EventTrackingRepository {
         });
   }
 
-  private stopProductReportingSession(): void {
+  private readonly stopProductReportingSession = (): void => {
     if (this.isProductReportingActivated === true) {
       Countly.end_session();
     }
-  }
+  };
 
   private subscribeToProductEvents(): void {
     amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, segmentations?: any) => {
       this.trackProductReportingEvent(eventName, segmentations);
     });
 
-    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession);
   }
 
   private startProductReportingSession(): void {

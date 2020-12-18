@@ -348,8 +348,8 @@ class App {
    * Subscribe to amplify events.
    */
   private _subscribeToEvents() {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
-    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh);
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
     amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
       this.logger.info(`Access token refresh triggered by "${source}"...`);
       try {
@@ -476,7 +476,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository['userState'].isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
-        startNewVersionPolling(Environment.version(false), this.update.bind(this));
+        startNewVersionPolling(Environment.version(false), this.update);
       }
       audioRepository.init(true);
       conversationRepository.cleanup_conversations();
@@ -735,7 +735,7 @@ class App {
    * @param signOutReason Cause for logout
    * @param clearData Keep data in database
    */
-  logout(signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void {
+  logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
@@ -818,12 +818,12 @@ class App {
 
     this.logger.warn('No internet access. Continuing when internet connectivity regained.');
     $(window).on('online', () => _logoutOnBackend());
-  }
+  };
 
   /**
    * Refresh the web app or desktop wrapper
    */
-  refresh(): void {
+  refresh = (): void => {
     this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
@@ -833,14 +833,14 @@ class App {
 
     window.location.reload();
     window.focus();
-  }
+  };
 
   /**
    * Notify about found update
    */
-  update(): void {
+  update = (): void => {
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
-  }
+  };
 
   /**
    * Redirect to the login page after internet connectivity has been verified.

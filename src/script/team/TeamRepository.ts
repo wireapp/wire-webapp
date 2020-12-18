@@ -99,7 +99,7 @@ export class TeamRepository {
       );
     };
 
-    amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent.bind(this));
+    amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent);
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
@@ -201,7 +201,7 @@ export class TeamRepository {
     return IntegrationMapper.mapServicesFromArray(servicesData);
   }
 
-  onTeamEvent(eventJson: any, source: typeof EventRepository.SOURCE): void {
+  onTeamEvent = (eventJson: any, source: typeof EventRepository.SOURCE): void => {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
@@ -237,7 +237,7 @@ export class TeamRepository {
         this.onUnhandled(eventJson);
       }
     }
-  }
+  };
 
   async sendAccountInfo(isDesktop: true): Promise<AccountInfo>;
   async sendAccountInfo(isDesktop?: false): Promise<void>;

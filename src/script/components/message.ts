@@ -200,8 +200,6 @@ class Message {
 
     this.hasReadReceiptsTurnedOn = this.conversationRepository.expectReadReceipt(this.conversation());
 
-    this.bindShowMore = this.bindShowMore.bind(this);
-
     this.readReceiptTooltip = ko.pureComputed(() => {
       const receipts = this.message.readReceipts();
       if (!receipts.length || !this.conversation().is1to1()) {
@@ -340,7 +338,7 @@ class Message {
     Context.from(event, entries, 'message-options-menu');
   }
 
-  bindShowMore(elements: HTMLElement[], scope: Message) {
+  bindShowMore = (elements: HTMLElement[], scope: Message) => {
     const label = elements.find(element => element.className === 'message-header-label');
     if (!label) {
       return;
@@ -349,7 +347,7 @@ class Message {
     if (link) {
       link.addEventListener('click', () => this.onClickParticipants((scope.message as any).highlightedUsers()));
     }
-  }
+  };
 }
 
 // If this is not explicitly defined as string,

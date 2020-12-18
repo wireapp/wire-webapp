@@ -101,9 +101,6 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
   constructor(params: PanelViewModelProps) {
     super(params);
-    this.clickOnShowService = this.clickOnShowService.bind(this);
-    this.clickOnShowUser = this.clickOnShowUser.bind(this);
-
     const {mainViewModel, repositories} = params;
 
     this.userState = container.resolve(UserState);
@@ -402,13 +399,13 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.navigateTo(PanelViewModel.STATE.NOTIFICATIONS);
   }
 
-  clickOnShowUser(userEntity: User): void {
+  clickOnShowUser = (userEntity: User): void => {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
-  }
+  };
 
-  clickOnShowService(serviceEntity: ServiceEntity): void {
+  clickOnShowService = (serviceEntity: ServiceEntity): void => {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
-  }
+  };
 
   clickToArchive(): void {
     this.actionsViewModel.archiveConversation(this.activeConversation());
