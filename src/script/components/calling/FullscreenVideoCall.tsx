@@ -34,7 +34,7 @@ import type {Call} from '../../calling/Call';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import type {CallActions} from '../../view_model/CallingViewModel';
+import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import Duration from './Duration';
 import NamedIcon from 'Components/NamedIcon';
@@ -51,6 +51,7 @@ export interface FullscreenVideoCallProps {
   multitasking: Multitasking;
   videoGrid: Grid;
   videoInput: (ElectronDesktopCapturerSource | MediaDeviceInfo)[];
+  videoSpeakersActiveTab: string;
 }
 
 const FullscreenVideoCallConfig = {
@@ -84,6 +85,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   multitasking,
   videoGrid,
   videoInput,
+  videoSpeakersActiveTab,
 }) => {
   const selfSharesScreen = call.getSelfParticipant().sharesScreen();
   const selfSharesCamera = call.getSelfParticipant().sharesCamera();
@@ -125,10 +127,24 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     };
   }, [videoGrid]);
 
+  const activeVideoSpeakers = call.getActiveVideoSpeakers();
+
   return (
     <div id="video-calling" className="video-calling" ref={onRefChange}>
       <div id="video-element-remote" className="video-element-remote">
-        <GroupVideoGrid grid={videoGrid} muted={isMuted} selfParticipant={call.getSelfParticipant()} />
+        <GroupVideoGrid
+          muted={isMuted}
+          selfParticipant={call.getSelfParticipant()}
+          grid={
+            videoSpeakersActiveTab === VideoSpeakersTabs.speakers
+              ? {
+                  grid: activeVideoSpeakers,
+                  hasRemoteVideo: activeVideoSpeakers.length > 0,
+                  thumbnail: null,
+                }
+              : videoGrid
+          }
+        />
       </div>
 
       {!isChoosingScreen && <div className="video-element-overlay hide-controls-hidden"></div>}
@@ -143,9 +159,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls hide-controls-hidden">
           <ButtonGroup
-            items={['all', 'speakers']}
-            onChangeItem={() => {}}
-            currentItem="all"
+            items={Object.values(VideoSpeakersTabs)}
+            onChangeItem={item => callActions.setVideoSpeakersActiveTab(item)}
+            currentItem={videoSpeakersActiveTab}
             style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
           />
           <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
@@ -242,5 +258,5 @@ export default FullscreenVideoCall;
 registerReactComponent('fullscreen-video-call', {
   component: FullscreenVideoCall,
   template:
-    '<div data-bind="react: {call, callActions, canShareScreen, mediaDevicesHandler, multitasking, videoInput: ko.unwrap(videoInput), conversation: ko.unwrap(conversation), isChoosingScreen: ko.unwrap(isChoosingScreen), isMuted: ko.unwrap(isMuted), videoGrid: ko.unwrap(videoGrid)}"></div>',
+    '<div data-bind="react: {call, callActions, videoSpeakersActiveTab: ko.unwrap(videoSpeakersActiveTab), canShareScreen, mediaDevicesHandler, multitasking, videoInput: ko.unwrap(videoInput), conversation: ko.unwrap(conversation), isChoosingScreen: ko.unwrap(isChoosingScreen), isMuted: ko.unwrap(isMuted), videoGrid: ko.unwrap(videoGrid)}"></div>',
 });

@@ -37,7 +37,7 @@ import type {CallingRepository} from '../../calling/CallingRepository';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
-import type {CallActions} from '../../view_model/CallingViewModel';
+import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import type {TeamRepository} from 'src/script/team/TeamRepository';
 import {Participant} from '../../calling/Participant';
@@ -53,6 +53,7 @@ interface ComponentParams {
   teamRepository: TeamRepository;
   temporaryUserStyle?: boolean;
   videoGrid: ko.PureComputed<Grid>;
+  videoSpeakersActiveTab: ko.Observable<string>;
 }
 
 class ConversationListCallingCell {
@@ -90,6 +91,7 @@ class ConversationListCallingCell {
   readonly participants: ko.PureComputed<Participant[]>;
   readonly selfParticipant: Participant;
   readonly teamRepository: TeamRepository;
+  readonly videoSpeakersActiveTab: ko.Observable<string>;
 
   constructor({
     call,
@@ -101,6 +103,7 @@ class ConversationListCallingCell {
     callActions,
     teamRepository,
     hasAccessToCamera,
+    videoSpeakersActiveTab,
     isSelfVerified = ko.observable(false),
   }: ComponentParams) {
     this.call = call;
@@ -112,7 +115,7 @@ class ConversationListCallingCell {
     this.callActions = callActions;
     this.AVATAR_SIZE = AVATAR_SIZE;
     this.isSelfVerified = isSelfVerified;
-
+    this.videoSpeakersActiveTab = videoSpeakersActiveTab;
     this.conversationUrl = generateConversationUrl(conversation().id);
     this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
 
@@ -217,6 +220,19 @@ class ConversationListCallingCell {
     // Once there is a new solution to this, this needs to go.
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }
+
+  calculateGrid(): Grid {
+    if (this.videoSpeakersActiveTab() === VideoSpeakersTabs.all) {
+      return this.videoGrid();
+    }
+
+    const activeVideoSpeakers = this.call.getActiveVideoSpeakers();
+    return {
+      grid: activeVideoSpeakers,
+      hasRemoteVideo: activeVideoSpeakers.length > 0,
+      thumbnail: null,
+    };
+  }
 }
 
 ko.components.register('conversation-list-calling-cell', {
@@ -275,7 +291,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <!-- ko if: showVideoGrid() -->
         <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
-          <group-video-grid params="minimized: true, grid: videoGrid, selfParticipant: selfParticipant"></group-video-grid>
+          <group-video-grid params="minimized: true, grid: calculateGrid(), selfParticipant: selfParticipant"></group-video-grid>
           <!-- ko if: showMaximize() -->
             <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
               <fullscreen-icon></fullscreen-icon>
