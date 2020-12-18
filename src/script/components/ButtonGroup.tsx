@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/core';
 export interface ButtonGroupProps {
   currentItem: string;
   items: string[];
-  onChangeItem: (item: string) => any;
+  onChangeItem: (item: string) => void;
   style?: CSSObject;
 }
 
