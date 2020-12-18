@@ -17,9 +17,10 @@
  *
  */
 
-import {ConversationEventData, TeamEventData, UserEventData} from '@wireapp/api-client/src/event/';
-import {ConversationContent} from '../content';
-import {Message} from './Message';
+import type {ConversationEventData, TeamEventData, UserEventData} from '@wireapp/api-client/src/event/';
+
+import type {ConversationContent} from '../content';
+import type {Message} from './Message';
 
 export type PayloadBundleContent = ConversationContent | ConversationEventData | TeamEventData | UserEventData;
 

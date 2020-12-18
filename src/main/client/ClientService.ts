@@ -17,14 +17,13 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {LoginData, PreKey} from '@wireapp/api-client/src/auth/';
+import type {APIClient} from '@wireapp/api-client';
+import type {LoginData, PreKey} from '@wireapp/api-client/src/auth/';
 import {ClientClassification, ClientType, NewClient, RegisteredClient} from '@wireapp/api-client/src/client/';
-import {CRUDEngine} from '@wireapp/store-engine';
-import {CryptographyService} from '../cryptography/';
-import {ClientInfo} from './';
-import {ClientBackendRepository} from './ClientBackendRepository';
-import {ClientDatabaseRepository} from './ClientDatabaseRepository';
+import type {CRUDEngine} from '@wireapp/store-engine';
+
+import type {CryptographyService} from '../cryptography/';
+import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
 
 export interface MetaClient extends RegisteredClient {
   meta: {

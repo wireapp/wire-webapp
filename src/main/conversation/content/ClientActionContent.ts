@@ -17,6 +17,6 @@
  *
  */
 
-import {IGenericMessage} from '@wireapp/protocol-messaging';
+import type {IGenericMessage} from '@wireapp/protocol-messaging';
 
 export type ClientActionContent = Required<Pick<IGenericMessage, 'clientAction'>>;

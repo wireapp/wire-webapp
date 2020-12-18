@@ -18,7 +18,7 @@
  */
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 import {
   Conversation,
   CONVERSATION_TYPE,
@@ -30,8 +30,8 @@ import {
   UserClients,
 } from '@wireapp/api-client/src/conversation/';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data/';
-import {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event/';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event/';
+import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {
   Asset,
   ButtonAction,
@@ -50,8 +50,9 @@ import {
   MessageHide,
   Reaction,
 } from '@wireapp/protocol-messaging';
-import {AxiosError} from 'axios';
+import type {AxiosError} from 'axios';
 import {Encoder} from 'bazinga64';
+
 import {
   AssetService,
   AssetTransferState,
@@ -61,14 +62,12 @@ import {
   PayloadBundleState,
   PayloadBundleType,
 } from '../conversation/';
-
-import {AssetContent, ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
-
-import {CryptographyService, EncryptedAsset} from '../cryptography/';
+import type {AssetContent, ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
+import type {CryptographyService, EncryptedAsset} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {MessageBuilder} from './message/MessageBuilder';
 import {MessageToProtoMapper} from './message/MessageToProtoMapper';
-import {
+import type {
   ButtonActionConfirmationMessage,
   ButtonActionMessage,
   CallMessage,

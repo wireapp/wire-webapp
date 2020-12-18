@@ -17,8 +17,9 @@
  *
  */
 
-import {IQuote} from '@wireapp/protocol-messaging';
-import {AssetContent, LocationContent, TextContent} from '../content/';
+import type {IQuote} from '@wireapp/protocol-messaging';
+
+import type {AssetContent, LocationContent, TextContent} from '../content/';
 
 export {IQuote as QuoteContent};
 

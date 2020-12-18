@@ -17,7 +17,7 @@
  *
  */
 
-import {EncryptedAsset} from '../cryptography/';
+import type {EncryptedAsset} from '../cryptography/';
 const {crypto} = window;
 
 const isEqual = (a: Buffer, b: Buffer): boolean => {

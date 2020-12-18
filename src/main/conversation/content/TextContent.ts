@@ -17,7 +17,7 @@
  *
  */
 
-import {LegalHoldStatus, LinkPreviewUploadedContent, MentionContent, QuoteContent} from '../content/';
+import type {LegalHoldStatus, LinkPreviewUploadedContent, MentionContent, QuoteContent} from '../content/';
 
 export interface TextContent {
   expectsReadConfirmation?: boolean;

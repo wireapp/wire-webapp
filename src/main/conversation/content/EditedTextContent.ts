@@ -17,7 +17,7 @@
  *
  */
 
-import {QuoteContent, TextContent} from '../content/';
+import type {QuoteContent, TextContent} from '../content/';
 
 export interface EditedTextContent extends TextContent {
   originalMessageId: string;

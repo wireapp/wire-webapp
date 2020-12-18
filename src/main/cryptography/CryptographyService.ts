@@ -17,20 +17,21 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {PreKey as SerializedPreKey} from '@wireapp/api-client/src/auth/';
-import {RegisteredClient} from '@wireapp/api-client/src/client/';
-import {OTRRecipients} from '@wireapp/api-client/src/conversation/';
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {APIClient} from '@wireapp/api-client';
+import type {PreKey as SerializedPreKey} from '@wireapp/api-client/src/auth/';
+import type {RegisteredClient} from '@wireapp/api-client/src/client/';
+import type {OTRRecipients} from '@wireapp/api-client/src/conversation/';
+import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
+import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
-import {CRUDEngine} from '@wireapp/store-engine';
+import type {CRUDEngine} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 import logdown from 'logdown';
+
 import {GenericMessageType, PayloadBundle, PayloadBundleSource} from '../conversation';
-import {SessionPayloadBundle} from '../cryptography/';
+import type {SessionPayloadBundle} from '../cryptography/';
 import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
 import {GenericMessageMapper} from './GenericMessageMapper';
 

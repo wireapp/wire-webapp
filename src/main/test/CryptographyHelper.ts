@@ -19,10 +19,10 @@
 
 import {Cryptobox} from '@wireapp/cryptobox';
 import * as Proteus from '@wireapp/proteus';
-import {PreKey} from '@wireapp/proteus/src/main/keys';
+import type {PreKey} from '@wireapp/proteus/src/main/keys';
 import * as bazinga64 from 'bazinga64';
 
-import {CryptographyService} from '../cryptography';
+import type {CryptographyService} from '../cryptography';
 
 const StoreHelper = require('./StoreHelper');
 
