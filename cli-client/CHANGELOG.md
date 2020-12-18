@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [8.1.223](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@8.1.222...@wireapp/cli-client@8.1.223) (2020-12-18)
+
+**Note:** Version bump only for package @wireapp/cli-client
+
+
+
+
+
 ## [8.1.222](https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client/compare/@wireapp/cli-client@8.1.221...@wireapp/cli-client@8.1.222) (2020-12-17)
 
 **Note:** Version bump only for package @wireapp/cli-client
