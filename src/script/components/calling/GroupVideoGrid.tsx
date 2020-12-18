@@ -76,7 +76,6 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
 
-  console.info('bardia video grid re-render videoParticipants', videoParticipants);
   return (
     <div className="group-video">
       <div
