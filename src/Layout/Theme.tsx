@@ -21,6 +21,7 @@
 import {jsx} from '@emotion/core';
 import React from 'react';
 import {ThemeProvider as EmotionThemeProvider} from 'emotion-theming';
+
 import {COLOR} from '../Identity/colors';
 import {filterProps} from '../util';
 

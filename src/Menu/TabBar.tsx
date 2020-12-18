@@ -20,8 +20,9 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
+
 import {COLOR} from '../Identity';
-import {Theme} from '../Layout';
+import type {Theme} from '../Layout';
 import {TextProps, textStyle} from '../Text';
 import {filterProps} from '../util';
 

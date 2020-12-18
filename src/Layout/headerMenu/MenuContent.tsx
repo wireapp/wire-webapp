@@ -19,7 +19,8 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
-import {TextProps} from '../../Text';
+
+import type {TextProps} from '../../Text';
 import {filterProps} from '../../util';
 import {contentStyle} from '../Content';
 

@@ -20,9 +20,10 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 import React from 'react';
+
 import {COLOR} from '../Identity';
 import {Loading} from '../Misc';
-import {InputProps} from './Input';
+import type {InputProps} from './Input';
 
 export interface SwitchProps<T = HTMLInputElement> extends InputProps<T> {
   activatedColor?: string;

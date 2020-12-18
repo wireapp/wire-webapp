@@ -19,7 +19,8 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
-import {Theme} from '../Layout';
+
+import type {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 import {TextProps, filterTextProps, textStyle} from './Text';
 

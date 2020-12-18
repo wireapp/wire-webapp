@@ -20,6 +20,7 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
+
 import {QueryKeys, media} from '../mediaQueries';
 import {filterProps} from '../util';
 import {GUTTER, WIDTH} from './sizes';

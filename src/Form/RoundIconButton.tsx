@@ -20,9 +20,10 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
-import {SVGIconProps} from '../Icon/SVGIcon';
+
+import type {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
-import {Theme} from '../Layout';
+import type {Theme} from '../Layout';
 import {childrenWithDefaultProps} from '../Misc/';
 import {ButtonProps, buttonStyle, filterButtonProps} from './Button';
 

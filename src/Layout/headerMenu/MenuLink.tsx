@@ -19,10 +19,11 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
+
 import {QueryKeys, media} from '../../mediaQueries';
 import {LinkProps, filterLinkProps, linkStyle} from '../../Text';
 import {filterProps} from '../../util';
-import {Theme} from '../Theme';
+import type {Theme} from '../Theme';
 import {DESKTOP_HEADER_SUB_MENU_CLASSNAME} from './HeaderSubMenu';
 
 export interface MenuLinkProps<T = HTMLAnchorElement> extends LinkProps<T> {

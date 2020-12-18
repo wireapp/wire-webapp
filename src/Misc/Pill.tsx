@@ -20,9 +20,10 @@
 /** @jsx jsx */
 import {CSSObject, jsx, keyframes} from '@emotion/core';
 import React from 'react';
+
 import {COLOR} from '../Identity';
 import {DURATION, EASE} from '../Identity/motions';
-import {Theme} from '../Layout';
+import type {Theme} from '../Layout';
 import {filterProps} from '../util';
 
 export interface PillProps<T = HTMLSpanElement> extends React.HTMLProps<T> {

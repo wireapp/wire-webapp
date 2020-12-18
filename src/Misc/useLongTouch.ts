@@ -18,6 +18,7 @@
  */
 
 import {useEffect} from 'react';
+
 import {useTimeout} from './useTimeout';
 
 const useLongTouch = (element: HTMLElement | null, onLongTouch: () => void, touchDuration = 800) => {

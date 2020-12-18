@@ -19,8 +19,9 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
+
 import {COLOR} from '../Identity/colors';
-import {Theme} from '../Layout';
+import type {Theme} from '../Layout';
 import {LinkProps, filterLinkProps, linkStyle} from './Link';
 
 export type TextLinkProps<T = HTMLAnchorElement> = LinkProps<T>;

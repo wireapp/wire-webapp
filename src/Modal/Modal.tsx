@@ -21,10 +21,11 @@
 import {CSSObject, jsx} from '@emotion/core';
 import React, {CSSProperties} from 'react';
 import Color from 'color';
+
 import {CloseIcon} from '../Icon';
-import {SVGIconProps} from '../Icon/SVGIcon';
+import type {SVGIconProps} from '../Icon/SVGIcon';
 import {COLOR} from '../Identity';
-import {Theme} from '../Layout';
+import type {Theme} from '../Layout';
 import {QueryKeys, media} from '../mediaQueries';
 import {filterProps, noop} from '../util';
 import {OverlayBackgroundProps, OverlayWrapper, overlayBackgroundStyle} from './Overlay';

@@ -20,6 +20,7 @@
 /** @jsx jsx */
 import React from 'react';
 import {CSSObject, jsx} from '@emotion/core';
+
 import {COLOR} from '../Identity';
 import {INPUT_CLASSNAME} from './Input';
 import {INPUT_SUBMIT_COMBO_CLASSNAME} from './InputSubmitCombo';

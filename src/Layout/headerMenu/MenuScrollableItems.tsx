@@ -20,6 +20,7 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
+
 import {QueryKeys, media} from '../../mediaQueries';
 
 export interface MenuScrollableItemsProps<T = HTMLDivElement> extends React.HTMLProps<T> {

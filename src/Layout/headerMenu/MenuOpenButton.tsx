@@ -20,9 +20,10 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
+
 import {QueryKeys, media} from '../../mediaQueries';
 import {filterProps} from '../../util';
-import {Theme} from '../Theme';
+import type {Theme} from '../Theme';
 
 export interface MenuOpenButtonProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;

@@ -19,6 +19,7 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
+
 import {INPUT_CLASSNAME, InputProps, inputStyle} from './Input';
 import {COLOR} from '../Identity';
 
