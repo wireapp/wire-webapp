@@ -111,6 +111,11 @@ export class Call {
     return this.participants().filter(p => p.isActivelySpeaking());
   }
 
+  getActiveVideoSpeakers = () =>
+    this.getActiveSpeakers()
+      .filter(p => p.hasActiveVideo())
+      .slice(0, 4);
+
   addParticipant(participant: Participant): void {
     this.participants.push(participant);
   }
