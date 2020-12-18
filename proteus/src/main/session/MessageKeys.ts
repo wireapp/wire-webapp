@@ -19,8 +19,7 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import {CipherKey} from '../derived/CipherKey';
-import {MacKey} from '../derived/MacKey';
+import {CipherKey, MacKey} from '../derived/';
 import {DecodeError} from '../errors';
 
 export class MessageKeys {

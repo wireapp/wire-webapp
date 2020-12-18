@@ -17,7 +17,7 @@
  *
  */
 
-import {Connection} from '../connection/';
+import type {Connection} from '../connection/';
 
 export interface UserConnectionList {
   connections: Connection[];

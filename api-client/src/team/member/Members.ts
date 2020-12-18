@@ -17,7 +17,7 @@
  *
  */
 
-import {MemberData} from './MemberData';
+import type {MemberData} from './MemberData';
 
 export interface Members {
   hasMore: boolean;

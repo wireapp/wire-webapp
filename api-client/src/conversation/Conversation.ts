@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationMembers} from './';
+import type {ConversationMembers} from './';
 
 export enum CONVERSATION_TYPE {
   REGULAR = 0,

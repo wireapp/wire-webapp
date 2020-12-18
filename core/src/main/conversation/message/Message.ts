@@ -17,8 +17,8 @@
  *
  */
 
-import {OtrMessage} from './OtrMessage';
-import {TeamMessage} from './TeamMessage';
-import {UserMessage} from './UserMessage';
+import type {OtrMessage} from './OtrMessage';
+import type {TeamMessage} from './TeamMessage';
+import type {UserMessage} from './UserMessage';
 
 export type Message = OtrMessage | TeamMessage | UserMessage;

@@ -20,6 +20,7 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 import React, {ReactFragment, useEffect, useState} from 'react';
+
 import {QUERY, QueryKeys} from '../mediaQueries';
 
 type Query = string | keyof QueryKeys;

@@ -19,11 +19,10 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import {InputError} from '../errors/InputError';
 import {PublicKey} from '../keys/PublicKey';
-import {Message} from './Message';
 import {SessionTag} from './SessionTag';
-import {DecodeError} from '../errors';
+import {Message} from './Message';
+import {DecodeError, InputError} from '../errors';
 
 export class CipherMessage extends Message {
   readonly cipher_text: Uint8Array;

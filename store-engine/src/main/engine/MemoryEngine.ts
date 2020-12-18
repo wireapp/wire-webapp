@@ -17,7 +17,7 @@
  *
  */
 
-import {CRUDEngine} from './CRUDEngine';
+import type {CRUDEngine} from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error/';
 
 export type MemoryStore = Record<string, Record<string, any>>;

@@ -17,10 +17,10 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
-import {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
-import {HttpClient} from '../http/';
+import type {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
+import type {HttpClient} from '../http/';
 
 export class ConnectionAPI {
   constructor(private readonly client: HttpClient) {}

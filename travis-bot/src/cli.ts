@@ -19,12 +19,13 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/src/auth/';
+import type {LoginData} from '@wireapp/api-client/src/auth/';
 import {ClientType} from '@wireapp/api-client/src/client/';
 import * as path from 'path';
+import logdown from 'logdown';
+
 import {MessageData, TravisBot} from './';
 
-import logdown from 'logdown';
 const {version}: {version: string} = require('../package.json');
 
 const logger = logdown('@wireapp/travis-bot/cli', {

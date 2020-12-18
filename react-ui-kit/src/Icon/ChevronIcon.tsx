@@ -19,6 +19,7 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
+
 import {ArrowProps, rotation} from './ArrowIcon';
 import {SVGIcon} from './SVGIcon';
 

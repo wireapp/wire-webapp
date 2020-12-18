@@ -17,7 +17,7 @@
  *
  */
 
-import {UserAsset} from '../../user/';
+import type {UserAsset} from '../../user/';
 
 export interface Service {
   assets: UserAsset[];

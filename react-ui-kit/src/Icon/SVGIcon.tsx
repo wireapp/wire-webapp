@@ -20,7 +20,8 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
-import {Theme} from '../Layout';
+
+import type {Theme} from '../Layout';
 
 export interface InternalSVGIconProps<T = SVGSVGElement> extends SVGIconProps<T> {
   realHeight: number;

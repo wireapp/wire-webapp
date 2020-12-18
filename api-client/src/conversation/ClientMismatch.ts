@@ -17,7 +17,7 @@
  *
  */
 
-import {UserClients} from './';
+import type {UserClients} from './';
 
 export interface ClientMismatch {
   deleted: UserClients;

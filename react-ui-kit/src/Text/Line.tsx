@@ -20,6 +20,7 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import React from 'react';
+
 import {COLOR} from '../Identity';
 import {GUTTER} from '../Layout/sizes';
 

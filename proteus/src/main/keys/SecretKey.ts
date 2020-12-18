@@ -20,10 +20,9 @@
 import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
 
-import {InputError} from '../errors/InputError';
-import * as ArrayUtil from '../util/ArrayUtil';
-import {PublicKey} from './PublicKey';
-import {DecodeError} from '../errors';
+import {ArrayUtil} from '../util/';
+import type {PublicKey} from './PublicKey';
+import {DecodeError, InputError} from '../errors';
 
 export class SecretKey {
   readonly sec_curve: Uint8Array;

@@ -18,6 +18,7 @@
  */
 
 import * as platform from 'platform';
+
 import {BROWSER, WEBAPP_SUPPORTED_BROWSERS} from '../config/CommonConfig';
 
 const UNKNOWN_PROPERTY = 'unknown';

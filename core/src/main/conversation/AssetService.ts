@@ -20,8 +20,9 @@
 import type {APIClient} from '@wireapp/api-client';
 import type {AssetOptions} from '@wireapp/api-client/src/asset';
 import type {ProgressCallback} from '@wireapp/api-client/src/http';
-import {FileContent, ImageContent} from '../conversation/content/';
-import {EncryptedAssetUploaded} from '../cryptography/';
+
+import type {FileContent, ImageContent} from '../conversation/content/';
+import type {EncryptedAssetUploaded} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 
 export class AssetService {

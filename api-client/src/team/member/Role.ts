@@ -18,7 +18,7 @@
  */
 
 import {Permissions, combinePermissions, hasPermissions} from './Permissions';
-import {PermissionsData} from './PermissionsData';
+import type {PermissionsData} from './PermissionsData';
 
 export enum Role {
   ADMIN = 'admin',

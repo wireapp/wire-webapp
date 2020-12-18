@@ -17,7 +17,7 @@
  *
  */
 
-import {CRUDEngine} from '@wireapp/store-engine';
+import type {CRUDEngine} from '@wireapp/store-engine';
 
 export enum DatabaseStores {
   AMPLIFY = 'amplify',

@@ -20,16 +20,9 @@
 import * as CBOR from '@wireapp/cbor';
 
 import {PublicKey} from '../keys/PublicKey';
-
-import {DecryptError} from '../errors/DecryptError';
-import {ProteusError} from '../errors/ProteusError';
-
-import {CipherMessage} from '../message/CipherMessage';
-import {Envelope} from '../message/Envelope';
-
-import {ChainKey} from './ChainKey';
-import {MessageKeys} from './MessageKeys';
-import {DecodeError} from '../errors';
+import {ChainKey, MessageKeys} from './';
+import {DecodeError, DecryptError, ProteusError} from '../errors';
+import type {CipherMessage, Envelope} from '../message/';
 
 export class RecvChain {
   chain_key: ChainKey;

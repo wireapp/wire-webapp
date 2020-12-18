@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
-import {GenericMessage} from '@wireapp/protocol-messaging';
+import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
+import type {GenericMessage} from '@wireapp/protocol-messaging';
 import logdown from 'logdown';
 import {
   GenericMessageType,
@@ -27,7 +27,7 @@ import {
   PayloadBundleState,
   PayloadBundleType,
 } from '../conversation';
-import {
+import type {
   AssetContent,
   ClearedContent,
   ConfirmationContent,
@@ -39,7 +39,7 @@ import {
   ReactionContent,
   TextContent,
 } from '../conversation/content';
-import {ButtonActionMessage} from '../conversation/message/OtrMessage';
+import type {ButtonActionMessage} from '../conversation/message/OtrMessage';
 
 export class GenericMessageMapper {
   private static readonly logger = logdown('@wireapp/core/cryptography/GenericMessageMapper', {

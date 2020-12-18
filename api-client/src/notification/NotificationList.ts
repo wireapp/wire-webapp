@@ -17,7 +17,7 @@
  *
  */
 
-import {Notification} from './Notification';
+import type {Notification} from './Notification';
 
 export interface NotificationList {
   has_more: boolean;

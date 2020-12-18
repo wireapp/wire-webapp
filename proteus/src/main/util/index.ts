@@ -17,10 +17,8 @@
  *
  */
 
-import * as ArrayUtil from './ArrayUtil';
-import * as KeyDerivationUtil from './KeyDerivationUtil';
-import * as MemoryUtil from './MemoryUtil';
-import * as RandomUtil from './RandomUtil';
-import * as WASMUtil from './WASMUtil';
-
-export {ArrayUtil, KeyDerivationUtil, MemoryUtil, RandomUtil, WASMUtil};
+export * as ArrayUtil from './ArrayUtil';
+export * as KeyDerivationUtil from './KeyDerivationUtil';
+export * as MemoryUtil from './MemoryUtil';
+export * as RandomUtil from './RandomUtil';
+export * as WASMUtil from './WASMUtil';

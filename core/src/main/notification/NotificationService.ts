@@ -17,19 +17,19 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 import * as Events from '@wireapp/api-client/src/event';
-import {Notification} from '@wireapp/api-client/src/notification/';
+import type {Notification} from '@wireapp/api-client/src/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {EventEmitter} from 'events';
-
 import logdown = require('logdown');
+
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '../conversation';
-import {AssetContent} from '../conversation/content';
+import type {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
 import * as OtrMessage from '../conversation/message/OtrMessage';
 import {CoreError, NotificationError} from '../CoreError';
-import {CryptographyService} from '../cryptography';
+import type {CryptographyService} from '../cryptography';
 import {UserMapper} from '../user/UserMapper';
 import {NotificationBackendRepository} from './NotificationBackendRepository';
 import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';

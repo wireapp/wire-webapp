@@ -17,11 +17,11 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http';
-import {ConversationRolesList} from '../../conversation/ConversationRole';
-import {TeamConversationList, TeamConversation} from './TeamConversation';
+import type {HttpClient} from '../../http';
+import type {ConversationRolesList} from '../../conversation/ConversationRole';
+import type {TeamConversationList, TeamConversation} from './TeamConversation';
 
 export class TeamConversationAPI {
   constructor(private readonly client: HttpClient) {}

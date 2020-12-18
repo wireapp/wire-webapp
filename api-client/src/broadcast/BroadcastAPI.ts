@@ -17,11 +17,11 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
-import {ClientMismatch, NewOTRMessage} from '../conversation/';
-import {HttpClient} from '../http/';
 import {ValidationError} from '../validation/';
+import type {ClientMismatch, NewOTRMessage} from '../conversation/';
+import type {HttpClient} from '../http/';
 
 export class BroadcastAPI {
   constructor(private readonly client: HttpClient) {}

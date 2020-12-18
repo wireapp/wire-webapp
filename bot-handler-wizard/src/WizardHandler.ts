@@ -20,8 +20,8 @@
 import {MessageHandler} from '@wireapp/bot-api';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
 import {Prompt, Wizardy} from 'wizardy';
-import {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
-import {TextContent} from '@wireapp/core/src/main/conversation/content';
+import type {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import type {TextContent} from '@wireapp/core/src/main/conversation/content';
 
 export {Prompt};
 

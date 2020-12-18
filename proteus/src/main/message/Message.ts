@@ -18,6 +18,7 @@
  */
 
 import * as CBOR from '@wireapp/cbor';
+
 import {DecodeError} from '../errors/DecodeError';
 
 export class Message {

@@ -18,10 +18,11 @@
  */
 
 import {EventEmitter} from 'events';
-import {CRUDEngine} from '../engine/';
+
 import {RecordAlreadyExistsError, RecordNotFoundError} from '../engine/error/';
-import {ExpiredBundle} from './ExpiredBundle';
 import {TransientBundle} from './TransientBundle';
+import type {CRUDEngine} from '../engine/';
+import type {ExpiredBundle} from './ExpiredBundle';
 
 enum TOPIC {
   EXPIRED = 'expired',

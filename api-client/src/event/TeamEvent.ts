@@ -17,7 +17,7 @@
  *
  */
 
-import {
+import type {
   TeamConversationCreateData,
   TeamConversationDeleteData,
   TeamMemberJoinData,

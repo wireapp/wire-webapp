@@ -19,10 +19,8 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import {InputError} from '../errors/InputError';
-
 import {KeyPair} from './KeyPair';
-import {DecodeError} from '../errors';
+import {DecodeError, InputError} from '../errors';
 
 /**
  * Pre-generated (and regularly refreshed) pre-keys.

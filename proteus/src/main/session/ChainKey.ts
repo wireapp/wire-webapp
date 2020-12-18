@@ -19,8 +19,7 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import {DerivedSecrets} from '../derived/DerivedSecrets';
-import {MacKey} from '../derived/MacKey';
+import {DerivedSecrets, MacKey} from '../derived/';
 import {MessageKeys} from './MessageKeys';
 import {DecodeError} from '../errors';
 

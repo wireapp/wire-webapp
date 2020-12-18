@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/src/event';
+
 import {MessageBuilder} from './message/MessageBuilder';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from './message/PayloadBundle';
 

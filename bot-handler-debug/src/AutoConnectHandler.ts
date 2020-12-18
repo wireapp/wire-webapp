@@ -19,7 +19,7 @@
 
 import {MessageHandler} from '@wireapp/bot-api';
 import {PayloadBundle, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
-import {Connection} from '@wireapp/api-client/src/connection';
+import type {Connection} from '@wireapp/api-client/src/connection';
 
 export class AutoConnectHandler extends MessageHandler {
   async handleEvent(payload: PayloadBundle): Promise<void> {

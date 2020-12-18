@@ -18,9 +18,10 @@
  */
 
 import logdown from 'logdown';
-import {Config} from './Config';
+
 import {Item} from './Item';
 import {Priority} from './Priority';
+import type {Config} from './Config';
 
 export class PriorityQueue {
   private readonly logger: logdown.Logger = logdown('@wireapp/priority-queue/PriorityQueue', {

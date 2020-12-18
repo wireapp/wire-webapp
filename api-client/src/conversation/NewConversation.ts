@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamInfo} from '../team/';
+import type {TeamInfo} from '../team/';
 
 export interface NewConversation {
   message_timer?: number;

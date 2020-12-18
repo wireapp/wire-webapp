@@ -19,7 +19,8 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
-import {Rotation} from './ArrowIcon';
+
+import type {Rotation} from './ArrowIcon';
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
 export interface Props extends SVGIconProps {

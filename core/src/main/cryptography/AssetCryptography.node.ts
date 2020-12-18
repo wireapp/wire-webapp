@@ -18,7 +18,8 @@
  */
 
 import * as crypto from 'crypto';
-import {EncryptedAsset} from '../cryptography/';
+
+import type {EncryptedAsset} from '../cryptography/';
 
 const isEqual = (a: Buffer, b: Buffer): boolean => {
   const arrayA = new Uint32Array(a);

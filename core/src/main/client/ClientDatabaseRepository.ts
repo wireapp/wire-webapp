@@ -17,10 +17,11 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/src/client/';
-import {CRUDEngine} from '@wireapp/store-engine';
+import type {RegisteredClient} from '@wireapp/api-client/src/client/';
+import type {CRUDEngine} from '@wireapp/store-engine';
+
 import {CryptographyService} from '../cryptography/';
-import {MetaClient} from './ClientService';
+import type {MetaClient} from './ClientService';
 
 export enum DatabaseStores {
   CLIENTS = 'clients',

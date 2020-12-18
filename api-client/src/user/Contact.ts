@@ -17,6 +17,6 @@
  *
  */
 
-import {User} from './User';
+import type {User} from './User';
 
 export type Contact = Pick<User, 'accent_id' | 'handle' | 'id' | 'name' | 'team'>;

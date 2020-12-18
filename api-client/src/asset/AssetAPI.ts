@@ -19,13 +19,13 @@
 
 import axios, {AxiosRequestConfig} from 'axios';
 
-import {handleProgressEvent, HttpClient, ProgressCallback, RequestCancelable, SyntheticErrorLabel} from '../http/';
-import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
-import {unsafeAlphanumeric} from '../shims/node/random';
-import {RequestCancellationError} from '../user';
 import {AssetRetentionPolicy} from './AssetRetentionPolicy';
-import {AssetUploadData} from './AssetUploadData';
+import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
+import {handleProgressEvent, HttpClient, ProgressCallback, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import {isValidToken, isValidUUID} from './AssetUtil';
+import {RequestCancellationError} from '../user';
+import {unsafeAlphanumeric} from '../shims/node/random';
+import type {AssetUploadData} from './AssetUploadData';
 
 export interface AssetOptions {
   public: boolean;

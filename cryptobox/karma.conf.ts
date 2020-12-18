@@ -16,7 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {Config} from 'karma';
+import type {Config} from 'karma';
 
 module.exports = (config: Config): void => {
   config.set({

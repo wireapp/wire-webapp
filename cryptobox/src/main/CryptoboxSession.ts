@@ -18,8 +18,9 @@
  */
 
 import {message as ProteusMessage, session as ProteusSession} from '@wireapp/proteus';
+
 import {DecryptionError} from './DecryptionError';
-import {CryptoboxCRUDStore} from './store/';
+import type {CryptoboxCRUDStore} from './store/';
 
 export class CryptoboxSession {
   public readonly id: string;

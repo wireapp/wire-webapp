@@ -21,7 +21,7 @@ import fs from 'fs-extra';
 import logdown from 'logdown';
 import path from 'path';
 
-import {CopyConfigOptions} from './CopyConfigOptions';
+import type {CopyConfigOptions} from './CopyConfigOptions';
 import * as utils from './utils';
 
 const defaultOptions: Required<CopyConfigOptions> = {

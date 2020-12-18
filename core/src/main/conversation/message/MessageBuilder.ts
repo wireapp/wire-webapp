@@ -17,13 +17,13 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
+import type {APIClient} from '@wireapp/api-client';
 import {ClientAction, Confirmation} from '@wireapp/protocol-messaging';
 import UUID from 'uuidjs';
 
 import {AbortReason, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '..';
-import {AssetService} from '../AssetService';
-import {
+import type {AssetService} from '../AssetService';
+import type {
   ButtonActionConfirmationContent,
   ButtonActionContent,
   CallingContent,
@@ -47,7 +47,7 @@ import {
   TextContent,
 } from '../content';
 import {CompositeContentBuilder} from './CompositeContentBuilder';
-import {
+import type {
   ButtonActionConfirmationMessage,
   ButtonActionMessage,
   CallMessage,

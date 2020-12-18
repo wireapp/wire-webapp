@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from 'karma';
+import type {Config} from 'karma';
 
 module.exports = (config: Config): void => {
   config.set({

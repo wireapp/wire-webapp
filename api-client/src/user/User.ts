@@ -17,10 +17,10 @@
  *
  */
 
-import {AccentColor} from '@wireapp/commons';
+import type {AccentColor} from '@wireapp/commons';
 
-import {ServiceRef} from '../conversation/';
-import {UserAsset} from '../user/';
+import type {ServiceRef} from '../conversation/';
+import type {UserAsset} from '../user/';
 
 export interface QualifiedUser {
   domain: string;

@@ -21,7 +21,8 @@
 import {Global, CSSObject, css, jsx} from '@emotion/core';
 import emotionNormalize from 'emotion-normalize';
 import {withTheme} from 'emotion-theming';
-import {Theme} from './Layout';
+
+import type {Theme} from './Layout';
 import {textLinkStyle} from './Text/TextLink';
 
 const globalStyles: (theme: Theme) => CSSObject = theme => ({

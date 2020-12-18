@@ -19,13 +19,10 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import {IdentityKey} from '../keys/IdentityKey';
-import {PublicKey} from '../keys/PublicKey';
-
-import {InputError} from '../errors/InputError';
-import {CipherMessage} from './CipherMessage';
+import {IdentityKey, PublicKey} from '../keys/';
+import {DecodeError, InputError} from '../errors/';
 import {Message} from './Message';
-import {DecodeError} from '../errors';
+import {CipherMessage} from './CipherMessage';
 
 export class PreKeyMessage extends Message {
   readonly base_key: PublicKey;

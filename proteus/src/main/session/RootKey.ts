@@ -19,13 +19,10 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import {CipherKey} from '../derived/CipherKey';
-import {DerivedSecrets} from '../derived/DerivedSecrets';
-import {InputError} from '../errors/InputError';
-import {KeyPair} from '../keys/KeyPair';
-import {PublicKey} from '../keys/PublicKey';
 import {ChainKey} from './ChainKey';
-import {DecodeError} from '../errors';
+import {CipherKey, DerivedSecrets} from '../derived/';
+import {DecodeError, InputError} from '../errors';
+import type {PublicKey, KeyPair} from '../keys/';
 
 export class RootKey {
   readonly key: CipherKey;

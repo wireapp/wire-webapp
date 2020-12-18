@@ -19,7 +19,7 @@
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {APIClient} from '@wireapp/api-client';
-import {RegisterData} from '@wireapp/api-client/src/auth';
+import type {RegisterData} from '@wireapp/api-client/src/auth';
 import {AUTH_COOKIE_KEY, AUTH_TABLE_NAME, Context, Cookie, CookieStore, LoginData} from '@wireapp/api-client/src/auth/';
 import {ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
 import * as Events from '@wireapp/api-client/src/event';
@@ -41,7 +41,7 @@ import {
   PayloadBundleType,
 } from './conversation/';
 import * as OtrMessage from './conversation/message/OtrMessage';
-import {CoreError, NotificationError} from './CoreError';
+import type {CoreError, NotificationError} from './CoreError';
 import {CryptographyService} from './cryptography/';
 import {GiphyService} from './giphy/';
 import {NotificationHandler, NotificationService} from './notification/';

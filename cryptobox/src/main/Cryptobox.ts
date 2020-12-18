@@ -20,7 +20,7 @@
 import {LRUCache} from '@wireapp/lru-cache';
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {keys as ProteusKeys, message as ProteusMessage, session as ProteusSession} from '@wireapp/proteus';
-import {CRUDEngine} from '@wireapp/store-engine';
+import type {CRUDEngine} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
 import {EventEmitter} from 'events';
 import logdown from 'logdown';
@@ -29,7 +29,7 @@ import {CryptoboxSession} from './CryptoboxSession';
 import {DecryptionError} from './DecryptionError';
 import {CryptoboxError} from './error/';
 import {InvalidPreKeyFormatError} from './InvalidPreKeyFormatError';
-import {SerializedCryptobox} from './SerializedCryptobox';
+import type {SerializedCryptobox} from './SerializedCryptobox';
 import {CryptoboxCRUDStore} from './store/';
 
 const DEFAULT_CAPACITY = 1000;

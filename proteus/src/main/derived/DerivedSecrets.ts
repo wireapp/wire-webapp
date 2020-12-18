@@ -17,10 +17,8 @@
  *
  */
 
-import * as KeyDerivationUtil from '../util/KeyDerivationUtil';
-import * as MemoryUtil from '../util/MemoryUtil';
-import {CipherKey} from './CipherKey';
-import {MacKey} from './MacKey';
+import {KeyDerivationUtil, MemoryUtil} from '../util/';
+import {CipherKey, MacKey} from './';
 
 export class DerivedSecrets {
   readonly cipher_key: CipherKey;

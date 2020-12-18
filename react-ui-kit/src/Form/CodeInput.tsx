@@ -20,7 +20,8 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import React, {useEffect, useState} from 'react';
-import {Theme} from '../Layout';
+
+import type {Theme} from '../Layout';
 import {noop} from '../util';
 import {InputProps, inputStyle} from './Input';
 

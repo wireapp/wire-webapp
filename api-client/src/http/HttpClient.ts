@@ -17,12 +17,12 @@
  *
  */
 
-import {TimeUtil} from '@wireapp/commons';
-import {PriorityQueue} from '@wireapp/priority-queue';
-import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {EventEmitter} from 'events';
-import logdown from 'logdown';
+import {PriorityQueue} from '@wireapp/priority-queue';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {TimeUtil} from '@wireapp/commons';
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
+import logdown from 'logdown';
 
 import {
   AccessTokenData,

@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType, Location, PublicClient} from './';
+import type {ClientType, Location, PublicClient} from './';
 
 export interface AddedClient extends PublicClient {
   /** The IP address from which the client was registered */

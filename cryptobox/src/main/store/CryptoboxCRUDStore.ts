@@ -20,6 +20,7 @@
 import {keys as ProteusKeys, session as ProteusSession} from '@wireapp/proteus';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {Decoder, Encoder} from 'bazinga64';
+
 import {PersistedRecord, SerialisedRecord} from '../store/';
 
 export enum CRUDStoreKeys {

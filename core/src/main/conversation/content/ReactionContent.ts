@@ -17,8 +17,8 @@
  *
  */
 
-import {LegalHoldStatus} from '.';
-import {ReactionType} from '../';
+import type {LegalHoldStatus} from '.';
+import type {ReactionType} from '../';
 
 export interface ReactionContent {
   legalHoldStatus?: LegalHoldStatus;

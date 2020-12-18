@@ -25,6 +25,7 @@ import {
   UserEvent,
   UserUpdateEvent,
 } from '@wireapp/api-client/src/event';
+
 import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
 import {MessageBuilder} from '../conversation/message/MessageBuilder';
 

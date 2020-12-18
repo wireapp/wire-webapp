@@ -17,10 +17,10 @@
  *
  */
 
-import {Account} from './Account';
+import type {Account} from './Account';
 import * as auth from './auth/';
 import * as conversation from './conversation/';
-import {CoreError} from './CoreError';
+import type {CoreError} from './CoreError';
 import * as cryptography from './cryptography/';
 
 export = {

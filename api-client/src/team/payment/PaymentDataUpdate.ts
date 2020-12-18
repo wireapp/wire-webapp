@@ -17,7 +17,7 @@
  *
  */
 
-import {PaymentInterval} from '../payment/';
+import type {PaymentInterval} from '../payment/';
 
 export interface PaymentDataUpdate {
   coupon?: string;

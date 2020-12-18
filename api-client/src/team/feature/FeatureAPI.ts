@@ -17,12 +17,12 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
 import {BackendErrorLabel, HttpClient} from '../../http';
-import {FeatureAppLock, FeatureDigitalSignature, FeatureSSO} from './Feature';
 import {InvalidAppLockTimeoutError} from './FeatureError';
-import {FeatureList} from './FeatureList';
+import type {FeatureAppLock, FeatureDigitalSignature, FeatureSSO} from './Feature';
+import type {FeatureList} from './FeatureList';
 
 export class FeatureAPI {
   constructor(private readonly client: HttpClient) {}

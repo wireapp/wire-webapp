@@ -17,7 +17,7 @@
  *
  */
 
-import {CRUDEngine} from '../engine';
+import type {CRUDEngine} from '../engine';
 import {RecordAlreadyExistsError, RecordTypeError} from '../engine/error';
 
 const TABLE_NAME = 'the-simpsons';

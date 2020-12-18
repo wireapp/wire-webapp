@@ -17,7 +17,7 @@
  *
  */
 
-import {CRUDEngine} from '../engine';
+import type {CRUDEngine} from '../engine';
 
 const TABLE_NAME = 'the-simpsons';
 

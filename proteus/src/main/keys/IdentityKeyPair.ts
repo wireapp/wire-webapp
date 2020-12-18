@@ -19,9 +19,7 @@
 
 import * as CBOR from '@wireapp/cbor';
 
-import {IdentityKey} from './IdentityKey';
-import {KeyPair} from './KeyPair';
-import {SecretKey} from './SecretKey';
+import {IdentityKey, KeyPair, SecretKey} from './';
 import {DecodeError} from '../errors';
 
 export class IdentityKeyPair {

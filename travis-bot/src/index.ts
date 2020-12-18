@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {LoginData} from '@wireapp/api-client/src/auth/';
+import type {LoginData} from '@wireapp/api-client/src/auth/';
 import {Account} from '@wireapp/core';
 import {exec} from 'child_process';
 import {promisify} from 'util';

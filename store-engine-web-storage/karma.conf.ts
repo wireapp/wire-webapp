@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from 'karma';
+import type {Config} from 'karma';
 
 const jasmineConfig = require('./jasmine.json');
 

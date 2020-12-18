@@ -17,10 +17,10 @@
  *
  */
 
-import {AxiosRequestConfig} from 'axios';
+import type {AxiosRequestConfig} from 'axios';
 
-import {HttpClient} from '../../http/';
-import {Provider, Service, ServiceWhitelistData, Services} from './';
+import type {HttpClient} from '../../http/';
+import type {Provider, Service, ServiceWhitelistData, Services} from './';
 
 export class ServiceAPI {
   constructor(private readonly client: HttpClient) {}

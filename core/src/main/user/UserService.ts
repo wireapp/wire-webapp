@@ -17,12 +17,12 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {User} from '@wireapp/api-client/src/user/';
+import type {APIClient} from '@wireapp/api-client';
+import type {User} from '@wireapp/api-client/src/user/';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import UUID from 'uuidjs';
 
-import {AvailabilityType, BroadcastService} from '../broadcast/';
+import type {AvailabilityType, BroadcastService} from '../broadcast/';
 
 export class UserService {
   private readonly apiClient: APIClient;

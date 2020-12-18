@@ -21,7 +21,7 @@ import * as CBOR from '@wireapp/cbor';
 import * as sodium from 'libsodium-wrappers-sumo';
 
 import {DecodeError} from '../errors/DecodeError';
-import * as RandomUtil from '../util/RandomUtil';
+import {RandomUtil} from '../util/';
 
 export class SessionTag {
   private static readonly randomBytesLength = 16;

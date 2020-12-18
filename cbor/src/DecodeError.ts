@@ -17,8 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
-import {Type} from './Type';
+import {BaseError, Type} from './';
 
 export class DecodeError extends BaseError {
   static readonly INT_OVERFLOW = 'Integer overflow';

@@ -19,8 +19,7 @@
 
 import * as sodium from 'libsodium-wrappers-sumo';
 
-import * as ArrayUtil from '../util/ArrayUtil';
-import * as MemoryUtil from '../util/MemoryUtil';
+import {ArrayUtil, MemoryUtil} from '../util/';
 
 /**
  * HMAC-based Key Derivation Function

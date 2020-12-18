@@ -17,7 +17,7 @@
  *
  */
 
-import {OTRRecipients} from './';
+import type {OTRRecipients} from './';
 
 export interface NewOTRMessage {
   /**

@@ -19,8 +19,9 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
-import {Property} from 'csstype';
+import type {Property} from 'csstype';
 import React from 'react';
+
 import {filterProps} from '../util';
 
 export interface FlexBoxProps<T = HTMLDivElement> extends React.HTMLProps<T> {

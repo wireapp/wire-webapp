@@ -17,7 +17,7 @@
  *
  */
 
-import {SupportedCurrency} from '../payment/';
+import type {SupportedCurrency} from '../payment/';
 
 export interface TeamData {
   /** User binding team */

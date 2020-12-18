@@ -17,7 +17,7 @@
  *
  */
 
-import {Role} from '../member';
+import type {Role} from '../member';
 
 export interface NewTeamInvitation {
   email: string;

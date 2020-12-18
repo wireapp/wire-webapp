@@ -20,9 +20,10 @@
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
 import Color from 'color';
+
 import {COLOR} from '../Identity/colors';
 import {defaultTransition} from '../Identity/motions';
-import {Theme} from '../Layout';
+import type {Theme} from '../Layout';
 import {filterProps} from '../util';
 import {TextProps, filterTextProps, textStyle} from './Text';
 

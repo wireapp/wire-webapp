@@ -19,7 +19,8 @@
 
 import {Runtime} from '@wireapp/commons';
 import {EventEmitter} from 'events';
-import {Cookie} from './Cookie';
+
+import type {Cookie} from './Cookie';
 
 enum TOPIC {
   COOKIE_REFRESH = 'CookieStore.TOPIC.COOKIE_REFRESH',

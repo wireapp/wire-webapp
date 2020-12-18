@@ -19,6 +19,7 @@
 
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
+
 import {SVGIcon, SVGIconProps} from './SVGIcon';
 
 export const MuteIcon = (props: SVGIconProps) => (
