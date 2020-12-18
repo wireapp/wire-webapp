@@ -23,7 +23,7 @@ import path from 'path';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {APIClient} from './src/APIClient';
-import type {
+import {
   AUTH_ACCESS_TOKEN_KEY,
   AUTH_COOKIE_KEY,
   AUTH_TABLE_NAME,
