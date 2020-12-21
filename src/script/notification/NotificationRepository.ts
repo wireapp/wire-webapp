@@ -210,7 +210,7 @@ export class NotificationRepository {
    * Display browser notification and play sound notification.
    * @returns Resolves when notification has been handled
    */
-  notify = (
+  readonly notify = (
     messageEntity: ContentMessage,
     connectionEntity: ConnectionEntity,
     conversationEntity: Conversation,
@@ -243,7 +243,7 @@ export class NotificationRepository {
   };
 
   /** Remove notifications from the queue that are no longer unread */
-  removeReadNotifications = (): void => {
+  readonly removeReadNotifications = (): void => {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data || {};
 
@@ -261,12 +261,12 @@ export class NotificationRepository {
     });
   };
 
-  updatedProperties = (properties: WebappProperties): void => {
+  readonly updatedProperties = (properties: WebappProperties): void => {
     const notificationPreference = properties.settings.notifications;
     return this.notificationsPreference(notificationPreference);
   };
 
-  updatedNotificationsProperty = (notificationPreference: NotificationPreference): void => {
+  readonly updatedNotificationsProperty = (notificationPreference: NotificationPreference): void => {
     return this.notificationsPreference(notificationPreference);
   };
 
@@ -275,7 +275,7 @@ export class NotificationRepository {
    * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
-  updatePermissionState = (permissionState: PermissionState | PermissionStatusState): Promise<boolean> => {
+  readonly updatePermissionState = (permissionState: PermissionState | PermissionStatusState): Promise<boolean> => {
     this.permissionState(permissionState);
     return this.checkPermissionState();
   };

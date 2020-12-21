@@ -259,7 +259,7 @@ class UserActions {
     this.items = ko.computed(() => (user() ? allItems.filter(({condition}) => condition()).map(({item}) => item) : []));
   }
 
-  dispose = () => {
+  readonly dispose = () => {
     this.isMe.dispose();
     this.isNotMe.dispose();
     this.items.dispose();

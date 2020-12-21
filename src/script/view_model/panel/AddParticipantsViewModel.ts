@@ -163,7 +163,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.searchServices();
   }
 
-  clickOnSelectService = (serviceEntity: ServiceEntity): void => {
+  readonly clickOnSelectService = (serviceEntity: ServiceEntity): void => {
     this.selectedService(serviceEntity);
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {
       addMode: true,

@@ -140,7 +140,7 @@ class MessageQuote {
     };
   }
 
-  updateCanShowMore = (elements: Element[]) => {
+  readonly updateCanShowMore = (elements: Element[]) => {
     const textQuote = elements.find(element => element.classList && element.classList.contains('message-quote__text'));
     if (textQuote) {
       const preNode = textQuote.querySelector('pre');
@@ -152,7 +152,7 @@ class MessageQuote {
     }
   };
 
-  toggleShowMore = () => {
+  readonly toggleShowMore = () => {
     this.showFullText(!this.showFullText());
   };
 }

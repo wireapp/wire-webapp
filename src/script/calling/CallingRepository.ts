@@ -181,7 +181,7 @@ export class CallingRepository {
     this.subscribeToEvents();
   }
 
-  toggleCbrEncoding = (vbrEnabled: boolean): void => {
+  readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
     this.cbrEncoding(vbrEnabled ? 0 : 1);
   };
 
@@ -316,7 +316,7 @@ export class CallingRepository {
     }
   }
 
-  updateCallQuality = (conversationId: string, userId: string, clientId: string, quality: number) => {
+  readonly updateCallQuality = (conversationId: string, userId: string, clientId: string, quality: number) => {
     const call = this.findCall(conversationId);
     if (!call) {
       return;
@@ -619,7 +619,7 @@ export class CallingRepository {
   // Call actions
   //##############################################################################
 
-  toggleState = (withVideo: boolean): void => {
+  readonly toggleState = (withVideo: boolean): void => {
     const conversationEntity: Conversation | undefined = this.conversationState.activeConversation();
     if (conversationEntity) {
       const isActiveCall = this.findCall(conversationEntity.id);
@@ -749,7 +749,7 @@ export class CallingRepository {
     this.wCall.reject(this.wUser, conversationId);
   }
 
-  leaveCall = (conversationId: ConversationId): void => {
+  readonly leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
   };

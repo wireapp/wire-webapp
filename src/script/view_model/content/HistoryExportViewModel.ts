@@ -130,7 +130,7 @@ export class HistoryExportViewModel {
     }
   };
 
-  downloadArchiveFile = (): void => {
+  readonly downloadArchiveFile = (): void => {
     const userName = this.userState.self().username();
     const fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
     const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
@@ -140,16 +140,16 @@ export class HistoryExportViewModel {
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
   };
 
-  onCancel = (): void => {
+  readonly onCancel = (): void => {
     this.backupRepository.cancelAction();
   };
 
-  onProgress = (processedNumber: number): void => {
+  readonly onProgress = (processedNumber: number): void => {
     this.state(HistoryExportViewModel.STATE.EXPORTING);
     this.numberOfProcessedRecords(this.numberOfProcessedRecords() + processedNumber);
   };
 
-  onError = (error: Error): void => {
+  readonly onError = (error: Error): void => {
     if (error instanceof CancelError) {
       this.logger.log('History export was cancelled');
       return this.dismissExport();
@@ -158,17 +158,17 @@ export class HistoryExportViewModel {
     this.logger.error(`Failed to export history: ${error.message}`, error);
   };
 
-  onSuccess = (archiveBlob: Blob): void => {
+  readonly onSuccess = (archiveBlob: Blob): void => {
     this.state(HistoryExportViewModel.STATE.DONE);
     this.hasError(false);
     this.archiveBlob(archiveBlob);
   };
 
-  onTryAgain = (): void => {
+  readonly onTryAgain = (): void => {
     this.exportHistory();
   };
 
-  dismissExport = (): void => {
+  readonly dismissExport = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 }

@@ -83,7 +83,7 @@ export class PreferencesOptionsViewModel {
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  updateProperties = ({settings}: WebappProperties): void => {
+  readonly updateProperties = ({settings}: WebappProperties): void => {
     this.optionAudio(settings.sound.alerts);
     this.optionReplaceInlineEmoji(settings.emoji.replace_inline);
     this.optionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);

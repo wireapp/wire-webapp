@@ -46,7 +46,7 @@ export class Modal {
     }
   }
 
-  handleClick = (event: MouseEvent): void => {
+  readonly handleClick = (event: MouseEvent): void => {
     if (event.target === this.modal) {
       this._hide();
     }

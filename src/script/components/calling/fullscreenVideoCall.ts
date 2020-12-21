@@ -171,11 +171,11 @@ export class FullscreenVideoCalling {
     };
   }
 
-  switchCameraSource = (call: Call, deviceId: string) => {
+  readonly switchCameraSource = (call: Call, deviceId: string) => {
     this.callActions.switchCameraInput(call, deviceId);
   };
 
-  switchScreenSource = (call: Call, deviceId: string) => {
+  readonly switchScreenSource = (call: Call, deviceId: string) => {
     this.callActions.switchScreenInput(call, deviceId);
   };
 

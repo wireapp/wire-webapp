@@ -77,7 +77,7 @@ export class TimedMessagesViewModel extends BasePanelViewModel {
     });
   }
 
-  timedMessageChange = (_: TimedMessagesViewModel, event: KeyboardEvent): void => {
+  readonly timedMessageChange = (_: TimedMessagesViewModel, event: KeyboardEvent): void => {
     if (this.activeConversation()) {
       const timer = parseInt((event.target as HTMLInputElement).value, 10);
       const finalTimer = timer === 0 ? null : timer;

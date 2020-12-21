@@ -1342,7 +1342,11 @@ export class ConversationRepository {
    * @param userId ID of leaving user
    * @param isoDate Date of member removal
    */
-  teamMemberLeave = async (teamId: string, userId: string, isoDate = this.serverTimeHandler.toServerTimestamp()) => {
+  readonly teamMemberLeave = async (
+    teamId: string,
+    userId: string,
+    isoDate = this.serverTimeHandler.toServerTimestamp(),
+  ) => {
     const userEntity = await this.userRepository.getUserById(userId);
     this.conversationState
       .conversations()
@@ -1556,7 +1560,7 @@ export class ConversationRepository {
   // Send Generic Messages
   //##############################################################################
 
-  injectLegalHoldMessage = async ({
+  readonly injectLegalHoldMessage = async ({
     conversationEntity,
     conversationId,
     userId,

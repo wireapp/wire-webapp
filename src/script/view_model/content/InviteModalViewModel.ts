@@ -54,14 +54,14 @@ export class InviteModalViewModel {
       return this.inviteMessageSelected() ? t('inviteHintSelected', metaKey) : t('inviteHintUnselected', metaKey);
     });
   }
-  hide = () => this.isVisible(false);
+  readonly hide = () => this.isVisible(false);
 
-  show = () => this.isVisible(true);
+  readonly show = () => this.isVisible(true);
 
-  onTextClick = (textArea: HTMLTextAreaElement) => {
+  readonly onTextClick = (textArea: HTMLTextAreaElement) => {
     textArea.select();
     this.inviteMessageSelected(true);
   };
 
-  onBlur = () => this.inviteMessageSelected(false);
+  readonly onBlur = () => this.inviteMessageSelected(false);
 }

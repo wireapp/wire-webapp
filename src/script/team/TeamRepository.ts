@@ -103,15 +103,15 @@ export class TeamRepository {
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
-  getRoleBadge = (userId: string): string => {
+  readonly getRoleBadge = (userId: string): string => {
     return this.isExternal(userId) ? t('rolePartner') : '';
   };
 
-  isExternal = (userId: string): boolean => {
+  readonly isExternal = (userId: string): boolean => {
     return this.teamState.memberRoles()[userId] === ROLE.PARTNER;
   };
 
-  isSelfConnectedTo = (userId: string): boolean => {
+  readonly isSelfConnectedTo = (userId: string): boolean => {
     return (
       this.teamState.memberRoles()[userId] !== ROLE.PARTNER ||
       this.teamState.memberInviters()[userId] === this.userState.self().id
@@ -126,7 +126,7 @@ export class TeamRepository {
     this.scheduleFetchTeamInfo();
   };
 
-  scheduleFetchTeamInfo = (): void => {
+  readonly scheduleFetchTeamInfo = (): void => {
     window.setInterval(async () => {
       try {
         await this.getTeam();
@@ -201,7 +201,7 @@ export class TeamRepository {
     return IntegrationMapper.mapServicesFromArray(servicesData);
   }
 
-  onTeamEvent = (eventJson: any, source: typeof EventRepository.SOURCE): void => {
+  readonly onTeamEvent = (eventJson: any, source: typeof EventRepository.SOURCE): void => {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};

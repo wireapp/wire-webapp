@@ -138,31 +138,31 @@ export class HistoryImportViewModel {
     }
   };
 
-  onInit = (numberOfRecords: number): void => {
+  readonly onInit = (numberOfRecords: number): void => {
     this.state(HistoryImportViewModel.STATE.IMPORTING);
     this.numberOfRecords(numberOfRecords);
     this.numberOfProcessedRecords(0);
   };
 
-  onProgress = (numberProcessed: number): void => {
+  readonly onProgress = (numberProcessed: number): void => {
     this.numberOfProcessedRecords(this.numberOfProcessedRecords() + numberProcessed);
   };
 
-  onSuccess = (): void => {
+  readonly onSuccess = (): void => {
     this.error(null);
     this.state(HistoryImportViewModel.STATE.DONE);
     window.setTimeout(this.dismissImport, MotionDuration.X_LONG * 2);
   };
 
-  onCancel = (): void => {
+  readonly onCancel = (): void => {
     this.backupRepository.cancelAction();
   };
 
-  dismissImport = (): void => {
+  readonly dismissImport = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 
-  onError = (error: Error): void => {
+  readonly onError = (error: Error): void => {
     if (error instanceof CancelError) {
       this.logger.log('History import was cancelled');
       return this.dismissImport();

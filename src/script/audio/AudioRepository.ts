@@ -173,11 +173,11 @@ export class AudioRepository {
     }
   };
 
-  setAudioPreference = (audioPreference: AudioPreference): void => {
+  readonly setAudioPreference = (audioPreference: AudioPreference): void => {
     this.audioPreference(audioPreference);
   };
 
-  setMutedState = (handlingNotifications: NOTIFICATION_HANDLING_STATE): void => {
+  readonly setMutedState = (handlingNotifications: NOTIFICATION_HANDLING_STATE): void => {
     const updatedMutedState = handlingNotifications !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.muted !== updatedMutedState;
@@ -187,7 +187,7 @@ export class AudioRepository {
     }
   };
 
-  stop = (audioId: AudioType): void => {
+  readonly stop = (audioId: AudioType): void => {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement?.paused) {
       this.logger.info(`Stopping sound '${audioId}'`);
@@ -195,7 +195,7 @@ export class AudioRepository {
     }
   };
 
-  updatedProperties = (properties: WebappProperties): void => {
+  readonly updatedProperties = (properties: WebappProperties): void => {
     this.setAudioPreference(properties.settings.sound.alerts);
   };
 }

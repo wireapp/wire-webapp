@@ -61,7 +61,7 @@ export class AppInitStatistics {
     this.logger.debug('App initialization statistics', this.statistics);
   }
 
-  update_backend_requests = (number_of_requests: number): void => {
+  readonly update_backend_requests = (number_of_requests: number): void => {
     this.statistics[AppInitStatisticsValue.BACKEND_REQUESTS] = number_of_requests;
   };
 }

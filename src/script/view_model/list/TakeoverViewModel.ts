@@ -53,7 +53,7 @@ export class TakeoverViewModel {
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  chooseUsername = (): void => {
+  readonly chooseUsername = (): void => {
     this.listViewModel.dismissModal();
     window.requestAnimationFrame(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT));
   };

@@ -57,7 +57,7 @@ export class CollectionViewModel {
     this.searchInput = ko.observable('');
   }
 
-  addedToView = () => {
+  readonly addedToView = () => {
     amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
@@ -68,22 +68,22 @@ export class CollectionViewModel {
     });
   };
 
-  searchInConversation = (query: string) => {
+  readonly searchInConversation = (query: string) => {
     return this.conversationRepository.searchInConversation(this.conversationEntity(), query);
   };
 
-  onInputChange = (input: string) => {
+  readonly onInputChange = (input: string) => {
     this.searchInput(input || '');
   };
 
-  itemAdded = (messageEntity: ContentMessage) => {
+  readonly itemAdded = (messageEntity: ContentMessage) => {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
     if (isCurrentConversation) {
       this._populateItems([messageEntity]);
     }
   };
 
-  itemRemoved = (messageId: string, conversationId: string) => {
+  readonly itemRemoved = (messageId: string, conversationId: string) => {
     const isCurrentConversation = this.conversationEntity().id === conversationId;
     if (isCurrentConversation) {
       const _removeItem = (messageEntity: ContentMessage) => messageEntity.id === messageId;
@@ -91,11 +91,11 @@ export class CollectionViewModel {
     }
   };
 
-  messageRemoved = (messageEntity: ContentMessage) => {
+  readonly messageRemoved = (messageEntity: ContentMessage) => {
     this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
   };
 
-  removedFromView = () => {
+  readonly removedFromView = () => {
     amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
@@ -105,7 +105,7 @@ export class CollectionViewModel {
     [this.images, this.files, this.links, this.audio].forEach(array => array.removeAll());
   };
 
-  setConversation = (conversationEntity = this.conversationState.activeConversation()) => {
+  readonly setConversation = (conversationEntity = this.conversationState.activeConversation()) => {
     if (conversationEntity) {
       this.conversationEntity(conversationEntity);
 
@@ -140,7 +140,7 @@ export class CollectionViewModel {
     });
   }
 
-  clickOnMessage = (messageEntity: ContentMessage) => {
+  readonly clickOnMessage = (messageEntity: ContentMessage) => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity(), {exposeMessage: messageEntity});
   };
 

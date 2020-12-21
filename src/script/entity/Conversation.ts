@@ -490,7 +490,7 @@ export class Conversation {
     return [this.selfUser()].concat(this.participating_user_ets());
   }
 
-  persistState = (): void => {
+  readonly persistState = (): void => {
     if (this.shouldPersistStateChanges) {
       this.publishPersistState();
     }
@@ -895,7 +895,7 @@ export class Conversation {
     return participantCount <= config.MAX_VIDEO_PARTICIPANTS;
   }
 
-  isShowingLastReceivedMessage = (): boolean => {
+  readonly isShowingLastReceivedMessage = (): boolean => {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
   };
 

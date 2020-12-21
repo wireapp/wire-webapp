@@ -735,7 +735,7 @@ class App {
    * @param signOutReason Cause for logout
    * @param clearData Keep data in database
    */
-  logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
+  readonly logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
@@ -823,7 +823,7 @@ class App {
   /**
    * Refresh the web app or desktop wrapper
    */
-  refresh = (): void => {
+  readonly refresh = (): void => {
     this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
@@ -838,7 +838,7 @@ class App {
   /**
    * Notify about found update
    */
-  update = (): void => {
+  readonly update = (): void => {
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
   };
 

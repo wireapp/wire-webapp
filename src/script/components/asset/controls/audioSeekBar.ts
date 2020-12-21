@@ -118,7 +118,7 @@ class AudioSeekBarComponent {
 
   private readonly onAudioEnded = (): void => this.updateSeekClip(0);
 
-  dispose = (): void => {
+  readonly dispose = (): void => {
     this.audioElement.removeEventListener('ended', this.onAudioEnded);
     this.audioElement.removeEventListener('timeupdate', this.onTimeUpdate);
     this.element.removeEventListener('click', this.onLevelClick);

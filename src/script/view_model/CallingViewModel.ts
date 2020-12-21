@@ -352,7 +352,7 @@ export class CallingViewModel {
     return this.permissionRepository.permissionState.camera() === PermissionStatusState.GRANTED;
   }
 
-  onCancelScreenSelection = () => {
+  readonly onCancelScreenSelection = () => {
     this.selectableScreens([]);
     this.selectableWindows([]);
   };

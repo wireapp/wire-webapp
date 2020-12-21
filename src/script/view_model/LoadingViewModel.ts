@@ -42,13 +42,13 @@ export class LoadingViewModel {
     ko.applyBindings(this, this.element);
   }
 
-  removeFromView = () => {
+  readonly removeFromView = () => {
     ko.cleanNode(this.element);
     this.element.remove();
     amplify.unsubscribeAll(WebAppEvents.APP.UPDATE_PROGRESS);
   };
 
-  updateProgress = (progress = 0, message?: string, replaceContent?: {handled: number; total: number}) => {
+  readonly updateProgress = (progress = 0, message?: string, replaceContent?: {handled: number; total: number}) => {
     const hasProgressIncreased = progress > this.loadingProgress();
     progress = hasProgressIncreased ? progress : this.loadingProgress() + 0.01;
     this.loadingProgress(progress);

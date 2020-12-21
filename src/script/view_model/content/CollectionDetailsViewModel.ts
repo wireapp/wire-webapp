@@ -51,7 +51,7 @@ export class CollectionDetailsViewModel {
     this.MessageCategory = MessageCategory;
   }
 
-  setConversation = (conversationEntity: Conversation, category: string, items: ContentMessage[]) => {
+  readonly setConversation = (conversationEntity: Conversation, category: string, items: ContentMessage[]) => {
     amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
@@ -60,7 +60,7 @@ export class CollectionDetailsViewModel {
     koPushDeferred(this.items, items);
   };
 
-  itemAdded = (messageEntity: ContentMessage) => {
+  readonly itemAdded = (messageEntity: ContentMessage) => {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
     if (isCurrentConversation) {
       switch (this.template()) {
@@ -94,7 +94,7 @@ export class CollectionDetailsViewModel {
     }
   };
 
-  itemRemoved = (messageId: string, conversationId: string) => {
+  readonly itemRemoved = (messageId: string, conversationId: string) => {
     const isCurrentConversation = this.conversationEntity().id === conversationId;
     if (isCurrentConversation) {
       this.items.remove(messageEntity => messageEntity.id === messageId);
@@ -104,11 +104,11 @@ export class CollectionDetailsViewModel {
     }
   };
 
-  messageRemoved = (messageEntity: ContentMessage) => {
+  readonly messageRemoved = (messageEntity: ContentMessage) => {
     this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
   };
 
-  removedFromView = () => {
+  readonly removedFromView = () => {
     amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);

@@ -61,35 +61,35 @@ class SeekBarComponent {
     this.updateSeekBarStyle(0);
   }
 
-  on_mouse_down = (): void => {
+  readonly on_mouse_down = (): void => {
     this.mediaElement.pause();
     this.isSeekBarThumbDragged(true);
   };
 
-  on_mouse_up = (): void => {
+  readonly on_mouse_up = (): void => {
     this.mediaElement.play();
     this.isSeekBarThumbDragged(false);
   };
 
-  on_mouse_enter = (): void => {
+  readonly on_mouse_enter = (): void => {
     this.isSeekBarMouseOver(true);
   };
 
-  on_mouse_leave = (): void => {
+  readonly on_mouse_leave = (): void => {
     this.isSeekBarMouseOver(false);
   };
 
-  on_change = (): void => {
+  readonly on_change = (): void => {
     const currentTime = this.mediaElement.duration * (parseInt(this.seekBar.value, 10) / 100);
     this.mediaElement.currentTime = clamp(currentTime, 0, this.mediaElement.duration);
   };
 
-  on_timeupdate = (): void => {
+  readonly on_timeupdate = (): void => {
     const value = (100 / this.mediaElement.duration) * this.mediaElement.currentTime;
     this.updateSeekBar(value);
   };
 
-  on_ended = (): void => {
+  readonly on_ended = (): void => {
     this.updateSeekBar(100);
   };
 
@@ -106,7 +106,7 @@ class SeekBarComponent {
     this.seekBar.style.setProperty('--seek-bar-progress', `${progress}%`);
   }
 
-  dispose = (): void => {
+  readonly dispose = (): void => {
     this.seekBar.removeEventListener('mousedown', this.on_mouse_down);
     this.seekBar.removeEventListener('mouseup', this.on_mouse_up);
     this.seekBar.removeEventListener('mouseenter', this.on_mouse_enter);

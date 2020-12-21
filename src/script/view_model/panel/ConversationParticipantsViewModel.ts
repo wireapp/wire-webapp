@@ -69,7 +69,7 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
     return 'conversation-participants';
   }
 
-  clickOnShowUser = (userEntity: User): void => {
+  readonly clickOnShowUser = (userEntity: User): void => {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   };
 

@@ -72,7 +72,7 @@ export class EventTrackingRepository {
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
-  onUserEvent = (eventJson: any, source: EventSource) => {
+  readonly onUserEvent = (eventJson: any, source: EventSource) => {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.userState.isTeam()) {
       this.migrateDeviceId(eventJson.data.trackingIdentifier);

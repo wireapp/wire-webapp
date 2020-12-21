@@ -336,7 +336,7 @@ export class PreferencesAVViewModel {
     }
   }
 */
-  updateProperties = ({settings}: WebappProperties): void => {
+  readonly updateProperties = ({settings}: WebappProperties): void => {
     this.optionVbrEncoding(settings.call.enable_vbr_encoding);
   };
 
