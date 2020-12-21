@@ -143,24 +143,21 @@ export class StorageService {
     listenableTables.forEach(table => {
       this.db
         .table(table)
-        .hook(DEXIE_CRUD_EVENT.UPDATING, function (
-          modifications: Object,
-          primaryKey: string,
-          obj: Object,
-          transaction: Dexie.Transaction,
-        ): void {
-          this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
-        });
+        .hook(
+          DEXIE_CRUD_EVENT.UPDATING,
+          function (modifications: Object, primaryKey: string, obj: Object, transaction: Dexie.Transaction): void {
+            this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
+          },
+        );
 
       this.db
         .table(table)
-        .hook(DEXIE_CRUD_EVENT.DELETING, function (
-          primaryKey: string,
-          obj: Object,
-          transaction: Dexie.Transaction,
-        ): void {
-          this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, undefined, transaction);
-        });
+        .hook(
+          DEXIE_CRUD_EVENT.DELETING,
+          function (primaryKey: string, obj: Object, transaction: Dexie.Transaction): void {
+            this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, undefined, transaction);
+          },
+        );
     });
   }
 

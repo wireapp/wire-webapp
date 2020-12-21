@@ -345,7 +345,7 @@ export class UserRepository {
   private onLegalHoldRequestCanceled(eventJson: any): void {
     if (this.userState.self().id === eventJson.id) {
       this.userState.self().hasPendingLegalHold(false);
-      amplify.publish(LegalHoldModalViewModel.HIDE_DETAILS);
+      amplify.publish(LegalHoldModalViewModel.HIDE_REQUEST);
     } else {
       /*
        * TODO:

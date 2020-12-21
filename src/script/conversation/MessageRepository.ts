@@ -73,7 +73,7 @@ import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {buildMetadata, isVideo, isImage, isAudio} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
 import {StatusType} from '../message/StatusType';
@@ -1340,7 +1340,7 @@ export class MessageRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds ||= conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
+      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
 
       return this.userRepository
         .getUsersById(userIds)
@@ -1356,10 +1356,10 @@ export class MessageRepository {
           if (hasMultipleUsers) {
             titleString = t('modalConversationNewDeviceHeadlineMany', titleSubstitutions);
           } else {
-            const [userEntity_1] = userEntities;
+            const [firstUser] = userEntities;
 
-            if (userEntity_1) {
-              titleString = userEntity_1.isMe
+            if (firstUser) {
+              titleString = firstUser.isMe
                 ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
                 : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
             } else {
@@ -1371,7 +1371,7 @@ export class MessageRepository {
 
               const error = new Error('Failed to grant outgoing message');
 
-              reject(error);
+              return reject(error);
             }
           }
 
@@ -1395,33 +1395,35 @@ export class MessageRepository {
             }
           }
 
+          const options: ModalOptions = {
+            close: () => {
+              if (!sendAnyway) {
+                reject(
+                  new ConversationError(
+                    ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+                    ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
+                  ),
+                );
+              }
+            },
+            primaryAction: {
+              action: () => {
+                sendAnyway = true;
+                conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+                resolve();
+              },
+              text: actionString,
+            },
+            text: {
+              message: messageString,
+              title: titleString,
+            },
+          };
+
           amplify.publish(
             WebAppEvents.WARNING.MODAL,
             ModalsViewModel.TYPE.CONFIRM,
-            {
-              close: () => {
-                if (!sendAnyway) {
-                  reject(
-                    new ConversationError(
-                      ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-                      ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-                    ),
-                  );
-                }
-              },
-              primaryAction: {
-                action: () => {
-                  sendAnyway = true;
-                  conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-                  resolve();
-                },
-                text: actionString,
-              },
-              text: {
-                message: messageString,
-                title: titleString,
-              },
-            },
+            options,
             `degraded-${eventInfoEntity.conversationId}`,
           );
         })
