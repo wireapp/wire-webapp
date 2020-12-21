@@ -76,14 +76,14 @@ export class PreferencesOptionsViewModel {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
     this.updateProperties(this.propertiesRepository.properties);
 
     this.AudioPreference = AudioPreference;
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  updateProperties = ({settings}: WebappProperties): void => {
+  readonly updateProperties = ({settings}: WebappProperties): void => {
     this.optionAudio(settings.sound.alerts);
     this.optionReplaceInlineEmoji(settings.emoji.replace_inline);
     this.optionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);

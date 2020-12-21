@@ -93,7 +93,7 @@ class GroupVideoGrid {
     });
   }
 
-  doubleClickedOnVideo = (_: GroupVideoGrid, event: MouseEvent): void => {
+  readonly doubleClickedOnVideo = (_: GroupVideoGrid, event: MouseEvent): void => {
     const target = event.currentTarget as HTMLElement;
     const childVideo = target.querySelector('video');
     const {userId, clientId} = target.dataset;

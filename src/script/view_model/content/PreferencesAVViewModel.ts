@@ -139,7 +139,7 @@ export class PreferencesAVViewModel {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, vbrEncoding);
     });
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
     this.updateProperties(this.propertiesRepository.properties);
     this.isRequestingAudio = ko.observable(false);
     this.isRequestingVideo = ko.observable(false);
@@ -336,7 +336,7 @@ export class PreferencesAVViewModel {
     }
   }
 */
-  updateProperties = ({settings}: WebappProperties): void => {
+  readonly updateProperties = ({settings}: WebappProperties): void => {
     this.optionVbrEncoding(settings.call.enable_vbr_encoding);
   };
 

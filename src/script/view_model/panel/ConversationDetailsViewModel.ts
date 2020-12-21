@@ -101,9 +101,6 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
   constructor(params: PanelViewModelProps) {
     super(params);
-    this.clickOnShowService = this.clickOnShowService.bind(this);
-    this.clickOnShowUser = this.clickOnShowUser.bind(this);
-
     const {mainViewModel, repositories} = params;
 
     this.userState = container.resolve(UserState);
@@ -280,7 +277,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
   }
 
-  isSingleUserMode = (conversationEntity: Conversation): boolean =>
+  readonly isSingleUserMode = (conversationEntity: Conversation): boolean =>
     conversationEntity && (conversationEntity.is1to1() || conversationEntity.isRequest());
 
   getConversationActions(
@@ -402,13 +399,13 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.navigateTo(PanelViewModel.STATE.NOTIFICATIONS);
   }
 
-  clickOnShowUser(userEntity: User): void {
+  readonly clickOnShowUser = (userEntity: User): void => {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
-  }
+  };
 
-  clickOnShowService(serviceEntity: ServiceEntity): void {
+  readonly clickOnShowService = (serviceEntity: ServiceEntity): void => {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
-  }
+  };
 
   clickToArchive(): void {
     this.actionsViewModel.archiveConversation(this.activeConversation());
@@ -470,7 +467,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: RECEIPT_MODE): void => {
+  readonly updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: RECEIPT_MODE): void => {
     this.conversationRepository.updateConversationReceiptMode(conversationEntity, {receipt_mode: receiptMode});
   };
 

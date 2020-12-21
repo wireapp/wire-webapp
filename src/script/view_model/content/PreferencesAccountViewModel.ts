@@ -199,7 +199,7 @@ export class PreferencesAccountViewModel {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
   };
 
-  changeAccentColor = (id: AccentColorID) => {
+  readonly changeAccentColor = (id: AccentColorID) => {
     this.userRepository.changeAccentColor(id);
   };
 
@@ -298,7 +298,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  checkUsernameInput = (_username: string, keyboardEvent: KeyboardEvent) => {
+  readonly checkUsernameInput = (_username: string, keyboardEvent: KeyboardEvent) => {
     if (isKey(keyboardEvent, KEY.BACKSPACE)) {
       return true;
     }
@@ -308,7 +308,7 @@ export class PreferencesAccountViewModel {
     return validateCharacter(inputChar.toLowerCase());
   };
 
-  popNotification = () => {
+  readonly popNotification = () => {
     this.preferenceNotificationRepository
       .getNotifications()
       .forEach(({type, notification}) => this._showNotification(type, notification));
@@ -347,7 +347,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  clickOnChangePicture = (files: File[]) => {
+  readonly clickOnChangePicture = (files: File[]) => {
     const [newUserPicture] = Array.from(files);
 
     this.setPicture(newUserPicture).catch(error => {
@@ -358,16 +358,16 @@ export class PreferencesAccountViewModel {
     });
   };
 
-  clickOnAvailability = (viewModel: unknown, event: MouseEvent) => {
+  readonly clickOnAvailability = (viewModel: unknown, event: MouseEvent) => {
     AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   };
 
-  clickOnBackupExport = (): void => {
+  readonly clickOnBackupExport = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
     amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
   };
 
-  onImportFileChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): void => {
+  readonly onImportFileChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files[0];
     if (file) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
@@ -375,7 +375,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  clickOnDeleteAccount = (): void => {
+  readonly clickOnDeleteAccount = (): void => {
     modals.showModal(
       ModalsViewModel.TYPE.CONFIRM,
       {
@@ -392,7 +392,7 @@ export class PreferencesAccountViewModel {
     );
   };
 
-  clickOnLeaveGuestRoom = (): void => {
+  readonly clickOnLeaveGuestRoom = (): void => {
     modals.showModal(
       ModalsViewModel.TYPE.CONFIRM,
       {
@@ -417,39 +417,39 @@ export class PreferencesAccountViewModel {
     );
   };
 
-  clickOnLogout = (): void => {
+  readonly clickOnLogout = (): void => {
     this.clientRepository.logoutClient();
   };
 
-  clickOpenManageTeam = (): void => {
+  readonly clickOpenManageTeam = (): void => {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
     }
   };
 
-  clickOnResetPassword = (): void => {
+  readonly clickOnResetPassword = (): void => {
     safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
   };
 
-  clickOnResetAppLockPassphrase = (): void => {
+  readonly clickOnResetAppLockPassphrase = (): void => {
     amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
   };
 
-  removedFromView = (): void => {
+  readonly removedFromView = (): void => {
     this._resetUsernameInput();
   };
 
-  resetNameInput = (): void => {
+  readonly resetNameInput = (): void => {
     if (!this.nameSaved()) {
       this.name.notifySubscribers();
     }
   };
 
-  resetEmailInput = (): void => {
+  readonly resetEmailInput = (): void => {
     this.email.notifySubscribers();
   };
 
-  resetUsernameInput = (): void => {
+  readonly resetUsernameInput = (): void => {
     if (!this.usernameSaved()) {
       this._resetUsernameInput();
       this.username.notifySubscribers();
@@ -492,9 +492,9 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
+  readonly shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
-  verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
+  readonly verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
     const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
@@ -537,21 +537,21 @@ export class PreferencesAccountViewModel {
     this.submittedUsername(null);
   };
 
-  onReadReceiptsChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
+  readonly onReadReceiptsChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
     const mode = isChecked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key, mode);
     return true;
   };
 
-  onMarketingConsentChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
+  readonly onMarketingConsentChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
     const mode = isChecked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key, mode);
     return true;
   };
 
-  updateProperties = ({settings}: WebappProperties): void => {
+  readonly updateProperties = ({settings}: WebappProperties): void => {
     this.optionPrivacy(settings.privacy.improve_wire);
     this.optionTelemetrySharing(settings.privacy.telemetry_sharing);
   };

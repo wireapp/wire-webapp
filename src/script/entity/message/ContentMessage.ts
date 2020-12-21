@@ -96,7 +96,7 @@ export class ContentMessage extends Message {
     });
   }
 
-  display_edited_timestamp = () => {
+  readonly display_edited_timestamp = () => {
     return t('conversationEditTimestamp', formatTimeShort(this.edited_timestamp()));
   };
 

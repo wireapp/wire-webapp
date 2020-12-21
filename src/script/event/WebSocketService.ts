@@ -39,16 +39,16 @@ export class WebSocketService {
     this.logger = getLogger('WebSocketService');
   }
 
-  disconnect = () => {
+  readonly disconnect = () => {
     this.logger.info('Disconnecting websocket');
     this.apiClient.disconnect();
   };
 
-  lockWebsocket = () => {
+  readonly lockWebsocket = () => {
     this.apiClient.transport.ws.lock();
   };
 
-  unlockWebsocket = () => {
+  readonly unlockWebsocket = () => {
     this.apiClient.transport.ws.unlock();
   };
 

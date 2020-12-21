@@ -202,7 +202,7 @@ export class ListViewModel {
     amplify.subscribe(WebAppEvents.SHORTCUT.SILENCE, this.changeNotificationSetting); // todo: deprecated - remove when user base of wrappers version >= 3.4 is large enough
   };
 
-  answerCall = (conversationEntity: Conversation): void => {
+  readonly answerCall = (conversationEntity: Conversation): void => {
     const call = this.callingRepository.findCall(conversationEntity.id);
     if (!call) {
       return;
@@ -219,7 +219,7 @@ export class ListViewModel {
     }
   };
 
-  changeNotificationSetting = () => {
+  readonly changeNotificationSetting = () => {
     if (this.isProAccount()) {
       this.panelViewModel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
     } else {
@@ -227,11 +227,11 @@ export class ListViewModel {
     }
   };
 
-  goToNext = () => {
+  readonly goToNext = () => {
     this.iterateActiveItem(true);
   };
 
-  goToPrevious = () => {
+  readonly goToPrevious = () => {
     this.iterateActiveItem(false);
   };
 
@@ -283,7 +283,7 @@ export class ListViewModel {
     this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 
-  openPreferencesDevices = (deviceEntity?: ClientEntity): void => {
+  readonly openPreferencesDevices = (deviceEntity?: ClientEntity): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
 
     if (deviceEntity) {
@@ -294,26 +294,26 @@ export class ListViewModel {
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
   };
 
-  openPreferencesAbout = (): void => {
+  readonly openPreferencesAbout = (): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_ABOUT);
   };
 
-  openPreferencesAudioVideo = (): void => {
+  readonly openPreferencesAudioVideo = (): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_AV);
   };
 
-  openPreferencesOptions = (): void => {
+  readonly openPreferencesOptions = (): void => {
     this.switchList(ListViewModel.STATE.PREFERENCES);
     return this.contentViewModel.switchContent(ContentViewModel.STATE.PREFERENCES_OPTIONS);
   };
 
-  openStartUI = (): void => {
+  readonly openStartUI = (): void => {
     this.switchList(ListViewModel.STATE.START_UI);
   };
 
-  switchList = (newListState: string, respectLastState = true): void => {
+  readonly switchList = (newListState: string, respectLastState = true): void => {
     const isStateChange = this.state() !== newListState;
     if (isStateChange) {
       this.hideList();
@@ -322,7 +322,7 @@ export class ListViewModel {
     }
   };
 
-  openConversations = (): void => {
+  readonly openConversations = (): void => {
     const newState = this.isActivatedAccount()
       ? ListViewModel.STATE.CONVERSATIONS
       : ListViewModel.STATE.TEMPORARY_GUEST;
@@ -390,22 +390,22 @@ export class ListViewModel {
     }
   };
 
-  dismissModal = (): void => {
+  readonly dismissModal = (): void => {
     this.modal(undefined);
   };
 
-  showTakeover = (): void => {
+  readonly showTakeover = (): void => {
     this.modal(ListViewModel.MODAL_TYPE.TAKEOVER);
   };
 
-  showTemporaryGuest = (): void => {
+  readonly showTemporaryGuest = (): void => {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
     this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   };
 
-  onContextMenu = (conversationEntity: Conversation, event: MouseEvent): void => {
+  readonly onContextMenu = (conversationEntity: Conversation, event: MouseEvent): void => {
     const entries = [];
 
     if (conversationEntity.isMutable()) {
@@ -515,7 +515,7 @@ export class ListViewModel {
     Context.from(event, entries, 'conversation-list-options-menu');
   };
 
-  clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {
+  readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (this.isActivatedAccount()) {
       this.actionsViewModel.archiveConversation(conversationEntity);
     }
@@ -528,7 +528,7 @@ export class ListViewModel {
     await this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
   };
 
-  clickToCancelRequest = (conversationEntity: Conversation): void => {
+  readonly clickToCancelRequest = (conversationEntity: Conversation): void => {
     const userEntity = conversationEntity.firstUserEntity();
     const hideConversation = this.shouldHideConversation(conversationEntity);
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
@@ -536,23 +536,25 @@ export class ListViewModel {
     this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
   };
 
-  clickToClear = (conversationEntity = this.conversationState.activeConversation()): void => {
+  readonly clickToClear = (conversationEntity = this.conversationState.activeConversation()): void => {
     this.actionsViewModel.clearConversation(conversationEntity);
   };
 
-  clickToLeave = (conversationEntity: Conversation): void => {
+  readonly clickToLeave = (conversationEntity: Conversation): void => {
     this.actionsViewModel.leaveConversation(conversationEntity);
   };
 
-  clickToToggleMute = (conversationEntity = this.conversationState.activeConversation()): void => {
+  readonly clickToToggleMute = (conversationEntity = this.conversationState.activeConversation()): void => {
     this.actionsViewModel.toggleMuteConversation(conversationEntity);
   };
 
-  clickToOpenNotificationSettings = (conversationEntity = this.conversationState.activeConversation()): void => {
+  readonly clickToOpenNotificationSettings = (
+    conversationEntity = this.conversationState.activeConversation(),
+  ): void => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {openNotificationSettings: true});
   };
 
-  clickToUnarchive = (conversationEntity: Conversation): void => {
+  readonly clickToUnarchive = (conversationEntity: Conversation): void => {
     this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
       if (!this.conversationState.conversations_archived().length) {
         this.switchList(ListViewModel.STATE.CONVERSATIONS);

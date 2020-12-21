@@ -144,18 +144,18 @@ export class LegalHoldModalViewModel {
     );
   };
 
-  hideModal = () => {
+  readonly hideModal = () => {
     this.isVisible(false);
     this.conversationId = null;
   };
 
-  closeRequest = () => {
+  readonly closeRequest = () => {
     if (this.showRequest()) {
       this.hideModal();
     }
   };
 
-  hideLegalHoldModal = (conversationId?: string) => {
+  readonly hideLegalHoldModal = (conversationId?: string) => {
     const isCurrentConversation = conversationId && conversationId === this.conversationId;
     if (!this.showRequest() && isCurrentConversation) {
       this.hideModal();
@@ -225,18 +225,21 @@ export class LegalHoldModalViewModel {
     this.isLoading(false);
   };
 
-  showUserDevices = (user: User) => {
+  readonly showUserDevices = (user: User) => {
     this.devicesUser(user);
   };
 
-  clickOnBack = () => {
+  readonly clickOnBack = () => {
     if (!this.showDeviceList()) {
       return this.userDevicesHistory.goBack();
     }
     this.devicesUser(undefined);
   };
 
-  handleInputKey = (_data: LegalHoldModalViewModel, {key}: JQuery.Event<HTMLElement, KeyboardEvent>): boolean => {
+  readonly handleInputKey = (
+    _data: LegalHoldModalViewModel,
+    {key}: JQuery.Event<HTMLElement, KeyboardEvent>,
+  ): boolean => {
     if (key !== 'Enter') {
       return true;
     }

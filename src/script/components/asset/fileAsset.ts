@@ -68,9 +68,9 @@ class FileAssetComponent {
     });
   }
 
-  downloadAsset = () => this.assetRepository.downloadFile(this.asset);
+  readonly downloadAsset = () => this.assetRepository.downloadFile(this.asset);
 
-  cancelUpload = () => {
+  readonly cancelUpload = () => {
     this.assetRepository.cancelUpload(this.message.id);
     amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.message.id);
   };

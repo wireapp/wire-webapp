@@ -52,11 +52,11 @@ export class TemporaryGuestViewModel {
     this.isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   }
 
-  clickOnPreferencesButton = (): void => {
+  readonly clickOnPreferencesButton = (): void => {
     amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
   };
 
-  clickToCreateAccount = (): void => {
+  readonly clickToCreateAccount = (): void => {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       preventClose: true,
       primaryAction: {
@@ -70,7 +70,7 @@ export class TemporaryGuestViewModel {
     });
   };
 
-  isSelectedConversation = (): true => {
+  readonly isSelectedConversation = (): true => {
     return true;
   };
 }

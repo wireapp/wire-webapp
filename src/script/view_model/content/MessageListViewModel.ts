@@ -139,11 +139,11 @@ export class MessageListViewModel {
     });
   }
 
-  onMessageContainerInitiated = (messagesContainer: HTMLElement): void => {
+  readonly onMessageContainerInitiated = (messagesContainer: HTMLElement): void => {
     this.messagesContainer = messagesContainer;
   };
 
-  release_conversation = (conversation_et: Conversation): void => {
+  readonly release_conversation = (conversation_et: Conversation): void => {
     if (conversation_et) {
       conversation_et.release();
     }
@@ -216,7 +216,7 @@ export class MessageListViewModel {
     return messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
   };
 
-  getMessagesContainer = () => {
+  readonly getMessagesContainer = () => {
     return this.messagesContainer;
   };
 
@@ -327,7 +327,7 @@ export class MessageListViewModel {
     return Promise.resolve();
   };
 
-  loadFollowingMessages = (): Promise<void> => {
+  readonly loadFollowingMessages = (): Promise<void> => {
     const lastMessage = this.conversation().getLastMessage();
 
     if (lastMessage) {
@@ -354,7 +354,7 @@ export class MessageListViewModel {
     }
   };
 
-  onMessageMarked = (messageElement: HTMLElement) => {
+  readonly onMessageMarked = (messageElement: HTMLElement) => {
     const messagesContainer = this.getMessagesContainer();
     messageElement.classList.remove('message-marked');
     scrollBy(messagesContainer, messageElement.getBoundingClientRect().top - messagesContainer.offsetHeight / 2);
@@ -362,7 +362,7 @@ export class MessageListViewModel {
     this.focusedMessage(null);
   };
 
-  showUserDetails = (userEntity: User): void => {
+  readonly showUserDetails = (userEntity: User): void => {
     userEntity = ko.unwrap(userEntity);
     const conversationEntity = this.conversationState.activeConversation();
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
@@ -413,7 +413,7 @@ export class MessageListViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
   };
 
-  get_timestamp_class = (messageEntity: ContentMessage): string => {
+  readonly get_timestamp_class = (messageEntity: ContentMessage): string => {
     const previousMessage = this.conversation().get_previous_message(messageEntity);
     if (!previousMessage || messageEntity.is_call()) {
       return '';
@@ -441,7 +441,7 @@ export class MessageListViewModel {
     return '';
   };
 
-  shouldHideUserAvatar = (messageEntity: ContentMessage): boolean => {
+  readonly shouldHideUserAvatar = (messageEntity: ContentMessage): boolean => {
     // @todo avoid double check
     if (this.get_timestamp_class(messageEntity)) {
       return false;
@@ -455,25 +455,25 @@ export class MessageListViewModel {
     return last_message && last_message.is_content() && last_message.user().id === messageEntity.user().id;
   };
 
-  isLastDeliveredMessage = (messageEntity: Message): boolean => {
+  readonly isLastDeliveredMessage = (messageEntity: Message): boolean => {
     return this.conversation().getLastDeliveredMessage() === messageEntity;
   };
 
-  clickOnCancelRequest = (messageEntity: MemberMessage): void => {
+  readonly clickOnCancelRequest = (messageEntity: MemberMessage): void => {
     const conversationEntity = this.conversationState.activeConversation();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   };
 
-  clickOnLike = (messageEntity: ContentMessage): void => {
+  readonly clickOnLike = (messageEntity: ContentMessage): void => {
     this.messageRepository.toggle_like(this.conversation(), messageEntity);
   };
 
-  clickOnInvitePeople = (): void => {
+  readonly clickOnInvitePeople = (): void => {
     this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, undefined);
   };
 
-  getInViewportCallback = (
+  readonly getInViewportCallback = (
     conversationEntity: Conversation,
     messageEntity: MemberMessage | ContentMessage,
   ): Function | null => {
@@ -540,7 +540,7 @@ export class MessageListViewModel {
     };
   };
 
-  updateConversationLastRead = (conversationEntity: Conversation, messageEntity: Message): void => {
+  readonly updateConversationLastRead = (conversationEntity: Conversation, messageEntity: Message): void => {
     const conversationLastRead = conversationEntity.last_read_timestamp();
     const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
@@ -550,7 +550,7 @@ export class MessageListViewModel {
     }
   };
 
-  handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent): boolean => {
+  readonly handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent): boolean => {
     if (event.which === 3) {
       // Default browser behavior on right click
       return true;
@@ -603,11 +603,11 @@ export class MessageListViewModel {
     return true;
   };
 
-  showParticipants = (participants: User[]): void => {
+  readonly showParticipants = (participants: User[]): void => {
     this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {highlighted: participants});
   };
 
-  showMessageDetails = (view: {message: {id: string}}, showLikes: boolean): void => {
+  readonly showMessageDetails = (view: {message: {id: string}}, showLikes: boolean): void => {
     if (!this.conversation().is1to1()) {
       this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
         entity: {id: view.message.id} as Message,

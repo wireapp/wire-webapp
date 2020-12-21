@@ -95,7 +95,7 @@ export class PreferencesDeviceDetailsViewModel {
     }
   };
 
-  clickOnDetailsClose = (): void => {
+  readonly clickOnDetailsClose = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
     this.device(null);
   };
@@ -128,7 +128,7 @@ export class PreferencesDeviceDetailsViewModel {
     }
   };
 
-  toggleDeviceVerification = (): void => {
+  readonly toggleDeviceVerification = (): void => {
     const toggleVerified = !this.device().meta.isVerified();
     this.clientRepository.verifyClient(this.selfUser().id, this.device(), toggleVerified);
   };

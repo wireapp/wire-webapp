@@ -99,13 +99,13 @@ class FullSearch {
     });
   }
 
-  onInputChange = (query: string): void => {
+  readonly onInputChange = (query: string): void => {
     if (typeof this.params.change === 'function') {
       this.params.change(query);
     }
   };
 
-  clickOnMessage = (messageEntity: Message): void => {
+  readonly clickOnMessage = (messageEntity: Message): void => {
     if (typeof this.params.click === 'function') {
       this.params.click(messageEntity);
     }

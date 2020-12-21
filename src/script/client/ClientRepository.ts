@@ -71,8 +71,8 @@ export class ClientRepository {
 
     this.clientState.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
 
-    amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
-    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient);
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
   init(selfUser: User): void {
@@ -306,7 +306,7 @@ export class ClientRepository {
     });
   }
 
-  async logoutClient(): Promise<void> {
+  logoutClient = async (): Promise<void> => {
     if (this.clientState.currentClient()) {
       if (this.clientState.isTemporaryClient()) {
         await this.deleteTemporaryClient();
@@ -327,7 +327,7 @@ export class ClientRepository {
         });
       }
     }
-  }
+  };
 
   /**
    * Removes a stored client and the session connected with it.
@@ -517,7 +517,7 @@ export class ClientRepository {
    *
    * @param eventJson JSON data for event
    */
-  private onUserEvent(eventJson: UserClientAddEvent | UserClientRemoveEvent): void {
+  private readonly onUserEvent = (eventJson: UserClientAddEvent | UserClientRemoveEvent): void => {
     const type = eventJson.type;
 
     const isClientAdd = type === USER_EVENT.CLIENT_ADD;
@@ -529,7 +529,7 @@ export class ClientRepository {
     if (isClientRemove) {
       this.onClientRemove(eventJson as UserClientRemoveEvent);
     }
-  }
+  };
 
   /**
    * A client was added by the self user.

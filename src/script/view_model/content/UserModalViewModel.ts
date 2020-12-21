@@ -63,7 +63,7 @@ export class UserModalViewModel {
     this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
   }
 
-  onUserAction = (action: Actions): void => {
+  readonly onUserAction = (action: Actions): void => {
     this.hide();
   };
 

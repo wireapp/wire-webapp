@@ -117,7 +117,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     return !userEntity.isMe;
   }
 
-  onUserAction = (action: Actions): void => {
+  readonly onUserAction = (action: Actions): void => {
     if (action === Actions.REMOVE) {
       this.onGoBack();
     }

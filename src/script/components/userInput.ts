@@ -93,7 +93,7 @@ class UserInput {
     return true;
   }
 
-  dispose = (): void => {
+  readonly dispose = (): void => {
     if (this.selectedSubscription) {
       this.selectedSubscription.dispose();
     }
