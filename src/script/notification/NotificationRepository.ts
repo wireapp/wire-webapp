@@ -243,7 +243,7 @@ export class NotificationRepository {
   };
 
   /** Remove notifications from the queue that are no longer unread */
-  removeReadNotifications(): void {
+  removeReadNotifications = (): void => {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data || {};
 
@@ -259,7 +259,7 @@ export class NotificationRepository {
         });
       }
     });
-  }
+  };
 
   updatedProperties = (properties: WebappProperties): void => {
     const notificationPreference = properties.settings.notifications;
