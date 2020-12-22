@@ -42,6 +42,6 @@
     "create-commit-sha": "node ./bin/create_commit_sha_file.js",
     "clean": "rimraf ./dist/",
     "start:prod": "pm2 start \"./index.js\" --name \"Webapp\" && pm2 logs",
-    "test": "yarn jest"
+    "test": "jest"
   }
 }
