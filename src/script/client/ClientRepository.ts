@@ -24,11 +24,11 @@ import {Runtime} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import murmurhash from 'murmurhash';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
-import {murmurhash3} from 'Util/util';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
@@ -242,7 +242,7 @@ export class ClientRepository {
    * @returns Cookie label key
    */
   constructCookieLabelKey(login: string, clientType: ClientType = this.loadCurrentClientType()): string {
-    const loginHash = murmurhash3(login || this.selfUser().id, 42);
+    const loginHash = murmurhash.v3(login || this.selfUser().id, 42);
     return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
