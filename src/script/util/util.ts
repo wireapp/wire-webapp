@@ -18,20 +18,19 @@
  */
 
 import {Decoder} from 'bazinga64';
-import type {ObservableArray} from 'knockout';
 import sodium from 'libsodium-wrappers-sumo';
 import UUID from 'uuidjs';
 import {UrlUtil} from '@wireapp/commons';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Runtime} from '@wireapp/commons';
+import type {ObservableArray} from 'knockout';
 
 import {QUERY_KEY} from '../auth/route';
 import {Config} from '../Config';
-import type {Conversation} from '../entity/Conversation';
 import {StorageKey} from '../storage/StorageKey';
-
 import {loadValue} from './StorageUtil';
 import {AuthError} from '../error/AuthError';
-import {Runtime} from '@wireapp/commons';
+import type {Conversation} from '../entity/Conversation';
 
 export const isTemporaryClientAndNonPersistent = (persist: boolean): boolean => {
   if (persist === undefined) {
