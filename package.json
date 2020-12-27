@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/sinon": "9.0.9",
+    "@types/sinon": "9.0.10",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "6.6.9",
     "@wireapp/core": "16.12.73",
