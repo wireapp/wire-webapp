@@ -20,8 +20,11 @@
 import type {ClientClassification} from '@wireapp/api-client/src/client';
 
 export interface ClientRecord {
+  address?: string;
   class: ClientClassification | '?';
+  cookie?: string;
   id: string;
+  label?: string;
   location?: {
     lat: number;
     lon: number;
