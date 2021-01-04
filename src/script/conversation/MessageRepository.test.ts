@@ -40,9 +40,10 @@ import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
-import {ConversationError} from 'src/script/error/ConversationError';
 import * as sinon from 'sinon';
 import {amplify} from 'amplify';
+
+import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from './MessageRepository';
 
 describe('MessageRepository', () => {
