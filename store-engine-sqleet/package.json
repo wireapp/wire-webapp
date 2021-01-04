@@ -16,7 +16,7 @@
     "@types/uint32": "0.2.0",
     "@types/webpack": "4.41.25",
     "@wireapp/store-engine": "4.5.20",
-    "babel-loader": "8.1.0",
+    "babel-loader": "8.2.2",
     "bazinga64": "5.7.22",
     "del-cli": "3.0.1",
     "jasmine": "3.5.0",
