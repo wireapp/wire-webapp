@@ -45,11 +45,11 @@ export class PreferencesAboutViewModel {
     });
   }
 
-  showWireSection = (): boolean => {
+  readonly showWireSection = (): boolean => {
     return !!(this.termsOfUseUrl() || this.websiteUrl || this.privacyPolicyUrl);
   };
 
-  showSupportSection = (): boolean => {
+  readonly showSupportSection = (): boolean => {
     return !!(this.Config.URL.SUPPORT.INDEX || this.Config.URL.SUPPORT.CONTACT);
   };
 }

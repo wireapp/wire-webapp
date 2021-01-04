@@ -199,8 +199,6 @@ class Message {
 
     this.hasReadReceiptsTurnedOn = this.conversationRepository.expectReadReceipt(this.conversation());
 
-    this.bindShowMore = this.bindShowMore.bind(this);
-
     this.readReceiptTooltip = ko.pureComputed(() => {
       const receipts = this.message.readReceipts();
       if (!receipts.length || !this.conversation().is1to1()) {
@@ -295,7 +293,7 @@ class Message {
     });
   }
 
-  dispose = () => {
+  readonly dispose = () => {
     if (this.assetSubscription) {
       this.assetSubscription.dispose();
       this.previewSubscription.dispose();
@@ -330,7 +328,7 @@ class Message {
     amplify.publish(topic);
   }
 
-  showLegalHold = () => {
+  readonly showLegalHold = () => {
     amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS, this.conversationState.activeConversation());
   };
 
@@ -339,7 +337,7 @@ class Message {
     Context.from(event, entries, 'message-options-menu');
   }
 
-  bindShowMore(elements: HTMLElement[], scope: Message) {
+  readonly bindShowMore = (elements: HTMLElement[], scope: Message) => {
     const label = elements.find(element => element.className === 'message-header-label');
     if (!label) {
       return;
@@ -348,7 +346,7 @@ class Message {
     if (link) {
       link.addEventListener('click', () => this.onClickParticipants((scope.message as any).highlightedUsers()));
     }
-  }
+  };
 }
 
 // If this is not explicitly defined as string,

@@ -70,17 +70,17 @@ export class PreferencesDevicesViewModel {
     this.isSSO = ko.pureComputed(() => this.selfUser() && this.selfUser().isSingleSignOn);
   }
 
-  clickOnShowDevice = (clientEntity: ClientEntity): void => {
+  readonly clickOnShowDevice = (clientEntity: ClientEntity): void => {
     this.preferencesDeviceDetails.device(clientEntity);
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
   };
 
-  clickOnRemoveDevice = (clientEntity: ClientEntity, event: MouseEvent): void => {
+  readonly clickOnRemoveDevice = (clientEntity: ClientEntity, event: MouseEvent): void => {
     this.actionsViewModel.deleteClient(clientEntity);
     event.stopPropagation();
   };
 
-  updateDeviceInfo = (): void => {
+  readonly updateDeviceInfo = (): void => {
     if (this.currentClient() && !this.localFingerprint().length) {
       const date = formatTimestamp(this.currentClient().time);
       this.activationDate(t('preferencesDevicesActivatedOn', {date}));

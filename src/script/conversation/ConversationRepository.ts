@@ -176,7 +176,7 @@ export class ConversationRepository {
 
     this.stateHandler = new ConversationStateHandler(this.conversation_service, this.conversationMapper);
     this.ephemeralHandler = new ConversationEphemeralHandler(this.conversationMapper, this.eventService, {
-      onMessageTimeout: this.handleMessageExpiration.bind(this),
+      onMessageTimeout: this.handleMessageExpiration,
     });
 
     this.userState.directlyConnectedUsers = this.conversationState.connectedUsers;
@@ -218,21 +218,24 @@ export class ConversationRepository {
   }
 
   private initSubscriptions(): void {
-    amplify.subscribe(WebAppEvents.CONVERSATION.DELETE, this.deleteConversationLocally.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.MAP_CONNECTION, this.mapConnection.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, this.on_missed_events.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.PERSIST_STATE, this.saveConversationStateInDb.bind(this));
-    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState.bind(this));
-    amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave.bind(this));
-    amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.onUnblockUser.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage.bind(this));
+    amplify.subscribe(WebAppEvents.CONVERSATION.DELETE, this.deleteConversationLocally);
+    amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MAP_CONNECTION, this.mapConnection);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, this.on_missed_events);
+    amplify.subscribe(WebAppEvents.CONVERSATION.PERSIST_STATE, this.saveConversationStateInDb);
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
+    amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave);
+    amplify.subscribe(WebAppEvents.USER.UNBLOCKED, this.onUnblockUser);
+    amplify.subscribe(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, this.injectLegalHoldMessage);
 
-    this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity.bind(this));
-    this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity.bind(this));
+    this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
+    this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
   }
 
-  private async updateLocalMessageEntity({obj: updatedEvent, oldObj: oldEvent}: ConversationDBChange): Promise<void> {
+  private readonly updateLocalMessageEntity = async ({
+    obj: updatedEvent,
+    oldObj: oldEvent,
+  }: ConversationDBChange): Promise<void> => {
     const conversationEntity = this.conversationState.findConversation(updatedEvent.conversation);
     const replacedMessageEntity = await this.replaceMessageInConversation(
       conversationEntity,
@@ -243,14 +246,14 @@ export class ConversationRepository {
       const messageEntity = await this.updateMessageUserEntities(replacedMessageEntity);
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, oldEvent.id, messageEntity);
     }
-  }
+  };
 
-  private deleteLocalMessageEntity({oldObj: deletedEvent}: ConversationDBChange): void {
+  private readonly deleteLocalMessageEntity = ({oldObj: deletedEvent}: ConversationDBChange): void => {
     const conversationEntity = this.conversationState.findConversation(deletedEvent.conversation);
     if (conversationEntity) {
       conversationEntity.remove_message_by_id(deletedEvent.id);
     }
-  }
+  };
 
   /**
    * Remove obsolete conversations locally.
@@ -628,12 +631,12 @@ export class ConversationRepository {
   /**
    * Update conversation with a user you just unblocked
    */
-  private async onUnblockUser(user_et: User): Promise<void> {
+  private readonly onUnblockUser = async (user_et: User): Promise<void> => {
     const conversationEntity = await this.get1To1Conversation(user_et);
     if (typeof conversationEntity !== 'boolean') {
       conversationEntity.status(ConversationStatus.CURRENT_MEMBER);
     }
-  }
+  };
 
   /**
    * Update all conversations on app init.
@@ -710,7 +713,7 @@ export class ConversationRepository {
       });
   }
 
-  private deleteConversationLocally(conversationId: string, skipNotification = false) {
+  private readonly deleteConversationLocally = (conversationId: string, skipNotification = false) => {
     const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;
@@ -729,7 +732,7 @@ export class ConversationRepository {
     }
     this.deleteConversationFromRepository(conversationId);
     this.conversation_service.delete_conversation_from_db(conversationId);
-  }
+  };
 
   public getAllUsersInConversation(conversation_id: string) {
     return this.get_conversation_by_id(conversation_id).then(conversationEntity =>
@@ -954,7 +957,7 @@ export class ConversationRepository {
    * @param connectionEntity Connections
    * @returns Resolves when connection was mapped return value
    */
-  private mapConnection(connectionEntity: ConnectionEntity): Promise<void | Conversation> {
+  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<void | Conversation> => {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -986,7 +989,7 @@ export class ConversationRepository {
           throw error;
         }
       });
-  }
+  };
 
   /**
    * @returns resolves when deleted conversations are locally deleted, too.
@@ -1076,9 +1079,9 @@ export class ConversationRepository {
    * @param conversationEntity Conversation of which the state should be persisted
    * @returns Resolves when conversation was saved
    */
-  private saveConversationStateInDb(conversationEntity: Conversation) {
+  private readonly saveConversationStateInDb = (conversationEntity: Conversation) => {
     return this.conversation_service.save_conversation_state_in_db(conversationEntity);
-  }
+  };
 
   /**
    * Save conversations in the repository.
@@ -1094,7 +1097,7 @@ export class ConversationRepository {
    * @note Temporarily do not unarchive conversations when handling the notification stream
    * @param handlingState State of the notifications stream handling
    */
-  private setNotificationHandlingState(handlingState: NOTIFICATION_HANDLING_STATE) {
+  private readonly setNotificationHandlingState = (handlingState: NOTIFICATION_HANDLING_STATE) => {
     const isFetchingFromStream = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (this.isBlockingNotificationHandling !== isFetchingFromStream) {
@@ -1104,7 +1107,7 @@ export class ConversationRepository {
       this.isBlockingNotificationHandling = isFetchingFromStream;
       this.logger.info(`Block handling of conversation events: ${this.isBlockingNotificationHandling}`);
     }
-  }
+  };
 
   /**
    * Update participating users in a conversation.
@@ -1341,7 +1344,11 @@ export class ConversationRepository {
    * @param userId ID of leaving user
    * @param isoDate Date of member removal
    */
-  async teamMemberLeave(teamId: string, userId: string, isoDate = this.serverTimeHandler.toServerTimestamp()) {
+  readonly teamMemberLeave = async (
+    teamId: string,
+    userId: string,
+    isoDate = this.serverTimeHandler.toServerTimestamp(),
+  ) => {
     const userEntity = await this.userRepository.getUserById(userId);
     this.conversationState
       .conversations()
@@ -1355,7 +1362,7 @@ export class ConversationRepository {
         this.eventRepository.injectEvent(leaveEvent as EventRecord);
       });
     userEntity.isDeleted = true;
-  }
+  };
 
   /**
    * Set the notification state of a conversation.
@@ -1555,7 +1562,7 @@ export class ConversationRepository {
   // Send Generic Messages
   //##############################################################################
 
-  async injectLegalHoldMessage({
+  readonly injectLegalHoldMessage = async ({
     conversationEntity,
     conversationId,
     userId,
@@ -1569,7 +1576,7 @@ export class ConversationRepository {
     legalHoldStatus: LegalHoldStatus;
     timestamp: number;
     userId: string;
-  }) {
+  }) => {
     if (typeof legalHoldStatus === 'undefined') {
       return;
     }
@@ -1586,7 +1593,7 @@ export class ConversationRepository {
       beforeTimestamp,
     );
     await this.eventRepository.injectEvent(legalHoldUpdateMessage as EventRecord);
-  }
+  };
 
   async injectFileTypeRestrictedMessage(
     conversation: Conversation,
@@ -1610,13 +1617,13 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when event was handled
    */
-  private onConversationEvent(eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) {
+  private readonly onConversationEvent = (eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) => {
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
     const logMessage = `Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
     this.logger.info(logMessage, logObject);
 
     return this.pushToReceivingQueue(eventJson, eventSource);
-  }
+  };
 
   private handleConversationEvent(eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
@@ -1977,7 +1984,7 @@ export class ConversationRepository {
   /**
    * Add "missed events" system message to conversation.
    */
-  private on_missed_events() {
+  private readonly on_missed_events = (): void => {
     this.conversationState
       .filtered_conversations()
       .filter(conversationEntity => !conversationEntity.removed_from_conversation())
@@ -1986,7 +1993,7 @@ export class ConversationRepository {
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
         this.eventRepository.injectEvent(missed_event as EventRecord);
       });
-  }
+  };
 
   private on1to1Creation(conversationEntity: Conversation, eventJson: EventRecord) {
     return this.event_mapper
@@ -2441,7 +2448,7 @@ export class ConversationRepository {
     return {conversationEntity, messageEntity};
   }
 
-  private handleMessageExpiration(messageEntity: ContentMessage) {
+  private readonly handleMessageExpiration = (messageEntity: ContentMessage) => {
     amplify.publish(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
     const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.is_ping();
     if (shouldDeleteMessage) {
@@ -2456,7 +2463,7 @@ export class ConversationRepository {
         return this.messageRepositoryProvider().deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
       });
     }
-  }
+  };
 
   private async initMessageEntity(conversationEntity: Conversation, eventJson: EventRecord): Promise<Message> {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);

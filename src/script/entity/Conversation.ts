@@ -485,18 +485,18 @@ export class Conversation {
       this.status,
       this.type,
       this.verification_state,
-    ].forEach(property => (property as any).subscribe(this.persistState.bind(this)));
+    ].forEach(property => (property as any).subscribe(this.persistState));
   }
 
   get allUserEntities() {
     return [this.selfUser()].concat(this.participating_user_ets());
   }
 
-  persistState(): void {
+  readonly persistState = (): void => {
     if (this.shouldPersistStateChanges) {
       this.publishPersistState();
     }
-  }
+  };
 
   setStateChangePersistence(persistChanges: boolean): void {
     this.shouldPersistStateChanges = persistChanges;
@@ -897,7 +897,7 @@ export class Conversation {
     return participantCount <= config.MAX_VIDEO_PARTICIPANTS;
   }
 
-  isShowingLastReceivedMessage = (): boolean => {
+  readonly isShowingLastReceivedMessage = (): boolean => {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
   };
 

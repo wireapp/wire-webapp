@@ -40,8 +40,6 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
   MotionDuration: typeof MotionDuration;
   constructor(params: PanelViewModelProps) {
     super(params);
-    this.clickOnShowUser = this.clickOnShowUser.bind(this);
-
     const repositories = params.repositories;
     this.searchRepository = repositories.search;
     this.teamRepository = repositories.team;
@@ -71,9 +69,9 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
     return 'conversation-participants';
   }
 
-  clickOnShowUser(userEntity: User): void {
+  readonly clickOnShowUser = (userEntity: User): void => {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
-  }
+  };
 
   initView({highlighted}: PanelParams = {highlighted: []}): void {
     this.searchInput('');

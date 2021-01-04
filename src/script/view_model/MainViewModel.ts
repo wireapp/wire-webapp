@@ -220,7 +220,7 @@ export class MainViewModel {
     this.isPanelOpen(false);
   }
 
-  togglePanel = (forceState: string): Promise<void> => {
+  readonly togglePanel = (forceState: string): Promise<void> => {
     const app = document.querySelector<HTMLElement>('#app');
     const panel = document.querySelector<HTMLElement>('.right-column');
 
@@ -317,7 +317,7 @@ export class MainViewModel {
     }
   }
 
-  closePanelOnClick = (): void => {
+  readonly closePanelOnClick = (): void => {
     this.panel.closePanel();
   };
 }

@@ -55,7 +55,7 @@ export class WindowTitleViewModel {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.initiateTitleUpdates);
   }
 
-  initiateTitleUpdates = () => {
+  readonly initiateTitleUpdates = () => {
     amplify.unsubscribe(WebAppEvents.LIFECYCLE.LOADED, this.initiateTitleUpdates);
 
     this.logger.info('Starting to update window title');
@@ -132,7 +132,7 @@ export class WindowTitleViewModel {
     }).extend({rateLimit: WindowTitleViewModel.TITLE_DEBOUNCE});
   };
 
-  setUpdateState = (handlingNotifications: NOTIFICATION_HANDLING_STATE) => {
+  readonly setUpdateState = (handlingNotifications: NOTIFICATION_HANDLING_STATE) => {
     const updateWindowTitle = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.updateWindowTitle() !== updateWindowTitle;

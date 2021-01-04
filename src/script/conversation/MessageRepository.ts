@@ -147,8 +147,8 @@ export class MessageRepository {
   }
 
   private initSubscriptions(): void {
-    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState.bind(this));
-    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload.bind(this));
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
+    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload);
   }
 
   /**
@@ -157,7 +157,7 @@ export class MessageRepository {
    * @note Temporarily do not allow sending messages when handling the notification stream
    * @param handlingState State of the notifications stream handling
    */
-  private setNotificationHandlingState(handlingState: NOTIFICATION_HANDLING_STATE) {
+  private readonly setNotificationHandlingState = (handlingState: NOTIFICATION_HANDLING_STATE) => {
     const updatedHandlingState = handlingState !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     if (this.isBlockingNotificationHandling !== updatedHandlingState) {
@@ -167,7 +167,7 @@ export class MessageRepository {
       );
       this.messageSender.pauseQueue(this.isBlockingNotificationHandling);
     }
-  }
+  };
 
   /**
    * Send text message in specified conversation.
@@ -1111,13 +1111,13 @@ export class MessageRepository {
    * Cancel asset upload.
    * @param messageId Id of the message which upload has been cancelled
    */
-  private cancel_asset_upload(messageId: string): void {
+  private readonly cancel_asset_upload = (messageId: string) => {
     this.sendAssetUploadFailed(
       this.conversationState.activeConversation(),
       messageId,
       ProtobufAsset.NotUploaded.CANCELLED,
     );
-  }
+  };
 
   /**
    * Update message as sent in db and view.

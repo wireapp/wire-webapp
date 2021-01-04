@@ -262,7 +262,7 @@ export class ContentViewModel {
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
    */
-  showConversation = (conversation: Conversation | string, options: ShowConversationOptions = {}) => {
+  readonly showConversation = (conversation: Conversation | string, options: ShowConversationOptions = {}) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
@@ -352,7 +352,7 @@ export class ContentViewModel {
       });
   };
 
-  switchContent = (newContentState: string): void => {
+  readonly switchContent = (newContentState: string): void => {
     const isStateChange = newContentState !== this.state();
     if (isStateChange) {
       this.releaseContent(newContentState);
@@ -360,7 +360,7 @@ export class ContentViewModel {
     }
   };
 
-  switchPreviousContent = (): void => {
+  readonly switchPreviousContent = (): void => {
     const isStateChange = this.previousState !== this.state();
     if (isStateChange) {
       const isStateRequests = this.previousState === ContentViewModel.STATE.CONNECTION_REQUESTS;

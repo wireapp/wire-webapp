@@ -78,8 +78,6 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       [CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
     });
 
-    this.checkMessageTimer = this.checkMessageTimer.bind(this);
-
     this.conversationMapper = conversationMapper;
     this.logger = getLogger('ConversationEphemeralHandler');
 
@@ -110,7 +108,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
    * @param messageEntity Message to check
    * @param timeOffset Approximate time different to backend in milliseconds
    */
-  async checkMessageTimer(messageEntity: ContentMessage, timeOffset: number): Promise<void> {
+  checkMessageTimer = async (messageEntity: ContentMessage, timeOffset: number): Promise<void> => {
     const hasHitBackend = messageEntity.status() > StatusType.SENDING;
     if (!hasHitBackend) {
       return;
@@ -139,7 +137,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         break;
       }
     }
-  }
+  };
 
   async validateMessage(messageEntity: ContentMessage): Promise<Message | void> {
     const isEphemeralMessage = messageEntity.ephemeral_status() !== EphemeralStatusType.NONE;

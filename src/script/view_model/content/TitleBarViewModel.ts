@@ -110,7 +110,7 @@ export class TitleBarViewModel {
     this.peopleTooltip = t('tooltipConversationPeople', shortcut);
   }
 
-  addedToView = (): void => {
+  readonly addedToView = (): void => {
     window.setTimeout(() => {
       amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => this.showDetails(false));
       amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
@@ -121,16 +121,16 @@ export class TitleBarViewModel {
     }, 50);
   };
 
-  removedFromView = () => {
+  readonly removedFromView = () => {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PEOPLE);
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.ADD_PEOPLE);
   };
 
-  startAudioCall = (conversationEntity: Conversation): void => {
+  readonly startAudioCall = (conversationEntity: Conversation): void => {
     this._startCall(conversationEntity, CALL_TYPE.NORMAL);
   };
 
-  startVideoCall = (conversationEntity: Conversation): void => {
+  readonly startVideoCall = (conversationEntity: Conversation): void => {
     this._startCall(conversationEntity, CALL_TYPE.VIDEO);
   };
 
@@ -139,15 +139,15 @@ export class TitleBarViewModel {
     this.callingRepository.startCall(conversationEntity.id, convType, callType);
   };
 
-  clickOnDetails = (): void => {
+  readonly clickOnDetails = (): void => {
     this.showDetails(false);
   };
 
-  clickOnCollectionButton = (): void => {
+  readonly clickOnCollectionButton = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   };
 
-  showAddParticipant = (): void => {
+  readonly showAddParticipant = (): void => {
     const canAddPeople = this.conversationEntity() && this.conversationEntity().isActiveParticipant();
 
     if (!canAddPeople) {
@@ -165,7 +165,7 @@ export class TitleBarViewModel {
     }
   };
 
-  showDetails = (addParticipants: boolean): void => {
+  readonly showDetails = (addParticipants: boolean): void => {
     const panelId = addParticipants ? PanelViewModel.STATE.ADD_PARTICIPANTS : PanelViewModel.STATE.CONVERSATION_DETAILS;
 
     this.panelViewModel.togglePanel(panelId, undefined);

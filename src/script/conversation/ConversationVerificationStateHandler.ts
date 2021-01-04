@@ -46,28 +46,28 @@ export class ConversationVerificationStateHandler {
   ) {
     this.logger = getLogger('ConversationVerificationStateHandler');
 
-    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, this.onClientAdded.bind(this));
-    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, this.onClientRemoved.bind(this));
-    amplify.subscribe(WebAppEvents.USER.CLIENTS_UPDATED, this.onClientsUpdated.bind(this));
-    amplify.subscribe(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged.bind(this));
+    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, this.onClientAdded);
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, this.onClientRemoved);
+    amplify.subscribe(WebAppEvents.USER.CLIENTS_UPDATED, this.onClientsUpdated);
+    amplify.subscribe(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged);
   }
 
-  onClientVerificationChanged(userId: string): void {
+  readonly onClientVerificationChanged = (userId: string): void => {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this.checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
         this.checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.UNVERIFIED);
       }
     });
-  }
+  };
 
   /**
    * Self user or other participant added clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  onClientAdded(userId: string, _clientEntity?: ClientEntity): void {
+  readonly onClientAdded = (userId: string, _clientEntity?: ClientEntity): void => {
     this.onClientsAdded([userId]);
-  }
+  };
 
   /**
    * Multiple participants added clients.
@@ -83,11 +83,11 @@ export class ConversationVerificationStateHandler {
    * Self user removed a client or other participants deleted clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  onClientRemoved(userId: string, _clientId?: string): void {
+  readonly onClientRemoved = (userId: string, _clientId?: string): void => {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
       this.checkChangeToVerified(conversationEntity);
     });
-  }
+  };
 
   /**
    * A new conversation was created.
@@ -100,14 +100,14 @@ export class ConversationVerificationStateHandler {
   /**
    * Clients of a user were updated.
    */
-  onClientsUpdated(userId: string): void {
+  readonly onClientsUpdated = (userId: string): void => {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this.checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
         this.checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_DEVICE);
       }
     });
-  }
+  };
 
   /**
    * New member(s) joined the conversation.

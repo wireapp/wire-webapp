@@ -52,17 +52,17 @@ export class ArchiveViewModel {
     this.onJoinCall = onJoinCall;
   }
 
-  clickOnConversation = (conversationEntity: Conversation): void => {
+  readonly clickOnConversation = (conversationEntity: Conversation): void => {
     this.conversationRepository.unarchiveConversation(conversationEntity, true, 'opened conversation from archive');
     this.listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   };
 
-  clickOnClose = (): void => {
+  readonly clickOnClose = (): void => {
     this.listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
   };
 
-  updateList = (): void => {
+  readonly updateList = (): void => {
     this.conversationRepository.updateArchivedConversations();
   };
 }

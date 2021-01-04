@@ -74,7 +74,7 @@ export class EventTrackingRepository {
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
-  onUserEvent = (eventJson: any, source: EventSource) => {
+  readonly onUserEvent = (eventJson: any, source: EventSource) => {
     const type = eventJson.type;
     if (type === ClientEvent.USER.DATA_TRANSFER && this.userState.isTeam()) {
       this.migrateDeviceId(eventJson.data.trackingIdentifier);
@@ -218,18 +218,18 @@ export class EventTrackingRepository {
         });
   }
 
-  private stopProductReportingSession(): void {
+  private readonly stopProductReportingSession = (): void => {
     if (this.isProductReportingActivated === true) {
       Countly.end_session();
     }
-  }
+  };
 
   private subscribeToProductEvents(): void {
     amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, segmentations?: Record<string, any>) => {
       this.trackProductReportingEvent(eventName, segmentations);
     });
 
-    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession);
   }
 
   private startProductReportingSession(): void {

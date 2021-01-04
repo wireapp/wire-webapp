@@ -152,7 +152,7 @@ export class GroupCreationViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, this.showCreateGroup);
   }
 
-  showCreateGroup = (groupCreationSource: GroupCreationSource, userEntity: User) => {
+  readonly showCreateGroup = (groupCreationSource: GroupCreationSource, userEntity: User) => {
     this.groupCreationSource = groupCreationSource;
     this.enableReadReceipts(this.isTeam());
     this.isShown(true);
@@ -162,15 +162,15 @@ export class GroupCreationViewModel {
     }
   };
 
-  clickOnBack = (): void => {
+  readonly clickOnBack = (): void => {
     this.state(GroupCreationViewModel.STATE.PREFERENCES);
   };
 
-  clickOnClose = (): void => {
+  readonly clickOnClose = (): void => {
     this.isShown(false);
   };
 
-  clickOnToggleGuestMode = (): void => {
+  readonly clickOnToggleGuestMode = (): void => {
     const accessState = this.isGuestRoom() ? ACCESS_STATE.TEAM.TEAM_ONLY : ACCESS_STATE.TEAM.GUEST_ROOM;
 
     this.accessState(accessState);
@@ -202,7 +202,7 @@ export class GroupCreationViewModel {
     }
   };
 
-  clickOnNext = (): void => {
+  readonly clickOnNext = (): void => {
     if (!this.nameInput().length) {
       return;
     }
@@ -223,7 +223,7 @@ export class GroupCreationViewModel {
     this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
   };
 
-  afterHideModal = (): void => {
+  readonly afterHideModal = (): void => {
     this.isCreatingConversation = false;
     this.groupCreationSource = undefined;
     this.nameError('');

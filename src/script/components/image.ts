@@ -60,7 +60,7 @@ class Image {
     viewportObserver.onElementInViewport(this.element, _onInViewport);
   }
 
-  onClick = () => {
+  readonly onClick = () => {
     if (!this.assetIsLoading() && typeof this.params.click === 'function') {
       this.params.click(this.asset);
     }

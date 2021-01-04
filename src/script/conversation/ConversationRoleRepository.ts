@@ -88,7 +88,7 @@ export class ConversationRoleRepository {
     }
   };
 
-  setConversationRoles = (conversation: Conversation, newRoles: ConversationRole[]): void => {
+  readonly setConversationRoles = (conversation: Conversation, newRoles: ConversationRole[]): void => {
     this.conversationRoles[conversation.id] = newRoles;
   };
 
@@ -111,75 +111,79 @@ export class ConversationRoleRepository {
     conversation.roles(roleUpdates);
   };
 
-  setMemberConversationRole = (conversation: Conversation, userId: string, conversationRole: string): Promise<void> => {
+  readonly setMemberConversationRole = (
+    conversation: Conversation,
+    userId: string,
+    conversationRole: string,
+  ): Promise<void> => {
     return this.conversationService.putMembers(conversation.id, userId, {
       conversation_role: conversationRole,
     });
   };
 
-  getUserRole = (conversation: Conversation, userEntity: User): string => {
+  readonly getUserRole = (conversation: Conversation, userEntity: User): string => {
     return conversation.roles()[userEntity.id];
   };
 
-  isUserGroupAdmin = (conversation: Conversation, userEntity: User): boolean => {
+  readonly isUserGroupAdmin = (conversation: Conversation, userEntity: User): boolean => {
     return this.getUserRole(conversation, userEntity) === DefaultRole.WIRE_ADMIN;
   };
 
-  isSelfGroupAdmin = (conversation: Conversation): boolean => {
+  readonly isSelfGroupAdmin = (conversation: Conversation): boolean => {
     return this.isUserGroupAdmin(conversation, this.userState.self());
   };
 
-  getConversationRoles = (conversation: Conversation): ConversationRole[] => {
+  readonly getConversationRoles = (conversation: Conversation): ConversationRole[] => {
     if (this.teamState.isTeam() && this.teamState.team()?.id === conversation.team_id) {
       return this.teamRoles;
     }
     return this.conversationRoles[conversation.id] || this.teamRoles;
   };
 
-  getUserPermissions = (conversation: Conversation, user: User): ConversationRole => {
+  readonly getUserPermissions = (conversation: Conversation, user: User): ConversationRole => {
     const conversationRoles = this.getConversationRoles(conversation);
     const userRole: string = this.getUserRole(conversation, user);
     return conversationRoles?.find(({conversation_role}) => conversation_role === userRole) || defaultMemberRole;
   };
 
-  hasPermission = (conversation: Conversation, user: User, permissionName: Permissions): boolean => {
+  readonly hasPermission = (conversation: Conversation, user: User, permissionName: Permissions): boolean => {
     const userRole = this.getUserPermissions(conversation, user);
     return userRole.actions.includes(permissionName);
   };
 
-  canRenameGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canRenameGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.renameConversation);
   };
 
-  canAddParticipants = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canAddParticipants = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.addParticipants);
   };
 
-  canRemoveParticipants = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canRemoveParticipants = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.removeParticipants);
   };
 
-  canChangeParticipantRoles = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canChangeParticipantRoles = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.changeParticipantRoles);
   };
 
-  canToggleTimeout = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canToggleTimeout = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.toggleEphemeralTimer);
   };
 
-  canToggleGuests = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canToggleGuests = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.toggleGuestsAndServices);
   };
 
-  canToggleReadReceipts = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canToggleReadReceipts = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.toggleReadReceipts);
   };
 
-  canDeleteGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canDeleteGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.deleteConversation);
   };
 
-  canLeaveGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canLeaveGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
     return this.hasPermission(conversation, user, Permissions.leaveConversation);
   };
 }

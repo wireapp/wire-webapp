@@ -237,21 +237,21 @@ export class ConversationListViewModel {
     });
   };
 
-  expandFolder = (label: string) => {
+  readonly expandFolder = (label: string) => {
     if (!this.expandedFoldersIds().includes(label)) {
       this.expandedFoldersIds.push(label);
     }
   };
 
-  clickOnAvailability = (viewModel: unknown, event: MouseEvent): void => {
+  readonly clickOnAvailability = (viewModel: unknown, event: MouseEvent): void => {
     AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
   };
 
-  clickOnConnectRequests = (): void => {
+  readonly clickOnConnectRequests = (): void => {
     this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
   };
 
-  hasJoinableCall = (conversationId: string): boolean => {
+  readonly hasJoinableCall = (conversationId: string): boolean => {
     const call = this.callingRepository.findCall(conversationId);
     if (!call) {
       return false;
@@ -264,7 +264,7 @@ export class ConversationListViewModel {
     );
   };
 
-  setShowCallsState = (handlingNotifications: string): void => {
+  readonly setShowCallsState = (handlingNotifications: string): void => {
     const shouldShowCalls = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.showCalls() !== shouldShowCalls;
@@ -274,7 +274,7 @@ export class ConversationListViewModel {
     }
   };
 
-  isSelectedConversation = (conversationEntity: Conversation): boolean => {
+  readonly isSelectedConversation = (conversationEntity: Conversation): boolean => {
     const expectedStates = [
       ContentViewModel.STATE.COLLECTION,
       ContentViewModel.STATE.COLLECTION_DETAILS,
@@ -287,7 +287,7 @@ export class ConversationListViewModel {
     return isSelectedConversation && isExpectedState;
   };
 
-  onWebappLoaded = (): void => {
+  readonly onWebappLoaded = (): void => {
     this.webappIsLoaded(true);
   };
 
@@ -295,15 +295,15 @@ export class ConversationListViewModel {
   // Footer actions
   //##############################################################################
 
-  clickOnArchivedButton = (): void => {
+  readonly clickOnArchivedButton = (): void => {
     this.listViewModel.switchList(ListViewModel.STATE.ARCHIVE);
   };
 
-  clickOnPreferencesButton = (): void => {
+  readonly clickOnPreferencesButton = (): void => {
     amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
   };
 
-  clickOnPeopleButton = (): void => {
+  readonly clickOnPeopleButton = (): void => {
     if (this.isActivatedAccount()) {
       this.listViewModel.switchList(ListViewModel.STATE.START_UI);
     }

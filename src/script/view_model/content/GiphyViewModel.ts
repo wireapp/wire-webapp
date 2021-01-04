@@ -78,7 +78,7 @@ export class GiphyViewModel {
   }
 
   private readonly _initSubscriptions = (): void => {
-    amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SHOW, this.showGiphy.bind(this));
+    amplify.subscribe(WebAppEvents.EXTENSIONS.GIPHY.SHOW, this.showGiphy);
   };
 
   readonly clickOnBack = (): void => {

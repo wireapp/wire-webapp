@@ -46,7 +46,7 @@ export class ConnectRequestsViewModel {
     this.shouldUpdateScrollbar = ko.computed(() => this.connectRequests()).extend({notify: 'always', rateLimit: 500});
   }
 
-  afterRender = (elements: Object, request: User): void => {
+  readonly afterRender = (elements: Object, request: User): void => {
     if (isLastItem(this.connectRequests(), request)) {
       window.requestAnimationFrame(() => scrollToBottom(document.querySelector('.connect-requests')));
     }
@@ -63,7 +63,7 @@ export class ConnectRequestsViewModel {
     }
   };
 
-  clickOnIgnore = (userEntity: User): void => {
+  readonly clickOnIgnore = (userEntity: User): void => {
     this.actionsViewModel.ignoreConnectionRequest(userEntity);
   };
 }
