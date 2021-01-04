@@ -23,7 +23,6 @@ import {container} from 'tsyringe';
 import {escape} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
-import {container} from 'tsyringe';
 
 import {t} from '../../util/LocalizerUtil';
 import {TIME_IN_MILLIS, formatLocale} from '../../util/TimeUtil';
@@ -56,6 +55,7 @@ import {FileAsset} from '../../entity/message/FileAsset';
 import {MediumImage} from '../../entity/message/MediumImage';
 import {MessageRepository} from '../../conversation/MessageRepository';
 import {UserState} from '../../user/UserState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 interface DraftMessage {
   mentions: MentionEntity[];

@@ -38,7 +38,6 @@ import {
 } from '@wireapp/api-client/src/conversation';
 import {container} from 'tsyringe';
 import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data';
-import {container} from 'tsyringe';
 
 import {Logger, getLogger} from '../util/Logger';
 import {TIME_IN_MILLIS} from '../util/TimeUtil';

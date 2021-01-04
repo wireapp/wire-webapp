@@ -24,8 +24,6 @@ import {registerReactComponent} from '../util/ComponentUtil';
 import type {User} from '../entity/User';
 import {CSS_ABSOLUTE_CENTER, CSS_SQUARE} from '../util/CSSMixin';
 
-import type {User} from '../entity/User';
-
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;
   user: User;

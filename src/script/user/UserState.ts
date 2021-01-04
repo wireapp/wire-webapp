@@ -24,8 +24,6 @@ import {User} from '../entity/User';
 import {sortUsersByPriority} from '../util/StringUtil';
 import {TIME_IN_MILLIS} from '../util/TimeUtil';
 
-import {User} from '../entity/User';
-
 @singleton()
 export class UserState {
   public directlyConnectedUsers: ko.PureComputed<User[]>;

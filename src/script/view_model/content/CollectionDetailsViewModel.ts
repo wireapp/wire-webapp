@@ -25,10 +25,10 @@ import {getLogger, Logger} from '../../util/Logger';
 import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from '../../util/TimeUtil';
 import {t} from '../../util/LocalizerUtil';
 import {koPushDeferred} from '../../util/util';
-import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 import {Conversation} from '../../entity/Conversation';
 import {MessageCategory} from '../../message/MessageCategory';
+import {ContentMessage} from '../../entity/message/ContentMessage';
 
 // Parent: ContentViewModel
 export class CollectionDetailsViewModel {

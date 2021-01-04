@@ -21,20 +21,17 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
-import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 
 import {t} from '../../util/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {Config} from '../../Config';
-import {ModalsViewModel} from '../ModalsViewModel';
 import {UserState} from '../../user/UserState';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {CallingViewModel} from '../CallingViewModel';
 import type {User} from '../../entity/User';
 import type {TeamRepository} from '../../team/TeamRepository';
 import type {Multitasking} from '../../notification/NotificationRepository';
-import {UserState} from '../../user/UserState';
+import {MainViewModel} from '../MainViewModel';
 
 export class TemporaryGuestViewModel {
   readonly multitasking: Multitasking;

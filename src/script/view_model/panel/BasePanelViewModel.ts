@@ -19,7 +19,6 @@
 
 import ko from 'knockout';
 import {container} from 'tsyringe';
-import ko from 'knockout';
 
 import {ConversationState} from '../../conversation/ConversationState';
 import type {Conversation} from '../../entity/Conversation';

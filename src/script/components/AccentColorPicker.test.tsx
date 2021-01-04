@@ -17,6 +17,8 @@
  *
  */
 
+import {AccentColor} from '@wireapp/commons';
+
 import AccentColorPicker, {AccentColorPickerProps} from './AccentColorPicker';
 import TestPage from '../util/test/TestPage';
 import {User} from '../entity/User';

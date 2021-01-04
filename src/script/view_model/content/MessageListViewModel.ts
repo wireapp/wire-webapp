@@ -21,8 +21,6 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 import ko from 'knockout';
 
 import {getLogger, Logger} from '../../util/Logger';
@@ -43,7 +41,6 @@ import {Message} from '../../entity/message/Message';
 import {MessageCategory} from '../../message/MessageCategory';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {PanelViewModel} from '../PanelViewModel';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
@@ -51,7 +48,6 @@ import {UserError} from '../../error/UserError';
 import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PanelViewModel} from '../PanelViewModel';
-import type {MessageRepository} from '../../conversation/MessageRepository';
 import {UserState} from '../../user/UserState';
 import type {MessageRepository} from '../../conversation/MessageRepository';
 

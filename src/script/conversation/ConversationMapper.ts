@@ -26,8 +26,8 @@ import {
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
-} from '@wireapp/api-client/src/conversation';
-import {Conversation as ConversationBackendData} from '@wireapp/api-client/src/conversation/';
+  Conversation as ConversationBackendData,
+} from '@wireapp/api-client/src/conversation/';
 
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';

@@ -26,22 +26,21 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import murmurhash from 'murmurhash';
-import {container} from 'tsyringe';
 
-import {t} from '../util/LocalizerUtil';
-import {Logger, getLogger} from '../util/Logger';
+import {ClientEntity} from './ClientEntity';
+import {ClientError} from '../error/ClientError';
+import {ClientMapper} from './ClientMapper';
+import {ClientRecord} from '../storage';
+import {ClientState} from './ClientState';
 import {loadValue} from '../util/StorageUtil';
+import {Logger, getLogger} from '../util/Logger';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {ClientEntity} from './ClientEntity';
-import {ClientMapper} from './ClientMapper';
+import {t} from '../util/LocalizerUtil';
 import type {ClientService} from './ClientService';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
-import {ClientError} from '../error/ClientError';
-import {ClientRecord} from '../storage';
-import {ClientState} from './ClientState';
 
 export class ClientRepository {
   private readonly logger: Logger;

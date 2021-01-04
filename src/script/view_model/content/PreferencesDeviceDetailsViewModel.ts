@@ -18,7 +18,6 @@
  */
 
 import {amplify} from 'amplify';
-import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -34,7 +33,9 @@ import {MotionDuration} from '../../motion/MotionDuration';
 import {User} from '../../entity/User';
 import {getLogger, Logger} from '../../util/Logger';
 import type {MessageRepository} from '../../conversation/MessageRepository';
-import {ConversationState} from '../../conversation/ConversationState';
+import {ClientEntity} from '../../client/ClientEntity';
+import {ClientRepository} from '../../client/ClientRepository';
+import {ActionsViewModel} from '../ActionsViewModel';
 
 export class PreferencesDeviceDetailsViewModel {
   private readonly logger: Logger;

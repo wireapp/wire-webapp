@@ -21,20 +21,15 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {container} from 'tsyringe';
 
-import {isEscapeKey} from '../../util/KeyboardUtil';
-import {MessageCategory} from '../../message/MessageCategory';
-import {ContentViewModel} from '../ContentViewModel';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {ContentMessage} from '../../entity/message/ContentMessage';
 import {CollectionDetailsViewModel} from './CollectionDetailsViewModel';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {ContentViewModel} from '../ContentViewModel';
 import {Conversation} from '../../entity/Conversation';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ConversationState} from '../../conversation/ConversationState';
+import {isEscapeKey} from '../../util/KeyboardUtil';
+import {MessageCategory} from '../../message/MessageCategory';
 
 export class CollectionViewModel {
   collectionDetails: CollectionDetailsViewModel;

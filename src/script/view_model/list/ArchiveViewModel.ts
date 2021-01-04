@@ -17,12 +17,12 @@
  *
  */
 
+import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import {ListViewModel} from '../ListViewModel';
-import type {Conversation} from '../../entity/Conversation';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {Conversation} from '../../entity/Conversation';
 import {ConversationState} from '../../conversation/ConversationState';

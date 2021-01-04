@@ -18,26 +18,27 @@
  */
 
 import {amplify} from 'amplify';
+import type {PublicClient} from '@wireapp/api-client/src/client';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {USER_EVENT} from '@wireapp/api-client/src/event';
-import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/src/user';
+import type {TraceState} from '@wireapp/api-client/src/http';
+import {
+  UserAsset as APIClientUserAsset,
+  UserAssetType as APIClientUserAssetType,
+  User as APIClientUser,
+} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {AxiosError} from 'axios';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {container} from 'tsyringe';
 
 import {chunk, partition} from '../util/ArrayUtil';
 import {t} from '../util/LocalizerUtil';
 import {Logger, getLogger} from '../util/Logger';
 import {createRandomUuid, loadUrlBlob} from '../util/util';
-import {UNSPLASH_URL} from '../externalRoute';
-import {mapProfileAssetsV1} from '../assets/AssetMapper';
-import {User} from '../entity/User';
 import {ClientEvent} from '../event/Client';
 import {ClientMapper} from '../client/ClientMapper';
 import {Config} from '../Config';
@@ -61,8 +62,10 @@ import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {UserError} from '../error/UserError';
-import {UserState} from './UserState';
+import {AssetRepository} from '../assets/AssetRepository';
+import {UserService} from './UserService';
+import {ClientEntity} from '../client/ClientEntity';
+import {BackendError} from '../auth/module/action/BackendError';
 
 export class UserRepository {
   private readonly assetRepository: AssetRepository;
