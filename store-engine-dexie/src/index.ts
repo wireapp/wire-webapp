@@ -18,7 +18,7 @@
  */
 
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
-import Dexie from 'dexie';
+import Dexie, {DexieError} from 'dexie';
 import logdown = require('logdown');
 
 type DexieObservable = {_dbSchema?: Object};
@@ -113,11 +113,7 @@ export class IndexedDBEngine implements CRUDEngine {
     return this.db ? this.db.delete() : Dexie.delete(this.storeName);
   }
 
-  private mapDatabaseError<PrimaryKey = string>(
-    error: Dexie.DexieError,
-    tableName: string,
-    primaryKey: PrimaryKey,
-  ): Error {
+  private mapDatabaseError<PrimaryKey = string>(error: DexieError, tableName: string, primaryKey: PrimaryKey): Error {
     const isAlreadyExisting = error instanceof Dexie.ConstraintError;
     /** @see https://github.com/dfahlander/Dexie.js/issues/776 */
     const hasNotEnoughDiskSpace =
@@ -140,7 +136,7 @@ export class IndexedDBEngine implements CRUDEngine {
   ): Promise<PrimaryKey> {
     if (entity) {
       try {
-        const newPrimaryKey = await this.db.table(tableName).add(entity, primaryKey);
+        const newPrimaryKey = await this.db.table<EntityType, PrimaryKey>(tableName).add(entity, primaryKey);
         return newPrimaryKey;
       } catch (error) {
         throw this.mapDatabaseError(error, tableName, primaryKey);
@@ -151,7 +147,7 @@ export class IndexedDBEngine implements CRUDEngine {
   }
 
   public async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
-    await this.db.table(tableName).delete(primaryKey);
+    await this.db.table<any, PrimaryKey>(tableName).delete(primaryKey);
     return primaryKey;
   }
 
