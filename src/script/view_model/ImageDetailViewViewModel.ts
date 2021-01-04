@@ -17,13 +17,13 @@
  *
  */
 
-import {iterateItem} from 'Util/ArrayUtil';
-import {KEY} from 'Util/KeyboardUtil';
-import {formatLocale} from 'Util/TimeUtil';
 import ko from 'knockout';
 import {amplify} from 'amplify';
-
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {iterateItem} from '../util/ArrayUtil';
+import {KEY} from '../util/KeyboardUtil';
+import {formatLocale} from '../util/TimeUtil';
 import {Modal} from '../ui/Modal';
 import type {MainViewModel} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';

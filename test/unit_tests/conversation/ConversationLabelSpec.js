@@ -17,7 +17,7 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from '../util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';

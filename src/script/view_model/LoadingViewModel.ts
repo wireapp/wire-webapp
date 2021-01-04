@@ -21,11 +21,10 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import {t} from 'Util/LocalizerUtil';
-
+import {t} from '../util/LocalizerUtil';
 import {Config} from '../Config';
 
-import 'Components/loadingBar';
+import '../components/loadingBar';
 
 export class LoadingViewModel {
   loadingMessage: ko.Observable<string>;

@@ -19,16 +19,15 @@
 
 import ko from 'knockout';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import {UserlistMode} from 'Components/userList';
-import {t} from 'Util/LocalizerUtil';
-import {capitalizeFirstChar} from 'Util/StringUtil';
-
+import {AVATAR_SIZE} from '../../components/ParticipantAvatar';
+import {UserlistMode} from '../../components/userList';
+import {t} from '../../util/LocalizerUtil';
+import {capitalizeFirstChar} from '../../util/StringUtil';
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {viewportObserver} from '../../ui/viewportObserver';
 
-import 'Components/availabilityState';
+import '../components/availabilityState';
 import {Participant} from '../../calling/Participant';
 
 interface ParticipantItemParams {
@@ -163,7 +162,7 @@ ko.components.register('participant-item', {
             <!-- /ko -->
           </div>
         </div>
-        
+
         <!-- ko if: callParticipant -->
           <!-- ko if: callParticipant.sharesCamera() -->
             <camera-icon data-uie-name="status-video"></camera-icon>

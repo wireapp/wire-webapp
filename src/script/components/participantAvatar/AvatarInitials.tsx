@@ -19,9 +19,8 @@
 
 import React from 'react';
 
-import {getFirstChar} from 'Util/StringUtil';
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-
+import {getFirstChar} from '../../util/StringUtil';
+import {CSS_FILL_PARENT} from '../../util/CSSMixin';
 import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from '../ParticipantAvatar';
 
 export interface AvatarInitialsProps {

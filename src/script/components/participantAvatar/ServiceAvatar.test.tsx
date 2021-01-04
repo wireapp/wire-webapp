@@ -18,10 +18,10 @@
  */
 
 import ServiceAvatar, {ServiceAvatarProps} from './ServiceAvatar';
-import TestPage from 'Util/test/TestPage';
+import TestPage from '../../util//test/TestPage';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from '../../components/ParticipantAvatar';
 
 jest.mock('../../auth/util/SVGProvider');
 

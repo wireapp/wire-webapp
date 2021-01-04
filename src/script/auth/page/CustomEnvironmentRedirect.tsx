@@ -31,7 +31,7 @@ import {actionRoot} from '../module/action';
 import {Runtime} from '@wireapp/commons';
 import SVGProvider from '../util/SVGProvider';
 import {customEnvRedirectStrings} from '../../strings';
-import {afterRender} from 'Util/util';
+import {afterRender} from '../../util/util';
 
 const REDIRECT_DELAY = 5000;
 const CustomEnvironmentRedirect = ({doNavigate, doSendNavigationEvent}: DispatchProps) => {

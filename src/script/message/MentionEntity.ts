@@ -19,7 +19,7 @@
 
 import {Mention} from '@wireapp/protocol-messaging';
 
-import {isUUID} from 'Util/ValidationUtil';
+import {isUUID} from '../util/ValidationUtil';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 
 export enum ERROR {

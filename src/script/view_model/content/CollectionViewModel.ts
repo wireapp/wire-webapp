@@ -17,11 +17,12 @@
  *
  */
 
-import {isEscapeKey} from 'Util/KeyboardUtil';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
+
+import {isEscapeKey} from '../../util/KeyboardUtil';
 import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -29,7 +30,6 @@ import {ContentMessage} from '../../entity/message/ContentMessage';
 import {CollectionDetailsViewModel} from './CollectionDetailsViewModel';
 import {Conversation} from '../../entity/Conversation';
 import {ConversationState} from '../../conversation/ConversationState';
-import {container} from 'tsyringe';
 
 export class CollectionViewModel {
   collectionDetails: CollectionDetailsViewModel;

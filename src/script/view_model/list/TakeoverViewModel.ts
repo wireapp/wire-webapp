@@ -20,6 +20,7 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {Config} from '../../Config';
 import {getSupportUsernameUrl} from '../../externalRoute';
@@ -28,7 +29,6 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {ListViewModel} from '../ListViewModel';
 import type {User} from '../../entity/User';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class TakeoverViewModel {

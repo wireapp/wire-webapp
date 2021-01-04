@@ -18,10 +18,9 @@
  */
 
 import React from 'react';
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
+import {CSS_FILL_PARENT} from '../../util/CSSMixin';
 import {User} from '../../entity/User';
-
 import {AVATAR_SIZE, STATE, DIAMETER} from '../ParticipantAvatar';
 import AvatarBackground from './AvatarBackground';
 import AvatarInitials from './AvatarInitials';

@@ -17,7 +17,7 @@
  *
  */
 
-import {escapeRegex} from 'Util/SanitizationUtil';
+import {escapeRegex} from '../util/SanitizationUtil';
 
 export const getSearchRegex = (query: string): RegExp => {
   const delimiter = ' ';

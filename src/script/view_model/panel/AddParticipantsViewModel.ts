@@ -18,26 +18,24 @@
  */
 
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {sortUsersByPriority} from 'Util/StringUtil';
-
+import {Logger, getLogger} from '../../util/Logger';
+import {t} from '../../util/LocalizerUtil';
+import {safeWindowOpen} from '../../util/SanitizationUtil';
+import {sortUsersByPriority} from '../../util/StringUtil';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getManageServicesUrl} from '../../externalRoute';
 import {MotionDuration} from '../../motion/MotionDuration';
-
-import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import type {IntegrationRepository} from 'src/script/integration/IntegrationRepository';
-import type {SearchRepository} from 'src/script/search/SearchRepository';
-import type {ServiceEntity} from 'src/script/integration/ServiceEntity';
-import type {User} from 'src/script/entity/User';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {IntegrationRepository} from '../../integration/IntegrationRepository';
+import type {SearchRepository} from '../../search/SearchRepository';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
+import type {User} from '../../entity/User';
 import {PanelViewModel} from '../PanelViewModel';
 import {UserState} from '../../user/UserState';
-import {container} from 'tsyringe';
 import {TeamState} from '../../team/TeamState';
-import {TeamRepository} from 'src/script/team/TeamRepository';
+import {TeamRepository} from '../../team/TeamRepository';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;

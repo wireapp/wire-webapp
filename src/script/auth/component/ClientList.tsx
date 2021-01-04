@@ -23,7 +23,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from '../../util/Logger';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import * as LocalStorageAction from '../module/action/LocalStorageAction';
 import {RootState, bindActionCreators} from '../module/reducer';

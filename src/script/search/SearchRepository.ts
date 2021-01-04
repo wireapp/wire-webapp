@@ -17,10 +17,9 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
-import {EMOJI_RANGES} from 'Util/EmojiUtil';
-import {startsWith, computeTransliteration, sortByPriority, transliterationIndex} from 'Util/StringUtil';
-
+import {Logger, getLogger} from '../util/Logger';
+import {EMOJI_RANGES} from '../util/EmojiUtil';
+import {startsWith, computeTransliteration, sortByPriority, transliterationIndex} from '../util/StringUtil';
 import {validateHandle} from '../user/UserHandleGenerator';
 import type {SearchService} from './SearchService';
 import type {UserRepository} from '../user/UserRepository';

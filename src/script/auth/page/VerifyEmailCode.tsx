@@ -24,7 +24,7 @@ import {connect} from 'react-redux';
 import {RouteComponentProps} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from '../../util/Logger';
 import {verifyStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';

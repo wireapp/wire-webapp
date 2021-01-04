@@ -24,9 +24,8 @@ import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import {AssetRetentionPolicy} from '@wireapp/api-client/src/asset';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {base64ToBlob, createRandomUuid} from 'Util/util';
-import {getLogger, Logger} from 'Util/Logger';
-
+import {base64ToBlob, createRandomUuid} from '../util/util';
+import {getLogger, Logger} from '../util/Logger';
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';

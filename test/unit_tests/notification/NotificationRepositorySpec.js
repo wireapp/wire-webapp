@@ -24,9 +24,9 @@ import {NotificationPreference} from '@wireapp/api-client/src/user/data';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {t} from 'Util/LocalizerUtil';
-import {createRandomUuid} from 'Util/util';
-import {truncate} from 'Util/StringUtil';
+import {t} from '../util/LocalizerUtil';
+import {createRandomUuid} from '../util/util';
+import {truncate} from '../util/StringUtil';
 
 import 'src/script/localization/Localizer';
 

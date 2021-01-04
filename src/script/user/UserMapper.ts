@@ -20,9 +20,8 @@
 import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 import type {Self as APIClientSelf} from '@wireapp/api-client/src/self';
 
-import {joaatHash} from 'Util/Crypto';
-import {Logger, getLogger} from 'Util/Logger';
-
+import {joaatHash} from '../util/Crypto';
+import {Logger, getLogger} from '../util/Logger';
 import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../assets/AssetMapper';
 import {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';

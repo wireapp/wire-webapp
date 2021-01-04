@@ -41,7 +41,7 @@ import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from '../../util/Logger';
 import {Config} from '../../Config';
 import {loginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';

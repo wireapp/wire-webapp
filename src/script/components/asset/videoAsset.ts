@@ -19,9 +19,8 @@
 
 import ko from 'knockout';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {formatSeconds} from 'Util/TimeUtil';
-
+import {Logger, getLogger} from '../../util/Logger';
+import {formatSeconds} from '../../util/TimeUtil';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {FileAsset} from '../../entity/message/FileAsset';

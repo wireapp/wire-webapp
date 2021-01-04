@@ -17,7 +17,7 @@
  *
  */
 
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
 
 export const EphemeralTimings = {
   VALUES: [

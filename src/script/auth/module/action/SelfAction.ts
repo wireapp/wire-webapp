@@ -20,8 +20,8 @@
 import type {ChangePassword, ConsentType, Self} from '@wireapp/api-client/src/self';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {Environment} from 'Util/Environment';
-import {getLogger} from 'Util/Logger';
+import {Environment} from '../../../util/Environment';
+import {getLogger} from '../../../util/Logger';
 
 import type {ThunkAction} from '../reducer';
 import {SelfActionCreator} from './creator/';

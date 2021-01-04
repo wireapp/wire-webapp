@@ -21,8 +21,7 @@ import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import {getLinksFromHtml} from 'Util/UrlUtil';
-
+import {getLinksFromHtml} from '../util/UrlUtil';
 import {MediaEmbeds} from './MediaEmbeds';
 
 class MediaParser {

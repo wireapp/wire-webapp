@@ -21,10 +21,9 @@ import {Article, LinkPreview, Tweet} from '@wireapp/protocol-messaging';
 import type {Data as OpenGraphData} from 'open-graph';
 import {isEmpty} from 'underscore';
 
-import {deArrayify} from 'Util/ArrayUtil';
-import {truncate} from 'Util/StringUtil';
-import {isTweetUrl} from 'Util/ValidationUtil';
-
+import {deArrayify} from '../util/ArrayUtil';
+import {truncate} from '../util/StringUtil';
+import {isTweetUrl} from '../util/ValidationUtil';
 import {Config} from '../Config';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 

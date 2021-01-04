@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-
+import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
@@ -41,7 +41,6 @@ import type {Message} from '../entity/message/Message';
 import type {BasePanelViewModel} from './panel/BasePanelViewModel';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import {ConversationState} from '../conversation/ConversationState';
-import {container} from 'tsyringe';
 
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 

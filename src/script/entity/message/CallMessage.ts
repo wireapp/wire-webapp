@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
-
+import {t} from '../../util/LocalizerUtil';
 import type {TERMINATION_REASON} from '../../calling/enum/TerminationReason';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {SuperType} from '../../message/SuperType';

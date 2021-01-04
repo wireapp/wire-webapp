@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {sortUsersByPriority} from 'Util/StringUtil';
-
+import {sortUsersByPriority} from '../../util/StringUtil';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {User} from '../../entity/User';
 import {MotionDuration} from '../../motion/MotionDuration';

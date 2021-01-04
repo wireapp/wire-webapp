@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {renderMessage} from 'Util/messageRenderer';
-
+import {renderMessage} from '../../util/messageRenderer';
 import {AssetType} from '../../assets/AssetType';
 import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
 import {mediaParser} from '../../media/MediaParser';

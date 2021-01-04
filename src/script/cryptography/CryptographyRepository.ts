@@ -30,9 +30,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
-
+import {getLogger, Logger} from '../util/Logger';
+import {arrayToBase64, base64ToArray, zeroPadding} from '../util/util';
 import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
 import {EventName} from '../tracking/EventName';

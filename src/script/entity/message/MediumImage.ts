@@ -18,8 +18,8 @@
  */
 
 import ko from 'knockout';
-import {getLogger} from 'Util/Logger';
 
+import {getLogger} from '../../util/Logger';
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetType} from '../../assets/AssetType';
 import {FileAsset} from './FileAsset';

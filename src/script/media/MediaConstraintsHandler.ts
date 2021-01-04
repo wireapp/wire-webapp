@@ -17,9 +17,8 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
+import {Logger, getLogger} from '../util/Logger';
 import type {CurrentAvailableDeviceId} from './MediaDevicesHandler';
-
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 
 interface Config {

@@ -21,7 +21,7 @@ import {LoginData} from '@wireapp/api-client/src/auth';
 import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton, Select} from '@wireapp/react-ui-kit';
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
-import {COUNTRY_CODES, getCountryByCode, getCountryCode} from 'Util/CountryCodes';
+import {COUNTRY_CODES, getCountryByCode, getCountryCode} from '../../util/CountryCodes';
 import {phoneLoginStrings} from '../../strings';
 
 interface LoginFormProps {

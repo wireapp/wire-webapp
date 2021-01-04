@@ -19,10 +19,9 @@
 
 import ko from 'knockout';
 
-import {copyText} from 'Util/ClipboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
-
+import {copyText} from '../../util/ClipboardUtil';
+import {t} from '../../util/LocalizerUtil';
+import {formatLocale, formatTimeShort} from '../../util/TimeUtil';
 import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
 import type {User} from '../User';

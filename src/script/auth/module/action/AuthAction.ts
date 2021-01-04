@@ -26,7 +26,7 @@ import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import {LowDiskSpaceError} from '@wireapp/store-engine/src/main/engine/error/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
+import {isTemporaryClientAndNonPersistent} from '../../../util/util';
 import {currentCurrency, currentLanguage} from '../../localeConfig';
 import {provideTemporaryAndNonPersistentEngine} from '../../StoreEngineProvider';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';

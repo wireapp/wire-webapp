@@ -17,7 +17,7 @@
  *
  */
 
-import {includesString} from 'Util/StringUtil';
+import {includesString} from '../util/StringUtil';
 
 export const appendParameter = (url: string, parameter: string) => {
   const separator = includesString(url, '?') ? '&' : '?';

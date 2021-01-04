@@ -22,11 +22,10 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {clamp} from 'Util/NumberUtil';
-import {getFirstChar} from 'Util/StringUtil';
-
+import {t} from '../util/LocalizerUtil';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
+import {clamp} from '../util/NumberUtil';
+import {getFirstChar} from '../util/StringUtil';
 import {ACCENT_ID} from '../Config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {ConnectionEntity} from '../connection/ConnectionEntity';

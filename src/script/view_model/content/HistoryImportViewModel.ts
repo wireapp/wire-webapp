@@ -21,11 +21,11 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {loadFileBuffer} from 'Util/util';
-import {WebWorker} from 'Util/worker';
-import 'Components/loadingBar';
+import {getLogger, Logger} from '../../util/Logger';
+import {t} from '../../util/LocalizerUtil';
+import {loadFileBuffer} from '../../util/util';
+import {WebWorker} from '../../util/worker';
+import '../components/loadingBar';
 
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';

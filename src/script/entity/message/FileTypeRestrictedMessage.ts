@@ -17,8 +17,7 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
+import {t} from '../../util/LocalizerUtil';
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 

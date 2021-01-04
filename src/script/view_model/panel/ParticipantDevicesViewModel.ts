@@ -19,15 +19,14 @@
 
 import ko from 'knockout';
 
-import {makeUserDevicesHistory, UserDevicesState, UserDevicesHistory} from 'Components/userDevices';
-
+import {makeUserDevicesHistory, UserDevicesState, UserDevicesHistory} from '../../components/userDevices';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import type {User} from '../../entity/User';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {ClientRepository} from '../../client/ClientRepository';
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {PanelParams} from '../PanelViewModel';
-import type {MessageRepository} from 'src/script/conversation/MessageRepository';
+import type {MessageRepository} from '../../conversation/MessageRepository';
 
 export class ParticipantDevicesViewModel extends BasePanelViewModel {
   clientRepository: ClientRepository;

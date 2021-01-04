@@ -18,32 +18,32 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
-import {createRandomUuid} from 'Util/util';
-import {TestFactory} from '../../../test/helper/TestFactory';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
-import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {UserGenerator} from '../../../test/helper/UserGenerator';
-import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {ClientEvent} from 'src/script/event/Client';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {User} from 'src/script/entity/User';
-import {Message} from 'src/script/entity/message/Message';
 import * as sinon from 'sinon';
 import {amplify} from 'amplify';
 
-import {ConversationError} from 'src/script/error/ConversationError';
+import {createRandomUuid} from '../util/util';
+import {TestFactory} from '../../../test/helper/TestFactory';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {EventInfoEntity} from './EventInfoEntity';
+import {NOTIFICATION_STATE} from './NotificationSetting';
+import {ConversationVerificationState} from './ConversationVerificationState';
+import {AssetTransferState} from '../assets/AssetTransferState';
+import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
+import {ConversationStatus} from './ConversationStatus';
+import {UserGenerator} from '../../../test/helper/UserGenerator';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {ClientEvent} from '../event/Client';
+import {Conversation} from '../entity/Conversation';
+import {ConnectionEntity} from '../connection/ConnectionEntity';
+import {FileAsset} from '../entity/message/FileAsset';
+import {ContentMessage} from '../entity/message/ContentMessage';
+import {User} from '../entity/User';
+import {Message} from '../entity/message/Message';
+import {ConversationError} from '../error/ConversationError';
 import {MessageRepository} from './MessageRepository';
 
 describe('MessageRepository', () => {

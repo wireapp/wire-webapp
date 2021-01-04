@@ -17,14 +17,15 @@
  *
  */
 
+import {container} from 'tsyringe';
 import ko from 'knockout';
-import {scrollToBottom} from 'Util/scroll-helpers';
-import {isLastItem} from 'Util/ArrayUtil';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+
+import {scrollToBottom} from '../../util/scroll-helpers';
+import {isLastItem} from '../../util/ArrayUtil';
+import {AVATAR_SIZE} from '../../components/ParticipantAvatar';
 import {MainViewModel} from '../MainViewModel';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class ConnectRequestsViewModel {

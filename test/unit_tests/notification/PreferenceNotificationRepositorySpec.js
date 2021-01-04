@@ -23,7 +23,7 @@ import {USER_EVENT} from '@wireapp/api-client/src/event';
 
 import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from '../util/util';
 
 describe('PreferenceNotificationRepository', () => {
   const user = {id: createRandomUuid()};

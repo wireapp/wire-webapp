@@ -18,12 +18,12 @@
  */
 
 import ko from 'knockout';
+import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
 
 import {ContentViewModel} from '../ContentViewModel';
 import {ListViewModel} from '../ListViewModel';
-import type {CallingRepository} from 'src/script/calling/CallingRepository';
-import {Runtime} from '@wireapp/commons';
-import {container} from 'tsyringe';
+import type {CallingRepository} from '../../calling/CallingRepository';
 import {UserState} from '../../user/UserState';
 
 export class PreferencesListViewModel {

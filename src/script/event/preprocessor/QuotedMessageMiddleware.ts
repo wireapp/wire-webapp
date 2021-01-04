@@ -19,9 +19,8 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {base64ToArray} from 'Util/util';
-
+import {getLogger, Logger} from '../../util/Logger';
+import {base64ToArray} from '../../util/util';
 import {ClientEvent} from '../Client';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {MessageHasher} from '../../message/MessageHasher';

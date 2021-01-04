@@ -20,8 +20,7 @@
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {t} from 'Util/LocalizerUtil';
-
+import {t} from '../util/LocalizerUtil';
 import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
 import type {Conversation} from '../entity/Conversation';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';

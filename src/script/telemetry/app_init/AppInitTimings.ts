@@ -17,9 +17,8 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-
+import {Logger, getLogger} from '../../util/Logger';
+import {TIME_IN_MILLIS} from '../../util/TimeUtil';
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 
 export type AppTimings = Partial<Record<AppInitTimingsStep, number>>;

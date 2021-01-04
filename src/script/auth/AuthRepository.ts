@@ -21,8 +21,8 @@ import type {Context} from '@wireapp/api-client/src/auth';
 import {ClientType} from '@wireapp/api-client/src/client';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
+import {Logger, getLogger} from '../util/Logger';
+import {loadValue} from '../util/StorageUtil';
 import {StorageKey} from '../storage/StorageKey';
 import {APIClient} from '../service/APIClientSingleton';
 

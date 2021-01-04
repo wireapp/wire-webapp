@@ -17,7 +17,7 @@
  *
  */
 
-import {PromiseFn, PromiseQueue} from 'Util/PromiseQueue';
+import {PromiseFn, PromiseQueue} from '../util/PromiseQueue';
 
 export class MessageSender {
   private readonly sendingQueue: PromiseQueue;

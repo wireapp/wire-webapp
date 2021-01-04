@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from '../util/Logger';
 import {ConversationError} from '../error/ConversationError';
 
 export class WindowHandler {

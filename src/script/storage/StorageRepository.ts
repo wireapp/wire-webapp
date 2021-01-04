@@ -17,9 +17,9 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
 import {container} from 'tsyringe';
 
+import {Logger, getLogger} from '../util/Logger';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from './StorageService';
 import {StorageError} from '../error/StorageError';

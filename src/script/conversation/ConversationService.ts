@@ -43,8 +43,7 @@ import type {
 } from '@wireapp/api-client/src/event';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../util/Logger';
 import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';

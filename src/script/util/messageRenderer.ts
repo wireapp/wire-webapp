@@ -23,7 +23,6 @@ import type Token from 'markdown-it/lib/token';
 import {escape} from 'underscore';
 
 import {replaceInRange} from './StringUtil';
-
 import type {MentionEntity} from '../message/MentionEntity';
 
 interface MentionText {

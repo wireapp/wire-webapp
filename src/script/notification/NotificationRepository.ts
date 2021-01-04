@@ -22,21 +22,21 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
+import {Runtime} from '@wireapp/commons';
 
-import {Declension, t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {getUserName} from 'Util/SanitizationUtil';
-import {truncate} from 'Util/StringUtil';
-import {TIME_IN_MILLIS, formatDuration} from 'Util/TimeUtil';
-import {ValidationUtilError} from 'Util/ValidationUtil';
-import {getRenderedTextContent} from 'Util/messageRenderer';
-
+import {Declension, t} from '../util/LocalizerUtil';
+import {Logger, getLogger} from '../util/Logger';
+import {getUserName} from '../util/SanitizationUtil';
+import {truncate} from '../util/StringUtil';
+import {TIME_IN_MILLIS, formatDuration} from '../util/TimeUtil';
+import {ValidationUtilError} from '../util/ValidationUtil';
+import {getRenderedTextContent} from '../util/messageRenderer';
 import {AudioType} from '../audio/AudioType';
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {PermissionState} from './PermissionState';
-
 import type {CallingRepository} from '../calling/CallingRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
@@ -57,8 +57,6 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {AssetRepository} from '../assets/AssetRepository';
-import {container} from 'tsyringe';
-import {Runtime} from '@wireapp/commons';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 

@@ -25,13 +25,6 @@ module.exports = {
     },
   },
   moduleDirectories: ['node_modules', './'],
-  // Must be in sync with tsconfig.json >> paths
-  moduleNameMapper: {
-    'Components/(.*)': '<rootDir>/src/script/components/$1',
-    'I18n/(.*)': '<rootDir>/src/i18n/$1',
-    'Resource/(.*)': '<rootDir>/resource/$1',
-    'Util/(.*)': '<rootDir>/src/script/util/$1',
-  },
   preset: 'ts-jest/presets/js-with-ts',
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: './src/script/util/test/env/JSDomEnvironment.js',

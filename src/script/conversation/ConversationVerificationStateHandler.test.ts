@@ -17,13 +17,13 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
-import {ClientEntity} from 'src/script/client/ClientEntity';
-import {Conversation} from 'src/script/entity/Conversation';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {User} from 'src/script/entity/User';
+import {createRandomUuid} from '../util/util';
+import {ClientEntity} from '../client/ClientEntity';
+import {Conversation} from '../entity/Conversation';
+import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {User} from '../entity/User';
 import {TestFactory} from '../../../test/helper/TestFactory';
-import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
 import {ConversationRepository} from './ConversationRepository';
 

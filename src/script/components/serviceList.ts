@@ -19,11 +19,10 @@
 
 import ko from 'knockout';
 
-import {noop} from 'Util/util';
+import {noop} from '../util/util';
+import {AVATAR_SIZE} from '../components/ParticipantAvatar';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-
-import 'Components/list/participantItem';
+import '../components/list/participantItem';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 
 interface ServiceListParams {

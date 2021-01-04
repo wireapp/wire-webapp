@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../../util/Logger';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {ActionsViewModel} from '../ActionsViewModel';

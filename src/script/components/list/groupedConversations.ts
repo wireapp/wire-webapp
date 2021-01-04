@@ -19,9 +19,9 @@
 
 import ko from 'knockout';
 
-import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import type {Conversation} from 'src/script/entity/Conversation';
-import type {ConversationListViewModel} from 'src/script/view_model/list/ConversationListViewModel';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {Conversation} from '../../entity/Conversation';
+import type {ConversationListViewModel} from '../../view_model/list/ConversationListViewModel';
 import {
   ConversationLabel,
   createLabel,

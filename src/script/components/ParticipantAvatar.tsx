@@ -22,8 +22,7 @@ import React from 'react';
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
-import {registerReactComponent} from 'Util/ComponentUtil';
-
+import {registerReactComponent} from '../util/ComponentUtil';
 import UserAvatar from './participantAvatar/UserAvatar';
 import ServiceAvatar from './participantAvatar/ServiceAvatar';
 import TemporaryGuestAvatar from './participantAvatar/TemporaryGuestAvatar';

@@ -20,13 +20,10 @@
 import ko from 'knockout';
 import React from 'react';
 
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-
+import {CSS_FILL_PARENT} from '../../util/CSSMixin';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
-
 import SVGProvider from '../../auth/util/SVGProvider';
-
 import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
 import AvatarImage from './AvatarImage';

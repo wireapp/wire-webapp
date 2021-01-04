@@ -20,10 +20,9 @@
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import ko from 'knockout';
 
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
-import {getUserName} from 'Util/SanitizationUtil';
-import {capitalizeFirstChar} from 'Util/StringUtil';
-
+import {Declension, joinNames, t} from '../../util/LocalizerUtil';
+import {getUserName} from '../../util/SanitizationUtil';
+import {capitalizeFirstChar} from '../../util/StringUtil';
 import {ClientEvent} from '../../event/Client';
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';

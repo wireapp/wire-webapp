@@ -20,8 +20,7 @@
 import type {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/src/client';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../util/Logger';
 import type {ClientRecord} from '../storage';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';

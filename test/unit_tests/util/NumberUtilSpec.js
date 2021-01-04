@@ -17,7 +17,7 @@
  *
  */
 
-import {inRange, capToByte, clamp, getRandomNumber, rootMeanSquare, roundLogarithmic} from 'Util/NumberUtil';
+import {inRange, capToByte, clamp, getRandomNumber, rootMeanSquare, roundLogarithmic} from '../util/NumberUtil';
 
 describe('NumberUtil', () => {
   describe('inRange', () => {

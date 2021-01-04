@@ -17,9 +17,8 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-import {getRenderedTextContent} from 'Util/messageRenderer';
-
+import {t} from '../util/LocalizerUtil';
+import {getRenderedTextContent} from '../util/messageRenderer';
 import type {Text} from '../entity/message/Text';
 import type {FileAsset} from '../entity/message/FileAsset';
 import {AssetTransferState} from '../assets/AssetTransferState';

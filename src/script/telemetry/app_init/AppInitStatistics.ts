@@ -20,8 +20,7 @@
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../../util/Logger';
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
 
 export type AppStatistics = Partial<Record<AppInitStatisticsValue, string | number>>;

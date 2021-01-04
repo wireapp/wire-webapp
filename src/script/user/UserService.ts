@@ -20,8 +20,7 @@
 import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../util/Logger';
 import type {User} from '../entity/User';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';

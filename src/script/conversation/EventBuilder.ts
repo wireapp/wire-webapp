@@ -20,7 +20,8 @@
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import {createRandomUuid} from 'Util/util';
+
+import {createRandomUuid} from '../util/util';
 import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
 import type {Call as CallEntity} from '../calling/Call';
 import {StatusType} from '../message/StatusType';

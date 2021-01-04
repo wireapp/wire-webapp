@@ -17,14 +17,14 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
-import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from 'Util/TimeUtil';
-import {t} from 'Util/LocalizerUtil';
-import {koPushDeferred} from 'Util/util';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
+import {getLogger, Logger} from '../../util/Logger';
+import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from '../../util/TimeUtil';
+import {t} from '../../util/LocalizerUtil';
+import {koPushDeferred} from '../../util/util';
 import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 import {Conversation} from '../../entity/Conversation';

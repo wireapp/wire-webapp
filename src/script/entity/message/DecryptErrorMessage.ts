@@ -20,9 +20,8 @@
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
-import {printDevicesId} from 'Util/util';
-
+import {t} from '../../util/LocalizerUtil';
+import {printDevicesId} from '../../util/util';
 import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';

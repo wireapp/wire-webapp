@@ -21,9 +21,8 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
-
+import {isBeforeToday, formatDateNumeral, formatTimeShort} from '../util/TimeUtil';
+import {includesOnlyEmojis} from '../util/EmojiUtil';
 import {QuoteEntity} from '../message/QuoteEntity';
 import {ConversationError} from '../error/ConversationError';
 import type {Conversation} from '../entity/Conversation';

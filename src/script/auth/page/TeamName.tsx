@@ -38,7 +38,7 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from '../../util/Logger';
 import {addLocaleToUrl} from '../../externalRoute';
 import {teamNameStrings} from '../../strings';
 import RouterLink from '../component/RouterLink';

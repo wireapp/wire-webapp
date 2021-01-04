@@ -17,7 +17,7 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from '../util/util';
 import {
   isBearerToken,
   isUUID,
@@ -28,7 +28,7 @@ import {
   assetRetentionPolicy,
   assetV3,
   ValidationUtilError,
-} from 'Util/ValidationUtil';
+} from '../util/ValidationUtil';
 
 describe('ValidationUtil', () => {
   describe('"asset.legacy"', () => {

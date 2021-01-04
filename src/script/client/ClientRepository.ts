@@ -25,11 +25,11 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import murmurhash from 'murmurhash';
+import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
-
+import {t} from '../util/LocalizerUtil';
+import {Logger, getLogger} from '../util/Logger';
+import {loadValue} from '../util/StorageUtil';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -40,7 +40,6 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
-import {container} from 'tsyringe';
 import {ClientState} from './ClientState';
 
 export class ClientRepository {

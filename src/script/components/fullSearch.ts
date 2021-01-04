@@ -20,10 +20,9 @@
 import ko from 'knockout';
 import {debounce, escape} from 'underscore';
 
-import {isScrolledBottom} from 'Util/scroll-helpers';
-import {formatDateShort} from 'Util/TimeUtil';
-
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {isScrolledBottom} from '../util/scroll-helpers';
+import {formatDateShort} from '../util/TimeUtil';
+import {AVATAR_SIZE} from '../components/ParticipantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
 import type {Message} from '../entity/message/Message';
 import type {ContentMessage} from '../entity/message/ContentMessage';

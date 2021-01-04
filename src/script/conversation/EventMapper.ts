@@ -19,13 +19,12 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
+import type {ITweet} from '@wireapp/protocol-messaging';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {base64ToArray} from 'Util/util';
-
+import {getLogger, Logger} from '../util/Logger';
+import {t} from '../util/LocalizerUtil';
+import {base64ToArray} from '../util/util';
 import {AssetTransferState} from '../assets/AssetTransferState';
-
 import {MediumImage} from '../entity/message/MediumImage';
 import {VerificationMessage} from '../entity/message/VerificationMessage';
 import {MessageTimerUpdateMessage} from '../entity/message/MessageTimerUpdateMessage';
@@ -41,11 +40,9 @@ import {Text} from '../entity/message/Text';
 import {FileAsset} from '../entity/message/FileAsset';
 import {Button} from '../entity/message/Button';
 import {ReceiptModeUpdateMessage} from '../entity/message/ReceiptModeUpdateMessage';
-
 import {TERMINATION_REASON} from '../calling/enum/TerminationReason';
 import {ClientEvent} from '../event/Client';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
-
 import {SystemMessageType} from '../message/SystemMessageType';
 import {StatusType} from '../message/StatusType';
 import {CallMessage} from '../entity/message/CallMessage';
@@ -61,7 +58,6 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
-import type {ITweet} from '@wireapp/protocol-messaging';
 import type {LinkPreviewMetaDataType} from '../links/LinkPreviewMetaDataType';
 import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 

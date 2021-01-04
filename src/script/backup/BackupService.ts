@@ -21,8 +21,7 @@ import type Dexie from 'dexie';
 import DexieBatch from 'dexie-batch';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../util/Logger';
 import {StorageSchemata, StorageService} from '../storage';
 
 export class BackupService {

@@ -22,12 +22,11 @@ import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 import type {ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/src/event';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {clamp} from 'Util/NumberUtil';
-import {arrayToBase64, noop} from 'Util/util';
-import {obfuscate} from 'Util/StringUtil';
-
+import {Logger, getLogger} from '../util/Logger';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
+import {clamp} from '../util/NumberUtil';
+import {arrayToBase64, noop} from '../util/util';
+import {obfuscate} from '../util/StringUtil';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {StatusType} from '../message/StatusType';
 import {Text} from '../entity/message/Text';

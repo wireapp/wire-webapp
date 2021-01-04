@@ -45,13 +45,11 @@ import {
   Text,
 } from '@wireapp/protocol-messaging';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
-
+import {getLogger, Logger} from '../util/Logger';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
+import {base64ToArray, arrayToBase64, createRandomUuid} from '../util/util';
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
-
 import {ClientEvent, CONVERSATION} from '../event/Client';
 import {StatusType} from '../message/StatusType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';

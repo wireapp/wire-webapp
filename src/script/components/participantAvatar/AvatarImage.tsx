@@ -21,11 +21,9 @@ import React, {useEffect, useState} from 'react';
 import {Transition} from 'react-transition-group';
 import {CSSObject} from '@emotion/serialize';
 
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-
+import {CSS_FILL_PARENT} from '../../util/CSSMixin';
 import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetRepository} from '../../assets/AssetRepository';
-
 import {AVATAR_SIZE} from '../ParticipantAvatar';
 
 export interface AvatarImageProps {

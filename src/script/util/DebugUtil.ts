@@ -19,14 +19,16 @@
 
 import type {BackendEvent, ConversationEvent, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+import type {Notification} from '@wireapp/api-client/src/notification/';
 import {util as ProteusUtil} from '@wireapp/proteus';
-import {getLogger, Logger} from 'Util/Logger';
 import Dexie from 'dexie';
+import {container} from 'tsyringe';
+
+import {getLogger, Logger} from '../util/Logger';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
-import type {Notification} from '@wireapp/api-client/src/notification/';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {CallingRepository} from '../calling/CallingRepository';
 import {ClientRepository} from '../client/ClientRepository';
@@ -39,7 +41,6 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserId} from '../calling/Participant';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';

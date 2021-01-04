@@ -21,15 +21,15 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {loadValue, storeValue} from 'Util/StorageUtil';
-import {getCursorPixelPosition} from 'Util/PopupUtil';
-import {KEY, isKey, isEnterKey} from 'Util/KeyboardUtil';
-import {sortByPriority} from 'Util/StringUtil';
 
+import {loadValue, storeValue} from '../../util/StorageUtil';
+import {getCursorPixelPosition} from '../../util/PopupUtil';
+import {KEY, isKey, isEnterKey} from '../../util/KeyboardUtil';
+import {sortByPriority} from '../../util/StringUtil';
 import emojiBindings from './emoji.json';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {StorageKey} from '../../storage/StorageKey';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 
 export interface EmojiData {
   aliases: string[];

@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from '../util/LocalizerUtil';
 
 interface GuestModeToggleParams {
   extendedInfo?: string;

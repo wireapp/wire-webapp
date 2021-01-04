@@ -18,13 +18,14 @@
  */
 
 import ko from 'knockout';
-import {noop} from 'Util/util';
-import {Actions} from 'Components/panel/userActions';
+import {container} from 'tsyringe';
+
+import {noop} from '../../util/util';
+import {Actions} from '../../components/panel/userActions';
 import {Config} from '../../Config';
 import type {User} from '../../entity/User';
 import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class UserModalViewModel {

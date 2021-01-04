@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS, formatSeconds} from '../../util/TimeUtil';
 import type {Call} from '../../calling/Call';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
@@ -30,7 +30,7 @@ import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../med
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
 
-import 'Components/calling/deviceToggleButton';
+import '../components/calling/deviceToggleButton';
 
 interface Params {
   call: Call;

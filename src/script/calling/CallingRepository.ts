@@ -44,13 +44,12 @@ import ko from 'knockout';
 import 'webrtc-adapter';
 import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {createRandomUuid} from 'Util/util';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {flatten} from 'Util/ArrayUtil';
-import {roundLogarithmic} from 'Util/NumberUtil';
-
+import {t} from '../util/LocalizerUtil';
+import {Logger, getLogger} from '../util/Logger';
+import {createRandomUuid} from '../util/util';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
+import {flatten} from '../util/ArrayUtil';
+import {roundLogarithmic} from '../util/NumberUtil';
 import {Config} from '../Config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';

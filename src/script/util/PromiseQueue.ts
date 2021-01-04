@@ -17,8 +17,8 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {Logger, getLogger} from './Logger';
+import {TIME_IN_MILLIS} from './TimeUtil';
 
 interface PromiseQueueOptions {
   /** Concurrent promise execution. Default is 1. */

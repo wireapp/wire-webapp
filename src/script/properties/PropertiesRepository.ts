@@ -24,10 +24,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioPreference, NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data';
 import {ConsentType} from '@wireapp/api-client/src/self';
 
-import {Environment} from 'Util/Environment';
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Environment} from '../util/Environment';
+import {t} from '../util/LocalizerUtil';
+import {Logger, getLogger} from '../util/Logger';
 import {Config} from '../Config';
 import type {User} from '../entity/User';
 import type {SelfService} from '../self/SelfService';

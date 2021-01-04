@@ -19,14 +19,14 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {getLogger, Logger} from 'Util/Logger';
 import {WebappProperties} from '@wireapp/api-client/src/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
-import {getCurrentDate} from 'Util/TimeUtil';
-import {downloadBlob} from 'Util/util';
-
+import {t} from '../../util/LocalizerUtil';
+import {getCurrentDate} from '../../util/TimeUtil';
+import {downloadBlob} from '../../util/util';
+import {getLogger, Logger} from '../../util/Logger';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {Config, Configuration} from '../../Config';
@@ -38,7 +38,6 @@ import {Call} from '../../calling/Call';
 import {DeviceIds, Devices, DeviceSupport, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;

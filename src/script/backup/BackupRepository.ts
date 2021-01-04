@@ -18,10 +18,10 @@
  */
 
 import type Dexie from 'dexie';
+import {container} from 'tsyringe';
 
-import {chunk} from 'Util/ArrayUtil';
-import {Logger, getLogger} from 'Util/Logger';
-
+import {chunk} from '../util/ArrayUtil';
+import {Logger, getLogger} from '../util/Logger';
 import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
@@ -37,7 +37,6 @@ import {
   IncompatiblePlatformError,
   InvalidMetaDataError,
 } from './Error';
-import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
 import {ConversationRecord} from '../storage/ConversationRecord';

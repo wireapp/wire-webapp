@@ -22,7 +22,7 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import Dexie from 'dexie';
 
-import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
+import {saveRandomEncryptionKey} from '../util/ephemeralValueStore';
 
 import {StorageSchemata} from '../storage';
 import {SQLeetSchemata} from '../storage/SQLeetSchemata';

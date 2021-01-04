@@ -20,21 +20,20 @@
 import {debounce} from 'underscore';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {partition} from 'Util/ArrayUtil';
-
-import {UserlistMode} from 'Components/userList';
-
+import {getLogger, Logger} from '../../util/Logger';
+import {safeWindowOpen} from '../../util/SanitizationUtil';
+import {partition} from '../../util/ArrayUtil';
+import {UserlistMode} from '../../components/userList';
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {Config} from '../../Config';
 import {User} from '../../entity/User';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {SearchRepository} from '../../search/SearchRepository';
-import {sortByPriority} from 'Util/StringUtil';
+import {sortByPriority} from '../../util/StringUtil';
 import {ListViewModel} from '../ListViewModel';
 import type {MainViewModel} from '../MainViewModel';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -44,7 +43,6 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {Conversation} from '../../entity/Conversation';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationState} from '../../conversation/ConversationState';

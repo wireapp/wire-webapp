@@ -17,10 +17,11 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
+
 import {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import {ConversationType, UserType, PlatformType} from './attribute';
-import {Runtime} from '@wireapp/commons';
 
 /**
  * Get corresponding tracking attribute for conversation type.

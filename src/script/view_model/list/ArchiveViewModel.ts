@@ -19,13 +19,13 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
+
 import {ListViewModel} from '../ListViewModel';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import type {Conversation} from 'src/script/entity/Conversation';
+import type {Conversation} from '../../entity/Conversation';
 import {ConversationState} from '../../conversation/ConversationState';
-import {container} from 'tsyringe';
 
 export class ArchiveViewModel {
   readonly listViewModel: ListViewModel;

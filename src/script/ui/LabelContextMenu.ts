@@ -17,8 +17,7 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
+import {t} from '../util/LocalizerUtil';
 import type {ConversationLabelRepository} from '../conversation/ConversationLabelRepository';
 import type {Conversation} from '../entity/Conversation';
 import {Context, ContextMenuEntry} from '../ui/ContextMenu';

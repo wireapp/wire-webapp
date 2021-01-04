@@ -19,8 +19,7 @@
 
 import Long from 'long';
 
-import {utf8ToUtf16BE} from 'Util/StringUtil';
-
+import {utf8ToUtf16BE} from '../util/StringUtil';
 import {ClientEvent} from '../event/Client';
 import {EventRecord} from '../storage/EventRecord';
 

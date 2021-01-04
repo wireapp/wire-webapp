@@ -19,7 +19,7 @@
 
 import type {Dexie} from 'dexie';
 
-import {base64ToArraySync} from 'Util/util';
+import {base64ToArraySync} from '../util/util';
 import {categoryFromEvent} from '../message/MessageCategorization';
 
 interface DexieSchema {

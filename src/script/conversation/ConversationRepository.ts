@@ -37,14 +37,16 @@ import {
   Conversation as BackendConversation,
 } from '@wireapp/api-client/src/conversation';
 import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data';
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {PromiseQueue} from 'Util/PromiseQueue';
-import {t} from 'Util/LocalizerUtil';
-import {getNextItem} from 'Util/ArrayUtil';
-import {createRandomUuid, noop} from 'Util/util';
-import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
-import {compareTransliteration, sortByPriority, startsWith, sortUsersByPriority} from 'Util/StringUtil';
+import {container} from 'tsyringe';
+
+import {Logger, getLogger} from '../util/Logger';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
+import {PromiseQueue} from '../util/PromiseQueue';
+import {t} from '../util/LocalizerUtil';
+import {getNextItem} from '../util/ArrayUtil';
+import {createRandomUuid, noop} from '../util/util';
+import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from '../util/FileTypeUtil';
+import {compareTransliteration, sortByPriority, startsWith, sortUsersByPriority} from '../util/StringUtil';
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
@@ -86,7 +88,6 @@ import {MemberMessage} from '../entity/message/MemberMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import type {EventRecord} from '../storage';
 import {MessageRepository} from './MessageRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {TeamRepository} from '../team/TeamRepository';

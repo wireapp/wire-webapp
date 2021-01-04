@@ -19,23 +19,24 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {Environment} from 'Util/Environment';
-import {getLogger, Logger} from 'Util/Logger';
-import {includesString} from 'Util/StringUtil';
-import {getParameter} from 'Util/UrlUtil';
-import {createRandomUuid} from 'Util/util';
+import {container} from 'tsyringe';
+
+import {Environment} from '../util/Environment';
+import {getLogger, Logger} from '../util/Logger';
+import {includesString} from '../util/StringUtil';
+import {getParameter} from '../util/UrlUtil';
+import {createRandomUuid} from '../util/util';
 import {URLParameter} from '../auth/URLParameter';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
-import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
+import {loadValue, storeValue, resetStoreValue} from '../util/StorageUtil';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
-import {roundLogarithmic} from 'Util/NumberUtil';
+import {roundLogarithmic} from '../util/NumberUtil';
 import {EventName} from './EventName';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {ClientEvent} from '../event/Client';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 
 const Countly = require('countly-sdk-web');

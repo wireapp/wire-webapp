@@ -19,8 +19,9 @@
 
 import React from 'react';
 import {ReactWrapper} from 'enzyme';
-import {mountComponent} from './TestUtil';
 import {act} from '@testing-library/react';
+
+import {mountComponent} from './TestUtil';
 
 export default class TestPage<T> {
   private readonly driver: ReactWrapper;

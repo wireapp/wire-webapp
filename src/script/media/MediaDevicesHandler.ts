@@ -18,12 +18,11 @@
  */
 
 import ko from 'knockout';
-
-import {Logger, getLogger} from 'Util/Logger';
-import {loadValue, storeValue} from 'Util/StorageUtil';
-
-import {MediaDeviceType} from './MediaDeviceType';
 import {Runtime} from '@wireapp/commons';
+
+import {Logger, getLogger} from '../util/Logger';
+import {loadValue, storeValue} from '../util/StorageUtil';
+import {MediaDeviceType} from './MediaDeviceType';
 
 declare global {
   interface Window {

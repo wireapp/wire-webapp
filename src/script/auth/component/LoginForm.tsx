@@ -22,7 +22,7 @@ import {ArrowIcon, Input, InputBlock, InputSubmitCombo, Loading, RoundIconButton
 import React, {useRef, useState} from 'react';
 import {useIntl} from 'react-intl';
 
-import {isValidEmail, isValidPhoneNumber, isValidUsername} from 'Util/ValidationUtil';
+import {isValidEmail, isValidPhoneNumber, isValidUsername} from '../../util/ValidationUtil';
 
 import {Config} from '../../Config';
 import {loginStrings} from '../../strings';

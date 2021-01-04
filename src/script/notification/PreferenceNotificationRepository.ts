@@ -23,8 +23,7 @@ import {groupBy} from 'underscore';
 import {USER_EVENT} from '@wireapp/api-client/src/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
-
+import {loadValue, resetStoreValue, storeValue} from '../util/StorageUtil';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/PropertiesRepository';

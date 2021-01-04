@@ -21,8 +21,7 @@ import type {MemberData, TeamData} from '@wireapp/api-client/src/team/';
 import type {TeamUpdateData} from '@wireapp/api-client/src/team/data';
 import type {PermissionsData} from '@wireapp/api-client/src/team/member/PermissionsData';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../util/Logger';
 import {roleFromTeamPermissions} from '../user/UserPermission';
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';

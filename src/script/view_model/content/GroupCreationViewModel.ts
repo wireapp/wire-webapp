@@ -21,19 +21,18 @@ import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
-import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
-import {sortUsersByPriority} from 'Util/StringUtil';
-
+import {t} from '../../util/LocalizerUtil';
+import {onEscKey, offEscKey} from '../../util/KeyboardUtil';
+import {sortUsersByPriority} from '../../util/StringUtil';
 import {ACCESS_STATE, TEAM} from '../../conversation/AccessState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {User} from '../../entity/User';
 import {SearchRepository} from '../../search/SearchRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
-import {TeamRepository} from 'src/script/team/TeamRepository';
+import {TeamRepository} from '../../team/TeamRepository';
 
 type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 

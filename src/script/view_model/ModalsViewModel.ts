@@ -22,12 +22,11 @@ import {escape} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {noop, afterRender} from 'Util/util';
-import {formatLocale} from 'Util/TimeUtil';
-import {onEscKey, offEscKey, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
-
+import {getLogger, Logger} from '../util/Logger';
+import {t} from '../util/LocalizerUtil';
+import {noop, afterRender} from '../util/util';
+import {formatLocale} from '../util/TimeUtil';
+import {onEscKey, offEscKey, isEnterKey, isSpaceKey} from '../util/KeyboardUtil';
 import {Config} from '../Config';
 import type {ClientEntity} from '../client/ClientEntity';
 

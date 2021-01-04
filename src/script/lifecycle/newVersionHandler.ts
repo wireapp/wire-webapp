@@ -17,8 +17,8 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getLogger} from '../util/Logger';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
 
 type OnNewVersionAvailableFn = (serverVersion: string) => void;
 

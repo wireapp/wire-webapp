@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../util/Logger';
 import {PermissionType} from './PermissionType';
 import {PermissionStatusState} from './PermissionStatusState';
 import {PermissionState} from '../notification/PermissionState';

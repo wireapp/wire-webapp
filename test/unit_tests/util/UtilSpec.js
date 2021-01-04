@@ -31,7 +31,7 @@ import {
   stripUrlWrapper,
   trimFileExtension,
   zeroPadding,
-} from 'Util/util';
+} from '../util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 

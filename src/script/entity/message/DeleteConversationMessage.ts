@@ -19,8 +19,7 @@
 
 import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 
-import {t} from 'Util/LocalizerUtil';
-
+import {t} from '../../util/LocalizerUtil';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import type {Conversation} from '../Conversation';
 import {SystemMessage} from './SystemMessage';

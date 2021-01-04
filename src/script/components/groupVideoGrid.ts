@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {afterRender} from 'Util/util';
-
+import {afterRender} from '../util/util';
 import type {Participant} from '../calling/Participant';
 import {VideoFillMode} from '../calling/Participant';
 import type {Grid} from '../calling/videoGridHandler';

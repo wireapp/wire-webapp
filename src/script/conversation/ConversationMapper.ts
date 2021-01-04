@@ -27,13 +27,14 @@ import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/src/conversation';
+import {Conversation as ConversationBackendData} from '@wireapp/api-client/src/conversation/';
+
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
 import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
-import {Conversation as ConversationBackendData} from '@wireapp/api-client/src/conversation/';
 import {ConversationRecord} from '../storage/ConversationRecord';
 
 /** Conversation self data from the database. */

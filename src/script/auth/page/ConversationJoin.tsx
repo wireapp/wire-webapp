@@ -36,7 +36,7 @@ import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Redirect} from 'react-router';
 import {AnyAction, Dispatch} from 'redux';
-import {noop} from 'Util/util';
+import {noop} from '../../util/util';
 import type {RegisterData} from '@wireapp/api-client/src/auth';
 import {Config} from '../../Config';
 import {conversationJoinStrings} from '../../strings';

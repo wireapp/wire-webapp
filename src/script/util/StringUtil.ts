@@ -19,7 +19,7 @@
 
 import getSlug from 'speakingurl';
 
-import {randomElement} from 'Util/ArrayUtil';
+import {randomElement} from '../util/ArrayUtil';
 import type {User} from '../entity/User';
 
 export const startsWith = (string = '', query: string): boolean => string.toLowerCase().startsWith(query.toLowerCase());

@@ -21,9 +21,14 @@ import ko from 'knockout';
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import type {ReactionType} from '@wireapp/core/src/main/conversation';
 
-import {getUserName} from 'Util/SanitizationUtil';
-import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
-
+import {getUserName} from '../../util/SanitizationUtil';
+import {
+  TIME_IN_MILLIS,
+  formatDurationCaption,
+  formatTimeShort,
+  formatDateNumeral,
+  fromUnixTime,
+} from '../../util/TimeUtil';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
 import {EphemeralStatusType} from '../../message/EphemeralStatusType';

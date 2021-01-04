@@ -22,8 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../util/Logger';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioType} from './AudioType';

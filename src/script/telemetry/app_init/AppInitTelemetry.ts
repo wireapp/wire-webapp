@@ -17,8 +17,7 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../../util/Logger';
 import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
 import {AppInitTimings} from './AppInitTimings';
 import type {AppInitStatisticsValue} from './AppInitStatisticsValue';

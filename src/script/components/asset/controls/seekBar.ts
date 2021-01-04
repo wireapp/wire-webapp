@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {clamp} from 'Util/NumberUtil';
+import {clamp} from '../../../util/NumberUtil';
 
 interface Params {
   dark: boolean;

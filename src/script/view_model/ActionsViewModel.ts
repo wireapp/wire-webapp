@@ -19,8 +19,9 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {t} from 'Util/LocalizerUtil';
+import {container} from 'tsyringe';
 
+import {t} from '../util/LocalizerUtil';
 import {ModalsViewModel} from './ModalsViewModel';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {BackendClientError} from '../error/BackendClientError';
@@ -35,7 +36,6 @@ import type {ClientEntity} from '../client/ClientEntity';
 import type {Message} from '../entity/message/Message';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {

@@ -19,7 +19,7 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {arrayToBase64} from 'Util/util';
+import {arrayToBase64} from '../util/util';
 
 import {ClientEvent} from 'src/script/event/Client';
 import {QuotedMessageMiddleware} from 'src/script/event/preprocessor/QuotedMessageMiddleware';

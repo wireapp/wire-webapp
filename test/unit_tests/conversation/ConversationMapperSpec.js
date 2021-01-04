@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from '../util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';

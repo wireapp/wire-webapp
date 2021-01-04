@@ -17,11 +17,11 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {getLogger, Logger} from '../../util/Logger';
 import {Modal} from '../../ui/Modal';
 import {GiphyRepository, Gif} from '../../extension/GiphyRepository';
 

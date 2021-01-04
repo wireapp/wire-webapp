@@ -21,11 +21,10 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {Notification} from '@wireapp/api-client/src/notification';
 import {container} from 'tsyringe';
-
-import {Logger, getLogger} from 'Util/Logger';
 import {WebSocketClient, OnConnect} from '@wireapp/api-client/src/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 
+import {Logger, getLogger} from '../util/Logger';
 import {APIClient} from '../service/APIClientSingleton';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 

@@ -18,10 +18,10 @@
  */
 
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
-import {partition} from 'Util/ArrayUtil';
-import {sortByPriority} from 'Util/StringUtil';
-
+import {partition} from '../util/ArrayUtil';
+import {sortByPriority} from '../util/StringUtil';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
@@ -29,10 +29,8 @@ import {SearchRepository} from '../search/SearchRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import {viewportObserver} from '../ui/viewportObserver';
 import {validateHandle} from '../user/UserHandleGenerator';
-
-import 'Components/list/participantItem';
+import './list/participantItem';
 import {UserState} from '../user/UserState';
-import {container} from 'tsyringe';
 import {ConversationState} from '../conversation/ConversationState';
 
 export enum UserlistMode {

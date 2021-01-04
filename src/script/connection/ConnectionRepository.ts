@@ -24,7 +24,8 @@ import type {UserConnectionData} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
-import {getLogger, Logger} from 'Util/Logger';
+
+import {getLogger, Logger} from '../util/Logger';
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import type {User} from '../entity/User';

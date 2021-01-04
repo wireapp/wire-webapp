@@ -19,8 +19,7 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {t} from 'Util/LocalizerUtil';
-
+import {t} from '../util/LocalizerUtil';
 import {BaseError} from '../error/BaseError';
 import {UserError} from '../error/UserError';
 

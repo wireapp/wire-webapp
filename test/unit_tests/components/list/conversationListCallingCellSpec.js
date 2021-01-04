@@ -18,8 +18,8 @@
  */
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
-import {createRandomUuid} from 'Util/util';
 
+import {createRandomUuid} from '../util/util';
 import {instantiateComponent} from '../../../helper/knockoutHelpers';
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';

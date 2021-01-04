@@ -21,8 +21,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {t} from 'Util/LocalizerUtil';
-
+import {t} from '../util/LocalizerUtil';
 import {Context, ContextMenuEntry} from './ContextMenu';
 
 export const AvailabilityContextMenu = {

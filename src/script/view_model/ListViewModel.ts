@@ -21,18 +21,18 @@ import {CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
-import {iterateItem} from 'Util/ArrayUtil';
-import {isEscapeKey} from 'Util/KeyboardUtil';
-
+import {t} from '../util/LocalizerUtil';
+import {iterateItem} from '../util/ArrayUtil';
+import {isEscapeKey} from '../util/KeyboardUtil';
 import {ArchiveViewModel} from './list/ArchiveViewModel';
 import {ConversationListViewModel} from './list/ConversationListViewModel';
 import {PreferencesListViewModel} from './list/PreferencesListViewModel';
 import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
 import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
-
 import {Context} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
@@ -50,9 +50,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import type {AssetRemoteData} from '../assets/AssetRemoteData';
-import {Runtime} from '@wireapp/commons';
 import {UserState} from '../user/UserState';
-import {container} from 'tsyringe';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 

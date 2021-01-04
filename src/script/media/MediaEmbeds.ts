@@ -18,9 +18,9 @@
  */
 
 import 'url-search-params-polyfill';
-
 import {Runtime} from '@wireapp/commons';
-import {formatString} from 'Util/StringUtil';
+
+import {formatString} from '../util/StringUtil';
 
 interface IFrameOptions {
   allowfullscreen: string;

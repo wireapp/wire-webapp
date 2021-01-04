@@ -21,12 +21,14 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {formatDuration} from 'Util/TimeUtil';
-import {removeLineBreaks, sortUsersByPriority} from 'Util/StringUtil';
-
+import '../../components/receiptModeToggle';
+import '../../components/panel/panelActions';
+import {Logger, getLogger} from '../../util/Logger';
+import {t} from '../../util/LocalizerUtil';
+import {formatDuration} from '../../util/TimeUtil';
+import {removeLineBreaks, sortUsersByPriority} from '../../util/StringUtil';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {getNotificationText} from '../../conversation/NotificationSetting';
 import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
@@ -40,11 +42,7 @@ import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {User} from '../../entity/User';
 import type {Conversation} from '../../entity/Conversation';
-
-import 'Components/receiptModeToggle';
-import 'Components/panel/panelActions';
 import {PanelViewModel} from '../PanelViewModel';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 

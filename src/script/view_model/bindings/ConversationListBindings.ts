@@ -20,9 +20,9 @@
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {throttle} from 'underscore';
-import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
-
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {isScrollable, isScrolledBottom, isScrolledTop} from '../../util/scroll-helpers';
 import type {Conversation} from '../../entity/Conversation';
 
 // show scroll borders

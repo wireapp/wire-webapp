@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {KEY, isOneOfKeys, isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
+import {KEY, isOneOfKeys, isEnterKey, isEscapeKey} from '../util/KeyboardUtil';
 
 export interface ContextMenuEntry {
   click?: (event: MouseEvent) => void;

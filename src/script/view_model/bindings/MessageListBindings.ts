@@ -21,7 +21,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'jquery-mousewheel';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from '../../util/LocalizerUtil';
 import {
   TIME_IN_MILLIS,
   fromUnixTime,
@@ -35,10 +35,9 @@ import {
   formatLocale,
   formatDayMonth,
   isThisYear,
-} from 'Util/TimeUtil';
-import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from 'Util/KeyboardUtil';
-import {noop} from 'Util/util';
-
+} from '../../util/TimeUtil';
+import {isArrowKey, isPageUpDownKey, isMetaKey, isPasteAction} from '../../util/KeyboardUtil';
+import {noop} from '../../util/util';
 import {viewportObserver} from '../../ui/viewportObserver';
 import {AssetRepository} from '../../assets/AssetRepository';
 

@@ -18,11 +18,11 @@
  */
 
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {viewportObserver} from '../ui/viewportObserver';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
-import {container} from 'tsyringe';
 
 interface ImageParams {
   asset: AssetRemoteData;

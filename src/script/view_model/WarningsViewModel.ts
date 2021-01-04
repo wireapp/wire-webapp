@@ -20,16 +20,15 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {Runtime} from '@wireapp/commons';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {afterRender} from 'Util/util';
-
+import {getLogger, Logger} from '../util/Logger';
+import {t} from '../util/LocalizerUtil';
+import {safeWindowOpen} from '../util/SanitizationUtil';
+import {afterRender} from '../util/util';
 import {Config, Configuration} from '../Config';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
-import {Runtime} from '@wireapp/commons';
 
 export class WarningsViewModel {
   elementId: 'warnings';

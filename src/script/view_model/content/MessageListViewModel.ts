@@ -21,14 +21,14 @@ import $ from 'jquery';
 import {groupBy} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 import ko from 'knockout';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
-import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
-import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
-
+import {getLogger, Logger} from '../../util/Logger';
+import {scrollEnd, scrollToBottom, scrollBy} from '../../util/scroll-helpers';
+import {t} from '../../util/LocalizerUtil';
+import {safeWindowOpen, safeMailOpen} from '../../util/SanitizationUtil';
+import {isSameDay, differenceInMinutes} from '../../util/TimeUtil';
 import {Config} from '../../Config';
 import {Conversation} from '../../entity/Conversation';
 import {ModalsViewModel} from '../ModalsViewModel';
@@ -48,8 +48,7 @@ import {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {PanelViewModel} from '../PanelViewModel';
-import type {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {container} from 'tsyringe';
+import type {MessageRepository} from '../../conversation/MessageRepository';
 import {UserState} from '../../user/UserState';
 import {ConversationState} from '../../conversation/ConversationState';
 

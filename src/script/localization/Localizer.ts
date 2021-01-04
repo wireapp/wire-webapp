@@ -17,36 +17,34 @@
  *
  */
 
-import {loadValue, storeValue} from 'Util/StorageUtil';
-import {getParameter} from 'Util/UrlUtil';
-import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
-import {setDateLocale, LocaleType} from 'Util/TimeUtil';
-
+import {loadValue, storeValue} from '../util/StorageUtil';
+import {getParameter} from '../util/UrlUtil';
+import {DEFAULT_LOCALE, setLocale, setStrings} from '../util/LocalizerUtil';
+import {setDateLocale, LocaleType} from '../util/TimeUtil';
 import {URLParameter} from '../auth/URLParameter';
 import {StorageKey} from '../storage/StorageKey';
-
-import cs from 'I18n/cs-CZ.json';
-import da from 'I18n/da-DK.json';
-import de from 'I18n/de-DE.json';
-import el from 'I18n/el-GR.json';
-import en from 'I18n/en-US.json';
-import es from 'I18n/es-ES.json';
-import et from 'I18n/et-EE.json';
-import fi from 'I18n/fi-FI.json';
-import fr from 'I18n/fr-FR.json';
-import hr from 'I18n/hr-HR.json';
-import hu from 'I18n/hu-HU.json';
-import it from 'I18n/it-IT.json';
-import lt from 'I18n/lt-LT.json';
-import nl from 'I18n/nl-NL.json';
-import pl from 'I18n/pl-PL.json';
-import pt from 'I18n/pt-BR.json';
-import ro from 'I18n/ro-RO.json';
-import ru from 'I18n/ru-RU.json';
-import sk from 'I18n/sk-SK.json';
-import sl from 'I18n/sl-SI.json';
-import tr from 'I18n/tr-TR.json';
-import uk from 'I18n/uk-UA.json';
+import cs from '../../i18n/cs-CZ.json';
+import da from '../../i18n/da-DK.json';
+import de from '../../i18n/de-DE.json';
+import el from '../../i18n/el-GR.json';
+import en from '../../i18n/en-US.json';
+import es from '../../i18n/es-ES.json';
+import et from '../../i18n/et-EE.json';
+import fi from '../../i18n/fi-FI.json';
+import fr from '../../i18n/fr-FR.json';
+import hr from '../../i18n/hr-HR.json';
+import hu from '../../i18n/hu-HU.json';
+import it from '../../i18n/it-IT.json';
+import lt from '../../i18n/lt-LT.json';
+import nl from '../../i18n/nl-NL.json';
+import pl from '../../i18n/pl-PL.json';
+import pt from '../../i18n/pt-BR.json';
+import ro from '../../i18n/ro-RO.json';
+import ru from '../../i18n/ru-RU.json';
+import sk from '../../i18n/sk-SK.json';
+import sl from '../../i18n/sl-SI.json';
+import tr from '../../i18n/tr-TR.json';
+import uk from '../../i18n/uk-UA.json';
 
 window.z = window.z || {};
 

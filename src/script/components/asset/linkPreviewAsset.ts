@@ -19,10 +19,9 @@
 
 import ko from 'knockout';
 
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {getDomainName} from 'Util/UrlUtil';
-import {isTweetUrl} from 'Util/ValidationUtil';
-
+import {safeWindowOpen} from '../../util/SanitizationUtil';
+import {getDomainName} from '../../util/UrlUtil';
+import {isTweetUrl} from '../../util/ValidationUtil';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {LinkPreview} from '../../entity/message/LinkPreview';
 import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';

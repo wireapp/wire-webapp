@@ -20,15 +20,12 @@
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
 
-import {getLogger, Logger} from 'Util/Logger';
-
+import {getLogger, Logger} from '../util/Logger';
 import {StatusType} from '../message/StatusType';
 import {MessageCategory} from '../message/MessageCategory';
 import {categoryFromEvent} from '../message/MessageCategorization';
-
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {StorageSchemata} from '../storage/StorageSchemata';
-
 import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {StorageError} from '../error/StorageError';

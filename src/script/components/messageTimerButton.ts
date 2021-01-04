@@ -19,9 +19,8 @@
 
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
-import {formatDuration, DurationUnit} from 'Util/TimeUtil';
-
+import {t} from '../util/LocalizerUtil';
+import {formatDuration, DurationUnit} from '../util/TimeUtil';
 import {EphemeralTimings} from '../ephemeral/EphemeralTimings';
 import {Context} from '../ui/ContextMenu';
 import type {Conversation} from '../entity/Conversation';

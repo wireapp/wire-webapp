@@ -24,10 +24,9 @@ import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
 import Dexie from 'dexie';
 import {singleton} from 'tsyringe';
 
-import {getEphemeralValue} from 'Util/ephemeralValueStore';
-import {Logger, getLogger} from 'Util/Logger';
-import {loadValue, storeValue} from 'Util/StorageUtil';
-
+import {getEphemeralValue} from '../util/ephemeralValueStore';
+import {Logger, getLogger} from '../util/Logger';
+import {loadValue, storeValue} from '../util/StorageUtil';
 import {Config} from '../Config';
 import {SQLeetSchemata} from './SQLeetSchemata';
 import {StorageKey} from './StorageKey';

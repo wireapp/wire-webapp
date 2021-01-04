@@ -32,17 +32,17 @@ import type {
   TeamMemberUpdateEvent,
   TeamUpdateEvent,
 } from '@wireapp/api-client/src/event';
+import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {loadDataUrl} from 'Util/util';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {Environment} from 'Util/Environment';
-
+import {Logger, getLogger} from '../util/Logger';
+import {t} from '../util/LocalizerUtil';
+import {loadDataUrl} from '../util/util';
+import {TIME_IN_MILLIS} from '../util/TimeUtil';
+import {Environment} from '../util/Environment';
 import {TeamMapper} from './TeamMapper';
 import {TeamEntity} from './TeamEntity';
 import {roleFromTeamPermissions, ROLE} from '../user/UserPermission';
-
 import {IntegrationMapper} from '../integration/IntegrationMapper';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {User} from '../entity/User';
@@ -53,8 +53,6 @@ import {EventRepository} from '../event/EventRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
-import {Runtime} from '@wireapp/commons';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {TeamState} from './TeamState';
 

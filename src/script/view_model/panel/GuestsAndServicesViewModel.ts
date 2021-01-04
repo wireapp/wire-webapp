@@ -21,10 +21,9 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {copyText} from 'Util/ClipboardUtil';
-import {t} from 'Util/LocalizerUtil';
-
+import {Logger, getLogger} from '../../util/Logger';
+import {copyText} from '../../util/ClipboardUtil';
+import {t} from '../../util/LocalizerUtil';
 import {Config} from '../../Config';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {ModalsViewModel} from '../ModalsViewModel';

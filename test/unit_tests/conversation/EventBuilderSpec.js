@@ -17,7 +17,7 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from '../util/util';
 
 import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';

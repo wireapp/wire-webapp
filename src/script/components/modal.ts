@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {noop} from 'Util/util';
+import {noop} from '../util/util';
 
 interface ModalParams {
   isShown: ko.Observable<boolean>;

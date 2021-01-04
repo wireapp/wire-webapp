@@ -21,9 +21,8 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
-import {capitalizeFirstChar} from 'Util/StringUtil';
-
+import {Declension, joinNames, t} from '../../util/LocalizerUtil';
+import {capitalizeFirstChar} from '../../util/StringUtil';
 import {SuperType} from '../../message/SuperType';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
 import type {User} from '../User';

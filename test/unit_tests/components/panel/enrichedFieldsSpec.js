@@ -21,7 +21,7 @@ import {instantiateComponent} from '../../../helper/knockoutHelpers';
 
 import 'src/script/components/panel/enrichedFields';
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from '../util/util';
 
 const entriesListSelector = '.enriched-fields__entry';
 

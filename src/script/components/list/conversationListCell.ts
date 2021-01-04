@@ -19,16 +19,15 @@
 
 import ko from 'knockout';
 
-import {noop} from 'Util/util';
-
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {noop} from '../../util/util';
+import {AVATAR_SIZE} from '../../components/ParticipantAvatar';
 import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
 import type {Conversation} from '../../entity/Conversation';
 import {MediaType} from '../../media/MediaType';
 import {viewportObserver} from '../../ui/viewportObserver';
 
-import 'Components/availabilityState';
+import '../components/availabilityState';
 import type {User} from '../../entity/User';
 
 interface ConversationListCellProps {

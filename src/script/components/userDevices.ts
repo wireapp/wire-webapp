@@ -22,11 +22,12 @@ import {amplify} from 'amplify';
 import type Dexie from 'dexie';
 import ko from 'knockout';
 import {ClientClassification} from '@wireapp/api-client/src/client';
+import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {capitalizeFirstChar} from 'Util/StringUtil';
-
+import './deviceCard';
+import {t} from '../util/LocalizerUtil';
+import {getLogger} from '../util/Logger';
+import {capitalizeFirstChar} from '../util/StringUtil';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
@@ -34,9 +35,7 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {getPrivacyHowUrl, getPrivacyWhyUrl, getPrivacyPolicyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
-import 'Components/deviceCard';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
 import {ConversationState} from '../conversation/ConversationState';
 

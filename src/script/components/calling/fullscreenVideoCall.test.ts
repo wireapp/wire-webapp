@@ -19,10 +19,10 @@
 
 import ko from 'knockout';
 
-import {Call} from 'src/script/calling/Call';
-import {Participant} from 'src/script/calling/Participant';
-import {Conversation} from 'src/script/entity/Conversation';
-import {User} from 'src/script/entity/User';
+import {Call} from '../../calling/Call';
+import {Participant} from '../../calling/Participant';
+import {Conversation} from '../../entity/Conversation';
+import {User} from '../../entity/User';
 import {instantiateComponent} from '../../../../test/helper/knockoutHelpers';
 import './fullscreenVideoCall';
 

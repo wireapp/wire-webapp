@@ -19,7 +19,7 @@
 
 import JSZip from 'jszip';
 
-import {noop} from 'Util/util';
+import {noop} from '../util/util';
 
 import {BackupRepository} from 'src/script/backup/BackupRepository';
 import {

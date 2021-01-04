@@ -17,8 +17,7 @@
  *
  */
 
-import {partition} from 'Util/ArrayUtil';
-
+import {partition} from '../util/ArrayUtil';
 import {Config} from '../Config';
 
 export const allowsAllFiles = (): boolean => {

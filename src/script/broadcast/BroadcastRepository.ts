@@ -21,9 +21,10 @@ import type {GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
+
 import {BackendClientError} from '../error/BackendClientError';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
-import {Logger, getLogger} from 'Util/Logger';
+import {Logger, getLogger} from '../util/Logger';
 import type {BroadcastService} from './BroadcastService';
 import type {ClientMismatchHandler} from '../conversation/ClientMismatchHandler';
 import type {ClientRepository} from '../client/ClientRepository';

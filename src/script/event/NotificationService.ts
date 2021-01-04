@@ -23,8 +23,7 @@ import type {Notification} from '@wireapp/api-client/src/notification';
 import {DatabaseKeys} from '@wireapp/core/src/main/notification/NotificationDatabaseRepository';
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
-
+import {Logger, getLogger} from '../util/Logger';
 import {EventRecord, StorageSchemata, StorageService} from '../storage/';
 import {EventError} from '../error/EventError';
 import {APIClient} from '../service/APIClientSingleton';

@@ -18,7 +18,7 @@
  */
 
 import TemporaryGuestAvatar from './TemporaryGuestAvatar';
-import TestPage from 'Util/test/TestPage';
+import TestPage from '../../util//test/TestPage';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {UserAvatarProps} from './UserAvatar';

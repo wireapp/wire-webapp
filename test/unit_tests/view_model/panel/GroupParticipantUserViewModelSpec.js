@@ -17,8 +17,8 @@
  *
  */
 
-import {noop} from 'Util/util';
-import {createRandomUuid} from 'Util/util';
+import {noop} from '../util/util';
+import {createRandomUuid} from '../util/util';
 
 import {GroupParticipantUserViewModel} from 'src/script/view_model/panel/GroupParticipantUserViewModel';
 import {User} from 'src/script/entity/User';

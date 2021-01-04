@@ -18,13 +18,13 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {alias} from 'Util/util';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
+import {getLogger, Logger} from '../util/Logger';
+import {t} from '../util/LocalizerUtil';
+import {alias} from '../util/util';
 import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
 import {UserModalViewModel} from './content/UserModalViewModel';
@@ -56,7 +56,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {UserRepository} from '../user/UserRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';

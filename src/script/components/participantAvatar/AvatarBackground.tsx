@@ -18,7 +18,8 @@
  */
 
 import React from 'react';
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
+
+import {CSS_FILL_PARENT} from '../../util/CSSMixin';
 
 export interface AvatarBackgroundProps {
   backgroundColor?: string;

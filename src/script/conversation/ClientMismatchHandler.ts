@@ -21,9 +21,8 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {getDifference} from 'Util/ArrayUtil';
-
+import {Logger, getLogger} from '../util/Logger';
+import {getDifference} from '../util/ArrayUtil';
 import type {ConversationRepository} from './ConversationRepository';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {UserRepository} from '../user/UserRepository';

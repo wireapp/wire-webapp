@@ -29,7 +29,7 @@ import {
   sortByPriority,
   utf8ToUtf16BE,
   obfuscate,
-} from 'Util/StringUtil';
+} from '../util/StringUtil';
 
 describe('StringUtil', () => {
   describe('compareTransliteration', () => {

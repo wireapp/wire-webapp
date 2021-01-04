@@ -24,7 +24,7 @@ import {UserAssetType} from '@wireapp/api-client/src/user';
 import type {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
 import {UserMapper} from '../../src/script/user/UserMapper';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from '../../src/script/util/util';
 
 export class UserGenerator {
   static getRandomUser(): User {

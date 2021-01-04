@@ -23,10 +23,8 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {t} from 'Util/LocalizerUtil';
-
+import {t} from '../util/LocalizerUtil';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-
 import type {Conversation} from '../entity/Conversation';
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_STATE} from './AccessState';

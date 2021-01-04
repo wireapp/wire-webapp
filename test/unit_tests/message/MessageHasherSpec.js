@@ -17,7 +17,7 @@
  *
  */
 
-import {bytesToHex} from 'Util/StringUtil';
+import {bytesToHex} from '../util/StringUtil';
 
 import {ClientEvent} from 'src/script/event/Client';
 import {MessageHasher} from 'src/script/message/MessageHasher';

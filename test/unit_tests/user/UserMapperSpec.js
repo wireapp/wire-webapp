@@ -17,7 +17,7 @@
  *
  */
 
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from '../util/util';
 
 import {ACCENT_ID} from 'src/script/Config';
 import {User} from 'src/script/entity/User';

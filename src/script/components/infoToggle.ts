@@ -18,7 +18,8 @@
  */
 
 import ko from 'knockout';
-import {createRandomUuid} from 'Util/util';
+
+import {createRandomUuid} from '../util/util';
 
 interface InfoToggleParams {
   dataUieName: string;

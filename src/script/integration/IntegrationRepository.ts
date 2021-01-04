@@ -21,11 +21,11 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ConversationMemberJoinEvent} from '@wireapp/api-client/src/event';
+import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
-
+import {t} from '../util/LocalizerUtil';
+import {Logger, getLogger} from '../util/Logger';
+import {compareTransliteration, sortByPriority} from '../util/StringUtil';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
@@ -39,7 +39,6 @@ import {ServiceTag} from './ServiceTag';
 import {ConversationError} from '../error/ConversationError';
 import {ProviderEntity} from './ProviderEntity';
 import {MemberLeaveEvent} from '../conversation/EventBuilder';
-import {container} from 'tsyringe';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {t, setStrings, joinNames} from 'Util/LocalizerUtil';
+import {t, setStrings, joinNames} from '../util/LocalizerUtil';
 
 describe('LocalizerUtil', () => {
   describe('t', () => {

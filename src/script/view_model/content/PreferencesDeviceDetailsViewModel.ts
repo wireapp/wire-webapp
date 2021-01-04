@@ -20,10 +20,10 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
-import {formatTimestamp} from 'Util/TimeUtil';
-
+import {t} from '../../util/LocalizerUtil';
+import {formatTimestamp} from '../../util/TimeUtil';
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
@@ -33,9 +33,8 @@ import {CryptographyRepository} from '../../cryptography/CryptographyRepository'
 import {ClientEntity} from '../../client/ClientEntity';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
-import {getLogger, Logger} from 'Util/Logger';
-import type {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {container} from 'tsyringe';
+import {getLogger, Logger} from '../../util/Logger';
+import type {MessageRepository} from '../../conversation/MessageRepository';
 import {ConversationState} from '../../conversation/ConversationState';
 
 export class PreferencesDeviceDetailsViewModel {

@@ -23,9 +23,10 @@ import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-mes
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
-import {truncate} from 'Util/StringUtil';
+
+import {getLogger, Logger} from '../util/Logger';
+import {t} from '../util/LocalizerUtil';
+import {truncate} from '../util/StringUtil';
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationStatus} from '../conversation/ConversationStatus';

@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {formatDayMonthNumeral, formatTimeShort} from 'Util/TimeUtil';
-
+import {formatDayMonthNumeral, formatTimeShort} from '../../util/TimeUtil';
 import type {Message} from '../../entity/message/Message';
 
 interface Params {

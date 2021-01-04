@@ -1,6 +1,7 @@
 import fs from 'fs-extra';
 import Changelog from 'generate-changelog';
 import path from 'path';
+
 import * as pkg from '../package.json';
 
 const simpleGit = require('simple-git')();

@@ -22,42 +22,38 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
-import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
-import {afterRender, formatBytes} from 'Util/util';
-import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
-import {renderMessage} from 'Util/messageRenderer';
-import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-
+import {t} from '../../util/LocalizerUtil';
+import {TIME_IN_MILLIS, formatLocale} from '../../util/TimeUtil';
+import {afterRender, formatBytes} from '../../util/util';
+import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from '../../util/FileTypeUtil';
+import {renderMessage} from '../../util/messageRenderer';
+import {KEY, isFunctionKey, insertAtCaret} from '../../util/KeyboardUtil';
+import {AVATAR_SIZE} from '../../components/ParticipantAvatar';
 import {ModalsViewModel} from '../ModalsViewModel';
-
 import {StorageKey} from '../../storage/StorageKey';
-
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import {MentionEntity} from '../../message/MentionEntity';
-
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
 import {Config} from '../../Config';
 import {ConversationError} from '../../error/ConversationError';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {StorageRepository} from 'src/script/storage';
+import {AssetRepository} from '../../assets/AssetRepository';
+import {EventRepository} from '../../event/EventRepository';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {SearchRepository} from '../../search/SearchRepository';
+import {StorageRepository} from '../../storage';
 import {EmojiInputViewModel} from './EmojiInputViewModel';
-import {User} from 'src/script/entity/User';
-import {Conversation} from 'src/script/entity/Conversation';
-import {Text} from 'src/script/entity/message/Text';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Asset} from 'src/script/entity/message/Asset';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {container} from 'tsyringe';
+import {User} from '../../entity/User';
+import {Conversation} from '../../entity/Conversation';
+import {Text} from '../../entity/message/Text';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {Asset} from '../../entity/message/Asset';
+import {FileAsset} from '../../entity/message/FileAsset';
+import {MediumImage} from '../../entity/message/MediumImage';
+import {MessageRepository} from '../../conversation/MessageRepository';
 import {UserState} from '../../user/UserState';
 import {ConversationState} from '../../conversation/ConversationState';
 

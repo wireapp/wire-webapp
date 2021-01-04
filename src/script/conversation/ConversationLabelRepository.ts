@@ -22,10 +22,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {USER_EVENT} from '@wireapp/api-client/src/event';
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {createRandomUuid} from 'Util/util';
-
+import {t} from '../util/LocalizerUtil';
+import {Logger, getLogger} from '../util/Logger';
+import {createRandomUuid} from '../util/util';
 import type {Conversation} from '../entity/Conversation';
 import type {PropertiesService} from '../properties/PropertiesService';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';

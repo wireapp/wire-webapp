@@ -29,7 +29,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from '../../helper/TestFactory';
-import {createRandomUuid} from 'Util/util';
+import {createRandomUuid} from '../util/util';
 
 const createSelfParticipant = () => {
   const selfUser = new User();

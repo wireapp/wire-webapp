@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {formatDuration} from 'Util/TimeUtil';
-
+import {formatDuration} from '../../util/TimeUtil';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';

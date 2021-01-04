@@ -22,7 +22,6 @@ import {COLOR} from '@wireapp/react-ui-kit';
 
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
-
 import {AVATAR_SIZE, STATE} from '../ParticipantAvatar';
 import AvatarBackground from './AvatarBackground';
 import AvatarImage from './AvatarImage';

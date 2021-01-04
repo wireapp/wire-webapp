@@ -19,8 +19,7 @@
 
 import ko from 'knockout';
 
-import {noop} from 'Util/util';
-
+import {noop} from '../../../util/util';
 import type {AssetTransferState} from '../../../assets/AssetTransferState';
 import type {FileAsset} from '../../../entity/message/FileAsset';
 import {AbstractAssetTransferStateTracker} from '../AbstractAssetTransferStateTracker';

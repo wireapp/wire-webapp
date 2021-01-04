@@ -20,9 +20,8 @@
 import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
-import {noop} from 'Util/util';
-
+import {t} from '../../util/LocalizerUtil';
+import {noop} from '../../util/util';
 import type {User} from '../../entity/User';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 

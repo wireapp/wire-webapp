@@ -30,10 +30,12 @@ import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {chunk, partition} from 'Util/ArrayUtil';
-import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {container} from 'tsyringe';
+
+import {chunk, partition} from '../util/ArrayUtil';
+import {t} from '../util/LocalizerUtil';
+import {Logger, getLogger} from '../util/Logger';
+import {createRandomUuid, loadUrlBlob} from '../util/util';
 import {UNSPLASH_URL} from '../externalRoute';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
 import {User} from '../entity/User';
@@ -60,7 +62,6 @@ import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserError} from '../error/UserError';
 import {UserState} from './UserState';
-import {container} from 'tsyringe';
 
 export class UserRepository {
   private readonly assetRepository: AssetRepository;

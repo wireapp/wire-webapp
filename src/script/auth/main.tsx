@@ -26,8 +26,8 @@ import * as ReactDOM from 'react-dom';
 import {AppContainer} from 'react-hot-loader';
 import {Provider, ConnectedComponent} from 'react-redux';
 
-import {enableLogging} from 'Util/LoggerUtil';
-import {exposeWrapperGlobals} from 'Util/wrapper';
+import {enableLogging} from '../util/LoggerUtil';
+import {exposeWrapperGlobals} from '../util/wrapper';
 
 import {Config} from '../Config';
 import {configureClient} from './configureClient';

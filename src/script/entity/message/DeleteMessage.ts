@@ -17,9 +17,8 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-import {formatTimeShort} from 'Util/TimeUtil';
-
+import {t} from '../../util/LocalizerUtil';
+import {formatTimeShort} from '../../util/TimeUtil';
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 

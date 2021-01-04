@@ -20,8 +20,7 @@
 import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
 import ko from 'knockout';
 
-import {zeroPadding} from 'Util/util';
-
+import {zeroPadding} from '../util/util';
 import {ClientRecord} from '../storage';
 import {ClientMapper} from './ClientMapper';
 

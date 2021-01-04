@@ -37,9 +37,9 @@ import {useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
-import {getLogger} from 'Util/Logger';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
+import {getLogger} from '../../util/Logger';
 import {Config} from '../../Config';
 import {ssoLoginStrings} from '../../strings';
 import AppAlreadyOpen from '../component/AppAlreadyOpen';
