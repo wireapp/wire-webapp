@@ -44,7 +44,7 @@ import 'Components/infoToggle';
 import 'Components/inputLevel';
 import 'Components/list/conversationListCallingCell';
 import 'Components/list/conversationListCell';
-import 'Components/list/groupAvatar';
+import 'Components/list/GroupAvatar';
 import 'Components/message';
 import 'Components/messageQuote';
 import 'Components/messageTimerButton';
