@@ -5,7 +5,7 @@
     "uuidjs": "4.2.6"
   },
   "devDependencies": {
-    "@types/karma": "5.0.0",
+    "@types/karma": "5.0.1",
     "cross-env": "7.0.2",
     "del-cli": "3.0.1",
     "jasmine": "3.5.0",
