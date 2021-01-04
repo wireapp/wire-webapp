@@ -17,8 +17,8 @@
  *
  */
 
-import {noop} from '../util/util';
-import {createRandomUuid} from '../util/util';
+import {noop} from 'src/script/util/util';
+import {createRandomUuid} from 'src/script/util/util';
 
 import {ReceiptsMiddleware} from 'src/script/event/preprocessor/ReceiptsMiddleware';
 import {ClientEvent} from 'src/script/event/Client';

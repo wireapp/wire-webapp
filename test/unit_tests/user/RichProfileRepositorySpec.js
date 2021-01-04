@@ -19,7 +19,7 @@
 
 import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 
-import {createRandomUuid} from '../util/util';
+import {createRandomUuid} from 'src/script/util/util';
 
 describe('RichProfileRepository', () => {
   let richProfileRepository;

@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 
+import '../availabilityState';
 import {AVATAR_SIZE} from '../../components/ParticipantAvatar';
 import {UserlistMode} from '../../components/userList';
 import {t} from '../../util/LocalizerUtil';
@@ -26,8 +27,6 @@ import {capitalizeFirstChar} from '../../util/StringUtil';
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {viewportObserver} from '../../ui/viewportObserver';
-
-import '../components/availabilityState';
 import {Participant} from '../../calling/Participant';
 
 interface ParticipantItemParams {

@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import {AVATAR_SIZE} from '../../components/ParticipantAvatar';
 import type {User} from '../../entity/User';
 
-import '../components/availabilityState';
+import '../availabilityState';
 
 interface UserDetailsProps {
   badge?: string;

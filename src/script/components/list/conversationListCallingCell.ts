@@ -20,8 +20,8 @@
 import ko from 'knockout';
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE, CONV_TYPE} from '@wireapp/avs';
 
-import './calling/fullscreenVideoCall';
-import './groupVideoGrid';
+import '../calling/fullscreenVideoCall';
+import '../groupVideoGrid';
 import './participantItem';
 import {AVATAR_SIZE} from '../ParticipantAvatar';
 import {t} from '../../util/LocalizerUtil';

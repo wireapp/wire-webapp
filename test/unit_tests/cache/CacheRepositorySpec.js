@@ -18,7 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-import {createRandomUuid} from '../util/util';
+import {createRandomUuid} from 'src/script/util/util';
 
 import {StorageKey} from 'src/script/storage/StorageKey';
 import {CacheRepository} from 'src/script/cache/CacheRepository';

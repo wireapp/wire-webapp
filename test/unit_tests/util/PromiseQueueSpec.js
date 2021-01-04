@@ -17,7 +17,7 @@
  *
  */
 
-import {PromiseQueue} from '../util/PromiseQueue';
+import {PromiseQueue} from 'src/script/util/PromiseQueue';
 
 describe('PromiseQueue', () => {
   describe('push', () => {

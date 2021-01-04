@@ -17,7 +17,7 @@
  *
  */
 
-import {createRandomUuid} from '../util/util';
+import {createRandomUuid} from 'src/script/util/util';
 import 'src/script/localization/Localizer';
 
 import {User} from 'src/script/entity/User';

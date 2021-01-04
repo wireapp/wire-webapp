@@ -17,7 +17,7 @@
  *
  */
 
-import {createRandomUuid} from '../util/util';
+import {createRandomUuid} from 'src/script/util/util';
 
 import {User} from 'src/script/entity/User';
 import {TestFactory} from '../../helper/TestFactory';

@@ -40,7 +40,7 @@ import {ReactionType} from '@wireapp/core/src/main/conversation';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {CryptographyMapper} from 'src/script/cryptography/CryptographyMapper';
-import {arrayToBase64, createRandomUuid} from '../util/util';
+import {arrayToBase64, createRandomUuid} from 'src/script/util/util';
 import {encryptAesAsset} from 'src/script/assets/AssetCrypto';
 import {ClientEvent} from 'src/script/event/Client';
 import {PROTO_MESSAGE_TYPE} from 'src/script/cryptography/ProtoMessageType';

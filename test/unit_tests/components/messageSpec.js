@@ -26,8 +26,8 @@ import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
 import {User} from 'src/script/entity/User';
 import 'src/script/components/message';
-import {t} from '../util/LocalizerUtil';
-import {createRandomUuid} from '../util/util';
+import {t} from 'src/script/util/LocalizerUtil';
+import {createRandomUuid} from 'src/script/util/util';
 
 describe('message', () => {
   const testFactory = new TestFactory();

@@ -22,7 +22,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {createRandomUuid} from '../util/util';
+import {createRandomUuid} from 'src/script/util/util';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';

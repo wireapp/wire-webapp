@@ -26,7 +26,7 @@ import {
   uniquify,
   flatten,
   partition,
-} from '../util/ArrayUtil';
+} from 'src/script/util/ArrayUtil';
 
 describe('ArrayUtil', () => {
   describe('chunk', () => {

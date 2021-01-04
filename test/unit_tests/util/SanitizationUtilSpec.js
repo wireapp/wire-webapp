@@ -17,7 +17,7 @@
  *
  */
 
-import {LocalizerUtil, Declension, setStrings} from '../util/LocalizerUtil';
+import {LocalizerUtil, Declension, setStrings} from 'src/script/util/LocalizerUtil';
 
 import 'src/script/localization/Localizer';
 

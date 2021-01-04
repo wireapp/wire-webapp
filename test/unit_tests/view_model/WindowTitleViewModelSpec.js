@@ -21,8 +21,8 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 
-import {t, setStrings} from '../util/LocalizerUtil';
-import {createRandomUuid} from '../util/util';
+import {t, setStrings} from 'src/script/util/LocalizerUtil';
+import {createRandomUuid} from 'src/script/util/util';
 
 import 'src/script/localization/Localizer';
 

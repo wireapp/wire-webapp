@@ -25,7 +25,7 @@ import {
   getDomainName,
   getLinksFromHtml,
   prependProtocol,
-} from '../util/UrlUtil';
+} from 'src/script/util/UrlUtil';
 
 describe('UrlUtil', () => {
   describe('appendParameter', () => {

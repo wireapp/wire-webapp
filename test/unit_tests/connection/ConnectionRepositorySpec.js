@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {createRandomUuid} from '../util/util';
+import {createRandomUuid} from 'src/script/util/util';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';

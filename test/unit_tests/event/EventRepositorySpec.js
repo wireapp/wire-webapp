@@ -24,7 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Proteus from '@wireapp/proteus';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event';
 
-import {createRandomUuid, arrayToBase64} from '../util/util';
+import {createRandomUuid, arrayToBase64} from 'src/script/util/util';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';

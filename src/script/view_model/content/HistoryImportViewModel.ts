@@ -25,7 +25,7 @@ import {getLogger, Logger} from '../../util/Logger';
 import {t} from '../../util/LocalizerUtil';
 import {loadFileBuffer} from '../../util/util';
 import {WebWorker} from '../../util/worker';
-import '../components/loadingBar';
+import '../../components/loadingBar';
 
 import {Config} from '../../Config';
 import {MotionDuration} from '../../motion/MotionDuration';
