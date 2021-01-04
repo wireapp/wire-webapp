@@ -28,7 +28,7 @@ import {koPushDeferred} from '../../util/util';
 import {MessageCategory} from '../../message/MessageCategory';
 import {ContentViewModel} from '../ContentViewModel';
 import {Conversation} from '../../entity/Conversation';
-import {ContentMessage} from '../../entity/message/ContentMessage';
+import {MessageCategory} from '../../message/MessageCategory';
 
 // Parent: ContentViewModel
 export class CollectionDetailsViewModel {

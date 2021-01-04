@@ -61,6 +61,12 @@ import {TeamEntity} from '../../team/TeamEntity';
 import type {ClientEntity} from '../../client/ClientEntity';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import {User} from '../../entity/User';
+import {UserError} from '../../error/UserError';
+import {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
+import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
+import type {ClientEntity} from '../../client/ClientEntity';
 
 export class PreferencesAccountViewModel {
   logger: Logger;

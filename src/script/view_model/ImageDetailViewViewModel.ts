@@ -25,15 +25,14 @@ import {iterateItem} from '../util/ArrayUtil';
 import {KEY} from '../util/KeyboardUtil';
 import {formatLocale} from '../util/TimeUtil';
 import {Modal} from '../ui/Modal';
-import type {MainViewModel} from './MainViewModel';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {AssetRepository} from '../assets/AssetRepository';
 import type {ActionsViewModel} from './ActionsViewModel';
-import type {Conversation} from '../entity/Conversation';
+import type {AssetRepository} from '../assets/AssetRepository';
 import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {Conversation} from '../entity/Conversation';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {MainViewModel} from './MainViewModel';
 import type {MediumImage} from '../entity/message/MediumImage';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {MessageCategory} from '../message/MessageCategory';
 
 export class ImageDetailViewViewModel {
   elementId: 'detail-view';

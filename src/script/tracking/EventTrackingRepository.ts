@@ -224,7 +224,7 @@ export class EventTrackingRepository {
   };
 
   private subscribeToProductEvents(): void {
-    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, segmentations?: any) => {
+    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, segmentations?: Record<string, any>) => {
       this.trackProductReportingEvent(eventName, segmentations);
     });
 
@@ -253,7 +253,7 @@ export class EventTrackingRepository {
     return 'member';
   }
 
-  private trackProductReportingEvent(eventName: string, customSegmentations?: any): void {
+  private trackProductReportingEvent(eventName: string, customSegmentations?: Record<string, any>): void {
     if (this.isProductReportingActivated === true) {
       const userData = {
         [UserData.IS_TEAM]: this.userState.isTeam(),

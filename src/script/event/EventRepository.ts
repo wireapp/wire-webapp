@@ -202,7 +202,7 @@ export class EventRepository {
    * Get notifications for the current client from the stream.
    *
    * @param notificationId Event ID to start from
-   * @param [limit=EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX] Max. number of notifications to retrieve from backend at once
+   * @param limit Max. number of notifications to retrieve from backend at once
    * @returns Resolves when all new notifications from the stream have been handled
    */
   private async getNotifications(
@@ -320,7 +320,7 @@ export class EventRepository {
    * Get the last notification ID and set event date for a given client.
    *
    * @param clientId Client ID to retrieve last notification ID for
-   * @param [isInitialization=false] Set initial date to 0 if not found
+   * @param isInitialization Set initial date to 0 if not found
    * @returns Resolves when stream state has been initialized
    */
   private setStreamState(clientId: string, isInitialization = false) {
@@ -453,10 +453,10 @@ export class EventRepository {
    * @note Don't add unable to decrypt to self conversation
    *
    * @param event Event payload to be injected
-   * @param [source=EventRepository.SOURCE.INJECTED] Source of injection
+   * @param source Source of injection
    * @returns Resolves when the event has been processed
    */
-  injectEvent(event: EventRecord, source = EventRepository.SOURCE.INJECTED) {
+  injectEvent(event: EventRecord, source = EventRepository.SOURCE.INJECTED): Promise<EventRecord> {
     if (!event) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
@@ -516,7 +516,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns Resolves with the saved record or the plain event if the event was skipped
    */
-  private handleEvent(event: EventRecord, source: EventSource) {
+  private handleEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
     const validationResult = validateEvent(
       event as {time: string; type: CONVERSATION_EVENT | USER_EVENT},
@@ -547,7 +547,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns Resolves with the saved record or `true` if the event was skipped
    */
-  private async processEvent(event: EventRecord, source: EventSource) {
+  private async processEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
     const isEncryptedEvent = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     if (isEncryptedEvent) {
       event = await this.cryptographyRepository.handleEncryptedEvent(event);
@@ -572,7 +572,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns The distributed event
    */
-  private handleEventDistribution(event: EventRecord, source: EventSource) {
+  private handleEventDistribution(event: EventRecord, source: EventSource): EventRecord {
     const eventDate = this.getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
@@ -604,7 +604,7 @@ export class EventRepository {
    * @param event Backend event extracted from notification stream
    * @returns Resolves with the saved event
    */
-  private handleEventSaving(event: EventRecord) {
+  private handleEventSaving(event: EventRecord): Promise<EventRecord | void> {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 
@@ -638,7 +638,7 @@ export class EventRepository {
     });
   }
 
-  private handleEventReplacement(originalEvent: EventRecord, newEvent: EventRecord) {
+  private handleEventReplacement(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord> {
     const newData = newEvent.data || {};
     if (originalEvent.data.from !== newData.from) {
       const logMessage = `ID previously used by user '${newEvent.from}'`;
@@ -673,7 +673,7 @@ export class EventRepository {
     }
   }
 
-  private handleAssetUpdate(originalEvent: EventRecord, newEvent: EventRecord) {
+  private handleAssetUpdate(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord | void> {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
@@ -700,11 +700,11 @@ export class EventRepository {
       }
 
       default:
-        return this.throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
+        this.throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
     }
   }
 
-  private handleLinkPreviewUpdate(originalEvent: EventRecord, newEvent: EventRecord) {
+  private handleLinkPreviewUpdate(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord | void> {
     const newEventData = newEvent.data;
     const originalData = originalEvent.data;
     if (originalEvent.from !== newEvent.from) {
@@ -746,11 +746,11 @@ export class EventRepository {
     };
   }
 
-  private getUpdatesForEditMessage(originalEvent: EventRecord, newEvent: EventRecord) {
+  private getUpdatesForEditMessage(originalEvent: EventRecord, newEvent: EventRecord): EventRecord & {reactions: {}} {
     return {...newEvent, reactions: {}};
   }
 
-  private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: EventRecord) {
+  private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: EventRecord): EventRecord {
     const newData = newEvent.data;
     const originalData = originalEvent.data;
     const updatingLinkPreview = !!originalData.previews.length;
@@ -777,7 +777,7 @@ export class EventRepository {
     };
   }
 
-  private throwValidationError(event: EventRecord, errorMessage: string, logMessage?: string) {
+  private throwValidationError(event: EventRecord, errorMessage: string, logMessage?: string): never {
     const baseLogMessage = `Ignored '${event.type}' (${event.id}) in '${event.conversation}' from '${event.from}':'`;
     const baseErrorMessage = 'Event validation failed:';
     this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);

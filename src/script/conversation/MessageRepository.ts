@@ -39,7 +39,7 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {RequestCancellationError} from '@wireapp/api-client/src/user';
+import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -61,7 +61,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {EventBuilder} from '../conversation/EventBuilder';
+import {AssetAddEvent, EventBuilder} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
@@ -183,7 +183,7 @@ export class MessageRepository {
     textMessage: string,
     mentionEntities: MentionEntity[],
     quoteEntity: QuoteEntity,
-  ) {
+  ): Promise<GenericMessage> {
     const messageId = createRandomUuid();
 
     const protoText = this.createTextProto(
@@ -254,7 +254,7 @@ export class MessageRepository {
     textMessage: string,
     mentionEntities: MentionEntity[],
     quoteEntity: QuoteEntity,
-  ) {
+  ): Promise<ConversationEvent> {
     try {
       const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
       return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
@@ -281,7 +281,7 @@ export class MessageRepository {
     textMessage: string,
     originalMessageEntity: ContentMessage,
     mentionEntities: MentionEntity[],
-  ) {
+  ): Promise<ConversationEvent> {
     const hasDifferentText = isTextDifferent(originalMessageEntity, textMessage);
     const hasDifferentMentions = areMentionsDifferent(originalMessageEntity, mentionEntities);
     const wasEdited = hasDifferentText || hasDifferentMentions;
@@ -336,7 +336,7 @@ export class MessageRepository {
     url: string,
     tag: string | number | Record<string, string>,
     quoteEntity: QuoteEntity,
-  ) {
+  ): Promise<void> {
     if (!tag) {
       tag = t('extensionsGiphyRandom');
     }
@@ -387,7 +387,11 @@ export class MessageRepository {
    * @returns Resolves when file was uploaded
    */
 
-  private async upload_file(conversationEntity: Conversation, file: File | Blob, asImage?: boolean) {
+  private async upload_file(
+    conversationEntity: Conversation,
+    file: File | Blob,
+    asImage?: boolean,
+  ): Promise<EventRecord | void> {
     let messageId;
     try {
       const uploadStarted = Date.now();
@@ -436,7 +440,12 @@ export class MessageRepository {
     }
   }
 
-  private async sendAssetRemotedata(conversationEntity: Conversation, file: Blob, messageId: string, asImage: boolean) {
+  private async sendAssetRemotedata(
+    conversationEntity: Conversation,
+    file: Blob,
+    messageId: string,
+    asImage: boolean,
+  ): Promise<void> {
     let genericMessage: GenericMessage;
 
     await this.getMessageInConversationById(conversationEntity, messageId);
@@ -460,7 +469,7 @@ export class MessageRepository {
     const {uploaded: assetData} = conversationEntity.messageTimer()
       ? genericMessage.ephemeral.asset
       : genericMessage.asset;
-    const data = {
+    const data: AssetRecord = {
       key: assetData.assetId,
       otr_key: assetData.otrKey,
       sha256: assetData.sha256,
@@ -480,10 +489,7 @@ export class MessageRepository {
    * @param event_json JSON data of 'conversation.asset-upload-complete' event
    * @returns Resolves when the event was handled
    */
-  private async onAssetUploadComplete(
-    conversationEntity: Conversation,
-    event_json: import('./EventBuilder').AssetAddEvent,
-  ) {
+  private async onAssetUploadComplete(conversationEntity: Conversation, event_json: AssetAddEvent): Promise<void> {
     try {
       const message_et = await this.getMessageInConversationById(conversationEntity, event_json.id);
       return await this.update_message_as_upload_complete(conversationEntity, message_et, event_json);
@@ -527,9 +533,9 @@ export class MessageRepository {
         [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
         [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
       });
-      const asset = protoAsset;
+
       let genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+        [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
         messageId: createRandomUuid(),
       });
 
@@ -583,7 +589,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     message_et: ContentMessage,
     event_json: EventJson,
-  ) {
+  ): Promise<void> {
     const {id, key, otr_key, sha256, token} = event_json.data;
     const asset_et = message_et.get_first_asset() as FileAsset;
 
@@ -610,7 +616,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     messageId: string,
     reason = ProtobufAsset.NotUploaded.FAILED,
-  ) {
+  ): Promise<ConversationEvent> {
     const wasCancelled = reason === ProtobufAsset.NotUploaded.CANCELLED;
     const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
     const protoAsset = new Asset({
@@ -643,7 +649,7 @@ export class MessageRepository {
     genericMessage: GenericMessage,
     mentionEntities: MentionEntity[],
     quoteEntity?: QuoteEntity,
-  ) {
+  ): Promise<ConversationEvent> {
     const conversationId = conversationEntity.id;
     const messageId = genericMessage.messageId;
     let messageEntity: ContentMessage;
@@ -723,7 +729,7 @@ export class MessageRepository {
       amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
     }
 
-    const injectedEvent = ((await this.eventRepository.injectEvent(mappedEvent)) as unknown) as ConversationEvent;
+    const injectedEvent = (await this.eventRepository.injectEvent(mappedEvent)) as ConversationEvent;
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
     eventInfoEntity.setTimestamp((injectedEvent as any).time as string);
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
@@ -739,7 +745,7 @@ export class MessageRepository {
    * @param conversationEntity Conversation entity
    * @param message_et Message to react to
    */
-  public toggle_like(conversationEntity: Conversation, message_et: ContentMessage) {
+  public toggle_like(conversationEntity: Conversation, message_et: ContentMessage): void {
     if (!conversationEntity.removed_from_conversation()) {
       const reaction = message_et.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());
@@ -820,7 +826,7 @@ export class MessageRepository {
     messageEntity: Message,
     type: Confirmation.Type,
     moreMessageEntities: Message[] = [],
-  ) {
+  ): void {
     const typeToConfirm = (EventTypeHandling.CONFIRM as string[]).includes(messageEntity.type);
 
     if (messageEntity.user().isMe || !typeToConfirm) {
@@ -864,7 +870,11 @@ export class MessageRepository {
    * @param reaction Reaction
    * @returns Resolves after sending the reaction
    */
-  private sendReaction(conversationEntity: Conversation, messageEntity: Message, reaction: ReactionType) {
+  private sendReaction(
+    conversationEntity: Conversation,
+    messageEntity: Message,
+    reaction: ReactionType,
+  ): Promise<ConversationEvent> {
     const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
@@ -944,7 +954,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     messageEntity: Message,
     precondition?: string[] | boolean,
-  ) {
+  ): Promise<number> {
     const conversationId = conversationEntity.id;
     const messageId = messageEntity.id;
 
@@ -966,7 +976,7 @@ export class MessageRepository {
           this.sendGenericMessage(eventInfoEntity, true);
         });
       });
-      return this._delete_message_by_id(conversationEntity, messageId);
+      return this.deleteMessageById(conversationEntity, messageId);
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
@@ -986,7 +996,7 @@ export class MessageRepository {
    * @param messageEntity Message to delete
    * @returns Resolves when message was deleted
    */
-  public async deleteMessage(conversationEntity: Conversation, messageEntity: Message) {
+  public async deleteMessage(conversationEntity: Conversation, messageEntity: Message): Promise<number> {
     try {
       const protoMessageHide = new MessageHide({
         conversationId: conversationEntity.id,
@@ -999,7 +1009,7 @@ export class MessageRepository {
 
       const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
       await this.sendGenericMessageToConversation(eventInfoEntity);
-      return this._delete_message_by_id(conversationEntity, messageEntity.id);
+      return this.deleteMessageById(conversationEntity, messageEntity.id);
     } catch (error) {
       this.logger.info(
         `Failed to send delete message with id '${messageEntity.id}' for conversation '${conversationEntity.id}'`,
@@ -1012,7 +1022,7 @@ export class MessageRepository {
   /**
    * Update cleared of conversation using timestamp.
    */
-  public updateClearedTimestamp(conversationEntity: Conversation) {
+  public updateClearedTimestamp(conversationEntity: Conversation): void {
     const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
 
     if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
@@ -1032,7 +1042,7 @@ export class MessageRepository {
     }
   }
 
-  sendButtonAction(conversationEntity: Conversation, messageEntity: CompositeMessage, buttonId: string) {
+  sendButtonAction(conversationEntity: Conversation, messageEntity: CompositeMessage, buttonId: string): void {
     if (conversationEntity.removed_from_conversation()) {
       return;
     }
@@ -1074,7 +1084,7 @@ export class MessageRepository {
    * @param messageId ID of message to delete
    * @returns Resolves when message was deleted
    */
-  public async _delete_message_by_id(conversationEntity: Conversation, messageId: string) {
+  public async deleteMessageById(conversationEntity: Conversation, messageId: string): Promise<number> {
     const isLastDeleted =
       conversationEntity.isShowingLastReceivedMessage() && conversationEntity.getLastMessage()?.id === messageId;
 
@@ -1089,7 +1099,7 @@ export class MessageRepository {
     return deleteCount;
   }
 
-  private sendGenericMessageToConversation(eventInfoEntity: EventInfoEntity) {
+  private sendGenericMessageToConversation(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
     return this.messageSender.queueMessage(async () => {
       const recipients = await this.create_recipients(eventInfoEntity.conversationId);
       eventInfoEntity.updateOptions({recipients});
@@ -1120,12 +1130,12 @@ export class MessageRepository {
   private async updateMessageAsSent(
     conversationEntity: Conversation,
     eventJson: ConversationEvent,
-    isoDate: string | number | Date,
-  ) {
+    isoDate: string,
+  ): Promise<Pick<Partial<EventRecord>, 'status' | 'time'> | void> {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
       messageEntity.status(StatusType.SENT);
-      const changes: {status: StatusType; time?: string | number | Date} = {status: StatusType.SENT};
+      const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {status: StatusType.SENT};
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {

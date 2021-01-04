@@ -17,6 +17,8 @@
  *
  */
 
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import '../components/availabilityState';
@@ -35,17 +37,20 @@ import {getLogger, Logger} from '../../util/Logger';
 import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
-import {Shortcut} from '../../ui/Shortcut';
-import {ShortcutType} from '../../ui/ShortcutType';
 import {ContentViewModel} from '../ContentViewModel';
+import {ConversationState} from '../../conversation/ConversationState';
+import {generateConversationUrl} from '../../router/routeGenerator';
 import {ListViewModel} from '../ListViewModel';
 import type {MainViewModel} from '../MainViewModel';
 import type {CallingViewModel} from '../CallingViewModel';
 import type {CallingRepository} from '../../calling/CallingRepository';
+import type {CallingViewModel} from '../CallingViewModel';
+import type {Conversation} from '../../entity/Conversation';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {EventRepository} from '../../event/EventRepository';
+import type {MainViewModel} from '../MainViewModel';
 import type {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import type {PropertiesRepository} from '../../properties/PropertiesRepository';
-import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import type {EventRepository} from '../../event/EventRepository';
 import {UserState} from '../../user/UserState';

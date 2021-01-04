@@ -17,7 +17,6 @@
  *
  */
 
-import ko from 'knockout';
 import {amplify} from 'amplify';
 import {throttle} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';

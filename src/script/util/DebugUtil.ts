@@ -18,6 +18,7 @@
  */
 
 import type {BackendEvent, ConversationEvent, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
+import type {Notification} from '@wireapp/api-client/src/notification/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import type {Notification} from '@wireapp/api-client/src/notification/';
 import {util as ProteusUtil} from '@wireapp/proteus';

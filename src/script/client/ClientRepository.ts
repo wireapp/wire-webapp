@@ -24,6 +24,7 @@ import {Runtime} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
 import murmurhash from 'murmurhash';
 import {container} from 'tsyringe';
 

@@ -17,6 +17,8 @@
  *
  */
 
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
@@ -25,7 +27,8 @@ import {container} from 'tsyringe';
 import {t} from '../../util/LocalizerUtil';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {Config} from '../../Config';
-import type {MainViewModel} from '../MainViewModel';
+import {ModalsViewModel} from '../ModalsViewModel';
+import {UserState} from '../../user/UserState';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {CallingViewModel} from '../CallingViewModel';
 import type {User} from '../../entity/User';

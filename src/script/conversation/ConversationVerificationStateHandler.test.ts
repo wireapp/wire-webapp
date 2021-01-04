@@ -25,7 +25,9 @@ import {User} from '../entity/User';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
-import {ConversationRepository} from './ConversationRepository';
+import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {TestFactory} from '../../../test/helper/TestFactory';
+import {User} from 'src/script/entity/User';
 
 describe('ConversationVerificationStateHandler', () => {
   const testFactory = new TestFactory();

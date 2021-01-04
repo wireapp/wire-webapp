@@ -29,7 +29,7 @@ import {VerificationMessageType} from '../message/VerificationMessageType';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
-import {EventRecord} from '../storage';
+import {AssetRecord, EventRecord} from '../storage';
 
 export interface BaseEvent {
   conversation: string;
@@ -47,8 +47,9 @@ export interface ConversationEvent<T> extends BaseEvent {
 export interface CallingEvent {
   content: CallEntity;
   conversation: string;
-  from: number;
-  sender: number;
+  from: string;
+  sender: string;
+  time?: string;
   type: CALL;
 }
 
@@ -118,7 +119,7 @@ export const EventBuilder = {
     };
   },
 
-  buildAssetAdd(conversationEntity: Conversation, data: any, currentTimestamp: number): AssetAddEvent {
+  buildAssetAdd(conversationEntity: Conversation, data: AssetRecord, currentTimestamp: number): AssetAddEvent {
     return {
       conversation: conversationEntity.id,
       data,
@@ -132,8 +133,8 @@ export const EventBuilder = {
   buildCalling(
     conversationEntity: Conversation,
     callMessage: CallEntity,
-    userId: number,
-    clientId: number,
+    userId: string,
+    clientId: string,
   ): CallingEvent {
     return {
       content: callMessage,
@@ -226,7 +227,7 @@ export const EventBuilder = {
     };
   },
 
-  buildIncomingMessageTooBig(event: any, messageError: Error, errorCode: number): ErrorEvent {
+  buildIncomingMessageTooBig(event: EventRecord, messageError: Error, errorCode: number): ErrorEvent {
     const {conversation: conversationId, data: eventData, from, time} = event;
 
     return {

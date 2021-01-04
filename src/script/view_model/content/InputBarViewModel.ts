@@ -17,10 +17,11 @@
  *
  */
 
-import {escape} from 'underscore';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {Availability} from '@wireapp/protocol-messaging';
+import {container} from 'tsyringe';
+import {escape} from 'underscore';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
@@ -55,14 +56,13 @@ import {FileAsset} from '../../entity/message/FileAsset';
 import {MediumImage} from '../../entity/message/MediumImage';
 import {MessageRepository} from '../../conversation/MessageRepository';
 import {UserState} from '../../user/UserState';
-import {ConversationState} from '../../conversation/ConversationState';
 
-type DraftMessage = {
+interface DraftMessage {
   mentions: MentionEntity[];
   reply: ContentMessage;
   replyEntityPromise?: Promise<ContentMessage>;
   text: string;
-};
+}
 
 interface Draft {
   mentions: MentionEntity[];

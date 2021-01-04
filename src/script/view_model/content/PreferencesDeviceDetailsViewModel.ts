@@ -17,21 +17,20 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {t} from '../../util/LocalizerUtil';
 import {formatTimestamp} from '../../util/TimeUtil';
 import {Config} from '../../Config';
-import {MotionDuration} from '../../motion/MotionDuration';
 import {ContentViewModel} from '../ContentViewModel';
-import {MainViewModel} from '../MainViewModel';
-import {ClientRepository} from '../../client/ClientRepository';
+import {ConversationState} from '../../conversation/ConversationState';
 import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {ClientEntity} from '../../client/ClientEntity';
-import {ActionsViewModel} from '../ActionsViewModel';
+import {MainViewModel} from '../MainViewModel';
+import {MotionDuration} from '../../motion/MotionDuration';
 import {User} from '../../entity/User';
 import {getLogger, Logger} from '../../util/Logger';
 import type {MessageRepository} from '../../conversation/MessageRepository';
