@@ -31,6 +31,7 @@ export interface AssetRecord {
   token?: string;
 }
 
+// TODO: Replace with Record from "LocalWireDatabase"
 export interface EventRecord<T = any> {
   category: number;
   client?: {time: string};
