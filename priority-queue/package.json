@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/node": "~12",
+    "@types/node": "~14",
     "logdown": "3.3.1",
     "uuidjs": "4.2.6"
   },
