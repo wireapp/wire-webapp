@@ -44,9 +44,10 @@ import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference} from 'Util/ArrayUtil';
 import {arrayToBase64, createRandomUuid, loadUrlBlob} from 'Util/util';
