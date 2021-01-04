@@ -20,7 +20,9 @@
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
@@ -28,13 +30,11 @@ import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {Context, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
-
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import type {VerificationMessage} from '../entity/message/VerificationMessage';
 import {StatusType} from '../message/StatusType';
 import type {Text} from '../entity/message/Text';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {ActionsViewModel} from '../view_model/ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
@@ -43,7 +43,9 @@ import type {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {SystemMessage} from '../entity/message/SystemMessage';
 import {AssetRepository} from '../assets/AssetRepository';
-import {container} from 'tsyringe';
+import type {MessageRepository} from '../conversation/MessageRepository';
+import {ConversationState} from '../conversation/ConversationState';
+import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -52,9 +54,6 @@ import './asset/linkPreviewAsset';
 import './asset/locationAsset';
 import './asset/videoAsset';
 import './asset/messageButton';
-import type {MessageRepository} from '../conversation/MessageRepository';
-import {ConversationState} from '../conversation/ConversationState';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;

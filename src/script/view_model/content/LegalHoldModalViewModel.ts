@@ -22,17 +22,19 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
+
 import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
 import {t} from 'Util/LocalizerUtil';
-import type {ClientRepository} from 'src/script/client/ClientRepository';
-import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import type {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import type {Conversation} from 'src/script/entity/Conversation';
-import type {User} from 'src/script/entity/User';
-import type {TeamRepository} from 'src/script/team/TeamRepository';
-import type {MessageRepository} from 'src/script/conversation/MessageRepository';
+
 import {UserState} from '../../user/UserState';
-import {container} from 'tsyringe';
+import type {ClientRepository} from '../../client/ClientRepository';
+import type {Conversation} from '../../entity/Conversation';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import type {MessageRepository} from '../../conversation/MessageRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {User} from '../../entity/User';
 
 export class LegalHoldModalViewModel {
   static SHOW_REQUEST = 'LegalHold.showRequestModal';

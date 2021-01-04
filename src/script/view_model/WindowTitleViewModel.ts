@@ -20,6 +20,7 @@
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -28,7 +29,6 @@ import {Config} from '../Config';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel} from './MainViewModel';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 

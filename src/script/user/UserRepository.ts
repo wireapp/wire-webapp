@@ -17,50 +17,52 @@
  *
  */
 
-import type {AccentColor} from '@wireapp/commons';
-import type {PublicClient} from '@wireapp/api-client/src/client';
-import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
+import {amplify} from 'amplify';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self';
+import {container} from 'tsyringe';
+import {flatten} from 'underscore';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {USER_EVENT} from '@wireapp/api-client/src/event';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/src/user';
-import {amplify} from 'amplify';
-import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import type {AccentColor} from '@wireapp/commons';
 import type {AxiosError} from 'axios';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
+import type {PublicClient} from '@wireapp/api-client/src/client';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {UNSPLASH_URL} from '../externalRoute';
-import {mapProfileAssetsV1} from '../assets/AssetMapper';
-import {User} from '../entity/User';
-import {ClientEvent} from '../event/Client';
-import {EventRepository} from '../event/EventRepository';
-import type {EventSource} from '../event/EventSource';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import {protoFromType, valueFromType} from './AvailabilityMapper';
-import {showAvailabilityModal} from './AvailabilityModal';
-import {ConsentValue} from './ConsentValue';
-import {createSuggestions} from './UserHandleGenerator';
-import {UserMapper} from './UserMapper';
-import type {UserService} from './UserService';
+
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
+import {ClientEvent} from '../event/Client';
 import {ClientMapper} from '../client/ClientMapper';
-import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
+import {ConsentValue} from './ConsentValue';
+import {createSuggestions} from './UserHandleGenerator';
+import {EventRepository} from '../event/EventRepository';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {mapProfileAssetsV1} from '../assets/AssetMapper';
+import {protoFromType, valueFromType} from './AvailabilityMapper';
+import {showAvailabilityModal} from './AvailabilityModal';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {UNSPLASH_URL} from '../externalRoute';
+import {User} from '../entity/User';
+import {UserError} from '../error/UserError';
+import {UserMapper} from './UserMapper';
+import {UserState} from './UserState';
+import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
+import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {UserError} from '../error/UserError';
-import {UserState} from './UserState';
-import {container} from 'tsyringe';
+import type {UserService} from './UserService';
 
 export class UserRepository {
   private readonly assetRepository: AssetRepository;

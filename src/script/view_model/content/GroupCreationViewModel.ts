@@ -21,6 +21,7 @@ import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
@@ -30,7 +31,6 @@ import {ACCESS_STATE, TEAM} from '../../conversation/AccessState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {User} from '../../entity/User';
 import {SearchRepository} from '../../search/SearchRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {TeamRepository} from 'src/script/team/TeamRepository';

@@ -17,18 +17,19 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
-import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from 'Util/TimeUtil';
-import {t} from 'Util/LocalizerUtil';
-import {koPushDeferred} from 'Util/util';
 import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {MessageCategory} from '../../message/MessageCategory';
+import {getLogger, Logger} from 'Util/Logger';
+import {isToday, isThisYear, isSameDay, isSameMonth, formatLocale} from 'Util/TimeUtil';
+import {koPushDeferred} from 'Util/util';
+import {t} from 'Util/LocalizerUtil';
+
+import {ContentMessage} from '../../entity/message/ContentMessage';
 import {ContentViewModel} from '../ContentViewModel';
 import {Conversation} from '../../entity/Conversation';
-import {ContentMessage} from '../../entity/message/ContentMessage';
+import {MessageCategory} from '../../message/MessageCategory';
 
 // Parent: ContentViewModel
 export class CollectionDetailsViewModel {

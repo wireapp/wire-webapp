@@ -24,6 +24,7 @@ import {Runtime} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
 import murmurhash from 'murmurhash';
 
 import {t} from 'Util/LocalizerUtil';
@@ -40,7 +41,6 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
-import {container} from 'tsyringe';
 import {ClientState} from './ClientState';
 
 export class ClientRepository {

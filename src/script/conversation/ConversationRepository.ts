@@ -36,7 +36,9 @@ import {
   NewConversation,
   Conversation as BackendConversation,
 } from '@wireapp/api-client/src/conversation';
+import {container} from 'tsyringe';
 import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data';
+
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
@@ -45,6 +47,7 @@ import {getNextItem} from 'Util/ArrayUtil';
 import {createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {compareTransliteration, sortByPriority, startsWith, sortUsersByPriority} from 'Util/StringUtil';
+
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
@@ -86,7 +89,6 @@ import {MemberMessage} from '../entity/message/MemberMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import type {EventRecord} from '../storage';
 import {MessageRepository} from './MessageRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {TeamRepository} from '../team/TeamRepository';
@@ -2302,7 +2304,7 @@ export class ConversationRepository {
         }
       })
       .then(() => {
-        return this.messageRepositoryProvider()._delete_message_by_id(conversationEntity, eventData.message_id);
+        return this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
       })
       .catch(error => {
         const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -2337,7 +2339,7 @@ export class ConversationRepository {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
       const conversationEntity = await this.get_conversation_by_id(eventData.conversation_id);
-      return this.messageRepositoryProvider()._delete_message_by_id(conversationEntity, eventData.message_id);
+      return this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
     } catch (error) {
       this.logger.info(
         `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
@@ -2367,15 +2369,15 @@ export class ConversationRepository {
       if (!messageEntity || !messageEntity.is_content()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
-        const log = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(log, messageEntity);
+        const logMessage = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
+        this.logger.error(logMessage, messageEntity);
         throw new ConversationError(ConversationError.TYPE.WRONG_TYPE, ConversationError.MESSAGE.WRONG_TYPE);
       }
 
       const changes = messageEntity.getUpdatedReactions(eventJson);
       if (changes) {
-        const log_1 = `Updating reactions of message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.debug(log_1, {changes, event: eventJson});
+        const logMessage = `Updating reactions of message '${messageId}' in conversation '${conversationId}'`;
+        this.logger.debug(logMessage, {changes, event: eventJson});
 
         this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
         return this.prepareReactionNotification(conversationEntity, messageEntity, eventJson);
@@ -2383,8 +2385,8 @@ export class ConversationRepository {
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
-        const log_2 = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
-        this.logger.error(log_2, {error, event: eventJson});
+        const logMessage = `Failed to handle reaction to message '${messageId}' in conversation '${conversationId}'`;
+        this.logger.error(logMessage, {error, event: eventJson});
         throw error;
       }
     }

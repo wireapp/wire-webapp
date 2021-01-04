@@ -26,6 +26,8 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import type {SQLeetEngine} from '@wireapp/store-engine-sqleet';
+import Dexie from 'dexie';
+import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -33,9 +35,12 @@ import {checkIndexedDb, createRandomUuid, isTemporaryClientAndNonPersistent} fro
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
+import {DebugUtil} from 'Util/DebugUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
+import {loadValue} from 'Util/StorageUtil';
+
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
@@ -57,7 +62,6 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {TeamRepository} from '../team/TeamRepository';
 import {SearchRepository} from '../search/SearchRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
-import Dexie from 'dexie';
 import {EventRepository} from '../event/EventRepository';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {EventService} from '../event/EventService';
@@ -66,16 +70,13 @@ import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddle
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
 import {ConversationService} from '../conversation/ConversationService';
-
 import {SingleInstanceHandler} from './SingleInstanceHandler';
-
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
-
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
@@ -112,7 +113,6 @@ import {MediaRepository} from '../media/MediaRepository';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
-import {loadValue} from 'Util/StorageUtil';
 import {APIClient} from '../service/APIClientSingleton';
 import {ClientService} from '../client/ClientService';
 import {ConnectionService} from '../connection/ConnectionService';
@@ -123,10 +123,8 @@ import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenErr
 import {ClientError} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
-import {DebugUtil} from 'Util/DebugUtil';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
-import {Runtime} from '@wireapp/commons';
 import {MessageRepository} from '../conversation/MessageRepository';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {

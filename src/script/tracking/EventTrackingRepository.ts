@@ -19,23 +19,25 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+
 import {Environment} from 'Util/Environment';
 import {getLogger, Logger} from 'Util/Logger';
 import {includesString} from 'Util/StringUtil';
 import {getParameter} from 'Util/UrlUtil';
 import {createRandomUuid} from 'Util/util';
+import {roundLogarithmic} from 'Util/NumberUtil';
+import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
+
 import {URLParameter} from '../auth/URLParameter';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserData} from './UserData';
 import {Segmentation} from './Segmentation';
-import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
-import {roundLogarithmic} from 'Util/NumberUtil';
 import {EventName} from './EventName';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {ClientEvent} from '../event/Client';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 
 const Countly = require('countly-sdk-web');
@@ -223,7 +225,7 @@ export class EventTrackingRepository {
   };
 
   private subscribeToProductEvents(): void {
-    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, segmentations?: any) => {
+    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, segmentations?: Record<string, any>) => {
       this.trackProductReportingEvent(eventName, segmentations);
     });
 
@@ -252,7 +254,7 @@ export class EventTrackingRepository {
     return 'member';
   }
 
-  private trackProductReportingEvent(eventName: string, customSegmentations?: any): void {
+  private trackProductReportingEvent(eventName: string, customSegmentations?: Record<string, any>): void {
     if (this.isProductReportingActivated === true) {
       const userData = {
         [UserData.IS_TEAM]: this.userState.isTeam(),

@@ -24,15 +24,16 @@ import sodium from 'libsodium-wrappers-sumo';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {UrlUtil} from '@wireapp/commons';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
+
 import {QUERY_KEY} from '../../auth/route';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import type {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
 import type {User} from '../../entity/User';
-import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 
 export enum APPLOCK_STATE {

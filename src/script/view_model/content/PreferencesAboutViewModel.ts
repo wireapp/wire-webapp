@@ -17,10 +17,11 @@
  *
  */
 import ko from 'knockout';
+import {container} from 'tsyringe';
+
 import {Config, Configuration} from '../../Config';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../externalRoute';
 import {User} from '../../entity/User';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class PreferencesAboutViewModel {

@@ -18,10 +18,12 @@
  */
 
 import React from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {AccentColor} from '@wireapp/commons';
-import type {User} from '../entity/User';
+
+import {registerReactComponent} from 'Util/ComponentUtil';
 import {CSS_ABSOLUTE_CENTER, CSS_SQUARE} from 'Util/CSSMixin';
+
+import type {User} from '../entity/User';
 
 export interface AccentColorPickerProps {
   doSetAccentColor: (id: number) => void;

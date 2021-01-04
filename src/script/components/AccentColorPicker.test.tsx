@@ -17,10 +17,12 @@
  *
  */
 
-import AccentColorPicker, {AccentColorPickerProps} from './AccentColorPicker';
-import TestPage from 'Util/test/TestPage';
-import {User} from '../entity/User';
 import {AccentColor} from '@wireapp/commons';
+
+import TestPage from 'Util/test/TestPage';
+
+import AccentColorPicker, {AccentColorPickerProps} from './AccentColorPicker';
+import {User} from '../entity/User';
 
 class AccentColorPickerPage extends TestPage<AccentColorPickerProps> {
   constructor(props?: AccentColorPickerProps) {

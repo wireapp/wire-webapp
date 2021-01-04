@@ -23,6 +23,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
+
 import type {Call} from '../../calling/Call';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';

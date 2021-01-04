@@ -17,10 +17,12 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
-import {afterRender} from 'Util/util';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
+
+import {getLogger, Logger} from 'Util/Logger';
+import {afterRender} from 'Util/util';
 
 import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals, ModalsViewModel} from './ModalsViewModel';
@@ -59,7 +61,6 @@ import type {AuthRepository} from '../auth/AuthRepository';
 import type {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 
 export interface ViewModelRepositories {

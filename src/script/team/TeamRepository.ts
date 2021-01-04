@@ -32,6 +32,8 @@ import type {
   TeamMemberUpdateEvent,
   TeamUpdateEvent,
 } from '@wireapp/api-client/src/event';
+import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -53,8 +55,6 @@ import {EventRepository} from '../event/EventRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
-import {Runtime} from '@wireapp/commons';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {TeamState} from './TeamState';
 

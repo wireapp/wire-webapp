@@ -21,17 +21,16 @@ import ko from 'knockout';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE, CONV_TYPE} from '@wireapp/avs';
 
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import {generateConversationUrl} from '../../router/routeGenerator';
-
 import 'Components/calling/fullscreenVideoCall';
 import 'Components/groupVideoGrid';
 import 'Components/list/participantItem';
+import {generateConversationUrl} from '../../router/routeGenerator';
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {Grid} from '../../calling/videoGridHandler';
@@ -39,7 +38,7 @@ import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
 import type {CallActions} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
-import type {TeamRepository} from 'src/script/team/TeamRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
 import {Participant} from '../../calling/Participant';
 
 interface ComponentParams {

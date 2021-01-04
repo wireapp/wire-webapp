@@ -18,15 +18,17 @@
  */
 
 import ko from 'knockout';
+import {container} from 'tsyringe';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
-import type {ContentMessage} from 'src/script/entity/message/ContentMessage';
+
+import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {FileAsset} from '../../entity/message/FileAsset';
 import './assetLoader';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {container} from 'tsyringe';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 interface Params {
   /** Does the asset have a visible header? */
