@@ -39,7 +39,7 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {RequestCancellationError} from '@wireapp/api-client/src/user';
+import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -1243,6 +1243,56 @@ export class MessageRepository {
     return messagePromise as Promise<ContentMessage>;
   }
 
+  static getOtherUsersWithoutClients(eventInfoEntity: EventInfoEntity, selfUserId: string): string[] {
+    const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(id => id !== selfUserId);
+    const userIdsWithoutClients = [];
+    for (const userId of allRecipientsBesideSelf) {
+      const clientIdsOfUser = eventInfoEntity.options.recipients[userId];
+      const noRemainingClients = clientIdsOfUser.length === 0;
+      if (noRemainingClients) {
+        userIdsWithoutClients.push(userId);
+      }
+    }
+    return userIdsWithoutClients;
+  }
+
+  async triggerTeamMemberLeaveChecks(users: APIClientUser[]): Promise<void> {
+    for (const user of users) {
+      // Since this is a bare API client user we use `.deleted`
+      const isDeleted = user.deleted === true;
+      if (isDeleted) {
+        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, user.id);
+      }
+    }
+  }
+
+  private async shouldShowLegalHoldWarning(eventInfoEntity: EventInfoEntity): Promise<boolean> {
+    const messageType = eventInfoEntity.getType();
+    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
+    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
+    const localLegalHoldStatus = conversationEntity.legalHoldStatus();
+    await this.updateAllClients(conversationEntity, !isMessageEdit);
+    const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
+
+    const {genericMessage} = eventInfoEntity;
+    (genericMessage as any)[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
+
+    const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
+
+    if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
+      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
+      await this.conversationRepositoryProvider().injectLegalHoldMessage({
+        beforeTimestamp: true,
+        conversationId,
+        legalHoldStatus: updatedLocalLegalHoldStatus,
+        timestamp: numericTimestamp,
+        userId: this.userState.self().id,
+      });
+    }
+
+    return haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
+  }
+
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
     userIds: string[],
@@ -1250,32 +1300,18 @@ export class MessageRepository {
   ): Promise<void> {
     const messageType = eventInfoEntity.getType();
     const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
+
     if (allowedMessageTypes.includes(messageType)) {
       return;
     }
 
     if (this.teamState.isTeam()) {
-      const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(
-        id => id !== this.userState.self().id,
+      const userIdsWithoutClients = MessageRepository.getOtherUsersWithoutClients(
+        eventInfoEntity,
+        this.userState.self().id,
       );
-      const userIdsWithoutClients = [];
-      for (const recipientId of allRecipientsBesideSelf) {
-        const clientIdsOfUser = eventInfoEntity.options.recipients[recipientId];
-        const noRemainingClients = clientIdsOfUser.length === 0;
-
-        if (noRemainingClients) {
-          userIdsWithoutClients.push(recipientId);
-        }
-      }
-      const bareUserList = await this.userRepository.getUserListFromBackend(userIdsWithoutClients);
-      for (const user of bareUserList) {
-        // Since this is a bare API client user we use `.deleted`
-        const isDeleted = user?.deleted === true;
-
-        if (isDeleted) {
-          await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, user.id);
-        }
-      }
+      const usersWithoutClients = await this.userRepository.getUserListFromBackend(userIdsWithoutClients);
+      this.triggerTeamMemberLeaveChecks(usersWithoutClients);
     }
 
     const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
@@ -1283,37 +1319,13 @@ export class MessageRepository {
       ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
       : ConversationRepository.CONSENT_TYPE.MESSAGE;
 
-    // Legal Hold
+    let shouldShowLegalHoldWarning: boolean = false;
+
     if (checkLegalHold) {
-      const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-      const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
-      const localLegalHoldStatus = conversationEntity.legalHoldStatus();
-      await this.updateAllClients(conversationEntity, !isMessageEdit);
-      const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
-
-      const {genericMessage} = eventInfoEntity;
-      (genericMessage as any)[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
-
-      const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
-
-      if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
-        const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
-        await this.conversationRepositoryProvider().injectLegalHoldMessage({
-          beforeTimestamp: true,
-          conversationId,
-          legalHoldStatus: updatedLocalLegalHoldStatus,
-          timestamp: numericTimestamp,
-          userId: this.userState.self().id,
-        });
-      }
-
-      const shouldShowLegalHoldWarning =
-        haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
-
-      return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+      shouldShowLegalHoldWarning = await this.shouldShowLegalHoldWarning(eventInfoEntity);
     }
 
-    return this.grantMessage(eventInfoEntity, consentType, userIds, false);
+    return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
   }
 
   async grantMessage(
