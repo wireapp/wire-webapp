@@ -410,7 +410,7 @@ describe('ConversationRepository', () => {
   });
 
   describe('getPrecedingMessages', () => {
-    it('gets messages which are not broken by design', () => {
+    it('gets messages which are not broken by design', async () => {
       spyOn(testFactory.user_repository, 'getUserById').and.returnValue(Promise.resolve(new User()));
       const selfUser = UserGenerator.getRandomUser();
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
@@ -438,13 +438,17 @@ describe('ConversationRepository', () => {
 
       const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
 
-      return storage_service
-        .save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
-        .catch(() => storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
-        .then(() => testFactory.conversation_repository.getPrecedingMessages(conversation_et))
-        .then(loaded_events => {
-          expect(loaded_events.length).toBe(1);
-        });
+      let amountOfLoadedEvents = 0;
+
+      try {
+        await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message);
+      } catch (error) {
+        await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message);
+        const loadedEvents = await testFactory.conversation_repository.getPrecedingMessages(conversation_et);
+        amountOfLoadedEvents = loadedEvents.length;
+      }
+
+      expect(amountOfLoadedEvents).toBe(1);
     });
   });
 
