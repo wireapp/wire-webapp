@@ -33,7 +33,7 @@ import {SQLeetSchemata} from './SQLeetSchemata';
 import {StorageKey} from './StorageKey';
 import {StorageSchemata} from './StorageSchemata';
 import {StorageError} from '../error/StorageError';
-import {LocalWireDatabase} from './LocalWireDatabase';
+import {DexieDatabase} from './DexieDatabase';
 
 interface DatabaseListener {
   callback: DatabaseListenerCallback;
@@ -50,7 +50,7 @@ enum DEXIE_CRUD_EVENT {
 
 @singleton()
 export class StorageService {
-  public db?: LocalWireDatabase;
+  public db?: DexieDatabase;
   private readonly hasHookSupport: boolean;
   private readonly dbListeners: DatabaseListener[];
   private readonly engine: CRUDEngine;
@@ -96,7 +96,7 @@ export class StorageService {
         this.logger.info(`Initializing Storage Service with encrypted database '${this.dbName}'`);
         await this.engine.init(this.dbName);
       } else {
-        this.db = new LocalWireDatabase(this.dbName);
+        this.db = new DexieDatabase(this.dbName);
         try {
           await this.engine.initWithDb(this.db, requestPersistentStorage);
         } catch (error) {

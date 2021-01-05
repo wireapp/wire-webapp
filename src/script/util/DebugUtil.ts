@@ -36,7 +36,7 @@ import {ClientRepository} from '../client/ClientRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {ConnectionRepository} from '../connection/ConnectionRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {StorageRepository} from '../storage';
+import {EventRecord, StorageRepository} from '../storage';
 import {UserRepository} from '../user/UserRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
@@ -45,7 +45,6 @@ import type {MessageRepository} from '../conversation/MessageRepository';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
-import {EventRecord} from '../storage/LocalWireDatabase';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;

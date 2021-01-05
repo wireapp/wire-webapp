@@ -33,7 +33,7 @@ import type {User} from '../../entity/User';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {MemberMessage} from '../../entity/message/MemberMessage';
 import type {PanelParams} from '../PanelViewModel';
-import type {ReadReceipt} from '../../storage/EventRecord';
+import type {ReadReceipt} from '../../storage/record/EventRecord';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
