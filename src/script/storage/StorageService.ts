@@ -21,7 +21,7 @@ import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {ClientType} from '@wireapp/api-client/src/client/';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-import Dexie from 'dexie';
+import Dexie, {Transaction} from 'dexie';
 import {singleton} from 'tsyringe';
 
 import {getEphemeralValue} from 'Util/ephemeralValueStore';
@@ -129,7 +129,7 @@ export class StorageService {
       eventType: string,
       obj: Object,
       updatedObj: Object,
-      transaction: Dexie.Transaction,
+      transaction: Transaction,
     ) => {
       transaction.on('complete', () => {
         this.dbListeners
@@ -145,19 +145,16 @@ export class StorageService {
         .table(table)
         .hook(
           DEXIE_CRUD_EVENT.UPDATING,
-          function (modifications: Object, primaryKey: string, obj: Object, transaction: Dexie.Transaction): void {
+          function (modifications: Object, primaryKey: string, obj: Object, transaction: Transaction): void {
             this.onsuccess = updatedObj => callListener(table, DEXIE_CRUD_EVENT.UPDATING, obj, updatedObj, transaction);
           },
         );
 
       this.db
         .table(table)
-        .hook(
-          DEXIE_CRUD_EVENT.DELETING,
-          function (primaryKey: string, obj: Object, transaction: Dexie.Transaction): void {
-            this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, undefined, transaction);
-          },
-        );
+        .hook(DEXIE_CRUD_EVENT.DELETING, function (primaryKey: string, obj: Object, transaction: Transaction): void {
+          this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, undefined, transaction);
+        });
     });
   }
 
@@ -165,7 +162,7 @@ export class StorageService {
     StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
       const versionUpdate = db.version(version).stores(schema);
       if (upgrade) {
-        versionUpdate.upgrade((transaction: Dexie.Transaction) => {
+        versionUpdate.upgrade((transaction: Transaction) => {
           this.logger.warn(`Database upgrade to version '${version}'`);
           upgrade(transaction, db);
         });
