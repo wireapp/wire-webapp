@@ -30,7 +30,7 @@ export class BackupService {
 
   static get CONFIG() {
     return {
-      BATCH_SIZE: 10000,
+      BATCH_SIZE: 10_000,
       SUPPORTED_TABLES: [StorageSchemata.OBJECT_STORE.CONVERSATIONS, StorageSchemata.OBJECT_STORE.EVENTS],
     };
   }
@@ -39,27 +39,28 @@ export class BackupService {
     this.logger = getLogger('BackupService');
   }
 
-  public async exportTable(table: Dexie.Table<any, string>, onProgress: (batch: any[]) => void): Promise<void> {
+  async exportTable(table: Dexie.Table<any, string>, onProgress: (batch: any[]) => void): Promise<void> {
     const collection = table.toCollection();
     const tableCount = await table.count();
-    const batchDriver = new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: tableCount});
-    const batchCount = await batchDriver.eachBatch(collection, batch => onProgress(batch));
-    return this.logger.log(`Exported store '${table.name}' in '${batchCount}' batches`);
+    const parallelBatchDriver = new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: tableCount});
+    // TODO: The "collection as any" typing can be fixed once this is released: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/50408
+    const batchCount = await parallelBatchDriver.eachBatch(collection as any, batch => onProgress(batch));
+    this.logger.log(`Exported store '${table.name}' in '${batchCount}' batches`);
   }
 
-  public getDatabaseVersion(): number {
+  getDatabaseVersion(): number {
     if (this.storageService.db) {
       return this.storageService.db.verno;
     }
     return 1;
   }
 
-  public async getHistoryCount(): Promise<number> {
+  async getHistoryCount(): Promise<number> {
     const recordsPerTable = await Promise.all(this.getTables().map(table => table.count()));
     return recordsPerTable.reduce((accumulator, recordCount) => accumulator + recordCount, 0);
   }
 
-  public getTables(): Dexie.Table<any, string>[] {
+  getTables(): Dexie.Table<any, string>[] {
     return this.storageService.getTables(BackupService.CONFIG.SUPPORTED_TABLES);
   }
 
