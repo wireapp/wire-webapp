@@ -19,7 +19,7 @@
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import type Dexie from 'dexie';
+import {DexieError} from 'dexie';
 import ko from 'knockout';
 import {ClientClassification} from '@wireapp/api-client/src/client';
 import {container} from 'tsyringe';
@@ -271,7 +271,7 @@ ko.components.register('user-devices', {
       const toggleVerified = !this.selectedClient().meta.isVerified();
       clientRepository
         .verifyClient(userEntity().id, this.selectedClient(), toggleVerified)
-        .catch((error: Dexie.DexieError) => logger.warn(`Failed to toggle client verification: ${error.message}`));
+        .catch((error: DexieError) => logger.warn(`Failed to toggle client verification: ${error.message}`));
     };
 
     this.dispose = () => {

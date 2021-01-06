@@ -391,7 +391,7 @@ export class ConversationRepository {
     }
   }
 
-  public async getConversations() {
+  public async getConversations(): Promise<Conversation[]> {
     const remoteConversationsPromise = this.conversation_service.getAllConversations().catch(error => {
       this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
       return [];
@@ -445,7 +445,7 @@ export class ConversationRepository {
    * @param conversationEntity Respective conversation
    * @returns Resolves with the messages
    */
-  public async getPrecedingMessages(conversationEntity: Conversation) {
+  public async getPrecedingMessages(conversationEntity: Conversation): Promise<ContentMessage[]> {
     conversationEntity.is_pending(true);
 
     const firstMessageEntity = conversationEntity.getFirstMessage();
@@ -464,7 +464,10 @@ export class ConversationRepository {
     return mappedMessageEntities;
   }
 
-  private async addPrecedingEventsToConversation(events: EventRecord[], conversationEntity: Conversation) {
+  private async addPrecedingEventsToConversation(
+    events: EventRecord[],
+    conversationEntity: Conversation,
+  ): Promise<ContentMessage[]> {
     const hasAdditionalMessages = events.length === Config.getConfig().MESSAGES_FETCH_LIMIT;
 
     const mappedMessageEntities = await this.addEventsToConversation(events, conversationEntity);
@@ -498,7 +501,7 @@ export class ConversationRepository {
     isTemporaryGuest: boolean,
     timestamp?: number,
     eventSource?: EventSource,
-  ) {
+  ): void {
     conversationEntity.hasCreationMessage = true;
 
     if (conversationEntity.inTeam()) {

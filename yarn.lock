@@ -102,7 +102,7 @@
     browserslist "^4.14.5"
     semver "^5.5.0"
 
-"@babel/helper-create-class-features-plugin@^7.10.4", "@babel/helper-create-class-features-plugin@^7.12.1":
+"@babel/helper-create-class-features-plugin@^7.12.1":
   version "7.12.1"
   resolved "https://registry.yarnpkg.com/@babel/helper-create-class-features-plugin/-/helper-create-class-features-plugin-7.12.1.tgz#3c45998f431edd4a9214c5f1d3ad1448a6137f6e"
   integrity sha512-hkL++rWeta/OVOBTRJc9a5Azh5mt5WgZUGAKMD8JM141YsE08K//bp1unBBieO6rUKkIPyUE0USQ30jAy3Sk1w==
@@ -319,14 +319,6 @@
     "@babel/helper-remap-async-to-generator" "^7.12.1"
     "@babel/plugin-syntax-async-generators" "^7.8.0"
 
-"@babel/plugin-proposal-class-properties@7.10.4":
-  version "7.10.4"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-class-properties/-/plugin-proposal-class-properties-7.10.4.tgz#a33bf632da390a59c7a8c570045d1115cd778807"
-  integrity sha512-vhwkEROxzcHGNu2mzUC0OFFNXdZ4M23ib8aRRcJSsW8BZK9pQMD7QB7csl97NBbgGZO7ZyHUyKDnxzOaP4IrCg==
-  dependencies:
-    "@babel/helper-create-class-features-plugin" "^7.10.4"
-    "@babel/helper-plugin-utils" "^7.10.4"
-
 "@babel/plugin-proposal-class-properties@7.12.1", "@babel/plugin-proposal-class-properties@^7.12.1":
   version "7.12.1"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-class-properties/-/plugin-proposal-class-properties-7.12.1.tgz#a082ff541f2a29a4821065b8add9346c0c16e5de"
@@ -408,15 +400,6 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.10.4"
     "@babel/plugin-syntax-optional-catch-binding" "^7.8.0"
-
-"@babel/plugin-proposal-optional-chaining@7.12.1":
-  version "7.12.1"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.12.1.tgz#cce122203fc8a32794296fc377c6dedaf4363797"
-  integrity sha512-c2uRpY6WzaVDzynVY9liyykS+kVU+WRZPMPYpkelXH8KBt1oXoI89kPbZKKG/jDT5UK92FTW2fZkZaJhdiBabw==
-  dependencies:
-    "@babel/helper-plugin-utils" "^7.10.4"
-    "@babel/helper-skip-transparent-expression-wrappers" "^7.12.1"
-    "@babel/plugin-syntax-optional-chaining" "^7.8.0"
 
 "@babel/plugin-proposal-optional-chaining@7.12.7", "@babel/plugin-proposal-optional-chaining@^7.12.7":
   version "7.12.7"
@@ -837,7 +820,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.10.4"
 
-"@babel/plugin-transform-typescript@^7.10.4", "@babel/plugin-transform-typescript@^7.12.1":
+"@babel/plugin-transform-typescript@^7.12.1":
   version "7.12.1"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-typescript/-/plugin-transform-typescript-7.12.1.tgz#d92cc0af504d510e26a754a7dbc2e5c8cd9c7ab4"
   integrity sha512-VrsBByqAIntM+EYMqSm59SiMEf7qkmI9dqMt6RbD/wlwueWmYcI0FFK5Fj47pP6DRZm+3teXjosKlwcZJ5lIMw==
@@ -954,14 +937,6 @@
     "@babel/plugin-transform-react-jsx" "^7.12.10"
     "@babel/plugin-transform-react-jsx-development" "^7.12.7"
     "@babel/plugin-transform-react-pure-annotations" "^7.12.1"
-
-"@babel/preset-typescript@7.10.4":
-  version "7.10.4"
-  resolved "https://registry.yarnpkg.com/@babel/preset-typescript/-/preset-typescript-7.10.4.tgz#7d5d052e52a682480d6e2cc5aa31be61c8c25e36"
-  integrity sha512-SdYnvGPv+bLlwkF2VkJnaX/ni1sMNetcGI1+nThF1gyv6Ph8Qucc4ZZAjM5yZcE/AKRXIOTZz7eSRDWOEjPyRQ==
-  dependencies:
-    "@babel/helper-plugin-utils" "^7.10.4"
-    "@babel/plugin-transform-typescript" "^7.10.4"
 
 "@babel/preset-typescript@7.12.7":
   version "7.12.7"
@@ -2888,23 +2863,23 @@
     emotion-theming "10.0.27"
     react-transition-group "4.4.1"
 
-"@wireapp/store-engine-dexie@1.3.23":
-  version "1.3.23"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.3.23.tgz#1cae8540a302317a61f154972b279eedba942ed9"
-  integrity sha512-s3f+X628ximVm3OYADcopc2XqPWCeo4SABQVubf2QdVeyywEk1C2uknPI1EmVkcFci+vbb6tmz6q7xClRXCAjQ==
+"@wireapp/store-engine-dexie@1.3.25":
+  version "1.3.25"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.3.25.tgz#995b611d572ba563003814b01ffc8aa1841c3713"
+  integrity sha512-hz3PsK4HAGpdCH9r50U4FkAtqA2aUSd1MsN4YBi3DKdojHd0M6llV08PzG2C0+9w2KPaYUFpMV+KlBpZirgexg==
   dependencies:
-    dexie "2.0.4"
+    dexie "3.0.3"
 
-"@wireapp/store-engine-sqleet@1.3.35":
-  version "1.3.35"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.35.tgz#9f5b828453c1b2b6d62cb8cf39ba4922a2f9eb19"
-  integrity sha512-4/iuvQcJAvyE4qer7EAmz9kcaLRcSTzjdnorp671G2MO23Tem5wevxSSh8K0xRqZ8b9EabxcrqX09uImWgMmjw==
+"@wireapp/store-engine-sqleet@1.3.36":
+  version "1.3.36"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.36.tgz#921a3b34b0bd077ce4c7468d19885993f1063016"
+  integrity sha512-lgQZGQFnT2/y1nARH0PQSr6dD8r7OaJS16nA6P7yVUKrVsXZm9Y2qopFgTphRdDWx6AxnFFuTVL7lI5a/DBrXg==
   dependencies:
     "@babel/core" "7.12.10"
-    "@babel/plugin-proposal-class-properties" "7.10.4"
+    "@babel/plugin-proposal-class-properties" "7.12.1"
     "@babel/plugin-proposal-object-rest-spread" "7.12.1"
-    "@babel/plugin-proposal-optional-chaining" "7.12.1"
-    "@babel/preset-typescript" "7.10.4"
+    "@babel/plugin-proposal-optional-chaining" "7.12.7"
+    "@babel/preset-typescript" "7.12.7"
     "@wireapp/websql" "0.0.17"
     uint32 "0.2.1"
 
@@ -5284,7 +5259,12 @@ dexie-batch@0.4.2:
   resolved "https://registry.yarnpkg.com/dexie-batch/-/dexie-batch-0.4.2.tgz#8e457d7eb3da933802eae561e9f0141c9d84b2f9"
   integrity sha512-tDEVCArDddWtSq8EnRovbxw4CBQaBxABMFzahbI8+C6oWMG4yu0DZjMhC3kzdDjz39PIlz75/wuBHk5lgrDiTw==
 
-dexie@2.0.4, dexie@^2.0.0:
+dexie@3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.0.3.tgz#ede63849dfe5f07e13e99bb72a040e8ac1d29dab"
+  integrity sha512-BSFhGpngnCl1DOr+8YNwBDobRMH0ziJs2vts69VilwetHYOtEDcLqo7d/XiIphM0tJZ2rPPyAGd31lgH2Ln3nw==
+
+dexie@^2.0.0:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/dexie/-/dexie-2.0.4.tgz#6027a5e05879424e8f9979d8c14e7420f27e3a11"
   integrity sha512-aQ/s1U2wHxwBKRrt2Z/mwFNHMQWhESerFsMYzE+5P5OsIe5o1kgpFMWkzKTtkvkyyEni6mWr/T4HUJuY9xIHLA==
