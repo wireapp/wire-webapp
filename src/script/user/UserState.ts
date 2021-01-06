@@ -19,9 +19,11 @@
 
 import ko from 'knockout';
 import {singleton} from 'tsyringe';
-import {User} from '../entity/User';
+
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+
+import {User} from '../entity/User';
 
 @singleton()
 export class UserState {

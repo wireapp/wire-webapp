@@ -24,15 +24,16 @@ import sodium from 'libsodium-wrappers-sumo';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {UrlUtil} from '@wireapp/commons';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {afterRender} from 'Util/util';
+
 import {QUERY_KEY} from '../../auth/route';
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import type {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
 import type {User} from '../../entity/User';
-import {container} from 'tsyringe';
 import {ClientState} from '../../client/ClientState';
 import {TeamState} from '../../team/TeamState';
 
@@ -205,7 +206,7 @@ export class AppLockViewModel {
     amplify.subscribe(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE, this.changePassphrase);
   }
 
-  getStored = () => this.localStorage.getItem(this.storageKey());
+  readonly getStored = () => this.localStorage.getItem(this.storageKey());
 
   setCode = async (code: string) => {
     this.stopPassphraseObserver();
@@ -219,21 +220,21 @@ export class AppLockViewModel {
     this.startPassphraseObserver();
   };
 
-  onClosed = () => {
+  readonly onClosed = () => {
     this.state(APPLOCK_STATE.NONE);
     this.setupPassphrase('');
   };
 
-  handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent) => {
+  readonly handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent) => {
     if (key === this.storageKey()) {
       this.localStorage.setItem(this.storageKey(), oldValue);
     }
   };
 
-  startPassphraseObserver = () => window.addEventListener('storage', this.handlePassphraseStorageEvent);
-  stopPassphraseObserver = () => window.removeEventListener('storage', this.handlePassphraseStorageEvent);
+  readonly startPassphraseObserver = () => window.addEventListener('storage', this.handlePassphraseStorageEvent);
+  readonly stopPassphraseObserver = () => window.removeEventListener('storage', this.handlePassphraseStorageEvent);
 
-  startObserver = () => {
+  readonly startObserver = () => {
     afterRender(() => {
       this.modalObserver.observe(document.querySelector('#wire-main'), {
         childList: true,
@@ -243,27 +244,27 @@ export class AppLockViewModel {
     });
   };
 
-  stopObserver = () => {
+  readonly stopObserver = () => {
     this.modalObserver.disconnect();
     this.appObserver.disconnect();
   };
 
-  clearAppLockTimeout = () => {
+  readonly clearAppLockTimeout = () => {
     window.clearTimeout(this.unfocusTimeoutId);
   };
 
-  startAppLockTimeout = () => {
+  readonly startAppLockTimeout = () => {
     this.unfocusTimeoutId = window.setTimeout(this.showAppLock, getUnfocusAppLockTimeoutInSeconds() * 1000);
   };
 
-  startScheduledTimeout = () => {
+  readonly startScheduledTimeout = () => {
     if (isScheduledAppLockEnabled()) {
       window.clearTimeout(this.scheduledTimeoutId);
       this.scheduledTimeoutId = window.setTimeout(this.showAppLock, getScheduledAppLockTimeoutInSeconds() * 1000);
     }
   };
 
-  showAppLock = () => {
+  readonly showAppLock = () => {
     const hasCode = !!this.getStored();
     this.state(hasCode ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     this.isVisible(true);
@@ -289,12 +290,12 @@ export class AppLockViewModel {
     this.startScheduledTimeout();
   };
 
-  clearUnlockError = () => {
+  readonly clearUnlockError = () => {
     this.unlockError('');
     return true;
   };
 
-  clearWipeError = () => {
+  readonly clearWipeError = () => {
     this.wipeError('');
     return true;
   };
@@ -317,20 +318,20 @@ export class AppLockViewModel {
     }
   };
 
-  changePassphrase = () => {
+  readonly changePassphrase = () => {
     this.state(APPLOCK_STATE.SETUP);
     this.isVisible(true);
   };
 
-  onGoBack = () => this.state(APPLOCK_STATE.LOCKED);
-  onClickForgot = () => this.state(APPLOCK_STATE.FORGOT);
-  onClickWipe = () => this.state(APPLOCK_STATE.WIPE_CONFIRM);
-  onClickWipeConfirm = () => this.state(APPLOCK_STATE.WIPE_PASSWORD);
+  readonly onGoBack = () => this.state(APPLOCK_STATE.LOCKED);
+  readonly onClickForgot = () => this.state(APPLOCK_STATE.FORGOT);
+  readonly onClickWipe = () => this.state(APPLOCK_STATE.WIPE_CONFIRM);
+  readonly onClickWipeConfirm = () => this.state(APPLOCK_STATE.WIPE_PASSWORD);
 
-  isSetupChange = () => this.state() === APPLOCK_STATE.SETUP_CHANGE;
-  isSetupScreen = () => this.state() === APPLOCK_STATE.SETUP;
-  isLockScreen = () => this.state() === APPLOCK_STATE.LOCKED;
-  isForgotScreen = () => this.state() === APPLOCK_STATE.FORGOT;
-  isWipeConfirmScreen = () => this.state() === APPLOCK_STATE.WIPE_CONFIRM;
-  isWipePasswordScreen = () => this.state() === APPLOCK_STATE.WIPE_PASSWORD;
+  readonly isSetupChange = () => this.state() === APPLOCK_STATE.SETUP_CHANGE;
+  readonly isSetupScreen = () => this.state() === APPLOCK_STATE.SETUP;
+  readonly isLockScreen = () => this.state() === APPLOCK_STATE.LOCKED;
+  readonly isForgotScreen = () => this.state() === APPLOCK_STATE.FORGOT;
+  readonly isWipeConfirmScreen = () => this.state() === APPLOCK_STATE.WIPE_CONFIRM;
+  readonly isWipePasswordScreen = () => this.state() === APPLOCK_STATE.WIPE_PASSWORD;
 }

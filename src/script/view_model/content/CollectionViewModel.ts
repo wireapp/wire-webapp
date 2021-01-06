@@ -17,19 +17,20 @@
  *
  */
 
-import {isEscapeKey} from 'Util/KeyboardUtil';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {MessageCategory} from '../../message/MessageCategory';
-import {ContentViewModel} from '../ContentViewModel';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {ContentMessage} from '../../entity/message/ContentMessage';
+import {isEscapeKey} from 'Util/KeyboardUtil';
+
 import {CollectionDetailsViewModel} from './CollectionDetailsViewModel';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {ContentViewModel} from '../ContentViewModel';
 import {Conversation} from '../../entity/Conversation';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ConversationState} from '../../conversation/ConversationState';
-import {container} from 'tsyringe';
+import {MessageCategory} from '../../message/MessageCategory';
 
 export class CollectionViewModel {
   collectionDetails: CollectionDetailsViewModel;
@@ -45,16 +46,6 @@ export class CollectionViewModel {
     private readonly conversationRepository: ConversationRepository,
     private readonly conversationState = container.resolve(ConversationState),
   ) {
-    this.addedToView = this.addedToView.bind(this);
-    this.clickOnMessage = this.clickOnMessage.bind(this);
-    this.itemAdded = this.itemAdded.bind(this);
-    this.itemRemoved = this.itemRemoved.bind(this);
-    this.messageRemoved = this.messageRemoved.bind(this);
-    this.onInputChange = this.onInputChange.bind(this);
-    this.removedFromView = this.removedFromView.bind(this);
-    this.searchInConversation = this.searchInConversation.bind(this);
-    this.setConversation = this.setConversation.bind(this);
-
     this.collectionDetails = contentViewModel.collectionDetails;
 
     this.conversationEntity = ko.observable();
@@ -67,7 +58,7 @@ export class CollectionViewModel {
     this.searchInput = ko.observable('');
   }
 
-  addedToView() {
+  readonly addedToView = () => {
     amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
@@ -76,36 +67,36 @@ export class CollectionViewModel {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
       }
     });
-  }
+  };
 
-  searchInConversation(query: string) {
+  readonly searchInConversation = (query: string) => {
     return this.conversationRepository.searchInConversation(this.conversationEntity(), query);
-  }
+  };
 
-  onInputChange(input: string) {
+  readonly onInputChange = (input: string) => {
     this.searchInput(input || '');
-  }
+  };
 
-  itemAdded(messageEntity: ContentMessage) {
+  readonly itemAdded = (messageEntity: ContentMessage) => {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
     if (isCurrentConversation) {
       this._populateItems([messageEntity]);
     }
-  }
+  };
 
-  itemRemoved(messageId: string, conversationId: string) {
+  readonly itemRemoved = (messageId: string, conversationId: string) => {
     const isCurrentConversation = this.conversationEntity().id === conversationId;
     if (isCurrentConversation) {
       const _removeItem = (messageEntity: ContentMessage) => messageEntity.id === messageId;
       [this.audio, this.files, this.images, this.links].forEach(array => array.remove(_removeItem));
     }
-  }
+  };
 
-  messageRemoved(messageEntity: ContentMessage) {
+  readonly messageRemoved = (messageEntity: ContentMessage) => {
     this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
-  }
+  };
 
-  removedFromView() {
+  readonly removedFromView = () => {
     amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
@@ -113,9 +104,9 @@ export class CollectionViewModel {
     this.conversationEntity(null);
     this.searchInput('');
     [this.images, this.files, this.links, this.audio].forEach(array => array.removeAll());
-  }
+  };
 
-  setConversation(conversationEntity = this.conversationState.activeConversation()) {
+  readonly setConversation = (conversationEntity = this.conversationState.activeConversation()) => {
     if (conversationEntity) {
       this.conversationEntity(conversationEntity);
 
@@ -123,7 +114,7 @@ export class CollectionViewModel {
         .get_events_for_category(conversationEntity, MessageCategory.LINK_PREVIEW)
         .then(messageEntities => this._populateItems(messageEntities as ContentMessage[]));
     }
-  }
+  };
 
   private _populateItems(messageEntities: ContentMessage[]) {
     messageEntities.forEach((messageEntity: ContentMessage) => {
@@ -150,9 +141,9 @@ export class CollectionViewModel {
     });
   }
 
-  clickOnMessage(messageEntity: ContentMessage) {
+  readonly clickOnMessage = (messageEntity: ContentMessage) => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity(), {exposeMessage: messageEntity});
-  }
+  };
 
   clickOnBackButton() {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());

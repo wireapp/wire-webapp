@@ -20,10 +20,10 @@
 import ko from 'knockout';
 import {debounce, escape} from 'underscore';
 
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {formatDateShort} from 'Util/TimeUtil';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
 import type {Message} from '../entity/message/Message';
 import type {ContentMessage} from '../entity/message/ContentMessage';
@@ -99,13 +99,13 @@ class FullSearch {
     });
   }
 
-  onInputChange = (query: string): void => {
+  readonly onInputChange = (query: string): void => {
     if (typeof this.params.change === 'function') {
       this.params.change(query);
     }
   };
 
-  clickOnMessage = (messageEntity: Message): void => {
+  readonly clickOnMessage = (messageEntity: Message): void => {
     if (typeof this.params.click === 'function') {
       this.params.click(messageEntity);
     }

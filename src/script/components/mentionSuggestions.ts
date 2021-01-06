@@ -20,11 +20,11 @@
 import ko from 'knockout';
 import type SimpleBar from 'simplebar';
 
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {clamp} from 'Util/NumberUtil';
 import {noop} from 'Util/util';
 import {KEY, isEnterKey} from 'Util/KeyboardUtil';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {User} from '../entity/User';
 
 interface MentionSuggestionsParams {
@@ -87,11 +87,11 @@ class MentionSuggestions {
     }
   }
 
-  onInitSimpleBar = (simpleBar: SimpleBar) => {
+  readonly onInitSimpleBar = (simpleBar: SimpleBar) => {
     this.scrollElement = simpleBar.getScrollElement();
   };
 
-  onInput = (keyboardEvent: KeyboardEvent) => {
+  readonly onInput = (keyboardEvent: KeyboardEvent) => {
     const actions = {
       [KEY.ARROW_UP]: this.moveSelection.bind(this, 1),
       [KEY.ARROW_DOWN]: this.moveSelection.bind(this, -1),
@@ -109,7 +109,7 @@ class MentionSuggestions {
     }
   };
 
-  onMouseEnter = (user: User): void => {
+  readonly onMouseEnter = (user: User): void => {
     this.selectedSuggestionIndex(this.suggestions().indexOf(user));
   };
 
@@ -120,7 +120,7 @@ class MentionSuggestions {
     return true;
   }
 
-  onSuggestionClick = (data: User, event: Event) => {
+  readonly onSuggestionClick = (data: User, event: Event) => {
     event.preventDefault();
     $(this.targetInput).focus();
     this.onSelectionValidated(data, this.targetInput);

@@ -52,7 +52,7 @@ export class NotificationsViewModel extends BasePanelViewModel {
     );
   }
 
-  notificationChanged = (_: NotificationsViewModel, event: KeyboardEvent): void => {
+  readonly notificationChanged = (_: NotificationsViewModel, event: KeyboardEvent): void => {
     const notificationState = parseInt((event.target as HTMLInputElement).value, 10);
     this.conversationRepository.setNotificationState(this.activeConversation(), notificationState);
   };

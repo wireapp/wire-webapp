@@ -19,7 +19,9 @@
 
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
+
 import {sortUsersByPriority} from 'Util/StringUtil';
+
 import {User} from '../entity/User';
 import {UserState} from '../user/UserState';
 import {TeamEntity} from './TeamEntity';

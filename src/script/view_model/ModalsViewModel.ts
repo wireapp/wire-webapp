@@ -144,9 +144,9 @@ export class ModalsViewModel {
     amplify.subscribe(WebAppEvents.WARNING.MODAL, this.showModal);
   }
 
-  isModalVisible = () => this.state() === States.OPEN;
+  readonly isModalVisible = () => this.state() === States.OPEN;
 
-  showModal = (type: ModalType, options: ModalOptions, modalId: string) => {
+  readonly showModal = (type: ModalType, options: ModalOptions, modalId: string) => {
     const alreadyOpen = modalId && modalId === this.currentId();
     if (alreadyOpen) {
       return this.unqueue();
@@ -162,13 +162,13 @@ export class ModalsViewModel {
     this.unqueue();
   };
 
-  ready = () => {
+  readonly ready = () => {
     ko.applyBindings(this, document.getElementById(this.elementId));
     this.state(States.READY);
     this.unqueue();
   };
 
-  unqueue = () => {
+  readonly unqueue = () => {
     if (this.state() === States.READY && this.queue.length) {
       const {type, options, id} = this.queue.shift();
       this._showModal(type, options, id);
@@ -292,7 +292,7 @@ export class ModalsViewModel {
     afterRender(() => this.inputFocus(true));
   };
 
-  handleEnterKey = (event: KeyboardEvent) => {
+  readonly handleEnterKey = (event: KeyboardEvent) => {
     if ((event.target as HTMLElement).tagName === 'BUTTON') {
       if (isSpaceKey(event) || isEnterKey(event)) {
         (event.target as HTMLElement).click();
@@ -304,12 +304,12 @@ export class ModalsViewModel {
     }
   };
 
-  hasPassword = () => this.content().currentType === ModalType.PASSWORD;
-  hasInput = () => this.content().currentType === ModalType.INPUT;
-  hasOption = () => this.content().currentType === ModalType.OPTION;
-  hasMultipleSecondary = () => this.content().currentType === ModalType.MULTI_ACTIONS;
+  readonly hasPassword = () => this.content().currentType === ModalType.PASSWORD;
+  readonly hasInput = () => this.content().currentType === ModalType.INPUT;
+  readonly hasOption = () => this.content().currentType === ModalType.OPTION;
+  readonly hasMultipleSecondary = () => this.content().currentType === ModalType.MULTI_ACTIONS;
 
-  confirm = () => {
+  readonly confirm = () => {
     const action = this.content().primaryAction.action;
     if (typeof action === 'function') {
       if (this.content().currentType === ModalType.OPTION) {
@@ -325,7 +325,7 @@ export class ModalsViewModel {
     }
   };
 
-  doAction = (action: Function, closeAfter: boolean, skipValidation = false) => {
+  readonly doAction = (action: Function, closeAfter: boolean, skipValidation = false) => {
     if (!skipValidation && !this.actionEnabled()) {
       return;
     }
@@ -337,7 +337,7 @@ export class ModalsViewModel {
     }
   };
 
-  hide = () => {
+  readonly hide = () => {
     offEscKey(this.hide);
     window.removeEventListener('keydown', this.handleEnterKey);
     this.inputFocus(false);
@@ -346,7 +346,7 @@ export class ModalsViewModel {
     this.currentId(null);
   };
 
-  onModalHidden = () => {
+  readonly onModalHidden = () => {
     this.content(defaultContent);
     this.inputValue('');
     this.passwordValue('');

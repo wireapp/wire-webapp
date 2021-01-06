@@ -20,6 +20,7 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {Config} from '../../Config';
 import {getSupportUsernameUrl} from '../../externalRoute';
@@ -28,7 +29,6 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {ListViewModel} from '../ListViewModel';
 import type {User} from '../../entity/User';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class TakeoverViewModel {
@@ -53,7 +53,7 @@ export class TakeoverViewModel {
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  chooseUsername = (): void => {
+  readonly chooseUsername = (): void => {
     this.listViewModel.dismissModal();
     window.requestAnimationFrame(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT));
   };

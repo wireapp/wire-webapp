@@ -248,7 +248,7 @@ export class MemberMessage extends SystemMessage {
     });
   }
 
-  showLargeAvatar = (): boolean => {
+  readonly showLargeAvatar = (): boolean => {
     const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
     return largeAvatarTypes.includes(this.memberMessageType);
   };

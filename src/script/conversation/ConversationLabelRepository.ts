@@ -101,7 +101,7 @@ export class ConversationLabelRepository {
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
-  marshal = (): LabelProperty => {
+  readonly marshal = (): LabelProperty => {
     const labelJson = this.labels().map(({id, type, name, conversations}) => ({
       conversations: conversations().map(({id}) => id),
       id,
@@ -111,7 +111,7 @@ export class ConversationLabelRepository {
     return {labels: labelJson};
   };
 
-  unmarshal = (labelJson: LabelProperty) => {
+  readonly unmarshal = (labelJson: LabelProperty) => {
     const labels = labelJson.labels.map(
       ({id, type, name, conversations}): ConversationLabel => ({
         conversations: ko.observableArray(
@@ -129,7 +129,7 @@ export class ConversationLabelRepository {
     this.labels(labels);
   };
 
-  saveLabels = () => {
+  readonly saveLabels = () => {
     this.propertiesService.putPropertiesByKey(propertiesKey, this.marshal());
   };
 
@@ -142,35 +142,35 @@ export class ConversationLabelRepository {
     }
   };
 
-  onUserEvent = (event: any) => {
+  readonly onUserEvent = (event: any) => {
     if (event.type === USER_EVENT.PROPERTIES_SET && event.key === propertiesKey) {
       this.unmarshal(event.value);
     }
   };
 
-  getGroupsWithoutLabel = () => {
+  readonly getGroupsWithoutLabel = () => {
     return this.conversations().filter(
       conversation => conversation.isGroup() && !this.allLabeledConversations().includes(conversation),
     );
   };
 
-  getContactsWithoutLabel = () => {
+  readonly getContactsWithoutLabel = () => {
     return this.conversations().filter(
       conversation => !conversation.isGroup() && !this.allLabeledConversations().includes(conversation),
     );
   };
 
-  getFavoriteLabel = (): ConversationLabel => this.labels().find(({type}) => type === LabelType.Favorite);
-  getLabelById = (labelId: string): ConversationLabel => this.labels().find(({id}) => id === labelId);
+  readonly getFavoriteLabel = (): ConversationLabel => this.labels().find(({type}) => type === LabelType.Favorite);
+  readonly getLabelById = (labelId: string): ConversationLabel => this.labels().find(({id}) => id === labelId);
 
-  getFavorites = (): Conversation[] => this.getLabelConversations(this.getFavoriteLabel());
+  readonly getFavorites = (): Conversation[] => this.getLabelConversations(this.getFavoriteLabel());
 
-  getLabelConversations = (label: ConversationLabel): Conversation[] =>
+  readonly getLabelConversations = (label: ConversationLabel): Conversation[] =>
     label ? this.conversations().filter(conversation => label.conversations().includes(conversation)) : [];
 
-  isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
+  readonly isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
 
-  addConversationToFavorites = (addedConversation: Conversation): void => {
+  readonly addConversationToFavorites = (addedConversation: Conversation): void => {
     let favoriteLabel = this.getFavoriteLabel();
     if (!favoriteLabel) {
       // The favorite label doesn't need a name since it is set at runtime for i18n compatibility
@@ -181,7 +181,7 @@ export class ConversationLabelRepository {
     this.saveLabels();
   };
 
-  removeConversationFromFavorites = (removedConversation: Conversation): void => {
+  readonly removeConversationFromFavorites = (removedConversation: Conversation): void => {
     const favoriteLabel = this.getFavoriteLabel();
     if (favoriteLabel) {
       favoriteLabel.conversations(
@@ -192,7 +192,7 @@ export class ConversationLabelRepository {
   };
 
   // TODO: Write test cases!
-  getConversationLabelIds = (conversation: Conversation): string[] => {
+  readonly getConversationLabelIds = (conversation: Conversation): string[] => {
     const ids: string[] = [];
 
     if (this.getFavorites().includes(conversation)) {
@@ -212,18 +212,18 @@ export class ConversationLabelRepository {
     return ids;
   };
 
-  getConversationCustomLabel = (conversation: Conversation, includeFavorites: boolean = false) =>
+  readonly getConversationCustomLabel = (conversation: Conversation, includeFavorites: boolean = false) =>
     this.labels().find(
       ({type, conversations}) =>
         (includeFavorites || type === LabelType.Custom) && conversations().includes(conversation),
     );
 
-  getLabels = (): ConversationLabel[] =>
+  readonly getLabels = (): ConversationLabel[] =>
     this.labels()
       .filter(({type}) => type === LabelType.Custom)
       .sort(({name: nameA}, {name: nameB}) => nameA.localeCompare(nameB, undefined, {sensitivity: 'base'}));
 
-  removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
+  readonly removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
     label.conversations(label.conversations().filter(conversation => conversation !== removeConversation));
     if (!label.conversations().length) {
       this.labels.remove(label);
@@ -231,7 +231,10 @@ export class ConversationLabelRepository {
     this.saveLabels();
   };
 
-  removeConversationFromAllLabels = (removeConversation: Conversation, removeFromFavorites: boolean = false): void => {
+  readonly removeConversationFromAllLabels = (
+    removeConversation: Conversation,
+    removeFromFavorites: boolean = false,
+  ): void => {
     this.labels().forEach(label => {
       const isCustom = label.type === LabelType.Custom;
       if (removeFromFavorites || isCustom) {
@@ -243,7 +246,7 @@ export class ConversationLabelRepository {
     });
   };
 
-  addConversationToLabel = (label: ConversationLabel, conversation: Conversation): void => {
+  readonly addConversationToLabel = (label: ConversationLabel, conversation: Conversation): void => {
     if (!label.conversations().includes(conversation)) {
       this.removeConversationFromAllLabels(conversation);
       label.conversations.push(conversation);
@@ -252,7 +255,7 @@ export class ConversationLabelRepository {
     }
   };
 
-  addConversationToNewLabel = (conversation: Conversation) => {
+  readonly addConversationToNewLabel = (conversation: Conversation) => {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.INPUT, {
       primaryAction: {
         action: (name: string) => {

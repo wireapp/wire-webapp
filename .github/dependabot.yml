@@ -54,4 +54,4 @@ updates:
           - '< 4'
       - dependency-name: '@types/node'
         versions:
-          - '< 13'
+          - '>= 13.a'

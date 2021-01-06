@@ -18,6 +18,7 @@
  */
 
 import {Runtime} from '@wireapp/commons';
+
 import {Config} from '../Config';
 import {BackendEnvironment} from '../service/BackendEnvironment';
 

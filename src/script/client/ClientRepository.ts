@@ -24,11 +24,12 @@ import {Runtime} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {container} from 'tsyringe';
+import murmurhash from 'murmurhash';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
-import {murmurhash3} from 'Util/util';
 
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
@@ -40,7 +41,6 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
-import {container} from 'tsyringe';
 import {ClientState} from './ClientState';
 
 export class ClientRepository {
@@ -71,8 +71,8 @@ export class ClientRepository {
 
     this.clientState.clients = ko.pureComputed(() => (this.selfUser() ? this.selfUser().devices() : []));
 
-    amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient.bind(this));
-    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient);
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
   init(selfUser: User): void {
@@ -242,7 +242,7 @@ export class ClientRepository {
    * @returns Cookie label key
    */
   constructCookieLabelKey(login: string, clientType: ClientType = this.loadCurrentClientType()): string {
-    const loginHash = murmurhash3(login || this.selfUser().id, 42);
+    const loginHash = murmurhash.v3(login || this.selfUser().id, 42);
     return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
@@ -306,7 +306,7 @@ export class ClientRepository {
     });
   }
 
-  async logoutClient(): Promise<void> {
+  logoutClient = async (): Promise<void> => {
     if (this.clientState.currentClient()) {
       if (this.clientState.isTemporaryClient()) {
         await this.deleteTemporaryClient();
@@ -327,7 +327,7 @@ export class ClientRepository {
         });
       }
     }
-  }
+  };
 
   /**
    * Removes a stored client and the session connected with it.
@@ -517,7 +517,7 @@ export class ClientRepository {
    *
    * @param eventJson JSON data for event
    */
-  private onUserEvent(eventJson: UserClientAddEvent | UserClientRemoveEvent): void {
+  private readonly onUserEvent = (eventJson: UserClientAddEvent | UserClientRemoveEvent): void => {
     const type = eventJson.type;
 
     const isClientAdd = type === USER_EVENT.CLIENT_ADD;
@@ -529,7 +529,7 @@ export class ClientRepository {
     if (isClientRemove) {
       this.onClientRemove(eventJson as UserClientRemoveEvent);
     }
-  }
+  };
 
   /**
    * A client was added by the self user.

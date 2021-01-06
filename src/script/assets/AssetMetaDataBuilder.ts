@@ -31,7 +31,7 @@ export type MetaData = Asset.AudioMetaData | Asset.VideoMetaData | Asset.ImageMe
  * @param file the file to generate metadata for
  * @returns Resolves with ImageMetaData, VideoMetaData or AudioMetaData
  */
-const buildMetadata = (file: File | Blob): Promise<MetaData | void> => {
+export const buildMetadata = (file: File | Blob): Promise<MetaData | void> => {
   if (!(file instanceof Blob)) {
     throw new Error('Expected file to be type of Blob');
   }
@@ -51,18 +51,14 @@ const buildMetadata = (file: File | Blob): Promise<MetaData | void> => {
   return Promise.resolve();
 };
 
-const buildMetadataAudio = (audioFile: File | Blob): Promise<Asset.AudioMetaData> => {
-  return loadFileBuffer(audioFile)
-    .then(buffer => {
-      const audioContext = new AudioContext();
-      audioContext.close();
-      return audioContext.decodeAudioData(buffer as ArrayBuffer);
-    })
-    .then(audioBuffer => {
-      const durationInMillis = audioBuffer.duration * TIME_IN_MILLIS.SECOND;
-      const normalizedLoudness = normalizeLoudness(audioBuffer);
-      return new Asset.AudioMetaData({durationInMillis, normalizedLoudness});
-    });
+const buildMetadataAudio = async (audioFile: File | Blob): Promise<Asset.AudioMetaData> => {
+  const buffer = await loadFileBuffer(audioFile);
+  const audioContext = new AudioContext();
+  audioContext.close();
+  const audioBuffer = await audioContext.decodeAudioData(buffer as ArrayBuffer);
+  const durationInMillis = audioBuffer.duration * TIME_IN_MILLIS.SECOND;
+  const normalizedLoudness = normalizeLoudness(audioBuffer);
+  return new Asset.AudioMetaData({durationInMillis, normalizedLoudness});
 };
 
 const buildMetadataImage = (imageFile: File | Blob): Promise<Asset.ImageMetaData> => {
@@ -128,15 +124,15 @@ const convertEventToError = (event: any): MediaError => {
   return error;
 };
 
-const isAudio = (file: File | Blob): boolean => {
+export const isAudio = (file: File | Blob): boolean => {
   return file?.type.startsWith('audio');
 };
 
-const isImage = (file: File | Blob): boolean => {
+export const isImage = (file: File | Blob): boolean => {
   return file?.type.startsWith('image');
 };
 
-const isVideo = (file: File | Blob): boolean => {
+export const isVideo = (file: File | Blob): boolean => {
   return file?.type.startsWith('video');
 };
 
@@ -153,5 +149,3 @@ const normalizeLoudness = (audioBuffer: AudioBuffer): Uint8Array => {
 
   return new Uint8Array(audioPreview);
 };
-
-export {buildMetadata, isAudio, isImage, isVideo};

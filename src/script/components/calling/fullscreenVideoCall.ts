@@ -23,6 +23,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 
 import {TIME_IN_MILLIS, formatSeconds} from 'Util/TimeUtil';
+
 import type {Call} from '../../calling/Call';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
@@ -171,11 +172,11 @@ export class FullscreenVideoCalling {
     };
   }
 
-  switchCameraSource = (call: Call, deviceId: string) => {
+  readonly switchCameraSource = (call: Call, deviceId: string) => {
     this.callActions.switchCameraInput(call, deviceId);
   };
 
-  switchScreenSource = (call: Call, deviceId: string) => {
+  readonly switchScreenSource = (call: Call, deviceId: string) => {
     this.callActions.switchScreenInput(call, deviceId);
   };
 

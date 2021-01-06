@@ -19,6 +19,7 @@
 
 import {VIDEO_STATE} from '@wireapp/avs';
 import ko from 'knockout';
+
 import {User} from '../entity/User';
 
 export type UserId = string;
@@ -66,7 +67,8 @@ export class Participant {
     this.videoFillMode = ko.observable(VideoFillMode.UNSET);
   }
 
-  doesMatchIds = (userId: UserId, clientId: ClientId): boolean => userId === this.user.id && clientId === this.clientId;
+  readonly doesMatchIds = (userId: UserId, clientId: ClientId): boolean =>
+    userId === this.user.id && clientId === this.clientId;
 
   setAudioStream(audioStream: MediaStream): void {
     this.releaseStream(this.audioStream());

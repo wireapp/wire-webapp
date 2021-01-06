@@ -63,13 +63,13 @@ class LinkPreviewAssetComponent {
     }
   }
 
-  onClick = () => {
+  readonly onClick = () => {
     if (!this.messageEntity.is_expired()) {
       safeWindowOpen(this.preview.url);
     }
   };
 
-  dispose = () => {
+  readonly dispose = () => {
     this.element.removeEventListener('click', this.onClick);
   };
 }

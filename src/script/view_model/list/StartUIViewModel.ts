@@ -20,10 +20,13 @@
 import {debounce} from 'underscore';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {partition} from 'Util/ArrayUtil';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {UserlistMode} from 'Components/userList';
 
@@ -32,9 +35,7 @@ import {Config} from '../../Config';
 import {User} from '../../entity/User';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {SearchRepository} from '../../search/SearchRepository';
-import {sortByPriority} from 'Util/StringUtil';
 import {ListViewModel} from '../ListViewModel';
 import type {MainViewModel} from '../MainViewModel';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -44,7 +45,6 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {Conversation} from '../../entity/Conversation';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationState} from '../../conversation/ConversationState';
@@ -226,7 +226,7 @@ export class StartUIViewModel {
       .extend({notify: 'always', rateLimit: 500});
   }
 
-  clickOnClose = (): void => {
+  readonly clickOnClose = (): void => {
     this.closeList();
   };
 
@@ -241,34 +241,34 @@ export class StartUIViewModel {
     delete this.alreadyClickedOnContact[userEntity.id];
   };
 
-  clickOnConversation = (conversationEntity: Conversation): Promise<void> => {
+  readonly clickOnConversation = (conversationEntity: Conversation): Promise<void> => {
     return this.actionsViewModel.openGroupConversation(conversationEntity).then(() => this.closeList());
   };
 
-  clickOnCreateGroup = (): void => {
+  readonly clickOnCreateGroup = (): void => {
     amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'start_ui');
   };
 
-  clickOnCreateGuestRoom = (): void => {
+  readonly clickOnCreateGuestRoom = (): void => {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
     });
   };
 
-  clickOpenManageTeam = (): void => {
+  readonly clickOpenManageTeam = (): void => {
     if (!this.manageTeamUrl) {
       return;
     }
     safeWindowOpen(this.manageTeamUrl);
   };
 
-  clickOpenManageServices = () => {
+  readonly clickOpenManageServices = () => {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
     }
   };
 
-  clickOnOther = (participantEntity: User | ServiceEntity): Promise<void> | void => {
+  readonly clickOnOther = (participantEntity: User | ServiceEntity): Promise<void> | void => {
     const isUser = participantEntity instanceof User;
     if (isUser && (participantEntity as User).isOutgoingRequest()) {
       return this.clickOnContact(participantEntity as User);
@@ -279,15 +279,15 @@ export class StartUIViewModel {
     return this.mainViewModel.content.serviceModal.showService(participantEntity as ServiceEntity);
   };
 
-  clickOnShowPeople = (): void => {
+  readonly clickOnShowPeople = (): void => {
     this.updateList(StartUIViewModel.STATE.ADD_PEOPLE);
   };
 
-  clickOnShowServices = (): void => {
+  readonly clickOnShowServices = (): void => {
     this.updateList(StartUIViewModel.STATE.ADD_SERVICE);
   };
 
-  handleSearchInput = (): void => {
+  readonly handleSearchInput = (): void => {
     if (!this.submittedSearch && this.isSearching()) {
       const [matchingContact] = this.searchResults.contacts();
       if (matchingContact) {
@@ -366,13 +366,13 @@ export class StartUIViewModel {
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
   };
 
-  clickToShowInviteModal = () => this.mainViewModel.content.inviteModal.show();
+  readonly clickToShowInviteModal = () => this.mainViewModel.content.inviteModal.show();
 
   //##############################################################################
   // Search
   //##############################################################################
 
-  clearSearchResults = (): void => {
+  readonly clearSearchResults = (): void => {
     this.searchResults.groups.removeAll();
     this.searchResults.contacts.removeAll();
     this.searchResults.others.removeAll();

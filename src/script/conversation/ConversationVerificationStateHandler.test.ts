@@ -18,14 +18,15 @@
  */
 
 import {createRandomUuid} from 'Util/util';
+
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {Conversation} from 'src/script/entity/Conversation';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {User} from 'src/script/entity/User';
-import {TestFactory} from '../../../test/helper/TestFactory';
-import {EventBuilder} from 'src/script/conversation/EventBuilder';
-import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
 import {ConversationRepository} from './ConversationRepository';
+import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
+import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
+import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {TestFactory} from '../../../test/helper/TestFactory';
+import {User} from 'src/script/entity/User';
 
 describe('ConversationVerificationStateHandler', () => {
   const testFactory = new TestFactory();

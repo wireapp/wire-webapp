@@ -46,7 +46,10 @@ module.exports = {
         test: /\.[tj]sx?$/,
       },
       {
-        loader: 'svg-inline-loader?removeSVGTagAttrs=false',
+        loader: 'svg-inline-loader',
+        options: {
+          removeSVGTagAttrs: false,
+        },
         test: /\.svg$/,
       },
     ],

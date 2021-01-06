@@ -17,13 +17,15 @@
  *
  */
 
+import {AssetUploadData} from '@wireapp/api-client/src/asset';
+
 import {createRandomUuid} from 'Util/util';
+import {ValidationUtilError} from 'Util/ValidationUtil';
+
 import {encryptAesAsset} from './AssetCrypto';
 import {AssetRemoteData} from './AssetRemoteData';
 import {AssetRepository, AssetUploadOptions} from './AssetRepository';
 import {EventMapper} from '../conversation/EventMapper';
-import {ValidationUtilError} from 'Util/ValidationUtil';
-import {AssetUploadData} from '@wireapp/api-client/src/asset';
 import {AssetService} from './AssetService';
 import {APIClient} from '../service/APIClientSingleton';
 

@@ -72,15 +72,15 @@ class MediaButtonComponent extends AbstractAssetTransferStateTracker {
     this.mediaElement.addEventListener('pause', this.onPause);
   }
 
-  onPlay = () => {
+  readonly onPlay = () => {
     this.isPlaying(true);
   };
 
-  onPause = () => {
+  readonly onPause = () => {
     this.isPlaying(false);
   };
 
-  dispose = () => {
+  readonly dispose = () => {
     this.mediaElement.removeEventListener('playing', this.onPlay);
     this.mediaElement.removeEventListener('pause', this.onPause);
   };

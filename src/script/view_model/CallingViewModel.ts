@@ -21,8 +21,12 @@ import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
+import 'Components/calling/chooseScreen';
 import {getLogger, Logger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
 
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
@@ -37,13 +41,8 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
-
-import 'Components/calling/chooseScreen';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {ModalsViewModel} from './ModalsViewModel';
-import {t} from 'Util/LocalizerUtil';
 import {ConversationState} from '../conversation/ConversationState';
-import {container} from 'tsyringe';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -352,7 +351,7 @@ export class CallingViewModel {
     return this.permissionRepository.permissionState.camera() === PermissionStatusState.GRANTED;
   }
 
-  onCancelScreenSelection = () => {
+  readonly onCancelScreenSelection = () => {
     this.selectableScreens([]);
     this.selectableWindows([]);
   };

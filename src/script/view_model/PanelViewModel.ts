@@ -142,7 +142,7 @@ export class PanelViewModel {
    *
    * Note: panels that are toggled are not counted in the state history.
    */
-  togglePanel = (state: string, params: PanelParams): void => {
+  readonly togglePanel = (state: string, params: PanelParams): void => {
     const isStateChange = this.state() !== state;
     if (!isStateChange) {
       const currentInstance = this.subViews[state];

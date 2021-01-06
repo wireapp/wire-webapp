@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+
 import type {Conversation} from '../entity/Conversation';
 import {generateConversationUrl} from '../router/routeGenerator';
 

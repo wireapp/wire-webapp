@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {isRemovalAction} from 'Util/KeyboardUtil';
+
 import type {User} from '../entity/User';
 
 interface UserInputParams {
@@ -93,7 +94,7 @@ class UserInput {
     return true;
   }
 
-  dispose = (): void => {
+  readonly dispose = (): void => {
     if (this.selectedSubscription) {
       this.selectedSubscription.dispose();
     }

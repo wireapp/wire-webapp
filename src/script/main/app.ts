@@ -26,6 +26,8 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import type {SQLeetEngine} from '@wireapp/store-engine-sqleet';
+import Dexie from 'dexie';
+import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -33,9 +35,12 @@ import {checkIndexedDb, createRandomUuid, isTemporaryClientAndNonPersistent} fro
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {enableLogging} from 'Util/LoggerUtil';
 import {Environment} from 'Util/Environment';
+import {DebugUtil} from 'Util/DebugUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 import {includesString} from 'Util/StringUtil';
 import {appendParameter} from 'Util/UrlUtil';
+import {loadValue} from 'Util/StorageUtil';
+
 import {Config} from '../Config';
 import {startNewVersionPolling} from '../lifecycle/newVersionHandler';
 import {LoadingViewModel} from '../view_model/LoadingViewModel';
@@ -57,7 +62,6 @@ import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {TeamRepository} from '../team/TeamRepository';
 import {SearchRepository} from '../search/SearchRepository';
 import {ConversationRepository} from '../conversation/ConversationRepository';
-import Dexie from 'dexie';
 import {EventRepository} from '../event/EventRepository';
 import {EventServiceNoCompound} from '../event/EventServiceNoCompound';
 import {EventService} from '../event/EventService';
@@ -66,16 +70,13 @@ import {QuotedMessageMiddleware} from '../event/preprocessor/QuotedMessageMiddle
 import {ServiceMiddleware} from '../event/preprocessor/ServiceMiddleware';
 import {WebSocketService} from '../event/WebSocketService';
 import {ConversationService} from '../conversation/ConversationService';
-
 import {SingleInstanceHandler} from './SingleInstanceHandler';
-
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {MainViewModel, ViewModelRepositories} from '../view_model/MainViewModel';
 import {ThemeViewModel} from '../view_model/ThemeViewModel';
 import {WindowHandler} from '../ui/WindowHandler';
-
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
@@ -112,7 +113,6 @@ import {MediaRepository} from '../media/MediaRepository';
 import {GiphyRepository} from '../extension/GiphyRepository';
 import {GiphyService} from '../extension/GiphyService';
 import {PermissionRepository} from '../permission/PermissionRepository';
-import {loadValue} from 'Util/StorageUtil';
 import {APIClient} from '../service/APIClientSingleton';
 import {ClientService} from '../client/ClientService';
 import {ConnectionService} from '../connection/ConnectionService';
@@ -123,10 +123,8 @@ import {AccessTokenError, ACCESS_TOKEN_ERROR_TYPE} from '../error/AccessTokenErr
 import {ClientError} from '../error/ClientError';
 import {AuthError} from '../error/AuthError';
 import {AssetRepository} from '../assets/AssetRepository';
-import {DebugUtil} from 'Util/DebugUtil';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
-import {Runtime} from '@wireapp/commons';
 import {MessageRepository} from '../conversation/MessageRepository';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
@@ -348,8 +346,8 @@ class App {
    * Subscribe to amplify events.
    */
   private _subscribeToEvents() {
-    amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh.bind(this));
-    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout.bind(this));
+    amplify.subscribe(WebAppEvents.LIFECYCLE.REFRESH, this.refresh);
+    amplify.subscribe(WebAppEvents.LIFECYCLE.SIGN_OUT, this.logout);
     amplify.subscribe(WebAppEvents.CONNECTION.ACCESS_TOKEN.RENEW, async (source: string) => {
       this.logger.info(`Access token refresh triggered by "${source}"...`);
       try {
@@ -476,7 +474,7 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.UPDATED_CONVERSATIONS);
       if (userRepository['userState'].isActivatedAccount()) {
         // start regularly polling the server to check if there is a new version of Wire
-        startNewVersionPolling(Environment.version(false), this.update.bind(this));
+        startNewVersionPolling(Environment.version(false), this.update);
       }
       audioRepository.init(true);
       conversationRepository.cleanup_conversations();
@@ -735,7 +733,7 @@ class App {
    * @param signOutReason Cause for logout
    * @param clearData Keep data in database
    */
-  logout(signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void {
+  readonly logout = (signOutReason: SIGN_OUT_REASON, clearData: boolean): Promise<void> | void => {
     const _redirectToLogin = () => {
       amplify.publish(WebAppEvents.LIFECYCLE.SIGNED_OUT, clearData);
       this._redirectToLogin(signOutReason);
@@ -818,12 +816,12 @@ class App {
 
     this.logger.warn('No internet access. Continuing when internet connectivity regained.');
     $(window).on('online', () => _logoutOnBackend());
-  }
+  };
 
   /**
    * Refresh the web app or desktop wrapper
    */
-  refresh(): void {
+  readonly refresh = (): void => {
     this.logger.info('Refresh to update started');
     if (Runtime.isDesktopApp()) {
       // if we are in a desktop env, we just warn the wrapper that we need to reload. It then decide what should be done
@@ -833,14 +831,14 @@ class App {
 
     window.location.reload();
     window.focus();
-  }
+  };
 
   /**
    * Notify about found update
    */
-  update(): void {
+  readonly update = (): void => {
     amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
-  }
+  };
 
   /**
    * Redirect to the login page after internet connectivity has been verified.

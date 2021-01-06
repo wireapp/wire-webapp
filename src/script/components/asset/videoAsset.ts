@@ -112,7 +112,7 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     }
   };
 
-  onPauseButtonClicked = (): void => {
+  readonly onPauseButtonClicked = (): void => {
     this.videoElement?.pause();
   };
 
