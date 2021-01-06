@@ -44,7 +44,7 @@ import type {Message} from './message/Message';
 import type {SystemMessage} from './message/SystemMessage';
 import {Config} from '../Config';
 import type {Call} from '../calling/Call';
-import {ConversationRecord} from '../storage/ConversationRecord';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 interface UnreadState {

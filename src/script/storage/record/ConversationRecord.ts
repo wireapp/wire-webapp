@@ -1,5 +1,5 @@
-import {ConversationStatus} from '../conversation/ConversationStatus';
-import {ConversationVerificationState} from '../conversation/ConversationVerificationState';
+import {ConversationStatus} from '../../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
 import {
   DefaultConversationRoleName,
   CONVERSATION_ACCESS,

@@ -42,7 +42,7 @@ import type {LegalHoldMessage} from './LegalHoldMessage';
 import type {DecryptErrorMessage} from './DecryptErrorMessage';
 import type {PingMessage} from './PingMessage';
 import type {LinkPreview} from './LinkPreview';
-import type {ReadReceipt} from '../../storage/EventRecord';
+import type {ReadReceipt} from '../../storage/record/EventRecord';
 
 export class Message {
   private messageTimerStarted: boolean;
