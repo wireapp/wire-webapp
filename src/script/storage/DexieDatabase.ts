@@ -1,4 +1,4 @@
-import Dexie from 'dexie';
+import {Dexie, Table, Transaction} from 'dexie';
 import {StorageSchemata} from './StorageSchemata';
 import {getLogger, Logger} from 'Util/Logger';
 import {ClientRecord} from './record/ClientRecord';
@@ -9,19 +9,16 @@ import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRec
  * @see https://dexie.org/docs/Typescript#create-a-subclass
  */
 export class DexieDatabase extends Dexie {
-  /**  @see https://dexie.org/docs/Observable/Dexie.Observable */
-  _dbSchema?: Object;
-
-  amplify: Dexie.Table<AmplifyRecord, string>;
-  clients: Dexie.Table<ClientRecord, string>;
+  amplify: Table<AmplifyRecord, string>;
+  clients: Table<ClientRecord, string>;
   /** @deprecated */
-  conversation_events: Dexie.Table<{}, string>;
-  conversations: Dexie.Table<ConversationRecord, string>;
-  events: Dexie.Table<EventRecord, number>;
-  keys: Dexie.Table<CryptoboxRecord, string>;
-  prekeys: Dexie.Table<CryptoboxRecord, string>;
-  sessions: Dexie.Table<CryptoboxRecord, string>;
-  users: Dexie.Table<UserRecord, string>;
+  conversation_events: Table<{}, string>;
+  conversations: Table<ConversationRecord, string>;
+  events: Table<EventRecord, number>;
+  keys: Table<CryptoboxRecord, string>;
+  prekeys: Table<CryptoboxRecord, string>;
+  sessions: Table<CryptoboxRecord, string>;
+  users: Table<UserRecord, string>;
 
   private readonly logger: Logger;
 
@@ -32,7 +29,7 @@ export class DexieDatabase extends Dexie {
     StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
       const versionInstance = this.version(version).stores(schema);
       if (upgrade) {
-        versionInstance.upgrade((transaction: Dexie.Transaction) => {
+        versionInstance.upgrade((transaction: Transaction) => {
           this.logger.warn(`Database upgrade to version '${version}'`);
           upgrade(transaction, this);
         });
