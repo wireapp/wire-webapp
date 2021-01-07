@@ -83,7 +83,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
         css={
           hasBlackBackground()
             ? css`
-                background-color: #000;
+                background-color: #323739;
               `
             : undefined
         }
