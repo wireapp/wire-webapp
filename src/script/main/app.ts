@@ -95,7 +95,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
-import {AppLockViewModel} from '../view_model/content/AppLockViewModel';
+import AppLock from '../components/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {BroadcastService} from '../broadcast/BroadcastService';
@@ -155,7 +155,6 @@ class App {
   debug: DebugUtil;
   util: {debug: DebugUtil};
   singleInstanceHandler: SingleInstanceHandler;
-  applock: AppLockViewModel;
 
   static get CONFIG() {
     return {
@@ -464,7 +463,8 @@ class App {
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      this.applock = new AppLockViewModel(clientRepository, userRepository['userState'].self);
+      //this.applock = new AppLockViewModel(clientRepository, userRepository['userState'].self);
+      AppLock.init(clientRepository, ko.unwrap(userRepository['userState'].self));
 
       loadingView.removeFromView();
       telemetry.report();
