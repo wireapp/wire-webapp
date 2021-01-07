@@ -17,6 +17,7 @@
  *
  */
 
+import {NewOtrMessage as ProtobufOTRMessage} from '@wireapp/protocol-messaging/web/otr';
 import type {AxiosError, AxiosRequestConfig} from 'axios';
 
 import {ValidationError} from '../validation/';
@@ -468,12 +469,13 @@ export class ConversationAPI {
   public async postOTRMessage(
     clientId: string,
     conversationId: string,
-    messageData?: NewOTRMessage,
+    messageData?: NewOTRMessage<string>,
     ignoreMissing?: boolean | string[],
   ): Promise<ClientMismatch> {
     if (!clientId) {
       throw new ValidationError('Unable to send OTR message without client ID.');
     }
+
     if (!messageData) {
       messageData = {
         recipients: {},
@@ -492,16 +494,57 @@ export class ConversationAPI {
       config.params = {ignore_missing};
       // `ignore_missing` takes precedence on the server so we can remove
       // `report_missing` to save some bandwidth.
-      delete messageData.report_missing;
-    } else if (typeof messageData.report_missing === 'undefined') {
+      messageData.report_missing = [];
+    } else if (typeof messageData.report_missing === 'undefined' || !messageData.report_missing.length) {
       // both `ignore_missing` and `report_missing` are undefined
       config.params = {ignore_missing: !!messageData.data};
     }
 
-    const response =
-      typeof messageData.recipients === 'object'
-        ? await this.client.sendJSON<ClientMismatch>(config, true)
-        : await this.client.sendProtocolBuffer<ClientMismatch>(config, true);
+    const response = await this.client.sendJSON<ClientMismatch>(config, true);
+    return response.data;
+  }
+
+  /**
+   * Post an encrypted message to a conversation.
+   * @param sendingClientId The sender's client ID
+   * @param conversationId The conversation ID
+   * @param messageData The message content
+   * @param ignoreMissing Whether to report missing clients or not:
+   * `false`: Report about all missing clients
+   * `true`: Ignore all missing clients and force sending.
+   * Array: User IDs specifying which user IDs are allowed to have
+   * missing clients
+   * `undefined`: Default to setting of `report_missing` in `NewOTRMessage`
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrMessage
+   */
+  public async postOTRProtobufMessage(
+    sendingClientId: string,
+    conversationId: string,
+    messageData: ProtobufOTRMessage,
+    ignoreMissing?: boolean | string[],
+  ): Promise<ClientMismatch> {
+    if (!sendingClientId) {
+      throw new ValidationError('Unable to send OTR message without client ID.');
+    }
+
+    const config: AxiosRequestConfig = {
+      data: ProtobufOTRMessage.encode(messageData).finish(),
+      method: 'post',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`,
+    };
+
+    if (typeof ignoreMissing !== 'undefined') {
+      const ignore_missing = Array.isArray(ignoreMissing) ? ignoreMissing.join(',') : ignoreMissing;
+      config.params = {ignore_missing};
+      // `ignore_missing` takes precedence on the server so we can remove
+      // `report_missing` to save some bandwidth.
+      messageData.reportMissing = [];
+    } else if (typeof messageData.reportMissing === 'undefined' || !messageData.reportMissing.length) {
+      // both `ignore_missing` and `report_missing` are undefined
+      config.params = {ignore_missing: !!messageData.blob};
+    }
+
+    const response = await this.client.sendProtocolBuffer<ClientMismatch>(config, true);
     return response.data;
   }
 

@@ -133,7 +133,7 @@ describe('CryptographyService', () => {
       expect(Object.keys(otrBundle).length).toBe(2);
       expect(Object.keys(otrBundle[firstUserID]).length).toBe(3);
       expect(Object.keys(otrBundle[secondUserID]).length).toBe(2);
-      expect(otrBundle[firstUserID][firstClientId]).toEqual(jasmine.any(String));
+      expect(otrBundle[firstUserID][firstClientId]).toEqual(jasmine.any(Object));
     });
   });
 
@@ -187,7 +187,7 @@ describe('CryptographyService', () => {
         text,
         encodedPreKey,
       );
-      expect(encryptedPayload).not.toBe('💣');
+      expect(new TextDecoder().decode(encryptedPayload)).not.toBe('💣');
       expect(sessionId).toBe(sessionWithBobId);
     });
 
@@ -200,7 +200,7 @@ describe('CryptographyService', () => {
         undefined,
         encodedPreKey,
       );
-      expect(encryptedPayload).toBe('💣');
+      expect(new TextDecoder().decode(encryptedPayload)).toBe('💣');
       expect(sessionId).toBe(sessionWithBobId);
     });
   });

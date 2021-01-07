@@ -20,7 +20,7 @@
 import type {APIClient} from '@wireapp/api-client';
 import type {PreKey as SerializedPreKey} from '@wireapp/api-client/src/auth/';
 import type {RegisteredClient} from '@wireapp/api-client/src/client/';
-import type {OTRRecipients} from '@wireapp/api-client/src/conversation/';
+import type {OTRClientMap, OTRRecipients} from '@wireapp/api-client/src/conversation/';
 import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
@@ -61,12 +61,38 @@ export class CryptographyService {
     return `${userId}@${clientId}`;
   }
 
+  public static convertArrayRecipientsToBase64(recipients: OTRRecipients<Uint8Array>): OTRRecipients<string> {
+    return Object.fromEntries(
+      Object.entries(recipients).map(([userId, otrClientMap]) => {
+        const otrClientMapWithBase64: OTRClientMap<string> = Object.fromEntries(
+          Object.entries(otrClientMap).map(([clientId, payload]) => {
+            return [clientId, Encoder.toBase64(payload).asString];
+          }),
+        );
+        return [userId, otrClientMapWithBase64];
+      }),
+    );
+  }
+
+  public static convertBase64RecipientsToArray(recipients: OTRRecipients<string>): OTRRecipients<Uint8Array> {
+    return Object.fromEntries(
+      Object.entries(recipients).map(([userId, otrClientMap]) => {
+        const otrClientMapWithUint8Array: OTRClientMap<Uint8Array> = Object.fromEntries(
+          Object.entries(otrClientMap).map(([clientId, payload]) => {
+            return [clientId, Decoder.fromBase64(payload).asBytes];
+          }),
+        );
+        return [userId, otrClientMapWithUint8Array];
+      }),
+    );
+  }
+
   public async createCryptobox(): Promise<SerializedPreKey[]> {
-    const initialPreKeys: ProteusKeys.PreKey[] = await this.cryptobox.create();
+    const initialPreKeys = await this.cryptobox.create();
 
     return initialPreKeys
       .map(preKey => {
-        const preKeyJson: SerializedPreKey = this.cryptobox.serialize_prekey(preKey);
+        const preKeyJson = this.cryptobox.serialize_prekey(preKey);
         if (preKeyJson.id !== ProteusKeys.PreKey.MAX_PREKEY_ID) {
           return preKeyJson;
         }
@@ -77,7 +103,7 @@ export class CryptographyService {
 
   public decrypt(sessionId: string, encodedCiphertext: string): Promise<Uint8Array> {
     this.logger.log(`Decrypting message for session ID "${sessionId}"`);
-    const messageBytes: Uint8Array = Decoder.fromBase64(encodedCiphertext).asBytes;
+    const messageBytes = Decoder.fromBase64(encodedCiphertext).asBytes;
     return this.cryptobox.decrypt(sessionId, messageBytes.buffer);
   }
 
@@ -85,31 +111,28 @@ export class CryptographyService {
     return sessionId.split('@');
   }
 
-  public async encrypt(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): Promise<OTRRecipients> {
-    const recipients: OTRRecipients = {};
-    const encryptions: Promise<SessionPayloadBundle>[] = [];
+  public async encrypt(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): Promise<OTRRecipients<Uint8Array>> {
+    const recipients: OTRRecipients<Uint8Array> = {};
+    const bundles: Promise<SessionPayloadBundle>[] = [];
 
     for (const userId in preKeyBundles) {
       recipients[userId] = {};
 
       for (const clientId in preKeyBundles[userId]) {
-        const preKeyPayload: SerializedPreKey = preKeyBundles[userId][clientId];
-        const preKey: string = preKeyPayload.key;
-        const sessionId: string = CryptographyService.constructSessionId(userId, clientId);
-        encryptions.push(this.encryptPayloadForSession(sessionId, plainText, preKey));
+        const preKeyPayload = preKeyBundles[userId][clientId];
+        const preKey = preKeyPayload.key;
+        const sessionId = CryptographyService.constructSessionId(userId, clientId);
+        bundles.push(this.encryptPayloadForSession(sessionId, plainText, preKey));
       }
     }
 
-    const payloads: SessionPayloadBundle[] = await Promise.all(encryptions);
+    const payloads = await Promise.all(bundles);
 
-    if (payloads) {
-      payloads.forEach((payload: SessionPayloadBundle) => {
-        const sessionId: string = payload.sessionId;
-        const encrypted: string = payload.encryptedPayload;
-        const [userId, clientId] = CryptographyService.dismantleSessionId(sessionId);
-        recipients[userId][clientId] = encrypted;
-      });
-    }
+    payloads.forEach(payload => {
+      const {encryptedPayload, sessionId} = payload;
+      const [userId, clientId] = CryptographyService.dismantleSessionId(sessionId);
+      recipients[userId][clientId] = encryptedPayload;
+    });
 
     return recipients;
   }
@@ -119,20 +142,17 @@ export class CryptographyService {
     plainText: Uint8Array,
     base64EncodedPreKey: string,
   ): Promise<SessionPayloadBundle> {
-    this.logger.log(`Encrypting Payload for session ID "${sessionId}"`);
+    this.logger.log(`Encrypting payload for session ID "${sessionId}"`);
+
     let encryptedPayload;
 
     try {
-      const decodedPreKeyBundle: Uint8Array = Decoder.fromBase64(base64EncodedPreKey).asBytes;
-      const payloadAsBuffer: ArrayBuffer = await this.cryptobox.encrypt(
-        sessionId,
-        plainText,
-        decodedPreKeyBundle.buffer,
-      );
-      encryptedPayload = Encoder.toBase64(payloadAsBuffer).asString;
+      const decodedPreKeyBundle = Decoder.fromBase64(base64EncodedPreKey).asBytes;
+      const payloadAsBuffer = await this.cryptobox.encrypt(sessionId, plainText, decodedPreKeyBundle.buffer);
+      encryptedPayload = new Uint8Array(payloadAsBuffer);
     } catch (error) {
       this.logger.error(`Could not encrypt payload: ${error.message}`);
-      encryptedPayload = '💣';
+      encryptedPayload = new Uint8Array(Buffer.from('💣', 'utf-8'));
     }
 
     return {encryptedPayload, sessionId};

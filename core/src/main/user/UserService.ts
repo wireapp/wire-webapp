@@ -42,12 +42,12 @@ export class UserService {
     return this.apiClient.user.api.getUsers({ids: userIds});
   }
 
-  public setAvailability(teamId: string, type: AvailabilityType): Promise<void> {
+  public setAvailability(teamId: string, type: AvailabilityType, sendAsProtobuf?: boolean): Promise<void> {
     const genericMessage = GenericMessage.create({
       availability: new Availability({type}),
       messageId: UUID.genV4().toString(),
     });
 
-    return this.broadcastService.broadcastGenericMessage(teamId, genericMessage);
+    return this.broadcastService.broadcastGenericMessage(teamId, genericMessage, sendAsProtobuf);
   }
 }

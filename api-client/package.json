@@ -9,6 +9,7 @@
     "@types/tough-cookie": "4.0.0",
     "@wireapp/commons": "3.8.17",
     "@wireapp/priority-queue": "1.6.17",
+    "@wireapp/protocol-messaging": "1.27.1",
     "axios": "0.21.1",
     "http-status-codes": "2.1.4",
     "logdown": "3.3.1",

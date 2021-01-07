@@ -102,4 +102,4 @@ export type UserPreKeyList = Record<string, string[]>;
 export type UserPreKeyDataList = Record<string, Record<string, string>>;
 export type UserSeenByService = Pick<User, 'id' | 'name' | 'accent_id'>;
 export type ClientSeenByService = PublicClient;
-export type ServiceMessage = NewOTRMessage;
+export type ServiceMessage = NewOTRMessage<Uint8Array>;
