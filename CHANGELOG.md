@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.35.6...@wireapp/api-client@12.0.0) (2021-01-07)
+
+
+### Features
+
+* **api-client,core:** Send messages as protobuf (SQCORE-252) (BREAKING) ([#3356](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3356)) ([8ebdd33](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/8ebdd33be1c9fb03c2d5d7bb031cc874e7454aec))
+
+
+### BREAKING CHANGES
+
+* **api-client,core:** - cryptographyService.encrypt() now returns a Uint8Array
+- new MessageService class for crucial parts of sending messages
+
+
+
+
+
 ## [11.35.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.35.5...@wireapp/api-client@11.35.6) (2021-01-04)
 
 **Note:** Version bump only for package @wireapp/api-client
