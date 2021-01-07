@@ -17,6 +17,7 @@
  *
  */
 
+import {NewOtrMessage as ProtobufOTRMessage} from '@wireapp/protocol-messaging/web/otr';
 import type {AxiosRequestConfig} from 'axios';
 
 import {ValidationError} from '../validation/';
@@ -44,7 +45,7 @@ export class BroadcastAPI {
    */
   public async postBroadcastMessage(
     clientId: string,
-    messageData: NewOTRMessage,
+    messageData: NewOTRMessage<string>,
     ignoreMissing?: boolean | string[],
   ): Promise<ClientMismatch> {
     if (!clientId) {
@@ -68,10 +69,49 @@ export class BroadcastAPI {
       config.params = {ignore_missing: !!messageData.data};
     }
 
-    const response =
-      typeof messageData.recipients === 'object'
-        ? await this.client.sendJSON<ClientMismatch>(config)
-        : await this.client.sendProtocolBuffer<ClientMismatch>(config);
+    const response = await this.client.sendJSON<ClientMismatch>(config);
+    return response.data;
+  }
+
+  /**
+   * Broadcast an encrypted message to all team members and all contacts (accepts Protobuf).
+   * @param clientId The sender's client ID
+   * @param messageData The message content
+   * @param ignoreMissing Whether to report missing clients or not:
+   * `false`: Report about all missing clients
+   * `true`: Ignore all missing clients and force sending
+   * Array: User IDs specifying which user IDs are allowed to have
+   * missing clients
+   * `undefined`: Default to setting of `report_missing` in `NewOTRMessage`
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/postOtrBroadcast
+   */
+  public async postBroadcastProtobufMessage(
+    clientId: string,
+    messageData: ProtobufOTRMessage,
+    ignoreMissing?: boolean | string[],
+  ): Promise<ClientMismatch> {
+    if (!clientId) {
+      throw new ValidationError('Unable to send OTR message without client ID.');
+    }
+
+    const config: AxiosRequestConfig = {
+      data: ProtobufOTRMessage.encode(messageData).finish(),
+      method: 'post',
+      url: BroadcastAPI.URL.BROADCAST,
+    };
+
+    if (typeof ignoreMissing !== 'undefined') {
+      const ignore_missing = Array.isArray(ignoreMissing) ? ignoreMissing.join(',') : ignoreMissing;
+      config.params = {ignore_missing};
+      // `ignore_missing` takes precedence on the server so we can remove
+      // `report_missing` to save some bandwidth.
+      messageData.reportMissing = [];
+    } else if (typeof messageData.reportMissing === 'undefined' || !messageData.reportMissing.length) {
+      // both `ignore_missing` and `report_missing` are undefined
+      config.params = {ignore_missing: !!messageData.blob};
+    }
+
+    const response = await this.client.sendProtocolBuffer<ClientMismatch>(config);
     return response.data;
   }
 }

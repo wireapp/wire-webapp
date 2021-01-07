@@ -19,6 +19,6 @@
 
 import type {OTRClientMap} from './';
 
-export interface OTRRecipients {
-  [userId: string]: OTRClientMap;
+export interface OTRRecipients<T extends string | Uint8Array> {
+  [userId: string]: OTRClientMap<T>;
 }
