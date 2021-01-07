@@ -6,7 +6,7 @@ import {UserState} from '../../user/UserState';
 import {container} from 'tsyringe';
 
 const fadeAnimation = keyframes`
-  0%   { opacity: 0; }
+  0%   { opacity: 0.2; }
   100% { opacity: 1; }
 `;
 
@@ -25,7 +25,7 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
   const userState = container.resolve(UserState);
   return (
     <span
-      css={{animation: isActive ? `${fadeAnimation} 1s ease infinite alternate` : 'initial'}}
+      css={{animation: isActive ? `${fadeAnimation} 0.7s ease-in-out infinite alternate` : 'initial'}}
       className={className}
       {...props}
     >
@@ -50,5 +50,5 @@ export default ParticipantMicOnIcon;
 registerReactComponent('participant-mic-on-icon', {
   component: ParticipantMicOnIcon,
   optionalParams: ['className', 'isActive', 'color'],
-  template: '<span data-bind="react: {className, isActive, color}"></span>',
+  template: '<span data-bind="react: {className, isActive: ko.unwrap(isActive), color}"></span>',
 });

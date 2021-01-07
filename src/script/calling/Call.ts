@@ -97,13 +97,13 @@ export class Call {
         participant.audioLevel(activeSpeakerParticipant.audio_level);
         participant.isActivelySpeaking(true);
         if (activeSpeakerParticipant.isTopActiveSpeaker) {
-          participant.isTopActiveSpeaker = true;
+          participant.isTopActiveSpeaker(true);
         }
         return;
       }
       participant.audioLevel(0);
       participant.isActivelySpeaking(false);
-      participant.isTopActiveSpeaker = false;
+      participant.isTopActiveSpeaker(false);
     });
   }
 

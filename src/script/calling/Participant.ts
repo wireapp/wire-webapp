@@ -35,7 +35,7 @@ export class Participant {
   public startedScreenSharingAt: ko.Observable<number>;
   public isActivelySpeaking: ko.Observable<boolean>;
   public audioLevel: ko.Observable<number>;
-  public isTopActiveSpeaker: boolean = false;
+  public isTopActiveSpeaker: ko.Observable<boolean>;
 
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
@@ -58,6 +58,7 @@ export class Participant {
     this.videoStream = ko.observable();
     this.audioStream = ko.observable();
     this.isActivelySpeaking = ko.observable(false);
+    this.isTopActiveSpeaker = ko.observable(false);
     this.audioLevel = ko.observable(0);
     this.startedScreenSharingAt = ko.observable();
     this.isMuted = ko.observable(false);
