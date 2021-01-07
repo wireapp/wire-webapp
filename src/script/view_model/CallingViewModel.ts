@@ -60,8 +60,10 @@ export interface CallActions {
 }
 
 export const VideoSpeakersTabs = {
-  all: 'all',
   speakers: 'speakers',
+  // explictly disabled.
+  // eslint-disable-next-line sort-keys-fix/sort-keys-fix
+  all: 'all',
 };
 
 declare global {
