@@ -21,6 +21,7 @@ import {ClientType} from '@wireapp/api-client/src/client';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
+
 import {Account} from '../Account';
 import * as PayloadHelper from '../test/PayloadHelper';
 import {MentionContent, QuoteContent} from './content';

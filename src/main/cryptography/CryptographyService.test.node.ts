@@ -144,12 +144,12 @@ describe('CryptographyService', () => {
           },
         },
       };
-      const text = new Uint8Array([72, 101, 108, 108, 111, 33]); // "Hello!"
+      const text = new Uint8Array(Buffer.from('Hello', 'utf8'));
       const otrBundle = await cryptographyService.encrypt(text, preKeyBundleMap);
       expect(Object.keys(otrBundle).length).toBe(2);
       expect(Object.keys(otrBundle[firstUserID]).length).toBe(3);
       expect(Object.keys(otrBundle[secondUserID]).length).toBe(2);
-      expect(otrBundle[firstUserID][firstClientId]).toEqual(jasmine.any(String));
+      expect(otrBundle[firstUserID][firstClientId]).toEqual(jasmine.any(Uint8Array));
     });
 
     it('does not generate a message counter twice when ran asynchronously multiple times for the same cryptographic session', async () => {
@@ -171,7 +171,7 @@ describe('CryptographyService', () => {
       );
       const encryptedPayloads = otrBundles.map(bundle => bundle[userId][clientId]);
       const messageCounters = encryptedPayloads.map(encodedCiphertext => {
-        const messageBytes = bazinga64.Decoder.fromBase64(encodedCiphertext).asBytes;
+        const messageBytes = encodedCiphertext;
         const messageEnvelope = Proteus.message.Envelope.deserialise(messageBytes.buffer);
         const preKeyMessage = messageEnvelope.message as Proteus.message.PreKeyMessage;
         const cipherMessage = preKeyMessage.message;
@@ -206,7 +206,7 @@ describe('CryptographyService', () => {
         text,
         encodedPreKey,
       );
-      expect(encryptedPayload).not.toBe('💣');
+      expect(Buffer.from(encryptedPayload).toString('utf8')).not.toBe('💣');
       expect(sessionId).toBe(sessionWithBobId);
     });
 
@@ -219,7 +219,7 @@ describe('CryptographyService', () => {
         undefined as any,
         encodedPreKey,
       );
-      expect(encryptedPayload).toBe('💣');
+      expect(Buffer.from(encryptedPayload).toString()).toBe('💣');
       expect(sessionId).toBe(sessionWithBobId);
     });
   });

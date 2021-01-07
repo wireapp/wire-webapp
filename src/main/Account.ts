@@ -192,7 +192,7 @@ export class Account extends EventEmitter {
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
 
-    const broadcastService = new BroadcastService(this.apiClient, conversationService, cryptographyService);
+    const broadcastService = new BroadcastService(this.apiClient, cryptographyService);
     const userService = new UserService(this.apiClient, broadcastService);
 
     this.service = {

@@ -18,6 +18,6 @@
  */
 
 export interface SessionPayloadBundle {
-  encryptedPayload: string;
+  encryptedPayload: Uint8Array;
   sessionId: string;
 }
