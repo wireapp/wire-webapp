@@ -212,7 +212,7 @@ describe('StringUtil', () => {
       // Example taken from https://en.wikipedia.org/wiki/Universally_unique_identifier#Encoding
       const uuid = '00112233-4455-6677-8899-aabbccddeeff';
       // prettier-ignore
-      const expected = new ArrayBuffer([0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff])
+      const expected = Uint8Array.from([48, 48, 49, 49, 50, 50, 51, 51, 52, 52, 53, 53, 54, 54, 55, 55, 56, 56, 57, 57, 97, 97, 98, 98, 99, 99, 100, 100, 101, 101, 102, 102]);
       const actual = uuidToBytes(uuid);
       expect(expected).toEqual(actual);
     });
