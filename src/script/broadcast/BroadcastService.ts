@@ -21,9 +21,9 @@ import type {ClientMismatch, NewOTRMessage, OTRRecipients} from '@wireapp/api-cl
 import {NewOtrMessage, IUserEntry, IClientEntry} from '@wireapp/protocol-messaging/web/otr';
 import Long from 'long';
 import {container} from 'tsyringe';
-import {uuidToBytes} from '../../../../wire-web-packages/node_modules/@wireapp/commons/src/main/util/StringUtil';
 
 import {APIClient} from '../service/APIClientSingleton';
+import {uuidToBytes} from '../util/StringUtil';
 
 export class BroadcastService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
