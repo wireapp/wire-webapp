@@ -24,7 +24,7 @@ import {getLogger, Logger} from 'Util/Logger';
 
 import {UserState} from '../../user/UserState';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import {EventRecord} from '../../storage/EventRecord';
+import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
 

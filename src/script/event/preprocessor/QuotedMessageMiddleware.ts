@@ -26,7 +26,7 @@ import {ClientEvent} from '../Client';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {MessageHasher} from '../../message/MessageHasher';
 import type {EventService} from '../EventService';
-import {EventRecord} from '../../storage/EventRecord';
+import {EventRecord} from '../../storage/record/EventRecord';
 
 export class QuotedMessageMiddleware {
   private readonly eventService: EventService;

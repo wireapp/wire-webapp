@@ -85,6 +85,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
             this._showModal(messageString);
           }
+          return;
         }
       }
     }

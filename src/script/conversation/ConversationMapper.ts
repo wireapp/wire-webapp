@@ -35,7 +35,7 @@ import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
 import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
-import {ConversationRecord} from '../storage/ConversationRecord';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {

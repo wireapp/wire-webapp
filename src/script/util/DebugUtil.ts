@@ -144,17 +144,14 @@ export class DebugUtil {
     };
   }
 
-  getLastMessagesFromDatabase(
+  async getLastMessagesFromDatabase(
     amount = 10,
     conversationId = this.conversationState.activeConversation().id,
-  ): EventRecord[] {
+  ): Promise<EventRecord[]> {
     if (this.storageRepository.storageService.db) {
-      return this.storageRepository.storageService.db[StorageSchemata.OBJECT_STORE.EVENTS].toArray(
-        (records: EventRecord[]) => {
-          const messages = records.filter((event: EventRecord) => event.conversation === conversationId);
-          return messages.slice(amount * -1).reverse();
-        },
-      );
+      const records = await this.storageRepository.storageService.db.events.toArray();
+      const messages = records.filter(event => event.conversation === conversationId);
+      return messages.slice(-amount).reverse();
     }
     return [];
   }

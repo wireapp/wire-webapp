@@ -20,10 +20,20 @@
 import type {ClientClassification} from '@wireapp/api-client/src/client';
 
 export interface ClientRecord {
+  address?: string;
   class: ClientClassification | '?';
+  cookie?: string;
   id: string;
+  label?: string;
+  location?: {
+    lat: number;
+    lon: number;
+  };
   meta?: {
     is_verified?: boolean;
     primary_key?: string;
   };
+  model?: string;
+  time?: string;
+  type?: 'permanent' | 'temporary';
 }

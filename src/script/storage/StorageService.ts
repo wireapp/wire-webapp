@@ -33,6 +33,7 @@ import {SQLeetSchemata} from './SQLeetSchemata';
 import {StorageKey} from './StorageKey';
 import {StorageSchemata} from './StorageSchemata';
 import {StorageError} from '../error/StorageError';
+import {DexieDatabase} from './DexieDatabase';
 
 interface DatabaseListener {
   callback: DatabaseListenerCallback;
@@ -42,9 +43,6 @@ interface DatabaseListener {
 
 export type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void;
 
-// @see https://dexie.org/docs/Observable/Dexie.Observable
-type DexieObservable = {_dbSchema?: Object};
-
 enum DEXIE_CRUD_EVENT {
   DELETING = 'deleting',
   UPDATING = 'updating',
@@ -52,8 +50,7 @@ enum DEXIE_CRUD_EVENT {
 
 @singleton()
 export class StorageService {
-  // Quickfix to use table name index; can be removed once we have proper db instance typings: https://dexie.org/docs/Typescript#create-a-subclass
-  public db?: Dexie & DexieObservable & {[tableName: string]: any};
+  public db?: DexieDatabase;
   private readonly hasHookSupport: boolean;
   private readonly dbListeners: DatabaseListener[];
   private readonly engine: CRUDEngine;
@@ -99,8 +96,7 @@ export class StorageService {
         this.logger.info(`Initializing Storage Service with encrypted database '${this.dbName}'`);
         await this.engine.init(this.dbName);
       } else {
-        this.db = new Dexie(this.dbName);
-        this._upgradeStores(this.db);
+        this.db = new DexieDatabase(this.dbName);
         try {
           await this.engine.initWithDb(this.db, requestPersistentStorage);
         } catch (error) {
@@ -155,18 +151,6 @@ export class StorageService {
         .hook(DEXIE_CRUD_EVENT.DELETING, function (primaryKey: string, obj: Object, transaction: Transaction): void {
           this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, undefined, transaction);
         });
-    });
-  }
-
-  private _upgradeStores(db: Dexie): void {
-    StorageSchemata.SCHEMATA.forEach(({schema, upgrade, version}) => {
-      const versionUpdate = db.version(version).stores(schema);
-      if (upgrade) {
-        versionUpdate.upgrade((transaction: Transaction) => {
-          this.logger.warn(`Database upgrade to version '${version}'`);
-          upgrade(transaction, db);
-        });
-      }
     });
   }
 

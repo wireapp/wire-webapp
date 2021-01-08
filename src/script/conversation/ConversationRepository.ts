@@ -93,7 +93,7 @@ import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {TeamRepository} from '../team/TeamRepository';
 import {ConversationState} from './ConversationState';
-import {ConversationRecord} from '../storage/ConversationRecord';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {reject_fn: (error: ConversationError) => void; resolve_fn: (conversation: Conversation) => void};
