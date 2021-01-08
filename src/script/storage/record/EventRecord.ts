@@ -17,7 +17,7 @@
  *
  */
 
-import {StatusType} from '../message/StatusType';
+import {StatusType} from '../../message/StatusType';
 
 export interface ReadReceipt {
   time: string;

@@ -40,7 +40,7 @@ import {
 } from './Error';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
-import {ConversationRecord} from '../storage/ConversationRecord';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
 
 export interface Metadata {
   client_id: string;
