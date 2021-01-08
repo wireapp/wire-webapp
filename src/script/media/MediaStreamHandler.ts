@@ -19,6 +19,7 @@
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {Runtime} from '@wireapp/commons';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -32,7 +33,6 @@ import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsH
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
-import {Runtime} from '@wireapp/commons';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 
 declare global {

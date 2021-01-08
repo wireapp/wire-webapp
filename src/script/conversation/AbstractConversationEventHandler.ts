@@ -18,6 +18,7 @@
  */
 
 import type {Conversation} from '../entity/Conversation';
+import {ConversationEvent} from './EventBuilder';
 
 export type EventHandlingConfig = {[eventId: string]: (conversationEntity: Conversation) => void | Promise<void>};
 
@@ -46,7 +47,7 @@ export class AbstractConversationEventHandler {
    * @param conversationEntity the conversation the event relates to
    * @param eventJson JSON data for the event
    */
-  handleConversationEvent(conversationEntity: Conversation, eventJson: any): Promise<void> {
+  handleConversationEvent(conversationEntity: Conversation, eventJson: ConversationEvent<unknown>): Promise<void> {
     const handler = this.eventHandlingConfig[eventJson.type] || (() => Promise.resolve());
     return handler.bind(this)(conversationEntity, eventJson);
   }

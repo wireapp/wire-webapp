@@ -20,6 +20,7 @@
 import React from 'react';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
+
 import {DIAMETER, AVATAR_SIZE} from '../ParticipantAvatar';
 
 export interface AvatarWrapperProps extends React.ComponentProps<'div'> {

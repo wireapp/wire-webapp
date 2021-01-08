@@ -17,56 +17,53 @@
  *
  */
 
-import {escape} from 'underscore';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {Availability} from '@wireapp/protocol-messaging';
+import {container} from 'tsyringe';
+import {escape} from 'underscore';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
 import {afterRender, formatBytes} from 'Util/util';
 import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
-import {renderMessage} from 'Util/messageRenderer';
-import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
+import {renderMessage} from 'Util/messageRenderer';
+import {t} from 'Util/LocalizerUtil';
+import {TIME_IN_MILLIS, formatLocale} from 'Util/TimeUtil';
 
-import {ModalsViewModel} from '../ModalsViewModel';
-
-import {StorageKey} from '../../storage/StorageKey';
-
-import {QuoteEntity} from '../../message/QuoteEntity';
-import {MessageHasher} from '../../message/MessageHasher';
+import {Asset} from '../../entity/message/Asset';
+import {AssetRepository} from '../../assets/AssetRepository';
+import {Config} from '../../Config';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {Conversation} from '../../entity/Conversation';
+import {ConversationError} from '../../error/ConversationError';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {ConversationState} from '../../conversation/ConversationState';
+import {EmojiInputViewModel} from './EmojiInputViewModel';
+import {EventRepository} from '../../event/EventRepository';
+import {FileAsset} from '../../entity/message/FileAsset';
+import {MediumImage} from '../../entity/message/MediumImage';
 import {MentionEntity} from '../../message/MentionEntity';
-
+import {MessageHasher} from '../../message/MessageHasher';
+import {MessageRepository} from '../../conversation/MessageRepository';
+import {ModalsViewModel} from '../ModalsViewModel';
+import {QuoteEntity} from '../../message/QuoteEntity';
+import {SearchRepository} from '../../search/SearchRepository';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import {Config} from '../../Config';
-import {ConversationError} from '../../error/ConversationError';
-import {AssetRepository} from 'src/script/assets/AssetRepository';
-import {EventRepository} from 'src/script/event/EventRepository';
-import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import {SearchRepository} from 'src/script/search/SearchRepository';
-import {StorageRepository} from 'src/script/storage';
-import {EmojiInputViewModel} from './EmojiInputViewModel';
-import {User} from 'src/script/entity/User';
-import {Conversation} from 'src/script/entity/Conversation';
-import {Text} from 'src/script/entity/message/Text';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {Asset} from 'src/script/entity/message/Asset';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {MediumImage} from 'src/script/entity/message/MediumImage';
-import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {container} from 'tsyringe';
+import {StorageKey} from '../../storage/StorageKey';
+import {StorageRepository} from '../../storage';
+import {Text} from '../../entity/message/Text';
+import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
-import {ConversationState} from '../../conversation/ConversationState';
 
-type DraftMessage = {
+interface DraftMessage {
   mentions: MentionEntity[];
   reply: ContentMessage;
   replyEntityPromise?: Promise<ContentMessage>;
   text: string;
-};
+}
 
 interface Draft {
   mentions: MentionEntity[];
@@ -353,7 +350,7 @@ export class InputBarViewModel {
     });
   };
 
-  setElements = (nodes: HTMLElement[]): void => {
+  readonly setElements = (nodes: HTMLElement[]): void => {
     this.textarea = nodes.find(node => node.id === 'conversation-input-bar-text') as HTMLTextAreaElement;
     this.shadowInput = nodes.find(node => node.classList?.contains('shadow-input')) as HTMLDivElement;
     this.updateSelectionState();
@@ -449,7 +446,7 @@ export class InputBarViewModel {
     return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
   };
 
-  addMention = (userEntity: User, inputElement: HTMLInputElement): void => {
+  readonly addMention = (userEntity: User, inputElement: HTMLInputElement): void => {
     const mentionEntity = this._createMentionEntity(userEntity);
 
     // keep track of what is before and after the mention being edited
@@ -470,16 +467,16 @@ export class InputBarViewModel {
     this.endMentionFlow();
   };
 
-  endMentionFlow = (): void => {
+  readonly endMentionFlow = (): void => {
     this.editedMention(undefined);
     this.updateSelectionState();
   };
 
-  addedToView = (): void => {
+  readonly addedToView = (): void => {
     amplify.subscribe(WebAppEvents.SHORTCUT.PING, this.clickToPing);
   };
 
-  cancelMessageEditing = (resetDraft = true): void => {
+  readonly cancelMessageEditing = (resetDraft = true): void => {
     this.editMessageEntity(undefined);
     this.replyMessageEntity(undefined);
     if (resetDraft) {
@@ -487,29 +484,29 @@ export class InputBarViewModel {
     }
   };
 
-  cancelMessageReply = (resetDraft = true): void => {
+  readonly cancelMessageReply = (resetDraft = true): void => {
     this.replyMessageEntity(undefined);
     if (resetDraft) {
       this._resetDraftState();
     }
   };
 
-  handleCancelReply = (): void => {
+  readonly handleCancelReply = (): void => {
     if (!this.mentionSuggestions().length) {
       this.cancelMessageReply(false);
     }
     this.textarea.focus();
   };
 
-  clickToCancelPastedFile = (): void => {
+  readonly clickToCancelPastedFile = (): void => {
     this.pastedFile(null);
   };
 
-  clickToShowGiphy = (): void => {
+  readonly clickToShowGiphy = (): void => {
     amplify.publish(WebAppEvents.EXTENSIONS.GIPHY.SHOW, this.input());
   };
 
-  clickToPing = (): void => {
+  readonly clickToPing = (): void => {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
       this.messageRepository.sendKnock(this.conversationEntity()).then(() => {
@@ -518,7 +515,7 @@ export class InputBarViewModel {
     }
   };
 
-  editMessage = (messageEntity: ContentMessage): void => {
+  readonly editMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.is_editable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageReply();
       this.cancelMessageEditing();
@@ -537,7 +534,7 @@ export class InputBarViewModel {
     }
   };
 
-  replyMessage = (messageEntity: ContentMessage): void => {
+  readonly replyMessage = (messageEntity: ContentMessage): void => {
     if (messageEntity?.isReplyable() && messageEntity !== this.replyMessageEntity()) {
       this.cancelMessageReply(false);
       this.cancelMessageEditing(!!this.editMessageEntity());
@@ -546,7 +543,7 @@ export class InputBarViewModel {
     }
   };
 
-  onDropFiles = (droppedFiles: File[]): void => {
+  readonly onDropFiles = (droppedFiles: File[]): void => {
     const images: File[] = [];
     const files: File[] = [];
 
@@ -569,12 +566,12 @@ export class InputBarViewModel {
     this.uploadFiles(files);
   };
 
-  onPasteFiles = (pastedFiles: File[]): void => {
+  readonly onPasteFiles = (pastedFiles: File[]): void => {
     const [pastedFile] = pastedFiles;
     this.pastedFile(pastedFile);
   };
 
-  onWindowClick = (event: Event): void => {
+  readonly onWindowClick = (event: Event): void => {
     if ($(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
       return;
     }
@@ -582,7 +579,7 @@ export class InputBarViewModel {
     this.cancelMessageReply();
   };
 
-  onInputEnter = (data: unknown, event: Event): void | boolean => {
+  readonly onInputEnter = (data: unknown, event: Event): void | boolean => {
     if (this.pastedFile()) {
       return this.sendPastedFile();
     }
@@ -616,7 +613,7 @@ export class InputBarViewModel {
     $(event.target).focus();
   };
 
-  onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): void | boolean => {
+  readonly onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): void | boolean => {
     const inputHandledByEmoji = !this.editedMention() && this.emojiInput.onInputKeyDown(data, keyboardEvent);
 
     if (!inputHandledByEmoji) {
@@ -659,7 +656,7 @@ export class InputBarViewModel {
     }
   };
 
-  getMentionCandidate = (
+  readonly getMentionCandidate = (
     selectionStart: number,
     selectionEnd: number,
     value: string,
@@ -685,14 +682,14 @@ export class InputBarViewModel {
     return undefined;
   };
 
-  handleMentionFlow = (): void => {
+  readonly handleMentionFlow = (): void => {
     const {selectionStart, selectionEnd, value} = this.textarea;
     const mentionCandidate = this.getMentionCandidate(selectionStart, selectionEnd, value);
     this.editedMention(mentionCandidate);
     this.updateSelectionState();
   };
 
-  updateSelectionState = (): void => {
+  readonly updateSelectionState = (): void => {
     if (!this.textarea) {
       return;
     }
@@ -715,7 +712,7 @@ export class InputBarViewModel {
     this.selectionEnd(newEnd);
   };
 
-  updateMentions = (data: unknown, event: Event): void => {
+  readonly updateMentions = (data: unknown, event: Event): void => {
     const textarea = event.target as HTMLTextAreaElement;
     const value = textarea.value;
     const previousValue = this.input();
@@ -729,7 +726,7 @@ export class InputBarViewModel {
     }
   };
 
-  detectMentionEdgeDeletion = (textarea: HTMLTextAreaElement, lengthDifference: number): MentionEntity => {
+  readonly detectMentionEdgeDeletion = (textarea: HTMLTextAreaElement, lengthDifference: number): MentionEntity => {
     const hadSelection = this.selectionStart() !== this.selectionEnd();
     if (hadSelection) {
       return null;
@@ -743,7 +740,7 @@ export class InputBarViewModel {
     return this.findMentionAtPosition(checkPosition, this.currentMentions());
   };
 
-  updateMentionRanges = (
+  readonly updateMentionRanges = (
     mentions: MentionEntity[],
     start: number,
     end: number,
@@ -760,11 +757,11 @@ export class InputBarViewModel {
     return remainingMentions;
   };
 
-  findMentionAtPosition = (position: number, mentions: MentionEntity[]): MentionEntity => {
+  readonly findMentionAtPosition = (position: number, mentions: MentionEntity[]): MentionEntity => {
     return mentions.find(({startIndex, endIndex}) => position > startIndex && position < endIndex);
   };
 
-  onInputKeyUp = (data: unknown, keyboardEvent: KeyboardEvent): void => {
+  readonly onInputKeyUp = (data: unknown, keyboardEvent: KeyboardEvent): void => {
     if (!this.editedMention()) {
       this.emojiInput.onInputKeyUp(data, keyboardEvent);
     }
@@ -773,15 +770,15 @@ export class InputBarViewModel {
     }
   };
 
-  removedFromView = (): void => {
+  readonly removedFromView = (): void => {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PING);
   };
 
-  triggerInputChangeEvent = (newInputHeight = 0, previousInputHeight = 0): void => {
+  readonly triggerInputChangeEvent = (newInputHeight = 0, previousInputHeight = 0): void => {
     amplify.publish(WebAppEvents.INPUT.RESIZE, newInputHeight - previousInputHeight);
   };
 
-  sendGiphy = (gifUrl: string, tag: string): void => {
+  readonly sendGiphy = (gifUrl: string, tag: string): void => {
     const conversationEntity = this.conversationEntity();
     const replyMessageEntity = this.replyMessageEntity();
     this._generateQuote(replyMessageEntity).then(quoteEntity => {
@@ -805,7 +802,7 @@ export class InputBarViewModel {
           });
   };
 
-  sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {
+  readonly sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {
     if (!messageText.length) {
       return;
     }
@@ -822,7 +819,7 @@ export class InputBarViewModel {
     });
   };
 
-  sendMessageEdit = (messageText: string, messageEntity: ContentMessage): void | Promise<any> => {
+  readonly sendMessageEdit = (messageText: string, messageEntity: ContentMessage): void | Promise<any> => {
     const mentionEntities = this.currentMentions.slice(0);
     this.cancelMessageEditing();
 
@@ -840,12 +837,12 @@ export class InputBarViewModel {
     this.cancelMessageReply();
   };
 
-  sendPastedFile = (): void => {
+  readonly sendPastedFile = (): void => {
     this.onDropFiles([this.pastedFile()]);
     this.pastedFile(null);
   };
 
-  uploadImages = (images: File[]): void => {
+  readonly uploadImages = (images: File[]): void => {
     if (!this._isHittingUploadLimit(images)) {
       for (const image of Array.from(images)) {
         const isTooLarge = image.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
@@ -858,7 +855,7 @@ export class InputBarViewModel {
     }
   };
 
-  uploadFiles = (files: File[]): void | boolean => {
+  readonly uploadFiles = (files: File[]): void | boolean => {
     const fileArray = Array.from(files);
     if (!allowsAllFiles()) {
       for (const file of fileArray) {

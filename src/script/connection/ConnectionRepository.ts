@@ -24,7 +24,9 @@ import type {UserConnectionData} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
+
 import {getLogger, Logger} from 'Util/Logger';
+
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import type {User} from '../entity/User';
@@ -58,7 +60,7 @@ export class ConnectionRepository {
     this.connectionMapper = new ConnectionMapper();
     this.connectionEntities = ko.observable({});
 
-    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
   /**
@@ -67,7 +69,7 @@ export class ConnectionRepository {
    * @param eventJson JSON data for event
    * @param source Source of event
    */
-  private onUserEvent(eventJson: UserConnectionEvent, source: EventSource): void {
+  private readonly onUserEvent = (eventJson: UserConnectionEvent, source: EventSource): void => {
     const eventType = eventJson.type;
 
     const isSupportedType = ConnectionRepository.CONFIG.SUPPORTED_EVENTS.includes(eventType);
@@ -80,7 +82,7 @@ export class ConnectionRepository {
         this.onUserConnection(eventJson, source);
       }
     }
-  }
+  };
 
   /**
    * Convert a JSON event into an entity and get the matching conversation.

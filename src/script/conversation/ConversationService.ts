@@ -54,7 +54,7 @@ import {search as fullTextSearch} from '../search/FullTextSearch';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
-import {ConversationRecord} from '../storage/ConversationRecord';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
 
 export class ConversationService {
   private readonly eventService: EventService;

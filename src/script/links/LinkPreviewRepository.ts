@@ -117,7 +117,7 @@ export class LinkPreviewRepository {
    * Update the send link preview preference
    * @param sendPreviewsPreference Updated preference
    */
-  updatedSendPreference = (sendPreviewsPreference: boolean): void => {
+  readonly updatedSendPreference = (sendPreviewsPreference: boolean): void => {
     this.shouldSendPreviews = sendPreviewsPreference;
   };
 

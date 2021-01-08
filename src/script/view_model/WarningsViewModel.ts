@@ -134,7 +134,7 @@ export class WarningsViewModel {
    * Close warning.
    * @note Used to close a warning banner by clicking the close button
    */
-  closeWarning = (): void => {
+  readonly closeWarning = (): void => {
     const warningToClose = this.visibleWarning();
     this.dismissWarning(warningToClose);
 
@@ -166,14 +166,14 @@ export class WarningsViewModel {
     }
   };
 
-  dismissWarning = (type = this.visibleWarning()) => {
+  readonly dismissWarning = (type = this.visibleWarning()) => {
     const dismissedWarnings = this.warnings.remove(type);
     if (dismissedWarnings.length) {
       this.logger.info(`Dismissed warning of type '${type}'`);
     }
   };
 
-  showWarning = (type: string, info: {name: string}) => {
+  readonly showWarning = (type: string, info: {name: string}) => {
     const connectivityTypes = [WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT, WarningsViewModel.TYPE.NO_INTERNET];
     const isConnectivityWarning = connectivityTypes.includes(type);
     const visibleWarningIsLifecycleUpdate = this.visibleWarning() === WarningsViewModel.TYPE.LIFECYCLE_UPDATE;

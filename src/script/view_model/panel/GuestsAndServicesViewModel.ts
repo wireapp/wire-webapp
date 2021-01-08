@@ -96,7 +96,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     }
   };
 
-  revokeAccessCode = (): void => {
+  readonly revokeAccessCode = (): void => {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       preventClose: true,
       primaryAction: {

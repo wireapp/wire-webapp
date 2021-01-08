@@ -21,7 +21,10 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
+import 'Components/receiptModeToggle';
+import 'Components/panel/panelActions';
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -40,11 +43,7 @@ import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {User} from '../../entity/User';
 import type {Conversation} from '../../entity/Conversation';
-
-import 'Components/receiptModeToggle';
-import 'Components/panel/panelActions';
 import {PanelViewModel} from '../PanelViewModel';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 
@@ -101,9 +100,6 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
   constructor(params: PanelViewModelProps) {
     super(params);
-    this.clickOnShowService = this.clickOnShowService.bind(this);
-    this.clickOnShowUser = this.clickOnShowUser.bind(this);
-
     const {mainViewModel, repositories} = params;
 
     this.userState = container.resolve(UserState);
@@ -280,7 +276,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
   }
 
-  isSingleUserMode = (conversationEntity: Conversation): boolean =>
+  readonly isSingleUserMode = (conversationEntity: Conversation): boolean =>
     conversationEntity && (conversationEntity.is1to1() || conversationEntity.isRequest());
 
   getConversationActions(
@@ -402,13 +398,13 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.navigateTo(PanelViewModel.STATE.NOTIFICATIONS);
   }
 
-  clickOnShowUser(userEntity: User): void {
+  readonly clickOnShowUser = (userEntity: User): void => {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
-  }
+  };
 
-  clickOnShowService(serviceEntity: ServiceEntity): void {
+  readonly clickOnShowService = (serviceEntity: ServiceEntity): void => {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE, {entity: serviceEntity});
-  }
+  };
 
   clickToArchive(): void {
     this.actionsViewModel.archiveConversation(this.activeConversation());
@@ -470,7 +466,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: RECEIPT_MODE): void => {
+  readonly updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: RECEIPT_MODE): void => {
     this.conversationRepository.updateConversationReceiptMode(conversationEntity, {receipt_mode: receiptMode});
   };
 

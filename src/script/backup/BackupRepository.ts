@@ -18,6 +18,7 @@
  */
 
 import type Dexie from 'dexie';
+import {container} from 'tsyringe';
 
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -37,10 +38,9 @@ import {
   IncompatiblePlatformError,
   InvalidMetaDataError,
 } from './Error';
-import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
-import {ConversationRecord} from '../storage/ConversationRecord';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
 
 export interface Metadata {
   client_id: string;

@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+
 import type {User} from '../entity/User';
 
 interface TopPeopleParams {
@@ -44,7 +45,7 @@ class TopPeople {
     this.displayedUsers = ko.pureComputed(() => this.userEntities().slice(0, this.maxUsers));
   }
 
-  onUserClick = (userEntity: User, event: Event): void => {
+  readonly onUserClick = (userEntity: User, event: Event): void => {
     if (typeof this.click === 'function') {
       return this.click(userEntity, event);
     }

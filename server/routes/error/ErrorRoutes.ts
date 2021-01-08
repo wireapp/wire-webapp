@@ -37,12 +37,14 @@ const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res) =>
     message: 'Internal server error',
     stack: err.stack,
   };
-  const request = {
-    date: req.headers.date,
+  const request: any = {
     host: req.hostname,
     ip: req.ip,
     url: req.url,
   };
+  if (req.headers?.date) {
+    request.date = req.headers.date;
+  }
   req.app.locals.error = error;
   req.app.locals.request = request;
   return res.status(error.code).render('error');

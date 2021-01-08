@@ -17,14 +17,16 @@
  *
  */
 
-import ko from 'knockout';
-import {container, singleton} from 'tsyringe';
-import {sortGroupsByLastEvent} from 'Util/util';
-import {Conversation} from '../entity/Conversation';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
+import {container, singleton} from 'tsyringe';
+import ko from 'knockout';
+
+import {sortGroupsByLastEvent} from 'Util/util';
+
+import {Conversation} from '../entity/Conversation';
+import {TeamState} from '../team/TeamState';
 import {User} from '../entity/User';
 import {UserState} from '../user/UserState';
-import {TeamState} from '../team/TeamState';
 
 @singleton()
 export class ConversationState {

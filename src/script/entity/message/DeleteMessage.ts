@@ -33,7 +33,7 @@ export class DeleteMessage extends Message {
     this.deleted_timestamp = null;
   }
 
-  display_deleted_timestamp = () => {
+  readonly display_deleted_timestamp = () => {
     return t('conversationDeleteTimestamp', formatTimeShort(this.deleted_timestamp));
   };
 }

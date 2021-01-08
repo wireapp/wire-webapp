@@ -25,46 +25,43 @@ import {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import {ChangeEvent} from 'react';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
-import {t} from 'Util/LocalizerUtil';
-import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
-import {isKey, KEY} from 'Util/KeyboardUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-
-import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
-import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-
-import {modals, ModalsViewModel} from '../ModalsViewModel';
-import {User} from '../../entity/User';
-
-import {Config} from '../../Config';
-import {ConsentValue} from '../../user/ConsentValue';
-import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
-import {UserRepository} from '../../user/UserRepository';
-import {nameFromType} from '../../user/AvailabilityMapper';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
-import {MotionDuration} from '../../motion/MotionDuration';
-import {ContentViewModel} from '../ContentViewModel';
+import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
+import {container} from 'tsyringe';
 import {Logger, Runtime} from '@wireapp/commons';
-import {getLogger} from 'Util/Logger';
 
 import 'Components/availabilityState';
-import {isAppLockEnabled} from './AppLockViewModel';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {getLogger} from 'Util/Logger';
+import {isKey, KEY} from 'Util/KeyboardUtil';
+import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import {loadValue} from 'Util/StorageUtil';
-import {StorageKey} from '../../storage';
-import {UserError} from '../../error/UserError';
-import {HistoryExportViewModel} from './HistoryExportViewModel';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {t} from 'Util/LocalizerUtil';
+
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {ClientRepository} from '../../client/ClientRepository';
+import {Config} from '../../Config';
+import {ConsentValue} from '../../user/ConsentValue';
+import {ContentViewModel} from '../ContentViewModel';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
+import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
+import {HistoryExportViewModel} from './HistoryExportViewModel';
+import {isAppLockEnabled} from './AppLockViewModel';
+import {modals, ModalsViewModel} from '../ModalsViewModel';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {nameFromType} from '../../user/AvailabilityMapper';
+import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {StorageKey} from '../../storage';
 import {TeamEntity} from '../../team/TeamEntity';
-import type {ClientEntity} from 'src/script/client/ClientEntity';
-import {UserState} from '../../user/UserState';
-import {container} from 'tsyringe';
 import {TeamState} from '../../team/TeamState';
+import {User} from '../../entity/User';
+import {UserError} from '../../error/UserError';
+import {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
+import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
+import type {ClientEntity} from '../../client/ClientEntity';
 
 export class PreferencesAccountViewModel {
   logger: Logger;
@@ -199,7 +196,7 @@ export class PreferencesAccountViewModel {
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
   };
 
-  changeAccentColor = (id: AccentColorID) => {
+  readonly changeAccentColor = (id: AccentColorID) => {
     this.userRepository.changeAccentColor(id);
   };
 
@@ -298,7 +295,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  checkUsernameInput = (_username: string, keyboardEvent: KeyboardEvent) => {
+  readonly checkUsernameInput = (_username: string, keyboardEvent: KeyboardEvent) => {
     if (isKey(keyboardEvent, KEY.BACKSPACE)) {
       return true;
     }
@@ -308,7 +305,7 @@ export class PreferencesAccountViewModel {
     return validateCharacter(inputChar.toLowerCase());
   };
 
-  popNotification = () => {
+  readonly popNotification = () => {
     this.preferenceNotificationRepository
       .getNotifications()
       .forEach(({type, notification}) => this._showNotification(type, notification));
@@ -347,7 +344,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  clickOnChangePicture = (files: File[]) => {
+  readonly clickOnChangePicture = (files: File[]) => {
     const [newUserPicture] = Array.from(files);
 
     this.setPicture(newUserPicture).catch(error => {
@@ -358,16 +355,16 @@ export class PreferencesAccountViewModel {
     });
   };
 
-  clickOnAvailability = (viewModel: unknown, event: MouseEvent) => {
+  readonly clickOnAvailability = (viewModel: unknown, event: MouseEvent) => {
     AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
   };
 
-  clickOnBackupExport = (): void => {
+  readonly clickOnBackupExport = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_EXPORT);
     amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
   };
 
-  onImportFileChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): void => {
+  readonly onImportFileChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files[0];
     if (file) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
@@ -375,7 +372,7 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  clickOnDeleteAccount = (): void => {
+  readonly clickOnDeleteAccount = (): void => {
     modals.showModal(
       ModalsViewModel.TYPE.CONFIRM,
       {
@@ -392,7 +389,7 @@ export class PreferencesAccountViewModel {
     );
   };
 
-  clickOnLeaveGuestRoom = (): void => {
+  readonly clickOnLeaveGuestRoom = (): void => {
     modals.showModal(
       ModalsViewModel.TYPE.CONFIRM,
       {
@@ -417,39 +414,39 @@ export class PreferencesAccountViewModel {
     );
   };
 
-  clickOnLogout = (): void => {
+  readonly clickOnLogout = (): void => {
     this.clientRepository.logoutClient();
   };
 
-  clickOpenManageTeam = (): void => {
+  readonly clickOpenManageTeam = (): void => {
     if (this.manageTeamUrl) {
       safeWindowOpen(this.manageTeamUrl);
     }
   };
 
-  clickOnResetPassword = (): void => {
+  readonly clickOnResetPassword = (): void => {
     safeWindowOpen(getAccountPagesUrl(URL_PATH.PASSWORD_RESET));
   };
 
-  clickOnResetAppLockPassphrase = (): void => {
+  readonly clickOnResetAppLockPassphrase = (): void => {
     amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
   };
 
-  removedFromView = (): void => {
+  readonly removedFromView = (): void => {
     this._resetUsernameInput();
   };
 
-  resetNameInput = (): void => {
+  readonly resetNameInput = (): void => {
     if (!this.nameSaved()) {
       this.name.notifySubscribers();
     }
   };
 
-  resetEmailInput = (): void => {
+  readonly resetEmailInput = (): void => {
     this.email.notifySubscribers();
   };
 
-  resetUsernameInput = (): void => {
+  readonly resetUsernameInput = (): void => {
     if (!this.usernameSaved()) {
       this._resetUsernameInput();
       this.username.notifySubscribers();
@@ -492,9 +489,9 @@ export class PreferencesAccountViewModel {
     }
   };
 
-  shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
+  readonly shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
-  verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
+  readonly verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
     const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
 
     const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
@@ -537,21 +534,21 @@ export class PreferencesAccountViewModel {
     this.submittedUsername(null);
   };
 
-  onReadReceiptsChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
+  readonly onReadReceiptsChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
     const mode = isChecked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key, mode);
     return true;
   };
 
-  onMarketingConsentChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
+  readonly onMarketingConsentChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
     const mode = isChecked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key, mode);
     return true;
   };
 
-  updateProperties = ({settings}: WebappProperties): void => {
+  readonly updateProperties = ({settings}: WebappProperties): void => {
     this.optionPrivacy(settings.privacy.improve_wire);
     this.optionTelemetrySharing(settings.privacy.telemetry_sharing);
   };

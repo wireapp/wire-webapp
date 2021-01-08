@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {partition} from 'Util/ArrayUtil';
 import {sortByPriority} from 'Util/StringUtil';
@@ -32,7 +33,6 @@ import {validateHandle} from '../user/UserHandleGenerator';
 
 import 'Components/list/participantItem';
 import {UserState} from '../user/UserState';
-import {container} from 'tsyringe';
 import {ConversationState} from '../conversation/ConversationState';
 
 export enum UserlistMode {

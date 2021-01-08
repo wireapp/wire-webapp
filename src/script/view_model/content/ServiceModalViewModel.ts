@@ -38,21 +38,21 @@ export class ServiceModalViewModel {
     this.avatarSize = AVATAR_SIZE.LARGE;
   }
 
-  showService = (service: ServiceEntity) => {
+  readonly showService = (service: ServiceEntity) => {
     this.integrationRepository.addProviderNameToParticipant(service);
     this.service(service);
     this.isVisible(true);
   };
 
-  onClosed = () => {
+  readonly onClosed = () => {
     this.service(null);
   };
 
-  hide = () => {
+  readonly hide = () => {
     this.isVisible(false);
   };
 
-  openService = () => {
+  readonly openService = () => {
     this.isVisible(false);
     this.actionsViewModel.open1to1ConversationWithService(this.service());
   };

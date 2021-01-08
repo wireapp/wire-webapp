@@ -33,8 +33,6 @@ export class Modal {
   }
 
   constructor(modal: string | HTMLElement, hideCallback?: () => void, beforeHideCallback?: () => void) {
-    this.handleClick = this.handleClick.bind(this);
-
     this.modal = typeof modal === 'string' ? document.querySelector(modal) : modal;
     this.hideCallback = hideCallback;
     this.beforeHideCallback = beforeHideCallback;
@@ -48,7 +46,7 @@ export class Modal {
     }
   }
 
-  handleClick = (event: MouseEvent): void => {
+  readonly handleClick = (event: MouseEvent): void => {
     if (event.target === this.modal) {
       this._hide();
     }

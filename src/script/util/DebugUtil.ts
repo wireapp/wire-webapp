@@ -18,15 +18,18 @@
  */
 
 import type {BackendEvent, ConversationEvent, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
+import type {Notification} from '@wireapp/api-client/src/notification/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {util as ProteusUtil} from '@wireapp/proteus';
-import {getLogger, Logger} from 'Util/Logger';
 import Dexie from 'dexie';
+import {container} from 'tsyringe';
+
+import {getLogger, Logger} from 'Util/Logger';
+
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {downloadFile} from './util';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
-import type {Notification} from '@wireapp/api-client/src/notification/';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {CallingRepository} from '../calling/CallingRepository';
 import {ClientRepository} from '../client/ClientRepository';
@@ -39,7 +42,6 @@ import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
 import {UserId} from '../calling/Participant';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {container} from 'tsyringe';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
@@ -142,17 +144,14 @@ export class DebugUtil {
     };
   }
 
-  getLastMessagesFromDatabase(
+  async getLastMessagesFromDatabase(
     amount = 10,
     conversationId = this.conversationState.activeConversation().id,
-  ): EventRecord[] {
+  ): Promise<EventRecord[]> {
     if (this.storageRepository.storageService.db) {
-      return this.storageRepository.storageService.db[StorageSchemata.OBJECT_STORE.EVENTS].toArray(
-        (records: EventRecord[]) => {
-          const messages = records.filter((event: EventRecord) => event.conversation === conversationId);
-          return messages.slice(amount * -1).reverse();
-        },
-      );
+      const records = await this.storageRepository.storageService.db.events.toArray();
+      const messages = records.filter(event => event.conversation === conversationId);
+      return messages.slice(-amount).reverse();
     }
     return [];
   }

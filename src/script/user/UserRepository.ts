@@ -17,50 +17,52 @@
  *
  */
 
-import type {AccentColor} from '@wireapp/commons';
-import type {PublicClient} from '@wireapp/api-client/src/client';
-import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
+import {amplify} from 'amplify';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self';
+import {container} from 'tsyringe';
+import {flatten} from 'underscore';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {USER_EVENT} from '@wireapp/api-client/src/event';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/src/user';
-import {amplify} from 'amplify';
-import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import type {AccentColor} from '@wireapp/commons';
 import type {AxiosError} from 'axios';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
+import type {PublicClient} from '@wireapp/api-client/src/client';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {UNSPLASH_URL} from '../externalRoute';
-import {mapProfileAssetsV1} from '../assets/AssetMapper';
-import {User} from '../entity/User';
-import {ClientEvent} from '../event/Client';
-import {EventRepository} from '../event/EventRepository';
-import type {EventSource} from '../event/EventSource';
-import {SIGN_OUT_REASON} from '../auth/SignOutReason';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import {protoFromType, valueFromType} from './AvailabilityMapper';
-import {showAvailabilityModal} from './AvailabilityModal';
-import {ConsentValue} from './ConsentValue';
-import {createSuggestions} from './UserHandleGenerator';
-import {UserMapper} from './UserMapper';
-import type {UserService} from './UserService';
+
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
+import {ClientEvent} from '../event/Client';
 import {ClientMapper} from '../client/ClientMapper';
-import type {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
+import {ConsentValue} from './ConsentValue';
+import {createSuggestions} from './UserHandleGenerator';
+import {EventRepository} from '../event/EventRepository';
+import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
+import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {mapProfileAssetsV1} from '../assets/AssetMapper';
+import {protoFromType, valueFromType} from './AvailabilityMapper';
+import {showAvailabilityModal} from './AvailabilityModal';
+import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {UNSPLASH_URL} from '../externalRoute';
+import {User} from '../entity/User';
+import {UserError} from '../error/UserError';
+import {UserMapper} from './UserMapper';
+import {UserState} from './UserState';
+import type {ClientRepository} from '../client/ClientRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
+import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import {UserError} from '../error/UserError';
-import {UserState} from './UserState';
-import {container} from 'tsyringe';
+import type {UserService} from './UserService';
 
 export class UserRepository {
   private readonly assetRepository: AssetRepository;
@@ -108,19 +110,19 @@ export class UserRepository {
 
     this.getTeamMembersFromUsers = async (_: User[]) => undefined;
 
-    amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser.bind(this));
-    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser.bind(this));
-    amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser.bind(this));
-    amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability.bind(this));
-    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
-    amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb.bind(this));
-    amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUserById.bind(this));
+    amplify.subscribe(WebAppEvents.CLIENT.ADD, this.addClientToUser);
+    amplify.subscribe(WebAppEvents.CLIENT.REMOVE, this.removeClientFromUser);
+    amplify.subscribe(WebAppEvents.CLIENT.UPDATE, this.updateClientsFromUser);
+    amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.setAvailability);
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
+    amplify.subscribe(WebAppEvents.USER.PERSIST, this.saveUserInDb);
+    amplify.subscribe(WebAppEvents.USER.UPDATE, this.updateUserById);
   }
 
   /**
    * Listener for incoming user events.
    */
-  private onUserEvent(eventJson: any, source: EventSource): void {
+  private readonly onUserEvent = (eventJson: any, source: EventSource): void => {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
@@ -157,7 +159,7 @@ export class UserRepository {
           break;
       }
     }
-  }
+  };
 
   async loadUsers(): Promise<void> {
     if (this.userState.isTeam()) {
@@ -190,9 +192,9 @@ export class UserRepository {
   /**
    * Persists a conversation state in the database.
    */
-  private saveUserInDb(userEntity: User): Promise<User> {
+  private readonly saveUserInDb = (userEntity: User): Promise<User> => {
     return this.userService.saveUserInDb(userEntity);
-  }
+  };
 
   /**
    * Event to delete the matching user.
@@ -272,7 +274,7 @@ export class UserRepository {
    *
    * @returns Resolves with `true` when a client has been added
    */
-  async addClientToUser(userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> {
+  addClientToUser = async (userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> => {
     const userEntity = await this.getUserById(userId);
     const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.isMe);
     const wasClientAdded = userEntity.addClient(clientEntity);
@@ -289,29 +291,29 @@ export class UserRepository {
       }
     }
     return wasClientAdded;
-  }
+  };
 
   /**
    * Removes a stored client and the session connected with it.
    */
-  async removeClientFromUser(userId: string, clientId: string): Promise<void> {
+  removeClientFromUser = async (userId: string, clientId: string): Promise<void> => {
     await this.clientRepository.removeClient(userId, clientId);
     const userEntity = await this.getUserById(userId);
     userEntity.remove_client(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
-  }
+  };
 
   /**
    * Update clients for given user.
    */
-  private updateClientsFromUser(userId: string, clientEntities: ClientEntity[]): void {
+  private readonly updateClientsFromUser = (userId: string, clientEntities: ClientEntity[]): void => {
     this.getUserById(userId).then(userEntity => {
       userEntity.devices(clientEntities);
       amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId, clientEntities);
     });
-  }
+  };
 
-  private setAvailability(availability: Availability.Type, method: string): void {
+  private readonly setAvailability = (availability: Availability.Type, method: string): void => {
     const hasAvailabilityChanged = availability !== this.userState.self().availability();
     const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {
@@ -340,7 +342,7 @@ export class UserRepository {
     );
 
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
-  }
+  };
 
   private onLegalHoldRequestCanceled(eventJson: any): void {
     if (this.userState.self().id === eventJson.id) {
@@ -588,7 +590,7 @@ export class UserRepository {
   /**
    * Update a local user from the backend by ID.
    */
-  async updateUserById(userId: string): Promise<void> {
+  updateUserById = async (userId: string): Promise<void> => {
     const localUserEntity = this.findUserById(userId) || new User();
     const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
@@ -598,7 +600,7 @@ export class UserRepository {
     if (updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
       amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.id);
     }
-  }
+  };
 
   /**
    * Add user entities for suspended users.

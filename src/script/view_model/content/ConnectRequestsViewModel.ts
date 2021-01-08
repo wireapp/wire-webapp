@@ -18,13 +18,15 @@
  */
 
 import ko from 'knockout';
+import {container} from 'tsyringe';
+
 import {scrollToBottom} from 'Util/scroll-helpers';
 import {isLastItem} from 'Util/ArrayUtil';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+
 import {MainViewModel} from '../MainViewModel';
 import {ActionsViewModel} from '../ActionsViewModel';
 import {User} from '../../entity/User';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class ConnectRequestsViewModel {
@@ -44,7 +46,7 @@ export class ConnectRequestsViewModel {
     this.shouldUpdateScrollbar = ko.computed(() => this.connectRequests()).extend({notify: 'always', rateLimit: 500});
   }
 
-  afterRender = (elements: Object, request: User): void => {
+  readonly afterRender = (elements: Object, request: User): void => {
     if (isLastItem(this.connectRequests(), request)) {
       window.requestAnimationFrame(() => scrollToBottom(document.querySelector('.connect-requests')));
     }
@@ -61,7 +63,7 @@ export class ConnectRequestsViewModel {
     }
   };
 
-  clickOnIgnore = (userEntity: User): void => {
+  readonly clickOnIgnore = (userEntity: User): void => {
     this.actionsViewModel.ignoreConnectionRequest(userEntity);
   };
 }

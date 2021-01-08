@@ -58,18 +58,18 @@ class DeviceRemove {
     }
   };
 
-  click_on_cancel = () => {
+  readonly click_on_cancel = () => {
     this.remove_form_visible(false);
     if (typeof this.params.cancel === 'function') {
       this.params.cancel();
     }
   };
 
-  click_on_remove_device = () => {
+  readonly click_on_remove_device = () => {
     this.remove_form_visible(true);
   };
 
-  dispose = () => {
+  readonly dispose = () => {
     this.passwordSubscription.dispose();
   };
 }

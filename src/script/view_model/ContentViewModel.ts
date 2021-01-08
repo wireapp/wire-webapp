@@ -24,6 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import {alias} from 'Util/util';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {Config} from '../Config';
 import {MessageListViewModel} from './content/MessageListViewModel';
@@ -56,7 +57,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {UserRepository} from '../user/UserRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
@@ -262,7 +262,7 @@ export class ContentViewModel {
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
    */
-  showConversation = (conversation: Conversation | string, options: ShowConversationOptions = {}) => {
+  readonly showConversation = (conversation: Conversation | string, options: ShowConversationOptions = {}) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
@@ -352,7 +352,7 @@ export class ContentViewModel {
       });
   };
 
-  switchContent = (newContentState: string): void => {
+  readonly switchContent = (newContentState: string): void => {
     const isStateChange = newContentState !== this.state();
     if (isStateChange) {
       this.releaseContent(newContentState);
@@ -360,7 +360,7 @@ export class ContentViewModel {
     }
   };
 
-  switchPreviousContent = (): void => {
+  readonly switchPreviousContent = (): void => {
     const isStateChange = this.previousState !== this.state();
     if (isStateChange) {
       const isStateRequests = this.previousState === ContentViewModel.STATE.CONNECTION_REQUESTS;

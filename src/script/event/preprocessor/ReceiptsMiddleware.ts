@@ -18,6 +18,7 @@
  */
 
 import {Confirmation} from '@wireapp/protocol-messaging';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -25,8 +26,7 @@ import {StatusType} from '../../message/StatusType';
 import {ClientEvent} from '../Client';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {EventService} from '../EventService';
-import type {EventRecord} from '../../storage/EventRecord';
-import {container} from 'tsyringe';
+import type {EventRecord} from '../../storage/record/EventRecord';
 import {UserState} from '../../user/UserState';
 
 export class ReceiptsMiddleware {
