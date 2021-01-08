@@ -20,6 +20,7 @@
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
 
 export type ConversationId = string;
@@ -46,6 +47,7 @@ export class Call {
   public readonly initialType: CALL_TYPE;
   public readonly isCbrEnabled: ko.Observable<boolean>;
   public blockMessages: boolean = false;
+  public type?: CALL_MESSAGE_TYPE;
   /**
    * set to `true` if anyone has enabled their video during a call (used for analytics)
    */

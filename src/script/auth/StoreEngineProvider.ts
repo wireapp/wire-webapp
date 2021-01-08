@@ -20,7 +20,7 @@
 import type {CRUDEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 import {SQLeetEngine} from '@wireapp/store-engine-sqleet';
-import Dexie from 'dexie';
+import Dexie, {Transaction} from 'dexie';
 
 import {saveRandomEncryptionKey} from 'Util/ephemeralValueStore';
 
@@ -35,7 +35,7 @@ export const providePermanentEngine = async (storeName: string): Promise<CRUDEng
       return db
         .version(version)
         .stores(schema)
-        .upgrade((transaction: Dexie.Transaction) => upgrade(transaction, db));
+        .upgrade((transaction: Transaction) => upgrade(transaction, db));
     }
     return db.version(version).stores(schema);
   });

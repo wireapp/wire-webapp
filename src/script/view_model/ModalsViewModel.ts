@@ -59,7 +59,7 @@ interface Text {
   title?: string;
 }
 
-interface ModalOptions {
+export interface ModalOptions {
   close?: Function;
   closeOnConfirm?: boolean;
   /** Content needed for visualization on modal */
@@ -96,17 +96,17 @@ const States = {
   READY: 'ModalState.READY',
 };
 
-const Types = {
-  ACCOUNT_NEW_DEVICES: 'modal-account-new-devices',
-  ACCOUNT_READ_RECEIPTS_CHANGED: 'modal-account-read-receipts-changed',
-  ACKNOWLEDGE: 'modal-template-acknowledge',
-  CONFIRM: 'modal-template-confirm',
-  INPUT: 'modal-template-input',
-  MULTI_ACTIONS: 'modal-multi-actions',
-  OPTION: 'modal-template-option',
-  PASSWORD: 'modal-template-password',
-  SESSION_RESET: 'modal-session-reset',
-};
+enum ModalType {
+  ACCOUNT_NEW_DEVICES = 'modal-account-new-devices',
+  ACCOUNT_READ_RECEIPTS_CHANGED = 'modal-account-read-receipts-changed',
+  ACKNOWLEDGE = 'modal-template-acknowledge',
+  CONFIRM = 'modal-template-confirm',
+  INPUT = 'modal-template-input',
+  MULTI_ACTIONS = 'modal-multi-actions',
+  OPTION = 'modal-template-option',
+  PASSWORD = 'modal-template-password',
+  SESSION_RESET = 'modal-session-reset',
+}
 
 export class ModalsViewModel {
   logger: Logger;
@@ -118,12 +118,12 @@ export class ModalsViewModel {
   content: ko.Observable<Content>;
   state: ko.Observable<string>;
   currentId: ko.Observable<string>;
-  queue: {id: string; options: ModalOptions; type: string}[];
+  queue: {id: string; options: ModalOptions; type: ModalType}[];
   errorMessage: ko.Observable<string>;
   actionEnabled: ko.PureComputed<boolean>;
 
-  static get TYPE() {
-    return Types;
+  static get TYPE(): typeof ModalType {
+    return ModalType;
   }
 
   constructor() {
@@ -144,9 +144,9 @@ export class ModalsViewModel {
     amplify.subscribe(WebAppEvents.WARNING.MODAL, this.showModal);
   }
 
-  isModalVisible = () => this.state() === States.OPEN;
+  readonly isModalVisible = () => this.state() === States.OPEN;
 
-  showModal = (type: string, options: ModalOptions, modalId: string) => {
+  readonly showModal = (type: ModalType, options: ModalOptions, modalId: string) => {
     const alreadyOpen = modalId && modalId === this.currentId();
     if (alreadyOpen) {
       return this.unqueue();
@@ -162,13 +162,13 @@ export class ModalsViewModel {
     this.unqueue();
   };
 
-  ready = () => {
+  readonly ready = () => {
     ko.applyBindings(this, document.getElementById(this.elementId));
     this.state(States.READY);
     this.unqueue();
   };
 
-  unqueue = () => {
+  readonly unqueue = () => {
     if (this.state() === States.READY && this.queue.length) {
       const {type, options, id} = this.queue.shift();
       this._showModal(type, options, id);
@@ -181,8 +181,8 @@ export class ModalsViewModel {
    * @param type Indicates which modal to show
    * @param id The optional ID of another modal to prevent multiple instances
    */
-  private readonly _showModal = (type: string, options: ModalOptions = {} as ModalOptions, id?: string): void => {
-    if (!Object.values(Types).includes(type)) {
+  private readonly _showModal = (type: ModalType, options: ModalOptions = {}, id?: string): void => {
+    if (!Object.values(ModalType).includes(type)) {
       return this.logger.warn(`Modal of type '${type}' is not supported`);
     }
 
@@ -214,7 +214,7 @@ export class ModalsViewModel {
     };
 
     switch (type) {
-      case Types.ACCOUNT_NEW_DEVICES: {
+      case ModalType.ACCOUNT_NEW_DEVICES: {
         content.titleText = t('modalAccountNewDevicesHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
@@ -229,7 +229,7 @@ export class ModalsViewModel {
         content.messageHtml = `<div class="modal__content__device-list">${deviceList}</div>`;
         break;
       }
-      case Types.ACCOUNT_READ_RECEIPTS_CHANGED: {
+      case ModalType.ACCOUNT_READ_RECEIPTS_CHANGED: {
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         content.titleText = data
           ? t('modalAccountReadReceiptsChangedOnHeadline')
@@ -237,25 +237,25 @@ export class ModalsViewModel {
         content.messageText = t('modalAccountReadReceiptsChangedMessage');
         break;
       }
-      case Types.ACKNOWLEDGE: {
+      case ModalType.ACKNOWLEDGE: {
         content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
         content.titleText = text.title || t('modalAcknowledgeHeadline');
         content.messageText = !text.htmlMessage && text.message;
         break;
       }
-      case Types.CONFIRM: {
+      case ModalType.CONFIRM: {
         content.secondaryAction = {text: t('modalConfirmSecondary'), ...content.secondaryAction};
         break;
       }
-      case Types.INPUT:
-      case Types.PASSWORD:
-      case Types.OPTION: {
+      case ModalType.INPUT:
+      case ModalType.PASSWORD:
+      case ModalType.OPTION: {
         if (!hideSecondary) {
           content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
         }
         break;
       }
-      case Types.SESSION_RESET: {
+      case ModalType.SESSION_RESET: {
         content.titleText = t('modalSessionResetHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         content.messageHtml = t(
@@ -265,12 +265,12 @@ export class ModalsViewModel {
             '/link': '</a>',
             link: `<a href="${
               Config.getConfig().URL.SUPPORT.BUG_REPORT
-            }"rel="nofollow noopener noreferrer" target="_blank">`,
+            }" rel="nofollow noopener noreferrer" target="_blank">`,
           },
         );
         break;
       }
-      case Types.MULTI_ACTIONS: {
+      case ModalType.MULTI_ACTIONS: {
         // no additional actions needed for now
       }
     }
@@ -292,7 +292,7 @@ export class ModalsViewModel {
     afterRender(() => this.inputFocus(true));
   };
 
-  handleEnterKey = (event: KeyboardEvent) => {
+  readonly handleEnterKey = (event: KeyboardEvent) => {
     if ((event.target as HTMLElement).tagName === 'BUTTON') {
       if (isSpaceKey(event) || isEnterKey(event)) {
         (event.target as HTMLElement).click();
@@ -304,28 +304,28 @@ export class ModalsViewModel {
     }
   };
 
-  hasPassword = () => this.content().currentType === Types.PASSWORD;
-  hasInput = () => this.content().currentType === Types.INPUT;
-  hasOption = () => this.content().currentType === Types.OPTION;
-  hasMultipleSecondary = () => this.content().currentType === Types.MULTI_ACTIONS;
+  readonly hasPassword = () => this.content().currentType === ModalType.PASSWORD;
+  readonly hasInput = () => this.content().currentType === ModalType.INPUT;
+  readonly hasOption = () => this.content().currentType === ModalType.OPTION;
+  readonly hasMultipleSecondary = () => this.content().currentType === ModalType.MULTI_ACTIONS;
 
-  confirm = () => {
+  readonly confirm = () => {
     const action = this.content().primaryAction.action;
     if (typeof action === 'function') {
-      if (this.content().currentType === Types.OPTION) {
+      if (this.content().currentType === ModalType.OPTION) {
         return action(this.optionChecked());
       }
-      if (this.content().currentType === Types.INPUT) {
+      if (this.content().currentType === ModalType.INPUT) {
         return action(this.inputValue());
       }
-      if (this.content().currentType === Types.PASSWORD) {
+      if (this.content().currentType === ModalType.PASSWORD) {
         return action(this.passwordValue());
       }
       action();
     }
   };
 
-  doAction = (action: Function, closeAfter: boolean, skipValidation = false) => {
+  readonly doAction = (action: Function, closeAfter: boolean, skipValidation = false) => {
     if (!skipValidation && !this.actionEnabled()) {
       return;
     }
@@ -337,7 +337,7 @@ export class ModalsViewModel {
     }
   };
 
-  hide = () => {
+  readonly hide = () => {
     offEscKey(this.hide);
     window.removeEventListener('keydown', this.handleEnterKey);
     this.inputFocus(false);
@@ -346,7 +346,7 @@ export class ModalsViewModel {
     this.currentId(null);
   };
 
-  onModalHidden = () => {
+  readonly onModalHidden = () => {
     this.content(defaultContent);
     this.inputValue('');
     this.passwordValue('');

@@ -20,6 +20,7 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {t} from 'Util/LocalizerUtil';
+import {container} from 'tsyringe';
 
 import {ModalsViewModel} from './ModalsViewModel';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
@@ -35,7 +36,6 @@ import type {ClientEntity} from '../client/ClientEntity';
 import type {Message} from '../entity/message/Message';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {container} from 'tsyringe';
 import {UserState} from '../user/UserState';
 
 export class ActionsViewModel {
@@ -53,11 +53,11 @@ export class ActionsViewModel {
     this.modalsViewModel = mainViewModel.modals;
   }
 
-  acceptConnectionRequest = (userEntity: User): Promise<void> => {
+  readonly acceptConnectionRequest = (userEntity: User): Promise<void> => {
     return this.connectionRepository.acceptRequest(userEntity);
   };
 
-  archiveConversation = (conversationEntity: Conversation): Promise<void> => {
+  readonly archiveConversation = (conversationEntity: Conversation): Promise<void> => {
     if (!conversationEntity) {
       return Promise.reject();
     }
@@ -71,7 +71,11 @@ export class ActionsViewModel {
    * @param nextConversationEntity Conversation to be switched to
    * @returns Resolves when the user was blocked
    */
-  blockUser = (userEntity: User, hideConversation?: boolean, nextConversationEntity?: Conversation): Promise<void> => {
+  readonly blockUser = (
+    userEntity: User,
+    hideConversation?: boolean,
+    nextConversationEntity?: Conversation,
+  ): Promise<void> => {
     // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
     return new Promise(resolve => {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -98,7 +102,7 @@ export class ActionsViewModel {
    * @param nextConversationEntity Conversation to be switched to
    * @returns Resolves when the connection request was canceled
    */
-  cancelConnectionRequest = (
+  readonly cancelConnectionRequest = (
     userEntity: User,
     hideConversation?: boolean,
     nextConversationEntity?: Conversation,
@@ -127,7 +131,7 @@ export class ActionsViewModel {
     });
   };
 
-  clearConversation = (conversationEntity: Conversation): void => {
+  readonly clearConversation = (conversationEntity: Conversation): void => {
     if (conversationEntity) {
       const modalType = conversationEntity.isLeavable() ? ModalsViewModel.TYPE.OPTION : ModalsViewModel.TYPE.CONFIRM;
 
@@ -147,7 +151,7 @@ export class ActionsViewModel {
     }
   };
 
-  deleteClient = (clientEntity: ClientEntity) => {
+  readonly deleteClient = (clientEntity: ClientEntity) => {
     const isSSO = this.userState.self().isSingleSignOn;
     const isTemporary = clientEntity.isTemporary();
     if (isSSO || isTemporary) {
@@ -155,7 +159,7 @@ export class ActionsViewModel {
       return this.clientRepository.deleteClient(clientEntity.id, undefined);
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise<void>(resolve => {
       const expectedErrors = {
         [BackendClientError.LABEL.BAD_REQUEST]: t('BackendError.LABEL.BAD_REQUEST'),
         [BackendClientError.LABEL.INVALID_CREDENTIALS]: t('BackendError.LABEL.INVALID_CREDENTIALS'),
@@ -194,7 +198,7 @@ export class ActionsViewModel {
     });
   };
 
-  deleteMessage = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
+  readonly deleteMessage = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -216,7 +220,7 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
-  deleteMessageEveryone = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
+  readonly deleteMessageEveryone = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
     if (conversationEntity && messageEntity) {
       return new Promise(resolve => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -238,14 +242,14 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
-  ignoreConnectionRequest = (userEntity: User): Promise<void> => {
+  readonly ignoreConnectionRequest = (userEntity: User): Promise<void> => {
     if (!userEntity) {
       return Promise.reject();
     }
     return this.connectionRepository.ignoreRequest(userEntity);
   };
 
-  leaveConversation = (conversationEntity: Conversation): Promise<void> => {
+  readonly leaveConversation = (conversationEntity: Conversation): Promise<void> => {
     if (!conversationEntity) {
       return Promise.reject();
     }
@@ -272,7 +276,7 @@ export class ActionsViewModel {
     });
   };
 
-  deleteConversation = (conversationEntity: Conversation): Promise<void> => {
+  readonly deleteConversation = (conversationEntity: Conversation): Promise<void> => {
     if (conversationEntity && conversationEntity.isCreatedBySelf()) {
       return new Promise(() => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -305,7 +309,7 @@ export class ActionsViewModel {
     return this.openConversation(conversationEntity);
   };
 
-  open1to1ConversationWithService = (serviceEntity: ServiceEntity): Promise<void> => {
+  readonly open1to1ConversationWithService = (serviceEntity: ServiceEntity): Promise<void> => {
     if (!serviceEntity) {
       return Promise.reject();
     }
@@ -314,7 +318,7 @@ export class ActionsViewModel {
       .then(conversationEntity => this.openConversation(conversationEntity));
   };
 
-  openGroupConversation = (conversationEntity?: Conversation): Promise<void> => {
+  readonly openGroupConversation = (conversationEntity?: Conversation): Promise<void> => {
     if (!conversationEntity) {
       return Promise.reject();
     }
@@ -368,11 +372,11 @@ export class ActionsViewModel {
    * @param userEntity User to connect to
    * @returns Resolves when the connection request was successfully created
    */
-  sendConnectionRequest = (userEntity: User): Promise<void> => {
+  readonly sendConnectionRequest = (userEntity: User): Promise<void> => {
     return this.connectionRepository.createConnection(userEntity);
   };
 
-  toggleMuteConversation = (conversationEntity: Conversation): void => {
+  readonly toggleMuteConversation = (conversationEntity: Conversation): void => {
     if (conversationEntity) {
       const notificationState = conversationEntity.showNotificationsEverything()
         ? NOTIFICATION_STATE.NOTHING
@@ -385,7 +389,7 @@ export class ActionsViewModel {
    * @param userEntity User to unblock
    * @returns Resolves when the user was unblocked
    */
-  unblockUser = (userEntity: User): Promise<void> => {
+  readonly unblockUser = (userEntity: User): Promise<void> => {
     return new Promise(resolve => {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         primaryAction: {

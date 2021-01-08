@@ -42,7 +42,7 @@ import type {LegalHoldMessage} from './LegalHoldMessage';
 import type {DecryptErrorMessage} from './DecryptErrorMessage';
 import type {PingMessage} from './PingMessage';
 import type {LinkPreview} from './LinkPreview';
-import type {ReadReceipt} from '../../storage/EventRecord';
+import type {ReadReceipt} from '../../storage/record/EventRecord';
 
 export class Message {
   private messageTimerStarted: boolean;
@@ -149,17 +149,17 @@ export class Message {
     this.accent_color = ko.pureComputed(() => `accent-color-${this.user().accent_id()}`);
   }
 
-  displayTimestampShort = (): string => {
+  readonly displayTimestampShort = (): string => {
     const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
     return formatTimeShort(date);
   };
 
-  displayTimestampLong = (): string => {
+  readonly displayTimestampLong = (): string => {
     const date = fromUnixTime(this.timestamp() / TIME_IN_MILLIS.SECOND);
     return formatDateNumeral(date);
   };
 
-  equals = (messageEntity?: Message) => (messageEntity && this.id ? this.id === messageEntity.id : false);
+  readonly equals = (messageEntity?: Message) => (messageEntity && this.id ? this.id === messageEntity.id : false);
 
   /**
    * Check if message contains an asset of type file.
@@ -340,7 +340,7 @@ export class Message {
    * Check if ephemeral message is expired.
    * @returns `true`, if message expired, `false` otherwise.
    */
-  is_expired = (): boolean => this.ephemeral_expires() === true;
+  readonly is_expired = (): boolean => this.ephemeral_expires() === true;
 
   /**
    * Check if message has an unavailable (uploading or failed) asset.
@@ -389,7 +389,7 @@ export class Message {
   }
 
   /** Start the ephemeral timer for the message. */
-  startMessageTimer = (timeOffset: number): void => {
+  readonly startMessageTimer = (timeOffset: number): void => {
     if (this.messageTimerStarted) {
       return;
     }

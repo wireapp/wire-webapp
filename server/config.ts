@@ -17,11 +17,11 @@
  *
  */
 
-import * as dotenv from 'dotenv-extended';
-import * as fs from 'fs-extra';
+import dotenv from 'dotenv-extended';
+import fs from 'fs-extra';
 import {ContentSecurityPolicyOptions} from 'helmet/dist/middlewares/content-security-policy';
-import * as logdown from 'logdown';
-import * as path from 'path';
+import logdown from 'logdown';
+import path from 'path';
 
 import type {ServerConfig} from './ServerConfig';
 type ContentSecurityPolicyDirectives = ContentSecurityPolicyOptions['directives'];

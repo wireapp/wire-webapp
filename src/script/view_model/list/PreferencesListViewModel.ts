@@ -18,12 +18,12 @@
  */
 
 import ko from 'knockout';
+import {Runtime} from '@wireapp/commons';
+import {container} from 'tsyringe';
 
 import {ContentViewModel} from '../ContentViewModel';
 import {ListViewModel} from '../ListViewModel';
-import type {CallingRepository} from 'src/script/calling/CallingRepository';
-import {Runtime} from '@wireapp/commons';
-import {container} from 'tsyringe';
+import type {CallingRepository} from '../../calling/CallingRepository';
 import {UserState} from '../../user/UserState';
 
 export class PreferencesListViewModel {
@@ -65,7 +65,7 @@ export class PreferencesListViewModel {
     this.selectedOptions = ko.pureComputed(() => this.contentState() === ContentViewModel.STATE.PREFERENCES_OPTIONS);
   }
 
-  clickOnClosePreferences = (): void => {
+  readonly clickOnClosePreferences = (): void => {
     const preventingContentViewStates = [ContentViewModel.STATE.HISTORY_EXPORT, ContentViewModel.STATE.HISTORY_IMPORT];
 
     if (!preventingContentViewStates.includes(this.contentState())) {
@@ -76,23 +76,23 @@ export class PreferencesListViewModel {
     }
   };
 
-  clickOnAbout = (): void => {
+  readonly clickOnAbout = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_ABOUT);
   };
 
-  clickOnAccount = (): void => {
+  readonly clickOnAccount = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 
-  clickOnAV = (): void => {
+  readonly clickOnAV = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_AV);
   };
 
-  clickOnDevices = (): void => {
+  readonly clickOnDevices = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_DEVICES);
   };
 
-  clickOnOptions = (): void => {
+  readonly clickOnOptions = (): void => {
     this._switchContent(ContentViewModel.STATE.PREFERENCES_OPTIONS);
   };
 

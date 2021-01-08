@@ -92,11 +92,11 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
     }
   };
 
-  onPauseButtonClicked = () => {
+  readonly onPauseButtonClicked = () => {
     this.audioElement?.pause();
   };
 
-  dispose = (): void => {
+  readonly dispose = (): void => {
     window.URL.revokeObjectURL(this.audioSrc());
   };
 }

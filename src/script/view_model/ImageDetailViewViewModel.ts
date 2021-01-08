@@ -22,18 +22,18 @@ import {KEY} from 'Util/KeyboardUtil';
 import {formatLocale} from 'Util/TimeUtil';
 import ko from 'knockout';
 import {amplify} from 'amplify';
-
 import {WebAppEvents} from '@wireapp/webapp-events';
+
+import {MessageCategory} from '../message/MessageCategory';
 import {Modal} from '../ui/Modal';
-import type {MainViewModel} from './MainViewModel';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {AssetRepository} from '../assets/AssetRepository';
 import type {ActionsViewModel} from './ActionsViewModel';
-import type {Conversation} from '../entity/Conversation';
+import type {AssetRepository} from '../assets/AssetRepository';
 import type {ContentMessage} from '../entity/message/ContentMessage';
+import type {Conversation} from '../entity/Conversation';
+import type {ConversationRepository} from '../conversation/ConversationRepository';
+import type {MainViewModel} from './MainViewModel';
 import type {MediumImage} from '../entity/message/MediumImage';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {MessageCategory} from '../message/MessageCategory';
 
 export class ImageDetailViewViewModel {
   elementId: 'detail-view';
@@ -81,11 +81,11 @@ export class ImageDetailViewViewModel {
     ko.applyBindings(this, document.getElementById(this.elementId));
   }
 
-  beforeHideCallback = () => {
+  readonly beforeHideCallback = () => {
     this.imageVisible(false);
   };
 
-  hideCallback = () => {
+  readonly hideCallback = () => {
     $(document).off('keydown.lightbox');
     window.URL.revokeObjectURL(this.imageSrc());
 
@@ -99,7 +99,7 @@ export class ImageDetailViewViewModel {
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
   };
 
-  show = (messageEntity: ContentMessage, messageEntities: ContentMessage[], source: string) => {
+  readonly show = (messageEntity: ContentMessage, messageEntities: ContentMessage[], source: string) => {
     this.items(messageEntities);
     this.messageEntity(messageEntity);
     this.source = source;
@@ -140,7 +140,7 @@ export class ImageDetailViewViewModel {
     });
   };
 
-  messageAdded = (messageEntity: ContentMessage) => {
+  readonly messageAdded = (messageEntity: ContentMessage) => {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
     const isImage = messageEntity.category & MessageCategory.IMAGE && !(messageEntity.category & MessageCategory.GIF);
     if (isCurrentConversation && isImage) {
@@ -148,11 +148,11 @@ export class ImageDetailViewViewModel {
     }
   };
 
-  messageExpired = (messageEntity: ContentMessage) => {
+  readonly messageExpired = (messageEntity: ContentMessage) => {
     this.messageRemoved(messageEntity.id, messageEntity.conversation_id);
   };
 
-  messageRemoved = (messageId: string, conversationId: string) => {
+  readonly messageRemoved = (messageId: string, conversationId: string) => {
     const isCurrentConversation = this.conversationEntity().id === conversationId;
     if (isCurrentConversation) {
       const isVisibleMessage = this.messageEntity().id === messageId;
@@ -164,7 +164,7 @@ export class ImageDetailViewViewModel {
     }
   };
 
-  formatTimestamp = (timestamp: number) => {
+  readonly formatTimestamp = (timestamp: number) => {
     return formatLocale(timestamp, 'P p');
   };
 
@@ -178,30 +178,30 @@ export class ImageDetailViewViewModel {
     });
   };
 
-  clickOnClose = () => {
+  readonly clickOnClose = () => {
     this.imageModal.hide();
   };
 
-  clickOnDownload = () => {
+  readonly clickOnDownload = () => {
     this.messageEntity().download(this.assetRepository);
   };
 
-  clickOnLike = () => {
+  readonly clickOnLike = () => {
     this.messageRepository.toggle_like(this.conversationEntity(), this.messageEntity());
   };
 
-  clickOnReply = () => {
+  readonly clickOnReply = () => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
     amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, this.messageEntity());
     this.imageModal.hide();
   };
 
-  clickOnShowNext = (imageDetailViewViewModel: unknown, event: MouseEvent) => {
+  readonly clickOnShowNext = (imageDetailViewViewModel: unknown, event: MouseEvent) => {
     event.stopPropagation();
     this.iterateImage(true);
   };
 
-  clickOnShowPrevious = (imageDetailViewViewModel: unknown, event: MouseEvent) => {
+  readonly clickOnShowPrevious = (imageDetailViewViewModel: unknown, event: MouseEvent) => {
     event.stopPropagation();
     this.iterateImage(false);
   };

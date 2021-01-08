@@ -143,7 +143,7 @@ describe('ConversationRepository', () => {
       conversationEntity.selfUser(selfUser);
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 
-      expect(conversationEntity._isInitialized()).toBe(true);
+      expect(conversationEntity.hasInitializedUsers()).toBe(true);
       expect(conversationEntity.hasLegalHold()).toBe(false);
       expect(conversationEntity.participating_user_ets().length).toBe(1);
 
@@ -410,7 +410,7 @@ describe('ConversationRepository', () => {
   });
 
   describe('getPrecedingMessages', () => {
-    it('gets messages which are not broken by design', () => {
+    it('gets messages which are not broken by design', async () => {
       spyOn(testFactory.user_repository, 'getUserById').and.returnValue(Promise.resolve(new User()));
       const selfUser = UserGenerator.getRandomUser();
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
@@ -418,7 +418,7 @@ describe('ConversationRepository', () => {
       conversation_et = new Conversation(createRandomUuid());
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
-      const bad_message = {
+      const messageWithoutTime = {
         'conversation': `${conversation_et.id}`,
         'id': 'aeac8355-739b-4dfc-a119-891a52c6a8dc',
         'from': '532af01e-1e24-4366-aacf-33b67d4ee376',
@@ -426,7 +426,7 @@ describe('ConversationRepository', () => {
         'type': 'conversation.message-add',
       };
       // prettier-ignore
-      const good_message = {
+      const messageWithTime = {
         'conversation': `${conversation_et.id}`,
         'id': '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb',
         'from': '8b497692-7a38-4a5d-8287-e3d1006577d6',
@@ -436,15 +436,18 @@ describe('ConversationRepository', () => {
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
-      const bad_message_key = `${conversation_et.id}@${bad_message.from}@NaN`;
+      const bad_message_key = `${conversation_et.id}@${messageWithoutTime.from}@NaN`;
+      /**
+       * The 'events' table uses auto-incremented inbound keys, so there is no need to define a key, when saving a record.
+       *  - With Dexie 2.x, specifying a key when saving a record with an auto-inc. inbound key results in an error: "Data provided to an operation does not meet requirements"
+       *  - With Dexie 3.x, specifying a key when saving a record with an auto-inc. inbound key just fails silently
+       */
+      await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, messageWithoutTime);
+      await storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, messageWithTime);
+      const loadedEvents = await testFactory.conversation_repository.getPrecedingMessages(conversation_et);
 
-      return storage_service
-        .save(StorageSchemata.OBJECT_STORE.EVENTS, bad_message_key, bad_message)
-        .catch(() => storage_service.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, good_message))
-        .then(() => testFactory.conversation_repository.getPrecedingMessages(conversation_et))
-        .then(loaded_events => {
-          expect(loaded_events.length).toBe(1);
-        });
+      expect(loadedEvents.length).toBe(1);
+      expect(loadedEvents[0].id).toBe(messageWithTime.id);
     });
   });
 

@@ -20,7 +20,9 @@
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
@@ -28,14 +30,11 @@ import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {Context, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
-
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import type {VerificationMessage} from '../entity/message/VerificationMessage';
 import {StatusType} from '../message/StatusType';
 import type {Text} from '../entity/message/Text';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import {SHOW_LEGAL_HOLD_MODAL} from '../view_model/content/LegalHoldModalViewModel';
 import type {ActionsViewModel} from '../view_model/ActionsViewModel';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
@@ -44,7 +43,9 @@ import type {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {SystemMessage} from '../entity/message/SystemMessage';
 import {AssetRepository} from '../assets/AssetRepository';
-import {container} from 'tsyringe';
+import type {MessageRepository} from '../conversation/MessageRepository';
+import {ConversationState} from '../conversation/ConversationState';
+import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 import './asset/audioAsset';
 import './asset/fileAsset';
@@ -53,8 +54,6 @@ import './asset/linkPreviewAsset';
 import './asset/locationAsset';
 import './asset/videoAsset';
 import './asset/messageButton';
-import type {MessageRepository} from '../conversation/MessageRepository';
-import {ConversationState} from '../conversation/ConversationState';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -200,8 +199,6 @@ class Message {
 
     this.hasReadReceiptsTurnedOn = this.conversationRepository.expectReadReceipt(this.conversation());
 
-    this.bindShowMore = this.bindShowMore.bind(this);
-
     this.readReceiptTooltip = ko.pureComputed(() => {
       const receipts = this.message.readReceipts();
       if (!receipts.length || !this.conversation().is1to1()) {
@@ -296,7 +293,7 @@ class Message {
     });
   }
 
-  dispose = () => {
+  readonly dispose = () => {
     if (this.assetSubscription) {
       this.assetSubscription.dispose();
       this.previewSubscription.dispose();
@@ -331,8 +328,8 @@ class Message {
     amplify.publish(topic);
   }
 
-  showLegalHold = () => {
-    amplify.publish(SHOW_LEGAL_HOLD_MODAL, this.conversationState.activeConversation());
+  readonly showLegalHold = () => {
+    amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS, this.conversationState.activeConversation());
   };
 
   showContextMenu(event: MouseEvent) {
@@ -340,7 +337,7 @@ class Message {
     Context.from(event, entries, 'message-options-menu');
   }
 
-  bindShowMore(elements: HTMLElement[], scope: Message) {
+  readonly bindShowMore = (elements: HTMLElement[], scope: Message) => {
     const label = elements.find(element => element.className === 'message-header-label');
     if (!label) {
       return;
@@ -349,7 +346,7 @@ class Message {
     if (link) {
       link.addEventListener('click', () => this.onClickParticipants((scope.message as any).highlightedUsers()));
     }
-  }
+  };
 }
 
 // If this is not explicitly defined as string,

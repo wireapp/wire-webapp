@@ -17,40 +17,41 @@
  *
  */
 
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
+import type {Availability} from '@wireapp/protocol-messaging';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
+
 import 'Components/AvailabilityState';
 import 'Components/legalHoldDot';
 import 'Components/list/groupedConversations';
-import ko from 'knockout';
-import {amplify} from 'amplify';
-
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
-import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
-import {generateConversationUrl} from '../../router/routeGenerator';
+import {t} from 'Util/LocalizerUtil';
+
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {ContentViewModel} from '../ContentViewModel';
+import {ConversationState} from '../../conversation/ConversationState';
+import {generateConversationUrl} from '../../router/routeGenerator';
+import {ListViewModel} from '../ListViewModel';
+import {NOTIFICATION_HANDLING_STATE} from '../../event/NotificationHandlingState';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {Shortcut} from '../../ui/Shortcut';
 import {ShortcutType} from '../../ui/ShortcutType';
-import {ContentViewModel} from '../ContentViewModel';
-import {ListViewModel} from '../ListViewModel';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data';
-import type {MainViewModel} from '../MainViewModel';
-import type {CallingViewModel} from '../CallingViewModel';
+import {TeamState} from '../../team/TeamState';
+import {UserState} from '../../user/UserState';
 import type {CallingRepository} from '../../calling/CallingRepository';
+import type {CallingViewModel} from '../CallingViewModel';
+import type {Conversation} from '../../entity/Conversation';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {EventRepository} from '../../event/EventRepository';
+import type {MainViewModel} from '../MainViewModel';
 import type {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import type {PropertiesRepository} from '../../properties/PropertiesRepository';
-import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
-import type {EventRepository} from '../../event/EventRepository';
-import type {Availability} from '@wireapp/protocol-messaging';
-import {container} from 'tsyringe';
-import {UserState} from '../../user/UserState';
-import {TeamState} from '../../team/TeamState';
-import {ConversationState} from '../../conversation/ConversationState';
 
 export class ConversationListViewModel {
   readonly startTooltip: string;
@@ -236,21 +237,21 @@ export class ConversationListViewModel {
     });
   };
 
-  expandFolder = (label: string) => {
+  readonly expandFolder = (label: string) => {
     if (!this.expandedFoldersIds().includes(label)) {
       this.expandedFoldersIds.push(label);
     }
   };
 
-  clickOnAvailability = (viewModel: unknown, event: MouseEvent): void => {
+  readonly clickOnAvailability = (viewModel: unknown, event: MouseEvent): void => {
     AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
   };
 
-  clickOnConnectRequests = (): void => {
+  readonly clickOnConnectRequests = (): void => {
     this.contentViewModel.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
   };
 
-  hasJoinableCall = (conversationId: string): boolean => {
+  readonly hasJoinableCall = (conversationId: string): boolean => {
     const call = this.callingRepository.findCall(conversationId);
     if (!call) {
       return false;
@@ -263,7 +264,7 @@ export class ConversationListViewModel {
     );
   };
 
-  setShowCallsState = (handlingNotifications: string): void => {
+  readonly setShowCallsState = (handlingNotifications: string): void => {
     const shouldShowCalls = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.showCalls() !== shouldShowCalls;
@@ -273,7 +274,7 @@ export class ConversationListViewModel {
     }
   };
 
-  isSelectedConversation = (conversationEntity: Conversation): boolean => {
+  readonly isSelectedConversation = (conversationEntity: Conversation): boolean => {
     const expectedStates = [
       ContentViewModel.STATE.COLLECTION,
       ContentViewModel.STATE.COLLECTION_DETAILS,
@@ -286,7 +287,7 @@ export class ConversationListViewModel {
     return isSelectedConversation && isExpectedState;
   };
 
-  onWebappLoaded = (): void => {
+  readonly onWebappLoaded = (): void => {
     this.webappIsLoaded(true);
   };
 
@@ -294,15 +295,15 @@ export class ConversationListViewModel {
   // Footer actions
   //##############################################################################
 
-  clickOnArchivedButton = (): void => {
+  readonly clickOnArchivedButton = (): void => {
     this.listViewModel.switchList(ListViewModel.STATE.ARCHIVE);
   };
 
-  clickOnPreferencesButton = (): void => {
+  readonly clickOnPreferencesButton = (): void => {
     amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
   };
 
-  clickOnPeopleButton = (): void => {
+  readonly clickOnPeopleButton = (): void => {
     if (this.isActivatedAccount()) {
       this.listViewModel.switchList(ListViewModel.STATE.START_UI);
     }

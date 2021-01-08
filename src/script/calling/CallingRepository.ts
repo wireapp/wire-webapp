@@ -57,7 +57,7 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {ConversationRepository} from '../conversation/ConversationRepository';
-import {EventBuilder} from '../conversation/EventBuilder';
+import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
@@ -181,9 +181,9 @@ export class CallingRepository {
     this.subscribeToEvents();
   }
 
-  toggleCbrEncoding(vbrEnabled: boolean): void {
+  readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
     this.cbrEncoding(vbrEnabled ? 0 : 1);
-  }
+  };
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
     return this.wCall.getStats(conversationId);
@@ -317,7 +317,7 @@ export class CallingRepository {
     }
   }
 
-  updateCallQuality = (conversationId: string, userId: string, clientId: string, quality: number) => {
+  readonly updateCallQuality = (conversationId: string, userId: string, clientId: string, quality: number) => {
     const call = this.findCall(conversationId);
     if (!call) {
       return;
@@ -452,9 +452,9 @@ export class CallingRepository {
    * Subscribe to amplify topics.
    */
   subscribeToEvents(): void {
-    amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent.bind(this));
-    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState.bind(this)); // This event needs to be kept, it is sent by the wrapper
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding.bind(this));
+    amplify.subscribe(WebAppEvents.CALL.EVENT_FROM_BACKEND, this.onCallEvent);
+    amplify.subscribe(WebAppEvents.CALL.STATE.TOGGLE, this.toggleState); // This event needs to be kept, it is sent by the wrapper
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_VBR_ENCODING, this.toggleCbrEncoding);
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
       this.toggleCbrEncoding(settings.call.enable_vbr_encoding);
     });
@@ -499,14 +499,14 @@ export class CallingRepository {
   // Inbound call events
   //##############################################################################
 
-  private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<boolean> {
+  private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<void> {
     const recipients = await this.messageRepository.create_recipients(conversationId, false, [userId]);
     const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse
       ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
       : ConversationRepository.CONSENT_TYPE.OUTGOING_CALL;
-    return this.messageRepository.grantMessage(eventInfoEntity, consentType);
+    await this.messageRepository.grantMessage(eventInfoEntity, consentType, [], false);
   }
 
   private abortCall(conversationId: string): void {
@@ -537,13 +537,13 @@ export class CallingRepository {
   /**
    * Handle incoming calling events from backend.
    */
-  async onCallEvent(event: any, source: string): Promise<void> {
+  onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
     const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
 
-    let validatedPromise = Promise.resolve(true);
+    let validatedPromise = Promise.resolve();
 
     switch (content.type) {
       case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
@@ -592,7 +592,7 @@ export class CallingRepository {
       return;
     }
     return this.handleCallEventSaving(content.type, conversationId, userId, time, source);
-  }
+  };
 
   handleCallEventSaving(
     type: string,
@@ -620,7 +620,7 @@ export class CallingRepository {
   // Call actions
   //##############################################################################
 
-  toggleState(withVideo: boolean): void {
+  readonly toggleState = (withVideo: boolean): void => {
     const conversationEntity: Conversation | undefined = this.conversationState.activeConversation();
     if (conversationEntity) {
       const isActiveCall = this.findCall(conversationEntity.id);
@@ -630,7 +630,7 @@ export class CallingRepository {
         ? this.leaveCall(conversationEntity.id)
         : this.startCall(conversationEntity.id, isGroupCall, callType) && undefined;
     }
-  }
+  };
 
   async startCall(
     conversationId: ConversationId,
@@ -750,7 +750,7 @@ export class CallingRepository {
     this.wCall.reject(this.wUser, conversationId);
   }
 
-  leaveCall = (conversationId: ConversationId): void => {
+  readonly leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
   };
@@ -908,7 +908,7 @@ export class CallingRepository {
     const needsVerification = [CALL_MESSAGE_TYPE.SETUP, CALL_MESSAGE_TYPE.GROUP_START].includes(type);
     const validationPromise = needsVerification
       ? this.verificationPromise(conversationId, userId, resp)
-      : Promise.resolve(true);
+      : Promise.resolve();
     validationPromise
       .then(() => {
         let options: MessageSendingOptions;

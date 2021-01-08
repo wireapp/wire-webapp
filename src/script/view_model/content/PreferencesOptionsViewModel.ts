@@ -21,12 +21,12 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/src/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {container} from 'tsyringe';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 
@@ -76,14 +76,14 @@ export class PreferencesOptionsViewModel {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
     this.updateProperties(this.propertiesRepository.properties);
 
     this.AudioPreference = AudioPreference;
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  updateProperties = ({settings}: WebappProperties): void => {
+  readonly updateProperties = ({settings}: WebappProperties): void => {
     this.optionAudio(settings.sound.alerts);
     this.optionReplaceInlineEmoji(settings.emoji.replace_inline);
     this.optionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);

@@ -39,16 +39,16 @@ export class WebSocketService {
     this.logger = getLogger('WebSocketService');
   }
 
-  disconnect = () => {
+  readonly disconnect = () => {
     this.logger.info('Disconnecting websocket');
     this.apiClient.disconnect();
   };
 
-  lockWebsocket = () => {
+  readonly lockWebsocket = () => {
     this.apiClient.transport.ws.lock();
   };
 
-  unlockWebsocket = () => {
+  readonly unlockWebsocket = () => {
     this.apiClient.transport.ws.unlock();
   };
 
@@ -92,7 +92,7 @@ export class WebSocketService {
     // Note: `connect()` should only resolve after `onBeforeConnect()` is executed successfully
     // We need to wrap this into a plain Promise because `reconnecting-websocket` doesn't give a handle
     // to wait for the execution (connection lost on RWS constructor)
-    await new Promise((resolve, reject) =>
+    await new Promise<void>((resolve, reject) =>
       this.apiClient.connect(async abortHandler => {
         try {
           await onConnect(abortHandler);

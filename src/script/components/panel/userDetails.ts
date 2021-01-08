@@ -22,9 +22,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import type {User} from '../../entity/User';
 
 import 'Components/AvailabilityState';
+import type {User} from '../../entity/User';
 
 interface UserDetailsProps {
   badge?: string;

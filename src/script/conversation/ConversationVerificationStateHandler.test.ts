@@ -21,26 +21,28 @@ import {createRandomUuid} from 'Util/util';
 
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {Conversation} from 'src/script/entity/Conversation';
+import {ConversationRepository} from './ConversationRepository';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {User} from 'src/script/entity/User';
-import {TestFactory} from '../../helper/TestFactory';
+import {ConversationVerificationStateHandler} from './ConversationVerificationStateHandler';
 import {EventBuilder} from 'src/script/conversation/EventBuilder';
+import {TestFactory} from '../../../test/helper/TestFactory';
+import {User} from 'src/script/entity/User';
 
 describe('ConversationVerificationStateHandler', () => {
   const testFactory = new TestFactory();
-  let stateHandler = undefined;
-  let conversationRepository = undefined;
+  let stateHandler: ConversationVerificationStateHandler;
+  let conversationRepository: ConversationRepository;
 
-  let conversationAB = undefined;
-  let conversationB = undefined;
-  let conversationC = undefined;
+  let conversationAB: Conversation;
+  let conversationB: Conversation;
+  let conversationC: Conversation;
 
-  let selfUserEntity = undefined;
-  let userA = undefined;
-  let userB = undefined;
+  let selfUserEntity: User;
+  let userA: User;
+  let userB: User;
 
-  let clientA = undefined;
-  let clientB = undefined;
+  let clientA: ClientEntity;
+  let clientB: ClientEntity;
 
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(_conversation_repository => {
@@ -56,7 +58,7 @@ describe('ConversationVerificationStateHandler', () => {
       selfUserEntity.isMe = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
-      spyOn(conversationRepository.userState, 'self').and.returnValue(selfUserEntity);
+      spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUserEntity);
 
       userA = new User(createRandomUuid());
       userB = new User(createRandomUuid());
@@ -82,11 +84,11 @@ describe('ConversationVerificationStateHandler', () => {
       conversationC.selfUser(selfUserEntity);
       conversationC.verification_state(ConversationVerificationState.VERIFIED);
 
-      conversationRepository.conversationState.conversations.removeAll();
+      conversationRepository['conversationState'].conversations.removeAll();
       return Promise.all([
-        conversationRepository.saveConversation(conversationAB),
-        conversationRepository.saveConversation(conversationB),
-        conversationRepository.saveConversation(conversationC),
+        conversationRepository['saveConversation'](conversationAB),
+        conversationRepository['saveConversation'](conversationB),
+        conversationRepository['saveConversation'](conversationC),
       ]);
     });
   });
@@ -246,7 +248,7 @@ describe('ConversationVerificationStateHandler', () => {
     it('should change state to UNVERIFIED if user unverified client', () => {
       clientA.meta.isVerified(false);
 
-      stateHandler.onClientVerificationChanged(userA.id, clientA.id);
+      stateHandler.onClientVerificationChanged(userA.id);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.UNVERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);

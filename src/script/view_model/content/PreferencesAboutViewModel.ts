@@ -17,17 +17,18 @@
  *
  */
 import ko from 'knockout';
+import {container} from 'tsyringe';
+
 import {Config, Configuration} from '../../Config';
 import {getPrivacyPolicyUrl, getTermsOfUsePersonalUrl, getTermsOfUseTeamUrl, URL} from '../../externalRoute';
 import {User} from '../../entity/User';
-import {container} from 'tsyringe';
 import {UserState} from '../../user/UserState';
 
 export class PreferencesAboutViewModel {
   private readonly selfUser: ko.Observable<User>;
   readonly Config: Configuration;
   readonly websiteUrl: string;
-  readonly privacyPolicyUrl: string;
+  privacyPolicyUrl: string;
   readonly termsOfUseUrl: ko.PureComputed<string>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
@@ -44,11 +45,11 @@ export class PreferencesAboutViewModel {
     });
   }
 
-  showWireSection = (): boolean => {
+  readonly showWireSection = (): boolean => {
     return !!(this.termsOfUseUrl() || this.websiteUrl || this.privacyPolicyUrl);
   };
 
-  showSupportSection = (): boolean => {
+  readonly showSupportSection = (): boolean => {
     return !!(this.Config.URL.SUPPORT.INDEX || this.Config.URL.SUPPORT.CONTACT);
   };
 }
