@@ -3,7 +3,7 @@
     "@types/sinon": "9.0.10",
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "6.6.9",
-    "@wireapp/core": "16.12.77",
+    "@wireapp/core": "17.0.0",
     "@wireapp/protocol-messaging": "1.28.0",
     "@wireapp/react-ui-kit": "7.37.15",
     "@wireapp/store-engine-dexie": "1.3.25",
