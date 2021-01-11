@@ -2285,7 +2285,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.message-delete'
    * @returns Resolves when the event was handled
    */
-  private async onMessageDeleted(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onMessageDeleted(conversationEntity: Conversation, eventJson: EventJson): Promise<number | void> {
     const {data: eventData, from, id: eventId, time} = eventJson;
 
     try {

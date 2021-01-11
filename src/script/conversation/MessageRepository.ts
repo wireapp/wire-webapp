@@ -1216,9 +1216,11 @@ export class MessageRepository {
     skipConversationMessages = false,
     ensureUser = false,
   ): Promise<ContentMessage> {
-    const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
+    let message: ContentMessage | undefined;
 
-    let message = messageEntity as ContentMessage;
+    if (!skipConversationMessages) {
+      message = conversationEntity.getMessage(messageId) as ContentMessage | undefined;
+    }
 
     if (!message) {
       const event = await this.eventService.loadEvent(conversationEntity.id, messageId);
