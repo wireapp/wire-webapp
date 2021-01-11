@@ -17,18 +17,11 @@
  *
  */
 
-import logdown from 'logdown';
-
 import {Item} from './Item';
 import {Priority} from './Priority';
 import type {Config} from './Config';
 
 export class PriorityQueue {
-  private readonly logger: logdown.Logger = logdown('@wireapp/priority-queue/PriorityQueue', {
-    logger: console,
-    markdown: false,
-  });
-
   private readonly config: Config = {
     comparator: (a: Item, b: Item): Priority => {
       if (a.priority === b.priority) {
@@ -51,21 +44,21 @@ export class PriorityQueue {
 
   public add<T>(thunkedPromise: () => T, priority: Priority = Priority.MEDIUM, label?: string): Promise<T> {
     return new Promise((resolve, reject) => {
-      const queueObject = new Item();
-      queueObject.fn = thunkedPromise;
-      queueObject.label = label;
-      queueObject.priority = priority;
-      queueObject.reject = reject;
-      queueObject.resolve = resolve;
-      queueObject.retry = 0;
-      queueObject.timestamp = Date.now() + this.size;
-      this.queue.push(queueObject);
+      const item = new Item();
+      item.fn = thunkedPromise;
+      item.label = label;
+      item.priority = priority;
+      item.reject = reject;
+      item.resolve = resolve;
+      item.retry = 0;
+      item.timestamp = Date.now() + this.size;
+
+      this.queue.push(item);
       this.queue.sort(this.config.comparator);
 
       if (!this.isRunning) {
         this.isRunning = true;
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        this.processList();
+        void this.processList();
       }
     });
   }
@@ -95,27 +88,24 @@ export class PriorityQueue {
   }
 
   private async processList(): Promise<void> {
-    const queueObject = this.first;
-    if (!queueObject) {
+    const item = this.queue.shift();
+
+    if (!item) {
       this.isRunning = false;
       return;
     }
 
     try {
-      queueObject.resolve(await queueObject.fn());
-      this.queue.shift();
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.processList();
+      item.resolve(await item.fn());
+      void this.processList();
     } catch (error) {
-      if (queueObject.retry >= this.config.maxRetries) {
-        this.queue.shift();
-        queueObject.reject(error);
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        this.processList();
+      if (item.retry >= this.config.maxRetries) {
+        item.reject(error);
+        void this.processList();
       } else {
-        this.logger.log(`Retrying item "${queueObject}"`);
-        setTimeout(() => this.processList(), this.getGrowingDelay(queueObject.retry));
-        queueObject.retry++;
+        this.queue.push(item);
+        setTimeout(() => this.processList(), this.getGrowingDelay(item.retry));
+        item.retry++;
       }
     }
   }

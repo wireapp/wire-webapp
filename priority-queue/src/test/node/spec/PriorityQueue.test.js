@@ -32,16 +32,6 @@ describe('PriorityQueue', () => {
     }
   });
 
-  describe('"constructor"', () => {
-    it('allows a configuration with zero retries', () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
-      queue = new PriorityQueue({maxRetries: 0});
-      expect(queue.config.maxRetries).toBe(0);
-      queue.add(() => promise);
-      expect(queue.first.retry).toBe(0);
-    });
-  });
-
   describe('"add"', () => {
     it('works with thunked Promises', async () => {
       queue = new PriorityQueue();
@@ -138,13 +128,6 @@ describe('PriorityQueue', () => {
         expect(task.calls.count()).toBe(2);
       }
     });
-
-    it('set retry count to 0', () => {
-      const promise = new Promise(resolve => setTimeout(() => resolve(), 200000));
-      queue = new PriorityQueue();
-      queue.add(() => promise);
-      expect(queue.first.retry).toBe(0);
-    });
   });
 
   describe('"delete"', () => {
@@ -157,11 +140,15 @@ describe('PriorityQueue', () => {
       queue.add(() => promise, 1, 'delete-me');
       queue.add(() => promise, 1);
 
-      expect(queue.all.length).toBe(4);
+      expect(queue.all.length)
+        .withContext('When adding four items, three are in the queue and one is in progress.')
+        .toBe(3);
 
       queue.delete('delete-me');
 
-      expect(queue.all.length).toBe(3);
+      expect(queue.all.length)
+        .withContext('After deleting one item, two are in the queue and one is in progress.')
+        .toBe(2);
     });
   });
 
@@ -174,7 +161,9 @@ describe('PriorityQueue', () => {
       queue.add(() => promise);
       queue.add(() => promise);
 
-      expect(queue.all.length).toBe(3);
+      expect(queue.all.length)
+        .withContext('When adding three items, two are in the queue and one is in progress.')
+        .toBe(2);
 
       queue.deleteAll();
 

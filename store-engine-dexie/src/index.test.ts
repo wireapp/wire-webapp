@@ -55,10 +55,6 @@ describe('IndexedDBEngine', () => {
     return storeEngine;
   }
 
-  beforeEach(async () => {
-    engine = await initEngine();
-  });
-
   afterEach(async () => {
     let storeName = STORE_NAME;
     if (engine && engine['db']) {
@@ -69,6 +65,8 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('init', () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     it('resolves with the database instance to which the records will be saved.', async () => {
       engine = new IndexedDBEngine();
       const instance = await engine.init(STORE_NAME);
@@ -77,6 +75,8 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('create', () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     Object.entries(createSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });
@@ -108,36 +108,48 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('delete', () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     Object.entries(deleteSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });
   });
 
   describe('deleteAll', () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     Object.entries(deleteAllSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });
   });
 
   describe('purge', () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     Object.entries(purgeSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine, initEngine));
     });
   });
 
   describe('readAllPrimaryKeys', async () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     Object.entries(readAllPrimaryKeysSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });
   });
 
   describe('readAll', () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     Object.entries(readAllSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });
   });
 
   describe('read', () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     Object.entries(readSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });
@@ -170,6 +182,8 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('save', () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     it('generates primary keys', async () => {
       const TABLE_NAME = 'test-table';
 
@@ -195,13 +209,32 @@ describe('IndexedDBEngine', () => {
   });
 
   describe('updateOrCreate', async () => {
-    engine = await initEngine(true, false);
-    Object.entries(updateOrCreateSpec).map(([description, testFunction]) => {
-      it(description, () => testFunction(engine));
+    it(Object.keys(updateOrCreateSpec)[0], async () => {
+      /**
+       * For tests that are based on records without primary keys, we need to use an IndexedDB schema with out-of-line
+       * keys.
+       */
+      engine = await initEngine(true, true);
+      const testFunction = Object.values(updateOrCreateSpec)[0];
+      await testFunction(engine);
+    });
+
+    it(Object.keys(updateOrCreateSpec)[1], async () => {
+      engine = await initEngine(true, false);
+      const testFunction = Object.values(updateOrCreateSpec)[1];
+      await testFunction(engine);
+    });
+
+    it(Object.keys(updateOrCreateSpec)[2], async () => {
+      engine = await initEngine(true, false);
+      const testFunction = Object.values(updateOrCreateSpec)[2];
+      await testFunction(engine);
     });
   });
 
   describe('update', () => {
+    beforeEach(async () => (engine = await initEngine()));
+
     Object.entries(updateSpec).map(([description, testFunction]) => {
       it(description, () => testFunction(engine));
     });

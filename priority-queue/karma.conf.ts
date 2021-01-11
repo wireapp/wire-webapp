@@ -18,7 +18,9 @@
  */
 
 import type {Config} from 'karma';
-const dist = 'dist/';
+import * as path from 'path';
+
+const distDir = 'dist/';
 
 const preprocessors = {
   '**/*.js': ['sourcemap'],
@@ -41,7 +43,7 @@ module.exports = (config: Config): void => {
         flags: ['--no-sandbox'],
       },
     },
-    files: [`${dist}priority-queue.test.bundle.js`],
+    files: [path.join(distDir, 'priority-queue.test.bundle.js')],
     frameworks: ['jasmine'],
     logLevel: config.LOG_INFO,
     port: 9876,

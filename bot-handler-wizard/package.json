@@ -8,7 +8,7 @@
     "@wireapp/bot-api": "7.11.81",
     "cross-env": "7.0.2",
     "dotenv-defaults": "2.0.1",
-    "jasmine": "3.5.0",
+    "jasmine": "3.6.3",
     "rimraf": "3.0.2",
     "ts-node": "9.0.0",
     "typescript": "4.0.3"
