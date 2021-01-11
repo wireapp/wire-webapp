@@ -1210,37 +1210,34 @@ export class MessageRepository {
    * @param ensureUser Make sure message entity has a valid user
    * @returns Resolves with the message
    */
-  getMessageInConversationById(
+  async getMessageInConversationById(
     conversationEntity: Conversation,
     messageId: string,
     skipConversationMessages = false,
     ensureUser = false,
   ): Promise<ContentMessage> {
     const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
-    const messagePromise = messageEntity
-      ? Promise.resolve(messageEntity)
-      : this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
-          if (event) {
-            return this.event_mapper.mapJsonEvent(event, conversationEntity);
-          }
-          throw new ConversationError(
-            ConversationError.TYPE.MESSAGE_NOT_FOUND,
-            ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
-          );
-        });
 
-    if (ensureUser) {
-      return messagePromise.then(message => {
-        if (message.from && !message.user().id) {
-          return this.userRepository.getUserById(message.from).then(userEntity => {
-            message.user(userEntity);
-            return message as ContentMessage;
-          });
-        }
-        return message as ContentMessage;
-      });
+    let message = messageEntity as ContentMessage;
+
+    if (!message) {
+      const event = await this.eventService.loadEvent(conversationEntity.id, messageId);
+      if (event) {
+        message = (await this.event_mapper.mapJsonEvent(event, conversationEntity)) as ContentMessage;
+      } else {
+        throw new ConversationError(
+          ConversationError.TYPE.MESSAGE_NOT_FOUND,
+          ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
+        );
+      }
     }
-    return messagePromise as Promise<ContentMessage>;
+
+    if (ensureUser && message.from && !message.user().id) {
+      const userEntity = await this.userRepository.getUserById(message.from);
+      message.user(userEntity);
+    }
+
+    return message;
   }
 
   static getOtherUsersWithoutClients(eventInfoEntity: EventInfoEntity, selfUserId: string): string[] {
@@ -1568,16 +1565,16 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: string) {
-    return this.messageSender.queueMessage(() => {
+  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: string): Promise<ClientMismatch> {
+    return this.messageSender.queueMessage(async () => {
       const options = eventInfoEntity.options;
-      const recipientsPromise = options.recipients
-        ? Promise.resolve(eventInfoEntity)
-        : this.create_recipients(conversationId, false).then(recipients => {
-            eventInfoEntity.updateOptions({recipients});
-            return eventInfoEntity;
-          });
-      return recipientsPromise.then(infoEntity => this.sendGenericMessage(infoEntity, true));
+
+      if (!options.recipients) {
+        const recipients = await this.create_recipients(conversationId, false);
+        eventInfoEntity.updateOptions({recipients});
+      }
+
+      return this.sendGenericMessage(eventInfoEntity, true);
     });
   }
 
