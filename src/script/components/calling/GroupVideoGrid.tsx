@@ -90,6 +90,29 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
         style={rowsAndColumns}
         data-uie-name="grids-wrapper"
       >
+        {grid.grid.length === 0 && (
+          <div
+            css={{
+              alignItems: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            <NamedIcon
+              css={{
+                '> path': {
+                  fill: '#fff',
+                },
+                height: 32,
+                marginBottom: 32,
+                width: 32,
+              }}
+              name="loading-icon"
+            />
+            <div css={{color: '#fff'}}>{t('noActiveSpeakers')}</div>
+          </div>
+        )}
         {participants.map(participant => (
           <div
             key={participant.clientId + participant.user.id}
