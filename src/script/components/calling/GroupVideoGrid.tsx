@@ -56,11 +56,6 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid.grid.length));
   const videoParticipants: Participant[] = grid.grid.filter(participant => !!participant);
 
-  const hasBlackBackground = (): boolean => {
-    const gridElementsCount = grid.grid.filter(participant => !!participant).length;
-    return minimized && gridElementsCount > 1;
-  };
-
   const doubleClickedOnVideo = (userId: string, clientId: string) => {
     if (maximizedParticipant !== null) {
       setMaximizedParticipant(null);
@@ -83,13 +78,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     <div className="group-video">
       <div
         className="group-video-grid"
-        css={
-          hasBlackBackground()
-            ? css`
-                background-color: #323739;
-              `
-            : undefined
-        }
+        css={{backgroundColor: '#323739'}}
         style={rowsAndColumns}
         data-uie-name="grids-wrapper"
       >
