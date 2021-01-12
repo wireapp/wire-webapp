@@ -1468,20 +1468,19 @@ export class ConversationRepository {
 
     const conversationId = conversationEntity.id;
 
-    if (!conversationEntity.removed_from_conversation()) {
-      try {
-        await this.conversation_service.update_member_properties(conversationId, payload);
-      } catch (error) {
-        const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
-        this.logger.error(logMessage);
+    const updatePromise = conversationEntity.removed_from_conversation()
+      ? Promise.resolve()
+      : this.conversation_service.update_member_properties(conversationId, payload).catch(error => {
+          const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
+          this.logger.error(logMessage);
 
-        const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
-        if (!isNotFound) {
-          throw error;
-        }
-      }
-    }
+          const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
+          if (!isNotFound) {
+            throw error;
+          }
+        });
 
+    await updatePromise;
     const response = {
       data: payload,
       from: this.userState.self().id,
@@ -1629,9 +1628,9 @@ export class ConversationRepository {
     return this.pushToReceivingQueue(eventJson, eventSource);
   };
 
-  private async handleConversationEvent(eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) {
+  private handleConversationEvent(eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
-      throw new Error('Conversation Repository Event Handling: Event missing');
+      return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
     const {conversation, data: eventData, type} = eventJson;
@@ -1645,60 +1644,60 @@ export class ConversationRepository {
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
-        throw new ConversationError(
-          ConversationError.TYPE.WRONG_CONVERSATION,
-          ConversationError.MESSAGE.WRONG_CONVERSATION,
+        return Promise.reject(
+          new ConversationError(
+            ConversationError.TYPE.WRONG_CONVERSATION,
+            ConversationError.MESSAGE.WRONG_CONVERSATION,
+          ),
         );
       }
     }
 
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
+    const onEventPromise = isConversationCreate ? Promise.resolve(null) : this.get_conversation_by_id(conversationId);
     let previouslyArchived = false;
 
-    let conversationEntity: Conversation = null;
+    return onEventPromise
+      .then((conversationEntity: Conversation) => {
+        if (conversationEntity) {
+          // Check if conversation was archived
+          previouslyArchived = conversationEntity.is_archived();
 
-    if (!isConversationCreate) {
-      conversationEntity = await this.get_conversation_by_id(conversationId);
-    }
+          const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
+          conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
+        }
 
-    try {
-      if (conversationEntity) {
-        // Check if conversation was archived
-        previouslyArchived = conversationEntity.is_archived();
+        return conversationEntity;
+      })
+      .then(conversationEntity => this.checkLegalHoldStatus(conversationEntity, eventJson))
+      .then(conversationEntity => this.checkConversationParticipants(conversationEntity, eventJson, eventSource))
+      .then(conversationEntity => this.triggerFeatureEventHandlers(conversationEntity, eventJson))
+      .then(
+        conversationEntity => this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
+      )
+      .then((entityObject = {} as EntityObject) =>
+        this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived),
+      )
+      .catch((error: BaseError) => {
+        const ignoredErrorTypes: string[] = [
+          ConversationError.TYPE.MESSAGE_NOT_FOUND,
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+        ];
 
-        const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
-        conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
-      }
+        const isRemovedFromConversation =
+          (error as BackendClientError).label === BackendClientError.LABEL.ACCESS_DENIED;
+        if (isRemovedFromConversation) {
+          const messageText = t('conversationNotFoundMessage');
+          const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
 
-      await this.checkLegalHoldStatus(conversationEntity, eventJson);
-      await this.checkConversationParticipants(conversationEntity, eventJson, eventSource);
-      await this.triggerFeatureEventHandlers(conversationEntity, eventJson);
+          this.showModal(messageText, titleText);
+          return;
+        }
 
-      const entityObject = (await this.reactToConversationEvent(
-        conversationEntity,
-        eventJson,
-        eventSource,
-      )) as EntityObject;
-      await this.handleConversationNotification(entityObject, eventSource, previouslyArchived);
-    } catch (error) {
-      const ignoredErrorTypes: string[] = [
-        ConversationError.TYPE.MESSAGE_NOT_FOUND,
-        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-      ];
-
-      const isRemovedFromConversation = (error as BackendClientError).label === BackendClientError.LABEL.ACCESS_DENIED;
-      if (isRemovedFromConversation) {
-        const messageText = t('conversationNotFoundMessage');
-        const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
-
-        this.showModal(messageText, titleText);
-        return;
-      }
-
-      if (!ignoredErrorTypes.includes(error.type)) {
-        throw error;
-      }
-    }
+        if (!ignoredErrorTypes.includes(error.type)) {
+          throw error;
+        }
+      });
   }
 
   /**
@@ -1709,15 +1708,15 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when the participant list has been checked
    */
-  private async checkConversationParticipants(
+  private checkConversationParticipants(
     conversationEntity: Conversation,
     eventJson: EventJson,
     eventSource: EventSource,
-  ): Promise<void> {
+  ) {
     // We ignore injected events
     const isInjectedEvent = eventSource === EventRepository.SOURCE.INJECTED;
     if (isInjectedEvent || !conversationEntity) {
-      return;
+      return conversationEntity;
     }
 
     const {from: sender, id, type, time} = eventJson;
@@ -1737,7 +1736,7 @@ export class ConversationRepository {
           const isFromUpdatedMember = eventJson.data.user_ids.includes(sender);
           if (isFromUpdatedMember) {
             // we ignore leave/join events that are sent by the user actually leaving or joining
-            return;
+            return conversationEntity;
           }
         }
 
@@ -1745,17 +1744,16 @@ export class ConversationRepository {
         this.logger.warn(message, eventJson);
 
         const timestamp = new Date(time).getTime() - 1;
-        await this.addMissingMember(conversationEntity, [sender], timestamp);
+        return this.addMissingMember(conversationEntity, [sender], timestamp).then(() => conversationEntity);
       }
     }
+
+    return conversationEntity;
   }
 
-  private async checkLegalHoldStatus(
-    conversationEntity: Conversation,
-    eventJson: LegalHoldEvaluator.MappedEvent,
-  ): Promise<void> {
+  private async checkLegalHoldStatus(conversationEntity: Conversation, eventJson: LegalHoldEvaluator.MappedEvent) {
     if (!LegalHoldEvaluator.hasMessageLegalHoldFlag(eventJson)) {
-      return;
+      return conversationEntity;
     }
 
     const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(
@@ -1764,7 +1762,7 @@ export class ConversationRepository {
     );
 
     if (!renderLegalHoldMessage) {
-      return;
+      return conversationEntity;
     }
 
     const {
@@ -1785,7 +1783,7 @@ export class ConversationRepository {
     await this.messageRepositoryProvider().updateAllClients(conversationEntity, true);
 
     if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
-      return;
+      return conversationEntity;
     }
 
     await this.injectLegalHoldMessage({
@@ -1794,6 +1792,8 @@ export class ConversationRepository {
       timestamp: isoTimestamp,
       userId,
     });
+
+    return conversationEntity;
   }
 
   /**
@@ -1882,12 +1882,13 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when all the handlers have done their job
    */
-  private async triggerFeatureEventHandlers(conversationEntity: Conversation, eventJson: EventJson): Promise<void> {
+  private async triggerFeatureEventHandlers(conversationEntity: Conversation, eventJson: EventJson) {
     const conversationEventHandlers = [this.ephemeralHandler, this.stateHandler];
     const handlePromises = conversationEventHandlers.map(handler =>
       handler.handleConversationEvent(conversationEntity, eventJson),
     );
     await Promise.all(handlePromises);
+    return conversationEntity;
   }
 
   /**
@@ -2285,35 +2286,36 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.message-delete'
    * @returns Resolves when the event was handled
    */
-  private async onMessageDeleted(conversationEntity: Conversation, eventJson: EventJson): Promise<number | void> {
+  private onMessageDeleted(conversationEntity: Conversation, eventJson: EventJson) {
     const {data: eventData, from, id: eventId, time} = eventJson;
 
-    try {
-      const deletedMessageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
-        conversationEntity,
-        eventData.message_id,
-      );
-      if (deletedMessageEntity.ephemeral_expires()) {
-        return;
-      }
+    return this.messageRepositoryProvider()
+      .getMessageInConversationById(conversationEntity, eventData.message_id)
+      .then(deletedMessageEntity => {
+        if (deletedMessageEntity.ephemeral_expires()) {
+          return;
+        }
 
-      const isSameSender = from === deletedMessageEntity.from;
-      if (!isSameSender) {
-        throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
-      }
+        const isSameSender = from === deletedMessageEntity.from;
+        if (!isSameSender) {
+          throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
+        }
 
-      const isFromSelf = from === this.userState.self().id;
-      if (!isFromSelf) {
-        return this.addDeleteMessage(conversationEntity.id, eventId, time, deletedMessageEntity);
-      }
-      return await this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
-    } catch (error) {
-      const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
-      if (!isNotFound) {
-        this.logger.info(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
-        throw error;
-      }
-    }
+        const isFromSelf = from === this.userState.self().id;
+        if (!isFromSelf) {
+          return this.addDeleteMessage(conversationEntity.id, eventId, time, deletedMessageEntity);
+        }
+      })
+      .then(() => {
+        return this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
+      })
+      .catch(error => {
+        const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        if (!isNotFound) {
+          this.logger.info(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
+          throw error;
+        }
+      });
   }
 
   /**
@@ -2322,7 +2324,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.message-hidden'
    * @returns Resolves when the event was handled
    */
-  private async onMessageHidden(eventJson: EventJson): Promise<number> {
+  private async onMessageHidden(eventJson: EventJson) {
     const {conversation: conversationId, data: eventData, from} = eventJson;
 
     try {

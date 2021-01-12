@@ -606,38 +606,36 @@ export class EventRepository {
    * @param event Backend event extracted from notification stream
    * @returns Resolves with the saved event
    */
-  private handleEventSaving(event: EventRecord): Promise<EventRecord | void> {
+  private async handleEventSaving(event: EventRecord): Promise<EventRecord | void> {
     const conversationId = event.conversation;
     const mappedData = event.data || {};
 
+    let eventToReplace;
     // first check if a message that should be replaced exists in DB
-    const findEventToReplacePromise = mappedData.replacing_message_id
-      ? this.eventService.loadEvent(conversationId, mappedData.replacing_message_id)
-      : Promise.resolve();
+    if (mappedData.replacing_message_id) {
+      eventToReplace = await this.eventService.loadEvent(conversationId, mappedData.replacing_message_id);
+    }
 
-    return (findEventToReplacePromise as Promise<EventRecord>).then((eventToReplace: EventRecord) => {
-      const hasLinkPreview = mappedData.previews && mappedData.previews.length;
-      const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
-      if (isReplacementWithoutOriginal && !hasLinkPreview) {
-        // the only valid case of a replacement with no original message is when an edited message gets a link preview
-        this.throwValidationError(event, 'Edit event without original event');
+    const hasLinkPreview = mappedData.previews && mappedData.previews.length;
+    const isReplacementWithoutOriginal = !eventToReplace && mappedData.replacing_message_id;
+    if (isReplacementWithoutOriginal && !hasLinkPreview) {
+      // the only valid case of a replacement with no original message is when an edited message gets a link preview
+      this.throwValidationError(event, 'Edit event without original event');
+    }
+
+    if (eventToReplace) {
+      return this.handleEventReplacement(eventToReplace, event);
+    }
+
+    // check for duplicates (same id)
+    if (event.id) {
+      const storedEvent = await this.eventService.loadEvent(conversationId, event.id);
+      if (storedEvent) {
+        return this.handleDuplicatedEvent(storedEvent, event);
       }
 
-      const handleEvent = (newEvent: EventRecord) => {
-        // check for duplicates (same id)
-        const loadEventPromise = newEvent.id
-          ? this.eventService.loadEvent(conversationId, newEvent.id)
-          : Promise.resolve();
-
-        return (loadEventPromise as Promise<EventRecord>).then((storedEvent: EventRecord) => {
-          return storedEvent
-            ? this.handleDuplicatedEvent(storedEvent, newEvent)
-            : this.eventService.saveEvent(newEvent);
-        });
-      };
-
-      return eventToReplace ? this.handleEventReplacement(eventToReplace, event) : handleEvent(event);
-    });
+      return this.eventService.saveEvent(event);
+    }
   }
 
   private handleEventReplacement(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord> {
