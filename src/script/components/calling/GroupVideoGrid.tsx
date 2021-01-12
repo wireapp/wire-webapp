@@ -146,7 +146,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                   </span>
                 ) : (
                   <ParticipantMicOnIcon
-                    isActive={participant.isTopActiveSpeaker()}
+                    isActive={participant.isActivelySpeaking()}
                     className="group-video-grid__element__label__icon"
                   />
                 )}

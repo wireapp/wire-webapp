@@ -174,7 +174,7 @@ ko.components.register('participant-item', {
           <!-- /ko -->
 
           <!-- ko ifnot: callParticipant.isMuted() -->
-            <participant-mic-on-icon params="isActive: callParticipant.isTopActiveSpeaker()" data-bind="attr: {'data-uie-name': callParticipant.isTopActiveSpeaker() ? 'status-active-speaking' : 'status-audio-on'}"></participant-mic-on-icon>            
+            <participant-mic-on-icon params="isActive: callParticipant.isActivelySpeaking()" data-bind="attr: {'data-uie-name': callParticipant.isActivelySpeaking() ? 'status-active-speaking' : 'status-audio-on'}"></participant-mic-on-icon>            
           <!-- /ko -->
 
           <!-- ko if: callParticipant.isMuted() -->

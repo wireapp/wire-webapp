@@ -167,6 +167,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls hide-controls-hidden">
+          {}
           <ButtonGroup
             items={Object.values(VideoSpeakersTabs)}
             onChangeItem={item => callActions.setVideoSpeakersActiveTab(item)}
