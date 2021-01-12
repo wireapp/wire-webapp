@@ -66,6 +66,9 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
       setMaximizedParticipant(null);
       return;
     }
+    if (grid.thumbnail) {
+      return;
+    }
     const participant = videoParticipants.find(participant => participant.doesMatchIds(userId, clientId));
     setMaximizedParticipant(participant);
   };
