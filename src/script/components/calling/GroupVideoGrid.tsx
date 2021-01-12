@@ -102,7 +102,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               }}
               name="loading-icon"
             />
-            <div data-uie-name="noActiveSpeakers" css={{color: '#fff', fontSize: 11, fontWeight: 500}}>
+            <div data-uie-name="no-active-speakers" css={{color: '#fff', fontSize: 11, fontWeight: 500}}>
               {t('noActiveSpeakers')}
             </div>
           </div>
@@ -114,7 +114,10 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             onDoubleClick={() => doubleClickedOnVideo(participant.user.id, participant.clientId)}
             data-uie-name="item-grid"
             css={{
-              // border: participant.isActivelySpeaking() ? `2px solid ${selfParticipant.user.accent_color()}` : 'initial',
+              border:
+                participants.length > 1 && participant.isActivelySpeaking()
+                  ? `2px solid ${selfParticipant.user.accent_color()}`
+                  : 'initial',
               boxSizing: 'border-box',
             }}
           >
