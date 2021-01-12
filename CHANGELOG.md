@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.0.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.0.0...@wireapp/api-client@12.0.1) (2021-01-12)
+
+
+### Bug Fixes
+
+* **priority-queue:** Run tests with Jasmine 3.6 ([#3441](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3441)) ([cd92afe](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/cd92afe589816a78005cf81d90722a83fc1c52ac))
+
+
+
+
+
 # [12.0.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@11.35.6...@wireapp/api-client@12.0.0) (2021-01-07)
 
 
