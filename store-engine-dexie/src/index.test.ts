@@ -28,12 +28,11 @@ import {readAllSpec} from '@wireapp/store-engine/src/main/test/readAllSpec';
 import {readSpec} from '@wireapp/store-engine/src/main/test/readSpec';
 import {updateOrCreateSpec} from '@wireapp/store-engine/src/main/test/updateOrCreateSpec';
 import {updateSpec} from '@wireapp/store-engine/src/main/test/updateSpec';
+import UUID from 'uuidjs';
 
 import {IndexedDBEngine} from './index';
 
 describe('IndexedDBEngine', () => {
-  const STORE_NAME = 'store-name';
-
   let engine: IndexedDBEngine;
 
   async function initEngine(
@@ -41,7 +40,8 @@ describe('IndexedDBEngine', () => {
     useInLineKeys: boolean = false,
   ): Promise<IndexedDBEngine> {
     const storeEngine = shouldCreateNewEngine ? new IndexedDBEngine() : engine;
-    const db: Dexie = await storeEngine.init(STORE_NAME);
+
+    const db: Dexie = await storeEngine.init(`database-${UUID.genV4().toString()}`);
     let schema = {
       'the-simpsons': ', firstName, lastName',
     };
@@ -56,21 +56,19 @@ describe('IndexedDBEngine', () => {
   }
 
   afterEach(async () => {
-    let storeName = STORE_NAME;
     if (engine && engine['db']) {
-      storeName = engine['db'].name;
+      const storeName = engine['db'].name;
       engine['db'].close();
+      await Dexie.delete(storeName);
     }
-    await Dexie.delete(storeName);
   });
 
   describe('init', () => {
-    beforeEach(async () => (engine = await initEngine()));
-
     it('resolves with the database instance to which the records will be saved.', async () => {
-      engine = new IndexedDBEngine();
-      const instance = await engine.init(STORE_NAME);
+      const engine = new IndexedDBEngine();
+      const instance = await engine.init(`database-${UUID.genV4().toString()}`);
       expect(instance instanceof Dexie).toBe(true);
+      await Dexie.delete(instance.name);
     });
   });
 
