@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.3.37](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.3.36...@wireapp/store-engine-sqleet@1.3.37) (2021-01-12)
+
+
+### Bug Fixes
+
+* **priority-queue:** Run tests with Jasmine 3.6 ([#3441](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/issues/3441)) ([cd92afe](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/commit/cd92afe589816a78005cf81d90722a83fc1c52ac))
+
+
+
+
+
 ## [1.3.36](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.3.35...@wireapp/store-engine-sqleet@1.3.36) (2021-01-04)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet

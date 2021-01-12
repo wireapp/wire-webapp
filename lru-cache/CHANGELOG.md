@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.7.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.7.10...@wireapp/lru-cache@3.7.11) (2021-01-12)
+
+
+### Bug Fixes
+
+* **priority-queue:** Run tests with Jasmine 3.6 ([#3441](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/issues/3441)) ([cd92afe](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/commit/cd92afe589816a78005cf81d90722a83fc1c52ac))
+
+
+
+
+
 ## [3.7.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/lru-cache/compare/@wireapp/lru-cache@3.7.9...@wireapp/lru-cache@3.7.10) (2021-01-04)
 
 **Note:** Version bump only for package @wireapp/lru-cache

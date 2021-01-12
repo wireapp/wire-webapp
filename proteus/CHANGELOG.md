@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [9.8.33](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.8.32...@wireapp/proteus@9.8.33) (2021-01-12)
+
+
+### Bug Fixes
+
+* **priority-queue:** Run tests with Jasmine 3.6 ([#3441](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/issues/3441)) ([cd92afe](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/commit/cd92afe589816a78005cf81d90722a83fc1c52ac))
+
+
+
+
+
 ## [9.8.32](https://github.com/wireapp/wire-web-packages/tree/master/packages/proteus/compare/@wireapp/proteus@9.8.31...@wireapp/proteus@9.8.32) (2021-01-04)
 
 **Note:** Version bump only for package @wireapp/proteus

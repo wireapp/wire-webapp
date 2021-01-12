@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.2.26](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/compare/@wireapp/store-engine-fs@2.2.25...@wireapp/store-engine-fs@2.2.26) (2021-01-12)
+
+
+### Bug Fixes
+
+* **priority-queue:** Run tests with Jasmine 3.6 ([#3441](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/issues/3441)) ([cd92afe](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/commit/cd92afe589816a78005cf81d90722a83fc1c52ac))
+
+
+
+
+
 ## [2.2.25](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-fs/compare/@wireapp/store-engine-fs@2.2.24...@wireapp/store-engine-fs@2.2.25) (2021-01-04)
 
 **Note:** Version bump only for package @wireapp/store-engine-fs

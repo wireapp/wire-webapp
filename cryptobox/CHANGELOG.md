@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.2.46](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.2.45...@wireapp/cryptobox@12.2.46) (2021-01-12)
+
+
+### Bug Fixes
+
+* **priority-queue:** Run tests with Jasmine 3.6 ([#3441](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/3441)) ([cd92afe](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/cd92afe589816a78005cf81d90722a83fc1c52ac))
+
+
+
+
+
 ## [12.2.45](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.2.44...@wireapp/cryptobox@12.2.45) (2021-01-04)
 
 **Note:** Version bump only for package @wireapp/cryptobox

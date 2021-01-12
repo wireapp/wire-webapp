@@ -3,8 +3,8 @@
     "wire-cli": "dist/index.js"
   },
   "dependencies": {
-    "@wireapp/core": "17.0.0",
-    "@wireapp/store-engine-fs": "2.2.25",
+    "@wireapp/core": "17.0.1",
+    "@wireapp/store-engine-fs": "2.2.26",
     "commander": "6.2.0",
     "dotenv": "8.2.0",
     "fs-extra": "9.0.1"
@@ -33,5 +33,5 @@
     "test:project": "yarn dist && yarn test",
     "test:node": "exit 0"
   },
-  "version": "8.1.225"
+  "version": "8.1.226"
 }

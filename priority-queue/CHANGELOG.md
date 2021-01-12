@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.6.17...@wireapp/priority-queue@1.6.18) (2021-01-12)
+
+
+### Bug Fixes
+
+* **priority-queue:** Run tests with Jasmine 3.6 ([#3441](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/issues/3441)) ([cd92afe](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/cd92afe589816a78005cf81d90722a83fc1c52ac))
+
+
+
+
+
 ## [1.6.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.6.16...@wireapp/priority-queue@1.6.17) (2021-01-04)
 
 **Note:** Version bump only for package @wireapp/priority-queue
