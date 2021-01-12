@@ -653,13 +653,9 @@ export class CallingRepository {
       const call = new Call(this.selfUser.id, conversationId, conversationType, selfParticipant, callType);
       this.storeCall(call);
 
-      let success;
-
-      if ([CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(conversationType) && callType === CALL_TYPE.VIDEO) {
-        success = await this.warmupMediaStreams(call, true, true);
-      } else {
-        success = true;
-      }
+      const isGroupVideo =
+        [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(conversationType) && callType === CALL_TYPE.VIDEO;
+      const success = isGroupVideo ? await this.warmupMediaStreams(call, true, true) : true;
 
       if (success) {
         this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());

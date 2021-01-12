@@ -28,6 +28,7 @@ import {
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
   ConversationMemberLeaveEvent,
+  ConversationReceiptModeUpdateEvent,
 } from '@wireapp/api-client/src/event';
 import {
   DefaultConversationRoleName as DefaultRole,
@@ -1022,12 +1023,12 @@ export class ConversationRepository {
    *
    * @param payload Payload to map
    * @param initialTimestamp Initial server and event timestamp
-   * @returns Mapped conversation/s
+   * @returns Mapped conversation(s)
    */
   mapConversations(
-    payload: BackendConversation[] | BackendConversation,
+    payload: BackendConversation | BackendConversation[],
     initialTimestamp = this.getLatestEventTimestamp(),
-  ) {
+  ): Conversation | Conversation[] {
     const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
     const entities = this.conversationMapper.mapConversations(
       conversationsData as ConversationDatabaseData[],
@@ -1171,7 +1172,7 @@ export class ConversationRepository {
    * @param serviceId ID of service
    * @returns Resolves when service was added
    */
-  async addService(conversationEntity: Conversation, providerId: string, serviceId: string) {
+  async addService(conversationEntity: Conversation, providerId: string, serviceId: string): Promise<any> {
     try {
       const response: any = await this.conversation_service.postBots(conversationEntity.id, providerId, serviceId);
       const event = response?.event;
@@ -1287,11 +1288,8 @@ export class ConversationRepository {
   public async removeService(conversationEntity: Conversation, userId: string): Promise<any> {
     const response: any = await this.conversation_service.deleteBots(conversationEntity.id, userId);
     // TODO: Can this even have a response? in the API Client it look like it always returns `void`
-    const hasResponse = response?.event;
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = hasResponse
-      ? response.event
-      : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+    const event = response?.event || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
     this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
   }
@@ -1334,7 +1332,7 @@ export class ConversationRepository {
   public async updateConversationReceiptMode(
     conversationEntity: Conversation,
     receiptMode: ConversationReceiptModeUpdateData,
-  ) {
+  ): Promise<ConversationReceiptModeUpdateEvent> {
     const response = await this.conversation_service.updateConversationReceiptMode(conversationEntity.id, receiptMode);
     if (response) {
       this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
@@ -1448,7 +1446,7 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     newState: boolean,
     forceChange: boolean = false,
-  ) {
+  ): Promise<void> {
     if (!conversationEntity) {
       const error = new ConversationError(
         ConversationError.TYPE.CONVERSATION_NOT_FOUND,
@@ -1610,7 +1608,7 @@ export class ConversationRepository {
     isIncoming: boolean,
     fileExt: string,
     id = createRandomUuid(),
-  ) {
+  ): Promise<void> {
     const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt, id);
     await this.eventRepository.injectEvent(fileRestrictionMessage as EventRecord);
   }
@@ -2572,7 +2570,7 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     messageEntity: ContentMessage,
     eventJson: EventJson,
-  ) {
+  ): Promise<{conversationEntity: Conversation; messageEntity?: Message}> {
     const {data: event_data, from} = eventJson;
 
     const messageFromSelf = messageEntity.from === this.userState.self().id;
