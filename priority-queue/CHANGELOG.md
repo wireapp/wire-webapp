@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.6.18...@wireapp/priority-queue@1.6.19) (2021-01-12)
+
+
+### Bug Fixes
+
+* **priority-queue:** Sort items by priority when adding to queue ([6072d3a](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/commit/6072d3ab7654d00809bf52251e77997a74d0c420))
+
+
+
+
+
 ## [1.6.18](https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue/compare/@wireapp/priority-queue@1.6.17...@wireapp/priority-queue@1.6.18) (2021-01-12)
 
 
