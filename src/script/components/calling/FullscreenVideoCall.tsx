@@ -127,7 +127,16 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     };
   }, [videoGrid]);
 
-  const activeVideoSpeakers = call.getActiveVideoSpeakers();
+  const [activeVideoSpeakers, setActiveVideoSpeakers] = useState(call.getActiveVideoSpeakers());
+
+  useEffect(() => {
+    const subscription = call.lastActiveSpeakersUpdatTime.subscribe(() => {
+      setActiveVideoSpeakers(call.getActiveSpeakers());
+    });
+    return () => {
+      subscription.dispose();
+    };
+  }, []);
 
   return (
     <div id="video-calling" className="video-calling" ref={onRefChange}>

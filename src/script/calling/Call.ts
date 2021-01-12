@@ -46,6 +46,7 @@ export class Call {
   public readonly conversationType: CONV_TYPE;
   public readonly initialType: CALL_TYPE;
   public readonly isCbrEnabled: ko.Observable<boolean>;
+  public lastActiveSpeakersUpdatTime: ko.Observable<number> = ko.observable(0);
   public blockMessages: boolean = false;
   public type?: CALL_MESSAGE_TYPE;
   /**
@@ -107,6 +108,7 @@ export class Call {
       participant.isActivelySpeaking(false);
       participant.isTopActiveSpeaker(false);
     });
+    this.lastActiveSpeakersUpdatTime(Date.now());
   }
 
   getActiveSpeakers(): Participant[] {
