@@ -1468,19 +1468,19 @@ export class ConversationRepository {
 
     const conversationId = conversationEntity.id;
 
-    const updatePromise = conversationEntity.removed_from_conversation()
-      ? Promise.resolve()
-      : this.conversation_service.update_member_properties(conversationId, payload).catch(error => {
-          const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
-          this.logger.error(logMessage);
+    if (!conversationEntity.removed_from_conversation()) {
+      try {
+        await this.conversation_service.update_member_properties(conversationId, payload);
+      } catch (error) {
+        const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
+        this.logger.error(logMessage);
 
-          const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
-          if (!isNotFound) {
-            throw error;
-          }
-        });
-
-    await updatePromise;
+        const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
+        if (!isNotFound) {
+          throw error;
+        }
+      }
+    }
     const response = {
       data: payload,
       from: this.userState.self().id,
@@ -1538,18 +1538,17 @@ export class ConversationRepository {
     this.showModal(messageText, titleText);
   }
 
-  private handleUsersNotConnected(userIds: string[] = []) {
+  private async handleUsersNotConnected(userIds: string[] = []) {
     const [userID] = userIds;
     const userPromise = userIds.length === 1 ? this.userRepository.getUserById(userID) : Promise.resolve(null);
 
-    userPromise.then((userEntity: User) => {
-      const username = userEntity?.name();
-      const messageText = username
-        ? t('modalConversationNotConnectedMessageOne', username)
-        : t('modalConversationNotConnectedMessageMany');
-      const titleText = t('modalConversationNotConnectedHeadline');
-      this.showModal(messageText, titleText);
-    });
+    const userEntity = await userPromise;
+    const username = userEntity?.name();
+    const messageText = username
+      ? t('modalConversationNotConnectedMessageOne', username)
+      : t('modalConversationNotConnectedMessageMany');
+    const titleText = t('modalConversationNotConnectedHeadline');
+    this.showModal(messageText, titleText);
   }
 
   private showModal(messageText: string, titleText: string) {
@@ -1628,9 +1627,9 @@ export class ConversationRepository {
     return this.pushToReceivingQueue(eventJson, eventSource);
   };
 
-  private handleConversationEvent(eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) {
+  private async handleConversationEvent(eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
-      return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
+      throw new Error('Conversation Repository Event Handling: Event missing');
     }
 
     const {conversation, data: eventData, type} = eventJson;
@@ -1644,60 +1643,51 @@ export class ConversationRepository {
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
-        return Promise.reject(
-          new ConversationError(
-            ConversationError.TYPE.WRONG_CONVERSATION,
-            ConversationError.MESSAGE.WRONG_CONVERSATION,
-          ),
+        throw new ConversationError(
+          ConversationError.TYPE.WRONG_CONVERSATION,
+          ConversationError.MESSAGE.WRONG_CONVERSATION,
         );
       }
     }
 
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
-    const onEventPromise = isConversationCreate ? Promise.resolve(null) : this.get_conversation_by_id(conversationId);
     let previouslyArchived = false;
 
-    return onEventPromise
-      .then((conversationEntity: Conversation) => {
-        if (conversationEntity) {
-          // Check if conversation was archived
-          previouslyArchived = conversationEntity.is_archived();
+    try {
+      const conversationEntity = isConversationCreate ? null : await this.get_conversation_by_id(conversationId);
+      if (conversationEntity) {
+        // Check if conversation was archived
+        previouslyArchived = conversationEntity.is_archived();
 
-          const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
-          conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
-        }
+        const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
+        conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
+      }
 
-        return conversationEntity;
-      })
-      .then(conversationEntity => this.checkLegalHoldStatus(conversationEntity, eventJson))
-      .then(conversationEntity => this.checkConversationParticipants(conversationEntity, eventJson, eventSource))
-      .then(conversationEntity => this.triggerFeatureEventHandlers(conversationEntity, eventJson))
-      .then(
-        conversationEntity => this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
-      )
-      .then((entityObject = {} as EntityObject) =>
-        this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived),
-      )
-      .catch((error: BaseError) => {
-        const ignoredErrorTypes: string[] = [
-          ConversationError.TYPE.MESSAGE_NOT_FOUND,
-          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-        ];
+      await this.checkLegalHoldStatus(conversationEntity, eventJson);
+      await this.checkConversationParticipants(conversationEntity, eventJson, eventSource);
+      await this.triggerFeatureEventHandlers(conversationEntity, eventJson);
+      const entityObject = ((await this.reactToConversationEvent(conversationEntity, eventJson, eventSource)) ||
+        {}) as EntityObject;
+      await this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived);
+    } catch (error) {
+      const ignoredErrorTypes: string[] = [
+        ConversationError.TYPE.MESSAGE_NOT_FOUND,
+        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+      ];
 
-        const isRemovedFromConversation =
-          (error as BackendClientError).label === BackendClientError.LABEL.ACCESS_DENIED;
-        if (isRemovedFromConversation) {
-          const messageText = t('conversationNotFoundMessage');
-          const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
+      const isRemovedFromConversation = (error as BackendClientError).label === BackendClientError.LABEL.ACCESS_DENIED;
+      if (isRemovedFromConversation) {
+        const messageText = t('conversationNotFoundMessage');
+        const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
 
-          this.showModal(messageText, titleText);
-          return;
-        }
+        this.showModal(messageText, titleText);
+        return;
+      }
 
-        if (!ignoredErrorTypes.includes(error.type)) {
-          throw error;
-        }
-      });
+      if (!ignoredErrorTypes.includes(error.type)) {
+        throw error;
+      }
+    }
   }
 
   /**
@@ -2088,12 +2078,15 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-join' event
    * @returns Resolves when the event was handled
    */
-  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onMemberJoin(
+    conversationEntity: Conversation,
+    eventJson: EventJson,
+  ): Promise<{conversationEntity: Conversation; messageEntity: Message} | void> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
     if (isPendingConnection) {
-      return Promise.resolve();
+      return;
     }
 
     const eventData = eventJson.data;
@@ -2113,15 +2106,14 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
+    if (selfUserRejoins) {
+      await this.updateConversationFromBackend(conversationEntity);
+    }
 
-    return updateSequence
-      .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
-      .then(() => this.addEventToConversation(conversationEntity, eventJson))
-      .then(({messageEntity}) => {
-        this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
-        return {conversationEntity, messageEntity};
-      });
+    await this.updateParticipatingUserEntities(conversationEntity, false, true);
+    const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
+    this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
+    return {conversationEntity, messageEntity};
   }
 
   /**
@@ -2134,7 +2126,7 @@ export class ConversationRepository {
   private async onMemberLeave(
     conversationEntity: Conversation,
     eventJson: EventJson,
-  ): Promise<{conversationEntity: Conversation; messageEntity: Message} | undefined> {
+  ): Promise<{conversationEntity: Conversation; messageEntity: Message} | void> {
     const {data: eventData, from} = eventJson;
     const isFromSelf = from === this.userState.self().id;
     const removesSelfUser = eventData.user_ids.includes(this.userState.self().id);
@@ -2171,8 +2163,6 @@ export class ConversationRepository {
 
       return {conversationEntity, messageEntity};
     }
-
-    return undefined;
   }
 
   /**
