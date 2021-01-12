@@ -24,7 +24,7 @@
     "@wireapp/commons": "4.0.0",
     "@wireapp/store-engine-dexie": "1.3.25",
     "commander": "6.2.0",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "del-cli": "3.0.1",
     "dotenv": "8.2.0",
     "faker": "5.1.0",

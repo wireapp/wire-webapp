@@ -6,7 +6,7 @@
     "@types/jasmine": "3.6.2",
     "@types/node": "~14",
     "@wireapp/bot-api": "7.11.81",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "dotenv-defaults": "2.0.1",
     "jasmine": "3.6.3",
     "rimraf": "3.0.2",

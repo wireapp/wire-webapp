@@ -4,7 +4,7 @@
   },
   "devDependencies": {
     "@types/karma": "5.0.1",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "del-cli": "3.0.1",
     "jasmine": "3.6.3",
     "karma": "5.2.3",

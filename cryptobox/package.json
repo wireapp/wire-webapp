@@ -14,7 +14,7 @@
     "@wireapp/store-engine-fs": "2.2.25",
     "browser-sync": "2.26.13",
     "cpx": "1.5.0",
-    "cross-env": "7.0.2",
+    "cross-env": "7.0.3",
     "jasmine": "3.6.3",
     "karma": "5.2.3",
     "karma-chrome-launcher": "3.1.0",
