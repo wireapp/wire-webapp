@@ -115,7 +115,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             data-uie-name="item-grid"
             css={{
               border:
-                participants.length > 1 && participant.isActivelySpeaking()
+                participants.length > 2 && participant.isActivelySpeaking()
                   ? `2px solid ${selfParticipant.user.accent_color()}`
                   : 'initial',
               boxSizing: 'border-box',
