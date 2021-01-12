@@ -114,13 +114,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             onDoubleClick={() => doubleClickedOnVideo(participant.user.id, participant.clientId)}
             data-uie-name="item-grid"
             data-user-id={participant.user.id}
-            css={{
-              border:
-                participants.length > 2 && participant.isActivelySpeaking()
-                  ? `2px solid ${selfParticipant.user.accent_color()}`
-                  : 'initial',
-              boxSizing: 'border-box',
-            }}
+            css={{position: 'relative'}}
           >
             <Video
               className="group-video-grid__element-video"
@@ -131,6 +125,20 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                 objectFit: !!maximizedParticipant || participant.sharesScreen() ? 'contain' : 'cover',
                 transform:
                   participant === selfParticipant && participant.sharesCamera() ? 'rotateY(180deg)' : 'initial',
+              }}
+            />
+            <div
+              css={{
+                bottom: 0,
+                boxShadow:
+                  participants.length > 2 && participant.isActivelySpeaking()
+                    ? `inset 0px 0px 2px 2px ${selfParticipant.user.accent_color()}`
+                    : `inset 0px 0px 0px 0px ${selfParticipant.user.accent_color()}`,
+                left: 0,
+                position: 'absolute',
+                right: 0,
+                top: 0,
+                transition: 'box-shadow 0.3s ease-in-out',
               }}
             />
             {!minimized && (
