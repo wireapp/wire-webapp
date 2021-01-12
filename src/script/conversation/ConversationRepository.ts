@@ -714,7 +714,7 @@ export class ConversationRepository {
           },
         });
       }
-    });
+    })();
   }
 
   private readonly deleteConversationLocally = (conversationId: string, skipNotification = false) => {
@@ -2477,7 +2477,7 @@ export class ConversationRepository {
 
         const userIds = conversationEntity.isGroup() ? [this.userState.self().id, messageEntity.from] : undefined;
         return this.messageRepositoryProvider().deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
-      });
+      })();
     }
   };
 

@@ -935,7 +935,7 @@ export class CallingRepository {
       } catch {
         this.abortCall(conversationId);
       }
-    });
+    })();
 
     return 0;
   };
