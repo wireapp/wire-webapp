@@ -113,6 +113,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             className="group-video-grid__element"
             onDoubleClick={() => doubleClickedOnVideo(participant.user.id, participant.clientId)}
             data-uie-name="item-grid"
+            data-user-id={participant.user.id}
             css={{
               border:
                 participants.length > 2 && participant.isActivelySpeaking()
