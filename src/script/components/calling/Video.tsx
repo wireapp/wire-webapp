@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,25 @@
  *
  */
 
-import ko from 'knockout';
+// https://github.com/facebook/react/issues/11163#issuecomment-628379291
+import React from 'react';
+import {VideoHTMLAttributes, useEffect, useRef} from 'react';
 
-import type {User} from '../../entity/User';
+type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
+  srcObject: MediaStream;
+};
 
-interface ComponentParams {
-  users: ko.PureComputed<User[]>;
-}
+const Video = ({srcObject, ...props}: VideoProps) => {
+  const refVideo = useRef<HTMLVideoElement>(null);
 
-ko.components.register('group-avatar', {
-  template: `
-    <div class="group-avatar-box-wrapper" data-bind="foreach: users">
-      <div class="group-avatar-box" data-bind="text: Array.from($data.initials())[0], style: {color: $data.accent_color()}"></div>
-    </div>
-  `,
-  viewModel: class {
-    readonly users: ko.PureComputed<User[]>;
-
-    constructor(params: ComponentParams) {
-      this.users = ko.pureComputed(() => params.users().slice(0, 4));
+  useEffect(() => {
+    if (!refVideo.current) {
+      return;
     }
-  },
-});
+    refVideo.current.srcObject = srcObject;
+  }, [srcObject]);
+
+  return <video ref={refVideo} {...props} />;
+};
+
+export default Video;

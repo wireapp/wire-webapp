@@ -25,7 +25,7 @@ import ko from 'knockout';
 import type {Availability} from '@wireapp/protocol-messaging';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 
-import 'Components/availabilityState';
+import 'Components/AvailabilityState';
 import 'Components/legalHoldDot';
 import 'Components/list/groupedConversations';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';

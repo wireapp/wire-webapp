@@ -29,7 +29,6 @@ import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
 import {container} from 'tsyringe';
 import {Logger, Runtime} from '@wireapp/commons';
 
-import 'Components/availabilityState';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {getLogger} from 'Util/Logger';
 import {isKey, KEY} from 'Util/KeyboardUtil';
@@ -43,6 +42,8 @@ import {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
 import {ConsentValue} from '../../user/ConsentValue';
 import {ContentViewModel} from '../ContentViewModel';
+
+import 'Components/AvailabilityState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
 import {HistoryExportViewModel} from './HistoryExportViewModel';

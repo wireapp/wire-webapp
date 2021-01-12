@@ -48,6 +48,7 @@ export interface CallActions {
   answer: (call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
+  setVideoSpeakersActiveTab: (tab: string) => void;
   startAudio: (conversationEntity: Conversation) => void;
   startVideo: (conversationEntity: Conversation) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
@@ -56,6 +57,13 @@ export interface CallActions {
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
 }
+
+export const VideoSpeakersTabs = {
+  speakers: 'speakers',
+  // explictly disabled.
+  // eslint-disable-next-line sort-keys-fix/sort-keys-fix
+  all: 'all',
+};
 
 declare global {
   interface HTMLAudioElement {
@@ -81,6 +89,7 @@ export class CallingViewModel {
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
   readonly teamRepository: TeamRepository;
+  readonly videoSpeakersActiveTab: ko.Observable<string>;
 
   constructor(
     callingRepository: CallingRepository,
@@ -118,7 +127,7 @@ export class CallingViewModel {
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
     this.multitasking = multitasking;
-
+    this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTabs.all);
     this.onChooseScreen = () => {};
 
     const ring = (call: Call): void => {
@@ -186,6 +195,9 @@ export class CallingViewModel {
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
+      },
+      setVideoSpeakersActiveTab: (tab: string) => {
+        this.videoSpeakersActiveTab(tab);
       },
       startAudio: (conversationEntity: Conversation): void => {
         startCall(conversationEntity, CALL_TYPE.NORMAL);

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,37 +17,21 @@
  *
  */
 
-device-toggle-button {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  color: #fff;
-  cursor: pointer;
+import React from 'react';
+
+import SVGProvider from '../auth/util/SVGProvider';
+
+export interface NamedIconProps extends React.SVGProps<SVGSVGElement> {
+  name: string;
 }
 
-.device-toggle-button-dark {
-  color: var(--background);
+const NamedIcon: React.FC<NamedIconProps> = ({name, children, ...otherProps}) => {
+  const props = {
+    viewBox: `0 0 ${otherProps.width || 16} ${otherProps.height || 16}`,
+    ...otherProps,
+  };
 
-  .device-toggle-button-indicator-dot {
-    color: var(--background);
-  }
-}
+  return <svg {...props} dangerouslySetInnerHTML={{__html: SVGProvider[name]?.documentElement?.innerHTML}} />;
+};
 
-.device-toggle-button-indicator {
-  display: flex;
-  margin-top: 8px;
-}
-
-.device-toggle-button-indicator-dot {
-  .dot-md;
-
-  background-color: var(--foreground-fade-24);
-
-  &:not(:last-child) {
-    margin-right: 8px;
-  }
-}
-
-.device-toggle-button-indicator-dot-active {
-  background-color: currentColor;
-}
+export default NamedIcon;
