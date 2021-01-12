@@ -53,14 +53,18 @@ export class PriorityQueue {
       item.retry = 0;
       item.timestamp = Date.now() + this.size;
 
-      this.queue.push(item);
-      this.queue.sort(this.config.comparator);
+      this.enqueue(item);
 
       if (!this.isRunning) {
         this.isRunning = true;
         void this.processList();
       }
     });
+  }
+
+  enqueue(item: Item): void {
+    this.queue.push(item);
+    this.queue.sort(this.config.comparator);
   }
 
   public delete(label: string): void {
@@ -103,7 +107,7 @@ export class PriorityQueue {
         item.reject(error);
         void this.processList();
       } else {
-        this.queue.push(item);
+        this.enqueue(item);
         setTimeout(() => this.processList(), this.getGrowingDelay(item.retry));
         item.retry++;
       }
