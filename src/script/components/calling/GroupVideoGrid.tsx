@@ -150,7 +150,18 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                     className="group-video-grid__element__label__icon"
                   />
                 )}
-                <span className="group-video-grid__element__label__name">{participant.user.name()}</span>
+                <span
+                  data-uie-name={
+                    participant.isActivelySpeaking()
+                      ? 'status-active-speaking'
+                      : participant.isMuted()
+                      ? 'status-audio-off'
+                      : 'status-audio-on'
+                  }
+                  className="group-video-grid__element__label__name"
+                >
+                  {participant.user.name()}
+                </span>
               </div>
             )}
             {participant.hasPausedVideo() && (
