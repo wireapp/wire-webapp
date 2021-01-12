@@ -997,7 +997,7 @@
   "verify.resendCode": "Resend code",
   "verify.subhead": "Enter the verification code we sent to{newline}{email}",
   "videoCallOverlayConversations": "Conversations",
-  "videoCallOverlayFitVideoLabel": "Double-click to fit or fill video to frame",
+  "videoCallOverlayFitVideoLabel": "double-click to maximize any participant",
   "videoCallOverlayHangUp": "Hang Up",
   "videoCallOverlayMute": "Mute",
   "videoCallOverlayShareScreen": "Share Screen",
