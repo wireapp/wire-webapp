@@ -1902,10 +1902,10 @@
   resolved "https://registry.yarnpkg.com/@types/emscripten/-/emscripten-1.39.3.tgz#cac2f24b4739c344c42f928a4c1af1aab245364e"
   integrity sha512-F+LPHVwVWp6bkhRq7sMdW0JsQMXd5ZuPbjwU/X6HaAtvIjRmYL2z4BCIopnBRcrzZLorVFf8gxY/GR7szLuPEw==
 
-"@types/enzyme@3.10.6":
-  version "3.10.6"
-  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.6.tgz#a34a6b09ff732be29c194dc8d786555f4717fd85"
-  integrity sha512-Jxyn2U+UfhmrE7EaeZYfV1sPA5OEDuZmg9Lxj8TxOnfCn71flf0Cn1136LWdCVYj7yapLFmUWqKCcgplWNZCJg==
+"@types/enzyme@3.10.8":
+  version "3.10.8"
+  resolved "https://registry.yarnpkg.com/@types/enzyme/-/enzyme-3.10.8.tgz#ad7ac9d3af3de6fd0673773123fafbc63db50d42"
+  integrity sha512-vlOuzqsTHxog6PV79+tvOHFb6hq4QZKMq1lLD9MaWD1oec2lHTKndn76XOpSwCA0oFTaIbKVPrgM3k78Jjd16g==
   dependencies:
     "@types/cheerio" "*"
     "@types/react" "*"
