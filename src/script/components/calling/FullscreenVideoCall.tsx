@@ -131,7 +131,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   useEffect(() => {
     const subscription = call.lastActiveSpeakersUpdatTime.subscribe(() => {
-      setActiveVideoSpeakers(call.getActiveSpeakers());
+      setActiveVideoSpeakers(call.getActiveVideoSpeakers());
     });
     return () => {
       subscription.dispose();
