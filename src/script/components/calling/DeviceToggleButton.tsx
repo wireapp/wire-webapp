@@ -38,6 +38,7 @@ const DeviceToggleButton: React.FC<DeviceToggleButtonProps> = ({currentDevice, d
 
   return (
     <div
+      data-uie-name="device-toggle-button"
       css={css`
         align-items: center;
         flex-direction: column;
