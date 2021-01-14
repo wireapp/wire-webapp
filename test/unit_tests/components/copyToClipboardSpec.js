@@ -17,7 +17,7 @@
  *
  */
 
-import 'src/script/components/copyToClipboard';
+import 'Components/CopyToClipboard';
 
 import {instantiateComponent} from '../../helper/knockoutHelpers';
 

@@ -17,24 +17,33 @@
  *
  */
 
-class CopyToClipboard {
-  public readonly text: string;
+import React from 'react';
+import {registerReactComponent} from '../util/ComponentUtil';
 
-  constructor(params: {text: string}) {
-    this.text = params.text;
-  }
+export interface CopyToClipboardProps {
+  text: string;
+}
 
-  onClick(viewModel: CopyToClipboard, event: JQuery.Event<HTMLElement, KeyboardEvent>): void {
+const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text}) => {
+  const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     if (window.getSelection) {
       const selectionRange = document.createRange();
       selectionRange.selectNode(event.currentTarget);
       window.getSelection().removeAllRanges();
       window.getSelection().addRange(selectionRange);
     }
-  }
-}
+  };
 
-ko.components.register('copy-to-clipboard', {
-  template: '<div class="copy-to-clipboard" data-bind="click: onClick, text: text()"></div>',
-  viewModel: CopyToClipboard,
+  return (
+    <div className="copy-to-clipboard" onClick={onClick}>
+      {text}
+    </div>
+  );
+};
+
+export default CopyToClipboard;
+
+registerReactComponent('copy-to-clipboard', {
+  component: CopyToClipboard,
+  template: '<div class="copy-to-clipboard" data-bind="react: {click: onClick, text: text()}"></div>',
 });

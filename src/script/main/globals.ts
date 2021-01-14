@@ -32,7 +32,7 @@ import 'Components/asset/assetHeader';
 import 'Components/asset/controls/audioSeekBar';
 import 'Components/asset/controls/mediaButton';
 import 'Components/asset/controls/seekBar';
-import 'Components/copyToClipboard';
+import 'Components/CopyToClipboard';
 import 'Components/deviceRemove';
 import 'Components/ephemeralTimer';
 import 'Components/fullSearch';
