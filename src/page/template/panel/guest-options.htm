@@ -15,7 +15,7 @@
           <div data-bind="text: t('guestOptionsInfoText', brandName)" data-uie-name="status-guest-options-info"></div>
         </div>
         <!-- ko if: hasAccessCode() -->
-          <copy-to-clipboard class="guest-options__link" params="text: activeConversation().accessCode" data-uie-name="status-invite-link"></copy-to-clipboard>
+          <select-target class="guest-options__link" params="text: activeConversation().accessCode" data-uie-name="status-invite-link"></select-target>
           <div class="panel__action-item panel__action-item--alternate" data-bind="click: copyLink, css: {'panel__action-item--show-alternative': isLinkCopied}" data-uie-name="do-copy-link">
             <div class="panel__action-item__default">
               <copy-icon class="panel__action-item__icon"></copy-icon>

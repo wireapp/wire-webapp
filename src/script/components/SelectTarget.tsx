@@ -18,13 +18,13 @@
  */
 
 import React from 'react';
-import {registerReactComponent} from '../util/ComponentUtil';
+import {registerReactComponent} from 'Util/ComponentUtil';
 
-export interface CopyToClipboardProps {
+export interface SelectTargetProps {
   text: string;
 }
 
-const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text}) => {
+const SelectTarget: React.FC<SelectTargetProps> = ({text}) => {
   const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     if (window.getSelection) {
       const selectionRange = document.createRange();
@@ -35,15 +35,15 @@ const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text}) => {
   };
 
   return (
-    <div className="copy-to-clipboard" onClick={onClick}>
+    <div className="select-target" data-uie-name="do-select" onClick={onClick}>
       {text}
     </div>
   );
 };
 
-export default CopyToClipboard;
+export default SelectTarget;
 
-registerReactComponent('copy-to-clipboard', {
-  component: CopyToClipboard,
-  template: '<div class="copy-to-clipboard" data-bind="react: {click: onClick, text: text()}"></div>',
+registerReactComponent('select-target', {
+  component: SelectTarget,
+  template: '<div class="select-target" data-bind="react: {text: text()}"></div>',
 });
