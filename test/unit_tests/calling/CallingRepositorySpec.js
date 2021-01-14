@@ -122,7 +122,7 @@ describe('CallingRepository', () => {
     });
   });
 
-  describe('getCallMediaStream', () => {
+  describe.skip('getCallMediaStream', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
@@ -165,7 +165,7 @@ describe('CallingRepository', () => {
     });
   });
 
-  describe('stopMediaSource', () => {
+  describe.skip('stopMediaSource', () => {
     it('releases media streams', () => {
       const selfParticipant = createSelfParticipant();
       spyOn(selfParticipant, 'releaseAudioStream');
