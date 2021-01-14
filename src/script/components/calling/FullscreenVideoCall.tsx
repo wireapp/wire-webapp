@@ -55,7 +55,6 @@ export interface FullscreenVideoCallProps {
 }
 
 const FullscreenVideoCallConfig = {
-  AUTO_MINIMIZE_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
   HIDE_CONTROLS_TIMEOUT: TIME_IN_MILLIS.SECOND * 4,
 };
 
@@ -111,21 +110,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
     };
   }, []);
-
-  useEffect(() => {
-    let minimizeTimeout: number;
-    minimizeTimeout = undefined;
-    if (!videoGrid.hasRemoteVideo && multitasking.autoMinimize()) {
-      minimizeTimeout = window.setTimeout(() => {
-        if (!isChoosingScreen) {
-          multitasking.isMinimized(true);
-        }
-      }, FullscreenVideoCallConfig.AUTO_MINIMIZE_TIMEOUT);
-    }
-    return () => {
-      window.clearTimeout(minimizeTimeout);
-    };
-  }, [videoGrid]);
 
   const [activeVideoSpeakers, setActiveVideoSpeakers] = useState(call.getActiveVideoSpeakers());
 
