@@ -123,7 +123,7 @@ describe('CallingRepository', () => {
   });
 
   describe('getCallMediaStream', () => {
-    it('returns cached mediastream for self user if set', () => {
+    it.skip('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
       const source = new RTCAudioSource();
@@ -143,7 +143,7 @@ describe('CallingRepository', () => {
       });
     });
 
-    it('asks only once for mediastream when queried multiple times', () => {
+    it.skip('asks only once for mediastream when queried multiple times', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
       const source = new RTCAudioSource();
