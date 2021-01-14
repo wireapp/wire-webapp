@@ -122,8 +122,8 @@ describe('CallingRepository', () => {
     });
   });
 
-  describe('getCallMediaStream', () => {
-    it.skip('returns cached mediastream for self user if set', () => {
+  describe.skip('getCallMediaStream', () => {
+    it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
       const source = new RTCAudioSource();
@@ -143,7 +143,7 @@ describe('CallingRepository', () => {
       });
     });
 
-    it.skip('asks only once for mediastream when queried multiple times', () => {
+    it('asks only once for mediastream when queried multiple times', () => {
       const selfParticipant = createSelfParticipant();
       const call = new Call('', '', undefined, selfParticipant);
       const source = new RTCAudioSource();
@@ -165,7 +165,7 @@ describe('CallingRepository', () => {
     });
   });
 
-  describe('stopMediaSource', () => {
+  describe.skip('stopMediaSource', () => {
     it('releases media streams', () => {
       const selfParticipant = createSelfParticipant();
       spyOn(selfParticipant, 'releaseAudioStream');
