@@ -32,7 +32,7 @@ describe('messageListBindings', () => {
     ];
 
     scrollingTests.forEach(({expectedCalls, initialScroll, scrollTop}) => {
-      it.skip('calls params functions when scroll hits top and bottom', () => {
+      it('calls params functions when scroll hits top and bottom', () => {
         const context = {
           onHitBottom: jest.fn(),
           onHitTop: jest.fn(),
