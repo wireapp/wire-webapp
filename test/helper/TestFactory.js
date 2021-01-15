@@ -342,6 +342,7 @@ export class TestFactory {
       new PermissionRepository(),
       this.user_repository.userState,
       this.conversation_repository.conversationState,
+      this.calling_repository.callState,
     );
 
     return this.notification_repository;

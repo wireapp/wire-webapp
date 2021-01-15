@@ -23,6 +23,7 @@ import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
 import {Participant} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
+import {CallState} from 'src/script/calling/CallState';
 import {User} from 'src/script/entity/User';
 import {MediaType} from 'src/script/media/MediaType';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -56,7 +57,7 @@ describe('CallingRepository', () => {
   });
 
   afterEach(() => {
-    callingRepository.activeCalls([]);
+    callingRepository.callState.activeCalls([]);
   });
 
   afterAll(() => {
@@ -73,7 +74,7 @@ describe('CallingRepository', () => {
         CALL_TYPE.NORMAL,
       );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
-      spyOn(callingRepository, 'activeCalls').and.returnValue([activeCall]);
+      spyOn(callingRepository.callState, 'activeCalls').and.returnValue([activeCall]);
       spyOn(amplify, 'publish').and.returnValue(undefined);
       const conversationId = createRandomUuid();
       const conversationType = CONV_TYPE.ONEONONE;
@@ -116,9 +117,9 @@ describe('CallingRepository', () => {
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
 
-      callingRepository.activeCalls([incomingCall, activeCall, declinedCall]);
+      callingRepository.callState.activeCalls([incomingCall, activeCall, declinedCall]);
 
-      expect(callingRepository.joinedCall()).toBe(activeCall);
+      expect(callingRepository.callState.joinedCall()).toBe(activeCall);
     });
   });
 
@@ -217,7 +218,8 @@ describe('CallingRepository ISO', () => {
         {
           findConversation: jest.fn().mockImplementation(() => conversation),
           participating_user_ets: jest.fn(),
-        }, //ConversationState
+        }, // ConversationState
+        new CallState(),
       );
 
       const avs = await callingRepo.initAvs(selfUser, selfUser.clientId);
@@ -246,10 +248,10 @@ describe('CallingRepository ISO', () => {
         type: 'call.e-call',
       };
 
-      expect(callingRepo.activeCalls().length).toBe(0);
+      expect(callingRepo.callState.activeCalls().length).toBe(0);
 
       callingRepo.onIncomingCall(call => {
-        expect(callingRepo.activeCalls().length).toBe(1);
+        expect(callingRepo.callState.activeCalls().length).toBe(1);
 
         done();
       });
