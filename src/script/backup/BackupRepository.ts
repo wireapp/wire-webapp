@@ -23,7 +23,6 @@ import {container} from 'tsyringe';
 import {chunk} from 'Util/ArrayUtil';
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {ConnectionRepository} from '../connection/ConnectionRepository';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
 import {ClientEvent} from '../event/Client';
@@ -41,6 +40,7 @@ import {
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {ConnectionState} from '../connection/ConnectionState';
 
 export interface Metadata {
   client_id: string;
@@ -59,7 +59,6 @@ export interface FileDescriptor {
 
 export class BackupRepository {
   private readonly backupService: BackupService;
-  private readonly connectionRepository: ConnectionRepository;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
   private canceled: boolean;
@@ -77,15 +76,14 @@ export class BackupRepository {
 
   constructor(
     backupService: BackupService,
-    connectionRepository: ConnectionRepository,
     conversationRepository: ConversationRepository,
     private readonly clientState = container.resolve(ClientState),
     private readonly userState = container.resolve(UserState),
+    private readonly connectionState = container.resolve(ConnectionState),
   ) {
     this.logger = getLogger('BackupRepository');
 
     this.backupService = backupService;
-    this.connectionRepository = connectionRepository;
     this.conversationRepository = conversationRepository;
 
     this.canceled = false;
@@ -274,7 +272,7 @@ export class BackupRepository {
     await this.importHistoryEvents(eventEntities, progressCallback);
     await this.conversationRepository.updateConversations(importedEntities);
     await Promise.all(
-      this.conversationRepository.map_connections(Object.values(this.connectionRepository.connectionEntities())),
+      this.conversationRepository.map_connections(Object.values(this.connectionState.connectionEntities())),
     );
     // doesn't need to be awaited
     void this.conversationRepository.checkForDeletedConversations();

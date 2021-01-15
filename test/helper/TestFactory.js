@@ -103,10 +103,10 @@ export class TestFactory {
 
     this.backup_repository = new BackupRepository(
       this.backup_service,
-      this.connection_repository,
       this.conversation_repository,
       this.client_repository.clientState,
       this.user_repository.userState,
+      this.connection_repository.connectionState,
     );
 
     return this.backup_repository;
