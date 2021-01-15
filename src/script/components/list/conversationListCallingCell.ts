@@ -42,7 +42,7 @@ import type {Multitasking} from '../../notification/NotificationRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import {Participant} from '../../calling/Participant';
 import {container} from 'tsyringe';
-import {CallState} from 'src/script/calling/CallState';
+import {CallState} from '../../calling/CallState';
 
 interface ComponentParams {
   call: Call;

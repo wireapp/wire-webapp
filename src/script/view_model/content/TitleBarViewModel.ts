@@ -36,7 +36,7 @@ import {CallingRepository} from '../../calling/CallingRepository';
 import {Conversation} from '../../entity/Conversation';
 import {UserState} from '../../user/UserState';
 import {ConversationState} from '../../conversation/ConversationState';
-import {CallState} from 'src/script/calling/CallState';
+import {CallState} from '../../calling/CallState';
 
 // Parent: ContentViewModel
 export class TitleBarViewModel {
