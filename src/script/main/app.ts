@@ -310,11 +310,7 @@ class App {
       repositories.team,
     );
     repositories.permission = new PermissionRepository();
-    repositories.notification = new NotificationRepository(
-      repositories.calling,
-      repositories.conversation,
-      repositories.permission,
-    );
+    repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     repositories.conversation.leaveCall = repositories.calling.leaveCall;

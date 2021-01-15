@@ -34,16 +34,15 @@ import {CallingViewModel} from '../CallingViewModel';
 import {PanelViewModel} from '../PanelViewModel';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {Conversation} from '../../entity/Conversation';
-import {Call} from '../../calling/Call';
 import {UserState} from '../../user/UserState';
 import {ConversationState} from '../../conversation/ConversationState';
+import {CallState} from 'src/script/calling/CallState';
 
 // Parent: ContentViewModel
 export class TitleBarViewModel {
   readonly panelIsVisible: ko.PureComputed<boolean>;
   readonly conversationEntity: ko.Observable<Conversation>;
   readonly ConversationVerificationState: typeof ConversationVerificationState;
-  private readonly joinedCall: ko.PureComputed<Call | undefined>;
   readonly isActivatedAccount: ko.PureComputed<boolean>;
   private readonly hasCall: ko.PureComputed<boolean>;
   readonly badgeLabelCopy: ko.PureComputed<string>;
@@ -58,6 +57,7 @@ export class TitleBarViewModel {
     private readonly callingRepository: CallingRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly callState = container.resolve(CallState),
   ) {
     this.contentViewModel = contentViewModel;
 
@@ -69,12 +69,11 @@ export class TitleBarViewModel {
     this.conversationEntity = this.conversationState.activeConversation;
     this.ConversationVerificationState = ConversationVerificationState;
 
-    this.joinedCall = this.callingRepository.joinedCall;
     this.isActivatedAccount = this.userState.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
-      const hasEntities = this.conversationEntity() && !!this.joinedCall();
-      return hasEntities ? this.conversationEntity().id === this.joinedCall().conversationId : false;
+      const hasEntities = this.conversationEntity() && !!this.callState.joinedCall();
+      return hasEntities ? this.conversationEntity().id === this.callState.joinedCall().conversationId : false;
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {

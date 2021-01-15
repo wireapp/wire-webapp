@@ -43,6 +43,7 @@ import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
+import {CallState} from '../calling/CallState';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -101,6 +102,7 @@ export class CallingViewModel {
     selfUser: ko.Observable<User>,
     multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly callState = container.resolve(CallState),
   ) {
     this.logger = getLogger('CallingViewModel');
     this.callingRepository = callingRepository;
@@ -112,7 +114,7 @@ export class CallingViewModel {
     this.selfUser = selfUser;
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
-      callingRepository.activeCalls().filter(call => {
+      this.callState.activeCalls().filter(call => {
         const conversation = this.conversationState.findConversation(call.conversationId);
         if (!conversation || conversation.removed_from_conversation()) {
           return false;
@@ -269,7 +271,7 @@ export class CallingViewModel {
       });
     });
     ko.computed(() => {
-      const call = this.callingRepository.joinedCall();
+      const call = this.callState.joinedCall();
       if (call) {
         call.getRemoteParticipants().forEach(participant => {
           const stream = participant.audioStream();

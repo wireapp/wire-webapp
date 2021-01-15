@@ -338,7 +338,6 @@ export class TestFactory {
     await this.exposeCallingActors();
 
     this.notification_repository = new NotificationRepository(
-      this.calling_repository,
       this.conversation_repository,
       new PermissionRepository(),
       this.user_repository.userState,

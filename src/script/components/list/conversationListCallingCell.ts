@@ -41,6 +41,8 @@ import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel'
 import type {Multitasking} from '../../notification/NotificationRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import {Participant} from '../../calling/Participant';
+import {container} from 'tsyringe';
+import {CallState} from 'src/script/calling/CallState';
 
 interface ComponentParams {
   call: Call;
@@ -61,6 +63,7 @@ class ConversationListCallingCell {
   readonly callActions: CallActions;
   readonly callDuration: ko.Observable<string>;
   readonly callingRepository: CallingRepository;
+  readonly callState: CallState;
   readonly conversation: ko.PureComputed<Conversation>;
   readonly conversationParticipants: ko.PureComputed<User[]>;
   readonly conversationUrl: string;
@@ -106,6 +109,7 @@ class ConversationListCallingCell {
     videoSpeakersActiveTab,
     isSelfVerified = ko.observable(false),
   }: ComponentParams) {
+    this.callState = container.resolve(CallState);
     this.call = call;
     this.conversation = conversation;
     this.callingRepository = callingRepository;
@@ -138,7 +142,7 @@ class ConversationListCallingCell {
 
     this.isStillOngoing = ko.pureComputed(() => [CALL_REASON.STILL_ONGOING].includes(call.reason()));
 
-    this.isMuted = callingRepository.isMuted;
+    this.isMuted = this.callState.isMuted;
 
     this.callDuration = ko.observable();
     let callDurationUpdateInterval: number;
