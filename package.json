@@ -71,7 +71,7 @@
     "@types/generate-changelog": "1.8.0",
     "@types/highlight.js": "10.1.0",
     "@types/js-cookie": "2.2.6",
-    "@types/jsdom": "16.2.5",
+    "@types/jsdom": "16.2.6",
     "@types/keyboardjs": "2.5.0",
     "@types/libsodium-wrappers-sumo": "0.7.4",
     "@types/linkify-it": "3.0.0",
