@@ -17,21 +17,22 @@
  *
  */
 
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
-import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {ModalsViewModel} from '../ModalsViewModel';
 import {Config} from '../../Config';
-import type {MainViewModel} from '../MainViewModel';
+import {ModalsViewModel} from '../ModalsViewModel';
+import {UserState} from '../../user/UserState';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import type {UserRepository} from '../../user/UserRepository';
 import type {CallingViewModel} from '../CallingViewModel';
-import type {User} from '../../entity/User';
-import type {TeamRepository} from 'src/script/team/TeamRepository';
+import type {MainViewModel} from '../MainViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {User} from '../../entity/User';
 
 export class TemporaryGuestViewModel {
   readonly multitasking: Multitasking;
@@ -41,21 +42,21 @@ export class TemporaryGuestViewModel {
 
   constructor(
     mainViewModel: MainViewModel,
-    private readonly userRepository: UserRepository,
     readonly callingRepository: CallingRepository,
     readonly teamRepository: TeamRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.multitasking = mainViewModel.multitasking;
     this.callingViewModel = mainViewModel.calling;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
     this.isAccountCreationEnabled = Config.getConfig().FEATURE.ENABLE_ACCOUNT_REGISTRATION;
   }
 
-  clickOnPreferencesButton = (): void => {
+  readonly clickOnPreferencesButton = (): void => {
     amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT);
   };
 
-  clickToCreateAccount = (): void => {
+  readonly clickToCreateAccount = (): void => {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
       preventClose: true,
       primaryAction: {
@@ -69,7 +70,7 @@ export class TemporaryGuestViewModel {
     });
   };
 
-  isSelectedConversation = (): true => {
+  readonly isSelectedConversation = (): true => {
     return true;
   };
 }

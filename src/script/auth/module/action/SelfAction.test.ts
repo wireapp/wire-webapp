@@ -17,7 +17,7 @@
  *
  */
 
-import type {Self} from '@wireapp/api-client/dist/self';
+import type {Self} from '@wireapp/api-client/src/self';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {actionRoot} from '.';
@@ -86,15 +86,8 @@ describe('SelfAction', () => {
       actions: mockedActions,
       apiClient: mockedApiClient,
     })({});
-    try {
-      await store.dispatch(actionRoot.selfAction.fetchSelf());
-      fail();
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([
-        SelfActionCreator.startFetchSelf(),
-        SelfActionCreator.failedFetchSelf(error),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.selfAction.fetchSelf())).rejects.toThrow();
+    expect(store.getActions()).toEqual([SelfActionCreator.startFetchSelf(), SelfActionCreator.failedFetchSelf(error)]);
   });
 
   it('fetches the set password state', async () => {
@@ -142,6 +135,8 @@ describe('SelfAction', () => {
       await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
       fail();
     } catch (backendError) {
+      // TODO: Check for thrown error with jest error helpers (`await expect(Promise).rejects.toThrow()`)
+      // eslint-disable-next-line jest/no-try-expect
       expect(store.getActions()).toEqual([
         SelfActionCreator.startSetPasswordState(),
         SelfActionCreator.failedSetPasswordState(error),
@@ -176,15 +171,11 @@ describe('SelfAction', () => {
     const store = mockStoreFactory({
       apiClient: mockedApiClient,
     })({});
-    try {
-      await store.dispatch(actionRoot.selfAction.doSetEmail(email));
-      fail();
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([
-        SelfActionCreator.startSetSelfEmail(),
-        SelfActionCreator.failedSetSelfEmail(error),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.selfAction.doSetEmail(email))).rejects.toThrow();
+    expect(store.getActions()).toEqual([
+      SelfActionCreator.startSetSelfEmail(),
+      SelfActionCreator.failedSetSelfEmail(error),
+    ]);
   });
 
   it('can set the self password', async () => {
@@ -214,14 +205,10 @@ describe('SelfAction', () => {
     const store = mockStoreFactory({
       apiClient: mockedApiClient,
     })({});
-    try {
-      await store.dispatch(actionRoot.selfAction.doSetPassword({new_password: password}));
-      fail();
-    } catch (backendError) {
-      expect(store.getActions()).toEqual([
-        SelfActionCreator.startSetSelfPassword(),
-        SelfActionCreator.failedSetSelfPassword(error),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.selfAction.doSetPassword({new_password: password}))).rejects.toThrow();
+    expect(store.getActions()).toEqual([
+      SelfActionCreator.startSetSelfPassword(),
+      SelfActionCreator.failedSetSelfPassword(error),
+    ]);
   });
 });

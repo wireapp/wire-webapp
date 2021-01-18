@@ -19,8 +19,8 @@
 
 import ko from 'knockout';
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
-import type {ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/dist/event';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import type {ConversationMessageTimerUpdateEvent} from '@wireapp/api-client/src/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -37,6 +37,7 @@ import type {ConversationMapper} from './ConversationMapper';
 import type {Message} from '../entity/message/Message';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {Conversation} from '../entity/Conversation';
+import type {EventRecord} from '../storage';
 
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   eventListeners: Record<string, (...args: any[]) => void>;
@@ -59,7 +60,6 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   static validateTimer(messageTimer: number | null): number {
     const TIMER_RANGE = ConversationEphemeralHandler.CONFIG.TIMER_RANGE;
     const isTimerReset = messageTimer === null;
-
     return isTimerReset ? messageTimer : clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
   }
 
@@ -77,8 +77,6 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     this.setEventHandlingConfig({
       [CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
     });
-
-    this.checkMessageTimer = this.checkMessageTimer.bind(this);
 
     this.conversationMapper = conversationMapper;
     this.logger = getLogger('ConversationEphemeralHandler');
@@ -110,7 +108,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
    * @param messageEntity Message to check
    * @param timeOffset Approximate time different to backend in milliseconds
    */
-  async checkMessageTimer(messageEntity: ContentMessage, timeOffset: number): Promise<void> {
+  checkMessageTimer = async (messageEntity: ContentMessage, timeOffset: number): Promise<void> => {
     const hasHitBackend = messageEntity.status() > StatusType.SENDING;
     if (!hasHitBackend) {
       return;
@@ -130,7 +128,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       case EphemeralStatusType.INACTIVE: {
         messageEntity.startMessageTimer(timeOffset);
 
-        const changes = {
+        const changes: Pick<Partial<EventRecord>, 'ephemeral_expires' | 'ephemeral_started'> = {
           ephemeral_expires: messageEntity.ephemeral_expires(),
           ephemeral_started: Number(messageEntity.ephemeral_started()),
         };
@@ -139,7 +137,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         break;
       }
     }
-  }
+  };
 
   async validateMessage(messageEntity: ContentMessage): Promise<Message | void> {
     const isEphemeralMessage = messageEntity.ephemeral_status() !== EphemeralStatusType.NONE;
@@ -176,7 +174,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
-    const changes = {
+    const changes: Pick<Partial<EventRecord>, 'data' | 'ephemeral_expires'> = {
       data: {
         content_type: assetEntity.file_type,
         meta: {},
@@ -192,7 +190,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.get_first_asset();
-    const changes = {
+    const changes: Pick<Partial<EventRecord>, 'data' | 'ephemeral_expires'> = {
       data: {
         info: {
           height: (assetEntity as any).size,
@@ -243,7 +241,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     obfuscatedAsset.previews(assetEntity.previews());
 
     messageEntity.assets([obfuscatedAsset]);
-    const changes = {
+    const changes: Pick<Partial<EventRecord>, 'data' | 'ephemeral_expires'> = {
       data: {
         content: obfuscatedAsset.text,
         previews: obfuscatedPreviews,

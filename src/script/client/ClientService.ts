@@ -17,17 +17,17 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import type {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/dist/client';
+import type {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/src/client';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {ClientRecord, StorageService} from '../storage';
+import type {ClientRecord} from '../storage';
+import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {APIClient} from '../service/APIClientSingleton';
 
 export class ClientService {
-  private readonly apiClient: APIClient;
-  private readonly storageService: StorageService;
   private readonly logger: Logger;
   private readonly CLIENT_STORE_NAME: string;
 
@@ -39,9 +39,10 @@ export class ClientService {
     return '/users';
   }
 
-  constructor(apiClient: APIClient, storageService: StorageService) {
-    this.apiClient = apiClient;
-    this.storageService = storageService;
+  constructor(
+    private readonly storageService = container.resolve(StorageService),
+    private readonly apiClient = container.resolve(APIClient),
+  ) {
     this.logger = getLogger('ClientService');
 
     this.CLIENT_STORE_NAME = StorageSchemata.OBJECT_STORE.CLIENTS;

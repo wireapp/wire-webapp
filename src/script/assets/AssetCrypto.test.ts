@@ -20,34 +20,28 @@
 import {decryptAesAsset, encryptAesAsset} from './AssetCrypto';
 
 describe('AssetCrypto', () => {
-  it('should encrypt and decrypt ArrayBuffer', () => {
+  it('should encrypt and decrypt ArrayBuffer', async () => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    return encryptAesAsset(bytes.buffer)
-      .then(({cipherText, keyBytes, sha256}) => decryptAesAsset(cipherText, keyBytes, sha256))
-      .then(buffer => {
-        expect(buffer).toEqual(bytes.buffer);
-      });
+    const {cipherText, keyBytes, sha256} = await encryptAesAsset(bytes.buffer);
+    const buffer = await decryptAesAsset(cipherText, keyBytes, sha256);
+    expect(buffer).toEqual(bytes.buffer);
   });
 
-  it('should not decrypt when hash is missing', done => {
+  it('should not decrypt when hash is missing', async () => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    encryptAesAsset(bytes.buffer)
-      .then(({cipherText, keyBytes}) => decryptAesAsset(cipherText, keyBytes, null))
-      .then(() => done.fail())
-      .catch(() => done());
+    const {cipherText, keyBytes} = await encryptAesAsset(bytes.buffer);
+    await expect(decryptAesAsset(cipherText, keyBytes, null)).rejects.toThrow();
   });
 
-  it('should not decrypt when hash is an empty array', done => {
+  it('should not decrypt when hash is an empty array', async () => {
     const bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
 
-    encryptAesAsset(bytes.buffer)
-      .then(({cipherText, keyBytes}) => decryptAesAsset(cipherText, keyBytes, new Uint8Array([])))
-      .then(() => done.fail())
-      .catch(() => done());
+    const {cipherText, keyBytes} = await encryptAesAsset(bytes.buffer);
+    await expect(decryptAesAsset(cipherText, keyBytes, new Uint8Array([]))).rejects.toThrow();
   });
 });

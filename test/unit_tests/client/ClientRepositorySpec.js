@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/dist/client/';
+import {ClientType} from '@wireapp/api-client/src/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {User} from 'src/script/entity/User';
@@ -42,8 +42,8 @@ describe('ClientRepository', () => {
 
   beforeEach(() => testFactory.storage_repository.clearStores());
 
-  describe('getClientsByUserId', () =>
-    it('maps client entities from client payloads by the backend', () => {
+  describe('getClientsByUserId', () => {
+    it('maps client entities from client payloads by the backend', async () => {
       const client = new ClientEntity();
       client.id = clientId;
 
@@ -56,14 +56,14 @@ describe('ClientRepository', () => {
         {class: 'tablet', id: 'c411f97b139c818b'},
         {class: 'desktop', id: 'cbf3ea49214702d8'},
       ];
-      spyOn(testFactory.client_repository.clientService, 'getClientsByUserId').and.returnValue(
+      spyOn(testFactory.client_repository.clientService, 'getClientsByUserId').and.callFake(() =>
         Promise.resolve(allClients),
       );
 
-      return testFactory.client_repository.getClientsByUserId(entities.user.john_doe.id).then(clientEntities => {
-        expect(clientEntities.length).toBe(allClients.length);
-      });
-    }));
+      const clientEntities = await testFactory.client_repository.getClientsByUserId(entities.user.john_doe.id);
+      expect(clientEntities.length).toBe(allClients.length);
+    });
+  });
 
   describe('getValidLocalClient', () => {
     const clientPayloadServer = {
@@ -105,9 +105,9 @@ describe('ClientRepository', () => {
       spyOn(clientService, 'loadClientFromDb').and.returnValue(
         Promise.resolve(ClientRepository.PRIMARY_KEY_CURRENT_CLIENT),
       );
-      const backendError = new Error();
+      const backendError = new Error('not found locally');
       backendError.code = HTTP_STATUS.NOT_FOUND;
-      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.callFake(() => Promise.reject(backendError));
 
       return testFactory.client_repository
         .getValidLocalClient()
@@ -122,9 +122,9 @@ describe('ClientRepository', () => {
       const clientService = testFactory.client_repository.clientService;
       spyOn(clientService, 'loadClientFromDb').and.returnValue(Promise.resolve(clientPayloadDatabase));
       spyOn(testFactory.storage_service, 'deleteDatabase').and.returnValue(Promise.resolve(true));
-      const backendError = new Error();
+      const backendError = new Error('not found on backend');
       backendError.response = {status: HTTP_STATUS.NOT_FOUND};
-      spyOn(clientService, 'getClientById').and.returnValue(Promise.reject(backendError));
+      spyOn(clientService, 'getClientById').and.callFake(() => Promise.reject(backendError));
 
       return testFactory.client_repository
         .getValidLocalClient()
@@ -135,19 +135,14 @@ describe('ClientRepository', () => {
         });
     });
 
-    it('rejects with an error if something else fails', done => {
+    it('rejects with an error if something else fails', async () => {
       spyOn(testFactory.client_repository.clientService, 'loadClientFromDb').and.returnValue(
         Promise.reject(new Error('Expected unit test error')),
       );
 
-      testFactory.client_repository
-        .getValidLocalClient()
-        .then(done.fail)
-        .catch(error => {
-          expect(error).toEqual(jasmine.any(Error));
-          expect(error.type).toBe(ClientError.TYPE.DATABASE_FAILURE);
-          done();
-        });
+      await expect(testFactory.client_repository.getValidLocalClient()).rejects.toMatchObject({
+        type: ClientError.TYPE.DATABASE_FAILURE,
+      });
     });
   });
 

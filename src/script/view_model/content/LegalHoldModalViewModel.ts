@@ -17,31 +17,31 @@
  *
  */
 
-import {LegalHoldMemberStatus} from '@wireapp/api-client/dist/team/legalhold';
+import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
 import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
 import {t} from 'Util/LocalizerUtil';
 
-import type {ClientRepository} from 'src/script/client/ClientRepository';
-import type {ConversationRepository} from 'src/script/conversation/ConversationRepository';
-import type {CryptographyRepository} from 'src/script/cryptography/CryptographyRepository';
-import type {Conversation} from 'src/script/entity/Conversation';
-import type {User} from 'src/script/entity/User';
-import type {TeamRepository} from 'src/script/team/TeamRepository';
-import type {UserRepository} from 'src/script/user/UserRepository';
-import type {MessageRepository} from 'src/script/conversation/MessageRepository';
-
-export const SHOW_REQUEST_MODAL = 'LegalHold.showRequestModal';
-export const HIDE_REQUEST_MODAL = 'LegalHold.hideRequestModal';
-export const SHOW_LEGAL_HOLD_MODAL = 'LegalHold.showLegalHoldModal';
-export const HIDE_LEGAL_HOLD_MODAL = 'LegalHold.hideLegalHoldModal';
+import {UserState} from '../../user/UserState';
+import type {ClientRepository} from '../../client/ClientRepository';
+import type {Conversation} from '../../entity/Conversation';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
+import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import type {MessageRepository} from '../../conversation/MessageRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
+import type {User} from '../../entity/User';
 
 export class LegalHoldModalViewModel {
+  static SHOW_REQUEST = 'LegalHold.showRequestModal';
+  static HIDE_REQUEST = 'LegalHold.hideRequestModal';
+  static SHOW_DETAILS = 'LegalHold.showLegalHoldModal';
+  static HIDE_DETAILS = 'LegalHold.hideLegalHoldModal';
+
   isVisible: ko.Observable<boolean>;
   isSelfInfo: ko.Observable<boolean>;
   users: ko.Observable<User[]>;
@@ -62,12 +62,12 @@ export class LegalHoldModalViewModel {
   conversationId: string;
 
   constructor(
-    public userRepository: UserRepository,
     public conversationRepository: ConversationRepository,
     public teamRepository: TeamRepository,
     public clientRepository: ClientRepository,
     public cryptographyRepository: CryptographyRepository,
     public messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.isVisible = ko.observable(false);
     this.showRequest = ko.observable(false);
@@ -99,10 +99,12 @@ export class LegalHoldModalViewModel {
       this.isLoading(false);
     };
     this.disableSubmit = ko.pureComputed(() => this.requiresPassword() && this.passwordValue().length < 1);
-    amplify.subscribe(SHOW_REQUEST_MODAL, (fingerprint?: string[]) => this.showRequestModal(false, fingerprint));
-    amplify.subscribe(HIDE_REQUEST_MODAL, this.hideModal);
-    amplify.subscribe(SHOW_LEGAL_HOLD_MODAL, this.showUsers);
-    amplify.subscribe(HIDE_LEGAL_HOLD_MODAL, this.hideLegalHoldModal);
+    amplify.subscribe(LegalHoldModalViewModel.SHOW_REQUEST, (fingerprint?: string[]) =>
+      this.showRequestModal(false, fingerprint),
+    );
+    amplify.subscribe(LegalHoldModalViewModel.HIDE_REQUEST, this.hideModal);
+    amplify.subscribe(LegalHoldModalViewModel.SHOW_DETAILS, this.showUsers);
+    amplify.subscribe(LegalHoldModalViewModel.HIDE_DETAILS, this.hideLegalHoldModal);
   }
 
   showRequestModal = async (showLoading?: boolean, fingerprint?: string[]) => {
@@ -116,7 +118,7 @@ export class LegalHoldModalViewModel {
     if (showLoading) {
       setModalParams(true);
     }
-    const selfUser = this.userRepository.self();
+    const selfUser = this.userState.self();
     this.requiresPassword(!selfUser.isSingleSignOn);
     if (!selfUser.inTeam()) {
       setModalParams(false);
@@ -144,18 +146,18 @@ export class LegalHoldModalViewModel {
     );
   };
 
-  hideModal = () => {
+  readonly hideModal = () => {
     this.isVisible(false);
     this.conversationId = null;
   };
 
-  closeRequest = () => {
+  readonly closeRequest = () => {
     if (this.showRequest()) {
       this.hideModal();
     }
   };
 
-  hideLegalHoldModal = (conversationId?: string) => {
+  readonly hideLegalHoldModal = (conversationId?: string) => {
     const isCurrentConversation = conversationId && conversationId === this.conversationId;
     if (!this.showRequest() && isCurrentConversation) {
       this.hideModal();
@@ -166,7 +168,7 @@ export class LegalHoldModalViewModel {
     if (this.disableSubmit()) {
       return;
     }
-    const selfUser = this.userRepository.self();
+    const selfUser = this.userState.self();
     this.requestError('');
     this.isSendingApprove(true);
     try {
@@ -202,7 +204,7 @@ export class LegalHoldModalViewModel {
     }
     this.showRequest(false);
     if (conversation === undefined) {
-      this.users([this.userRepository.self()]);
+      this.users([this.userState.self()]);
       this.isSelfInfo(true);
       this.isLoading(false);
       this.isVisible(true);
@@ -214,7 +216,7 @@ export class LegalHoldModalViewModel {
     this.isLoading(true);
     this.isVisible(true);
     await this.messageRepository.updateAllClients(conversation, false);
-    const allUsers = await this.conversationRepository.get_all_users_in_conversation(conversation.id);
+    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation.id);
     const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
     if (!legalHoldUsers.length) {
       this.isVisible(false);
@@ -225,18 +227,21 @@ export class LegalHoldModalViewModel {
     this.isLoading(false);
   };
 
-  showUserDevices = (user: User) => {
+  readonly showUserDevices = (user: User) => {
     this.devicesUser(user);
   };
 
-  clickOnBack = () => {
+  readonly clickOnBack = () => {
     if (!this.showDeviceList()) {
       return this.userDevicesHistory.goBack();
     }
     this.devicesUser(undefined);
   };
 
-  handleInputKey = (_data: LegalHoldModalViewModel, {key}: JQuery.Event<HTMLElement, KeyboardEvent>): boolean => {
+  readonly handleInputKey = (
+    _data: LegalHoldModalViewModel,
+    {key}: JQuery.Event<HTMLElement, KeyboardEvent>,
+  ): boolean => {
     if (key !== 'Enter') {
       return true;
     }

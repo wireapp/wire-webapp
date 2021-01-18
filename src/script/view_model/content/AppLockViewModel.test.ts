@@ -25,6 +25,15 @@ import {Config, Configuration} from '../../Config';
 import type {User} from '../../entity/User';
 import {APPLOCK_STATE, AppLockViewModel} from './AppLockViewModel';
 
+require('src/script/util/test/mock/LocalStorageMock');
+
+// https://github.com/jedisct1/libsodium.js/issues/235
+jest.mock('libsodium-wrappers-sumo', () => ({
+  crypto_pwhash_str: (value: string) => value,
+  crypto_pwhash_str_verify: (value1: string, value2: string) => value1 === value2,
+  ready: Promise.resolve,
+}));
+
 type Writable<T> = {
   -readonly [K in keyof T]: T[K];
 };
@@ -82,14 +91,16 @@ describe('AppLockViewModel', () => {
 
   describe('unlock', () => {
     it('stores the passphrase, respects the timeout and unlocks', async () => {
-      jasmine.clock().install();
+      jest.useFakeTimers();
       writeableConfig.FEATURE = {...writeableConfig.FEATURE, APPLOCK_UNFOCUS_TIMEOUT: 10};
       let storedCode: string;
       const passphrase = 'abcABC123!';
-      spyOn(window.localStorage, 'setItem').and.callFake((_, code) => {
+      jest.spyOn(window.localStorage, 'setItem').mockImplementation((_, code) => {
         storedCode = code;
       });
-      spyOn(window.localStorage, 'getItem').and.callFake(() => storedCode);
+      jest.spyOn(window.localStorage, 'getItem').mockImplementation(() => {
+        return storedCode;
+      });
       const appLock = getAppLock();
       appLock.isVisible.subscribe(isVisible => {
         if (!isVisible) {
@@ -105,18 +116,18 @@ describe('AppLockViewModel', () => {
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
       expect(storedCode).toBeDefined();
       window.dispatchEvent(new Event('blur'));
-      jasmine.clock().tick(5000);
+      jest.advanceTimersByTime(5000);
 
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
-      jasmine.clock().tick(6000);
+      jest.advanceTimersByTime(6000);
 
       expect(appLock.state()).toBe(APPLOCK_STATE.LOCKED);
-      document.body.innerHTML += `<form id="unlock"><input value="${passphrase}"/></form>`;
-      const unlockForm: HTMLFormElement = window.document.querySelector('#unlock');
+      document.body.innerHTML += `<form id="unlock"><input id="pass" value="${passphrase}"/></form>`;
+      const unlockForm = ([document.querySelector('#pass')] as unknown) as HTMLFormElement;
       await appLock.onUnlock(unlockForm);
 
       expect(appLock.state()).toBe(APPLOCK_STATE.NONE);
-      jasmine.clock().uninstall();
+      jest.useRealTimers();
     });
   });
 });

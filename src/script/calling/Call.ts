@@ -20,9 +20,20 @@
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
+import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
 
 export type ConversationId = string;
+
+interface ActiveSpeaker {
+  audio_level: number;
+  clientid: string;
+  userid: string;
+}
+
+interface ActiveSpeakers {
+  audio_levels: ActiveSpeaker[];
+}
 
 export class Call {
   public readonly conversationId: ConversationId;
@@ -35,7 +46,9 @@ export class Call {
   public readonly conversationType: CONV_TYPE;
   public readonly initialType: CALL_TYPE;
   public readonly isCbrEnabled: ko.Observable<boolean>;
+  public lastActiveSpeakersUpdatTime: ko.Observable<number> = ko.observable(0);
   public blockMessages: boolean = false;
+  public type?: CALL_MESSAGE_TYPE;
   /**
    * set to `true` if anyone has enabled their video during a call (used for analytics)
    */
@@ -75,6 +88,33 @@ export class Call {
   getSelfParticipant(): Participant {
     return this.participants().find(({user, clientId}) => user.isMe && this.selfClientId === clientId);
   }
+
+  setActiveSpeakers(activeSpeakers: ActiveSpeakers): void {
+    const activeParticipants: {[clientId: string]: ActiveSpeaker} = {};
+    activeSpeakers.audio_levels.forEach(speaker => {
+      activeParticipants[speaker.clientid] = {...speaker};
+    });
+    this.participants().forEach(participant => {
+      const activeSpeakerParticipant = activeParticipants[participant.clientId];
+      if (activeSpeakerParticipant) {
+        participant.audioLevel(activeSpeakerParticipant.audio_level);
+        participant.isActivelySpeaking(true);
+        return;
+      }
+      participant.audioLevel(0);
+      participant.isActivelySpeaking(false);
+    });
+    this.lastActiveSpeakersUpdatTime(Date.now());
+  }
+
+  getActiveSpeakers(): Participant[] {
+    return this.participants().filter(p => p.isActivelySpeaking());
+  }
+
+  getActiveVideoSpeakers = () =>
+    this.getActiveSpeakers()
+      .filter(p => p.hasActiveVideo())
+      .slice(0, 4);
 
   addParticipant(participant: Participant): void {
     this.participants.push(participant);

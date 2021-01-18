@@ -18,15 +18,16 @@
  */
 
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {noop} from 'Util/util';
-
 import {Actions} from 'Components/panel/userActions';
 
 import {Config} from '../../Config';
 import type {User} from '../../entity/User';
 import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
+import {UserState} from '../../user/UserState';
 
 export class UserModalViewModel {
   userRepository: UserRepository;
@@ -39,11 +40,17 @@ export class UserModalViewModel {
   hide: () => void;
   brandName: string;
   isSelfVerified: ko.PureComputed<boolean>;
+  isActivatedAccount: ko.PureComputed<boolean>;
 
-  constructor(userRepository: UserRepository, actionsViewModel: ActionsViewModel) {
+  constructor(
+    userRepository: UserRepository,
+    actionsViewModel: ActionsViewModel,
+    private readonly userState = container.resolve(UserState),
+  ) {
     this.userRepository = userRepository;
     this.actionsViewModel = actionsViewModel;
 
+    this.isActivatedAccount = this.userState.isActivatedAccount;
     this.isVisible = ko.observable(false);
     this.user = ko.observable(null);
     this.userNotFound = ko.observable(false);
@@ -55,16 +62,10 @@ export class UserModalViewModel {
     };
     this.hide = () => this.isVisible(false);
     this.brandName = Config.getConfig().BRAND_NAME;
-    this.isSelfVerified = ko.pureComputed(() => userRepository.self()?.is_verified());
+    this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
   }
 
-  onUserAction = (userAction: string): void => {
-    switch (userAction) {
-      case Actions.UNBLOCK:
-      case Actions.SEND_REQUEST:
-        this.actionsViewModel.open1to1Conversation(this.user());
-        break;
-    }
+  readonly onUserAction = (action: Actions): void => {
     this.hide();
   };
 

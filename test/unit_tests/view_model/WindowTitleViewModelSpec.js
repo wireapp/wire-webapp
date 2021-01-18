@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 
 import {t, setStrings} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
@@ -51,16 +51,16 @@ describe('WindowTitleViewModel', () => {
             state: ko.observable(ContentViewModel.STATE.CONVERSATION),
           },
         },
-        testFactory.user_repository,
-        conversationRepository,
+        testFactory.user_repository.userState,
+        conversationRepository.conversationState,
       );
     });
   });
 
   describe('initiateTitleUpdates', () => {
-    beforeEach(() => jasmine.clock().install());
+    beforeEach(() => jest.useFakeTimers());
 
-    afterEach(() => jasmine.clock().uninstall());
+    afterEach(() => jest.useRealTimers());
 
     it('sets a default title when there is an unknown state', () => {
       title_view_model.contentState('invalid or unknown');
@@ -73,7 +73,7 @@ describe('WindowTitleViewModel', () => {
       const selected_conversation = new Conversation(createRandomUuid());
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(CONVERSATION_TYPE.REGULAR);
-      title_view_model.conversationRepository.active_conversation(selected_conversation);
+      title_view_model.conversationState.activeConversation(selected_conversation);
 
       const expected_title = `${selected_conversation.name()} · ${suffix}`;
       title_view_model.initiateTitleUpdates();
@@ -92,8 +92,8 @@ describe('WindowTitleViewModel', () => {
       conversationEntity.type(CONVERSATION_TYPE.REGULAR);
       conversationEntity.selfUser(new User(createRandomUuid()));
 
-      title_view_model.conversationRepository.conversations_unarchived.push(conversationEntity);
-      title_view_model.conversationRepository.active_conversation(conversationEntity);
+      title_view_model.conversationState.conversations_unarchived.push(conversationEntity);
+      title_view_model.conversationState.activeConversation(conversationEntity);
       title_view_model.initiateTitleUpdates();
 
       const expected_title = `(1) ${conversationEntity.name()} · ${suffix}`;
@@ -109,7 +109,7 @@ describe('WindowTitleViewModel', () => {
       selected_conversation.name('Selected Conversation');
       selected_conversation.type(CONVERSATION_TYPE.REGULAR);
       selected_conversation.selfUser(selfUserEntity);
-      title_view_model.conversationRepository.active_conversation(selected_conversation);
+      title_view_model.conversationState.activeConversation(selected_conversation);
 
       const muted_conversation = new Conversation(createRandomUuid());
       muted_conversation.mutedState(NOTIFICATION_STATE.NOTHING);
@@ -118,12 +118,12 @@ describe('WindowTitleViewModel', () => {
       muted_conversation.selfUser(selfUserEntity);
 
       // Add conversations to conversation repository
-      expect(title_view_model.conversationRepository.conversations_unarchived().length).toBe(0);
+      expect(title_view_model.conversationState.conversations_unarchived().length).toBe(0);
 
-      title_view_model.conversationRepository.conversations_unarchived.push(selected_conversation);
-      title_view_model.conversationRepository.conversations_unarchived.push(muted_conversation);
+      title_view_model.conversationState.conversations_unarchived.push(selected_conversation);
+      title_view_model.conversationState.conversations_unarchived.push(muted_conversation);
 
-      expect(title_view_model.conversationRepository.conversations_unarchived().length).toBe(2);
+      expect(title_view_model.conversationState.conversations_unarchived().length).toBe(2);
 
       // Check title when there are no messages
       title_view_model.initiateTitleUpdates();
@@ -215,7 +215,7 @@ describe('WindowTitleViewModel', () => {
 
     it('shows the number of connection requests when viewing the inbox', () => {
       title_view_model.contentState(ContentViewModel.STATE.CONNECTION_REQUESTS);
-      title_view_model.userRepository.connectRequests = ko.observableArray([]);
+      title_view_model.userState.connectRequests = ko.observableArray([]);
 
       const firstConnectedUser = new User(createRandomUuid());
       const secondConnectedUser = new User(createRandomUuid());
@@ -239,8 +239,8 @@ describe('WindowTitleViewModel', () => {
       title_view_model.initiateTitleUpdates();
 
       tests.forEach(({connections, expected}) => {
-        title_view_model.userRepository.connectRequests(connections);
-        jasmine.clock().tick(WindowTitleViewModel.TITLE_DEBOUNCE);
+        title_view_model.userState.connectRequests(connections);
+        jest.advanceTimersByTime(WindowTitleViewModel.TITLE_DEBOUNCE);
 
         expect(window.document.title).toBe(expected);
       });
@@ -262,8 +262,8 @@ describe('WindowTitleViewModel', () => {
         done();
       });
 
-      title_view_model.conversationRepository.conversations_unarchived.push(conversationEntity);
-      title_view_model.conversationRepository.active_conversation(conversationEntity);
+      title_view_model.conversationState.conversations_unarchived.push(conversationEntity);
+      title_view_model.conversationState.activeConversation(conversationEntity);
 
       title_view_model.initiateTitleUpdates();
     });

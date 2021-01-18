@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import ko from 'knockout';
 
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
@@ -248,7 +248,7 @@ export class MemberMessage extends SystemMessage {
     });
   }
 
-  showLargeAvatar = (): boolean => {
+  readonly showLargeAvatar = (): boolean => {
     const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];
     return largeAvatarTypes.includes(this.memberMessageType);
   };

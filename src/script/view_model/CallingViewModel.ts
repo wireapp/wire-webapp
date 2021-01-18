@@ -21,8 +21,12 @@ import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
+import 'Components/calling/chooseScreen';
 import {getLogger, Logger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
 
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
@@ -32,22 +36,19 @@ import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {AudioRepository} from '../audio/AudioRepository';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
-
-import 'Components/calling/chooseScreen';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {ModalsViewModel} from './ModalsViewModel';
-import {t} from 'Util/LocalizerUtil';
+import {ConversationState} from '../conversation/ConversationState';
 
 export interface CallActions {
   answer: (call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
+  setVideoSpeakersActiveTab: (tab: string) => void;
   startAudio: (conversationEntity: Conversation) => void;
   startVideo: (conversationEntity: Conversation) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
@@ -56,6 +57,13 @@ export interface CallActions {
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
 }
+
+export const VideoSpeakersTabs = {
+  speakers: 'speakers',
+  // explictly disabled.
+  // eslint-disable-next-line sort-keys-fix/sort-keys-fix
+  all: 'all',
+};
 
 declare global {
   interface HTMLAudioElement {
@@ -72,7 +80,6 @@ export class CallingViewModel {
   readonly audioRepository: AudioRepository;
   readonly callActions: CallActions;
   readonly callingRepository: CallingRepository;
-  readonly conversationRepository: ConversationRepository;
   readonly isChoosingScreen: ko.PureComputed<boolean>;
   readonly mediaDevicesHandler: MediaDevicesHandler;
   readonly mediaStreamHandler: MediaStreamHandler;
@@ -82,10 +89,10 @@ export class CallingViewModel {
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
   readonly teamRepository: TeamRepository;
+  readonly videoSpeakersActiveTab: ko.Observable<string>;
 
   constructor(
     callingRepository: CallingRepository,
-    conversationRepository: ConversationRepository,
     audioRepository: AudioRepository,
     mediaDevicesHandler: MediaDevicesHandler,
     mediaStreamHandler: MediaStreamHandler,
@@ -93,10 +100,10 @@ export class CallingViewModel {
     teamRepository: TeamRepository,
     selfUser: ko.Observable<User>,
     multitasking: Multitasking,
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.logger = getLogger('CallingViewModel');
     this.callingRepository = callingRepository;
-    this.conversationRepository = conversationRepository;
     this.mediaDevicesHandler = mediaDevicesHandler;
     this.mediaStreamHandler = mediaStreamHandler;
     this.permissionRepository = permissionRepository;
@@ -106,7 +113,7 @@ export class CallingViewModel {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       callingRepository.activeCalls().filter(call => {
-        const conversation = this.conversationRepository.find_conversation_by_id(call.conversationId);
+        const conversation = this.conversationState.findConversation(call.conversationId);
         if (!conversation || conversation.removed_from_conversation()) {
           return false;
         }
@@ -120,7 +127,7 @@ export class CallingViewModel {
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
     this.multitasking = multitasking;
-
+    this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTabs.all);
     this.onChooseScreen = () => {};
 
     const ring = (call: Call): void => {
@@ -188,6 +195,9 @@ export class CallingViewModel {
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
+      },
+      setVideoSpeakersActiveTab: (tab: string) => {
+        this.videoSpeakersActiveTab(tab);
       },
       startAudio: (conversationEntity: Conversation): void => {
         startCall(conversationEntity, CALL_TYPE.NORMAL);
@@ -346,14 +356,14 @@ export class CallingViewModel {
   }
 
   getConversationById(conversationId: string): Conversation {
-    return this.conversationRepository.find_conversation_by_id(conversationId);
+    return this.conversationState.findConversation(conversationId);
   }
 
   hasAccessToCamera(): boolean {
     return this.permissionRepository.permissionState.camera() === PermissionStatusState.GRANTED;
   }
 
-  onCancelScreenSelection = () => {
+  readonly onCancelScreenSelection = () => {
     this.selectableScreens([]);
     this.selectableWindows([]);
   };

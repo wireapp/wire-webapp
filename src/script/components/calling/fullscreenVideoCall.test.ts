@@ -17,32 +17,45 @@
  *
  */
 
-import ko from 'knockout';
+import {act} from 'react-dom/test-utils';
 
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
-import {instantiateComponent} from '../../../../test/helper/knockoutHelpers';
-import './fullscreenVideoCall';
+import FullscreenVideoCall, {FullscreenVideoCallProps} from './FullscreenVideoCall';
+import TestPage from 'Util/test/TestPage';
+import {Grid} from 'src/script/calling/videoGridHandler';
+
+class FullscreenVideoCallPage extends TestPage<FullscreenVideoCallProps> {
+  constructor(props?: FullscreenVideoCallProps) {
+    super(FullscreenVideoCall, props);
+  }
+
+  getVideoControls = () => this.get('.video-controls__button');
+  getVideoTimer = () => this.get('div[data-uie-name="video-timer"]');
+}
 
 describe('fullscreenVideoCall', () => {
-  let domContainer: Element;
-  let call: Call;
   beforeEach(() => {
-    jasmine.clock().install();
+    jest.useFakeTimers('modern');
+  });
+
+  afterEach(() => jest.useRealTimers());
+
+  it('shows the available screens', () => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User();
     selfUser.isMe = true;
-    call = new Call('', '', 0, new Participant(selfUser, ''), 0);
-    const params = {
+    const call = new Call('', '', 0, new Participant(selfUser, ''), 0);
+    const props = {
       call,
       callActions: {},
       canShareScreen: false,
-      conversation: ko.observable(conversation),
-      isChoosingScreen: ko.observable(false),
-      isMuted: ko.observable(false),
+      conversation: conversation,
+      isChoosingScreen: false,
+      isMuted: false,
       mediaDevicesHandler: {
         currentDeviceId: {
           audioInput: () => '',
@@ -50,27 +63,53 @@ describe('fullscreenVideoCall', () => {
         },
       },
       multitasking: {autoMinimize: () => false},
-      videoGrid: ko.observable({grid: [], hasRemoteVideo: false, thumbnail: null}),
-    };
+      videoGrid: {grid: [], hasRemoteVideo: false, thumbnail: null} as Grid,
+      videoInput: [],
+    } as FullscreenVideoCallProps;
 
-    return instantiateComponent('fullscreen-video-call', params).then((container: Element) => {
-      domContainer = container;
+    const fullscreenVideoCall = new FullscreenVideoCallPage(props);
+
+    expect(fullscreenVideoCall.getVideoControls()).not.toBe(null);
+  });
+
+  it('shows the calling timer', async () => {
+    const conversation = new Conversation();
+    spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
+    const selfUser = new User();
+    selfUser.isMe = true;
+    const call = new Call('', '', 0, new Participant(selfUser, ''), 0);
+    const props = {
+      call,
+      callActions: {},
+      canShareScreen: false,
+      conversation: conversation,
+      isChoosingScreen: false,
+      isMuted: false,
+      mediaDevicesHandler: {
+        currentDeviceId: {
+          audioInput: () => '',
+          videoInput: () => '',
+        },
+      },
+      multitasking: {autoMinimize: () => false},
+      videoGrid: {grid: [], hasRemoteVideo: false, thumbnail: null} as Grid,
+      videoInput: [],
+    } as FullscreenVideoCallProps;
+
+    const fullscreenVideoCall = new FullscreenVideoCallPage(props);
+    const now = Date.now();
+
+    jest.setSystemTime(now);
+    props.call.startedAt(Date.now());
+    fullscreenVideoCall.setProps(props);
+
+    expect(fullscreenVideoCall.getVideoTimer().text()).toEqual('00:00');
+
+    act(() => {
+      jest.advanceTimersByTime(1001);
+      fullscreenVideoCall.update();
     });
-  });
 
-  afterEach(() => jasmine.clock().uninstall());
-
-  it('shows the available screens', () => {
-    expect(domContainer.querySelector('.video-controls__button')).not.toBe(null);
-  });
-
-  it('shows the calling timer', () => {
-    call.startedAt(Date.now());
-
-    expect((domContainer.querySelector('.video-timer') as HTMLElement).innerText).toBe('00:00');
-    jasmine.clock().mockDate();
-    jasmine.clock().tick(1001);
-
-    expect((domContainer.querySelector('.video-timer') as HTMLElement).innerText).toBe('00:01');
+    expect(fullscreenVideoCall.getVideoTimer().text()).toEqual('00:01');
   });
 });

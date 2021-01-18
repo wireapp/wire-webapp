@@ -17,7 +17,7 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/dist/connection';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {instantiateComponent} from '../../../helper/knockoutHelpers';
 
 import {User} from 'src/script/entity/User';
@@ -70,7 +70,8 @@ describe('user-actions', () => {
       },
     ];
 
-    return tests.forEach(({expected, getParams, testName}) => {
+    tests.forEach(({expected, getParams, testName}) => {
+      // eslint-disable-next-line jest/valid-title
       it(testName, () => {
         const params = getParams();
         return instantiateComponent('user-actions', params).then(domContainer => {

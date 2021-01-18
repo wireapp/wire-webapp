@@ -17,7 +17,7 @@
  *
  */
 
-import {AudioPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {AudioPreference, WebappProperties} from '@wireapp/api-client/src/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -106,14 +106,14 @@ export class AudioRepository {
   }
 
   private subscribeToAudioEvents(): void {
-    amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play.bind(this));
-    amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop.bind(this));
+    amplify.subscribe(WebAppEvents.AUDIO.PLAY, this.play);
+    amplify.subscribe(WebAppEvents.AUDIO.STOP, this.stop);
   }
 
   private subscribeToEvents(): void {
-    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, this.setAudioPreference.bind(this));
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setMutedState);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.SOUND_ALERTS, this.setAudioPreference);
 
     if ('mediaSession' in navigator) {
       const noop = () => {};
@@ -146,7 +146,7 @@ export class AudioRepository {
     return audioElement.play();
   }
 
-  async play(audioId: AudioType, playInLoop: boolean = false): Promise<void> {
+  play = async (audioId: AudioType, playInLoop: boolean = false): Promise<void> => {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement) {
       this.logger.error(`Failed to play '${audioId}': sound not found`);
@@ -171,13 +171,13 @@ export class AudioRepository {
         this.logger.debug(`Playing '${audioId}' was disallowed because of user's preferences`);
         break;
     }
-  }
+  };
 
-  setAudioPreference(audioPreference: AudioPreference): void {
+  readonly setAudioPreference = (audioPreference: AudioPreference): void => {
     this.audioPreference(audioPreference);
-  }
+  };
 
-  setMutedState(handlingNotifications: NOTIFICATION_HANDLING_STATE): void {
+  readonly setMutedState = (handlingNotifications: NOTIFICATION_HANDLING_STATE): void => {
     const updatedMutedState = handlingNotifications !== NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.muted !== updatedMutedState;
@@ -185,17 +185,17 @@ export class AudioRepository {
       this.muted = updatedMutedState;
       this.logger.debug(`Set muted state to '${this.muted}'`);
     }
-  }
+  };
 
-  stop(audioId: AudioType): void {
+  readonly stop = (audioId: AudioType): void => {
     const audioElement = this.getSoundById(audioId);
     if (!audioElement?.paused) {
       this.logger.info(`Stopping sound '${audioId}'`);
       audioElement.pause();
     }
-  }
+  };
 
-  updatedProperties(properties: WebappProperties): void {
+  readonly updatedProperties = (properties: WebappProperties): void => {
     this.setAudioPreference(properties.settings.sound.alerts);
-  }
+  };
 }

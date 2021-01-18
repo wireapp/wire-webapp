@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+
 import type {Message} from '../entity/message/Message';
 
 interface EphemeralTimerParams {

@@ -17,14 +17,15 @@
  *
  */
 
-import type {Dexie} from 'dexie';
+import type {Dexie, Transaction} from 'dexie';
 
 import {base64ToArraySync} from 'Util/util';
+
 import {categoryFromEvent} from '../message/MessageCategorization';
 
 interface DexieSchema {
   schema: Record<string, string>;
-  upgrade?: (transaction: Dexie.Transaction, database?: Dexie) => void;
+  upgrade?: (transaction: Transaction, database?: Dexie) => void;
   version: number;
 }
 
@@ -89,7 +90,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: Dexie.Transaction) => {
+        upgrade: (transaction: Transaction) => {
           transaction
             .table(StorageSchemata.OBJECT_STORE.CLIENTS)
             .toCollection()
@@ -121,7 +122,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: Dexie.Transaction, database: Dexie) => {
+        upgrade: (transaction: Transaction, database: Dexie) => {
           transaction
             .table(StorageSchemata.OBJECT_STORE.CONVERSATIONS)
             .toCollection()
@@ -153,7 +154,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: Dexie.Transaction) => {
+        upgrade: (transaction: Transaction) => {
           transaction
             .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
             .toCollection()
@@ -177,7 +178,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: Dexie.Transaction) => {
+        upgrade: (transaction: Transaction) => {
           transaction
             .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
             .toCollection()
@@ -213,7 +214,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: Dexie.Transaction) => {
+        upgrade: (transaction: Transaction) => {
           transaction
             .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
             .toCollection()
@@ -234,7 +235,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: Dexie.Transaction) => {
+        upgrade: (transaction: Transaction) => {
           const localClientPrimaryKey = 'local_identity';
 
           transaction
@@ -266,7 +267,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: Dexie.Transaction) => {
+        upgrade: (transaction: Transaction) => {
           transaction
             .table(StorageSchemata.OBJECT_STORE.KEYS)
             .toCollection()
@@ -301,7 +302,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: Dexie.Transaction, database: Dexie) => {
+        upgrade: (transaction: Transaction, database: Dexie) => {
           transaction
             .table(StorageSchemata.OBJECT_STORE.CONVERSATION_EVENTS)
             .toCollection()
@@ -323,7 +324,7 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.PRE_KEYS]: '',
           [StorageSchemata.OBJECT_STORE.SESSIONS]: '',
         },
-        upgrade: (transaction: Dexie.Transaction) => {
+        upgrade: (transaction: Transaction) => {
           transaction
             .table(StorageSchemata.OBJECT_STORE.EVENTS)
             .toCollection()

@@ -17,25 +17,26 @@
  *
  */
 
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
-import {t} from 'Util/LocalizerUtil';
 import {formatTimestamp} from 'Util/TimeUtil';
-
-import {Config} from '../../Config';
-import {MotionDuration} from '../../motion/MotionDuration';
-import {ContentViewModel} from '../ContentViewModel';
-import {MainViewModel} from '../MainViewModel';
-import {ClientRepository} from '../../client/ClientRepository';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {ClientEntity} from '../../client/ClientEntity';
-import {ActionsViewModel} from '../ActionsViewModel';
-import {User} from '../../entity/User';
 import {getLogger, Logger} from 'Util/Logger';
-import type {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {t} from 'Util/LocalizerUtil';
+
+import {ActionsViewModel} from '../ActionsViewModel';
+import {ClientEntity} from '../../client/ClientEntity';
+import {ClientRepository} from '../../client/ClientRepository';
+import {Config} from '../../Config';
+import {ContentViewModel} from '../ContentViewModel';
+import {ConversationState} from '../../conversation/ConversationState';
+import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import {MainViewModel} from '../MainViewModel';
+import {MotionDuration} from '../../motion/MotionDuration';
+import {User} from '../../entity/User';
+import type {MessageRepository} from '../../conversation/MessageRepository';
 
 export class PreferencesDeviceDetailsViewModel {
   private readonly logger: Logger;
@@ -59,9 +60,9 @@ export class PreferencesDeviceDetailsViewModel {
   constructor(
     mainViewModel: MainViewModel,
     private readonly clientRepository: ClientRepository,
-    private readonly conversationRepository: ConversationRepository,
     private readonly cryptographyRepository: CryptographyRepository,
     private readonly messageRepository: MessageRepository,
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.actionsViewModel = mainViewModel.actions;
     this.selfUser = this.clientRepository.selfUser;
@@ -94,7 +95,7 @@ export class PreferencesDeviceDetailsViewModel {
     }
   };
 
-  clickOnDetailsClose = (): void => {
+  readonly clickOnDetailsClose = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
     this.device(null);
   };
@@ -103,7 +104,7 @@ export class PreferencesDeviceDetailsViewModel {
     this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING);
 
     try {
-      const selfConversationId = this.conversationRepository.self_conversation().id;
+      const selfConversationId = this.conversationState.self_conversation().id;
       await this.messageRepository.reset_session(this.selfUser().id, this.device().id, selfConversationId);
       window.setTimeout(() => {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);
@@ -127,7 +128,7 @@ export class PreferencesDeviceDetailsViewModel {
     }
   };
 
-  toggleDeviceVerification = (): void => {
+  readonly toggleDeviceVerification = (): void => {
     const toggleVerified = !this.device().meta.isVerified();
     this.clientRepository.verifyClient(this.selfUser().id, this.device(), toggleVerified);
   };

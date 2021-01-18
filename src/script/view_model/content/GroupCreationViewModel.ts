@@ -21,6 +21,7 @@ import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {onEscKey, offEscKey} from 'Util/KeyboardUtil';
@@ -28,10 +29,11 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {ACCESS_STATE, TEAM} from '../../conversation/AccessState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {TeamRepository} from '../../team/TeamRepository';
-import {UserRepository} from '../../user/UserRepository';
 import {User} from '../../entity/User';
 import {SearchRepository} from '../../search/SearchRepository';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
+import {TeamRepository} from 'src/script/team/TeamRepository';
 
 type GroupCreationSource = 'start_ui' | 'conversation_details' | 'create';
 
@@ -57,7 +59,6 @@ export class GroupCreationViewModel {
   shouldUpdateScrollbar: ko.Computed<User[]>;
   maxNameLength: number;
   maxSize: number;
-  searchRepository: SearchRepository;
 
   static get STATE() {
     return {
@@ -68,15 +69,15 @@ export class GroupCreationViewModel {
   }
 
   constructor(
-    private readonly conversationRepository: ConversationRepository,
-    searchRepository: SearchRepository,
-    private readonly teamRepository: TeamRepository,
-    private readonly userRepository: UserRepository,
+    public readonly conversationRepository: ConversationRepository,
+    public readonly searchRepository: SearchRepository,
+    public readonly teamRepository: TeamRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
-    this.isTeam = this.teamRepository.isTeam;
+    this.isTeam = this.teamState.isTeam;
     this.maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
     this.maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
-    this.searchRepository = searchRepository;
 
     this.isShown = ko.observable(false);
     this.state = ko.observable(GroupCreationViewModel.STATE.DEFAULT);
@@ -102,14 +103,14 @@ export class GroupCreationViewModel {
     this.contacts = ko.pureComputed(() => {
       if (this.showContacts()) {
         if (!this.isTeam()) {
-          return this.userRepository.connectedUsers();
+          return this.userState.connectedUsers();
         }
 
         if (this.isGuestRoom()) {
-          return this.teamRepository.teamUsers();
+          return this.teamState.teamUsers();
         }
 
-        return this.teamRepository.teamMembers().sort(sortUsersByPriority);
+        return this.teamState.teamMembers().sort(sortUsersByPriority);
       }
       return [];
     });
@@ -151,7 +152,7 @@ export class GroupCreationViewModel {
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, this.showCreateGroup);
   }
 
-  showCreateGroup = (groupCreationSource: GroupCreationSource, userEntity: User) => {
+  readonly showCreateGroup = (groupCreationSource: GroupCreationSource, userEntity: User) => {
     this.groupCreationSource = groupCreationSource;
     this.enableReadReceipts(this.isTeam());
     this.isShown(true);
@@ -161,15 +162,15 @@ export class GroupCreationViewModel {
     }
   };
 
-  clickOnBack = (): void => {
+  readonly clickOnBack = (): void => {
     this.state(GroupCreationViewModel.STATE.PREFERENCES);
   };
 
-  clickOnClose = (): void => {
+  readonly clickOnClose = (): void => {
     this.isShown(false);
   };
 
-  clickOnToggleGuestMode = (): void => {
+  readonly clickOnToggleGuestMode = (): void => {
     const accessState = this.isGuestRoom() ? ACCESS_STATE.TEAM.TEAM_ONLY : ACCESS_STATE.TEAM.GUEST_ROOM;
 
     this.accessState(accessState);
@@ -201,7 +202,7 @@ export class GroupCreationViewModel {
     }
   };
 
-  clickOnNext = (): void => {
+  readonly clickOnNext = (): void => {
     if (!this.nameInput().length) {
       return;
     }
@@ -222,7 +223,7 @@ export class GroupCreationViewModel {
     this.state(GroupCreationViewModel.STATE.PARTICIPANTS);
   };
 
-  afterHideModal = (): void => {
+  readonly afterHideModal = (): void => {
     this.isCreatingConversation = false;
     this.groupCreationSource = undefined;
     this.nameError('');

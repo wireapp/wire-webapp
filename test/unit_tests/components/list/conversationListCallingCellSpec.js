@@ -38,24 +38,25 @@ describe('conversationListCallingCell', () => {
   let defaultParams;
 
   beforeEach(() => {
-    jasmine.clock().install();
     const mockedCallingRepository = {
       isMuted: () => false,
       supportsScreenSharing: () => true,
     };
+    const mockedTeamRepository = {
+      isExternal: () => false,
+    };
+    const conversation = new Conversation();
+    conversation.participating_user_ets([new User('id')]);
     defaultParams = {
       call: new Call(),
       callActions: {},
       callingRepository: mockedCallingRepository,
-      conversation: () => new Conversation(),
+      conversation: () => conversation,
       hasAccessToCamera: () => true,
       multitasking: {isMinimized: () => false},
+      teamRepository: mockedTeamRepository,
       videoGrid: () => ({grid: []}),
     };
-  });
-
-  afterEach(() => {
-    jasmine.clock().uninstall();
   });
 
   it('displays an incoming ringing call', () => {
@@ -95,16 +96,20 @@ describe('conversationListCallingCell', () => {
     };
     const params = {...defaultParams, call, conversation: () => conversation, teamRepository: mockedTeamRepository};
     return instantiateComponent('conversation-list-calling-cell', params).then(domContainer => {
-      call.startedAt(Date.now());
+      jest.useFakeTimers('modern');
+      const now = Date.now();
+      jest.setSystemTime(now);
+      call.startedAt(now);
+
       const callDurationElement = domContainer.querySelector('[data-uie-name=call-duration]');
 
       expect(callDurationElement).not.toBe(null);
-      expect(callDurationElement.innerText).toBe('00:00');
+      expect(callDurationElement.innerHTML).toBe('00:00');
 
-      jasmine.clock().mockDate(10000);
-      jasmine.clock().tick(10000);
+      jest.advanceTimersByTime(10000);
 
-      expect(callDurationElement.innerText).toBe('00:10');
+      expect(callDurationElement.innerHTML).toBe('00:10');
+      jest.useRealTimers();
     });
   });
 });

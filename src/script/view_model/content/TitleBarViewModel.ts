@@ -21,6 +21,7 @@ import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -32,10 +33,10 @@ import {ContentViewModel} from '../ContentViewModel';
 import {CallingViewModel} from '../CallingViewModel';
 import {PanelViewModel} from '../PanelViewModel';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {UserRepository} from '../../user/UserRepository';
 import {Conversation} from '../../entity/Conversation';
 import {Call} from '../../calling/Call';
+import {UserState} from '../../user/UserState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 // Parent: ContentViewModel
 export class TitleBarViewModel {
@@ -55,8 +56,8 @@ export class TitleBarViewModel {
     private readonly panelViewModel: PanelViewModel,
     readonly contentViewModel: ContentViewModel,
     private readonly callingRepository: CallingRepository,
-    private readonly conversationRepository: ConversationRepository,
-    private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.contentViewModel = contentViewModel;
 
@@ -65,11 +66,11 @@ export class TitleBarViewModel {
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), TIME_IN_MILLIS.SECOND);
 
-    this.conversationEntity = this.conversationRepository.active_conversation;
+    this.conversationEntity = this.conversationState.activeConversation;
     this.ConversationVerificationState = ConversationVerificationState;
 
     this.joinedCall = this.callingRepository.joinedCall;
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && !!this.joinedCall();
@@ -109,7 +110,7 @@ export class TitleBarViewModel {
     this.peopleTooltip = t('tooltipConversationPeople', shortcut);
   }
 
-  addedToView = (): void => {
+  readonly addedToView = (): void => {
     window.setTimeout(() => {
       amplify.subscribe(WebAppEvents.SHORTCUT.PEOPLE, () => this.showDetails(false));
       amplify.subscribe(WebAppEvents.SHORTCUT.ADD_PEOPLE, () => {
@@ -120,16 +121,16 @@ export class TitleBarViewModel {
     }, 50);
   };
 
-  removedFromView = () => {
+  readonly removedFromView = () => {
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.PEOPLE);
     amplify.unsubscribeAll(WebAppEvents.SHORTCUT.ADD_PEOPLE);
   };
 
-  startAudioCall = (conversationEntity: Conversation): void => {
+  readonly startAudioCall = (conversationEntity: Conversation): void => {
     this._startCall(conversationEntity, CALL_TYPE.NORMAL);
   };
 
-  startVideoCall = (conversationEntity: Conversation): void => {
+  readonly startVideoCall = (conversationEntity: Conversation): void => {
     this._startCall(conversationEntity, CALL_TYPE.VIDEO);
   };
 
@@ -138,15 +139,15 @@ export class TitleBarViewModel {
     this.callingRepository.startCall(conversationEntity.id, convType, callType);
   };
 
-  clickOnDetails = (): void => {
+  readonly clickOnDetails = (): void => {
     this.showDetails(false);
   };
 
-  clickOnCollectionButton = (): void => {
+  readonly clickOnCollectionButton = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION);
   };
 
-  showAddParticipant = (): void => {
+  readonly showAddParticipant = (): void => {
     const canAddPeople = this.conversationEntity() && this.conversationEntity().isActiveParticipant();
 
     if (!canAddPeople) {
@@ -164,7 +165,7 @@ export class TitleBarViewModel {
     }
   };
 
-  showDetails = (addParticipants: boolean): void => {
+  readonly showDetails = (addParticipants: boolean): void => {
     const panelId = addParticipants ? PanelViewModel.STATE.ADD_PARTICIPANTS : PanelViewModel.STATE.CONVERSATION_DETAILS;
 
     this.panelViewModel.togglePanel(panelId, undefined);

@@ -17,7 +17,7 @@
  *
  */
 
-import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/dist/http';
+import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/src/http';
 import {defineMessages} from 'react-intl';
 
 import {BackendError} from './auth/module/action/BackendError';
@@ -227,7 +227,7 @@ export const chooseHandleStrings = defineMessages({
     id: 'chooseHandle.headline',
   },
   subhead: {
-    defaultMessage: 'Usernames help people find you.',
+    defaultMessage: 'Your username helps people find you.',
     id: 'chooseHandle.subhead',
   },
 });

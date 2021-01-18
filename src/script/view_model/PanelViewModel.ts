@@ -22,8 +22,6 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-
 import {AddParticipantsViewModel} from './panel/AddParticipantsViewModel';
 import {ConversationDetailsViewModel} from './panel/ConversationDetailsViewModel';
 import {ConversationParticipantsViewModel} from './panel/ConversationParticipantsViewModel';
@@ -42,6 +40,8 @@ import type {User} from '../entity/User';
 import type {Message} from '../entity/message/Message';
 import type {BasePanelViewModel} from './panel/BasePanelViewModel';
 import type {ServiceEntity} from '../integration/ServiceEntity';
+import {ConversationState} from '../conversation/ConversationState';
+import {container} from 'tsyringe';
 
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 
@@ -56,7 +56,6 @@ export class PanelViewModel {
   mainViewModel: MainViewModel;
   repositories: ViewModelRepositories;
   elementId: string;
-  conversationRepository: ConversationRepository;
   conversationEntity: ko.Observable<Conversation>;
   stateHistory: {params?: PanelParams; state: string}[];
   isAnimating: ko.Observable<boolean>;
@@ -113,12 +112,13 @@ export class PanelViewModel {
    * View model for the details column.
    */
   constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
+    const conversationState = container.resolve(ConversationState);
+
     this.elementId = 'right-column';
     this.repositories = repositories;
-    this.conversationRepository = repositories.conversation;
     this.mainViewModel = mainViewModel;
 
-    this.conversationEntity = this.conversationRepository.active_conversation;
+    this.conversationEntity = conversationState.activeConversation;
     this.stateHistory = [];
 
     this.isAnimating = ko.observable(false);
@@ -142,7 +142,7 @@ export class PanelViewModel {
    *
    * Note: panels that are toggled are not counted in the state history.
    */
-  togglePanel = (state: string, params: PanelParams): void => {
+  readonly togglePanel = (state: string, params: PanelParams): void => {
     const isStateChange = this.state() !== state;
     if (!isStateChange) {
       const currentInstance = this.subViews[state];

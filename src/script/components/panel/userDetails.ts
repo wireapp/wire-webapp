@@ -21,10 +21,10 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
-import type {User} from '../../entity/User';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 
-import 'Components/availabilityState';
+import 'Components/AvailabilityState';
+import type {User} from '../../entity/User';
 
 interface UserDetailsProps {
   badge?: string;
@@ -57,7 +57,7 @@ ko.components.register('panel-user-details', {
         <div class="panel-participant__user-name" data-bind="text: participant().username()" data-uie-name="status-username"></div>
       <!-- /ko -->
 
-      <participant-avatar params="participant: participant, size: '${ParticipantAvatar.SIZE.X_LARGE}'" data-uie-name="status-profile-picture"></participant-avatar>
+      <participant-avatar params="participant: participant, size: '${AVATAR_SIZE.X_LARGE}'" data-uie-name="status-profile-picture"></participant-avatar>
 
       <!-- ko if: badge -->
         <div class="panel-participant__label" data-uie-name="status-external">

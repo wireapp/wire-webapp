@@ -19,15 +19,16 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/dist/user/data';
+import {AudioPreference, WebappProperties, NotificationPreference} from '@wireapp/api-client/src/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
 import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {Config} from '../../Config';
 import {THEMES as ThemeViewModelThemes} from '../ThemeViewModel';
-import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
-import {TeamRepository} from 'src/script/team/TeamRepository';
-import {UserRepository} from 'src/script/user/UserRepository';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 export class PreferencesOptionsViewModel {
   isActivatedAccount: ko.PureComputed<boolean>;
@@ -42,11 +43,11 @@ export class PreferencesOptionsViewModel {
 
   constructor(
     private readonly propertiesRepository: PropertiesRepository,
-    private readonly teamRepository: TeamRepository,
-    private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
-    this.isActivatedAccount = this.userRepository.isActivatedAccount;
-    this.isTeam = this.teamRepository.isTeam;
+    this.isActivatedAccount = this.userState.isActivatedAccount;
+    this.isTeam = this.teamState.isTeam;
 
     this.optionAudio = ko.observable();
     this.optionAudio.subscribe(audioPreference => {
@@ -75,14 +76,14 @@ export class PreferencesOptionsViewModel {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.PREVIEWS.SEND, sendPreviewsPreference);
     });
 
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties.bind(this));
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
     this.updateProperties(this.propertiesRepository.properties);
 
     this.AudioPreference = AudioPreference;
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  updateProperties = ({settings}: WebappProperties): void => {
+  readonly updateProperties = ({settings}: WebappProperties): void => {
     this.optionAudio(settings.sound.alerts);
     this.optionReplaceInlineEmoji(settings.emoji.replace_inline);
     this.optionDarkMode(settings.interface.theme === ThemeViewModelThemes.DARK);

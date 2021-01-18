@@ -17,13 +17,15 @@
  *
  */
 
+import {container} from 'tsyringe';
 import ko from 'knockout';
 
+import {ConversationState} from '../../conversation/ConversationState';
 import type {Conversation} from '../../entity/Conversation';
-import type {User} from '../../entity/User';
-import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {MainViewModel, ViewModelRepositories} from '../MainViewModel';
 import type {PanelParams} from '../PanelViewModel';
+import type {ServiceEntity} from '../../integration/ServiceEntity';
+import type {User} from '../../entity/User';
 
 export interface PanelViewModelProps {
   isVisible: ko.PureComputed<boolean>;
@@ -42,7 +44,10 @@ export class BasePanelViewModel {
   navigateTo: PanelViewModelProps['navigateTo'];
   isVisible: ko.PureComputed<boolean>;
   activeConversation: ko.Observable<Conversation>;
-  constructor({isVisible, navigateTo, onClose, onGoBack, onGoToRoot, repositories}: PanelViewModelProps) {
+
+  constructor({isVisible, navigateTo, onClose, onGoBack, onGoToRoot}: PanelViewModelProps) {
+    const conversationState = container.resolve(ConversationState);
+
     this.onClose = onClose;
     this.onGoBack = onGoBack;
     this.onGoToRoot = onGoToRoot;
@@ -50,7 +55,7 @@ export class BasePanelViewModel {
 
     this.isVisible = isVisible;
 
-    this.activeConversation = repositories.conversation.active_conversation;
+    this.activeConversation = conversationState.activeConversation;
   }
 
   initView(params?: PanelParams): void {}

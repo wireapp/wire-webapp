@@ -17,22 +17,24 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-import {formatTimestamp} from 'Util/TimeUtil';
 import {amplify} from 'amplify';
-import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {ContentViewModel} from '../ContentViewModel';
-import {sortUserDevices} from 'Components/userDevices';
-import {MainViewModel} from '../MainViewModel';
-import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
-import {UserRepository} from '../../user/UserRepository';
-import {User} from '../../entity/User';
-import {ClientEntity} from '../../client/ClientEntity';
-import {ActionsViewModel} from '../ActionsViewModel';
-import {PreferencesDeviceDetailsViewModel} from './PreferencesDeviceDetailsViewModel';
 import {container} from 'tsyringe';
+import {formatTimestamp} from 'Util/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
+
+import {sortUserDevices} from 'Components/userDevices';
+
+import {ActionsViewModel} from '../ActionsViewModel';
+import {ClientEntity} from '../../client/ClientEntity';
 import {ClientState} from '../../client/ClientState';
+import {ContentViewModel} from '../ContentViewModel';
+import {CryptographyRepository} from '../../cryptography/CryptographyRepository';
+import {MainViewModel} from '../MainViewModel';
+import {PreferencesDeviceDetailsViewModel} from './PreferencesDeviceDetailsViewModel';
+import {User} from '../../entity/User';
+import {UserState} from '../../user/UserState';
 
 export class PreferencesDevicesViewModel {
   private readonly actionsViewModel: ActionsViewModel;
@@ -49,8 +51,8 @@ export class PreferencesDevicesViewModel {
     mainViewModel: MainViewModel,
     contentViewModel: ContentViewModel,
     private readonly cryptographyRepository: CryptographyRepository,
-    private readonly userRepository: UserRepository,
     private readonly clientState = container.resolve(ClientState),
+    private readonly userState = container.resolve(UserState),
   ) {
     this.actionsViewModel = mainViewModel.actions;
     this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
@@ -64,21 +66,21 @@ export class PreferencesDevicesViewModel {
       return sortUserDevices(clients);
     });
     this.localFingerprint = ko.observableArray([]);
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
     this.isSSO = ko.pureComputed(() => this.selfUser() && this.selfUser().isSingleSignOn);
   }
 
-  clickOnShowDevice = (clientEntity: ClientEntity): void => {
+  readonly clickOnShowDevice = (clientEntity: ClientEntity): void => {
     this.preferencesDeviceDetails.device(clientEntity);
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICE_DETAILS);
   };
 
-  clickOnRemoveDevice = (clientEntity: ClientEntity, event: MouseEvent): void => {
+  readonly clickOnRemoveDevice = (clientEntity: ClientEntity, event: MouseEvent): void => {
     this.actionsViewModel.deleteClient(clientEntity);
     event.stopPropagation();
   };
 
-  updateDeviceInfo = (): void => {
+  readonly updateDeviceInfo = (): void => {
     if (this.currentClient() && !this.localFingerprint().length) {
       const date = formatTimestamp(this.currentClient().time);
       this.activationDate(t('preferencesDevicesActivatedOn', {date}));

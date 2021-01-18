@@ -19,8 +19,9 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/dist/conversation';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
@@ -30,7 +31,6 @@ import 'Components/panel/userDetails';
 
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {TeamRepository} from '../../team/TeamRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -39,14 +39,19 @@ import {PanelViewModel} from '../PanelViewModel';
 import type {PanelParams} from '../PanelViewModel';
 import {ClientEvent} from '../../event/Client';
 import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
-  userRepository: UserRepository;
+  private readonly userState: UserState;
+  private readonly teamState: TeamState;
+
   actionsViewModel: ActionsViewModel;
   teamRepository: TeamRepository;
   conversationRepository: ConversationRepository;
   conversationRoleRepository: ConversationRoleRepository;
   logger: Logger;
+  isActivatedAccount: ko.PureComputed<boolean>;
   selectedParticipant: ko.Observable<User>;
   isSelfVerified: ko.PureComputed<boolean>;
   canChangeRole: ko.PureComputed<boolean>;
@@ -54,9 +59,11 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
   constructor(params: PanelViewModelProps) {
     super(params);
 
+    this.userState = container.resolve(UserState);
+    this.teamState = container.resolve(TeamState);
+
     const {mainViewModel, repositories} = params;
 
-    this.userRepository = repositories.user;
     this.actionsViewModel = mainViewModel.actions;
     this.teamRepository = repositories.team;
     this.conversationRepository = repositories.conversation;
@@ -64,8 +71,9 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
 
     this.logger = getLogger('GroupParticipantUserViewModel');
 
+    this.isActivatedAccount = this.userState.isActivatedAccount;
     this.selectedParticipant = ko.observable(undefined);
-    this.isSelfVerified = ko.pureComputed(() => repositories.user.self()?.is_verified());
+    this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
 
     this.canChangeRole = ko.pureComputed(
       () =>
@@ -109,7 +117,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     return !userEntity.isMe;
   }
 
-  onUserAction = (action: Actions): void => {
+  readonly onUserAction = (action: Actions): void => {
     if (action === Actions.REMOVE) {
       this.onGoBack();
     }
@@ -134,8 +142,8 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     }
 
     this.selectedParticipant(userEntity);
-    if (this.teamRepository.isTeam()) {
-      this.teamRepository.updateTeamMembersByIds(this.teamRepository.team(), [userEntity.id], true);
+    if (this.teamState.isTeam()) {
+      this.teamRepository.updateTeamMembersByIds(this.teamState.team(), [userEntity.id], true);
     }
     if (userEntity.isTemporaryGuest()) {
       userEntity.checkGuestExpiration();

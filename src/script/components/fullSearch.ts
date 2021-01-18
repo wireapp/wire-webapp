@@ -20,10 +20,10 @@
 import ko from 'knockout';
 import {debounce, escape} from 'underscore';
 
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {formatDateShort} from 'Util/TimeUtil';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
 import {getSearchRegex} from '../search/FullTextSearch';
 import type {Message} from '../entity/message/Message';
 import type {ContentMessage} from '../entity/message/ContentMessage';
@@ -40,7 +40,7 @@ class FullSearch {
   inputSubscription: ko.Subscription;
   messageEntities: Message[];
   params: FullSearchParams;
-  ParticipantAvatar: typeof ParticipantAvatar;
+  AVATAR_SIZE: typeof AVATAR_SIZE;
   searchProvider: (query: string) => Promise<{messageEntities: Message[]; query: string}>;
   showNoResultsText: ko.Observable<boolean>;
   visibleMessageEntities: ko.ObservableArray<Message>;
@@ -56,7 +56,7 @@ class FullSearch {
 
   constructor(params: FullSearchParams) {
     this.searchProvider = params.search_provider;
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
     this.params = params;
 
     this.messageEntities = [];
@@ -99,13 +99,13 @@ class FullSearch {
     });
   }
 
-  onInputChange = (query: string): void => {
+  readonly onInputChange = (query: string): void => {
     if (typeof this.params.change === 'function') {
       this.params.change(query);
     }
   };
 
-  clickOnMessage = (messageEntity: Message): void => {
+  readonly clickOnMessage = (messageEntity: Message): void => {
     if (typeof this.params.click === 'function') {
       this.params.click(messageEntity);
     }
@@ -178,7 +178,7 @@ ko.components.register('full-search', {
     <div class="full-search-list" data-bind="foreach: {data: visibleMessageEntities, as: 'messageEntity', noChildContext: true}" data-uie-name="full-search-list">
       <div class="full-search-item" data-bind="click: () => clickOnMessage(messageEntity)" data-uie-name="full-search-item">
         <div class="full-search-item-avatar">
-          <participant-avatar params="participant: messageEntity.user, size: ParticipantAvatar.SIZE.X_SMALL"></participant-avatar>
+          <participant-avatar params="participant: messageEntity.user, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
         </div>
         <div class="full-search-item-content">
           <div class="full-search-item-content-text ellipsis" data-bind="html: htmlFormatResult(messageEntity)" data-uie-name="full-search-item-text"></div>

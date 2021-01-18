@@ -17,9 +17,10 @@
  *
  */
 
-import type {Connection as ConnectionData} from '@wireapp/api-client/dist/connection/';
+import type {Connection as ConnectionData} from '@wireapp/api-client/src/connection/';
 
 import {Logger, getLogger} from 'Util/Logger';
+
 import {ConnectionEntity} from './ConnectionEntity';
 
 /**

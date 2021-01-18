@@ -20,10 +20,13 @@
 import {debounce} from 'underscore';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {partition} from 'Util/ArrayUtil';
+import {sortByPriority} from 'Util/StringUtil';
 
 import {UserlistMode} from 'Components/userList';
 
@@ -32,9 +35,7 @@ import {Config} from '../../Config';
 import {User} from '../../entity/User';
 import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {SearchRepository} from '../../search/SearchRepository';
-import {sortByPriority} from 'Util/StringUtil';
 import {ListViewModel} from '../ListViewModel';
 import type {MainViewModel} from '../MainViewModel';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -44,6 +45,9 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {Conversation} from '../../entity/Conversation';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
+import {ConversationState} from '../../conversation/ConversationState';
 
 export class StartUIViewModel {
   readonly brandName: string;
@@ -105,19 +109,22 @@ export class StartUIViewModel {
     readonly searchRepository: SearchRepository,
     readonly teamRepository: TeamRepository,
     private readonly userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly teamState = container.resolve(TeamState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
-    this.alreadyClickedOnContact = {};
     this.logger = getLogger('StartUIViewModel');
+    this.alreadyClickedOnContact = {};
     this.brandName = Config.getConfig().BRAND_NAME;
     this.UserlistMode = UserlistMode;
 
     this.actionsViewModel = this.mainViewModel.actions;
 
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
 
-    this.isTeam = this.teamRepository.isTeam;
-    this.teamName = this.teamRepository.teamName;
-    this.teamSize = this.teamRepository.teamSize;
+    this.isTeam = this.teamState.isTeam;
+    this.teamName = this.teamState.teamName;
+    this.teamSize = this.teamState.teamSize;
 
     this.state = ko.observable(StartUIViewModel.STATE.ADD_PEOPLE);
     this.isVisible = ko.pureComputed(() => listViewModel.state() === ListViewModel.STATE.START_UI);
@@ -149,19 +156,19 @@ export class StartUIViewModel {
       }
 
       if (this.showOnlyConnectedUsers()) {
-        return this.conversationRepository.connectedUsers();
+        return this.conversationState.connectedUsers();
       }
 
       if (this.isTeam()) {
-        const connectedUsers = this.conversationRepository.connectedUsers();
-        const teamUsersWithoutPartners = this.teamRepository
+        const connectedUsers = this.conversationState.connectedUsers();
+        const teamUsersWithoutPartners = this.teamState
           .teamUsers()
           .filter(user => connectedUsers.includes(user) || this.teamRepository.isSelfConnectedTo(user.id));
 
         return teamUsersWithoutPartners;
       }
 
-      return this.userRepository.connectedUsers();
+      return this.userState.connectedUsers();
     });
 
     this.matchedUsers = ko.observableArray([]);
@@ -219,7 +226,7 @@ export class StartUIViewModel {
       .extend({notify: 'always', rateLimit: 500});
   }
 
-  clickOnClose = (): void => {
+  readonly clickOnClose = (): void => {
     this.closeList();
   };
 
@@ -228,39 +235,40 @@ export class StartUIViewModel {
       return;
     }
     this.alreadyClickedOnContact[userEntity.id] = true;
-    await this.actionsViewModel.open1to1Conversation(userEntity);
+    const conversationEntity = await this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
+    await this.actionsViewModel.open1to1Conversation(conversationEntity);
     this.closeList();
     delete this.alreadyClickedOnContact[userEntity.id];
   };
 
-  clickOnConversation = (conversationEntity: Conversation): Promise<void> => {
+  readonly clickOnConversation = (conversationEntity: Conversation): Promise<void> => {
     return this.actionsViewModel.openGroupConversation(conversationEntity).then(() => this.closeList());
   };
 
-  clickOnCreateGroup = (): void => {
+  readonly clickOnCreateGroup = (): void => {
     amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'start_ui');
   };
 
-  clickOnCreateGuestRoom = (): void => {
+  readonly clickOnCreateGuestRoom = (): void => {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
     });
   };
 
-  clickOpenManageTeam = (): void => {
+  readonly clickOpenManageTeam = (): void => {
     if (!this.manageTeamUrl) {
       return;
     }
     safeWindowOpen(this.manageTeamUrl);
   };
 
-  clickOpenManageServices = () => {
+  readonly clickOpenManageServices = () => {
     if (this.manageServicesUrl) {
       safeWindowOpen(this.manageServicesUrl);
     }
   };
 
-  clickOnOther = (participantEntity: User | ServiceEntity): Promise<void> | void => {
+  readonly clickOnOther = (participantEntity: User | ServiceEntity): Promise<void> | void => {
     const isUser = participantEntity instanceof User;
     if (isUser && (participantEntity as User).isOutgoingRequest()) {
       return this.clickOnContact(participantEntity as User);
@@ -271,15 +279,15 @@ export class StartUIViewModel {
     return this.mainViewModel.content.serviceModal.showService(participantEntity as ServiceEntity);
   };
 
-  clickOnShowPeople = (): void => {
+  readonly clickOnShowPeople = (): void => {
     this.updateList(StartUIViewModel.STATE.ADD_PEOPLE);
   };
 
-  clickOnShowServices = (): void => {
+  readonly clickOnShowServices = (): void => {
     this.updateList(StartUIViewModel.STATE.ADD_SERVICE);
   };
 
-  handleSearchInput = (): void => {
+  readonly handleSearchInput = (): void => {
     if (!this.submittedSearch && this.isSearching()) {
       const [matchingContact] = this.searchResults.contacts();
       if (matchingContact) {
@@ -358,13 +366,13 @@ export class StartUIViewModel {
       .then(userEntities => userEntities.filter(userEntity => !userEntity.isBlocked()));
   };
 
-  clickToShowInviteModal = () => this.mainViewModel.content.inviteModal.show();
+  readonly clickToShowInviteModal = () => this.mainViewModel.content.inviteModal.show();
 
   //##############################################################################
   // Search
   //##############################################################################
 
-  clearSearchResults = (): void => {
+  readonly clearSearchResults = (): void => {
     this.searchResults.groups.removeAll();
     this.searchResults.contacts.removeAll();
     this.searchResults.others.removeAll();
@@ -382,17 +390,15 @@ export class StartUIViewModel {
     const trimmedQuery = query.trim();
     const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
 
-    const allLocalUsers = this.isTeam() ? this.teamRepository.teamUsers() : this.userRepository.connectedUsers();
+    const allLocalUsers = this.isTeam() ? this.teamState.teamUsers() : this.userState.connectedUsers();
 
-    const localSearchSources = this.showOnlyConnectedUsers()
-      ? this.conversationRepository.connectedUsers()
-      : allLocalUsers;
+    const localSearchSources = this.showOnlyConnectedUsers() ? this.conversationState.connectedUsers() : allLocalUsers;
 
     const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
     const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
     const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
-    const connectedUsers = this.conversationRepository.connectedUsers();
+    const connectedUsers = this.conversationState.connectedUsers();
     const filteredResults = contactResults.filter(
       user =>
         connectedUsers.includes(user) ||

@@ -18,20 +18,19 @@
  */
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
 
 import {CALL, CONVERSATION, ClientEvent} from '../event/Client';
-
 import type {Call as CallEntity} from '../calling/Call';
 import {StatusType} from '../message/StatusType';
 import {VerificationMessageType} from '../message/VerificationMessageType';
-
 import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
+import {AssetRecord, EventRecord} from '../storage';
 
 export interface BaseEvent {
   conversation: string;
@@ -49,8 +48,9 @@ export interface ConversationEvent<T> extends BaseEvent {
 export interface CallingEvent {
   content: CallEntity;
   conversation: string;
-  from: number;
-  sender: number;
+  from: string;
+  sender: string;
+  time?: string;
   type: CALL;
 }
 
@@ -120,7 +120,7 @@ export const EventBuilder = {
     };
   },
 
-  buildAssetAdd(conversationEntity: Conversation, data: any, currentTimestamp: number): AssetAddEvent {
+  buildAssetAdd(conversationEntity: Conversation, data: AssetRecord, currentTimestamp: number): AssetAddEvent {
     return {
       conversation: conversationEntity.id,
       data,
@@ -134,8 +134,8 @@ export const EventBuilder = {
   buildCalling(
     conversationEntity: Conversation,
     callMessage: CallEntity,
-    userId: number,
-    clientId: number,
+    userId: string,
+    clientId: string,
   ): CallingEvent {
     return {
       content: callMessage,
@@ -228,7 +228,7 @@ export const EventBuilder = {
     };
   },
 
-  buildIncomingMessageTooBig(event: any, messageError: Error, errorCode: number): ErrorEvent {
+  buildIncomingMessageTooBig(event: EventRecord, messageError: Error, errorCode: number): ErrorEvent {
     const {conversation: conversationId, data: eventData, from, time} = event;
 
     return {
@@ -339,7 +339,7 @@ export const EventBuilder = {
     };
   },
 
-  buildUnableToDecrypt(event: any, decryptionError: Error, errorCode: number | string): ErrorEvent {
+  buildUnableToDecrypt(event: EventRecord, decryptionError: Error, errorCode: number): ErrorEvent {
     const {conversation: conversationId, data: eventData, from, time} = event;
 
     return {

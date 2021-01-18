@@ -18,22 +18,23 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
-import {amplify} from 'amplify';
-import ko from 'knockout';
+import 'Components/loadingBar';
 
 import {ContentViewModel} from '../ContentViewModel';
 import {Config} from '../../Config';
 
 import {CancelError} from '../../backup/Error';
 
-import 'Components/loadingBar';
 import {BackupRepository} from '../../backup/BackupRepository';
-import {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
 
 export class HistoryExportViewModel {
   private readonly logger: Logger;
@@ -63,7 +64,10 @@ export class HistoryExportViewModel {
     };
   }
 
-  constructor(private readonly backupRepository: BackupRepository, private readonly userRepository: UserRepository) {
+  constructor(
+    private readonly backupRepository: BackupRepository,
+    private readonly userState = container.resolve(UserState),
+  ) {
     this.logger = getLogger('HistoryExportViewModel');
 
     this.hasError = ko.observable(false);
@@ -118,7 +122,7 @@ export class HistoryExportViewModel {
 
       this.numberOfRecords(numberOfRecords);
       this.numberOfProcessedRecords(0);
-      const archiveBlob = await this.backupRepository.generateHistory(this.onProgress.bind(this));
+      const archiveBlob = await this.backupRepository.generateHistory(this.onProgress);
       this.onSuccess(archiveBlob);
       this.logger.log(`Completed export of '${numberOfRecords}' records from history`);
     } catch (error) {
@@ -126,8 +130,8 @@ export class HistoryExportViewModel {
     }
   };
 
-  downloadArchiveFile = (): void => {
-    const userName = this.userRepository.self().username();
+  readonly downloadArchiveFile = (): void => {
+    const userName = this.userState.self().username();
     const fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
     const sanitizedBrandName = Config.getConfig().BRAND_NAME.replace(/[^A-Za-z0-9_]/g, '');
     const filename = `${sanitizedBrandName}-${userName}-Backup_${getCurrentDate()}.${fileExtension}`;
@@ -136,16 +140,16 @@ export class HistoryExportViewModel {
     downloadBlob(this.archiveBlob(), filename, 'application/octet-stream');
   };
 
-  onCancel = (): void => {
+  readonly onCancel = (): void => {
     this.backupRepository.cancelAction();
   };
 
-  onProgress = (processedNumber: number): void => {
+  readonly onProgress = (processedNumber: number): void => {
     this.state(HistoryExportViewModel.STATE.EXPORTING);
     this.numberOfProcessedRecords(this.numberOfProcessedRecords() + processedNumber);
   };
 
-  onError = (error: Error): void => {
+  readonly onError = (error: Error): void => {
     if (error instanceof CancelError) {
       this.logger.log('History export was cancelled');
       return this.dismissExport();
@@ -154,17 +158,17 @@ export class HistoryExportViewModel {
     this.logger.error(`Failed to export history: ${error.message}`, error);
   };
 
-  onSuccess = (archiveBlob: Blob): void => {
+  readonly onSuccess = (archiveBlob: Blob): void => {
     this.state(HistoryExportViewModel.STATE.DONE);
     this.hasError(false);
     this.archiveBlob(archiveBlob);
   };
 
-  onTryAgain = (): void => {
+  readonly onTryAgain = (): void => {
     this.exportHistory();
   };
 
-  dismissExport = (): void => {
+  readonly dismissExport = (): void => {
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_ACCOUNT);
   };
 }

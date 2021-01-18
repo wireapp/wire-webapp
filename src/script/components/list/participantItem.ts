@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {UserlistMode} from 'Components/userList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -28,7 +28,7 @@ import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 import {viewportObserver} from '../../ui/viewportObserver';
 
-import 'Components/availabilityState';
+import 'Components/AvailabilityState';
 import {Participant} from '../../calling/Participant';
 
 interface ParticipantItemParams {
@@ -81,7 +81,7 @@ class ParticipantItem {
     }: ParticipantItemParams,
     element: HTMLElement,
   ) {
-    this.avatarSize = ParticipantAvatar.SIZE.SMALL;
+    this.avatarSize = AVATAR_SIZE.SMALL;
     this.participant = ko.unwrap(participant);
     this.isSelf = !!(this.participant as User).isMe;
     this.selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
@@ -174,7 +174,7 @@ ko.components.register('participant-item', {
           <!-- /ko -->
 
           <!-- ko ifnot: callParticipant.isMuted() -->
-            <mic-on-icon data-uie-name="status-audio-on"></mic-on-icon>
+            <participant-mic-on-icon params="isActive: callParticipant.isActivelySpeaking()" data-bind="attr: {'data-uie-name': callParticipant.isActivelySpeaking() ? 'status-active-speaking' : 'status-audio-on'}"></participant-mic-on-icon>            
           <!-- /ko -->
 
           <!-- ko if: callParticipant.isMuted() -->

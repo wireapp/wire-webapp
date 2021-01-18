@@ -60,19 +60,15 @@ describe('ClientAction', () => {
       apiClient: mockedApiClient,
       core: mockedCore,
     })({});
-    try {
-      await store.dispatch(actionRoot.clientAction.doGetAllClients());
-      fail();
-    } catch (expectedError) {
-      expect(expectedError).toBeDefined();
-      expect(expectedError.message).toEqual(backendError.message);
-      expect(expectedError.code).toEqual(backendError.code);
-      expect(expectedError.label).toEqual(backendError.label);
-      expect(store.getActions()).toEqual([
-        ClientActionCreator.startGetAllClients(),
-        ClientActionCreator.failedGetAllClients(backendError),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.clientAction.doGetAllClients())).rejects.toMatchObject({
+      code: backendError.code,
+      label: backendError.label,
+      message: backendError.message,
+    });
+    expect(store.getActions()).toEqual([
+      ClientActionCreator.startGetAllClients(),
+      ClientActionCreator.failedGetAllClients(backendError),
+    ]);
   });
 
   it('removes a self client', async () => {
@@ -115,18 +111,14 @@ describe('ClientAction', () => {
       apiClient: mockedApiClient,
       core: mockedCore,
     })({});
-    try {
-      await store.dispatch(actionRoot.clientAction.doRemoveClient(clientId, password));
-      fail();
-    } catch (expectedError) {
-      expect(expectedError).toBeDefined();
-      expect(expectedError.message).toEqual(backendError.message);
-      expect(expectedError.code).toEqual(backendError.code);
-      expect(expectedError.label).toEqual(backendError.label);
-      expect(store.getActions()).toEqual([
-        ClientActionCreator.startRemoveClient(),
-        ClientActionCreator.failedRemoveClient(backendError),
-      ]);
-    }
+    await expect(store.dispatch(actionRoot.clientAction.doRemoveClient(clientId, password))).rejects.toMatchObject({
+      code: backendError.code,
+      label: backendError.label,
+      message: backendError.message,
+    });
+    expect(store.getActions()).toEqual([
+      ClientActionCreator.startRemoveClient(),
+      ClientActionCreator.failedRemoveClient(backendError),
+    ]);
   });
 });

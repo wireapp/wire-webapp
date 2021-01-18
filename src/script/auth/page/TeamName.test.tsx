@@ -31,6 +31,8 @@ import {History} from 'history';
 import {initialAuthState} from '../module/reducer/authReducer';
 import {ValidationError} from '../module/action/ValidationError';
 
+jest.mock('../util/SVGProvider');
+
 class SetTeamNamePage {
   private readonly driver: ReactWrapper;
 
@@ -136,7 +138,7 @@ describe('when entering a team name', () => {
         }),
       );
 
-      expect(setTeamNamePage.getNextButton().props().disabled).withContext('Submit button is disabled').toBe(true);
+      expect(setTeamNamePage.getNextButton().props().disabled).toBe(true);
     });
   });
 
@@ -159,9 +161,7 @@ describe('when entering a team name', () => {
       expect(setTeamNamePage.getTeamNameInput().props().value).toBe(expectedTeamName);
       setTeamNamePage.clickNextButton();
 
-      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.PATTERN_MISMATCH).exists())
-        .withContext('pattern mismatch error is shown')
-        .toBe(true);
+      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.PATTERN_MISMATCH).exists()).toBe(true);
     });
 
     it('appears when input gets trimmed', () => {
@@ -183,9 +183,7 @@ describe('when entering a team name', () => {
       expect(setTeamNamePage.getTeamNameInput().props().value).toBe(expectedTeamName);
       setTeamNamePage.clickNextButton();
 
-      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.VALUE_MISSING).exists())
-        .withContext('value missing error is shown')
-        .toBe(true);
+      expect(setTeamNamePage.getErrorMessage(ValidationError.FIELD.NAME.VALUE_MISSING).exists()).toBe(true);
     });
   });
 });

@@ -20,11 +20,12 @@
 import type {GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/dist/conversation';
+import type {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
+
+import {Logger, getLogger} from 'Util/Logger';
 
 import {BackendClientError} from '../error/BackendClientError';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
-import {Logger, getLogger} from 'Util/Logger';
 import type {BroadcastService} from './BroadcastService';
 import type {ClientMismatchHandler} from '../conversation/ClientMismatchHandler';
 import type {ClientRepository} from '../client/ClientRepository';
@@ -127,8 +128,8 @@ export class BroadcastRepository {
 
     return this.broadcastService
       .postBroadcastMessage(payload, eventInfoEntity.options.precondition)
-      .then(response => {
-        this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
+      .then(async response => {
+        await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
       })
       .catch(axiosError => {
@@ -145,7 +146,10 @@ export class BroadcastRepository {
         return this.clientMismatchHandler.onClientMismatch(eventInfoEntity, error, payload).then(updatedPayload => {
           this.logger.info(`Updated '${messageType}' message as broadcast`, updatedPayload);
           eventInfoEntity.forceSending();
-          return this.sendEncryptedMessage(eventInfoEntity, updatedPayload);
+          if (updatedPayload) {
+            return this.sendEncryptedMessage(eventInfoEntity, updatedPayload);
+          }
+          return this.sendEncryptedMessage(eventInfoEntity, payload);
         });
       });
   }

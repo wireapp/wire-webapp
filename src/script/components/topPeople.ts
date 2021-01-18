@@ -19,7 +19,8 @@
 
 import ko from 'knockout';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+
 import type {User} from '../entity/User';
 
 interface TopPeopleParams {
@@ -32,19 +33,19 @@ class TopPeople {
   click: (userEntity: User, event: Event) => void;
   maxUsers: number;
   userEntities: ko.Observable<User[]>;
-  ParticipantAvatar: typeof ParticipantAvatar;
+  AVATAR_SIZE: typeof AVATAR_SIZE;
   displayedUsers: ko.PureComputed<User[]>;
 
   constructor(params: TopPeopleParams) {
     this.click = params.click;
     this.maxUsers = params.max || 9;
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
     this.userEntities = params.users;
 
     this.displayedUsers = ko.pureComputed(() => this.userEntities().slice(0, this.maxUsers));
   }
 
-  onUserClick = (userEntity: User, event: Event): void => {
+  readonly onUserClick = (userEntity: User, event: Event): void => {
     if (typeof this.click === 'function') {
       return this.click(userEntity, event);
     }
@@ -55,7 +56,7 @@ ko.components.register('top-people', {
   template: `
     <div class="search-list search-list-sm" data-bind="foreach: {data: displayedUsers}">
       <div class="search-list-item" data-bind="click: $parent.onUserClick, attr: {'data-uie-uid': $data.id, 'data-uie-value': $data.name(), 'data-uie-status': $data.connection().status()}" data-uie-name="item-user">
-        <participant-avatar class="search-list-item-image" params="participant: $data, delay: 300, size: $parent.ParticipantAvatar.SIZE.LARGE"></participant-avatar>
+        <participant-avatar class="search-list-item-image" params="participant: $data, delay: 300, size: $parent.AVATAR_SIZE.LARGE"></participant-avatar>
         <div class="search-list-item-content">
           <div class="search-list-item-content-name" data-bind="text: name"></div>
         </div>

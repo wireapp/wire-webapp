@@ -17,12 +17,14 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
+import {UserState} from '../../user/UserState';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import {EventRecord} from '../../storage/EventRecord';
+import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
 
@@ -31,7 +33,11 @@ export class ServiceMiddleware {
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
 
-  constructor(conversationRepository: ConversationRepository, userRepository: UserRepository) {
+  constructor(
+    conversationRepository: ConversationRepository,
+    userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
+  ) {
     this.userRepository = userRepository;
     this.conversationRepository = conversationRepository;
     this.logger = getLogger('ServiceMiddleware');
@@ -54,7 +60,7 @@ export class ServiceMiddleware {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, data: eventData} = event;
-    const selfUserId = this.userRepository.self().id;
+    const selfUserId = this.userState.self().id;
     const containsSelfUser = eventData.user_ids.includes(selfUserId);
 
     const userIds = containsSelfUser

@@ -17,40 +17,38 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {Notification} from '@wireapp/api-client/dist/notification';
+import type {Notification} from '@wireapp/api-client/src/notification';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {WebSocketClient, OnConnect} from '@wireapp/api-client/dist/tcp/';
-import {WEBSOCKET_STATE} from '@wireapp/api-client/dist/tcp/ReconnectingWebsocket';
+import {WebSocketClient, OnConnect} from '@wireapp/api-client/src/tcp/';
+import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 
+import {APIClient} from '../service/APIClientSingleton';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 
 export type OnNotificationCallback = (data: Notification) => void;
 
 export class WebSocketService {
-  private readonly apiClient: APIClient;
   private readonly logger: Logger;
-
   public clientId?: string;
 
-  constructor(apiClient: APIClient) {
-    this.apiClient = apiClient;
+  constructor(private readonly apiClient = container.resolve(APIClient)) {
     this.logger = getLogger('WebSocketService');
   }
 
-  disconnect = () => {
+  readonly disconnect = () => {
     this.logger.info('Disconnecting websocket');
     this.apiClient.disconnect();
   };
 
-  lockWebsocket = () => {
+  readonly lockWebsocket = () => {
     this.apiClient.transport.ws.lock();
   };
 
-  unlockWebsocket = () => {
+  readonly unlockWebsocket = () => {
     this.apiClient.transport.ws.unlock();
   };
 
@@ -94,7 +92,7 @@ export class WebSocketService {
     // Note: `connect()` should only resolve after `onBeforeConnect()` is executed successfully
     // We need to wrap this into a plain Promise because `reconnecting-websocket` doesn't give a handle
     // to wait for the execution (connection lost on RWS constructor)
-    await new Promise((resolve, reject) =>
+    await new Promise<void>((resolve, reject) =>
       this.apiClient.connect(async abortHandler => {
         try {
           await onConnect(abortHandler);

@@ -17,13 +17,15 @@
  *
  */
 
-import ko from 'knockout';
 import {amplify} from 'amplify';
-
+import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import ko from 'knockout';
+
+import {ConversationState} from '../../conversation/ConversationState';
 import {ListViewModel} from '../ListViewModel';
+import type {Conversation} from '../../entity/Conversation';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
-import type {Conversation} from 'src/script/entity/Conversation';
 
 export class ArchiveViewModel {
   readonly listViewModel: ListViewModel;
@@ -32,11 +34,16 @@ export class ArchiveViewModel {
   readonly shouldUpdateScrollbar: ko.Computed<number>;
   readonly onJoinCall: Function;
 
-  constructor(listViewModel: ListViewModel, conversationRepository: ConversationRepository, onJoinCall: Function) {
+  constructor(
+    listViewModel: ListViewModel,
+    conversationRepository: ConversationRepository,
+    onJoinCall: Function,
+    private readonly conversationState = container.resolve(ConversationState),
+  ) {
     this.listViewModel = listViewModel;
     this.conversationRepository = conversationRepository;
 
-    this.archivedConversations = this.conversationRepository.conversations_archived;
+    this.archivedConversations = this.conversationState.conversations_archived;
 
     this.shouldUpdateScrollbar = ko
       .computed(() => this.listViewModel.lastUpdate())
@@ -45,17 +52,17 @@ export class ArchiveViewModel {
     this.onJoinCall = onJoinCall;
   }
 
-  clickOnConversation = (conversationEntity: Conversation): void => {
+  readonly clickOnConversation = (conversationEntity: Conversation): void => {
     this.conversationRepository.unarchiveConversation(conversationEntity, true, 'opened conversation from archive');
     this.listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   };
 
-  clickOnClose = (): void => {
+  readonly clickOnClose = (): void => {
     this.listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
   };
 
-  updateList = (): void => {
+  readonly updateList = (): void => {
     this.conversationRepository.updateArchivedConversations();
   };
 }

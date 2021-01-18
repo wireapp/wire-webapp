@@ -20,6 +20,7 @@
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -28,8 +29,8 @@ import {Config} from '../Config';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel} from './MainViewModel';
-import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {UserRepository} from '../user/UserRepository';
+import {UserState} from '../user/UserState';
+import {ConversationState} from '../conversation/ConversationState';
 
 export class WindowTitleViewModel {
   contentState: ko.Observable<string>;
@@ -42,8 +43,8 @@ export class WindowTitleViewModel {
 
   constructor(
     mainViewModel: MainViewModel,
-    readonly userRepository: UserRepository,
-    readonly conversationRepository: ConversationRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.contentState = mainViewModel.content.state;
     this.logger = getLogger('WindowTitleViewModel');
@@ -54,7 +55,7 @@ export class WindowTitleViewModel {
     amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, this.initiateTitleUpdates);
   }
 
-  initiateTitleUpdates = () => {
+  readonly initiateTitleUpdates = () => {
     amplify.unsubscribe(WebAppEvents.LIFECYCLE.LOADED, this.initiateTitleUpdates);
 
     this.logger.info('Starting to update window title');
@@ -62,9 +63,9 @@ export class WindowTitleViewModel {
 
     ko.computed(() => {
       if (this.updateWindowTitle()) {
-        const connectionRequests = this.userRepository.connectRequests().length;
+        const connectionRequests = this.userState.connectRequests().length;
 
-        const unreadConversations = this.conversationRepository
+        const unreadConversations = this.conversationState
           .conversations_unarchived()
           .filter(conversationEntity => conversationEntity.hasUnread()).length;
 
@@ -85,8 +86,8 @@ export class WindowTitleViewModel {
           }
 
           case ContentViewModel.STATE.CONVERSATION: {
-            if (this.conversationRepository.active_conversation()) {
-              specificTitle += this.conversationRepository.active_conversation().display_name();
+            if (this.conversationState.activeConversation()) {
+              specificTitle += this.conversationState.activeConversation().display_name();
             }
             break;
           }
@@ -131,7 +132,7 @@ export class WindowTitleViewModel {
     }).extend({rateLimit: WindowTitleViewModel.TITLE_DEBOUNCE});
   };
 
-  setUpdateState = (handlingNotifications: NOTIFICATION_HANDLING_STATE) => {
+  readonly setUpdateState = (handlingNotifications: NOTIFICATION_HANDLING_STATE) => {
     const updateWindowTitle = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
 
     const isStateChange = this.updateWindowTitle() !== updateWindowTitle;

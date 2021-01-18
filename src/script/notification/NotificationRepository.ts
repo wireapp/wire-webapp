@@ -17,11 +17,13 @@
  *
  */
 
-import {NotificationPreference, WebappProperties} from '@wireapp/api-client/dist/user/data';
+import {NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {container} from 'tsyringe';
+import {Runtime} from '@wireapp/commons';
 
 import {Declension, t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
@@ -54,12 +56,11 @@ import type {User} from '../entity/User';
 import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {PermissionRepository} from '../permission/PermissionRepository';
-import type {UserRepository} from '../user/UserRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {AssetRepository} from '../assets/AssetRepository';
-import {container} from 'tsyringe';
-import {Runtime} from '@wireapp/commons';
+import {UserState} from '../user/UserState';
+import {ConversationState} from '../conversation/ConversationState';
 
 export interface Multitasking {
   autoMinimize?: ko.Observable<boolean>;
@@ -99,7 +100,6 @@ export class NotificationRepository {
   private readonly permissionRepository: PermissionRepository;
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState>;
   private readonly selfUser: ko.Observable<User>;
-  private readonly userRepository: UserRepository;
   private readonly assetRepository: AssetRepository;
 
   static get CONFIG() {
@@ -120,19 +120,19 @@ export class NotificationRepository {
    * @param callingRepository Repository for all call interactions
    * @param conversationRepository Repository for all conversation interactions
    * @param permissionRepository Repository for all permission interactions
-   * @param userRepository Repository for users
+   * @param userState Repository for users
    */
   constructor(
     callingRepository: CallingRepository,
     conversationRepository: ConversationRepository,
     permissionRepository: PermissionRepository,
-    userRepository: UserRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.assetRepository = container.resolve(AssetRepository);
     this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
-    this.userRepository = userRepository;
     this.contentViewModelState = {multitasking: {isMinimized: () => false}, state: () => false};
 
     this.logger = getLogger('NotificationRepository');
@@ -149,7 +149,7 @@ export class NotificationRepository {
     });
 
     this.permissionState = this.permissionRepository.permissionState[PermissionType.NOTIFICATIONS];
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
   }
 
   setContentViewModelStates(
@@ -160,11 +160,11 @@ export class NotificationRepository {
   }
 
   subscribeToEvents(): void {
-    amplify.subscribe(WebAppEvents.NOTIFICATION.NOTIFY, this.notify.bind(this));
-    amplify.subscribe(WebAppEvents.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState.bind(this));
-    amplify.subscribe(WebAppEvents.NOTIFICATION.REMOVE_READ, this.removeReadNotifications.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties.bind(this));
-    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty.bind(this));
+    amplify.subscribe(WebAppEvents.NOTIFICATION.NOTIFY, this.notify);
+    amplify.subscribe(WebAppEvents.NOTIFICATION.PERMISSION_STATE, this.updatePermissionState);
+    amplify.subscribe(WebAppEvents.NOTIFICATION.REMOVE_READ, this.removeReadNotifications);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updatedProperties);
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.NOTIFICATIONS, this.updatedNotificationsProperty);
   }
 
   /**
@@ -210,11 +210,11 @@ export class NotificationRepository {
    * Display browser notification and play sound notification.
    * @returns Resolves when notification has been handled
    */
-  notify(
+  readonly notify = (
     messageEntity: ContentMessage,
     connectionEntity: ConnectionEntity,
     conversationEntity: Conversation,
-  ): Promise<void> {
+  ): Promise<void> => {
     const isUserAway = this.selfUser().availability() === Availability.Type.AWAY;
     const isComposite = messageEntity.isComposite();
 
@@ -240,10 +240,10 @@ export class NotificationRepository {
     }
 
     return Promise.resolve();
-  }
+  };
 
   /** Remove notifications from the queue that are no longer unread */
-  removeReadNotifications(): void {
+  readonly removeReadNotifications = (): void => {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data || {};
 
@@ -259,26 +259,26 @@ export class NotificationRepository {
         });
       }
     });
-  }
+  };
 
-  updatedProperties(properties: WebappProperties): void {
+  readonly updatedProperties = (properties: WebappProperties): void => {
     const notificationPreference = properties.settings.notifications;
     return this.notificationsPreference(notificationPreference);
-  }
+  };
 
-  updatedNotificationsProperty(notificationPreference: NotificationPreference): void {
+  readonly updatedNotificationsProperty = (notificationPreference: NotificationPreference): void => {
     return this.notificationsPreference(notificationPreference);
-  }
+  };
 
   /**
    * Set the permission state.
    * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
-  updatePermissionState(permissionState: PermissionState | PermissionStatusState): Promise<boolean> {
+  readonly updatePermissionState = (permissionState: PermissionState | PermissionStatusState): Promise<boolean> => {
     this.permissionState(permissionState);
     return this.checkPermissionState();
-  }
+  };
 
   /**
    * Creates the notification body for calls.
@@ -793,7 +793,7 @@ export class NotificationRepository {
    */
   private shouldShowNotification(messageEntity: Message, conversationEntity?: Conversation): boolean {
     const inActiveConversation = conversationEntity
-      ? this.conversationRepository.is_active_conversation(conversationEntity)
+      ? this.conversationState.isActiveConversation(conversationEntity)
       : false;
     const inConversationView = this.contentViewModelState.state() === ContentViewModel.STATE.CONVERSATION;
     const inMaximizedCall =

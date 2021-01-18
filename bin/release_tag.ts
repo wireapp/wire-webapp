@@ -18,8 +18,8 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/dist/client';
-import {GIPHY_RATING} from '@wireapp/api-client/dist/giphy/';
+import {ClientType} from '@wireapp/api-client/src/client';
+import {GIPHY_RATING} from '@wireapp/api-client/src/giphy/';
 import {Account} from '@wireapp/core';
 import {execSync} from 'child_process';
 import logdown from 'logdown';
@@ -29,11 +29,16 @@ import readline from 'readline';
 
 require('dotenv').config();
 
+enum DeploymentStage {
+  PRODUCTION = 'production',
+  STAGING = 'staging',
+}
+
 const input = readline.createInterface(process.stdin, process.stdout);
 
 const currentDate = new Date().toISOString().substring(0, 10);
 const filename = path.basename(__filename);
-const firstArgument = process.argv[2];
+const stage = process.argv[2];
 const usageText = `Usage: ${filename} [-h|--help] <staging|production> <commitId>`;
 
 let commitId = process.argv[3];
@@ -50,24 +55,24 @@ logger.state.isEnabled = true;
 
 const exec = (command: string): string => execSync(command, {stdio: 'pipe'}).toString().trim();
 
-if (!isDryRun) {
+if (isDryRun) {
   logger.info('Note: Dry run enabled.');
 }
 
-switch (firstArgument) {
+switch (stage) {
   case '--help':
   case '-h': {
     logger.info(usageText);
     process.exit();
   }
-  case 'production': {
+  case DeploymentStage.PRODUCTION: {
     branch = 'master';
-    target = firstArgument;
+    target = stage;
     break;
   }
-  case 'staging': {
+  case DeploymentStage.STAGING: {
     branch = 'dev';
-    target = firstArgument;
+    target = stage;
     break;
   }
   default: {
@@ -191,12 +196,15 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
   if (answer === 'yes') {
     logger.info(`Creating tag "${tagName}" ...`);
     if (!isDryRun) {
+      if (stage === DeploymentStage.PRODUCTION) {
+        exec('npm version minor --no-git-tag-version');
+      }
       exec(`git tag ${tagName} ${commitId}`);
     }
 
     logger.info(`Pushing "${tagName}" to "${origin}" ...`);
     if (!isDryRun) {
-      exec(`git push ${origin} ${tagName}`);
+      exec(`git push origin && git push ${origin} ${tagName}`);
     }
 
     try {

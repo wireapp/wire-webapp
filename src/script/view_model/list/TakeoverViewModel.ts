@@ -20,6 +20,7 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 
 import {Config} from '../../Config';
 import {getSupportUsernameUrl} from '../../externalRoute';
@@ -28,6 +29,7 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {ListViewModel} from '../ListViewModel';
 import type {User} from '../../entity/User';
+import {UserState} from '../../user/UserState';
 
 export class TakeoverViewModel {
   readonly brandName: string;
@@ -40,9 +42,10 @@ export class TakeoverViewModel {
     private readonly listViewModel: ListViewModel,
     private readonly userRepository: UserRepository,
     private readonly conversationRepository: ConversationRepository,
+    private readonly userState = container.resolve(UserState),
   ) {
     this.listViewModel = listViewModel;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
 
     this.name = ko.pureComputed(() => (this.selfUser() ? this.selfUser().name() : ''));
     this.username = ko.pureComputed(() => (this.selfUser() ? this.selfUser().username() : ''));
@@ -50,7 +53,7 @@ export class TakeoverViewModel {
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  chooseUsername = (): void => {
+  readonly chooseUsername = (): void => {
     this.listViewModel.dismissModal();
     window.requestAnimationFrame(() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_ACCOUNT));
   };
@@ -63,7 +66,7 @@ export class TakeoverViewModel {
         return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
       }
 
-      if (this.userRepository.connectRequests().length) {
+      if (this.userState.connectRequests().length) {
         amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
       }
     } catch (error) {

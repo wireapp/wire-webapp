@@ -17,8 +17,8 @@
  *
  */
 
-import type {NewTeamInvitation} from '@wireapp/api-client/dist/team';
-import {Role} from '@wireapp/api-client/dist/team/member';
+import type {NewTeamInvitation} from '@wireapp/api-client/src/team';
+import {Role} from '@wireapp/api-client/src/team/member';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import type {ThunkAction} from '../reducer';

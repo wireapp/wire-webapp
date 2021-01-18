@@ -17,7 +17,6 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
@@ -26,12 +25,12 @@ import type {
   ConversationCode,
   NewConversation,
   NewOTRMessage,
-} from '@wireapp/api-client/dist/conversation';
+} from '@wireapp/api-client/src/conversation';
 import type {
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
-} from '@wireapp/api-client/dist/conversation/data';
+} from '@wireapp/api-client/src/conversation/data';
 import type {
   ConversationCodeDeleteEvent,
   ConversationCodeUpdateEvent,
@@ -41,27 +40,30 @@ import type {
   ConversationMessageTimerUpdateEvent,
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
-} from '@wireapp/api-client/dist/event';
+} from '@wireapp/api-client/src/event';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import type {Conversation as ConversationEntity, SerializedConversation} from '../entity/Conversation';
+import type {Conversation as ConversationEntity} from '../entity/Conversation';
 import type {EventService} from '../event/EventService';
 import {MessageCategory} from '../message/MessageCategory';
 import {search as fullTextSearch} from '../search/FullTextSearch';
-import type {StorageService} from '../storage';
+import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
+import {APIClient} from '../service/APIClientSingleton';
+import {ConversationRecord} from '../storage/record/ConversationRecord';
 
 export class ConversationService {
-  private readonly apiClient: APIClient;
   private readonly eventService: EventService;
   private readonly logger: Logger;
-  private readonly storageService: StorageService;
 
-  constructor(apiClient: APIClient, eventService: EventService, storageService: StorageService) {
-    this.apiClient = apiClient;
+  constructor(
+    eventService: EventService,
+    private readonly storageService = container.resolve(StorageService),
+    private readonly apiClient = container.resolve(APIClient),
+  ) {
     this.eventService = eventService;
-    this.storageService = storageService;
     this.logger = getLogger('ConversationService');
   }
 
@@ -397,11 +399,9 @@ export class ConversationService {
    * @param conversations Conversation entity
    * @returns Resolves with a list of conversation records
    */
-  async save_conversations_in_db(
-    conversations: ConversationEntity[] | SerializedConversation[],
-  ): Promise<ConversationEntity[] | SerializedConversation[]> {
+  async save_conversations_in_db(conversations: ConversationRecord[]): Promise<ConversationRecord[]> {
     if (this.storageService.db) {
-      const keys = (conversations as ConversationEntity[]).map(conversation => conversation.id);
+      const keys = conversations.map(conversation => conversation.id);
       await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
     } else {
       for (const conversation of conversations) {

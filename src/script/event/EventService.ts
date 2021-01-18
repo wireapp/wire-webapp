@@ -18,6 +18,7 @@
  */
 
 import type {Dexie} from 'dexie';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -50,7 +51,7 @@ export const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
 export class EventService {
   logger: Logger;
 
-  constructor(public readonly storageService: StorageService) {
+  constructor(public readonly storageService = container.resolve(StorageService)) {
     this.logger = getLogger('EventService');
   }
 
@@ -320,7 +321,7 @@ export class EventService {
    *
    * @param event JSON event to be stored
    */
-  async replaceEvent(event: EventRecord): Promise<EventRecord> {
+  async replaceEvent<T extends Partial<EventRecord>>(event: T): Promise<T> {
     await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
     return event;
   }
@@ -383,13 +384,12 @@ export class EventService {
    * @param primaryKey event's primary key
    * @param updates Updates to perform on the message.
    */
-  updateEvent(primaryKey: string, updates: any): Promise<any> {
-    return Promise.resolve(primaryKey).then(key => {
+  updateEvent<T extends Partial<EventRecord>>(primaryKey: string, updates: T): Promise<T & {primary_key: string}> {
+    return Promise.resolve().then(() => {
       const hasChanges = updates && !!Object.keys(updates).length;
       if (!hasChanges) {
         throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
-
       const hasVersionedUpdates = !!updates.version;
       if (hasVersionedUpdates) {
         const error = new ConversationError(
@@ -399,8 +399,7 @@ export class EventService {
         error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
         throw error;
       }
-
-      const identifiedUpdates = {...updates, primary_key: key};
+      const identifiedUpdates = {...updates, primary_key: primaryKey};
       return this.replaceEvent(identifiedUpdates);
     });
   }

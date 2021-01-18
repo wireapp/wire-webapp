@@ -1,6 +1,6 @@
 
 <div id="conversation" class="conversation" data-bind="drop_file: $root.inputBar.onDropFiles, css: { loading: !$root.messageList.conversationLoaded() }">
-  <!-- ko if: $root.conversationRepository.active_conversation() -->
+  <!-- ko if: $root.conversationRepository.conversationState.activeConversation() -->
     #include('content/conversation/title-bar.htm')
     #include('content/conversation/message-list.htm')
     #include('content/conversation/input-bar.htm')

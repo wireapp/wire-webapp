@@ -20,7 +20,12 @@
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Config} from 'src/script/Config';
+import {TeamRepository} from 'src/script/team/TeamRepository';
+import {TeamState} from 'src/script/team/TeamState';
+import {UserState} from 'src/script/user/UserState';
 import {TestFactory} from '../../helper/TestFactory';
+
+jest.deepUnmock('axios');
 
 describe('TeamRepository', () => {
   const testFactory = new TestFactory();
@@ -58,9 +63,9 @@ describe('TeamRepository', () => {
   let server = undefined;
   let team_repository = undefined;
 
-  beforeAll(() => testFactory.exposeTeamActors().then(repository => (team_repository = repository)));
+  beforeEach(async () => {
+    team_repository = await testFactory.exposeTeamActors();
 
-  beforeEach(() => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
@@ -93,6 +98,7 @@ describe('TeamRepository', () => {
 
   describe('getTeam()', () => {
     it('returns the binding team entity', () => {
+      spyOn(team_repository.userState, 'self').and.returnValue({id: 'self-id'});
       return team_repository.getTeam().then(team_et => {
         const [team_data] = teams_data.teams;
 
@@ -113,14 +119,33 @@ describe('TeamRepository', () => {
   });
 
   describe('sendAccountInfo', () => {
-    it(`doesn't crash when there is no team logo`, async () => {
-      expect(team_repository.isTeam()).toBe(true);
-
-      team_repository.selfUser().getIconResource = async () => ({
-        load: async () => undefined,
+    it('does not crash when there is no team logo', async () => {
+      const userState = new UserState();
+      userState.self({
+        accent_id: () => 2,
+        teamRole: () => 'z.team.TeamRole.ROLE.NONE',
+        getIconResource: async () => ({
+          load: async () => undefined,
+        }),
+      });
+      const teamState = new TeamState(userState);
+      teamState.team({
+        id: 'team-id',
+        members: () => [],
+        getIconResource: () => {},
+        name: () => 'teamName',
       });
 
-      const accountInfo = await team_repository.sendAccountInfo(true);
+      const teamRepo = new TeamRepository(
+        {}, // TeamService,
+        {}, // UserRepository,
+        {}, // AssetRepository,
+        userState,
+        teamState,
+      );
+      expect(teamRepo.teamState.isTeam()).toBe(true);
+
+      const accountInfo = await teamRepo.sendAccountInfo(true);
 
       expect(accountInfo.picture).toBeUndefined();
     });

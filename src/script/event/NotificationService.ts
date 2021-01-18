@@ -17,21 +17,20 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
-import type {NotificationList} from '@wireapp/api-client/dist/notification/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
-import type {Notification} from '@wireapp/api-client/dist/notification';
-import {DatabaseKeys} from '@wireapp/core/dist/notification/NotificationDatabaseRepository';
+import type {NotificationList} from '@wireapp/api-client/src/notification/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+import type {Notification} from '@wireapp/api-client/src/notification';
+import {DatabaseKeys} from '@wireapp/core/src/main/notification/NotificationDatabaseRepository';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
 import {EventRecord, StorageSchemata, StorageService} from '../storage/';
 import {EventError} from '../error/EventError';
+import {APIClient} from '../service/APIClientSingleton';
 
 export class NotificationService {
-  private readonly apiClient: APIClient;
   private readonly logger: Logger;
-  private readonly storageService: StorageService;
   private readonly AMPLIFY_STORE_NAME: string;
 
   static get CONFIG() {
@@ -42,9 +41,10 @@ export class NotificationService {
     };
   }
 
-  constructor(apiClient: APIClient, storageService: StorageService) {
-    this.apiClient = apiClient;
-    this.storageService = storageService;
+  constructor(
+    private readonly storageService = container.resolve(StorageService),
+    private readonly apiClient = container.resolve(APIClient),
+  ) {
     this.logger = getLogger('NotificationService');
     this.AMPLIFY_STORE_NAME = StorageSchemata.OBJECT_STORE.AMPLIFY;
   }

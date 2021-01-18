@@ -76,7 +76,7 @@ describe('User Mapper', () => {
     });
   });
 
-  describe('mapSelfUserFromJson', () =>
+  describe('mapSelfUserFromJson', () => {
     it('can convert JSON into a single user entity', () => {
       const user_et = mapper.mapSelfUserFromJson(self_user_payload);
 
@@ -86,7 +86,8 @@ describe('User Mapper', () => {
       expect(user_et.isMe).toBeTruthy();
       expect(user_et.locale).toBe('en');
       expect(user_et.accent_id()).toBe(ACCENT_ID.YELLOW);
-    }));
+    });
+  });
 
   describe('mapUsersFromJson', () => {
     it('can convert JSON into multiple user entities', () => {

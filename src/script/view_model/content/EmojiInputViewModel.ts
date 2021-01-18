@@ -18,7 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {WebappProperties} from '@wireapp/api-client/dist/user/data';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {loadValue, storeValue} from 'Util/StorageUtil';
@@ -180,7 +180,7 @@ export class EmojiInputViewModel {
     this.initSubscriptions();
   }
 
-  onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): boolean => {
+  readonly onInputKeyDown = (data: unknown, keyboardEvent: KeyboardEvent): boolean => {
     const input = keyboardEvent.target as HTMLInputElement;
 
     // Handling just entered inline emoji
@@ -245,7 +245,7 @@ export class EmojiInputViewModel {
     return false;
   };
 
-  onInputKeyUp = (data: unknown, keyboardEvent: KeyboardEvent): boolean => {
+  readonly onInputKeyUp = (data: unknown, keyboardEvent: KeyboardEvent): boolean => {
     if (this.suppressKeyUp) {
       this.suppressKeyUp = false;
       return true;
@@ -280,7 +280,7 @@ export class EmojiInputViewModel {
     });
   };
 
-  updatedReplaceEmojiPreference = (preference: boolean): void => {
+  readonly updatedReplaceEmojiPreference = (preference: boolean): void => {
     this.shouldReplaceEmoji = preference;
   };
 
@@ -444,7 +444,7 @@ export class EmojiInputViewModel {
     this.emojiDiv.remove();
   };
 
-  removeEmojiPopup = (): void => {
+  readonly removeEmojiPopup = (): void => {
     this.closeEmojiPopup();
     this.emojiStartPosition = -1;
   };

@@ -17,8 +17,7 @@
  *
  */
 
-export * from './ClientRecord';
-export * from './EventRecord';
+export * from './record/';
 export * from './StorageKey';
 export * from './StorageRepository';
 export * from './StorageSchemata';

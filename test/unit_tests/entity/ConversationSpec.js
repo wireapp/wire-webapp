@@ -17,11 +17,11 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/dist/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 
 import 'src/script/localization/Localizer';
 import {createRandomUuid} from 'Util/util';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/dist/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -363,10 +363,10 @@ describe('Conversation', () => {
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
     });
 
-    it('returns undefined if last message is not text and not added by self user', () => {
+    it('returns undefined if last message is not text and is added by self user', () => {
       const message_et = new PingMessage();
       message_et.id = createRandomUuid();
-      message_et.user(new User());
+      message_et.user(self_user_et);
       conversation_et.add_message(message_et);
 
       expect(conversation_et.get_last_editable_message()).not.toBeDefined();
@@ -392,7 +392,7 @@ describe('Conversation', () => {
       expect(conversation_et.get_last_editable_message()).toBeDefined();
     });
 
-    it('returns message if last message is text and send by self user', () => {
+    it('returns last text message if last message is not text and send by self user', () => {
       const message_et = new ContentMessage();
       message_et.add_asset(new Text());
       message_et.id = createRandomUuid();
@@ -408,7 +408,7 @@ describe('Conversation', () => {
       expect(conversation_et.get_last_editable_message().id).toBe(message_et.id);
     });
 
-    it('returns message if last message is text and send by self user', () => {
+    it('returns last message if last message is text and send by self user', () => {
       const message_et = new ContentMessage();
       message_et.add_asset(new Text());
       message_et.id = createRandomUuid();
@@ -450,7 +450,9 @@ describe('Conversation', () => {
       const reference_iso_date = new Date(referenceTimestamp).toISOString();
 
       expect(conversation_et.get_next_iso_date(referenceTimestamp)).toBe(reference_iso_date);
-      expect(conversation_et.get_next_iso_date('foo')).toBeGreaterThan(reference_iso_date);
+      expect(new Date(conversation_et.get_next_iso_date('foo')).getTime()).toBeGreaterThan(
+        new Date(reference_iso_date).getTime(),
+      );
 
       const last_server_timestamp = referenceTimestamp + 10000;
       conversation_et.last_server_timestamp(last_server_timestamp);
@@ -1024,7 +1026,7 @@ describe('Conversation', () => {
     });
   });
 
-  describe('check subscribers', () =>
+  describe('check subscribers', () => {
     it('to state updates', () => {
       conversation_et.archivedState(false);
       conversation_et.cleared_timestamp(0);
@@ -1034,7 +1036,8 @@ describe('Conversation', () => {
 
       expect(conversation_et.last_event_timestamp.getSubscriptionsCount()).toEqual(1);
       expect(conversation_et.last_read_timestamp.getSubscriptionsCount()).toEqual(1);
-    }));
+    });
+  });
 
   describe('connection', () => {
     it('updates the participating user IDs with the user ID of the other party', () => {

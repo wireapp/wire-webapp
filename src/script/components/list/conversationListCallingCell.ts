@@ -21,25 +21,25 @@ import ko from 'knockout';
 
 import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE, CONV_TYPE} from '@wireapp/avs';
 
+import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {afterRender} from 'Util/util';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
-import {ParticipantAvatar} from 'Components/participantAvatar';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
-import 'Components/calling/fullscreenVideoCall';
-import 'Components/groupVideoGrid';
+import 'Components/calling/FullscreenVideoCall.tsx';
+import 'Components/calling/GroupVideoGrid';
 import 'Components/list/participantItem';
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
-import type {CallActions} from '../../view_model/CallingViewModel';
+import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
-import type {TeamRepository} from 'src/script/team/TeamRepository';
+import type {TeamRepository} from '../../team/TeamRepository';
 import {Participant} from '../../calling/Participant';
 
 interface ComponentParams {
@@ -53,6 +53,7 @@ interface ComponentParams {
   teamRepository: TeamRepository;
   temporaryUserStyle?: boolean;
   videoGrid: ko.PureComputed<Grid>;
+  videoSpeakersActiveTab: ko.Observable<string>;
 }
 
 class ConversationListCallingCell {
@@ -75,7 +76,7 @@ class ConversationListCallingCell {
   readonly isOngoing: ko.PureComputed<boolean>;
   readonly isOutgoing: ko.PureComputed<boolean>;
   readonly multitasking: Multitasking;
-  readonly ParticipantAvatar: typeof ParticipantAvatar;
+  readonly AVATAR_SIZE: typeof AVATAR_SIZE;
   readonly participantsButtonLabel: ko.PureComputed<string>;
   readonly showMaximize: ko.PureComputed<boolean>;
   readonly showNoCameraPreview: ko.Computed<boolean>;
@@ -90,6 +91,7 @@ class ConversationListCallingCell {
   readonly participants: ko.PureComputed<Participant[]>;
   readonly selfParticipant: Participant;
   readonly teamRepository: TeamRepository;
+  readonly videoSpeakersActiveTab: ko.Observable<string>;
 
   constructor({
     call,
@@ -101,6 +103,7 @@ class ConversationListCallingCell {
     callActions,
     teamRepository,
     hasAccessToCamera,
+    videoSpeakersActiveTab,
     isSelfVerified = ko.observable(false),
   }: ComponentParams) {
     this.call = call;
@@ -110,9 +113,9 @@ class ConversationListCallingCell {
     this.temporaryUserStyle = temporaryUserStyle;
     this.multitasking = multitasking;
     this.callActions = callActions;
-    this.ParticipantAvatar = ParticipantAvatar;
+    this.AVATAR_SIZE = AVATAR_SIZE;
     this.isSelfVerified = isSelfVerified;
-
+    this.videoSpeakersActiveTab = videoSpeakersActiveTab;
     this.conversationUrl = generateConversationUrl(conversation().id);
     this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
 
@@ -217,6 +220,19 @@ class ConversationListCallingCell {
     // Once there is a new solution to this, this needs to go.
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }
+
+  calculateGrid(): Grid {
+    if (this.videoSpeakersActiveTab() === VideoSpeakersTabs.all) {
+      return this.videoGrid();
+    }
+
+    const activeVideoSpeakers = this.call.getActiveVideoSpeakers();
+    return {
+      grid: activeVideoSpeakers,
+      hasRemoteVideo: activeVideoSpeakers.length > 0,
+      thumbnail: null,
+    };
+  }
 }
 
 ko.components.register('conversation-list-calling-cell', {
@@ -230,10 +246,10 @@ ko.components.register('conversation-list-calling-cell', {
         <!-- ko ifnot: temporaryUserStyle -->
           <div class="conversation-list-cell-left" data-bind="link_to: conversationUrl">
             <!-- ko if: conversation().isGroup() -->
-              <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation"></group-avatar>
+              <group-avatar class="conversation-list-cell-avatar-arrow call-ui__avatar" params="users: conversationParticipants(), conversation: conversation, isLight: true"></group-avatar>
             <!-- /ko -->
             <!-- ko if: !conversation().isGroup() && conversationParticipants().length -->
-              <participant-avatar params="participant: conversationParticipants()[0], size: ParticipantAvatar.SIZE.SMALL"></participant-avatar>
+              <participant-avatar params="participant: conversationParticipants()[0], size: AVATAR_SIZE.SMALL"></participant-avatar>
             <!-- /ko -->
           </div>
         <!-- /ko -->
@@ -275,7 +291,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <!-- ko if: showVideoGrid() -->
         <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
-          <group-video-grid params="minimized: true, grid: videoGrid, selfParticipant: selfParticipant"></group-video-grid>
+          <group-video-grid params="minimized: true, grid: calculateGrid(), selfParticipant: selfParticipant"></group-video-grid>
           <!-- ko if: showMaximize() -->
             <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
               <fullscreen-icon></fullscreen-icon>

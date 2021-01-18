@@ -17,7 +17,7 @@
  *
  */
 
-import type {ConversationEvent} from '@wireapp/api-client/dist/event';
+import type {ConversationEvent} from '@wireapp/api-client/src/event';
 
 import type {AppAction} from '.';
 

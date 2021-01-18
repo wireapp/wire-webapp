@@ -19,73 +19,63 @@
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
-
 import {createRandomUuid} from 'Util/util';
-
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
-import {TestFactory} from '../../helper/TestFactory';
+import {ClientMismatchHandler} from 'src/script/conversation/ClientMismatchHandler';
 
 describe('ClientMismatchHandler', () => {
-  const testFactory = new TestFactory();
-
-  let conversationEntity = undefined;
-
-  beforeEach(async () => {
-    await testFactory.exposeStorageActors();
-    return testFactory.exposeConversationActors().then(conversationRepository => {
-      conversationEntity = new Conversation(createRandomUuid());
-      return conversationRepository.saveConversation(conversationEntity);
-    });
-  });
-
-  afterEach(() => testFactory.conversation_repository.conversations.removeAll());
-
   describe('onClientMismatch', () => {
-    let clientMismatch = undefined;
-    let genericMessage = undefined;
-    let payload = undefined;
-
-    let johnDoe = undefined;
-    let janeRoe = undefined;
-
-    beforeAll(() => {
-      genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
-        messageId: createRandomUuid(),
-      });
-
-      johnDoe = {
-        client_id: 'd13a2ec9b6436122',
-        user_id: entities.user.john_doe.id,
-      };
-      janeRoe = {
-        client_id: 'edc943ba4d6ef6b1',
-        user_id: entities.user.jane_roe.id,
-      };
-    });
-
-    beforeEach(() => {
-      spyOn(testFactory.user_repository, 'removeClientFromUser').and.returnValue(Promise.resolve());
-
-      payload = {
-        recipients: {
-          [janeRoe.user_id]: {
-            [janeRoe.client_id]: '💣',
-          },
+    const johnDoe = {
+      client_id: 'd13a2ec9b6436122',
+      user_id: entities.user.john_doe.id,
+    };
+    const janeRoe = {
+      client_id: 'edc943ba4d6ef6b1',
+      user_id: entities.user.jane_roe.id,
+    };
+    const payload = {
+      recipients: {
+        [janeRoe.user_id]: {
+          [janeRoe.client_id]: '💣',
         },
-        sender: '43619b6a2ec22e24',
-      };
-    });
+      },
+      sender: '43619b6a2ec22e24',
+    };
 
-    it('should trigger member-join event if new user is detected', () => {
-      const conversationId = conversationEntity.id;
+    it('should trigger member-join event if new user is detected', async () => {
       const knownUserId = johnDoe.user_id;
       const unknownUserId = janeRoe.user_id;
+      const conversation = new Conversation(createRandomUuid());
+      conversation.participating_user_ids([knownUserId]);
 
-      conversationEntity.participating_user_ids([knownUserId]);
+      const userRepositorySpy = {
+        addClientToUser: jest.fn(),
+        getClientsByUserId: jest.fn().mockImplementation(clientId =>
+          Promise.resolve([
+            {class: 'desktop', id: clientId},
+            {class: 'phone', id: '809fd276d6709474'},
+          ]),
+        ),
+      };
+      const conversationRepositorySpy = {
+        addMissingMember: jest.fn(),
+        get_conversation_by_id: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
+        verificationStateHandler: {
+          onClientsAdded: jest.fn(), // params `missingUserIds`
+        },
+      };
+      const cryptographyRepositorySpy = {
+        encryptGenericMessage: jest.fn(),
+      };
 
-      clientMismatch = {
+      const clientMismatchHandler = new ClientMismatchHandler(
+        () => conversationRepositorySpy,
+        cryptographyRepositorySpy,
+        userRepositorySpy,
+      );
+
+      const clientMismatch = {
         deleted: {},
         missing: {
           [knownUserId]: [johnDoe.client_id],
@@ -95,63 +85,54 @@ describe('ClientMismatchHandler', () => {
         time: '2016-04-29T10:38:23.002Z',
       };
 
-      spyOn(testFactory.conversation_repository, 'addMissingMember').and.returnValue(Promise.resolve());
-      spyOn(testFactory.cryptography_repository, 'encryptGenericMessage').and.returnValue(Promise.resolve(payload));
-      spyOn(testFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
-      spyOn(testFactory.user_repository, 'getClientsByUserId').and.callFake(clientId => {
-        return Promise.resolve([
-          {class: 'desktop', id: clientId},
-          {class: 'phone', id: '809fd276d6709474'},
-        ]);
-      });
-
       const timestamp = new Date(clientMismatch.time).getTime();
-      const eventInfoEntity = new EventInfoEntity(undefined, conversationId);
+      const eventInfoEntity = new EventInfoEntity(undefined, conversation.id);
       eventInfoEntity.setTimestamp(timestamp);
-      return testFactory.message_repository.clientMismatchHandler
-        .onClientMismatch(eventInfoEntity, clientMismatch, payload)
-        .then(() => {
-          expect(testFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
-            conversationEntity,
-            [unknownUserId],
-            timestamp - 1,
-          );
-        });
+
+      await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
+      expect(conversationRepositorySpy.addMissingMember).toHaveBeenCalledWith(
+        conversation,
+        [unknownUserId],
+        timestamp - 1,
+      );
     });
 
-    it('should add missing clients to the payload', () => {
-      spyOn(testFactory.user_repository, 'getClientsByUserId').and.callFake(clientId => {
-        return Promise.resolve([
-          {class: 'desktop', id: clientId},
-          {class: 'phone', id: '809fd276d6709474'},
-        ]);
+    it('should add missing clients to the payload', async () => {
+      const conversation = new Conversation(createRandomUuid());
+      const userRepositorySpy = {
+        addClientToUser: jest.fn(),
+        getClientsByUserId: jest.fn().mockImplementation(clientId =>
+          Promise.resolve([
+            {class: 'desktop', id: clientId},
+            {class: 'phone', id: '809fd276d6709474'},
+          ]),
+        ),
+      };
+      const conversationRepositorySpy = {
+        addMissingMember: jest.fn(),
+        get_conversation_by_id: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
+        verificationStateHandler: {
+          onClientsAdded: jest.fn(), // params `missingUserIds`
+        },
+      };
+      const cryptographyRepositorySpy = {
+        encryptGenericMessage: jest.fn(),
+        getUsersPreKeys: jest.fn().mockImplementation(() => Promise.resolve()),
+      };
+
+      const clientMismatchHandler = new ClientMismatchHandler(
+        () => conversationRepositorySpy,
+        cryptographyRepositorySpy,
+        userRepositorySpy,
+      );
+
+      const message = new GenericMessage({
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+        messageId: createRandomUuid(),
       });
-      spyOn(testFactory.user_repository, 'addClientToUser').and.returnValue(Promise.resolve());
-      // TODO: Make this fake method available as a utility function for testing
-      spyOn(testFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(recipients => {
-        return Promise.resolve().then(() => {
-          const preKeyMap = {};
+      const eventInfoEntity = new EventInfoEntity(message, conversation.id);
 
-          for (const userId in recipients) {
-            if (recipients.hasOwnProperty(userId)) {
-              const clientIds = recipients[userId];
-              preKeyMap[userId] = preKeyMap[userId] || {};
-
-              clientIds.forEach(clientId => {
-                preKeyMap[userId][clientId] = {
-                  id: 65535,
-                  key:
-                    'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g==',
-                };
-              });
-            }
-          }
-
-          return preKeyMap;
-        });
-      });
-
-      clientMismatch = {
+      const clientMismatch = {
         deleted: {},
         missing: {
           [johnDoe.user_id]: [`${johnDoe.client_id}`],
@@ -159,27 +140,50 @@ describe('ClientMismatchHandler', () => {
         redundant: {},
         time: '2016-04-29T10:38:23.002Z',
       };
+      const payload = {
+        recipients: {
+          [janeRoe.user_id]: {
+            [janeRoe.client_id]: '💣',
+          },
+        },
+        sender: '43619b6a2ec22e24',
+      };
 
-      return testFactory.cryptography_repository.initCryptobox().then(() => {
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
-        eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime());
-        return testFactory.message_repository.clientMismatchHandler
-          .onClientMismatch(eventInfoEntity, clientMismatch, payload)
-          .then(updatedPayload => {
-            expect(Object.keys(updatedPayload.recipients).length).toBe(2);
-            expect(Object.keys(updatedPayload.recipients[johnDoe.user_id]).length).toBe(1);
-          });
-      });
+      eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime());
+      await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
+
+      const expectedReceipients = {
+        [johnDoe.user_id]: [johnDoe.client_id],
+      };
+      expect(cryptographyRepositorySpy.encryptGenericMessage).toHaveBeenCalledWith(
+        expectedReceipients,
+        message,
+        payload,
+      );
     });
 
-    it('should remove the payload of deleted clients', () => {
-      spyOn(testFactory.user_repository, 'getUserFromBackend').and.callFake(() => {
-        return Promise.resolve({
-          deleted: true,
-        });
-      });
+    it('should remove the payload of deleted clients', async () => {
+      const conversation = new Conversation(createRandomUuid());
+      const userRepositorySpy = {
+        getUserFromBackend: jest.fn().mockImplementation(() => Promise.resolve({deleted: true})),
+        removeClientFromUser: jest.fn(),
+      };
+      const conversationRepositorySpy = {
+        get_conversation_by_id: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
+      };
+      const clientMismatchHandler = new ClientMismatchHandler(
+        () => conversationRepositorySpy,
+        {}, // CryptographyRepository
+        userRepositorySpy,
+      );
 
-      clientMismatch = {
+      const message = new GenericMessage({
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+        messageId: createRandomUuid(),
+      });
+      const eventInfoEntity = new EventInfoEntity(message, conversation.id);
+
+      const clientMismatch = {
         deleted: {
           [janeRoe.user_id]: [`${janeRoe.client_id}`],
         },
@@ -187,24 +191,44 @@ describe('ClientMismatchHandler', () => {
         redundant: {},
         time: '2016-04-29T10:38:23.002Z',
       };
+      const payload = {
+        recipients: {
+          [janeRoe.user_id]: {
+            [janeRoe.client_id]: '💣',
+          },
+        },
+        sender: '43619b6a2ec22e24',
+      };
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
-      return testFactory.message_repository.clientMismatchHandler
-        .onClientMismatch(eventInfoEntity, clientMismatch, payload)
-        .then(updatedPayload => {
-          expect(testFactory.user_repository.removeClientFromUser).toHaveBeenCalled();
-          expect(Object.keys(updatedPayload.recipients).length).toBe(0);
-        });
+      const updatedPayload = await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
+
+      expect(userRepositorySpy.removeClientFromUser).toHaveBeenCalled();
+      expect(Object.keys(updatedPayload.recipients).length).toBe(0);
     });
 
-    it('should remove the payload of redundant clients', () => {
-      spyOn(testFactory.user_repository, 'getUserFromBackend').and.callFake(() => {
-        return Promise.resolve({
-          deleted: true,
-        });
-      });
+    it('should remove the payload of redundant clients', async () => {
+      const conversation = new Conversation(createRandomUuid());
+      const userRepositorySpy = {
+        getUserFromBackend: jest.fn().mockImplementation(() => Promise.resolve({deleted: true})),
+        removeClientFromUser: jest.fn(),
+      };
+      const conversationRepositorySpy = {
+        get_conversation_by_id: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
+      };
 
-      clientMismatch = {
+      const clientMismatchHandler = new ClientMismatchHandler(
+        () => conversationRepositorySpy,
+        {}, // CryptographyRepository
+        userRepositorySpy,
+      );
+
+      const message = new GenericMessage({
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+        messageId: createRandomUuid(),
+      });
+      const eventInfoEntity = new EventInfoEntity(message, conversation.id);
+
+      const clientMismatch = {
         deleted: {},
         missing: {},
         redundant: {
@@ -212,14 +236,19 @@ describe('ClientMismatchHandler', () => {
         },
         time: '2016-04-29T10:38:23.002Z',
       };
+      const payload = {
+        recipients: {
+          [janeRoe.user_id]: {
+            [janeRoe.client_id]: '💣',
+          },
+        },
+        sender: '43619b6a2ec22e24',
+      };
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
-      return testFactory.message_repository.clientMismatchHandler
-        .onClientMismatch(eventInfoEntity, clientMismatch, payload)
-        .then(updated_payload => {
-          expect(testFactory.user_repository.removeClientFromUser).not.toHaveBeenCalled();
-          expect(Object.keys(updated_payload.recipients).length).toBe(0);
-        });
+      const updated_payload = await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
+
+      expect(userRepositorySpy.removeClientFromUser).not.toHaveBeenCalled();
+      expect(Object.keys(updated_payload.recipients).length).toBe(0);
     });
   });
 });

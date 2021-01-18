@@ -33,8 +33,10 @@ import {actionRoot} from '../module/action';
 import waitForExpect from 'wait-for-expect';
 import {createMemoryHistory} from 'history';
 import {ROUTE} from '../route';
-import {ClientType} from '@wireapp/api-client/dist/client';
+import {ClientType} from '@wireapp/api-client/src/client';
 import {BackendError} from '../module/action/BackendError';
+
+jest.mock('../util/SVGProvider');
 
 class LoginPage {
   private readonly driver: ReactWrapper;
@@ -86,14 +88,10 @@ describe('Login', () => {
     loginPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin)
-        .withContext('doLogin action was called')
-        .toHaveBeenCalledWith({clientType: ClientType.PERMANENT, email, password});
+      expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith({clientType: ClientType.PERMANENT, email, password});
     });
 
-    expect(historyPushSpy)
-      .withContext('navigation to history page was triggered')
-      .toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+    expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
   });
 
   it('redirects to client deletion page if max devices is reached', async () => {
@@ -124,14 +122,10 @@ describe('Login', () => {
     loginPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin)
-        .withContext('doLogin action was called')
-        .toHaveBeenCalledWith({clientType: ClientType.PERMANENT, email, password});
+      expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith({clientType: ClientType.PERMANENT, email, password});
     });
 
-    expect(historyPushSpy)
-      .withContext('navigation to max clients page was triggered')
-      .toHaveBeenCalledWith(ROUTE.CLIENTS as any);
+    expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.CLIENTS as any);
   });
 
   it('successfully logs in with handle', async () => {
@@ -161,14 +155,10 @@ describe('Login', () => {
     loginPage.clickLoginButton();
 
     await waitForExpect(() => {
-      expect(actionRoot.authAction.doLogin)
-        .withContext('doLogin action was called')
-        .toHaveBeenCalledWith({clientType: ClientType.PERMANENT, handle, password});
+      expect(actionRoot.authAction.doLogin).toHaveBeenCalledWith({clientType: ClientType.PERMANENT, handle, password});
     });
 
-    expect(historyPushSpy)
-      .withContext('navigation to history page was triggered')
-      .toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
+    expect(historyPushSpy).toHaveBeenCalledWith(ROUTE.HISTORY_INFO as any);
   });
 
   it('has disabled submit button as long as one input is empty', () => {

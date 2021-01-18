@@ -17,38 +17,41 @@
  *
  */
 
-import $ from 'jquery';
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
 import {groupBy} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
+import $ from 'jquery';
 import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
+import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
+import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
 import {scrollEnd, scrollToBottom, scrollBy} from 'Util/scroll-helpers';
 import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen, safeMailOpen} from 'Util/SanitizationUtil';
-import {isSameDay, differenceInMinutes} from 'Util/TimeUtil';
 
-import {Config} from '../../Config';
-import {Conversation} from '../../entity/Conversation';
-import {ModalsViewModel} from '../ModalsViewModel';
-import {MessageCategory} from '../../message/MessageCategory';
-import {MotionDuration} from '../../motion/MotionDuration';
-import {UserError} from '../../error/UserError';
-import {MemberMessage} from '../../entity/message/MemberMessage';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {User} from '../../entity/User';
-import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
-import {Message} from '../../entity/message/Message';
-import {Text} from '../../entity/message/Text';
-import {MainViewModel} from '../MainViewModel';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {IntegrationRepository} from '../../integration/IntegrationRepository';
-import {ServerTimeHandler} from '../../time/serverTimeHandler';
-import {UserRepository} from '../../user/UserRepository';
 import {ActionsViewModel} from '../ActionsViewModel';
+import {Config} from '../../Config';
+import {ContentMessage} from '../../entity/message/ContentMessage';
+import {Conversation} from '../../entity/Conversation';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {ConversationState} from '../../conversation/ConversationState';
+import {DecryptErrorMessage} from '../../entity/message/DecryptErrorMessage';
+import {IntegrationRepository} from '../../integration/IntegrationRepository';
+import {MainViewModel} from '../MainViewModel';
+import {MemberMessage} from '../../entity/message/MemberMessage';
+import {Message} from '../../entity/message/Message';
+import {MessageCategory} from '../../message/MessageCategory';
+import {ModalsViewModel} from '../ModalsViewModel';
+import {MotionDuration} from '../../motion/MotionDuration';
 import {PanelViewModel} from '../PanelViewModel';
-import type {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {ServerTimeHandler} from '../../time/serverTimeHandler';
+import {Text} from '../../entity/message/Text';
+import {User} from '../../entity/User';
+import {UserError} from '../../error/UserError';
+import {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
+import type {MessageRepository} from '../../conversation/MessageRepository';
 
 /*
  * Message list rendering view model.
@@ -78,12 +81,14 @@ export class MessageListViewModel {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly messageRepository: MessageRepository,
+    private readonly userState = container.resolve(UserState),
+    private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.mainViewModel = mainViewModel;
     this.logger = getLogger('MessageListViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;
-    this.selfUser = this.userRepository.self;
+    this.selfUser = this.userState.self;
     this.focusedMessage = ko.observable(null);
 
     this.conversation = ko.observable(new Conversation());
@@ -134,11 +139,11 @@ export class MessageListViewModel {
     });
   }
 
-  onMessageContainerInitiated = (messagesContainer: HTMLElement): void => {
+  readonly onMessageContainerInitiated = (messagesContainer: HTMLElement): void => {
     this.messagesContainer = messagesContainer;
   };
 
-  release_conversation = (conversation_et: Conversation): void => {
+  readonly release_conversation = (conversation_et: Conversation): void => {
     if (conversation_et) {
       conversation_et.release();
     }
@@ -200,22 +205,18 @@ export class MessageListViewModel {
     conversationEntity: Conversation,
     messageEntity: Message,
   ): Promise<ContentMessage[]> => {
-    const _conversationEntity = await this.conversationRepository.updateParticipatingUserEntities(
-      conversationEntity,
-      false,
-      true,
-    );
+    await this.conversationRepository.updateParticipatingUserEntities(conversationEntity, false, true);
 
     return messageEntity
-      ? this.conversationRepository.getMessagesWithOffset(_conversationEntity, messageEntity)
-      : this.conversationRepository.getPrecedingMessages(_conversationEntity);
+      ? this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity)
+      : this.conversationRepository.getPrecedingMessages(conversationEntity);
   };
 
   private readonly isLastReceivedMessage = (messageEntity: Message, conversationEntity: Conversation): boolean => {
     return messageEntity.timestamp() && messageEntity.timestamp() >= conversationEntity.last_event_timestamp();
   };
 
-  getMessagesContainer = () => {
+  readonly getMessagesContainer = () => {
     return this.messagesContainer;
   };
 
@@ -326,7 +327,7 @@ export class MessageListViewModel {
     return Promise.resolve();
   };
 
-  loadFollowingMessages = (): Promise<void> => {
+  readonly loadFollowingMessages = (): Promise<void> => {
     const lastMessage = this.conversation().getLastMessage();
 
     if (lastMessage) {
@@ -353,7 +354,7 @@ export class MessageListViewModel {
     }
   };
 
-  onMessageMarked = (messageElement: HTMLElement) => {
+  readonly onMessageMarked = (messageElement: HTMLElement) => {
     const messagesContainer = this.getMessagesContainer();
     messageElement.classList.remove('message-marked');
     scrollBy(messagesContainer, messageElement.getBoundingClientRect().top - messagesContainer.offsetHeight / 2);
@@ -361,9 +362,9 @@ export class MessageListViewModel {
     this.focusedMessage(null);
   };
 
-  showUserDetails = (userEntity: User): void => {
+  readonly showUserDetails = (userEntity: User): void => {
     userEntity = ko.unwrap(userEntity);
-    const conversationEntity = this.conversationRepository.active_conversation();
+    const conversationEntity = this.conversationState.activeConversation();
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
     if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
@@ -412,7 +413,7 @@ export class MessageListViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
   };
 
-  get_timestamp_class = (messageEntity: ContentMessage): string => {
+  readonly get_timestamp_class = (messageEntity: ContentMessage): string => {
     const previousMessage = this.conversation().get_previous_message(messageEntity);
     if (!previousMessage || messageEntity.is_call()) {
       return '';
@@ -440,7 +441,7 @@ export class MessageListViewModel {
     return '';
   };
 
-  shouldHideUserAvatar = (messageEntity: ContentMessage): boolean => {
+  readonly shouldHideUserAvatar = (messageEntity: ContentMessage): boolean => {
     // @todo avoid double check
     if (this.get_timestamp_class(messageEntity)) {
       return false;
@@ -454,25 +455,25 @@ export class MessageListViewModel {
     return last_message && last_message.is_content() && last_message.user().id === messageEntity.user().id;
   };
 
-  isLastDeliveredMessage = (messageEntity: Message): boolean => {
+  readonly isLastDeliveredMessage = (messageEntity: Message): boolean => {
     return this.conversation().getLastDeliveredMessage() === messageEntity;
   };
 
-  clickOnCancelRequest = (messageEntity: MemberMessage): void => {
-    const conversationEntity = this.conversationRepository.active_conversation();
+  readonly clickOnCancelRequest = (messageEntity: MemberMessage): void => {
+    const conversationEntity = this.conversationState.activeConversation();
     const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   };
 
-  clickOnLike = (messageEntity: ContentMessage): void => {
+  readonly clickOnLike = (messageEntity: ContentMessage): void => {
     this.messageRepository.toggle_like(this.conversation(), messageEntity);
   };
 
-  clickOnInvitePeople = (): void => {
+  readonly clickOnInvitePeople = (): void => {
     this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, undefined);
   };
 
-  getInViewportCallback = (
+  readonly getInViewportCallback = (
     conversationEntity: Conversation,
     messageEntity: MemberMessage | ContentMessage,
   ): Function | null => {
@@ -539,7 +540,7 @@ export class MessageListViewModel {
     };
   };
 
-  updateConversationLastRead = (conversationEntity: Conversation, messageEntity: Message): void => {
+  readonly updateConversationLastRead = (conversationEntity: Conversation, messageEntity: Message): void => {
     const conversationLastRead = conversationEntity.last_read_timestamp();
     const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
@@ -549,7 +550,7 @@ export class MessageListViewModel {
     }
   };
 
-  handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent): boolean => {
+  readonly handleClickOnMessage = (messageEntity: ContentMessage | Text, event: MouseEvent): boolean => {
     if (event.which === 3) {
       // Default browser behavior on right click
       return true;
@@ -602,11 +603,11 @@ export class MessageListViewModel {
     return true;
   };
 
-  showParticipants = (participants: User[]): void => {
+  readonly showParticipants = (participants: User[]): void => {
     this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {highlighted: participants});
   };
 
-  showMessageDetails = (view: {message: {id: string}}, showLikes: boolean): void => {
+  readonly showMessageDetails = (view: {message: {id: string}}, showLikes: boolean): void => {
     if (!this.conversation().is1to1()) {
       this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.MESSAGE_DETAILS, {
         entity: {id: view.message.id} as Message,

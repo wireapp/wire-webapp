@@ -18,8 +18,8 @@
  */
 
 import * as faker from 'faker';
-import type {User as APIClientUser} from '@wireapp/api-client/dist/user';
-import {UserAssetType} from '@wireapp/api-client/dist/user';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+import {UserAssetType} from '@wireapp/api-client/src/user';
 
 import type {User} from '../../src/script/entity/User';
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
@@ -27,7 +27,7 @@ import {UserMapper} from '../../src/script/user/UserMapper';
 import {createRandomUuid} from 'Util/util';
 
 export class UserGenerator {
-  static getRandomUser(): User | void {
+  static getRandomUser(): User {
     const template: APIClientUser = {
       accent_id: Math.floor(Math.random() * 7 + 1),
       assets: [

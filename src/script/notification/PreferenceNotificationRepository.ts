@@ -20,7 +20,7 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
-import {USER_EVENT} from '@wireapp/api-client/dist/event';
+import {USER_EVENT} from '@wireapp/api-client/src/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
@@ -78,7 +78,7 @@ export class PreferenceNotificationRepository {
         this.onClientRemove(userId, clientId);
       }
     });
-    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent.bind(this));
+    amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
 
   getNotifications(): GroupedNotifications[] {
@@ -110,7 +110,7 @@ export class PreferenceNotificationRepository {
     });
   }
 
-  onUserEvent(event: any): void {
+  readonly onUserEvent = (event: any): void => {
     if (event.type === USER_EVENT.PROPERTIES_DELETE || event.type === USER_EVENT.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
         const defaultValue = !!PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;
@@ -120,5 +120,5 @@ export class PreferenceNotificationRepository {
         });
       }
     }
-  }
+  };
 }
