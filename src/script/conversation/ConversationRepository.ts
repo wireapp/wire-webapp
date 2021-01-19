@@ -27,8 +27,6 @@ import {
   CONVERSATION_EVENT,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
-  ConversationMemberLeaveEvent,
-  ConversationReceiptModeUpdateEvent,
 } from '@wireapp/api-client/src/event';
 import {
   DefaultConversationRoleName as DefaultRole,
@@ -53,7 +51,7 @@ import {compareTransliteration, sortByPriority, startsWith, sortUsersByPriority}
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {EventBuilder, MemberLeaveEvent} from '../conversation/EventBuilder';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
@@ -415,7 +413,7 @@ export class ConversationRepository {
     return this.conversationState.conversations();
   }
 
-  public async updateConversationStates(conversationsDatas: ConversationRecord[]): Promise<Conversation[]> {
+  public async updateConversationStates(conversationsDatas: ConversationRecord[]) {
     const handledConversationEntities: Conversation[] = [];
 
     const unknownConversations: ConversationRecord[] = [];
@@ -646,7 +644,7 @@ export class ConversationRepository {
   /**
    * Update all conversations on app init.
    */
-  public async updateConversationsOnAppInit(): Promise<Conversation[]> {
+  public async updateConversationsOnAppInit() {
     this.logger.info('Updating group participants');
     await this.updateUnarchivedConversations();
     const updatePromises = this.conversationState.sorted_conversations().map(conversationEntity => {
@@ -658,18 +656,18 @@ export class ConversationRepository {
   /**
    * Update users and events for archived conversations currently visible.
    */
-  public updateArchivedConversations(): void {
+  public updateArchivedConversations() {
     this.updateConversations(this.conversationState.conversations_archived());
   }
 
   /**
    * Update users and events for all unarchived conversations.
    */
-  private updateUnarchivedConversations(): Promise<void> {
+  private updateUnarchivedConversations() {
     return this.updateConversations(this.conversationState.conversations_unarchived());
   }
 
-  private async updateConversationFromBackend(conversationEntity: Conversation): Promise<void> {
+  private async updateConversationFromBackend(conversationEntity: Conversation) {
     const conversationData = await this.conversation_service.get_conversation_by_id(conversationEntity.id);
     const {name, message_timer} = conversationData;
     this.conversationMapper.updateProperties(conversationEntity, {name} as any);
@@ -698,24 +696,24 @@ export class ConversationRepository {
    * Deletes a conversation from the repository.
    * @param conversation_id ID of conversation to be deleted from the repository
    */
-  private deleteConversationFromRepository(conversation_id: string): void {
+  private deleteConversationFromRepository(conversation_id: string) {
     this.conversationState.conversations.remove(conversationEntity => conversationEntity.id === conversation_id);
   }
 
-  public deleteConversation(conversationEntity: Conversation): void {
-    void (async () => {
-      try {
-        await this.conversation_service.deleteConversation(this.teamState.team().id, conversationEntity.id);
+  public deleteConversation(conversationEntity: Conversation) {
+    this.conversation_service
+      .deleteConversation(this.teamState.team().id, conversationEntity.id)
+      .then(() => {
         this.deleteConversationLocally(conversationEntity.id, true);
-      } catch (error) {
+      })
+      .catch(() => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
             message: t('modalConversationDeleteErrorMessage', conversationEntity.name()),
             title: t('modalConversationDeleteErrorHeadline'),
           },
         });
-      }
-    })();
+      });
   }
 
   private readonly deleteConversationLocally = (conversationId: string, skipNotification = false) => {
@@ -739,35 +737,33 @@ export class ConversationRepository {
     this.conversation_service.delete_conversation_from_db(conversationId);
   };
 
-  public async getAllUsersInConversation(conversation_id: string): Promise<User[]> {
-    const conversationEntity = await this.get_conversation_by_id(conversation_id);
-    return [this.userState.self()].concat(conversationEntity.participating_user_ets());
+  public getAllUsersInConversation(conversation_id: string) {
+    return this.get_conversation_by_id(conversation_id).then(conversationEntity =>
+      [this.userState.self()].concat(conversationEntity.participating_user_ets()),
+    );
   }
 
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    */
-  async get_conversation_by_id(conversation_id: string): Promise<Conversation> {
+  get_conversation_by_id(conversation_id: string): Promise<Conversation> {
     if (typeof conversation_id !== 'string') {
-      throw new ConversationError(
-        ConversationError.TYPE.NO_CONVERSATION_ID,
-        ConversationError.MESSAGE.NO_CONVERSATION_ID,
+      return Promise.reject(
+        new ConversationError(ConversationError.TYPE.NO_CONVERSATION_ID, ConversationError.MESSAGE.NO_CONVERSATION_ID),
       );
     }
     const conversationEntity = this.conversationState.findConversation(conversation_id);
     if (conversationEntity) {
-      return conversationEntity;
+      return Promise.resolve(conversationEntity);
     }
-    try {
-      return this.fetchConversationById(conversation_id);
-    } catch (error) {
+    return this.fetchConversationById(conversation_id).catch(error => {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
         this.logger.warn(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
       }
 
       throw error;
-    }
+    });
   }
 
   /**
@@ -813,7 +809,7 @@ export class ConversationRepository {
    * @param increment Increment by one for unique timestamp
    * @returns Timestamp value
    */
-  private getLatestEventTimestamp(increment = false): number {
+  private getLatestEventTimestamp(increment = false) {
     const mostRecentConversation = this.getMostRecentConversation(true);
     if (mostRecentConversation) {
       const lastEventTimestamp = mostRecentConversation.last_event_timestamp();
@@ -849,11 +845,12 @@ export class ConversationRepository {
    * Returns a list of sorted conversation ids based on the number of messages in the last 30 days.
    * @returns Resolve with the most active conversations
    */
-  async get_most_active_conversations() {
-    const conversationIds = await this.conversation_service.get_active_conversations_from_db();
-    return conversationIds
-      .map(conversation_id => this.conversationState.findConversation(conversation_id))
-      .filter(conversationEntity => conversationEntity);
+  get_most_active_conversations() {
+    return this.conversation_service.get_active_conversations_from_db().then(conversation_ids => {
+      return conversation_ids
+        .map(conversation_id => this.conversationState.findConversation(conversation_id))
+        .filter(conversationEntity => conversationEntity);
+    });
   }
 
   /**
@@ -961,35 +958,40 @@ export class ConversationRepository {
    *
    * @note If there is no conversation it will request it from the backend
    * @param connectionEntity Connections
-   * @returns Resolves when connection was mapped with the return value
+   * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = async (connectionEntity: ConnectionEntity): Promise<Conversation | void> => {
-    try {
-      let conversationEntity = this.conversationState.findConversation(connectionEntity.conversationId);
-      if (!conversationEntity && (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest())) {
-        conversationEntity = await this.fetchConversationById(connectionEntity.conversationId);
-      }
+  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<void | Conversation> => {
+    return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
+      .then(conversationEntity => {
+        if (!conversationEntity) {
+          if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
+            return this.fetchConversationById(connectionEntity.conversationId);
+          }
+        }
+        return conversationEntity;
+      })
+      .then(conversationEntity => {
+        if (!conversationEntity) {
+          return undefined;
+        }
+        conversationEntity.connection(connectionEntity);
 
-      if (!conversationEntity) {
-        return;
-      }
+        if (connectionEntity.isConnected()) {
+          conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
+        }
 
-      conversationEntity.connection(connectionEntity);
-
-      if (connectionEntity.isConnected()) {
-        conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
-      }
-
-      const updatedConversationEntity = await this.updateParticipatingUserEntities(conversationEntity);
-
-      this.conversationState.conversations.notifySubscribers();
-      return updatedConversationEntity;
-    } catch (error) {
-      const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-      if (!isConversationNotFound) {
-        throw error;
-      }
-    }
+        return this.updateParticipatingUserEntities(conversationEntity);
+      })
+      .then(updatedConversationEntity => {
+        this.conversationState.conversations.notifySubscribers();
+        return updatedConversationEntity;
+      })
+      .catch(error => {
+        const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+        if (!isConversationNotFound) {
+          throw error;
+        }
+      });
   };
 
   /**
@@ -1023,12 +1025,12 @@ export class ConversationRepository {
    *
    * @param payload Payload to map
    * @param initialTimestamp Initial server and event timestamp
-   * @returns Mapped conversation(s)
+   * @returns Mapped conversation/s
    */
   mapConversations(
-    payload: BackendConversation | BackendConversation[],
+    payload: BackendConversation[] | BackendConversation,
     initialTimestamp = this.getLatestEventTimestamp(),
-  ): Conversation | Conversation[] {
+  ) {
     const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
     const entities = this.conversationMapper.mapConversations(
       conversationsData as ConversationDatabaseData[],
@@ -1043,7 +1045,7 @@ export class ConversationRepository {
     return Array.isArray(payload) ? entities : entities[0];
   }
 
-  private mapGuestStatusSelf(): void {
+  private mapGuestStatusSelf() {
     this.conversationState
       .filtered_conversations()
       .forEach(conversationEntity => this._mapGuestStatusSelf(conversationEntity));
@@ -1054,7 +1056,7 @@ export class ConversationRepository {
     }
   }
 
-  private _mapGuestStatusSelf(conversationEntity: Conversation): void {
+  private _mapGuestStatusSelf(conversationEntity: Conversation) {
     const conversationTeamId = conversationEntity.team_id;
     const selfTeamId = this.teamState.team() && this.teamState.team().id;
     const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
@@ -1066,7 +1068,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to be saved in the repository
    * @returns Resolves when conversation was saved
    */
-  private saveConversation(conversationEntity: Conversation): Promise<Conversation> {
+  private saveConversation(conversationEntity: Conversation) {
     const localEntity = this.conversationState.findConversation(conversationEntity.id);
     if (!localEntity) {
       this.conversationState.conversations.push(conversationEntity);
@@ -1088,7 +1090,7 @@ export class ConversationRepository {
    * Save conversations in the repository.
    * @param conversationEntities Conversations to be saved in the repository
    */
-  private saveConversations(conversationEntities: Conversation[]): void {
+  private saveConversations(conversationEntities: Conversation[]) {
     this.conversationState.conversations.push(...conversationEntities);
   }
 
@@ -1172,26 +1174,23 @@ export class ConversationRepository {
    * @param serviceId ID of service
    * @returns Resolves when service was added
    */
-  async addService(conversationEntity: Conversation, providerId: string, serviceId: string): Promise<any> {
-    try {
-      const response: any = await this.conversation_service.postBots(conversationEntity.id, providerId, serviceId);
-      const event = response?.event;
-      if (event) {
-        const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
-        this.logger.debug(logMessage, response);
-        return this.eventRepository.injectEvent(response.event, EventRepository.SOURCE.BACKEND_RESPONSE);
-      }
-      return event;
-    } catch (error) {
-      return this.handleAddToConversationError(error, conversationEntity, [serviceId]);
-    }
+  addService(conversationEntity: Conversation, providerId: string, serviceId: string) {
+    return this.conversation_service
+      .postBots(conversationEntity.id, providerId, serviceId)
+      .then((response: any) => {
+        const event = response?.event;
+        if (event) {
+          const logMessage = `Successfully added service to conversation '${conversationEntity.display_name()}'`;
+          this.logger.debug(logMessage, response);
+          return this.eventRepository.injectEvent(response.event, EventRepository.SOURCE.BACKEND_RESPONSE);
+        }
+
+        return event;
+      })
+      .catch(error => this.handleAddToConversationError(error, conversationEntity, [serviceId]));
   }
 
-  private handleAddToConversationError(
-    error: BackendClientError,
-    conversationEntity: Conversation,
-    userIds: string[],
-  ): void {
+  private handleAddToConversationError(error: BackendClientError, conversationEntity: Conversation, userIds: string[]) {
     switch (error.label) {
       case BackendClientError.LABEL.NOT_CONNECTED: {
         this.handleUsersNotConnected(userIds);
@@ -1229,7 +1228,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to clear
    * @param leaveConversation Should we leave the conversation before clearing the content?
    */
-  public clear_conversation(conversationEntity: Conversation, leaveConversation = false): void {
+  public clear_conversation(conversationEntity: Conversation, leaveConversation = false) {
     const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
     const nextConversationEntity = this.get_next_conversation(conversationEntity);
 
@@ -1264,10 +1263,7 @@ export class ConversationRepository {
    * @param userId ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(
-    conversationEntity: Conversation,
-    userId: string,
-  ): Promise<MemberLeaveEvent | ConversationMemberLeaveEvent> {
+  public async removeMember(conversationEntity: Conversation, userId: string) {
     const response = await this.conversation_service.deleteMembers(conversationEntity.id, userId);
     const roles = conversationEntity.roles();
     delete roles[userId];
@@ -1285,13 +1281,18 @@ export class ConversationRepository {
    * @param userId ID of service user to be removed from the conversation
    * @returns Resolves when service was removed from the conversation
    */
-  public async removeService(conversationEntity: Conversation, userId: string): Promise<any> {
-    const response: any = await this.conversation_service.deleteBots(conversationEntity.id, userId);
-    // TODO: Can this even have a response? in the API Client it look like it always returns `void`
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = response?.event || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
-    this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
-    return event;
+  public removeService(conversationEntity: Conversation, userId: string) {
+    return this.conversation_service.deleteBots(conversationEntity.id, userId).then((response: any) => {
+      // TODO: Can this even have a response? in the API Client it look like it always returns `void`
+      const hasResponse = response?.event;
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const event = hasResponse
+        ? response.event
+        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+
+      this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
+      return event;
+    });
   }
 
   /**
@@ -1332,7 +1333,7 @@ export class ConversationRepository {
   public async updateConversationReceiptMode(
     conversationEntity: Conversation,
     receiptMode: ConversationReceiptModeUpdateData,
-  ): Promise<ConversationReceiptModeUpdateEvent> {
+  ) {
     const response = await this.conversation_service.updateConversationReceiptMode(conversationEntity.id, receiptMode);
     if (response) {
       this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
@@ -1375,17 +1376,15 @@ export class ConversationRepository {
    */
   public async setNotificationState(conversationEntity: Conversation, notificationState: number) {
     if (!conversationEntity || notificationState === undefined) {
-      throw new ConversationError(
-        BaseError.TYPE.MISSING_PARAMETER as BASE_ERROR_TYPE,
-        BaseError.MESSAGE.MISSING_PARAMETER,
+      return Promise.reject(
+        new ConversationError(BaseError.TYPE.MISSING_PARAMETER as BASE_ERROR_TYPE, BaseError.MESSAGE.MISSING_PARAMETER),
       );
     }
 
     const validNotificationStates = Object.values(NOTIFICATION_STATE);
     if (!validNotificationStates.includes(notificationState)) {
-      throw new ConversationError(
-        BaseError.TYPE.INVALID_PARAMETER as BASE_ERROR_TYPE,
-        BaseError.MESSAGE.INVALID_PARAMETER,
+      return Promise.reject(
+        new ConversationError(BaseError.TYPE.INVALID_PARAMETER as BASE_ERROR_TYPE, BaseError.MESSAGE.INVALID_PARAMETER),
       );
     }
 
@@ -1420,7 +1419,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to rename
    * @returns Resolves when the conversation was archived
    */
-  public async archiveConversation(conversationEntity: Conversation): Promise<void> {
+  public async archiveConversation(conversationEntity: Conversation) {
     await this.toggleArchiveConversation(conversationEntity, true);
     this.logger.info(`Conversation '${conversationEntity.id}' archived`);
   }
@@ -1433,11 +1432,7 @@ export class ConversationRepository {
    * @param trigger Trigger for unarchive
    * @returns Resolves when the conversation was unarchived
    */
-  public async unarchiveConversation(
-    conversationEntity: Conversation,
-    forceChange = false,
-    trigger = 'unknown',
-  ): Promise<void> {
+  public async unarchiveConversation(conversationEntity: Conversation, forceChange = false, trigger = 'unknown') {
     await this.toggleArchiveConversation(conversationEntity, false, forceChange);
     this.logger.info(`Conversation '${conversationEntity.id}' unarchived by trigger '${trigger}'`);
   }
@@ -1446,7 +1441,7 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     newState: boolean,
     forceChange: boolean = false,
-  ): Promise<void> {
+  ) {
     if (!conversationEntity) {
       const error = new ConversationError(
         ConversationError.TYPE.CONVERSATION_NOT_FOUND,
@@ -1473,19 +1468,19 @@ export class ConversationRepository {
 
     const conversationId = conversationEntity.id;
 
-    if (!conversationEntity.removed_from_conversation()) {
-      try {
-        await this.conversation_service.update_member_properties(conversationId, payload);
-      } catch (error) {
-        const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
-        this.logger.error(logMessage);
+    const updatePromise = conversationEntity.removed_from_conversation()
+      ? Promise.resolve()
+      : this.conversation_service.update_member_properties(conversationId, payload).catch(error => {
+          const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
+          this.logger.error(logMessage);
 
-        const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
-        if (!isNotFound) {
-          throw error;
-        }
-      }
-    }
+          const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
+          if (!isNotFound) {
+            throw error;
+          }
+        });
+
+    await updatePromise;
     const response = {
       data: payload,
       from: this.userState.self().id,
@@ -1493,7 +1488,7 @@ export class ConversationRepository {
     this.onMemberUpdate(conversationEntity, response);
   }
 
-  private checkChangedConversations(): void {
+  private checkChangedConversations() {
     this.conversationsWithNewEvents.forEach(conversationEntity => {
       if (conversationEntity.shouldUnarchive()) {
         this.unarchiveConversation(conversationEntity, false, 'event from notification stream');
@@ -1509,7 +1504,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation entity to delete
    * @param timestamp Optional timestamps for which messages to remove
    */
-  private _clear_conversation(conversationEntity: Conversation, timestamp?: number): void {
+  private _clear_conversation(conversationEntity: Conversation, timestamp?: number) {
     this.deleteMessages(conversationEntity, timestamp);
 
     if (conversationEntity.removed_from_conversation()) {
@@ -1531,7 +1526,7 @@ export class ConversationRepository {
     }
   }
 
-  private handleTooManyMembersError(participants = ConversationRepository.CONFIG.GROUP.MAX_SIZE): void {
+  private handleTooManyMembersError(participants = ConversationRepository.CONFIG.GROUP.MAX_SIZE) {
     const openSpots = ConversationRepository.CONFIG.GROUP.MAX_SIZE - participants;
     const substitutions = {
       number1: ConversationRepository.CONFIG.GROUP.MAX_SIZE.toString(10),
@@ -1543,20 +1538,21 @@ export class ConversationRepository {
     this.showModal(messageText, titleText);
   }
 
-  private async handleUsersNotConnected(userIds: string[] = []): Promise<void> {
+  private handleUsersNotConnected(userIds: string[] = []) {
     const [userID] = userIds;
     const userPromise = userIds.length === 1 ? this.userRepository.getUserById(userID) : Promise.resolve(null);
 
-    const userEntity = await userPromise;
-    const username = userEntity?.name();
-    const messageText = username
-      ? t('modalConversationNotConnectedMessageOne', username)
-      : t('modalConversationNotConnectedMessageMany');
-    const titleText = t('modalConversationNotConnectedHeadline');
-    this.showModal(messageText, titleText);
+    userPromise.then((userEntity: User) => {
+      const username = userEntity?.name();
+      const messageText = username
+        ? t('modalConversationNotConnectedMessageOne', username)
+        : t('modalConversationNotConnectedMessageMany');
+      const titleText = t('modalConversationNotConnectedHeadline');
+      this.showModal(messageText, titleText);
+    });
   }
 
-  private showModal(messageText: string, titleText: string): void {
+  private showModal(messageText: string, titleText: string) {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message: messageText,
@@ -1608,7 +1604,7 @@ export class ConversationRepository {
     isIncoming: boolean,
     fileExt: string,
     id = createRandomUuid(),
-  ): Promise<void> {
+  ) {
     const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt, id);
     await this.eventRepository.injectEvent(fileRestrictionMessage as EventRecord);
   }
@@ -1632,12 +1628,9 @@ export class ConversationRepository {
     return this.pushToReceivingQueue(eventJson, eventSource);
   };
 
-  private async handleConversationEvent(
-    eventJson: EventJson,
-    eventSource = EventRepository.SOURCE.STREAM,
-  ): Promise<void> {
+  private handleConversationEvent(eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
-      throw new Error('Conversation Repository Event Handling: Event missing');
+      return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
     const {conversation, data: eventData, type} = eventJson;
@@ -1651,51 +1644,60 @@ export class ConversationRepository {
 
       const isExpectedType = typesInSelfConversation.includes(type);
       if (!isExpectedType) {
-        throw new ConversationError(
-          ConversationError.TYPE.WRONG_CONVERSATION,
-          ConversationError.MESSAGE.WRONG_CONVERSATION,
+        return Promise.reject(
+          new ConversationError(
+            ConversationError.TYPE.WRONG_CONVERSATION,
+            ConversationError.MESSAGE.WRONG_CONVERSATION,
+          ),
         );
       }
     }
 
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
+    const onEventPromise = isConversationCreate ? Promise.resolve(null) : this.get_conversation_by_id(conversationId);
     let previouslyArchived = false;
 
-    try {
-      const conversationEntity = isConversationCreate ? null : await this.get_conversation_by_id(conversationId);
-      if (conversationEntity) {
-        // Check if conversation was archived
-        previouslyArchived = conversationEntity.is_archived();
+    return onEventPromise
+      .then((conversationEntity: Conversation) => {
+        if (conversationEntity) {
+          // Check if conversation was archived
+          previouslyArchived = conversationEntity.is_archived();
 
-        const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
-        conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
-      }
+          const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
+          conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
+        }
 
-      await this.checkLegalHoldStatus(conversationEntity, eventJson);
-      await this.checkConversationParticipants(conversationEntity, eventJson, eventSource);
-      await this.triggerFeatureEventHandlers(conversationEntity, eventJson);
-      const entityObject = ((await this.reactToConversationEvent(conversationEntity, eventJson, eventSource)) ||
-        {}) as EntityObject;
-      await this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived);
-    } catch (error) {
-      const ignoredErrorTypes: string[] = [
-        ConversationError.TYPE.MESSAGE_NOT_FOUND,
-        ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-      ];
+        return conversationEntity;
+      })
+      .then(conversationEntity => this.checkLegalHoldStatus(conversationEntity, eventJson))
+      .then(conversationEntity => this.checkConversationParticipants(conversationEntity, eventJson, eventSource))
+      .then(conversationEntity => this.triggerFeatureEventHandlers(conversationEntity, eventJson))
+      .then(
+        conversationEntity => this.reactToConversationEvent(conversationEntity, eventJson, eventSource) as EntityObject,
+      )
+      .then((entityObject = {} as EntityObject) =>
+        this.handleConversationNotification(entityObject as EntityObject, eventSource, previouslyArchived),
+      )
+      .catch((error: BaseError) => {
+        const ignoredErrorTypes: string[] = [
+          ConversationError.TYPE.MESSAGE_NOT_FOUND,
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+        ];
 
-      const isRemovedFromConversation = (error as BackendClientError).label === BackendClientError.LABEL.ACCESS_DENIED;
-      if (isRemovedFromConversation) {
-        const messageText = t('conversationNotFoundMessage');
-        const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
+        const isRemovedFromConversation =
+          (error as BackendClientError).label === BackendClientError.LABEL.ACCESS_DENIED;
+        if (isRemovedFromConversation) {
+          const messageText = t('conversationNotFoundMessage');
+          const titleText = t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME);
 
-        this.showModal(messageText, titleText);
-        return;
-      }
+          this.showModal(messageText, titleText);
+          return;
+        }
 
-      if (!ignoredErrorTypes.includes(error.type)) {
-        throw error;
-      }
-    }
+        if (!ignoredErrorTypes.includes(error.type)) {
+          throw error;
+        }
+      });
   }
 
   /**
@@ -1706,15 +1708,15 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when the participant list has been checked
    */
-  private async checkConversationParticipants(
+  private checkConversationParticipants(
     conversationEntity: Conversation,
     eventJson: EventJson,
     eventSource: EventSource,
-  ): Promise<void> {
+  ) {
     // We ignore injected events
     const isInjectedEvent = eventSource === EventRepository.SOURCE.INJECTED;
     if (isInjectedEvent || !conversationEntity) {
-      return;
+      return conversationEntity;
     }
 
     const {from: sender, id, type, time} = eventJson;
@@ -1734,7 +1736,7 @@ export class ConversationRepository {
           const isFromUpdatedMember = eventJson.data.user_ids.includes(sender);
           if (isFromUpdatedMember) {
             // we ignore leave/join events that are sent by the user actually leaving or joining
-            return;
+            return conversationEntity;
           }
         }
 
@@ -1742,17 +1744,16 @@ export class ConversationRepository {
         this.logger.warn(message, eventJson);
 
         const timestamp = new Date(time).getTime() - 1;
-        await this.addMissingMember(conversationEntity, [sender], timestamp);
+        return this.addMissingMember(conversationEntity, [sender], timestamp).then(() => conversationEntity);
       }
     }
+
+    return conversationEntity;
   }
 
-  private async checkLegalHoldStatus(
-    conversationEntity: Conversation,
-    eventJson: LegalHoldEvaluator.MappedEvent,
-  ): Promise<void> {
+  private async checkLegalHoldStatus(conversationEntity: Conversation, eventJson: LegalHoldEvaluator.MappedEvent) {
     if (!LegalHoldEvaluator.hasMessageLegalHoldFlag(eventJson)) {
-      return;
+      return conversationEntity;
     }
 
     const renderLegalHoldMessage = LegalHoldEvaluator.renderLegalHoldMessage(
@@ -1761,7 +1762,7 @@ export class ConversationRepository {
     );
 
     if (!renderLegalHoldMessage) {
-      return;
+      return conversationEntity;
     }
 
     const {
@@ -1782,7 +1783,7 @@ export class ConversationRepository {
     await this.messageRepositoryProvider().updateAllClients(conversationEntity, true);
 
     if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
-      return;
+      return conversationEntity;
     }
 
     await this.injectLegalHoldMessage({
@@ -1791,6 +1792,8 @@ export class ConversationRepository {
       timestamp: isoTimestamp,
       userId,
     });
+
+    return conversationEntity;
   }
 
   /**
@@ -1879,12 +1882,13 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when all the handlers have done their job
    */
-  private async triggerFeatureEventHandlers(conversationEntity: Conversation, eventJson: EventJson): Promise<void> {
+  private async triggerFeatureEventHandlers(conversationEntity: Conversation, eventJson: EventJson) {
     const conversationEventHandlers = [this.ephemeralHandler, this.stateHandler];
     const handlePromises = conversationEventHandlers.map(handler =>
       handler.handleConversationEvent(conversationEntity, eventJson),
     );
     await Promise.all(handlePromises);
+    return conversationEntity;
   }
 
   /**
@@ -1899,7 +1903,7 @@ export class ConversationRepository {
     entityObject: EntityObject,
     eventSource: EventSource,
     previouslyArchived: boolean,
-  ): Promise<void> {
+  ) {
     const {conversationEntity, messageEntity} = entityObject;
 
     if (conversationEntity) {
@@ -1930,8 +1934,7 @@ export class ConversationRepository {
       if (previouslyArchived) {
         // Add to check for un-archiving at the end of stream handling
         if (eventFromStream) {
-          this.conversationsWithNewEvents.set(conversationEntity.id, conversationEntity);
-          return;
+          return this.conversationsWithNewEvents.set(conversationEntity.id, conversationEntity);
         }
 
         if (eventFromWebSocket && conversationEntity.shouldUnarchive()) {
@@ -1946,38 +1949,39 @@ export class ConversationRepository {
    * @param eventJson JSON data for event
    * @param source Source of event
    */
-  private async pushToReceivingQueue(eventJson: EventJson, source: EventSource): Promise<void> {
-    try {
-      await this.receiving_queue.push(() => this.handleConversationEvent(eventJson, source));
+  private pushToReceivingQueue(eventJson: EventJson, source: EventSource) {
+    this.receiving_queue
+      .push(() => this.handleConversationEvent(eventJson, source))
+      .then(() => {
+        if (this.init_promise) {
+          const eventFromStream = source === EventRepository.SOURCE.STREAM;
+          if (eventFromStream) {
+            this.init_handled = this.init_handled + 1;
+            if (this.init_handled % 5 === 0 || this.init_handled < 5) {
+              const content = {
+                handled: this.init_handled,
+                total: this.init_total,
+              };
+              const progress = (this.init_handled / this.init_total) * 20 + 75;
 
-      if (this.init_promise) {
-        const eventFromStream = source === EventRepository.SOURCE.STREAM;
-        if (eventFromStream) {
-          this.init_handled = this.init_handled + 1;
-          if (this.init_handled % 5 === 0 || this.init_handled < 5) {
-            const content = {
-              handled: this.init_handled,
-              total: this.init_total,
-            };
-            const progress = (this.init_handled / this.init_total) * 20 + 75;
+              amplify.publish(WebAppEvents.APP.UPDATE_PROGRESS, progress, t('initEvents'), content);
+            }
+          }
 
-            amplify.publish(WebAppEvents.APP.UPDATE_PROGRESS, progress, t('initEvents'), content);
+          if (!this.receiving_queue.getLength() || !eventFromStream) {
+            this.init_promise.resolve_fn();
+            this.init_promise = undefined;
           }
         }
-
-        if (!this.receiving_queue.getLength() || !eventFromStream) {
-          this.init_promise.resolve_fn();
+      })
+      .catch(error => {
+        if (this.init_promise) {
+          this.init_promise.reject_fn(error);
           this.init_promise = undefined;
+        } else {
+          throw error;
         }
-      }
-    } catch (error) {
-      if (this.init_promise) {
-        this.init_promise.reject_fn(error);
-        this.init_promise = undefined;
-      } else {
-        throw error;
-      }
-    }
+      });
   }
 
   /**
@@ -1994,21 +1998,20 @@ export class ConversationRepository {
       });
   };
 
-  private async on1to1Creation(
-    conversationEntity: Conversation,
-    eventJson: EventRecord,
-  ): Promise<{conversationEntity: Conversation}> {
-    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
-    const memberMessage = (await this.updateMessageUserEntities(messageEntity)) as MemberMessage;
+  private on1to1Creation(conversationEntity: Conversation, eventJson: EventRecord) {
+    return this.event_mapper
+      .mapJsonEvent(eventJson, conversationEntity)
+      .then(messageEntity => this.updateMessageUserEntities(messageEntity))
+      .then((messageEntity: MemberMessage) => {
+        const userEntity = messageEntity.otherUser();
+        const isOutgoingRequest = userEntity && userEntity.isOutgoingRequest();
+        if (isOutgoingRequest) {
+          messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
+        }
 
-    const userEntity = memberMessage.otherUser();
-    const isOutgoingRequest = userEntity && userEntity.isOutgoingRequest();
-    if (isOutgoingRequest) {
-      memberMessage.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
-    }
-
-    conversationEntity.add_message(memberMessage);
-    return {conversationEntity};
+        conversationEntity.add_message(messageEntity);
+        return {conversationEntity};
+      });
   }
 
   /**
@@ -2050,10 +2053,7 @@ export class ConversationRepository {
     return undefined;
   }
 
-  private async onGroupCreation(
-    conversationEntity: Conversation,
-    eventJson: EventRecord,
-  ): Promise<{conversationEntity: Conversation; messageEntity: Message}> {
+  private async onGroupCreation(conversationEntity: Conversation, eventJson: EventRecord) {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     const creatorId = conversationEntity.creator;
     const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
@@ -2088,15 +2088,12 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-join' event
    * @returns Resolves when the event was handled
    */
-  private async onMemberJoin(
-    conversationEntity: Conversation,
-    eventJson: EventJson,
-  ): Promise<{conversationEntity: Conversation; messageEntity: Message} | void> {
+  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
     if (isPendingConnection) {
-      return;
+      return Promise.resolve();
     }
 
     const eventData = eventJson.data;
@@ -2116,14 +2113,15 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    if (selfUserRejoins) {
-      await this.updateConversationFromBackend(conversationEntity);
-    }
+    const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
 
-    await this.updateParticipatingUserEntities(conversationEntity, false, true);
-    const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
-    this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
-    return {conversationEntity, messageEntity};
+    return updateSequence
+      .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
+      .then(() => this.addEventToConversation(conversationEntity, eventJson))
+      .then(({messageEntity}) => {
+        this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
+        return {conversationEntity, messageEntity};
+      });
   }
 
   /**
@@ -2136,7 +2134,7 @@ export class ConversationRepository {
   private async onMemberLeave(
     conversationEntity: Conversation,
     eventJson: EventJson,
-  ): Promise<{conversationEntity: Conversation; messageEntity: Message} | void> {
+  ): Promise<{conversationEntity: Conversation; messageEntity: Message} | undefined> {
     const {data: eventData, from} = eventJson;
     const isFromSelf = from === this.userState.self().id;
     const removesSelfUser = eventData.user_ids.includes(this.userState.self().id);
@@ -2173,6 +2171,8 @@ export class ConversationRepository {
 
       return {conversationEntity, messageEntity};
     }
+
+    return undefined;
   }
 
   /**
@@ -2182,7 +2182,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-update' event
    * @returns Resolves when the event was handled
    */
-  private onMemberUpdate(conversationEntity: Conversation, eventJson: EventJson): void {
+  private onMemberUpdate(conversationEntity: Conversation, eventJson: EventJson) {
     const {conversation: conversationId, data: eventData, from} = eventJson;
 
     const isConversationRoleUpdate = !!eventData.conversation_role;
@@ -2239,10 +2239,7 @@ export class ConversationRepository {
    * @param event JSON data of 'conversation.asset-add'
    * @returns Resolves when the event was handled
    */
-  private async onAssetAdd(
-    conversationEntity: Conversation,
-    event: EventJson,
-  ): Promise<{conversationEntity: Conversation; messageEntity: Message} | void> {
+  private async onAssetAdd(conversationEntity: Conversation, event: EventJson) {
     const fromSelf = event.from === this.userState.self().id;
 
     const isRemoteFailure = !fromSelf && event.data.status === AssetTransferState.UPLOAD_FAILED;
@@ -2289,16 +2286,16 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.message-delete'
    * @returns Resolves when the event was handled
    */
-  private async onMessageDeleted(conversationEntity: Conversation, eventJson: EventJson): Promise<number | void> {
+  private onMessageDeleted(conversationEntity: Conversation, eventJson: EventJson) {
     const {data: eventData, from, id: eventId, time} = eventJson;
 
-    try {
-      const deletedMessageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
-        conversationEntity,
-        eventData.message_id,
-      );
+    return this.messageRepositoryProvider()
+      .getMessageInConversationById(conversationEntity, eventData.message_id)
+      .then(deletedMessageEntity => {
+        if (deletedMessageEntity.ephemeral_expires()) {
+          return;
+        }
 
-      if (!deletedMessageEntity.ephemeral_expires()) {
         const isSameSender = from === deletedMessageEntity.from;
         if (!isSameSender) {
           throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
@@ -2306,18 +2303,19 @@ export class ConversationRepository {
 
         const isFromSelf = from === this.userState.self().id;
         if (!isFromSelf) {
-          this.addDeleteMessage(conversationEntity.id, eventId, time, deletedMessageEntity);
+          return this.addDeleteMessage(conversationEntity.id, eventId, time, deletedMessageEntity);
         }
-      }
-
-      return await this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
-    } catch (error) {
-      const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
-      if (!isNotFound) {
-        this.logger.info(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
-        throw error;
-      }
-    }
+      })
+      .then(() => {
+        return this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
+      })
+      .catch(error => {
+        const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+        if (!isNotFound) {
+          this.logger.info(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
+          throw error;
+        }
+      });
   }
 
   /**
@@ -2326,7 +2324,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.message-hidden'
    * @returns Resolves when the event was handled
    */
-  private async onMessageHidden(eventJson: EventJson): Promise<number> {
+  private async onMessageHidden(eventJson: EventJson) {
     const {conversation: conversationId, data: eventData, from} = eventJson;
 
     try {
@@ -2361,10 +2359,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.reaction' event
    * @returns Resolves when the event was handled
    */
-  private async onReaction(
-    conversationEntity: Conversation,
-    eventJson: EventJson,
-  ): Promise<{conversationEntity: Conversation; messageEntity?: Message}> {
+  private async onReaction(conversationEntity: Conversation, eventJson: EventJson) {
     const conversationId = conversationEntity.id;
     const eventData = eventJson.data;
     const messageId = eventData.message_id;
@@ -2401,7 +2396,7 @@ export class ConversationRepository {
     return undefined;
   }
 
-  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: EventJson): Promise<void> {
+  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: EventJson) {
     const {messageId, buttonId} = eventJson.data;
     try {
       const messageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
@@ -2419,6 +2414,7 @@ export class ConversationRepository {
       if (changes) {
         this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
       }
+      return;
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
@@ -2436,10 +2432,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.rename' event
    * @returns Resolves when the event was handled
    */
-  private async onRename(
-    conversationEntity: Conversation,
-    eventJson: EventJson,
-  ): Promise<{conversationEntity: Conversation; messageEntity: Message}> {
+  private async onRename(conversationEntity: Conversation, eventJson: EventJson) {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     this.conversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
@@ -2452,21 +2445,17 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.receipt-mode-update' event
    * @returns Resolves when the event was handled
    */
-  private async onReceiptModeChanged(
-    conversationEntity: Conversation,
-    eventJson: EventJson,
-  ): Promise<{conversationEntity: Conversation; messageEntity: Message}> {
+  private async onReceiptModeChanged(conversationEntity: Conversation, eventJson: EventJson) {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     this.conversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data.receipt_mode});
     return {conversationEntity, messageEntity};
   }
 
-  private readonly handleMessageExpiration = async (messageEntity: ContentMessage) => {
+  private readonly handleMessageExpiration = (messageEntity: ContentMessage) => {
     amplify.publish(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
     const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.is_ping();
     if (shouldDeleteMessage) {
-      void (async () => {
-        const conversationEntity = await this.get_conversation_by_id(messageEntity.conversation_id);
+      this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
         const isPingFromSelf = messageEntity.user().isMe && messageEntity.is_ping();
         const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
         if (deleteForSelf) {
@@ -2475,7 +2464,7 @@ export class ConversationRepository {
 
         const userIds = conversationEntity.isGroup() ? [this.userState.self().id, messageEntity.from] : undefined;
         return this.messageRepositoryProvider().deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
-      })();
+      });
     }
   };
 
@@ -2484,11 +2473,7 @@ export class ConversationRepository {
     return this.updateMessageUserEntities(messageEntity);
   }
 
-  private async replaceMessageInConversation(
-    conversationEntity: Conversation,
-    eventId: string,
-    newData: EventRecord,
-  ): Promise<ContentMessage | undefined> {
+  private async replaceMessageInConversation(conversationEntity: Conversation, eventId: string, newData: EventRecord) {
     const originalMessage = conversationEntity.getMessage(eventId);
     if (!originalMessage) {
       return undefined;
@@ -2530,11 +2515,7 @@ export class ConversationRepository {
    * @param prepend Should existing messages be prepended
    * @returns Resolves with an array of mapped messages
    */
-  private async addEventsToConversation(
-    events: EventRecord[],
-    conversationEntity: Conversation,
-    prepend = true,
-  ): Promise<ContentMessage[]> {
+  private async addEventsToConversation(events: EventRecord[], conversationEntity: Conversation, prepend = true) {
     const mappedEvents = await this.event_mapper.mapJsonEvents(events, conversationEntity);
     const updatedEvents = (await this.updateMessagesUserEntities(mappedEvents)) as ContentMessage[];
     const validatedMessages = (await this.ephemeralHandler.validateMessages(updatedEvents)) as ContentMessage[];
@@ -2551,7 +2532,7 @@ export class ConversationRepository {
    *
    * @param conversationEntity Conversation fetch events and users for
    */
-  private fetchUsersAndEvents(conversationEntity: Conversation): void {
+  private fetchUsersAndEvents(conversationEntity: Conversation) {
     if (!conversationEntity.is_loaded() && !conversationEntity.is_pending()) {
       this.updateParticipatingUserEntities(conversationEntity);
       this.getUnreadEvents(conversationEntity);
@@ -2570,7 +2551,7 @@ export class ConversationRepository {
     conversationEntity: Conversation,
     messageEntity: ContentMessage,
     eventJson: EventJson,
-  ): Promise<{conversationEntity: Conversation; messageEntity?: Message}> {
+  ) {
     const {data: event_data, from} = eventJson;
 
     const messageFromSelf = messageEntity.from === this.userState.self().id;
@@ -2585,7 +2566,7 @@ export class ConversationRepository {
     return {conversationEntity};
   }
 
-  private updateMessagesUserEntities(messageEntities: Message[]): Promise<Message[]> {
+  private updateMessagesUserEntities(messageEntities: Message[]) {
     return Promise.all(messageEntities.map(messageEntity => this.updateMessageUserEntities(messageEntity)));
   }
 
@@ -2595,26 +2576,26 @@ export class ConversationRepository {
    * @param messageEntity Message to be updated
    * @returns Resolves when users have been update
    */
-  private async updateMessageUserEntities(messageEntity: Message): Promise<Message> {
+  private async updateMessageUserEntities(messageEntity: Message) {
     const userEntity = await this.userRepository.getUserById(messageEntity.from);
     messageEntity.user(userEntity);
     const isMemberMessage = messageEntity.isMember();
-
     if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
-      const userEntities = await this.userRepository.getUsersById((messageEntity as MemberMessage).userIds());
-      userEntities.sort(sortUsersByPriority);
-      (messageEntity as MemberMessage).userEntities(userEntities);
-      return messageEntity;
+      return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
+        userEntities.sort(sortUsersByPriority);
+        (messageEntity as MemberMessage).userEntities(userEntities);
+        return messageEntity;
+      });
     }
-
     if (messageEntity.is_content()) {
       const userIds = Object.keys(messageEntity.reactions());
 
       messageEntity.reactions_user_ets.removeAll();
       if (userIds.length) {
-        const userEntities = await this.userRepository.getUsersById(userIds);
-        messageEntity.reactions_user_ets(userEntities);
-        return messageEntity;
+        return this.userRepository.getUsersById(userIds).then(userEntities_1 => {
+          messageEntity.reactions_user_ets(userEntities_1);
+          return messageEntity;
+        });
       }
     }
     return messageEntity;
@@ -2626,7 +2607,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation that contains the message
    * @param timestamp Timestamp as upper bound which messages to remove
    */
-  private deleteMessages(conversationEntity: Conversation, timestamp: number): void {
+  private deleteMessages(conversationEntity: Conversation, timestamp: number) {
     conversationEntity.hasCreationMessage = false;
 
     const iso_date = timestamp ? new Date(timestamp).toISOString() : undefined;
@@ -2641,7 +2622,7 @@ export class ConversationRepository {
    * @param time ISO 8601 formatted time string
    * @param messageEntity Message to delete
    */
-  public addDeleteMessage(conversationId: string, messageId: string, time: number, messageEntity: Message): void {
+  public addDeleteMessage(conversationId: string, messageId: string, time: number, messageEntity: Message) {
     const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
     this.eventRepository.injectEvent(deleteEvent as EventRecord);
   }

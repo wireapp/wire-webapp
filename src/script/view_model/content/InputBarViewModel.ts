@@ -787,23 +787,19 @@ export class InputBarViewModel {
     });
   };
 
-  private readonly _generateQuote = async (replyMessageEntity: ContentMessage): Promise<QuoteEntity | undefined> => {
-    if (!replyMessageEntity) {
-      return undefined;
-    }
-
-    const event = await this.eventRepository.eventService.loadEvent(
-      replyMessageEntity.conversation_id,
-      replyMessageEntity.id,
-    );
-
-    const messageHash = await MessageHasher.hashEvent(event);
-
-    return new QuoteEntity({
-      hash: messageHash,
-      messageId: replyMessageEntity.id,
-      userId: replyMessageEntity.from,
-    });
+  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity | undefined> => {
+    return !replyMessageEntity
+      ? Promise.resolve(undefined)
+      : this.eventRepository.eventService
+          .loadEvent(replyMessageEntity.conversation_id, replyMessageEntity.id)
+          .then(MessageHasher.hashEvent)
+          .then((messageHash: ArrayBuffer) => {
+            return new QuoteEntity({
+              hash: messageHash,
+              messageId: replyMessageEntity.id,
+              userId: replyMessageEntity.from,
+            });
+          });
   };
 
   readonly sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {
