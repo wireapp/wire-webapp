@@ -772,7 +772,7 @@
   "preferencesAVCamera": "Kamera",
   "preferencesAVMicrophone": "Mikrofon",
   "preferencesAVNoCamera": "{{brandName}} har inte tillgång till kameran.[br][faqLink]Läs den här hjälpartikeln[/faqLink] för att få reda på hur du löser det.",
-  "preferencesAVPermissionDetail": "Enable from your preferences",
+  "preferencesAVPermissionDetail": "Aktivera från dina webbläsarinställningar",
   "preferencesAVSpeakers": "Högtalare",
   "preferencesAVTemporaryDisclaimer": "Guests can’t start video conferences. Select the camera to use if you join one.",
   "preferencesAVTryAgain": "Försök igen",
