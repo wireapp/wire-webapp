@@ -967,11 +967,11 @@ export class ConversationRepository {
     try {
       let conversationEntity = this.conversationState.findConversation(connectionEntity.conversationId);
       if (!conversationEntity && (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest())) {
-        const fetchedConversation = await this.fetchConversationById(connectionEntity.conversationId);
-        if (!fetchedConversation) {
-          return;
-        }
-        conversationEntity = fetchedConversation;
+        conversationEntity = await this.fetchConversationById(connectionEntity.conversationId);
+      }
+
+      if (!conversationEntity) {
+        return;
       }
 
       conversationEntity.connection(connectionEntity);
