@@ -772,7 +772,7 @@
   "preferencesAVCamera": "Kamera",
   "preferencesAVMicrophone": "Mikrofon",
   "preferencesAVNoCamera": "{{brandName}} doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.",
-  "preferencesAVPermissionDetail": "Omogoči iz nastavitev vašega brskalnika",
+  "preferencesAVPermissionDetail": "Enable from your preferences",
   "preferencesAVSpeakers": "Zvočniki",
   "preferencesAVTemporaryDisclaimer": "Guests can’t start video conferences. Select the camera to use if you join one.",
   "preferencesAVTryAgain": "Try Again",
