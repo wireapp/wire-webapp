@@ -65,16 +65,14 @@ export class AssetRepository {
     this.logger = getLogger('AssetRepository');
   }
 
-  async getObjectUrl(asset: AssetRemoteData): Promise<string> {
+  getObjectUrl(asset: AssetRemoteData): Promise<string> {
     const objectUrl = getAssetUrl(asset.identifier);
-
-    if (objectUrl) {
-      return objectUrl;
-    }
-
-    const blob = await this.load(asset);
-    const url = window.URL.createObjectURL(blob);
-    return setAssetUrl(asset.identifier, url);
+    return objectUrl
+      ? Promise.resolve(objectUrl)
+      : this.load(asset).then(blob => {
+          const url = window.URL.createObjectURL(blob);
+          return setAssetUrl(asset.identifier, url);
+        });
   }
 
   public async load(asset: AssetRemoteData): Promise<void | Blob> {

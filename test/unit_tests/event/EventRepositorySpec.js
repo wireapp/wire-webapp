@@ -508,7 +508,7 @@ describe('EventRepository', () => {
       };
       const linkPreviewEvent = {...event};
       spyOn(testFactory.event_service, 'loadEvent').and.callFake((conversationId, messageId) => {
-        return Promise.resolve(messageId === replacingId ? undefined : storedEvent);
+        return messageId === replacingId ? Promise.resolve() : Promise.resolve(storedEvent);
       });
       spyOn(testFactory.event_service, 'replaceEvent').and.callFake(ev => ev);
 

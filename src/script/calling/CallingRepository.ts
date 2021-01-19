@@ -653,11 +653,11 @@ export class CallingRepository {
       const selfParticipant = new Participant(this.selfUser, this.selfClientId);
       const call = new Call(this.selfUser.id, conversationId, conversationType, selfParticipant, callType);
       this.storeCall(call);
-
-      const isGroupVideo =
-        [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(conversationType) && callType === CALL_TYPE.VIDEO;
-      const success = isGroupVideo ? await this.warmupMediaStreams(call, true, true) : true;
-
+      const loadPreviewPromise =
+        [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(conversationType) && callType === CALL_TYPE.VIDEO
+          ? this.warmupMediaStreams(call, true, true)
+          : Promise.resolve(true);
+      const success = await loadPreviewPromise;
       if (success) {
         this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
         this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
@@ -901,20 +901,16 @@ export class CallingRepository {
       messageId: createRandomUuid(),
     });
     const call = this.findCall(conversationId);
-
     if (call?.blockMessages) {
       return 0;
     }
-
     const {type, resp} = JSON.parse(payload);
     const needsVerification = [CALL_MESSAGE_TYPE.SETUP, CALL_MESSAGE_TYPE.GROUP_START].includes(type);
-
-    void (async () => {
-      try {
-        if (needsVerification) {
-          await this.verificationPromise(conversationId, userId, resp);
-        }
-
+    const validationPromise = needsVerification
+      ? this.verificationPromise(conversationId, userId, resp)
+      : Promise.resolve();
+    validationPromise
+      .then(() => {
         let options: MessageSendingOptions;
 
         if (typeof targets === 'string') {
@@ -928,11 +924,9 @@ export class CallingRepository {
         }
 
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-        await this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
-      } catch {
-        this.abortCall(conversationId);
-      }
-    })();
+        return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
+      })
+      .catch(() => this.abortCall(conversationId));
 
     return 0;
   };
