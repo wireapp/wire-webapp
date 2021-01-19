@@ -1,5 +1,3 @@
-import {ContentSecurityPolicyOptions} from 'helmet/dist/middlewares/content-security-policy';
-
 export interface ServerConfig {
   CLIENT: {
     ANALYTICS_API_KEY: string;
@@ -61,7 +59,7 @@ export interface ServerConfig {
   SERVER: {
     APP_BASE: string;
     CACHE_DURATION_SECONDS: number;
-    CSP: ContentSecurityPolicyOptions['directives'];
+    CSP: Record<string, Iterable<string>>;
     DEVELOPMENT?: boolean;
     ENFORCE_HTTPS: boolean;
     ENVIRONMENT: string;
