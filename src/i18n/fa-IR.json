@@ -772,7 +772,7 @@
   "preferencesAVCamera": "دوربین",
   "preferencesAVMicrophone": "میکروفون",
   "preferencesAVNoCamera": "{{brandName}} doesn’t have access to the camera.[br][faqLink]Read this support article[/faqLink] to find out how to fix it.",
-  "preferencesAVPermissionDetail": "Enable from your preferences",
+  "preferencesAVPermissionDetail": "از تنظیمات مرورگر خود فعال کنید",
   "preferencesAVSpeakers": "بلندگو‌ها",
   "preferencesAVTemporaryDisclaimer": "Guests can’t start video conferences. Select the camera to use if you join one.",
   "preferencesAVTryAgain": "Try Again",
