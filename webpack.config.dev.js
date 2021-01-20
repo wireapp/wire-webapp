@@ -35,6 +35,6 @@ module.exports = {
     ],
   },
   mode: 'development',
-  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin(), new webpack.NamedModulesPlugin()],
+  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin()],
   resolve: {...commonConfig.resolve, alias: {...commonConfig.resolve.alias, 'react-dom': '@hot-loader/react-dom'}},
 };
