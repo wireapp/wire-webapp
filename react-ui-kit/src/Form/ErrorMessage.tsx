@@ -19,16 +19,17 @@
 
 /** @jsx jsx */
 import {CSSObject, jsx} from '@emotion/core';
+import {ErrorIcon} from '../Icon';
 
 import {COLOR} from '../Identity';
-import type {Theme} from '../Layout';
+import {FlexBox, Theme} from '../Layout';
 import {Text, TextProps, linkStyle, textStyle} from '../Text';
 
 type ErrorMessageProps<T = HTMLSpanElement> = TextProps<T>;
 
 export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) => CSSObject = (
   theme,
-  {bold = false, center = true, color = COLOR.RED, fontSize = '11px', textTransform = 'none', ...props},
+  {bold = false, center, color = COLOR.RED, fontSize = '11px', textTransform = 'none', ...props},
 ) => ({
   ...textStyle(theme, {bold, center, color, fontSize, textTransform, ...props}),
   a: {
@@ -38,6 +39,9 @@ export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) =
   marginBottom: '12px',
 });
 
-export const ErrorMessage = (props: ErrorMessageProps) => (
-  <Text css={theme => errorMessageStyle(theme, props)} {...props} />
+export const ErrorMessage = ({center = true, ...props}: ErrorMessageProps) => (
+  <FlexBox align="center" justify={center ? 'center' : undefined}>
+    <ErrorIcon style={{marginBottom: '12px', marginRight: '8px'}} />
+    <Text css={theme => errorMessageStyle(theme, props)} {...props} />
+  </FlexBox>
 );
