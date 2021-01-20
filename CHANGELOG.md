@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.0.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.0.4...@wireapp/api-client@12.0.5) (2021-01-20)
+
+
+### Bug Fixes
+
+* **api-client:** Add team_code attribute to RegisterData type ([#3464](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3464)) ([d85ae51](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d85ae51bf4eece218d9b674c4250b01f6ab0a063))
+
+
+
+
+
 ## [12.0.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.0.3...@wireapp/api-client@12.0.4) (2021-01-20)
 
 **Note:** Version bump only for package @wireapp/api-client
