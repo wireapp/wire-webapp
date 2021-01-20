@@ -22,26 +22,32 @@ import {CSSObject, jsx} from '@emotion/core';
 import {ErrorIcon} from '../Icon';
 
 import {COLOR} from '../Identity';
-import {FlexBox, Theme} from '../Layout';
-import {Text, TextProps, linkStyle, textStyle} from '../Text';
+import {FlexBox, FlexBoxProps, flexBoxStyle, filterFlexBoxProps, Theme} from '../Layout';
+import {Text, linkStyle} from '../Text';
+import {filterProps} from '../util';
 
-type ErrorMessageProps<T = HTMLSpanElement> = TextProps<T>;
+type ErrorMessageProps<T = HTMLDivElement> = FlexBoxProps<T>;
 
 export const errorMessageStyle: <T>(theme: Theme, props: ErrorMessageProps<T>) => CSSObject = (
   theme,
-  {bold = false, center, color = COLOR.RED, fontSize = '11px', textTransform = 'none', ...props},
+  {justify = 'center', align = 'center', ...props},
 ) => ({
-  ...textStyle(theme, {bold, center, color, fontSize, textTransform, ...props}),
+  ...flexBoxStyle({align, justify, ...props}),
   a: {
-    ...linkStyle(theme, {bold, fontSize, textTransform}),
+    ...linkStyle(theme, {bold: false, fontSize: '11px', textTransform: 'none', ...props}),
   },
-  display: 'block',
   marginBottom: '12px',
 });
 
-export const ErrorMessage = ({center = true, ...props}: ErrorMessageProps) => (
-  <FlexBox align="center" justify={center ? 'center' : undefined}>
-    <ErrorIcon style={{marginBottom: '12px', marginRight: '8px'}} />
-    <Text css={theme => errorMessageStyle(theme, props)} {...props} />
+export const filterErrorMessageProps = (props: ErrorMessageProps) => {
+  return filterProps(filterFlexBoxProps(props) as ErrorMessageProps, []);
+};
+
+export const ErrorMessage = ({children, ...props}: ErrorMessageProps) => (
+  <FlexBox css={theme => errorMessageStyle(theme, props)} {...props}>
+    <ErrorIcon style={{marginRight: '8px'}} />
+    <Text color={COLOR.RED} fontSize={'11px'}>
+      {children}
+    </Text>
   </FlexBox>
 );

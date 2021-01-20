@@ -1,7 +1,10 @@
 Demo:
 
 ```js
-import {onCodeComplete} from '@wireapp/react-ui-kit';
-
-<ErrorMessage>Sample Error Message</ErrorMessage>;
+<>
+  <ErrorMessage>Sample Error Message</ErrorMessage>
+  <ErrorMessage>
+    Sample Error Message <a>with link</a>
+  </ErrorMessage>
+</>
 ```

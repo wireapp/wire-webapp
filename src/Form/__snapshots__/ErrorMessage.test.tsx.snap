@@ -8,6 +8,24 @@ exports[`"ErrorMessage" renders 1`] = `
 }
 
 .emotion-2 {
+  -webkit-align-items: flex-start;
+  -webkit-box-align: flex-start;
+  -ms-flex-align: flex-start;
+  align-items: flex-start;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-flex-wrap: nowrap;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -webkit-box-pack: start;
+  -webkit-justify-content: flex-start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -26,32 +44,10 @@ exports[`"ErrorMessage" renders 1`] = `
   -webkit-justify-content: center;
   -ms-flex-pack: center;
   justify-content: center;
-}
-
-.emotion-0 {
-  fill: rgb(52,56,59);
-  overflow: visible;
-}
-
-.emotion-1 {
-  color: rgb(52,56,59);
-  display: inline;
-  font-size: 16px;
-  font-weight: 300;
-  opacity: 1;
-  text-align: left;
-  text-transform: none;
-  color: #e02020;
-  display: block;
-  font-size: 11px;
-  font-weight: 300;
-  opacity: 1;
-  text-align: left;
-  text-transform: none;
   margin-bottom: 12px;
 }
 
-.emotion-1 a {
+.emotion-2 a {
   color: rgb(52,56,59);
   display: inline;
   font-size: 11px;
@@ -66,14 +62,29 @@ exports[`"ErrorMessage" renders 1`] = `
   transition: all 0.24s;
 }
 
-.emotion-1 a:hover {
+.emotion-2 a:hover {
   color: rgb(44,47,50);
 }
 
-.emotion-1 a:visited,
-.emotion-1 a:link,
-.emotion-1 a:active {
+.emotion-2 a:visited,
+.emotion-2 a:link,
+.emotion-2 a:active {
   color: rgb(52,56,59);
+}
+
+.emotion-0 {
+  fill: rgb(52,56,59);
+  overflow: visible;
+}
+
+.emotion-1 {
+  color: #e02020;
+  display: inline;
+  font-size: 11px;
+  font-weight: 300;
+  opacity: 1;
+  text-align: left;
+  text-transform: none;
 }
 
 <div
@@ -87,7 +98,6 @@ exports[`"ErrorMessage" renders 1`] = `
       height={12}
       style={
         Object {
-          "marginBottom": "12px",
           "marginRight": "8px",
         }
       }
