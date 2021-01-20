@@ -44,7 +44,8 @@ export const flexBoxStyle: <T>(props: FlexBoxProps<T>) => CSSObject = ({
   justifyContent: justify,
 });
 
-const filterFlexBoxProps = (props: FlexBoxProps) => filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
+export const filterFlexBoxProps = (props: FlexBoxProps) =>
+  filterProps(props, ['align', 'column', 'justify', 'flexWrap']);
 
 export const FlexBox: React.FC<FlexBoxProps> = React.forwardRef<HTMLDivElement, FlexBoxProps>((props, ref) => (
   <div ref={ref} css={flexBoxStyle(props)} {...filterFlexBoxProps(props)} />
