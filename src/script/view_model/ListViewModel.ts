@@ -235,6 +235,15 @@ export class ListViewModel {
     this.iterateActiveItem(false);
   };
 
+  onKeyDownListView = (keyboardEvent: KeyboardEvent) => {
+    if (isEscapeKey(keyboardEvent)) {
+      const newState = this.isActivatedAccount()
+        ? ListViewModel.STATE.CONVERSATIONS
+        : ListViewModel.STATE.TEMPORARY_GUEST;
+      this.switchList(newState);
+    }
+  };
+
   private readonly iterateActiveItem = (reverse = false) => {
     const isStatePreferences = this.state() === ListViewModel.STATE.PREFERENCES;
     return isStatePreferences ? this.iterateActivePreference(reverse) : this.iterateActiveConversation(reverse);
@@ -337,7 +346,7 @@ export class ListViewModel {
 
     const listStateElementId = this.getElementIdOfList(this.state());
     $(`#${listStateElementId}`).removeClass('left-list-is-visible');
-    $(document).off('keydown.listView');
+    document.removeEventListener('keydown', this.onKeyDownListView);
   };
 
   private readonly showList = (newListState: string): void => {
@@ -347,14 +356,7 @@ export class ListViewModel {
     this.state(newListState);
     this.lastUpdate(Date.now());
 
-    $(document).on('keydown.listView', keyboardEvent => {
-      if (isEscapeKey((keyboardEvent as unknown) as KeyboardEvent)) {
-        const newState = this.isActivatedAccount()
-          ? ListViewModel.STATE.CONVERSATIONS
-          : ListViewModel.STATE.TEMPORARY_GUEST;
-        this.switchList(newState);
-      }
-    });
+    document.addEventListener('keydown', this.onKeyDownListView);
   };
 
   private readonly updateList = (newListState: string, respectLastState: boolean): void => {
