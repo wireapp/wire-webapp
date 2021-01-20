@@ -161,7 +161,7 @@
     "stylelint-config-idiomatic-order": "8.1.0",
     "stylelint-config-prettier": "8.0.2",
     "svg-inline-loader": "0.8.2",
-    "terser-webpack-plugin": "4.2.3",
+    "terser-webpack-plugin": "5.1.1",
     "text-encoding": "0.7.0",
     "ts-jest": "26.4.4",
     "ts-node": "9.1.1",
