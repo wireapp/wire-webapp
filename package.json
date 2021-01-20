@@ -204,7 +204,6 @@
     "build:style": "node ./bin/less.js",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",
-    "bundle:test": "webpack --config webpack.config.test.js",
     "changelog:dev": "ts-node ./bin/changelog.ts dev",
     "changelog:ci": "ts-node ./bin/changelog.ts",
     "configure": "copy-config",
