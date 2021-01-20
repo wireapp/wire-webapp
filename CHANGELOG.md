@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.45.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.45.0...@wireapp/react-ui-kit@7.45.1) (2021-01-20)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Adjust ErrorMessage props chaining ([#3461](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3461)) ([70abc35](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/70abc35ffc7a1beebc78e53d85c4864944b9791f))
+
+
+
+
+
 # [7.45.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.44.7...@wireapp/react-ui-kit@7.45.0) (2021-01-20)
 
 
