@@ -34,6 +34,12 @@ updates:
         versions:
           - '>= 7.a'
           - '< 8'
+      - dependency-name: 'webpack '
+        versions:
+          - '>= 5'
+      - dependency-name: 'less '
+        versions:
+          - '>= 4'
   - package-ecosystem: npm
     directory: '/server'
     schedule:
