@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.45.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.44.7...@wireapp/react-ui-kit@7.45.0) (2021-01-20)
+
+
+### Features
+
+* **react-ui-kit:** ErrorMessage icon ([#3460](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3460)) ([7438a12](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/7438a12e2a907d40ac979d835c3bc3831afe091f))
+
+
+
+
+
 ## [7.44.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.44.6...@wireapp/react-ui-kit@7.44.7) (2021-01-12)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
