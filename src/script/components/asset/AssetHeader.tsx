@@ -31,9 +31,7 @@ export interface AssetHeaderProps {
 
 const AssetHeader: React.FC<AssetHeaderProps> = ({message}) => {
   const timestamp = message.timestamp();
-  const dayMonth = formatDayMonthNumeral(timestamp);
-  const time = formatTimeShort(timestamp);
-  const timeText = `${dayMonth} ${time}`;
+  const timeText = `${formatDayMonthNumeral(timestamp)} ${formatTimeShort(timestamp)}`;
 
   return (
     <Fragment>
