@@ -17,7 +17,6 @@
  *
  */
 
-import ko from 'knockout';
 import TestPage from 'Util/test/TestPage';
 import LegalHoldDot, {LegalHoldDotProps} from 'Components/LegalHoldDot';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
