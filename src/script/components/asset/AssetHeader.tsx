@@ -49,8 +49,5 @@ export default AssetHeader;
 
 registerReactComponent('asset-header', {
   component: AssetHeader,
-  template: `
-    <span data-bind="react: {text: message_et.user().name(), css: message_et.accent_color}"></span>
-    <span data-bind="react: {text: timeText}"></span>
-  `,
+  template: '<div class="asset-header" data-bind="react: {message}"></div>',
 });
