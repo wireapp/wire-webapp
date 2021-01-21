@@ -25,7 +25,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import {Config} from '../Config';
 
-import 'Components/loadingBar';
+import 'Components/LoadingBar';
 
 export class LoadingViewModel {
   loadingMessage: ko.Observable<string>;

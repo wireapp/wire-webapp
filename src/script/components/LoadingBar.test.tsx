@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,21 @@
  *
  */
 
-import ko from 'knockout';
+import TestPage from 'Util/test/TestPage';
 
-interface LoadingBarParams {
-  message: ko.Subscribable<string>;
-  progress: ko.Subscribable<number>;
+import LoadingBar, {LoadingBarProps} from './LoadingBar';
+
+class LoadingBarPage extends TestPage<LoadingBarProps> {
+  constructor(props?: LoadingBarProps) {
+    super(LoadingBar, props);
+  }
+
+  getProgressElement = () => this.get('div[data-uie-name="loading-bar-progress"]');
 }
 
-ko.components.register('loading-bar', {
-  template: `
-    <div class="text-center">
-      <div class="progress-console" data-bind="text: loadingMessage"></div>
-      <div class="progress-bar"><div data-bind="style: {width: loadingPercentage}"></div></div>
-    </div>
-`,
-  viewModel: function ({progress, message}: LoadingBarParams): void {
-    this.loadingMessage = message;
-    this.loadingPercentage = ko.pureComputed(() => `${progress()}%`);
-  },
+describe('LoadingBar', () => {
+  it('renders correct progress', async () => {
+    const LoadingBar = new LoadingBarPage({message: 'example', progress: 30});
+    expect(LoadingBar.getProgressElement().getDOMNode().getAttribute('style')).toBe('width: 30%;');
+  });
 });
