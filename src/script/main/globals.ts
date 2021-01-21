@@ -40,7 +40,7 @@ import 'Components/groupList';
 import 'Components/guestModeToggle';
 import 'Components/icons';
 import 'Components/image';
-import 'Components/infoToggle';
+import 'Components/InfoToggle';
 import 'Components/inputLevel';
 import 'Components/list/conversationListCallingCell';
 import 'Components/list/conversationListCell';
