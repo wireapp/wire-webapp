@@ -17,7 +17,6 @@
  *
  */
 
-import ko from 'knockout';
 import React from 'react';
 import cx from 'classnames';
 import type {Conversation} from '../entity/Conversation';
@@ -45,7 +44,7 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({conversation, isPending, lar
       onClick={event => {
         event.stopPropagation();
         if (isInteractive) {
-          if (isPending()) {
+          if (isPending) {
             legalHoldModal.showRequestModal(true);
             return;
           }
