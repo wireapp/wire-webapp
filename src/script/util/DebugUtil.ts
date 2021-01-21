@@ -45,6 +45,7 @@ import type {MessageRepository} from '../conversation/MessageRepository';
 import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
+import {CallState} from '../calling/CallState';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -74,6 +75,7 @@ export class DebugUtil {
     private readonly clientState = container.resolve(ClientState),
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly callState = container.resolve(CallState),
   ) {
     this.$ = $;
     this.Dexie = Dexie;
@@ -236,7 +238,7 @@ export class DebugUtil {
   }
 
   getActiveCallStats(): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
-    const activeCall = this.callingRepository.joinedCall();
+    const activeCall = this.callState.joinedCall();
     if (!activeCall) {
       throw new Error('no active call found');
     }
