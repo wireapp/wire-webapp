@@ -167,13 +167,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls hide-controls-hidden">
-          {}
-          <ButtonGroup
-            items={Object.values(VideoSpeakersTabs)}
-            onChangeItem={item => callActions.setVideoSpeakersActiveTab(item)}
-            currentItem={videoSpeakersActiveTab}
-            style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
-          />
+          {call.participants().length > 2 && (
+            <ButtonGroup
+              items={Object.values(VideoSpeakersTabs)}
+              onChangeItem={item => callActions.setVideoSpeakersActiveTab(item)}
+              currentItem={videoSpeakersActiveTab}
+              style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
+            />
+          )}
           <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
             {t('videoCallOverlayFitVideoLabel')}
           </div>
