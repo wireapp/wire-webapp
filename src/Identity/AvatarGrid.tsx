@@ -81,7 +81,7 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
           <Avatar
             key={Math.random().toString()}
             backgroundColor={item.backgroundColor || COLOR.GRAY_DARKEN_80}
-            base64Image={item.base64Image}
+            url={item.url}
             color={item.color}
             forceInitials={item.forceInitials}
             isAvatarGridItem
@@ -91,6 +91,7 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
           />
         ) : (
           <div
+            key={Math.random().toString()}
             css={{
               backgroundColor: COLOR.GRAY_DARKEN_80,
               height: '100%',
