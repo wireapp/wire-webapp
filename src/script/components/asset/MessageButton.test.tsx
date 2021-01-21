@@ -29,6 +29,7 @@ class MessageButtonPage extends TestPage<MessageButtonProps> {
 
   getButtonWithId = (id: string) => this.get(`button[data-uie-uid="${id}"]`);
   getError = () => this.get('div[data-uie-name="message-button-error"]');
+  getLoadingIcon = () => this.get('svg[data-uie-name="message-button-loading-icon"]');
 
   clickButtonWithId = (id: string) => this.click(this.getButtonWithId(id));
 }
@@ -69,5 +70,23 @@ describe('MessageButton', () => {
 
     expect(messageButton.getError().exists()).toBe(false);
     expect((messageButton.getButtonWithId(messageId).props() as any)['data-uie-selected']).toBe(true);
+  });
+
+  it('renders loading icon when in waiting state', async () => {
+    const messageId = 'id';
+    const message: Partial<CompositeMessage> = {
+      errorButtonId: ko.observable(''),
+      errorMessage: ko.observable(''),
+      selectedButtonId: ko.observable(''),
+      waitingButtonId: ko.observable(messageId),
+    };
+    const messageButton = new MessageButtonPage({
+      id: messageId,
+      label: 'buttonLabel',
+      message: message as CompositeMessage,
+    });
+
+    expect(messageButton.getError().exists()).toBe(false);
+    expect(messageButton.getLoadingIcon().exists()).toBe(true);
   });
 });

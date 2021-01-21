@@ -49,13 +49,11 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
         data-uie-waiting={isWaiting}
       >
         <span>{label}</span>
-        <div
-          className={classNames('message-button__waiting-overlay', {
-            'message-button__waiting-overlay--visible': isWaiting,
-          })}
-        >
-          <NamedIcon name="loading-icon" data-uie-name="message-button-loading-icon" />
-        </div>
+        {isWaiting && (
+          <div className="message-button__waiting-overlay message-button__waiting-overlay--visible">
+            <NamedIcon name="loading-icon" data-uie-name="message-button-loading-icon" />
+          </div>
+        )}
       </button>
       {errorMessage && (
         <div className="message-button__error" data-uie-name="message-button-error">
