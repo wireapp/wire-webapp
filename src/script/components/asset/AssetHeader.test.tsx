@@ -29,8 +29,8 @@ class AssetHeaderPage extends TestPage<AssetHeaderProps> {
     super(AssetHeader, props);
   }
 
-  getUserName = () => this.get('span[data-uie-name="user-name"]');
-  getTime = () => this.get('span[data-uie-name="header-time"]');
+  getUserName = () => this.get('span[data-uie-name="user-name"]').text();
+  getTime = () => this.get('span[data-uie-name="header-time"]').text();
 }
 
 describe('AssetHeader', () => {
@@ -48,6 +48,6 @@ describe('AssetHeader', () => {
     const assetHeader = new AssetHeaderPage({message});
 
     expect(assetHeader.getUserName()).toBe(userName);
-    expect(assetHeader.getTime()).toBe('Thursday 15:08');
+    expect(assetHeader.getTime()).toBe('01/21 4:08 PM');
   });
 });
