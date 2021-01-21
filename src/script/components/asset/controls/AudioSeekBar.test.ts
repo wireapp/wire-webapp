@@ -29,7 +29,7 @@ class AudioSeekBarPage extends TestPage<AudioSeekBarProps> {
 }
 
 describe('AudioSeekBar', () => {
-  const getaudioAsset = () =>
+  const getAudioAsset = () =>
     (({
       meta: {
         loudness: new Uint8Array(Array.from({length: 200}, (item, index) => index)),
