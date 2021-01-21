@@ -27,7 +27,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface LegalHoldDotProps {
   conversation?: Conversation;
-  isPending?: ko.Observable<boolean>;
+  isPending?: boolean;
   large?: boolean;
   legalHoldModal?: LegalHoldModalViewModel;
 }
