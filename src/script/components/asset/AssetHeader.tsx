@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,42 @@
  *
  */
 
-import ko from 'knockout';
+import React, {Fragment} from 'react';
+import cx from 'classnames';
 
 import {formatDayMonthNumeral, formatTimeShort} from 'Util/TimeUtil';
+import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {Message} from '../../entity/message/Message';
 
-interface Params {
+export interface AssetHeaderProps {
   message: Message;
 }
 
-ko.components.register('asset-header', {
+const AssetHeader: React.FC<AssetHeaderProps> = ({message}) => {
+  const timestamp = message.timestamp();
+  const dayMonth = formatDayMonthNumeral(timestamp);
+  const time = formatTimeShort(timestamp);
+  const timeText = `${dayMonth} ${time}`;
+
+  return (
+    <Fragment>
+      <span className={cx('asset-header-name', message.accent_color)} data-uie-name="user-name">
+        {message.user().name()}
+      </span>
+      <span className="asset-header-time" data-uie-name="header-time">
+        {timeText}
+      </span>
+    </Fragment>
+  );
+};
+
+registerReactComponent('select-target', {
+  component: AssetHeader,
   template: `
     <span class="asset-header-name" data-bind="text: message_et.user().name(), css: message_et.accent_color"></span>
     <span class="asset-header-time" data-bind="text: timeText"></span>
   `,
-  viewModel: function ({message}: Params): void {
-    this.message_et = message;
-    this.timeText = ko.pureComputed(() => {
-      const timeStamp = message.timestamp();
-      const dayMonth = formatDayMonthNumeral(timeStamp);
-      const time = formatTimeShort(timeStamp);
-      return `${dayMonth} ${time}`;
-    });
-  },
 });
+
+export default AssetHeader;
