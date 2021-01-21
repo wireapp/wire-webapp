@@ -19,13 +19,13 @@
 
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
+import {FeatureList} from '@wireapp/api-client/src/team/feature/';
 
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {User} from '../entity/User';
 import {UserState} from '../user/UserState';
 import {TeamEntity} from './TeamEntity';
-import {FeatureList} from './TeamService';
 
 @singleton()
 export class TeamState {

@@ -46,7 +46,7 @@ import {ContentViewModel} from '../ContentViewModel';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
 import {HistoryExportViewModel} from './HistoryExportViewModel';
-import {isAppLockEnabled} from './AppLockViewModel';
+import {appLockSettings} from '../../components/AppLock';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {nameFromType} from '../../user/AvailabilityMapper';
@@ -177,7 +177,7 @@ export class PreferencesAccountViewModel {
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
-    this.optionResetAppLock = isAppLockEnabled();
+    this.optionResetAppLock = appLockSettings.isAppLockEnabled();
     this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
