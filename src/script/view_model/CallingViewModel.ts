@@ -194,6 +194,7 @@ export class CallingViewModel {
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
+        this.videoSpeakersActiveTab(VideoSpeakersTabs.all);
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
