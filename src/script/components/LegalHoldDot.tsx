@@ -62,5 +62,6 @@ export default LegalHoldDot;
 
 registerReactComponent('legal-hold-dot', {
   component: LegalHoldDot,
+  optionalParams: ['conversation', 'isPending', 'large', 'legalHoldModal'],
   template: '<div data-bind="react: {conversation, isPending: ko.unwrap(isPending), large, legalHoldModal}"></div>',
 });
