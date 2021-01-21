@@ -172,7 +172,7 @@ describe('CallingRepository', () => {
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
       const call = new Call('', '', 0, selfParticipant, 0);
-      spyOn(callingRepository, 'joinedCall').and.returnValue(call);
+      spyOn(callingRepository.callState, 'joinedCall').and.returnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
 
       expect(selfParticipant.releaseAudioStream).toHaveBeenCalledTimes(1);
