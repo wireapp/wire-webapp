@@ -38,7 +38,7 @@ describe('LegalHoldDot', () => {
     } as LegalHoldModalViewModel;
 
     const legalHoldDotPage = new LegalHoldDotPage({
-      isPending: ko.observable(true),
+      isPending: true,
       legalHoldModal,
     });
 
