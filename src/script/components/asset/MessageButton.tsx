@@ -51,7 +51,7 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
         <span>{label}</span>
         {isWaiting && (
           <div className="message-button__waiting-overlay message-button__waiting-overlay--visible">
-            <NamedIcon name="loading-icon" data-uie-name="message-button-loading-icon" />
+            <NamedIcon width={20} height={20} name="loading-icon" data-uie-name="message-button-loading-icon" />
           </div>
         )}
       </button>
