@@ -82,8 +82,9 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
   onClosed = noop,
   showLoading = false,
   children,
+  ...rest
 }) => {
-  const [displayNone, setDisplayNone] = useState<boolean>(isShown);
+  const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
 
   useEffect(() => {
@@ -106,6 +107,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       onClick={onBgClick}
       css={hasVisibleClass ? ModalOverlayVisibleStyles : ModalOverlayStyles}
       style={{display: displayNone ? 'none' : 'flex'}}
+      {...rest}
     >
       {showLoading ? (
         <svg
