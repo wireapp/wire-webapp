@@ -1,0 +1,28 @@
+body.debug-mode {
+  .message[data-uie-uid] .debug-info,
+  .conversation-list-cell[data-uie-uid] .debug-info {
+    display: block;
+    content: attr(data-uie-uid);
+    position: absolute;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    top: auto;
+    height: auto;
+    padding: 4px;
+    font-size: 10px;
+    color: #fff;
+    border-radius: 4px;
+    opacity: 1;
+    user-select: text;
+    font-weight: 300;
+  }
+
+  .message[data-uie-uid] .debug-info {
+    background-color: rgba(0, 0, 128, 0.5);
+  }
+
+  .conversation-list-cell[data-uie-uid] .debug-info {
+    background-color: rgba(128, 0, 0, 0.5);
+  }
+}
