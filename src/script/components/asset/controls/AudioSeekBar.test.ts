@@ -45,8 +45,8 @@ describe('AudioSeekBar', () => {
 
   const getDefaultProps = () => ({
     asset: getAudioAsset(),
-    disabled: false,
     audioElement: createAudioElement(),
+    disabled: false,
   });
 
   it('renders level indicators for the audio asset', () => {
