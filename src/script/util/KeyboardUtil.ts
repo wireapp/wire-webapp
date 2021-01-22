@@ -119,6 +119,8 @@ const escKeyHandlers: KeyboardHandler[] = [];
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
     escKeyHandlers.forEach(handler => handler(event));
+  } else if (event.ctrlKey && event.shiftKey && isKey(event, 'd')) {
+    handleDebugKey();
   }
 });
 
@@ -128,5 +130,29 @@ export const offEscKey = (handler: KeyboardHandler) => {
   const index = escKeyHandlers.indexOf(handler);
   if (index >= 0) {
     escKeyHandlers.splice(index, 1);
+  }
+};
+
+const handleDebugKey = () => {
+  const removeDebugInfo = (els: NodeListOf<HTMLElement>) => els.forEach(el => el.parentNode.removeChild(el));
+
+  const addDebugInfo = (els: NodeListOf<HTMLElement>) =>
+    els.forEach(el => {
+      const debugInfo = document.createElement('div');
+      debugInfo.classList.add('debug-info');
+      debugInfo.textContent = el.dataset.uieUid;
+      el.appendChild(debugInfo);
+    });
+
+  const debugInfos = document.querySelectorAll<HTMLElement>('.debug-info');
+  const isShowingDebugInfo = debugInfos.length > 0;
+
+  if (isShowingDebugInfo) {
+    removeDebugInfo(debugInfos);
+  } else {
+    const debugElements = document.querySelectorAll<HTMLElement>(
+      '.message[data-uie-uid], .conversation-list-cell[data-uie-uid]',
+    );
+    addDebugInfo(debugElements);
   }
 };
