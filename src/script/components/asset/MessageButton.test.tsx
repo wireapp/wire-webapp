@@ -71,22 +71,4 @@ describe('MessageButton', () => {
     expect(messageButton.getError().exists()).toBe(false);
     expect((messageButton.getButtonWithId(messageId).props() as any)['data-uie-selected']).toBe(true);
   });
-
-  it('renders loading icon when in waiting state', async () => {
-    const messageId = 'id';
-    const message: Partial<CompositeMessage> = {
-      errorButtonId: ko.observable(''),
-      errorMessage: ko.observable(''),
-      selectedButtonId: ko.observable(''),
-      waitingButtonId: ko.observable(messageId),
-    };
-    const messageButton = new MessageButtonPage({
-      id: messageId,
-      label: 'buttonLabel',
-      message: message as CompositeMessage,
-    });
-
-    expect(messageButton.getError().exists()).toBe(false);
-    expect(messageButton.getLoadingIcon().exists()).toBe(true);
-  });
 });
