@@ -1,21 +1,21 @@
 body.debug-mode {
   .message[data-uie-uid] .debug-info,
   .conversation-list-cell[data-uie-uid] .debug-info {
-    display: block;
-    content: attr(data-uie-uid);
     position: absolute;
+    top: auto;
     right: auto;
     bottom: 0;
     left: 0;
-    top: auto;
+    display: block;
     height: auto;
     padding: 4px;
-    font-size: 10px;
-    color: #fff;
     border-radius: 4px;
+    color: #fff;
+    content: attr(data-uie-uid);
+    font-size: 10px;
+    font-weight: 300;
     opacity: 1;
     user-select: text;
-    font-weight: 300;
   }
 
   .message[data-uie-uid] .debug-info {
