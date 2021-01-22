@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2020 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,25 @@
  *
  */
 
-import ko from 'knockout';
+// https://github.com/facebook/react/issues/11163#issuecomment-628379291
+import React from 'react';
+import {VideoHTMLAttributes, useEffect, useRef} from 'react';
 
-interface LoadingBarParams {
-  message: ko.Subscribable<string>;
-  progress: ko.Subscribable<number>;
-}
+type VideoProps = VideoHTMLAttributes<HTMLVideoElement> & {
+  srcObject: MediaStream;
+};
 
-ko.components.register('loading-bar', {
-  template: `
-    <div class="text-center">
-      <div class="progress-console" data-bind="text: loadingMessage"></div>
-      <div class="progress-bar"><div data-bind="style: {width: loadingPercentage}"></div></div>
-    </div>
-`,
-  viewModel: function ({progress, message}: LoadingBarParams): void {
-    this.loadingMessage = message;
-    this.loadingPercentage = ko.pureComputed(() => `${progress()}%`);
-  },
-});
+const Video = ({srcObject, ...props}: VideoProps) => {
+  const refVideo = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (!refVideo.current) {
+      return;
+    }
+    refVideo.current.srcObject = srcObject;
+  }, [srcObject]);
+
+  return <video ref={refVideo} {...props} />;
+};
+
+export default Video;

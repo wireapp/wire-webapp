@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,33 +17,15 @@
  *
  */
 
-group-avatar {
-  .square(32px);
+import {singleton} from 'tsyringe';
+import ko from 'knockout';
+import {ConnectionEntity} from './ConnectionEntity';
 
-  border: 1px solid fade(#fff, 12%);
-  border-radius: 6px;
-}
+@singleton()
+export class ConnectionState {
+  public readonly connectionEntities: ko.Observable<{[userId: string]: ConnectionEntity}>;
 
-.group-avatar-box-wrapper {
-  .square(28px);
-
-  display: flex;
-  overflow: hidden;
-  flex-wrap: wrap;
-  margin: 1px;
-  background-color: fade(#000, 40%);
-  border-radius: 4px;
-}
-
-.group-avatar-box {
-  .flex-center;
-  .square(14px);
-
-  flex: 0 0 auto;
-  font-size: 9px;
-  font-weight: 900;
-}
-
-.group-avatar-active {
-  border-color: var(--accent-color);
+  constructor() {
+    this.connectionEntities = ko.observable({});
+  }
 }

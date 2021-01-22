@@ -17,38 +17,7 @@
  *
  */
 
-availability-state {
+.availability-state {
   display: flex;
   align-items: center;
-
-  .availability-state-arrow {
-    display: inline-block;
-    padding-bottom: 4px;
-    margin-left: 4px;
-    .square(16px);
-
-    &::before {
-      width: 0;
-      height: 0;
-      border-top: 4px solid currentColor;
-      border-right: 4px solid transparent;
-      border-left: 4px solid transparent;
-      content: '';
-    }
-  }
-
-  .availability-state-icon {
-    svg {
-      .square(10px);
-
-      min-width: 10px;
-      margin: 0 6px 1px 0;
-      fill: currentColor;
-      stroke: currentColor;
-    }
-  }
-
-  .availability-state-label {
-    user-select: none;
-  }
 }

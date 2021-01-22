@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,21 @@
  *
  */
 
-import ko from 'knockout';
+import TestPage from 'Util/test/TestPage';
 
-import type {User} from '../../entity/User';
+import LoadingBar, {LoadingBarProps} from './LoadingBar';
 
-interface ComponentParams {
-  users: ko.PureComputed<User[]>;
+class LoadingBarPage extends TestPage<LoadingBarProps> {
+  constructor(props?: LoadingBarProps) {
+    super(LoadingBar, props);
+  }
+
+  getProgressElement = () => this.get('div[data-uie-name="loading-bar-progress"]');
 }
 
-ko.components.register('group-avatar', {
-  template: `
-    <div class="group-avatar-box-wrapper" data-bind="foreach: users">
-      <div class="group-avatar-box" data-bind="text: Array.from($data.initials())[0], style: {color: $data.accent_color()}"></div>
-    </div>
-  `,
-  viewModel: class {
-    readonly users: ko.PureComputed<User[]>;
-
-    constructor(params: ComponentParams) {
-      this.users = ko.pureComputed(() => params.users().slice(0, 4));
-    }
-  },
+describe('LoadingBar', () => {
+  it('renders correct progress', async () => {
+    const LoadingBar = new LoadingBarPage({message: 'example', progress: 30});
+    expect(LoadingBar.getProgressElement().getDOMNode().getAttribute('style')).toBe('width: 30%;');
+  });
 });

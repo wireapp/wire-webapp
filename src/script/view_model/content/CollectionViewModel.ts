@@ -58,15 +58,17 @@ export class CollectionViewModel {
     this.searchInput = ko.observable('');
   }
 
+  onKeyDownCollection = (keyboardEvent: KeyboardEvent) => {
+    if (isEscapeKey(keyboardEvent)) {
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
+    }
+  };
+
   readonly addedToView = () => {
     amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
-    $(document).on('keydown.collection', keyboardEvent => {
-      if (isEscapeKey((keyboardEvent as unknown) as KeyboardEvent)) {
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
-      }
-    });
+    document.addEventListener('keydown', this.onKeyDownCollection);
   };
 
   readonly searchInConversation = (query: string) => {
@@ -100,7 +102,7 @@ export class CollectionViewModel {
     amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
-    $(document).off('keydown.collection');
+    document.removeEventListener('keydown', this.onKeyDownCollection);
     this.conversationEntity(null);
     this.searchInput('');
     [this.images, this.files, this.links, this.audio].forEach(array => array.removeAll());

@@ -54,6 +54,8 @@ class SetHandlePage {
 
 describe('SetHandle', () => {
   it('has disabled submit button as long as there is no input', () => {
+    spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
     const setHandlePage = new SetHandlePage(
       mockStoreFactory()({
         ...initialRootState,
@@ -76,6 +78,8 @@ describe('SetHandle', () => {
   });
 
   it('trims the handle', () => {
+    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.selfAction, 'setHandle').and.returnValue(() => Promise.resolve());
 
     const handle = 'handle';

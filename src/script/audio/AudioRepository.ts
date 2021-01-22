@@ -20,12 +20,13 @@
 import {AudioPreference, WebappProperties} from '@wireapp/api-client/src/user/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {AudioPlayingType} from './AudioPlayingType';
+import {AudioState} from './AudioState';
 import {AudioType} from './AudioType';
 
 declare global {
@@ -45,18 +46,16 @@ enum AUDIO_PLAY_PERMISSION {
 export class AudioRepository {
   private readonly logger: Logger;
   private readonly audioElements: Record<string, HTMLAudioElement>;
-  private readonly audioPreference: ko.Observable<AudioPreference>;
   private muted: boolean;
 
-  constructor() {
+  constructor(private readonly audioState = container.resolve(AudioState)) {
     this.logger = getLogger('AudioRepository');
-    this.audioElements = {};
-    this.audioPreference = ko.observable(AudioPreference.ALL);
-    this.audioPreference.subscribe(audioPreference => {
+    this.audioState.audioPreference.subscribe(audioPreference => {
       if (audioPreference === AudioPreference.NONE) {
         this.stopAll();
       }
     });
+    this.audioElements = {};
     this.muted = true;
     this.subscribeToEvents();
   }
@@ -66,12 +65,12 @@ export class AudioRepository {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_MUTE_STATE;
     }
 
-    const preferenceIsNone = this.audioPreference() === AudioPreference.NONE;
+    const preferenceIsNone = this.audioState.audioPreference() === AudioPreference.NONE;
     if (preferenceIsNone && !AudioPlayingType.NONE.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_PREFERENCES;
     }
 
-    const preferenceIsSome = this.audioPreference() === AudioPreference.SOME;
+    const preferenceIsSome = this.audioState.audioPreference() === AudioPreference.SOME;
     if (preferenceIsSome && !AudioPlayingType.SOME.includes(audioId)) {
       return AUDIO_PLAY_PERMISSION.DISALLOWED_BY_PREFERENCES;
     }
@@ -174,7 +173,7 @@ export class AudioRepository {
   };
 
   readonly setAudioPreference = (audioPreference: AudioPreference): void => {
-    this.audioPreference(audioPreference);
+    this.audioState.audioPreference(audioPreference);
   };
 
   readonly setMutedState = (handlingNotifications: NOTIFICATION_HANDLING_STATE): void => {

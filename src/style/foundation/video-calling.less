@@ -30,7 +30,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: #000;
+  background-color: #323739;
 }
 
 // common
@@ -125,11 +125,6 @@
       fill: #fff;
     }
 
-    message-unread-icon {
-      margin-top: -2px;
-      margin-right: -2px;
-    }
-
     &__label {
       position: absolute;
       bottom: -16px;
@@ -143,31 +138,8 @@
       white-space: nowrap;
     }
 
-    device-toggle-button {
-      position: absolute;
-      bottom: -16px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
     &:hover &__label {
       opacity: 1;
-    }
-
-    &--active {
-      background-color: #fff;
-
-      svg > path {
-        fill: #202123;
-      }
-    }
-
-    &--disabled {
-      cursor: default;
-
-      svg {
-        opacity: 0.4;
-      }
     }
 
     &--red {

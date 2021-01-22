@@ -17,6 +17,12 @@
  *
  */
 
+.group-video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .group-video {
   position: relative;
   width: 100%;
@@ -83,10 +89,6 @@
     --rows: 1;
     --columns: 1;
 
-    &--black-background {
-      background-color: #000;
-    }
-
     &__element {
       position: relative;
       overflow: hidden;
@@ -109,10 +111,6 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
-
-        &--contain {
-          object-fit: contain;
-        }
       }
 
       &__label {
@@ -178,10 +176,6 @@
         font-size: 14px;
         font-weight: @font-weight-bold;
         text-align: center;
-
-        &--minimized {
-          font-size: 11px;
-        }
       }
 
       .background {
@@ -199,14 +193,6 @@
     border-radius: 4px;
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.16);
     line-height: 0;
-
-    &--minimized {
-      top: unset;
-      right: 8px;
-      bottom: 8px;
-      width: 80px;
-      box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
-    }
 
     &-video {
       width: 100%;

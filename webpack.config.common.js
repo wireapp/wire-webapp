@@ -54,11 +54,8 @@ module.exports = {
       },
     ],
   },
-  node: {
-    fs: 'empty',
-    path: 'empty',
-  },
   optimization: {
+    moduleIds: 'named',
     runtimeChunk: 'single',
     splitChunks: {
       cacheGroups: {
@@ -106,6 +103,12 @@ module.exports = {
       Util: path.resolve(srcScript, 'util'),
     },
     extensions: ['.js', '.jsx', '.ts', '.tsx', '.svg'],
+    fallback: {
+      crypto: false,
+      fs: false,
+      os: require.resolve('os-browserify'),
+      path: require.resolve('path-browserify'),
+    },
     modules: [auth, 'node_modules'],
   },
 };
