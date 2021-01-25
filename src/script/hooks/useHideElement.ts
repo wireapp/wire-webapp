@@ -1,5 +1,7 @@
 import {useEffect} from 'react';
 
+const hideControlsClass = 'hide-controls';
+
 const useHideElement = (element: HTMLElement, timeout: number, skipClass?: string) => {
   useEffect(() => {
     if (!element) {
@@ -11,17 +13,17 @@ const useHideElement = (element: HTMLElement, timeout: number, skipClass?: strin
 
     const onMouseEnter = () => {
       isMouseIn = true;
-      element.classList.remove('hide-controls');
+      element.classList.remove(hideControlsClass);
     };
 
     const onMouseLeave = () => {
       isMouseIn = false;
-      element.classList.add('hide-controls');
+      element.classList.add(hideControlsClass);
     };
 
     const startTimer = () => {
       hideTimeout = window.setTimeout(() => {
-        element.classList.add('hide-controls');
+        element.classList.add(hideControlsClass);
       }, timeout);
     };
 
@@ -31,7 +33,7 @@ const useHideElement = (element: HTMLElement, timeout: number, skipClass?: strin
       }
 
       window.clearTimeout(hideTimeout);
-      element.classList.remove('hide-controls');
+      element.classList.remove(hideControlsClass);
 
       let node = target as Element;
       while (node && node !== element) {
@@ -53,7 +55,7 @@ const useHideElement = (element: HTMLElement, timeout: number, skipClass?: strin
       element.removeEventListener('mouseenter', onMouseEnter);
       element.removeEventListener('mouseleave', onMouseLeave);
       element.removeEventListener('mousemove', onMouseMove);
-      element.classList.remove('hide-controls');
+      element.classList.remove(hideControlsClass);
     };
   }, [element]);
 };
