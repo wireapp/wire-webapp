@@ -47,9 +47,11 @@ describe('GroupVideoGrid', () => {
         hasRemoteVideo: false,
         thumbnail: null,
       },
+      maximizedParticipant: null,
       minimized: false,
       muted: false,
       selfParticipant: participant,
+      setMaximizedParticipant: () => undefined,
     });
 
     expect(groupVideoGrid.getGridsWrapper().exists()).toBe(true);
@@ -66,9 +68,11 @@ describe('GroupVideoGrid', () => {
         hasRemoteVideo: false,
         thumbnail: null,
       },
+      maximizedParticipant: null,
       minimized: false,
       muted: false,
       selfParticipant: participant,
+      setMaximizedParticipant: () => undefined,
     });
 
     expect(groupVideoGrid.getGridsWrapper().children().length).toBe(2);
@@ -87,9 +91,11 @@ describe('GroupVideoGrid', () => {
         hasRemoteVideo: false,
         thumbnail: null,
       },
+      maximizedParticipant: null,
       minimized: false,
       muted: false,
       selfParticipant: participant,
+      setMaximizedParticipant: () => undefined,
     });
 
     expect(groupVideoGrid.getPausedGrid().exists()).toBe(true);
@@ -106,9 +112,11 @@ describe('GroupVideoGrid', () => {
         hasRemoteVideo: false,
         thumbnail: participant,
       },
+      maximizedParticipant: null,
       minimized: false,
       muted: true,
       selfParticipant: participant,
+      setMaximizedParticipant: () => undefined,
     });
 
     expect(groupVideoGrid.getThumbnail().exists()).toBe(true);
@@ -126,9 +134,11 @@ describe('GroupVideoGrid', () => {
         hasRemoteVideo: false,
         thumbnail: participant,
       },
+      maximizedParticipant: null,
       minimized: false,
       muted: true,
       selfParticipant: participant,
+      setMaximizedParticipant: () => undefined,
     });
 
     expect(groupVideoGrid.getThumbnailMutedIcon().exists()).toBe(true);
