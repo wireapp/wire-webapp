@@ -30,9 +30,11 @@ import NamedIcon from 'Components/NamedIcon';
 
 export interface GroupVideoGripProps {
   grid: Grid;
+  maximizedParticipant: Participant;
   minimized?: boolean;
   muted?: boolean;
   selfParticipant: Participant;
+  setMaximizedParticipant: (participant: Participant) => void;
 }
 
 interface RowsAndColumns extends CSSProperties {
@@ -51,8 +53,9 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   grid,
   muted = false,
   selfParticipant,
+  maximizedParticipant,
+  setMaximizedParticipant,
 }) => {
-  const [maximizedParticipant, setMaximizedParticipant] = useState<Participant | null>(null);
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid.grid.length));
   const videoParticipants: Participant[] = grid.grid.filter(participant => !!participant);
 
@@ -231,5 +234,5 @@ registerReactComponent('group-video-grid', {
   component: GroupVideoGrid,
   optionalParams: ['muted', 'minimized'],
   template:
-    '<div class="group-video-wrapper" data-bind="react: {grid: ko.unwrap(grid), selfParticipant: ko.unwrap(selfParticipant), minimized, muted: ko.unwrap(muted)}"></div>',
+    '<div class="group-video-wrapper" data-bind="react: {grid: ko.unwrap(grid), selfParticipant: ko.unwrap(selfParticipant), maximizedParticipant: ko.unwrap(maximizedParticipant), minimized, muted: ko.unwrap(muted)}"></div>',
 });

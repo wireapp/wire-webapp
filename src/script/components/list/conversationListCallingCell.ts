@@ -51,6 +51,7 @@ interface ComponentParams {
   conversation: ko.PureComputed<Conversation>;
   hasAccessToCamera: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
+  maximizedTileVideoParticipant: ko.Observable<Participant>;
   multitasking: Multitasking;
   teamRepository: TeamRepository;
   temporaryUserStyle?: boolean;
@@ -95,6 +96,7 @@ class ConversationListCallingCell {
   readonly selfParticipant: Participant;
   readonly teamRepository: TeamRepository;
   readonly videoSpeakersActiveTab: ko.Observable<string>;
+  readonly maximizedTileVideoParticipant: ko.Observable<Participant>;
 
   constructor({
     call,
@@ -107,6 +109,7 @@ class ConversationListCallingCell {
     teamRepository,
     hasAccessToCamera,
     videoSpeakersActiveTab,
+    maximizedTileVideoParticipant,
     isSelfVerified = ko.observable(false),
   }: ComponentParams) {
     this.callState = container.resolve(CallState);
@@ -120,6 +123,7 @@ class ConversationListCallingCell {
     this.AVATAR_SIZE = AVATAR_SIZE;
     this.isSelfVerified = isSelfVerified;
     this.videoSpeakersActiveTab = videoSpeakersActiveTab;
+    this.maximizedTileVideoParticipant = maximizedTileVideoParticipant;
     this.conversationUrl = generateConversationUrl(conversation().id);
     this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
 
@@ -295,7 +299,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <!-- ko if: showVideoGrid() -->
         <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
-          <group-video-grid params="minimized: true, grid: calculateGrid(), selfParticipant: selfParticipant"></group-video-grid>
+          <group-video-grid params="minimized: true, maximizedParticipant: maximizedTileVideoParticipant, setMaximizedParticipant: callActions.setMaximizedTileVideoParticipant, grid: calculateGrid(), selfParticipant: selfParticipant"></group-video-grid>
           <!-- ko if: showMaximize() -->
             <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
               <fullscreen-icon></fullscreen-icon>

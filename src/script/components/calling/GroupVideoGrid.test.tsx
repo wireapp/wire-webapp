@@ -47,9 +47,11 @@ describe('GroupVideoGrid', () => {
         hasRemoteVideo: false,
         thumbnail: null,
       },
+      maximizedParticipant: null,
       minimized: false,
       muted: false,
       selfParticipant: participant,
+      setMaximizedParticipant: () => undefined,
     });
 
     expect(groupVideoGrid.getGridsWrapper().exists()).toBe(true);
@@ -57,23 +59,32 @@ describe('GroupVideoGrid', () => {
   });
 
   it('maximizes a grid on double click', async () => {
-    const user = new User('id');
-    user.name('Anton Bertha');
-    const participant = new Participant(user, 'example');
-    const groupVideoGrid = new GroupVideoGridPage({
+    const userOne = new User('idOne');
+    const userTwo = new User('idTwo');
+    userOne.name('Testing User One');
+    userOne.name('Testing User Two');
+    const participantOne = new Participant(userOne, 'exampleOne');
+    const participantTwo = new Participant(userTwo, 'exampleTwo');
+    let maximizedParticipant: Participant = null;
+    const props: GroupVideoGripProps = {
       grid: {
-        grid: [participant, participant],
+        grid: [participantOne, participantTwo],
         hasRemoteVideo: false,
         thumbnail: null,
       },
+      maximizedParticipant,
       minimized: false,
       muted: false,
-      selfParticipant: participant,
-    });
+      selfParticipant: participantOne,
+      setMaximizedParticipant: () => {
+        maximizedParticipant = participantTwo;
+      },
+    };
+    const groupVideoGrid = new GroupVideoGridPage(props);
 
     expect(groupVideoGrid.getGridsWrapper().children().length).toBe(2);
     groupVideoGrid.doubleClickOnGridFirstChild();
-    expect(groupVideoGrid.getGridsWrapper().children().length).toBe(1);
+    expect(maximizedParticipant.user.id).toBe(participantTwo.user.id);
   });
 
   it('renders a grid with paused video', async () => {
@@ -87,9 +98,11 @@ describe('GroupVideoGrid', () => {
         hasRemoteVideo: false,
         thumbnail: null,
       },
+      maximizedParticipant: null,
       minimized: false,
       muted: false,
       selfParticipant: participant,
+      setMaximizedParticipant: () => undefined,
     });
 
     expect(groupVideoGrid.getPausedGrid().exists()).toBe(true);
@@ -106,9 +119,11 @@ describe('GroupVideoGrid', () => {
         hasRemoteVideo: false,
         thumbnail: participant,
       },
+      maximizedParticipant: null,
       minimized: false,
       muted: true,
       selfParticipant: participant,
+      setMaximizedParticipant: () => undefined,
     });
 
     expect(groupVideoGrid.getThumbnail().exists()).toBe(true);
@@ -126,9 +141,11 @@ describe('GroupVideoGrid', () => {
         hasRemoteVideo: false,
         thumbnail: participant,
       },
+      maximizedParticipant: null,
       minimized: false,
       muted: true,
       selfParticipant: participant,
+      setMaximizedParticipant: () => undefined,
     });
 
     expect(groupVideoGrid.getThumbnailMutedIcon().exists()).toBe(true);
