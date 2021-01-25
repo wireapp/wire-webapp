@@ -104,7 +104,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     [videoInput],
   );
   const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
-  const wrapper = useRef<HTMLDivElement>()
+  const wrapper = useRef<HTMLDivElement>();
   useHideElement(wrapper.current, FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
