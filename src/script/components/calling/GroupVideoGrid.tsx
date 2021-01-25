@@ -132,7 +132,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                 bottom: 0,
                 boxShadow:
                   participants.length > 2 && participant.isActivelySpeaking()
-                    ? `inset 0px 0px 2px 2px ${selfParticipant.user.accent_color()}`
+                    ? `inset 0px 0px 0px 2px ${selfParticipant.user.accent_color()}`
                     : `inset 0px 0px 0px 0px ${selfParticipant.user.accent_color()}`,
                 left: 0,
                 position: 'absolute',
