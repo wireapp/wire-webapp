@@ -61,7 +61,9 @@ export const isEscapeKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyb
 export const isFunctionKey = (keyboardEvent: KeyboardEvent): boolean =>
   keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
 
-export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean => keyboardEvent.metaKey || keyboardEvent.ctrlKey;
+/** On macOS the meta key is '⌘', which represents 'Ctrl' in the Windows world: https://www.oreilly.com/library/view/switching-to-the/9781449372927/ch01s08.html */
+export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
+  keyboardEvent.metaKey || keyboardEvent.ctrlKey || keyboardEvent?.key.toLowerCase() === 'control';
 
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
@@ -119,7 +121,7 @@ const escKeyHandlers: KeyboardHandler[] = [];
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape') {
     escKeyHandlers.forEach(handler => handler(event));
-  } else if (event.ctrlKey && event.shiftKey && isKey(event, 'd')) {
+  } else if (isMetaKey(event) && event.shiftKey && isKey(event, '!')) {
     handleDebugKey();
   }
 });
