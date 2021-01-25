@@ -41,6 +41,7 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
+import type {Participant} from '../calling/Participant';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
@@ -49,6 +50,7 @@ export interface CallActions {
   answer: (call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
+  setMaximizedTileVideoParticipant: (participant: Participant) => void;
   setVideoSpeakersActiveTab: (tab: string) => void;
   startAudio: (conversationEntity: Conversation) => void;
   startVideo: (conversationEntity: Conversation) => void;
@@ -91,6 +93,7 @@ export class CallingViewModel {
   readonly isSelfVerified: ko.Computed<boolean>;
   readonly teamRepository: TeamRepository;
   readonly videoSpeakersActiveTab: ko.Observable<string>;
+  readonly maximizedTileVideoParticipant: ko.Observable<Participant | null>;
 
   constructor(
     callingRepository: CallingRepository,
@@ -102,7 +105,7 @@ export class CallingViewModel {
     selfUser: ko.Observable<User>,
     multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
-    private readonly callState = container.resolve(CallState),
+    readonly callState = container.resolve(CallState),
   ) {
     this.logger = getLogger('CallingViewModel');
     this.callingRepository = callingRepository;
@@ -130,6 +133,7 @@ export class CallingViewModel {
     );
     this.multitasking = multitasking;
     this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTabs.all);
+    this.maximizedTileVideoParticipant = ko.observable(null);
     this.onChooseScreen = () => {};
 
     const ring = (call: Call): void => {
@@ -195,9 +199,13 @@ export class CallingViewModel {
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
         this.videoSpeakersActiveTab(VideoSpeakersTabs.all);
+        this.maximizedTileVideoParticipant(null);
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
+      },
+      setMaximizedTileVideoParticipant: (participant: Participant) => {
+        this.maximizedTileVideoParticipant(participant);
       },
       setVideoSpeakersActiveTab: (tab: string) => {
         this.videoSpeakersActiveTab(tab);

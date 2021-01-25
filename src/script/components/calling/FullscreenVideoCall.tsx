@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {css} from '@emotion/core';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -38,7 +38,7 @@ import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel'
 import type {Multitasking} from '../../notification/NotificationRepository';
 import Duration from './Duration';
 import NamedIcon from 'Components/NamedIcon';
-import ButtonGroup from 'Components/ButtonGroup';
+import type {Participant} from 'src/script/calling/Participant';
 
 export interface FullscreenVideoCallProps {
   call: Call;
@@ -47,6 +47,7 @@ export interface FullscreenVideoCallProps {
   conversation: Conversation;
   isChoosingScreen: boolean;
   isMuted: boolean;
+  maximizedParticipant: Participant;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
   videoGrid: Grid;
@@ -85,6 +86,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   multitasking,
   videoGrid,
   videoInput,
+  maximizedParticipant,
   videoSpeakersActiveTab,
 }) => {
   const selfSharesScreen = call.getSelfParticipant().sharesScreen();
@@ -95,11 +97,13 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const showToggleVideo =
     call.initialType === CALL_TYPE.VIDEO ||
     conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE);
-  const availableCameras = videoInput.map(
-    device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id,
+  const availableCameras = useMemo(
+    () =>
+      videoInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    [videoInput],
   );
   const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
-  const wrapper = useRef<HTMLDivElement>(null);
+  const wrapper = useRef<HTMLDivElement>();
   useHideElement(wrapper.current, FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
@@ -113,7 +117,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   useEffect(() => {
     let minimizeTimeout: number;
-    minimizeTimeout = undefined;
     if (!videoGrid.hasRemoteVideo && multitasking.autoMinimize()) {
       minimizeTimeout = window.setTimeout(() => {
         if (!isChoosingScreen) {
@@ -129,7 +132,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const [activeVideoSpeakers, setActiveVideoSpeakers] = useState(call.getActiveVideoSpeakers());
 
   useEffect(() => {
-    const subscription = call.lastActiveSpeakersUpdatTime.subscribe(() => {
+    const subscription = call.lastActiveSpeakersUpdateTime.subscribe(() => {
       setActiveVideoSpeakers(call.getActiveVideoSpeakers());
     });
     return () => {
@@ -142,6 +145,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       <div id="video-element-remote" className="video-element-remote">
         <GroupVideoGrid
           muted={isMuted}
+          maximizedParticipant={maximizedParticipant}
           selfParticipant={call.getSelfParticipant()}
           grid={
             videoSpeakersActiveTab === VideoSpeakersTabs.speakers
@@ -152,6 +156,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 }
               : videoGrid
           }
+          setMaximizedParticipant={callActions.setMaximizedTileVideoParticipant}
         />
       </div>
 
@@ -166,14 +171,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls hide-controls-hidden">
-          {call.participants().length > 2 && (
-            <ButtonGroup
-              items={Object.values(VideoSpeakersTabs)}
-              onChangeItem={item => callActions.setVideoSpeakersActiveTab(item)}
-              currentItem={videoSpeakersActiveTab}
-              style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
-            />
-          )}
           <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
             {t('videoCallOverlayFitVideoLabel')}
           </div>
@@ -268,5 +265,5 @@ export default FullscreenVideoCall;
 registerReactComponent('fullscreen-video-call', {
   component: FullscreenVideoCall,
   template:
-    '<div data-bind="react: {call, callActions, videoSpeakersActiveTab: ko.unwrap(videoSpeakersActiveTab), canShareScreen, mediaDevicesHandler, multitasking, videoInput: ko.unwrap(videoInput), conversation: ko.unwrap(conversation), isChoosingScreen: ko.unwrap(isChoosingScreen), isMuted: ko.unwrap(isMuted), videoGrid: ko.unwrap(videoGrid)}"></div>',
+    '<div data-bind="react: {call, callActions, maximizedParticipant: ko.unwrap(maximizedParticipant), videoSpeakersActiveTab: ko.unwrap(videoSpeakersActiveTab), canShareScreen, mediaDevicesHandler, multitasking, videoInput: ko.unwrap(videoInput), conversation: ko.unwrap(conversation), isChoosingScreen: ko.unwrap(isChoosingScreen), isMuted: ko.unwrap(isMuted), videoGrid: ko.unwrap(videoGrid)}"></div>',
 });
