@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {css} from '@emotion/core';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -97,13 +97,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const showToggleVideo =
     call.initialType === CALL_TYPE.VIDEO ||
     conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE);
-  const availableCameras = videoInput.map(
-    device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id,
+  const availableCameras = useMemo(
+    () =>
+      videoInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),
+    [videoInput],
   );
   const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
-  const [wrapperRef, setWrapperRefRef] = useState<HTMLElement | null>(null);
-  const onRefChange = useCallback(node => setWrapperRefRef(node), []);
-  useHideElement(wrapperRef, FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
+  const wrapper = useRef<HTMLDivElement>();
+  useHideElement(wrapper.current, FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
@@ -116,7 +117,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
   useEffect(() => {
     let minimizeTimeout: number;
-    minimizeTimeout = undefined;
     if (!videoGrid.hasRemoteVideo && multitasking.autoMinimize()) {
       minimizeTimeout = window.setTimeout(() => {
         if (!isChoosingScreen) {
@@ -132,7 +132,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const [activeVideoSpeakers, setActiveVideoSpeakers] = useState(call.getActiveVideoSpeakers());
 
   useEffect(() => {
-    const subscription = call.lastActiveSpeakersUpdatTime.subscribe(() => {
+    const subscription = call.lastActiveSpeakersUpdateTime.subscribe(() => {
       setActiveVideoSpeakers(call.getActiveVideoSpeakers());
     });
     return () => {
@@ -141,7 +141,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   }, []);
 
   return (
-    <div id="video-calling" className="video-calling" ref={onRefChange}>
+    <div id="video-calling" className="video-calling" ref={wrapper}>
       <div id="video-element-remote" className="video-element-remote">
         <GroupVideoGrid
           muted={isMuted}
