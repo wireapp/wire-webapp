@@ -38,7 +38,6 @@ import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel'
 import type {Multitasking} from '../../notification/NotificationRepository';
 import Duration from './Duration';
 import NamedIcon from 'Components/NamedIcon';
-import ButtonGroup from 'Components/ButtonGroup';
 
 export interface FullscreenVideoCallProps {
   call: Call;
