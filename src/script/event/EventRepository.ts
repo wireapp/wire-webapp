@@ -170,6 +170,7 @@ export class EventRepository {
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           this.logger.info(`Done handling '${this.notificationsTotal}' notifications from the stream`);
           this.webSocketService.unlockWebsocket();
+          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
         } catch (error) {
           this.logger.warn('Error while processing notification stream', error);
         } finally {
