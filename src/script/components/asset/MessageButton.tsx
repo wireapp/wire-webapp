@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
 import classNames from 'classnames';
@@ -32,9 +32,15 @@ export interface MessageButtonProps {
 }
 
 const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClick = noop}) => {
-  const isSelected = message.selectedButtonId() === id;
-  const isWaiting = message.waitingButtonId() === id;
-  const errorMessage = message.errorButtonId() === id ? message.errorMessage() : '';
+  const [isSelected, setIsSelected] = useState(message.selectedButtonId() === id);
+  const [isWaiting, setIsWaiting] = useState(message.waitingButtonId() === id);
+  const [errorMessage, setErrorMessage] = useState(message.errorButtonId() === id ? message.errorMessage() : '');
+
+  message.selectedButtonId.subscribe(selectedButtonId => setIsSelected(selectedButtonId === id));
+  message.waitingButtonId.subscribe(waitingButtonId => setIsWaiting(waitingButtonId === id));
+  message.selectedButtonId.subscribe(errorButtonId =>
+    setErrorMessage(errorButtonId === id ? message.errorMessage() : ''),
+  );
 
   return (
     <>
@@ -49,11 +55,13 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
         data-uie-waiting={isWaiting}
       >
         <span>{label}</span>
-        {isWaiting && (
-          <div className="message-button__waiting-overlay message-button__waiting-overlay--visible">
-            <NamedIcon width={20} height={20} name="loading-icon" data-uie-name="message-button-loading-icon" />
-          </div>
-        )}
+        <div
+          className={classNames('message-button__waiting-overlay', {
+            'message-button__waiting-overlay--visible': isWaiting,
+          })}
+        >
+          <NamedIcon width={20} height={20} name="loading-icon" data-uie-name="message-button-loading-icon" />
+        </div>
       </button>
       {errorMessage && (
         <div className="message-button__error" data-uie-name="message-button-error">
