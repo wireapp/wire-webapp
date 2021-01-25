@@ -38,6 +38,7 @@ import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel'
 import type {Multitasking} from '../../notification/NotificationRepository';
 import Duration from './Duration';
 import NamedIcon from 'Components/NamedIcon';
+import type {Participant} from 'src/script/calling/Participant';
 
 export interface FullscreenVideoCallProps {
   call: Call;
@@ -46,6 +47,7 @@ export interface FullscreenVideoCallProps {
   conversation: Conversation;
   isChoosingScreen: boolean;
   isMuted: boolean;
+  maximizedParticipant: Participant;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
   videoGrid: Grid;
@@ -84,6 +86,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   multitasking,
   videoGrid,
   videoInput,
+  maximizedParticipant,
   videoSpeakersActiveTab,
 }) => {
   const selfSharesScreen = call.getSelfParticipant().sharesScreen();
@@ -142,6 +145,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       <div id="video-element-remote" className="video-element-remote">
         <GroupVideoGrid
           muted={isMuted}
+          maximizedParticipant={maximizedParticipant}
           selfParticipant={call.getSelfParticipant()}
           grid={
             videoSpeakersActiveTab === VideoSpeakersTabs.speakers
@@ -152,6 +156,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 }
               : videoGrid
           }
+          setMaximizedParticipant={callActions.setMaximizedTileVideoParticipant}
         />
       </div>
 
@@ -260,5 +265,5 @@ export default FullscreenVideoCall;
 registerReactComponent('fullscreen-video-call', {
   component: FullscreenVideoCall,
   template:
-    '<div data-bind="react: {call, callActions, videoSpeakersActiveTab: ko.unwrap(videoSpeakersActiveTab), canShareScreen, mediaDevicesHandler, multitasking, videoInput: ko.unwrap(videoInput), conversation: ko.unwrap(conversation), isChoosingScreen: ko.unwrap(isChoosingScreen), isMuted: ko.unwrap(isMuted), videoGrid: ko.unwrap(videoGrid)}"></div>',
+    '<div data-bind="react: {call, callActions, maximizedParticipant: ko.unwrap(maximizedParticipant), videoSpeakersActiveTab: ko.unwrap(videoSpeakersActiveTab), canShareScreen, mediaDevicesHandler, multitasking, videoInput: ko.unwrap(videoInput), conversation: ko.unwrap(conversation), isChoosingScreen: ko.unwrap(isChoosingScreen), isMuted: ko.unwrap(isMuted), videoGrid: ko.unwrap(videoGrid)}"></div>',
 });
