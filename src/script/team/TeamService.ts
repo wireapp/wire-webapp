@@ -67,7 +67,6 @@ export class TeamService {
   }
 
   getAllTeamFeatures(teamId: string): Promise<FeatureList> {
-    console.info('##### teamId', teamId);
     return this.apiClient.teams.feature.api.getAllFeatures(teamId);
   }
 }

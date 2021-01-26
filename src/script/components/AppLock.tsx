@@ -230,7 +230,6 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
   };
 
   const onSetCode = async (event: React.FormEvent) => {
-    console.log('### onSetCode');
     event.preventDefault();
     await setCode(setupPassphrase);
     setIsVisible(false);
@@ -309,7 +308,7 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
           <form onSubmit={onSetCode}>
             <div
               className="modal__text"
-              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br>'})}}
+              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', {}, {br: '<br><br>'})}}
               data-uie-name="label-applock-set-text"
             ></div>
             <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
@@ -325,19 +324,65 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
               autoComplete="new-password"
             />
             <div className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}>
-              At least 8 charcters long
+              {t('modalAppLockSetupLong')}
             </div>
             <div className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}>
-              A lowercase letter
+              {t('modalAppLockSetupLower')}
             </div>
             <div className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}>
-              An uppercase letter
+              {t('modalAppLockSetupUppercase')}
             </div>
             <div className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}>
-              A digit
+              {t('modalAppLockSetupDigit')}
             </div>
             <div className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}>
-              A special character
+              {t('modalAppLockSetupSpecial')}
+            </div>
+            <div className="modal__buttons">
+              <button
+                type="submit"
+                className="modal__button modal__button--primary modal__button--full"
+                data-uie-name="do-action"
+                disabled={!isSetupPassphraseValid}
+              >
+                {t('modalAppLockSetupAcceptButton')}
+              </button>
+            </div>
+          </form>
+        )}
+        {appLockState === APPLOCK_STATE.SETUP_CHANGE && (
+          <form onSubmit={onSetCode}>
+            <div
+              className="modal__text"
+              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupChangeMessage', {}, {br: '<br><br>'})}}
+              data-uie-name="label-applock-set-text"
+            ></div>
+            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
+              {t('modalAppLockPasscode')}
+            </div>
+            <input
+              className="modal__input"
+              type="password"
+              value={setupPassphrase}
+              onChange={event => setSetupPassphrase(event.target.value)}
+              data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
+              data-uie-name="input-applock-set-a"
+              autoComplete="new-password"
+            />
+            <div className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupLong')}
+            </div>
+            <div className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupLower')}
+            </div>
+            <div className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupUppercase')}
+            </div>
+            <div className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupDigit')}
+            </div>
+            <div className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}>
+              {t('modalAppLockSetupSpecial')}
             </div>
             <div className="modal__buttons">
               <button
