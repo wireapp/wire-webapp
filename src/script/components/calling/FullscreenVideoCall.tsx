@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {css} from '@emotion/core';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
