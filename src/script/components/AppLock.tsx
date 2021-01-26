@@ -29,12 +29,12 @@ export enum APPLOCK_STATE {
   WIPE_PASSWORD = 'applock.wipe-password',
 }
 
+const passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH));
+const passwordRegexDigit = /(?=.*[0-9])/;
 const passwordRegexLength = new RegExp(`^.{${Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH},}$`);
 const passwordRegexLower = /(?=.*[a-z])/;
-const passwordRegexUpper = /(?=.*[A-Z])/;
-const passwordRegexDigit = /(?=.*[0-9])/;
 const passwordRegexSpecial = /(?=.*[!@#$%^&*(),.?":{}|<>])/;
-const passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH));
+const passwordRegexUpper = /(?=.*[A-Z])/;
 
 export interface AppLockProps {
   clientRepository: ClientRepository;
