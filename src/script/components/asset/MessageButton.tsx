@@ -34,13 +34,13 @@ export interface MessageButtonProps {
 const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClick = noop}) => {
   const [isSelected, setIsSelected] = useState(message.selectedButtonId() === id);
   const [isWaiting, setIsWaiting] = useState(message.waitingButtonId() === id);
-  const [errorMessage, setErrorMessage] = useState(message.errorButtonId() === id ? message.errorMessage() : '');
+  const [hasError, setHasError] = useState(message.errorButtonId() === id);
+  const [errorMessage, setErrorMessage] = useState(message.errorMessage());
 
   message.selectedButtonId.subscribe(selectedButtonId => setIsSelected(selectedButtonId === id));
   message.waitingButtonId.subscribe(waitingButtonId => setIsWaiting(waitingButtonId === id));
-  message.selectedButtonId.subscribe(errorButtonId =>
-    setErrorMessage(errorButtonId === id ? message.errorMessage() : ''),
-  );
+  message.errorButtonId.subscribe(errorButtonId => setHasError(errorButtonId === id));
+  message.errorMessage.subscribe(errorMessage => setErrorMessage(errorMessage));
 
   return (
     <>
@@ -63,7 +63,7 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
           <NamedIcon width={20} height={20} name="loading-icon" data-uie-name="message-button-loading-icon" />
         </div>
       </button>
-      {errorMessage && (
+      {hasError && errorMessage && (
         <div className="message-button__error" data-uie-name="message-button-error">
           {errorMessage}
         </div>
