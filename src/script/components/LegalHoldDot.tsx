@@ -48,7 +48,13 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({conversation, isPending, lar
             legalHoldModal.showRequestModal(true);
             return;
           }
-          legalHoldModal.showUsers(conversation);
+
+          if (conversation) {
+            legalHoldModal.showUsers(conversation);
+            return;
+          }
+
+          legalHoldModal.showUsers();
         }
       }}
     >
