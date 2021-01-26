@@ -103,10 +103,10 @@ export class TestFactory {
 
     this.backup_repository = new BackupRepository(
       this.backup_service,
-      this.connection_repository,
       this.conversation_repository,
       this.client_repository.clientState,
       this.user_repository.userState,
+      this.connection_repository.connectionState,
     );
 
     return this.backup_repository;
@@ -338,11 +338,11 @@ export class TestFactory {
     await this.exposeCallingActors();
 
     this.notification_repository = new NotificationRepository(
-      this.calling_repository,
       this.conversation_repository,
       new PermissionRepository(),
       this.user_repository.userState,
       this.conversation_repository.conversationState,
+      this.calling_repository.callState,
     );
 
     return this.notification_repository;

@@ -53,7 +53,7 @@ import './asset/imageAsset';
 import './asset/linkPreviewAsset';
 import './asset/locationAsset';
 import './asset/videoAsset';
-import './asset/messageButton';
+import './asset/MessageButton';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;

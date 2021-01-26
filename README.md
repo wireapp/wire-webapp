@@ -94,10 +94,6 @@ Alternatively, you can test specific parts of the app:
    ```
 1. Enter "yes"
 
-If everything is done right, you will see a Travis CI job in the [build pipeline](https://travis-ci.org/wireapp/wire-webapp/builds) based on the new tag:
-
-![Staging Release](./docs/release/staging-release.png)
-
 ### RC testing
 
 Before RC testing we create a merge commit (**don't squash!**) from "dev" to "master" branch, so that our QA team can run tests on the latest version of our app.

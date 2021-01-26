@@ -289,7 +289,7 @@ class App {
       quotedMessageMiddleware.processEvent.bind(quotedMessageMiddleware),
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
-    repositories.backup = new BackupRepository(new BackupService(), repositories.connection, repositories.conversation);
+    repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
     repositories.broadcast = new BroadcastRepository(
       new BroadcastService(),
       repositories.client,
@@ -310,11 +310,7 @@ class App {
       repositories.team,
     );
     repositories.permission = new PermissionRepository();
-    repositories.notification = new NotificationRepository(
-      repositories.calling,
-      repositories.conversation,
-      repositories.permission,
-    );
+    repositories.notification = new NotificationRepository(repositories.conversation, repositories.permission);
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 
     repositories.conversation.leaveCall = repositories.calling.leaveCall;
@@ -430,7 +426,9 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
       await Promise.all(
-        conversationRepository.map_connections(Object.values(connectionRepository.connectionEntities())),
+        conversationRepository.map_connections(
+          Object.values(connectionRepository['connectionState'].connectionEntities()),
+        ),
       );
       this._subscribeToUnloadEvents();
 

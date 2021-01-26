@@ -41,6 +41,8 @@ import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel'
 import type {Multitasking} from '../../notification/NotificationRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import {Participant} from '../../calling/Participant';
+import {container} from 'tsyringe';
+import {CallState} from '../../calling/CallState';
 
 interface ComponentParams {
   call: Call;
@@ -49,6 +51,7 @@ interface ComponentParams {
   conversation: ko.PureComputed<Conversation>;
   hasAccessToCamera: ko.Observable<boolean>;
   isSelfVerified: ko.Subscribable<boolean>;
+  maximizedTileVideoParticipant: ko.Observable<Participant>;
   multitasking: Multitasking;
   teamRepository: TeamRepository;
   temporaryUserStyle?: boolean;
@@ -61,6 +64,7 @@ class ConversationListCallingCell {
   readonly callActions: CallActions;
   readonly callDuration: ko.Observable<string>;
   readonly callingRepository: CallingRepository;
+  readonly callState: CallState;
   readonly conversation: ko.PureComputed<Conversation>;
   readonly conversationParticipants: ko.PureComputed<User[]>;
   readonly conversationUrl: string;
@@ -92,6 +96,7 @@ class ConversationListCallingCell {
   readonly selfParticipant: Participant;
   readonly teamRepository: TeamRepository;
   readonly videoSpeakersActiveTab: ko.Observable<string>;
+  readonly maximizedTileVideoParticipant: ko.Observable<Participant>;
 
   constructor({
     call,
@@ -104,8 +109,10 @@ class ConversationListCallingCell {
     teamRepository,
     hasAccessToCamera,
     videoSpeakersActiveTab,
+    maximizedTileVideoParticipant,
     isSelfVerified = ko.observable(false),
   }: ComponentParams) {
+    this.callState = container.resolve(CallState);
     this.call = call;
     this.conversation = conversation;
     this.callingRepository = callingRepository;
@@ -116,6 +123,7 @@ class ConversationListCallingCell {
     this.AVATAR_SIZE = AVATAR_SIZE;
     this.isSelfVerified = isSelfVerified;
     this.videoSpeakersActiveTab = videoSpeakersActiveTab;
+    this.maximizedTileVideoParticipant = maximizedTileVideoParticipant;
     this.conversationUrl = generateConversationUrl(conversation().id);
     this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
 
@@ -138,7 +146,7 @@ class ConversationListCallingCell {
 
     this.isStillOngoing = ko.pureComputed(() => [CALL_REASON.STILL_ONGOING].includes(call.reason()));
 
-    this.isMuted = callingRepository.isMuted;
+    this.isMuted = this.callState.isMuted;
 
     this.callDuration = ko.observable();
     let callDurationUpdateInterval: number;
@@ -291,7 +299,7 @@ ko.components.register('conversation-list-calling-cell', {
 
       <!-- ko if: showVideoGrid() -->
         <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
-          <group-video-grid params="minimized: true, grid: calculateGrid(), selfParticipant: selfParticipant"></group-video-grid>
+          <group-video-grid params="minimized: true, maximizedParticipant: maximizedTileVideoParticipant, setMaximizedParticipant: callActions.setMaximizedTileVideoParticipant, grid: calculateGrid(), selfParticipant: selfParticipant"></group-video-grid>
           <!-- ko if: showMaximize() -->
             <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
               <fullscreen-icon></fullscreen-icon>

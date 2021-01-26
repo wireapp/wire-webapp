@@ -1,0 +1,27 @@
+body {
+  .message[data-uie-uid] .debug-info,
+  .conversation-list-cell[data-uie-uid] .debug-info {
+    position: absolute;
+    top: auto;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    display: block;
+    height: auto;
+    padding: 4px;
+    border-radius: 4px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 300;
+    opacity: 1;
+    user-select: text;
+  }
+
+  .message[data-uie-uid] .debug-info {
+    background-color: rgba(0, 0, 128, 0.5);
+  }
+
+  .conversation-list-cell[data-uie-uid] .debug-info {
+    background-color: rgba(128, 0, 0, 0.5);
+  }
+}

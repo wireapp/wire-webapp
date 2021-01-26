@@ -26,7 +26,7 @@ import type {Availability} from '@wireapp/protocol-messaging';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 
 import 'Components/AvailabilityState';
-import 'Components/legalHoldDot';
+import 'Components/LegalHoldDot';
 import 'Components/list/groupedConversations';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {getLogger, Logger} from 'Util/Logger';
