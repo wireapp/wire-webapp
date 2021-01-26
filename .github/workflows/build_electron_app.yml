@@ -1,0 +1,163 @@
+name: Build Electron App
+
+on:
+  push:
+    branches: [master, dev, edge, avs]
+    tags:
+      - '*staging*'
+      - '*production*'
+  pull_request:
+    branches: [master, dev, edge, avs]
+
+jobs:
+  build_webapp:
+    if: |
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.title, '+ElectronBuild')
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        DISTRIBUTION: ['DISTRIBUTION_0']
+
+    env:
+      DISTRIBUTION: ${{secrets[matrix.DISTRIBUTION]}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: 'Use latest Node.js v12'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Set environment variables
+        run: |
+          echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
+          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+          echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
+          echo "COMMIT_URL=${{github.event.head_commit.url}}" >> $GITHUB_ENV
+          echo "COMMITTER=${{github.event.head_commit.committer.name}}" >> $GITHUB_ENV
+
+      - name: Set TITLE
+        env:
+          PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
+        run: echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
+
+      - name: Print environment variables
+        env:
+          GITHUB_CONTEXT: ${{toJson(github)}}
+        run: |
+          echo -e "BRANCH_NAME = ${BRANCH_NAME}"
+          echo -e "TAG = ${TAG}"
+          echo -e "TITLE = ${TITLE}"
+          echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
+          echo -e "COMMIT_URL = ${COMMIT_URL}"
+          echo -e "COMMITTER = ${COMMITTER}"
+          echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
+
+      - name: Skip CI
+        if: |
+          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[skip ci]') ||
+          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
+        uses: andymckay/cancel-action@0.2
+
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{github.token}}
+
+      - name: Yarn cache
+        uses: c-hive/gha-yarn-cache@v1
+
+      - name: Authenticate git clone
+        env:
+          GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+        run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
+
+      - name: Install JS dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Build WebApp
+        run: yarn build:prod
+
+      - name: Build config.js file
+        run: node electron/bin/build-config.js
+
+      - name: Upload WebApp artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: webapp-dist
+          path: server/dist
+
+  build_electron_app:
+    if: |
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.title, '+ElectronBuild')
+    needs: build_webapp
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        DISTRIBUTION: ['DISTRIBUTION_0']
+
+    env:
+      DISTRIBUTION: ${{secrets[matrix.DISTRIBUTION]}}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: 'Use latest Node.js v12'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Download WebApp artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: webapp-dist
+          path: server/dist
+
+      - name: Install JS dependencies
+        working-directory: electron
+        run: yarn
+
+      - name: Prepare Building Electron App
+        working-directory: electron
+        run: |
+          yarn copy:webapp
+          yarn dist
+
+      - name: Build Electron App for Windows
+        if: matrix.os == 'windows-latest'
+        working-directory: electron
+        run: |
+          echo "OS=windows" >> $GITHUB_ENV
+          yarn build:windows
+
+      - name: Build Electron App for Linux
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: electron
+        run: |
+          echo "OS=linux" >> $GITHUB_ENV
+          yarn build:linux
+
+      - name: Build Electron App for macOS
+        if: matrix.os == 'macos-latest'
+        working-directory: electron
+        run: |
+          echo "OS=macos" >> $GITHUB_ENV
+          yarn build:mac
+
+      - name: Upload Electron artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: electron-app-${{env.OS}}
+          path: electron/build/WireDevelopment*
