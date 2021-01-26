@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,21 @@
  *
  */
 
-import type {Picture, SSOSignature} from '../self/';
-import type {User} from '../user/';
-import type {ManagedSource} from '../user/ManagedSource';
+import {Role} from '..';
+import type {TeamContact} from './TeamContact';
 
-export interface Self extends User {
-  locale: string;
-  /**
-   * What is the source of truth for this user; if it's SCIM
-   * then the profile can't be edited via normal means.
-   */
-  managed_by?: ManagedSource;
-  phone?: string;
-  picture?: Picture[];
-  sso_id?: SSOSignature;
+export enum SearchOrder {
+  ASCENDING = 'asc',
+  DESCENDING = 'desc',
+}
+
+export interface TeamSearchOptions {
+  /** Filter results by member role */
+  frole?: Role[];
+  /** Sort order (asc | desc | undefined) */
+  order?: SearchOrder;
+  /** Max number of search results. Defaults to 15 results. Min 1, max 500. */
+  size?: number;
+  /** Sort results */
+  sortby?: keyof Pick<TeamContact, 'email' | 'name' | 'handle' | 'created_at' | 'role' | 'managed_by' | 'saml_idp'>;
 }
