@@ -19,7 +19,7 @@
 
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
-import {formatDateShort, formatTimeShort} from 'Util/TimeUtil';
+import * as TimeUtil from 'Util/TimeUtil';
 
 import {Message} from '../../entity/message/Message';
 import {User} from '../../entity/User';
@@ -38,8 +38,8 @@ describe('AssetHeader', () => {
   it('displays the expected username and time', async () => {
     const timestamp = new Date('2021-01-21T15:08:14.225Z').getTime();
     const userName = 'John Doe';
-    jest.fn(formatTimeShort).mockReturnValue('3:08 PM');
-    jest.fn(formatDateShort).mockReturnValue('01/21');
+    jest.spyOn(TimeUtil, 'formatTimeShort').mockReturnValue('3:08 PM');
+    jest.spyOn(TimeUtil, 'formatDateShort').mockReturnValue('01/21');
 
     const user = new User(createRandomUuid());
     user.name(userName);
