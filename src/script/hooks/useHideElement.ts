@@ -1,57 +1,61 @@
 import {useEffect} from 'react';
-import {throttle} from 'Util/util';
+
+const hideControlsClass = 'hide-controls';
 
 const useHideElement = (element: HTMLElement, timeout: number, skipClass?: string) => {
   useEffect(() => {
-    let hide_timeout: number = undefined;
+    if (!element) {
+      return undefined;
+    }
+
+    let hideTimeout: number;
     let isMouseIn: boolean = false;
 
-    const effect = () => {
-      if (!element) {
+    const onMouseEnter = () => {
+      isMouseIn = true;
+      element.classList.remove(hideControlsClass);
+    };
+
+    const onMouseLeave = () => {
+      isMouseIn = false;
+      element.classList.add(hideControlsClass);
+    };
+
+    const startTimer = () => {
+      hideTimeout = window.setTimeout(() => {
+        element.classList.add(hideControlsClass);
+      }, timeout);
+    };
+
+    const onMouseMove = ({target}: MouseEvent) => {
+      if (!isMouseIn) {
         return;
       }
 
-      const startTimer = () => {
-        hide_timeout = window.setTimeout(() => {
-          element.classList.add('hide-controls');
-        }, timeout);
-      };
+      window.clearTimeout(hideTimeout);
+      element.classList.remove(hideControlsClass);
 
-      element.onmouseenter = () => {
-        isMouseIn = true;
-        element.classList.remove('hide-controls');
-      };
-
-      element.onmouseleave = () => {
-        isMouseIn = false;
-        if (document.hasFocus()) {
-          return element.classList.add('hide-controls');
-        }
-      };
-
-      element.onmousemove = throttle(({target}: MouseEvent) => {
-        if (!isMouseIn) {
+      let node = target as Element;
+      while (node && node !== element) {
+        if (node.classList.contains(skipClass)) {
           return;
         }
-        window.clearTimeout(hide_timeout);
-        element.classList.remove('hide-controls');
-
-        let node = target as Element;
-        while (node && node !== element) {
-          if (node.classList.contains(skipClass)) {
-            return;
-          }
-          node = node.parentNode as Element;
-        }
-        startTimer();
-      }, 500);
-
+        node = node.parentNode as Element;
+      }
       startTimer();
     };
 
-    effect();
+    element.addEventListener('mouseenter', onMouseEnter);
+    element.addEventListener('mouseleave', onMouseLeave);
+    element.addEventListener('mousemove', onMouseMove);
+
+    startTimer();
     return () => {
-      window.clearTimeout(hide_timeout);
+      window.clearTimeout(hideTimeout);
+      element.removeEventListener('mouseenter', onMouseEnter);
+      element.removeEventListener('mouseleave', onMouseLeave);
+      element.removeEventListener('mousemove', onMouseMove);
+      element.classList.remove(hideControlsClass);
     };
   }, [element]);
 };

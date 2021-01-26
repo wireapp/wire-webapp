@@ -105,7 +105,7 @@ export class CallingViewModel {
     selfUser: ko.Observable<User>,
     multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
-    private readonly callState = container.resolve(CallState),
+    readonly callState = container.resolve(CallState),
   ) {
     this.logger = getLogger('CallingViewModel');
     this.callingRepository = callingRepository;
