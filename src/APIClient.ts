@@ -60,6 +60,7 @@ import {
 } from './team/';
 import {UserAPI} from './user/';
 import type {Config} from './Config';
+import {TeamSearchAPI} from './team/search';
 
 const {version}: {version: string} = require('../package.json');
 
@@ -106,6 +107,7 @@ export class APIClient extends EventEmitter {
     legalhold: {api: LegalHoldAPI};
     member: {api: MemberAPI};
     payment: {api: PaymentAPI};
+    search: {api: TeamSearchAPI};
     service: {api: ServiceAPI};
     team: {api: TeamAPI};
   };
@@ -214,6 +216,9 @@ export class APIClient extends EventEmitter {
       },
       payment: {
         api: new PaymentAPI(this.transport.http),
+      },
+      search: {
+        api: new TeamSearchAPI(this.transport.http),
       },
       service: {
         api: new ServiceAPI(this.transport.http),
