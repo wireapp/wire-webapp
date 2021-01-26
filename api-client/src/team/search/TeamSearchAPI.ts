@@ -50,7 +50,7 @@ export class TeamSearchAPI {
         ...options,
         frole: options.frole?.join(','),
       },
-      url: `/${TeamAPI.URL.TEAMS}/${teamId}/${TeamSearchAPI.URL.SEARCH}`,
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamSearchAPI.URL.SEARCH}`,
     };
 
     const handleRequest = async () => {
