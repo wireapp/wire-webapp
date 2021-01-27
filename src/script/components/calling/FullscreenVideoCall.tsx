@@ -89,8 +89,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   maximizedParticipant,
   videoSpeakersActiveTab,
 }) => {
-  const selfSharesScreen = call.getSelfParticipant().sharesScreen();
-  const selfSharesCamera = call.getSelfParticipant().sharesCamera();
+  const selfSharesScreen = call.getSelfParticipant()?.sharesScreen() ?? false;
+  const selfSharesCamera = call.getSelfParticipant()?.sharesCamera() ?? false;
   const currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput();
   const switchCameraSource = (call: Call, deviceId: string) => callActions.switchCameraInput(call, deviceId);
   const minimize = () => multitasking.isMinimized(true);
