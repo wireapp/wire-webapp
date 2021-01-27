@@ -49,6 +49,8 @@ class AppLockPage extends TestPage<AppLockProps> {
     super(AppLock.AppLock, props);
     act(() => AppLock.init(props.clientRepository, props.selfUser));
   }
+
+  getAppLockModal = () => this.get('div[data-uie-name=applock-modal]');
 }
 describe('AppLock', () => {
   const initAppLock = () =>
@@ -80,18 +82,26 @@ describe('AppLock', () => {
         APPLOCK_SCHEDULED_TIMEOUT: undefined,
         APPLOCK_UNFOCUS_TIMEOUT: undefined,
       };
-      initAppLock();
-      const appLockModal = document.querySelector('[data-uie-name=applock-modal]') as HTMLDivElement;
+      const appLockPage = new AppLockPage({
+        clientRepository: ({
+          clientService: ({
+            deleteClient: (clientId: string, password: string) => Promise.resolve(),
+          } as unknown) as ClientService,
+          currentClient: ko.observable({id: 'clientId'}),
+        } as unknown) as ClientRepository,
+        selfUser: ({id: 'userID'} as unknown) as User,
+      });
+      const appLockModal = appLockPage.getAppLockModal();
       expect(appLockModal.style.display).toBe('none');
     });
-    it.skip('shows the locked modal on start if timeout is set as flag and a code is stored', () => {
+    it('shows the locked modal on start if timeout is set as flag and a code is stored', () => {
       writeableConfig.FEATURE = {...writeableConfig.FEATURE, APPLOCK_UNFOCUS_TIMEOUT: 10};
       spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
       initAppLock();
       const appLockModal = document.querySelector('#applock [data-uie-name=applock-modal]') as HTMLDivElement;
       expect(appLockModal.style.display).toBe('flex');
     });
-    it.skip('shows the locked modal on start if timeout is set as query parameter and a code is stored', () => {
+    it('shows the locked modal on start if timeout is set as query parameter and a code is stored', () => {
       writeableConfig.FEATURE = {
         ...writeableConfig.FEATURE,
         APPLOCK_SCHEDULED_TIMEOUT: undefined,
@@ -107,7 +117,7 @@ describe('AppLock', () => {
 
   describe('unlock', () => {
     // TODO: Figure out the steps to hide the modal after submitting the passphrase.
-    it.skip('stores the passphrase, respects the timeout and unlocks', async () => {
+    it('stores the passphrase, respects the timeout and unlocks', async () => {
       jest.useFakeTimers();
       writeableConfig.FEATURE = {...writeableConfig.FEATURE, APPLOCK_UNFOCUS_TIMEOUT: 10};
       let storedCode: string;
