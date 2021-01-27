@@ -1,10 +1,12 @@
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 
 const hideControlsClass = 'hide-controls';
 
-const useHideElement = (element: HTMLElement, timeout: number, skipClass?: string) => {
+const useHideElement = (timeout: number, skipClass?: string) => {
+  const ref = useRef<HTMLDivElement>();
+
   useEffect(() => {
-    if (!element) {
+    if (!ref.current) {
       return undefined;
     }
 
@@ -13,17 +15,17 @@ const useHideElement = (element: HTMLElement, timeout: number, skipClass?: strin
 
     const onMouseEnter = () => {
       isMouseIn = true;
-      element.classList.remove(hideControlsClass);
+      ref.current.classList.remove(hideControlsClass);
     };
 
     const onMouseLeave = () => {
       isMouseIn = false;
-      element.classList.add(hideControlsClass);
+      ref.current.classList.add(hideControlsClass);
     };
 
     const startTimer = () => {
       hideTimeout = window.setTimeout(() => {
-        element.classList.add(hideControlsClass);
+        ref.current.classList.add(hideControlsClass);
       }, timeout);
     };
 
@@ -33,10 +35,10 @@ const useHideElement = (element: HTMLElement, timeout: number, skipClass?: strin
       }
 
       window.clearTimeout(hideTimeout);
-      element.classList.remove(hideControlsClass);
+      ref.current.classList.remove(hideControlsClass);
 
       let node = target as Element;
-      while (node && node !== element) {
+      while (node && node !== ref.current) {
         if (node.classList.contains(skipClass)) {
           return;
         }
@@ -45,19 +47,21 @@ const useHideElement = (element: HTMLElement, timeout: number, skipClass?: strin
       startTimer();
     };
 
-    element.addEventListener('mouseenter', onMouseEnter);
-    element.addEventListener('mouseleave', onMouseLeave);
-    element.addEventListener('mousemove', onMouseMove);
+    ref.current.addEventListener('mouseenter', onMouseEnter);
+    ref.current.addEventListener('mouseleave', onMouseLeave);
+    ref.current.addEventListener('mousemove', onMouseMove);
 
     startTimer();
     return () => {
       window.clearTimeout(hideTimeout);
-      element.removeEventListener('mouseenter', onMouseEnter);
-      element.removeEventListener('mouseleave', onMouseLeave);
-      element.removeEventListener('mousemove', onMouseMove);
-      element.classList.remove(hideControlsClass);
+      ref.current.removeEventListener('mouseenter', onMouseEnter);
+      ref.current.removeEventListener('mouseleave', onMouseLeave);
+      ref.current.removeEventListener('mousemove', onMouseMove);
+      ref.current.classList.remove(hideControlsClass);
     };
-  }, [element]);
+  }, [ref.current]);
+
+  return ref;
 };
 
 export default useHideElement;

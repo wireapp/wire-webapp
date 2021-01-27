@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {css} from '@emotion/core';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -102,8 +102,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     [videoInput],
   );
   const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
-  const wrapper = useRef<HTMLDivElement>();
-  useHideElement(wrapper.current, FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
+  const wrapper = useHideElement(FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
