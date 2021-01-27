@@ -18,9 +18,8 @@
  */
 
 export const QUERY_KEY = {
-  ACCOUNT_ID: 'id',
+  ACCOUNT_ID: 'id', // account ID passed from the wrapper to the webview
   APPLOCK_INACTIVITY_TIMEOUT: 'applock_unfocus_timeout',
-  // account ID passed from the wrapper to the webview
   APPLOCK_SCHEDULED_TIMEOUT: 'applock_scheduled_timeout',
   CLIENT_TYPE: 'clienttype',
   CONVERSATION_CODE: 'join_code',
