@@ -10,18 +10,11 @@ on:
     branches: [master, dev, edge, avs]
 
 jobs:
-  build_webapp:
+  'Build Webapp':
     if: |
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.title, '+ElectronBuild')
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        DISTRIBUTION: ['DISTRIBUTION_0']
-
-    env:
-      DISTRIBUTION: ${{secrets[matrix.DISTRIBUTION]}}
 
     steps:
       - name: Checkout
@@ -39,8 +32,6 @@ jobs:
           echo "BRANCH_NAME=$(git branch --show-current)" >> $GITHUB_ENV
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
           echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
-          echo "COMMIT_URL=${{github.event.head_commit.url}}" >> $GITHUB_ENV
-          echo "COMMITTER=${{github.event.head_commit.committer.name}}" >> $GITHUB_ENV
 
       - name: Set TITLE
         env:
@@ -51,13 +42,9 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
-          echo -e "BRANCH_NAME = ${BRANCH_NAME}"
           echo -e "TAG = ${TAG}"
           echo -e "TITLE = ${TITLE}"
           echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
-          echo -e "COMMIT_URL = ${COMMIT_URL}"
-          echo -e "COMMITTER = ${COMMITTER}"
-          echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: Skip CI
         if: |
@@ -93,7 +80,7 @@ jobs:
           name: webapp-dist
           path: server/dist
 
-  build_electron_app:
+  'Build Electron binaries':
     if: |
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.title, '+ElectronBuild')
@@ -103,10 +90,6 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        DISTRIBUTION: ['DISTRIBUTION_0']
-
-    env:
-      DISTRIBUTION: ${{secrets[matrix.DISTRIBUTION]}}
 
     steps:
       - name: Checkout
@@ -158,6 +141,19 @@ jobs:
 
       - name: Upload Electron artifacts
         uses: actions/upload-artifact@v2
+        if: contains(env.TAG, 'staging')
         with:
           name: electron-app-${{env.OS}}
           path: electron/build/WireDevelopment*
+
+      - name: Attach Electron build to release assets
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          # TODO: Pair with webapp build
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: electron/build/WireDevelopment*
+          asset_name: electron-app-${{env.OS}}
+          asset_content_type: application/zip
