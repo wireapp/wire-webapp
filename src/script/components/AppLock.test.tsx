@@ -25,9 +25,18 @@ import type {ClientRepository} from '../client/ClientRepository';
 import type {ClientService} from '../client/ClientService';
 import {Config, Configuration} from '../Config';
 import type {User} from '../entity/User';
+import {TeamState} from '../team/TeamState';
 import AppLock, {AppLockProps} from './AppLock';
 
 require('src/script/util/test/mock/LocalStorageMock');
+
+/**
+ * Show or not the applock based on:
+ *   - App lock enabled (status)
+ *   - App lock enforced
+ *   - Stored in local storage
+ *
+ * */
 
 // https://github.com/jedisct1/libsodium.js/issues/235
 jest.mock('libsodium-wrappers-sumo', () => ({
@@ -35,14 +44,6 @@ jest.mock('libsodium-wrappers-sumo', () => ({
   crypto_pwhash_str_verify: (value1: string, value2: string) => value1 === value2,
   ready: Promise.resolve,
 }));
-
-type Writable<T> = {
-  -readonly [K in keyof T]: T[K];
-};
-
-type WriteableConfig = Writable<Configuration>;
-
-const writeableConfig: WriteableConfig = Config.getConfig();
 
 class AppLockPage extends TestPage<AppLockProps> {
   constructor(props?: AppLockProps) {
@@ -53,26 +54,12 @@ class AppLockPage extends TestPage<AppLockProps> {
   getAppLockModal = () => this.get('div[data-uie-name="applock-modal"]');
 }
 describe('AppLock', () => {
-  const initAppLock = () =>
-    new AppLockPage({
-      clientRepository: ({
-        clientService: ({
-          deleteClient: (clientId: string, password: string) => Promise.resolve(),
-        } as unknown) as ClientService,
-        currentClient: ko.observable({id: 'clientId'}),
-      } as unknown) as ClientRepository,
-      selfUser: ({id: 'userID'} as unknown) as User,
-    });
-
-  const originalFeature = writeableConfig.FEATURE;
   beforeEach(() => {
-    writeableConfig.FEATURE = {...writeableConfig.FEATURE};
     document.body.innerHTML = '<div id="wire-main"><div id="app"></div><div id="applock"></div></div>';
   });
 
   afterEach(() => {
     document.body.innerHTML = '';
-    writeableConfig.FEATURE = originalFeature;
   });
 
   describe('constructor', () => {
@@ -114,7 +101,7 @@ describe('AppLock', () => {
       const appLockModal = appLockPage.getAppLockModal();
       expect(appLockModal.props().style.display).toBe('flex');
     });
-    it.skip('shows the locked modal on start if timeout is set as query parameter and a code is stored', () => {
+    it('shows the locked modal on start if timeout is set as query parameter and a code is stored', () => {
       spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
         FEATURE: {
           APPLOCK_INACTIVITY_TIMEOUT: undefined,
@@ -122,12 +109,30 @@ describe('AppLock', () => {
       });
       window.history.pushState({}, '', '?applock_unfocus_timeout=10');
       spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
-      initAppLock();
+      // TODO: Instantiate AppLock
       const appLockModal = document.querySelector('[data-uie-name=applock-modal]') as HTMLDivElement;
       expect(appLockModal.style.display).toBe('flex');
     });
   });
 
+  describe('applock', () => {
+    it('show the app lock unlock modal dialog, when enabled and passphrase is stored', () => {
+      const teamState: Partial<TeamState> = {
+        isAppLockEnabled: ko.pureComputed(() => true),
+        isAppLockEnforced: ko.pureComputed(() => false),
+      };
+
+      const appLockPage = new AppLockPage({
+        clientRepository: ({} as unknown) as ClientRepository,
+        selfUser: ({id: 'userID'} as unknown) as User,
+        teamState: teamState as TeamState,
+      });
+
+      expect(true).toBe(true);
+    });
+    it('show the app lock setup modal dialog, when enabled, enforced and there is no stored passphrase', () => {});
+    it('show the app lock setup modal dialog, when enabled, enforced and there is no stored passphrase', () => {});
+  });
   describe('unlock', () => {
     // TODO: Figure out the steps to hide the modal after submitting the passphrase.
     it.skip('stores the passphrase, respects the timeout and unlocks', async () => {

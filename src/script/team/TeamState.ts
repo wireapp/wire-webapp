@@ -35,6 +35,9 @@ export class TeamState {
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList>;
+  public readonly isAppLockEnabled: ko.PureComputed<boolean>;
+  public readonly isAppLockEnforced: ko.PureComputed<boolean>;
+  public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
   readonly teamMembers: ko.PureComputed<User[]>;
   readonly teamUsers: ko.PureComputed<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
@@ -67,5 +70,20 @@ export class TeamState {
     this.userState.isTeam = this.isTeam;
     this.userState.teamMembers = this.teamMembers;
     this.userState.teamUsers = this.teamUsers;
+
+    this.isAppLockEnabled = ko.pureComputed(() => {
+      const appLock = this.teamFeatures()?.['appLock'];
+      return appLock?.status === 'enabled';
+    });
+
+    this.isAppLockEnforced = ko.pureComputed(() => {
+      const appLock = this.teamFeatures()?.['appLock'];
+      return appLock?.config?.enforceAppLock;
+    });
+
+    this.appLockInactivityTimeoutSecs = ko.pureComputed(() => {
+      const appLock = this.teamFeatures()?.['appLock'];
+      return appLock?.config?.inactivityTimeoutSecs;
+    });
   }
 }

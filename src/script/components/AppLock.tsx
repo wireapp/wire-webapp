@@ -46,53 +46,7 @@ export interface AppLockProps {
 
 const APP_LOCK_STORAGE = 'app_lock';
 
-class AppLockSettings {
-  constructor(private readonly teamState: TeamState) {}
-
-  getInactivityAppLockTimeoutInSeconds() {
-    const appLock = this.teamState.teamFeatures()?.['appLock'];
-    const queryTimeout = parseInt(UrlUtil.getURLParameter(QUERY_KEY.APPLOCK_INACTIVITY_TIMEOUT), 10);
-    const backendTimeout = appLock?.status === 'enabled' ? appLock.config.inactivityTimeoutSecs : null;
-
-    if (Number.isFinite(queryTimeout)) {
-      return queryTimeout;
-    }
-    if (Number.isFinite(backendTimeout)) {
-      return backendTimeout;
-    }
-    return DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC;
-  }
-
-  getScheduledAppLockTimeoutInSeconds() {
-    const queryTimeout = parseInt(UrlUtil.getURLParameter(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT), 10);
-    const configTimeout = Config.getConfig().FEATURE?.APPLOCK_SCHEDULED_TIMEOUT;
-
-    if (Number.isFinite(queryTimeout)) {
-      return queryTimeout;
-    }
-    if (Number.isFinite(configTimeout)) {
-      return configTimeout;
-    }
-    return null;
-  }
-
-  isScheduledAppLockEnabled() {
-    return this.getScheduledAppLockTimeoutInSeconds() !== null;
-  }
-
-  isAppLockAllowed() {
-    const appLock = this.teamState.teamFeatures()?.['appLock'];
-    return appLock?.status === 'enabled';
-  }
-
-  isAppLockEnforced() {
-    const appLock = this.teamState.teamFeatures()?.['appLock'];
-    return appLock?.config?.enforceAppLock;
-  }
-}
-
 const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamState), clientRepository, selfUser}) => {
-  const appLockSettings = new AppLockSettings(teamState);
   const [appLockState, setAppLockState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [wipeError, setWipeError] = useState('');
   const [unlockError, setUnlockError] = useState('');
@@ -121,9 +75,39 @@ const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamStat
     }),
   );
 
+  const getInactivityAppLockTimeoutInSeconds = () => {
+    const queryTimeout = parseInt(UrlUtil.getURLParameter(QUERY_KEY.APPLOCK_INACTIVITY_TIMEOUT), 10);
+    const backendTimeout = teamState.isAppLockEnabled() && teamState.appLockInactivityTimeoutSecs();
+
+    if (Number.isFinite(queryTimeout)) {
+      return queryTimeout;
+    }
+    if (Number.isFinite(backendTimeout)) {
+      return backendTimeout;
+    }
+    return DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC;
+  };
+
+  const getScheduledAppLockTimeoutInSeconds = () => {
+    const queryTimeout = parseInt(UrlUtil.getURLParameter(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT), 10);
+    const configTimeout = Config.getConfig().FEATURE?.APPLOCK_SCHEDULED_TIMEOUT;
+
+    if (Number.isFinite(queryTimeout)) {
+      return queryTimeout;
+    }
+    if (Number.isFinite(configTimeout)) {
+      return configTimeout;
+    }
+    return null;
+  };
+
+  const isScheduledAppLockEnabled = () => {
+    return getScheduledAppLockTimeoutInSeconds() !== null;
+  };
+
   const startAppLockTimeout = useCallback(() => {
     window.clearTimeout(inactivityTimeoutId);
-    const id = window.setTimeout(showAppLock, appLockSettings.getInactivityAppLockTimeoutInSeconds() * 1000);
+    const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * 1000);
     setInactivityTimeoutId(id);
   }, [inactivityTimeoutId]);
 
@@ -132,8 +116,8 @@ const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamStat
   }, [inactivityTimeoutId]);
 
   useEffect(() => {
-    if (appLockSettings.isAppLockAllowed()) {
-      if (appLockSettings.isAppLockEnforced() || hasPassphrase()) {
+    if (teamState.isAppLockEnabled()) {
+      if (teamState.isAppLockEnforced() || hasPassphrase()) {
         showAppLock();
       }
       startPassphraseObserver();
@@ -142,7 +126,7 @@ const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamStat
   }, []);
 
   useEffect(() => {
-    if (appLockSettings.isAppLockAllowed() && hasPassphrase()) {
+    if (teamState.isAppLockEnabled() && hasPassphrase()) {
       window.addEventListener('blur', startAppLockTimeout);
       return () => window.removeEventListener('blur', startAppLockTimeout);
     }
@@ -150,7 +134,7 @@ const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamStat
   }, [startAppLockTimeout]);
 
   useEffect(() => {
-    if (appLockSettings.isAppLockAllowed() && hasPassphrase()) {
+    if (teamState.isAppLockEnabled() && hasPassphrase()) {
       window.addEventListener('focus', clearAppLockTimeout);
       return () => window.removeEventListener('focus', clearAppLockTimeout);
     }
@@ -219,11 +203,9 @@ const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamStat
   };
 
   const startScheduledTimeout = () => {
-    if (appLockSettings.isScheduledAppLockEnabled()) {
+    if (isScheduledAppLockEnabled()) {
       window.clearTimeout(scheduledTimeoutId);
-      setScheduledTimeoutId(
-        window.setTimeout(showAppLock, appLockSettings.getScheduledAppLockTimeoutInSeconds() * 1000),
-      );
+      setScheduledTimeoutId(window.setTimeout(showAppLock, getScheduledAppLockTimeoutInSeconds() * 1000));
     }
   };
 
