@@ -178,7 +178,7 @@ export class PreferencesAccountViewModel {
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
-    this.optionResetAppLock = appLockSettings.isAppLockEnabled();
+    this.optionResetAppLock = appLockSettings.isAppLockShowInPreferences();
     this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();

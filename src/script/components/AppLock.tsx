@@ -92,6 +92,11 @@ class AppLockSettings {
   isAppLockEnabled() {
     return this.isUnfocusAppLockEnabled() || this.isScheduledAppLockEnabled();
   }
+
+  isAppLockShowInPreferences() {
+    const appLock = this.teamState.teamFeatures()?.['appLock'];
+    return appLock?.status === 'enabled';
+  }
 }
 
 export const appLockSettings = new AppLockSettings();
