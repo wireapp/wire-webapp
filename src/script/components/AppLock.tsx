@@ -30,7 +30,6 @@ export enum APPLOCK_STATE {
 }
 
 const DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC = 60;
-const DEFAULT_SCHEDULED_APP_LOCK_TIMEOUT_IN_SEC = 60 * 60 * 4;
 
 const passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH));
 const passwordRegexDigit = /(?=.*[0-9])/;
@@ -53,13 +52,9 @@ class AppLockSettings {
   }
 
   getInactivityAppLockTimeoutInSeconds() {
-    const queryTimeout = parseInt(UrlUtil.getURLParameter(QUERY_KEY.APPLOCK_INACTIVITY_TIMEOUT), 10);
     const appLock = this.teamState.teamFeatures()?.['appLock'];
     const backendTimeout = appLock?.status === 'enabled' ? appLock.config.inactivityTimeoutSecs : null;
 
-    if (Number.isFinite(queryTimeout)) {
-      return queryTimeout;
-    }
     if (Number.isFinite(backendTimeout)) {
       return backendTimeout;
     }
