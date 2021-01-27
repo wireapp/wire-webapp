@@ -94,7 +94,7 @@ declare global {
         ENVIRONMENT: string;
         FEATURE: {
           ALLOWED_FILE_UPLOAD_EXTENSIONS: string[];
-          APPLOCK_SCHEDULED_TIMEOUT: number;
+          APPLOCK_INACTIVITY_TIMEOUT: number;
           APPLOCK_UNFOCUS_TIMEOUT: number;
           CHECK_CONSENT: boolean;
           CONFERENCE_AUTO_MUTE: boolean;

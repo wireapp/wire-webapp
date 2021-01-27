@@ -133,11 +133,8 @@ const config: ServerConfig = {
       ALLOWED_FILE_UPLOAD_EXTENSIONS: (process.env.FEATURE_ALLOWED_FILE_UPLOAD_EXTENSIONS || '*')
         .split(',')
         .map(extension => extension.trim()),
-      APPLOCK_SCHEDULED_TIMEOUT: process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT
-        ? Number(process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT)
-        : null,
-      APPLOCK_UNFOCUS_TIMEOUT: process.env.FEATURE_APPLOCK_UNFOCUS_TIMEOUT
-        ? Number(process.env.FEATURE_APPLOCK_UNFOCUS_TIMEOUT)
+      APPLOCK_INACTIVITY_TIMEOUT: process.env.FEATURE_APPLOCK_INACTIVITY_TIMEOUT
+        ? Number(process.env.FEATURE_APPLOCK_INACTIVITY_TIMEOUT)
         : null,
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT != 'false',
       CONFERENCE_AUTO_MUTE: process.env.FEATURE_CONFERENCE_AUTO_MUTE == 'true',

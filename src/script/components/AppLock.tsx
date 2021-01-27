@@ -56,7 +56,7 @@ class AppLockSettings {
     return null;
   }
 
-  getTimeout(queryName: string, configName: 'APPLOCK_SCHEDULED_TIMEOUT' | 'APPLOCK_UNFOCUS_TIMEOUT') {
+  getTimeout(queryName: string, configName: 'APPLOCK_INACTIVITY_TIMEOUT') {
     const queryTimeout = parseInt(UrlUtil.getURLParameter(queryName), 10);
     const backendTimeout = this.getInactivityTimeout();
     const configTimeout = Config.getConfig().FEATURE && Config.getConfig().FEATURE[configName];
@@ -73,20 +73,12 @@ class AppLockSettings {
     return null;
   }
 
-  getUnfocusAppLockTimeoutInSeconds() {
-    return this.getTimeout(QUERY_KEY.APPLOCK_UNFOCUS_TIMEOUT, 'APPLOCK_UNFOCUS_TIMEOUT');
+  getInnactivityAppLockTimeoutInSeconds() {
+    return this.getTimeout(QUERY_KEY.APPLOCK_INACTIVITY_TIMEOUT, 'APPLOCK_INACTIVITY_TIMEOUT');
   }
 
-  getScheduledAppLockTimeoutInSeconds() {
-    return this.getTimeout(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT, 'APPLOCK_SCHEDULED_TIMEOUT');
-  }
-
-  isUnfocusAppLockEnabled() {
-    return this.getUnfocusAppLockTimeoutInSeconds() !== null;
-  }
-
-  isScheduledAppLockEnabled() {
-    return this.getScheduledAppLockTimeoutInSeconds() !== null;
+  isInnactivityAppLockEnabled() {
+    return this.getInnactivityAppLockTimeoutInSeconds() !== null;
   }
 
   isAppLockAllowed() {
@@ -133,7 +125,7 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
 
   const startAppLockTimeout = useCallback(() => {
     window.clearTimeout(unfocusTimeoutId);
-    const id = window.setTimeout(showAppLock, appLockSettings.getUnfocusAppLockTimeoutInSeconds() * 1000);
+    const id = window.setTimeout(showAppLock, appLockSettings.getInactivityTimeout() * 1000);
     setUnfocusTimeoutId(id);
   }, [unfocusTimeoutId]);
 
@@ -152,7 +144,7 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
   }, []);
 
   useEffect(() => {
-    if (appLockSettings.isAppLockAllowed() && hasPassphrase() && appLockSettings.isUnfocusAppLockEnabled()) {
+    if (appLockSettings.isAppLockAllowed() && hasPassphrase() && appLockSettings.isInnactivityAppLockEnabled()) {
       window.addEventListener('blur', startAppLockTimeout);
       return () => window.removeEventListener('blur', startAppLockTimeout);
     }
@@ -160,7 +152,7 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
   }, [startAppLockTimeout]);
 
   useEffect(() => {
-    if (appLockSettings.isAppLockAllowed() && hasPassphrase() && appLockSettings.isUnfocusAppLockEnabled()) {
+    if (appLockSettings.isAppLockAllowed() && hasPassphrase() && appLockSettings.isInnactivityAppLockEnabled()) {
       window.addEventListener('focus', clearAppLockTimeout);
       return () => window.removeEventListener('focus', clearAppLockTimeout);
     }
@@ -229,10 +221,10 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
   };
 
   const startScheduledTimeout = () => {
-    if (appLockSettings.isScheduledAppLockEnabled()) {
+    if (appLockSettings.isInnactivityAppLockEnabled()) {
       window.clearTimeout(scheduledTimeoutId);
       setScheduledTimeoutId(
-        window.setTimeout(showAppLock, appLockSettings.getScheduledAppLockTimeoutInSeconds() * 1000),
+        window.setTimeout(showAppLock, appLockSettings.getInnactivityAppLockTimeoutInSeconds() * 1000),
       );
     }
   };
