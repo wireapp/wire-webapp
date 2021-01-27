@@ -1,59 +1,67 @@
-import {useEffect} from 'react';
-import {throttle} from 'Util/util';
+import {useEffect, useRef} from 'react';
 
-const useHideElement = (element: HTMLElement, timeout: number, skipClass?: string) => {
+const hideControlsClass = 'hide-controls';
+
+const useHideElement = (timeout: number, skipClass?: string) => {
+  const ref = useRef<HTMLDivElement>();
+
   useEffect(() => {
-    let hide_timeout: number = undefined;
+    if (!ref.current) {
+      return undefined;
+    }
+
+    let hideTimeout: number;
     let isMouseIn: boolean = false;
 
-    const effect = () => {
-      if (!element) {
+    const onMouseEnter = () => {
+      isMouseIn = true;
+      ref.current.classList.remove(hideControlsClass);
+    };
+
+    const onMouseLeave = () => {
+      isMouseIn = false;
+      ref.current.classList.add(hideControlsClass);
+    };
+
+    const startTimer = () => {
+      hideTimeout = window.setTimeout(() => {
+        ref.current.classList.add(hideControlsClass);
+      }, timeout);
+    };
+
+    const onMouseMove = ({target}: MouseEvent) => {
+      if (!isMouseIn) {
         return;
       }
 
-      const startTimer = () => {
-        hide_timeout = window.setTimeout(() => {
-          element.classList.add('hide-controls');
-        }, timeout);
-      };
+      window.clearTimeout(hideTimeout);
+      ref.current.classList.remove(hideControlsClass);
 
-      element.onmouseenter = () => {
-        isMouseIn = true;
-        element.classList.remove('hide-controls');
-      };
-
-      element.onmouseleave = () => {
-        isMouseIn = false;
-        if (document.hasFocus()) {
-          return element.classList.add('hide-controls');
-        }
-      };
-
-      element.onmousemove = throttle(({target}: MouseEvent) => {
-        if (!isMouseIn) {
+      let node = target as Element;
+      while (node && node !== ref.current) {
+        if (node.classList.contains(skipClass)) {
           return;
         }
-        window.clearTimeout(hide_timeout);
-        element.classList.remove('hide-controls');
-
-        let node = target as Element;
-        while (node && node !== element) {
-          if (node.classList.contains(skipClass)) {
-            return;
-          }
-          node = node.parentNode as Element;
-        }
-        startTimer();
-      }, 500);
-
+        node = node.parentNode as Element;
+      }
       startTimer();
     };
 
-    effect();
+    ref.current.addEventListener('mouseenter', onMouseEnter);
+    ref.current.addEventListener('mouseleave', onMouseLeave);
+    ref.current.addEventListener('mousemove', onMouseMove);
+
+    startTimer();
     return () => {
-      window.clearTimeout(hide_timeout);
+      window.clearTimeout(hideTimeout);
+      ref.current.removeEventListener('mouseenter', onMouseEnter);
+      ref.current.removeEventListener('mouseleave', onMouseLeave);
+      ref.current.removeEventListener('mousemove', onMouseMove);
+      ref.current.classList.remove(hideControlsClass);
     };
-  }, [element]);
+  }, [ref.current]);
+
+  return ref;
 };
 
 export default useHideElement;

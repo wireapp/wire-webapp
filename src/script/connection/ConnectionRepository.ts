@@ -23,7 +23,6 @@ import type {BackendEventType} from '@wireapp/api-client/src/event/BackendEvent'
 import type {UserConnectionData} from '@wireapp/api-client/src/user/data';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -37,13 +36,14 @@ import type {UserRepository} from '../user/UserRepository';
 import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
 import type {ConnectionService} from './ConnectionService';
+import {ConnectionState} from './ConnectionState';
+import {container} from 'tsyringe';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
   private readonly connectionMapper: ConnectionMapper;
-  public readonly connectionEntities: ko.Observable<{[userId: string]: ConnectionEntity}>;
 
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
@@ -51,14 +51,17 @@ export class ConnectionRepository {
     };
   }
 
-  constructor(connectionService: ConnectionService, userRepository: UserRepository) {
+  constructor(
+    connectionService: ConnectionService,
+    userRepository: UserRepository,
+    private readonly connectionState = container.resolve(ConnectionState),
+  ) {
     this.connectionService = connectionService;
     this.userRepository = userRepository;
 
     this.logger = getLogger('ConnectionRepository');
 
     this.connectionMapper = new ConnectionMapper();
-    this.connectionEntities = ko.observable({});
 
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
@@ -178,7 +181,7 @@ export class ConnectionRepository {
    * Get a connection for a user ID.
    */
   private getConnectionByUserId(userId: string): ConnectionEntity {
-    return this.connectionEntities()[userId];
+    return this.connectionState.connectionEntities()[userId];
   }
 
   /**
@@ -187,7 +190,7 @@ export class ConnectionRepository {
    * @returns User connection entity
    */
   getConnectionByConversationId(conversationId: string): ConnectionEntity {
-    const connectionEntities = Object.values(this.connectionEntities());
+    const connectionEntities = Object.values(this.connectionState.connectionEntities());
     return connectionEntities.find(connectionEntity => connectionEntity.conversationId === conversationId);
   }
 
@@ -204,7 +207,7 @@ export class ConnectionRepository {
       const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
       return newConnectionEntities.length
         ? this.updateConnections(newConnectionEntities)
-        : Object.values(this.connectionEntities());
+        : Object.values(this.connectionState.connectionEntities());
     } catch (error) {
       this.logger.error(`Failed to retrieve connections from backend: ${error.message}`, error);
       throw error;
@@ -231,7 +234,7 @@ export class ConnectionRepository {
   }
 
   addConnectionEntity(connectionEntity: ConnectionEntity): void {
-    this.connectionEntities()[connectionEntity.userId] = connectionEntity;
+    this.connectionState.connectionEntities()[connectionEntity.userId] = connectionEntity;
   }
 
   /**
@@ -252,10 +255,10 @@ export class ConnectionRepository {
     const updatedConnections = connectionEntities.reduce((allConnections, connectionEntity) => {
       allConnections[connectionEntity.userId] = connectionEntity;
       return allConnections;
-    }, this.connectionEntities());
-    this.connectionEntities(updatedConnections);
+    }, this.connectionState.connectionEntities());
+    this.connectionState.connectionEntities(updatedConnections);
     await this.userRepository.updateUsersFromConnections(connectionEntities);
-    return Object.values(this.connectionEntities());
+    return Object.values(this.connectionState.connectionEntities());
   }
 
   /**

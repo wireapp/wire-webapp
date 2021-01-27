@@ -62,7 +62,9 @@ jobs:
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: Skip CI
-        if: contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[skip ci]') || contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
+        if: |
+          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[skip ci]') ||
+          contains(env.TITLE || env.PR_LAST_COMMIT_MESSAGE, '[ci skip]')
         uses: andymckay/cancel-action@0.2
 
       - name: Cancel Previous Runs
@@ -76,17 +78,21 @@ jobs:
       - name: Authenticate git clone
         env:
           GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
-        run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
+        run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
+        # Run for all PRs with DISTRIBUTION == 'wire' and all pushes to master/dev
+        if: env.DISTRIBUTION == 'wire' || github.event_name != 'pull_request'
         run: yarn --frozen-lockfile
 
       - name: Test
+        # Run for all PRs and pushes to master/dev with DISTRIBUTION == 'wire'
         if: env.DISTRIBUTION == 'wire'
-        run: yarn test --coverage --detectOpenHandles --forceExit
+        run: yarn test --coverage --detectOpenHandles=false --forceExit
 
       - name: Monitor coverage
-        if: github.event_name == 'pull_request' && env.DISTRIBUTION == 'wire'
+        # Run for all PRs with DISTRIBUTION == 'wire'
+        if: env.DISTRIBUTION == 'wire' && github.event_name == 'pull_request'
         uses: slavcodev/coverage-monitor-action@1.2.0
         with:
           github_token: ${{github.token}}
@@ -201,7 +207,10 @@ jobs:
           wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
 
       - name: Push master/dev/edge Docker image
-        if: env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'edge'
+        if: |
+          env.BRANCH_NAME == 'master' ||
+          env.BRANCH_NAME == 'dev' ||
+          env.BRANCH_NAME == 'edge'
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}

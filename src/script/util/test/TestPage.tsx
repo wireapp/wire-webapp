@@ -45,6 +45,8 @@ export default class TestPage<T> {
   click = (element: ReactWrapper) => this.do(() => element.simulate('click'));
   doubleClick = (element: ReactWrapper) => this.do(() => element.simulate('dblclick'));
   changeValue = (element: ReactWrapper, value: any) => this.do(() => element.simulate('change', {target: {value}}));
+  changeCheckboxValue = (element: ReactWrapper, value: any) =>
+    this.do(() => element.simulate('change', {target: {checked: value}}));
   changeFiles = (element: ReactWrapper, files: File[]) => this.do(() => element.simulate('change', {target: {files}}));
   submit = (element: ReactWrapper) => this.do(() => element.simulate('submit'));
   mouseEnter = (element: ReactWrapper) => this.do(() => element.simulate('mouseenter'));

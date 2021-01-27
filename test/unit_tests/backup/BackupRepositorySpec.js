@@ -195,15 +195,15 @@ describe('BackupRepository', () => {
         importEntities: jest.fn(),
       };
 
-      const connectionRepository = {
-        connectionEntities: jest.fn().mockImplementation(() => []),
-      };
-
       const conversationRepository = {
         checkForDeletedConversations: jest.fn(),
         map_connections: jest.fn().mockImplementation(() => []),
         updateConversationStates: jest.fn().mockImplementation(conversations => conversations),
         updateConversations: jest.fn().mockImplementation(async () => {}),
+      };
+
+      const connectionState = {
+        connectionEntities: jest.fn().mockImplementation(() => []),
       };
 
       const clientState = {
@@ -222,10 +222,10 @@ describe('BackupRepository', () => {
 
       const backupRepo = new BackupRepository(
         backupService,
-        connectionRepository,
         conversationRepository,
         clientState,
         userState,
+        connectionState,
       );
 
       const metadataArray = [{...backupRepo.createMetaData(), version: 15}];

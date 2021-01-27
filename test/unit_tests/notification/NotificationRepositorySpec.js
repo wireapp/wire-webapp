@@ -230,7 +230,7 @@ describe('NotificationRepository', () => {
     it('if the browser tab has focus and conversation is active', () => {
       testFactory.conversation_repository.conversationState.activeConversation(conversation_et);
       document.hasFocus = () => true;
-      testFactory.calling_repository.joinedCall = () => true;
+      spyOn(testFactory.calling_repository.callState, 'joinedCall').and.returnValue(true);
 
       return testFactory.notification_repository
         .notify(message_et, undefined, conversation_et)

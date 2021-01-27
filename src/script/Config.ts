@@ -45,7 +45,7 @@ export class Configuration {
   readonly MAX_GROUP_PARTICIPANTS = env.MAX_GROUP_PARTICIPANTS || 500;
   readonly MAX_VIDEO_PARTICIPANTS = env.MAX_VIDEO_PARTICIPANTS || 4;
   readonly NEW_PASSWORD_MINIMUM_LENGTH = env.NEW_PASSWORD_MINIMUM_LENGTH || ValidationUtil.DEFAULT_PASSWORD_MIN_LENGTH;
-  readonly URL = env.URL || {
+  readonly URL = {
     ACCOUNT_BASE: 'https://account.wire.com',
     MOBILE_BASE: '',
     PRIVACY_POLICY: 'https://wire-website-staging.zinfra.io/security',
@@ -68,6 +68,7 @@ export class Configuration {
     TERMS_OF_USE_TEAMS: 'https://wire-website-staging.zinfra.io/legal/terms/teams',
     WEBSITE_BASE: 'https://wire.com',
     WHATS_NEW: 'https://medium.com/wire-news/webapp-updates/home',
+    ...env.URL,
   };
   readonly VERSION = env.VERSION || '0.0.0';
   readonly WEBSITE_LABEL = env.WEBSITE_LABEL;

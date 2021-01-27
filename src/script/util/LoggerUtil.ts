@@ -17,8 +17,6 @@
  *
  */
 
-import 'url-search-params-polyfill';
-
 export function enableLogging(force = false, search = window.location.search): void {
   let localStorage;
 

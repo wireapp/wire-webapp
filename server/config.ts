@@ -19,12 +19,10 @@
 
 import dotenv from 'dotenv-extended';
 import fs from 'fs-extra';
-import {ContentSecurityPolicyOptions} from 'helmet/dist/middlewares/content-security-policy';
 import logdown from 'logdown';
 import path from 'path';
 
 import type {ServerConfig} from './ServerConfig';
-type ContentSecurityPolicyDirectives = ContentSecurityPolicyOptions['directives'];
 
 const nodeEnvironment = process.env.NODE_ENV || 'production';
 
@@ -36,7 +34,7 @@ const VERSION_FILE = path.join(__dirname, 'version');
 
 dotenv.load();
 
-const defaultCSP: ContentSecurityPolicyDirectives = {
+const defaultCSP = {
   connectSrc: [
     "'self'",
     'blob:',
@@ -95,8 +93,8 @@ function parseCommaSeparatedList(list: string = ''): string[] {
   return cleanedList.split(',');
 }
 
-function mergedCSP(): ContentSecurityPolicyDirectives {
-  const csp: ContentSecurityPolicyDirectives = {
+function mergedCSP(): Record<string, Iterable<string>> {
+  const csp = {
     connectSrc: [
       ...defaultCSP.connectSrc,
       process.env.BACKEND_REST,
