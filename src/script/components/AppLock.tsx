@@ -89,13 +89,14 @@ class AppLockSettings {
     return this.getScheduledAppLockTimeoutInSeconds() !== null;
   }
 
-  isAppLockEnabled() {
-    return this.isUnfocusAppLockEnabled() || this.isScheduledAppLockEnabled();
-  }
-
-  isAppLockShowInPreferences() {
+  isAppLockAllowed() {
     const appLock = this.teamState.teamFeatures()?.['appLock'];
     return appLock?.status === 'enabled';
+  }
+
+  isAppLockEnforced() {
+    const appLock = this.teamState.teamFeatures()?.['appLock'];
+    return appLock?.config?.enforceAppLock;
   }
 }
 
@@ -141,15 +142,17 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
   }, [unfocusTimeoutId]);
 
   useEffect(() => {
-    if (appLockSettings.isAppLockEnabled()) {
-      showAppLock();
+    if (appLockSettings.isAppLockAllowed()) {
+      if (appLockSettings.isAppLockEnforced() || hasPassphrase()) {
+        showAppLock();
+      }
       startPassphraseObserver();
     }
     amplify.subscribe(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE, changePassphrase);
   }, []);
 
   useEffect(() => {
-    if (appLockSettings.isAppLockEnabled() && appLockSettings.isUnfocusAppLockEnabled()) {
+    if (appLockSettings.isAppLockAllowed() && hasPassphrase() && appLockSettings.isUnfocusAppLockEnabled()) {
       window.addEventListener('blur', startAppLockTimeout);
       return () => window.removeEventListener('blur', startAppLockTimeout);
     }
@@ -157,7 +160,7 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
   }, [startAppLockTimeout]);
 
   useEffect(() => {
-    if (appLockSettings.isAppLockEnabled() && appLockSettings.isUnfocusAppLockEnabled()) {
+    if (appLockSettings.isAppLockAllowed() && hasPassphrase() && appLockSettings.isUnfocusAppLockEnabled()) {
       window.addEventListener('focus', clearAppLockTimeout);
       return () => window.removeEventListener('focus', clearAppLockTimeout);
     }
@@ -183,10 +186,10 @@ const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser})
 
   const storageKey = `${APP_LOCK_STORAGE}_${selfUser.id}`;
   const getStored = () => window.localStorage.getItem(storageKey);
+  const hasPassphrase = () => !!getStored();
 
   const showAppLock = () => {
-    const hasCode = !!getStored();
-    setAppLockState(hasCode ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setAppLockState(hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
