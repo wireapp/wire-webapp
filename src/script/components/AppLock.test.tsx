@@ -94,7 +94,7 @@ describe('AppLock', () => {
       const appLockModal = appLockPage.getAppLockModal();
       expect(appLockModal.props().style.display).toBe('none');
     });
-    it.skip('shows the locked modal on start if timeout is set as flag and a code is stored', () => {
+    it('shows the locked modal on start if timeout is set as flag and a code is stored', () => {
       spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
         FEATURE: {
           APPLOCK_INACTIVITY_TIMEOUT: 10,

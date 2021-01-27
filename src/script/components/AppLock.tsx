@@ -41,15 +41,13 @@ const passwordRegexUpper = /(?=.*[A-Z])/;
 export interface AppLockProps {
   clientRepository: ClientRepository;
   selfUser: User;
+  teamState?: TeamState;
 }
 
 const APP_LOCK_STORAGE = 'app_lock';
 
 class AppLockSettings {
-  private readonly teamState: TeamState;
-  constructor() {
-    this.teamState = container.resolve(TeamState);
-  }
+  constructor(private readonly teamState: TeamState) {}
 
   getInactivityAppLockTimeoutInSeconds() {
     const appLock = this.teamState.teamFeatures()?.['appLock'];
@@ -93,9 +91,8 @@ class AppLockSettings {
   }
 }
 
-export const appLockSettings = new AppLockSettings();
-
-const AppLock: React.FC<AppLockProps> = ({children, clientRepository, selfUser}) => {
+const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamState), clientRepository, selfUser}) => {
+  const appLockSettings = new AppLockSettings(teamState);
   const [appLockState, setAppLockState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [wipeError, setWipeError] = useState('');
   const [unlockError, setUnlockError] = useState('');
