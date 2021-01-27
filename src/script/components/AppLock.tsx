@@ -53,8 +53,12 @@ class AppLockSettings {
 
   getInactivityAppLockTimeoutInSeconds() {
     const appLock = this.teamState.teamFeatures()?.['appLock'];
+    const queryTimeout = parseInt(UrlUtil.getURLParameter(QUERY_KEY.APPLOCK_INACTIVITY_TIMEOUT), 10);
     const backendTimeout = appLock?.status === 'enabled' ? appLock.config.inactivityTimeoutSecs : null;
 
+    if (Number.isFinite(queryTimeout)) {
+      return queryTimeout;
+    }
     if (Number.isFinite(backendTimeout)) {
       return backendTimeout;
     }
