@@ -75,11 +75,13 @@ describe('AppLock', () => {
 
   describe('constructor', () => {
     it('does not shows up if no valid timeout is set', () => {
-      writeableConfig.FEATURE = {
-        ...writeableConfig.FEATURE,
-        APPLOCK_SCHEDULED_TIMEOUT: undefined,
-        APPLOCK_UNFOCUS_TIMEOUT: undefined,
-      };
+      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>. 
+      (Config, 'getConfig').and.returnValue({
+        FEATURE: {
+          APPLOCK_SCHEDULED_TIMEOUT: undefined,
+          APPLOCK_UNFOCUS_TIMEOUT: undefined,
+        },
+      });
       initAppLock();
       const appLockModal = document.querySelector('[data-uie-name=applock-modal]') as HTMLDivElement;
       expect(appLockModal.style.display).toBe('none');
