@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "wire-web-config-internal": "https://github.com/wireapp/wire-web-config-default#v0.28.2",
+    "wire-web-config-production": "https://github.com/wireapp/wire-web-config-wire#v0.28.3-0"
+  }
+}
