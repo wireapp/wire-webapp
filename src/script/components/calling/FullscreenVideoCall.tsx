@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {css} from '@emotion/core';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -89,8 +89,8 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   maximizedParticipant,
   videoSpeakersActiveTab,
 }) => {
-  const selfSharesScreen = call.getSelfParticipant().sharesScreen();
-  const selfSharesCamera = call.getSelfParticipant().sharesCamera();
+  const selfSharesScreen = call.getSelfParticipant()?.sharesScreen() ?? false;
+  const selfSharesCamera = call.getSelfParticipant()?.sharesCamera() ?? false;
   const currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput();
   const switchCameraSource = (call: Call, deviceId: string) => callActions.switchCameraInput(call, deviceId);
   const minimize = () => multitasking.isMinimized(true);
@@ -103,8 +103,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     [videoInput],
   );
   const showSwitchCamera = selfSharesCamera && availableCameras.length > 1;
-  const wrapper = useRef<HTMLDivElement>();
-  useHideElement(wrapper.current, FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
+  const wrapper = useHideElement(FullscreenVideoCallConfig.HIDE_CONTROLS_TIMEOUT, 'video-controls__button');
 
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
