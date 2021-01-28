@@ -149,7 +149,6 @@ describe('AppLock', () => {
       });
       amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
       appLockPage.update();
-      appLockPage.debug();
       expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP).exists()).toBe(true);
     });
     // it('show the app lock setup modal dialog, when enabled, enforced and there is no stored passphrase', () => {});
