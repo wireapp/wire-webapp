@@ -49,7 +49,7 @@ jobs:
           PR_TITLE: github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE
         run: |
           echo "TITLE=${PR_TITLE}" >> $GITHUB_ENV
-          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || (github.event_name == 'pull_request' && contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop'))}}" >> $GITHUB_ENV
+          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
 
       - name: Print environment variables
         env:
@@ -340,7 +340,15 @@ jobs:
       - name: Set BUILD_DESKTOP
         shell: bash
         run: |
-          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || (github.event_name == 'pull_request' && contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop'))}}" >> $GITHUB_ENV
+          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
+
+      - name: Print environment variables
+        env:
+          GITHUB_CONTEXT: ${{toJson(github)}}
+        run: |
+          echo -e "TAG = ${TAG}"
+          echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
+          echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: 'Use latest Node.js v12'
         if: env.BUILD_DESKTOP == 'true'
