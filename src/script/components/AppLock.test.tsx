@@ -148,6 +148,7 @@ describe('AppLock', () => {
         teamState: teamState as TeamState,
       });
       amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
+      appLockPage.update();
       appLockPage.debug();
       expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP).exists()).toBe(true);
     });
