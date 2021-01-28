@@ -202,7 +202,7 @@
   },
   "scripts": {
     "build:prod": "yarn build:server && grunt build_prod",
-    "build:server": "cd server && yarn build",
+    "build:server": "cd server && yarn && yarn build",
     "build:style": "node ./bin/less.js",
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",

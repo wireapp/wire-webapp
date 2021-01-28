@@ -11,6 +11,7 @@ on:
 
 jobs:
   test_build_deploy:
+    name: 'Webapp Pipeline'
     runs-on: ubuntu-latest
 
     strategy:
@@ -106,7 +107,7 @@ jobs:
           threshold_alert: ${{env.TEST_COVERAGE_FAIL_THRESHOLD}}
           threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
 
-      - name: Build
+      - name: 'Build webapp'
         # Run for all pushes to master/dev with DISTRIBUTION == 'wire'
         # and when a Desktop version should be built
         if: |
