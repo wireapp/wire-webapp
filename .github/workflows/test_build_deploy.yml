@@ -88,6 +88,7 @@ jobs:
         # and when a Desktop version should be built
         if: |
           env.DISTRIBUTION == 'wire' ||
+          github.event_name != 'pull_request' ||
           env.BUILD_DESKTOP == 'true'
         run: yarn --frozen-lockfile
 
