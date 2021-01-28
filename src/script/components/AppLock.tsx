@@ -283,7 +283,7 @@ const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamStat
           {headerText()}
         </div>
       </div>
-      <div className="modal__body">
+      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={appLockState}>
         {appLockState === APPLOCK_STATE.SETUP && (
           <form onSubmit={onSetCode}>
             <div

@@ -19,6 +19,8 @@
 
 import {act} from '@testing-library/react';
 import type {TypeUtil} from '@wireapp/commons';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import ko from 'knockout';
 import TestPage from 'Util/test/TestPage';
 import type {ClientRepository} from '../client/ClientRepository';
@@ -26,12 +28,13 @@ import type {ClientService} from '../client/ClientService';
 import {Config, Configuration} from '../Config';
 import type {User} from '../entity/User';
 import {TeamState} from '../team/TeamState';
-import AppLock, {AppLockProps} from './AppLock';
+import AppLock, {AppLockProps, APPLOCK_STATE} from './AppLock';
 
+require('src/script/util/test/mock/mutationObserverMock');
 require('src/script/util/test/mock/LocalStorageMock');
 
 /**
- * Show or not the applock based on:
+ * Show or not the applock based on:im
  *   - App lock enabled (status)
  *   - App lock enforced
  *   - Stored in local storage
@@ -52,6 +55,8 @@ class AppLockPage extends TestPage<AppLockProps> {
   }
 
   getAppLockModal = () => this.get('div[data-uie-name="applock-modal"]');
+  getAppLockModalBody = (appLockState: APPLOCK_STATE) =>
+    this.get(`div[data-uie-name="applock-modal-body"][data-uie-value="${appLockState}"]`);
 }
 describe('AppLock', () => {
   beforeEach(() => {
@@ -116,7 +121,22 @@ describe('AppLock', () => {
   });
 
   describe('applock', () => {
-    it('show the app lock unlock modal dialog, when enabled and passphrase is stored', () => {
+    it('show the app lock modal locked when it the passhprase is set and app lock is enabled', () => {
+      const teamState: Partial<TeamState> = {
+        isAppLockEnabled: ko.pureComputed(() => true),
+        isAppLockEnforced: ko.pureComputed(() => false),
+      };
+      spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
+
+      const appLockPage = new AppLockPage({
+        clientRepository: ({} as unknown) as ClientRepository,
+        selfUser: ({id: 'userID'} as unknown) as User,
+        teamState: teamState as TeamState,
+      });
+      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.LOCKED).exists()).toBe(true);
+    });
+
+    it('show the app lock modal setup when there is no passhprase is set and app lock is enabled', () => {
       const teamState: Partial<TeamState> = {
         isAppLockEnabled: ko.pureComputed(() => true),
         isAppLockEnforced: ko.pureComputed(() => false),
@@ -127,42 +147,43 @@ describe('AppLock', () => {
         selfUser: ({id: 'userID'} as unknown) as User,
         teamState: teamState as TeamState,
       });
-
-      expect(true).toBe(true);
+      amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
+      appLockPage.debug();
+      expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP).exists()).toBe(true);
     });
-    it('show the app lock setup modal dialog, when enabled, enforced and there is no stored passphrase', () => {});
-    it('show the app lock setup modal dialog, when enabled, enforced and there is no stored passphrase', () => {});
+    // it('show the app lock setup modal dialog, when enabled, enforced and there is no stored passphrase', () => {});
+    // it('show the app lock setup modal dialog, when enabled, enforced and there is no stored passphrase', () => {});
   });
-  describe('unlock', () => {
-    // TODO: Figure out the steps to hide the modal after submitting the passphrase.
-    it.skip('stores the passphrase, respects the timeout and unlocks', async () => {
-      jest.useFakeTimers();
-      spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
-        FEATURE: {
-          APPLOCK_INACTIVITY_TIMEOUT: 10,
-        },
-      });
-      let storedCode: string;
-      const passphrase = 'abcABC123!';
-      jest.spyOn(window.localStorage, 'setItem').mockImplementation((_, code) => {
-        storedCode = code;
-      });
-      jest.spyOn(window.localStorage, 'getItem').mockImplementation(() => {
-        return storedCode;
-      });
-      const page = initAppLock();
-      const setupInput = page.get('input[data-uie-name="input-applock-set-a"]');
-      expect(setupInput).toBeDefined();
-      setupInput.simulate('change', {target: {value: passphrase}});
-      await page.get('form').simulate('submit');
-      expect(storedCode).toBeDefined();
-      const appLockModal = document.querySelector('[data-uie-name=applock-modal]') as HTMLDivElement;
-      expect(appLockModal.style.display).toBe('none');
-      window.dispatchEvent(new Event('blur'));
-      jest.advanceTimersByTime(5000);
-      expect(appLockModal.style.display).toBe('none');
-      jest.advanceTimersByTime(6000);
-      expect(appLockModal.style.display).toBe('flex');
-    });
-  });
+  // describe('unlock', () => {
+  //   // TODO: Figure out the steps to hide the modal after submitting the passphrase.
+  //   it.skip('stores the passphrase, respects the timeout and unlocks', async () => {
+  //     jest.useFakeTimers();
+  //     spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+  //       FEATURE: {
+  //         APPLOCK_INACTIVITY_TIMEOUT: 10,
+  //       },
+  //     });
+  //     let storedCode: string;
+  //     const passphrase = 'abcABC123!';
+  //     jest.spyOn(window.localStorage, 'setItem').mockImplementation((_, code) => {
+  //       storedCode = code;
+  //     });
+  //     jest.spyOn(window.localStorage, 'getItem').mockImplementation(() => {
+  //       return storedCode;
+  //     });
+  //     const page = initAppLock();
+  //     const setupInput = page.get('input[data-uie-name="input-applock-set-a"]');
+  //     expect(setupInput).toBeDefined();
+  //     setupInput.simulate('change', {target: {value: passphrase}});
+  //     await page.get('form').simulate('submit');
+  //     expect(storedCode).toBeDefined();
+  //     const appLockModal = document.querySelector('[data-uie-name=applock-modal]') as HTMLDivElement;
+  //     expect(appLockModal.style.display).toBe('none');
+  //     window.dispatchEvent(new Event('blur'));
+  //     jest.advanceTimersByTime(5000);
+  //     expect(appLockModal.style.display).toBe('none');
+  //     jest.advanceTimersByTime(6000);
+  //     expect(appLockModal.style.display).toBe('flex');
+  //   });
+  // });
 });
