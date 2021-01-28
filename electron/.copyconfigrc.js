@@ -27,7 +27,7 @@ const contentSource = 'wire-desktop/content';
 const imageSource = `${contentSource}/image`;
 const macOsSource = `${contentSource}/macos`;
 
-const configurationEntry = `wire-web-config-${process.env.APP_ENV !== 'internal' ? 'production' : 'internal'}`;
+const configurationEntry = `wire-web-config-${process.env.TAG == 'production' ? 'production' : 'internal'}`;
 const repositoryUrl = appConfigPkg.dependencies[configurationEntry];
 
 /** @type {CopyConfigOptions} */
