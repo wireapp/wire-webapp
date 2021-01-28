@@ -10,7 +10,7 @@ on:
     branches: [master, dev, edge, avs]
 
 jobs:
-  'Build Webapp':
+  build_webapp:
     if: |
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.title, '+ElectronBuild')
@@ -80,7 +80,7 @@ jobs:
           name: webapp-dist
           path: server/dist
 
-  'Build Electron binaries':
+  build_electron_binaries:
     if: |
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.title, '+ElectronBuild')
@@ -120,6 +120,7 @@ jobs:
 
       - name: Build Electron App for Windows
         if: matrix.os == 'windows-latest'
+        shell: bash
         working-directory: electron
         run: |
           echo "OS=windows" >> $GITHUB_ENV
