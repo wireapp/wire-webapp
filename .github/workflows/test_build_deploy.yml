@@ -1,4 +1,4 @@
-name: Test, Build & Deploy
+name: CI
 
 on:
   push:
