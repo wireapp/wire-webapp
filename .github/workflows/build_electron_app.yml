@@ -85,7 +85,7 @@ jobs:
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.title, '+ElectronBuild')
     needs: build_webapp
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{matrix.os}}
 
     strategy:
       matrix:
@@ -101,6 +101,18 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
+
+      - name: Cache Electron
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/.cache/electron
+          key: ${{runner.os}}-electron-cache-${{hashFiles(format('{0}{1}', github.workspace, '/yarn.lock'))}}
+
+      - name: Cache Electron-Builder
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/.cache/electron-builder
+          key: ${{runner.os}}-electron-builder-cache-${{hashFiles(format('{0}{1}', github.workspace, '/yarn.lock'))}}
 
       - name: Download WebApp artifacts
         uses: actions/download-artifact@v2
@@ -147,14 +159,14 @@ jobs:
           name: electron-app-${{env.OS}}
           path: electron/build/WireDevelopment*
 
-      - name: Attach Electron build to release assets
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{github.token}}
-        with:
-          # TODO: Pair with webapp build
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: electron/build/WireDevelopment*
-          asset_name: electron-app-${{env.OS}}
-          asset_content_type: application/zip
+      # - name: Attach Electron build to release assets
+      #   id: upload-release-asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{github.token}}
+      #   with:
+      #     # TODO: Pair with webapp build
+      #     upload_url: ${{steps.create_release.outputs.upload_url}}
+      #     asset_path: electron/build/WireDevelopment*
+      #     asset_name: electron-app-${{env.OS}}
+      #     asset_content_type: application/zip
