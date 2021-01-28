@@ -336,6 +336,7 @@ jobs:
         shell: bash
         run: |
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+          echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
 
       - name: Set BUILD_DESKTOP
         shell: bash
@@ -343,6 +344,7 @@ jobs:
           echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
 
       - name: Print environment variables
+        shell: bash
         env:
           GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
