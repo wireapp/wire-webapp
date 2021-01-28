@@ -11,6 +11,7 @@ on:
 
 jobs:
   build_webapp:
+    name: 'Build Webapp'
     if: |
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.title, '+ElectronBuild')
@@ -81,6 +82,7 @@ jobs:
           path: server/dist
 
   build_electron_binaries:
+    name: 'Build Electron binaries'
     if: |
       github.event_name != 'pull_request' ||
       contains(github.event.pull_request.title, '+ElectronBuild')
