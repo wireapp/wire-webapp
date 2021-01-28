@@ -40,13 +40,19 @@ const passwordRegexUpper = /(?=.*[A-Z])/;
 
 export interface AppLockProps {
   clientRepository: ClientRepository;
+  clientState?: ClientState;
   selfUser: User;
   teamState?: TeamState;
 }
 
 const APP_LOCK_STORAGE = 'app_lock';
 
-const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamState), clientRepository, selfUser}) => {
+const AppLock: React.FC<AppLockProps> = ({
+  clientRepository,
+  selfUser,
+  teamState = container.resolve(TeamState),
+  clientState = container.resolve(ClientState),
+}) => {
   const [appLockState, setAppLockState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [wipeError, setWipeError] = useState('');
   const [unlockError, setUnlockError] = useState('');
@@ -55,7 +61,6 @@ const AppLock: React.FC<AppLockProps> = ({teamState = container.resolve(TeamStat
   const [setupPassphrase, setSetupPassphrase] = useState('');
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
-  const {current: clientState} = useRef(container.resolve(ClientState));
 
   const {current: appObserver} = useRef(
     new MutationObserver(mutationRecords => {
