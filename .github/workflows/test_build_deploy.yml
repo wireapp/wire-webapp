@@ -84,7 +84,8 @@ jobs:
         run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        # Run for all PRs with DISTRIBUTION == 'wire' and all pushes to master/dev
+        # Run for all PRs with DISTRIBUTION == 'wire', all pushes to master/dev
+        # and when a Desktop version should be built
         if: |
           env.DISTRIBUTION == 'wire' ||
           env.BUILD_DESKTOP == 'true'
@@ -106,6 +107,8 @@ jobs:
           threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
 
       - name: Build
+        # Run for all pushes to master/dev with DISTRIBUTION == 'wire'
+        # and when a Desktop version should be built
         if: |
           github.event_name != 'pull_request' ||
           env.BUILD_DESKTOP == 'true'
