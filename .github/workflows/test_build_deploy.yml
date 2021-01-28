@@ -82,7 +82,10 @@ jobs:
 
       - name: Install JS dependencies
         # Run for all PRs with DISTRIBUTION == 'wire' and all pushes to master/dev
-        if: env.DISTRIBUTION == 'wire' || github.event_name != 'pull_request'
+        if: |
+          env.DISTRIBUTION == 'wire' ||
+          github.event_name != 'pull_request' ||
+          contains(github.event.pull_request.title, '+ElectronBuild')
         run: yarn --frozen-lockfile
 
       - name: Test
@@ -101,7 +104,9 @@ jobs:
           threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
 
       - name: Build
-        if: github.event_name != 'pull_request'
+        if: |
+          github.event_name != 'pull_request' ||
+          contains(github.event.pull_request.title, '+ElectronBuild')
         run: yarn build:prod
 
       # https://wire-webapp-avs.zinfra.io/
@@ -298,3 +303,132 @@ jobs:
           password: ${{secrets.WIRE_BOT_PASSWORD}}
           conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
           text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
+
+      - name: Build config.js file for Electron
+        if: env.DISTRIBUTION == 'wire'
+        run: node electron/bin/build-config.js
+
+      - name: Upload WebApp artifacts
+        if: env.DISTRIBUTION == 'wire'
+        uses: actions/upload-artifact@v2
+        with:
+          name: webapp-dist
+          path: server/dist
+
+  build_electron_binaries:
+    name: 'Build Electron binaries'
+    if: |
+      github.event_name != 'pull_request' ||
+      contains(github.event.pull_request.title, '+ElectronBuild')
+    needs: test_build_deploy
+    runs-on: ${{matrix.os}}
+
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set environment variables
+        shell: bash
+        run: |
+          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+
+      - name: 'Use latest Node.js v12'
+        #if: contains(env.TAG, 'staging') || contains(env.TAG, 'production')
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Cache Electron
+        #if: contains(env.TAG, 'staging') || contains(env.TAG, 'production')
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/.cache/electron
+          key: ${{runner.os}}-electron-cache-${{hashFiles(format('{0}{1}', github.workspace, 'electron/yarn.lock'))}}
+          restore-keys: ${{runner.os}}-electron-cache-
+
+      - name: Cache Electron-Builder
+        #if: contains(env.TAG, 'staging') || contains(env.TAG, 'production')
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/.cache/electron-builder
+          key: ${{runner.os}}-electron-builder-cache-${{hashFiles(format('{0}{1}', github.workspace, 'electron/yarn.lock'))}}
+          restore-keys: ${{runner.os}}-electron-builder-cache-
+
+      - name: Download WebApp artifacts
+        #if: contains(env.TAG, 'staging') || contains(env.TAG, 'production')
+        uses: actions/download-artifact@v2
+        with:
+          name: webapp-dist
+          path: server/dist
+
+      - name: Install JS dependencies
+        #if: contains(env.TAG, 'staging') || contains(env.TAG, 'production')
+        working-directory: electron
+        run: yarn
+
+      - name: Prepare Building Electron App
+        #if: contains(env.TAG, 'staging') || contains(env.TAG, 'production')
+        working-directory: electron
+        run: |
+          yarn copy:webapp
+          yarn dist
+
+      - name: Build Electron App for Windows
+        #if: contains(env.TAG, 'staging') || contains(env.TAG, 'production') && matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        working-directory: electron
+        run: |
+          echo "OS=windows" >> $GITHUB_ENV
+          yarn build:windows
+
+      - name: Build Electron App for Linux
+        #if: contains(env.TAG, 'staging') || contains(env.TAG, 'production') && matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: electron
+        run: |
+          echo "OS=linux" >> $GITHUB_ENV
+          yarn build:linux
+
+      - name: Build Electron App for macOS
+        if: matrix.os == 'macos-latest'
+        working-directory: electron
+        run: |
+          echo "OS=macos" >> $GITHUB_ENV
+          yarn build:mac
+
+      - name: Upload Electron artifacts
+        uses: actions/upload-artifact@v2
+        #if: contains(env.TAG, 'staging') || contains(env.TAG, 'production')
+        with:
+          name: electron-app-${{env.OS}}
+          path: electron/build/WireDevelopment*
+
+      - name: Attach Electron build to staging release assets
+        if: contains(env.TAG, 'staging')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          upload_url: ${{needs.test_build_deploy.outputs.upload_url}}
+          asset_path: electron/build/WireDevelopment*
+          asset_name: electron-app-${{env.OS}}
+          asset_content_type: application/zip
+
+      - name: Attach Electron build to production release assets
+        if: contains(env.TAG, 'production')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          upload_url: ${{needs.test_build_deploy.outputs.upload_url}}
+          asset_path: electron/build/WireDevelopment*
+          asset_name: electron-app-${{env.OS}}
+          asset_content_type: application/zip
+

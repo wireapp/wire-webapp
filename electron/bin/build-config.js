@@ -22,8 +22,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const {config} = require('../../server/dist/config');
-const staticWebappDir = path.resolve(__dirname, '../../server/dist/static/');
+const serverDist = path.resolve(__dirname, '../../server/dist');
+
+const {config} = require(path.join(serverDist, 'config'));
+const staticWebappDir = path.join(serverDist, 'static/');
 
 const clientConfig = {
   ...config.CLIENT,
