@@ -336,6 +336,10 @@ jobs:
         shell: bash
         run: |
           echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+
+      - name: Set BUILD_DESKTOP
+        shell: bash
+        run: |
           echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || (github.event_name == 'pull_request' && contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop'))}}" >> $GITHUB_ENV
 
       - name: 'Use latest Node.js v12'
