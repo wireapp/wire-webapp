@@ -26,6 +26,7 @@ class ChooseScreenPage extends TestPage<ChooseScreenProps> {
     super(ChooseScreen, props);
   }
   getListItems = () => this.get('.choose-screen-list-item');
+  getCancelButton = () => this.get('[data-uie-name="do-choose-screen-cancel"]');
 }
 
 describe('ChooseScreen', () => {
@@ -61,8 +62,7 @@ describe('ChooseScreen', () => {
 
   it('calls cancel on cancel button click', () => {
     const chooseScreen = new ChooseScreenPage(props);
-    const close = chooseScreen.get('[data-uie-name="do-choose-screen-cancel"]');
-    close.simulate('click');
+    chooseScreen.getCancelButton().simulate('click');
     expect(props.cancel).toHaveBeenCalled();
   });
 
