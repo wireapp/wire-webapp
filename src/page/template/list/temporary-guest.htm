@@ -5,10 +5,12 @@
         data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': getConversationById(activeCall.conversationId).display_name}"
         params="
           call: activeCall,
+          videoSpeakersActiveTab: videoSpeakersActiveTab,
           videoGrid: getVideoGrid(activeCall),
           conversation: getConversationById(activeCall.conversationId),
           multitasking: multitasking,
           callingRepository: callingRepository,
+          maximizedTileVideoParticipant: maximizedTileVideoParticipant,
           teamRepository: teamRepository,
           temporaryUserStyle: true,
           callActions: callActions,

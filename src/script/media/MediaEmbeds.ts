@@ -17,8 +17,6 @@
  *
  */
 
-import 'url-search-params-polyfill';
-
 import {Runtime} from '@wireapp/commons';
 import {formatString} from 'Util/StringUtil';
 

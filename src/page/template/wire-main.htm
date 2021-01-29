@@ -96,12 +96,15 @@
         <fullscreen-video-call params="
           videoGrid: getVideoGrid(call),
           call: call,
+          videoSpeakersActiveTab: videoSpeakersActiveTab,
           conversation: getConversationById(call.conversationId),
           multitasking: multitasking,
           canShareScreen: callingRepository.supportsScreenSharing,
           callActions: callActions,
+          maximizedParticipant: maximizedTileVideoParticipant,
+          videoInput: mediaDevicesHandler.availableDevices.videoInput,
           mediaDevicesHandler: mediaDevicesHandler,
-          isMuted: callingRepository.isMuted,
+          isMuted: callState.isMuted,
           isChoosingScreen: isChoosingScreen">
        </fullscreen-video-call>
       <!-- /ko -->

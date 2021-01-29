@@ -25,6 +25,7 @@ import {User} from 'src/script/entity/User';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {TestFactory} from '../../helper/TestFactory';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
+import {ConnectionState} from 'src/script/connection/ConnectionState';
 
 describe('ConnectionRepository', () => {
   let server = undefined;
@@ -40,7 +41,7 @@ describe('ConnectionRepository', () => {
   });
 
   afterEach(() => {
-    connectionRepository.connectionEntities({});
+    connectionRepository.connectionState.connectionEntities({});
     server.restore();
   });
 
@@ -124,11 +125,12 @@ describe('ConnectionRepository', () => {
         updateUsersFromConnections: jest.fn(),
       };
 
-      const connectionRepo = new ConnectionRepository(connectionServiceSpy, userRepoSpy);
+      const connectionState = new ConnectionState();
+      const connectionRepo = new ConnectionRepository(connectionServiceSpy, userRepoSpy, connectionState);
 
       await connectionRepo.getConnections();
 
-      const connectionEntities = Object.values(connectionRepo.connectionEntities());
+      const connectionEntities = Object.values(connectionState.connectionEntities());
       expect(connectionEntities.length).toBe(1);
       expect(connectionEntities[0].status()).toEqual(connectionRequest.status);
       expect(connectionEntities[0].conversationId).toEqual(connectionRequest.conversation);

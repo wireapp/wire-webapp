@@ -17,7 +17,6 @@
  *
  */
 
-const {createLogger} = require('redux-logger');
 import {APIClient} from '@wireapp/api-client';
 import type {TypeUtil} from '@wireapp/commons';
 import {Account} from '@wireapp/core';
@@ -77,23 +76,6 @@ export const mockStoreFactory = (
       core,
       getConfig: getConfig || defaultGetConfig,
       localStorage,
-    }),
-    createLogger({
-      actionTransformer(action: any): string {
-        return JSON.stringify(action);
-      },
-      colors: {
-        action: false,
-        error: false,
-        nextState: false,
-        prevState: false,
-        title: false,
-      },
-      level: {
-        action: 'info',
-        nextState: false,
-        prevState: false,
-      },
     }),
   ]);
 };

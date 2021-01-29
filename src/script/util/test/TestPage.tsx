@@ -34,6 +34,7 @@ export default class TestPage<T> {
   getProps = () => this.props;
 
   get = (selector: string) => this.driver.find(selector);
+  getText = () => this.driver.text();
 
   private readonly do = (action: Function) => {
     act(() => {
@@ -42,7 +43,10 @@ export default class TestPage<T> {
     this.update();
   };
   click = (element: ReactWrapper) => this.do(() => element.simulate('click'));
+  doubleClick = (element: ReactWrapper) => this.do(() => element.simulate('dblclick'));
   changeValue = (element: ReactWrapper, value: any) => this.do(() => element.simulate('change', {target: {value}}));
+  changeCheckboxValue = (element: ReactWrapper, value: any) =>
+    this.do(() => element.simulate('change', {target: {checked: value}}));
   changeFiles = (element: ReactWrapper, files: File[]) => this.do(() => element.simulate('change', {target: {files}}));
   submit = (element: ReactWrapper) => this.do(() => element.simulate('submit'));
   mouseEnter = (element: ReactWrapper) => this.do(() => element.simulate('mouseenter'));
@@ -50,5 +54,6 @@ export default class TestPage<T> {
   keyCodeDown = (element: ReactWrapper, keyCode: number) => this.do(() => element.simulate('keydown', {keyCode}));
 
   update = () => this.driver.update();
+  setProps = (props: T) => this.do(() => this.driver.setProps(props));
   debug = (element?: ReactWrapper) => console.info((element ? element : this.driver).debug());
 }

@@ -39,7 +39,6 @@ import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
 import {PermissionState} from './PermissionState';
 
-import type {CallingRepository} from '../calling/CallingRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import {ConversationEphemeralHandler} from '../conversation/ConversationEphemeralHandler';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -61,6 +60,7 @@ import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
+import {CallState} from '../calling/CallState';
 
 export interface Multitasking {
   autoMinimize?: ko.Observable<boolean>;
@@ -92,7 +92,6 @@ interface NotificationContent {
  */
 export class NotificationRepository {
   private contentViewModelState: ContentViewModelState;
-  private readonly callingRepository: CallingRepository;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
   private readonly notifications: any[];
@@ -117,20 +116,18 @@ export class NotificationRepository {
 
   /**
    * Construct a new Notification Repository.
-   * @param callingRepository Repository for all call interactions
    * @param conversationRepository Repository for all conversation interactions
    * @param permissionRepository Repository for all permission interactions
    * @param userState Repository for users
    */
   constructor(
-    callingRepository: CallingRepository,
     conversationRepository: ConversationRepository,
     permissionRepository: PermissionRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly callState = container.resolve(CallState),
   ) {
     this.assetRepository = container.resolve(AssetRepository);
-    this.callingRepository = callingRepository;
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
     this.contentViewModelState = {multitasking: {isMinimized: () => false}, state: () => false};
@@ -796,8 +793,7 @@ export class NotificationRepository {
       ? this.conversationState.isActiveConversation(conversationEntity)
       : false;
     const inConversationView = this.contentViewModelState.state() === ContentViewModel.STATE.CONVERSATION;
-    const inMaximizedCall =
-      !!this.callingRepository.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
+    const inMaximizedCall = !!this.callState.joinedCall() && !this.contentViewModelState.multitasking.isMinimized();
 
     const activeConversation = document.hasFocus() && inConversationView && inActiveConversation && !inMaximizedCall;
     const messageFromSelf = messageEntity.user().isMe;

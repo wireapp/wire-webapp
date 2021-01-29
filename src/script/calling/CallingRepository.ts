@@ -62,6 +62,7 @@ import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoE
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
 import {Call, ConversationId} from './Call';
+import {CallState} from './CallState';
 import {ClientId, Participant, UserId} from './Participant';
 import {EventName} from '../tracking/EventName';
 import {Segmentation} from '../tracking/Segmentation';
@@ -97,10 +98,8 @@ enum CALL_DIRECTION {
 }
 
 export class CallingRepository {
-  private readonly acceptedVersionWarnings: ko.ObservableArray<string>;
   private readonly acceptVersionWarning: (conversationId: string) => void;
   private readonly callLog: string[];
-  private readonly cbrEncoding: ko.Observable<number>;
   private readonly logger: Logger;
   private avsVersion: number;
   private incomingCallCallback: (call: Call) => void;
@@ -112,9 +111,6 @@ export class CallingRepository {
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
-  public readonly activeCalls: ko.ObservableArray<Call>;
-  public readonly isMuted: ko.Observable<boolean>;
-  public readonly joinedCall: ko.PureComputed<Call | undefined>;
 
   static get CONFIG() {
     return {
@@ -131,18 +127,16 @@ export class CallingRepository {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly callState = container.resolve(CallState),
   ) {
-    this.activeCalls = ko.observableArray();
-    this.isMuted = ko.observable(false);
-    this.joinedCall = ko.pureComputed(() => {
-      return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
-    });
+    this.logger = getLogger('CallingRepository');
+    this.incomingCallCallback = () => {};
+    this.callLog = [];
 
     /** {<userId>: <isVerified>} */
     let callParticipants: Record<string, boolean> = {};
-
     ko.computed(() => {
-      const activeCall = this.joinedCall();
+      const activeCall = this.callState.joinedCall();
       if (!activeCall) {
         callParticipants = {};
         return;
@@ -161,28 +155,19 @@ export class CallingRepository {
       }
     });
 
-    this.acceptedVersionWarnings = ko.observableArray<string>();
     this.acceptVersionWarning = (conversationId: string) => {
-      this.acceptedVersionWarnings.push(conversationId);
-      window.setTimeout(() => this.acceptedVersionWarnings.remove(conversationId), TIME_IN_MILLIS.MINUTE * 15);
+      this.callState.acceptedVersionWarnings.push(conversationId);
+      window.setTimeout(
+        () => this.callState.acceptedVersionWarnings.remove(conversationId),
+        TIME_IN_MILLIS.MINUTE * 15,
+      );
     };
-
-    this.activeCalls.subscribe(activeCalls => {
-      const activeCallIds = activeCalls.map(call => call.conversationId);
-      this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
-    });
-
-    this.incomingCallCallback = () => {};
-
-    this.logger = getLogger('CallingRepository');
-    this.callLog = [];
-    this.cbrEncoding = ko.observable(0);
 
     this.subscribeToEvents();
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
-    this.cbrEncoding(vbrEnabled ? 0 : 1);
+    this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
   };
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -253,10 +238,11 @@ export class CallingRepository {
     /* cspell:enable */
     const tenSeconds = 10;
     wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
-    wCall.setMuteHandler(wUser, this.isMuted);
+    wCall.setMuteHandler(wUser, this.callState.isMuted);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
     wCall.setReqClientsHandler(wUser, this.requestClients);
+    wCall.setActiveSpeakerHandler(wUser, this.updateActiveSpeakers);
 
     return wUser;
   }
@@ -373,7 +359,7 @@ export class CallingRepository {
   }
 
   findCall(conversationId: ConversationId): Call | undefined {
-    return this.activeCalls().find((callInstance: Call) => callInstance.conversationId === conversationId);
+    return this.callState.activeCalls().find((callInstance: Call) => callInstance.conversationId === conversationId);
   }
 
   private findParticipant(conversationId: ConversationId, userId: UserId, clientId: ClientId): Participant | undefined {
@@ -382,7 +368,7 @@ export class CallingRepository {
   }
 
   private storeCall(call: Call): void {
-    this.activeCalls.push(call);
+    this.callState.activeCalls.push(call);
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
       conversation.call(call);
@@ -390,11 +376,11 @@ export class CallingRepository {
   }
 
   private removeCall(call: Call): void {
-    const index = this.activeCalls().indexOf(call);
+    const index = this.callState.activeCalls().indexOf(call);
     call.getSelfParticipant().releaseMediaStream();
     call.participants.removeAll();
     if (index !== -1) {
-      this.activeCalls.splice(index, 1);
+      this.callState.activeCalls.splice(index, 1);
     }
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
@@ -463,7 +449,7 @@ export class CallingRepository {
    * Leave call when a participant is not verified anymore
    */
   private readonly leaveCallOnUnverified = (unverifiedUserId: string): void => {
-    const activeCall = this.joinedCall();
+    const activeCall = this.callState.joinedCall();
 
     if (!activeCall) {
       return;
@@ -582,7 +568,7 @@ export class CallingRepository {
     if (res !== 0) {
       this.logger.warn(`recv_msg failed with code: ${res}`);
       if (
-        this.acceptedVersionWarnings().every((acceptedId: string) => acceptedId !== conversationId) &&
+        this.callState.acceptedVersionWarnings().every((acceptedId: string) => acceptedId !== conversationId) &&
         res === ERROR.UNKNOWN_PROTOCOL &&
         event.content.type === 'CONFSTART'
       ) {
@@ -658,7 +644,7 @@ export class CallingRepository {
           : Promise.resolve(true);
       const success = await loadPreviewPromise;
       if (success) {
-        this.wCall.start(this.wUser, conversationId, callType, conversationType, this.cbrEncoding());
+        this.wCall.start(this.wUser, conversationId, callType, conversationType, this.callState.cbrEncoding());
         this.sendCallingEvent(EventName.CALLING.INITIATED_CALL, call);
         this.sendCallingEvent(EventName.CONTRIBUTED, call, {
           [Segmentation.MESSAGE.ACTION]: callType === CALL_TYPE.VIDEO ? 'video_call' : 'audio_call',
@@ -735,7 +721,7 @@ export class CallingRepository {
         this.wCall.setMute(this.wUser, 1);
       }
 
-      this.wCall.answer(this.wUser, call.conversationId, callType, this.cbrEncoding());
+      this.wCall.answer(this.wUser, call.conversationId, callType, this.callState.cbrEncoding());
 
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
@@ -755,7 +741,7 @@ export class CallingRepository {
   };
 
   muteCall(call: Call, shouldMute: boolean): void {
-    if (call.hasWorkingAudioInput === false && this.isMuted()) {
+    if (call.hasWorkingAudioInput === false && this.callState.isMuted()) {
       this.showNoAudioInputModal();
       return;
     }
@@ -797,7 +783,7 @@ export class CallingRepository {
    * @returns `true` if a media stream has been stopped.
    */
   public stopMediaSource(mediaType: MediaType): boolean {
-    const activeCall = this.joinedCall();
+    const activeCall = this.callState.joinedCall();
     if (!activeCall) {
       return false;
     }
@@ -821,7 +807,11 @@ export class CallingRepository {
   /**
    * Will change the input source of all the active calls for the given media type
    */
-  public changeMediaSource(mediaStream: MediaStream, mediaType: MediaType, call: Call = this.joinedCall()): void {
+  public changeMediaSource(
+    mediaStream: MediaStream,
+    mediaType: MediaType,
+    call: Call = this.callState.joinedCall(),
+  ): void {
     if (!call) {
       return;
     }
@@ -1193,6 +1183,20 @@ export class CallingRepository {
     return this.mediaStreamQuery;
   };
 
+  private readonly updateActiveSpeakers = (wuser: number, conversationId: string, rawJson: string) => {
+    const call = this.findCall(conversationId);
+    if (!call) {
+      return;
+    }
+
+    const activeSpeakers = JSON.parse(rawJson);
+    if (!activeSpeakers) {
+      return;
+    }
+
+    call.setActiveSpeakers(activeSpeakers);
+  };
+
   private readonly updateParticipantStream = (
     conversationId: ConversationId,
     userId: UserId,
@@ -1220,7 +1224,7 @@ export class CallingRepository {
   };
 
   private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
-    const activeCall = this.activeCalls()[0];
+    const activeCall = this.callState.activeCalls()[0];
     if (activeCall) {
       activeCall.isCbrEnabled(!!enabled);
     }
@@ -1303,7 +1307,7 @@ export class CallingRepository {
    * @note Should only used by "window.onbeforeunload".
    */
   destroy(): void {
-    this.activeCalls().forEach((call: Call) => this.wCall.end(this.wUser, call.conversationId));
+    this.callState.activeCalls().forEach((call: Call) => this.wCall.end(this.wUser, call.conversationId));
     this.wCall.destroy(this.wUser);
   }
 
@@ -1317,9 +1321,9 @@ export class CallingRepository {
 
   private checkConcurrentJoinedCall(conversationId: ConversationId, newCallState: CALL_STATE): Promise<void> {
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
-    const activeCall = this.activeCalls().find(
-      call => call.conversationId !== conversationId && !idleCallStates.includes(call.state()),
-    );
+    const activeCall = this.callState
+      .activeCalls()
+      .find(call => call.conversationId !== conversationId && !idleCallStates.includes(call.state()));
     if (!activeCall) {
       return Promise.resolve();
     }

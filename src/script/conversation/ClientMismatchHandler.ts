@@ -150,7 +150,9 @@ export class ClientMismatchHandler {
         await removeDeletedClient(userId, clientId);
       }
 
-      await removeDeletedUser(userId);
+      if (payload?.recipients?.[userId]) {
+        await removeDeletedUser(userId);
+      }
     }
   }
 }

@@ -93,15 +93,15 @@ describe('videoGridHandler', () => {
         expect(grid().thumbnail).toBe(selfParticipant);
       });
 
-      it('places the self user in the grid if the call is a group call with just one other participant', () => {
+      it('places the self user in the grid for any call type with just one other participant', () => {
         const selfParticipant = generateVideoParticipant('self', true);
         const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant);
         call.addParticipant(participants[0]);
         const grid = getGrid(call);
 
-        expect(grid().grid.map(toParticipantId)).toEqual([selfParticipant, participants[0]].map(toParticipantId));
+        expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
 
-        expect(grid().thumbnail).toBe(null);
+        expect(grid().thumbnail).toBe(selfParticipant);
       });
 
       it('places the self user in the grid if there are no other video participants', () => {

@@ -1,0 +1,39 @@
+{
+  "author": "Wire Swiss <wireapp@wire.com>",
+  "description": "Wire for Desktop",
+  "dependencies": {
+    "electron-serve": "1.1.0"
+  },
+  "devDependencies": {
+    "@wireapp/copy-config": "1.1.12",
+    "cpx": "1.5.0",
+    "electron": "11.2.0",
+    "electron-builder": "22.9.1",
+    "rimraf": "3.0.2",
+    "ts-node": "9.1.1",
+    "typescript": "4.1.3"
+  },
+  "license": "GPL-3.0",
+  "main": "dist/main.js",
+  "name": "wire-desktop",
+  "repository": "https://github.com/wireapp/wire-desktop.git",
+  "scripts": {
+    "build:config": "node bin/build-config.js",
+    "build:webapp": "cd .. && yarn build:prod",
+    "build:dir": "electron-builder --dir",
+    "build:mac": "yarn clear:build && electron-builder -c electron-builder.config.js --mac",
+    "build:linux": "yarn clear:build && electron-builder -c electron-builder.config.js --linux",
+    "build:prepare": "yarn build:webapp && yarn build:config && yarn copy:webapp",
+    "build:ts": "tsc",
+    "build:windows": "yarn clear:build && electron-builder -c electron-builder.config.js --windows",
+    "clear:build": "rimraf build",
+    "clear:ts": "rimraf dist",
+    "clear:webapp": "rimraf static-webapp",
+    "copy:webapp": "yarn clear:webapp && cpx \"../server/dist/static/**/*\" static-webapp",
+    "dist": "yarn clear:ts && yarn build:ts",
+    "postinstall": "copy-config",
+    "prestart": "yarn dist",
+    "start": "electron . --no-sandbox"
+  },
+  "version": "4.0.0"
+}

@@ -7,6 +7,7 @@ src/i18n/
 /package-lock.json
 /resource
 /src/ext
+/electron/build
 CHANGELOG.md
 node_modules
 npm-debug.log

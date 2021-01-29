@@ -26,7 +26,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
-import 'Components/loadingBar';
+import 'Components/LoadingBar';
 
 import {ContentViewModel} from '../ContentViewModel';
 import {Config} from '../../Config';

@@ -86,7 +86,7 @@ export class ImageDetailViewViewModel {
   };
 
   readonly hideCallback = () => {
-    $(document).off('keydown.lightbox');
+    document.removeEventListener('keydown', this.onKeyDownLightBox);
     window.URL.revokeObjectURL(this.imageSrc());
 
     this.imageSrc(undefined);
@@ -97,6 +97,27 @@ export class ImageDetailViewViewModel {
     amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageExpired);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.messageAdded);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.messageRemoved);
+  };
+
+  onKeyDownLightBox = (keyboardEvent: KeyboardEvent) => {
+    switch (keyboardEvent.key) {
+      case KEY.ESC: {
+        this.clickOnClose();
+        break;
+      }
+      case KEY.ARROW_DOWN:
+      case KEY.ARROW_RIGHT: {
+        this.clickOnShowNext(this, keyboardEvent);
+        break;
+      }
+      case KEY.ARROW_LEFT:
+      case KEY.ARROW_UP: {
+        this.clickOnShowPrevious(this, keyboardEvent);
+        break;
+      }
+      default:
+        break;
+    }
   };
 
   readonly show = (messageEntity: ContentMessage, messageEntities: ContentMessage[], source: string) => {
@@ -115,29 +136,8 @@ export class ImageDetailViewViewModel {
     this.imageModal.show();
 
     this.loadImage();
-    $(document).on('keydown.lightbox', keyboardEvent => {
-      switch (keyboardEvent.key) {
-        case KEY.ESC: {
-          this.clickOnClose();
-          break;
-        }
 
-        case KEY.ARROW_DOWN:
-        case KEY.ARROW_RIGHT: {
-          this.clickOnShowNext(this, (keyboardEvent as unknown) as MouseEvent);
-          break;
-        }
-
-        case KEY.ARROW_LEFT:
-        case KEY.ARROW_UP: {
-          this.clickOnShowPrevious(this, (keyboardEvent as unknown) as MouseEvent);
-          break;
-        }
-
-        default:
-          break;
-      }
-    });
+    document.addEventListener('keydown', this.onKeyDownLightBox);
   };
 
   readonly messageAdded = (messageEntity: ContentMessage) => {
@@ -196,12 +196,12 @@ export class ImageDetailViewViewModel {
     this.imageModal.hide();
   };
 
-  readonly clickOnShowNext = (imageDetailViewViewModel: unknown, event: MouseEvent) => {
+  readonly clickOnShowNext = (imageDetailViewViewModel: unknown, event: MouseEvent | KeyboardEvent) => {
     event.stopPropagation();
     this.iterateImage(true);
   };
 
-  readonly clickOnShowPrevious = (imageDetailViewViewModel: unknown, event: MouseEvent) => {
+  readonly clickOnShowPrevious = (imageDetailViewViewModel: unknown, event: MouseEvent | KeyboardEvent) => {
     event.stopPropagation();
     this.iterateImage(false);
   };

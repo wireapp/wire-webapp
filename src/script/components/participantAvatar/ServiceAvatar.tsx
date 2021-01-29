@@ -25,13 +25,12 @@ import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
 
-import SVGProvider from '../../auth/util/SVGProvider';
-
 import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
 import AvatarImage from './AvatarImage';
 import AvatarWrapper from './AvatarWrapper';
 import {AVATAR_SIZE} from '../ParticipantAvatar';
+import NamedIcon from 'Components/NamedIcon';
 
 export interface ServiceAvatarProps {
   assetRepository: AssetRepository;
@@ -61,7 +60,8 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
         }}
         data-uie-name="element-avatar-service-icon"
       >
-        <svg
+        <NamedIcon
+          name="service-icon"
           viewBox="0 0 32 32"
           css={{
             '& > path': {
@@ -69,8 +69,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
             },
             width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(size) ? '32px' : '60%',
           }}
-          dangerouslySetInnerHTML={{__html: SVGProvider['service-icon']?.documentElement?.innerHTML}}
-        ></svg>
+        />
       </div>
       <AvatarImage
         assetRepository={assetRepository}
