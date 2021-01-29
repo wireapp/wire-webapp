@@ -17,17 +17,19 @@
  *
  */
 
-import ko from 'knockout';
 import cx from 'classnames';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {CSSProperties, useEffect, useRef, useState} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {clamp} from 'Util/NumberUtil';
 
 export interface SeekBarProps {
   dark: boolean;
-  disabled: ko.Subscribable<boolean>;
-  /** Media source */
+  disabled: boolean;
   src: HTMLMediaElement;
+}
+
+export interface SeekBarCSS extends CSSProperties {
+  '--seek-bar-progress': string;
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaElement}: SeekBarProps) => {
@@ -44,6 +46,9 @@ const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaEl
 
   useEffect(() => {
     const onTimeUpdate = () => {
+      if (mediaElement.currentTime > mediaElement.duration) {
+        mediaElement.currentTime = mediaElement.duration;
+      }
       const value = (100 / mediaElement.duration) * mediaElement.currentTime;
       setProgress(value);
     };
@@ -63,7 +68,8 @@ const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaEl
 
   return (
     <input
-      className={cx('legal-hold-dot', {
+      data-uie-name="asset-control-media-seek-bar"
+      className={cx({
         'element-disabled': disabled,
         'seek-bar--dark': darkMode,
         'show-seek-bar-thumb': showSeekBarThumb,
@@ -86,7 +92,7 @@ const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaEl
       style={
         {
           '--seek-bar-progress': `${progress.toString(10)}%`,
-        } as React.CSSProperties
+        } as SeekBarCSS
       }
       type="range"
       value="0"
