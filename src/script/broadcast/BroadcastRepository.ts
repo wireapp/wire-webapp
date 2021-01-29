@@ -121,13 +121,32 @@ export class BroadcastRepository {
    * @param payload OTR message to broadcast
    * @returns Promise that resolves after sending the encrypted message
    */
-  private sendEncryptedMessage(eventInfoEntity: EventInfoEntity, payload: NewOTRMessage): Promise<ClientMismatch> {
+  private sendEncryptedMessage(
+    eventInfoEntity: EventInfoEntity,
+    payload: NewOTRMessage<Uint8Array>,
+  ): Promise<ClientMismatch> {
     const messageType = eventInfoEntity.getType();
     const receivingUsers = Object.keys(payload.recipients);
     this.logger.info(`Sending '${messageType}' broadcast message to '${receivingUsers.length}' users`, payload);
 
+    const stringPayload: NewOTRMessage<string> = {
+      ...payload,
+      data: new TextDecoder().decode(payload.data),
+      recipients: Object.fromEntries(
+        Object.entries(payload.recipients).map(([userId, otrClientMap]) => {
+          const stringClientMap = Object.fromEntries(
+            Object.entries(otrClientMap).map(([clientId, payload]) => {
+              return [clientId, new TextDecoder().decode(payload)];
+            }),
+          );
+
+          return [userId, stringClientMap];
+        }),
+      ),
+    };
+
     return this.broadcastService
-      .postBroadcastMessage(payload, eventInfoEntity.options.precondition)
+      .postBroadcastMessage(stringPayload, eventInfoEntity.options.precondition)
       .then(async response => {
         await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
