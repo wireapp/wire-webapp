@@ -353,6 +353,7 @@ jobs:
           GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
           echo -e "TAG = ${TAG}"
+          echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
           echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
