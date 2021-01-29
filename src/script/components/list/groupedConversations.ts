@@ -31,7 +31,7 @@ import {
 } from '../../conversation/ConversationLabelRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 
-import './groupedConversationHeader';
+import './GroupedConversationHeader';
 
 interface GroupedConversationsParams {
   conversationRepository: ConversationRepository;
