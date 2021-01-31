@@ -174,7 +174,7 @@
     "webpack-cli": "4.4.0",
     "webpack-dev-middleware": "4.1.0",
     "webpack-hot-middleware": "2.25.0",
-    "workbox-webpack-plugin": "6.0.2",
+    "workbox-webpack-plugin": "6.1.0",
     "wrtc": "0.4.7"
   },
   "engines": {
