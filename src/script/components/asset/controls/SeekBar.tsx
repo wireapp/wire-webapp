@@ -23,8 +23,8 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import {clamp} from 'Util/NumberUtil';
 
 export interface SeekBarProps {
-  dark: boolean;
-  disabled: boolean;
+  dark?: boolean;
+  disabled?: boolean;
   src: HTMLMediaElement;
 }
 
@@ -104,6 +104,6 @@ export default SeekBar;
 
 registerReactComponent('seek-bar', {
   component: SeekBar,
-  optionalParams: [],
+  optionalParams: ['dark', 'disabled'],
   template: '<div data-bind="react: {dark, disabled: ko.unwrap(disabled), src}"></div>',
 });
