@@ -34,10 +34,7 @@ export class BroadcastService {
    * @param preconditionOption Level that backend checks for missing clients
    * @returns Promise that resolves when the message was sent
    */
-  postBroadcastMessage(
-    payload: NewOTRMessage<string>,
-    preconditionOption: string[] | boolean,
-  ): Promise<ClientMismatch> {
+  postBroadcastMessage(payload: NewOTRMessage, preconditionOption: string[] | boolean): Promise<ClientMismatch> {
     const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
     const ignoreMissing = preconditionOption === true ? true : undefined;
 
