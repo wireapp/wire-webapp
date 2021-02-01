@@ -11,19 +11,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Cancel Previous Runs
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Skip CI check
+        uses: mstachniuk/ci-skip@v1
+
+      - name: Cancel previous runs
+        if: env.CI_SKIP == 'false'
         uses: styfle/cancel-workflow-action@0.5.0
         with:
           access_token: ${{github.token}}
 
-      - name: Checkout
-        uses: actions/checkout@v2
-
       - name: Yarn cache
+        if: env.CI_SKIP == 'false'
         uses: c-hive/gha-yarn-cache@v1
 
       - name: Install JS dependencies
+        if: env.CI_SKIP == 'false'
         run: yarn --frozen-lockfile
 
       - name: Lint
+        if: env.CI_SKIP == 'false'
         run: yarn lint
