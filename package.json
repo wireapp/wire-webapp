@@ -15,7 +15,7 @@
     "logdown": "3.3.1",
     "long": "4.0.0",
     "protobufjs": "6.10.2",
-    "uuidjs": "4.2.6"
+    "uuidjs": "4.2.7"
   },
   "devDependencies": {
     "@types/faker": "5.1.6",
