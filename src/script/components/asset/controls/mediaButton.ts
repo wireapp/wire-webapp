@@ -25,7 +25,7 @@ import type {AssetTransferState} from '../../../assets/AssetTransferState';
 import type {FileAsset} from '../../../entity/message/FileAsset';
 import {AbstractAssetTransferStateTracker} from '../AbstractAssetTransferStateTracker';
 
-import '../assetLoader';
+import '../AssetLoader';
 
 interface Params {
   asset: FileAsset;
