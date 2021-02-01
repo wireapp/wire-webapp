@@ -475,6 +475,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Skip CI check
+        uses: mstachniuk/ci-skip@v1
+
+      - name: Cancel action
+        if: env.CI_SKIP == 'true'
+        uses: andymckay/cancel-action@0.2
+
+      - name: Cancel previous runs
+        uses: styfle/cancel-workflow-action@0.5.0
+        with:
+          access_token: ${{github.token}}
+
       - name: Set environment variables
         shell: bash
         run: |
