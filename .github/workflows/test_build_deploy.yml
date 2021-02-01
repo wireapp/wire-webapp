@@ -36,7 +36,7 @@ jobs:
 
       - name: Cancel action
         if: env.CI_SKIP == 'true'
-        uses: andymckay/cancel-action
+        uses: andymckay/cancel-action@0.2
 
       - name: Cancel previous runs
         uses: styfle/cancel-workflow-action@0.5.0
