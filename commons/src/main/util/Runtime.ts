@@ -37,6 +37,11 @@ export interface OS {
   version: string;
 }
 
+export interface BrowserVersion {
+  major: number;
+  minor: number;
+}
+
 export class Runtime {
   public static getPlatform(): typeof platform {
     const unsetPlatform = ({} as unknown) as typeof platform;
@@ -67,7 +72,7 @@ export class Runtime {
     return (Runtime.getPlatform().name || UNKNOWN_PROPERTY).toLowerCase();
   }
 
-  public static getBrowserVersion(): {major: number; minor: number} {
+  public static getBrowserVersion(): BrowserVersion {
     const [majorVersion, minorVersion] = (Runtime.getPlatform().version || UNKNOWN_PROPERTY).split('.');
     return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
   }
@@ -124,26 +129,29 @@ export class Runtime {
   };
 
   public static isSupportingLegacyCalling = (): boolean => {
-    if (
-      !Runtime.isSupportingRTCPeerConnection() ||
-      !Runtime.isSupportingRTCDataChannel() ||
-      !Runtime.isSupportingUserMedia() ||
-      !Runtime.isSupportingWebSockets()
-    ) {
-      return false;
-    }
-    return true;
+    return (
+      Runtime.isSupportingRTCPeerConnection() &&
+      Runtime.isSupportingRTCDataChannel() &&
+      Runtime.isSupportingUserMedia() &&
+      Runtime.isSupportingWebSockets()
+    );
   };
 
   public static isSupportingConferenceCalling = (): boolean => {
-    /** API 'createEncodedVideoStreams' is important for Chrome 83 but got deprecated in Chrome 86 in favor of 'createEncodedStreams'. The 'createEncodedVideoStreams' API will be completely removed in Chrome 88+. */
+    /*
+     * The API 'createEncodedVideoStreams' is important for Chrome 83 but got
+     * deprecated in Chrome 86 in favor of 'createEncodedStreams'. The
+     * 'createEncodedVideoStreams' API will be completely removed in
+     * Chrome 88+.
+     */
     const isSupportingEncodedVideoStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedVideoStreams');
     const isSupportingEncodedStreams = RTCRtpSender.prototype.hasOwnProperty('createEncodedStreams');
     return isSupportingEncodedStreams || isSupportingEncodedVideoStreams;
-    return Runtime.isSupportingLegacyCalling() && isSupportingEncodedStreams;
   };
 
-  public static isSupportingRTCPeerConnection = (): boolean => 'RTCPeerConnection' in window;
+  public static isSupportingRTCPeerConnection = (): boolean => {
+    return 'RTCPeerConnection' in window;
+  };
 
   public static isSupportingRTCDataChannel = (): boolean => {
     if (!Runtime.isSupportingRTCPeerConnection()) {
@@ -169,7 +177,9 @@ export class Runtime {
     return hasScreenCaptureAPI || Runtime.isFirefox();
   };
 
-  public static isSupportingPermissions = (): boolean => !!navigator.permissions;
+  public static isSupportingPermissions = (): boolean => {
+    return !!navigator.permissions;
+  };
 
   public static isSupportingNotifications = (): boolean => {
     const notificationNotSupported = window.Notification === undefined;
