@@ -34,20 +34,21 @@ jobs:
       - name: Skip CI check
         uses: mstachniuk/ci-skip@v1
 
+      - name: Cancel action
+        if: env.CI_SKIP == 'true'
+        uses: andymckay/cancel-action
+
       - name: Cancel previous runs
-        if: env.CI_SKIP == 'false'
         uses: styfle/cancel-workflow-action@0.5.0
         with:
           access_token: ${{github.token}}
 
       - name: Use latest Node.js v12
-        if: env.CI_SKIP == 'false'
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
 
       - name: Set environment variables
-        if: env.CI_SKIP == 'false'
         env:
           PR_TITLE: github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE
         run: |
@@ -63,7 +64,6 @@ jobs:
           echo "TITLE=${PR_TITLE}" >> $GITHUB_ENV
 
       - name: Print environment variables
-        if: env.CI_SKIP == 'false'
         env:
           GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
@@ -71,11 +71,9 @@ jobs:
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: Yarn cache
-        if: env.CI_SKIP == 'false'
         uses: c-hive/gha-yarn-cache@v1
 
       - name: Authenticate git clone
-        if: env.CI_SKIP == 'false'
         env:
           GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
         run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
@@ -84,23 +82,19 @@ jobs:
         # Run for all PRs with DISTRIBUTION == 'wire', all pushes to master/dev
         # and when a Desktop version should be built
         if: |
-          env.CI_SKIP == 'false' &&
-          (env.DISTRIBUTION == 'wire' ||
-           github.event_name != 'pull_request' ||
-           env.BUILD_DESKTOP == 'true')
+          env.DISTRIBUTION == 'wire' ||
+          github.event_name != 'pull_request' ||
+          env.BUILD_DESKTOP == 'true'
         run: yarn --frozen-lockfile
 
       - name: Test
         # Run for all PRs and pushes to master/dev with DISTRIBUTION == 'wire'
-        if: |
-          env.CI_SKIP == 'false' &&
-          env.DISTRIBUTION == 'wire'
+        if: env.DISTRIBUTION == 'wire'
         run: yarn test --coverage --detectOpenHandles=false --forceExit
 
       - name: Monitor coverage
         # Run for all PRs with DISTRIBUTION == 'wire'
         if: |
-          env.CI_SKIP == 'false' &&
           env.DISTRIBUTION == 'wire' &&
           github.event_name == 'pull_request'
         uses: slavcodev/coverage-monitor-action@1.2.0
@@ -114,15 +108,13 @@ jobs:
         # Run for all pushes to master/dev with DISTRIBUTION == 'wire'
         # and when a Desktop version should be built
         if: |
-          env.CI_SKIP == 'false' &&
-          (github.event_name != 'pull_request' ||
-           env.BUILD_DESKTOP == 'true')
+          github.event_name != 'pull_request' ||
+          env.BUILD_DESKTOP == 'true'
         run: yarn build:prod
 
       # https://wire-webapp-avs.zinfra.io/
       - name: Deploy avs build to Elastic Beanstalk
         if: |
-          env.CI_SKIP == 'false' &&
           env.BRANCH_NAME == 'avs' &&
           env.DISTRIBUTION == 'wire'
         uses: einaregilsson/beanstalk-deploy@v14
@@ -142,7 +134,6 @@ jobs:
       # Stage 1: https://wire-webapp-edge.zinfra.io/
       - name: Deploy edge build to Elastic Beanstalk
         if: |
-          env.CI_SKIP == 'false' &&
           env.BRANCH_NAME == 'edge' &&
           env.DISTRIBUTION == 'wire'
         uses: einaregilsson/beanstalk-deploy@v14
@@ -162,7 +153,6 @@ jobs:
       # Stage 2: https://wire-webapp-dev.zinfra.io/
       - name: Deploy dev build to Elastic Beanstalk
         if: |
-          env.CI_SKIP == 'false' &&
           env.BRANCH_NAME == 'dev' &&
           env.DISTRIBUTION == 'wire'
         uses: einaregilsson/beanstalk-deploy@v14
@@ -182,7 +172,6 @@ jobs:
       # Stage 3: https://wire-webapp-staging.zinfra.io/
       - name: Deploy staging build to Elastic Beanstalk
         if: |
-          env.CI_SKIP == 'false' &&
           contains(env.TAG, 'staging') &&
           env.DISTRIBUTION == 'wire'
         uses: einaregilsson/beanstalk-deploy@v14
@@ -202,7 +191,6 @@ jobs:
       # Stage 4: https://wire-webapp-master.zinfra.io/
       - name: Deploy master build to Elastic Beanstalk
         if: |
-          env.CI_SKIP == 'false' &&
           env.BRANCH_NAME == 'master' &&
           env.DISTRIBUTION == 'wire'
         uses: einaregilsson/beanstalk-deploy@v14
@@ -222,7 +210,6 @@ jobs:
       # Stage 5: https://app.wire.com/
       - name: Deploy production build to Elastic Beanstalk
         if: |
-          env.CI_SKIP == 'false' &&
           contains(env.TAG, 'production') &&
           env.DISTRIBUTION == 'wire'
         uses: einaregilsson/beanstalk-deploy@v14
@@ -241,10 +228,9 @@ jobs:
 
       - name: Push master/dev/edge Docker image
         if: |
-          env.CI_SKIP == 'false' &&
-          (env.BRANCH_NAME == 'master' ||
-           env.BRANCH_NAME == 'dev' ||
-           env.BRANCH_NAME == 'edge')
+          env.BRANCH_NAME == 'master' ||
+          env.BRANCH_NAME == 'dev' ||
+          env.BRANCH_NAME == 'edge'
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
@@ -254,9 +240,7 @@ jobs:
           fi
 
       - name: Push staging Docker image
-        if: |
-          env.CI_SKIP == 'false' &&
-          contains(env.TAG, 'staging')
+        if: contains(env.TAG, 'staging')
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
@@ -268,9 +252,7 @@ jobs:
           fi
 
       - name: Push production Docker image
-        if: |
-          env.CI_SKIP == 'false' &&
-          contains(env.TAG, 'production')
+        if: contains(env.TAG, 'production')
         env:
           DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
@@ -283,7 +265,6 @@ jobs:
 
       - name: Generate changelog
         if: |
-          env.CI_SKIP == 'false' &&
           contains(env.TAG, 'production') &&
           env.DISTRIBUTION == 'wire'
         run: yarn changelog:ci
@@ -291,7 +272,6 @@ jobs:
       - name: Create GitHub production release
         id: create_release_production
         if: |
-          env.CI_SKIP == 'false' &&
           contains(env.TAG, 'production') &&
           env.DISTRIBUTION == 'wire'
         uses: actions/create-release@v1
@@ -307,7 +287,6 @@ jobs:
       - name: Create GitHub staging release draft
         id: create_release_staging
         if: |
-          env.CI_SKIP == 'false' &&
           contains(env.TAG, 'staging') &&
           env.DISTRIBUTION == 'wire'
         uses: actions/create-release@v1
@@ -321,7 +300,6 @@ jobs:
 
       - name: Notify staging bump
         if: |
-          env.CI_SKIP == 'false' &&
           contains(env.TAG, 'staging') &&
           env.DISTRIBUTION == 'wire'
         uses: wireapp/github-action-wire-messenger@v1
@@ -333,7 +311,6 @@ jobs:
 
       - name: Notify AVS commit
         if: |
-          env.CI_SKIP == 'false' &&
           env.BRANCH_NAME == 'avs' &&
           env.DISTRIBUTION == 'wire'
         uses: wireapp/github-action-wire-messenger@v1
@@ -354,13 +331,11 @@ jobs:
 
       - name: Build config.js file for Desktop
         if: |
-          env.CI_SKIP == 'false' &&
           env.BUILD_DESKTOP == 'true'
         run: node electron/bin/build-config.js
 
       - name: Upload WebApp artifacts
         if: |
-          env.CI_SKIP == 'false' &&
           env.BUILD_DESKTOP == 'true'
         uses: actions/upload-artifact@v2
         with:
@@ -382,11 +357,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Skip CI check
-        uses: mstachniuk/ci-skip@v1
-
       - name: Set environment variables
-        if: env.CI_SKIP == 'false'
         shell: bash
         run: |
           TAG="$(git tag --points-at ${{github.sha}})"
@@ -397,7 +368,6 @@ jobs:
           echo "BUILD_DESKTOP=${BUILD_DESKTOP}" >> $GITHUB_ENV
 
       - name: Print environment variables
-        if: env.CI_SKIP == 'false'
         shell: bash
         env:
           GITHUB_CONTEXT: ${{toJson(github)}}
@@ -408,17 +378,13 @@ jobs:
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: Use latest Node.js v12
-        if: |
-          env.CI_SKIP == 'false' &&
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
 
       - name: Cache Electron
-        if: |
-          env.CI_SKIP == 'false' &&
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         uses: actions/cache@v2
         with:
           path: ${{github.workspace}}/.cache/electron
@@ -426,9 +392,7 @@ jobs:
           restore-keys: ${{runner.os}}-electron-cache-
 
       - name: Cache electron-builder
-        if: |
-          env.CI_SKIP == 'false' &&
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         uses: actions/cache@v2
         with:
           path: ${{github.workspace}}/.cache/electron-builder
@@ -436,25 +400,19 @@ jobs:
           restore-keys: ${{runner.os}}-electron-builder-cache-
 
       - name: Download WebApp artifacts
-        if: |
-          env.CI_SKIP == 'false' &&
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         uses: actions/download-artifact@v2
         with:
           name: webapp-dist
           path: server/dist
 
       - name: Install JS dependencies
-        if: |
-          env.CI_SKIP == 'false' &&
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         working-directory: electron
         run: yarn
 
       - name: Prepare Building Desktop App
-        if: |
-          env.CI_SKIP == 'false' &&
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         working-directory: electron
         run: |
           yarn copy:webapp
@@ -462,7 +420,6 @@ jobs:
 
       - name: Build Desktop App for Windows
         if: |
-          env.CI_SKIP == 'false' &&
           env.BUILD_DESKTOP == 'true' &&
           matrix.os == 'windows-latest'
         shell: bash
@@ -473,7 +430,6 @@ jobs:
 
       - name: Build Desktop App for Linux
         if: |
-          env.CI_SKIP == 'false' &&
           env.BUILD_DESKTOP == 'true' &&
           matrix.os == 'ubuntu-latest'
         working-directory: electron
@@ -483,7 +439,6 @@ jobs:
 
       - name: Build Desktop App for macOS
         if: |
-          env.CI_SKIP == 'false' &&
           env.BUILD_DESKTOP == 'true' &&
           matrix.os == 'macos-latest'
         working-directory: electron
@@ -493,18 +448,15 @@ jobs:
 
       - name: Upload Electron artifacts
         uses: actions/upload-artifact@v2
-        if: |
-          env.CI_SKIP == 'false' &&
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         with:
           name: electron-app-${{env.OS}}
           path: electron/build/WireDevelopment*
 
       - name: Attach Electron build to release assets
         if: |
-          env.CI_SKIP == 'false' &&
-          (contains(env.TAG, 'staging') ||
-           contains(env.TAG, 'production'))
+          contains(env.TAG, 'staging') ||
+          contains(env.TAG, 'production')
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
@@ -525,11 +477,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Skip CI check
-        uses: mstachniuk/ci-skip@v1
-
       - name: Set environment variables
-        if: env.CI_SKIP == 'false'
         shell: bash
         run: |
           TAG="$(git tag --points-at ${{github.sha}})"
@@ -538,9 +486,7 @@ jobs:
           echo "BUILD_DESKTOP=${BUILD_DESKTOP}" >> $GITHUB_ENV
 
       - name: Delete WebApp artifacts
-        if: |
-          env.CI_SKIP == 'false' &&
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         uses: geekyeggo/delete-artifact@v1
         with:
           name: webapp-dist
