@@ -2,7 +2,7 @@
   "dependencies": {
     "@types/node": "*",
     "@wireapp/core": "17.0.10",
-    "uuidjs": "4.2.6"
+    "uuidjs": "4.2.7"
   },
   "devDependencies": {
     "@types/jasmine": "3.6.2",
