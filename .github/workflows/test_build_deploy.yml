@@ -330,13 +330,11 @@ jobs:
           text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
 
       - name: Build config.js file for Desktop
-        if: |
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         run: node electron/bin/build-config.js
 
       - name: Upload WebApp artifacts
-        if: |
-          env.BUILD_DESKTOP == 'true'
+        if: env.BUILD_DESKTOP == 'true'
         uses: actions/upload-artifact@v2
         with:
           name: webapp-dist
