@@ -30,7 +30,7 @@
     "faker": "5.2.0",
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.6.3",
-    "karma": "5.2.3",
+    "karma": "6.0.3",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "3.1.1",
     "karma-jasmine-diff-reporter": "2.0.1",
