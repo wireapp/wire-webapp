@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@types/fs-extra": "9.0.6",
-    "fs-extra": "9.0.1"
+    "fs-extra": "9.1.0"
   },
   "devDependencies": {
     "@types/jasmine": "3.6.2",

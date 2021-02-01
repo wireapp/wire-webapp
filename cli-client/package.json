@@ -7,7 +7,7 @@
     "@wireapp/store-engine-fs": "2.2.27",
     "commander": "6.2.0",
     "dotenv": "8.2.0",
-    "fs-extra": "9.0.1"
+    "fs-extra": "9.1.0"
   },
   "devDependencies": {
     "@types/fs-extra": "9.0.6",
