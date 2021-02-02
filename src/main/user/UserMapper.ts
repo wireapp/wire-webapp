@@ -33,9 +33,9 @@ export class UserMapper {
   public static mapUserEvent(event: UserEvent, selfUserId: string, source: PayloadBundleSource): PayloadBundle | void {
     switch (event.type) {
       case USER_EVENT.CONNECTION: {
-        const {connection} = event as UserConnectionEvent;
+        const {connection, user} = event as UserConnectionEvent;
         return {
-          content: connection,
+          content: {connection, user},
           conversation: connection.conversation,
           from: connection.from,
           id: MessageBuilder.createId(),
