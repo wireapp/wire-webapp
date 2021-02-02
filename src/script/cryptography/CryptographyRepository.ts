@@ -383,8 +383,10 @@ export class CryptographyRepository {
         for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
           if (preKeyPayload) {
             const sessionId = this.constructSessionId(userId, clientId);
-            const encryptionPromise = base64ToArray(preKeyPayload.key).then(payloadArray =>
-              this.encryptPayloadForSession(sessionId, genericMessage, payloadArray.buffer),
+            const encryptionPromise = this.encryptPayloadForSession(
+              sessionId,
+              genericMessage,
+              base64ToArray(preKeyPayload.key).buffer,
             );
             cipherPayloadPromises.push(encryptionPromise);
           }
