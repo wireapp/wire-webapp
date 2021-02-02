@@ -17,10 +17,12 @@
  *
  */
 
-import {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/src/event';
+import {UserConnectionData} from '@wireapp/api-client/src/user/data';
 
-import {PayloadBundle, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
+import {PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '../conversation';
+import {UserConnectionMessage} from '../conversation/message/UserMessage';
 import {UserMapper} from './UserMapper';
 
 describe('UserMapper', () => {
@@ -46,9 +48,9 @@ describe('UserMapper', () => {
         event,
         selfUserId,
         PayloadBundleSource.WEBSOCKET,
-      ) as PayloadBundle & {content: Connection};
+      ) as UserConnectionMessage;
 
-      expect(incomingEvent.content).toBe(event.connection);
+      expect(incomingEvent.content).toEqual({connection: event.connection, user: event.user} as UserConnectionData);
       expect(incomingEvent.conversation).toBe(event.connection.conversation);
       expect(incomingEvent.from).toBe(event.connection.from);
       expect(typeof incomingEvent.id).toBe('string');

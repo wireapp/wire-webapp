@@ -19,7 +19,7 @@
 
 //@ts-check
 
-/* eslint-disable no-magic-numbers, no-unused-vars, no-inner-declarations */
+/* eslint-disable no-unused-vars, no-inner-declarations */
 
 process.on('uncaughtException', error =>
   console.error(`Uncaught exception "${error.constructor.name}": ${error.message}`, error),
@@ -51,7 +51,7 @@ const {APIClient} = require('@wireapp/api-client');
 const {ClientType} = require('@wireapp/api-client/src/client/');
 const {FileEngine} = require('@wireapp/store-engine-fs');
 
-(async () => {
+void (async () => {
   try {
     const CONVERSATION_ID = program.conversationId || process.env.WIRE_CONVERSATION_ID;
     const MESSAGE_TIMER = TimeUtil.TimeInMillis.SECOND * 5;
@@ -66,18 +66,18 @@ const {FileEngine} = require('@wireapp/store-engine-fs');
     const engine = new FileEngine(path.join(__dirname, '.tmp', 'sender'));
     await engine.init(undefined, {fileExtension: '.json'});
 
-    const apiClient = new APIClient({store: engine, urls: backend});
-    const account = new Account(apiClient);
+    const apiClient = new APIClient({urls: backend});
+    const account = new Account(apiClient, () => Promise.resolve(engine));
     await account.login(login);
     await account.listen();
 
-    account.on('error', error => logger.error(error));
+    account.on(Account.TOPIC.ERROR, error => logger.error(error));
 
     const name = await account.service.self.getName();
 
     logger.log('Name', name);
-    logger.log('User ID', account.apiClient.context.userId);
-    logger.log('Client ID', account.apiClient.context.clientId);
+    logger.log('User ID', account['apiClient'].context.userId);
+    logger.log('Client ID', account['apiClient'].context.clientId);
 
     async function sendAndDeleteMessage() {
       const deleteTextPayload = account.service.conversation.messageBuilder
@@ -92,7 +92,7 @@ const {FileEngine} = require('@wireapp/store-engine-fs');
     }
 
     async function sendConversationLevelTimer(timeInMillis = TimeUtil.TimeInMillis.YEAR) {
-      await account.apiClient.conversation.api.putConversationMessageTimer(CONVERSATION_ID, {
+      await account['apiClient'].conversation.api.putConversationMessageTimer(CONVERSATION_ID, {
         message_timer: timeInMillis,
       });
     }
