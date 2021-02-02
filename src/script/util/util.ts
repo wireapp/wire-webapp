@@ -18,7 +18,6 @@
  */
 
 import {Decoder} from 'bazinga64';
-import sodium from 'libsodium-wrappers-sumo';
 import UUID from 'uuidjs';
 import {UrlUtil} from '@wireapp/commons';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -200,18 +199,20 @@ export const stripDataUri = (string: string): string => string.replace(/^data:.*
 export const base64ToArraySync = (base64: string): Uint8Array => Decoder.fromBase64(stripDataUri(base64)).asBytes;
 
 /**
- * Convert a base64 string to an Uint8Array asynchronously.
+ * Convert a base64 string to an Uint8Array.
  * @note Function will remove "data-uri" attribute if present.
  */
 export const base64ToArray = (base64: string): Uint8Array => {
-  return sodium.from_base64(stripDataUri(base64), sodium.base64_variants.ORIGINAL);
+  const encoded = window.atob(stripDataUri(base64));
+  return new TextEncoder().encode(encoded);
 };
 
 /**
- * Convert an ArrayBuffer or an Uint8Array to a base64 string asynchronously
+ * Convert an ArrayBuffer or an Uint8Array to a base64 string
  */
 export const arrayToBase64 = (array: ArrayBuffer | Uint8Array): string => {
-  return sodium.to_base64(new Uint8Array(array), sodium.base64_variants.ORIGINAL);
+  const decoded = new TextDecoder('utf8').decode(array);
+  return window.btoa(decoded);
 };
 
 /**
