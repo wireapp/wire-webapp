@@ -23,12 +23,12 @@ import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import {Account} from '@wireapp/core';
 import {PayloadBundleType} from '@wireapp/core/src/main/conversation/';
 import {FileEngine} from '@wireapp/store-engine-fs';
-import type {AxiosError} from 'axios';
-import program from 'commander';
+import commander from 'commander';
 import dotenv from 'dotenv';
 import fs from 'fs-extra';
 import os from 'os';
 import path from 'path';
+import type {AxiosError} from 'axios';
 
 dotenv.config();
 
@@ -38,7 +38,7 @@ const {
   version,
 }: {bin: Record<string, string>; description: string; version: string} = require('../package.json');
 
-program
+commander
   .name(Object.keys(bin)[0])
   .version(version)
   .description(description)
@@ -47,18 +47,20 @@ program
   .option('-c, --conversation <conversationId>', 'The conversation to write in')
   .parse(process.argv);
 
+const {conversation, email, password} = commander.opts();
+
 const loginData = {
   clientType: ClientType.PERMANENT,
-  email: program.email || process.env.WIRE_LOGIN_EMAIL,
-  password: program.password || process.env.WIRE_LOGIN_PASSWORD,
+  email: email || process.env.WIRE_LOGIN_EMAIL,
+  password: password || process.env.WIRE_LOGIN_PASSWORD,
 };
 
 if (!loginData.email || !loginData.password) {
   console.error('Email and password both need to be set');
-  program.help();
+  commander.help();
 }
 
-const conversationID = program.conversation || process.env.WIRE_CONVERSATION_ID;
+const conversationID = conversation || process.env.WIRE_CONVERSATION_ID;
 
 const directory = path.join(os.homedir(), '.wire-cli', loginData.email);
 

@@ -19,7 +19,7 @@
  *
  */
 
-import program from 'commander';
+import commander from 'commander';
 import logdown from 'logdown';
 
 import type {Parameters} from './Interfaces';
@@ -34,7 +34,7 @@ const logger = logdown('@wireapp/changelog-bot/cli', {
 
 logger.state.isEnabled = true;
 
-program
+commander
   .version(version)
   .description(description)
   .option('-c, --conversations <conversationId,...>', 'The conversation IDs to write in')
@@ -48,22 +48,24 @@ program
   .option('-x, --exclude-commit-types <type,...>', 'Commit types to exclude (e.g. chore,build,...)')
   .parse(process.argv);
 
-let excludeCommitTypes = program.excludeCommitTypes ?? process.env.EXCLUDE_COMMIT_TYPES;
+const {backend, conversations, email, message, password, range, slug, tag} = commander.opts();
+
+let excludeCommitTypes = commander.opts().excludeCommitTypes ?? process.env.EXCLUDE_COMMIT_TYPES;
 
 if (typeof excludeCommitTypes !== 'undefined') {
   excludeCommitTypes = excludeCommitTypes.includes(',') ? excludeCommitTypes.split(',') : [excludeCommitTypes];
 }
 
 const parameters: Parameters = {
-  backend: program.backend,
-  conversationIds: program.conversations || process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS,
-  email: program.email || process.env.WIRE_CHANGELOG_BOT_EMAIL,
+  backend: backend,
+  conversationIds: conversations || process.env.WIRE_CHANGELOG_BOT_CONVERSATION_IDS,
+  email: email || process.env.WIRE_CHANGELOG_BOT_EMAIL,
   excludeCommitTypes,
-  message: program.message,
-  password: program.password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
-  travisCommitRange: program.range || process.env.TRAVIS_COMMIT_RANGE,
-  travisRepoSlug: program.slug || process.env.TRAVIS_REPO_SLUG,
-  travisTag: program.tag || process.env.TRAVIS_TAG,
+  message: message,
+  password: password || process.env.WIRE_CHANGELOG_BOT_PASSWORD,
+  travisCommitRange: range || process.env.TRAVIS_COMMIT_RANGE,
+  travisRepoSlug: slug || process.env.TRAVIS_REPO_SLUG,
+  travisTag: tag || process.env.TRAVIS_TAG,
 };
 
 logger.log(`wire-changelog-bot v${version}`);
