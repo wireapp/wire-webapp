@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.0.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.0.10...@wireapp/core@17.0.11) (2021-02-02)
+
+
+### Bug Fixes
+
+* **core,api-client:** Fix demos and events ([#3494](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3494)) ([2206ef9](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/2206ef9b4f7c4e98016d91dd430b3dafcf049241))
+
+
+
+
+
 ## [17.0.10](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.0.9...@wireapp/core@17.0.10) (2021-02-01)
 
 **Note:** Version bump only for package @wireapp/core
