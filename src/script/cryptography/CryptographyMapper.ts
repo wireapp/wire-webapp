@@ -245,9 +245,7 @@ export class CryptographyMapper {
           protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
         }
 
-        const mentions = await Promise.all(
-          protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
-        );
+        const mentions = protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish()));
 
         return {
           text: {
@@ -466,7 +464,7 @@ export class CryptographyMapper {
       if (!eventData.data || !otrKey || !sha256) {
         throw new Error('Not all expected properties defined');
       }
-      const cipherTextArray = await base64ToArray(eventData.data);
+      const cipherTextArray = base64ToArray(eventData.data);
       const cipherText = cipherTextArray.buffer;
       const keyBytes = new Uint8Array(otrKey).buffer;
       const referenceSha256 = new Uint8Array(sha256).buffer;
@@ -596,7 +594,7 @@ export class CryptographyMapper {
     };
 
     if (protoQuote) {
-      const quote = await arrayToBase64(Quote.encode(protoQuote).finish());
+      const quote = arrayToBase64(Quote.encode(protoQuote).finish());
       mappedText.data.quote = quote;
     }
 

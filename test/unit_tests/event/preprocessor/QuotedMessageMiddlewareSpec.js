@@ -64,7 +64,7 @@ describe('QuotedMessageMiddleware', () => {
         quotedMessageSha256: '',
       });
 
-      const base64Quote = await arrayToBase64(Quote.encode(quote).finish());
+      const base64Quote = arrayToBase64(Quote.encode(quote).finish());
 
       const event = {
         conversation: 'c3dfbc39-4e61-42e3-ab31-62800a0faeeb',
@@ -101,7 +101,7 @@ describe('QuotedMessageMiddleware', () => {
         quotedMessageSha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
       });
 
-      const base64Quote = await arrayToBase64(Quote.encode(quote).finish());
+      const base64Quote = arrayToBase64(Quote.encode(quote).finish());
 
       const event = {
         conversation: 'conversation-uuid',
@@ -136,7 +136,7 @@ describe('QuotedMessageMiddleware', () => {
         quotedMessageSha256: '7fec6710751f67587b6f6109782257cd7c56b5d29570824132e8543e18242f1b',
       });
 
-      const base64Quote = await arrayToBase64(Quote.encode(quote).finish());
+      const base64Quote = arrayToBase64(Quote.encode(quote).finish());
 
       const event = {
         conversation: 'conversation-uuid',

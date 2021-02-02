@@ -39,11 +39,11 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
+import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
 import {container} from 'tsyringe';
 
@@ -1622,7 +1622,7 @@ export class MessageRepository {
         options.recipients,
         genericMessageExternal,
       );
-      payload.data = await arrayToBase64(encryptedAsset.cipherText);
+      payload.data = new Uint8Array(encryptedAsset.cipherText);
       payload.native_push = options.nativePush;
       return this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
@@ -1645,7 +1645,7 @@ export class MessageRepository {
    */
   private async sendEncryptedMessage(
     eventInfoEntity: EventInfoEntity,
-    payload: NewOTRMessage,
+    payload: NewOTRMessage<Uint8Array>,
   ): Promise<ClientMismatch> {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;
@@ -1669,10 +1669,26 @@ export class MessageRepository {
       );
     }
 
+    const stringPayload: NewOTRMessage<string> = {
+      ...payload,
+      data: arrayToBase64(payload.data),
+      recipients: Object.fromEntries(
+        Object.entries(payload.recipients).map(([userId, otrClientMap]) => {
+          const stringClientMap = Object.fromEntries(
+            Object.entries(otrClientMap).map(([clientId, clientPayload]) => {
+              return [clientId, arrayToBase64(clientPayload)];
+            }),
+          );
+
+          return [userId, stringClientMap];
+        }),
+      ),
+    };
+
     try {
       const response = await this.conversation_service.post_encrypted_message(
         conversationId,
-        payload,
+        stringPayload,
         options.precondition,
       );
       await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
@@ -1702,9 +1718,9 @@ export class MessageRepository {
         payloadWithMissingClients,
       );
       if (payloadWithMissingClients) {
-        return this.conversation_service.post_encrypted_message(conversationId, payloadWithMissingClients, true);
+        return this.conversation_service.post_encrypted_message(conversationId, stringPayload, true);
       }
-      return this.conversation_service.post_encrypted_message(conversationId, payload, true);
+      return this.conversation_service.post_encrypted_message(conversationId, stringPayload, true);
     }
   }
 

@@ -171,7 +171,7 @@ export class LinkPreviewRepository {
    * @returns Resolves with the uploaded asset
    */
   private async uploadPreviewImage(dataUri: string): Promise<Asset> {
-    const blob = await base64ToBlob(dataUri);
+    const blob = base64ToBlob(dataUri);
     return this.assetRepository.uploadFile(
       createRandomUuid(),
       blob,

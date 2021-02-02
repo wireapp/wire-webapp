@@ -203,25 +203,23 @@ export const base64ToArraySync = (base64: string): Uint8Array => Decoder.fromBas
  * Convert a base64 string to an Uint8Array asynchronously.
  * @note Function will remove "data-uri" attribute if present.
  */
-export const base64ToArray = async (base64: string): Promise<Uint8Array> => {
-  await sodium.ready;
+export const base64ToArray = (base64: string): Uint8Array => {
   return sodium.from_base64(stripDataUri(base64), sodium.base64_variants.ORIGINAL);
 };
 
 /**
  * Convert an ArrayBuffer or an Uint8Array to a base64 string asynchronously
  */
-export const arrayToBase64 = async (array: ArrayBuffer | Uint8Array): Promise<string> => {
-  await sodium.ready;
+export const arrayToBase64 = (array: ArrayBuffer | Uint8Array): string => {
   return sodium.to_base64(new Uint8Array(array), sodium.base64_variants.ORIGINAL);
 };
 
 /**
  * Convert base64 dataURI to Blob
  */
-export const base64ToBlob = async (base64: string): Promise<Blob> => {
+export const base64ToBlob = (base64: string): Blob => {
   const mimeType = getContentTypeFromDataUrl(base64);
-  const bytes = await base64ToArray(base64);
+  const bytes = base64ToArray(base64);
   return new Blob([bytes], {type: mimeType});
 };
 

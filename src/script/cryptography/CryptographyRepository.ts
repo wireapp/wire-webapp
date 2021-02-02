@@ -31,7 +31,7 @@ import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
+import {base64ToArray, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
@@ -49,7 +49,7 @@ export interface SignalingKeys {
 }
 
 interface EncryptedPayload {
-  cipherText?: string;
+  cipherText?: Uint8Array;
   sessionId: string;
 }
 
@@ -245,7 +245,7 @@ export class CryptographyRepository {
   async encryptGenericMessage(
     recipients: Recipients,
     genericMessage: GenericMessage,
-    payload: NewOTRMessage = this.constructPayload(this.currentClient().id),
+    payload: NewOTRMessage<Uint8Array> = this.constructPayload(this.currentClient().id),
   ) {
     const receivingUsers = Object.keys(recipients).length;
     const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users...`;
@@ -335,7 +335,7 @@ export class CryptographyRepository {
       } else {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
         const sessionId = this.constructSessionId(userId, clientId);
-        const preKeyArray = await base64ToArray(preKey.key);
+        const preKeyArray = base64ToArray(preKey.key);
         return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
@@ -347,8 +347,8 @@ export class CryptographyRepository {
   private async buildPayload(
     recipients: Recipients,
     genericMessage: GenericMessage,
-    messagePayload: NewOTRMessage,
-  ): Promise<{messagePayload: NewOTRMessage; missingRecipients: Recipients}> {
+    messagePayload: NewOTRMessage<Uint8Array>,
+  ): Promise<{messagePayload: NewOTRMessage<Uint8Array>; missingRecipients: Recipients}> {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
@@ -372,7 +372,7 @@ export class CryptographyRepository {
   private async encryptGenericMessageForMissingRecipients(
     missingRecipients: Recipients,
     genericMessage: GenericMessage,
-    messagePayload: NewOTRMessage,
+    messagePayload: NewOTRMessage<Uint8Array>,
   ) {
     const userPreKeyMap = await this.getUsersPreKeys(missingRecipients);
     this.logger.info(`Fetched pre-keys for '${Object.keys(userPreKeyMap).length}' users.`, userPreKeyMap);
@@ -397,9 +397,9 @@ export class CryptographyRepository {
   }
 
   private mapCipherTextToPayload(
-    messagePayload: NewOTRMessage,
+    messagePayload: NewOTRMessage<Uint8Array>,
     cipherPayload: EncryptedPayload[],
-  ): {messagePayload: NewOTRMessage; missingRecipients: Recipients} {
+  ): {messagePayload: NewOTRMessage<Uint8Array>; missingRecipients: Recipients} {
     const missingRecipients: Recipients = {};
 
     cipherPayload.forEach(({cipherText, sessionId}) => {
@@ -422,7 +422,7 @@ export class CryptographyRepository {
    * @param sender Client ID of message sender
    * @returns Payload to send to backend
    */
-  private constructPayload(sender: string): NewOTRMessage {
+  private constructPayload(sender: string): NewOTRMessage<Uint8Array> {
     return {
       native_push: true,
       recipients: {},
@@ -438,7 +438,7 @@ export class CryptographyRepository {
    */
   private async decryptEvent(event: EventRecord): Promise<GenericMessage> {
     const {data: eventData, from: userId} = event;
-    const cipherTextArray = await base64ToArray(eventData.text || eventData.key);
+    const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
     const sessionId = this.constructSessionId(userId, eventData.sender);
 
@@ -463,7 +463,7 @@ export class CryptographyRepository {
     try {
       const messageArray = GenericMessage.encode(genericMessage).finish();
       const cipherText = await this.cryptobox.encrypt(sessionId, messageArray, preKeyBundle);
-      const cipherTextArray = await arrayToBase64(cipherText);
+      const cipherTextArray = new Uint8Array(cipherText);
       return {cipherText: cipherTextArray, sessionId};
     } catch (error) {
       if (error instanceof StoreEngineError.RecordNotFoundError) {
@@ -473,7 +473,7 @@ export class CryptographyRepository {
 
       const message = `Failed encrypting '${genericMessage.content}' for session '${sessionId}': ${error.message}`;
       this.logger.warn(message, error);
-      return {cipherText: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, sessionId};
+      return {cipherText: new TextEncoder().encode(CryptographyRepository.REMOTE_ENCRYPTION_FAILURE), sessionId};
     }
   }
 
