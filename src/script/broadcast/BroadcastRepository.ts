@@ -130,6 +130,7 @@ export class BroadcastRepository {
     const receivingUsers = Object.keys(payload.recipients);
     this.logger.info(`Sending '${messageType}' broadcast message to '${receivingUsers.length}' users`, payload);
 
+    // This can be removed as soon as `postBroadcastProtobufMessage` is used
     const stringPayload: NewOTRMessage<string> = {
       ...payload,
       data: arrayToBase64(payload.data),

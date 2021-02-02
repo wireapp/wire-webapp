@@ -189,7 +189,7 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.TEXT: {
-        const mappedText = await this._mapText(genericMessage.text as Text);
+        const mappedText = this._mapText(genericMessage.text as Text);
         specificContent = addMetadata(mappedText, genericMessage.text);
         break;
       }
@@ -431,7 +431,7 @@ export class CryptographyMapper {
   }
 
   async _mapEdited(edited: MessageEdit) {
-    const mappedMessage = await this._mapText(edited.text as Text);
+    const mappedMessage = this._mapText(edited.text as Text);
     mappedMessage.data.replacing_message_id = edited.replacingMessageId;
     return mappedMessage;
   }
@@ -567,7 +567,7 @@ export class CryptographyMapper {
     };
   }
 
-  async _mapText(text: Text): Promise<MappedText> {
+  _mapText(text: Text): MappedText {
     const {mentions: protoMentions, quote: protoQuote} = text;
 
     const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
@@ -577,11 +577,9 @@ export class CryptographyMapper {
       protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
 
-    const mentions = await Promise.all(
-      protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
-    );
-    const previews = await Promise.all(
-      protoLinkPreviews.map(protoLinkPreview => arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())),
+    const mentions = protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish()));
+    const previews = protoLinkPreviews.map(protoLinkPreview =>
+      arrayToBase64(LinkPreview.encode(protoLinkPreview).finish()),
     );
 
     const mappedText: MappedText = {

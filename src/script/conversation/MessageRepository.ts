@@ -1669,6 +1669,7 @@ export class MessageRepository {
       );
     }
 
+    // This can be removed as soon as `postOTRProtobufMessage` is used
     const stringPayload: NewOTRMessage<string> = {
       ...payload,
       data: arrayToBase64(payload.data),
