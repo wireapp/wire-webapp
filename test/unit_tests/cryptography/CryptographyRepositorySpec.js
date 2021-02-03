@@ -29,8 +29,6 @@ import {ClientEvent} from 'src/script/event/Client';
 import {TestFactory} from '../../helper/TestFactory';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 
-jest.mock('axios');
-
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
 
