@@ -69,7 +69,7 @@ const defaultCSP = {
   prefetchSrc: ["'self'"],
   scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'", 'https://apis.google.com'],
   styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
-  workerSrc: ["'self'"],
+  workerSrc: ["'self'", 'blob:'],
 };
 const logger = logdown('config', {
   logger: console,
