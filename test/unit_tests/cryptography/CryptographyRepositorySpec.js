@@ -29,6 +29,8 @@ import {ClientEvent} from 'src/script/event/Client';
 import {TestFactory} from '../../helper/TestFactory';
 import {CryptographyError} from 'src/script/error/CryptographyError';
 
+jest.mock('axios');
+
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
 
@@ -156,6 +158,9 @@ describe('CryptographyRepository', () => {
     });
 
     it('detects duplicated messages', async () => {
+      jest
+        .spyOn(testFactory.cryptography_repository.cryptographyService, 'putClientPreKeys')
+        .mockReturnValue(Promise.resolve());
       const preKeys = await testFactory.cryptography_repository.initCryptobox();
       const alice = testFactory.cryptography_repository.cryptobox.identity;
 
