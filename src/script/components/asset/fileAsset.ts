@@ -26,7 +26,7 @@ import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {FileAsset} from '../../entity/message/FileAsset';
-import './assetLoader';
+import './AssetLoader';
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetRepository} from '../../assets/AssetRepository';
 

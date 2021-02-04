@@ -17,32 +17,61 @@
  *
  */
 
-import ko from 'knockout';
+import TestPage from 'Util/test/TestPage';
 
-import {instantiateComponent} from '../../../../test/helper/knockoutHelpers';
-import './chooseScreen';
+import ChooseScreen, {ChooseScreenProps} from './ChooseScreen';
 
-describe('chooseScreen', () => {
-  it('shows the available screens', async () => {
-    const screens = [
-      {id: 'screen:first', thumbnail: {toDataURL: () => 'first screen'}},
-      {id: 'screen:second', thumbnail: {toDataURL: () => 'second screen'}},
-    ];
-    const windows = [
-      {id: 'window:first', thumbnail: {toDataURL: () => 'first window'}},
-      {id: 'window:second', thumbnail: {toDataURL: () => 'second window'}},
-    ];
-    const params = {
-      cancel: () => {},
-      choose: () => {},
-      screens: ko.observable(screens),
-      windows: ko.observable(windows),
-    };
+class ChooseScreenPage extends TestPage<ChooseScreenProps> {
+  constructor(props?: ChooseScreenProps) {
+    super(ChooseScreen, props);
+  }
+  getListItems = () => this.get('.choose-screen-list-item');
+  getCancelButton = () => this.get('[data-uie-name="do-choose-screen-cancel"]');
+}
 
-    window.t = jest.fn().mockImplementation((value: string) => value);
+describe('ChooseScreen', () => {
+  const screens = [
+    {id: 'screen:first', thumbnail: {toDataURL: () => 'first screen'} as HTMLCanvasElement},
+    {id: 'screen:second', thumbnail: {toDataURL: () => 'second screen'} as HTMLCanvasElement},
+  ];
+  const windows = [
+    {id: 'window:first', thumbnail: {toDataURL: () => 'first window'} as HTMLCanvasElement},
+    {id: 'window:second', thumbnail: {toDataURL: () => 'second window'} as HTMLCanvasElement},
+  ];
+  const cancel = jasmine.createSpy();
+  const choose = jasmine.createSpy();
 
-    const domContainer = await instantiateComponent('choose-screen', params);
-    const screenItems = domContainer.querySelectorAll('.choose-screen-list-item');
-    expect(screenItems.length).toBe(screens.length + windows.length);
+  const props = {
+    cancel,
+    choose,
+    screens,
+    windows,
+  };
+
+  it('shows the available screens', () => {
+    const chooseScreen = new ChooseScreenPage(props);
+    expect(chooseScreen.getListItems().length).toBe(screens.length + windows.length);
+  });
+
+  it('calls cancel on escape', () => {
+    new ChooseScreenPage(props);
+    const event = new KeyboardEvent('keydown', {key: 'Escape'});
+    document.dispatchEvent(event);
+    expect(props.cancel).toHaveBeenCalled();
+  });
+
+  it('calls cancel on cancel button click', () => {
+    const chooseScreen = new ChooseScreenPage(props);
+    chooseScreen.getCancelButton().simulate('click');
+    expect(props.cancel).toHaveBeenCalled();
+  });
+
+  it('chooses the correct screens on click', () => {
+    const chooseScreen = new ChooseScreenPage(props);
+    const ids = [...screens, ...windows].map(({id}) => id);
+    chooseScreen.getListItems().forEach((listItem, index) => {
+      listItem.simulate('click');
+      expect(props.choose).toHaveBeenCalledWith(ids[index]);
+    });
   });
 });

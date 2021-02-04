@@ -23,7 +23,7 @@ jobs:
       TEST_COVERAGE_WARNING_THRESHOLD: 60
       DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
       AWS_APPLICATION_NAME: Webapp
-      AWS_BUILD_ZIP_PATH: 'server/dist/s3/ebs.zip'
+      AWS_BUILD_ZIP_PATH: server/dist/s3/ebs.zip
 
     steps:
       - name: Checkout
@@ -31,7 +31,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 'Use latest Node.js v12'
+      - name: Use latest Node.js v12
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
@@ -103,7 +103,7 @@ jobs:
         uses: slavcodev/coverage-monitor-action@1.2.0
         with:
           github_token: ${{github.token}}
-          clover_file: 'coverage/clover.xml'
+          clover_file: coverage/clover.xml
           threshold_alert: ${{env.TEST_COVERAGE_FAIL_THRESHOLD}}
           threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
 
@@ -289,7 +289,7 @@ jobs:
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: '4223f57f-0c8d-42fe-bf8a-908d680788ab'
+          conversation: 4223f57f-0c8d-42fe-bf8a-908d680788ab
           text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
       - name: Notify AVS commit
@@ -298,7 +298,7 @@ jobs:
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: '5496b04a-afd3-410e-8154-855142bcfb03'
+          conversation: 5496b04a-afd3-410e-8154-855142bcfb03
           text: 'Deployed commit **${{github.sha}}** ("${{env.TITLE}}") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁'
 
       - name: Notify CI error
@@ -307,7 +307,7 @@ jobs:
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
+          conversation: b2cc7120-4154-4be4-b0c0-45a8c361c4d1
           text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
 
       - name: Build config.js file for Desktop
@@ -322,7 +322,7 @@ jobs:
           path: server/dist
 
   build_desktop_binaries:
-    name: 'Build Desktop binaries'
+    name: Build Desktop binaries
     needs: test_build_deploy
     runs-on: ${{matrix.os}}
 
@@ -353,10 +353,11 @@ jobs:
           GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
           echo -e "TAG = ${TAG}"
+          echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
           echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
-      - name: 'Use latest Node.js v12'
+      - name: Use latest Node.js v12
         if: env.BUILD_DESKTOP == 'true'
         uses: actions/setup-node@v1
         with:
@@ -437,3 +438,30 @@ jobs:
           asset_name: electron-app-${{env.OS}}
           asset_content_type: application/zip
 
+  cleanup_artifacts:
+    name: Cleanup artifacts
+    needs: build_desktop_binaries
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set environment variables
+        shell: bash
+        run: |
+          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+          echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
+
+      - name: Set BUILD_DESKTOP
+        shell: bash
+        run: |
+          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
+
+      - name: Delete WebApp artifacts
+        if: env.BUILD_DESKTOP == 'true'
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: webapp-dist
