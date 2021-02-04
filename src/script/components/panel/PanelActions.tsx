@@ -27,6 +27,7 @@ export interface MenuItem {
   icon: string;
   identifier: string;
   label: string;
+  size?: {height: number; width: number};
 }
 
 export interface PanelActionsProps {
@@ -36,10 +37,10 @@ export interface PanelActionsProps {
 const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
   return (
     <Fragment>
-      {items.map(({click, identifier, icon, label}) => (
+      {items.map(({click, identifier, icon, label, size = {}}) => (
         <div className="panel__action-item" key={identifier} onClick={click} data-uie-name={identifier}>
           <div className="panel__action-item__icon">
-            <NamedIcon name={icon} />
+            <NamedIcon name={icon} width={size.width || 16} height={size.height || 16} />
           </div>
           <div className="panel__action-item__text">{label}</div>
         </div>

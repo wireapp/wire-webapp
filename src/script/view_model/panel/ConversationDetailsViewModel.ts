@@ -46,7 +46,7 @@ import type {Conversation} from '../../entity/Conversation';
 import {PanelViewModel} from '../PanelViewModel';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
-import {MenuItem} from 'Components/panel/PanelActions';
+import type {MenuItem} from 'Components/panel/PanelActions';
 
 export class ConversationDetailsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;

@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 
-import './PanelActions';
+import {MenuItem} from './PanelActions';
 import type {User} from '../../entity/User';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import type {Conversation} from '../../entity/Conversation';
@@ -51,23 +51,16 @@ interface UserInputParams {
   user: ko.Observable<User>;
 }
 
-interface UserActionItem {
-  click: () => void;
-  icon: string;
-  identifier: string;
-  label: string;
-}
-
 type UserAction = {
   condition: () => boolean;
-  item: UserActionItem;
+  item: MenuItem;
 };
 
 class UserActions {
   isSelfActivated: boolean;
   isMe: ko.Computed<boolean>;
   isNotMe: ko.Computed<any>;
-  items: ko.Computed<UserActionItem[]>;
+  items: ko.Computed<MenuItem[]>;
 
   constructor({
     user,
@@ -240,6 +233,7 @@ class UserActions {
         icon: 'minus-icon',
         identifier: 'do-remove',
         label: t('groupParticipantActionRemove'),
+        size: {height: 2, width: 16},
       },
     };
 
