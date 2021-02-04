@@ -18,8 +18,9 @@
  */
 
 import React from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import cx from 'classnames';
+
+import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface GuestModeToggleProps {
