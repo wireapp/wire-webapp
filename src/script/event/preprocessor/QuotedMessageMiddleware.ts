@@ -20,7 +20,7 @@
 import {Quote} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {base64ToArray} from 'Util/util';
+import {base64ToArraySync} from 'Util/util';
 
 import {ClientEvent} from '../Client';
 import {QuoteEntity} from '../../message/QuoteEntity';
@@ -95,7 +95,7 @@ export class QuotedMessageMiddleware {
       return event;
     }
 
-    const encodedQuote = base64ToArray(rawQuote);
+    const encodedQuote = base64ToArraySync(rawQuote);
     const quote = Quote.decode(encodedQuote);
     this.logger.info('Found quoted message', quote);
 
