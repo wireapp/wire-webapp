@@ -57,7 +57,6 @@ describe('DeviceCard', () => {
         },
       }),
       showIcon: true,
-      showVerified: false,
     });
 
     expect(deviceCard.getDesktopIcon().exists()).toBe(true);
@@ -72,7 +71,6 @@ describe('DeviceCard', () => {
         },
       }),
       showIcon: true,
-      showVerified: false,
     });
 
     expect(deviceCard.getMobileDeviceIcon().exists()).toBe(true);
@@ -88,7 +86,6 @@ describe('DeviceCard', () => {
         },
       }),
       showIcon: true,
-      showVerified: false,
     });
 
     expect(deviceCard.getDiscloseIcon().exists()).toBe(true);
