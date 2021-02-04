@@ -40,7 +40,7 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
       {items.map(({click, identifier, icon, label, size = {}}) => (
         <div className="panel__action-item" key={identifier} onClick={click} data-uie-name={identifier}>
           <div className="panel__action-item__icon">
-            <NamedIcon name={icon} width={size.width || 16} height={size.height || 16} />
+            <NamedIcon name={icon} width={size.width} height={size.height} />
           </div>
           <div className="panel__action-item__text">{label}</div>
         </div>
