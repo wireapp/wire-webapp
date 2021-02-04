@@ -1672,7 +1672,7 @@ export class MessageRepository {
     // This can be removed as soon as `postOTRProtobufMessage` is used
     const stringPayload: NewOTRMessage<string> = {
       ...payload,
-      data: arrayToBase64(payload.data),
+      data: payload.data ? arrayToBase64(payload.data) : undefined,
       recipients: Object.fromEntries(
         Object.entries(payload.recipients).map(([userId, otrClientMap]) => {
           const stringClientMap = Object.fromEntries(
