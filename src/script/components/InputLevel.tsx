@@ -53,7 +53,11 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, level}) => {
   return (
     <ul className="input-level">
       {amountOfBullets.map(bulletIndex => (
-        <li key={bulletIndex} className={cx('input-level-bullet', getBulletClass(bulletIndex))} />
+        <li
+          key={bulletIndex}
+          data-uie-name={getBulletClass(bulletIndex)}
+          className={cx('input-level-bullet', getBulletClass(bulletIndex))}
+        />
       ))}
     </ul>
   );
