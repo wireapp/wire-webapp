@@ -25,6 +25,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {ClientEntity} from '../client/ClientEntity';
 import NamedIcon from './NamedIcon';
+import LegalHoldDot from './LegalHoldDot';
 
 interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -62,15 +63,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
       data-uie-uid={id}
       data-uie-name="device-card"
     >
-      {showLegalHoldIcon && (
-        <NamedIcon
-          width={16}
-          height={16}
-          name="legal-hold-dot"
-          className="device-card__icon"
-          data-uie-name="status-legal-hold-device"
-        />
-      )}
+      {showLegalHoldIcon && <LegalHoldDot className="device-card__icon" dataUieName="status-legal-hold-device" />}
       {showDesktopIcon && (
         <NamedIcon
           width={16}
