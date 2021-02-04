@@ -23,7 +23,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import NamedIcon from '../NamedIcon';
 
 export interface AssetLoaderProps {
-  large: boolean;
+  large?: boolean;
   loadProgress: number;
   onCancel: () => void;
 }
@@ -61,5 +61,7 @@ export default AssetLoader;
 
 registerReactComponent('asset-loader', {
   component: AssetLoader,
-  template: '<div class="asset-loader" data-bind="react: {loadProgress: ko.unwrap(loadProgress)}"></div>',
+  optionalParams: ['large'],
+  template:
+    '<div class="asset-loader" data-bind="react: {large, loadProgress: ko.unwrap(loadProgress), onCancel}"></div>',
 });

@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
-    "@wireapp/avs": "6.6.14",
+    "@wireapp/avs": "6.7.2",
     "@wireapp/core": "17.0.10",
     "@wireapp/protocol-messaging": "1.28.0",
     "@wireapp/react-ui-kit": "7.44.7",
@@ -140,9 +140,11 @@
     "i18next-scanner": "3.0.0",
     "intersection-observer": "0.12.0",
     "jest": "26.6.3",
+    "jsdom-worker": "0.2.1",
     "less": "3.13.1",
     "lint-staged": "10.5.3",
     "load-grunt-tasks": "5.1.0",
+    "node-fetch": "2.6.1",
     "node-sass": "5.0.0",
     "node-webcrypto-ossl": "2.1.2",
     "os-browserify": "0.3.0",
