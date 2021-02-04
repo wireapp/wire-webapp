@@ -629,10 +629,10 @@
     "@types/qs" "*"
     "@types/range-parser" "*"
 
-"@types/express-sitemap-xml@1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-1.1.1.tgz#be4c20cd458e8d22cd742db34623100579cc1c49"
-  integrity sha512-D0zeqqRNrZnmYZxnWJLvZzMSVv13+AmsBOQUg9iDBOVPbYqCDwCFp52x/DxBwLVpUSAOFpbiFmue+U5NsmHB1A==
+"@types/express-sitemap-xml@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-3.0.0.tgz#b9bd5c6679f900d8cad84043e4b8fdfa1bf9ae69"
+  integrity sha512-pWD1odN7HTo6XiIGvtys0yrJ/2yt6Ihgz/6EzmGaJNJkpchOx0CjjK1sT/868apLlCleEUcEGzKc156G/+zqFw==
   dependencies:
     "@types/express" "*"
 
