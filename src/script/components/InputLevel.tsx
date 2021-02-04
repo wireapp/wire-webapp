@@ -26,15 +26,23 @@ export interface InputLevelProps {
   level: number;
 }
 
-const InputLevel: React.FC<InputLevelProps> = ({disabled, level}) => {
-  const bulletCount = Array.from(Array(20).keys());
+export const MAX_AUDIO_BULLETS = 20;
 
-  const isBulletActive = (index: number): string => {
+/**
+ * Shows bullet indicators to visualize the audio input level.
+ *
+ * @param disabled - Don't show audio level indicator if set to `false`
+ * @param level - Audio input volume as floating point number, `1.0` is 100%
+ */
+const InputLevel: React.FC<InputLevelProps> = ({disabled, level}) => {
+  const amountOfBullets = Array.from(Array(MAX_AUDIO_BULLETS).keys());
+
+  const isActiveBullet = (bulletIndex: number): string => {
     if (disabled) {
       return 'input-level-bullet-disabled';
     }
 
-    const passedThreshold = level > (index + 1) / bulletCount.length;
+    const passedThreshold = level > bulletIndex / amountOfBullets.length;
     if (passedThreshold) {
       return 'input-level-bullet-active';
     }
@@ -44,12 +52,14 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, level}) => {
 
   return (
     <>
-      {bulletCount.map(count => (
-        <li key={count} className={cx('input-level-bullet', isBulletActive(count))} />
+      {amountOfBullets.map(bulletIndex => (
+        <li key={bulletIndex} className={cx('input-level-bullet', isActiveBullet(bulletIndex))} />
       ))}
     </>
   );
 };
+
+export default InputLevel;
 
 registerReactComponent('input-level', {
   component: InputLevel,
