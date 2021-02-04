@@ -31,16 +31,17 @@ interface ModalParams {
 
 ko.components.register('modal', {
   template: `
-    <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" >
+    <div class="modal" data-bind="style: {display: displayNone() ? 'none': 'flex', zIndex: 10000001}">
       <!-- ko if: showLoading() -->
         <loading-icon class="modal__loading"></loading-icon>
       <!-- /ko -->
       <!-- ko ifnot: showLoading() -->
-        <div class="modal__content" data-bind="click: () => true, clickBubble: false, css: {'modal__content--large': large, 'modal__content--visible':  hasVisibleClass() && !showLoading()}, fadingscrollbar" >
+        <div class="modal__content" data-bind="css: {'modal__content--large': large, 'modal__content--visible':  hasVisibleClass() && !showLoading()}, fadingscrollbar" >
           <!-- ko template: { nodes: $componentTemplateNodes, data: $parent } --><!-- /ko -->
         </div>
       <!-- /ko -->
     </div>
+    <div class="modal__overlay" data-bind="click: () => onBgClick(), css: {'modal__overlay--visible': hasVisibleClass()}, style: {display: displayNone() ? 'none': 'flex'}" ></div>
     `,
   viewModel: function ({
     isShown,
