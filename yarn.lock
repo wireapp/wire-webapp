@@ -2778,10 +2778,10 @@
   dependencies:
     dexie "3.0.3"
 
-"@wireapp/store-engine-sqleet@1.3.38":
-  version "1.3.38"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.38.tgz#8d9338c43d06272788bff143b5477a28bf9f52aa"
-  integrity sha512-xu9OYQMB0Xw5AFZ93A+xb/Iar22nJyEFKzuFpSXgnlHV8pTqFoonYT0vFmuyW3ivisYIceAPT/8PqLFI4T1pPw==
+"@wireapp/store-engine-sqleet@1.3.39":
+  version "1.3.39"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.39.tgz#dc79e7c7a03f8c5619003301600989b0ebc08afe"
+  integrity sha512-9PDVvjhugcir+MJq72DyL10cCc36IOhTVb97B8fsZnlbIKTYrRNQqNpt2T+MzWYgl8Z+HnxMYe/qfgG3wbb0PQ==
   dependencies:
     "@babel/core" "7.12.10"
     "@babel/plugin-proposal-class-properties" "7.12.1"
