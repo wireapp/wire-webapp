@@ -62,7 +62,7 @@
     "@emotion/babel-preset-css-prop": "10.2.1",
     "@formatjs/cli": "3.0.2",
     "@hot-loader/react-dom": "16.14.0",
-    "@testing-library/react": "11.2.3",
+    "@testing-library/react": "11.2.5",
     "@types/adm-zip": "0.4.33",
     "@types/classnames": "2.2.11",
     "@types/dexie-batch": "0.4.1",
