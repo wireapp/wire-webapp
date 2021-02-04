@@ -72,7 +72,7 @@ ko.components.register('device-card', {
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: clickable -->
-        <disclose-icon></disclose-icon>
+        <disclose-icon class="disclose-icon"></disclose-icon>
       <!-- /ko -->
     </div>
   `,

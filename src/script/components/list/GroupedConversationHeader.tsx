@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 import cx from 'classnames';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
@@ -34,20 +34,20 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({co
   const badge = conversationLabel.conversations().filter(conversation => conversation.hasUnread()).length;
 
   return (
-    <Fragment>
-      <div
-        className={cx('conversation-folder__head', {'conversation-folder__head--open': isOpen})}
-        data-uie-name="conversation-folder-head"
-      >
-        <NamedIcon name="disclose-icon"></NamedIcon>
-        <span className="conversation-folder__head__name">{conversationLabel.name}</span>
-        {badge && (
-          <span className="cell-badge-dark conversation-folder__head__badge" data-uie-name="conversation-folder-badge">
-            {badge}
-          </span>
-        )}
+    <div
+      className={cx('conversation-folder__head', {'conversation-folder__head--open': isOpen})}
+      data-uie-name="conversation-folder-head"
+    >
+      <div className="disclose-icon">
+        <NamedIcon name="disclose-icon" width="5" height="8" />
       </div>
-    </Fragment>
+      <span className="conversation-folder__head__name">{conversationLabel.name}</span>
+      {badge && (
+        <span className="cell-badge-dark conversation-folder__head__badge" data-uie-name="conversation-folder-badge">
+          {badge}
+        </span>
+      )}
+    </div>
   );
 };
 
@@ -55,5 +55,5 @@ export default GroupedConversationHeader;
 
 registerReactComponent('grouped-conversation-header', {
   component: GroupedConversationHeader,
-  template: '<div class="asset-header" data-bind="react: {conversationLabel, isOpen}"></div>',
+  template: '<div data-bind="react: {conversationLabel, isOpen}"></div>',
 });

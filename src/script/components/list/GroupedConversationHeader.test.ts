@@ -49,7 +49,7 @@ describe('GroupedConversationHeader', () => {
 
     const groupedConversationHeader = new GroupedConversationHeaderPage({
       conversationLabel,
-      isOpen: true,
+      isOpen: false,
     });
 
     let badgeSpan = groupedConversationHeader.getBadge();
@@ -62,6 +62,7 @@ describe('GroupedConversationHeader', () => {
     unreadConversation.selfUser(new User(createRandomUuid()));
     unreadConversation.add_message(message);
     conversationLabel.conversations.push(unreadConversation);
+    groupedConversationHeader.setProps({conversationLabel, isOpen: false});
 
     badgeSpan = groupedConversationHeader.getBadge();
     expect(badgeSpan.exists()).toBe(true);
