@@ -29,7 +29,7 @@ class DeviceCardPage extends TestPage<DeviceCardProps> {
   }
 
   getDesktopIcon = () => this.get('svg[data-uie-name="status-desktop-device"]');
-  getOtherDeviceIcon = () => this.get('svg[data-uie-name="status-mobile-device"]');
+  getMobileDeviceIcon = () => this.get('svg[data-uie-name="status-mobile-device"]');
 }
 
 describe('DeviceCard', () => {
@@ -53,7 +53,7 @@ describe('DeviceCard', () => {
     expect(deviceCard.getDesktopIcon().exists()).toBe(true);
   });
 
-  it('renders other devices icon for non-desktop clients', async () => {
+  it('renders mobile devices icon for non-desktop clients', async () => {
     const deviceCard = new DeviceCardPage({
       click: () => undefined,
       device: {
@@ -70,6 +70,6 @@ describe('DeviceCard', () => {
       showVerified: false,
     });
 
-    expect(deviceCard.getOtherDeviceIcon().exists()).toBe(true);
+    expect(deviceCard.getMobileDeviceIcon().exists()).toBe(true);
   });
 });
