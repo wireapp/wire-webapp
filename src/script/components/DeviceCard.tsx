@@ -36,11 +36,10 @@ export interface DeviceCardProps {
 
 const DeviceCard: React.FC<DeviceCardProps> = ({
   click,
-  device: wrappedDevice,
+  device: clientEntity,
   showVerified = false,
   showIcon = false,
 }) => {
-  const clientEntity = wrappedDevice;
   const {class: deviceClass = '?', id = '', label = '?', meta} = clientEntity;
   const formattedId = id ? clientEntity.formatId() : [];
   const name = clientEntity.getName();
@@ -48,7 +47,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   const isVerified = meta.isVerified;
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
   const showDesktopIcon = showIcon && deviceClass === ClientClassification.DESKTOP;
-  const showOtherIcon = showIcon && !showLegalHoldIcon && !showDesktopIcon;
+  const showMobileIcon = showIcon && !showLegalHoldIcon && !showDesktopIcon;
 
   const clickOnDevice = () => {
     if (typeof click === 'function') {
@@ -78,7 +77,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
           data-uie-name="status-desktop-device"
         />
       )}
-      {showOtherIcon && (
+      {showMobileIcon && (
         <NamedIcon
           width={16}
           height={16}
