@@ -53,7 +53,7 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, level}) => {
   return (
     <>
       {amountOfBullets.map(bulletIndex => (
-        <li key={bulletIndex} className={cx('input-level-bullet', isActiveBullet(bulletIndex))} />
+        <li key={bulletIndex} className={cx('input-level-bullet', getBulletClass(bulletIndex))} />
       ))}
     </>
   );
