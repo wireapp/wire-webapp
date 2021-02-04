@@ -17,6 +17,8 @@
  *
  */
 
+import 'jsdom-worker';
+
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON} from '@wireapp/avs';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
