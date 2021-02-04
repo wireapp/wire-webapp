@@ -31,18 +31,18 @@ export const MAX_AUDIO_BULLETS = 20;
 /**
  * Shows bullet indicators to visualize the audio input level.
  *
- * @param disabled Don't show audio level indicator if set to `false`
+ * @param disabled Show audio meter with disabled bullets if set to `false`
  * @param level Audio input volume as floating point number, `1.0` is 100%
  */
 const InputLevel: React.FC<InputLevelProps> = ({disabled, level}) => {
   const amountOfBullets = Array.from(Array(MAX_AUDIO_BULLETS).keys());
 
-  const isActiveBullet = (bulletIndex: number): string => {
+  const getBulletClass = (bulletIndex: number): string => {
     if (disabled) {
       return 'input-level-bullet-disabled';
     }
 
-    const passedThreshold = level > bulletIndex / amountOfBullets.length;
+    const passedThreshold = level > bulletIndex / MAX_AUDIO_BULLETS;
     if (passedThreshold) {
       return 'input-level-bullet-active';
     }
@@ -51,11 +51,11 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, level}) => {
   };
 
   return (
-    <>
+    <ul className="input-level">
       {amountOfBullets.map(bulletIndex => (
         <li key={bulletIndex} className={cx('input-level-bullet', getBulletClass(bulletIndex))} />
       ))}
-    </>
+    </ul>
   );
 };
 
@@ -63,5 +63,5 @@ export default InputLevel;
 
 registerReactComponent('input-level', {
   component: InputLevel,
-  template: '<ul class="input-level" data-bind="react: {disabled: ko.unwrap(disabled), level: ko.unwrap(level)}"></ul>',
+  template: '<div data-bind="react: {disabled: ko.unwrap(disabled), level: ko.unwrap(level)}"></div>',
 });
