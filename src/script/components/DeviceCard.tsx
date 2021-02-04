@@ -51,7 +51,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   const showMobileIcon = showIcon && !showLegalHoldIcon && !showDesktopIcon;
 
   const clickOnDevice = () => {
-    if (typeof click === 'function') {
+    if (clickable) {
       click(clientEntity);
     }
   };
