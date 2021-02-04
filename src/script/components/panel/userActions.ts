@@ -23,7 +23,7 @@ import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
 
-import './panelActions';
+import './PanelActions';
 import type {User} from '../../entity/User';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import type {Conversation} from '../../entity/Conversation';
