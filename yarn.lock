@@ -5814,10 +5814,10 @@ fake-indexeddb@3.1.2:
     realistic-structured-clone "^2.0.1"
     setimmediate "^1.0.5"
 
-faker@5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/faker/-/faker-5.1.0.tgz#e10fa1dec4502551aee0eb771617a7e7b94692e8"
-  integrity sha512-RrWKFSSA/aNLP0g3o2WW1Zez7/MnMr7xkiZmoCfAGZmdkDQZ6l2KtuXHN5XjdvpRjDl8+3vf+Rrtl06Z352+Mw==
+faker@5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/faker/-/faker-5.3.1.tgz#67f8f5c170b97a76b875389e0e8b9155da7b4853"
+  integrity sha512-sVdoApX/awJHO9DZHZsHVaJBNFiJW0n3lPs0q/nFxp/Mtya1dr2sCMktST3mdxNMHjkvKTTMAW488E+jH1eSbg==
 
 fast-deep-equal@^3.1.1:
   version "3.1.3"
