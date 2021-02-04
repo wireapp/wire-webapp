@@ -370,9 +370,7 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
-          echo -e "TAG = ${TAG}"
-          echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
-          echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
+          cat "${GITHUB_ENV}"
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: Use latest Node.js v12
@@ -491,9 +489,15 @@ jobs:
         shell: bash
         run: |
           TAG="$(git tag --points-at ${{github.sha}})"
-          PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)"
-          BUILD_DESKTOP=$([[ "${TAG}" =~ staging|production ]] || [[ "${PR_LAST_COMMIT_MESSAGE}" =~ .*\+Desktop.* ]] && echo "true" || echo "false")
+          BUILD_DESKTOP="$([[ "${TAG}" =~ staging|production ]] || [[ "${PR_LAST_COMMIT_MESSAGE}" =~ .*\+Desktop.* ]] && echo "true" || echo "false")"
           echo "BUILD_DESKTOP=${BUILD_DESKTOP}" >> $GITHUB_ENV
+
+      - name: Print environment variables
+        env:
+          GITHUB_CONTEXT: ${{toJson(github)}}
+        run: |
+          cat "${GITHUB_ENV}"
+          echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: Delete WebApp artifacts
         if: env.BUILD_DESKTOP == 'true'
