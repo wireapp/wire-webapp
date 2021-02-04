@@ -26,6 +26,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import type {ClientEntity} from '../client/ClientEntity';
 import NamedIcon from './NamedIcon';
 import LegalHoldDot from './LegalHoldDot';
+import VerifiedIcon from './VerifiedIcon';
 
 export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -101,24 +102,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
           </span>
         </div>
       </div>
-      {showVerified && isVerified() && (
-        <NamedIcon
-          width={14}
-          height={16}
-          className="verified-icon"
-          name="verified-icon"
-          data-uie-name="user-device-verified"
-        />
-      )}
-      {showVerified && !isVerified() && (
-        <NamedIcon
-          width={14}
-          height={16}
-          className="not-verified-icon"
-          name="not-verified-icon"
-          data-uie-name="user-device-not-verified"
-        />
-      )}
+      {showVerified && <VerifiedIcon isVerified={isVerified()} />}
       {clickable && <NamedIcon width={5} height={8} name="disclose-icon" className="disclose-icon" />}
     </div>
   );
