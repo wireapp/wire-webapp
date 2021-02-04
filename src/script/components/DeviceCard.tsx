@@ -103,7 +103,9 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         </div>
       </div>
       {showVerified && <VerifiedIcon isVerified={isVerified()} />}
-      {clickable && <NamedIcon width={5} height={8} name="disclose-icon" className="disclose-icon" />}
+      {clickable && (
+        <NamedIcon width={5} height={8} name="disclose-icon" className="disclose-icon" data-uie-name="disclose-icon" />
+      )}
     </div>
   );
 };

@@ -30,6 +30,9 @@ class DeviceCardPage extends TestPage<DeviceCardProps> {
 
   getDesktopIcon = () => this.get('svg[data-uie-name="status-desktop-device"]');
   getMobileDeviceIcon = () => this.get('svg[data-uie-name="status-mobile-device"]');
+  getDiscloseIcon = () => this.get('svg[data-uie-name="disclose-icon"]');
+  getVerifiedIcon = () => this.get('svg[data-uie-name="user-device-verified"]');
+  getNotVerifedIcon = () => this.get('svg[data-uie-name="user-device-not-verified"]');
 }
 
 describe('DeviceCard', () => {
@@ -71,5 +74,65 @@ describe('DeviceCard', () => {
     });
 
     expect(deviceCard.getMobileDeviceIcon().exists()).toBe(true);
+  });
+
+  it('shows disclose icon when component is clickable', async () => {
+    const deviceCard = new DeviceCardPage({
+      click: () => undefined,
+      device: {
+        class: ClientClassification.PHONE,
+        formatId: () => ['ab', 'cd', 'ed'],
+        getName: () => 'example name',
+        id: 'example',
+        label: 'example label',
+        meta: {
+          isVerified: ko.observable(false),
+        },
+      } as ClientEntity,
+      showIcon: true,
+      showVerified: false,
+    });
+
+    expect(deviceCard.getDiscloseIcon().exists()).toBe(true);
+  });
+
+  it('shows verified icon', async () => {
+    const deviceCard = new DeviceCardPage({
+      click: () => undefined,
+      device: {
+        class: ClientClassification.PHONE,
+        formatId: () => ['ab', 'cd', 'ed'],
+        getName: () => 'example name',
+        id: 'example',
+        label: 'example label',
+        meta: {
+          isVerified: ko.observable(true),
+        },
+      } as ClientEntity,
+      showIcon: true,
+      showVerified: true,
+    });
+
+    expect(deviceCard.getVerifiedIcon().exists()).toBe(true);
+  });
+
+  it('shows unverified icon', async () => {
+    const deviceCard = new DeviceCardPage({
+      click: () => undefined,
+      device: {
+        class: ClientClassification.PHONE,
+        formatId: () => ['ab', 'cd', 'ed'],
+        getName: () => 'example name',
+        id: 'example',
+        label: 'example label',
+        meta: {
+          isVerified: ko.observable(false),
+        },
+      } as ClientEntity,
+      showIcon: true,
+      showVerified: true,
+    });
+
+    expect(deviceCard.getNotVerifedIcon().exists()).toBe(true);
   });
 });
