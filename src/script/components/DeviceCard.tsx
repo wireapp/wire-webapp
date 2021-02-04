@@ -27,7 +27,7 @@ import type {ClientEntity} from '../client/ClientEntity';
 import NamedIcon from './NamedIcon';
 import LegalHoldDot from './LegalHoldDot';
 
-interface DeviceCardProps {
+export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
   device: ClientEntity;
   showIcon?: boolean;
