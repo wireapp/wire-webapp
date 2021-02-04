@@ -41,7 +41,7 @@ import 'Components/GuestModeToggle';
 import 'Components/icons';
 import 'Components/image';
 import 'Components/InfoToggle';
-import 'Components/inputLevel';
+import 'Components/InputLevel';
 import 'Components/list/conversationListCallingCell';
 import 'Components/list/conversationListCell';
 import 'Components/list/GroupAvatar';
