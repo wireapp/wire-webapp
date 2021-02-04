@@ -22,7 +22,7 @@ import {LinkPreview, ITweet, Mention} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
-import {base64ToArraySync} from 'Util/util';
+import {base64ToArray} from 'Util/util';
 
 import {AssetTransferState} from '../assets/AssetTransferState';
 
@@ -793,7 +793,7 @@ export class EventMapper {
    * @returns Array of mapped link previews
    */
   private async _mapAssetLinkPreviews(linkPreviews: string[]) {
-    const encodedLinkPreviews = await Promise.all(linkPreviews.map(base64 => base64ToArraySync(base64)));
+    const encodedLinkPreviews = await Promise.all(linkPreviews.map(base64 => base64ToArray(base64)));
     return encodedLinkPreviews
       .map(encodedLinkPreview => LinkPreview.decode(encodedLinkPreview))
       .map(linkPreview => this._mapAssetLinkPreview(linkPreview))
@@ -808,7 +808,7 @@ export class EventMapper {
    * @returns Array of mapped mentions
    */
   private async _mapAssetMentions(mentions: string[], messageText: string) {
-    const encodedMentions = await Promise.all(mentions.map(base64 => base64ToArraySync(base64)));
+    const encodedMentions = await Promise.all(mentions.map(base64 => base64ToArray(base64)));
     return encodedMentions
       .map(encodedMention => {
         const protoMention = Mention.decode(encodedMention);

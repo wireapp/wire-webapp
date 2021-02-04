@@ -19,7 +19,7 @@
 
 import type {Dexie, Transaction} from 'dexie';
 
-import {base64ToArraySyncSync} from 'Util/util';
+import {base64ToArray} from 'Util/util';
 
 import {categoryFromEvent} from '../message/MessageCategorization';
 
@@ -272,19 +272,19 @@ export class StorageSchemata {
             .table(StorageSchemata.OBJECT_STORE.KEYS)
             .toCollection()
             .modify(record => {
-              record.serialised = base64ToArraySyncSync(record.serialised).buffer;
+              record.serialised = base64ToArray(record.serialised).buffer;
             });
           transaction
             .table(StorageSchemata.OBJECT_STORE.PRE_KEYS)
             .toCollection()
             .modify(record => {
-              record.serialised = base64ToArraySyncSync(record.serialised).buffer;
+              record.serialised = base64ToArray(record.serialised).buffer;
             });
           transaction
             .table(StorageSchemata.OBJECT_STORE.SESSIONS)
             .toCollection()
             .modify(record => {
-              record.serialised = base64ToArraySyncSync(record.serialised).buffer;
+              record.serialised = base64ToArray(record.serialised).buffer;
             });
         },
         version: 12,

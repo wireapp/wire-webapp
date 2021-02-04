@@ -47,7 +47,7 @@ import {
 
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {base64ToArraySync, arrayToBase64, createRandomUuid} from 'Util/util';
+import {base64ToArray, arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {decryptAesAsset} from '../assets/AssetCrypto';
 import {AssetTransferState} from '../assets/AssetTransferState';
@@ -464,7 +464,7 @@ export class CryptographyMapper {
       if (!eventData.data || !otrKey || !sha256) {
         throw new Error('Not all expected properties defined');
       }
-      const cipherTextArray = base64ToArraySync(eventData.data);
+      const cipherTextArray = base64ToArray(eventData.data);
       const cipherText = cipherTextArray.buffer;
       const keyBytes = new Uint8Array(otrKey).buffer;
       const referenceSha256 = new Uint8Array(sha256).buffer;

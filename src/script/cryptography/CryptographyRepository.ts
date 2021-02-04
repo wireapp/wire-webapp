@@ -31,7 +31,7 @@ import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {base64ToArraySync, zeroPadding} from 'Util/util';
+import {base64ToArray, zeroPadding} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
@@ -335,7 +335,7 @@ export class CryptographyRepository {
       } else {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
         const sessionId = this.constructSessionId(userId, clientId);
-        const preKeyArray = base64ToArraySync(preKey.key);
+        const preKeyArray = base64ToArray(preKey.key);
         return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
@@ -386,7 +386,7 @@ export class CryptographyRepository {
             const encryptionPromise = this.encryptPayloadForSession(
               sessionId,
               genericMessage,
-              base64ToArraySync(preKeyPayload.key).buffer,
+              base64ToArray(preKeyPayload.key).buffer,
             );
             cipherPayloadPromises.push(encryptionPromise);
           }
@@ -440,7 +440,7 @@ export class CryptographyRepository {
    */
   private async decryptEvent(event: EventRecord): Promise<GenericMessage> {
     const {data: eventData, from: userId} = event;
-    const cipherTextArray = base64ToArraySync(eventData.text || eventData.key);
+    const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
     const sessionId = this.constructSessionId(userId, eventData.sender);
 

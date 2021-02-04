@@ -196,7 +196,7 @@ export const stripDataUri = (string: string): string => string.replace(/^data:.*
  * Convert a base64 string to an Uint8Array.
  * @note Function will remove "data-uri" attribute if present.
  */
-export const base64ToArraySync = (base64: string): Uint8Array => {
+export const base64ToArray = (base64: string): Uint8Array => {
   return Decoder.fromBase64(stripDataUri(base64)).asBytes;
 };
 
@@ -212,7 +212,7 @@ export const arrayToBase64 = (array: ArrayBuffer | Uint8Array): string => {
  */
 export const base64ToBlob = (base64: string): Blob => {
   const mimeType = getContentTypeFromDataUrl(base64);
-  const bytes = base64ToArraySync(base64);
+  const bytes = base64ToArray(base64);
   return new Blob([bytes], {type: mimeType});
 };
 
