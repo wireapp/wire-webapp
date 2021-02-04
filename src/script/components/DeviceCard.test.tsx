@@ -23,6 +23,18 @@ import TestPage from 'Util/test/TestPage';
 import DeviceCard, {DeviceCardProps} from './DeviceCard';
 import type {ClientEntity} from '../client/ClientEntity';
 
+function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
+  const device: Partial<ClientEntity> = {
+    formatId: () => ['ab', 'cd', 'ed'],
+    getName: () => 'example name',
+    id: 'example',
+    label: 'example label',
+    ...clientEntity,
+  };
+
+  return device as ClientEntity;
+}
+
 class DeviceCardPage extends TestPage<DeviceCardProps> {
   constructor(props?: DeviceCardProps) {
     super(DeviceCard, props);
@@ -38,17 +50,12 @@ class DeviceCardPage extends TestPage<DeviceCardProps> {
 describe('DeviceCard', () => {
   it('renders desktop icon for desktop clients', async () => {
     const deviceCard = new DeviceCardPage({
-      click: () => undefined,
-      device: {
+      device: createClientEntity({
         class: ClientClassification.DESKTOP,
-        formatId: () => ['ab', 'cd', 'ed'],
-        getName: () => 'example name',
-        id: 'example',
-        label: 'example label',
         meta: {
           isVerified: ko.observable(false),
         },
-      } as ClientEntity,
+      }),
       showIcon: true,
       showVerified: false,
     });
@@ -58,17 +65,12 @@ describe('DeviceCard', () => {
 
   it('renders mobile devices icon for non-desktop clients', async () => {
     const deviceCard = new DeviceCardPage({
-      click: () => undefined,
-      device: {
+      device: createClientEntity({
         class: ClientClassification.PHONE,
-        formatId: () => ['ab', 'cd', 'ed'],
-        getName: () => 'example name',
-        id: 'example',
-        label: 'example label',
         meta: {
           isVerified: ko.observable(false),
         },
-      } as ClientEntity,
+      }),
       showIcon: true,
       showVerified: false,
     });
@@ -79,16 +81,12 @@ describe('DeviceCard', () => {
   it('shows disclose icon when component is clickable', async () => {
     const deviceCard = new DeviceCardPage({
       click: () => undefined,
-      device: {
+      device: createClientEntity({
         class: ClientClassification.PHONE,
-        formatId: () => ['ab', 'cd', 'ed'],
-        getName: () => 'example name',
-        id: 'example',
-        label: 'example label',
         meta: {
           isVerified: ko.observable(false),
         },
-      } as ClientEntity,
+      }),
       showIcon: true,
       showVerified: false,
     });
@@ -98,17 +96,12 @@ describe('DeviceCard', () => {
 
   it('shows verified icon', async () => {
     const deviceCard = new DeviceCardPage({
-      click: () => undefined,
-      device: {
+      device: createClientEntity({
         class: ClientClassification.PHONE,
-        formatId: () => ['ab', 'cd', 'ed'],
-        getName: () => 'example name',
-        id: 'example',
-        label: 'example label',
         meta: {
           isVerified: ko.observable(true),
         },
-      } as ClientEntity,
+      }),
       showIcon: true,
       showVerified: true,
     });
@@ -118,17 +111,12 @@ describe('DeviceCard', () => {
 
   it('shows unverified icon', async () => {
     const deviceCard = new DeviceCardPage({
-      click: () => undefined,
-      device: {
+      device: createClientEntity({
         class: ClientClassification.PHONE,
-        formatId: () => ['ab', 'cd', 'ed'],
-        getName: () => 'example name',
-        id: 'example',
-        label: 'example label',
         meta: {
           isVerified: ko.observable(false),
         },
-      } as ClientEntity,
+      }),
       showIcon: true,
       showVerified: true,
     });
