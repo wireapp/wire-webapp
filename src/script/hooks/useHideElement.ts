@@ -11,51 +11,34 @@ const useHideElement = (timeout: number, skipClass?: string) => {
     }
 
     let hideTimeout: number;
-    let isMouseIn: boolean = false;
 
-    const onMouseEnter = () => {
-      isMouseIn = true;
-      ref.current.classList.remove(hideControlsClass);
-    };
-
-    const onMouseLeave = () => {
-      isMouseIn = false;
-      ref.current.classList.add(hideControlsClass);
-    };
+    const hideElement = () => ref.current.classList.add(hideControlsClass);
 
     const startTimer = () => {
-      hideTimeout = window.setTimeout(() => {
-        ref.current.classList.add(hideControlsClass);
-      }, timeout);
+      hideTimeout = window.setTimeout(hideElement, timeout);
     };
 
     const onMouseMove = ({target}: MouseEvent) => {
-      if (!isMouseIn) {
-        return;
-      }
-
       window.clearTimeout(hideTimeout);
       ref.current.classList.remove(hideControlsClass);
 
-      let node = target as Element;
-      while (node && node !== ref.current) {
-        if (node.classList.contains(skipClass)) {
+      if (skipClass) {
+        const closest = (target as Element).closest(`.${skipClass}`);
+        if (ref.current.contains(closest)) {
           return;
         }
-        node = node.parentNode as Element;
       }
+
       startTimer();
     };
 
-    ref.current.addEventListener('mouseenter', onMouseEnter);
-    ref.current.addEventListener('mouseleave', onMouseLeave);
+    ref.current.addEventListener('mouseleave', hideElement);
     ref.current.addEventListener('mousemove', onMouseMove);
 
     startTimer();
     return () => {
       window.clearTimeout(hideTimeout);
-      ref.current.removeEventListener('mouseenter', onMouseEnter);
-      ref.current.removeEventListener('mouseleave', onMouseLeave);
+      ref.current.removeEventListener('mouseleave', hideElement);
       ref.current.removeEventListener('mousemove', onMouseMove);
       ref.current.classList.remove(hideControlsClass);
     };

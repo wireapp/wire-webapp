@@ -41,11 +41,11 @@ import {
 } from '@wireapp/protocol-messaging';
 import {IClientEntry, IUserEntry, NewOtrMessage} from '@wireapp/protocol-messaging/web/otr';
 import Long from 'long';
+import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {NewOTRMessage, ClientMismatch, OTRRecipients} from '@wireapp/api-client/src/conversation';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
 import {container} from 'tsyringe';
 
@@ -53,7 +53,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference} from 'Util/ArrayUtil';
-import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {arrayToBase64, createRandomUuid, loadUrlBlob} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {capitalizeFirstChar, uuidToBytes} from 'Util/StringUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
@@ -1624,7 +1624,7 @@ export class MessageRepository {
         options.recipients,
         genericMessageExternal,
       );
-      payload.data = new Uint8Array(encryptedAsset.cipherText);
+      payload.data = await arrayToBase64(encryptedAsset.cipherText);
       payload.native_push = options.nativePush;
       return this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
@@ -1647,7 +1647,7 @@ export class MessageRepository {
    */
   private async sendEncryptedMessage(
     eventInfoEntity: EventInfoEntity,
-    payload: NewOTRMessage<Uint8Array>,
+    payload: NewOTRMessage,
   ): Promise<ClientMismatch> {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;

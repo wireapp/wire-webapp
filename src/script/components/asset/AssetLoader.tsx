@@ -23,7 +23,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import NamedIcon from '../NamedIcon';
 
 export interface AssetLoaderProps {
-  large: boolean;
+  large?: boolean;
   loadProgress: number;
   onCancel: () => void;
 }
@@ -49,9 +49,11 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
             cx="50%"
             cy="50%"
             data-uie-name="asset-loader-circle"
-          ></circle>
+          />
         </svg>
-        <NamedIcon name="close-icon" className="media-button__icon"></NamedIcon>
+        <div className="media-button__icon">
+          <NamedIcon name="close-icon" width="14" height="14" />
+        </div>
       </div>
     </Fragment>
   );
@@ -61,5 +63,7 @@ export default AssetLoader;
 
 registerReactComponent('asset-loader', {
   component: AssetLoader,
-  template: '<div class="asset-loader" data-bind="react: {loadProgress: ko.unwrap(loadProgress)}"></div>',
+  optionalParams: ['large'],
+  template:
+    '<div class="asset-loader" data-bind="react: {large, loadProgress: ko.unwrap(loadProgress), onCancel}"></div>',
 });
