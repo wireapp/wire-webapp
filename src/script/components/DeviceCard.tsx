@@ -63,7 +63,12 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
       data-uie-uid={id}
       data-uie-name="device-card"
     >
-      {showLegalHoldIcon && <LegalHoldDot className="device-card__icon" dataUieName="status-legal-hold-device" />}
+      {showLegalHoldIcon && (
+        <LegalHoldDot
+          className="device-card__icon device-card__legal_hold_icon"
+          dataUieName="status-legal-hold-device"
+        />
+      )}
       {showDesktopIcon && (
         <NamedIcon
           width={16}
@@ -126,5 +131,5 @@ registerReactComponent('device-card', {
   component: DeviceCard,
   optionalParams: ['click', 'showIcon', 'showVerified'],
   template:
-    '<div class="device-card" data-bind="react: {device: ko.unwrap(device), click, current, showIcon, showVerified}"></div>',
+    '<div class="device-card" data-bind="react: {device: ko.unwrap(device), click, showIcon, showVerified}"></div>',
 });
