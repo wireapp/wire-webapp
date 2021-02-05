@@ -42,7 +42,9 @@ const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
           <div className="panel__action-item__icon">
             <NamedIcon name={icon} width={size.width} height={size.height} />
           </div>
-          <div className="panel__action-item__text">{label}</div>
+          <div data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
+            {label}
+          </div>
         </div>
       ))}
     </Fragment>

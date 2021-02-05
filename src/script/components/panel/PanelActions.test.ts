@@ -27,7 +27,7 @@ class PanelActionsPage extends TestPage<PanelActionsProps> {
   }
 
   getMainAction = (identifier: string) => this.get(`div[data-uie-name="${identifier}"]`);
-  getMainActionLabel = (identifier: string) => this.getMainAction(identifier).find('div.panel__action-item__text');
+  getMainActionLabel = (identifier: string) => this.get(`div[data-uie-name="${identifier}-item-text"]`);
   clickMainAction = (identifier: string) => this.click(this.getMainAction(identifier));
 }
 
