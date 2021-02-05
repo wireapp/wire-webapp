@@ -17,10 +17,9 @@
  *
  */
 
-import React, {useState, useEffect} from 'react';
 import {CSSObject} from '@emotion/core';
+import React, {useEffect, useState} from 'react';
 import {noop} from 'Util/util';
-import SVGProvider from '../auth/util/SVGProvider';
 import NamedIcon from './NamedIcon';
 
 interface ModalComponentProps {
@@ -87,7 +86,6 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
 }) => {
   const [displayNone, setDisplayNone] = useState<boolean>(!isShown);
   const hasVisibleClass = isShown && !displayNone;
-
   useEffect(() => {
     let timeoutId = 0;
     if (isShown) {
