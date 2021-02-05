@@ -20,20 +20,31 @@
 
 //@ts-check
 
-const fs = require('fs');
 const path = require('path');
+const globby = require('globby');
+const AdmZip = require('adm-zip');
 
-const serverDist = path.resolve(__dirname, '../../server/dist');
+const {
+  directories: {output: buildDir},
+  productName,
+} = require('../electron-builder.config');
 
-const {config} = require(path.join(serverDist, 'config'));
-const staticWebappDir = path.join(serverDist, 'static/');
+const buildDirResolved = path.resolve(__dirname, '..', buildDir);
+const zipFile = path.join(buildDirResolved, `${productName}.zip`);
+const buildFiles = globby.sync(`${productName}-*`, {
+  cwd: buildDir,
+  expandDirectories: false,
+  followSymbolicLinks: false,
+  onlyFiles: true,
+});
 
-const clientConfig = {
-  ...config.CLIENT,
-  APP_BASE: config.SERVER.APP_BASE,
-};
+if (!buildFiles.length) {
+  console.error('No build files found.');
+  process.exit(1);
+}
 
-const payload = `
-window.wire = window.wire || {};
-window.wire.env = ${JSON.stringify(clientConfig)};`;
-fs.writeFileSync(path.join(staticWebappDir, 'config.js'), payload);
+const buildFile = path.join(buildDirResolved, buildFiles[0]);
+
+const zip = new AdmZip();
+zip.addLocalFile(buildFile);
+zip.writeZip(zipFile);

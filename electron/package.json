@@ -7,9 +7,11 @@
   "devDependencies": {
     "@types/node": "12.19.16",
     "@wireapp/copy-config": "1.1.13",
+    "adm-zip": "0.5.2",
     "cpx": "1.5.0",
     "electron": "11.2.2",
     "electron-builder": "22.9.1",
+    "globby": "11.0.2",
     "rimraf": "3.0.2",
     "ts-node": "9.1.1",
     "typescript": "4.1.3"
@@ -22,8 +24,8 @@
     "build:config": "node bin/build-config.js",
     "build:webapp": "cd .. && yarn build:prod",
     "build:dir": "electron-builder --dir",
-    "build:mac": "yarn clear:build && electron-builder -c electron-builder.config.js --mac",
     "build:linux": "yarn clear:build && electron-builder -c electron-builder.config.js --linux",
+    "build:macos": "yarn clear:build && electron-builder -c electron-builder.config.js --mac",
     "build:prepare": "yarn build:webapp && yarn build:config && yarn copy:webapp",
     "build:ts": "tsc",
     "build:windows": "yarn clear:build && electron-builder -c electron-builder.config.js --windows",
@@ -34,7 +36,8 @@
     "dist": "yarn clear:ts && yarn build:ts",
     "postinstall": "copy-config",
     "prestart": "yarn dist",
-    "start": "electron . --no-sandbox"
+    "start": "electron . --no-sandbox",
+    "zip": "node bin/zip.js"
   },
   "version": "4.0.0"
 }
