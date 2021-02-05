@@ -224,8 +224,6 @@
     right: 0;
     bottom: 0;
     left: 0;
-    align-items: center;
-    justify-content: center;
     background-color: fade(#000, 64%);
     opacity: 0;
     overflow-x: hidden;
@@ -250,11 +248,14 @@
 
   &__content {
     position: relative;
+    z-index: @z-index-modal + 1;
     display: flex;
     overflow: hidden;
     width: 384px;
     max-height: 480px;
     flex-direction: column;
+
+    align-self: center;
     padding: 16px;
 
     border: var(--modal-border-color);
@@ -264,6 +265,7 @@
     border-radius: 4px;
     cursor: default;
     font-size: 14px;
+    justify-self: center;
     overflow-y: hidden;
 
     transform: scale(0.8);
