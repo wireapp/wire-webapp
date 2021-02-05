@@ -26,7 +26,7 @@ class GuestModePage extends TestPage<GuestModeToggleProps> {
     super(GuestModeToggle, props);
   }
 
-  getInput = () => this.get('input[data-uie-name="do-allow-guests"]');
+  getInput = () => this.get('input[data-uie-name="allow-guest-input"]');
 
   changeInputValue = (value: boolean) => this.changeCheckboxValue(this.getInput(), value);
 }

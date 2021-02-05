@@ -47,6 +47,7 @@ const GuestModeToggle: React.FC<GuestModeToggleProps> = ({extendedInfo, isChecke
             id="toggle"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
             checked={isChecked}
+            data-uie-name="allow-guest-input"
           />
           <label
             className="button-label"
