@@ -21,6 +21,7 @@ import React, {useState, useEffect} from 'react';
 import {CSSObject} from '@emotion/core';
 import {noop} from 'Util/util';
 import SVGProvider from '../auth/util/SVGProvider';
+import NamedIcon from './NamedIcon';
 
 interface ModalComponentProps {
   isShown: boolean;
@@ -110,10 +111,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       {...rest}
     >
       {showLoading ? (
-        <svg
-          css={{height: 48, path: {fill: 'var(--modal-bg)'}, width: 48}}
-          dangerouslySetInnerHTML={{__html: SVGProvider['loading-icon']?.documentElement?.innerHTML}}
-        />
+        <NamedIcon name="loading-icon" width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
       ) : (
         <div
           onClick={event => event.stopPropagation()}

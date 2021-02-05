@@ -357,7 +357,9 @@ const AppLock: React.FC<AppLockProps> = ({
               autoComplete="new-password"
             />
             <div className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}>
-              {t('modalAppLockSetupLong')}
+              {t('modalAppLockSetupLong', {
+                minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
+              })}
             </div>
             <div className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}>
               {t('modalAppLockSetupLower')}
