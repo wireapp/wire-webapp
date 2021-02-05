@@ -24,7 +24,7 @@
     "@babel/plugin-proposal-object-rest-spread": "7.12.1",
     "@babel/plugin-proposal-optional-chaining": "7.12.7",
     "@babel/preset-react": "7.12.10",
-    "@babel/preset-typescript": "7.12.7",
+    "@babel/preset-typescript": "7.12.13",
     "@types/jasmine": "3.6.3",
     "@types/karma": "5.0.1",
     "@types/ws": "7.4.0",
