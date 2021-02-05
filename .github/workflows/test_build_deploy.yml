@@ -428,7 +428,7 @@ jobs:
           echo "OS=macos" >> $GITHUB_ENV
           yarn build:macos
 
-      - name: Zip Electron build
+      - name: Zip desktop build
         if: env.BUILD_DESKTOP == 'true'
         working-directory: electron
         run: yarn zip
