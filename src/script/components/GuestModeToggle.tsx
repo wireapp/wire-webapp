@@ -47,10 +47,13 @@ const GuestModeToggle: React.FC<GuestModeToggleProps> = ({extendedInfo, isChecke
             id="toggle"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
             checked={isChecked}
+          />
+          <label
+            className="button-label"
+            htmlFor="toggle"
             data-uie-name="do-allow-guests"
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           />
-          <label className="button-label" htmlFor="toggle" />
         </div>
       </div>
       <div className="info-toggle__details" data-uie-name="status-guest-toggle">
