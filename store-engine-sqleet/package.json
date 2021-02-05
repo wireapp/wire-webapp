@@ -9,7 +9,7 @@
     "uint32": "0.2.1"
   },
   "devDependencies": {
-    "@types/jasmine": "3.6.2",
+    "@types/jasmine": "3.6.3",
     "@types/karma": "5.0.1",
     "@types/karma-webpack": "2.0.8",
     "@types/node": "~14",
