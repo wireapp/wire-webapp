@@ -699,18 +699,18 @@ export class UserRepository {
   }
 
   /**
-   * Verify a username against the backend.
-   * @returns Username which is not taken.
+   * Verify a user handle against the backend.
+   * @returns handle User handle to verify
    */
-  async verifyUsername(username: string): Promise<string> {
+  async verifyUserHandle(handle: string): Promise<string> {
     try {
-      await this.userService.checkUserHandle(username);
+      await this.userService.checkUserHandle(handle);
       throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
     } catch (error) {
       const errorCode = error.response?.status;
 
       if (errorCode === HTTP_STATUS.NOT_FOUND) {
-        return username;
+        return handle;
       }
 
       if (errorCode === HTTP_STATUS.BAD_REQUEST) {
