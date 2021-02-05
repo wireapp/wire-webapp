@@ -32,7 +32,7 @@ export const MAX_AUDIO_BULLETS = 20;
 /**
  * Shows bullet indicators to visualize the audio input level.
  *
- * @param disabled Show audio meter with disabled bullets if set to `false`
+ * @param disabled Show audio meter with disabled bullets if set to `true`
  * @param level Audio input volume as floating point number, `1.0` is 100%
  */
 const InputLevel: React.FC<InputLevelProps> = ({disabled, level}) => {
