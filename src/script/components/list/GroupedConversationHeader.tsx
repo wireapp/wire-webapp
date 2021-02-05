@@ -42,7 +42,7 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({co
         <NamedIcon name="disclose-icon" width="5" height="8" />
       </div>
       <span className="conversation-folder__head__name">{conversationLabel.name}</span>
-      {badge && (
+      {badge > 0 && (
         <span className="cell-badge-dark conversation-folder__head__badge" data-uie-name="conversation-folder-badge">
           {badge}
         </span>
@@ -55,5 +55,5 @@ export default GroupedConversationHeader;
 
 registerReactComponent('grouped-conversation-header', {
   component: GroupedConversationHeader,
-  template: '<div data-bind="react: {conversationLabel, isOpen}"></div>',
+  template: '<div data-bind="react: {conversationLabel, isOpen: ko.unwrap(isOpen)}"></div>',
 });

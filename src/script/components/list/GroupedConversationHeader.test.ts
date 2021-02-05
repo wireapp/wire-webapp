@@ -25,19 +25,17 @@ import TestPage from 'Util/test/TestPage';
 import GroupedConversationHeader, {GroupedConversationHeaderProps} from './GroupedConversationHeader';
 import {ConversationLabel, LabelType} from '../../conversation/ConversationLabelRepository';
 import {Conversation} from '../../entity/Conversation';
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import {User} from '../../entity/User';
 
 class GroupedConversationHeaderPage extends TestPage<GroupedConversationHeaderProps> {
   constructor(props?: GroupedConversationHeaderProps) {
     super(GroupedConversationHeader, props);
   }
 
-  getBadge = () => this.get('span[data-uie-name="conversation-folder-badge"]');
+  getUnreadBadge = () => this.get('span[data-uie-name="conversation-folder-badge"]');
 }
 
 describe('GroupedConversationHeader', () => {
-  it('displays the badge', () => {
+  it('displays the unread badge', () => {
     const conversations = ko.observableArray([new Conversation(createRandomUuid())]);
 
     const conversationLabel: ConversationLabel = {
@@ -52,19 +50,15 @@ describe('GroupedConversationHeader', () => {
       isOpen: false,
     });
 
-    let badgeSpan = groupedConversationHeader.getBadge();
-    expect(badgeSpan.exists()).toBe(false);
+    let unreadBadge = groupedConversationHeader.getUnreadBadge();
+    expect(unreadBadge.exists()).toBe(false);
 
-    const message = new ContentMessage(createRandomUuid());
-    message.visible(true);
+    const conversation: Partial<Conversation> = {hasUnread: ko.pureComputed(() => true)};
+    conversationLabel.conversations.push(conversation as Conversation);
 
-    const unreadConversation = new Conversation(createRandomUuid());
-    unreadConversation.selfUser(new User(createRandomUuid()));
-    unreadConversation.add_message(message);
-    conversationLabel.conversations.push(unreadConversation);
     groupedConversationHeader.setProps({conversationLabel, isOpen: false});
 
-    badgeSpan = groupedConversationHeader.getBadge();
-    expect(badgeSpan.exists()).toBe(true);
+    unreadBadge = groupedConversationHeader.getUnreadBadge();
+    expect(unreadBadge.exists()).toBe(true);
   });
 });
