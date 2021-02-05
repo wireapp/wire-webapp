@@ -505,7 +505,7 @@ export class PreferencesAccountViewModel {
 
     if (validateHandle(enteredUsername)) {
       this.userRepository
-        .verifyUsername(enteredUsername)
+        .verifyUserHandle(enteredUsername)
         .then(() => {
           const isCurrentRequest = this.enteredUsername() === enteredUsername;
           if (isCurrentRequest) {
