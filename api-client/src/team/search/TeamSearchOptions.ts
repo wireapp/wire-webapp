@@ -29,7 +29,7 @@ export interface TeamSearchOptions {
   /** Filter results by member role */
   frole?: Role[];
   /** Sort order (asc | desc | undefined) */
-  order?: SearchOrder;
+  sortorder?: SearchOrder;
   /** Max number of search results. Defaults to 15 results. Min 1, max 500. */
   size?: number;
   /** Sort results */
