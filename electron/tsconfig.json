@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "declaration": true,
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["DOM", "ESNext"],
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "noEmitOnError": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "outDir": "dist",
+    "removeComments": true,
+    "rootDir": "src",
+    "sourceMap": true,
+    "strict": true,
+    "target": "ES6"
+  },
+  "include": ["src"]
+}

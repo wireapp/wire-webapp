@@ -12,6 +12,7 @@
 /package-lock.json
 /resource
 /temp
+/electron/build
 CHANGELOG.md
 node_modules
 npm-debug.log

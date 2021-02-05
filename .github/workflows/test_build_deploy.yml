@@ -1,4 +1,4 @@
-name: Test, Build & Deploy
+name: CI
 
 on:
   push:
@@ -23,7 +23,7 @@ jobs:
       TEST_COVERAGE_WARNING_THRESHOLD: 60
       DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
       AWS_APPLICATION_NAME: Webapp
-      AWS_BUILD_ZIP_PATH: 'server/dist/s3/ebs.zip'
+      AWS_BUILD_ZIP_PATH: server/dist/s3/ebs.zip
 
     steps:
       - name: Checkout
@@ -31,7 +31,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 'Use latest Node.js v12'
+      - name: Use latest Node.js v12
         uses: actions/setup-node@v1
         with:
           node-version: 12.x
@@ -44,10 +44,12 @@ jobs:
           echo "COMMIT_URL=${{github.event.head_commit.url}}" >> $GITHUB_ENV
           echo "COMMITTER=${{github.event.head_commit.committer.name}}" >> $GITHUB_ENV
 
-      - name: Set TITLE
+      - name: Set TITLE and BUILD_DESKTOP
         env:
-          PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
-        run: echo "TITLE=$PR_TITLE" >> $GITHUB_ENV
+          PR_TITLE: github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE
+        run: |
+          echo "TITLE=${PR_TITLE}" >> $GITHUB_ENV
+          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
 
       - name: Print environment variables
         env:
@@ -59,6 +61,7 @@ jobs:
           echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
           echo -e "COMMIT_URL = ${COMMIT_URL}"
           echo -e "COMMITTER = ${COMMITTER}"
+          echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
           echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: Skip CI
@@ -81,8 +84,12 @@ jobs:
         run: echo "machine github.com login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        # Run for all PRs with DISTRIBUTION == 'wire' and all pushes to master/dev
-        if: env.DISTRIBUTION == 'wire' || github.event_name != 'pull_request'
+        # Run for all PRs with DISTRIBUTION == 'wire', all pushes to master/dev
+        # and when a Desktop version should be built
+        if: |
+          env.DISTRIBUTION == 'wire' ||
+          github.event_name != 'pull_request' ||
+          env.BUILD_DESKTOP == 'true'
         run: yarn --frozen-lockfile
 
       - name: Test
@@ -96,12 +103,16 @@ jobs:
         uses: slavcodev/coverage-monitor-action@1.2.0
         with:
           github_token: ${{github.token}}
-          clover_file: 'coverage/clover.xml'
+          clover_file: coverage/clover.xml
           threshold_alert: ${{env.TEST_COVERAGE_FAIL_THRESHOLD}}
           threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
 
       - name: Build
-        if: github.event_name != 'pull_request'
+        # Run for all pushes to master/dev with DISTRIBUTION == 'wire'
+        # and when a Desktop version should be built
+        if: |
+          github.event_name != 'pull_request' ||
+          env.BUILD_DESKTOP == 'true'
         run: yarn build:prod
 
       # https://wire-webapp-avs.zinfra.io/
@@ -278,7 +289,7 @@ jobs:
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: '4223f57f-0c8d-42fe-bf8a-908d680788ab'
+          conversation: 4223f57f-0c8d-42fe-bf8a-908d680788ab
           text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
       - name: Notify AVS commit
@@ -287,7 +298,7 @@ jobs:
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: '5496b04a-afd3-410e-8154-855142bcfb03'
+          conversation: 5496b04a-afd3-410e-8154-855142bcfb03
           text: 'Deployed commit **${{github.sha}}** ("${{env.TITLE}}") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁'
 
       - name: Notify CI error
@@ -296,5 +307,161 @@ jobs:
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
+          conversation: b2cc7120-4154-4be4-b0c0-45a8c361c4d1
           text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
+
+      - name: Build config.js file for Desktop
+        if: env.BUILD_DESKTOP == 'true'
+        run: node electron/bin/build-config.js
+
+      - name: Upload WebApp artifacts
+        if: env.BUILD_DESKTOP == 'true'
+        uses: actions/upload-artifact@v2
+        with:
+          name: webapp-dist
+          path: server/dist
+
+  build_desktop_binaries:
+    name: Build Desktop binaries
+    needs: test_build_deploy
+    runs-on: ${{matrix.os}}
+
+    strategy:
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set environment variables
+        shell: bash
+        run: |
+          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+          echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
+
+      - name: Set BUILD_DESKTOP
+        shell: bash
+        run: |
+          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
+
+      - name: Print environment variables
+        shell: bash
+        env:
+          GITHUB_CONTEXT: ${{toJson(github)}}
+        run: |
+          echo -e "TAG = ${TAG}"
+          echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
+          echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
+          echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
+
+      - name: Use latest Node.js v12
+        if: env.BUILD_DESKTOP == 'true'
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: Cache Electron
+        if: env.BUILD_DESKTOP == 'true'
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/.cache/electron
+          key: ${{runner.os}}-electron-cache-${{hashFiles(format('{0}{1}', github.workspace, 'electron/yarn.lock'))}}
+          restore-keys: ${{runner.os}}-electron-cache-
+
+      - name: Cache electron-builder
+        if: env.BUILD_DESKTOP == 'true'
+        uses: actions/cache@v2
+        with:
+          path: ${{github.workspace}}/.cache/electron-builder
+          key: ${{runner.os}}-electron-builder-cache-${{hashFiles(format('{0}{1}', github.workspace, 'electron/yarn.lock'))}}
+          restore-keys: ${{runner.os}}-electron-builder-cache-
+
+      - name: Download WebApp artifacts
+        if: env.BUILD_DESKTOP == 'true'
+        uses: actions/download-artifact@v2
+        with:
+          name: webapp-dist
+          path: server/dist
+
+      - name: Install JS dependencies
+        if: env.BUILD_DESKTOP == 'true'
+        working-directory: electron
+        run: yarn
+
+      - name: Prepare Building Desktop App
+        if: env.BUILD_DESKTOP == 'true'
+        working-directory: electron
+        run: |
+          yarn copy:webapp
+          yarn dist
+
+      - name: Build Desktop App for Windows
+        if: env.BUILD_DESKTOP == 'true' && matrix.os == 'windows-latest'
+        shell: bash
+        working-directory: electron
+        run: |
+          echo "OS=windows" >> $GITHUB_ENV
+          yarn build:windows
+
+      - name: Build Desktop App for Linux
+        if: env.BUILD_DESKTOP == 'true' && matrix.os == 'ubuntu-latest'
+        working-directory: electron
+        run: |
+          echo "OS=linux" >> $GITHUB_ENV
+          yarn build:linux
+
+      - name: Build Desktop App for macOS
+        if: env.BUILD_DESKTOP == 'true' && matrix.os == 'macos-latest'
+        working-directory: electron
+        run: |
+          echo "OS=macos" >> $GITHUB_ENV
+          yarn build:mac
+
+      - name: Upload Electron artifacts
+        uses: actions/upload-artifact@v2
+        if: env.BUILD_DESKTOP == 'true'
+        with:
+          name: electron-app-${{env.OS}}
+          path: electron/build/WireDevelopment*
+
+      - name: Attach Electron build to release assets
+        if: contains(env.TAG, 'staging') || contains(env.TAG, 'production')
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          upload_url: ${{needs.test_build_deploy.outputs.upload_url}}
+          asset_path: electron/build/WireDevelopment*
+          asset_name: electron-app-${{env.OS}}
+          asset_content_type: application/zip
+
+  cleanup_artifacts:
+    name: Cleanup artifacts
+    needs: build_desktop_binaries
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set environment variables
+        shell: bash
+        run: |
+          echo "TAG=$(git tag --points-at ${{github.sha}})" >> $GITHUB_ENV
+          echo "PR_LAST_COMMIT_MESSAGE=$(git log --format=%B -n 1 ${{github.event.after}} | head -n 1)" >> $GITHUB_ENV
+
+      - name: Set BUILD_DESKTOP
+        shell: bash
+        run: |
+          echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
+
+      - name: Delete WebApp artifacts
+        if: env.BUILD_DESKTOP == 'true'
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: webapp-dist
