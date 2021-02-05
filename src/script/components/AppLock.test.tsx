@@ -157,48 +157,4 @@ describe('AppLock', () => {
     const appLockModal = appLockPage.getAppLockModal();
     expect(appLockModal.props().style.display).toBe('flex');
   });
-
-  describe('unlock', () => {
-    it('stores the passphrase, respects the timeout and unlocks', async () => {
-      jest.useFakeTimers();
-
-      const teamState: Partial<TeamState> = {
-        appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
-        isAppLockEnabled: ko.pureComputed(() => true),
-        isAppLockEnforced: ko.pureComputed(() => false),
-      };
-      spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
-
-      const appLockPage = new AppLockPage({
-        clientRepository: ({} as unknown) as ClientRepository,
-        selfUser: ({id: 'userID'} as unknown) as User,
-        teamState: teamState as TeamState,
-      });
-
-      let storedCode: string;
-      const passphrase = 'abcABC123!';
-      jest.spyOn(window.localStorage, 'setItem').mockImplementation((_, code) => {
-        storedCode = code;
-      });
-      jest.spyOn(window.localStorage, 'getItem').mockImplementation(() => {
-        return storedCode;
-      });
-      act(() => {
-        amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
-      });
-      appLockPage.update();
-      expect(appLockPage.getAppLockInput()).toBeDefined();
-      appLockPage.changeAppLockInput(passphrase);
-      appLockPage.formSubmit();
-      expect(storedCode).toBeDefined();
-
-      // const appLockModal = document.querySelector('[data-uie-name=applock-modal]') as HTMLDivElement;
-      // expect(appLockModal.style.display).toBe('none');
-      // window.dispatchEvent(new Event('blur'));
-      // jest.advanceTimersByTime(5000);
-      // expect(appLockModal.style.display).toBe('none');
-      // jest.advanceTimersByTime(6000);
-      // expect(appLockModal.style.display).toBe('flex');
-    });
-  });
 });

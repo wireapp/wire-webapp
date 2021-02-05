@@ -17,52 +17,48 @@
  *
  */
 
+import {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
+import {Logger, Runtime} from '@wireapp/commons';
+import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
 import {Availability, Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import ko from 'knockout';
-import {WebappProperties} from '@wireapp/api-client/src/user/data';
-import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
-import {ChangeEvent} from 'react';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
-import {container} from 'tsyringe';
-import {Logger, Runtime} from '@wireapp/commons';
-
+import 'Components/AvailabilityState';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import {getLogger} from 'Util/Logger';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import ko from 'knockout';
+import {ChangeEvent} from 'react';
+import {container} from 'tsyringe';
 import {isKey, KEY} from 'Util/KeyboardUtil';
-import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
-import {loadValue} from 'Util/StorageUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {getLogger} from 'Util/Logger';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {loadValue} from 'Util/StorageUtil';
+import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
+import type {ClientEntity} from '../../client/ClientEntity';
 import {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
-import {ConsentValue} from '../../user/ConsentValue';
-import {ContentViewModel} from '../ContentViewModel';
-
-import 'Components/AvailabilityState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {User} from '../../entity/User';
+import {UserError} from '../../error/UserError';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
-import {HistoryExportViewModel} from './HistoryExportViewModel';
-import {appLockSettings} from '../../components/AppLock';
-import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {nameFromType} from '../../user/AvailabilityMapper';
-import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {Notification, PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {StorageKey} from '../../storage';
 import {TeamEntity} from '../../team/TeamEntity';
 import {TeamState} from '../../team/TeamState';
-import {User} from '../../entity/User';
-import {UserError} from '../../error/UserError';
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {nameFromType} from '../../user/AvailabilityMapper';
+import {ConsentValue} from '../../user/ConsentValue';
+import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
-import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
-import type {ClientEntity} from '../../client/ClientEntity';
+import {ContentViewModel} from '../ContentViewModel';
+import {modals, ModalsViewModel} from '../ModalsViewModel';
+import {HistoryExportViewModel} from './HistoryExportViewModel';
 
 export class PreferencesAccountViewModel {
   logger: Logger;
