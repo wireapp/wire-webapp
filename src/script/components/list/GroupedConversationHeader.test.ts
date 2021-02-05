@@ -54,11 +54,12 @@ describe('GroupedConversationHeader', () => {
     expect(unreadBadge.exists()).toBe(false);
 
     const conversation: Partial<Conversation> = {hasUnread: ko.pureComputed(() => true)};
-    conversationLabel.conversations.push(conversation as Conversation);
+    conversationLabel.conversations.push(conversation as Conversation, conversation as Conversation);
 
     groupedConversationHeader.setProps({conversationLabel, isOpen: false});
 
     unreadBadge = groupedConversationHeader.getUnreadBadge();
     expect(unreadBadge.exists()).toBe(true);
+    expect(unreadBadge.text()).toBe('2');
   });
 });
