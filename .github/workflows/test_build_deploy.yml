@@ -93,7 +93,7 @@ jobs:
 
       - name: Install JS dependencies
         # Run for all PRs with DISTRIBUTION == 'wire', all pushes to master/dev
-        # and when a Desktop version should be built
+        # and when a desktop version should be built
         if: |
           env.DISTRIBUTION == 'wire' ||
           github.event_name != 'pull_request' ||
@@ -117,7 +117,7 @@ jobs:
 
       - name: Build
         # Run for all pushes to master/dev with DISTRIBUTION == 'wire'
-        # and when a Desktop version should be built
+        # and when a desktop version should be built
         if: |
           github.event_name != 'pull_request' ||
           env.BUILD_DESKTOP == 'true'
@@ -318,7 +318,7 @@ jobs:
           conversation: b2cc7120-4154-4be4-b0c0-45a8c361c4d1
           text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
 
-      - name: Build config.js file for Desktop
+      - name: Build config.js file for desktop
         if: env.BUILD_DESKTOP == 'true'
         run: node electron/bin/build-config.js
 
@@ -330,7 +330,7 @@ jobs:
           path: ./server/dist
 
   build_desktop_binaries:
-    name: Build Desktop binaries
+    name: Build desktop binaries
     needs: test_build_deploy
     runs-on: ${{matrix.os}}
 
@@ -399,14 +399,14 @@ jobs:
         working-directory: electron
         run: yarn
 
-      - name: Prepare Building Desktop App
+      - name: Prepare Building desktop App
         if: env.BUILD_DESKTOP == 'true'
         working-directory: electron
         run: |
           yarn copy:webapp
           yarn dist
 
-      - name: Build Desktop App for Windows
+      - name: Build desktop App for Windows
         if: env.BUILD_DESKTOP == 'true' && matrix.os == 'windows-latest'
         shell: bash
         working-directory: electron
@@ -414,14 +414,14 @@ jobs:
           echo "OS=windows" >> $GITHUB_ENV
           yarn build:windows
 
-      - name: Build Desktop App for Linux
+      - name: Build desktop App for Linux
         if: env.BUILD_DESKTOP == 'true' && matrix.os == 'ubuntu-latest'
         working-directory: electron
         run: |
           echo "OS=linux" >> $GITHUB_ENV
           yarn build:linux
 
-      - name: Build Desktop App for macOS
+      - name: Build desktop App for macOS
         if: env.BUILD_DESKTOP == 'true' && matrix.os == 'macos-latest'
         working-directory: electron
         run: |
@@ -433,14 +433,14 @@ jobs:
         working-directory: electron
         run: yarn zip
 
-      - name: Upload Desktop artifacts
+      - name: Upload desktop artifacts
         uses: actions/upload-artifact@v2
         if: env.BUILD_DESKTOP == 'true'
         with:
           name: wire-desktop-${{env.OS}}.zip
           path: ./electron/build/WireDevelopment.zip
 
-      - name: Attach Desktop build to staging release assets
+      - name: Attach desktop build to staging release assets
         if: contains(env.TAG, 'staging')
         uses: actions/upload-release-asset@v1
         env:
@@ -451,7 +451,7 @@ jobs:
           asset_name: wire-desktop-${{env.OS}}.zip
           asset_content_type: application/zip
 
-      - name: Attach Desktop build to production release assets
+      - name: Attach desktop build to production release assets
         if: contains(env.TAG, 'production')
         uses: actions/upload-release-asset@v1
         env:
