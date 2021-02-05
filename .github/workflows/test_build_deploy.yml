@@ -399,14 +399,14 @@ jobs:
         working-directory: electron
         run: yarn
 
-      - name: Prepare Building desktop App
+      - name: Prepare building desktop app
         if: env.BUILD_DESKTOP == 'true'
         working-directory: electron
         run: |
           yarn copy:webapp
           yarn dist
 
-      - name: Build desktop App for Windows
+      - name: Build desktop app for Windows
         if: env.BUILD_DESKTOP == 'true' && matrix.os == 'windows-latest'
         shell: bash
         working-directory: electron
@@ -414,14 +414,14 @@ jobs:
           echo "OS=windows" >> $GITHUB_ENV
           yarn build:windows
 
-      - name: Build desktop App for Linux
+      - name: Build desktop app for Linux
         if: env.BUILD_DESKTOP == 'true' && matrix.os == 'ubuntu-latest'
         working-directory: electron
         run: |
           echo "OS=linux" >> $GITHUB_ENV
           yarn build:linux
 
-      - name: Build desktop App for macOS
+      - name: Build desktop app for macOS
         if: env.BUILD_DESKTOP == 'true' && matrix.os == 'macos-latest'
         working-directory: electron
         run: |
