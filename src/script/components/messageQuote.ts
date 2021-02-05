@@ -187,7 +187,7 @@ ko.components.register('message-quote', {
             <!-- ko if: $parent.canShowMore -->
               <div class="message-quote__text__show-more" data-bind="click: $parent.toggleShowMore" data-uie-name="do-show-more-quote">
                 <span data-bind="text: $parent.showFullText() ? t('replyQuoteShowLess') : t('replyQuoteShowMore')"></span>
-                <disclose-icon data-bind="css: {'upside-down': $parent.showFullText()}"></disclose-icon>
+                <disclose-icon class="disclose-icon" data-bind="css: {'upside-down': $parent.showFullText()}"></disclose-icon>
               </div>
             <!-- /ko -->
           <!-- /ko -->
