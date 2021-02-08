@@ -26,6 +26,7 @@ export interface InputLevelProps {
   level: number;
 }
 
+/** How many bullets should be displayed */
 export const MAX_AUDIO_BULLETS = 20;
 
 /**
@@ -35,31 +36,20 @@ export const MAX_AUDIO_BULLETS = 20;
  * @param level Audio input volume as floating point number, `1.0` is 100%
  */
 const InputLevel: React.FC<InputLevelProps> = ({disabled, level}) => {
-  const amountOfBullets = Array.from(Array(MAX_AUDIO_BULLETS).keys());
-
-  const getBulletClass = (bulletIndex: number): string => {
-    if (disabled) {
-      return 'input-level-bullet-disabled';
-    }
-
-    const passedThreshold = level > bulletIndex / MAX_AUDIO_BULLETS;
-    if (passedThreshold) {
-      return 'input-level-bullet-active';
-    }
-
-    return '';
-  };
+  const bullets = Array.from(Array(MAX_AUDIO_BULLETS).keys());
 
   return (
-    <ul className="input-level">
-      {amountOfBullets.map(bulletIndex => (
-        <li
+    <div className="input-level">
+      {bullets.map(bulletIndex => (
+        <div
           key={bulletIndex}
-          data-uie-name={getBulletClass(bulletIndex)}
-          className={cx('input-level-bullet', getBulletClass(bulletIndex))}
+          className={cx('input-level__bullet', {
+            'input-level__bullet--active': !disabled && level > bulletIndex / MAX_AUDIO_BULLETS,
+            'input-level__bullet--disabled': disabled,
+          })}
         />
       ))}
-    </ul>
+    </div>
   );
 };
 
