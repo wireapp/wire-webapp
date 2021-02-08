@@ -68,7 +68,7 @@ describe('AppLock', () => {
   });
 
   describe('modal state', () => {
-    it('shows locked state when it the passhprase is set and app lock is enabled', () => {
+    it('shows locked state when it the passphrase is set and app lock is enabled', () => {
       const teamState: Partial<TeamState> = {
         appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
         isAppLockEnabled: ko.pureComputed(() => true),
@@ -84,7 +84,7 @@ describe('AppLock', () => {
       expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.LOCKED).exists()).toBe(true);
     });
 
-    it('shows setup state when there is no passhprase is set and app lock is enabled', () => {
+    it('shows setup state when there is no passphrase is set and app lock is enabled', () => {
       const teamState: Partial<TeamState> = {
         appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
         isAppLockEnabled: ko.pureComputed(() => true),
@@ -103,7 +103,7 @@ describe('AppLock', () => {
       expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP).exists()).toBe(true);
     });
 
-    it('shows setup state when there is no passhprase is set and enforced is enabled', () => {
+    it('shows setup state when there is no passphrase is set and enforced is enabled', () => {
       const teamState: Partial<TeamState> = {
         appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
         isAppLockEnabled: ko.pureComputed(() => true),

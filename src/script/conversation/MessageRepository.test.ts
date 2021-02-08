@@ -189,6 +189,7 @@ describe('MessageRepository', () => {
         .then(() => {
           const text = new Text({
             content:
+              /* cspell:disable-next-line */
               'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message',
           });
           const genericMessage = new GenericMessage({

@@ -44,7 +44,7 @@ class DeviceCardPage extends TestPage<DeviceCardProps> {
   getMobileDeviceIcon = () => this.get('svg[data-uie-name="status-mobile-device"]');
   getDiscloseIcon = () => this.get('svg[data-uie-name="disclose-icon"]');
   getVerifiedIcon = () => this.get('svg[data-uie-name="user-device-verified"]');
-  getNotVerifedIcon = () => this.get('svg[data-uie-name="user-device-not-verified"]');
+  getNotVerifiedIcon = () => this.get('svg[data-uie-name="user-device-not-verified"]');
 }
 
 describe('DeviceCard', () => {
@@ -118,6 +118,6 @@ describe('DeviceCard', () => {
       showVerified: true,
     });
 
-    expect(deviceCard.getNotVerifedIcon().exists()).toBe(true);
+    expect(deviceCard.getNotVerifiedIcon().exists()).toBe(true);
   });
 });
