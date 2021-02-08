@@ -73,16 +73,12 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         data-uie-name="element-message-verification"
         data-uie-value={message.verificationMessageType()}
       >
-        {/* "All fingerprints are verified" */}
         {isTypeVerified && <span>{t('tooltipConversationAllVerified')}</span>}
         {isTypeUnverified && (
           <>
-            {/* You or other username */}
             <span className="message-header-sender-name">{unsafeSenderName}</span>
-            {/* " unverified one of" */}
             <span className="ellipsis">{t('conversationDeviceUnverified')}</span>
             <span className="message-verification-action accent-text" onClick={showDevice} data-uie-name="go-devices">
-              {/* for self " your devices" or " {{user}}´s devices" for first user*/}
               {message.isSelfClient()
                 ? t('conversationDeviceYourDevices')
                 : t('conversationDeviceUserDevices', userEntities[0]?.name())}
@@ -91,25 +87,20 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
         )}
         {isTypeNewDevice && (
           <>
-            {/* Comma separated list of user names */}
             <span className="message-header-plain-sender-name">{nameList}</span>
-            {/* singular " started using" or plural " started using" */}
             <span className="ellipsis">
               {hasMultipleUsers ? t('conversationDeviceStartedUsingMany') : t('conversationDeviceStartedUsingOne')}
             </span>
             <span className="message-verification-action accent-text" onClick={showDevice} data-uie-name="go-devices">
-              {/* singular " new device" or plural " new devices" */}
               {hasMultipleUsers ? t('conversationDeviceNewDeviceMany') : t('conversationDeviceNewDeviceOne')}
             </span>
           </>
         )}
         {isTypeNewMember && (
           <>
-            {/* "New people joined." */}
             <span className="ellipsis">{t('conversationDeviceNewPeopleJoined')}</span>
             &nbsp;
             <span className="message-verification-action accent-text" onClick={showDevice} data-uie-name="go-devices">
-              {/* "Verify devices" */}
               {t('conversationDeviceNewPeopleJoinedVerify')}
             </span>
           </>
