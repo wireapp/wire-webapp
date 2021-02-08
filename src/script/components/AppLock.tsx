@@ -265,11 +265,11 @@ const AppLock: React.FC<AppLockProps> = ({
   const headerText = () => {
     switch (appLockState) {
       case APPLOCK_STATE.SETUP_CHANGE:
-        return t('modalAppLockSetupChangeTitle');
+        return t('modalAppLockSetupChangeTitle', Config.getConfig().BRAND_NAME);
       case APPLOCK_STATE.SETUP:
         return t('modalAppLockSetupTitle');
       case APPLOCK_STATE.LOCKED:
-        return t('modalAppLockLockedTitle');
+        return t('modalAppLockLockedTitle', Config.getConfig().BRAND_NAME);
       case APPLOCK_STATE.FORGOT:
         return t('modalAppLockForgotTitle');
       case APPLOCK_STATE.WIPE_CONFIRM:
@@ -341,7 +341,13 @@ const AppLock: React.FC<AppLockProps> = ({
           <form onSubmit={onSetCode}>
             <div
               className="modal__text"
-              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupChangeMessage', {}, {br: '<br><br>'})}}
+              dangerouslySetInnerHTML={{
+                __html: t(
+                  'modalAppLockSetupChangeMessage',
+                  {brandName: Config.getConfig().BRAND_NAME},
+                  {br: '<br><br>'},
+                ),
+              }}
               data-uie-name="label-applock-set-text"
             ></div>
             <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
