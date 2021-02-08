@@ -413,11 +413,11 @@ export class ConversationRepository {
     return this.conversationState.conversations();
   }
 
-  public async updateConversationStates(conversationsDatas: ConversationRecord[]) {
+  public async updateConversationStates(conversationsDataArray: ConversationRecord[]) {
     const handledConversationEntities: Conversation[] = [];
 
     const unknownConversations: ConversationRecord[] = [];
-    conversationsDatas.forEach(conversationData => {
+    conversationsDataArray.forEach(conversationData => {
       const localEntity = this.conversationState.conversations().find(({id}) => id === conversationData.id);
 
       if (localEntity) {
