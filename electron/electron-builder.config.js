@@ -78,7 +78,7 @@ const config = {
   removePackageScripts: true,
   win: {
     icon: 'img/logo/logo.ico',
-    target: ['msi'],
+    target: ['msi', 'portable'],
   },
 };
 
