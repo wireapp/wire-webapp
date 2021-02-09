@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.2.0...@wireapp/api-client@12.2.1) (2021-02-09)
+
+
+### Bug Fixes
+
+* **api-client:** Remove duplicated slash ([#3517](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3517)) ([32695f6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/32695f67a7e0bb09ae991bc9f2e04038691886b4))
+
+
+
+
+
 # [12.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.1.5...@wireapp/api-client@12.2.0) (2021-02-09)
 
 
