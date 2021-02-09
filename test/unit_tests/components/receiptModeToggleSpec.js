@@ -20,7 +20,7 @@
 import {instantiateComponent} from '../../helper/knockoutHelpers';
 
 import {Conversation} from 'src/script/entity/Conversation';
-import 'src/script/components/receiptModeToggle';
+import 'Components/ReceiptModeToggle';
 
 describe('read-receipt-toggle', () => {
   it('renders the toggle according to the conversation read receipt mode', () => {

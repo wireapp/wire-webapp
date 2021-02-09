@@ -23,7 +23,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
-import 'Components/receiptModeToggle';
+import 'Components/ReceiptModeToggle';
 import 'Components/panel/PanelActions';
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
