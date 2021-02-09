@@ -28,23 +28,24 @@ class LocationAssetPage extends TestPage<LocationAssetProps> {
     super(LocationAsset, props);
   }
 
-  getMapsLink = () => this.get('[data-uie-name="location-asset-link"]');
-  getLocationName = () => this.get('[data-uie-name="location-name"]');
+  getMapsElement = () => this.get('[data-uie-name="location-asset-link"]');
+  getMapsLink = () => this.getMapsElement().getDOMNode<HTMLLinkElement>().href;
+  getLocationElement = () => this.get('[data-uie-name="location-name"]');
 }
 
 describe('LocationAsset', () => {
   const location: Partial<Location> = {latitude: '52.31', longitude: '13.24', name: 'Berlin', zoom: '0'};
 
   it('sets the correct Google Maps link', () => {
-    const assetLoader = new LocationAssetPage({asset: location as Location});
-    const mapsLink = assetLoader.getMapsLink();
+    const locationAsset = new LocationAssetPage({asset: location as Location});
+    const mapsLink = locationAsset.getMapsLink();
 
-    expect(mapsLink.getDOMNode<HTMLLinkElement>().href).toContain(`${location.latitude},${location.longitude}`);
+    expect(mapsLink).toContain(`${location.latitude},${location.longitude}`);
   });
 
   it('sets the correct location name', () => {
-    const assetLoader = new LocationAssetPage({asset: location as Location});
-    const locationName = assetLoader.getLocationName();
+    const locationAsset = new LocationAssetPage({asset: location as Location});
+    const locationName = locationAsset.getLocationElement();
 
     expect(locationName.text()).toBe(location.name);
   });
