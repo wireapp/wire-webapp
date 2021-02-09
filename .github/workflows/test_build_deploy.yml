@@ -430,21 +430,21 @@ jobs:
 
       - name: Attach desktop build to staging release assets
         if: contains(env.TAG, 'staging')
-        uses: actions/upload-release-asset@v1
+        uses: wireapp/upload-assets@v1.1
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.test_build_deploy.outputs.staging_upload_url}}
-          asset_path: ./electron/build/Wire-Staging-*
+          asset_paths: ./electron/build/Wire-Staging-*
 
       - name: Attach desktop build to production release assets
         if: contains(env.TAG, 'production')
-        uses: actions/upload-release-asset@v1
+        uses: wireapp/upload-assets@v1.1
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.test_build_deploy.outputs.production_upload_url}}
-          asset_path: ./electron/build/Wire-Production-*
+          asset_paths: ./electron/build/Wire-Production-*
 
   cleanup_artifacts:
     name: Cleanup artifacts
