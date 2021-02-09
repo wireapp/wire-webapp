@@ -545,7 +545,7 @@ const pingTemplate: string = `
       </span>
     </div>
     <div class="message-body-actions">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestam, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
+      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
       ${receiptStatusTemplate}
     </div>
   </div>

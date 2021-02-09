@@ -19,8 +19,9 @@
 
 // @ts-check
 
-const artifactName = '${productName}-${version}_${arch}.${ext}';
-const productName = 'WireDevelopment';
+const artifactName = '${productName}-${version}.${ext}';
+const portableArtifactName = '${productName}-${version}-portable.${ext}';
+const productName = process.env.TAG === 'production' ? 'Wire' : 'WireInternal';
 const schema = 'wire';
 const macBundleId = 'com.wearezeta.zclient.macdev';
 
@@ -67,6 +68,9 @@ const config = {
     createStartMenuShortcut: true,
     warningsAsErrors: true,
   },
+  portable: {
+    artifactName: portableArtifactName,
+  },
   productName,
   protocols: [
     {
@@ -78,7 +82,7 @@ const config = {
   removePackageScripts: true,
   win: {
     icon: 'img/logo/logo.ico',
-    target: ['msi'],
+    target: ['msi', 'portable'],
   },
 };
 

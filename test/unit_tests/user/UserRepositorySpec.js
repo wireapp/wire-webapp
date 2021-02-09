@@ -302,7 +302,7 @@ describe('UserRepository', () => {
           {}, // UserState
         );
 
-        const actualUsername = await userRepo.verifyUsername(expectedUsername);
+        const actualUsername = await userRepo.verifyUserHandle(expectedUsername);
         expect(actualUsername).toBe(expectedUsername);
       });
 
@@ -321,7 +321,7 @@ describe('UserRepository', () => {
           {}, // UserState
         );
 
-        await expect(userRepo.verifyUsername(username)).rejects.toMatchObject({
+        await expect(userRepo.verifyUserHandle(username)).rejects.toMatchObject({
           message: 'User related backend request failure',
           name: 'UserError',
           type: 'REQUEST_FAILURE',
