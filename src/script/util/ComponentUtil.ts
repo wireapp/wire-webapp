@@ -36,7 +36,7 @@ export function registerReactComponent<Props>(
 ) {
   ko.components.register(name, {
     template,
-    viewModel: function (knockoutParams: Record<keyof Props, any>) {
+    viewModel: function (knockoutParams: Props) {
       optionalParams.forEach(param => {
         if (!knockoutParams.hasOwnProperty(param)) {
           knockoutParams[param] = null;
