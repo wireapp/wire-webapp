@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.1.5...@wireapp/api-client@12.2.0) (2021-02-09)
+
+
+### Features
+
+* **api-client:** Dedicated team size endpoint ([#3401](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3401)) ([67ba1f7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/67ba1f70cbafc9c3d53bae2870a7ac0f4adc8130))
+
+
+
+
+
 ## [12.1.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.1.4...@wireapp/api-client@12.1.5) (2021-02-05)
 
 

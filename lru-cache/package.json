@@ -26,5 +26,5 @@
     "dist": "yarn clean && yarn build",
     "test": "make-dir .tmp && copyfiles -f \"src/!(*.d).ts\" .tmp && nyc --exclude src jasmine --config=jasmine.json && rimraf .tmp"
   },
-  "version": "3.7.11"
+  "version": "3.7.12"
 }
