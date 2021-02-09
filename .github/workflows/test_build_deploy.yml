@@ -435,7 +435,7 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.test_build_deploy.outputs.staging_upload_url}}
-          asset_paths: ./electron/build/Wire-Staging-*
+          asset_paths: ./electron/build/WireInternal-*
 
       - name: Attach desktop build to production release assets
         if: contains(env.TAG, 'production')
@@ -444,7 +444,7 @@ jobs:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.test_build_deploy.outputs.production_upload_url}}
-          asset_paths: ./electron/build/Wire-Production-*
+          asset_paths: ./electron/build/Wire-*
 
   cleanup_artifacts:
     name: Cleanup artifacts
