@@ -30,6 +30,7 @@ export function registerReactComponent<Props>(
   }: {
     component: React.ComponentType<Props>;
     injected?: Record<string, InjectionToken>;
+    /** The optional knockout params */
     optionalParams?: (keyof Props)[];
     template: string;
   },
