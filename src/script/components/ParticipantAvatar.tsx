@@ -150,7 +150,7 @@ export default ParticipantAvatar;
 registerReactComponent('participant-avatar', {
   component: ParticipantAvatar,
   injected: {assetRepository: AssetRepository},
-  optionalParams: ['size', 'click', 'noBadge', 'noFilter'],
+  optionalParams: ['size', 'clickHandler', 'noBadge', 'noFilter'],
   template:
     '<span data-bind="react: {assetRepository, participant: ko.unwrap(participant), size, clickHandler: click, noBadge, noFilter}"></span>',
 });
