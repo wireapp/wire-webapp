@@ -51,7 +51,7 @@ import './asset/audioAsset';
 import './asset/fileAsset';
 import './asset/imageAsset';
 import './asset/linkPreviewAsset';
-import './asset/locationAsset';
+import './asset/LocationAsset';
 import './asset/videoAsset';
 import './asset/MessageButton';
 
