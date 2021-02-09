@@ -18,7 +18,7 @@
  */
 
 import cx from 'classnames';
-import React, {CSSProperties, useEffect, useRef, useState} from 'react';
+import React, {CSSProperties, useEffect, useState} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {clamp} from 'Util/NumberUtil';
 
@@ -33,16 +33,9 @@ export interface SeekBarCSS extends CSSProperties {
 }
 
 const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaElement}: SeekBarProps) => {
-  const seekBar = useRef<HTMLInputElement>();
-
   const [isSeekBarMouseOver, setIsSeekBarMouseOver] = useState<boolean>(false);
   const [isSeekBarThumbDragged, setIsSeekBarThumbDragged] = useState<boolean>(false);
-  const [showSeekBarThumb, setShowSeekBarThumb] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
-
-  useEffect(() => {
-    setShowSeekBarThumb(isSeekBarThumbDragged || isSeekBarMouseOver);
-  }, [isSeekBarThumbDragged, isSeekBarMouseOver]);
 
   useEffect(() => {
     const onTimeUpdate = () => {
@@ -67,36 +60,38 @@ const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaEl
   }, [mediaElement]);
 
   return (
-    <input
-      data-uie-name="asset-control-media-seek-bar"
-      className={cx({
-        'element-disabled': disabled,
-        'seek-bar--dark': darkMode,
-        'show-seek-bar-thumb': showSeekBarThumb,
-      })}
-      max="100"
-      onChange={() => {
-        const currentTime = mediaElement.duration * (parseInt(seekBar.current.value, 10) / 100);
-        mediaElement.currentTime = clamp(currentTime, 0, mediaElement.duration);
-      }}
-      onMouseDown={() => {
-        mediaElement.pause();
-        setIsSeekBarThumbDragged(true);
-      }}
-      onMouseUp={() => {
-        mediaElement.play();
-        setIsSeekBarThumbDragged(false);
-      }}
-      onMouseEnter={() => setIsSeekBarMouseOver(true)}
-      onMouseLeave={() => setIsSeekBarMouseOver(false)}
-      style={
-        {
-          '--seek-bar-progress': `${progress.toString(10)}%`,
-        } as SeekBarCSS
-      }
-      type="range"
-      value="0"
-    />
+    <div className="seek-bar">
+      <input
+        data-uie-name="asset-control-media-seek-bar"
+        className={cx({
+          'element-disabled': disabled,
+          'seek-bar--dark': darkMode,
+          'show-seek-bar-thumb': isSeekBarThumbDragged || isSeekBarMouseOver,
+        })}
+        max={100}
+        onChange={({target}: React.ChangeEvent<HTMLInputElement>) => {
+          const currentTime = mediaElement.duration * (parseInt(target.value, 10) / 100);
+          mediaElement.currentTime = clamp(currentTime, 0, mediaElement.duration);
+        }}
+        onMouseDown={() => {
+          mediaElement.pause();
+          setIsSeekBarThumbDragged(true);
+        }}
+        onMouseUp={() => {
+          mediaElement.play();
+          setIsSeekBarThumbDragged(false);
+        }}
+        onMouseEnter={() => setIsSeekBarMouseOver(true)}
+        onMouseLeave={() => setIsSeekBarMouseOver(false)}
+        style={
+          {
+            '--seek-bar-progress': `${progress.toString(10)}%`,
+          } as SeekBarCSS
+        }
+        type="range"
+        value={progress}
+      />
+    </div>
   );
 };
 
