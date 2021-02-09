@@ -112,7 +112,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     if (typeof onClick === 'function') {
-      onClick(participant, (event.currentTarget as Node).parentNode);
+      onClick(participant, event.currentTarget.parentNode);
     }
   };
 
