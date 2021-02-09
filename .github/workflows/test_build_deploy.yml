@@ -428,39 +428,23 @@ jobs:
           echo "OS=macos" >> $GITHUB_ENV
           yarn build:macos
 
-      - name: Zip desktop build
-        if: env.BUILD_DESKTOP == 'true'
-        working-directory: electron
-        run: yarn zip
-
-      - name: Upload desktop artifacts
-        uses: actions/upload-artifact@v2
-        if: env.BUILD_DESKTOP == 'true'
-        with:
-          name: wire-desktop-${{env.OS}}.zip
-          path: ./electron/build/WireDevelopment.zip
-
       - name: Attach desktop build to staging release assets
         if: contains(env.TAG, 'staging')
-        uses: actions/upload-release-asset@v1
+        uses: wireapp/upload-assets@v1.1
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.test_build_deploy.outputs.staging_upload_url}}
-          asset_path: ./electron/build/WireDevelopment.zip
-          asset_name: wire-desktop-${{env.OS}}.zip
-          asset_content_type: application/zip
+          asset_paths: ./electron/build/WireInternal-*
 
       - name: Attach desktop build to production release assets
         if: contains(env.TAG, 'production')
-        uses: actions/upload-release-asset@v1
+        uses: wireapp/upload-assets@v1.1
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:
           upload_url: ${{needs.test_build_deploy.outputs.production_upload_url}}
-          asset_path: ./electron/build/WireDevelopment.zip
-          asset_name: wire-desktop-${{env.OS}}.zip
-          asset_content_type: application/zip
+          asset_paths: ./electron/build/Wire-*
 
   cleanup_artifacts:
     name: Cleanup artifacts
