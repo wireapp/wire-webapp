@@ -63,7 +63,7 @@ export const isFunctionKey = (keyboardEvent: KeyboardEvent): boolean =>
 
 /** On macOS the meta key is '⌘', which represents 'Ctrl' in the Windows world: https://www.oreilly.com/library/view/switching-to-the/9781449372927/ch01s08.html */
 export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
-  keyboardEvent.metaKey || keyboardEvent.ctrlKey || keyboardEvent?.key.toLowerCase() === 'control';
+  keyboardEvent.metaKey || keyboardEvent.ctrlKey || keyboardEvent.key?.toLowerCase() === 'control';
 
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
