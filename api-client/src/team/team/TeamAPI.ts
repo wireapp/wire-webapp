@@ -29,7 +29,7 @@ export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
-    SIZE: '/size',
+    SIZE: 'size',
     TEAMS: '/teams',
   };
 
