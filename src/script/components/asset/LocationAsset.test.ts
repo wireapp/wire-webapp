@@ -29,7 +29,7 @@ class LocationAssetPage extends TestPage<LocationAssetProps> {
   }
 
   getMapsElement = () => this.get('[data-uie-name="location-asset-link"]');
-  getMapsLink = () => this.getMapsElement().getDOMNode<HTMLLinkElement>().href;
+  getMapsLink = () => this.getMapsElement().props().href;
   getLocationElement = () => this.get('[data-uie-name="location-name"]');
 }
 

@@ -40,11 +40,11 @@ const LocationAsset: React.FC<LocationAssetProps> = ({asset}) => {
         {asset.name}
       </div>
       <a
-        href={mapsUrl}
-        target="_blank"
-        rel="nofollow noopener noreferrer"
         className="label-xs accent-text"
         data-uie-name="location-asset-link"
+        href={mapsUrl}
+        rel="nofollow noopener noreferrer"
+        target="_blank"
       >
         {t('conversationLocationLink')}
       </a>
