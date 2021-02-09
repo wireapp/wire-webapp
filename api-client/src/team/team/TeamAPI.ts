@@ -17,16 +17,19 @@
  *
  */
 
+import Axios from 'axios';
 import type {AxiosRequestConfig} from 'axios';
-
 import type {NewTeamData, TeamChunkData, TeamData} from '../';
-import type {HttpClient} from '../../http/';
+import {HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http/';
+import {RequestCancellationError} from '../../user';
+import type {TeamSizeData} from './TeamSizeData';
 import type {UpdateTeamData} from './UpdateTeamData';
 
 export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
+    SIZE: '/size',
     TEAMS: '/teams',
   };
 
@@ -81,5 +84,31 @@ export class TeamAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  public async getTeamSize(teamId: string): Promise<RequestCancelable<TeamSizeData>> {
+    const cancelSource = Axios.CancelToken.source();
+    const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
+      method: 'get',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${TeamAPI.URL.SIZE}`,
+    };
+
+    const handleRequest = async () => {
+      try {
+        const response = await this.client.sendJSON<TeamSizeData>(config);
+        return response.data;
+      } catch (error) {
+        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Team size request got cancelled');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      response: handleRequest(),
+    };
   }
 }
