@@ -46,6 +46,8 @@ export interface HttpClient {
   on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: InvalidTokenError | MissingCookieError) => void): this;
 }
 
+const FILE_SIZE_100_MB = 104857600;
+
 export class HttpClient extends EventEmitter {
   private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
@@ -118,7 +120,8 @@ export class HttpClient extends EventEmitter {
     try {
       const response = await axios.request<T>({
         ...config,
-        maxContentLength: 104857600, // 100 Megabytes
+        maxBodyLength: FILE_SIZE_100_MB,
+        maxContentLength: FILE_SIZE_100_MB,
       });
 
       this.updateConnectionState(ConnectionState.CONNECTED);
