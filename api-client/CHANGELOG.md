@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.2.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.2.2...@wireapp/api-client@12.2.3) (2021-02-10)
+
+
+### Bug Fixes
+
+* **api-client:** Allow sending text files up to 100 MB ([#3520](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3520)) ([a7aee40](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/a7aee4034a9595df0bd5abc4a367fd62581b7ee9))
+
+
+
+
+
 ## [12.2.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.2.1...@wireapp/api-client@12.2.2) (2021-02-10)
 
 **Note:** Version bump only for package @wireapp/api-client
