@@ -87,7 +87,7 @@ import type {
 } from './message/OtrMessage';
 
 /** A map of the format `{ UserId: [clientId, ...] }` */
-export type UserClientsMap = Record<string, string[]>;
+export type UserClientsMap = {[userId: string]: string[]};
 
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
@@ -143,17 +143,20 @@ export class ConversationService {
 
     if (userIds && !Array.isArray(userIds)) {
       preKeys = preKeys.map(preKey => {
-        if (preKey.user in userIds) {
-          preKey.clients = preKey.clients.filter(client => userIds[preKey.user].includes(client.client));
+        const userId = typeof preKey.user == 'string' ? preKey.user : preKey.user.id;
+        if (userId in userIds) {
+          preKey.clients = preKey.clients.filter(client => {
+            userIds[userId].includes(client.client);
+          });
         }
         return preKey;
       });
     }
 
     return preKeys.reduce((bundleMap: UserPreKeyBundleMap, bundle) => {
-      bundleMap[bundle.user] = {};
+      bundleMap[bundle.user.id] = {};
       for (const client of bundle.clients) {
-        bundleMap[bundle.user][client.client] = client.prekey;
+        bundleMap[bundle.user.id][client.client] = client.prekey;
       }
       return bundleMap;
     }, {});
