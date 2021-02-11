@@ -19,9 +19,12 @@
 
 import React from 'react';
 import {container} from 'tsyringe';
+
+import {Router} from '../router/Router';
 import GroupAvatar from './list/GroupAvatar';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {AssetRepository} from '../assets/AssetRepository';
+import {generateConversationUrl} from '../router/routeGenerator';
 import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {Conversation} from '../entity/Conversation';
 
@@ -32,6 +35,8 @@ export interface GroupListProps {
 
 const GroupList: React.FC<GroupListProps> = ({click, groups}) => {
   const assetRepository = container.resolve(AssetRepository);
+  const router = container.resolve(Router);
+
   return (
     <div className="search-list search-list-lg">
       {groups.map(group => (
@@ -40,10 +45,11 @@ const GroupList: React.FC<GroupListProps> = ({click, groups}) => {
           data-uie-name="item-group"
           className="search-list-item"
           data-uie-uid={group.id}
-          onClick={() => click(group)}
-          data-uie-value={group.display_name}
-          //TODO: What to do?
-          data-bind="link_to: getConversationUrl(group.id)"
+          onClick={() => {
+            click(group);
+            router.navigate(generateConversationUrl(group.id));
+          }}
+          data-uie-value={group.display_name()}
         >
           <div className="search-list-item-image">
             {group.is1to1() && (
@@ -55,7 +61,7 @@ const GroupList: React.FC<GroupListProps> = ({click, groups}) => {
             )}
             {!group.is1to1() && <GroupAvatar users={group.participating_user_ets()} />}
           </div>
-          <div className="search-list-item-header">{group.display_name}</div>
+          <div className="search-list-item-header">{group.display_name()}</div>
         </div>
       ))}
     </div>

@@ -17,10 +17,13 @@
  *
  */
 
+import React from 'react';
 import switchPath from 'switch-path';
+import {singleton} from 'tsyringe';
 
 export type Routes = Record<string, ((x: any) => void) | null>;
 
+@singleton()
 export class Router {
   private readonly parseRoute: () => any;
 
@@ -48,5 +51,12 @@ export class Router {
     window.history.replaceState(null, null, `#${path}`);
     this.parseRoute();
     return this;
+  }
+
+  createLink(path: string): (event: React.MouseEvent) => void {
+    return (event: React.MouseEvent) => {
+      event.preventDefault();
+      this.navigate(path);
+    };
   }
 }
