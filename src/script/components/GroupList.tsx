@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,20 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+
 import React from 'react';
 import {container} from 'tsyringe';
+import GroupAvatar from './list/GroupAvatar';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {AssetRepository} from '../assets/AssetRepository';
+import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {Conversation} from '../entity/Conversation';
-import GroupAvatar from './list/GroupAvatar';
 
 export interface GroupListProps {
   click: (group: Conversation) => void;
   groups: Conversation[];
 }
+
 const GroupList: React.FC<GroupListProps> = ({click, groups}) => {
   const assetRepository = container.resolve(AssetRepository);
   return (
