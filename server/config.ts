@@ -136,9 +136,6 @@ const config: ServerConfig = {
       APPLOCK_SCHEDULED_TIMEOUT: process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT
         ? Number(process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT)
         : null,
-      APPLOCK_UNFOCUS_TIMEOUT: process.env.FEATURE_APPLOCK_UNFOCUS_TIMEOUT
-        ? Number(process.env.FEATURE_APPLOCK_UNFOCUS_TIMEOUT)
-        : null,
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT != 'false',
       CONFERENCE_AUTO_MUTE: process.env.FEATURE_CONFERENCE_AUTO_MUTE == 'true',
       DEFAULT_LOGIN_TEMPORARY_CLIENT: process.env.FEATURE_DEFAULT_LOGIN_TEMPORARY_CLIENT == 'true',

@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {container, InjectionToken} from 'tsyringe';
 
-export function registerReactComponent(
+export function registerReactComponent<Props>(
   name: string,
   {
     template,
@@ -28,22 +28,23 @@ export function registerReactComponent(
     optionalParams = [],
     injected = {},
   }: {
-    component: React.ComponentType;
+    component: React.ComponentType<Props>;
     injected?: Record<string, InjectionToken>;
-    optionalParams?: string[];
+    /** The optional knockout params */
+    optionalParams?: (keyof Props)[];
     template: string;
   },
 ) {
   ko.components.register(name, {
-    template: template,
-    viewModel: function (knockoutParams: Record<string, any>) {
+    template,
+    viewModel: function (knockoutParams: Props) {
       optionalParams.forEach(param => {
         if (!knockoutParams.hasOwnProperty(param)) {
           knockoutParams[param] = null;
         }
       });
       Object.entries(injected).forEach(([injectedName, injectedClass]) => {
-        knockoutParams[injectedName] = container.resolve(injectedClass);
+        knockoutParams[injectedName as keyof Props] = container.resolve(injectedClass);
       });
       Object.assign(this, knockoutParams);
       this.reactComponent = component;

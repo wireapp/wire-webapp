@@ -33,12 +33,14 @@ const useHideElement = (timeout: number, skipClass?: string) => {
     };
 
     ref.current.addEventListener('mouseleave', hideElement);
+    ref.current.addEventListener('mouseout', hideElement);
     ref.current.addEventListener('mousemove', onMouseMove);
 
     startTimer();
     return () => {
       window.clearTimeout(hideTimeout);
       ref.current.removeEventListener('mouseleave', hideElement);
+      ref.current.removeEventListener('mouseout', hideElement);
       ref.current.removeEventListener('mousemove', onMouseMove);
       ref.current.classList.remove(hideControlsClass);
     };

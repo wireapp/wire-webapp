@@ -24,23 +24,21 @@
   justify-content: space-between;
   padding: 0;
   list-style: none;
-}
 
-.input-level-bullet::before {
-  .circle(@input-level-bullet-size);
+  &__bullet {
+    .circle(@input-level-bullet-size);
 
-  display: block;
-  border: 1px solid @separator-color;
-  background-color: #fff;
-  border-radius: @input-level-bullet-size / 2;
-  content: '';
-  transition: all 0.16s;
-}
+    border: 1px solid @separator-color;
+    background-color: #fff;
+    border-radius: @input-level-bullet-size / 2;
+    transition: all 0.16s;
 
-.input-level-bullet-active::before {
-  background-color: currentColor;
-}
+    &--active {
+      background-color: currentColor;
+    }
 
-.input-level-bullet-disabled::before {
-  background-color: @separator-color;
+    &--disabled {
+      background-color: @separator-color;
+    }
+  }
 }

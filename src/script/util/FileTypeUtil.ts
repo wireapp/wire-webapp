@@ -22,15 +22,15 @@ import {partition} from 'Util/ArrayUtil';
 import {Config} from '../Config';
 
 export const allowsAllFiles = (): boolean => {
-  const allowedExtentions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;
-  return allowedExtentions.some(extension => ['*', '.*', '*.*'].includes(extension));
+  const allowedExtensions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;
+  return allowedExtensions.some(extension => ['*', '.*', '*.*'].includes(extension));
 };
 
 export const hasAllowedExtension = (fileName: string): boolean => {
-  const allowedExtentions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;
+  const allowedExtensions = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS;
 
   // Creates a regex like this: (\.txt|\.pdf)$
-  const fileExtRegex = new RegExp(`(\\${allowedExtentions.join('|\\')})$`);
+  const fileExtRegex = new RegExp(`(\\${allowedExtensions.join('|\\')})$`);
   return fileExtRegex.test(fileName.toLowerCase());
 };
 
@@ -41,8 +41,8 @@ export const isAllowedFile = (name: string, type: string): boolean => {
   if (imageContentTypes.includes(type)) {
     return true;
   }
-  const allowedExtentions = [...imageFileExtensions, ...Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS];
-  const fileExtRegex = new RegExp(`(\\${allowedExtentions.join('|\\')})$`);
+  const allowedExtensions = [...imageFileExtensions, ...Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS];
+  const fileExtRegex = new RegExp(`(\\${allowedExtensions.join('|\\')})$`);
   return fileExtRegex.test(name.toLowerCase());
 };
 

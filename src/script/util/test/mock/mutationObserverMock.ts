@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /*
  * Wire
  * Copyright (C) 2021 Wire Swiss GmbH
@@ -18,22 +17,11 @@
  *
  */
 
-//@ts-check
-
-const fs = require('fs');
-const path = require('path');
-
-const serverDist = path.resolve(__dirname, '../../server/dist');
-
-const {config} = require(path.join(serverDist, 'config'));
-const staticWebappDir = path.join(serverDist, 'static/');
-
-const clientConfig = {
-  ...config.CLIENT,
-  APP_BASE: config.SERVER.APP_BASE,
-};
-
-const payload = `
-window.wire = window.wire || {};
-window.wire.env = ${JSON.stringify(clientConfig)};`;
-fs.writeFileSync(path.join(staticWebappDir, 'config.js'), payload);
+Object.defineProperty(window, 'MutationObserver', {
+  value: jest.fn(() => ({
+    disconnect: jest.fn(),
+    observe: jest.fn(),
+    unobserve: jest.fn(),
+  })),
+  writable: true,
+});

@@ -24,7 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import 'Components/receiptModeToggle';
-import 'Components/panel/panelActions';
+import 'Components/panel/PanelActions';
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
@@ -46,6 +46,7 @@ import type {Conversation} from '../../entity/Conversation';
 import {PanelViewModel} from '../PanelViewModel';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import type {MenuItem} from 'Components/panel/PanelActions';
 
 export class ConversationDetailsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;
@@ -279,9 +280,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   readonly isSingleUserMode = (conversationEntity: Conversation): boolean =>
     conversationEntity && (conversationEntity.is1to1() || conversationEntity.isRequest());
 
-  getConversationActions(
-    conversationEntity: Conversation,
-  ): {click: () => void; icon: string; identifier: string; label: string}[] {
+  getConversationActions(conversationEntity: Conversation): MenuItem[] {
     if (!conversationEntity) {
       return [];
     }

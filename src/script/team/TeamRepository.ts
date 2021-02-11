@@ -122,6 +122,7 @@ export class TeamRepository {
     const team = await this.getTeam();
     if (this.userState.self().teamId) {
       await this.updateTeamMembers(team);
+      this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures(team.id));
     }
     this.scheduleFetchTeamInfo();
   };

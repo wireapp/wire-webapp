@@ -37,11 +37,11 @@ import 'Components/deviceRemove';
 import 'Components/ephemeralTimer';
 import 'Components/fullSearch';
 import 'Components/groupList';
-import 'Components/guestModeToggle';
+import 'Components/GuestModeToggle';
 import 'Components/icons';
 import 'Components/image';
 import 'Components/InfoToggle';
-import 'Components/inputLevel';
+import 'Components/InputLevel';
 import 'Components/list/conversationListCallingCell';
 import 'Components/list/conversationListCell';
 import 'Components/list/GroupAvatar';
@@ -95,7 +95,6 @@ declare global {
         FEATURE: {
           ALLOWED_FILE_UPLOAD_EXTENSIONS: string[];
           APPLOCK_SCHEDULED_TIMEOUT: number;
-          APPLOCK_UNFOCUS_TIMEOUT: number;
           CHECK_CONSENT: boolean;
           CONFERENCE_AUTO_MUTE: boolean;
           DEFAULT_LOGIN_TEMPORARY_CLIENT: boolean;
