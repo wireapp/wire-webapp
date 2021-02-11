@@ -17,8 +17,8 @@
  *
  */
 
-import NamedIcon from 'Components/NamedIcon';
 import React from 'react';
+import NamedIcon from 'Components/NamedIcon';
 import {CallMessage as CallMessageEntity} from '../../entity/message/CallMessage';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
