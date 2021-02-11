@@ -70,9 +70,9 @@ export const INITIALS_SIZE = {
 
 export interface ParticipantAvatarProps {
   assetRepository: AssetRepository;
-  clickHandler?: (participant: User, target: Node) => void;
   noBadge?: boolean;
   noFilter?: boolean;
+  onClick?: (participant: User, target: Node) => void;
   participant: User;
   size?: AVATAR_SIZE;
 }
@@ -80,7 +80,7 @@ export interface ParticipantAvatarProps {
 const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   assetRepository,
   participant,
-  clickHandler,
+  onClick,
   noBadge = false,
   noFilter = false,
   size = AVATAR_SIZE.LARGE,
@@ -110,9 +110,9 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
     }
   })();
 
-  const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (typeof clickHandler === 'function') {
-      clickHandler(participant, (event.currentTarget as Node).parentNode);
+  const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (typeof onClick === 'function') {
+      onClick(participant, event.currentTarget.parentNode);
     }
   };
 
@@ -125,7 +125,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
         noFilter={noFilter}
         participant={participant}
         state={avatarState}
-        onClick={onClick}
+        onClick={clickHandler}
       />
     );
   }
@@ -137,12 +137,14 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
         participant={participant}
         state={avatarState}
         size={size}
-        onClick={onClick}
+        onClick={clickHandler}
       />
     );
   }
 
-  return <ServiceAvatar assetRepository={assetRepository} size={size} participant={participant} onClick={onClick} />;
+  return (
+    <ServiceAvatar assetRepository={assetRepository} size={size} participant={participant} onClick={clickHandler} />
+  );
 };
 
 export default ParticipantAvatar;
@@ -150,7 +152,7 @@ export default ParticipantAvatar;
 registerReactComponent('participant-avatar', {
   component: ParticipantAvatar,
   injected: {assetRepository: AssetRepository},
-  optionalParams: ['size', 'click', 'noBadge', 'noFilter'],
+  optionalParams: ['size', 'onClick', 'noBadge', 'noFilter'],
   template:
-    '<span data-bind="react: {assetRepository, participant: ko.unwrap(participant), size, clickHandler: click, noBadge, noFilter}"></span>',
+    '<span data-bind="react: {assetRepository, participant: ko.unwrap(participant), size, onClick, noBadge, noFilter}"></span>',
 });
