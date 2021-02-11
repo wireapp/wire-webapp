@@ -28,6 +28,9 @@ import type {
   CompletePasswordReset,
   HandleInfo,
   NewPasswordReset,
+  QualifiedHandle,
+  QualifiedHandleInfo,
+  QualifiedId,
   QualifiedUser,
   SearchResult,
   SendActivationCode,
@@ -51,6 +54,8 @@ export class UserAPI {
     CONTACTS: 'contacts',
     DELETE: '/delete',
     HANDLES: 'handles',
+    LIST_CLIENTS: '/list-clients',
+    LIST_USERS: '/list-users',
     PASSWORDRESET: '/password-reset',
     PRE_KEYS: 'prekeys',
     PROPERTIES: '/properties',
@@ -175,13 +180,20 @@ export class UserAPI {
    * @param handle The user's handle
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserHandleInfo
    */
-  public async getHandle(handle: string): Promise<HandleInfo> {
+  public async getHandle(handle: QualifiedHandle): Promise<QualifiedHandleInfo>;
+  public async getHandle(handle: string): Promise<HandleInfo>;
+  public async getHandle(handle: string | QualifiedHandle): Promise<HandleInfo | QualifiedHandleInfo> {
+    const url =
+      typeof handle === 'string'
+        ? `${UserAPI.URL.HANDLES}/${handle}`
+        : `${UserAPI.URL.USERS}/${handle.domain}/${handle.handle}`;
+
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
+      url,
     };
 
-    const response = await this.client.sendJSON<HandleInfo>(config);
+    const response = await this.client.sendJSON<HandleInfo | QualifiedHandleInfo>(config);
     return response.data;
   }
 
@@ -255,27 +267,34 @@ export class UserAPI {
 
   /**
    * Get a user by ID.
-   * @note If you want to get all properties (`sso_id`, `managed_by`, etc.) for your own user, use "/self". Otherwise you will get a user payload with a limited set of properties (what's publicly available).
-   * @param userId The user ID
+   * @note If you want to get all properties (`sso_id`, `managed_by`, etc.) for your own user, use "/self".
+   *       Otherwise you will get a user payload with a limited set of properties (what's publicly available).
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
-  public async getUser(userId: string): Promise<User> {
+  public async getUser(userId: string): Promise<User>;
+  public async getUser(userId: QualifiedId): Promise<QualifiedUser>;
+  public async getUser(userId: string | QualifiedId): Promise<User | QualifiedUser> {
+    const url =
+      typeof userId === 'string'
+        ? `${UserAPI.URL.USERS}/${userId}`
+        : `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}`;
+
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.USERS}/${userId}`,
+      url,
     };
 
-    const response = await this.client.sendJSON<User>(config);
+    const response = await this.client.sendJSON<User | QualifiedUser>(config);
     return response.data;
   }
 
-  public async getUserPreKeys(user: QualifiedUser): Promise<QualifiedPreKeyBundle>;
-  public async getUserPreKeys(user: string): Promise<PreKeyBundle>;
-  public async getUserPreKeys(user: QualifiedUser | string): Promise<PreKeyBundle | QualifiedPreKeyBundle> {
+  public async getUserPreKeys(userId: string): Promise<QualifiedPreKeyBundle>;
+  public async getUserPreKeys(userId: QualifiedId): Promise<PreKeyBundle>;
+  public async getUserPreKeys(userId: QualifiedId | string): Promise<PreKeyBundle | QualifiedPreKeyBundle> {
     const url =
-      typeof user === 'string'
-        ? `${UserAPI.URL.USERS}/${user}/${UserAPI.URL.PRE_KEYS}`
-        : `${UserAPI.URL.USERS}/${user.domain}/${user}/${UserAPI.URL.PRE_KEYS}`;
+      typeof userId === 'string'
+        ? `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}`
+        : `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.PRE_KEYS}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -292,59 +311,69 @@ export class UserAPI {
    * @param parameters Multiple user's handles or IDs
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    */
-  public async getUsers(parameters: {ids: string[]}, limit?: number): Promise<User[]>;
-  public async getUsers(parameters: {handles: string[]}, limit?: number): Promise<User[]>;
   public async getUsers(
-    parameters: {handles?: string[]; ids?: string[]},
+    parameters: {ids: string[]} | {handles: string[]},
     limit: number = UserAPI.DEFAULT_USERS_CHUNK_SIZE,
-  ): Promise<User[]> {
-    const {handles, ids} = parameters;
+  ): Promise<User[] | QualifiedUser[]> {
+    const fetchUsers = async (params: {ids: string[]} | {handles: string[]}): Promise<User[] | QualifiedUser[]> => {
+      const config: AxiosRequestConfig = {
+        method: 'get',
+        params: {},
+        url: UserAPI.URL.USERS,
+      };
 
-    if (handles?.length) {
-      const uniqueHandles = ArrayUtil.removeDuplicates(handles);
+      if ('handles' in params) {
+        config.params.handles = params.handles.join(',');
+      } else if ('ids' in params) {
+        config.params.ids = params.ids.join(',');
+      }
+
+      const response = await this.client.sendJSON<User[] | QualifiedUser[]>(config);
+      return response.data;
+    };
+
+    if ('handles' in parameters && parameters.handles.length) {
+      const uniqueHandles = ArrayUtil.removeDuplicates(parameters.handles);
       const handleChunks = ArrayUtil.chunk(uniqueHandles, limit);
-      const resolvedTasks = await Promise.all(handleChunks.map(handleChunk => this._getUsers({handles: handleChunk})));
+      const resolvedTasks = await Promise.all(handleChunks.map(handleChunk => fetchUsers({handles: handleChunk})));
       return ArrayUtil.flatten(resolvedTasks);
     }
 
-    if (ids?.length) {
-      const uniqueIds = ArrayUtil.removeDuplicates(ids);
+    if ('ids' in parameters && parameters.ids.length) {
+      const uniqueIds = ArrayUtil.removeDuplicates(parameters.ids);
       const idChunks = ArrayUtil.chunk(uniqueIds, limit);
-      const resolvedTasks = await Promise.all(idChunks.map(idChunk => this._getUsers({ids: idChunk})));
+      const resolvedTasks = await Promise.all(idChunks.map(idChunk => fetchUsers({ids: idChunk})));
       return ArrayUtil.flatten(resolvedTasks);
     }
 
     return [];
   }
 
-  private async _getUsers(parameters: {ids: string[]}): Promise<User[]>;
-  private async _getUsers(parameters: {handles: string[]}): Promise<User[]>;
-  private async _getUsers(parameters: {handles?: string[]; ids?: string[]}): Promise<User[]> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      params: {},
-      url: UserAPI.URL.USERS,
-    };
-
-    if (parameters.handles) {
-      config.params.handles = parameters.handles.join(',');
-    } else if (parameters.ids) {
-      config.params.ids = parameters.ids.join(',');
-    }
-
-    const response = await this.client.sendJSON<User[]>(config);
-    return response.data;
-  }
-
   /**
-   * DEPRECATED: List users.
-   * @deprecated
+   * List users.
    * @param userIds Multiple user's IDs
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    */
-  public async getUsersByIds(userIds: string[]): Promise<User[]> {
+  public async getUsersByIds(userIds: string[]): Promise<User[] | QualifiedUser[]> {
     const maxChunkSize = 100;
     return this.getUsers({ids: userIds}, maxChunkSize);
+  }
+
+  /**
+   * Check if a user ID exists.
+   */
+  public async headUsers(userId: string | QualifiedId): Promise<void> {
+    const url =
+      typeof userId === 'string'
+        ? `${UserAPI.URL.USERS}/${userId}`
+        : `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}`;
+
+    const config: AxiosRequestConfig = {
+      method: 'head',
+      url,
+    };
+
+    await this.client.sendJSON(config);
   }
 
   /**
@@ -451,6 +480,39 @@ export class UserAPI {
   }
 
   /**
+   * List users.
+   * Note: The 'qualified_ids' and 'qualified_handles' parameters are mutually exclusive.
+   * @param handles The user ids to check.
+   */
+  public async postListUsers(
+    users: {qualified_ids: QualifiedId[]} | {qualified_handles: QualifiedHandle[]},
+  ): Promise<QualifiedUser[]> {
+    const config: AxiosRequestConfig = {
+      data: users,
+      method: 'post',
+      url: UserAPI.URL.LIST_USERS,
+    };
+
+    const response = await this.client.sendJSON<QualifiedUser[]>(config);
+    return response.data;
+  }
+
+  /**
+   * List users.
+   * @param handles The user ids to check.
+   */
+  public async postListClients(userIds: QualifiedId[]): Promise<QualifiedUser[]> {
+    const config: AxiosRequestConfig = {
+      data: userIds,
+      method: 'post',
+      url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}`,
+    };
+
+    const response = await this.client.sendJSON<QualifiedUser[]>(config);
+    return response.data;
+  }
+
+  /**
    * Given a map of user IDs to client IDs return a prekey for each one.
    * @param userClientMap A map of the user's clients
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
@@ -460,26 +522,21 @@ export class UserAPI {
     limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
   ): Promise<UserPreKeyBundleMap> {
     const userIdChunks = ArrayUtil.chunk(Object.keys(userClientMap), limit);
-    const userPreKeyBundleMapChunks = await Promise.all(
-      userIdChunks.map(userIdChunk =>
-        this._postMultiPreKeyBundlesChunk(
-          userIdChunk.reduce(
-            (chunkedUserClientMap, userId) => ({
-              ...chunkedUserClientMap,
-              [userId]: userClientMap[userId],
-            }),
-            {},
-          ),
-        ),
+    const chunksPromises = userIdChunks.map(userIdChunk =>
+      this._postMultiPreKeyBundlesChunk(
+        userIdChunk.reduce<UserClients>((chunkedUserClientMap, userId) => {
+          chunkedUserClientMap[userId] = userClientMap[userId];
+          return chunkedUserClientMap;
+        }, {}),
       ),
     );
-    return userPreKeyBundleMapChunks.reduce(
-      (userPreKeyBundleMap, userPreKeyBundleMapChunk) => ({
+    const userPreKeyBundleMapChunks = await Promise.all(chunksPromises);
+    return userPreKeyBundleMapChunks.reduce((userPreKeyBundleMap, userPreKeyBundleMapChunk) => {
+      return {
         ...userPreKeyBundleMap,
         ...userPreKeyBundleMapChunk,
-      }),
-      {},
-    );
+      };
+    }, {});
   }
 
   /**
