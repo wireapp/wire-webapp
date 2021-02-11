@@ -154,9 +154,10 @@ export class ConversationService {
     }
 
     return preKeys.reduce((bundleMap: UserPreKeyBundleMap, bundle) => {
-      bundleMap[bundle.user.id] = {};
+      const userId = typeof bundle.user == 'string' ? bundle.user : bundle.user.id;
+      bundleMap[userId] = {};
       for (const client of bundle.clients) {
-        bundleMap[bundle.user.id][client.client] = client.prekey;
+        bundleMap[userId][client.client] = client.prekey;
       }
       return bundleMap;
     }, {});
