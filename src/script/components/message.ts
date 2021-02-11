@@ -32,7 +32,6 @@ import {Context, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
-import type {VerificationMessage} from '../entity/message/VerificationMessage';
 import {StatusType} from '../message/StatusType';
 import type {Text} from '../entity/message/Text';
 import type {ActionsViewModel} from '../view_model/ActionsViewModel';
@@ -54,6 +53,7 @@ import './asset/linkPreviewAsset';
 import './asset/LocationAsset';
 import './asset/videoAsset';
 import './asset/MessageButton';
+import './message/VerificationMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -323,11 +323,6 @@ class Message {
     }
   }
 
-  showDevice(messageEntity: VerificationMessage): void {
-    const topic = messageEntity.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
-    amplify.publish(topic);
-  }
-
   readonly showLegalHold = () => {
     amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS, this.conversationState.activeConversation());
   };
@@ -583,38 +578,6 @@ const legalHoldTemplate: string = `
   </div>
   `;
 
-const verificationTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <!-- ko if: message.isTypeVerified() -->
-        <verified-icon></verified-icon>
-      <!-- /ko -->
-      <!-- ko ifnot: message.isTypeVerified() -->
-        <not-verified-icon></not-verified-icon>
-      <!-- /ko -->
-    </div>
-    <div class="message-header-label">
-      <!-- ko if: message.isTypeVerified() -->
-        <span data-bind="text: t('tooltipConversationAllVerified')"></span>
-      <!-- /ko -->
-      <!-- ko if: message.isTypeUnverified() -->
-        <span class="message-header-sender-name" data-bind="text: message.unsafeSenderName()"></span>
-        <span class="ellipsis" data-bind="text: t('conversationDeviceUnverified')"></span>
-        <span class="message-verification-action accent-text" data-bind="click: () => showDevice(message), text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
-      <!-- /ko -->
-      <!-- ko if: message.isTypeNewDevice() -->
-        <span class="message-header-plain-sender-name" data-bind='text: message.captionUser'></span>
-        <span class="ellipsis" data-bind="text: message.captionStartedUsing"></span>
-        <span class="message-verification-action accent-text" data-bind="click: () => showDevice(message), text: message.captionNewDevice" data-uie-name="go-devices"></span>
-      <!-- /ko -->
-      <!-- ko if: message.isTypeNewMember() -->
-        <span class="ellipsis" data-bind="text: t('conversationDeviceNewPeopleJoined')"></span>&nbsp;<span class="message-verification-action accent-text" data-bind="click: () => showDevice(message), text: t('conversationDeviceNewPeopleJoinedVerify')" data-uie-name="go-devices"></span>
-      <!-- /ko -->
-      <hr class="message-header-line" />
-    </div>
-  </div>
-  `;
-
 const callTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg">
@@ -733,7 +696,7 @@ ko.components.register('message', {
       ${unableToDecryptTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'verification' -->
-      ${verificationTemplate}
+      <verification-message data-bind="{message}"></verification-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'delete' -->
       ${deleteTemplate}
