@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.3.0...@wireapp/api-client@12.3.1) (2021-02-11)
+
+
+### Bug Fixes
+
+* **api-client,core:** Endpoints can return qualified types ([#3528](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3528)) ([d9b1b01](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d9b1b017c7c866e7506cb31b790c0b50170f9641))
+
+
+
+
+
 # [12.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.2.3...@wireapp/api-client@12.3.0) (2021-02-11)
 
 
