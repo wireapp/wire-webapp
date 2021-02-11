@@ -24,7 +24,7 @@ export interface EphemeralTimerProps {
   message: Message;
 }
 
-const EphemeralTimer: React.FunctionComponent<EphemeralTimerProps> = ({message}) => {
+const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
   const started = message.ephemeral_started();
   const expires = message.ephemeral_expires() as number;
   const duration = expires - started;
