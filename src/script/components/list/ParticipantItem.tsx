@@ -164,13 +164,13 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
           )}
 
           {isUser && !isOthersMode && (participant as User).isGuest() && (
-            <NamedIcon name="guest-icon" data-uie-name="status-guest" />
+            <NamedIcon width={14} height={12} name="guest-icon" data-uie-name="status-guest" />
           )}
 
-          {external && <NamedIcon name="partner-icon" data-uie-name="status-external" />}
+          {external && <NamedIcon width={16} height={16} name="partner-icon" data-uie-name="status-external" />}
 
           {isUser && isSelfVerified && (participant as User).is_verified() && (
-            <NamedIcon name="verified-icon" data-uie-name="status-verified" />
+            <NamedIcon width={14} height={12} name="verified-icon" data-uie-name="status-verified" />
           )}
 
           {canSelect && (
