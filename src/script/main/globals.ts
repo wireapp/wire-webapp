@@ -34,7 +34,6 @@ import 'Components/asset/controls/mediaButton';
 import 'Components/asset/controls/SeekBar';
 import 'Components/copyToClipboard';
 import 'Components/deviceRemove';
-import 'Components/ephemeralTimer';
 import 'Components/fullSearch';
 import 'Components/groupList';
 import 'Components/GuestModeToggle';
