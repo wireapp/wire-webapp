@@ -80,9 +80,10 @@
     "start": "yarn build:node && concurrently \"tsc -w\" \"webpack -w\" \"browser-sync start -c bs-config.js\"",
     "start:node": "cross-env NODE_DEBUG=@wireapp* ts-node demo.ts",
     "test": "yarn test:node && yarn test:browser",
-    "test:project": "yarn dist && yarn test",
     "test:browser": "karma start",
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* nyc jasmine --config=jasmine.json",
+    "test:project": "yarn dist && yarn test",
+    "test:types": "tsc --noEmit",
     "watch": "webpack-dev-server --config webpack.browser.js"
   },
   "version": "12.2.3"

@@ -17,12 +17,10 @@
  *
  */
 
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '../../http';
+import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../../http';
 
 export class FeatureError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: HTTP_STATUS) {
+  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: StatusCode) {
     super(message, label, code);
     Object.setPrototypeOf(this, FeatureError.prototype);
     this.name = 'FeatureError';
@@ -30,7 +28,7 @@ export class FeatureError extends BackendError {
 }
 
 export class InvalidAppLockTimeoutError extends FeatureError {
-  constructor(message: string, label = BackendErrorLabel.APP_LOCK_INVALID_TIMEOUT, code = HTTP_STATUS.BAD_REQUEST) {
+  constructor(message: string, label = BackendErrorLabel.APP_LOCK_INVALID_TIMEOUT, code = StatusCode.BAD_REQUEST) {
     super(message, label, code);
     Object.setPrototypeOf(this, InvalidAppLockTimeoutError.prototype);
     this.name = 'InvalidAppLockTimeoutError';

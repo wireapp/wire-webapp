@@ -17,12 +17,10 @@
  *
  */
 
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '../http';
+import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../http';
 
 export class AccountError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: HTTP_STATUS) {
+  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: StatusCode) {
     super(message, label, code);
     Object.setPrototypeOf(this, AccountError.prototype);
     this.name = 'AccountError';
@@ -30,7 +28,7 @@ export class AccountError extends BackendError {
 }
 
 export class CustomBackendNotFoundError extends AccountError {
-  constructor(message: string, label = BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND, code = HTTP_STATUS.NOT_FOUND) {
+  constructor(message: string, label = BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND, code = StatusCode.NOT_FOUND) {
     super(message, label, code);
     Object.setPrototypeOf(this, CustomBackendNotFoundError.prototype);
     this.name = 'CustomBackendNotFoundError';

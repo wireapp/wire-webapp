@@ -17,12 +17,10 @@
  *
  */
 
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '../../http';
+import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../../http';
 
 export class InvitationError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: HTTP_STATUS) {
+  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code: StatusCode) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvitationError';
@@ -30,7 +28,7 @@ export class InvitationError extends BackendError {
 }
 
 export class InvitationInvalidEmailError extends InvitationError {
-  constructor(message: string, label = BackendErrorLabel.INVALID_EMAIL, code = HTTP_STATUS.BAD_REQUEST) {
+  constructor(message: string, label = BackendErrorLabel.INVALID_EMAIL, code = StatusCode.BAD_REQUEST) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvitationInvalidEmailError';
@@ -38,14 +36,14 @@ export class InvitationInvalidEmailError extends InvitationError {
 }
 
 export class InvitationInvalidPhoneError extends InvitationError {
-  constructor(message: string, label = BackendErrorLabel.INVALID_PHONE, code = HTTP_STATUS.BAD_REQUEST) {
+  constructor(message: string, label = BackendErrorLabel.INVALID_PHONE, code = StatusCode.BAD_REQUEST) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvitationInvalidPhoneError';
   }
 }
 export class InvitationEmailExistsError extends InvitationError {
-  constructor(message: string, label = BackendErrorLabel.INVITE_EMAIL_EXISTS, code = HTTP_STATUS.BAD_REQUEST) {
+  constructor(message: string, label = BackendErrorLabel.INVITE_EMAIL_EXISTS, code = StatusCode.BAD_REQUEST) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvitationEmailExistsError';
@@ -53,7 +51,7 @@ export class InvitationEmailExistsError extends InvitationError {
 }
 
 export class InvitationPhoneExistsError extends InvitationError {
-  constructor(message: string, label = BackendErrorLabel.PHONE_EXISTS, code = HTTP_STATUS.CONFLICT) {
+  constructor(message: string, label = BackendErrorLabel.PHONE_EXISTS, code = StatusCode.CONFLICT) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'InvitationPhoneExistsError';

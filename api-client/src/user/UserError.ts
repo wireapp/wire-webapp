@@ -17,12 +17,10 @@
  *
  */
 
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '../http/';
+import {BackendError, BackendErrorLabel, StatusCode, SyntheticErrorLabel} from '../http/';
 
 export class UserError extends BackendError {
-  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code?: HTTP_STATUS) {
+  constructor(message: string, label: BackendErrorLabel | SyntheticErrorLabel, code?: StatusCode) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'UserError';
@@ -33,7 +31,7 @@ export class UserIsUnknownError extends UserError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.CLIENT_ERROR,
-    code: HTTP_STATUS = HTTP_STATUS.BAD_REQUEST,
+    code: StatusCode = StatusCode.BAD_REQUEST,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
@@ -45,7 +43,7 @@ export class UnconnectedUserError extends UserError {
   constructor(
     message: string,
     label: BackendErrorLabel = BackendErrorLabel.NOT_CONNECTED,
-    code: HTTP_STATUS = HTTP_STATUS.FORBIDDEN,
+    code: StatusCode = StatusCode.FORBIDDEN,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
@@ -54,7 +52,7 @@ export class UnconnectedUserError extends UserError {
 }
 
 export class RequestCancellationError extends UserError {
-  constructor(message: string, label = SyntheticErrorLabel.REQUEST_CANCELLED, code?: HTTP_STATUS) {
+  constructor(message: string, label = SyntheticErrorLabel.REQUEST_CANCELLED, code?: StatusCode) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'RequestCancellationError';
