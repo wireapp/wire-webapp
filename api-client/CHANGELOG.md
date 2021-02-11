@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.2.3...@wireapp/api-client@12.3.0) (2021-02-11)
+
+
+### Features
+
+* **api-client,core:** Add new backend endpoints (SQCORE-289) ([#3360](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3360)) ([3f8098d](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3f8098d29a7940c6d29a3df27f1fa3ba71e7cde7))
+
+
+
+
+
 ## [12.2.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.2.2...@wireapp/api-client@12.2.3) (2021-02-10)
 
 
