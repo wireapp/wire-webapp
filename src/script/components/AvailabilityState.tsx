@@ -27,7 +27,7 @@ import NamedIcon from './NamedIcon';
 
 export interface AvailabilityStateProps {
   availability: Availability.Type;
-  className: string;
+  className?: string;
   label: string;
   showArrow?: boolean;
   theme?: boolean;
