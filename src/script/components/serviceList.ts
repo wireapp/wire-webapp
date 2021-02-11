@@ -23,7 +23,7 @@ import {noop} from 'Util/util';
 
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 
-import 'Components/list/participantItem';
+import 'Components/list/ParticipantItem';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 
 interface ServiceListParams {

@@ -31,7 +31,7 @@ import type {TeamRepository} from '../team/TeamRepository';
 import {viewportObserver} from '../ui/viewportObserver';
 import {validateHandle} from '../user/UserHandleGenerator';
 
-import 'Components/list/participantItem';
+import 'Components/list/ParticipantItem';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 

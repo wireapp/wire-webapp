@@ -31,7 +31,7 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 
 import 'Components/calling/FullscreenVideoCall.tsx';
 import 'Components/calling/GroupVideoGrid';
-import 'Components/list/participantItem';
+import 'Components/list/ParticipantItem';
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {Grid} from '../../calling/videoGridHandler';
