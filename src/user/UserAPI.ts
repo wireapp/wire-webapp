@@ -180,8 +180,8 @@ export class UserAPI {
    * @param handle The user's handle
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserHandleInfo
    */
+  public async getHandle(handle: string): Promise<HandleInfo | QualifiedHandleInfo>;
   public async getHandle(handle: QualifiedHandle): Promise<QualifiedHandleInfo>;
-  public async getHandle(handle: string): Promise<HandleInfo>;
   public async getHandle(handle: string | QualifiedHandle): Promise<HandleInfo | QualifiedHandleInfo> {
     const url =
       typeof handle === 'string'
@@ -271,7 +271,7 @@ export class UserAPI {
    *       Otherwise you will get a user payload with a limited set of properties (what's publicly available).
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
-  public async getUser(userId: string): Promise<User>;
+  public async getUser(userId: string): Promise<User | QualifiedUser>;
   public async getUser(userId: QualifiedId): Promise<QualifiedUser>;
   public async getUser(userId: string | QualifiedId): Promise<User | QualifiedUser> {
     const url =
@@ -288,8 +288,8 @@ export class UserAPI {
     return response.data;
   }
 
-  public async getUserPreKeys(userId: string): Promise<QualifiedPreKeyBundle>;
-  public async getUserPreKeys(userId: QualifiedId): Promise<PreKeyBundle>;
+  public async getUserPreKeys(userId: string): Promise<PreKeyBundle | QualifiedPreKeyBundle>;
+  public async getUserPreKeys(userId: QualifiedId): Promise<QualifiedPreKeyBundle>;
   public async getUserPreKeys(userId: QualifiedId | string): Promise<PreKeyBundle | QualifiedPreKeyBundle> {
     const url =
       typeof userId === 'string'
@@ -458,13 +458,13 @@ export class UserAPI {
    * @param handle The handle of a user to search for
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserByHandle
    */
-  public async getUserByHandle(handle: string): Promise<HandleInfo> {
+  public async getUserByHandle(handle: string): Promise<HandleInfo | QualifiedHandleInfo> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
     };
 
-    const response = await this.client.sendJSON<HandleInfo>(config);
+    const response = await this.client.sendJSON<HandleInfo | QualifiedHandleInfo>(config);
     return response.data;
   }
 
