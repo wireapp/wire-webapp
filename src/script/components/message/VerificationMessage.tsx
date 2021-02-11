@@ -26,7 +26,7 @@ import {VerificationMessageType} from '../../message/VerificationMessageType';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
-import {User} from 'src/script/entity/User';
+import {User} from '../../entity/User';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 export interface VerificationMessageProps {
