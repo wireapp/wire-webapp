@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.0.17...@wireapp/core@17.1.0) (2021-02-11)
+
+
+### Features
+
+* **api-client,core:** Add new backend endpoints (SQCORE-289) ([#3360](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3360)) ([3f8098d](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/3f8098d29a7940c6d29a3df27f1fa3ba71e7cde7))
+
+
+
+
+
 ## [17.0.17](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.0.16...@wireapp/core@17.0.17) (2021-02-10)
 
 **Note:** Version bump only for package @wireapp/core
