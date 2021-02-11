@@ -54,6 +54,7 @@ import './asset/LocationAsset';
 import './asset/videoAsset';
 import './asset/MessageButton';
 import './message/VerificationMessage';
+import './message/CallMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -578,26 +579,6 @@ const legalHoldTemplate: string = `
   </div>
   `;
 
-const callTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon message-header-icon--svg">
-      <!-- ko if: message.was_completed() -->
-        <div class="svg-green"><pickup-icon></pickup-icon></div>
-      <!-- /ko -->
-      <!-- ko if: !message.was_completed() -->
-        <div class="svg-red"><hangup-icon></hangup-icon></div>
-      <!-- /ko -->
-    </div>
-    <div class="message-header-label">
-      <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
-      <span class="ellipsis" data-bind="text: message.caption()"></span>
-    </div>
-    <div class="message-body-actions">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
-    </div>
-  </div>
-  `;
-
 const memberTemplate: string = `
   <!-- ko if: message.showLargeAvatar() -->
     <div class="message-connected">
@@ -702,7 +683,7 @@ ko.components.register('message', {
       ${deleteTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'call' -->
-      ${callTemplate}
+      <call-message data-bind="{message}"></call-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'system' -->
       ${systemTemplate}
