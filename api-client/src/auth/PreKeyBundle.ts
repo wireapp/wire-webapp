@@ -18,7 +18,7 @@
  */
 
 import type {ClientPreKey} from '../auth/';
-import type {QualifiedUser} from '../user';
+import type {QualifiedId} from '../user';
 
 export interface PreKeyBundleBase {
   /** PreKeys of all clients */
@@ -32,5 +32,5 @@ export interface PreKeyBundle extends PreKeyBundleBase {
 
 export interface QualifiedPreKeyBundle extends PreKeyBundleBase {
   /** The qualified user */
-  user: QualifiedUser;
+  user: QualifiedId;
 }

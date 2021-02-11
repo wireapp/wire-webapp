@@ -17,6 +17,15 @@
  *
  */
 
+import {QualifiedId} from './User';
+
 export interface HandleInfo {
   user: string;
 }
+
+export interface QualifiedHandle {
+  domain: string;
+  handle: string;
+}
+
+export type QualifiedHandleInfo = HandleInfo & QualifiedId;
