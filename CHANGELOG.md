@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.1.0...@wireapp/core@17.1.1) (2021-02-11)
+
+
+### Bug Fixes
+
+* **api-client,core:** Endpoints can return qualified types ([#3528](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3528)) ([d9b1b01](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/d9b1b017c7c866e7506cb31b790c0b50170f9641))
+
+
+
+
+
 # [17.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.0.17...@wireapp/core@17.1.0) (2021-02-11)
 
 
