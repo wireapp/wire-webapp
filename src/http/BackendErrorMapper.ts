@@ -17,8 +17,6 @@
  *
  */
 
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
 import {
   IdentifierExistsError,
   InvalidCredentialsError,
@@ -31,12 +29,12 @@ import {
 import {ConversationIsUnknownError, ConversationOperationError} from '../conversation/';
 import {InvalidInvitationCodeError, InviteEmailInUseError, ServiceNotFoundError} from '../team/';
 import {UnconnectedUserError, UserIsUnknownError} from '../user/';
-import {BackendError, BackendErrorLabel} from './';
+import {BackendError, BackendErrorLabel, StatusCode} from './';
 
 export class BackendErrorMapper {
   public static get ERRORS(): Record<number, Record<string, Record<string, BackendError>>> {
     return {
-      [HTTP_STATUS.BAD_REQUEST]: {
+      [StatusCode.BAD_REQUEST]: {
         [BackendErrorLabel.CLIENT_ERROR]: {
           'Error in $: Failed reading: satisfy': new BackendError('Wrong set of parameters.'),
           "[path] 'cnv' invalid: Failed reading: Invalid UUID": new ConversationIsUnknownError(
@@ -48,7 +46,7 @@ export class BackendErrorMapper {
           'Invalid invitation code.': new InvalidInvitationCodeError('Invalid invitation code.'),
         },
       },
-      [HTTP_STATUS.FORBIDDEN]: {
+      [StatusCode.FORBIDDEN]: {
         [BackendErrorLabel.INVALID_CREDENTIALS]: {
           'Authentication failed.': new InvalidCredentialsError(
             'Authentication failed because of invalid credentials.',
@@ -67,12 +65,12 @@ export class BackendErrorMapper {
           'Account suspended.': new SuspendedAccountError('Account suspended.'),
         },
       },
-      [HTTP_STATUS.TOO_MANY_REQUESTS]: {
+      [StatusCode.TOO_MANY_REQUESTS]: {
         [BackendErrorLabel.CLIENT_ERROR]: {
           'Logins too frequent': new LoginTooFrequentError('Logins too frequent. User login temporarily disabled.'),
         },
       },
-      [HTTP_STATUS.CONFLICT]: {
+      [StatusCode.CONFLICT]: {
         [BackendErrorLabel.INVITE_EMAIL_EXISTS]: {
           'The given e-mail address is in use.': new InviteEmailInUseError('The given e-mail address is in use.'),
         },
@@ -82,7 +80,7 @@ export class BackendErrorMapper {
           ),
         },
       },
-      [HTTP_STATUS.NOT_FOUND]: {
+      [StatusCode.NOT_FOUND]: {
         [BackendErrorLabel.NOT_FOUND]: {
           'Service not found': new ServiceNotFoundError('Service not found'),
         },

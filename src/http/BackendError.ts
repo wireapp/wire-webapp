@@ -17,20 +17,20 @@
  *
  */
 
-import type {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import type {StatusCodes as StatusCode} from 'http-status-codes';
 
 import type {BackendErrorLabel} from '../http/';
 import {SyntheticErrorLabel} from './BackendErrorLabel';
 
 export class BackendError extends Error {
-  code?: HTTP_STATUS;
+  code?: StatusCode;
   label: BackendErrorLabel | SyntheticErrorLabel;
   message: string;
 
   constructor(
     message: string,
     label: BackendErrorLabel | SyntheticErrorLabel = SyntheticErrorLabel.UNKNOWN,
-    code?: HTTP_STATUS,
+    code?: StatusCode,
   ) {
     super(message);
     this.code = code;

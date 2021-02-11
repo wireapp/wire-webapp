@@ -27,3 +27,4 @@ export * from './NetworkError';
 export * from './RequestCancelable';
 export * from './RequestProgressHandler';
 export * from './TraceState';
+export {StatusCodes as StatusCode} from 'http-status-codes';
