@@ -35,25 +35,27 @@ class MediaButtonTestPage extends TestPage<MediaButtonProps> {
 }
 
 describe('MediaButton', () => {
-  const videoElement = document.createElement('video');
+  const getDefaultProps = (): MediaButtonProps => {
+    const videoElement = document.createElement('video');
 
-  const defaultProps: MediaButtonProps = {
-    asset: {downloadProgress: () => 0} as FileAsset,
-    cancel: () => {},
-    large: false,
-    pause: () => {
-      videoElement.dispatchEvent(new Event('pause'));
-    },
-    play: () => {
-      videoElement.dispatchEvent(new Event('playing'));
-    },
-    src: videoElement,
-    transferState: AssetTransferState.UPLOAD_PENDING,
-    uploadProgress: 0,
+    return {
+      asset: {downloadProgress: () => 0} as FileAsset,
+      cancel: () => {},
+      large: false,
+      pause: () => {
+        videoElement.dispatchEvent(new Event('pause'));
+      },
+      play: () => {
+        videoElement.dispatchEvent(new Event('playing'));
+      },
+      src: videoElement,
+      transferState: AssetTransferState.UPLOAD_PENDING,
+      uploadProgress: 0,
+    };
   };
 
   it('displays the media buttons if the media is uploaded', () => {
-    const props: MediaButtonProps = {...defaultProps, transferState: AssetTransferState.UPLOADED};
+    const props: MediaButtonProps = {...getDefaultProps(), transferState: AssetTransferState.UPLOADED};
 
     jest.spyOn(props, 'play');
     jest.spyOn(props, 'pause');
@@ -70,7 +72,7 @@ describe('MediaButton', () => {
   });
 
   it('displays a loader if the media is being downloaded', () => {
-    const props: MediaButtonProps = {...defaultProps, transferState: AssetTransferState.DOWNLOADING};
+    const props: MediaButtonProps = {...getDefaultProps(), transferState: AssetTransferState.DOWNLOADING};
 
     const testPage = new MediaButtonTestPage(props);
 
@@ -80,7 +82,7 @@ describe('MediaButton', () => {
   });
 
   it('displays a loader if the media is being uploaded', () => {
-    const props: MediaButtonProps = {...defaultProps, transferState: AssetTransferState.UPLOADING};
+    const props: MediaButtonProps = {...getDefaultProps(), transferState: AssetTransferState.UPLOADING};
 
     const testPage = new MediaButtonTestPage(props);
 
