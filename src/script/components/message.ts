@@ -677,13 +677,13 @@ ko.components.register('message', {
       ${unableToDecryptTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'verification' -->
-      <verification-message params="{message: message}"></verification-message>
+      <verification-message params="message: message"></verification-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'delete' -->
       ${deleteTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'call' -->
-      <call-message params="{message: message}"></call-message>
+      <call-message params="message: message"></call-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'system' -->
       ${systemTemplate}
