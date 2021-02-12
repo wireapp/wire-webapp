@@ -59,7 +59,7 @@ export const useKoSubscribableCallback = <T = any>(
 ): void => {
   useEffect(() => {
     const subscription = observable.subscribe(newValue => callback(newValue));
-    return subscription.dispose();
+    return () => subscription.dispose();
   }, [observable]);
 };
 
