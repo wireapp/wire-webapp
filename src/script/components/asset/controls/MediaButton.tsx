@@ -21,10 +21,11 @@ import {noop} from 'Util/util';
 import {AssetTransferState} from '../../../assets/AssetTransferState';
 import type {FileAsset} from '../../../entity/message/FileAsset';
 import '../AssetLoader';
-import React, {useEffect, useRef, useState} from 'react';
+import cx from 'classnames';
+import React, {useEffect, useState} from 'react';
 import AssetLoader from "Components/asset/AssetLoader";
 import ko from 'knockout';
-import { registerReactComponent } from 'Util/ComponentUtil';
+import {registerReactComponent} from 'Util/ComponentUtil';
 
 interface MediaButtonProps {
   asset: FileAsset;
@@ -47,12 +48,6 @@ const MediaButton: React.FC<MediaButtonProps> = ({
                                                    pause = noop,
                                                    cancel = noop
                                                  }) => {
-  const element = useRef<HTMLElement>();
-
-  if (large) {
-    element.current.classList.add('media-button-lg');
-  }
-
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const onPlay = () => (setIsPlaying(true));
   const onPause = () => (setIsPlaying(false));
@@ -94,12 +89,16 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   )
 
   return (
-    <>
+    <div
+      className={cx({
+        'media-button-lg': large,
+      })}
+    >
       {isUploaded && !isPlaying && mediaButtonPlay}
       {isUploaded && isPlaying && mediaButtonPause}
       {isDownloading && isDownloadingIndicator}
       {isUploading && isUploadingIndicator}
-    </>
+    </div>
   );
 }
 
