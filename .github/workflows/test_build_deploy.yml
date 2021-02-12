@@ -64,7 +64,7 @@ jobs:
           GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
           echo -e "CI = ${CI}"
-          echo -e "env.CI = ${env.CI}"
+          echo -e "env.CI = ${{env.CI}}"
           echo -e "BRANCH_NAME = ${BRANCH_NAME}"
           echo -e "TAG = ${TAG}"
           echo -e "TITLE = ${TITLE}"
