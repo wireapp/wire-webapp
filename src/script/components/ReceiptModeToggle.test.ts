@@ -17,11 +17,9 @@
  *
  */
 
-import ko from 'knockout';
 import {Confirmation} from '@wireapp/protocol-messaging';
 
 import TestPage from 'Util/test/TestPage';
-import {Conversation} from '../entity/Conversation';
 
 import ReceiptModeToggle, {ReceiptModeToggleProps} from './ReceiptModeToggle';
 
@@ -30,15 +28,16 @@ class ReceiptModeTogglePage extends TestPage<ReceiptModeToggleProps> {
     super(ReceiptModeToggle, props);
   }
 
-  getCheckbox = () => this.get('[data-uie-name="toggle-receipt-mode-checkbox"]');
+  getCheckbox = () => this.get('input[data-uie-name="toggle-receipt-mode-checkbox"]');
+  checkCheckbox = () => this.changeValue(this.getCheckbox(), {checked: true});
+  uncheckCheckbox = () => this.changeValue(this.getCheckbox(), {checked: false});
 }
 
 describe('ReceiptModeToggle', () => {
   it('checks the checkbox when receipts are turned on', () => {
-    const conversation: Partial<Conversation> = {receiptMode: ko.observable(Confirmation.Type.DELIVERED)};
     const receiptModeToggle = new ReceiptModeTogglePage({
-      conversation: conversation as Conversation,
       onReceiptModeChanged: () => {},
+      receiptMode: Confirmation.Type.DELIVERED,
     });
 
     const checkBox = receiptModeToggle.getCheckbox();
@@ -47,10 +46,9 @@ describe('ReceiptModeToggle', () => {
   });
 
   it('unchecks the checkbox when receipts are turned off', () => {
-    const conversation: Partial<Conversation> = {receiptMode: ko.observable(Confirmation.Type.READ)};
     const receiptModeToggle = new ReceiptModeTogglePage({
-      conversation: conversation as Conversation,
       onReceiptModeChanged: () => {},
+      receiptMode: Confirmation.Type.READ,
     });
 
     const checkBox = receiptModeToggle.getCheckbox();

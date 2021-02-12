@@ -23,41 +23,41 @@ import {Confirmation} from '@wireapp/protocol-messaging';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import type {Conversation} from '../entity/Conversation';
 import NamedIcon from './NamedIcon';
 
 export interface ReceiptModeToggleProps {
-  conversation: Conversation;
-  onReceiptModeChanged: (conversation: Conversation, receiptMode: Confirmation.Type) => void;
+  onReceiptModeChanged: (receiptMode: Confirmation.Type) => void;
+  receiptMode: Confirmation.Type;
 }
 
-const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({conversation, onReceiptModeChanged}) => {
+const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onReceiptModeChanged}) => {
   const updateValue = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const receiptMode = event.target.checked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
-    conversation.receiptMode(receiptMode);
-    onReceiptModeChanged(conversation, receiptMode);
+    const newReceiptMode = event.target.checked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
+    onReceiptModeChanged(newReceiptMode);
   };
 
   return (
     <Fragment>
       <div className="panel__action-item">
-        <NamedIcon name="read-icon" className="panel__action-item__icon" />
+        <div className="panel__action-item__icon">
+          <NamedIcon width={16} height={12} name="read-icon" />
+        </div>
         <div className="panel__action-item__summary">
           <div className="panel__action-item__text">{t('receiptToggleLabel')}</div>
         </div>
         <input
-          checked={conversation.receiptMode() !== Confirmation.Type.DELIVERED}
+          checked={receiptMode !== Confirmation.Type.DELIVERED}
           className="slider-input"
+          data-uie-name="toggle-receipt-mode-checkbox"
           id="receipt-toggle-input"
           name="preferences_device_verification_toggle"
           onChange={updateValue}
           type="checkbox"
-          data-uie-name="toggle-receipt-mode-checkbox"
         />
         <label
           htmlFor="receipt-toggle-input"
           data-uie-name="do-toggle-receipt-mode"
-          data-uie-receipt-status={conversation.receiptMode()}
+          data-uie-receipt-status={receiptMode}
         />
       </div>
       <div className="panel__info-text panel__info-text--margin" data-uie-name="status-info-toggle-receipt-mode">
@@ -71,5 +71,5 @@ export default ReceiptModeToggle;
 
 registerReactComponent('read-receipt-toggle', {
   component: ReceiptModeToggle,
-  template: '<span data-bind="react: {conversation: ko.unwrap(conversation), onReceiptModeChanged}"></span>',
+  template: '<div data-bind="react: {receiptMode: ko.unwrap(receiptMode), onReceiptModeChanged}"></span>',
 });

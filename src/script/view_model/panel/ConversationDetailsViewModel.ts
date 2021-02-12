@@ -465,8 +465,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  readonly updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: RECEIPT_MODE): void => {
-    this.conversationRepository.updateConversationReceiptMode(conversationEntity, {receipt_mode: receiptMode});
+  readonly updateConversationReceiptMode = (receiptMode: RECEIPT_MODE): void => {
+    this.conversationRepository.updateConversationReceiptMode(this.activeConversation(), {receipt_mode: receiptMode});
   };
 
   initView(): void {
