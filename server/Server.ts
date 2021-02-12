@@ -156,8 +156,8 @@ class Server {
 
   private initStaticRoutes() {
     const rateLimiter = rateLimit({
-      windowMs: 15 * 60 * 1000, // 15 minutes
       max: 100,
+      windowMs: 15 * 60 * 1000, // 15 minutes
     });
 
     this.app.use(RedirectRoutes(this.config));
