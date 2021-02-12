@@ -70,7 +70,7 @@ const GroupList: React.FC<GroupListProps> = ({click, groups}) => {
 
 export default GroupList;
 
-registerReactComponent<GroupListProps>('group-list', {
+registerReactComponent('group-list', {
   component: GroupList,
   template: '<div data-bind="react: {click, groups: ko.unwrap(groups)}"></div>',
 });
