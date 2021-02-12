@@ -46,24 +46,15 @@ const MediaButton: React.FC<MediaButtonProps> = ({
                                                  }) => {
   const element = useRef<HTMLElement>();
 
-  const mediaElement = src;
-
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-
-
   if (large) {
     element.current.classList.add('media-button-lg');
   }
 
-  const onPlay = () => {
-    setIsPlaying(true);
-  };
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const onPlay = () => (setIsPlaying(true));
+  const onPause = () => (setIsPlaying(false));
 
-  const onPause = () => {
-    setIsPlaying(false);
-  };
-
-
+  const mediaElement = src;
 
   useEffect(() => {
     mediaElement.addEventListener('playing', onPlay);
@@ -77,15 +68,14 @@ const MediaButton: React.FC<MediaButtonProps> = ({
 
   const isUploaded = transferState === AssetTransferState.UPLOADED
 
-  const mediaButtonPlay = (<div className='media-button media-button-play icon-play'
-                                onClick={() => {
-                                  play();
-                                }}
-                                data-uie-name="do-play-media"
-  ></div>)
+  const mediaButtonPlay = (
+    <div className="media-button media-button-play icon-play"
+         onClick={play}
+         data-uie-name="do-play-media"></div>
+  )
 
   const mediaButtonPause = (
-    <div className='media-button media-button-pause icon-pause'
+    <div className="media-button media-button-pause icon-pause"
          onClick={pause}
          data-uie-name="do-pause-media"></div>
   )
