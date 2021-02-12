@@ -22,13 +22,16 @@ import {AssetTransferState} from '../../../assets/AssetTransferState';
 import type {FileAsset} from '../../../entity/message/FileAsset';
 import '../AssetLoader';
 import React, {useEffect, useRef, useState} from 'react';
+import AssetLoader from "Components/asset/AssetLoader";
+import ko from 'knockout';
+import { registerReactComponent } from 'Util/ComponentUtil';
 
 interface MediaButtonProps {
   asset: FileAsset;
   cancel?: () => void;
   large: boolean;
   pause?: () => void;
-  play?: () => void;
+  play: () => void;
   src: HTMLMediaElement;
   transferState: AssetTransferState;
   uploadProgress: number;
@@ -40,7 +43,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
                                                    asset,
                                                    uploadProgress,
                                                    transferState,
-                                                   play = noop,
+                                                   play,
                                                    pause = noop,
                                                    cancel = noop
                                                  }) => {
@@ -66,7 +69,9 @@ const MediaButton: React.FC<MediaButtonProps> = ({
     };
   }, [mediaElement]);
 
-  const isUploaded = transferState === AssetTransferState.UPLOADED
+  const isUploaded = transferState === AssetTransferState.UPLOADED;
+  const isDownloading = transferState === AssetTransferState.DOWNLOADING;
+  const isUploading = transferState === AssetTransferState.UPLOADING;
 
   const mediaButtonPlay = (
     <div className="media-button media-button-play icon-play"
@@ -80,13 +85,28 @@ const MediaButton: React.FC<MediaButtonProps> = ({
          data-uie-name="do-pause-media"></div>
   )
 
+  const isDownloadingIndicator = (
+    <AssetLoader large={large} loadProgress={ko.unwrap(asset.downloadProgress)} onCancel={cancel}/>
+  )
+
+  const isUploadingIndicator = (
+    <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel}/>
+  )
+
   return (
     <>
       {isUploaded && !isPlaying && mediaButtonPlay}
       {isUploaded && isPlaying && mediaButtonPause}
+      {isDownloading && isDownloadingIndicator}
+      {isUploading && isUploadingIndicator}
     </>
   );
 }
 
 export default MediaButton;
 
+registerReactComponent<MediaButtonProps>('media-button', {
+  component: MediaButton,
+  optionalParams: ['cancel', 'pause', 'play'],
+  template: '<div data-bind="react: {asset, cancel, large, pause, play, src, transferState: ko.unwrap(transferState), uploadProgress: ko.unwrap(uploadProgress)}"></div>',
+});
