@@ -73,7 +73,7 @@ class Server {
     this.app.use(InternalErrorRoute());
   }
 
-  private async initWebpack() {
+  private initWebpack() {
     if (!this.config.SERVER.DEVELOPMENT) {
       return;
     }
