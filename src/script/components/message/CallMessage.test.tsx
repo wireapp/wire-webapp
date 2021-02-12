@@ -27,7 +27,7 @@ class CallMessagePage extends TestPage<CallMessageProps> {
     super(CallMessage, props);
   }
 
-  getCallMessage = (completed?: string) =>
+  getCallMessage = (completed: 'completed' | 'not_completed') =>
     this.get(`[data-uie-name="element-message-call"]${completed ? `[data-uie-value="${completed}"]` : ''}`);
   getCallIcon = (name: 'pickup-icon' | 'hangup-icon') => this.get(`NamedIcon[name="${name}"]`);
 }
