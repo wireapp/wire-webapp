@@ -204,7 +204,7 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
 
     logger.info(`Pushing "${tagName}" to "${origin}" ...`);
     if (!isDryRun) {
-      exec(`git push origin && git push ${origin} ${tagName}`);
+      exec(`git push origin && git push --no-verify ${origin} ${tagName}`);
     }
 
     try {
