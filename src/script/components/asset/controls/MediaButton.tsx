@@ -67,30 +67,26 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   const isDownloading = transferState === AssetTransferState.DOWNLOADING;
   const isUploading = transferState === AssetTransferState.UPLOADING;
 
-  const mediaButtonPlay = (
-    <div className="media-button media-button-play icon-play" onClick={play} data-uie-name="do-play-media"></div>
-  );
-
-  const mediaButtonPause = (
-    <div className="media-button media-button-pause icon-pause" onClick={pause} data-uie-name="do-pause-media"></div>
-  );
-
-  const isDownloadingIndicator = (
-    <AssetLoader large={large} loadProgress={ko.unwrap(asset.downloadProgress)} onCancel={cancel} />
-  );
-
-  const isUploadingIndicator = <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel} />;
-
   return (
     <div
       className={cx({
         'media-button-lg': large,
       })}
     >
-      {isUploaded && !isPlaying && mediaButtonPlay}
-      {isUploaded && isPlaying && mediaButtonPause}
-      {isDownloading && isDownloadingIndicator}
-      {isUploading && isUploadingIndicator}
+      {isUploaded && !isPlaying && (
+        <div className="media-button media-button-play icon-play" onClick={play} data-uie-name="do-play-media"></div>
+      )}
+      {isUploaded && isPlaying && (
+        <div
+          className="media-button media-button-pause icon-pause"
+          onClick={pause}
+          data-uie-name="do-pause-media"
+        ></div>
+      )}
+      {isDownloading && (
+        <AssetLoader large={large} loadProgress={ko.unwrap(asset.downloadProgress)} onCancel={cancel} />
+      )}
+      {isUploading && <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel} />}
     </div>
   );
 };
