@@ -24,9 +24,8 @@ import React, {useEffect, useState} from 'react';
 import {VerificationMessage as VerificationMessageEntity} from '../../entity/message/VerificationMessage';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
-import {User} from '../../entity/User';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 export interface VerificationMessageProps {
@@ -34,15 +33,8 @@ export interface VerificationMessageProps {
 }
 
 const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
-  const [userIds, setUserIds] = useState(message.userIds() || []);
-  message.userIds.subscribe((userIds: string[]) => {
-    setUserIds(userIds);
-  });
-
-  const [userEntities, setUserEntities] = useState(message.userEntities());
-  message.userEntities.subscribe((users: User[]) => {
-    setUserEntities(users);
-  });
+  const userIds = useKoSubscribable(message.userIds, []);
+  const userEntities = useKoSubscribable(message.userEntities);
 
   const [nameList, setNameList] = useState('');
   useEffect(() => {
