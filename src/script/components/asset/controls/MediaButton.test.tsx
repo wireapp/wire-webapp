@@ -18,8 +18,8 @@
  */
 
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import TestPage from "Util/test/TestPage";
-import MediaButton, {MediaButtonProps} from "Components/asset/controls/MediaButton";
+import TestPage from 'Util/test/TestPage';
+import MediaButton, {MediaButtonProps} from 'Components/asset/controls/MediaButton';
 import {FileAsset} from "src/script/entity/message/FileAsset";
 
 class MediaButtonTestPage extends TestPage<MediaButtonProps> {
