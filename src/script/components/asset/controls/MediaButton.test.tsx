@@ -17,85 +17,80 @@
  *
  */
 
-import {instantiateComponent} from '../../../../helper/knockoutHelpers';
-
-import ko from 'knockout';
-
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
-import 'src/script/components/asset/controls/mediaButton';
+import TestPage from "Util/test/TestPage";
+import MediaButton, {MediaButtonProps} from "Components/asset/controls/MediaButton";
+import {FileAsset} from "../../../entity/message/FileAsset";
 
-describe('media-button', () => {
+class MediaButtonTestPage extends TestPage<MediaButtonProps> {
+  constructor(props?: MediaButtonProps) {
+    super(MediaButton, props);
+  }
+
+  getPlayButton = () => this.get('[data-uie-name="do-play-media"]');
+
+  getPauseButton = () => this.get('[data-uie-name="do-pause-media"]');
+
+  getAssetLoader = () => this.get('[data-uie-name="status-loading-media"]');
+
+  clickOnPlayButton = () => this.click(this.getPlayButton());
+
+  clickOnPauseButton = () => this.click(this.getPauseButton());
+}
+
+describe('MediaButton', () => {
   const videoElement = document.createElement('video');
-  const defaultParams = {
-    asset: {downloadProgress: () => 0},
-    cancel: () => {},
-    pause: () => {},
-    play: () => {},
+
+  const defaultProps: MediaButtonProps = {
+    asset: {downloadProgress: () => 0} as FileAsset,
+    cancel: () => {
+    },
+    large: false,
+    pause: () => {
+      videoElement.dispatchEvent(new Event('pause'));
+    },
+    play: () => {
+      videoElement.dispatchEvent(new Event('playing'));
+    },
     src: videoElement,
-    transferState: ko.observable(),
-    uploadProgress: () => '',
+    transferState: AssetTransferState.UPLOAD_PENDING,
+    uploadProgress: 0,
   };
 
   it('displays the media buttons if the media is uploaded', () => {
-    const params = {...defaultParams, transferState: ko.observable(AssetTransferState.UPLOADED)};
-    jest.spyOn(params, 'play');
-    jest.spyOn(params, 'pause');
-    return instantiateComponent('media-button', params).then(domContainer => {
-      const playButton = domContainer.querySelector('[data-uie-name=do-play-media]');
-      const pauseButton = domContainer.querySelector('[data-uie-name=do-pause-media]');
+    const props: MediaButtonProps = {...defaultProps, transferState: AssetTransferState.UPLOADED};
 
-      expect(playButton.style.display).toBe('');
+    jest.spyOn(props, 'play');
+    jest.spyOn(props, 'pause');
 
-      expect(pauseButton.style.display).toBe('none');
+    const testPage = new MediaButtonTestPage(props);
 
-      playButton.click();
+    testPage.clickOnPlayButton();
 
-      expect(params.play).toHaveBeenCalledTimes(1);
+    expect(props.play).toHaveBeenCalledTimes(1);
 
-      pauseButton.click();
+    testPage.clickOnPauseButton();
 
-      expect(params.pause).toHaveBeenCalledTimes(1);
-
-      videoElement.dispatchEvent(new Event('playing'));
-
-      expect(playButton.style.display).toBe('none');
-      expect(pauseButton.style.display).toBe('');
-
-      videoElement.dispatchEvent(new Event('pause'));
-
-      expect(playButton.style.display).toBe('');
-      expect(pauseButton.style.display).toBe('none');
-    });
+    expect(props.pause).toHaveBeenCalledTimes(1);
   });
 
   it('displays a loader if the media is being downloaded', () => {
-    const params = {...defaultParams, transferState: ko.observable(AssetTransferState.DOWNLOADING)};
+    const props: MediaButtonProps = {...defaultProps, transferState: AssetTransferState.DOWNLOADING};
 
-    return instantiateComponent('media-button', params).then(domContainer => {
-      const playButton = domContainer.querySelector('[data-uie-name=do-play-media]');
-      const pauseButton = domContainer.querySelector('[data-uie-name=do-pause-media]');
+    const testPage = new MediaButtonTestPage(props);
 
-      expect(playButton).toBe(null);
+    const loader = testPage.getAssetLoader();
 
-      expect(pauseButton).toBe(null);
-
-      expect(domContainer.querySelector('asset-loader')).not.toBe(null);
-    });
+    expect(loader).not.toBe(null);
   });
 
   it('displays a loader if the media is being uploaded', () => {
-    const params = {...defaultParams, transferState: ko.observable(AssetTransferState.UPLOADING)};
+    const props: MediaButtonProps = {...defaultProps, transferState: AssetTransferState.UPLOADING};
 
-    spyOn(params, 'cancel');
+    const testPage = new MediaButtonTestPage(props);
 
-    return instantiateComponent('media-button', params).then(domContainer => {
-      const playButton = domContainer.querySelector('[data-uie-name=do-play-media]');
-      const pauseButton = domContainer.querySelector('[data-uie-name=do-pause-media]');
+    const loader = testPage.getAssetLoader();
 
-      expect(playButton).toBe(null);
-      expect(pauseButton).toBe(null);
-
-      expect(domContainer.querySelector('asset-loader')).not.toBe(null);
-    });
+    expect(loader).not.toBe(null);
   });
 });

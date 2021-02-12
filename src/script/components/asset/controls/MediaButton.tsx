@@ -27,7 +27,7 @@ import AssetLoader from "Components/asset/AssetLoader";
 import ko from 'knockout';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
-interface MediaButtonProps {
+export interface MediaButtonProps {
   asset: FileAsset;
   cancel?: () => void;
   large: boolean;
