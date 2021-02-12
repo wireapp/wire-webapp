@@ -87,7 +87,7 @@ export class PreferencesAccountViewModel {
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
-  hasAppLockPassphrase: boolean;
+  hasAppLockPassphrase: () => boolean;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   isMacOsWrapper: boolean;
   manageTeamUrl: string;
@@ -177,7 +177,7 @@ export class PreferencesAccountViewModel {
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
     this.optionResetAppLock = this.teamState.isAppLockEnabled();
-    this.hasAppLockPassphrase = hasPassphrase(this.selfUser().id);
+    this.hasAppLockPassphrase = () => hasPassphrase(this.selfUser().id);
     this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
