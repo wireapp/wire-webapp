@@ -807,6 +807,7 @@
   "preferencesAccountPrivacy": "Privacy",
   "preferencesAccountReadReceiptsCheckbox": "Read receipts",
   "preferencesAccountReadReceiptsDetail": "When this is off, you won’t be able to see read receipts from other people. This setting does not apply to group conversations.",
+  "preferencesAccountSetAppLockPassphrase": "Set app lock passphrase",
   "preferencesAccountResetAppLockPassphrase": "Reset app lock passphrase",
   "preferencesAccountResetPassword": "Reset password",
   "preferencesAccountTeam": "in {{name}}",

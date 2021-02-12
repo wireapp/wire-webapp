@@ -95,7 +95,7 @@ export class QuotedMessageMiddleware {
       return event;
     }
 
-    const encodedQuote = await base64ToArray(rawQuote);
+    const encodedQuote = base64ToArray(rawQuote);
     const quote = Quote.decode(encodedQuote);
     this.logger.info('Found quoted message', quote);
 

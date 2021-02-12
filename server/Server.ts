@@ -17,8 +17,9 @@
  *
  */
 
-const expressSitemapXml = require('express-sitemap-xml');
 import express from 'express';
+import expressSitemapXml from 'express-sitemap-xml';
+import rateLimit from 'express-rate-limit';
 import fs from 'fs';
 import hbs from 'hbs';
 import helmet from 'helmet';
@@ -154,6 +155,11 @@ class Server {
   }
 
   private initStaticRoutes() {
+    const rateLimiter = rateLimit({
+      max: 100,
+      windowMs: 15 * 60 * 1000, // 15 minutes
+    });
+
     this.app.use(RedirectRoutes(this.config));
 
     this.app.use('/audio', express.static(path.join(__dirname, 'static/audio')));
@@ -165,9 +171,11 @@ class Server {
     this.app.use('/style', express.static(path.join(__dirname, 'static/style')));
     this.app.use('/worker', express.static(path.join(__dirname, 'static/worker')));
 
-    this.app.get('/favicon.ico', (_req, res) => res.sendFile(path.join(__dirname, 'static/image/favicon.ico')));
+    this.app.get('/favicon.ico', rateLimiter, (_req, res) => {
+      return res.sendFile(path.join(__dirname, 'static/image/favicon.ico'));
+    });
     if (!this.config.SERVER.DEVELOPMENT) {
-      this.app.get('/sw.js', (_req, res) => res.sendFile(path.join(__dirname, 'static/sw.js')));
+      this.app.get('/sw.js', rateLimiter, (_req, res) => res.sendFile(path.join(__dirname, 'static/sw.js')));
     }
   }
 

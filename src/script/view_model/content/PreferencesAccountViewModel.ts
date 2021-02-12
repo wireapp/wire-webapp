@@ -24,6 +24,7 @@ import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
 import {Availability, Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {hasPassphrase} from 'Components/AppLock';
 import 'Components/AvailabilityState';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -86,6 +87,7 @@ export class PreferencesAccountViewModel {
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
+  hasAppLockPassphrase: () => boolean;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   isMacOsWrapper: boolean;
   manageTeamUrl: string;
@@ -175,6 +177,7 @@ export class PreferencesAccountViewModel {
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
     this.optionResetAppLock = this.teamState.isAppLockEnabled();
+    this.hasAppLockPassphrase = () => hasPassphrase(this.selfUser().id);
     this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
