@@ -17,14 +17,13 @@
  *
  */
 
-import {noop} from 'Util/util';
-import {AssetTransferState} from '../../../assets/AssetTransferState';
-import type {FileAsset} from '../../../entity/message/FileAsset';
-import '../AssetLoader';
 import cx from 'classnames';
-import React, {useEffect, useState} from 'react';
-import AssetLoader from "Components/asset/AssetLoader";
 import ko from 'knockout';
+import AssetLoader from 'Components/asset/AssetLoader';
+import React, {useEffect, useState} from 'react';
+import type {FileAsset} from '../../../entity/message/FileAsset';
+import {AssetTransferState} from '../../../assets/AssetTransferState';
+import {noop} from 'Util/util';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface MediaButtonProps {
@@ -39,18 +38,18 @@ export interface MediaButtonProps {
 }
 
 const MediaButton: React.FC<MediaButtonProps> = ({
-                                                   src,
-                                                   large,
-                                                   asset,
-                                                   uploadProgress,
-                                                   transferState,
-                                                   play,
-                                                   pause = noop,
-                                                   cancel = noop
-                                                 }) => {
+  src,
+  large,
+  asset,
+  uploadProgress,
+  transferState,
+  play,
+  pause = noop,
+  cancel = noop,
+}) => {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const onPlay = () => (setIsPlaying(true));
-  const onPause = () => (setIsPlaying(false));
+  const onPlay = () => setIsPlaying(true);
+  const onPause = () => setIsPlaying(false);
 
   const mediaElement = src;
 
@@ -69,24 +68,18 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   const isUploading = transferState === AssetTransferState.UPLOADING;
 
   const mediaButtonPlay = (
-    <div className="media-button media-button-play icon-play"
-         onClick={play}
-         data-uie-name="do-play-media"></div>
-  )
+    <div className="media-button media-button-play icon-play" onClick={play} data-uie-name="do-play-media"></div>
+  );
 
   const mediaButtonPause = (
-    <div className="media-button media-button-pause icon-pause"
-         onClick={pause}
-         data-uie-name="do-pause-media"></div>
-  )
+    <div className="media-button media-button-pause icon-pause" onClick={pause} data-uie-name="do-pause-media"></div>
+  );
 
   const isDownloadingIndicator = (
-    <AssetLoader large={large} loadProgress={ko.unwrap(asset.downloadProgress)} onCancel={cancel}/>
-  )
+    <AssetLoader large={large} loadProgress={ko.unwrap(asset.downloadProgress)} onCancel={cancel} />
+  );
 
-  const isUploadingIndicator = (
-    <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel}/>
-  )
+  const isUploadingIndicator = <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel} />;
 
   return (
     <div
@@ -100,12 +93,13 @@ const MediaButton: React.FC<MediaButtonProps> = ({
       {isUploading && isUploadingIndicator}
     </div>
   );
-}
+};
 
 export default MediaButton;
 
 registerReactComponent<MediaButtonProps>('media-button', {
   component: MediaButton,
   optionalParams: ['cancel', 'pause', 'play'],
-  template: '<div data-bind="react: {asset, cancel, large, pause, play, src, transferState: ko.unwrap(transferState), uploadProgress: ko.unwrap(uploadProgress)}"></div>',
+  template:
+    '<div data-bind="react: {asset, cancel, large, pause, play, src, transferState: ko.unwrap(transferState), uploadProgress: ko.unwrap(uploadProgress)}"></div>',
 });
