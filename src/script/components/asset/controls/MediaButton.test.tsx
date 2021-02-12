@@ -28,13 +28,9 @@ class MediaButtonTestPage extends TestPage<MediaButtonProps> {
   }
 
   getPlayButton = () => this.get('[data-uie-name="do-play-media"]');
-
   getPauseButton = () => this.get('[data-uie-name="do-pause-media"]');
-
   getAssetLoader = () => this.get('[data-uie-name="status-loading-media"]');
-
   clickOnPlayButton = () => this.click(this.getPlayButton());
-
   clickOnPauseButton = () => this.click(this.getPauseButton());
 }
 
