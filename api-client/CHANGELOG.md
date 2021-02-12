@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.3.1...@wireapp/api-client@12.3.2) (2021-02-12)
+
+
+### Bug Fixes
+
+* **api-client:** Add missing path for getHandle endpoint ([#3531](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3531)) ([4fa84f1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/4fa84f16a6426eafd3908617f09551b640fce8ff))
+
+
+
+
+
 ## [12.3.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.3.0...@wireapp/api-client@12.3.1) (2021-02-11)
 
 
