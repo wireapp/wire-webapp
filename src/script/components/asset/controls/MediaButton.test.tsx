@@ -39,8 +39,7 @@ describe('MediaButton', () => {
 
   const defaultProps: MediaButtonProps = {
     asset: {downloadProgress: () => 0} as FileAsset,
-    cancel: () => {
-    },
+    cancel: () => {},
     large: false,
     pause: () => {
       videoElement.dispatchEvent(new Event('pause'));
