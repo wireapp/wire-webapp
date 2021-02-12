@@ -185,8 +185,8 @@ export class UserAPI {
   public async getHandle(handle: string | QualifiedHandle): Promise<HandleInfo | QualifiedHandleInfo> {
     const url =
       typeof handle === 'string'
-        ? `${UserAPI.URL.HANDLES}/${handle}`
-        : `${UserAPI.URL.USERS}/${handle.domain}/${handle.handle}`;
+        ? `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`
+        : `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle.domain}/${handle.handle}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
