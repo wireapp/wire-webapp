@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 import cx from 'classnames';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import {UserlistMode} from 'Components/userList';
 import {t} from 'Util/LocalizerUtil';
@@ -67,7 +67,6 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   isSelfVerified = false,
 }) => {
   const {viewportElementRef, isInViewport} = useViewPortObserver<HTMLDivElement>();
-
   const assetRepository = container.resolve(AssetRepository);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
@@ -78,110 +77,138 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const hasUsernameInfo = isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  let contentInfo: string;
+  const isGuest = useKoSubscribable((participant as User).isGuest || ko.observable());
+  const isVerified = useKoSubscribable((participant as User).is_verified || ko.observable());
+  const availability = useKoSubscribable((participant as User).availability || ko.observable());
+
+  const participantName = useKoSubscribable(
+    isUser ? (participant as User).name : ko.observable((participant as ServiceEntity).name),
+  );
+  const callParticipantSharesCamera = useKoSubscribable(
+    callParticipant ? callParticipant.sharesCamera : ko.observable(),
+  );
+  const callParticipantSharesScreen = useKoSubscribable(
+    callParticipant ? callParticipant.sharesScreen : ko.observable(),
+  );
+  const callParticipantIsActivelySpeaking = useKoSubscribable(
+    callParticipant ? callParticipant.isActivelySpeaking : ko.observable(),
+  );
+
+  const callParticipantIsMuted = useKoSubscribable(callParticipant ? callParticipant.isMuted : ko.observable());
+
+  let contentInfo: ko.Observable;
   if (hasCustomInfo) {
-    contentInfo = customInfo;
+    contentInfo = ko.observable(customInfo);
   } else if (hideInfo) {
-    contentInfo = null;
+    contentInfo = ko.observable('');
   } else if (isService) {
-    contentInfo = (participant as ServiceEntity).summary;
+    contentInfo = ko.observable((participant as ServiceEntity).summary);
   } else if (isTemporaryGuest) {
-    contentInfo = (participant as User).expirationText();
+    contentInfo = (participant as User).expirationText;
   } else {
-    contentInfo = (participant as User).username();
+    contentInfo = (participant as User).username;
   }
 
+  const contentInfoText = useKoSubscribable(contentInfo);
+
   return (
-    <div
-      className="participant-item"
-      data-uie-name={isUser ? 'item-user' : 'item-service'}
-      data-uie-value={ko.unwrap(participant.name)}
-      ref={viewportElementRef}
-    >
-      {isInViewport && (
-        <>
-          <div className="participant-item__image">
-            <ParticipantAvatar
-              participant={participant as User}
-              size={AVATAR_SIZE.SMALL}
-              assetRepository={assetRepository}
-            />
-          </div>
-
-          <div className="participant-item__content">
-            <div className="participant-item__content__name-wrapper">
-              {isUser && selfInTeam && (
-                <AvailabilityState
-                  className="participant-item__content__availability participant-item__content__name"
-                  data-uie-name="status-name"
-                  availability={(participant as User).availability()}
-                  label={ko.unwrap(participant.name)}
-                />
-              )}
-
-              {(isService || !selfInTeam) && (
-                <div className="participant-item__content__name" data-uie-name="status-name">
-                  {ko.unwrap(participant.name)}
-                </div>
-              )}
-              {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
+    <div className="participant-item-wrapper">
+      <div
+        className="participant-item"
+        data-uie-name={isUser ? 'item-user' : 'item-service'}
+        data-uie-value={participantName}
+        ref={viewportElementRef}
+      >
+        {isInViewport && (
+          <>
+            <div className="participant-item__image">
+              <ParticipantAvatar
+                participant={participant as User}
+                size={AVATAR_SIZE.SMALL}
+                assetRepository={assetRepository}
+              />
             </div>
-            <div className="participant-item__content__info">
-              {contentInfo && (
-                <Fragment>
-                  <span
-                    className={cx('participant-item__content__username label-username-notext', {
-                      'label-username': hasUsernameInfo,
-                    })}
-                    data-uie-name="status-username"
-                  >
-                    {contentInfo}
-                  </span>
-                  {hasUsernameInfo && badge && (
-                    <span className="participant-item__content__badge" data-uie-name="status-partner">
-                      {badge}
+
+            <div className="participant-item__content">
+              <div className="participant-item__content__name-wrapper">
+                {isUser && selfInTeam && (
+                  <AvailabilityState
+                    className="participant-item__content__availability participant-item__content__name"
+                    data-uie-name="status-name"
+                    availability={availability}
+                    label={participantName}
+                  />
+                )}
+
+                {(isService || !selfInTeam) && (
+                  <div className="participant-item__content__name" data-uie-name="status-name">
+                    {participantName}
+                  </div>
+                )}
+                {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
+              </div>
+              <div className="participant-item__content__info">
+                {contentInfoText && (
+                  <Fragment>
+                    <span
+                      className={cx('participant-item__content__username label-username-notext', {
+                        'label-username': hasUsernameInfo,
+                      })}
+                      data-uie-name="status-username"
+                    >
+                      {contentInfoText}
                     </span>
-                  )}
-                </Fragment>
-              )}
+                    {hasUsernameInfo && badge && (
+                      <span className="participant-item__content__badge" data-uie-name="status-partner">
+                        {badge}
+                      </span>
+                    )}
+                  </Fragment>
+                )}
+              </div>
             </div>
-          </div>
-          {callParticipant && (
-            <Fragment>
-              {callParticipant.sharesCamera() && <NamedIcon name="camera-icon" data-uie-name="status-video" />}
-              {callParticipant.sharesScreen() && (
-                <NamedIcon name="screenshare-icon" data-uie-name="status-screenshare" />
-              )}
+            {callParticipant && (
+              <Fragment>
+                {callParticipantSharesCamera && (
+                  <NamedIcon name="camera-icon" className="camera-icon" data-uie-name="status-video" />
+                )}
+                {callParticipantSharesScreen && (
+                  <NamedIcon name="screenshare-icon" className="screenshare-icon" data-uie-name="status-screenshare" />
+                )}
 
-              {!callParticipant.isMuted() && (
-                <ParticipantMicOnIcon
-                  isActive={callParticipant.isActivelySpeaking()}
-                  data-uie-name={callParticipant.isActivelySpeaking() ? 'status-active-speaking' : 'status-audio-on'}
-                />
-              )}
-              {callParticipant.isMuted() && <NamedIcon name="mic-off-icon" data-uie-name="status-audio-off" />}
-            </Fragment>
-          )}
+                {!callParticipantIsMuted && (
+                  <ParticipantMicOnIcon
+                    className="participant-mic-on-icon"
+                    isActive={callParticipantIsActivelySpeaking}
+                    data-uie-name={callParticipantIsActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
+                  />
+                )}
+                {callParticipantIsMuted && (
+                  <NamedIcon name="mic-off-icon" className="mic-off-icon" data-uie-name="status-audio-off" />
+                )}
+              </Fragment>
+            )}
 
-          {isUser && !isOthersMode && (participant as User).isGuest() && (
-            <NamedIcon width={14} height={12} name="guest-icon" data-uie-name="status-guest" />
-          )}
+            {isUser && !isOthersMode && isGuest && (
+              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" />
+            )}
 
-          {external && <NamedIcon width={16} height={16} name="partner-icon" data-uie-name="status-external" />}
+            {external && <NamedIcon name="partner-icon" className="partner-icon" data-uie-name="status-external" />}
 
-          {isUser && isSelfVerified && (participant as User).is_verified() && (
-            <NamedIcon width={14} height={12} name="verified-icon" data-uie-name="status-verified" />
-          )}
+            {isUser && isSelfVerified && isVerified && (
+              <NamedIcon name="verified-icon" className="verified-icon" data-uie-name="status-verified" />
+            )}
 
-          {canSelect && (
-            <div
-              className={cx('search-list-item-select icon-check', {selected: isSelected})}
-              data-uie-name="status-selected"
-            ></div>
-          )}
-          <NamedIcon name="disclose-icon" className="disclose-icon" />
-        </>
-      )}
+            {canSelect && (
+              <div
+                className={cx('search-list-item-select icon-check', {selected: isSelected})}
+                data-uie-name="status-selected"
+              />
+            )}
+            <NamedIcon name="disclose-icon" className="disclose-icon" />
+          </>
+        )}
+      </div>
     </div>
   );
 };
