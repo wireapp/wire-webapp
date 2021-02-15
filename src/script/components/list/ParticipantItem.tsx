@@ -114,7 +114,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   } else if (isTemporaryGuest) {
     contentInfo = (participant as User).expirationText;
   } else {
-    contentInfo = (participant as User).username;
+    contentInfo = ko.observable((participant as User).handle);
   }
 
   const contentInfoText = useKoSubscribable(contentInfo);
