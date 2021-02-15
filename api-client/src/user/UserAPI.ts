@@ -29,9 +29,7 @@ import type {
   HandleInfo,
   NewPasswordReset,
   QualifiedHandle,
-  QualifiedHandleInfo,
   QualifiedId,
-  QualifiedUser,
   SearchResult,
   SendActivationCode,
   User,
@@ -180,9 +178,7 @@ export class UserAPI {
    * @param handle The user's handle
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserHandleInfo
    */
-  public async getHandle(handle: string): Promise<HandleInfo | QualifiedHandleInfo>;
-  public async getHandle(handle: QualifiedHandle): Promise<QualifiedHandleInfo>;
-  public async getHandle(handle: string | QualifiedHandle): Promise<HandleInfo | QualifiedHandleInfo> {
+  public async getHandle(handle: string | QualifiedHandle): Promise<HandleInfo> {
     const url =
       typeof handle === 'string'
         ? `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`
@@ -193,7 +189,7 @@ export class UserAPI {
       url,
     };
 
-    const response = await this.client.sendJSON<HandleInfo | QualifiedHandleInfo>(config);
+    const response = await this.client.sendJSON<HandleInfo>(config);
     return response.data;
   }
 
@@ -271,9 +267,7 @@ export class UserAPI {
    *       Otherwise you will get a user payload with a limited set of properties (what's publicly available).
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
-  public async getUser(userId: string): Promise<User | QualifiedUser>;
-  public async getUser(userId: QualifiedId): Promise<QualifiedUser>;
-  public async getUser(userId: string | QualifiedId): Promise<User | QualifiedUser> {
+  public async getUser(userId: string | QualifiedId): Promise<User> {
     const url =
       typeof userId === 'string'
         ? `${UserAPI.URL.USERS}/${userId}`
@@ -284,13 +278,13 @@ export class UserAPI {
       url,
     };
 
-    const response = await this.client.sendJSON<User | QualifiedUser>(config);
+    const response = await this.client.sendJSON<User>(config);
     return response.data;
   }
 
   public async getUserPreKeys(userId: string): Promise<PreKeyBundle | QualifiedPreKeyBundle>;
   public async getUserPreKeys(userId: QualifiedId): Promise<QualifiedPreKeyBundle>;
-  public async getUserPreKeys(userId: QualifiedId | string): Promise<PreKeyBundle | QualifiedPreKeyBundle> {
+  public async getUserPreKeys(userId: string | QualifiedId): Promise<PreKeyBundle | QualifiedPreKeyBundle> {
     const url =
       typeof userId === 'string'
         ? `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}`
@@ -314,8 +308,8 @@ export class UserAPI {
   public async getUsers(
     parameters: {ids: string[]} | {handles: string[]},
     limit: number = UserAPI.DEFAULT_USERS_CHUNK_SIZE,
-  ): Promise<User[] | QualifiedUser[]> {
-    const fetchUsers = async (params: {ids: string[]} | {handles: string[]}): Promise<User[] | QualifiedUser[]> => {
+  ): Promise<User[]> {
+    const fetchUsers = async (params: {ids: string[]} | {handles: string[]}): Promise<User[]> => {
       const config: AxiosRequestConfig = {
         method: 'get',
         params: {},
@@ -328,7 +322,7 @@ export class UserAPI {
         config.params.ids = params.ids.join(',');
       }
 
-      const response = await this.client.sendJSON<User[] | QualifiedUser[]>(config);
+      const response = await this.client.sendJSON<User[]>(config);
       return response.data;
     };
 
@@ -354,7 +348,7 @@ export class UserAPI {
    * @param userIds Multiple user's IDs
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    */
-  public async getUsersByIds(userIds: string[]): Promise<User[] | QualifiedUser[]> {
+  public async getUsersByIds(userIds: string[]): Promise<User[]> {
     const maxChunkSize = 100;
     return this.getUsers({ids: userIds}, maxChunkSize);
   }
@@ -458,13 +452,13 @@ export class UserAPI {
    * @param handle The handle of a user to search for
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserByHandle
    */
-  public async getUserByHandle(handle: string): Promise<HandleInfo | QualifiedHandleInfo> {
+  public async getUserByHandle(handle: string): Promise<HandleInfo> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
     };
 
-    const response = await this.client.sendJSON<HandleInfo | QualifiedHandleInfo>(config);
+    const response = await this.client.sendJSON<HandleInfo>(config);
     return response.data;
   }
 
@@ -486,14 +480,14 @@ export class UserAPI {
    */
   public async postListUsers(
     users: {qualified_ids: QualifiedId[]} | {qualified_handles: QualifiedHandle[]},
-  ): Promise<QualifiedUser[]> {
+  ): Promise<User[]> {
     const config: AxiosRequestConfig = {
       data: users,
       method: 'post',
       url: UserAPI.URL.LIST_USERS,
     };
 
-    const response = await this.client.sendJSON<QualifiedUser[]>(config);
+    const response = await this.client.sendJSON<User[]>(config);
     return response.data;
   }
 
@@ -501,14 +495,14 @@ export class UserAPI {
    * List users.
    * @param handles The user ids to check.
    */
-  public async postListClients(userIds: QualifiedId[]): Promise<QualifiedUser[]> {
+  public async postListClients(userIds: QualifiedId[]): Promise<User[]> {
     const config: AxiosRequestConfig = {
       data: userIds,
       method: 'post',
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}`,
     };
 
-    const response = await this.client.sendJSON<QualifiedUser[]>(config);
+    const response = await this.client.sendJSON<User[]>(config);
     return response.data;
   }
 

@@ -36,10 +36,7 @@ export interface User {
   handle?: string;
   id: string;
   name: string;
+  qualified_id?: QualifiedId;
   service?: ServiceRef;
   team?: string;
-}
-
-export interface QualifiedUser extends User {
-  qualified_id: QualifiedId;
 }

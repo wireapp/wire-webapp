@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,8 @@
  *
  */
 
-import type {Picture, SSOSignature} from '../self/';
-import type {QualifiedId, User} from '../user/';
-import type {ManagedSource} from '../user/ManagedSource';
+import type {Consent} from './Consent';
 
-export interface Self extends User {
-  locale: string;
-  /**
-   * What is the source of truth for this user; if it's SCIM
-   * then the profile can't be edited via normal means.
-   */
-  managed_by?: ManagedSource;
-  phone?: string;
-  picture?: Picture[];
-  qualified_id?: QualifiedId;
-  sso_id?: SSOSignature;
+export interface ConsentResults {
+  results: Consent[];
 }
