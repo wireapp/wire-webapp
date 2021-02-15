@@ -53,8 +53,8 @@ ko.components.register('panel-user-details', {
         <!-- /ko -->
       </div>
 
-      <!-- ko if: participant().username() -->
-        <div class="panel-participant__user-name" data-bind="text: participant().username()" data-uie-name="status-username"></div>
+      <!-- ko if: participant().handle -->
+        <div class="panel-participant__user-name" data-bind="text: participant().handle" data-uie-name="status-username"></div>
       <!-- /ko -->
 
       <participant-avatar params="participant: participant, size: '${AVATAR_SIZE.X_LARGE}'" data-uie-name="status-profile-picture"></participant-avatar>
