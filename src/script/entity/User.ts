@@ -82,6 +82,7 @@ export class User {
   public readonly username: ko.Observable<string>;
   public serviceId?: string;
   public teamId?: string;
+  public domain?: string;
 
   static get ACCENT_COLOR() {
     return {
@@ -193,6 +194,10 @@ export class User {
     this.expirationIntervalId = undefined;
     this.expirationTimeoutId = undefined;
     this.isExpired = ko.observable(false);
+  }
+
+  get isFederatedUser(): boolean {
+    return !!this.domain;
   }
 
   subscribeToChanges(): void {
