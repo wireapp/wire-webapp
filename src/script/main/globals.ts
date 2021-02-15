@@ -33,7 +33,7 @@ import 'Components/asset/controls/AudioSeekBar';
 import 'Components/asset/controls/MediaButton';
 import 'Components/asset/controls/SeekBar';
 import 'Components/copyToClipboard';
-import 'Components/ephemeralTimer';
+import 'Components/EphemeralTimer';
 import 'Components/fullSearch';
 import 'Components/groupList';
 import 'Components/GuestModeToggle';
