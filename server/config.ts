@@ -146,6 +146,7 @@ const config: ServerConfig = {
       ENABLE_DOMAIN_DISCOVERY: process.env.FEATURE_ENABLE_DOMAIN_DISCOVERY != 'false',
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN != 'false',
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true',
+      FEDERATION_DOMAIN: process.env.FEATURE_FEDERATION_DOMAIN,
       PERSIST_TEMPORARY_CLIENTS: process.env.FEATURE_PERSIST_TEMPORARY_CLIENTS != 'false',
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true',
     },
