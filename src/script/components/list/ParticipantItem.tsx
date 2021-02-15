@@ -219,7 +219,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
             )}
 
             {isUser && !isOthersMode && isGuest && (
-              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={12} />
+              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" />
             )}
 
             {external && (
