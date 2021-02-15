@@ -113,7 +113,7 @@ class ParticipantItem {
     } else if (isTemporaryGuest) {
       this.contentInfo = (this.participant as User).expirationText;
     } else {
-      this.contentInfo = (this.participant as User).username();
+      this.contentInfo = (this.participant as User).handle;
     }
     this.isInViewport = ko.observable(false);
 

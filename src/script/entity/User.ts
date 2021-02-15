@@ -200,6 +200,18 @@ export class User {
     return !!this.domain;
   }
 
+  /**
+   * Returns the fully qualified user ID.
+   * @example "@handle@wire.com"
+   */
+  get handle(): string {
+    if (!this.username()) {
+      /** Very old user accounts don't have a handle on Wire. */
+      return '';
+    }
+    return this.domain ? `@${this.username()}@${this.domain}` : `@${this.username}`;
+  }
+
   subscribeToChanges(): void {
     this.availability.subscribe(() => amplify.publish(WebAppEvents.USER.PERSIST, this));
   }
