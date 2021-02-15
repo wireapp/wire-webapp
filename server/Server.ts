@@ -156,7 +156,7 @@ class Server {
 
   private initStaticRoutes() {
     const rateLimiter = rateLimit({
-      max: 100,
+      max: 1000,
       windowMs: 15 * 60 * 1000, // 15 minutes
     });
 
