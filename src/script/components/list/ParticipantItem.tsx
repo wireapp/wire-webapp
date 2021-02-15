@@ -46,25 +46,33 @@ export interface ParticipantItemProps {
   customInfo?: string;
   external?: boolean;
   hideInfo?: boolean;
+  highlighted: boolean;
   isSelected?: boolean;
   isSelfVerified?: boolean;
   mode?: UserlistMode;
+  noInteraction: boolean;
+  noUnderline?: boolean;
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
+  showArrow?: boolean;
 }
 
 const ParticipantItem: React.FC<ParticipantItemProps> = ({
-  participant,
   badge,
-  mode = UserlistMode.DEFAULT,
-  canSelect,
-  isSelected,
   callParticipant,
+  canSelect,
   customInfo,
-  hideInfo,
-  selfInTeam,
   external,
+  hideInfo,
+  highlighted = false,
+  isSelected,
   isSelfVerified = false,
+  mode = UserlistMode.DEFAULT,
+  noInteraction = false,
+  noUnderline = false,
+  participant,
+  selfInTeam,
+  showArrow = false,
 }) => {
   const {viewportElementRef, isInViewport} = useViewPortObserver<HTMLDivElement>();
   const assetRepository = container.resolve(AssetRepository);
@@ -112,7 +120,14 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const contentInfoText = useKoSubscribable(contentInfo);
 
   return (
-    <div className="participant-item-wrapper">
+    <div
+      className={cx('participant-item-wrapper', {
+        highlighted,
+        'no-interaction': noInteraction,
+        'no-underline': noUnderline,
+        'show-arrow': showArrow,
+      })}
+    >
       <div
         className="participant-item"
         data-uie-name={isUser ? 'item-user' : 'item-service'}
@@ -170,7 +185,13 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
             {callParticipant && (
               <Fragment>
                 {callParticipantSharesCamera && (
-                  <NamedIcon name="camera-icon" className="camera-icon" data-uie-name="status-video" />
+                  <NamedIcon
+                    name="camera-icon"
+                    className="camera-icon"
+                    data-uie-name="status-video"
+                    width={16}
+                    height={12}
+                  />
                 )}
                 {callParticipantSharesScreen && (
                   <NamedIcon name="screenshare-icon" className="screenshare-icon" data-uie-name="status-screenshare" />
@@ -183,20 +204,42 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                     data-uie-name={callParticipantIsActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
                   />
                 )}
+
                 {callParticipantIsMuted && (
-                  <NamedIcon name="mic-off-icon" className="mic-off-icon" data-uie-name="status-audio-off" />
+                  <NamedIcon
+                    name="mic-off-icon"
+                    className="mic-off-icon"
+                    data-uie-name="status-audio-off"
+                    width={16}
+                    height={16}
+                    style={{height: 12}}
+                  />
                 )}
               </Fragment>
             )}
 
             {isUser && !isOthersMode && isGuest && (
-              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" />
+              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={12} />
             )}
 
-            {external && <NamedIcon name="partner-icon" className="partner-icon" data-uie-name="status-external" />}
+            {external && (
+              <NamedIcon
+                name="partner-icon"
+                className="partner-icon"
+                data-uie-name="status-external"
+                width={16}
+                height={16}
+              />
+            )}
 
             {isUser && isSelfVerified && isVerified && (
-              <NamedIcon name="verified-icon" className="verified-icon" data-uie-name="status-verified" />
+              <NamedIcon
+                name="verified-icon"
+                className="verified-icon"
+                data-uie-name="status-verified"
+                width={14}
+                height={16}
+              />
             )}
 
             {canSelect && (
@@ -205,7 +248,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 data-uie-name="status-selected"
               />
             )}
-            <NamedIcon name="disclose-icon" className="disclose-icon" />
+
+            <NamedIcon name="disclose-icon" className="disclose-icon" width={5} height={8} />
           </>
         )}
       </div>
@@ -224,11 +268,15 @@ registerReactComponent<ParticipantItemProps>('participant-item', {
     'customInfo',
     'external',
     'hideInfo',
+    'highlighted',
     'isSelected',
     'isSelfVerified',
     'mode',
+    'noInteraction',
+    'noUnderline',
     'selfInTeam',
+    'showArrow',
   ],
   template:
-    '<div data-bind="react: {badge, callParticipant, canSelect, customInfo, external, hideInfo, isSelected, isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
+    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external, hideInfo, isSelected, isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
 });
