@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.3.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.3.2...@wireapp/api-client@12.3.3) (2021-02-15)
+
+
+### Bug Fixes
+
+* **api-client:** QualifiedId is in nested key ([48ea06d](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/48ea06d50e950e8583db0418ceb8615c5d324e5c))
+
+
+
+
+
 ## [12.3.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.3.1...@wireapp/api-client@12.3.2) (2021-02-12)
 
 
