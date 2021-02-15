@@ -52,7 +52,7 @@ export class UserMapper {
     const dataFromBackend = userData as APIClientSelf;
 
     if (dataFromBackend.locale) {
-      userEntity.locale = (userData as APIClientSelf).locale;
+      userEntity.locale = dataFromBackend.locale;
     }
 
     return userEntity;
