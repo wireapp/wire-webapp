@@ -1164,7 +1164,11 @@ export class MessageRepository {
    * @param user_ids Optionally the intended recipient users
    * @returns Resolves with a user client map
    */
-  async create_recipients(conversation_id: string, skip_own_clients = false, user_ids: string[] = null) {
+  async create_recipients(
+    conversation_id: string,
+    skip_own_clients = false,
+    user_ids: string[] = null,
+  ): Promise<Recipients> {
     const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id);
     const recipients: Recipients = {};
     for (const userEntity of userEntities) {
@@ -1622,7 +1626,7 @@ export class MessageRepository {
         options.recipients,
         genericMessageExternal,
       );
-      payload.data = new Uint8Array(encryptedAsset.cipherText);
+      payload.data = arrayToBase64(encryptedAsset.cipherText);
       payload.native_push = options.nativePush;
       return this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
@@ -1645,7 +1649,7 @@ export class MessageRepository {
    */
   private async sendEncryptedMessage(
     eventInfoEntity: EventInfoEntity,
-    payload: NewOTRMessage<Uint8Array>,
+    payload: NewOTRMessage<string>,
   ): Promise<ClientMismatch> {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;
@@ -1669,27 +1673,10 @@ export class MessageRepository {
       );
     }
 
-    // This can be removed as soon as `postOTRProtobufMessage` is used
-    const stringPayload: NewOTRMessage<string> = {
-      ...payload,
-      data: payload.data ? arrayToBase64(payload.data) : undefined,
-      recipients: Object.fromEntries(
-        Object.entries(payload.recipients).map(([userId, otrClientMap]) => {
-          const stringClientMap = Object.fromEntries(
-            Object.entries(otrClientMap).map(([clientId, clientPayload]) => {
-              return [clientId, arrayToBase64(clientPayload)];
-            }),
-          );
-
-          return [userId, stringClientMap];
-        }),
-      ),
-    };
-
     try {
       const response = await this.conversation_service.post_encrypted_message(
         conversationId,
-        stringPayload,
+        payload,
         options.precondition,
       );
       await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
@@ -1719,9 +1706,9 @@ export class MessageRepository {
         payloadWithMissingClients,
       );
       if (payloadWithMissingClients) {
-        return this.conversation_service.post_encrypted_message(conversationId, stringPayload, true);
+        return this.conversation_service.post_encrypted_message(conversationId, payloadWithMissingClients, true);
       }
-      return this.conversation_service.post_encrypted_message(conversationId, stringPayload, true);
+      return this.conversation_service.post_encrypted_message(conversationId, payload, true);
     }
   }
 
