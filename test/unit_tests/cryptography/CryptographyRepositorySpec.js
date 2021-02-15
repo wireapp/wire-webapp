@@ -96,7 +96,7 @@ describe('CryptographyRepository', () => {
         expect(Object.keys(payload.recipients).length).toBe(2);
         expect(Object.keys(payload.recipients[john_doe.id]).length).toBe(2);
         expect(Object.keys(payload.recipients[jane_roe.id]).length).toBe(1);
-        expect(payload.recipients[jane_roe.id][jane_roe.clients.phone_id]).toEqual(jasmine.any(Uint8Array));
+        expect(payload.recipients[jane_roe.id][jane_roe.clients.phone_id]).toEqual(jasmine.any(String));
       });
     });
   });
