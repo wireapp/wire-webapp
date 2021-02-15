@@ -33,4 +33,6 @@ export interface Self extends User {
   sso_id?: SSOSignature;
 }
 
-export type QualifiedSelf = Self & QualifiedId;
+export interface QualifiedSelf extends Self {
+  qualified_id: QualifiedId;
+}
