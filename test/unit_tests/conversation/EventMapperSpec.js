@@ -82,7 +82,7 @@ describe('Event Mapper', () => {
         urlOffset: 0,
       });
 
-      const base64LinkPreview = await arrayToBase64(LinkPreview.encode(link_preview).finish());
+      const base64LinkPreview = arrayToBase64(LinkPreview.encode(link_preview).finish());
 
       const event = {
         conversation: conversation_et.id,
@@ -117,7 +117,7 @@ describe('Event Mapper', () => {
         urlOffset: 0,
       });
 
-      const base64Preview = await arrayToBase64(LinkPreview.encode(link_preview).finish());
+      const base64Preview = arrayToBase64(LinkPreview.encode(link_preview).finish());
 
       const event = {
         conversation: conversation_et.id,
@@ -181,10 +181,10 @@ describe('Event Mapper', () => {
 
       const conversationEntity = new Conversation(createRandomUuid());
 
-      const mentionArrays = await Promise.all([
+      const mentionArrays = [
         arrayToBase64(Mention.encode(validMention.toProto()).finish()),
         arrayToBase64(Mention.encode(outOfRangeMention.toProto()).finish()),
-      ]);
+      ];
 
       const event = {
         category: 16,
@@ -223,11 +223,11 @@ describe('Event Mapper', () => {
 
       const conversationEntity = new Conversation(createRandomUuid());
 
-      const mentionArrays = await Promise.all([
+      const mentionArrays = [
         arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
         arrayToBase64(Mention.encode(overlappingMention.toProto()).finish()),
         arrayToBase64(Mention.encode(validMention2.toProto()).finish()),
-      ]);
+      ];
 
       const event = {
         category: 16,

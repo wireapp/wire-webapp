@@ -17,8 +17,8 @@
  *
  */
 
-const expressSitemapXml = require('express-sitemap-xml');
 import express from 'express';
+import expressSitemapXml from 'express-sitemap-xml';
 import fs from 'fs';
 import hbs from 'hbs';
 import helmet from 'helmet';

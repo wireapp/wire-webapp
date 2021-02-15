@@ -737,10 +737,10 @@ export class ConversationRepository {
     this.conversation_service.delete_conversation_from_db(conversationId);
   };
 
-  public getAllUsersInConversation(conversation_id: string) {
-    return this.get_conversation_by_id(conversation_id).then(conversationEntity =>
-      [this.userState.self()].concat(conversationEntity.participating_user_ets()),
-    );
+  public async getAllUsersInConversation(conversation_id: string): Promise<User[]> {
+    const conversationEntity = await this.get_conversation_by_id(conversation_id);
+    const users = [this.userState.self()].concat(conversationEntity.participating_user_ets());
+    return users;
   }
 
   /**
