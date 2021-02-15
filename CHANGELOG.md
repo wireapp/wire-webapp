@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.1.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.1.2...@wireapp/core@17.1.3) (2021-02-15)
+
+
+### Bug Fixes
+
+* **core:** Return self user with qualified ID ([6888317](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/688831719e463016a7ff975aeebfc98e9f27fb44))
+
+
+
+
+
 ## [17.1.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.1.1...@wireapp/core@17.1.2) (2021-02-12)
 
 **Note:** Version bump only for package @wireapp/core
