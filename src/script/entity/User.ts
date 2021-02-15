@@ -82,6 +82,7 @@ export class User {
   public readonly username: ko.Observable<string>;
   public serviceId?: string;
   public teamId?: string;
+  public domain?: string;
 
   static get ACCENT_COLOR() {
     return {
@@ -193,6 +194,22 @@ export class User {
     this.expirationIntervalId = undefined;
     this.expirationTimeoutId = undefined;
     this.isExpired = ko.observable(false);
+  }
+
+  get isFederatedUser(): boolean {
+    return !!this.domain;
+  }
+
+  /**
+   * Returns the fully qualified user ID.
+   * @example "@handle@wire.com"
+   */
+  get handle(): string {
+    if (!this.username()) {
+      /** Very old user accounts don't have a handle on Wire. */
+      return '';
+    }
+    return this.domain ? `@${this.username()}@${this.domain}` : `@${this.username}`;
   }
 
   subscribeToChanges(): void {

@@ -23,7 +23,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {arrayToBase64} from 'Util/util';
 
 import {BackendClientError} from '../error/BackendClientError';
 import {EventInfoEntity} from '../conversation/EventInfoEntity';
@@ -124,31 +123,14 @@ export class BroadcastRepository {
    */
   private sendEncryptedMessage(
     eventInfoEntity: EventInfoEntity,
-    payload: NewOTRMessage<Uint8Array>,
+    payload: NewOTRMessage<string>,
   ): Promise<ClientMismatch> {
     const messageType = eventInfoEntity.getType();
     const receivingUsers = Object.keys(payload.recipients);
     this.logger.info(`Sending '${messageType}' broadcast message to '${receivingUsers.length}' users`, payload);
 
-    // This can be removed as soon as `postBroadcastProtobufMessage` is used
-    const stringPayload: NewOTRMessage<string> = {
-      ...payload,
-      data: payload.data ? arrayToBase64(payload.data) : undefined,
-      recipients: Object.fromEntries(
-        Object.entries(payload.recipients).map(([userId, otrClientMap]) => {
-          const stringClientMap = Object.fromEntries(
-            Object.entries(otrClientMap).map(([clientId, clientPayload]) => {
-              return [clientId, arrayToBase64(clientPayload)];
-            }),
-          );
-
-          return [userId, stringClientMap];
-        }),
-      ),
-    };
-
     return this.broadcastService
-      .postBroadcastMessage(stringPayload, eventInfoEntity.options.precondition)
+      .postBroadcastMessage(payload, eventInfoEntity.options.precondition)
       .then(async response => {
         await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
         return response;
