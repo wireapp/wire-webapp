@@ -18,7 +18,7 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
-import type {Self} from '@wireapp/api-client/src/self/';
+import type {QualifiedSelf, Self} from '@wireapp/api-client/src/self/';
 
 export class SelfService {
   constructor(private readonly apiClient: APIClient) {}
@@ -39,7 +39,7 @@ export class SelfService {
     return name;
   }
 
-  public getSelf(): Promise<Self> {
+  public getSelf(): Promise<Self | QualifiedSelf> {
     return this.apiClient.self.api.getSelf();
   }
 
