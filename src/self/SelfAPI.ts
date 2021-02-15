@@ -20,9 +20,8 @@
 import type {AxiosRequestConfig, AxiosResponse} from 'axios';
 
 import type {HttpClient, TraceState} from '../http/';
-import type {ChangePassword, Delete, QualifiedSelf, Self} from '../self/';
+import type {ChangePassword, Consent, ConsentResults, Delete, Name, Self} from './';
 import type {UserUpdate} from '../user/';
-import type {Consent} from './Consent';
 
 export class SelfAPI {
   constructor(private readonly client: HttpClient) {}
@@ -82,13 +81,13 @@ export class SelfAPI {
    * Get your profile name.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/selfName
    */
-  public async getName(): Promise<{name: string}> {
+  public async getName(): Promise<Name> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.NAME}`,
     };
 
-    const response = await this.client.sendJSON<{name: string}>(config);
+    const response = await this.client.sendJSON<Name>(config);
     return response.data;
   }
 
@@ -96,7 +95,7 @@ export class SelfAPI {
    * Get your consents.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/consent
    */
-  public async getConsents(): Promise<{results: Consent[]}> {
+  public async getConsents(): Promise<ConsentResults> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.CONSENT}`,
@@ -124,7 +123,7 @@ export class SelfAPI {
    * Get your profile
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/self
    */
-  public async getSelf(traceStates: TraceState[] = []): Promise<Self | QualifiedSelf> {
+  public async getSelf(traceStates: TraceState[] = []): Promise<Self> {
     traceStates.push({position: 'SelfAPI.getSelf', vendor: 'api-client'});
     const config: AxiosRequestConfig = {
       headers: {
@@ -133,7 +132,7 @@ export class SelfAPI {
       method: 'get',
       url: SelfAPI.URL.SELF,
     };
-    const response = await this.client.sendJSON<Self | QualifiedSelf>(config);
+    const response = await this.client.sendJSON<Self>(config);
     return response.data;
   }
 
