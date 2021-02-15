@@ -28,4 +28,6 @@ export interface QualifiedHandle {
   handle: string;
 }
 
-export type QualifiedHandleInfo = HandleInfo & QualifiedId;
+export interface QualifiedHandleInfo extends HandleInfo {
+  qualified_id: QualifiedId;
+}
