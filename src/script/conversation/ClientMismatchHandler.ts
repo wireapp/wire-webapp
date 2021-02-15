@@ -55,8 +55,8 @@ export class ClientMismatchHandler {
   async onClientMismatch(
     eventInfoEntity: EventInfoEntity,
     clientMismatch: ClientMismatch,
-    payload?: NewOTRMessage,
-  ): Promise<NewOTRMessage | void> {
+    payload?: NewOTRMessage<Uint8Array>,
+  ): Promise<NewOTRMessage<Uint8Array> | void> {
     const {deleted, missing, redundant} = clientMismatch;
     // Note: Broadcast messages have an empty conversation ID
     const conversationEntity: Conversation | undefined =
@@ -75,8 +75,8 @@ export class ClientMismatchHandler {
     recipients: UserClients,
     eventInfoEntity: EventInfoEntity,
     conversationEntity?: Conversation,
-    payload?: NewOTRMessage,
-  ): Promise<NewOTRMessage | void> {
+    payload?: NewOTRMessage<Uint8Array>,
+  ): Promise<NewOTRMessage<Uint8Array> | void> {
     const missingUserIds = Object.keys(recipients);
 
     if (missingUserIds.length === 0) {
@@ -118,7 +118,7 @@ export class ClientMismatchHandler {
     recipients: UserClients,
     removeLocallyStoredClient: boolean,
     conversationEntity?: Conversation,
-    payload?: NewOTRMessage,
+    payload?: NewOTRMessage<Uint8Array>,
   ): Promise<void> {
     const removeDeletedUser = async (userId: string): Promise<void> => {
       const clientIdsOfUser = Object.keys(payload.recipients[userId]);

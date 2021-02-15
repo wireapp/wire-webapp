@@ -46,6 +46,9 @@ export interface AppLockProps {
 }
 
 const APP_LOCK_STORAGE = 'app_lock';
+const getStorageKey = (userId: string) => `${APP_LOCK_STORAGE}_${userId}`;
+const getStored = (userId: string) => window.localStorage.getItem(getStorageKey(userId));
+export const hasPassphrase = (userId: string) => !!getStored(userId);
 
 const AppLock: React.FC<AppLockProps> = ({
   clientRepository,
@@ -122,7 +125,7 @@ const AppLock: React.FC<AppLockProps> = ({
 
   useEffect(() => {
     if (teamState.isAppLockEnabled()) {
-      if (teamState.isAppLockEnforced() || hasPassphrase()) {
+      if (teamState.isAppLockEnforced() || hasPassphrase(selfUser.id)) {
         showAppLock();
       }
       startPassphraseObserver();
@@ -131,7 +134,7 @@ const AppLock: React.FC<AppLockProps> = ({
   }, []);
 
   useEffect(() => {
-    if (teamState.isAppLockEnabled() && hasPassphrase()) {
+    if (teamState.isAppLockEnabled() && hasPassphrase(selfUser.id)) {
       window.addEventListener('blur', startAppLockTimeout);
       return () => window.removeEventListener('blur', startAppLockTimeout);
     }
@@ -139,7 +142,7 @@ const AppLock: React.FC<AppLockProps> = ({
   }, [startAppLockTimeout]);
 
   useEffect(() => {
-    if (teamState.isAppLockEnabled() && hasPassphrase()) {
+    if (teamState.isAppLockEnabled() && hasPassphrase(selfUser.id)) {
       window.addEventListener('focus', clearAppLockTimeout);
       return () => window.removeEventListener('focus', clearAppLockTimeout);
     }
@@ -163,16 +166,13 @@ const AppLock: React.FC<AppLockProps> = ({
     };
   }, [appLockState, isVisible]);
 
-  const storageKey = `${APP_LOCK_STORAGE}_${selfUser.id}`;
-  const getStored = () => window.localStorage.getItem(storageKey);
-  const hasPassphrase = () => !!getStored();
-
   const showAppLock = () => {
-    setAppLockState(hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setAppLockState(hasPassphrase(selfUser.id) ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
   const handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent) => {
+    const storageKey = getStorageKey(selfUser.id);
     if (key === storageKey) {
       window.localStorage.setItem(storageKey, oldValue);
     }
@@ -190,14 +190,14 @@ const AppLock: React.FC<AppLockProps> = ({
       sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
       sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
     );
-    window.localStorage.setItem(storageKey, hashed);
+    window.localStorage.setItem(getStorageKey(selfUser.id), hashed);
     startPassphraseObserver();
   };
 
   const onUnlock = async (event: React.FormEvent) => {
     event.preventDefault();
     const target = event.target as HTMLFormElement & {password: HTMLInputElement};
-    const hashedCode = getStored();
+    const hashedCode = getStored(selfUser.id);
     await sodium.ready;
     if (sodium.crypto_pwhash_str_verify(hashedCode, target.password.value)) {
       setIsVisible(false);
@@ -228,7 +228,7 @@ const AppLock: React.FC<AppLockProps> = ({
       const currentClientId = clientState.currentClient().id;
       await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
       stopPassphraseObserver();
-      window.localStorage.removeItem(storageKey);
+      window.localStorage.removeItem(getStorageKey(selfUser.id));
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
     } catch ({code, message}) {
       setIsLoading(false);

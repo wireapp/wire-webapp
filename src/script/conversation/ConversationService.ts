@@ -309,7 +309,7 @@ export class ConversationService {
    */
   post_encrypted_message(
     conversationId: string,
-    payload: NewOTRMessage,
+    payload: NewOTRMessage<string>,
     preconditionOption?: boolean | string[],
   ): Promise<ClientMismatch> {
     const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
