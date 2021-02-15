@@ -156,6 +156,9 @@ describe('CryptographyRepository', () => {
     });
 
     it('detects duplicated messages', async () => {
+      jest
+        .spyOn(testFactory.cryptography_repository.cryptographyService, 'putClientPreKeys')
+        .mockReturnValue(Promise.resolve());
       const preKeys = await testFactory.cryptography_repository.initCryptobox();
       const alice = testFactory.cryptography_repository.cryptobox.identity;
 
@@ -181,7 +184,7 @@ describe('CryptographyRepository', () => {
         GenericMessage.encode(genericMessage).finish(),
         aliceBundle.serialise(),
       );
-      const encodedCipherText = await arrayToBase64(cipherText);
+      const encodedCipherText = arrayToBase64(cipherText);
 
       const mockedEvent = {
         data: {

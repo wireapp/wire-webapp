@@ -189,7 +189,7 @@ export class CryptographyMapper {
       }
 
       case GENERIC_MESSAGE_TYPE.TEXT: {
-        const mappedText = await this._mapText(genericMessage.text as Text);
+        const mappedText = this._mapText(genericMessage.text as Text);
         specificContent = addMetadata(mappedText, genericMessage.text);
         break;
       }
@@ -245,9 +245,7 @@ export class CryptographyMapper {
           protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
         }
 
-        const mentions = await Promise.all(
-          protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
-        );
+        const mentions = protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish()));
 
         return {
           text: {
@@ -433,7 +431,7 @@ export class CryptographyMapper {
   }
 
   async _mapEdited(edited: MessageEdit) {
-    const mappedMessage = await this._mapText(edited.text as Text);
+    const mappedMessage = this._mapText(edited.text as Text);
     mappedMessage.data.replacing_message_id = edited.replacingMessageId;
     return mappedMessage;
   }
@@ -466,7 +464,7 @@ export class CryptographyMapper {
       if (!eventData.data || !otrKey || !sha256) {
         throw new Error('Not all expected properties defined');
       }
-      const cipherTextArray = await base64ToArray(eventData.data);
+      const cipherTextArray = base64ToArray(eventData.data);
       const cipherText = cipherTextArray.buffer;
       const keyBytes = new Uint8Array(otrKey).buffer;
       const referenceSha256 = new Uint8Array(sha256).buffer;
@@ -569,7 +567,7 @@ export class CryptographyMapper {
     };
   }
 
-  async _mapText(text: Text): Promise<MappedText> {
+  _mapText(text: Text): MappedText {
     const {mentions: protoMentions, quote: protoQuote} = text;
 
     const protoLinkPreviews = text[PROTO_MESSAGE_TYPE.LINK_PREVIEWS];
@@ -579,11 +577,9 @@ export class CryptographyMapper {
       protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
     }
 
-    const mentions = await Promise.all(
-      protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish())),
-    );
-    const previews = await Promise.all(
-      protoLinkPreviews.map(protoLinkPreview => arrayToBase64(LinkPreview.encode(protoLinkPreview).finish())),
+    const mentions = protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish()));
+    const previews = protoLinkPreviews.map(protoLinkPreview =>
+      arrayToBase64(LinkPreview.encode(protoLinkPreview).finish()),
     );
 
     const mappedText: MappedText = {
@@ -596,7 +592,7 @@ export class CryptographyMapper {
     };
 
     if (protoQuote) {
-      const quote = await arrayToBase64(Quote.encode(protoQuote).finish());
+      const quote = arrayToBase64(Quote.encode(protoQuote).finish());
       mappedText.data.quote = quote;
     }
 

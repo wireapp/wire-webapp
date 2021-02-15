@@ -69,7 +69,7 @@ const defaultCSP = {
   prefetchSrc: ["'self'"],
   scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'", 'https://apis.google.com'],
   styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
-  workerSrc: ["'self'"],
+  workerSrc: ["'self'", 'blob:'],
 };
 const logger = logdown('config', {
   logger: console,
@@ -135,9 +135,6 @@ const config: ServerConfig = {
         .map(extension => extension.trim()),
       APPLOCK_SCHEDULED_TIMEOUT: process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT
         ? Number(process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT)
-        : null,
-      APPLOCK_UNFOCUS_TIMEOUT: process.env.FEATURE_APPLOCK_UNFOCUS_TIMEOUT
-        ? Number(process.env.FEATURE_APPLOCK_UNFOCUS_TIMEOUT)
         : null,
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT != 'false',
       CONFERENCE_AUTO_MUTE: process.env.FEATURE_CONFERENCE_AUTO_MUTE == 'true',

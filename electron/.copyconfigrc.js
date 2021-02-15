@@ -21,13 +21,13 @@
 
 /** @typedef {import('@wireapp/copy-config').CopyConfigOptions} CopyConfigOptions */
 
-const appConfigPkg = require('./app-config/package.json');
+const appConfigPkg = require('../app-config/package.json');
 
 const contentSource = 'wire-desktop/content';
 const imageSource = `${contentSource}/image`;
 const macOsSource = `${contentSource}/macos`;
 
-const configurationEntry = `wire-web-config-${process.env.TAG == 'production' ? 'production' : 'internal'}`;
+const configurationEntry = `wire-web-config-default-${process.env.TAG == 'production' ? 'master' : 'staging'}`;
 const repositoryUrl = appConfigPkg.dependencies[configurationEntry];
 
 /** @type {CopyConfigOptions} */

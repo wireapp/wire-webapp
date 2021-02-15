@@ -163,7 +163,7 @@ ko.components.register('participant-item', {
             <!-- /ko -->
           </div>
         </div>
-        
+
         <!-- ko if: callParticipant -->
           <!-- ko if: callParticipant.sharesCamera() -->
             <camera-icon data-uie-name="status-video"></camera-icon>
@@ -174,7 +174,7 @@ ko.components.register('participant-item', {
           <!-- /ko -->
 
           <!-- ko ifnot: callParticipant.isMuted() -->
-            <participant-mic-on-icon params="isActive: callParticipant.isActivelySpeaking()" data-bind="attr: {'data-uie-name': callParticipant.isActivelySpeaking() ? 'status-active-speaking' : 'status-audio-on'}"></participant-mic-on-icon>            
+            <participant-mic-on-icon params="isActive: callParticipant.isActivelySpeaking()" data-bind="attr: {'data-uie-name': callParticipant.isActivelySpeaking() ? 'status-active-speaking' : 'status-audio-on'}"></participant-mic-on-icon>
           <!-- /ko -->
 
           <!-- ko if: callParticipant.isMuted() -->
@@ -198,7 +198,7 @@ ko.components.register('participant-item', {
           <div class="search-list-item-select icon-check" data-bind="css: {'selected': isSelected}" data-uie-name="status-selected"></div>
         <!-- /ko -->
 
-        <disclose-icon></disclose-icon>
+        <disclose-icon class="disclose-icon"></disclose-icon>
       <!-- /ko -->
     </div>
   `,

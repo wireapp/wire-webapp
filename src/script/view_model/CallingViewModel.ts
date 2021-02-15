@@ -24,7 +24,7 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
-import 'Components/calling/chooseScreen';
+import 'Components/calling/ChooseScreen';
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
@@ -63,7 +63,7 @@ export interface CallActions {
 
 export const VideoSpeakersTabs = {
   speakers: 'speakers',
-  // explictly disabled.
+  // explicitly disabled.
   // eslint-disable-next-line sort-keys-fix/sort-keys-fix
   all: 'all',
 };

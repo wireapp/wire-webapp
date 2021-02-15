@@ -108,7 +108,7 @@ describe('ClientMapper', () => {
     });
   });
 
-  describe('mapClients', () =>
+  describe('mapClients', () => {
     it('can map a multiple clients at once', () => {
       const clientEntities = ClientMapper.mapClients(payload.clients.get.many, true);
       const [firstClientEntity, secondClientEntity] = clientEntities;
@@ -118,7 +118,8 @@ describe('ClientMapper', () => {
       expect(firstClientEntity.isTemporary()).toBe(true);
       expect(secondClientEntity.id).toBe(entities.clients.john_doe.permanent.id);
       expect(secondClientEntity.isPermanent()).toBe(true);
-    }));
+    });
+  });
 
   describe('updateClient', () => {
     it('can map changes into a client', () => {

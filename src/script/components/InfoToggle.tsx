@@ -70,5 +70,5 @@ export default InfoToggle;
 registerReactComponent('info-toggle', {
   component: InfoToggle,
   template:
-    '<div data-bind="react: {isChecked: ko.unwrap(isChecked), setIsChecked: isChecked, dataUieName, info, isDisabled, name}"></div>',
+    '<div class="info-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), setIsChecked: isChecked, dataUieName, info, isDisabled, name}"></div>',
 });

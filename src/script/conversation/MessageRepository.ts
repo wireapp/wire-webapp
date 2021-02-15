@@ -39,11 +39,11 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
+import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
 import {container} from 'tsyringe';
 
@@ -1164,7 +1164,11 @@ export class MessageRepository {
    * @param user_ids Optionally the intended recipient users
    * @returns Resolves with a user client map
    */
-  async create_recipients(conversation_id: string, skip_own_clients = false, user_ids: string[] = null) {
+  async create_recipients(
+    conversation_id: string,
+    skip_own_clients = false,
+    user_ids: string[] = null,
+  ): Promise<Recipients> {
     const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id);
     const recipients: Recipients = {};
     for (const userEntity of userEntities) {
@@ -1622,7 +1626,7 @@ export class MessageRepository {
         options.recipients,
         genericMessageExternal,
       );
-      payload.data = await arrayToBase64(encryptedAsset.cipherText);
+      payload.data = arrayToBase64(encryptedAsset.cipherText);
       payload.native_push = options.nativePush;
       return this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
@@ -1645,7 +1649,7 @@ export class MessageRepository {
    */
   private async sendEncryptedMessage(
     eventInfoEntity: EventInfoEntity,
-    payload: NewOTRMessage,
+    payload: NewOTRMessage<string>,
   ): Promise<ClientMismatch> {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;

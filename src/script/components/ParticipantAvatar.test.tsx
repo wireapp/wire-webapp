@@ -30,13 +30,13 @@ class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
     super(ParticipantAvatar, props);
   }
 
-  getUserParticpantAvatar = () => this.get('div[data-uie-name="element-avatar-user"]');
+  getUserParticipantAvatar = () => this.get('div[data-uie-name="element-avatar-user"]');
   getServiceParticipantAvatar = () => this.get('div[data-uie-name="service-avatar"]');
   getTemporaryGuestAvatar = () => this.get('div[data-uie-name="element-avatar-temporary-guest"]');
   getServiceAvatar = () => this.get('div[data-uie-name="element-avatar-service"]');
   getUserAvatar = () => this.get('div[data-uie-name="element-avatar-user"]');
 
-  clickUserAvatar = () => this.click(this.getUserParticpantAvatar());
+  clickUserAvatar = () => this.click(this.getUserParticipantAvatar());
 }
 
 describe('ParticipantAvatar', () => {
@@ -47,13 +47,13 @@ describe('ParticipantAvatar', () => {
 
     const participantAvatar = new ParticipantAvatarPage({
       assetRepository: assetRepoSpy,
-      clickHandler: jasmine.createSpy(),
+      onClick: jasmine.createSpy(),
       participant,
     });
 
     participantAvatar.clickUserAvatar();
 
-    expect(participantAvatar.getProps().clickHandler).toHaveBeenCalledWith(
+    expect(participantAvatar.getProps().onClick).toHaveBeenCalledWith(
       participantAvatar.getProps().participant,
       jasmine.anything(),
     );
