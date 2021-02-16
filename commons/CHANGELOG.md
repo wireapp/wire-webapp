@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@4.0.3...@wireapp/commons@4.1.0) (2021-02-16)
+
+
+### Features
+
+* **commons:** Add OptionalKeys and RequiredKeys and add tests ([#3540](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3540)) ([4977cda](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/4977cda1917baa90c04114b84d529df74285b3df))
+
+
+
+
+
 ## [4.0.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@4.0.2...@wireapp/commons@4.0.3) (2021-02-09)
 
 **Note:** Version bump only for package @wireapp/commons
