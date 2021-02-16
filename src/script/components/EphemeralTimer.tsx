@@ -30,22 +30,16 @@ const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
   const started = message.ephemeral_started();
   const duration = ((message.ephemeral_expires() as number) - started) / 1000;
 
-  function setAnimationDelay(event: React.AnimationEvent<SVGCircleElement>) {
-    // every time the component gets rendered, the animation delay gets set
-    // to accommodate for the passed lifetime of the timed message
-    (event.target as HTMLElement).style.animationDelay = `${(started - Date.now()) / 1000}s`;
-  }
-
   return (
-    <svg className="ephemeral-timer" viewBox="0 0 8 8" width="8" height="8">
-      <circle className="ephemeral-timer__background" cx="4" cy="4" r="3.5" />
+    <svg className="ephemeral-timer" viewBox="0 0 8 8" width={8} height={8}>
+      <circle className="ephemeral-timer__background" cx={4} cy={4} r={3.5} />
       <circle
+        data-uie-name="ephemeral-timer-circle"
         className="ephemeral-timer__dial"
         cx={4}
         cy={4}
-        onAnimationStart={setAnimationDelay}
         r={2}
-        style={{animationDuration: `${duration}s`}}
+        style={{animationDelay: `${(started - Date.now()) / 1000}s`, animationDuration: `${duration}s`}}
         transform="rotate(-90 4 4)"
       />
     </svg>

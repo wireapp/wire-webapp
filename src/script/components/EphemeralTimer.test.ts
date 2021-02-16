@@ -18,6 +18,7 @@
  */
 
 import TestPage from 'Util/test/TestPage';
+import {Message} from '../entity/message/Message';
 import EphemeralTimer, {EphemeralTimerProps} from './EphemeralTimer';
 
 class EphemeralTimerPage extends TestPage<EphemeralTimerProps> {
@@ -25,13 +26,24 @@ class EphemeralTimerPage extends TestPage<EphemeralTimerProps> {
     super(EphemeralTimer, props);
   }
 
-  getDesktopIcon = () => this.get('svg[data-uie-name="status-desktop-device"]');
-  getMobileDeviceIcon = () => this.get('svg[data-uie-name="status-mobile-device"]');
-  getDiscloseIcon = () => this.get('svg[data-uie-name="disclose-icon"]');
-  getVerifiedIcon = () => this.get('svg[data-uie-name="user-device-verified"]');
-  getNotVerifiedIcon = () => this.get('svg[data-uie-name="user-device-not-verified"]');
+  getCircle = () => this.get('[data-uie-name="ephemeral-timer-circle"]');
 }
 
 describe('EphemeralTimer', () => {
-  it('renders desktop icon for desktop clients', async () => {});
+  it('shows the icon', () => {
+    const message = new Message();
+    message.ephemeral_started(Date.now());
+    message.ephemeral_expires(new Date(new Date().getTime() + 10 * 60000).getTime());
+
+    const ephemeralTimer = new EphemeralTimerPage({message});
+    const circle = ephemeralTimer.getCircle();
+    expect(circle.props().style.animationDuration).toBe('600s');
+  });
+  it('hides the icon when no ephemeral timer was started', () => {
+    const message = new Message();
+
+    const ephemeralTimer = new EphemeralTimerPage({message});
+    const circle = ephemeralTimer.getCircle();
+    expect(circle.props().style.animationDuration).toBe('0s');
+  });
 });
