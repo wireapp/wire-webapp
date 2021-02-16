@@ -75,7 +75,7 @@ export class CollectionViewModel {
     return this.conversationRepository.searchInConversation(this.conversationEntity(), query);
   };
 
-  readonly onInputChange = (input: string) => {
+  readonly onInputChange = (input?: string) => {
     this.searchInput(input || '');
   };
 

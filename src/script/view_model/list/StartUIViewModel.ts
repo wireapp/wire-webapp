@@ -48,6 +48,7 @@ import type {Conversation} from '../../entity/Conversation';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationState} from '../../conversation/ConversationState';
+import {isValidFederationUsername} from '../../util/ValidationUtil';
 
 export class StartUIViewModel {
   readonly brandName: string;
@@ -93,6 +94,8 @@ export class StartUIViewModel {
   private readonly showMatches: ko.Observable<boolean>;
   private readonly hasSearchResults: ko.PureComputed<boolean>;
   private readonly showContent: ko.PureComputed<boolean>;
+  readonly searchOnSameFederatedDomain: ko.PureComputed<boolean>;
+  readonly searchOnOtherFederatedDomain: ko.PureComputed<boolean>;
 
   static get STATE() {
     return {
@@ -190,6 +193,14 @@ export class StartUIViewModel {
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
     this.showCreateGuestRoom = ko.pureComputed(() => this.isTeam());
     this.showInvitePeople = ko.pureComputed(() => !this.isTeam());
+    this.searchOnSameFederatedDomain = ko.pureComputed(() => !this.searchOnOtherFederatedDomain());
+    this.searchOnOtherFederatedDomain = ko.pureComputed(() => {
+      return (
+        Config.getConfig().FEATURE.FEDERATION_DOMAIN &&
+        isValidFederationUsername(this.searchInput()) &&
+        !this.searchInput().endsWith(Config.getConfig().FEATURE.FEDERATION_DOMAIN)
+      );
+    });
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
     this.showInviteMember = ko.pureComputed(

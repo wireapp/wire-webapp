@@ -903,6 +903,7 @@
   "searchNoServicesManager": "Services are helpers that can improve your workflow.",
   "searchNoServicesMember": "Services are helpers that can improve your workflow. To enable them, ask your administrator.",
   "searchOthers": "Connect",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchPeople": "People",
   "searchPlaceholder": "Search by name or username",
   "searchServiceConfirmButton": "Open Conversation",
