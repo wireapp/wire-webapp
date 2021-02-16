@@ -19,7 +19,7 @@
 
 /**
  * Makes all properties of a type recursively optional
- * @see https://stackoverflow.com/questions/41980195/recursive-partialt-in-typescript-2-1
+ * @see https://stackoverflow.com/a/51365037
  * @since TypeScript 2.8
  */
 export type RecursivePartial<T> = {
@@ -29,3 +29,19 @@ export type RecursivePartial<T> = {
     ? RecursivePartial<T[P]>
     : T[P];
 };
+
+/**
+ * Retreive all optional keys from an interface
+ * @see https://stackoverflow.com/a/52991061
+ */
+export type OptionalKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
+}[keyof T];
+
+/**
+ * Retreive all required keys from an interface
+ * @see https://stackoverflow.com/a/52991061
+ */
+export type RequiredKeys<T> = {
+  [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
+}[keyof T];
