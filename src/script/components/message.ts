@@ -587,7 +587,7 @@ const memberTemplate: string = `
         <span class="message-connected-provider-name" data-bind='text: message.otherUser().providerName()'></span>
       <!-- /ko -->
       <!-- ko ifnot: message.otherUser().isService -->
-        <span class="message-connected-username label-username" data-bind='text: message.otherUser().username()'></span>
+        <span class="message-connected-username label-username" data-bind='text: message.otherUser().username'></span>
       <!-- /ko -->
       <participant-avatar class="message-connected-avatar cursor-default"
                    params="participant: message.otherUser, size: AVATAR_SIZE.X_LARGE, noBadge: message.otherUser().isOutgoingRequest()"></participant-avatar>
