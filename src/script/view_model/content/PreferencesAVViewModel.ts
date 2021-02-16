@@ -77,6 +77,7 @@ export class PreferencesAVViewModel {
   willChangeMediaSource: WillChangeMediaSource;
   optionVbrEncoding: ko.Observable<boolean>;
   supportsConferenceCalling: boolean;
+  optionAgcEnabled: ko.Observable<boolean>;
 
   static get CONFIG() {
     return {
@@ -137,6 +138,11 @@ export class PreferencesAVViewModel {
     this.optionVbrEncoding = ko.observable(false);
     this.optionVbrEncoding.subscribe(vbrEncoding => {
       this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, vbrEncoding);
+    });
+
+    this.optionAgcEnabled = ko.observable(this.constraintsHandler.getAgcPreference());
+    this.optionAgcEnabled.subscribe(agcEnabled => {
+      this.constraintsHandler.setAgcPreference(agcEnabled);
     });
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, this.updateProperties);
