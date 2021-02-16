@@ -560,7 +560,7 @@
   "modalAppLockLockedUnlockButton": "解锁",
   "modalAppLockPasscode": "Passcode",
   "modalAppLockSetupAcceptButton": "设置密码",
-  "modalAppLockSetupChangeMessage": "Your organization needs to lock your app when {{brandName}} is not in use to keep the team safe .[br]Create a passlock to unlock {{brandName}}. Please, remeber it, as it can not be recovered.",
+  "modalAppLockSetupChangeMessage": "Your organization needs to lock your app when {{brandName}} is not in use to keep the team safe .[br]Create a passlock to unlock {{brandName}}. Please, remember it, as it can not be recovered.",
   "modalAppLockSetupChangeTitle": "There was a change at {{brandName}}",
   "modalAppLockSetupDigit": "A digit",
   "modalAppLockSetupLong": "At least {{minPasswordLength}} characters long",
