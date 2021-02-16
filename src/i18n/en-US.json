@@ -566,7 +566,7 @@
   "modalAppLockLockedUnlockButton": "Unlock",
   "modalAppLockSetupAcceptButton": "Set passphrase",
   "modalAppLockSetupMessage": "The app will lock itself after a certain time of inactivity.[br]To unlock the app you need to enter this passphrase.[br]Make sure to remember this passphrase as there is no way to recover it.",
-  "modalAppLockSetupChangeMessage": "Your organization needs to lock your app when {{brandName}} is not in use to keep the team safe .[br]Create a passlock to unlock {{brandName}}. Please, remember it, as it can not be recovered.",
+  "modalAppLockSetupChangeMessage": "Your organization needs to lock your app when {{brandName}} is not in use to keep the team safe.[br]Create a passlock to unlock {{brandName}}. Please, remember it, as it can not be recovered.",
   "modalAppLockSetupSecondPlaceholder": "Repeat passphrase",
   "modalAppLockSetupTitle": "Set app lock passphrase",
   "modalAppLockSetupChangeTitle": "There was a change at {{brandName}}",
