@@ -60,7 +60,7 @@
     "@babel/preset-react": "7.12.13",
     "@babel/preset-typescript": "7.12.13",
     "@emotion/babel-preset-css-prop": "10.2.1",
-    "@formatjs/cli": "3.0.5",
+    "@formatjs/cli": "3.1.0",
     "@hot-loader/react-dom": "16.14.0",
     "@testing-library/react": "11.2.5",
     "@types/adm-zip": "0.4.33",
