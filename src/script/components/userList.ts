@@ -31,7 +31,7 @@ import type {TeamRepository} from '../team/TeamRepository';
 import {viewportObserver} from '../ui/viewportObserver';
 import {validateHandle} from '../user/UserHandleGenerator';
 
-import 'Components/list/participantItem';
+import 'Components/list/ParticipantItem';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 
@@ -75,14 +75,13 @@ const listTemplate = (data: string, uieName: string = ''): string => `
       ${uieName ? ` data-uie-name="${uieName}"` : ''}>
     <!-- ko if: noSelfInteraction && user.isMe -->
       <participant-item
-        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
-        data-bind="css: {'no-underline': noUnderline, 'highlighted': highlightedUserIds.includes(user.id), 'no-interaction': true}">
+        params="participant: user, noUnderline: noUnderline, highlighted: highlightedUserIds.includes(user.id), noInteraction: true, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified">
       </participant-item>
     <!-- /ko -->
     <!-- ko ifnot: noSelfInteraction && user.isMe -->
       <participant-item
-        params="participant: user, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
-        data-bind="click: (viewmodel, event) => onUserClick(user, event), css: {'no-underline': noUnderline, 'show-arrow': arrow, 'highlighted': highlightedUserIds.includes(user.id)}">
+        params="participant: user, noUnderline: noUnderline, showArrow: arrow, highlighted: highlightedUserIds.includes(user.id), customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
+        data-bind="click: (viewmodel, event) => onUserClick(user, event)">
       </participant-item>
     <!-- /ko -->
   </div>

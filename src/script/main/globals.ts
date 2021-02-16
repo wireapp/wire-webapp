@@ -33,7 +33,7 @@ import 'Components/asset/controls/AudioSeekBar';
 import 'Components/asset/controls/MediaButton';
 import 'Components/asset/controls/SeekBar';
 import 'Components/copyToClipboard';
-import 'Components/ephemeralTimer';
+import 'Components/EphemeralTimer';
 import 'Components/fullSearch';
 import 'Components/groupList';
 import 'Components/GuestModeToggle';
@@ -103,6 +103,7 @@ declare global {
           ENABLE_DOMAIN_DISCOVERY: boolean;
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
+          FEDERATION_DOMAIN: string;
           PERSIST_TEMPORARY_CLIENTS: boolean;
           SHOW_LOADING_INFORMATION: boolean;
         };

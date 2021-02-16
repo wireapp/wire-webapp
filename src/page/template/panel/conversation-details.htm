@@ -203,7 +203,7 @@
           <!-- ko if: showOptionReadReceipts() -->
             <div class="conversation-details__read-receipts">
               <read-receipt-toggle
-                params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"
+                params="receiptMode: activeConversation().receiptMode, onReceiptModeChanged: updateConversationReceiptMode"
               ></read-receipt-toggle>
             </div>
           <!-- /ko -->

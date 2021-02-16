@@ -27,7 +27,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
 import {getFirstChar} from 'Util/StringUtil';
 
-import {ACCENT_ID} from '../Config';
+import {ACCENT_ID, Config} from '../Config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {ClientEntity} from '../client/ClientEntity';
@@ -209,7 +209,9 @@ export class User {
       /** Very old user accounts don't have a handle on Wire. */
       return '';
     }
-    return this.domain ? `@${this.username()}@${this.domain}` : `@${this.username}`;
+    return this.domain
+      ? `@${this.username()}@${this.domain}`.replace(`@${Config.getConfig().FEATURE.FEDERATION_DOMAIN}`, '')
+      : `@${this.username}`;
   }
 
   subscribeToChanges(): void {
