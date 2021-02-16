@@ -184,7 +184,7 @@ describe('CryptographyRepository', () => {
         GenericMessage.encode(genericMessage).finish(),
         aliceBundle.serialise(),
       );
-      const encodedCipherText = await arrayToBase64(cipherText);
+      const encodedCipherText = arrayToBase64(cipherText);
 
       const mockedEvent = {
         data: {

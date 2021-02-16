@@ -27,6 +27,7 @@ import NamedIcon from './NamedIcon';
 
 export interface AvailabilityStateProps {
   availability: Availability.Type;
+  className?: string;
   label: string;
   showArrow?: boolean;
   theme?: boolean;
@@ -42,6 +43,7 @@ const iconStyles: CSSObject = {
 
 const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   availability,
+  className,
   label,
   showArrow = false,
   theme = false,
@@ -50,7 +52,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   const isAway = availability === Availability.Type.AWAY;
   const isBusy = availability === Availability.Type.BUSY;
 
-  return (
+  const content = (
     <React.Fragment>
       {isAvailable && (
         <NamedIcon
@@ -119,6 +121,12 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
       )}
     </React.Fragment>
   );
+
+  if (className) {
+    return <span className={`availability-state ${className}`}>{content}</span>;
+  }
+
+  return content;
 };
 
 export default AvailabilityState;

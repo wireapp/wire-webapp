@@ -605,7 +605,7 @@ describe('CryptographyMapper', () => {
       const encryptedAsset = await encryptAesAsset(GenericMessage.encode(generic_message).finish());
       const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
       const sha256 = new Uint8Array(encryptedAsset.sha256);
-      event.data.data = await arrayToBase64(encryptedAsset.cipherText);
+      event.data.data = arrayToBase64(encryptedAsset.cipherText);
 
       const external_message = new GenericMessage({
         external: new External({otrKey: keyBytes, sha256}),
@@ -629,7 +629,7 @@ describe('CryptographyMapper', () => {
       const encryptedAsset = await encryptAesAsset(GenericMessage.encode(genericMessage).finish());
       const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
       const sha256 = new Uint8Array(encryptedAsset.sha256);
-      event.data.data = await arrayToBase64(encryptedAsset.cipherText);
+      event.data.data = arrayToBase64(encryptedAsset.cipherText);
 
       external_message = new GenericMessage({
         external: new External({otrKey: keyBytes, sha256}),

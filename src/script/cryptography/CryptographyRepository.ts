@@ -245,7 +245,7 @@ export class CryptographyRepository {
   async encryptGenericMessage(
     recipients: Recipients,
     genericMessage: GenericMessage,
-    payload: NewOTRMessage = this.constructPayload(this.currentClient().id),
+    payload: NewOTRMessage<string> = this.constructPayload(this.currentClient().id),
   ) {
     const receivingUsers = Object.keys(recipients).length;
     const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users...`;
@@ -335,7 +335,7 @@ export class CryptographyRepository {
       } else {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
         const sessionId = this.constructSessionId(userId, clientId);
-        const preKeyArray = await base64ToArray(preKey.key);
+        const preKeyArray = base64ToArray(preKey.key);
         return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
@@ -347,8 +347,8 @@ export class CryptographyRepository {
   private async buildPayload(
     recipients: Recipients,
     genericMessage: GenericMessage,
-    messagePayload: NewOTRMessage,
-  ): Promise<{messagePayload: NewOTRMessage; missingRecipients: Recipients}> {
+    messagePayload: NewOTRMessage<string>,
+  ): Promise<{messagePayload: NewOTRMessage<string>; missingRecipients: Recipients}> {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
@@ -372,7 +372,7 @@ export class CryptographyRepository {
   private async encryptGenericMessageForMissingRecipients(
     missingRecipients: Recipients,
     genericMessage: GenericMessage,
-    messagePayload: NewOTRMessage,
+    messagePayload: NewOTRMessage<string>,
   ) {
     const userPreKeyMap = await this.getUsersPreKeys(missingRecipients);
     this.logger.info(`Fetched pre-keys for '${Object.keys(userPreKeyMap).length}' users.`, userPreKeyMap);
@@ -383,8 +383,10 @@ export class CryptographyRepository {
         for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
           if (preKeyPayload) {
             const sessionId = this.constructSessionId(userId, clientId);
-            const encryptionPromise = base64ToArray(preKeyPayload.key).then(payloadArray =>
-              this.encryptPayloadForSession(sessionId, genericMessage, payloadArray.buffer),
+            const encryptionPromise = this.encryptPayloadForSession(
+              sessionId,
+              genericMessage,
+              base64ToArray(preKeyPayload.key).buffer,
             );
             cipherPayloadPromises.push(encryptionPromise);
           }
@@ -397,9 +399,9 @@ export class CryptographyRepository {
   }
 
   private mapCipherTextToPayload(
-    messagePayload: NewOTRMessage,
+    messagePayload: NewOTRMessage<string>,
     cipherPayload: EncryptedPayload[],
-  ): {messagePayload: NewOTRMessage; missingRecipients: Recipients} {
+  ): {messagePayload: NewOTRMessage<string>; missingRecipients: Recipients} {
     const missingRecipients: Recipients = {};
 
     cipherPayload.forEach(({cipherText, sessionId}) => {
@@ -422,7 +424,7 @@ export class CryptographyRepository {
    * @param sender Client ID of message sender
    * @returns Payload to send to backend
    */
-  private constructPayload(sender: string): NewOTRMessage {
+  private constructPayload(sender: string): NewOTRMessage<string> {
     return {
       native_push: true,
       recipients: {},
@@ -438,7 +440,7 @@ export class CryptographyRepository {
    */
   private async decryptEvent(event: EventRecord): Promise<GenericMessage> {
     const {data: eventData, from: userId} = event;
-    const cipherTextArray = await base64ToArray(eventData.text || eventData.key);
+    const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
     const sessionId = this.constructSessionId(userId, eventData.sender);
 
@@ -463,7 +465,7 @@ export class CryptographyRepository {
     try {
       const messageArray = GenericMessage.encode(genericMessage).finish();
       const cipherText = await this.cryptobox.encrypt(sessionId, messageArray, preKeyBundle);
-      const cipherTextArray = await arrayToBase64(cipherText);
+      const cipherTextArray = arrayToBase64(cipherText);
       return {cipherText: cipherTextArray, sessionId};
     } catch (error) {
       if (error instanceof StoreEngineError.RecordNotFoundError) {

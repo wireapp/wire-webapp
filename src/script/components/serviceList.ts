@@ -23,7 +23,7 @@ import {noop} from 'Util/util';
 
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 
-import 'Components/list/participantItem';
+import 'Components/list/ParticipantItem';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 
 interface ServiceListParams {
@@ -74,7 +74,7 @@ class ServiceList {
 ko.components.register('service-list', {
   template: `
     <div class="search-list" data-bind="css: cssClasses(), foreach: services">
-      <participant-item params="participant: $data" data-bind="click: $parent.onClick, css: {'no-underline': $parent.noUnderline, 'show-arrow': $parent.arrow}"></participant-item>
+      <participant-item params="participant: $data, noUnderline: $parent.noUnderline, showArrow: $parent.arrow}" data-bind="click: $parent.onClick"></participant-item>
     </div>
     <!-- ko if: isSearching() && !services().length -->
       <div class="no-results" data-bind="text: t('searchListNoMatches')"></div>

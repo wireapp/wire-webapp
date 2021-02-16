@@ -21,6 +21,7 @@ export interface ServerConfig {
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
+      FEDERATION_DOMAIN: string;
       PERSIST_TEMPORARY_CLIENTS: boolean;
       SHOW_LOADING_INFORMATION: boolean;
     };

@@ -89,7 +89,7 @@ const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaEl
           } as SeekBarCSS
         }
         type="range"
-        value={progress}
+        value={isNaN(progress) ? 0 : progress}
       />
     </div>
   );
