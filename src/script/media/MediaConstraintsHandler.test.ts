@@ -19,6 +19,8 @@
 
 import ko from 'knockout';
 
+import {createRandomUuid} from 'Util/util';
+import {UserState} from '../user/UserState';
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 
 describe('MediaConstraintsHandler', () => {
@@ -30,12 +32,16 @@ describe('MediaConstraintsHandler', () => {
     screenInput: ko.observable(),
     videoInput: ko.observable(),
   };
+  const selfUserId = createRandomUuid();
+  const userState = {
+    self: () => ({id: selfUserId}),
+  } as UserState;
   beforeEach(() => {
     availableDevices.audioInput('mic');
     availableDevices.audioOutput('speaker');
     availableDevices.videoInput('camera');
     availableDevices.screenInput('screen1');
-    constraintsHandler = new MediaConstraintsHandler(availableDevices as any);
+    constraintsHandler = new MediaConstraintsHandler(availableDevices as any, userState);
   });
 
   describe('getMediaStreamConstraints', () => {
@@ -53,7 +59,7 @@ describe('MediaConstraintsHandler', () => {
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
 
       expect(constraints.audio.deviceId).not.toBeDefined();
-      expect(constraints.audio).toEqual({autoGainControl: false});
+      expect(constraints.audio).toEqual({autoGainControl: true});
       expect(constraints.video.deviceId).not.toBeDefined();
       expect(constraints.video).toEqual(
         jasmine.objectContaining({
@@ -95,6 +101,22 @@ describe('MediaConstraintsHandler', () => {
           mediaSource: 'screen',
         }),
       );
+    });
+  });
+
+  describe('setAgcPreference', () => {
+    it('stores the stringified preference for the userId', () => {
+      const setItemSpy = spyOn(Object.getPrototypeOf(localStorage), 'setItem').and.returnValue(undefined);
+      constraintsHandler.setAgcPreference(true);
+      expect(setItemSpy).toHaveBeenCalledWith(expect.stringContaining(selfUserId), 'true');
+    });
+  });
+
+  describe('getAgcPreference', () => {
+    it('loads the preference for the userId', () => {
+      const getItemSpy = spyOn(Object.getPrototypeOf(localStorage), 'getItem').and.returnValue('true');
+      expect(constraintsHandler.getAgcPreference()).toEqual(true);
+      expect(getItemSpy).toHaveBeenCalledWith(expect.stringContaining(selfUserId));
     });
   });
 });
