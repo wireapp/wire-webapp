@@ -855,6 +855,8 @@
   "preferencesOptionsContactsMacos": "Aus Kontakte importieren",
   "preferencesOptionsEmojiReplaceCheckbox": "Schrift-Emoticons mit Emojis ersetzen",
   "preferencesOptionsEmojiReplaceDetail": ":-) → [icon]",
+  "preferencesOptionsEnableAgcCheckbox": "Automatic gain control (AGC)",
+  "preferencesOptionsEnableAgcDetails": "Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.",
   "preferencesOptionsEnableVbrCheckbox": "Codierung mit variabler Bitrate",
   "preferencesOptionsEnableVbrDetails": "Anrufe benötigen weniger Datenvolumen und funktionieren besser in Netzen mit geringer Bandbreite. Schalten Sie diese Option aus, um die Kodierung mit konstanter Bitrate zu verwenden.",
   "preferencesOptionsNotifications": "Benachrichtigungen",

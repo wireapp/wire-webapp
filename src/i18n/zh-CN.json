@@ -855,6 +855,8 @@
   "preferencesOptionsContactsMacos": "从联系人导入",
   "preferencesOptionsEmojiReplaceCheckbox": "使用 emoji 来代替文字表情",
   "preferencesOptionsEmojiReplaceDetail": ":-) → [icon]",
+  "preferencesOptionsEnableAgcCheckbox": "Automatic gain control (AGC)",
+  "preferencesOptionsEnableAgcDetails": "Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.",
   "preferencesOptionsEnableVbrCheckbox": "Variable Bit Rate Encoding",
   "preferencesOptionsEnableVbrDetails": "This makes audio calls use less data and work better on slower networks. Turn off to use Constant Bitrate Encoding.",
   "preferencesOptionsNotifications": "通知",

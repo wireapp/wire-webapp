@@ -855,6 +855,8 @@
   "preferencesOptionsContactsMacos": "Импортировать из Контактов",
   "preferencesOptionsEmojiReplaceCheckbox": "Заменять текстовые смайлы на эмодзи",
   "preferencesOptionsEmojiReplaceDetail": ":-) → [icon]",
+  "preferencesOptionsEnableAgcCheckbox": "Automatic gain control (AGC)",
+  "preferencesOptionsEnableAgcDetails": "Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.",
   "preferencesOptionsEnableVbrCheckbox": "Кодирование с переменным битрейтом",
   "preferencesOptionsEnableVbrDetails": "Это значительно снижает потребление данных при аудиозвонках и улучшает работу при медленном соединении. Выключите, чтобы использовать кодирование с постоянным битрейтом.",
   "preferencesOptionsNotifications": "Уведомления",
