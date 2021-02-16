@@ -46,11 +46,11 @@ export interface ParticipantItemProps {
   customInfo?: string;
   external?: boolean;
   hideInfo?: boolean;
-  highlighted: boolean;
+  highlighted?: boolean;
   isSelected?: boolean;
   isSelfVerified?: boolean;
   mode?: UserlistMode;
-  noInteraction: boolean;
+  noInteraction?: boolean;
   noUnderline?: boolean;
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
