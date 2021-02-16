@@ -81,8 +81,8 @@ export class StartUIViewModel {
   readonly isInitialServiceSearch: ko.Observable<boolean>;
   readonly manageTeamUrl: string;
   readonly manageServicesUrl: string;
+  readonly federationDomain?: string;
   private submittedSearch: boolean;
-  private readonly federationDomain?: string;
   private readonly matchedUsers: ko.ObservableArray<User>;
   private readonly alreadyClickedOnContact: Record<string, boolean>;
   private readonly logger: Logger;
