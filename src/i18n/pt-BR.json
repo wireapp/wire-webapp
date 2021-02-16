@@ -560,7 +560,7 @@
   "modalAppLockLockedUnlockButton": "Desbloquear",
   "modalAppLockPasscode": "Código de Acesso",
   "modalAppLockSetupAcceptButton": "Definir frase-chave",
-  "modalAppLockSetupChangeMessage": "Your organization needs to lock your app when {{brandName}} is not in use to keep the team safe .[br]Create a passlock to unlock {{brandName}}. Please, remember it, as it can not be recovered.",
+  "modalAppLockSetupChangeMessage": "Your organization needs to lock your app when {{brandName}} is not in use to keep the team safe.[br]Create a passlock to unlock {{brandName}}. Please, remember it, as it can not be recovered.",
   "modalAppLockSetupChangeTitle": "Houve uma mudança no {{brandName}}",
   "modalAppLockSetupDigit": "Um dígito",
   "modalAppLockSetupLong": "At least {{minPasswordLength}} characters long",

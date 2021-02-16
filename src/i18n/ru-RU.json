@@ -560,7 +560,7 @@
   "modalAppLockLockedUnlockButton": "Разблокировать",
   "modalAppLockPasscode": "Код доступа",
   "modalAppLockSetupAcceptButton": "Установить ключевую фразу",
-  "modalAppLockSetupChangeMessage": "Your organization needs to lock your app when {{brandName}} is not in use to keep the team safe .[br]Create a passlock to unlock {{brandName}}. Please, remember it, as it can not be recovered.",
+  "modalAppLockSetupChangeMessage": "Your organization needs to lock your app when {{brandName}} is not in use to keep the team safe.[br]Create a passlock to unlock {{brandName}}. Please, remember it, as it can not be recovered.",
   "modalAppLockSetupChangeTitle": "В {{brandName}} произошло изменение",
   "modalAppLockSetupDigit": "Цифра",
   "modalAppLockSetupLong": "At least {{minPasswordLength}} characters long",
