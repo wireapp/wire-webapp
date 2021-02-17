@@ -55,7 +55,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   const isBusy = availability === Availability.Type.BUSY;
 
   const content = (
-    <span data-uie-name={dataUieName}>
+    <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex'}}>
       {isAvailable && (
         <NamedIcon
           className="availability-state-icon"
