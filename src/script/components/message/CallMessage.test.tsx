@@ -37,6 +37,7 @@ const createCallMessage = (partialCallMessage: Partial<CallMessageEntity>) => {
     caption: ko.pureComputed(() => ''),
     displayTimestampLong: () => '',
     displayTimestampShort: () => '',
+    timestamp: ko.observable(Date.now()),
     unsafeSenderName: ko.pureComputed(() => ''),
     ...partialCallMessage,
   };

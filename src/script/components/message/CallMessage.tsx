@@ -66,7 +66,7 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
           className="time with-tooltip with-tooltip--top with-tooltip--time"
           onMouseEnter={() => showAllTimestamps(true)}
           onMouseLeave={() => showAllTimestamps(false)}
-          data-timestamp={message.timestamp}
+          data-timestamp={message.timestamp()}
           data-tooltip={displayTimestampLong}
         >
           {displayTimestampShort}
