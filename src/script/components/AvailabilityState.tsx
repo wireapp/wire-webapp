@@ -28,7 +28,7 @@ import NamedIcon from './NamedIcon';
 export interface AvailabilityStateProps {
   availability: Availability.Type;
   className?: string;
-  dataUieName?: string;
+  dataUieName: string;
   label: string;
   showArrow?: boolean;
   theme?: boolean;
@@ -55,7 +55,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   const isBusy = availability === Availability.Type.BUSY;
 
   const content = (
-    <React.Fragment>
+    <span data-uie-name={dataUieName}>
       {isAvailable && (
         <NamedIcon
           className="availability-state-icon"
@@ -96,7 +96,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
         <div
           className="availability-state-label"
           css={theme ? {color: 'var(--accent-color)', userSelect: 'none'} : {userSelect: 'none'}}
-          data-uie-name={dataUieName || 'status-label'}
+          data-uie-name="status-label"
         >
           {label}
         </div>
@@ -121,7 +121,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
           }}
         />
       )}
-    </React.Fragment>
+    </span>
   );
 
   if (className) {
@@ -133,9 +133,9 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
 
 export default AvailabilityState;
 
-registerReactComponent('availability-state', {
+registerReactComponent<AvailabilityStateProps>('availability-state', {
   component: AvailabilityState,
-  optionalParams: ['showArrow', 'theme', 'className', 'dataUieName'],
+  optionalParams: ['showArrow', 'theme', 'className'],
   template:
     '<span class="availability-state" data-bind="react: {availability: ko.unwrap(availability), label: ko.unwrap(label), showArrow, dataUieName, theme: ko.unwrap(theme)}"></span>',
 });
