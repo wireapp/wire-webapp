@@ -36,7 +36,7 @@ describe('AvailabilityState', () => {
   it('renders available icon', async () => {
     const availabilityState = new AvailabilityStatePage({
       availability: Availability.Type.AVAILABLE,
-      dataUieName: 'exampe-data-uie',
+      dataUieName: 'example-data-uie',
       label: 'example',
       showArrow: false,
       theme: false,
@@ -48,7 +48,7 @@ describe('AvailabilityState', () => {
   it('renders away icon', async () => {
     const availabilityState = new AvailabilityStatePage({
       availability: Availability.Type.AWAY,
-      dataUieName: 'exampe-data-uie',
+      dataUieName: 'example-data-uie',
       label: 'example',
       showArrow: false,
       theme: false,
@@ -60,7 +60,7 @@ describe('AvailabilityState', () => {
   it('renders busy icon', async () => {
     const availabilityState = new AvailabilityStatePage({
       availability: Availability.Type.BUSY,
-      dataUieName: 'exampe-data-uie',
+      dataUieName: 'example-data-uie',
       label: 'example',
       showArrow: false,
       theme: false,
@@ -72,7 +72,7 @@ describe('AvailabilityState', () => {
   it('renders availability icon with arrow', async () => {
     const availabilityState = new AvailabilityStatePage({
       availability: Availability.Type.BUSY,
-      dataUieName: 'exampe-data-uie',
+      dataUieName: 'example-data-uie',
       label: 'example',
       showArrow: true,
       theme: false,
