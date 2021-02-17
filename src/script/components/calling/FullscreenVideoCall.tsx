@@ -38,7 +38,8 @@ import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel'
 import type {Multitasking} from '../../notification/NotificationRepository';
 import Duration from './Duration';
 import NamedIcon from 'Components/NamedIcon';
-import type {Participant} from 'src/script/calling/Participant';
+import type {Participant} from '../../calling/Participant';
+import ButtonGroup from 'Components/ButtonGroup';
 
 export interface FullscreenVideoCallProps {
   call: Call;
@@ -164,6 +165,17 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls hide-controls-hidden">
+          {call.participants().length > 2 && (
+            <ButtonGroup
+              items={Object.values(VideoSpeakersTabs)}
+              onChangeItem={item => {
+                callActions.setVideoSpeakersActiveTab(item);
+                callActions.setMaximizedTileVideoParticipant(null);
+              }}
+              currentItem={videoSpeakersActiveTab}
+              style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
+            />
+          )}
           <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
             {t('videoCallOverlayFitVideoLabel')}
           </div>
