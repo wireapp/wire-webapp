@@ -149,7 +149,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 {isUser && selfInTeam && (
                   <AvailabilityState
                     className="participant-item__content__availability participant-item__content__name"
-                    data-uie-name="status-name"
+                    dataUieName="status-name"
                     availability={availability}
                     label={participantName}
                   />

@@ -28,6 +28,7 @@ import NamedIcon from './NamedIcon';
 export interface AvailabilityStateProps {
   availability: Availability.Type;
   className?: string;
+  dataUieName?: string;
   label: string;
   showArrow?: boolean;
   theme?: boolean;
@@ -44,6 +45,7 @@ const iconStyles: CSSObject = {
 const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   availability,
   className,
+  dataUieName,
   label,
   showArrow = false,
   theme = false,
@@ -94,7 +96,7 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
         <div
           className="availability-state-label"
           css={theme ? {color: 'var(--accent-color)', userSelect: 'none'} : {userSelect: 'none'}}
-          data-uie-name="status-label"
+          data-uie-name={dataUieName || 'status-label'}
         >
           {label}
         </div>
