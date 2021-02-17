@@ -9,8 +9,7 @@
     <availability-state
       class="left-list-header-availability"
       data-bind="clickOrDrag: clickOnAvailability"
-      data-uie-name="status-availability"
-      params="availability: selfAvailability, label: selfUserName"
+      params="availability: selfAvailability, label: selfUserName, dataUieName: 'status-availability'"
     >
     </availability-state>
       <!-- ko if: isOnLegalHold() || hasPendingLegalHold() -->

@@ -40,8 +40,7 @@ ko.components.register('panel-user-details', {
       <div class="panel-participant__head">
         <!-- ko if: participant().inTeam() -->
           <availability-state class="panel-participant__head__name"
-            data-uie-name="status-name"
-            params="availability: participant().availability, label: participant().name()"></availability-state>
+            params="availability: participant().availability, label: participant().name(), dataUieName: 'status-name'"></availability-state>
         <!-- /ko -->
 
         <!-- ko ifnot: participant().inTeam() -->
