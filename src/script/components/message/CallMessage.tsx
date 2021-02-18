@@ -21,16 +21,18 @@ import React from 'react';
 import NamedIcon from 'Components/NamedIcon';
 import {CallMessage as CallMessageEntity} from '../../entity/message/CallMessage';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 
 export interface CallMessageProps {
   message: CallMessageEntity;
 }
 
 const CallMessage: React.FC<CallMessageProps> = ({message}) => {
+  const unsafeSenderName = useKoSubscribable(message.unsafeSenderName);
+  const caption = useKoSubscribable(message.caption);
+  const timestamp = useKoSubscribable(message.timestamp);
+
   const isCompleted = message.was_completed();
-  const unsafeSenderName = message.unsafeSenderName();
-  const caption = message.caption();
   const displayTimestampShort = message.displayTimestampShort();
   const displayTimestampLong = message.displayTimestampLong();
 
@@ -66,7 +68,7 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
           className="time with-tooltip with-tooltip--top with-tooltip--time"
           onMouseEnter={() => showAllTimestamps(true)}
           onMouseLeave={() => showAllTimestamps(false)}
-          data-timestamp={message.timestamp()}
+          data-timestamp={timestamp}
           data-tooltip={displayTimestampLong}
         >
           {displayTimestampShort}
