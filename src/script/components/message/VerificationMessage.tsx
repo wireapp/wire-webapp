@@ -43,15 +43,18 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
   }, [userEntities]);
 
   const hasMultipleUsers = userIds.length > 1;
-  const unsafeSenderName = message.unsafeSenderName();
+  const unsafeSenderName = useKoSubscribable(message.unsafeSenderName);
 
-  const isTypeVerified = message.verificationMessageType() === VerificationMessageType.VERIFIED;
-  const isTypeUnverified = message.verificationMessageType() === VerificationMessageType.UNVERIFIED;
-  const isTypeNewDevice = message.verificationMessageType() === VerificationMessageType.NEW_DEVICE;
-  const isTypeNewMember = message.verificationMessageType() === VerificationMessageType.NEW_MEMBER;
+  const verificationMessageType = useKoSubscribable(message.verificationMessageType);
+  const isTypeVerified = verificationMessageType === VerificationMessageType.VERIFIED;
+  const isTypeUnverified = verificationMessageType === VerificationMessageType.UNVERIFIED;
+  const isTypeNewDevice = verificationMessageType === VerificationMessageType.NEW_DEVICE;
+  const isTypeNewMember = verificationMessageType === VerificationMessageType.NEW_MEMBER;
+
+  const isSelfClient = useKoSubscribable(message.isSelfClient);
 
   const showDevice = (): void => {
-    const topic = message.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
+    const topic = isSelfClient ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   };
 
@@ -63,7 +66,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
       <div
         className="message-header-label"
         data-uie-name="element-message-verification"
-        data-uie-value={message.verificationMessageType()}
+        data-uie-value={verificationMessageType}
       >
         {isTypeVerified && <span>{t('tooltipConversationAllVerified')}</span>}
         {isTypeUnverified && (
@@ -71,7 +74,7 @@ const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
             <span className="message-header-sender-name">{unsafeSenderName}</span>
             <span className="ellipsis">{t('conversationDeviceUnverified')}</span>
             <span className="message-verification-action accent-text" onClick={showDevice} data-uie-name="go-devices">
-              {message.isSelfClient()
+              {isSelfClient
                 ? t('conversationDeviceYourDevices')
                 : t('conversationDeviceUserDevices', userEntities[0]?.name())}
             </span>
