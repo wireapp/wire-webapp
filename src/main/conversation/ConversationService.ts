@@ -194,8 +194,20 @@ export class ConversationService {
     const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
     return sendAsProtobuf
-      ? this.messageService.sendOTRProtobufMessage(sendingClientId, recipients, conversationId, cipherText)
-      : this.messageService.sendOTRMessage(sendingClientId, recipients, conversationId, base64CipherText);
+      ? this.messageService.sendOTRProtobufMessage(
+          sendingClientId,
+          recipients,
+          conversationId,
+          plainTextArray,
+          cipherText,
+        )
+      : this.messageService.sendOTRMessage(
+          sendingClientId,
+          recipients,
+          conversationId,
+          plainTextArray,
+          base64CipherText,
+        );
   }
 
   private async sendGenericMessage(
@@ -222,8 +234,8 @@ export class ConversationService {
     const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
     return sendAsProtobuf
-      ? this.messageService.sendOTRProtobufMessage(sendingClientId, recipients, conversationId)
-      : this.messageService.sendOTRMessage(sendingClientId, recipients, conversationId);
+      ? this.messageService.sendOTRProtobufMessage(sendingClientId, recipients, conversationId, plainTextArray)
+      : this.messageService.sendOTRMessage(sendingClientId, recipients, conversationId, plainTextArray);
   }
 
   private async sendButtonAction(
@@ -680,7 +692,7 @@ export class ConversationService {
     userIds?: string[] | UserClientsMap,
     sendAsProtobuf?: boolean,
   ): Promise<ResetSessionMessage> {
-    const sessionReset = GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: payloadBundle.id,
     });
@@ -688,7 +700,7 @@ export class ConversationService {
     await this.sendGenericMessage(
       this.apiClient.validatedClientId,
       payloadBundle.conversation,
-      sessionReset,
+      genericMessage,
       userIds,
       sendAsProtobuf,
     );

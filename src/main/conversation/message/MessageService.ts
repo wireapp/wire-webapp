@@ -21,11 +21,12 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {AxiosError} from 'axios';
 import {IUserEntry, IClientEntry, NewOtrMessage} from '@wireapp/protocol-messaging/web/otr';
 import Long from 'long';
-import {uuidToBytes} from '@wireapp/commons/src/main/util/StringUtil';
+import {bytesToUUID, uuidToBytes} from '@wireapp/commons/src/main/util/StringUtil';
 import {APIClient} from '@wireapp/api-client';
 import {NewOTRMessage, OTRRecipients, UserClients} from '@wireapp/api-client/src/conversation';
 
 import {CryptographyService} from '../../cryptography';
+import {Decoder, Encoder} from 'bazinga64';
 
 export class MessageService {
   constructor(private readonly apiClient: APIClient, private readonly cryptographyService: CryptographyService) {}
@@ -34,23 +35,39 @@ export class MessageService {
     sendingClientId: string,
     recipients: OTRRecipients<Uint8Array>,
     conversationId: string | null,
-    data?: any,
+    plainTextArray: Uint8Array,
+    base64CipherText?: string,
   ): Promise<void> {
     const message: NewOTRMessage<string> = {
-      data,
+      data: base64CipherText,
       recipients: CryptographyService.convertArrayRecipientsToBase64(recipients),
       sender: sendingClientId,
     };
 
-    if (conversationId === null) {
-      await this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, message, true);
-    } else {
-      /**
-       * When creating the PreKey bundles we already found out to which users we want to send a message, so we can ignore
-       * missing clients. We have to ignore missing clients because there can be the case that there are clients that
-       * don't provide PreKeys (clients from the Pre-E2EE era).
-       */
-      await this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message, true);
+    /*
+     * When creating the PreKey bundles we already found out to which users we want to send a message, so we can ignore
+     * missing clients. We have to ignore missing clients because there can be the case that there are clients that
+     * don't provide PreKeys (clients from the Pre-E2EE era).
+     */
+    const ignoreMissing = true;
+
+    try {
+      if (conversationId === null) {
+        await this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, message, ignoreMissing);
+      } else {
+        await this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message, ignoreMissing);
+      }
+    } catch (error) {
+      const reEncryptedMessage = await this.onClientMismatch(
+        error,
+        {...message, data: base64CipherText ? Decoder.fromBase64(base64CipherText).asBytes : undefined, recipients},
+        plainTextArray,
+      );
+      await this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, {
+        data: reEncryptedMessage.data ? Encoder.toBase64(reEncryptedMessage.data).asString : undefined,
+        recipients: CryptographyService.convertArrayRecipientsToBase64(reEncryptedMessage.recipients),
+        sender: reEncryptedMessage.sender,
+      });
     }
   }
 
@@ -58,6 +75,7 @@ export class MessageService {
     sendingClientId: string,
     recipients: OTRRecipients<Uint8Array>,
     conversationId: string | null,
+    plainTextArray: Uint8Array,
     assetData?: Uint8Array,
   ): Promise<void> {
     const userEntries: IUserEntry[] = Object.entries(recipients).map(([userId, otrClientMap]) => {
@@ -89,26 +107,37 @@ export class MessageService {
       protoMessage.blob = assetData;
     }
 
-    if (conversationId === null) {
-      await this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, protoMessage, true);
-    } else {
-      /**
-       * When creating the PreKey bundles we already found out to which users we want to send a message, so we can ignore
-       * missing clients. We have to ignore missing clients because there can be the case that there are clients that
-       * don't provide PreKeys (clients from the Pre-E2EE era).
-       */
-      await this.apiClient.conversation.api.postOTRProtobufMessage(sendingClientId, conversationId, protoMessage, true);
+    /*
+     * When creating the PreKey bundles we already found out to which users we want to send a message, so we can ignore
+     * missing clients. We have to ignore missing clients because there can be the case that there are clients that
+     * don't provide PreKeys (clients from the Pre-E2EE era).
+     */
+    const ignoreMissing = true;
+
+    try {
+      if (conversationId === null) {
+        await this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, protoMessage, ignoreMissing);
+      } else {
+        await this.apiClient.conversation.api.postOTRProtobufMessage(
+          sendingClientId,
+          conversationId,
+          protoMessage,
+          ignoreMissing,
+        );
+      }
+    } catch (error) {
+      const reEncryptedMessage = await this.onClientProtobufMismatch(error, protoMessage, plainTextArray);
+      await this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, reEncryptedMessage);
     }
   }
 
-  // TODO: Move this to a generic "message sending class" and make it private.
-  public async onClientMismatch(
+  private async onClientMismatch(
     error: AxiosError,
     message: NewOTRMessage<Uint8Array>,
     plainTextArray: Uint8Array,
   ): Promise<NewOTRMessage<Uint8Array>> {
     if (error.response?.status === HTTP_STATUS.PRECONDITION_FAILED) {
-      const {missing, deleted}: {deleted: UserClients; missing: UserClients} = error.response?.data;
+      const {missing, deleted} = (error as AxiosError<{deleted: UserClients; missing: UserClients}>).response?.data!;
 
       const deletedUserIds = Object.keys(deleted);
       const missingUserIds = Object.keys(missing);
@@ -141,6 +170,65 @@ export class MessageService {
 
       return message;
     }
+
+    throw error;
+  }
+
+  private async onClientProtobufMismatch(
+    error: AxiosError,
+    message: NewOtrMessage,
+    plainTextArray: Uint8Array,
+  ): Promise<NewOtrMessage> {
+    if (error.response?.status === HTTP_STATUS.PRECONDITION_FAILED) {
+      const {missing, deleted} = (error as AxiosError<{deleted: UserClients; missing: UserClients}>).response?.data!;
+
+      const deletedUserIds = Object.keys(deleted);
+      const missingUserIds = Object.keys(missing);
+
+      if (deletedUserIds.length) {
+        for (const deletedUserId of deletedUserIds) {
+          for (const deletedClientId of deleted[deletedUserId]) {
+            const deletedUserIndex = message.recipients.findIndex(({user}) => bytesToUUID(user.uuid) === deletedUserId);
+            if (deletedUserIndex > -1) {
+              const deletedClientIndex = message.recipients[deletedUserIndex].clients?.findIndex(({client}) => {
+                return client.client.toString(16) === deletedClientId;
+              });
+              if (typeof deletedClientIndex !== 'undefined' && deletedClientIndex > -1) {
+                delete message.recipients[deletedUserIndex].clients?.[deletedClientIndex!];
+              }
+            }
+          }
+        }
+      }
+
+      if (missingUserIds.length) {
+        const missingPreKeyBundles = await this.apiClient.user.api.postMultiPreKeyBundles(missing);
+        const reEncryptedPayloads = await this.cryptographyService.encrypt(plainTextArray, missingPreKeyBundles);
+        for (const missingUserId of missingUserIds) {
+          for (const missingClientId in reEncryptedPayloads[missingUserId]) {
+            const missingUserIndex = message.recipients.findIndex(({user}) => bytesToUUID(user.uuid) === missingUserId);
+            if (missingUserIndex === -1) {
+              message.recipients.push({
+                clients: [
+                  {
+                    client: {
+                      client: Long.fromString(missingClientId, 16),
+                    },
+                    text: reEncryptedPayloads[missingUserId][missingClientId],
+                  },
+                ],
+                user: {
+                  uuid: uuidToBytes(missingUserId),
+                },
+              });
+            }
+          }
+        }
+      }
+
+      return message;
+    }
+
     throw error;
   }
 }
