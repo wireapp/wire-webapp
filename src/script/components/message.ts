@@ -55,6 +55,8 @@ import './asset/videoAsset';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
+import './message/MissedMessage';
+import './message/FileTypeRestrictedMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -468,24 +470,6 @@ const normalTemplate: string = `
   <!-- /ko -->
   `;
 
-const missedTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label" data-bind="text: t('conversationMissedMessages')"></div>
-  </div>
-  `;
-
-const fileTypeRestrictedTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label" data-bind="html: message.caption"></div>
-  </div>
-  `;
-
 const unableToDecryptTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -671,7 +655,7 @@ ko.components.register('message', {
       ${normalTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'missed' -->
-      ${missedTemplate}
+      <missed-message></missed-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'unable-to-decrypt' -->
       ${unableToDecryptTemplate}
@@ -695,7 +679,7 @@ ko.components.register('message', {
       ${pingTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'file-type-restricted' -->
-      ${fileTypeRestrictedTemplate}
+      <filetype-restricted-message params="message: message"></filetype-restricted-message>
     <!-- /ko -->
     <!-- ko if: message.isLegalHold() -->
       ${legalHoldTemplate}
