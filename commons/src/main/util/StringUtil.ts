@@ -29,3 +29,8 @@ export function pluralize(text: string, times: number, options?: {postfix: strin
 export function uuidToBytes(uuid: string): Buffer {
   return Buffer.from(uuid.replace(/-/g, ''), 'hex');
 }
+
+export function bytesToUUID(uuid: Buffer | Uint8Array): string {
+  const str = uuid.toString('hex');
+  return `${str.slice(0, 8)}-${str.slice(8, 12)}-${str.slice(12, 16)}-${str.slice(16, 20)}-${str.slice(20)}`;
+}

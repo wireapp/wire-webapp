@@ -119,10 +119,9 @@ export class CryptographyService {
       recipients[userId] = {};
 
       for (const clientId in preKeyBundles[userId]) {
-        const preKeyPayload = preKeyBundles[userId][clientId];
-        const preKey = preKeyPayload.key;
+        const {key: base64PreKey} = preKeyBundles[userId][clientId];
         const sessionId = CryptographyService.constructSessionId(userId, clientId);
-        bundles.push(this.encryptPayloadForSession(sessionId, plainText, preKey));
+        bundles.push(this.encryptPayloadForSession(sessionId, plainText, base64PreKey));
       }
     }
 
@@ -144,12 +143,12 @@ export class CryptographyService {
   ): Promise<SessionPayloadBundle> {
     this.logger.log(`Encrypting payload for session ID "${sessionId}"`);
 
-    let encryptedPayload;
+    let encryptedPayload: Uint8Array;
 
     try {
       const decodedPreKeyBundle = Decoder.fromBase64(base64EncodedPreKey).asBytes;
-      const payloadAsBuffer = await this.cryptobox.encrypt(sessionId, plainText, decodedPreKeyBundle.buffer);
-      encryptedPayload = new Uint8Array(payloadAsBuffer);
+      const payloadAsArrayBuffer = await this.cryptobox.encrypt(sessionId, plainText, decodedPreKeyBundle.buffer);
+      encryptedPayload = new Uint8Array(payloadAsArrayBuffer);
     } catch (error) {
       this.logger.error(`Could not encrypt payload: ${error.message}`);
       encryptedPayload = new Uint8Array(Buffer.from('💣', 'utf-8'));
