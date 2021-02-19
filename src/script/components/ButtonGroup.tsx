@@ -66,7 +66,11 @@ const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onC
         <div
           key={item}
           css={item === currentItem ? buttonGroupItemActiveStyles : buttonGroupItemStyles}
-          onClick={() => onChangeItem(item)}
+          onClick={() => {
+            if (item !== currentItem) {
+              onChangeItem(item);
+            }
+          }}
           data-uie-name="button-group-item"
           data-uie-value={item === currentItem ? 'active' : 'inactive'}
         >

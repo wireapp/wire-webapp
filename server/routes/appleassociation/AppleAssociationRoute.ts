@@ -19,10 +19,8 @@
 
 import {Router} from 'express';
 
-import type {ServerConfig} from '../../ServerConfig';
-
-export const AppleAssociationRoute = (config: ServerConfig) =>
-  Router().get('/apple-app-site-association', (req, res) => {
+export const AppleAssociationRoute = () =>
+  Router().get('/apple-app-site-association', (_req, res) => {
     const response = {
       webcredentials: {
         apps: [

@@ -61,6 +61,11 @@ import {ContentViewModel} from '../ContentViewModel';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {HistoryExportViewModel} from './HistoryExportViewModel';
 
+export enum UserNameState {
+  AVAILABLE = 'AVAILABLE',
+  TAKEN = 'TAKEN',
+}
+
 export class PreferencesAccountViewModel {
   logger: Logger;
   fileExtension: string;
@@ -75,7 +80,7 @@ export class PreferencesAccountViewModel {
   username: ko.PureComputed<string>;
   enteredUsername: ko.Observable<string>;
   submittedUsername: ko.Observable<string>;
-  usernameState: ko.Observable<string>;
+  usernameState: ko.Observable<UserNameState>;
   richProfileFields: ko.Observable<RichInfoField[]>;
   nameSaved: ko.Observable<boolean>;
   usernameSaved: ko.Observable<boolean>;
@@ -96,7 +101,8 @@ export class PreferencesAccountViewModel {
   isConsentCheckEnabled: () => boolean;
   canEditProfile: (user: User) => boolean;
   Config: typeof PreferencesAccountViewModel.CONFIG;
-  UserNameState: typeof PreferencesAccountViewModel.USERNAME_STATE;
+  /** The `UserNameState` exists, so that conditions in Knockout templates can make use of it. */
+  UserNameState: typeof UserNameState = UserNameState;
   isCountlyEnabled: boolean = false;
 
   static get CONFIG() {
@@ -105,13 +111,6 @@ export class PreferencesAccountViewModel {
         FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
       SAVE_ANIMATION_TIMEOUT: MotionDuration.X_LONG * 2,
-    };
-  }
-
-  static get USERNAME_STATE() {
-    return {
-      AVAILABLE: 'PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE',
-      TAKEN: 'PreferencesAccountViewModel.USERNAME_STATE.TAKEN',
     };
   }
 
@@ -133,7 +132,6 @@ export class PreferencesAccountViewModel {
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.selfUser = this.userState.self;
     this.Config = PreferencesAccountViewModel.CONFIG;
-    this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.email = ko.pureComputed(() => this.selfUser().email());
@@ -222,22 +220,23 @@ export class PreferencesAccountViewModel {
   };
 
   changeUsername = async (username: string, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const enteredUsername = event.target.value;
-    const normalizedUsername = enteredUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const normalizedUsername = event.target.value.toLowerCase();
 
-    const wasNormalized = enteredUsername !== normalizedUsername;
-    if (wasNormalized) {
-      event.target.value = normalizedUsername;
+    if (normalizedUsername !== event.target.value) {
+      event.target.value = event.target.value.toLowerCase();
+      this.enteredUsername(event.target.value);
     }
 
     const isUnchanged = normalizedUsername === this.selfUser().username();
     if (isUnchanged) {
-      return event.target.blur();
+      event.target.blur();
+      return;
     }
 
     const isInvalidName = normalizedUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     if (isInvalidName) {
-      return this.usernameState(null);
+      this.usernameState(null);
+      return;
     }
 
     this.submittedUsername(normalizedUsername);
@@ -256,7 +255,7 @@ export class PreferencesAccountViewModel {
       const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
       const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
       if (isUsernameTaken && isCurrentRequest) {
-        this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+        this.usernameState(UserNameState.TAKEN);
       }
     }
   };
@@ -492,7 +491,7 @@ export class PreferencesAccountViewModel {
   readonly shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
   readonly verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
-    const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const enteredUsername = event.target.value.toLowerCase();
 
     const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     const usernameUnchanged = enteredUsername === this.selfUser().username();
@@ -508,14 +507,14 @@ export class PreferencesAccountViewModel {
         .then(() => {
           const isCurrentRequest = this.enteredUsername() === enteredUsername;
           if (isCurrentRequest) {
-            this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE);
+            this.usernameState(UserNameState.AVAILABLE);
           }
         })
         .catch(error => {
           const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
           const isCurrentRequest = this.enteredUsername() === enteredUsername;
           if (isUsernameTaken && isCurrentRequest) {
-            this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+            this.usernameState(UserNameState.TAKEN);
           }
         });
     }

@@ -31,7 +31,7 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 
 import 'Components/calling/FullscreenVideoCall.tsx';
 import 'Components/calling/GroupVideoGrid';
-import 'Components/list/participantItem';
+import 'Components/list/ParticipantItem';
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {Grid} from '../../calling/videoGridHandler';
@@ -357,7 +357,7 @@ ko.components.register('conversation-list-calling-cell', {
 
         <div class="call-ui__participant-list__wrapper" data-bind="css: {'call-ui__participant-list__wrapper--active': showParticipants}">
           <div class="call-ui__participant-list" data-bind="foreach: {data: participants, as: 'participant', noChildContext: true}, fadingscrollbar" data-uie-name="list-call-ui-participants">
-            <participant-item params="participant: participant.user, hideInfo: true, callParticipant: participant, selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified, external: teamRepository.isExternal(participant.user.id)" data-bind="css: {'no-underline': true}"></participant-item>
+            <participant-item params="participant: participant.user, hideInfo: true, noUnderline: true, callParticipant: participant, selfInTeam: $parent.selfInTeam, isSelfVerified: isSelfVerified, external: teamRepository.isExternal(participant.user.id)"></participant-item>
           </div>
         </div>
 

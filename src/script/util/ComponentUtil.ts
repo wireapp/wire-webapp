@@ -20,6 +20,7 @@
 import ko from 'knockout';
 import {useEffect, useState} from 'react';
 import {container, InjectionToken} from 'tsyringe';
+import {TypeUtil} from '@wireapp/commons';
 
 export function registerReactComponent<Props>(
   name: string,
@@ -32,7 +33,7 @@ export function registerReactComponent<Props>(
     component: React.ComponentType<Props>;
     injected?: Record<string, InjectionToken>;
     /** The optional knockout params */
-    optionalParams?: (keyof Props)[];
+    optionalParams?: TypeUtil.OptionalKeys<Props>[];
     template: string;
   },
 ) {

@@ -119,7 +119,14 @@
         </div>
       </div>
       <div class="preferences-detail" data-bind="text: t('preferencesOptionsEnableVbrDetails')"></div>
-    </section>
+      <div class="preferences-option">
+        <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionAgcEnabled}" data-uie-name="status-preference-agc">
+          <input type="checkbox" id="agc-checkbox" data-bind="checked: optionAgcEnabled">
+          <label class="preferences-options-checkbox-label" for="agc-checkbox" data-bind="text: t('preferencesOptionsEnableAgcCheckbox')"></label>
+        </div>
+      </div>
+      <div class="preferences-detail" data-bind="text: t('preferencesOptionsEnableAgcDetails')"></div>
+   </section>
 
     <!-- ko if: callingRepository.supportsCalling -->
       <section class="preferences-section">

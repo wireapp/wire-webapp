@@ -27,6 +27,8 @@ import NamedIcon from './NamedIcon';
 
 export interface AvailabilityStateProps {
   availability: Availability.Type;
+  className?: string;
+  dataUieName: string;
   label: string;
   showArrow?: boolean;
   theme?: boolean;
@@ -42,6 +44,8 @@ const iconStyles: CSSObject = {
 
 const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   availability,
+  className,
+  dataUieName,
   label,
   showArrow = false,
   theme = false,
@@ -50,8 +54,8 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   const isAway = availability === Availability.Type.AWAY;
   const isBusy = availability === Availability.Type.BUSY;
 
-  return (
-    <React.Fragment>
+  const content = (
+    <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
       {isAvailable && (
         <NamedIcon
           className="availability-state-icon"
@@ -117,15 +121,21 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
           }}
         />
       )}
-    </React.Fragment>
+    </span>
   );
+
+  if (className) {
+    return <span className={`availability-state ${className}`}>{content}</span>;
+  }
+
+  return content;
 };
 
 export default AvailabilityState;
 
-registerReactComponent('availability-state', {
+registerReactComponent<AvailabilityStateProps>('availability-state', {
   component: AvailabilityState,
-  optionalParams: ['showArrow', 'theme'],
+  optionalParams: ['showArrow', 'theme', 'className'],
   template:
-    '<span class="availability-state" data-bind="react: {availability: ko.unwrap(availability), label: ko.unwrap(label), showArrow, theme: ko.unwrap(theme)}"></span>',
+    '<span class="availability-state" data-bind="react: {availability: ko.unwrap(availability), label: ko.unwrap(label), showArrow, dataUieName, theme: ko.unwrap(theme)}"></span>',
 });

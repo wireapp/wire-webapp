@@ -23,7 +23,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
-import 'Components/receiptModeToggle';
+import 'Components/ReceiptModeToggle';
 import 'Components/panel/PanelActions';
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -465,8 +465,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  readonly updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: RECEIPT_MODE): void => {
-    this.conversationRepository.updateConversationReceiptMode(conversationEntity, {receipt_mode: receiptMode});
+  readonly updateConversationReceiptMode = (receiptMode: RECEIPT_MODE): void => {
+    this.conversationRepository.updateConversationReceiptMode(this.activeConversation(), {receipt_mode: receiptMode});
   };
 
   initView(): void {

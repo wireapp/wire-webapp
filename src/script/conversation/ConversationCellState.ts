@@ -356,8 +356,8 @@ const _getStateUnreadMessage = {
 const _getStateUserName = {
   description: (conversationEntity: Conversation): string => {
     const [userEntity] = conversationEntity.participating_user_ets();
-    const hasUsername = userEntity && userEntity.username();
-    return hasUsername ? `@${userEntity.username()}` : '';
+    const hasHandle = userEntity && userEntity.username();
+    return hasHandle ? userEntity.handle : '';
   },
   icon: (conversationEntity: Conversation): ConversationStatusIcon.PENDING_CONNECTION | void => {
     if (conversationEntity.isRequest()) {
