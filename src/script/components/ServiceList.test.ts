@@ -18,7 +18,9 @@
  */
 
 import TestPage from 'Util/test/TestPage';
+import {createRandomUuid} from 'Util/util';
 
+import {ServiceEntity} from '../integration/ServiceEntity';
 import ServiceList, {ServiceListProps} from './ServiceList';
 
 class ServiceListPage extends TestPage<ServiceListProps> {
@@ -26,22 +28,41 @@ class ServiceListPage extends TestPage<ServiceListProps> {
     super(ServiceList, props);
   }
 
-  getCheckbox = () => this.get('input[data-uie-name="toggle-receipt-mode-checkbox"]');
-  checkCheckbox = () => this.changeValue(this.getCheckbox(), {checked: true});
-  uncheckCheckbox = () => this.changeValue(this.getCheckbox(), {checked: false});
+  getNoResultsDiv = () => this.get('[data-uie-name="service-list-no-results"]');
+  getServiceDiv = (serviceId: string) => this.get(`[data-uie-name="service-list-service-${serviceId}"]`);
 }
 
 describe('ServiceList', () => {
-  it('checks the checkbox when receipts are turned on', () => {
+  it('lists the services', () => {
+    const serviceEntity1 = new ServiceEntity({id: createRandomUuid()});
+    const serviceEntity2 = new ServiceEntity({id: createRandomUuid()});
+
     const serviceList = new ServiceListPage({
       arrow: false,
       click: () => {},
+      isSearching: false,
+      noUnderline: true,
+      services: [serviceEntity1, serviceEntity2],
+    });
+
+    const serviceDiv1 = serviceList.getServiceDiv(serviceEntity1.id);
+    const serviceDiv2 = serviceList.getServiceDiv(serviceEntity2.id);
+
+    expect(serviceDiv1.exists()).toBe(true);
+    expect(serviceDiv2.exists()).toBe(true);
+  });
+
+  it('shows the "no results found" div when there are no services', () => {
+    const serviceList = new ServiceListPage({
+      arrow: false,
+      click: () => {},
+      isSearching: true,
       noUnderline: true,
       services: [],
     });
 
-    const checkBox = serviceList.getCheckbox();
+    const noResultsDiv = serviceList.getNoResultsDiv();
 
-    expect(checkBox.props().checked).toBe(false);
+    expect(noResultsDiv.exists()).toBe(true);
   });
 });

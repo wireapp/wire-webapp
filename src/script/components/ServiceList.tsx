@@ -25,6 +25,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import ParticipantItem from 'Components/list/ParticipantItem';
+import {t} from '../util/LocalizerUtil';
 
 export interface ServiceListProps {
   arrow: boolean;
@@ -52,12 +53,16 @@ const ServiceList: React.FC<ServiceListProps> = ({
     <Fragment>
       <div className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
         {services.map(service => (
-          <div onClick={click} key={service.id}>
+          <div onClick={click} key={service.id} data-uie-name={`service-list-service-${service.id}`}>
             <ParticipantItem participant={service} noUnderline={noUnderline} showArrow={arrow} />
           </div>
         ))}
       </div>
-      {isSearching && !services.length && <div className="no-results" data-bind="text: t('searchListNoMatches')"></div>}
+      {isSearching && !services.length && (
+        <div className="no-results" data-uie-name="service-list-no-results">
+          {t('searchListNoMatches')}
+        </div>
+      )}
     </Fragment>
   );
 };
