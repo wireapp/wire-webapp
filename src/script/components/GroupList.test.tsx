@@ -20,14 +20,16 @@
 import GroupList, {GroupListProps} from 'Components/GroupList';
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid, noop} from 'Util/util';
+import {AssetRepository} from '../assets/AssetRepository';
 import {Conversation} from '../entity/Conversation';
 import {User} from '../entity/User';
+import {Router} from '../router/Router';
 
 class GroupListPage extends TestPage<GroupListProps> {
   constructor(props?: GroupListProps) {
     super(GroupList, props);
   }
-  getSearchListItems = () => this.get('.search-list-item');
+  getGroupConversationItem = (groupId: string) => this.get(`[data-uie-name="item-group"][data-uie-uid="${groupId}"]`);
 }
 
 describe('GroupList', () => {
@@ -42,10 +44,33 @@ describe('GroupList', () => {
   };
   it('shows group list', () => {
     const groups = [createConversation('groupA'), createConversation('groupB')];
+    const assetRepository: Partial<AssetRepository> = {};
+    const router: Partial<Router> = {};
+
     const groupListPage = new GroupListPage({
+      assetRepository: assetRepository as AssetRepository,
       click: noop,
       groups,
+      router: router as Router,
     });
-    expect(groupListPage.getSearchListItems().length).toEqual(groups.length);
+    expect(groupListPage.getGroupConversationItem(groups[0].id).exists()).toBe(true);
+    expect(groupListPage.getGroupConversationItem(groups[1].id).exists()).toBe(true);
+  });
+
+  it('shows group list and navigates conversation on click', () => {
+    const groups = [createConversation('groupA'), createConversation('groupB')];
+    const assetRepository: Partial<AssetRepository> = {};
+    const router: Partial<Router> = {
+      navigate: jest.fn(),
+    };
+
+    const groupListPage = new GroupListPage({
+      assetRepository: assetRepository as AssetRepository,
+      click: noop,
+      groups,
+      router: router as Router,
+    });
+
+    expect(groupListPage.getGroupConversationItem(groups[0].id).exists()).toBe(true);
   });
 });

@@ -29,14 +29,18 @@ import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {Conversation} from '../entity/Conversation';
 
 export interface GroupListProps {
+  assetRepository?: AssetRepository;
   click: (group: Conversation) => void;
   groups: Conversation[];
+  router?: Router;
 }
 
-const GroupList: React.FC<GroupListProps> = ({click, groups}) => {
-  const assetRepository = container.resolve(AssetRepository);
-  const router = container.resolve(Router);
-
+const GroupList: React.FC<GroupListProps> = ({
+  click,
+  groups,
+  assetRepository = container.resolve(AssetRepository),
+  router = container.resolve(Router),
+}) => {
   return (
     <div className="search-list search-list-lg">
       {groups.map(group => (
@@ -44,7 +48,7 @@ const GroupList: React.FC<GroupListProps> = ({click, groups}) => {
           key={group.id}
           data-uie-name="item-group"
           className="search-list-item"
-          data-uie-uid={group.id}
+          data-uie-uid={`${group.id}`}
           onClick={() => {
             click(group);
             router.navigate(generateConversationUrl(group.id));
