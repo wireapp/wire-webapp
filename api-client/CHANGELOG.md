@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.3.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.3.5...@wireapp/api-client@12.3.6) (2021-02-19)
+
+
+### Bug Fixes
+
+* **core:** Use onClientMismatch and properly use additional data ([#3551](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3551)) ([872d8b6](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/872d8b68d23dc49176088240ae9eaea358425a1a))
+
+
+
+
+
 ## [12.3.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.3.4...@wireapp/api-client@12.3.5) (2021-02-16)
 
 **Note:** Version bump only for package @wireapp/api-client

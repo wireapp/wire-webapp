@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@4.1.0...@wireapp/commons@4.1.1) (2021-02-19)
+
+
+### Bug Fixes
+
+* **core:** Use onClientMismatch and properly use additional data ([#3551](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3551)) ([872d8b6](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/872d8b68d23dc49176088240ae9eaea358425a1a))
+
+
+
+
+
 # [4.1.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@4.0.3...@wireapp/commons@4.1.0) (2021-02-16)
 
 
