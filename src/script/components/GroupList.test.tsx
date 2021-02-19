@@ -17,6 +17,7 @@
  *
  */
 
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 import GroupList, {GroupListProps} from 'Components/GroupList';
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid, noop} from 'Util/util';
@@ -30,10 +31,11 @@ class GroupListPage extends TestPage<GroupListProps> {
     super(GroupList, props);
   }
   getGroupConversationItem = (groupId: string) => this.get(`[data-uie-name="item-group"][data-uie-uid="${groupId}"]`);
+  clickGroupConversationItem = (groupId: string) => this.click(this.getGroupConversationItem(groupId));
 }
 
 describe('GroupList', () => {
-  const createConversation = (name: string, id = createRandomUuid()) => {
+  const createGroupConversation = (name: string, id = createRandomUuid()) => {
     const conversation = new Conversation(id);
     spyOn(conversation, 'display_name').and.returnValue(name);
     const userIds = [createRandomUuid(), createRandomUuid()];
@@ -42,8 +44,15 @@ describe('GroupList', () => {
     conversation.participating_user_ets.push(...users);
     return conversation;
   };
+
+  const create1on1Conversation = (name: string, id = createRandomUuid()) => {
+    const conversation = createGroupConversation(name, id);
+    conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+    return conversation;
+  };
+
   it('shows group list', () => {
-    const groups = [createConversation('groupA'), createConversation('groupB')];
+    const groups = [createGroupConversation('groupA'), create1on1Conversation('groupB')];
     const assetRepository: Partial<AssetRepository> = {};
     const router: Partial<Router> = {};
 
@@ -58,19 +67,25 @@ describe('GroupList', () => {
   });
 
   it('shows group list and navigates conversation on click', () => {
-    const groups = [createConversation('groupA'), createConversation('groupB')];
+    const groups = [createGroupConversation('groupA'), create1on1Conversation('groupB')];
     const assetRepository: Partial<AssetRepository> = {};
     const router: Partial<Router> = {
       navigate: jest.fn(),
     };
-
+    const onClickSpy = jest.fn();
     const groupListPage = new GroupListPage({
       assetRepository: assetRepository as AssetRepository,
-      click: noop,
+      click: onClickSpy,
       groups,
       router: router as Router,
     });
 
-    expect(groupListPage.getGroupConversationItem(groups[0].id).exists()).toBe(true);
+    groupListPage.clickGroupConversationItem(groups[0].id);
+    expect(router.navigate).toHaveBeenCalledWith(`/conversation/${groups[0].id}`);
+    expect(onClickSpy).toHaveBeenCalledWith(groups[0]);
+
+    groupListPage.clickGroupConversationItem(groups[1].id);
+    expect(router.navigate).toHaveBeenCalledWith(`/conversation/${groups[1].id}`);
+    expect(onClickSpy).toHaveBeenCalledWith(groups[1]);
   });
 });
