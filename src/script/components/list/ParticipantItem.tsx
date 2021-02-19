@@ -75,7 +75,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   selfInTeam,
   showArrow = false,
 }) => {
-  const {viewportElementRef, isInViewport} = useViewPortObserver<HTMLDivElement>();
+  const [isInViewport, viewportElementRef] = useViewPortObserver<HTMLDivElement>();
   const assetRepository = container.resolve(AssetRepository);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
