@@ -1,0 +1,72 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import React, {Fragment} from 'react';
+import cx from 'classnames';
+
+import 'Components/list/ParticipantItem';
+import {registerReactComponent} from 'Util/ComponentUtil';
+
+import type {ServiceEntity} from '../integration/ServiceEntity';
+import ParticipantItem from 'Components/list/ParticipantItem';
+
+export interface ServiceListProps {
+  arrow: boolean;
+  click: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  isSearching?: boolean;
+  mode?: MODE;
+  noUnderline: boolean;
+  services: ServiceEntity[];
+}
+
+export enum MODE {
+  COMPACT = 'ServiceList.MODE.COMPACT',
+  DEFAULT = 'ServiceList.MODE.DEFAULT',
+}
+
+const ServiceList: React.FC<ServiceListProps> = ({
+  arrow,
+  click,
+  isSearching = false,
+  mode = MODE.DEFAULT,
+  noUnderline,
+  services,
+}) => {
+  return (
+    <Fragment>
+      <div className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
+        {services.map(service => (
+          <div onClick={click} key={service.id}>
+            <ParticipantItem participant={service} noUnderline={noUnderline} showArrow={arrow} />
+          </div>
+        ))}
+      </div>
+      {isSearching && !services.length && <div className="no-results" data-bind="text: t('searchListNoMatches')"></div>}
+    </Fragment>
+  );
+};
+
+export default ServiceList;
+
+registerReactComponent('service-list', {
+  component: ServiceList,
+  optionalParams: ['isSearching', 'mode'],
+  template:
+    '<div data-bind="react: {arrow, click, isSearching: ko.unwrap(isSearching), mode, noUnderline, services: ko.unwrap(services)}"></div>',
+});
