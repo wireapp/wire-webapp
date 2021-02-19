@@ -33,7 +33,7 @@ export class BroadcastAPI {
 
   /**
    * Broadcast an encrypted message to all team members and all contacts (accepts Protobuf).
-   * @param clientId The sender's client ID
+   * @param sendingClientId The sender's client ID
    * @param messageData The message content
    * @param ignoreMissing Whether to report missing clients or not:
    * `false`: Report about all missing clients
@@ -44,11 +44,11 @@ export class BroadcastAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/postOtrBroadcast
    */
   public async postBroadcastMessage(
-    clientId: string,
+    sendingClientId: string,
     messageData: NewOTRMessage<string>,
     ignoreMissing?: boolean | string[],
   ): Promise<ClientMismatch> {
-    if (!clientId) {
+    if (!sendingClientId) {
       throw new ValidationError('Unable to send OTR message without client ID.');
     }
 
@@ -75,7 +75,7 @@ export class BroadcastAPI {
 
   /**
    * Broadcast an encrypted message to all team members and all contacts (accepts Protobuf).
-   * @param clientId The sender's client ID
+   * @param sendingClientId The sender's client ID
    * @param messageData The message content
    * @param ignoreMissing Whether to report missing clients or not:
    * `false`: Report about all missing clients
@@ -86,11 +86,11 @@ export class BroadcastAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/tab.html#!/postOtrBroadcast
    */
   public async postBroadcastProtobufMessage(
-    clientId: string,
+    sendingClientId: string,
     messageData: ProtobufOTRMessage,
     ignoreMissing?: boolean | string[],
   ): Promise<ClientMismatch> {
-    if (!clientId) {
+    if (!sendingClientId) {
       throw new ValidationError('Unable to send OTR message without client ID.');
     }
 
