@@ -91,18 +91,14 @@ export class Call {
     // Get the corresponding participants for the entries in ActiveSpeakers in the incoming order.
     const activeSpeakers = audio_levels
       // Consider just the entries with audio activity.
-      .filter(({audio_level, audio_level_now}) => audio_level > 0 || audio_level_now > 0)
+      .filter(({audio_level}) => audio_level > 0)
       // Get the participants.
       .map(({userid, clientid}) => this.getParticipant(userid, clientid))
       // Make sure there was a participant found.
       .filter(participant => !!participant);
 
-    // If there a only a few ( < 4 ) new active speakers, the previous top ones should stay in the list.
-    // Also we don't want duplicates in the list, of course.
-    const allSpeakers = Array.from(new Set([...activeSpeakers, ...this.activeSpeakers()]));
-
     // Set the new active speakers, limited to 4.
-    this.activeSpeakers(allSpeakers.slice(0, 4));
+    this.activeSpeakers(activeSpeakers.slice(0, 4));
   }
 
   getActiveVideoSpeakers = () =>
