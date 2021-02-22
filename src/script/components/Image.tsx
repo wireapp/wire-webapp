@@ -29,7 +29,6 @@ import {useViewPortObserver} from '../ui/viewportObserver';
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   asset: AssetRemoteData;
   assetRepository?: AssetRepository;
-  className?: string;
   click?: (asset: AssetRemoteData) => void;
 }
 
