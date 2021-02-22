@@ -32,7 +32,7 @@ import AvatarWrapper from './AvatarWrapper';
 import {AVATAR_SIZE} from '../ParticipantAvatar';
 import NamedIcon from 'Components/NamedIcon';
 
-export interface ServiceAvatarProps {
+export interface ServiceAvatarProps extends React.ComponentProps<'div'> {
   assetRepository: AssetRepository;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
