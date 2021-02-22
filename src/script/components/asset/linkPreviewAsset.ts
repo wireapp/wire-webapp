@@ -36,7 +36,7 @@ interface Params {
 }
 
 class LinkPreviewAssetComponent {
-  cleanURL: (url?: string) => string;
+  cleanURL: typeof cleanURL;
   messageEntity: ContentMessage;
   header: boolean;
   preview: LinkPreview;
