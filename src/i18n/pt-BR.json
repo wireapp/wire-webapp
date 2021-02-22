@@ -855,6 +855,8 @@
   "preferencesOptionsContactsMacos": "Importar de Contatos",
   "preferencesOptionsEmojiReplaceCheckbox": "Substituir o tipo emoticons com emojis",
   "preferencesOptionsEmojiReplaceDetail": ":-) → [icon]",
+  "preferencesOptionsEnableAgcCheckbox": "Automatic gain control (AGC)",
+  "preferencesOptionsEnableAgcDetails": "Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.",
   "preferencesOptionsEnableVbrCheckbox": "Codificação de Taxa de Bits Constante",
   "preferencesOptionsEnableVbrDetails": "Isto faz chamadas de áudio usar menos dados e funcionar melhor em redes mais lentas. Desligue-o para usar a Codificação de Taxa de Bits Constante.",
   "preferencesOptionsNotifications": "Notificações",

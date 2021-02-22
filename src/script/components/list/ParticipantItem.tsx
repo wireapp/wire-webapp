@@ -38,6 +38,7 @@ import {AssetRepository} from '../../assets/AssetRepository';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import NamedIcon from 'Components/NamedIcon';
+import {Availability} from '@wireapp/protocol-messaging';
 
 export interface ParticipantItemProps {
   badge?: boolean;
@@ -74,7 +75,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   selfInTeam,
   showArrow = false,
 }) => {
-  const {viewportElementRef, isInViewport} = useViewPortObserver<HTMLDivElement>();
+  const [isInViewport, viewportElementRef] = useViewPortObserver();
   const assetRepository = container.resolve(AssetRepository);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
@@ -85,21 +86,17 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const hasUsernameInfo = isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  const isGuest = useKoSubscribable((participant as User).isGuest || ko.observable());
-  const isVerified = useKoSubscribable((participant as User).is_verified || ko.observable());
-  const availability = useKoSubscribable((participant as User).availability || ko.observable());
+  const isGuest = useKoSubscribable((participant as User).isGuest ?? ko.observable(false));
+  const isVerified = useKoSubscribable((participant as User).is_verified ?? ko.observable(false));
+  const availability = useKoSubscribable((participant as User).availability ?? ko.observable<Availability.Type>());
 
   const participantName = useKoSubscribable(
     isUser ? (participant as User).name : ko.observable((participant as ServiceEntity).name),
   );
-  const callParticipantSharesCamera = useKoSubscribable(
-    callParticipant ? callParticipant.sharesCamera : ko.observable(),
-  );
-  const callParticipantSharesScreen = useKoSubscribable(
-    callParticipant ? callParticipant.sharesScreen : ko.observable(),
-  );
+  const callParticipantSharesCamera = useKoSubscribable(callParticipant?.sharesCamera ?? ko.observable(false));
+  const callParticipantSharesScreen = useKoSubscribable(callParticipant?.sharesScreen ?? ko.observable(false));
   const callParticipantIsActivelySpeaking = useKoSubscribable(
-    callParticipant ? callParticipant.isActivelySpeaking : ko.observable(),
+    callParticipant?.isActivelySpeaking ?? ko.observable(false),
   );
 
   const callParticipantIsMuted = useKoSubscribable(callParticipant ? callParticipant.isMuted : ko.observable());
@@ -149,7 +146,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 {isUser && selfInTeam && (
                   <AvailabilityState
                     className="participant-item__content__availability participant-item__content__name"
-                    data-uie-name="status-name"
+                    dataUieName="status-name"
                     availability={availability}
                     label={participantName}
                   />
@@ -219,7 +216,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
             )}
 
             {isUser && !isOthersMode && isGuest && (
-              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" />
+              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={16} />
             )}
 
             {external && (

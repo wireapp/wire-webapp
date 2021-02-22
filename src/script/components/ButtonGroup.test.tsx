@@ -31,6 +31,7 @@ class ButtonGroupPage extends TestPage<ButtonGroupProps> {
   getInactiveButton = () => this.get('div[data-uie-value="inactive"]');
 
   clickOnInactiveButton = () => this.click(this.getInactiveButton());
+  clickOnActiveButton = () => this.click(this.getActiveButton());
 }
 
 describe('ButtonGroup', () => {
@@ -60,5 +61,24 @@ describe('ButtonGroup', () => {
 
     buttonGroup.clickOnInactiveButton();
     expect(buttonGroup.getActiveButton().text()).toBe('active');
+  });
+
+  it('triggers onChangeItem only on inactive buttons', () => {
+    const onChangeSpy = jasmine.createSpy();
+    const props = {
+      currentItem: 'one',
+      items: ['one', 'two'],
+      onChangeItem: onChangeSpy,
+    };
+    const buttonGroup = new ButtonGroupPage(props);
+
+    buttonGroup.clickOnInactiveButton();
+
+    expect(onChangeSpy).toHaveBeenCalled();
+
+    onChangeSpy.calls.reset();
+    buttonGroup.clickOnActiveButton();
+
+    expect(onChangeSpy).not.toHaveBeenCalled();
   });
 });

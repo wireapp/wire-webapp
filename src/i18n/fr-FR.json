@@ -855,6 +855,8 @@
   "preferencesOptionsContactsMacos": "Importer depuis Contacts",
   "preferencesOptionsEmojiReplaceCheckbox": "Remplace les émoticônes typographiques par des emojis",
   "preferencesOptionsEmojiReplaceDetail": ":-) → [icon]",
+  "preferencesOptionsEnableAgcCheckbox": "Automatic gain control (AGC)",
+  "preferencesOptionsEnableAgcDetails": "Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.",
   "preferencesOptionsEnableVbrCheckbox": "Échantillonnage variable (VBR)",
   "preferencesOptionsEnableVbrDetails": "Les appels audio utiliseront moins de données et fonctionneront mieux sur des réseaux plus lents. Désactiver pour utiliser un échantillonnage constant (CBR).",
   "preferencesOptionsNotifications": "Notifications",
