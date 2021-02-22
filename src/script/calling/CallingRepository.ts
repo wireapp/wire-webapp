@@ -1185,16 +1185,10 @@ export class CallingRepository {
 
   private readonly updateActiveSpeakers = (wuser: number, conversationId: string, rawJson: string) => {
     const call = this.findCall(conversationId);
-    if (!call) {
-      return;
-    }
-
     const activeSpeakers = JSON.parse(rawJson);
-    if (!activeSpeakers) {
-      return;
+    if (call && activeSpeakers) {
+      call.setActiveSpeakers(activeSpeakers);
     }
-
-    call.setActiveSpeakers(activeSpeakers);
   };
 
   private readonly updateParticipantStream = (
