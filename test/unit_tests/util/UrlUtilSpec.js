@@ -23,6 +23,7 @@ import {
   appendParameter,
   getParameter,
   getDomainName,
+  cleanURL,
   getLinksFromHtml,
   prependProtocol,
 } from 'Util/UrlUtil';
@@ -64,7 +65,7 @@ describe('UrlUtil', () => {
     });
   });
 
-  describe('getDomainName', () => {
+  describe('cleanURL', () => {
     it('lowercases domains and respects others components case', () => {
       const baseUrl = 'wire.com';
       const tests = [
@@ -88,14 +89,14 @@ describe('UrlUtil', () => {
       ];
 
       tests.forEach(({url, expected}) => {
-        const result = getDomainName(url);
+        const result = cleanURL(url);
 
         expect(result).toBe(expected);
       });
     });
 
     it('returns empty string if URL is not set', () => {
-      expect(getDomainName()).toBe('');
+      expect(cleanURL()).toBe('');
     });
   });
 
@@ -158,6 +159,24 @@ describe('UrlUtil', () => {
     it('does not add a protocol if present', () => {
       expect(prependProtocol('http://wire.com/')).toBe('http://wire.com/');
       expect(prependProtocol('https://wire.com/')).toBe('https://wire.com/');
+    });
+  });
+
+  describe('getDomainName', () => {
+    it('returns the domain name from a simple domain', () => {
+      expect(getDomainName('wire.com')).toBe('wire');
+      expect(getDomainName('http://wire.com')).toBe('wire');
+      expect(getDomainName('ftp://wire.com')).toBe('wire');
+    });
+
+    it('returns the domain name from a subdomain', () => {
+      expect(getDomainName('wire.example.com')).toBe('wire');
+      expect(getDomainName('http://wire.example.com')).toBe('wire');
+    });
+
+    it('removes all other parts of the URL', () => {
+      expect(getDomainName('wire.example.com/search/?q=1')).toBe('wire');
+      expect(getDomainName('http://wire.example.com/search/?q=1')).toBe('wire');
     });
   });
 });
