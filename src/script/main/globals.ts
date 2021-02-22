@@ -38,7 +38,7 @@ import 'Components/fullSearch';
 import 'Components/groupList';
 import 'Components/GuestModeToggle';
 import 'Components/icons';
-import 'Components/image';
+import 'Components/Image';
 import 'Components/InfoToggle';
 import 'Components/InputLevel';
 import 'Components/list/conversationListCallingCell';
