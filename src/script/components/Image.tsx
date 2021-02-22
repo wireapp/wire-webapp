@@ -26,7 +26,7 @@ import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
 import {useViewPortObserver} from '../ui/viewportObserver';
 
-export interface ImageProps {
+export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   asset: AssetRemoteData;
   assetRepository?: AssetRepository;
   className?: string;
@@ -38,6 +38,7 @@ const Image: React.FC<ImageProps> = ({
   click,
   className,
   assetRepository = container.resolve(AssetRepository),
+  ...props
 }) => {
   const [isInViewport, viewportElementRef] = useViewPortObserver();
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
@@ -67,7 +68,7 @@ const Image: React.FC<ImageProps> = ({
   }, [isInViewport]);
 
   return (
-    <div ref={viewportElementRef} className={cx('image-wrapper', className)}>
+    <div ref={viewportElementRef} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img onClick={onClick} src={assetSrc} />
       ) : (
