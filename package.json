@@ -46,7 +46,7 @@
     "uint32": "0.2.1",
     "underscore": "1.12.0",
     "use-react-router": "1.0.7",
-    "uuidjs": "4.2.7",
+    "uuidjs": "4.2.8",
     "webrtc-adapter": "6.4.8"
   },
   "devDependencies": {
