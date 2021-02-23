@@ -56,9 +56,9 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   maximizedParticipant,
   setMaximizedParticipant,
 }) => {
-  const [thumbnailHasActiveVideo, setThumbnailHasActiveVideo] = useState(false);
-  const [thumbnailSharesScreen, setThumbnailSharesScreen] = useState(false);
-  const [thumbnailVideoStream, setThumbnailVideoStream] = useState<MediaStream>();
+  const [thumbnailHasActiveVideo, setThumbnailHasActiveVideo] = useState(grid.thumbnail?.hasActiveVideo());
+  const [thumbnailSharesScreen, setThumbnailSharesScreen] = useState(grid.thumbnail?.sharesScreen());
+  const [thumbnailVideoStream, setThumbnailVideoStream] = useState<MediaStream>(grid.thumbnail?.videoStream());
 
   useEffect(() => {
     const activeVideoSub = grid.thumbnail?.hasActiveVideo.subscribe(val => setThumbnailHasActiveVideo(val));
