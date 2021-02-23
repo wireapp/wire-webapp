@@ -44,8 +44,8 @@ describe('ServiceAvatar', () => {
 
     const serviceAvatar = new ServiceAvatarPage({
       assetRepository: assetRepoSpy,
-      avatarSize: AVATAR_SIZE.LARGE,
       participant: service,
+      size: AVATAR_SIZE.LARGE,
     });
 
     expect(serviceAvatar.getServiceIcon().exists()).toBe(true);
@@ -59,8 +59,8 @@ describe('ServiceAvatar', () => {
 
     const serviceAvatar = new ServiceAvatarPage({
       assetRepository: assetRepoSpy,
-      avatarSize: AVATAR_SIZE.LARGE,
       participant: service,
+      size: AVATAR_SIZE.LARGE,
     });
 
     expect(serviceAvatar.getInitials().exists()).toBe(false);
@@ -74,8 +74,8 @@ describe('ServiceAvatar', () => {
 
     const serviceAvatar = new ServiceAvatarPage({
       assetRepository: assetRepoSpy,
-      avatarSize: AVATAR_SIZE.LARGE,
       participant: service,
+      size: AVATAR_SIZE.LARGE,
     });
 
     expect(serviceAvatar.getUserBadgeIcon().exists()).toBe(false);

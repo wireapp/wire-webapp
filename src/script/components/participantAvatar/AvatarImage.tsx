@@ -30,13 +30,13 @@ import {AVATAR_SIZE} from '../ParticipantAvatar';
 
 export interface AvatarImageProps {
   assetRepository: AssetRepository;
-  avatarSize: AVATAR_SIZE;
   backgroundColor?: string;
   borderRadius?: string;
   devicePixelRatio?: number;
   isGrey?: boolean;
   mediumPicture: AssetRemoteData;
   previewPicture: AssetRemoteData;
+  size: AVATAR_SIZE;
 }
 
 const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
@@ -46,7 +46,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   isGrey = false,
   previewPicture,
   mediumPicture,
-  avatarSize,
+  size,
   devicePixelRatio = window.devicePixelRatio,
 }) => {
   const [avatarImage, setAvatarImage] = useState('');
@@ -55,13 +55,13 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
   useEffect(() => {
     loadAvatarPicture();
-  }, [previewPicture, mediumPicture, avatarSize]);
+  }, [previewPicture, mediumPicture, size]);
 
   const loadAvatarPicture = async () => {
     if (!avatarLoadingBlocked) {
       setAvatarLoadingBlocked(true);
 
-      const isSmall = avatarSize !== AVATAR_SIZE.LARGE && avatarSize !== AVATAR_SIZE.X_LARGE;
+      const isSmall = size !== AVATAR_SIZE.LARGE && size !== AVATAR_SIZE.X_LARGE;
       const loadHiRes = !isSmall && devicePixelRatio > 1;
       const pictureResource: AssetRemoteData = loadHiRes ? mediumPicture : previewPicture;
 

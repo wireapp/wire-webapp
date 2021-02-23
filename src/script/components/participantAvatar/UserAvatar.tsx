@@ -17,7 +17,7 @@
  *
  */
 
-import React, {HTMLProps} from 'react';
+import React from 'react';
 import {COLOR} from '@wireapp/react-ui-kit';
 
 import {User} from '../../entity/User';
@@ -31,13 +31,13 @@ import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
 
-export interface UserAvatarProps extends HTMLProps<HTMLDivElement> {
+export interface UserAvatarProps {
   assetRepository: AssetRepository;
-  avatarSize: AVATAR_SIZE;
   noBadge?: boolean;
   noFilter?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
+  size: AVATAR_SIZE;
   state: STATE;
 }
 
@@ -50,36 +50,34 @@ export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
 const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   assetRepository,
   participant,
-  avatarSize,
+  size,
   noBadge,
   noFilter,
   state,
   onClick,
-  ...props
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
   return (
     <AvatarWrapper
-      avatarSize={avatarSize}
       color={participant.accent_color()}
+      title={participant.name()}
+      size={size}
+      onClick={onClick}
       data-uie-name="element-avatar-user"
       data-uie-value={participant.id}
-      onClick={onClick}
-      title={participant.name()}
-      {...props}
     >
       <AvatarBackground backgroundColor={backgroundColor} />
-      <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
+      <AvatarInitials size={size} initials={participant.initials()} />
       <AvatarImage
         assetRepository={assetRepository}
-        avatarSize={avatarSize}
-        backgroundColor={backgroundColor}
+        size={size}
         isGrey={isImageGrey}
-        mediumPicture={participant.mediumPictureResource()}
+        backgroundColor={backgroundColor}
         previewPicture={participant.previewPictureResource()}
+        mediumPicture={participant.mediumPictureResource()}
       />
-      {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
+      {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
       {!isImageGrey && <AvatarBorder />}
     </AvatarWrapper>
   );

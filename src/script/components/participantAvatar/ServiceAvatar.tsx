@@ -18,10 +18,13 @@
  */
 
 import ko from 'knockout';
-import React, {HTMLProps} from 'react';
+import React from 'react';
+
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
+
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
+
 import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
 import AvatarImage from './AvatarImage';
@@ -29,27 +32,22 @@ import AvatarWrapper from './AvatarWrapper';
 import {AVATAR_SIZE} from '../ParticipantAvatar';
 import NamedIcon from 'Components/NamedIcon';
 
-export interface ServiceAvatarProps extends HTMLProps<HTMLDivElement> {
+export interface ServiceAvatarProps {
   assetRepository: AssetRepository;
-  avatarSize: AVATAR_SIZE;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
+  size: AVATAR_SIZE;
 }
 
-const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({
-  assetRepository,
-  participant,
-  avatarSize,
-  onClick,
-}) => {
+const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetRepository, participant, size, onClick}) => {
   return (
     <AvatarWrapper
-      avatarSize={avatarSize}
       color="#fff"
+      title={ko.unwrap(participant.name)}
+      size={size}
+      onClick={onClick}
       data-uie-name="element-avatar-service"
       data-uie-value={participant.id}
-      onClick={onClick}
-      title={ko.unwrap(participant.name)}
     >
       <AvatarBackground borderRadius="20%" />
       <div
@@ -69,16 +67,16 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({
             '& > path': {
               fill: 'rgba(141, 152, 159, 0.24)',
             },
-            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(avatarSize) ? '32px' : '60%',
+            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(size) ? '32px' : '60%',
           }}
         />
       </div>
       <AvatarImage
         assetRepository={assetRepository}
-        avatarSize={avatarSize}
-        borderRadius="20%"
-        mediumPicture={participant.mediumPictureResource()}
         previewPicture={participant.previewPictureResource()}
+        mediumPicture={participant.mediumPictureResource()}
+        borderRadius="20%"
+        size={size}
       />
       <AvatarBorder borderRadius="20%" />
     </AvatarWrapper>
