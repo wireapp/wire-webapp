@@ -13599,11 +13599,6 @@ uuid@^8.3.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
 
-uuidjs@4.2.7:
-  version "4.2.7"
-  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.7.tgz#ff444ba9947293b1e80988a67c52c42c5f11e985"
-  integrity sha512-1+r9Di3v/E7hKCtizpzCVGth5XkPIoicjR3V/SUF/MV6cJwES7/YnypmwWYX9KyZy4GT2yKP7yhR2iLWURxhDw==
-
 uuidjs@4.2.8:
   version "4.2.8"
   resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.8.tgz#cd42ba57b13c3369f3c3800b4786635da8916e0b"
