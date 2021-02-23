@@ -17,11 +17,10 @@
  *
  */
 
-import ko from 'knockout';
 import React, {useState, useEffect, CSSProperties} from 'react';
 import {css} from '@emotion/core';
 
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent} from 'Util/ComponentUtil';
 import type {Grid} from '../../calling/videoGridHandler';
 import Video from './Video';
 import type {Participant} from '../../calling/Participant';
@@ -57,11 +56,23 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   maximizedParticipant,
   setMaximizedParticipant,
 }) => {
+  const [thumbnailHasActiveVideo, setThumbnailHasActiveVideo] = useState(grid.thumbnail?.hasActiveVideo());
+  const [thumbnailSharesScreen, setThumbnailSharesScreen] = useState(grid.thumbnail?.sharesScreen());
+  const [thumbnailVideoStream, setThumbnailVideoStream] = useState<MediaStream>(grid.thumbnail?.videoStream());
+
+  useEffect(() => {
+    const activeVideoSub = grid.thumbnail?.hasActiveVideo.subscribe(val => setThumbnailHasActiveVideo(val));
+    const sharesScreenSub = grid.thumbnail?.sharesScreen.subscribe(val => setThumbnailSharesScreen(val));
+    const videoStreamSub = grid.thumbnail?.videoStream.subscribe(val => setThumbnailVideoStream(val));
+    return () => {
+      activeVideoSub?.dispose();
+      sharesScreenSub?.dispose();
+      videoStreamSub?.dispose();
+    };
+  }, [grid]);
+
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid.grid.length));
   const videoParticipants: Participant[] = grid.grid.filter(participant => !!participant);
-  const thumbnailHasActiveVideo = useKoSubscribable(grid.thumbnail?.hasActiveVideo || ko.observable());
-  const thumbnailSharesScreen = useKoSubscribable(grid.thumbnail?.sharesScreen || ko.observable());
-  const thumbnailVideoStream = useKoSubscribable(grid.thumbnail?.videoStream || ko.observable());
 
   const doubleClickedOnVideo = (userId: string, clientId: string) => {
     if (maximizedParticipant !== null) {
