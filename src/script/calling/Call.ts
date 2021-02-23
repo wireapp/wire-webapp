@@ -90,8 +90,6 @@ export class Call {
 
     // Get the corresponding participants for the entries in ActiveSpeakers in the incoming order.
     const activeSpeakers = audio_levels
-      // Consider just the entries with audio activity.
-      .filter(({audio_level}) => audio_level > 0)
       // Get the participants.
       .map(({userid, clientid}) => this.getParticipant(userid, clientid))
       // Make sure there was a participant found.
