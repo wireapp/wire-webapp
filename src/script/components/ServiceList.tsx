@@ -17,17 +17,17 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React, {Fragment, HTMLProps} from 'react';
 import cx from 'classnames';
 
 import 'Components/list/ParticipantItem';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import ParticipantItem from 'Components/list/ParticipantItem';
 
 import type {ServiceEntity} from '../integration/ServiceEntity';
-import ParticipantItem from 'Components/list/ParticipantItem';
 import {t} from '../util/LocalizerUtil';
 
-export interface ServiceListProps {
+export interface ServiceListProps extends HTMLProps<HTMLDivElement> {
   arrow: boolean;
   click: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   isSearching?: boolean;

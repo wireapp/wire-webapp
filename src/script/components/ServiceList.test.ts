@@ -28,8 +28,8 @@ class ServiceListPage extends TestPage<ServiceListProps> {
     super(ServiceList, props);
   }
 
-  getNoResultsDiv = () => this.get('[data-uie-name="service-list-no-results"]');
-  getServiceDiv = (serviceId: string) => this.get(`[data-uie-name="service-list-service-${serviceId}"]`);
+  getNoResultsElement = () => this.get('[data-uie-name="service-list-no-results"]');
+  getServiceElement = (serviceId: string) => this.get(`[data-uie-name="service-list-service-${serviceId}"]`);
 }
 
 describe('ServiceList', () => {
@@ -45,14 +45,14 @@ describe('ServiceList', () => {
       services: [serviceEntity1, serviceEntity2],
     });
 
-    const serviceDiv1 = serviceList.getServiceDiv(serviceEntity1.id);
-    const serviceDiv2 = serviceList.getServiceDiv(serviceEntity2.id);
+    const serviceElement1 = serviceList.getServiceElement(serviceEntity1.id);
+    const serviceElement2 = serviceList.getServiceElement(serviceEntity2.id);
 
-    expect(serviceDiv1.exists()).toBe(true);
-    expect(serviceDiv2.exists()).toBe(true);
+    expect(serviceElement1.exists()).toBe(true);
+    expect(serviceElement2.exists()).toBe(true);
   });
 
-  it('shows the "no results found" div when there are no services', () => {
+  it('shows the "no results found" element when there are no services', () => {
     const serviceList = new ServiceListPage({
       arrow: false,
       click: () => {},
@@ -61,8 +61,8 @@ describe('ServiceList', () => {
       services: [],
     });
 
-    const noResultsDiv = serviceList.getNoResultsDiv();
+    const noResultsElement = serviceList.getNoResultsElement();
 
-    expect(noResultsDiv.exists()).toBe(true);
+    expect(noResultsElement.exists()).toBe(true);
   });
 });
