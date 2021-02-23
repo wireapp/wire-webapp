@@ -3619,9 +3619,9 @@ babel-plugin-macros@^2.0.0:
     resolve "^1.12.0"
 
 babel-plugin-polyfill-corejs2@^0.1.2:
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/babel-plugin-polyfill-corejs2/-/babel-plugin-polyfill-corejs2-0.1.3.tgz#233d011885ddf670420910fd24cefa11999cb399"
-  integrity sha512-VETbaz2UPSTW3WBc0IC6vjxvKuVAjgMKdInt4e3Y/0A99+u460iw/y7JdHOUPYnU90tAMCMJo0Mj8huwK/ETSg==
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/babel-plugin-polyfill-corejs2/-/babel-plugin-polyfill-corejs2-0.1.4.tgz#4ae3252b3c1f369caea30df5e483af86bcff777b"
+  integrity sha512-Iju2mcwieZLjCl5s0jNrdjf0Z1HDidT8zDuVAh9jT5lN+p6K3KgwY5vTv1FWNklCSLXS+UH+C4tPBlEKbAfB5g==
   dependencies:
     "@babel/compat-data" "^7.11.0"
     "@babel/helper-define-polyfill-provider" "^0.1.1"
