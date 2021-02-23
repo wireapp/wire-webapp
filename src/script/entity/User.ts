@@ -200,6 +200,10 @@ export class User {
     return !!this.domain;
   }
 
+  isOnSameFederatedDomain(otherDomain: string = Config.getConfig().FEATURE.FEDERATION_DOMAIN): boolean {
+    return this.domain === otherDomain;
+  }
+
   /**
    * Returns the fully qualified user ID.
    * @example "@handle@wire.com"
