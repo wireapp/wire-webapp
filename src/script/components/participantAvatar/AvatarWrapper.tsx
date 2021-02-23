@@ -17,21 +17,21 @@
  *
  */
 
-import React from 'react';
+import React, {HTMLProps} from 'react';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
 import {DIAMETER, AVATAR_SIZE} from '../ParticipantAvatar';
 
-export interface AvatarWrapperProps extends React.ComponentProps<'div'> {
+export interface AvatarWrapperProps extends HTMLProps<HTMLDivElement> {
+  avatarSize: AVATAR_SIZE;
   color: string;
-  size: AVATAR_SIZE;
 }
 
-const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({color, size, ...props}) => (
+const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({color, avatarSize, ...props}) => (
   <div
     css={{
-      ...CSS_SQUARE(DIAMETER[size]),
+      ...CSS_SQUARE(DIAMETER[avatarSize]),
       color,
       display: 'inline-block',
       overflow: 'hidden',

@@ -68,13 +68,13 @@ export const INITIALS_SIZE = {
   [AVATAR_SIZE.XXX_SMALL]: '8px',
 };
 
-export interface ParticipantAvatarProps extends React.ComponentProps<'div'> {
+export interface ParticipantAvatarProps extends React.HTMLProps<HTMLDivElement> {
   assetRepository: AssetRepository;
+  avatarSize?: AVATAR_SIZE;
   noBadge?: boolean;
   noFilter?: boolean;
   onAvatarClick?: (participant: User, target: Node) => void;
   participant: User;
-  size?: AVATAR_SIZE;
 }
 
 const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
@@ -83,7 +83,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   onAvatarClick,
   noBadge = false,
   noFilter = false,
-  size = AVATAR_SIZE.LARGE,
+  avatarSize = AVATAR_SIZE.LARGE,
   ...props
 }) => {
   const isUser = participant instanceof User && !participant.isService && !participant.isTemporaryGuest();
@@ -121,11 +121,11 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
     return (
       <UserAvatar
         assetRepository={assetRepository}
+        avatarSize={avatarSize}
         noBadge={noBadge}
         noFilter={noFilter}
         onClick={clickHandler}
         participant={participant}
-        size={size}
         state={avatarState}
         {...props}
       />
@@ -135,10 +135,10 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   if (isTemporaryGuest) {
     return (
       <TemporaryGuestAvatar
+        avatarSize={avatarSize}
         noBadge={noBadge}
         onClick={clickHandler}
         participant={participant}
-        size={size}
         state={avatarState}
         {...props}
       />
@@ -148,9 +148,9 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   return (
     <ServiceAvatar
       assetRepository={assetRepository}
+      avatarSize={avatarSize}
       onClick={clickHandler}
       participant={participant}
-      size={size}
       {...props}
     />
   );
@@ -161,7 +161,7 @@ export default ParticipantAvatar;
 registerReactComponent<ParticipantAvatarProps>('participant-avatar', {
   component: ParticipantAvatar,
   injected: {assetRepository: AssetRepository},
-  optionalParams: ['size', 'onClick', 'noBadge', 'noFilter'],
+  optionalParams: ['avatarSize', 'onClick', 'noBadge', 'noFilter'],
   template:
-    '<span data-bind="react: {assetRepository, participant: ko.unwrap(participant), size, onAvatarClick: onClick, noBadge, noFilter}"></span>',
+    '<span data-bind="react: {assetRepository, participant: ko.unwrap(participant), avatarSize: size, onAvatarClick: onClick, noBadge, noFilter}"></span>',
 });

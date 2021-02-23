@@ -52,10 +52,10 @@ describe('AvatarImage', () => {
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
+      avatarSize: AVATAR_SIZE.LARGE,
       devicePixelRatio: 2,
       mediumPicture: participant.mediumPictureResource(),
       previewPicture: participant.previewPictureResource(),
-      size: AVATAR_SIZE.LARGE,
     });
 
     avatarImage.update();
@@ -76,10 +76,10 @@ describe('AvatarImage', () => {
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
+      avatarSize: AVATAR_SIZE.LARGE,
       devicePixelRatio: 1,
       mediumPicture: participant.mediumPictureResource(),
       previewPicture: participant.previewPictureResource(),
-      size: AVATAR_SIZE.LARGE,
     });
 
     avatarImage.update();
@@ -99,10 +99,10 @@ describe('AvatarImage', () => {
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
+      avatarSize: AVATAR_SIZE.SMALL,
       devicePixelRatio: 2,
       mediumPicture: participant.mediumPictureResource(),
       previewPicture: participant.previewPictureResource(),
-      size: AVATAR_SIZE.SMALL,
     });
 
     avatarImage.update();
@@ -121,9 +121,9 @@ describe('AvatarImage', () => {
 
     const avatarImage = new AvatarImagePage({
       assetRepository: assetRepo,
+      avatarSize: AVATAR_SIZE.LARGE,
       mediumPicture: participant.mediumPictureResource(),
       previewPicture: participant.previewPictureResource(),
-      size: AVATAR_SIZE.LARGE,
     });
 
     avatarImage.update();

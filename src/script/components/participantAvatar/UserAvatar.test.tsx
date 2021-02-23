@@ -44,8 +44,8 @@ describe('UserAvatar', () => {
 
     const userAvatar = new UserAvatarPage({
       assetRepository: assetRepoSpy,
+      avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
-      size: AVATAR_SIZE.LARGE,
       state: STATE.NONE,
     });
 
@@ -60,8 +60,8 @@ describe('UserAvatar', () => {
 
     const userAvatar = new UserAvatarPage({
       assetRepository: assetRepoSpy,
+      avatarSize: AVATAR_SIZE.X_SMALL,
       participant: participant,
-      size: AVATAR_SIZE.X_SMALL,
       state: STATE.NONE,
     });
 
@@ -76,8 +76,8 @@ describe('UserAvatar', () => {
 
     const userAvatar = new UserAvatarPage({
       assetRepository: assetRepoSpy,
+      avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
-      size: AVATAR_SIZE.LARGE,
       state: STATE.NONE,
     });
 
@@ -91,8 +91,8 @@ describe('UserAvatar', () => {
 
     const userAvatar = new UserAvatarPage({
       assetRepository: assetRepoSpy,
+      avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
-      size: AVATAR_SIZE.LARGE,
       state: STATE.BLOCKED,
     });
 
@@ -106,8 +106,8 @@ describe('UserAvatar', () => {
 
     const userAvatar = new UserAvatarPage({
       assetRepository: assetRepoSpy,
+      avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
-      size: AVATAR_SIZE.LARGE,
       state: STATE.PENDING,
     });
 

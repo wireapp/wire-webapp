@@ -34,20 +34,25 @@ import NamedIcon from 'Components/NamedIcon';
 
 export interface ServiceAvatarProps extends React.ComponentProps<'div'> {
   assetRepository: AssetRepository;
+  avatarSize: AVATAR_SIZE;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
-  size: AVATAR_SIZE;
 }
 
-const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetRepository, participant, size, onClick}) => {
+const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({
+  assetRepository,
+  participant,
+  avatarSize,
+  onClick,
+}) => {
   return (
     <AvatarWrapper
+      avatarSize={avatarSize}
       color="#fff"
-      title={ko.unwrap(participant.name)}
-      size={size}
-      onClick={onClick}
       data-uie-name="element-avatar-service"
       data-uie-value={participant.id}
+      onClick={onClick}
+      title={ko.unwrap(participant.name)}
     >
       <AvatarBackground borderRadius="20%" />
       <div
@@ -67,16 +72,16 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
             '& > path': {
               fill: 'rgba(141, 152, 159, 0.24)',
             },
-            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(size) ? '32px' : '60%',
+            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(avatarSize) ? '32px' : '60%',
           }}
         />
       </div>
       <AvatarImage
         assetRepository={assetRepository}
-        previewPicture={participant.previewPictureResource()}
-        mediumPicture={participant.mediumPictureResource()}
+        avatarSize={avatarSize}
         borderRadius="20%"
-        size={size}
+        mediumPicture={participant.mediumPictureResource()}
+        previewPicture={participant.previewPictureResource()}
       />
       <AvatarBorder borderRadius="20%" />
     </AvatarWrapper>

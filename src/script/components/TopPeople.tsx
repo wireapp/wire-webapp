@@ -48,13 +48,13 @@ const TopPeople: React.FC<TopPeopleProps> = ({clickOnContact, max, users}) => {
         data-uie-name="item-user"
       >
         <ParticipantAvatar
-          className="search-list-item-image"
           assetRepository={assetRepository}
-          size={AVATAR_SIZE.LARGE}
+          avatarSize={AVATAR_SIZE.LARGE}
+          className="search-list-item-image"
           participant={user}
         />
         <div className="search-list-item-content">
-          <div className="search-list-item-content-name" data-bind="text: name"></div>
+          <div className="search-list-item-content-name">{user.name}</div>
         </div>
       </div>
     );

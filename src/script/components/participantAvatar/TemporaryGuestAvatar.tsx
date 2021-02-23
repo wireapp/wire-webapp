@@ -31,15 +31,15 @@ import AvatarWrapper from './AvatarWrapper';
 import {shouldShowBadge} from './UserAvatar';
 
 export interface TemporaryGuestAvatarProps extends React.ComponentProps<'div'> {
+  avatarSize: AVATAR_SIZE;
   noBadge?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
-  size: AVATAR_SIZE;
   state: STATE;
 }
 
 const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> = ({
-  size,
+  avatarSize,
   participant,
   noBadge,
   state,
@@ -47,28 +47,28 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
   ...props
 }) => {
   const borderScale = 0.9916;
-  const finalBorderWidth = size === AVATAR_SIZE.X_LARGE ? 4 : 1;
+  const finalBorderWidth = avatarSize === AVATAR_SIZE.X_LARGE ? 4 : 1;
   const remainingTime = participant.expirationRemaining();
   const normalizedRemainingTime = remainingTime / User.CONFIG.TEMPORARY_GUEST.LIFETIME;
 
-  const borderWidth = (finalBorderWidth / DIAMETER[size]) * 32;
+  const borderWidth = (finalBorderWidth / DIAMETER[avatarSize]) * 32;
   const borderRadius = (16 - borderWidth / 2) * borderScale;
   const timerLength = borderRadius * Math.PI * 2;
   const timerOffset = timerLength * (normalizedRemainingTime - 1);
 
   return (
     <AvatarWrapper
+      avatarSize={avatarSize}
       color="rgba(50,54,57,0.08)"
-      title={participant.name()}
-      size={size}
-      onClick={onClick}
       data-uie-name="element-avatar-temporary-guest"
       data-uie-value={participant.id}
+      onClick={onClick}
+      title={participant.name()}
       {...props}
     >
       <AvatarBackground />
-      <AvatarInitials color="var(--background)" size={size} initials={participant.initials()} />
-      {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
+      <AvatarInitials color="var(--background)" avatarSize={avatarSize} initials={participant.initials()} />
+      {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
       <AvatarBorder />
       <svg
         css={{
