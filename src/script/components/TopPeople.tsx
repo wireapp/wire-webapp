@@ -54,7 +54,7 @@ const TopPeople: React.FC<TopPeopleProps> = ({clickOnContact, max, users}) => {
           participant={user}
         />
         <div className="search-list-item-content">
-          <div className="search-list-item-content-name">{user.name}</div>
+          <div className="search-list-item-content-name">{user.name()}</div>
         </div>
       </div>
     );
