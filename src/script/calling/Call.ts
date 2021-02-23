@@ -27,6 +27,7 @@ export type ConversationId = string;
 
 interface ActiveSpeaker {
   audio_level: number;
+  audio_level_now: number;
   clientid: string;
   userid: string;
 }
@@ -36,17 +37,14 @@ interface ActiveSpeakers {
 }
 
 export class Call {
-  public readonly conversationId: ConversationId;
-  public readonly initiator: UserId;
-  public readonly reason: ko.Observable<number | undefined>;
-  public readonly startedAt: ko.Observable<number | undefined>;
-  public readonly state: ko.Observable<CALL_STATE>;
+  public readonly reason: ko.Observable<number | undefined> = ko.observable();
+  public readonly startedAt: ko.Observable<number | undefined> = ko.observable();
+  public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
-  public readonly conversationType: CONV_TYPE;
   public readonly initialType: CALL_TYPE;
-  public readonly isCbrEnabled: ko.Observable<boolean>;
-  public lastActiveSpeakersUpdateTime: ko.Observable<number> = ko.observable(0);
+  public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(false);
+  public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
   public blockMessages: boolean = false;
   public type?: CALL_MESSAGE_TYPE;
   /**
@@ -63,22 +61,15 @@ export class Call {
   public analyticsMaximumParticipants: number = 0;
 
   constructor(
-    initiator: UserId,
-    conversationId: ConversationId,
-    conversationType: CONV_TYPE,
+    public readonly initiator: UserId,
+    public readonly conversationId: ConversationId,
+    public readonly conversationType: CONV_TYPE,
     private readonly selfParticipant: Participant,
     callType: CALL_TYPE,
   ) {
-    this.initiator = initiator;
-    this.conversationId = conversationId;
-    this.state = ko.observable(CALL_STATE.UNKNOWN);
-    this.conversationType = conversationType;
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
-    this.reason = ko.observable();
-    this.startedAt = ko.observable();
-    this.isCbrEnabled = ko.observable(false);
   }
 
   get hasWorkingAudioInput(): boolean {
@@ -89,30 +80,27 @@ export class Call {
     return this.participants().find(({user, clientId}) => user.isMe && this.selfClientId === clientId);
   }
 
-  setActiveSpeakers(activeSpeakers: ActiveSpeakers): void {
-    const activeParticipants: {[clientId: string]: ActiveSpeaker} = {};
-    activeSpeakers.audio_levels.forEach(speaker => {
-      activeParticipants[speaker.clientid] = {...speaker};
-    });
+  setActiveSpeakers({audio_levels}: ActiveSpeakers): void {
+    // Update activeSpeaking status on the participants based on their `audio_level_now`.
     this.participants().forEach(participant => {
-      const activeSpeakerParticipant = activeParticipants[participant.clientId];
-      if (activeSpeakerParticipant) {
-        participant.audioLevel(activeSpeakerParticipant.audio_level);
-        participant.isActivelySpeaking(true);
-        return;
-      }
-      participant.audioLevel(0);
-      participant.isActivelySpeaking(false);
+      const match = audio_levels.find(({userid, clientid}) => participant.doesMatchIds(userid, clientid));
+      const audioLevelNow = match?.audio_level_now ?? 0;
+      participant.isActivelySpeaking(audioLevelNow > 0);
     });
-    this.lastActiveSpeakersUpdateTime(Date.now());
-  }
 
-  getActiveSpeakers(): Participant[] {
-    return this.participants().filter(p => p.isActivelySpeaking());
+    // Get the corresponding participants for the entries in ActiveSpeakers in the incoming order.
+    const activeSpeakers = audio_levels
+      // Get the participants.
+      .map(({userid, clientid}) => this.getParticipant(userid, clientid))
+      // Make sure there was a participant found.
+      .filter(participant => !!participant);
+
+    // Set the new active speakers, limited to 4.
+    this.activeSpeakers(activeSpeakers.slice(0, 4));
   }
 
   getActiveVideoSpeakers = () =>
-    this.getActiveSpeakers()
+    this.activeSpeakers()
       .filter(p => p.hasActiveVideo())
       .slice(0, 4);
 

@@ -24,7 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {registerReactComponent, useKoSubscribableCallback} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import useHideElement from '../../hooks/useHideElement';
 import {t} from '../../util/LocalizerUtil';
 import GroupVideoGrid from './GroupVideoGrid';
@@ -129,10 +129,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     };
   }, [videoGrid]);
 
-  const [activeVideoSpeakers, setActiveVideoSpeakers] = useState(call.getActiveVideoSpeakers());
-  useKoSubscribableCallback(call.lastActiveSpeakersUpdateTime, () =>
-    setActiveVideoSpeakers(call.getActiveVideoSpeakers()),
-  );
+  const activeVideoSpeakers = useKoSubscribable(call.activeSpeakers);
 
   return (
     <div id="video-calling" className="video-calling" ref={wrapper}>

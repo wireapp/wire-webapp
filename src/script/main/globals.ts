@@ -38,7 +38,7 @@ import 'Components/fullSearch';
 import 'Components/groupList';
 import 'Components/GuestModeToggle';
 import 'Components/icons';
-import 'Components/image';
+import 'Components/Image';
 import 'Components/InfoToggle';
 import 'Components/InputLevel';
 import 'Components/list/conversationListCallingCell';
@@ -50,9 +50,8 @@ import 'Components/messageTimerButton';
 import 'Components/modal';
 import 'Components/panel/serviceDetails';
 import 'Components/panel/userDetails';
-import 'Components/serviceList';
+import 'Components/ServiceList';
 import 'Components/TopPeople';
-import 'Components/userInput';
 
 import 'Util/LocalizerUtil';
 
