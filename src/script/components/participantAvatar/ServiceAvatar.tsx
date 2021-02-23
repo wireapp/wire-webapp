@@ -18,13 +18,10 @@
  */
 
 import ko from 'knockout';
-import React from 'react';
-
+import React, {HTMLProps} from 'react';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
-
 import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
 import AvatarImage from './AvatarImage';
@@ -32,7 +29,7 @@ import AvatarWrapper from './AvatarWrapper';
 import {AVATAR_SIZE} from '../ParticipantAvatar';
 import NamedIcon from 'Components/NamedIcon';
 
-export interface ServiceAvatarProps extends React.ComponentProps<'div'> {
+export interface ServiceAvatarProps extends HTMLProps<HTMLDivElement> {
   assetRepository: AssetRepository;
   avatarSize: AVATAR_SIZE;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;

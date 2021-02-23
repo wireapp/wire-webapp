@@ -17,11 +17,9 @@
  *
  */
 
-import React from 'react';
+import React, {HTMLProps} from 'react';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-
 import {User} from '../../entity/User';
-
 import {AVATAR_SIZE, STATE, DIAMETER} from '../ParticipantAvatar';
 import AvatarBackground from './AvatarBackground';
 import AvatarInitials from './AvatarInitials';
@@ -30,7 +28,7 @@ import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
 import {shouldShowBadge} from './UserAvatar';
 
-export interface TemporaryGuestAvatarProps extends React.ComponentProps<'div'> {
+export interface TemporaryGuestAvatarProps extends HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
   noBadge?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
