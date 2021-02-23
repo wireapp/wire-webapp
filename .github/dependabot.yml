@@ -78,4 +78,4 @@ updates:
           - '>= 13.a'
       - dependency-name: 'husky'
         versions:
-          - '>= 5'
+          - '>= 5.a'
