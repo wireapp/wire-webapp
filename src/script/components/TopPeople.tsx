@@ -17,12 +17,13 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {User} from '../entity/User';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {AssetRepository} from '../assets/AssetRepository';
 import {container} from 'tsyringe';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 
 export interface TopPeopleProps {
   clickOnContact: (userEntity: User, event: React.MouseEvent) => void;
@@ -30,36 +31,51 @@ export interface TopPeopleProps {
   users: User[];
 }
 
+export interface TopPersonProps {
+  assetRepository: AssetRepository;
+  clickOnContact: (userEntity: User, event: React.MouseEvent) => void;
+  user: User;
+}
+
+const TopPerson: React.FC<TopPersonProps> = ({assetRepository, user, clickOnContact}) => {
+  const name = useKoSubscribable(user.name);
+  const connection = useKoSubscribable(user.connection);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>();
+
+  useEffect(() => {
+    const subscription = connection.status.subscribe(newStatus => setConnectionStatus(newStatus));
+    return () => subscription.dispose();
+  }, [connection]);
+
+  return (
+    <div
+      className="search-list-item"
+      data-uie-name="item-user"
+      data-uie-status={connectionStatus}
+      data-uie-uid={user.id}
+      data-uie-value={name}
+      onClick={event => clickOnContact(user, event)}
+    >
+      <ParticipantAvatar
+        assetRepository={assetRepository}
+        avatarSize={AVATAR_SIZE.LARGE}
+        className="search-list-item-image"
+        participant={user}
+      />
+      <div className="search-list-item-content">
+        <div className="search-list-item-content-name">{name}</div>
+      </div>
+    </div>
+  );
+};
+
 const TopPeople: React.FC<TopPeopleProps> = ({clickOnContact, max, users}) => {
   const assetRepository = container.resolve(AssetRepository);
   max ??= 9;
   const displayedUsers = users.slice(0, max);
-  const searchListItems = displayedUsers.map(user => {
-    return (
-      <div
-        key={user.id}
-        className="search-list-item"
-        data-uie-uid={user.id}
-        data-uie-value={user.name()}
-        data-uie-status={user.connection().status()}
-        onClick={event => {
-          clickOnContact(user, event);
-        }}
-        data-uie-name="item-user"
-      >
-        <ParticipantAvatar
-          assetRepository={assetRepository}
-          avatarSize={AVATAR_SIZE.LARGE}
-          className="search-list-item-image"
-          participant={user}
-        />
-        <div className="search-list-item-content">
-          <div className="search-list-item-content-name">{user.name()}</div>
-        </div>
-      </div>
-    );
-  });
-
+  const searchListItems = displayedUsers.map(user => (
+    <TopPerson assetRepository={assetRepository} clickOnContact={clickOnContact} key={user.id} user={user} />
+  ));
   return <div className="search-list search-list-sm">{searchListItems}</div>;
 };
 
