@@ -51,8 +51,7 @@ import 'Components/modal';
 import 'Components/panel/serviceDetails';
 import 'Components/panel/userDetails';
 import 'Components/ServiceList';
-import 'Components/topPeople';
-import 'Components/userInput';
+import 'Components/TopPeople';
 
 import 'Util/LocalizerUtil';
 

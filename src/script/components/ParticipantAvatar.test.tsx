@@ -47,13 +47,13 @@ describe('ParticipantAvatar', () => {
 
     const participantAvatar = new ParticipantAvatarPage({
       assetRepository: assetRepoSpy,
-      onClick: jasmine.createSpy(),
+      onAvatarClick: jasmine.createSpy(),
       participant,
     });
 
     participantAvatar.clickUserAvatar();
 
-    expect(participantAvatar.getProps().onClick).toHaveBeenCalledWith(
+    expect(participantAvatar.getProps().onAvatarClick).toHaveBeenCalledWith(
       participantAvatar.getProps().participant,
       jasmine.anything(),
     );
