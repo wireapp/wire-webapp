@@ -25,24 +25,24 @@ import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from '../ParticipantAvatar';
 
 export interface AvatarInitialsProps {
+  avatarSize: AVATAR_SIZE;
   color?: string;
   initials: string;
-  size: AVATAR_SIZE;
 }
 
-const AvatarInitials: React.FunctionComponent<AvatarInitialsProps> = ({size, initials, color = '#fff'}) => (
+const AvatarInitials: React.FunctionComponent<AvatarInitialsProps> = ({avatarSize, initials, color = '#fff'}) => (
   <div
     css={{
       ...CSS_FILL_PARENT,
       color,
-      fontSize: INITIALS_SIZE[size],
-      lineHeight: `${DIAMETER[size]}px`,
+      fontSize: INITIALS_SIZE[avatarSize],
+      lineHeight: `${DIAMETER[avatarSize]}px`,
       textAlign: 'center',
       userSelect: 'none',
     }}
     data-uie-name="element-avatar-initials"
   >
-    {size === AVATAR_SIZE.X_SMALL ? getFirstChar(initials) : initials}
+    {avatarSize === AVATAR_SIZE.X_SMALL ? getFirstChar(initials) : initials}
   </div>
 );
 
