@@ -135,9 +135,9 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
           <>
             <div className="participant-item__image">
               <ParticipantAvatar
-                assetRepository={assetRepository}
-                avatarSize={AVATAR_SIZE.SMALL}
                 participant={participant as User}
+                size={AVATAR_SIZE.SMALL}
+                assetRepository={assetRepository}
               />
             </div>
 
