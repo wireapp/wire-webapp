@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.45.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.45.7...@wireapp/react-ui-kit@7.45.8) (2021-02-24)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Columns query prop type ([#3560](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3560)) ([578bbc1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/578bbc1ed96ea94a93b7a1201162020f10047615))
+
+
+
+
+
 ## [7.45.7](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.45.6...@wireapp/react-ui-kit@7.45.7) (2021-02-19)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
