@@ -75,7 +75,6 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   }, [grid]);
 
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid.grid.length));
-  const videoParticipants: Participant[] = grid.grid.filter(participant => !!participant);
 
   const doubleClickedOnVideo = (userId: string, clientId: string) => {
     if (maximizedParticipant !== null) {
@@ -85,7 +84,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     if (grid.thumbnail) {
       return;
     }
-    const participant = videoParticipants.find(participant => participant.doesMatchIds(userId, clientId));
+    const participant = grid.grid.find(participant => participant?.doesMatchIds(userId, clientId));
     setMaximizedParticipant(participant);
   };
 
