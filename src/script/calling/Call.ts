@@ -93,7 +93,7 @@ export class Call {
       // Get the participants.
       .map(({userid, clientid}) => this.getParticipant(userid, clientid))
       // Make sure there was a participant found.
-      .filter(participant => !!participant);
+      .filter(participant => participant?.hasActiveVideo());
 
     // Set the new active speakers, limited to 4.
     this.activeSpeakers(activeSpeakers.slice(0, 4));
