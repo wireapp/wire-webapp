@@ -33,11 +33,11 @@ import AvatarWrapper from './AvatarWrapper';
 
 export interface UserAvatarProps {
   assetRepository: AssetRepository;
+  avatarSize: AVATAR_SIZE;
   noBadge?: boolean;
   noFilter?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: User;
-  size: AVATAR_SIZE;
   state: STATE;
 }
 
@@ -50,7 +50,7 @@ export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
 const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   assetRepository,
   participant,
-  size,
+  avatarSize,
   noBadge,
   noFilter,
   state,
@@ -60,24 +60,24 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
   return (
     <AvatarWrapper
+      avatarSize={avatarSize}
       color={participant.accent_color()}
-      title={participant.name()}
-      size={size}
-      onClick={onClick}
       data-uie-name="element-avatar-user"
       data-uie-value={participant.id}
+      onClick={onClick}
+      title={participant.name()}
     >
       <AvatarBackground backgroundColor={backgroundColor} />
-      <AvatarInitials size={size} initials={participant.initials()} />
+      <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
       <AvatarImage
         assetRepository={assetRepository}
-        size={size}
-        isGrey={isImageGrey}
+        avatarSize={avatarSize}
         backgroundColor={backgroundColor}
-        previewPicture={participant.previewPictureResource()}
+        isGrey={isImageGrey}
         mediumPicture={participant.mediumPictureResource()}
+        previewPicture={participant.previewPictureResource()}
       />
-      {!noBadge && shouldShowBadge(size, state) && <AvatarBadge state={state} />}
+      {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
       {!isImageGrey && <AvatarBorder />}
     </AvatarWrapper>
   );

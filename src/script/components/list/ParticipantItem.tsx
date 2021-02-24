@@ -135,9 +135,9 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
           <>
             <div className="participant-item__image">
               <ParticipantAvatar
-                participant={participant as User}
-                size={AVATAR_SIZE.SMALL}
                 assetRepository={assetRepository}
+                avatarSize={AVATAR_SIZE.SMALL}
+                participant={participant as User}
               />
             </div>
 
@@ -145,9 +145,9 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               <div className="participant-item__content__name-wrapper">
                 {isUser && selfInTeam && (
                   <AvailabilityState
+                    availability={availability}
                     className="participant-item__content__availability participant-item__content__name"
                     dataUieName="status-name"
-                    availability={availability}
                     label={participantName}
                   />
                 )}
