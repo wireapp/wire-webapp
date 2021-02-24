@@ -26,7 +26,7 @@ import {filterProps} from '../util';
 import {GUTTER} from './sizes';
 
 export interface ColumnsProps<T = HTMLDivElement> extends React.HTMLProps<T> {
-  query?: keyof QueryKeys;
+  query?: QueryKeys;
 }
 
 export const filterColumnsProps = (props: ColumnsProps) => {
