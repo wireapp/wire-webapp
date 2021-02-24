@@ -21,11 +21,11 @@ import React, {useState, useEffect, CSSProperties} from 'react';
 import {css} from '@emotion/core';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import NamedIcon from 'Components/NamedIcon';
 import type {Grid} from '../../calling/videoGridHandler';
 import Video from './Video';
 import type {Participant} from '../../calling/Participant';
-import {t} from '../../util/LocalizerUtil';
-import NamedIcon from 'Components/NamedIcon';
 import GroupVideoGridTile from './GroupVideoGridTile';
 
 export interface GroupVideoGripProps {
