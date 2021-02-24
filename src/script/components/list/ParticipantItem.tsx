@@ -219,6 +219,16 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={16} />
             )}
 
+            {participant instanceof User && !participant.isOnSameFederatedDomain() && (
+              <NamedIcon
+                name="federation-icon"
+                className="federation-icon"
+                data-uie-name="status-federated-user"
+                width={16}
+                height={16}
+              />
+            )}
+
             {external && (
               <NamedIcon
                 name="partner-icon"
@@ -275,5 +285,5 @@ registerReactComponent<ParticipantItemProps>('participant-item', {
     'showArrow',
   ],
   template:
-    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected, isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
+    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
 });
