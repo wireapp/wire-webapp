@@ -24,30 +24,30 @@ import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 import type {User} from '../entity/User';
 
 interface TopPeopleParams {
-  click: (userEntity: User, event: Event) => void;
+  clickOnUser: (userEntity: User, event: Event) => void;
   max?: number;
   users: ko.ObservableArray<User>;
 }
 
 class TopPeople {
-  click: (userEntity: User, event: Event) => void;
+  clickOnUser: (userEntity: User, event: Event) => void;
   maxUsers: number;
   userEntities: ko.Observable<User[]>;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   displayedUsers: ko.PureComputed<User[]>;
 
   constructor(params: TopPeopleParams) {
-    this.click = params.click;
-    this.maxUsers = params.max || 9;
     this.AVATAR_SIZE = AVATAR_SIZE;
+    this.clickOnUser = params.clickOnUser;
+    this.maxUsers = params.max || 9;
     this.userEntities = params.users;
 
     this.displayedUsers = ko.pureComputed(() => this.userEntities().slice(0, this.maxUsers));
   }
 
   readonly onUserClick = (userEntity: User, event: Event): void => {
-    if (typeof this.click === 'function') {
-      return this.click(userEntity, event);
+    if (typeof this.clickOnUser === 'function') {
+      return this.clickOnUser(userEntity, event);
     }
   };
 }
