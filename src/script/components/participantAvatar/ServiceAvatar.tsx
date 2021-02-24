@@ -32,7 +32,7 @@ import AvatarWrapper from './AvatarWrapper';
 import {AVATAR_SIZE} from '../ParticipantAvatar';
 import NamedIcon from 'Components/NamedIcon';
 
-export interface ServiceAvatarProps {
+export interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
   assetRepository: AssetRepository;
   avatarSize: AVATAR_SIZE;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -44,6 +44,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({
   participant,
   avatarSize,
   onClick,
+  ...props
 }) => {
   return (
     <AvatarWrapper
@@ -53,6 +54,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({
       onClick={onClick}
       data-uie-name="element-avatar-service"
       data-uie-value={participant.id}
+      {...props}
     >
       <AvatarBackground borderRadius="20%" />
       <div

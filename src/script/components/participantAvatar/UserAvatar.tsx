@@ -31,7 +31,7 @@ import AvatarBadge from './AvatarBadge';
 import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
 
-export interface UserAvatarProps {
+export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
   assetRepository: AssetRepository;
   avatarSize: AVATAR_SIZE;
   noBadge?: boolean;
@@ -55,6 +55,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
   noFilter,
   state,
   onClick,
+  ...props
 }) => {
   const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
@@ -66,6 +67,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       data-uie-value={participant.id}
       onClick={onClick}
       title={participant.name()}
+      {...props}
     >
       <AvatarBackground backgroundColor={backgroundColor} />
       <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
