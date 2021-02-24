@@ -58,9 +58,9 @@ const GroupList: React.FC<GroupListProps> = ({
           <div className="search-list-item-image">
             {group.is1to1() && (
               <ParticipantAvatar
-                participant={group.participating_user_ets()[0]}
-                size={AVATAR_SIZE.SMALL}
                 assetRepository={assetRepository}
+                avatarSize={AVATAR_SIZE.SMALL}
+                participant={group.participating_user_ets()[0]}
               />
             )}
             {!group.is1to1() && <GroupAvatar users={group.participating_user_ets()} />}
