@@ -38,6 +38,7 @@ import {AssetRepository} from '../../assets/AssetRepository';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import NamedIcon from 'Components/NamedIcon';
+import {Availability} from '@wireapp/protocol-messaging';
 
 export interface ParticipantItemProps {
   badge?: boolean;
@@ -74,7 +75,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   selfInTeam,
   showArrow = false,
 }) => {
-  const {viewportElementRef, isInViewport} = useViewPortObserver<HTMLDivElement>();
+  const [isInViewport, viewportElementRef] = useViewPortObserver();
   const assetRepository = container.resolve(AssetRepository);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
@@ -85,21 +86,17 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const hasUsernameInfo = isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  const isGuest = useKoSubscribable((participant as User).isGuest || ko.observable());
-  const isVerified = useKoSubscribable((participant as User).is_verified || ko.observable());
-  const availability = useKoSubscribable((participant as User).availability || ko.observable());
+  const isGuest = useKoSubscribable((participant as User).isGuest ?? ko.observable(false));
+  const isVerified = useKoSubscribable((participant as User).is_verified ?? ko.observable(false));
+  const availability = useKoSubscribable((participant as User).availability ?? ko.observable<Availability.Type>());
 
   const participantName = useKoSubscribable(
     isUser ? (participant as User).name : ko.observable((participant as ServiceEntity).name),
   );
-  const callParticipantSharesCamera = useKoSubscribable(
-    callParticipant ? callParticipant.sharesCamera : ko.observable(),
-  );
-  const callParticipantSharesScreen = useKoSubscribable(
-    callParticipant ? callParticipant.sharesScreen : ko.observable(),
-  );
+  const callParticipantSharesCamera = useKoSubscribable(callParticipant?.sharesCamera ?? ko.observable(false));
+  const callParticipantSharesScreen = useKoSubscribable(callParticipant?.sharesScreen ?? ko.observable(false));
   const callParticipantIsActivelySpeaking = useKoSubscribable(
-    callParticipant ? callParticipant.isActivelySpeaking : ko.observable(),
+    callParticipant?.isActivelySpeaking ?? ko.observable(false),
   );
 
   const callParticipantIsMuted = useKoSubscribable(callParticipant ? callParticipant.isMuted : ko.observable());
@@ -138,9 +135,9 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
           <>
             <div className="participant-item__image">
               <ParticipantAvatar
-                participant={participant as User}
-                size={AVATAR_SIZE.SMALL}
                 assetRepository={assetRepository}
+                avatarSize={AVATAR_SIZE.SMALL}
+                participant={participant as User}
               />
             </div>
 
@@ -148,9 +145,9 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               <div className="participant-item__content__name-wrapper">
                 {isUser && selfInTeam && (
                   <AvailabilityState
+                    availability={availability}
                     className="participant-item__content__availability participant-item__content__name"
                     dataUieName="status-name"
-                    availability={availability}
                     label={participantName}
                   />
                 )}
@@ -222,6 +219,16 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={16} />
             )}
 
+            {participant instanceof User && !participant.isOnSameFederatedDomain() && (
+              <NamedIcon
+                name="federation-icon"
+                className="federation-icon"
+                data-uie-name="status-federated-user"
+                width={16}
+                height={16}
+              />
+            )}
+
             {external && (
               <NamedIcon
                 name="partner-icon"
@@ -278,5 +285,5 @@ registerReactComponent<ParticipantItemProps>('participant-item', {
     'showArrow',
   ],
   template:
-    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected, isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
+    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
 });

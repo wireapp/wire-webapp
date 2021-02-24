@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,29 +18,25 @@
  */
 
 import React from 'react';
+import {registerReactComponent} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
 
-import {CSS_SQUARE} from 'Util/CSSMixin';
+export interface MissedMessageProps {}
 
-import {DIAMETER, AVATAR_SIZE} from '../ParticipantAvatar';
+const MissedMessage: React.FC<MissedMessageProps> = ({}) => {
+  return (
+    <div className="message-header">
+      <div className="message-header-icon">
+        <span className="icon-sysmsg-error text-red" />
+      </div>
+      <div className="message-header-label">{t('conversationMissedMessages')}</div>
+    </div>
+  );
+};
 
-export interface AvatarWrapperProps extends React.HTMLProps<HTMLDivElement> {
-  avatarSize: AVATAR_SIZE;
-  color: string;
-}
+export default MissedMessage;
 
-const AvatarWrapper: React.FunctionComponent<AvatarWrapperProps> = ({color, avatarSize, ...props}) => (
-  <div
-    css={{
-      ...CSS_SQUARE(DIAMETER[avatarSize]),
-      color,
-      display: 'inline-block',
-      overflow: 'hidden',
-      position: 'relative',
-      transform: 'translateZ(0)',
-      userSelect: 'none',
-    }}
-    {...props}
-  />
-);
-
-export default AvatarWrapper;
+registerReactComponent('missed-message', {
+  component: MissedMessage,
+  template: '<div data-bind="react: {}"></div>',
+});

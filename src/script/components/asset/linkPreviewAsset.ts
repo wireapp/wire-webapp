@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {getDomainName} from 'Util/UrlUtil';
+import {cleanURL} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 
 import type {ContentMessage} from '../../entity/message/ContentMessage';
@@ -36,7 +36,7 @@ interface Params {
 }
 
 class LinkPreviewAssetComponent {
-  getDomainName: (url?: string) => string;
+  cleanURL: typeof cleanURL;
   messageEntity: ContentMessage;
   header: boolean;
   preview: LinkPreview;
@@ -45,7 +45,7 @@ class LinkPreviewAssetComponent {
   author: string;
 
   constructor({message, header = false}: Params, element: HTMLElement) {
-    this.getDomainName = getDomainName;
+    this.cleanURL = cleanURL;
 
     this.messageEntity = ko.unwrap(message);
     this.header = header;
@@ -82,7 +82,7 @@ ko.components.register('link-preview-asset', {
           <div class="link-preview-image-placeholder icon-link"></div>
         <!-- /ko -->
         <!-- ko if: preview && preview.image_resource() -->
-          <image-component class="link-preview-image" params="asset: preview.image_resource" data-uie-name="link-preview-image"></image-component>
+          <image-component params="className: 'link-preview-image', asset: preview.image_resource" data-uie-name="link-preview-image"></image-component>
         <!-- /ko -->
       </div>
 
@@ -99,7 +99,7 @@ ko.components.register('link-preview-asset', {
             </div>
           <!-- /ko -->
           <!-- ko ifnot: isTweet -->
-            <div class="link-preview-info-link text-foreground ellipsis" data-bind="text: getDomainName(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
+            <div class="link-preview-info-link text-foreground ellipsis" data-bind="text: cleanURL(preview.url), attr: {title: preview.url}" data-uie-name="link-preview-url"></div>
           <!-- /ko -->
         <!-- /ko -->
       </div>
