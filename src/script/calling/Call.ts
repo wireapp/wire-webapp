@@ -19,6 +19,7 @@
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
+import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
@@ -81,22 +82,34 @@ export class Call {
   }
 
   setActiveSpeakers({audio_levels}: ActiveSpeakers): void {
+    // Make sure that every participant only has one entry in the list.
+    const uniqueAudioLevels = audio_levels.reduce((acc, curr) => {
+      if (!acc.some(({clientid, userid}) => userid === curr.userid && clientid === curr.clientid)) {
+        acc.push(curr);
+      }
+      return acc;
+    }, [] as ActiveSpeaker[]);
+
     // Update activeSpeaking status on the participants based on their `audio_level_now`.
     this.participants().forEach(participant => {
-      const match = audio_levels.find(({userid, clientid}) => participant.doesMatchIds(userid, clientid));
+      const match = uniqueAudioLevels.find(({userid, clientid}) => participant.doesMatchIds(userid, clientid));
       const audioLevelNow = match?.audio_level_now ?? 0;
       participant.isActivelySpeaking(audioLevelNow > 0);
     });
 
     // Get the corresponding participants for the entries in ActiveSpeakers in the incoming order.
-    const activeSpeakers = audio_levels
+    const activeSpeakers = uniqueAudioLevels
       // Get the participants.
       .map(({userid, clientid}) => this.getParticipant(userid, clientid))
       // Make sure there was a participant found.
-      .filter(participant => participant?.hasActiveVideo());
+      .filter(participant => participant?.hasActiveVideo())
+      // Limit them to 4.
+      .slice(0, 4)
+      // Sort them by name
+      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
 
-    // Set the new active speakers, limited to 4.
-    this.activeSpeakers(activeSpeakers.slice(0, 4));
+    // Set the new active speakers.
+    this.activeSpeakers(activeSpeakers);
   }
 
   getActiveVideoSpeakers = () =>
