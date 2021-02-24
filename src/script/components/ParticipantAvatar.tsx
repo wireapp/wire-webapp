@@ -84,6 +84,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   noFilter = false,
   onAvatarClick,
   participant,
+  ...props
 }) => {
   const isUser = participant instanceof User && !participant.isService && !participant.isTemporaryGuest();
   const isService = participant instanceof ServiceEntity || participant.isService;
@@ -124,6 +125,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
         onClick={clickHandler}
         participant={participant}
         state={avatarState}
+        {...props}
       />
     );
   }
@@ -136,6 +138,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
         onClick={clickHandler}
         participant={participant}
         state={avatarState}
+        {...props}
       />
     );
   }
@@ -146,6 +149,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
       avatarSize={avatarSize}
       participant={participant}
       onClick={clickHandler}
+      {...props}
     />
   );
 };

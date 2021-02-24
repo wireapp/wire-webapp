@@ -30,7 +30,7 @@ import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
 import {shouldShowBadge} from './UserAvatar';
 
-export interface TemporaryGuestAvatarProps {
+export interface TemporaryGuestAvatarProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;
   noBadge?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
@@ -44,6 +44,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
   onClick,
   participant,
   state,
+  ...props
 }) => {
   const borderScale = 0.9916;
   const finalBorderWidth = avatarSize === AVATAR_SIZE.X_LARGE ? 4 : 1;
@@ -63,6 +64,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
       data-uie-value={participant.id}
       onClick={onClick}
       title={participant.name()}
+      {...props}
     >
       <AvatarBackground />
       <AvatarInitials color="var(--background)" avatarSize={avatarSize} initials={participant.initials()} />
