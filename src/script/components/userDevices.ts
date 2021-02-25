@@ -35,7 +35,7 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {User} from '../entity/User';
 import {getPrivacyHowUrl, getPrivacyWhyUrl, getPrivacyPolicyUrl} from '../externalRoute';
 import {MotionDuration} from '../motion/MotionDuration';
-import 'Components/DeviceCard';
+import 'Components/userDevices/DeviceCard';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {ClientState} from '../client/ClientState';
 import {ConversationState} from '../conversation/ConversationState';
