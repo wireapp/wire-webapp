@@ -45,7 +45,7 @@ describe('MediaStreamHandler', () => {
 
       return streamHandler.requestMediaStream(true, false, false, true).then(() => {
         expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: {autoGainControl: true}, video: undefined}),
+          jasmine.objectContaining({audio: {autoGainControl: false}, video: undefined}),
         );
       });
     });
@@ -65,7 +65,7 @@ describe('MediaStreamHandler', () => {
 
       return streamHandler.requestMediaStream(true, true, false, true).then(() => {
         expect(window.navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith(
-          jasmine.objectContaining({audio: {autoGainControl: true}, video: jasmine.any(Object)}),
+          jasmine.objectContaining({audio: {autoGainControl: false}, video: jasmine.any(Object)}),
         );
       });
     });

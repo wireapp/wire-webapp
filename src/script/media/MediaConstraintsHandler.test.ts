@@ -62,7 +62,7 @@ describe('MediaConstraintsHandler', () => {
       const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
 
       expect(constraints.audio.deviceId).not.toBeDefined();
-      expect(constraints.audio).toEqual({autoGainControl: true});
+      expect(constraints.audio).toEqual({autoGainControl: false});
       expect(constraints.video.deviceId).not.toBeDefined();
       expect(constraints.video).toEqual(
         jasmine.objectContaining({
