@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment, HTMLProps} from 'react';
+import React, {Fragment} from 'react';
 import cx from 'classnames';
 
 import 'Components/list/ParticipantItem';
@@ -27,7 +27,7 @@ import ParticipantItem from 'Components/list/ParticipantItem';
 import type {ServiceEntity} from '../integration/ServiceEntity';
 import {t} from '../util/LocalizerUtil';
 
-export interface ServiceListProps extends HTMLProps<HTMLDivElement> {
+export interface ServiceListProps {
   arrow: boolean;
   click: (serviceEntity: ServiceEntity) => void;
   isSearching?: boolean;
