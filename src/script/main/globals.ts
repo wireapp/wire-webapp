@@ -35,7 +35,7 @@ import 'Components/asset/controls/SeekBar';
 import 'Components/copyToClipboard';
 import 'Components/EphemeralTimer';
 import 'Components/fullSearch';
-import 'Components/groupList';
+import 'Components/GroupList';
 import 'Components/GuestModeToggle';
 import 'Components/icons';
 import 'Components/Image';

@@ -17,6 +17,4 @@
  *
  */
 
-export function generateConversationUrl(conversationId: string): string {
-  return `/conversation/${conversationId}`;
-}
+export const generateConversationUrl = (conversationId: string): string => `/conversation/${conversationId}`;

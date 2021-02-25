@@ -688,6 +688,7 @@ class App {
       },
     });
     initRouterBindings(router);
+    container.registerInstance(Router, router);
 
     this.appContainer.dataset.uieValue = 'is-loaded';
 
