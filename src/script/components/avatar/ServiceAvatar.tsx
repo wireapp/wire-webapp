@@ -23,7 +23,6 @@ import React from 'react';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 import NamedIcon from 'Components/NamedIcon';
 
-import {AssetRepository} from '../../assets/AssetRepository';
 import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
 import AvatarImage from './AvatarImage';
@@ -32,19 +31,12 @@ import {AVATAR_SIZE} from '../Avatar';
 import {ServiceEntity} from '../../integration/ServiceEntity';
 
 export interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
-  assetRepository: AssetRepository;
   avatarSize: AVATAR_SIZE;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   participant: ServiceEntity;
 }
 
-const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({
-  assetRepository,
-  participant,
-  avatarSize,
-  onClick,
-  ...props
-}) => {
+const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({participant, avatarSize, onClick, ...props}) => {
   return (
     <AvatarWrapper
       color="#fff"
@@ -78,7 +70,6 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({
         />
       </div>
       <AvatarImage
-        assetRepository={assetRepository}
         avatarSize={avatarSize}
         borderRadius="20%"
         mediumPicture={participant.mediumPictureResource()}

@@ -21,7 +21,7 @@ import React from 'react';
 import {DeleteMessage as DeleteMessageEntity} from '../../entity/message/DeleteMessage';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
-import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {User} from 'src/script/entity/User';
 import MessageTime from './MessageTime';
 import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -44,7 +44,7 @@ const DeleteMessage: React.FC<DeleteMessageProps> = ({message, onClickAvatar}) =
   return (
     <div className="message-header">
       <div className="message-header-icon">
-        <ParticipantAvatar
+        <Avatar
           className="cursor-pointer"
           participant={user}
           onAvatarClick={onClickAvatar}

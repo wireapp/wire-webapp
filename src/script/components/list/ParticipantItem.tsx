@@ -19,7 +19,6 @@
 
 import React, {Fragment} from 'react';
 import ko from 'knockout';
-import {container} from 'tsyringe';
 import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
@@ -34,7 +33,6 @@ import {useViewPortObserver} from '../../ui/viewportObserver';
 
 import 'Components/AvailabilityState';
 import {Participant} from '../../calling/Participant';
-import {AssetRepository} from '../../assets/AssetRepository';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import NamedIcon from 'Components/NamedIcon';
@@ -76,7 +74,6 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   showArrow = false,
 }) => {
   const [isInViewport, viewportElementRef] = useViewPortObserver();
-  const assetRepository = container.resolve(AssetRepository);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
   const isSelf = !!(participant as User).isMe;
@@ -134,11 +131,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         {isInViewport && (
           <>
             <div className="participant-item__image">
-              <Avatar
-                assetRepository={assetRepository}
-                avatarSize={AVATAR_SIZE.SMALL}
-                participant={participant as User}
-              />
+              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant as User} />
             </div>
 
             <div className="participant-item__content">

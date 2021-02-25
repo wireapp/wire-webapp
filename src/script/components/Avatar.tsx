@@ -21,13 +21,11 @@ import React from 'react';
 
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {AssetRepository} from '../assets/AssetRepository';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 import UserAvatar from './avatar/UserAvatar';
 import ServiceAvatar from './avatar/ServiceAvatar';
 import TemporaryGuestAvatar from './avatar/TemporaryGuestAvatar';
-import {container} from 'tsyringe';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -70,7 +68,6 @@ export const INITIALS_SIZE = {
 };
 
 export interface AvatarProps extends React.HTMLProps<HTMLDivElement> {
-  assetRepository?: AssetRepository;
   avatarSize?: AVATAR_SIZE;
   noBadge?: boolean;
   noFilter?: boolean;
@@ -79,7 +76,6 @@ export interface AvatarProps extends React.HTMLProps<HTMLDivElement> {
 }
 
 const Avatar: React.FunctionComponent<AvatarProps> = ({
-  assetRepository = container.resolve(AssetRepository),
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
   noFilter = false,
@@ -96,7 +92,6 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   if (participant instanceof ServiceEntity) {
     return (
       <ServiceAvatar
-        assetRepository={assetRepository}
         avatarSize={avatarSize}
         participant={participant as ServiceEntity}
         onClick={clickHandler}
@@ -135,7 +130,6 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
 
   return (
     <UserAvatar
-      assetRepository={assetRepository}
       avatarSize={avatarSize}
       noBadge={noBadge}
       noFilter={noFilter}
@@ -151,8 +145,7 @@ export default Avatar;
 
 registerReactComponent('participant-avatar', {
   component: Avatar,
-  injected: {assetRepository: AssetRepository},
-  optionalParams: ['assetRepository', 'avatarSize', 'onAvatarClick', 'noBadge', 'noFilter'],
+  optionalParams: ['avatarSize', 'onAvatarClick', 'noBadge', 'noFilter'],
   template:
-    '<span data-bind="react: {assetRepository, participant: ko.unwrap(participant), avatarSize: size, onAvatarClick, noBadge, noFilter}"></span>',
+    '<span data-bind="react: {participant: ko.unwrap(participant), avatarSize: size, onAvatarClick, noBadge, noFilter}"></span>',
 });

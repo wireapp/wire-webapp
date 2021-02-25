@@ -52,12 +52,7 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
         clickOnUser(user, event);
       }}
     >
-      <Avatar
-        assetRepository={assetRepository}
-        avatarSize={AVATAR_SIZE.LARGE}
-        className="search-list-item-image"
-        participant={user}
-      />
+      <Avatar avatarSize={AVATAR_SIZE.LARGE} className="search-list-item-image" participant={user} />
       <div className="search-list-item-content">
         <div className="search-list-item-content-name">{name}</div>
       </div>

@@ -50,13 +50,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, gr
       data-uie-value={displayName}
     >
       <div className="search-list-item-image">
-        {is1to1 && (
-          <Avatar
-            assetRepository={assetRepository}
-            avatarSize={AVATAR_SIZE.SMALL}
-            participant={participatingUserEts[0]}
-          />
-        )}
+        {is1to1 && <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participatingUserEts[0]} />}
         {!is1to1 && <GroupAvatar users={participatingUserEts} />}
       </div>
       <div className="search-list-item-header">{displayName}</div>
