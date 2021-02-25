@@ -21,7 +21,7 @@ import React from 'react';
 
 import {CSS_SQUARE} from 'Util/CSSMixin';
 
-import {DIAMETER, AVATAR_SIZE} from '../ParticipantAvatar';
+import {DIAMETER, AVATAR_SIZE} from '../Avatar';
 
 export interface AvatarWrapperProps extends React.HTMLProps<HTMLDivElement> {
   avatarSize: AVATAR_SIZE;

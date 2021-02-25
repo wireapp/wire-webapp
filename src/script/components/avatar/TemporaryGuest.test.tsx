@@ -23,7 +23,7 @@ import TemporaryGuestAvatar from './TemporaryGuestAvatar';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {UserAvatarProps} from './UserAvatar';
-import {AVATAR_SIZE, STATE} from '../ParticipantAvatar';
+import {AVATAR_SIZE, STATE} from '../Avatar';
 
 jest.mock('../../auth/util/SVGProvider');
 

@@ -29,7 +29,7 @@ import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
 import AvatarImage from './AvatarImage';
 import AvatarWrapper from './AvatarWrapper';
-import {AVATAR_SIZE} from '../ParticipantAvatar';
+import {AVATAR_SIZE} from '../Avatar';
 import NamedIcon from 'Components/NamedIcon';
 
 export interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {

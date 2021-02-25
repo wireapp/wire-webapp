@@ -22,7 +22,7 @@ import React from 'react';
 import {getFirstChar} from 'Util/StringUtil';
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
 
-import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from '../ParticipantAvatar';
+import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from '../Avatar';
 
 export interface AvatarInitialsProps {
   avatarSize: AVATAR_SIZE;

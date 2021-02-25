@@ -20,7 +20,7 @@
 import React from 'react';
 import {CSS_FILL_PARENT, CSS_FLEX_CENTER, CSS_ICON} from 'Util/CSSMixin';
 
-import {STATE} from '../ParticipantAvatar';
+import {STATE} from '../Avatar';
 
 export interface AvatarBadgeProps {
   state: STATE;

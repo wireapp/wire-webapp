@@ -22,7 +22,7 @@ import TestPage from 'Util/test/TestPage';
 import UserAvatar, {UserAvatarProps} from './UserAvatar';
 import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
-import {AVATAR_SIZE, STATE} from '../ParticipantAvatar';
+import {AVATAR_SIZE, STATE} from '../Avatar';
 
 jest.mock('../../auth/util/SVGProvider');
 

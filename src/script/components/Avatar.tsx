@@ -24,9 +24,9 @@ import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
-import UserAvatar from './participantAvatar/UserAvatar';
-import ServiceAvatar from './participantAvatar/ServiceAvatar';
-import TemporaryGuestAvatar from './participantAvatar/TemporaryGuestAvatar';
+import UserAvatar from './avatar/UserAvatar';
+import ServiceAvatar from './avatar/ServiceAvatar';
+import TemporaryGuestAvatar from './avatar/TemporaryGuestAvatar';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -77,7 +77,7 @@ export interface ParticipantAvatarProps extends React.HTMLProps<HTMLDivElement> 
   participant: User;
 }
 
-const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
+const Avatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   assetRepository,
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
@@ -154,10 +154,10 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   );
 };
 
-export default ParticipantAvatar;
+export default Avatar;
 
 registerReactComponent('participant-avatar', {
-  component: ParticipantAvatar,
+  component: Avatar,
   injected: {assetRepository: AssetRepository},
   optionalParams: ['avatarSize', 'onAvatarClick', 'noBadge', 'noFilter'],
   template:

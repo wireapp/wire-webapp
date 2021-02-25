@@ -19,7 +19,7 @@
 
 import {User} from '../entity/User';
 import {AssetRepository} from '../assets/AssetRepository';
-import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {useKoSubscribable} from 'Util/ComponentUtil';
 import {useEffect, useState} from 'react';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
@@ -52,7 +52,7 @@ const TopContact: React.FC<TopContactProps> = ({assetRepository, user, clickOnUs
         clickOnUser(user, event);
       }}
     >
-      <ParticipantAvatar
+      <Avatar
         assetRepository={assetRepository}
         avatarSize={AVATAR_SIZE.LARGE}
         className="search-list-item-image"

@@ -19,7 +19,7 @@
 
 import TestPage from 'Util/test/TestPage';
 
-import ParticipantAvatar, {ParticipantAvatarProps} from './ParticipantAvatar';
+import Avatar, {ParticipantAvatarProps} from './Avatar';
 import {User} from '../entity/User';
 import {AssetRepository} from '../assets/AssetRepository';
 
@@ -27,7 +27,7 @@ jest.mock('../auth/util/SVGProvider');
 
 class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
   constructor(props?: ParticipantAvatarProps) {
-    super(ParticipantAvatar, props);
+    super(Avatar, props);
   }
 
   getUserParticipantAvatar = () => this.get('div[data-uie-name="element-avatar-user"]');

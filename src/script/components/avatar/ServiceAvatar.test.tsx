@@ -18,7 +18,7 @@
  */
 
 import TestPage from 'Util/test/TestPage';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 
 import ServiceAvatar, {ServiceAvatarProps} from './ServiceAvatar';
 import {User} from '../../entity/User';

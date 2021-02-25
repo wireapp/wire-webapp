@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {debounce, escape} from 'underscore';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import {formatDateShort} from 'Util/TimeUtil';
 
