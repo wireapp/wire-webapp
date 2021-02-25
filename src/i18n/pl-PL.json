@@ -905,6 +905,7 @@
   "searchNoServicesManager": "Services are helpers that can improve your workflow.",
   "searchNoServicesMember": "Services are helpers that can improve your workflow. To enable them, ask your administrator.",
   "searchOthers": "Połącz",
+  "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Osoby",
   "searchPlaceholder": "Szukaj według nazwy lub nazwy użytkownika",
   "searchServiceConfirmButton": "Open Conversation",

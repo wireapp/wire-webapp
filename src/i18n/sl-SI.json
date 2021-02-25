@@ -905,6 +905,7 @@
   "searchNoServicesManager": "Services are helpers that can improve your workflow.",
   "searchNoServicesMember": "Services are helpers that can improve your workflow. To enable them, ask your administrator.",
   "searchOthers": "Poveži",
+  "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Osebe",
   "searchPlaceholder": "Iskanje po imenu ali uporabniškem imenu",
   "searchServiceConfirmButton": "Open Conversation",
