@@ -29,13 +29,13 @@ import {noop} from 'Util/util';
 import type {User} from '../../entity/User';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 
-interface EnrichedFieldsProps {
+export interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;
   richProfileRepository?: RichProfileRepository;
   user: User;
 }
 
-export const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
+const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
   onFieldsLoaded = noop,
   richProfileRepository = container.resolve(RichProfileRepository),
   user,
@@ -54,7 +54,7 @@ export const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
       } catch {
       } finally {
         if (!cancel) {
-          onFieldsLoaded(fields);
+          onFieldsLoaded(returnFields);
           setFields(returnFields);
         }
       }
@@ -83,6 +83,8 @@ export const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
     )
   );
 };
+
+export default EnrichedFields;
 
 registerReactComponent<EnrichedFieldsProps>('enriched-fields', {
   component: EnrichedFields,
