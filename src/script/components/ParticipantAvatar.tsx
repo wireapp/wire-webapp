@@ -125,7 +125,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
         avatarSize={avatarSize}
         noBadge={noBadge}
         onClick={clickHandler}
-        participant={participant as User}
+        participant={participant}
         state={avatarState}
         {...props}
       />
@@ -139,7 +139,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
       noBadge={noBadge}
       noFilter={noFilter}
       onClick={clickHandler}
-      participant={participant as User}
+      participant={participant}
       state={avatarState}
       {...props}
     />
