@@ -73,8 +73,8 @@ export interface ParticipantAvatarProps extends React.HTMLProps<HTMLDivElement> 
   avatarSize?: AVATAR_SIZE;
   noBadge?: boolean;
   noFilter?: boolean;
-  onAvatarClick?: (participant: User, target: Node) => void;
-  participant: User;
+  onAvatarClick?: (participant: User | ServiceEntity, target: Node) => void;
+  participant: User | ServiceEntity;
 }
 
 const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
@@ -86,48 +86,37 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   participant,
   ...props
 }) => {
-  const isUser = participant instanceof User && !participant.isService && !participant.isTemporaryGuest();
-  const isService = participant instanceof ServiceEntity || participant.isService;
-  const isTemporaryGuest = !isService && participant.isTemporaryGuest();
-
-  const avatarState = (() => {
-    switch (true) {
-      case isService:
-        return STATE.NONE;
-      case participant.isMe:
-        return STATE.SELF;
-      case participant.isTeamMember():
-        return STATE.NONE;
-      case participant.isBlocked():
-        return STATE.BLOCKED;
-      case participant.isRequest():
-        return STATE.PENDING;
-      case participant.isIgnored():
-        return STATE.IGNORED;
-      case participant.isCanceled() || participant.isUnknown():
-        return STATE.UNKNOWN;
-      default:
-        return STATE.NONE;
-    }
-  })();
+  const isTemporaryGuest = participant instanceof User && participant.isTemporaryGuest();
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     onAvatarClick?.(participant, event.currentTarget.parentNode);
   };
 
-  if (isUser) {
+  if (participant instanceof ServiceEntity) {
     return (
-      <UserAvatar
+      <ServiceAvatar
         assetRepository={assetRepository}
         avatarSize={avatarSize}
-        noBadge={noBadge}
-        noFilter={noFilter}
+        participant={participant as ServiceEntity}
         onClick={clickHandler}
-        participant={participant}
-        state={avatarState}
         {...props}
       />
     );
+  }
+  let avatarState = STATE.NONE;
+
+  if (participant.isMe) {
+    avatarState = STATE.SELF;
+  } else if (participant.isTeamMember()) {
+    avatarState = STATE.NONE;
+  } else if (participant.isBlocked()) {
+    avatarState = STATE.BLOCKED;
+  } else if (participant.isRequest()) {
+    avatarState = STATE.PENDING;
+  } else if (participant.isIgnored()) {
+    avatarState = STATE.IGNORED;
+  } else if (participant.isCanceled() || participant.isUnknown()) {
+    avatarState = STATE.UNKNOWN;
   }
 
   if (isTemporaryGuest) {
@@ -144,11 +133,14 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   }
 
   return (
-    <ServiceAvatar
+    <UserAvatar
       assetRepository={assetRepository}
       avatarSize={avatarSize}
-      participant={participant}
+      noBadge={noBadge}
+      noFilter={noFilter}
       onClick={clickHandler}
+      participant={participant}
+      state={avatarState}
       {...props}
     />
   );
