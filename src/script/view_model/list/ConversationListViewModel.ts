@@ -28,7 +28,7 @@ import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import 'Components/AvailabilityState';
 import 'Components/LegalHoldDot';
 import 'Components/list/groupedConversations';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
