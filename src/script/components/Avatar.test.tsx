@@ -21,7 +21,6 @@ import TestPage from 'Util/test/TestPage';
 
 import Avatar, {AvatarProps} from './Avatar';
 import {User} from '../entity/User';
-import {AssetRepository} from '../assets/AssetRepository';
 import {ServiceEntity} from '../integration/ServiceEntity';
 
 jest.mock('../auth/util/SVGProvider');
@@ -42,12 +41,10 @@ class AvatarPage extends TestPage<AvatarProps> {
 
 describe('Avatar', () => {
   it('executes onClick with current participant', () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
 
     const participantAvatar = new AvatarPage({
-      assetRepository: assetRepoSpy,
       onAvatarClick: jasmine.createSpy(),
       participant,
     });
@@ -61,13 +58,11 @@ describe('Avatar', () => {
   });
 
   it('renders temporary guest avatar', () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
     const participantAvatar = new AvatarPage({
-      assetRepository: assetRepoSpy,
       participant,
     });
 
@@ -75,12 +70,10 @@ describe('Avatar', () => {
   });
 
   it('renders service avatar', () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new ServiceEntity({id: 'id'});
     participant.name = 'Anton Bertha';
 
     const participantAvatar = new AvatarPage({
-      assetRepository: assetRepoSpy,
       participant,
     });
 
@@ -88,12 +81,10 @@ describe('Avatar', () => {
   });
 
   it('renders user avatar', () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
 
     const participantAvatar = new AvatarPage({
-      assetRepository: assetRepoSpy,
       participant,
     });
 

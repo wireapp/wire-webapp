@@ -21,7 +21,6 @@ import TestPage from 'Util/test/TestPage';
 
 import TemporaryGuestAvatar from './TemporaryGuestAvatar';
 import {User} from '../../entity/User';
-import {AssetRepository} from '../../assets/AssetRepository';
 import {UserAvatarProps} from './UserAvatar';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 
@@ -41,13 +40,11 @@ class TemporaryGuestAvatarPage extends TestPage<UserAvatarProps> {
 
 describe('TemporaryGuestAvatar', () => {
   it('shows expiration circle', async () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
     const temporaryGuestAvatar = new TemporaryGuestAvatarPage({
-      assetRepository: assetRepoSpy,
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
@@ -57,13 +54,11 @@ describe('TemporaryGuestAvatar', () => {
   });
 
   it('shows participant initials', async () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
     const temporaryGuestAvatar = new TemporaryGuestAvatarPage({
-      assetRepository: assetRepoSpy,
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
@@ -74,13 +69,11 @@ describe('TemporaryGuestAvatar', () => {
   });
 
   it('does not show avatar badge in default state', async () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
     const temporaryGuestAvatar = new TemporaryGuestAvatarPage({
-      assetRepository: assetRepoSpy,
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
@@ -90,13 +83,11 @@ describe('TemporaryGuestAvatar', () => {
   });
 
   it('shows avatar badge for blocked user', async () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
     const temporaryGuestAvatar = new TemporaryGuestAvatarPage({
-      assetRepository: assetRepoSpy,
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.BLOCKED,

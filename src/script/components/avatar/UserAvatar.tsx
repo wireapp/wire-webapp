@@ -21,7 +21,6 @@ import React from 'react';
 import {COLOR} from '@wireapp/react-ui-kit';
 
 import {User} from '../../entity/User';
-import {AssetRepository} from '../../assets/AssetRepository';
 
 import {AVATAR_SIZE, STATE} from '../Avatar';
 import AvatarBackground from './AvatarBackground';
@@ -32,7 +31,6 @@ import AvatarBorder from './AvatarBorder';
 import AvatarWrapper from './AvatarWrapper';
 
 export interface UserAvatarProps extends React.HTMLProps<HTMLDivElement> {
-  assetRepository: AssetRepository;
   avatarSize: AVATAR_SIZE;
   noBadge?: boolean;
   noFilter?: boolean;
@@ -48,7 +46,6 @@ export const shouldShowBadge = (size: AVATAR_SIZE, state: STATE): boolean => {
 };
 
 const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
-  assetRepository,
   participant,
   avatarSize,
   noBadge,
@@ -72,7 +69,6 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       <AvatarBackground backgroundColor={backgroundColor} />
       <AvatarInitials avatarSize={avatarSize} initials={participant.initials()} />
       <AvatarImage
-        assetRepository={assetRepository}
         avatarSize={avatarSize}
         backgroundColor={backgroundColor}
         isGrey={isImageGrey}

@@ -21,7 +21,6 @@ import TestPage from 'Util/test/TestPage';
 
 import UserAvatar, {UserAvatarProps} from './UserAvatar';
 import {User} from '../../entity/User';
-import {AssetRepository} from '../../assets/AssetRepository';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 
 jest.mock('../../auth/util/SVGProvider');
@@ -38,12 +37,10 @@ class UserAvatarPage extends TestPage<UserAvatarProps> {
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({
-      assetRepository: assetRepoSpy,
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
@@ -54,12 +51,10 @@ describe('UserAvatar', () => {
   });
 
   it('shows single initial character when avatar size is extra small', async () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({
-      assetRepository: assetRepoSpy,
       avatarSize: AVATAR_SIZE.X_SMALL,
       participant: participant,
       state: STATE.NONE,
@@ -70,12 +65,10 @@ describe('UserAvatar', () => {
   });
 
   it('does not show avatar badge in default state', async () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({
-      assetRepository: assetRepoSpy,
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.NONE,
@@ -85,12 +78,10 @@ describe('UserAvatar', () => {
   });
 
   it('shows avatar badge for blocked user', async () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({
-      assetRepository: assetRepoSpy,
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.BLOCKED,
@@ -100,12 +91,10 @@ describe('UserAvatar', () => {
   });
 
   it('shows avatar badge for connection request', async () => {
-    const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
 
     const userAvatar = new UserAvatarPage({
-      assetRepository: assetRepoSpy,
       avatarSize: AVATAR_SIZE.LARGE,
       participant: participant,
       state: STATE.PENDING,

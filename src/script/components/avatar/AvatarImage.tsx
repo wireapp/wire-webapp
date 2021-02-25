@@ -27,9 +27,10 @@ import {AssetRemoteData} from '../../assets/AssetRemoteData';
 import {AssetRepository} from '../../assets/AssetRepository';
 
 import {AVATAR_SIZE} from '../Avatar';
+import {container} from 'tsyringe';
 
 export interface AvatarImageProps {
-  assetRepository: AssetRepository;
+  assetRepository?: AssetRepository;
   avatarSize: AVATAR_SIZE;
   backgroundColor?: string;
   borderRadius?: string;
@@ -40,7 +41,7 @@ export interface AvatarImageProps {
 }
 
 const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
-  assetRepository,
+  assetRepository = container.resolve(AssetRepository),
   avatarSize,
   backgroundColor = 'currentColor',
   borderRadius = '50%',
