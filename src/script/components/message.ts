@@ -57,6 +57,7 @@ import './message/VerificationMessage';
 import './message/CallMessage';
 import './message/MissedMessage';
 import './message/FileTypeRestrictedMessage';
+import './message/DeleteMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -531,21 +532,6 @@ const pingTemplate: string = `
   </div>
   `;
 
-const deleteTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <participant-avatar class="cursor-pointer" params="participant: message.user, onAvatarClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
-    </div>
-    <div class="message-header-label">
-      <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
-      <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
-    </div>
-    <div class="message-body-actions message-body-actions-large">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps" data-uie-name="item-message-delete-timestamp"></time>
-    </div>
-  </div>
-  `;
-
 const legalHoldTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -664,7 +650,7 @@ ko.components.register('message', {
       <verification-message params="message: message"></verification-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'delete' -->
-      ${deleteTemplate}
+      <delete-message params="message: message, onClickAvatar: onClickAvatar"></delete-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'call' -->
       <call-message params="message: message"></call-message>

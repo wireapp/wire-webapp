@@ -27,6 +27,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import UserAvatar from './participantAvatar/UserAvatar';
 import ServiceAvatar from './participantAvatar/ServiceAvatar';
 import TemporaryGuestAvatar from './participantAvatar/TemporaryGuestAvatar';
+import {container} from 'tsyringe';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -69,7 +70,7 @@ export const INITIALS_SIZE = {
 };
 
 export interface ParticipantAvatarProps extends React.HTMLProps<HTMLDivElement> {
-  assetRepository: AssetRepository;
+  assetRepository?: AssetRepository;
   avatarSize?: AVATAR_SIZE;
   noBadge?: boolean;
   noFilter?: boolean;
@@ -77,8 +78,8 @@ export interface ParticipantAvatarProps extends React.HTMLProps<HTMLDivElement> 
   participant: User | ServiceEntity;
 }
 
-const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
-  assetRepository,
+const ParticipantAvatar: React.FC<ParticipantAvatarProps> = ({
+  assetRepository = container.resolve(AssetRepository),
   avatarSize = AVATAR_SIZE.LARGE,
   noBadge = false,
   noFilter = false,
@@ -151,7 +152,7 @@ export default ParticipantAvatar;
 registerReactComponent('participant-avatar', {
   component: ParticipantAvatar,
   injected: {assetRepository: AssetRepository},
-  optionalParams: ['avatarSize', 'onAvatarClick', 'noBadge', 'noFilter'],
+  optionalParams: ['assetRepository', 'avatarSize', 'onAvatarClick', 'noBadge', 'noFilter'],
   template:
     '<span data-bind="react: {assetRepository, participant: ko.unwrap(participant), avatarSize: size, onAvatarClick, noBadge, noFilter}"></span>',
 });
