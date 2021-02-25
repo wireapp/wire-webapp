@@ -86,47 +86,37 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   participant,
   ...props
 }) => {
-  const isUser = participant instanceof User && !participant.isService && !participant.isTemporaryGuest();
-  const isService = participant instanceof ServiceEntity || participant.isService;
   const isTemporaryGuest = participant instanceof User && participant.isTemporaryGuest();
-
-  let avatarState: STATE;
-
-  if (isService) {
-    avatarState = STATE.NONE;
-  } else if ((participant as User).isMe) {
-    avatarState = STATE.SELF;
-  } else if ((participant as User).isTeamMember()) {
-    avatarState = STATE.NONE;
-  } else if ((participant as User).isBlocked()) {
-    avatarState = STATE.BLOCKED;
-  } else if ((participant as User).isRequest()) {
-    avatarState = STATE.PENDING;
-  } else if ((participant as User).isIgnored()) {
-    avatarState = STATE.IGNORED;
-  } else if ((participant as User).isCanceled() || (participant as User).isUnknown()) {
-    avatarState = STATE.UNKNOWN;
-  } else {
-    avatarState = STATE.NONE;
-  }
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     onAvatarClick?.(participant, event.currentTarget.parentNode);
   };
 
-  if (isUser) {
+  if (participant instanceof ServiceEntity) {
     return (
-      <UserAvatar
+      <ServiceAvatar
         assetRepository={assetRepository}
         avatarSize={avatarSize}
-        noBadge={noBadge}
-        noFilter={noFilter}
+        participant={participant as ServiceEntity}
         onClick={clickHandler}
-        participant={participant as User}
-        state={avatarState}
         {...props}
       />
     );
+  }
+  let avatarState = STATE.NONE;
+
+  if (participant.isMe) {
+    avatarState = STATE.SELF;
+  } else if (participant.isTeamMember()) {
+    avatarState = STATE.NONE;
+  } else if (participant.isBlocked()) {
+    avatarState = STATE.BLOCKED;
+  } else if (participant.isRequest()) {
+    avatarState = STATE.PENDING;
+  } else if (participant.isIgnored()) {
+    avatarState = STATE.IGNORED;
+  } else if (participant.isCanceled() || participant.isUnknown()) {
+    avatarState = STATE.UNKNOWN;
   }
 
   if (isTemporaryGuest) {
@@ -143,11 +133,14 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
   }
 
   return (
-    <ServiceAvatar
+    <UserAvatar
       assetRepository={assetRepository}
       avatarSize={avatarSize}
-      participant={participant as ServiceEntity}
+      noBadge={noBadge}
+      noFilter={noFilter}
       onClick={clickHandler}
+      participant={participant as User}
+      state={avatarState}
       {...props}
     />
   );
