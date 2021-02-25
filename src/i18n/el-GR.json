@@ -905,6 +905,7 @@
   "searchNoServicesManager": "Services are helpers that can improve your workflow.",
   "searchNoServicesMember": "Services are helpers that can improve your workflow. To enable them, ask your administrator.",
   "searchOthers": "Σύνδεση",
+  "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Άτομα",
   "searchPlaceholder": "Αναζητηση ονοματος χρηστη",
   "searchServiceConfirmButton": "Open Conversation",

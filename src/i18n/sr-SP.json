@@ -905,6 +905,7 @@
   "searchNoServicesManager": "Услуге су помоћ која може побољшати ваш радни ток.",
   "searchNoServicesMember": "Услуге су помоћ која може побољшати ваш радни ток. Да бисте их омогућили, питајте свог администратора.",
   "searchOthers": "Повежи се",
+  "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Особе",
   "searchPlaceholder": "Тражи по имену или корисничком имену",
   "searchServiceConfirmButton": "Отворени разговор",

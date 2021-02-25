@@ -905,6 +905,7 @@
   "searchNoServicesManager": "サービスはあなたのワークフローを改善に役立ちます。",
   "searchNoServicesMember": "あなたのワークフローを改善するサービスです。サービスを有効にするには、管理者に問い合わせてください。",
   "searchOthers": "つながる",
+  "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "メンバー",
   "searchPlaceholder": "名前またはユーザーネームで検索する",
   "searchServiceConfirmButton": "サービスを追加",

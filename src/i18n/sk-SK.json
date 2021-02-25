@@ -905,6 +905,7 @@
   "searchNoServicesManager": "Services are helpers that can improve your workflow.",
   "searchNoServicesMember": "Services are helpers that can improve your workflow. To enable them, ask your administrator.",
   "searchOthers": "Pripojiť",
+  "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Ľudia",
   "searchPlaceholder": "Vyhľadať podľa mena, alebo užívateľského mena",
   "searchServiceConfirmButton": "Open Conversation",
