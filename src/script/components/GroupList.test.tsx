@@ -37,7 +37,6 @@ class GroupListPage extends TestPage<GroupListProps> {
 describe('GroupList', () => {
   const createGroupConversation = (name: string, id = createRandomUuid()) => {
     const conversation = new Conversation(id);
-    spyOn(conversation, 'display_name').and.returnValue(name);
     const userIds = [createRandomUuid(), createRandomUuid()];
     const users = userIds.map(id => new User(id));
     conversation.participating_user_ids.push(...userIds);
