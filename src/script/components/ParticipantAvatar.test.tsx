@@ -22,6 +22,7 @@ import TestPage from 'Util/test/TestPage';
 import ParticipantAvatar, {ParticipantAvatarProps} from './ParticipantAvatar';
 import {User} from '../entity/User';
 import {AssetRepository} from '../assets/AssetRepository';
+import {ServiceEntity} from '../integration/ServiceEntity';
 
 jest.mock('../auth/util/SVGProvider');
 
@@ -40,26 +41,26 @@ class ParticipantAvatarPage extends TestPage<ParticipantAvatarProps> {
 }
 
 describe('ParticipantAvatar', () => {
-  it('executes onClick with current participant', async () => {
+  it('executes onClick with current participant', () => {
     const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
 
     const participantAvatar = new ParticipantAvatarPage({
       assetRepository: assetRepoSpy,
-      onClick: jasmine.createSpy(),
+      onAvatarClick: jasmine.createSpy(),
       participant,
     });
 
     participantAvatar.clickUserAvatar();
 
-    expect(participantAvatar.getProps().onClick).toHaveBeenCalledWith(
+    expect(participantAvatar.getProps().onAvatarClick).toHaveBeenCalledWith(
       participantAvatar.getProps().participant,
       jasmine.anything(),
     );
   });
 
-  it('renders temporary guest avatar', async () => {
+  it('renders temporary guest avatar', () => {
     const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');
@@ -73,11 +74,10 @@ describe('ParticipantAvatar', () => {
     expect(participantAvatar.getTemporaryGuestAvatar().exists()).toBe(true);
   });
 
-  it('renders service avatar', async () => {
+  it('renders service avatar', () => {
     const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
-    const participant = new User('id');
-    participant.name('Anton Bertha');
-    participant.isService = true;
+    const participant = new ServiceEntity({id: 'id'});
+    participant.name = 'Anton Bertha';
 
     const participantAvatar = new ParticipantAvatarPage({
       assetRepository: assetRepoSpy,
@@ -87,7 +87,7 @@ describe('ParticipantAvatar', () => {
     expect(participantAvatar.getServiceAvatar().exists()).toBe(true);
   });
 
-  it('renders user avatar', async () => {
+  it('renders user avatar', () => {
     const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
     const participant = new User('id');
     participant.name('Anton Bertha');

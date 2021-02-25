@@ -905,6 +905,7 @@
   "searchNoServicesManager": "Services are helpers that can improve your workflow.",
   "searchNoServicesMember": "Services are helpers that can improve your workflow. To enable them, ask your administrator.",
   "searchOthers": "Csatlakozás",
+  "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Partner",
   "searchPlaceholder": "Keresés név vagy felhasználónév alapján",
   "searchServiceConfirmButton": "Új szolgáltatás",

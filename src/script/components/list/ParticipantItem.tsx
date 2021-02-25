@@ -75,7 +75,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   selfInTeam,
   showArrow = false,
 }) => {
-  const {viewportElementRef, isInViewport} = useViewPortObserver<HTMLDivElement>();
+  const [isInViewport, viewportElementRef] = useViewPortObserver();
   const assetRepository = container.resolve(AssetRepository);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
@@ -135,9 +135,9 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
           <>
             <div className="participant-item__image">
               <ParticipantAvatar
-                participant={participant as User}
-                size={AVATAR_SIZE.SMALL}
                 assetRepository={assetRepository}
+                avatarSize={AVATAR_SIZE.SMALL}
+                participant={participant as User}
               />
             </div>
 
@@ -145,9 +145,9 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               <div className="participant-item__content__name-wrapper">
                 {isUser && selfInTeam && (
                   <AvailabilityState
+                    availability={availability}
                     className="participant-item__content__availability participant-item__content__name"
                     dataUieName="status-name"
-                    availability={availability}
                     label={participantName}
                   />
                 )}
@@ -219,6 +219,16 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={16} />
             )}
 
+            {participant instanceof User && !participant.isOnSameFederatedDomain() && (
+              <NamedIcon
+                name="federation-icon"
+                className="federation-icon"
+                data-uie-name="status-federated-user"
+                width={16}
+                height={16}
+              />
+            )}
+
             {external && (
               <NamedIcon
                 name="partner-icon"
@@ -275,5 +285,5 @@ registerReactComponent<ParticipantItemProps>('participant-item', {
     'showArrow',
   ],
   template:
-    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected, isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
+    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
 });

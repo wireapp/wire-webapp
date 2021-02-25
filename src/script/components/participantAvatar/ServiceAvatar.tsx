@@ -21,33 +21,39 @@ import ko from 'knockout';
 import React from 'react';
 
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
+import NamedIcon from 'Components/NamedIcon';
 
-import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
-
 import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
 import AvatarImage from './AvatarImage';
 import AvatarWrapper from './AvatarWrapper';
 import {AVATAR_SIZE} from '../ParticipantAvatar';
-import NamedIcon from 'Components/NamedIcon';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
-export interface ServiceAvatarProps {
+export interface ServiceAvatarProps extends React.HTMLProps<HTMLDivElement> {
   assetRepository: AssetRepository;
+  avatarSize: AVATAR_SIZE;
   onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-  participant: User;
-  size: AVATAR_SIZE;
+  participant: ServiceEntity;
 }
 
-const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetRepository, participant, size, onClick}) => {
+const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({
+  assetRepository,
+  participant,
+  avatarSize,
+  onClick,
+  ...props
+}) => {
   return (
     <AvatarWrapper
       color="#fff"
       title={ko.unwrap(participant.name)}
-      size={size}
+      avatarSize={avatarSize}
       onClick={onClick}
       data-uie-name="element-avatar-service"
       data-uie-value={participant.id}
+      {...props}
     >
       <AvatarBackground borderRadius="20%" />
       <div
@@ -67,16 +73,16 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({assetReposi
             '& > path': {
               fill: 'rgba(141, 152, 159, 0.24)',
             },
-            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(size) ? '32px' : '60%',
+            width: [AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(avatarSize) ? '32px' : '60%',
           }}
         />
       </div>
       <AvatarImage
         assetRepository={assetRepository}
-        previewPicture={participant.previewPictureResource()}
-        mediumPicture={participant.mediumPictureResource()}
+        avatarSize={avatarSize}
         borderRadius="20%"
-        size={size}
+        mediumPicture={participant.mediumPictureResource()}
+        previewPicture={participant.previewPictureResource()}
       />
       <AvatarBorder borderRadius="20%" />
     </AvatarWrapper>

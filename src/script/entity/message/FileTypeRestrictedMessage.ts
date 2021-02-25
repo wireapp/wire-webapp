@@ -17,17 +17,18 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
 export class FileTypeRestrictedMessage extends Message {
-  public caption: string;
-  constructor(isIncoming: boolean, name: string, fileExt: string, timestamp: number) {
+  constructor(
+    public readonly isIncoming: boolean,
+    public readonly name: string,
+    public readonly fileExt: string,
+    timestamp: number,
+  ) {
     super();
     this.super_type = SuperType.FILE_TYPE_RESTRICTED;
     this.timestamp(timestamp);
-    this.caption = isIncoming ? t('fileTypeRestrictedIncoming', name) : t('fileTypeRestrictedOutgoing', fileExt);
   }
 }

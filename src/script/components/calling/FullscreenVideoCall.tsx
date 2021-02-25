@@ -17,29 +17,26 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
 import {css} from '@emotion/core';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
-
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
+import NamedIcon from 'Components/NamedIcon';
+import React, {useEffect, useMemo, useState} from 'react';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {registerReactComponent, useKoSubscribableCallback} from 'Util/ComponentUtil';
-import useHideElement from '../../hooks/useHideElement';
-import {t} from '../../util/LocalizerUtil';
-import GroupVideoGrid from './GroupVideoGrid';
-import DeviceToggleButton from './DeviceToggleButton';
-
 import type {Call} from '../../calling/Call';
+import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
+import useHideElement from '../../hooks/useHideElement';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
-import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import {t} from '../../util/LocalizerUtil';
+import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
+import DeviceToggleButton from './DeviceToggleButton';
 import Duration from './Duration';
-import NamedIcon from 'Components/NamedIcon';
-import type {Participant} from '../../calling/Participant';
-import ButtonGroup from 'Components/ButtonGroup';
+import GroupVideoGrid from './GroupVideoGrid';
 
 export interface FullscreenVideoCallProps {
   call: Call;
@@ -129,10 +126,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     };
   }, [videoGrid]);
 
-  const [activeVideoSpeakers, setActiveVideoSpeakers] = useState(call.getActiveVideoSpeakers());
-  useKoSubscribableCallback(call.lastActiveSpeakersUpdateTime, () =>
-    setActiveVideoSpeakers(call.getActiveVideoSpeakers()),
-  );
+  const activeVideoSpeakers = useKoSubscribable(call.activeSpeakers);
 
   return (
     <div id="video-calling" className="video-calling" ref={wrapper}>
@@ -165,17 +159,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls hide-controls-hidden">
-          {call.participants().length > 2 && (
-            <ButtonGroup
-              items={Object.values(VideoSpeakersTabs)}
-              onChangeItem={item => {
-                callActions.setVideoSpeakersActiveTab(item);
-                callActions.setMaximizedTileVideoParticipant(null);
-              }}
-              currentItem={videoSpeakersActiveTab}
-              style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
-            />
-          )}
           <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
             {t('videoCallOverlayFitVideoLabel')}
           </div>

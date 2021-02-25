@@ -905,6 +905,7 @@
   "searchNoServicesManager": "Hizmetler, iş akışınızı iyileştirebilecek yardımcılardır.",
   "searchNoServicesMember": "Hizmetler, iş akışınızı iyileştirebilecek yardımcılardır. Onları etkinleştirmek için yöneticinize sorun.",
   "searchOthers": "Bağlan",
+  "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "İnsanlar",
   "searchPlaceholder": "İsim veya kullanıcı adına göre ara",
   "searchServiceConfirmButton": "Sohbet Başlat",

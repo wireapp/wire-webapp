@@ -55,6 +55,8 @@ import './asset/videoAsset';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
+import './message/MissedMessage';
+import './message/FileTypeRestrictedMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -370,7 +372,7 @@ const normalTemplate: string = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="cursor-pointer" params="participant: message.user, onClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="cursor-pointer" params="participant: message.user, onAvatarClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
@@ -468,24 +470,6 @@ const normalTemplate: string = `
   <!-- /ko -->
   `;
 
-const missedTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label" data-bind="text: t('conversationMissedMessages')"></div>
-  </div>
-  `;
-
-const fileTypeRestrictedTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label" data-bind="html: message.caption"></div>
-  </div>
-  `;
-
 const unableToDecryptTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -550,7 +534,7 @@ const pingTemplate: string = `
 const deleteTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
-      <participant-avatar class="cursor-pointer" params="participant: message.user, onClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
+      <participant-avatar class="cursor-pointer" params="participant: message.user, onAvatarClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
     </div>
     <div class="message-header-label">
       <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
@@ -671,7 +655,7 @@ ko.components.register('message', {
       ${normalTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'missed' -->
-      ${missedTemplate}
+      <missed-message></missed-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'unable-to-decrypt' -->
       ${unableToDecryptTemplate}
@@ -695,7 +679,7 @@ ko.components.register('message', {
       ${pingTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'file-type-restricted' -->
-      ${fileTypeRestrictedTemplate}
+      <filetype-restricted-message params="message: message"></filetype-restricted-message>
     <!-- /ko -->
     <!-- ko if: message.isLegalHold() -->
       ${legalHoldTemplate}

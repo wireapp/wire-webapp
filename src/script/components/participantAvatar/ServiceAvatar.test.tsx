@@ -21,8 +21,8 @@ import TestPage from 'Util/test/TestPage';
 import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
 
 import ServiceAvatar, {ServiceAvatarProps} from './ServiceAvatar';
-import {User} from '../../entity/User';
 import {AssetRepository} from '../../assets/AssetRepository';
+import {ServiceEntity} from '../../integration/ServiceEntity';
 
 jest.mock('../../auth/util/SVGProvider');
 
@@ -39,13 +39,12 @@ class ServiceAvatarPage extends TestPage<ServiceAvatarProps> {
 describe('ServiceAvatar', () => {
   it('shows a service icon', async () => {
     const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
-    const service = new User('id');
-    service.isService = true;
+    const service = new ServiceEntity({id: 'id'});
 
     const serviceAvatar = new ServiceAvatarPage({
       assetRepository: assetRepoSpy,
+      avatarSize: AVATAR_SIZE.LARGE,
       participant: service,
-      size: AVATAR_SIZE.LARGE,
     });
 
     expect(serviceAvatar.getServiceIcon().exists()).toBe(true);
@@ -53,14 +52,13 @@ describe('ServiceAvatar', () => {
 
   it('does not show initials', async () => {
     const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
-    const service = new User('id');
-    service.name('Anton Bertha');
-    service.isService = true;
+    const service = new ServiceEntity({id: 'id'});
+    service.name = 'Anton Bertha';
 
     const serviceAvatar = new ServiceAvatarPage({
       assetRepository: assetRepoSpy,
+      avatarSize: AVATAR_SIZE.LARGE,
       participant: service,
-      size: AVATAR_SIZE.LARGE,
     });
 
     expect(serviceAvatar.getInitials().exists()).toBe(false);
@@ -68,14 +66,13 @@ describe('ServiceAvatar', () => {
 
   it('does not show avatar badge', async () => {
     const assetRepoSpy = (jasmine.createSpy() as unknown) as AssetRepository;
-    const service = new User('id');
-    service.name('Anton Bertha');
-    service.isService = true;
+    const service = new ServiceEntity({id: 'id'});
+    service.name = 'Anton Bertha';
 
     const serviceAvatar = new ServiceAvatarPage({
       assetRepository: assetRepoSpy,
+      avatarSize: AVATAR_SIZE.LARGE,
       participant: service,
-      size: AVATAR_SIZE.LARGE,
     });
 
     expect(serviceAvatar.getUserBadgeIcon().exists()).toBe(false);

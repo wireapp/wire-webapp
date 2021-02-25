@@ -54,7 +54,7 @@ jobs:
 
       - name: Set TITLE and BUILD_DESKTOP
         env:
-          PR_TITLE: github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE
+          PR_TITLE: ${{github.event.pull_request.title || env.PR_LAST_COMMIT_MESSAGE}}
         run: |
           echo "TITLE=${PR_TITLE}" >> $GITHUB_ENV
           echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
