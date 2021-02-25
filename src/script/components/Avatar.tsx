@@ -93,24 +93,14 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   const isIgnored = useKoSubscribable((participant as User).isIgnored ?? ko.observable(false));
   const isCanceled = useKoSubscribable((participant as User).isCanceled ?? ko.observable(false));
   const isUnknown = useKoSubscribable((participant as User).isUnknown ?? ko.observable(false));
+  const isMe = !!(participant as User).isMe;
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     onAvatarClick?.(participant, event.currentTarget.parentNode);
   };
 
-  if (participant instanceof ServiceEntity) {
-    return (
-      <ServiceAvatar
-        avatarSize={avatarSize}
-        participant={participant as ServiceEntity}
-        onClick={clickHandler}
-        {...props}
-      />
-    );
-  }
-
   useEffect(() => {
-    if (participant.isMe) {
+    if (isMe) {
       setAvatarState(STATE.SELF);
     } else if (isTeamMember) {
       setAvatarState(STATE.NONE);
@@ -124,6 +114,17 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
       setAvatarState(STATE.UNKNOWN);
     }
   }, [participant, isTemporaryGuest, isTeamMember, isBlocked, isRequest, isIgnored, isCanceled, isUnknown]);
+
+  if (participant instanceof ServiceEntity) {
+    return (
+      <ServiceAvatar
+        avatarSize={avatarSize}
+        participant={participant as ServiceEntity}
+        onClick={clickHandler}
+        {...props}
+      />
+    );
+  }
 
   if (isTemporaryGuest) {
     return (
