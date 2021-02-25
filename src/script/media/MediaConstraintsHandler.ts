@@ -116,7 +116,7 @@ export class MediaConstraintsHandler {
 
   getAgcPreference(): boolean {
     const storedValue = window.localStorage.getItem(this.agcStorageKey);
-    return JSON.parse(storedValue) ?? true;
+    return JSON.parse(storedValue) ?? false;
   }
 
   getMediaStreamConstraints(
