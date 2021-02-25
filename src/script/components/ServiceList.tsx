@@ -29,7 +29,7 @@ import {t} from '../util/LocalizerUtil';
 
 export interface ServiceListProps extends HTMLProps<HTMLDivElement> {
   arrow: boolean;
-  click: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  click: (serviceEntity: ServiceEntity) => void;
   isSearching?: boolean;
   mode?: MODE;
   noUnderline: boolean;
@@ -53,7 +53,7 @@ const ServiceList: React.FC<ServiceListProps> = ({
     <Fragment>
       <div className={cx('search-list', mode === MODE.COMPACT ? 'search-list-sm' : 'search-list-lg')}>
         {services.map(service => (
-          <div onClick={click} key={service.id} data-uie-name={`service-list-service-${service.id}`}>
+          <div onClick={() => click(service)} key={service.id} data-uie-name={`service-list-service-${service.id}`}>
             <ParticipantItem participant={service} noUnderline={noUnderline} showArrow={arrow} />
           </div>
         ))}
