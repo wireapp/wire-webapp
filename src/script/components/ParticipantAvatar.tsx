@@ -73,8 +73,8 @@ export interface ParticipantAvatarProps extends React.HTMLProps<HTMLDivElement> 
   avatarSize?: AVATAR_SIZE;
   noBadge?: boolean;
   noFilter?: boolean;
-  onAvatarClick?: (participant: User, target: Node) => void;
-  participant: User;
+  onAvatarClick?: (participant: User | ServiceEntity, target: Node) => void;
+  participant: User | ServiceEntity;
 }
 
 const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
@@ -88,28 +88,27 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
 }) => {
   const isUser = participant instanceof User && !participant.isService && !participant.isTemporaryGuest();
   const isService = participant instanceof ServiceEntity || participant.isService;
-  const isTemporaryGuest = !isService && participant.isTemporaryGuest();
+  const isTemporaryGuest = participant instanceof User && participant.isTemporaryGuest();
 
-  const avatarState = (() => {
-    switch (true) {
-      case isService:
-        return STATE.NONE;
-      case participant.isMe:
-        return STATE.SELF;
-      case participant.isTeamMember():
-        return STATE.NONE;
-      case participant.isBlocked():
-        return STATE.BLOCKED;
-      case participant.isRequest():
-        return STATE.PENDING;
-      case participant.isIgnored():
-        return STATE.IGNORED;
-      case participant.isCanceled() || participant.isUnknown():
-        return STATE.UNKNOWN;
-      default:
-        return STATE.NONE;
-    }
-  })();
+  let avatarState: STATE;
+
+  if (isService) {
+    avatarState = STATE.NONE;
+  } else if ((participant as User).isMe) {
+    avatarState = STATE.SELF;
+  } else if ((participant as User).isTeamMember()) {
+    avatarState = STATE.NONE;
+  } else if ((participant as User).isBlocked()) {
+    avatarState = STATE.BLOCKED;
+  } else if ((participant as User).isRequest()) {
+    avatarState = STATE.PENDING;
+  } else if ((participant as User).isIgnored()) {
+    avatarState = STATE.IGNORED;
+  } else if ((participant as User).isCanceled() || (participant as User).isUnknown()) {
+    avatarState = STATE.UNKNOWN;
+  } else {
+    avatarState = STATE.NONE;
+  }
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     onAvatarClick?.(participant, event.currentTarget.parentNode);
@@ -123,7 +122,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
         noBadge={noBadge}
         noFilter={noFilter}
         onClick={clickHandler}
-        participant={participant}
+        participant={participant as User}
         state={avatarState}
         {...props}
       />
@@ -136,7 +135,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
         avatarSize={avatarSize}
         noBadge={noBadge}
         onClick={clickHandler}
-        participant={participant}
+        participant={participant as User}
         state={avatarState}
         {...props}
       />
@@ -147,7 +146,7 @@ const ParticipantAvatar: React.FunctionComponent<ParticipantAvatarProps> = ({
     <ServiceAvatar
       assetRepository={assetRepository}
       avatarSize={avatarSize}
-      participant={participant}
+      participant={participant as ServiceEntity}
       onClick={clickHandler}
       {...props}
     />
