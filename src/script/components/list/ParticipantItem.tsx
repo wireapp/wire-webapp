@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
-import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {UserlistMode} from 'Components/userList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -134,7 +134,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         {isInViewport && (
           <>
             <div className="participant-item__image">
-              <ParticipantAvatar
+              <Avatar
                 assetRepository={assetRepository}
                 avatarSize={AVATAR_SIZE.SMALL}
                 participant={participant as User}

@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {noop} from 'Util/util';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 
 import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';

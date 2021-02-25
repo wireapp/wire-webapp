@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
