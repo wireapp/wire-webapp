@@ -215,7 +215,7 @@ export class User {
     }
     return this.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION
       ? `@${this.username()}@${this.domain}`.replace(`@${Config.getConfig().FEATURE.FEDERATION_DOMAIN}`, '')
-      : `@${this.username}`;
+      : `@${this.username()}`;
   }
 
   subscribeToChanges(): void {
