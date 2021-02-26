@@ -60,6 +60,26 @@ describe('UrlUtil', () => {
       const expected = `${path}?${Q2}`;
       expect(actual).toEqual(expected);
     });
+
+    it('strips parameters not mentioned in the whitelist', () => {
+      const url = 'https://app.wire.com/?clienttype=permanent&sso_auto_login=true&hl=fr';
+      const [path, query = ''] = url.split('?');
+
+      const actual = UrlUtil.pathWithParams(path, undefined, ['clienttype', 'sso_auto_login'], query);
+
+      const expected = 'https://app.wire.com/?clienttype=permanent&sso_auto_login=true';
+      expect(actual).toEqual(expected);
+    });
+
+    it('overwrites parameters', () => {
+      const url = 'https://app.wire.com/?clienttype=permanent&sso_auto_login=true&hl=en';
+      const [path, query = ''] = url.split('?');
+
+      const actual = UrlUtil.pathWithParams(path, {hl: 'fr'}, undefined, query);
+
+      const expected = 'https://app.wire.com/?clienttype=permanent&sso_auto_login=true&hl=fr';
+      expect(actual).toEqual(expected);
+    });
   });
 
   describe('getURLParameter', () => {
