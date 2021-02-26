@@ -83,6 +83,7 @@ export class StartUIViewModel {
   readonly manageTeamUrl: string;
   readonly manageServicesUrl: string;
   readonly federationDomain?: string;
+  readonly enableFederation: boolean;
   private submittedSearch: boolean;
   private readonly matchedUsers: ko.ObservableArray<User>;
   private readonly alreadyClickedOnContact: Record<string, boolean>;
@@ -136,6 +137,7 @@ export class StartUIViewModel {
 
     this.submittedSearch = false;
     this.federationDomain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    this.enableFederation = Config.getConfig().FEATURE.ENABLE_FEDERATION;
 
     this.search = debounce((query: string): Promise<void> | void => {
       this.clearSearchResults();

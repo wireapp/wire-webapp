@@ -213,7 +213,7 @@ export class User {
       /** Very old user accounts don't have a handle on Wire. */
       return '';
     }
-    return this.domain
+    return this.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION
       ? `@${this.username()}@${this.domain}`.replace(`@${Config.getConfig().FEATURE.FEDERATION_DOMAIN}`, '')
       : `@${this.username}`;
   }

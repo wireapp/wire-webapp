@@ -114,7 +114,7 @@
                 <group-list params="groups: searchResults.groups, click: clickOnConversation"></group-list>
               </div>
               <div class="others" data-bind="visible: searchResults.others().length > 0">
-                <span class="start-ui-list-header" data-bind="text: federationDomain ? t('searchOthersFederation', federationDomain) : t('searchOthers')"></span>
+                <span class="start-ui-list-header" data-bind="text: enableFederation ? t('searchOthersFederation', federationDomain) : t('searchOthers')"></span>
                 <user-list class="search-list-theme-black" params="user: searchResults.others, click: clickOnOther, mode: UserlistMode.OTHERS, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
               </div>
             </div>
