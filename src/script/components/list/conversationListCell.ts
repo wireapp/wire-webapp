@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {noop} from 'Util/util';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 
 import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
@@ -148,8 +148,7 @@ ko.components.register('conversation-list-cell', {
       <div class="conversation-list-cell-center">
         <!-- ko if: is1To1 && isInTeam -->
           <availability-state class="conversation-list-cell-availability"
-                              data-uie-name="status-availability-item"
-                              params="availability: conversation.availabilityOfUser, label: conversation.display_name(), theme: isSelected()">
+                              params="availability: conversation.availabilityOfUser, label: conversation.display_name(), theme: isSelected(), dataUieName: 'status-availability-item'">
           </availability-state>
         <!-- /ko -->
         <!-- ko ifnot: is1To1 && isInTeam -->

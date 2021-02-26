@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
@@ -55,6 +55,9 @@ import './asset/videoAsset';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
+import './message/MissedMessage';
+import './message/FileTypeRestrictedMessage';
+import './message/DeleteMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -370,7 +373,7 @@ const normalTemplate: string = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="cursor-pointer" params="participant: message.user, onClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="cursor-pointer" params="participant: message.user, onAvatarClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
@@ -468,24 +471,6 @@ const normalTemplate: string = `
   <!-- /ko -->
   `;
 
-const missedTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label" data-bind="text: t('conversationMissedMessages')"></div>
-  </div>
-  `;
-
-const fileTypeRestrictedTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label" data-bind="html: message.caption"></div>
-  </div>
-  `;
-
 const unableToDecryptTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -547,21 +532,6 @@ const pingTemplate: string = `
   </div>
   `;
 
-const deleteTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <participant-avatar class="cursor-pointer" params="participant: message.user, onClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
-    </div>
-    <div class="message-header-label">
-      <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
-      <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
-    </div>
-    <div class="message-body-actions message-body-actions-large">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps" data-uie-name="item-message-delete-timestamp"></time>
-    </div>
-  </div>
-  `;
-
 const legalHoldTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -587,7 +557,7 @@ const memberTemplate: string = `
         <span class="message-connected-provider-name" data-bind='text: message.otherUser().providerName()'></span>
       <!-- /ko -->
       <!-- ko ifnot: message.otherUser().isService -->
-        <span class="message-connected-username label-username" data-bind='text: message.otherUser().username()'></span>
+        <span class="message-connected-username label-username" data-bind='text: message.otherUser().handle'></span>
       <!-- /ko -->
       <participant-avatar class="message-connected-avatar cursor-default"
                    params="participant: message.otherUser, size: AVATAR_SIZE.X_LARGE, noBadge: message.otherUser().isOutgoingRequest()"></participant-avatar>
@@ -671,7 +641,7 @@ ko.components.register('message', {
       ${normalTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'missed' -->
-      ${missedTemplate}
+      <missed-message></missed-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'unable-to-decrypt' -->
       ${unableToDecryptTemplate}
@@ -680,7 +650,7 @@ ko.components.register('message', {
       <verification-message params="message: message"></verification-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'delete' -->
-      ${deleteTemplate}
+      <delete-message params="message: message, onClickAvatar: onClickAvatar"></delete-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'call' -->
       <call-message params="message: message"></call-message>
@@ -695,7 +665,7 @@ ko.components.register('message', {
       ${pingTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'file-type-restricted' -->
-      ${fileTypeRestrictedTemplate}
+      <filetype-restricted-message params="message: message"></filetype-restricted-message>
     <!-- /ko -->
     <!-- ko if: message.isLegalHold() -->
       ${legalHoldTemplate}

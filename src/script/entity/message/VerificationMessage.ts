@@ -41,6 +41,6 @@ export class VerificationMessage extends Message {
 
     this.userEntities = ko.observableArray();
 
-    this.isSelfClient = ko.pureComputed(() => this.userIds().length === 1 && this.userIds()[0] === this.user().id);
+    this.isSelfClient = ko.pureComputed(() => this.userIds()?.length === 1 && this.userIds()[0] === this.user().id);
   }
 }

@@ -27,7 +27,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
 import {getFirstChar} from 'Util/StringUtil';
 
-import {ACCENT_ID} from '../Config';
+import {ACCENT_ID, Config} from '../Config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {ClientEntity} from '../client/ClientEntity';
@@ -82,6 +82,7 @@ export class User {
   public readonly username: ko.Observable<string>;
   public serviceId?: string;
   public teamId?: string;
+  public domain?: string;
 
   static get ACCENT_COLOR() {
     return {
@@ -193,6 +194,28 @@ export class User {
     this.expirationIntervalId = undefined;
     this.expirationTimeoutId = undefined;
     this.isExpired = ko.observable(false);
+  }
+
+  get isFederatedUser(): boolean {
+    return !!this.domain;
+  }
+
+  isOnSameFederatedDomain(otherDomain: string = Config.getConfig().FEATURE.FEDERATION_DOMAIN): boolean {
+    return this.domain === otherDomain;
+  }
+
+  /**
+   * Returns the fully qualified user ID.
+   * @example "@handle@wire.com"
+   */
+  get handle(): string {
+    if (!this.username()) {
+      /** Very old user accounts don't have a handle on Wire. */
+      return '';
+    }
+    return this.domain
+      ? `@${this.username()}@${this.domain}`.replace(`@${Config.getConfig().FEATURE.FEDERATION_DOMAIN}`, '')
+      : `@${this.username}`;
   }
 
   subscribeToChanges(): void {

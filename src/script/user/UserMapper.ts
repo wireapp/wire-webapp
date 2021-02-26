@@ -49,8 +49,10 @@ export class UserMapper {
     const userEntity = this.updateUserFromObject(new User(), userData);
     userEntity.isMe = true;
 
-    if ((userData as APIClientSelf).locale) {
-      userEntity.locale = (userData as APIClientSelf).locale;
+    const dataFromBackend = userData as APIClientSelf;
+
+    if (dataFromBackend.locale) {
+      userEntity.locale = dataFromBackend.locale;
     }
 
     return userEntity;
@@ -91,6 +93,11 @@ export class UserMapper {
     if (isNewUser) {
       userEntity.id = userData.id;
       userEntity.joaatHash = joaatHash(userData.id);
+    }
+
+    if (userData.qualified_id) {
+      userEntity.domain = userData.qualified_id.domain;
+      userEntity.id = userData.qualified_id.id;
     }
 
     const {

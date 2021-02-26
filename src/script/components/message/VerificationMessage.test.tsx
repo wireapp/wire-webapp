@@ -52,7 +52,7 @@ const createVerificationMessage = (partialVerificationMessage: Partial<Verificat
 
 describe('VerificationMessage', () => {
   describe('with verified message', () => {
-    it('shows verfied icon when message is verified', async () => {
+    it('shows verified icon when message is verified', async () => {
       const verificationMessagePage = new VerificationMessagePage({
         message: createVerificationMessage({
           verificationMessageType: ko.observable(VerificationMessageType.VERIFIED),
@@ -63,7 +63,7 @@ describe('VerificationMessage', () => {
       expect(verificationMessagePage.getVerifiedIcon().exists()).toBe(true);
     });
 
-    it('shows unverfied icon when message is not verified', async () => {
+    it('shows unverified icon when message is not verified', async () => {
       const verificationMessagePage = new VerificationMessagePage({
         message: createVerificationMessage({}),
       });
@@ -74,7 +74,7 @@ describe('VerificationMessage', () => {
   });
 
   describe('with unverified message', () => {
-    it('shows unverfied message', async () => {
+    it('shows unverified message', async () => {
       const verificationMessagePage = new VerificationMessagePage({
         message: createVerificationMessage({
           verificationMessageType: ko.observable(VerificationMessageType.UNVERIFIED),

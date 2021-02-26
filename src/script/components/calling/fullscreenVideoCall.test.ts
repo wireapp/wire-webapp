@@ -18,6 +18,7 @@
  */
 
 import {act} from 'react-dom/test-utils';
+import ko from 'knockout';
 
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
@@ -26,6 +27,8 @@ import {User} from 'src/script/entity/User';
 import FullscreenVideoCall, {FullscreenVideoCallProps} from './FullscreenVideoCall';
 import TestPage from 'Util/test/TestPage';
 import {Grid} from 'src/script/calling/videoGridHandler';
+import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
+import {CallActions} from 'src/script/view_model/CallingViewModel';
 
 class FullscreenVideoCallPage extends TestPage<FullscreenVideoCallProps> {
   constructor(props?: FullscreenVideoCallProps) {
@@ -34,9 +37,39 @@ class FullscreenVideoCallPage extends TestPage<FullscreenVideoCallProps> {
 
   getVideoControls = () => this.get('.video-controls__button');
   getVideoTimer = () => this.get('div[data-uie-name="video-timer"]');
+  getActiveSpeakerToggle = () => this.get('ButtonGroup');
+  clickInactiveButton = () => this.click(this.get('ButtonGroup > [data-uie-value="inactive"]'));
 }
 
 describe('fullscreenVideoCall', () => {
+  const createProps = (): FullscreenVideoCallProps => {
+    const conversation = new Conversation();
+    spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
+    const selfUser = new User();
+    selfUser.isMe = true;
+    const call = new Call('', '', 0, new Participant(selfUser, ''), 0);
+    const props: Partial<FullscreenVideoCallProps> = {
+      call,
+      callActions: {} as CallActions,
+      canShareScreen: false,
+      conversation: conversation,
+      isChoosingScreen: false,
+      isMuted: false,
+      mediaDevicesHandler: {
+        currentDeviceId: {
+          audioInput: ko.observable(''),
+          audioOutput: ko.observable(''),
+          screenInput: ko.observable(''),
+          videoInput: ko.observable(''),
+        },
+      } as MediaDevicesHandler,
+      multitasking: {autoMinimize: ko.observable(false), isMinimized: ko.observable(false)},
+      videoGrid: {grid: [], hasRemoteVideo: false, thumbnail: null} as Grid,
+      videoInput: [],
+    };
+    return props as FullscreenVideoCallProps;
+  };
+
   beforeEach(() => {
     jest.useFakeTimers('modern');
   });
@@ -44,57 +77,15 @@ describe('fullscreenVideoCall', () => {
   afterEach(() => jest.useRealTimers());
 
   it('shows the available screens', () => {
-    const conversation = new Conversation();
-    spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
-    const selfUser = new User();
-    selfUser.isMe = true;
-    const call = new Call('', '', 0, new Participant(selfUser, ''), 0);
-    const props = {
-      call,
-      callActions: {},
-      canShareScreen: false,
-      conversation: conversation,
-      isChoosingScreen: false,
-      isMuted: false,
-      mediaDevicesHandler: {
-        currentDeviceId: {
-          audioInput: () => '',
-          videoInput: () => '',
-        },
-      },
-      multitasking: {autoMinimize: () => false},
-      videoGrid: {grid: [], hasRemoteVideo: false, thumbnail: null} as Grid,
-      videoInput: [],
-    } as FullscreenVideoCallProps;
+    const props = createProps();
 
     const fullscreenVideoCall = new FullscreenVideoCallPage(props);
 
-    expect(fullscreenVideoCall.getVideoControls()).not.toBe(null);
+    expect(fullscreenVideoCall.getVideoControls().exists()).toBe(true);
   });
 
   it('shows the calling timer', async () => {
-    const conversation = new Conversation();
-    spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
-    const selfUser = new User();
-    selfUser.isMe = true;
-    const call = new Call('', '', 0, new Participant(selfUser, ''), 0);
-    const props = {
-      call,
-      callActions: {},
-      canShareScreen: false,
-      conversation: conversation,
-      isChoosingScreen: false,
-      isMuted: false,
-      mediaDevicesHandler: {
-        currentDeviceId: {
-          audioInput: () => '',
-          videoInput: () => '',
-        },
-      },
-      multitasking: {autoMinimize: () => false},
-      videoGrid: {grid: [], hasRemoteVideo: false, thumbnail: null} as Grid,
-      videoInput: [],
-    } as FullscreenVideoCallProps;
+    const props = createProps();
 
     const fullscreenVideoCall = new FullscreenVideoCallPage(props);
     const now = Date.now();
@@ -111,5 +102,33 @@ describe('fullscreenVideoCall', () => {
     });
 
     expect(fullscreenVideoCall.getVideoTimer().text()).toEqual('00:01');
+  });
+
+  it.skip('has no active speaker toggle for calls with more less than 3 participants', () => {
+    const props = createProps();
+    const fullscreenVideoCall = new FullscreenVideoCallPage(props);
+
+    expect(fullscreenVideoCall.getActiveSpeakerToggle().exists()).toBe(false);
+  });
+
+  it.skip('resets the maximized participant on active speaker switch', () => {
+    const setMaximizedSpy = jasmine.createSpy();
+    const props = createProps();
+    props.callActions.setMaximizedTileVideoParticipant = setMaximizedSpy;
+    props.callActions.setVideoSpeakersActiveTab = () => {};
+    props.call.participants([
+      new Participant(new User('a'), 'a'),
+      new Participant(new User('b'), 'b'),
+      new Participant(new User('c'), 'c'),
+    ]);
+    const fullscreenVideoCall = new FullscreenVideoCallPage(props);
+    const activeSpeakerToggle = fullscreenVideoCall.getActiveSpeakerToggle();
+
+    expect(activeSpeakerToggle.exists()).toBe(true);
+
+    const inactiveButton = activeSpeakerToggle.find('[data-uie-value="inactive"]');
+    fullscreenVideoCall.click(inactiveButton.first());
+
+    expect(setMaximizedSpy).toHaveBeenCalledWith(null);
   });
 });

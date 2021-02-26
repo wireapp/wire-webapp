@@ -80,7 +80,7 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
-import 'Components/mentionSuggestions';
+import '../page/message-list/mentionSuggestions';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
@@ -95,7 +95,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
-import AppLock from '../components/AppLock';
+import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {BroadcastService} from '../broadcast/BroadcastService';
@@ -688,6 +688,7 @@ class App {
       },
     });
     initRouterBindings(router);
+    container.registerInstance(Router, router);
 
     this.appContainer.dataset.uieValue = 'is-loaded';
 
