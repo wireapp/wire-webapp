@@ -37,6 +37,7 @@ import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import NamedIcon from 'Components/NamedIcon';
 import {Availability} from '@wireapp/protocol-messaging';
+import {Config} from '../../Config';
 
 export interface ParticipantItemProps {
   badge?: boolean;
@@ -212,15 +213,17 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={16} />
             )}
 
-            {participant instanceof User && !participant.isOnSameFederatedDomain() && (
-              <NamedIcon
-                name="federation-icon"
-                className="federation-icon"
-                data-uie-name="status-federated-user"
-                width={16}
-                height={16}
-              />
-            )}
+            {participant instanceof User &&
+              Config.getConfig().FEATURE.ENABLE_FEDERATION &&
+              !participant.isOnSameFederatedDomain() && (
+                <NamedIcon
+                  name="federation-icon"
+                  className="federation-icon"
+                  data-uie-name="status-federated-user"
+                  width={16}
+                  height={16}
+                />
+              )}
 
             {external && (
               <NamedIcon
