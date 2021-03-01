@@ -292,6 +292,12 @@ export class TestFactory {
       this.user_repository['userState'],
       this.team_repository['teamState'],
     );
+    const clientEntity = new ClientEntity();
+    clientEntity.address = '192.168.0.1';
+    clientEntity.class = ClientClassification.DESKTOP;
+    clientEntity.id = '60aee26b7f55a99f';
+    const clientState = new ClientState();
+    clientState.currentClient(clientEntity);
 
     this.message_repository = new MessageRepository(
       this.client_repository,
@@ -308,6 +314,7 @@ export class TestFactory {
       this.user_repository['userState'],
       this.team_repository['teamState'],
       conversationState,
+      clientState,
     );
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
