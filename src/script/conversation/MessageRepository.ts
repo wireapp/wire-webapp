@@ -253,7 +253,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     textMessage: string,
     mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
+    quoteEntity?: QuoteEntity,
   ): Promise<ConversationEvent> {
     try {
       const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);

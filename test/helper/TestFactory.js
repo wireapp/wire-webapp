@@ -17,12 +17,15 @@
  *
  */
 
+// @ts-check
+
 /* eslint no-undef: "off" */
 
 // Polyfill for "tsyringe" dependency injection
 import 'core-js/es7/reflect';
 import {container} from 'tsyringe';
 import ko from 'knockout';
+import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
 
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
@@ -96,6 +99,9 @@ export class TestFactory {
     return this.storage_repository;
   }
 
+  /**
+   * @returns {Promise<BackupRepository>} The backup repository.
+   */
   async exposeBackupActors() {
     await this.exposeStorageActors();
     await this.exposeConversationActors();
@@ -104,9 +110,9 @@ export class TestFactory {
     this.backup_repository = new BackupRepository(
       this.backup_service,
       this.conversation_repository,
-      this.client_repository.clientState,
-      this.user_repository.userState,
-      this.connection_repository.connectionState,
+      this.client_repository['clientState'],
+      this.user_repository['userState'],
+      this.connection_repository['connectionState'],
     );
 
     return this.backup_repository;
@@ -128,7 +134,7 @@ export class TestFactory {
     if (mockCryptobox === true) {
       spyOn(this.cryptography_repository, 'initCryptobox').and.returnValue(Promise.resolve());
     } else {
-      const storeEngine = storageRepository.storageService.engine;
+      const storeEngine = storageRepository.storageService['engine'];
       this.cryptography_repository.cryptobox = new Cryptobox(storeEngine, 10);
       await this.cryptography_repository.cryptobox.create();
     }
@@ -143,7 +149,7 @@ export class TestFactory {
     await this.exposeCryptographyActors();
     const clientEntity = new ClientEntity();
     clientEntity.address = '192.168.0.1';
-    clientEntity.class = 'desktop';
+    clientEntity.class = ClientClassification.DESKTOP;
     clientEntity.id = '60aee26b7f55a99f';
 
     const user = new User(entities.user.john_doe.id);
@@ -160,15 +166,15 @@ export class TestFactory {
 
     const currentClient = new ClientEntity();
     currentClient.address = '62.96.148.44';
-    currentClient.class = 'desktop';
+    currentClient.class = ClientClassification.DESKTOP;
     currentClient.cookie = 'webapp@2153234453@temporary@1470926647664';
     currentClient.id = '132b3653b33f851f';
     currentClient.label = 'Windows 10';
     currentClient.location = {lat: 52.5233, lon: 13.4138};
-    currentClient.meta = {is_verified: true, primary_key: 'local_identity'};
+    currentClient.meta = {isVerified: ko.observable(true), primaryKey: 'local_identity'};
     currentClient.model = 'Chrome (Temporary)';
     currentClient.time = '2016-10-07T16:01:42.133Z';
-    currentClient.type = 'temporary';
+    currentClient.type = ClientType.TEMPORARY;
 
     this.client_repository['clientState'].currentClient(currentClient);
 
@@ -194,7 +200,7 @@ export class TestFactory {
       this.web_socket_service,
       this.cryptography_repository,
       serverTimeHandler,
-      this.user_repository.userState,
+      this.user_repository['userState'],
     );
     this.event_repository.currentClient = ko.observable(this.cryptography_repository.currentClient());
 
@@ -222,7 +228,7 @@ export class TestFactory {
       new UserState(),
     );
 
-    this.user_repository.userState.self(this.client_repository.selfUser());
+    this.user_repository['userState'].self(this.client_repository.selfUser());
 
     return this.user_repository;
   }
@@ -250,6 +256,9 @@ export class TestFactory {
     return this.search_repository;
   }
 
+  /**
+   * @returns {Promise<TeamRepository>} The team repository.
+   */
   async exposeTeamActors() {
     await this.exposeUserActors();
     this.team_service = new TeamService();
@@ -257,8 +266,8 @@ export class TestFactory {
       this.team_service,
       this.user_repository,
       this.assetRepository,
-      this.user_repository.userState,
-      new TeamState(this.user_repository.userState),
+      this.user_repository['userState'],
+      new TeamState(this.user_repository['userState']),
     );
     return this.team_repository;
   }
@@ -277,8 +286,12 @@ export class TestFactory {
 
     const assetRepository = new AssetRepository(new AssetService());
 
+    /** @type {ConversationRepository} */
     this.conversation_repository = null;
-    const conversationState = new ConversationState(this.user_repository.userState, this.team_repository.teamState);
+    const conversationState = new ConversationState(
+      this.user_repository['userState'],
+      this.team_repository['teamState'],
+    );
 
     this.message_repository = new MessageRepository(
       this.client_repository,
@@ -292,8 +305,8 @@ export class TestFactory {
       this.conversation_service,
       new LinkPreviewRepository(assetRepository, this.propertyRepository),
       this.assetRepository,
-      this.user_repository.userState,
-      this.team_repository.teamState,
+      this.user_repository['userState'],
+      this.team_repository['teamState'],
       conversationState,
     );
     this.conversation_repository = new ConversationRepository(
@@ -305,8 +318,8 @@ export class TestFactory {
       this.user_repository,
       this.propertyRepository,
       serverTimeHandler,
-      this.user_repository.userState,
-      this.team_repository.teamState,
+      this.user_repository['userState'],
+      this.team_repository['teamState'],
       conversationState,
     );
 
@@ -324,7 +337,8 @@ export class TestFactory {
       this.user_repository,
       new MediaRepository(new PermissionRepository()).streamHandler,
       serverTimeHandler,
-      this.conversation_repository.conversationState,
+      undefined,
+      this.conversation_repository['conversationState'],
     );
 
     return this.calling_repository;
@@ -340,9 +354,9 @@ export class TestFactory {
     this.notification_repository = new NotificationRepository(
       this.conversation_repository,
       new PermissionRepository(),
-      this.user_repository.userState,
-      this.conversation_repository.conversationState,
-      this.calling_repository.callState,
+      this.user_repository['userState'],
+      this.conversation_repository['conversationState'],
+      this.calling_repository['callState'],
     );
 
     return this.notification_repository;
@@ -353,32 +367,33 @@ export class TestFactory {
    */
   async exposeTrackingActors() {
     await this.exposeTeamActors();
-    this.tracking_repository = new EventTrackingRepository(this.message_repository, this.user_repository.userState);
+    this.tracking_repository = new EventTrackingRepository(this.message_repository, this.user_repository['userState']);
 
     return this.tracking_repository;
   }
-
-  /**
-   * @returns {Promise<z.lifecycle.LifecycleRepository>} The lifecycle repository.
-   */
-  async exposeLifecycleActors() {
-    await this.exposeUserActors();
-    this.lifecycle_service = new z.lifecycle.LifecycleService();
-
-    this.lifecycle_repository = new z.lifecycle.LifecycleRepository(this.lifecycle_service, this.user_repository);
-    return this.lifecycle_repository;
-  }
 }
 
+/**
+ * @template C
+ * @typedef {{new (...args: any[]): C}} Constructor<T>
+ */
+
+/**
+ * @template S
+ * @type {Map<Constructor<S>, S>}
+ */
 const actorsCache = new Map();
 
 /**
  * Will instantiate a service only once (uses the global actorsCache to store instances)
- * @param {Constructor} Service the service to instantiate
- * @param {any} ...dependencies the dependencies required by the service
- * @returns {Object} the instantiated service
+ * @template T
+ * @param {Constructor<T>} Service the service to instantiate
+ * @param {...any} dependencies the dependencies required by the service
+ * @returns {T} the instantiated service
  */
 function singleton(Service, ...dependencies) {
-  actorsCache[Service] = actorsCache[Service] || new Service(...dependencies);
-  return actorsCache[Service];
+  // @ts-ignore
+  actorsCache.set(Service, actorsCache.get(Service) || new Service(...dependencies));
+  // @ts-ignore
+  return actorsCache.get(Service);
 }
