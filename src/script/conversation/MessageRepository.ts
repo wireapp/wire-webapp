@@ -715,7 +715,8 @@ export class MessageRepository {
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
+    const senderId = this.clientRepository.clientState.currentClient().id;
+    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp, senderId);
     const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
       genericMessage,
       optimisticEvent as EventRecord,
@@ -1459,7 +1460,7 @@ export class MessageRepository {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
-    const sender = this.clientRepository['clientState'].currentClient().id;
+    const sender = this.clientRepository.clientState.currentClient().id;
     try {
       await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
     } catch (axiosError) {

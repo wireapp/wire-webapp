@@ -62,7 +62,7 @@ export class ClientRepository {
   constructor(
     clientService: ClientService,
     cryptographyRepository: CryptographyRepository,
-    private readonly clientState = container.resolve(ClientState),
+    readonly clientState = container.resolve(ClientState),
   ) {
     this.clientService = clientService;
     this.cryptographyRepository = cryptographyRepository;
