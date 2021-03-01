@@ -20,7 +20,6 @@
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
-import {container} from 'tsyringe';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -32,7 +31,6 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {AssetRecord, EventRecord} from '../storage';
-import {ClientState} from '../client/ClientState';
 
 export interface BaseEvent {
   conversation: string;
@@ -302,14 +300,13 @@ export const EventBuilder = {
     };
   },
 
-  buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number): MessageAddEvent {
+  buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number, senderId: string): MessageAddEvent {
     const selfUser = conversationEntity.selfUser();
-    const clientState = container.resolve(ClientState);
 
     return {
       conversation: conversationEntity.id,
       data: {
-        sender: clientState.currentClient().id,
+        sender: senderId,
       },
       from: selfUser.id,
       status: StatusType.SENDING,
