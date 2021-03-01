@@ -51,6 +51,9 @@ export class NotificationAPI {
 
   /**
    * Fetch paged notifications.
+   * @param clientId Only return notifications targeted at the given client.
+   * @param size Maximum number of notifications to return.
+   * @param since Only return notifications more recent than this.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/fetchNotifications
    */
   public async getNotifications(
@@ -74,6 +77,8 @@ export class NotificationAPI {
 
   /**
    * Fetch all notifications.
+   * @param clientId Only return notifications targeted at the given client
+   * @param lastNotificationId Only return notifications more recent than this
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/push/fetchNotifications
    */
   public async getAllNotifications(clientId?: string, lastNotificationId?: string): Promise<Notification[]> {
