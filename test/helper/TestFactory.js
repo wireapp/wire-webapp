@@ -279,6 +279,12 @@ export class TestFactory {
 
     this.conversation_repository = null;
     const conversationState = new ConversationState(this.user_repository.userState, this.team_repository.teamState);
+    const clientEntity = new ClientEntity();
+    clientEntity.address = '192.168.0.1';
+    clientEntity.class = 'desktop';
+    clientEntity.id = '60aee26b7f55a99f';
+    const clientState = new ClientState();
+    clientState.currentClient(ClientEntity);
 
     this.message_repository = new MessageRepository(
       this.client_repository,
@@ -295,6 +301,7 @@ export class TestFactory {
       this.user_repository.userState,
       this.team_repository.teamState,
       conversationState,
+      clientState,
     );
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
