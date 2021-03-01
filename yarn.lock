@@ -21,11 +21,6 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.13.8.tgz#5b783b9808f15cef71547f1b691f34f8ff6003a6"
   integrity sha512-EaI33z19T4qN3xLXsGf48M2cDqa6ei9tPZlfLdb2HC+e/cFtREiRd8hdSqDbwdLB0/+gLwqJmCYASH0z2bUdog==
 
-"@babel/compat-data@^7.13.8":
-  version "7.13.8"
-  resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.13.8.tgz#5b783b9808f15cef71547f1b691f34f8ff6003a6"
-  integrity sha512-EaI33z19T4qN3xLXsGf48M2cDqa6ei9tPZlfLdb2HC+e/cFtREiRd8hdSqDbwdLB0/+gLwqJmCYASH0z2bUdog==
-
 "@babel/core@7.12.16":
   version "7.12.16"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.12.16.tgz#8c6ba456b23b680a6493ddcfcd9d3c3ad51cab7c"
@@ -2777,10 +2772,10 @@
     tough-cookie "4.0.0"
     ws "7.4.3"
 
-"@wireapp/avs@6.7.16":
-  version "6.7.16"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-6.7.16.tgz#f32fac4e384f9005275a5409be7ab7afe202d8a4"
-  integrity sha512-ETCiV6Wrr/zavVk1GNJAGIM34lkNEpzV3RKx5UwznBsESLD17Pi9sBdgkbk7TqrA/pzEkc1fH1XZxmJ1WesKzA==
+"@wireapp/avs@6.7.17":
+  version "6.7.17"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-6.7.17.tgz#bd1b8b3387db91be794fe522166c5a8fc07fcea7"
+  integrity sha512-Yud6Dhjv4RXVL4EEUW2ddm73/GUaR3NmknQOX2J87U/BlugUsrjvCr0hjnYDKx3j5HrHW5e3QVQmFWpWWIqNkg==
 
 "@wireapp/cbor@4.6.27":
   version "4.6.27"
