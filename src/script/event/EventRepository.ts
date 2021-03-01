@@ -205,14 +205,10 @@ export class EventRepository {
    * Get notifications for the current client from the stream.
    *
    * @param notificationId Event ID to start from
-   * @param limit Max. number of notifications to retrieve from backend at once
+   * @param abortHandler Max. number of notifications to retrieve from backend at once
    * @returns Resolves when all new notifications from the stream have been handled with the latest notification ID that has been processed
    */
-  private async getNotifications(
-    notificationId: string,
-    limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX,
-    abortHandler: AbortHandler,
-  ): Promise<string> {
+  private async getNotifications(notificationId: string, abortHandler: AbortHandler): Promise<string> {
     const processNotifications = async (notifications: Notification[], abortHandler: AbortHandler) => {
       if (notifications.length <= 0) {
         this.logger.info(`No notifications found since '${notificationId}'`);
@@ -305,6 +301,7 @@ export class EventRepository {
 
   /**
    * Set state for notification stream.
+   * @param abortHandler Handler for WebSocket disconnects
    * @returns Resolves when all notifications have been handled
    */
   private async initializeFromStream(abortHandler: AbortHandler) {
@@ -386,16 +383,13 @@ export class EventRepository {
    * Fetch all missed events from the notification stream since the given last notification ID.
    *
    * @param lastNotificationId Last known notification ID to start update from
+   * @param abortHandler Handler for WebSocket disconnects
    * @returns Resolves with the total number of processed notifications
    */
   private async updateFromStream(lastNotificationId: string, abortHandler: AbortHandler): Promise<number> {
     this.notificationsTotal = 0;
     try {
-      const updatedLastNotificationId = await this.getNotifications(
-        lastNotificationId,
-        EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL,
-        abortHandler,
-      );
+      const updatedLastNotificationId = await this.getNotifications(lastNotificationId, abortHandler);
       this.logger.info(`ID of last notification fetched from stream is '${updatedLastNotificationId}'`);
       return this.notificationsTotal;
     } catch (error) {
