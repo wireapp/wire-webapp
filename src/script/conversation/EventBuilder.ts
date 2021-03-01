@@ -301,14 +301,12 @@ export const EventBuilder = {
   },
 
   buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number, senderId: string): MessageAddEvent {
-    const selfUser = conversationEntity.selfUser();
-
     return {
       conversation: conversationEntity.id,
       data: {
         sender: senderId,
       },
-      from: selfUser.id,
+      from: conversationEntity.selfUser().id,
       status: StatusType.SENDING,
       time: conversationEntity.get_next_iso_date(currentTimestamp),
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
