@@ -381,13 +381,13 @@ export class TestFactory {
 }
 
 /**
- * @template C
- * @typedef {{new (...args: any[]): C}} Constructor<T>
+ * @template T
+ * @typedef {{new (...args: any[]): T}} Constructor<T>
  */
 
 /**
- * @template S
- * @type {Map<Constructor<S>, S>}
+ * @template T
+ * @type {Map<Constructor<T>, T>}
  */
 const actorsCache = new Map();
 
