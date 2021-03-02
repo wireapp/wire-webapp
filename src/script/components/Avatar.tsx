@@ -89,7 +89,7 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
     onAvatarClick?.(participant, event.currentTarget.parentNode);
   };
 
-  if (participant instanceof ServiceEntity) {
+  if (participant instanceof ServiceEntity || participant.isService) {
     return (
       <ServiceAvatar
         avatarSize={avatarSize}
