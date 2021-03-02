@@ -34,6 +34,7 @@ import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../med
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {t} from '../../util/LocalizerUtil';
 import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
+import ButtonGroup from './ButtonGroup';
 import DeviceToggleButton from './DeviceToggleButton';
 import Duration from './Duration';
 import GroupVideoGrid from './GroupVideoGrid';
@@ -159,6 +160,17 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls hide-controls-hidden">
+          {call.participants().length > 2 && (
+            <ButtonGroup
+              items={Object.values(VideoSpeakersTabs)}
+              onChangeItem={item => {
+                callActions.setVideoSpeakersActiveTab(item);
+                callActions.setMaximizedTileVideoParticipant(null);
+              }}
+              currentItem={videoSpeakersActiveTab}
+              style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
+            />
+          )}
           <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
             {t('videoCallOverlayFitVideoLabel')}
           </div>
