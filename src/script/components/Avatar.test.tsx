@@ -80,6 +80,21 @@ describe('Avatar', () => {
     expect(participantAvatar.getServiceAvatar().exists()).toBe(true);
   });
 
+  /**
+   * This behaviour exists in the message list for message avatars and in the conversation details in the services section.
+   */
+  it('renders service avatar with participant of type User but isService = true', () => {
+    const participant = new User('id');
+    participant.name('Anton Bertha');
+    participant.isService = true;
+
+    const participantAvatar = new AvatarPage({
+      participant,
+    });
+
+    expect(participantAvatar.getServiceAvatar().exists()).toBe(true);
+  });
+
   it('renders user avatar', () => {
     const participant = new User('id');
     participant.name('Anton Bertha');
