@@ -17,11 +17,12 @@
  *
  */
 
-import React from 'react';
+import ko from 'knockout';
+import React, {useEffect, useState} from 'react';
 
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 
 import UserAvatar from './avatar/UserAvatar';
 import ServiceAvatar from './avatar/ServiceAvatar';
@@ -83,11 +84,37 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   participant,
   ...props
 }) => {
-  const isTemporaryGuest = participant instanceof User && participant.isTemporaryGuest();
+  const [avatarState, setAvatarState] = useState(STATE.NONE);
+  const user = participant as User;
+
+  const isTemporaryGuest = useKoSubscribable(user.isTemporaryGuest ?? ko.observable(false));
+  const isTeamMember = useKoSubscribable(user.isTeamMember ?? ko.observable(false));
+  const isBlocked = useKoSubscribable(user.isBlocked ?? ko.observable(false));
+  const isRequest = useKoSubscribable(user.isRequest ?? ko.observable(false));
+  const isIgnored = useKoSubscribable(user.isIgnored ?? ko.observable(false));
+  const isCanceled = useKoSubscribable(user.isCanceled ?? ko.observable(false));
+  const isUnknown = useKoSubscribable(user.isUnknown ?? ko.observable(false));
+  const isMe = user.isMe;
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     onAvatarClick?.(participant, event.currentTarget.parentNode);
   };
+
+  useEffect(() => {
+    if (isMe) {
+      setAvatarState(STATE.SELF);
+    } else if (isTeamMember) {
+      setAvatarState(STATE.NONE);
+    } else if (isBlocked) {
+      setAvatarState(STATE.BLOCKED);
+    } else if (isRequest) {
+      setAvatarState(STATE.PENDING);
+    } else if (isIgnored) {
+      setAvatarState(STATE.IGNORED);
+    } else if (isCanceled || isUnknown) {
+      setAvatarState(STATE.UNKNOWN);
+    }
+  }, [participant, isTemporaryGuest, isTeamMember, isBlocked, isRequest, isIgnored, isCanceled, isUnknown]);
 
   if (participant instanceof ServiceEntity || participant.isService) {
     return (
@@ -98,21 +125,6 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
         {...props}
       />
     );
-  }
-  let avatarState = STATE.NONE;
-
-  if (participant.isMe) {
-    avatarState = STATE.SELF;
-  } else if (participant.isTeamMember()) {
-    avatarState = STATE.NONE;
-  } else if (participant.isBlocked()) {
-    avatarState = STATE.BLOCKED;
-  } else if (participant.isRequest()) {
-    avatarState = STATE.PENDING;
-  } else if (participant.isIgnored()) {
-    avatarState = STATE.IGNORED;
-  } else if (participant.isCanceled() || participant.isUnknown()) {
-    avatarState = STATE.UNKNOWN;
   }
 
   if (isTemporaryGuest) {
