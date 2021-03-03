@@ -37,6 +37,7 @@ exports[`"TextLink" renders (dark theme) 1`] = `
 >
   <a
     className="emotion-0"
+    rel="noopener noreferrer"
   >
     TextLink
   </a>
@@ -80,6 +81,7 @@ exports[`"TextLink" renders 1`] = `
 >
   <a
     className="emotion-0"
+    rel="noopener noreferrer"
   >
     TextLink
   </a>
