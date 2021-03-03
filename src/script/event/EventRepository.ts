@@ -205,14 +205,10 @@ export class EventRepository {
    * Get notifications for the current client from the stream.
    *
    * @param notificationId Event ID to start from
-   * @param limit Max. number of notifications to retrieve from backend at once
-   * @returns Resolves when all new notifications from the stream have been handled
+   * @param abortHandler Max. number of notifications to retrieve from backend at once
+   * @returns Resolves when all new notifications from the stream have been handled with the latest notification ID that has been processed
    */
-  private async getNotifications(
-    notificationId: string,
-    limit = EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX,
-    abortHandler: AbortHandler,
-  ) {
+  private async getNotifications(notificationId: string, abortHandler: AbortHandler): Promise<string> {
     const processNotifications = async (notifications: Notification[], abortHandler: AbortHandler) => {
       if (notifications.length <= 0) {
         this.logger.info(`No notifications found since '${notificationId}'`);
@@ -229,6 +225,9 @@ export class EventRepository {
         // Abort notification stream handling due to websocket disconnect
         // We'll start processing from the last processed notification when the websocket reconnects
         if (abortHandler.isAborted()) {
+          this.logger.info(
+            `Abort notification stream handling at ID "${notification.id}" due to WebSocket disconnect. We will restart with ID "${notificationId}".`,
+          );
           throw new EventError(EventError.TYPE.WEBSOCKET_DISCONNECT, EventError.MESSAGE.WEBSOCKET_DISCONNECT);
         }
       }
@@ -250,7 +249,7 @@ export class EventRepository {
       // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
       if (errorResponse.response?.notifications) {
         this.triggerMissedSystemEventMessageRendering();
-        return processNotifications(errorResponse.response?.notifications, abortHandler);
+        return processNotifications(errorResponse.response.notifications, abortHandler);
       }
 
       const isNotFound = errorResponse.response?.status === HTTP_STATUS.NOT_FOUND;
@@ -302,11 +301,13 @@ export class EventRepository {
 
   /**
    * Set state for notification stream.
+   * @param abortHandler Handler for WebSocket disconnects
    * @returns Resolves when all notifications have been handled
    */
   private async initializeFromStream(abortHandler: AbortHandler) {
     try {
       const {notificationId} = await this.getStreamState();
+      this.logger.info(`Retrieving messages from notification stream. Starting with ID "${notificationId}"...`);
       return this.updateFromStream(notificationId, abortHandler);
     } catch (error) {
       const isNoLastId = error.type === EventError.TYPE.NO_LAST_ID;
@@ -382,19 +383,14 @@ export class EventRepository {
    * Fetch all missed events from the notification stream since the given last notification ID.
    *
    * @param lastNotificationId Last known notification ID to start update from
-   * @returns Resolves with the total number of notifications
+   * @param abortHandler Handler for WebSocket disconnects
+   * @returns Resolves with the total number of processed notifications
    */
-  private async updateFromStream(lastNotificationId: string, abortHandler: AbortHandler) {
+  private async updateFromStream(lastNotificationId: string, abortHandler: AbortHandler): Promise<number> {
     this.notificationsTotal = 0;
     try {
-      const updatedLastNotificationId = await this.getNotifications(
-        lastNotificationId,
-        EventRepository.CONFIG.NOTIFICATION_BATCHES.INITIAL,
-        abortHandler,
-      );
-      if (updatedLastNotificationId) {
-        this.logger.info(`ID of last notification fetched from stream is '${updatedLastNotificationId}'`);
-      }
+      const updatedLastNotificationId = await this.getNotifications(lastNotificationId, abortHandler);
+      this.logger.info(`ID of last notification fetched from stream is '${updatedLastNotificationId}'`);
       return this.notificationsTotal;
     } catch (error) {
       const isNoNotifications = error.type === EventError.TYPE.NO_NOTIFICATIONS;

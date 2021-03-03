@@ -47,6 +47,7 @@ import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from './MessageRepository';
+import {AssetAddEvent} from './EventBuilder';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
@@ -89,7 +90,7 @@ describe('MessageRepository', () => {
     beforeEach(() => {
       conversationEntity = generate_conversation(CONVERSATION_TYPE.REGULAR);
 
-      return testFactory.conversation_repository.saveConversation(conversationEntity).then(() => {
+      return testFactory.conversation_repository['saveConversation'](conversationEntity).then(() => {
         const file_et = new FileAsset();
         file_et.status(AssetTransferState.UPLOADING);
         messageEntity = new ContentMessage(createRandomUuid());
@@ -105,7 +106,7 @@ describe('MessageRepository', () => {
     afterEach(() => conversationEntity.remove_messages());
 
     it('should update original asset when asset upload is complete', () => {
-      const event = {
+      const event: Partial<AssetAddEvent> = {
         conversation: conversationEntity.id,
         data: {
           id: createRandomUuid(),
@@ -118,22 +119,24 @@ describe('MessageRepository', () => {
         type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 
-      return testFactory.message_repository.onAssetUploadComplete(conversationEntity, event).then(() => {
-        expect(testFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
+      return testFactory.message_repository['onAssetUploadComplete'](conversationEntity, event as AssetAddEvent).then(
+        () => {
+          expect(testFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
 
-        const firstAsset = messageEntity.assets()[0] as FileAsset;
+          const firstAsset = messageEntity.assets()[0] as FileAsset;
 
-        expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
-        expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
-        expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
-      });
+          expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
+          expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
+          expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
+        },
+      );
     });
   });
 
   describe('sendTextWithLinkPreview', () => {
     it.skip('sends ephemeral message (within the range [1 second, 1 year])', async () => {
       const conversation = generate_conversation();
-      testFactory.conversation_repository.conversationState.conversations([conversation]);
+      testFactory.conversation_repository['conversationState'].conversations([conversation]);
 
       const inBoundValues = [1000, 5000, 12341234, 31536000000];
       const outOfBoundValues = [1, 999, 31536000001, 31557600000];
@@ -145,10 +148,10 @@ describe('MessageRepository', () => {
         Promise.resolve(new Message()),
       );
       spyOn(testFactory.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
-      spyOn(testFactory.conversation_repository.conversationMapper, 'mapConversations').and.returnValue(
+      spyOn(testFactory.conversation_repository['conversationMapper'], 'mapConversations').and.returnValue(
         Promise.resolve(conversation),
       );
-      spyOn(testFactory.conversation_repository, 'fetchConversationById').and.returnValue(
+      spyOn<any>(testFactory.conversation_repository, 'fetchConversationById').and.returnValue(
         Promise.resolve(conversation),
       );
       spyOn(testFactory.cryptography_repository, 'encryptGenericMessage').and.callFake(
@@ -168,7 +171,7 @@ describe('MessageRepository', () => {
         conversation.localMessageTimer(expiration);
         conversation.selfUser(new User(createRandomUuid()));
         const messageText = 'hello there';
-        return testFactory.message_repository.sendTextWithLinkPreview(conversation, messageText);
+        return testFactory.message_repository.sendTextWithLinkPreview(conversation, messageText, []);
       });
       const sentMessages = await Promise.all(sentPromises);
       expect(testFactory.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(sentMessages.length * 2);
@@ -184,8 +187,7 @@ describe('MessageRepository', () => {
           .map((x, i) => i.toString()),
       );
 
-      return testFactory.conversation_repository
-        .saveConversation(largeConversationEntity)
+      return testFactory.conversation_repository['saveConversation'](largeConversationEntity)
         .then(() => {
           const text = new Text({
             content:
@@ -198,7 +200,7 @@ describe('MessageRepository', () => {
           });
 
           const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
-          return testFactory.message_repository.shouldSendAsExternal(eventInfoEntity);
+          return testFactory.message_repository['shouldSendAsExternal'](eventInfoEntity);
         })
         .then((shouldSendAsExternal: boolean) => {
           expect(shouldSendAsExternal).toBeTruthy();
@@ -209,8 +211,7 @@ describe('MessageRepository', () => {
       const smallConversationEntity = generate_conversation();
       smallConversationEntity.participating_user_ids(['0', '1']);
 
-      return testFactory.conversation_repository
-        .saveConversation(smallConversationEntity)
+      return testFactory.conversation_repository['saveConversation'](smallConversationEntity)
         .then(() => {
           const genericMessage = new GenericMessage({
             [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
@@ -218,7 +219,7 @@ describe('MessageRepository', () => {
           });
 
           const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
-          return testFactory.message_repository.shouldSendAsExternal(eventInfoEntity);
+          return testFactory.message_repository['shouldSendAsExternal'](eventInfoEntity);
         })
         .then((shouldSendAsExternal: boolean) => {
           expect(shouldSendAsExternal).toBeFalsy();
@@ -230,7 +231,7 @@ describe('MessageRepository', () => {
     let conversationEntity: Conversation;
     beforeEach(() => {
       conversationEntity = generate_conversation(CONVERSATION_TYPE.REGULAR);
-      spyOn(testFactory.message_repository, 'sendGenericMessage').and.returnValue(Promise.resolve());
+      spyOn<any>(testFactory.message_repository, 'sendGenericMessage').and.returnValue(Promise.resolve());
     });
 
     it('should not delete other users messages', async () => {
@@ -337,7 +338,7 @@ describe('MessageRepository', () => {
       // Legal hold status is "on" because our conversation partner has a legal hold client
       expect(conversationEntity.hasLegalHold()).toBe(true);
 
-      await testFactory.conversation_repository.saveConversation(conversationEntity);
+      await testFactory.conversation_repository['saveConversation'](conversationEntity);
 
       spyOn(testFactory.conversation_service, 'post_encrypted_message').and.returnValue(
         Promise.reject({

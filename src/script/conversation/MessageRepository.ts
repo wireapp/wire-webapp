@@ -103,6 +103,7 @@ import type {AssetRecord, EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
+import {ClientState} from '../client/ClientState';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -129,6 +130,7 @@ export class MessageRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly clientState = container.resolve(ClientState),
   ) {
     this.logger = getLogger('MessageRepository');
 
@@ -253,7 +255,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     textMessage: string,
     mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
+    quoteEntity?: QuoteEntity,
   ): Promise<ConversationEvent> {
     try {
       const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
@@ -715,7 +717,8 @@ export class MessageRepository {
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
+    const senderId = this.clientState.currentClient().id;
+    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp, senderId);
     const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
       genericMessage,
       optimisticEvent as EventRecord,
@@ -1459,7 +1462,7 @@ export class MessageRepository {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
-    const sender = this.clientRepository['clientState'].currentClient().id;
+    const sender = this.clientState.currentClient().id;
     try {
       await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
     } catch (axiosError) {
