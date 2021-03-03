@@ -115,7 +115,7 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
     }
   }, [participant, isTemporaryGuest, isTeamMember, isBlocked, isRequest, isIgnored, isCanceled, isUnknown]);
 
-  if (participant instanceof ServiceEntity) {
+  if (participant instanceof ServiceEntity || participant.isService) {
     return (
       <ServiceAvatar
         avatarSize={avatarSize}
