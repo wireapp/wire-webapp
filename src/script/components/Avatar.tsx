@@ -85,15 +85,16 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   ...props
 }) => {
   const [avatarState, setAvatarState] = useState(STATE.NONE);
+  const user = participant as User;
 
-  const isTemporaryGuest = useKoSubscribable((participant as User).isTemporaryGuest ?? ko.observable(false));
-  const isTeamMember = useKoSubscribable((participant as User).isTeamMember ?? ko.observable(false));
-  const isBlocked = useKoSubscribable((participant as User).isBlocked ?? ko.observable(false));
-  const isRequest = useKoSubscribable((participant as User).isRequest ?? ko.observable(false));
-  const isIgnored = useKoSubscribable((participant as User).isIgnored ?? ko.observable(false));
-  const isCanceled = useKoSubscribable((participant as User).isCanceled ?? ko.observable(false));
-  const isUnknown = useKoSubscribable((participant as User).isUnknown ?? ko.observable(false));
-  const isMe = !!(participant as User).isMe;
+  const isTemporaryGuest = useKoSubscribable(user.isTemporaryGuest ?? ko.observable(false));
+  const isTeamMember = useKoSubscribable(user.isTeamMember ?? ko.observable(false));
+  const isBlocked = useKoSubscribable(user.isBlocked ?? ko.observable(false));
+  const isRequest = useKoSubscribable(user.isRequest ?? ko.observable(false));
+  const isIgnored = useKoSubscribable(user.isIgnored ?? ko.observable(false));
+  const isCanceled = useKoSubscribable(user.isCanceled ?? ko.observable(false));
+  const isUnknown = useKoSubscribable(user.isUnknown ?? ko.observable(false));
+  const isMe = user.isMe;
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     onAvatarClick?.(participant, event.currentTarget.parentNode);
