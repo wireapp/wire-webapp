@@ -62,6 +62,7 @@ const UserAvatar: React.FunctionComponent<UserAvatarProps> = ({
       color={participant.accent_color()}
       data-uie-name="element-avatar-user"
       data-uie-value={participant.id}
+      data-uie-status={state}
       onClick={onClick}
       title={participant.name()}
       {...props}
