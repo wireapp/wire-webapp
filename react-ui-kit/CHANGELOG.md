@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.45.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.45.8...@wireapp/react-ui-kit@7.45.9) (2021-03-03)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Add rel to TextLink ([#3610](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3610)) ([81e935f](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/81e935f865be76a1644ba581487647d7a3bb47f6))
+
+
+
+
+
 ## [7.45.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.45.7...@wireapp/react-ui-kit@7.45.8) (2021-02-24)
 
 
