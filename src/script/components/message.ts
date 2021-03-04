@@ -428,7 +428,7 @@ const normalTemplate: string = `
       <!-- ko if: asset.isLocation() -->
         <location-asset params="asset: asset"></location-asset>
       <!-- /ko -->
-      <!-- ko if: asset.is_button() -->
+      <!-- ko if: asset.isButton() -->
         <message-button params="onClick: () => clickButton(message, asset.id), label: asset.text, id: asset.id, message: message"></message-button>
       <!-- /ko -->
     <!-- /ko -->
