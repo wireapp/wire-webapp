@@ -23,14 +23,14 @@ import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 
 export function validateEvent(
-  event: {time: string; type: CONVERSATION_EVENT | USER_EVENT},
+  event: {time: string; type: string},
   source: EventSource,
   lastEventDate?: string,
 ): EventValidation {
   const eventType = event.type;
   const unhandledEvents: (CONVERSATION_EVENT | USER_EVENT)[] = [CONVERSATION_EVENT.TYPING];
 
-  if (unhandledEvents.includes(eventType)) {
+  if (unhandledEvents.includes(eventType as CONVERSATION_EVENT | USER_EVENT)) {
     return EventValidation.IGNORED_TYPE;
   }
 

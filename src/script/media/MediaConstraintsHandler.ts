@@ -133,7 +133,7 @@ export class MediaConstraintsHandler {
     };
   }
 
-  getScreenStreamConstraints(method: ScreensharingMethods): MediaStreamConstraints {
+  getScreenStreamConstraints(method: ScreensharingMethods): MediaStreamConstraints | undefined {
     switch (method) {
       case ScreensharingMethods.DESKTOP_CAPTURER:
         this.logger.info('Enabling screen sharing from desktopCapturer');
@@ -146,7 +146,7 @@ export class MediaConstraintsHandler {
         const chromeMediaSourceId = this.currentDeviceId.screenInput();
         streamConstraints.video.mandatory = {...streamConstraints.video.mandatory, chromeMediaSourceId};
 
-        return streamConstraints as MediaStreamConstraints;
+        return streamConstraints;
       case ScreensharingMethods.DISPLAY_MEDIA:
         this.logger.info('Enabling screen sharing from getDisplayMedia');
         return {

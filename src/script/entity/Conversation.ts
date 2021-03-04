@@ -104,7 +104,7 @@ export class Conversation {
   public readonly is_cleared: ko.PureComputed<boolean>;
   public readonly is_loaded: ko.Observable<boolean>;
   public readonly is_pending: ko.Observable<boolean>;
-  public readonly is_verified: ko.PureComputed<boolean>;
+  public readonly is_verified: ko.PureComputed<boolean | undefined>;
   public readonly is1to1: ko.PureComputed<boolean>;
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
   public readonly isClearable: ko.PureComputed<boolean>;
@@ -485,7 +485,7 @@ export class Conversation {
       this.status,
       this.type,
       this.verification_state,
-    ].forEach(property => (property as any).subscribe(this.persistState));
+    ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
   }
 
   get allUserEntities() {

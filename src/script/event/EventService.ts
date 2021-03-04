@@ -419,33 +419,24 @@ export class EventService {
 
       if (this.storageService.db) {
         // Create a DB transaction to avoid concurrent sequential update.
-        // TODO: The Dexie typing is wrong here, as it indeed does accept the table name as a string as the second parameter
-        return this.storageService.db.transaction(
-          'rw',
-          // @ts-ignore: Wrong typing in Dexie
-          StorageSchemata.OBJECT_STORE.EVENTS,
-          async () => {
-            const record = (await this.storageService.load(
-              StorageSchemata.OBJECT_STORE.EVENTS,
-              primaryKey,
-            )) as EventRecord;
-            if (!record) {
-              throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
-            }
-            const databaseVersion = record.version || 1;
-            const isSequentialUpdate = changes.version === databaseVersion + 1;
-            if (isSequentialUpdate) {
-              return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
-            }
-            const logMessage = 'Failed sequential database update';
-            const logObject = {
-              databaseVersion: databaseVersion,
-              updateVersion: changes.version,
-            };
-            this.logger.error(logMessage, logObject);
-            throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
-          },
-        );
+        return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
+          const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
+          if (!record) {
+            throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
+          }
+          const databaseVersion = record.version || 1;
+          const isSequentialUpdate = changes.version === databaseVersion + 1;
+          if (isSequentialUpdate) {
+            return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
+          }
+          const logMessage = 'Failed sequential database update';
+          const logObject = {
+            databaseVersion: databaseVersion,
+            updateVersion: changes.version,
+          };
+          this.logger.error(logMessage, logObject);
+          throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
+        });
       }
       return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
     });
