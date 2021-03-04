@@ -176,7 +176,7 @@ export class NotificationService {
       message = await this.storageService.db.table(StorageSchemata.OBJECT_STORE.EVENTS).where({id: messageId}).first();
     }
 
-    const {notifications} = await this.apiClient.notification.api.getNotifications(clientId);
+    const notifications = await this.apiClient.notification.api.getAllNotifications(clientId);
 
     for (const notification of notifications) {
       const matchedEvent = notification.payload.find(event => {

@@ -19,6 +19,7 @@
 
 import type {LegalHoldMemberData} from '@wireapp/api-client/src/team/legalhold/';
 import type {MemberData, Members} from '@wireapp/api-client/src/team/member/';
+import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
 import type {Services} from '@wireapp/api-client/src/team/service/';
 import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
 import type {TeamChunkData, TeamData} from '@wireapp/api-client/src/team/team/';
@@ -63,5 +64,9 @@ export class TeamService {
 
   getWhitelistedServices(teamId: string): Promise<Services> {
     return this.apiClient.teams.service.api.getTeamServices(teamId);
+  }
+
+  getAllTeamFeatures(teamId: string): Promise<FeatureList> {
+    return this.apiClient.teams.feature.api.getAllFeatures(teamId);
   }
 }

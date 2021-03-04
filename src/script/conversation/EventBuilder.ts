@@ -300,10 +300,12 @@ export const EventBuilder = {
     };
   },
 
-  buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number): MessageAddEvent {
+  buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number, senderId: string): MessageAddEvent {
     return {
       conversation: conversationEntity.id,
-      data: {},
+      data: {
+        sender: senderId,
+      },
       from: conversationEntity.selfUser().id,
       status: StatusType.SENDING,
       time: conversationEntity.get_next_iso_date(currentTimestamp),

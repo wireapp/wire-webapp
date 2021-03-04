@@ -17,8 +17,8 @@
  *
  */
 
-const expressSitemapXml = require('express-sitemap-xml');
 import express from 'express';
+import expressSitemapXml from 'express-sitemap-xml';
 import fs from 'fs';
 import hbs from 'hbs';
 import helmet from 'helmet';
@@ -63,11 +63,11 @@ class Server {
     this.initStaticRoutes();
     this.initWebpack();
     this.initSiteMap(this.config);
-    this.app.use(Root(this.config));
+    this.app.use(Root());
     this.app.use(HealthCheckRoute());
     this.app.use(ConfigRoute(this.config));
     this.app.use(GoogleWebmasterRoute(this.config));
-    this.app.use(AppleAssociationRoute(this.config));
+    this.app.use(AppleAssociationRoute());
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
   }

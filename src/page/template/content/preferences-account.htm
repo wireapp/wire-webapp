@@ -24,8 +24,7 @@
           <!-- ko if: isTeam() -->
             <availability-state class="preferences-account-availability"
                                 data-bind="click: clickOnAvailability"
-                                data-uie-name="status-availability-in-profile"
-                                params="availability: availability, label: availabilityLabel, showArrow: true">
+                                params="availability: availability, label: availabilityLabel, showArrow: true, dataUieName: 'status-availability-in-profile'">
             </availability-state>
           <!-- /ko -->
 
@@ -39,7 +38,7 @@
                      hasFocus: shouldFocusUsername(),
                      attr: {readonly: !canEditProfile(selfUser())}"
                    data-uie-name="enter-username"
-                   maxlength="21"
+                   maxlength="256"
                    spellcheck="false"
                    autocomplete="off" />
             <!-- ko if: canEditProfile(selfUser()) -->
@@ -193,7 +192,7 @@
         <!-- /ko -->
 
         <!-- ko if: optionResetAppLock -->
-          <div class="preferences-link accent-text" data-bind="click: clickOnResetAppLockPassphrase, text: t('preferencesAccountResetAppLockPassphrase')" data-uie-name="do-reset-app-lock"></div>
+          <div class="preferences-link accent-text" data-bind="click: clickOnResetAppLockPassphrase, text: hasAppLockPassphrase() ? t('preferencesAccountResetAppLockPassphrase') : t('preferencesAccountSetAppLockPassphrase')" data-uie-name="do-reset-app-lock"></div>
         <!-- /ko -->
 
         <!-- ko ifnot: selfUser().isSingleSignOn -->

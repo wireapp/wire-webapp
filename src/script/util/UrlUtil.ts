@@ -62,7 +62,7 @@ export const forwardParameter = (url: string, parameterName: string, locationSea
  * @param url URL to be cleaned
  * @returns Plain URL
  */
-export const getDomainName = (url = '') => {
+export const cleanURL = (url = '') => {
   // force a protocol if there is none
   url = url.replace(/^(?!https?:\/\/)/i, 'http://');
   try {
@@ -72,6 +72,19 @@ export const getDomainName = (url = '') => {
     return '';
   }
 };
+
+/**
+ * Extracts a (sub)domain name from a URL
+ *
+ * e.g. `wire.com -> wire`
+ *
+ * or `https://wire.example.com -> wire`
+ *
+ * @param url The URL to get the domain name from
+ */
+export function getDomainName(url: string): string {
+  return url.replace(/^(?:.*:\/\/)?([^.]+)\..*/, '$1');
+}
 
 export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
   if (!html) {

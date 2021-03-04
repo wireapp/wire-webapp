@@ -17,7 +17,7 @@
  *
  */
 
-participant-item {
+.participant-item-wrapper {
   position: relative;
   display: block;
 
@@ -32,52 +32,56 @@ participant-item {
     opacity: 0.06;
   }
 
-  mic-off-icon,
-  mic-on-icon,
-  participant-mic-on-icon,
-  verified-icon,
-  guest-icon,
-  disclose-icon,
-  camera-icon,
-  screenshare-icon,
-  partner-icon {
+  .camera-icon,
+  .disclose-icon,
+  .federation-icon,
+  .guest-icon,
+  .mic-off-icon,
+  .mic-on-icon,
+  .participant-mic-on-icon,
+  .partner-icon,
+  .screenshare-icon,
+  .verified-icon {
     display: flex;
     margin-left: 16px;
   }
 
-  camera-icon svg {
+  .camera-icon {
     width: 12px !important;
     height: 9px;
   }
 
-  mic-off-icon,
-  mic-on-icon,
-  participant-mic-on-icon,
-  screenshare-icon {
-    svg {
-      height: 12px;
-    }
+  .mic-off-icon,
+  .mic-on-icon,
+  .participant-mic-on-icon,
+  .screenshare-icon {
+    height: 12px;
   }
 
-  mic-off-icon,
-  mic-on-icon,
-  guest-icon,
-  partner-icon,
-  screenshare-icon,
-  camera-icon {
+  .camera-icon,
+  .federation-icon,
+  .guest-icon,
+  .mic-off-icon,
+  .mic-on-icon,
+  .partner-icon,
+  .screenshare-icon {
     fill: currentColor;
     opacity: 0.48;
   }
 
-  disclose-icon {
+  svg[data-uie-name='mic-icon-on'][data-uie-active='inactive'] path {
+    fill: #9c9fa0;
+  }
+
+  .disclose-icon {
     display: none;
 
-    svg path {
+    path {
       fill: var(--background-fade-40);
     }
   }
 
-  &.show-arrow disclose-icon {
+  &.show-arrow .disclose-icon {
     display: flex;
   }
 

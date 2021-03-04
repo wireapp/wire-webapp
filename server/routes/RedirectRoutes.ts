@@ -54,10 +54,10 @@ export const RedirectRoutes = (config: ServerConfig) => [
     const parseResult = BrowserUtil.parseUserAgent(userAgent);
     return res.json(parseResult);
   }),
-  router.get('/commit/?', (req, res) => {
+  router.get('/commit/?', (_req, res) => {
     return res.send(config.COMMIT);
   }),
-  router.get('/version/?', (req, res) => {
+  router.get('/version/?', (_req, res) => {
     return res.json({version: config.CLIENT.VERSION});
   }),
 ];

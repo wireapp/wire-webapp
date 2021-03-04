@@ -17,52 +17,54 @@
  *
  */
 
+import {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
+import {Logger, Runtime} from '@wireapp/commons';
+import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
 import {Availability, Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import ko from 'knockout';
-import {WebappProperties} from '@wireapp/api-client/src/user/data';
-import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
-import {ChangeEvent} from 'react';
+import {hasPassphrase} from '../../page/AppLock';
+import 'Components/AvailabilityState';
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
+import ko from 'knockout';
+import {ChangeEvent} from 'react';
 import {container} from 'tsyringe';
-import {Logger, Runtime} from '@wireapp/commons';
-
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
-import {getLogger} from 'Util/Logger';
 import {isKey, KEY} from 'Util/KeyboardUtil';
-import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
-import {loadValue} from 'Util/StorageUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {t} from 'Util/LocalizerUtil';
-
-import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {getLogger} from 'Util/Logger';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {loadValue} from 'Util/StorageUtil';
+import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
+import type {ClientEntity} from '../../client/ClientEntity';
 import {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
-import {ConsentValue} from '../../user/ConsentValue';
-import {ContentViewModel} from '../ContentViewModel';
-
-import 'Components/AvailabilityState';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
+import {User} from '../../entity/User';
+import {UserError} from '../../error/UserError';
 import {getAccountPagesUrl, getCreateTeamUrl, getManageTeamUrl, URL_PATH} from '../../externalRoute';
-import {HistoryExportViewModel} from './HistoryExportViewModel';
-import {isAppLockEnabled} from './AppLockViewModel';
-import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {MotionDuration} from '../../motion/MotionDuration';
-import {nameFromType} from '../../user/AvailabilityMapper';
-import {PreferenceNotificationRepository, Notification} from '../../notification/PreferenceNotificationRepository';
-import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
+import {Notification, PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 import {StorageKey} from '../../storage';
 import {TeamEntity} from '../../team/TeamEntity';
 import {TeamState} from '../../team/TeamState';
-import {User} from '../../entity/User';
-import {UserError} from '../../error/UserError';
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {nameFromType} from '../../user/AvailabilityMapper';
+import {ConsentValue} from '../../user/ConsentValue';
+import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
 import {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
-import {validateCharacter, validateHandle} from '../../user/UserHandleGenerator';
-import type {ClientEntity} from '../../client/ClientEntity';
+import {ContentViewModel} from '../ContentViewModel';
+import {modals, ModalsViewModel} from '../ModalsViewModel';
+import {HistoryExportViewModel} from './HistoryExportViewModel';
+
+export enum UserNameState {
+  AVAILABLE = 'AVAILABLE',
+  TAKEN = 'TAKEN',
+}
 
 export class PreferencesAccountViewModel {
   logger: Logger;
@@ -78,7 +80,7 @@ export class PreferencesAccountViewModel {
   username: ko.PureComputed<string>;
   enteredUsername: ko.Observable<string>;
   submittedUsername: ko.Observable<string>;
-  usernameState: ko.Observable<string>;
+  usernameState: ko.Observable<UserNameState>;
   richProfileFields: ko.Observable<RichInfoField[]>;
   nameSaved: ko.Observable<boolean>;
   usernameSaved: ko.Observable<boolean>;
@@ -90,6 +92,7 @@ export class PreferencesAccountViewModel {
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   optionResetAppLock: boolean;
+  hasAppLockPassphrase: () => boolean;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   isMacOsWrapper: boolean;
   manageTeamUrl: string;
@@ -98,7 +101,8 @@ export class PreferencesAccountViewModel {
   isConsentCheckEnabled: () => boolean;
   canEditProfile: (user: User) => boolean;
   Config: typeof PreferencesAccountViewModel.CONFIG;
-  UserNameState: typeof PreferencesAccountViewModel.USERNAME_STATE;
+  /** The `UserNameState` exists, so that conditions in Knockout templates can make use of it. */
+  UserNameState: typeof UserNameState = UserNameState;
   isCountlyEnabled: boolean = false;
 
   static get CONFIG() {
@@ -107,13 +111,6 @@ export class PreferencesAccountViewModel {
         FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
       SAVE_ANIMATION_TIMEOUT: MotionDuration.X_LONG * 2,
-    };
-  }
-
-  static get USERNAME_STATE() {
-    return {
-      AVAILABLE: 'PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE',
-      TAKEN: 'PreferencesAccountViewModel.USERNAME_STATE.TAKEN',
     };
   }
 
@@ -135,7 +132,6 @@ export class PreferencesAccountViewModel {
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.selfUser = this.userState.self;
     this.Config = PreferencesAccountViewModel.CONFIG;
-    this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.email = ko.pureComputed(() => this.selfUser().email());
@@ -178,7 +174,8 @@ export class PreferencesAccountViewModel {
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
-    this.optionResetAppLock = isAppLockEnabled();
+    this.optionResetAppLock = this.teamState.isAppLockEnabled();
+    this.hasAppLockPassphrase = () => hasPassphrase(this.selfUser().id);
     this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
@@ -223,22 +220,23 @@ export class PreferencesAccountViewModel {
   };
 
   changeUsername = async (username: string, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const enteredUsername = event.target.value;
-    const normalizedUsername = enteredUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const normalizedUsername = event.target.value.toLowerCase();
 
-    const wasNormalized = enteredUsername !== normalizedUsername;
-    if (wasNormalized) {
-      event.target.value = normalizedUsername;
+    if (normalizedUsername !== event.target.value) {
+      event.target.value = event.target.value.toLowerCase();
+      this.enteredUsername(event.target.value);
     }
 
     const isUnchanged = normalizedUsername === this.selfUser().username();
     if (isUnchanged) {
-      return event.target.blur();
+      event.target.blur();
+      return;
     }
 
     const isInvalidName = normalizedUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     if (isInvalidName) {
-      return this.usernameState(null);
+      this.usernameState(null);
+      return;
     }
 
     this.submittedUsername(normalizedUsername);
@@ -257,7 +255,7 @@ export class PreferencesAccountViewModel {
       const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
       const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
       if (isUsernameTaken && isCurrentRequest) {
-        this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+        this.usernameState(UserNameState.TAKEN);
       }
     }
   };
@@ -493,7 +491,7 @@ export class PreferencesAccountViewModel {
   readonly shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
   readonly verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
-    const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const enteredUsername = event.target.value.toLowerCase();
 
     const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     const usernameUnchanged = enteredUsername === this.selfUser().username();
@@ -505,18 +503,18 @@ export class PreferencesAccountViewModel {
 
     if (validateHandle(enteredUsername)) {
       this.userRepository
-        .verifyUsername(enteredUsername)
+        .verifyUserHandle(enteredUsername)
         .then(() => {
           const isCurrentRequest = this.enteredUsername() === enteredUsername;
           if (isCurrentRequest) {
-            this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE);
+            this.usernameState(UserNameState.AVAILABLE);
           }
         })
         .catch(error => {
           const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
           const isCurrentRequest = this.enteredUsername() === enteredUsername;
           if (isUsernameTaken && isCurrentRequest) {
-            this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+            this.usernameState(UserNameState.TAKEN);
           }
         });
     }

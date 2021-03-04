@@ -34,7 +34,7 @@ updates:
         versions:
           - '>= 7.a'
           - '< 8'
-      - dependency-name: 'less '
+      - dependency-name: 'less'
         versions:
           - '>= 4'
   - package-ecosystem: npm
@@ -58,3 +58,24 @@ updates:
       - dependency-name: '@types/node'
         versions:
           - '>= 13.a'
+  - package-ecosystem: npm
+    directory: '/electron'
+    schedule:
+      interval: weekly
+      day: sunday
+      time: '01:00'
+    open-pull-requests-limit: 99
+    assignees:
+      - ffflorian
+    labels:
+      - "type: chore \U0001F9F9"
+    ignore:
+      - dependency-name: electron
+        versions:
+          - '>= 12.a'
+      - dependency-name: '@types/node'
+        versions:
+          - '>= 13.a'
+      - dependency-name: 'husky'
+        versions:
+          - '>= 5.a'

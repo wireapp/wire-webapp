@@ -21,7 +21,7 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 
 import 'Components/AvailabilityState';
 import type {User} from '../../entity/User';
@@ -40,8 +40,7 @@ ko.components.register('panel-user-details', {
       <div class="panel-participant__head">
         <!-- ko if: participant().inTeam() -->
           <availability-state class="panel-participant__head__name"
-            data-uie-name="status-name"
-            params="availability: participant().availability, label: participant().name()"></availability-state>
+            params="availability: participant().availability, label: participant().name(), dataUieName: 'status-name'"></availability-state>
         <!-- /ko -->
 
         <!-- ko ifnot: participant().inTeam() -->
@@ -53,8 +52,8 @@ ko.components.register('panel-user-details', {
         <!-- /ko -->
       </div>
 
-      <!-- ko if: participant().username() -->
-        <div class="panel-participant__user-name" data-bind="text: participant().username()" data-uie-name="status-username"></div>
+      <!-- ko if: participant().handle -->
+        <div class="panel-participant__user-name" data-bind="text: participant().handle" data-uie-name="status-username"></div>
       <!-- /ko -->
 
       <participant-avatar params="participant: participant, size: '${AVATAR_SIZE.X_LARGE}'" data-uie-name="status-profile-picture"></participant-avatar>

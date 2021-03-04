@@ -39,11 +39,11 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
+import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
+import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
 import {container} from 'tsyringe';
 
@@ -103,6 +103,7 @@ import type {AssetRecord, EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
+import {ClientState} from '../client/ClientState';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -129,6 +130,7 @@ export class MessageRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly clientState = container.resolve(ClientState),
   ) {
     this.logger = getLogger('MessageRepository');
 
@@ -253,7 +255,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     textMessage: string,
     mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
+    quoteEntity?: QuoteEntity,
   ): Promise<ConversationEvent> {
     try {
       const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
@@ -715,7 +717,8 @@ export class MessageRepository {
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
+    const senderId = this.clientState.currentClient().id;
+    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp, senderId);
     const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
       genericMessage,
       optimisticEvent as EventRecord,
@@ -1164,7 +1167,11 @@ export class MessageRepository {
    * @param user_ids Optionally the intended recipient users
    * @returns Resolves with a user client map
    */
-  async create_recipients(conversation_id: string, skip_own_clients = false, user_ids: string[] = null) {
+  async create_recipients(
+    conversation_id: string,
+    skip_own_clients = false,
+    user_ids: string[] = null,
+  ): Promise<Recipients> {
     const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id);
     const recipients: Recipients = {};
     for (const userEntity of userEntities) {
@@ -1455,7 +1462,7 @@ export class MessageRepository {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
-    const sender = this.clientRepository['clientState'].currentClient().id;
+    const sender = this.clientState.currentClient().id;
     try {
       await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
     } catch (axiosError) {
@@ -1622,7 +1629,7 @@ export class MessageRepository {
         options.recipients,
         genericMessageExternal,
       );
-      payload.data = await arrayToBase64(encryptedAsset.cipherText);
+      payload.data = arrayToBase64(encryptedAsset.cipherText);
       payload.native_push = options.nativePush;
       return this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
@@ -1645,7 +1652,7 @@ export class MessageRepository {
    */
   private async sendEncryptedMessage(
     eventInfoEntity: EventInfoEntity,
-    payload: NewOTRMessage,
+    payload: NewOTRMessage<string>,
   ): Promise<ClientMismatch> {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;

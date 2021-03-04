@@ -368,7 +368,7 @@ describe('Markdown for code snippets', () => {
 
   it('renders escaped JavaScript code blocks', () => {
     const expected =
-      '<pre><code class="lang-js">$(<span class="hljs-built_in">document</span>).ready(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{\n  $(<span class="hljs-string">&#x27;pre code&#x27;</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">i, block</span>) </span>{\n    hljs.highlightBlock(block);\n  });\n});\n</code></pre>';
+      '<pre><code class="lang-js"><span class="hljs-constructor">$(<span class="hljs-params">document</span>)</span>.ready(<span class="hljs-keyword">function</span><span class="hljs-literal">()</span> {\n  <span class="hljs-constructor">$(&#x27;<span class="hljs-params">pre</span> <span class="hljs-params">code</span>&#x27;)</span>.each(<span class="hljs-keyword">function</span>(i, block) {\n    hljs.highlight<span class="hljs-constructor">Block(<span class="hljs-params">block</span>)</span>;\n  });\n});\n</code></pre>';
 
     expect(
       renderMessage(

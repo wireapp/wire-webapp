@@ -33,7 +33,7 @@
                 <div class="panel__action-item" data-bind="click: clickOnDevices" data-uie-name="go-devices">
                   <devices-icon class="panel__action-item__icon"></devices-icon>
                   <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionDevices')"></div>
-                  <disclose-icon></disclose-icon>
+                  <disclose-icon class="disclose-icon"></disclose-icon>
                 </div>
               </div>
             <!-- /ko -->
@@ -120,7 +120,7 @@
               >
                 <plus-icon class="panel__action-item__icon"></plus-icon>
                 <div class="panel__action-item__text" data-bind="text: t('conversationDetailsActionAddParticipants')"></div>
-                <disclose-icon></disclose-icon>
+                <disclose-icon class="disclose-icon"></disclose-icon>
               </div>
             </div>
           <!-- /ko -->
@@ -143,7 +143,7 @@
                   class="panel__action-item__text"
                   data-bind="text: t('conversationDetailsActionConversationParticipants', showAllUsersCount())"
                 ></div>
-                <disclose-icon></disclose-icon>
+                <disclose-icon class="disclose-icon"></disclose-icon>
               </div>
             <!-- /ko -->
           <!-- /ko -->
@@ -164,7 +164,7 @@
                     data-uie-name="status-notifications"
                   ></div>
                 </div>
-                <disclose-icon></disclose-icon>
+                <disclose-icon class="disclose-icon"></disclose-icon>
               </div>
             </div>
           <!-- /ko -->
@@ -180,7 +180,7 @@
                     data-uie-name="status-timed-messages"
                   ></div>
                 </div>
-                <disclose-icon></disclose-icon>
+                <disclose-icon class="disclose-icon"></disclose-icon>
               </div>
             </div>
           <!-- /ko -->
@@ -196,14 +196,14 @@
                     data-uie-name="status-allow-guests"
                   ></div>
                 </div>
-                <disclose-icon></disclose-icon>
+                <disclose-icon class="disclose-icon"></disclose-icon>
               </div>
             </div>
           <!-- /ko -->
           <!-- ko if: showOptionReadReceipts() -->
             <div class="conversation-details__read-receipts">
               <read-receipt-toggle
-                params="conversation: activeConversation, onReceiptModeChanged: updateConversationReceiptMode"
+                params="receiptMode: activeConversation().receiptMode, onReceiptModeChanged: updateConversationReceiptMode"
               ></read-receipt-toggle>
             </div>
           <!-- /ko -->
@@ -233,7 +233,7 @@
                   data-uie-name="status-notifications"
                 ></div>
               </div>
-              <disclose-icon></disclose-icon>
+              <disclose-icon class="disclose-icon"></disclose-icon>
             </div>
           </div>
         <!-- /ko -->

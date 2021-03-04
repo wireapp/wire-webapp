@@ -25,22 +25,35 @@ import NamedIcon from 'Components/NamedIcon';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface LegalHoldDotProps {
+  className?: string;
   conversation?: Conversation;
+  dataUieName?: string;
   isPending?: boolean;
   large?: boolean;
   legalHoldModal?: LegalHoldModalViewModel;
 }
 
-const LegalHoldDot: React.FC<LegalHoldDotProps> = ({conversation, isPending, large, legalHoldModal}) => {
+const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
+  conversation,
+  isPending,
+  large,
+  legalHoldModal,
+  className = '',
+  dataUieName = 'legal-hold-dot-pending-icon',
+}) => {
   const isInteractive = !!legalHoldModal;
 
   return (
     <div
-      className={cx('legal-hold-dot', {
-        'legal-hold-dot--active': !isPending,
-        'legal-hold-dot--interactive': isInteractive,
-        'legal-hold-dot--large': large,
-      })}
+      className={cx(
+        'legal-hold-dot',
+        {
+          'legal-hold-dot--active': !isPending,
+          'legal-hold-dot--interactive': isInteractive,
+          'legal-hold-dot--large': large,
+        },
+        className,
+      )}
       onClick={event => {
         event.stopPropagation();
         if (isInteractive) {
@@ -58,15 +71,16 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({conversation, isPending, lar
         }
       }}
     >
-      {isPending && <NamedIcon name="pending-icon" data-uie-name="legal-hold-dot-pending-icon" />}
+      {isPending && <NamedIcon name="pending-icon" data-uie-name={dataUieName} />}
     </div>
   );
 };
 
 export default LegalHoldDot;
 
-registerReactComponent('legal-hold-dot', {
+registerReactComponent<LegalHoldDotProps>('legal-hold-dot', {
   component: LegalHoldDot,
-  optionalParams: ['conversation', 'isPending', 'large', 'legalHoldModal'],
-  template: '<div data-bind="react: {conversation, isPending: ko.unwrap(isPending), large, legalHoldModal}"></div>',
+  optionalParams: ['conversation', 'isPending', 'large', 'legalHoldModal', 'className'],
+  template:
+    '<div data-bind="react: {conversation, isPending: ko.unwrap(isPending), large, className, legalHoldModal}"></div>',
 });

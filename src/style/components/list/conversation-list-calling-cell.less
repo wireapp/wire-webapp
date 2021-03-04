@@ -136,26 +136,26 @@
     }
 
     .participant-item {
-      height: 40px;
-      cursor: default;
+      height: 40px !important;
+      cursor: default !important;
       fill: var(--background-fade-48);
       pointer-events: none;
 
       &__image {
-        width: 48px;
+        width: 48px !important;
       }
 
       .availability-state-icon {
-        display: none;
+        display: none !important;
       }
 
-      verified-icon svg,
-      guest-icon svg {
-        height: 12px;
+      .verified-icon,
+      .guest-icon {
+        height: 12px !important;
       }
 
-      camera-icon svg {
-        width: 16px;
+      .camera-icon {
+        width: 16px !important;
       }
     }
   }

@@ -18,9 +18,11 @@
  */
 
 import ko from 'knockout';
+import {useEffect, useState} from 'react';
 import {container, InjectionToken} from 'tsyringe';
+import {TypeUtil} from '@wireapp/commons';
 
-export function registerReactComponent(
+export function registerReactComponent<Props>(
   name: string,
   {
     template,
@@ -28,25 +30,42 @@ export function registerReactComponent(
     optionalParams = [],
     injected = {},
   }: {
-    component: React.ComponentType;
+    component: React.ComponentType<Props>;
     injected?: Record<string, InjectionToken>;
-    optionalParams?: string[];
+    /** The optional knockout params */
+    optionalParams?: TypeUtil.OptionalKeys<Props>[];
     template: string;
   },
 ) {
   ko.components.register(name, {
-    template: template,
-    viewModel: function (knockoutParams: Record<string, any>) {
+    template,
+    viewModel: function (knockoutParams: Props) {
       optionalParams.forEach(param => {
         if (!knockoutParams.hasOwnProperty(param)) {
           knockoutParams[param] = null;
         }
       });
       Object.entries(injected).forEach(([injectedName, injectedClass]) => {
-        knockoutParams[injectedName] = container.resolve(injectedClass);
+        knockoutParams[injectedName as keyof Props] = container.resolve(injectedClass);
       });
       Object.assign(this, knockoutParams);
       this.reactComponent = component;
     },
   });
 }
+
+export const useKoSubscribableCallback = <T = any>(
+  observable: ko.Subscribable<T>,
+  callback: (newValue: T) => void,
+): void => {
+  useEffect(() => {
+    const subscription = observable.subscribe(newValue => callback(newValue));
+    return () => subscription.dispose();
+  }, [observable]);
+};
+
+export const useKoSubscribable = <T = any>(observable: ko.Subscribable<T>, defaultValue?: T): T => {
+  const [value, setValue] = useState<T>(observable() ?? defaultValue);
+  useKoSubscribableCallback(observable, newValue => setValue(newValue));
+  return value;
+};

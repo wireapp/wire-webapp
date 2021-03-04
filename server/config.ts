@@ -69,7 +69,7 @@ const defaultCSP = {
   prefetchSrc: ["'self'"],
   scriptSrc: ["'self'", "'unsafe-eval'", "'unsafe-inline'", 'https://apis.google.com'],
   styleSrc: ["'self'", "'unsafe-inline'", 'https://*.googleusercontent.com'],
-  workerSrc: ["'self'"],
+  workerSrc: ["'self'", 'blob:'],
 };
 const logger = logdown('config', {
   logger: console,
@@ -136,9 +136,6 @@ const config: ServerConfig = {
       APPLOCK_SCHEDULED_TIMEOUT: process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT
         ? Number(process.env.FEATURE_APPLOCK_SCHEDULED_TIMEOUT)
         : null,
-      APPLOCK_UNFOCUS_TIMEOUT: process.env.FEATURE_APPLOCK_UNFOCUS_TIMEOUT
-        ? Number(process.env.FEATURE_APPLOCK_UNFOCUS_TIMEOUT)
-        : null,
       CHECK_CONSENT: process.env.FEATURE_CHECK_CONSENT != 'false',
       CONFERENCE_AUTO_MUTE: process.env.FEATURE_CONFERENCE_AUTO_MUTE == 'true',
       DEFAULT_LOGIN_TEMPORARY_CLIENT: process.env.FEATURE_DEFAULT_LOGIN_TEMPORARY_CLIENT == 'true',
@@ -147,8 +144,10 @@ const config: ServerConfig = {
         process.env.FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY == 'true',
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true',
       ENABLE_DOMAIN_DISCOVERY: process.env.FEATURE_ENABLE_DOMAIN_DISCOVERY != 'false',
+      ENABLE_FEDERATION: process.env.FEATURE_ENABLE_FEDERATION == 'true',
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN != 'false',
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true',
+      FEDERATION_DOMAIN: process.env.FEATURE_FEDERATION_DOMAIN,
       PERSIST_TEMPORARY_CLIENTS: process.env.FEATURE_PERSIST_TEMPORARY_CLIENTS != 'false',
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true',
     },
