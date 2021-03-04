@@ -19,8 +19,6 @@
 
 import {CONVERSATION_EVENT, ConversationTypingEvent} from '@wireapp/api-client/src/event';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data';
-
-import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 import {validateEvent} from './EventValidator';
 
@@ -35,8 +33,7 @@ describe('EventValidator', () => {
         type: CONVERSATION_EVENT.TYPING,
       };
 
-      const source = EventSource.WEB_SOCKET;
-      const result = validateEvent(event, source, undefined);
+      const result = validateEvent(event);
 
       expect(result).toBe(EventValidation.IGNORED_TYPE);
     });
