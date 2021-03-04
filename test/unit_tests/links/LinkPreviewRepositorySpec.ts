@@ -29,7 +29,7 @@ import {LinkPreviewError} from 'src/script/error/LinkPreviewError';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
 
 describe('LinkPreviewRepository', () => {
-  let link_preview_repository = null;
+  let link_preview_repository: LinkPreviewRepository = null;
 
   beforeEach(() => {
     const apiClient = container.resolve(APIClient);
@@ -43,11 +43,10 @@ describe('LinkPreviewRepository', () => {
 
   describe('getLinkPreview', () => {
     it('fetches open graph data if openGraph lib is available', done => {
-      window.openGraphAsync = () => Promise.resolve();
+      window.openGraphAsync = () => Promise.resolve(undefined);
 
-      link_preview_repository
-        .getLinkPreview('https://app.wire.com/')
-        .then(done.fail)
+      link_preview_repository['getLinkPreview']('https://app.wire.com/')
+        .then(() => done.fail())
         .catch(error => {
           expect(error.type).toBe(LinkPreviewError.TYPE.NO_DATA_AVAILABLE);
           done();
@@ -55,11 +54,10 @@ describe('LinkPreviewRepository', () => {
     });
 
     it('rejects if a link is blacklisted', done => {
-      window.openGraphAsync = () => Promise.resolve();
+      window.openGraphAsync = () => Promise.resolve(undefined);
 
-      link_preview_repository
-        .getLinkPreview('https://www.youtube.com/watch?v=t4gjl-uwUHc')
-        .then(done.fail)
+      link_preview_repository['getLinkPreview']('https://www.youtube.com/watch?v=t4gjl-uwUHc')
+        .then(() => done.fail())
         .catch(error => {
           expect(error.type).toBe(LinkPreviewError.TYPE.BLACKLISTED);
           done();
@@ -70,9 +68,8 @@ describe('LinkPreviewRepository', () => {
       window.openGraphAsync = () => Promise.reject(new Error('Invalid URI'));
 
       const invalidUrl = 'http:////api/apikey';
-      link_preview_repository
-        .getLinkPreview(invalidUrl)
-        .then(done.fail)
+      link_preview_repository['getLinkPreview'](invalidUrl)
+        .then(() => done.fail())
         .catch(error => {
           expect(error.type).toBe(LinkPreviewError.TYPE.UNSUPPORTED_TYPE);
           done();

@@ -209,8 +209,8 @@ describe('MediaDevicesHandler', () => {
         expect(devicesHandler.availableDevices.audioOutput()).toEqual(fakeWorldTestSetup.speakers);
 
         const newCameras = [{deviceId: 'newcamera', kind: MediaDeviceType.VIDEO_INPUT}];
-        navigator.mediaDevices.enumerateDevices.and.returnValue(Promise.resolve(newCameras));
-        navigator.mediaDevices.ondevicechange();
+        (navigator.mediaDevices.enumerateDevices as jasmine.Spy).and.returnValue(Promise.resolve(newCameras));
+        navigator.mediaDevices.ondevicechange(undefined);
 
         setTimeout(() => {
           expect(navigator.mediaDevices.enumerateDevices).toHaveBeenCalledTimes(2);

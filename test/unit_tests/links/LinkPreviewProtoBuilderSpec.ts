@@ -17,6 +17,7 @@
  *
  */
 
+import {LinkPreview} from '@wireapp/protocol-messaging';
 import {buildFromOpenGraphData} from 'src/script/links/LinkPreviewProtoBuilder';
 
 const OpenGraphMocks = {
@@ -51,7 +52,12 @@ const OpenGraphMocks = {
 };
 
 describe('LinkPreviewProtoBuilder', () => {
-  const compare_article_with_mock = (url, offset, preview, mock) => {
+  const compare_article_with_mock = (
+    url: string,
+    offset: number,
+    preview: LinkPreview,
+    mock: ReturnType<typeof OpenGraphMocks.getHeiseMock> | ReturnType<typeof OpenGraphMocks.getWireMock>,
+  ) => {
     expect(preview).toBeDefined();
     expect(preview.preview).toBe('article');
     expect(preview.url).toBe(url);
@@ -59,17 +65,17 @@ describe('LinkPreviewProtoBuilder', () => {
     expect(preview.article.title).toBe(mock.title || '');
     expect(preview.article.permanentUrl).toBe(mock.url);
     expect(preview.article.summary).toEqual(mock.description || '');
-    expect(() => preview.buffer).toBeDefined();
+    expect(() => (preview as any).buffer).toBeDefined();
   };
 
   it('returns undefined if no data is given', () => {
-    const link_preview = buildFromOpenGraphData();
+    const link_preview = buildFromOpenGraphData(undefined, undefined);
 
     expect(link_preview).not.toBeDefined();
   });
 
   it('returns undefined if data is an empty object', () => {
-    const link_preview = buildFromOpenGraphData({});
+    const link_preview = buildFromOpenGraphData({} as any, undefined);
 
     expect(link_preview).not.toBeDefined();
   });
@@ -87,7 +93,11 @@ describe('LinkPreviewProtoBuilder', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    if (link_preview) {
+      compare_article_with_mock(url, 0, link_preview, mock);
+    } else {
+      fail('No link preview generated');
+    }
   });
 
   it('returns a link preview if type is image is missing', () => {
@@ -95,14 +105,22 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getWireMock();
     delete mock.image;
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    if (link_preview) {
+      compare_article_with_mock(url, 0, link_preview, mock);
+    } else {
+      fail('No link preview generated');
+    }
   });
 
   it('returns a link preview if title is present and offset is given', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     const link_preview = buildFromOpenGraphData(mock, url, 12);
-    compare_article_with_mock(url, 12, link_preview, mock);
+    if (link_preview) {
+      compare_article_with_mock(url, 12, link_preview, mock);
+    } else {
+      fail('No link preview generated');
+    }
   });
 
   it('returns a link preview if type is missing and title is present', () => {
@@ -110,7 +128,11 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getHeiseMock();
     delete mock.type;
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    if (link_preview) {
+      compare_article_with_mock(url, 0, link_preview, mock);
+    } else {
+      fail('No link preview generated');
+    }
   });
 
   it('returns a link preview even if there is no description', () => {
@@ -118,7 +140,11 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getHeiseMock();
     delete mock.description;
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    if (link_preview) {
+      compare_article_with_mock(url, 0, link_preview, mock);
+    } else {
+      fail('No link preview generated');
+    }
   });
 
   it('returns a regular link preview even if site name is Twitter', () => {
@@ -126,6 +152,10 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getHeiseMock();
     mock.site_name = 'Twitter';
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    if (link_preview) {
+      compare_article_with_mock(url, 0, link_preview, mock);
+    } else {
+      fail('No link preview generated');
+    }
   });
 });

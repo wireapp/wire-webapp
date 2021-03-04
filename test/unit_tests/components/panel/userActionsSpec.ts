@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {instantiateComponent} from '../../../helper/knockoutHelpers';
 
@@ -37,7 +38,7 @@ describe.skip('user-actions', () => {
           user.isMe = true;
 
           const conversation = new Conversation();
-          conversation.isGroup = () => true;
+          conversation.isGroup = ko.pureComputed(() => true);
           const conversationRoleRepository = {canLeaveGroup: () => true};
           return {
             conversation: () => conversation,
@@ -63,7 +64,7 @@ describe.skip('user-actions', () => {
         getParams: () => {
           const user = new User();
           const conversation = new Conversation();
-          conversation.isGroup = () => true;
+          conversation.isGroup = ko.pureComputed(() => true);
           user.connection().status(ConnectionStatus.ACCEPTED);
           return {conversation: () => conversation, isSelfActivated: true, user: () => user};
         },

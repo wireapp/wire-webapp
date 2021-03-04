@@ -31,7 +31,7 @@ import {FileAsset} from 'src/script/entity/message/FileAsset';
 
 describe('Member Message', () => {
   describe('generateNameString', () => {
-    let message_et = null;
+    let message_et: MemberMessage = null;
 
     beforeEach(() => {
       message_et = new MemberMessage();
@@ -42,7 +42,7 @@ describe('Member Message', () => {
       user_a.name('John');
       message_et.userEntities.push(user_a);
 
-      expect(message_et.generateNameString()).toBe('[bold]John[/bold]');
+      expect(message_et['generateNameString']()).toBe('[bold]John[/bold]');
     });
 
     it('can return correct string for two users', () => {
@@ -52,7 +52,7 @@ describe('Member Message', () => {
       user_b.name('Jim');
       message_et.userEntities.push(user_a, user_b);
 
-      expect(message_et.generateNameString()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
+      expect(message_et['generateNameString']()).toBe('[bold]Jim[/bold] and [bold]John[/bold]');
     });
 
     it('can return correct string for more than two users', () => {
@@ -64,7 +64,7 @@ describe('Member Message', () => {
       user_c.name('Jill');
       message_et.userEntities.push(user_a, user_b, user_c);
 
-      expect(message_et.generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
+      expect(message_et['generateNameString']()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
 
     it('can return correct string for more than one user without sender', () => {
@@ -80,12 +80,12 @@ describe('Member Message', () => {
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
 
-      expect(message_et.generateNameString()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
+      expect(message_et['generateNameString']()).toBe('[bold]Jill[/bold], [bold]Jim[/bold], and [bold]John[/bold]');
     });
   });
 
   describe('is_deletable', () => {
-    let message_et = null;
+    let message_et: ContentMessage = null;
 
     beforeEach(() => {
       message_et = new ContentMessage();
@@ -114,7 +114,7 @@ describe('Member Message', () => {
   });
 
   describe('has_asset_file', () => {
-    let message_et = null;
+    let message_et: ContentMessage = null;
 
     beforeEach(() => {
       message_et = new ContentMessage();

@@ -32,7 +32,7 @@ import {createRandomUuid} from 'Util/util';
 describe('message', () => {
   const testFactory = new TestFactory();
   const textValue = 'hello there';
-  let defaultParams;
+  let defaultParams: Record<string, any>;
 
   beforeEach(() => {
     return testFactory.exposeConversationActors().then(conversationRepository => {
@@ -79,12 +79,14 @@ describe('message', () => {
     spyOn(defaultParams, 'onLike');
     return instantiateComponent('message', defaultParams).then(domContainer => {
       expect(document.querySelector('.ctx-menu')).toBe(null);
-      domContainer.querySelector('.context-menu').click();
 
-      const menu = document.querySelector('.ctx-menu');
+      domContainer.querySelector<HTMLSpanElement>('.context-menu').click()
+
+      const menu: HTMLElement = document.querySelector('.ctx-menu');
 
       expect(menu).toBeDefined();
-      menu.querySelector(`[title=${t('conversationContextMenuLike')}]`).click();
+
+      menu.querySelector<HTMLElement>(`[title=${t('conversationContextMenuLike')}]`).click()
 
       expect(defaultParams.onLike).toHaveBeenCalled();
     });

@@ -22,8 +22,7 @@ import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 
 describe('ConnectionMapper', () => {
-  /** @type {ConnectionMapper} */
-  let connectionMapper = undefined;
+  let connectionMapper: ConnectionMapper = undefined;
 
   beforeAll(() => {
     connectionMapper = new ConnectionMapper();

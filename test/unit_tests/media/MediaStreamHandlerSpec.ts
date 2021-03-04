@@ -17,23 +17,23 @@
  *
  */
 
+import ko from 'knockout';
+
 import {MediaStreamHandler} from 'src/script/media/MediaStreamHandler';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
 import {MediaConstraintsHandler} from 'src/script/media/MediaConstraintsHandler';
+import {DeviceTypes} from 'src/script/media/MediaDevicesHandler';
 
 describe('MediaStreamHandler', () => {
-  let streamHandler;
+  let streamHandler: MediaStreamHandler;
 
   const availableDevices = {
-    audioInput: () => {},
-    audioOutput: () => {},
-    screenInput: () => {},
-    videoInput: () => {},
+    [DeviceTypes.AUDIO_INPUT]: ko.pureComputed(() => ''),
+    [DeviceTypes.AUDIO_OUTPUT]: ko.pureComputed(() => ''),
+    [DeviceTypes.SCREEN_INPUT]: ko.pureComputed(() => ''),
+    [DeviceTypes.VIDEO_INPUT]: ko.pureComputed(() => ''),
   };
-  const userState = {
-    self: () => ({id: ''}),
-  };
-  const mediaConstraintsHandler = new MediaConstraintsHandler(availableDevices, userState);
+  const mediaConstraintsHandler = new MediaConstraintsHandler(availableDevices);
 
   beforeEach(() => {
     streamHandler = new MediaStreamHandler(mediaConstraintsHandler, new PermissionRepository());

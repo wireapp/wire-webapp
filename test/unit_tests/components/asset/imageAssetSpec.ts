@@ -26,10 +26,11 @@ import 'src/script/components/asset/imageAsset';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 import {container} from 'tsyringe';
 import {AssetRepository} from 'src/script/assets/AssetRepository';
+import {createRandomUuid} from 'Util/util';
 
 describe('image-asset', () => {
   const defaultParams = {
-    asset: new MediumImage(),
+    asset: new MediumImage(createRandomUuid()),
     message: new ContentMessage(),
     onClick: () => {},
   };
@@ -41,16 +42,16 @@ describe('image-asset', () => {
   });
 
   it('displays a dummy image when resource is not loaded', () => {
-    const image = new MediumImage();
-    image.height = 10;
-    image.width = 100;
+    const image = new MediumImage(createRandomUuid());
+    image.height = "10px";
+    image.width = "100px";
     const params = {...defaultParams, asset: image};
     return instantiateComponent('image-asset', params).then(domContainer => {
       const img = domContainer.querySelector('img');
 
       expect(img.src).toContain('svg');
-      expect(img.src).toContain('10');
-      expect(img.src).toContain('100');
+      expect(img.src).toContain('10px');
+      expect(img.src).toContain('100px');
     });
   });
 
@@ -58,8 +59,8 @@ describe('image-asset', () => {
     const assetRepository = container.resolve(AssetRepository);
     spyOn(assetRepository, 'load').and.returnValue(Promise.resolve(new Blob()));
 
-    const image = new MediumImage();
-    image.resource(new AssetRemoteData());
+    const image = new MediumImage(createRandomUuid());
+    image.resource(new AssetRemoteData(createRandomUuid()));
     const params = {...defaultParams, asset: image};
 
     spyOn(window.URL, 'createObjectURL').and.returnValue('/image-url');

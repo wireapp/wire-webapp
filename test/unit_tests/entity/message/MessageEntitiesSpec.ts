@@ -17,6 +17,7 @@
  *
  */
 
+import {createRandomUuid} from 'Util/util';
 import {MediumImage} from 'src/script/entity/message/MediumImage';
 import {StatusType} from 'src/script/message/StatusType';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
@@ -24,7 +25,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {Text} from 'src/script/entity/message/Text';
 
 describe('Message Entities', () => {
-  let message_et = null;
+  let message_et: ContentMessage = null;
 
   describe('is_downloadable', () => {
     it('message with text asset should not be downloadable', () => {
@@ -36,7 +37,7 @@ describe('Message Entities', () => {
 
     it('message with image asset should be downloadable', () => {
       message_et = new ContentMessage();
-      message_et.assets.push(new MediumImage());
+      message_et.assets.push(new MediumImage(createRandomUuid()));
 
       expect(message_et.is_downloadable()).toBeTruthy();
     });
@@ -50,7 +51,7 @@ describe('Message Entities', () => {
 
     it('ephemeral message with image asset should be downloadable', () => {
       message_et = new ContentMessage();
-      message_et.assets.push(new MediumImage());
+      message_et.assets.push(new MediumImage(createRandomUuid()));
       message_et.ephemeral_expires(12312123);
 
       expect(message_et.is_downloadable()).toBeTruthy();
@@ -58,7 +59,7 @@ describe('Message Entities', () => {
 
     it('expired ephemeral message with image asset should not be downloadable', () => {
       message_et = new ContentMessage();
-      message_et.assets.push(new MediumImage());
+      message_et.assets.push(new MediumImage(createRandomUuid()));
       message_et.ephemeral_expires(true);
 
       expect(message_et.is_downloadable()).toBeFalsy();
@@ -82,7 +83,7 @@ describe('Message Entities', () => {
 
     describe('medium asset', () => {
       beforeEach(() => {
-        message_et.assets.push(new MediumImage());
+        message_et.assets.push(new MediumImage(createRandomUuid()));
       });
 
       it('has_asset_medium_image return true', () => {

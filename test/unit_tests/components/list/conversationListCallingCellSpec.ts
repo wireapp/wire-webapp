@@ -17,7 +17,8 @@
  *
  */
 
-import {STATE as CALL_STATE} from '@wireapp/avs';
+import ko from 'knockout';
+import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import {createRandomUuid} from 'Util/util';
 
 import {instantiateComponent} from '../../../helper/knockoutHelpers';
@@ -26,16 +27,17 @@ import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
 import 'src/script/components/list/conversationListCallingCell';
 import {User} from 'src/script/entity/User';
+import type {Grid} from 'src/script/calling/videoGridHandler';
 
-function createCall(state, selfUser = new User(createRandomUuid())) {
-  const selfParticipant = new Participant(selfUser);
-  const call = new Call('', '', undefined, selfParticipant);
+function createCall(state: CALL_STATE, selfUser = new User(createRandomUuid())): Call {
+  const selfParticipant = new Participant(selfUser, createRandomUuid());
+  const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL);
   call.state(state);
   return call;
 }
 
 describe('conversationListCallingCell', () => {
-  let defaultParams;
+  let defaultParams: Record<string, any>;
 
   beforeEach(() => {
     const mockedCallingRepository = {
@@ -48,14 +50,20 @@ describe('conversationListCallingCell', () => {
     const conversation = new Conversation();
     conversation.participating_user_ets([new User('id')]);
     defaultParams = {
-      call: new Call(),
+      call: new Call(
+        '',
+        '',
+        undefined,
+        new Participant(new User(createRandomUuid()), createRandomUuid()),
+        CALL_TYPE.NORMAL,
+      ),
       callActions: {},
       callingRepository: mockedCallingRepository,
       conversation: () => conversation,
       hasAccessToCamera: () => true,
       multitasking: {isMinimized: () => false},
       teamRepository: mockedTeamRepository,
-      videoGrid: () => ({grid: []}),
+      videoGrid: ko.pureComputed((): Partial<Grid> => ({grid: []})),
     };
   });
 

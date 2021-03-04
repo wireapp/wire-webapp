@@ -80,37 +80,57 @@ describe('getFirstLinkWithOffset', () => {
   });
 
   it('should return the correct link and offset for a single link without text)', () => {
-    const link_preview = getFirstLinkWithOffset('wire.com');
+    const firstLink = getFirstLinkWithOffset('wire.com');
 
-    expect(link_preview.offset).toEqual(0);
-    expect(link_preview.url).toEqual('wire.com');
+    if (firstLink) {
+      expect(firstLink.offset).toEqual(0);
+      expect(firstLink.url).toEqual('wire.com');
+    } else {
+      fail('No link found');
+    }
   });
 
   it('should return the correct link and offset for a single link with text in front)', () => {
-    const link_preview = getFirstLinkWithOffset('Hey check wire.com');
+    const firstLink = getFirstLinkWithOffset('Hey check wire.com');
 
-    expect(link_preview.offset).toEqual(10);
-    expect(link_preview.url).toEqual('wire.com');
+    if (firstLink) {
+      expect(firstLink.offset).toEqual(10);
+      expect(firstLink.url).toEqual('wire.com');
+    } else {
+      fail('No link found');
+    }
   });
 
   it('should return the correct link and offset for a single link surrounded by text)', () => {
-    const link_preview = getFirstLinkWithOffset('Hey check wire.com PLEASE!');
+    const firstLink = getFirstLinkWithOffset('Hey check wire.com PLEASE!');
 
-    expect(link_preview.offset).toEqual(10);
-    expect(link_preview.url).toEqual('wire.com');
+    if (firstLink) {
+      expect(firstLink.offset).toEqual(10);
+      expect(firstLink.url).toEqual('wire.com');
+    } else {
+      fail('No link found');
+    }
   });
 
   it('should return the correct link and offset for a single link surrounded by text)', () => {
-    const link_preview = getFirstLinkWithOffset('wire.com wire.com wire.com wire.com wire.com');
+    const firstLink = getFirstLinkWithOffset('wire.com wire.com wire.com wire.com wire.com');
 
-    expect(link_preview.offset).toEqual(0);
-    expect(link_preview.url).toEqual('wire.com');
+    if (firstLink) {
+      expect(firstLink.offset).toEqual(0);
+      expect(firstLink.url).toEqual('wire.com');
+    } else {
+      fail('No link found');
+    }
   });
 
   it('ignores mailto link', () => {
     const link_preview = getFirstLinkWithOffset('mailto:person@wire.com wire.com');
 
-    expect(link_preview.offset).toEqual(23);
-    expect(link_preview.url).toEqual('wire.com');
+    if (link_preview) {
+      expect(link_preview.offset).toEqual(23);
+      expect(link_preview.url).toEqual('wire.com');
+    } else {
+      fail('No link found');
+    }
   });
 });

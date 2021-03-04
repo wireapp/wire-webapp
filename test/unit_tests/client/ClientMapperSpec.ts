@@ -19,6 +19,7 @@
 
 import {ClientType} from '@wireapp/api-client/src/client/';
 import {ClientMapper} from 'src/script/client/ClientMapper';
+import {entities, payload} from '../../api/payloads';
 
 describe('ClientMapper', () => {
   describe('mapClient', () => {
@@ -126,44 +127,44 @@ describe('ClientMapper', () => {
       const initialClientEntity = ClientMapper.mapClient(entities.clients.john_doe.plain, true);
       const clientPayload = entities.clients.john_doe.permanent;
 
-      const {client: clientEntity, wasUpdated} = ClientMapper.updateClient(initialClientEntity, clientPayload);
+      const {wasUpdated} = ClientMapper.updateClient(initialClientEntity as any, clientPayload);
 
       expect(wasUpdated).toBe(true);
-      expect(clientEntity.address).toBe(clientPayload.address);
-      expect(clientEntity.class).toBe(clientPayload.class);
-      expect(clientEntity.cookie).toBe(clientPayload.cookie);
-      expect(clientEntity.id).toBe(clientPayload.id);
-      expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBe(false);
-      expect(clientEntity.model).toBe(clientPayload.model);
-      expect(clientEntity.time).toBe(clientPayload.time);
-      expect(clientEntity.type).toBe(ClientType.PERMANENT);
-      expect(clientEntity.isPermanent()).toBe(true);
-      expect(clientEntity.isTemporary()).toBe(false);
+      expect(initialClientEntity.address).toBe(clientPayload.address);
+      expect(initialClientEntity.class).toBe(clientPayload.class);
+      expect(initialClientEntity.cookie).toBe(clientPayload.cookie);
+      expect(initialClientEntity.id).toBe(clientPayload.id);
+      expect(initialClientEntity.label).toBe(clientPayload.label);
+      expect(initialClientEntity.location.lat).toBe(clientPayload.location.lat);
+      expect(initialClientEntity.location.lon).toBe(clientPayload.location.lon);
+      expect(initialClientEntity.meta.isVerified()).toBe(false);
+      expect(initialClientEntity.model).toBe(clientPayload.model);
+      expect(initialClientEntity.time).toBe(clientPayload.time);
+      expect(initialClientEntity.type).toBe(ClientType.PERMANENT);
+      expect(initialClientEntity.isPermanent()).toBe(true);
+      expect(initialClientEntity.isTemporary()).toBe(false);
     });
 
     it('does not change the client if there are no updates', () => {
       const clientPayload = entities.clients.john_doe.permanent;
       const initialClientEntity = ClientMapper.mapClient(clientPayload, true);
 
-      const {client: clientEntity, wasUpdated} = ClientMapper.updateClient(initialClientEntity, clientPayload);
+      const {wasUpdated} = ClientMapper.updateClient(initialClientEntity as any, clientPayload);
 
       expect(wasUpdated).toBe(false);
-      expect(clientEntity.address).toBe(clientPayload.address);
-      expect(clientEntity.class).toBe(clientPayload.class);
-      expect(clientEntity.cookie).toBe(clientPayload.cookie);
-      expect(clientEntity.id).toBe(clientPayload.id);
-      expect(clientEntity.label).toBe(clientPayload.label);
-      expect(clientEntity.location.lat).toBe(clientPayload.location.lat);
-      expect(clientEntity.location.lon).toBe(clientPayload.location.lon);
-      expect(clientEntity.meta.isVerified()).toBe(false);
-      expect(clientEntity.model).toBe(clientPayload.model);
-      expect(clientEntity.time).toBe(clientPayload.time);
-      expect(clientEntity.type).toBe(ClientType.PERMANENT);
-      expect(clientEntity.isPermanent()).toBe(true);
-      expect(clientEntity.isTemporary()).toBe(false);
+      expect(initialClientEntity.address).toBe(clientPayload.address);
+      expect(initialClientEntity.class).toBe(clientPayload.class);
+      expect(initialClientEntity.cookie).toBe(clientPayload.cookie);
+      expect(initialClientEntity.id).toBe(clientPayload.id);
+      expect(initialClientEntity.label).toBe(clientPayload.label);
+      expect(initialClientEntity.location.lat).toBe(clientPayload.location.lat);
+      expect(initialClientEntity.location.lon).toBe(clientPayload.location.lon);
+      expect(initialClientEntity.meta.isVerified()).toBe(false);
+      expect(initialClientEntity.model).toBe(clientPayload.model);
+      expect(initialClientEntity.time).toBe(clientPayload.time);
+      expect(initialClientEntity.type).toBe(ClientType.PERMANENT);
+      expect(initialClientEntity.isPermanent()).toBe(true);
+      expect(initialClientEntity.isTemporary()).toBe(false);
     });
   });
 });

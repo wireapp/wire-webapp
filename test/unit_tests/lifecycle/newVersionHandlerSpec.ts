@@ -47,7 +47,7 @@ describe('newVersionHandler', () => {
     it('warns the app if a new version is available', done => {
       jest.useFakeTimers();
       const testData = {
-        callback: currentVersion => {},
+        callback: () => {},
         currentVersion: '2019-03-04',
         response: {version: '2019-03-19'},
       };

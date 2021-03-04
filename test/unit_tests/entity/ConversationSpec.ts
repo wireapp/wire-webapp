@@ -18,10 +18,10 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 
 import 'src/script/localization/Localizer';
 import {createRandomUuid} from 'Util/util';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -41,12 +41,14 @@ import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {MentionEntity} from 'src/script/message/MentionEntity';
+import {entities} from '../../api/payloads';
+import {t} from 'Util/LocalizerUtil';
 
 describe('Conversation', () => {
-  let conversation_et = null;
-  let other_user = null;
+  let conversation_et: Conversation = null;
+  let other_user: User = null;
 
-  const self_user = new User(window.entities.user.john_doe.id);
+  const self_user = new User(entities.user.john_doe.id);
   self_user.isMe = true;
 
   const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
@@ -54,7 +56,7 @@ describe('Conversation', () => {
 
   beforeEach(() => {
     conversation_et = new Conversation();
-    other_user = new User(window.entities.user.jane_roe.id);
+    other_user = new User(entities.user.jane_roe.id);
   });
 
   describe('type checks', () => {
@@ -140,7 +142,7 @@ describe('Conversation', () => {
   });
 
   describe('add message', () => {
-    let initial_message_et = undefined;
+    let initial_message_et: Message = undefined;
 
     beforeEach(() => {
       initial_message_et = new Message(createRandomUuid());
@@ -161,7 +163,7 @@ describe('Conversation', () => {
       const newMessageEntity = new Message(createRandomUuid());
       newMessageEntity.id = initial_message_et.id;
 
-      conversation_et.add_message(newMessageEntity, true);
+      conversation_et.add_message(newMessageEntity);
 
       expect(conversation_et.messages().length).toBe(initialLength);
       expect(conversation_et.messages().some(message => message == newMessageEntity)).toBe(false);
@@ -210,7 +212,7 @@ describe('Conversation', () => {
       it('and adding a message should not update it if affect_order is false', () => {
         const message_et = new Message(createRandomUuid());
         message_et.timestamp(second_timestamp);
-        message_et.affect_order(false);
+        message_et['affect_order'](false);
 
         conversation_et.last_event_timestamp(first_timestamp);
         conversation_et.last_server_timestamp(second_timestamp);
@@ -287,7 +289,7 @@ describe('Conversation', () => {
 
     it('adds multiple messages', () => {
       const message_ets = [message1, message2];
-      conversation_et.add_messages(message_ets);
+      conversation_et.add_messages(message_ets as ContentMessage[]);
 
       expect(conversation_et.messages_unordered().length).toBe(2);
     });
@@ -341,7 +343,7 @@ describe('Conversation', () => {
   });
 
   describe('get_last_editable_message', () => {
-    let self_user_et = undefined;
+    let self_user_et: User = undefined;
 
     beforeEach(() => {
       self_user_et = new User();
@@ -450,7 +452,7 @@ describe('Conversation', () => {
       const reference_iso_date = new Date(referenceTimestamp).toISOString();
 
       expect(conversation_et.get_next_iso_date(referenceTimestamp)).toBe(reference_iso_date);
-      expect(new Date(conversation_et.get_next_iso_date('foo')).getTime()).toBeGreaterThan(
+      expect(new Date(conversation_et.get_next_iso_date(new Date().getTime())).getTime()).toBeGreaterThan(
         new Date(reference_iso_date).getTime(),
       );
 
@@ -459,13 +461,13 @@ describe('Conversation', () => {
       const expected_iso_date = new Date(last_server_timestamp + 1).toISOString();
 
       expect(conversation_et.get_next_iso_date(referenceTimestamp)).toEqual(expected_iso_date);
-      expect(conversation_et.get_next_iso_date('foo')).toEqual(expected_iso_date);
+      expect(conversation_et.get_next_iso_date(new Date().getTime())).toEqual(expected_iso_date);
     });
   });
 
   describe('display_name', () => {
     it('displays a name if the conversation is a 1:1 conversation or a connection request', () => {
-      other_user.name(window.entities.user.jane_roe.name);
+      other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
@@ -489,7 +491,7 @@ describe('Conversation', () => {
     it('displays a group conversation name with names from the participants', () => {
       const third_user = new User(createRandomUuid());
       third_user.name('Brad Delson');
-      other_user.name(window.entities.user.jane_roe.name);
+      other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.participating_user_ets.push(third_user);
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
@@ -503,7 +505,7 @@ describe('Conversation', () => {
     it('displays "Empty Conversation" if no other participants are in the conversation', () => {
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
-      expect(conversation_et.display_name()).toBe(z.string.conversationsEmptyConversation);
+      expect(conversation_et.display_name()).toBe(t('conversationsEmptyConversation'));
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
@@ -698,7 +700,7 @@ describe('Conversation', () => {
 
     it('returns visible unmerged pings', () => {
       const timestamp = Date.now();
-      conversation_et.id = createRandomUuid();
+      (conversation_et as any).id = createRandomUuid();
 
       const ping_message_1 = new PingMessage();
       ping_message_1.timestamp(timestamp - 4000);
@@ -757,7 +759,7 @@ describe('Conversation', () => {
   });
 
   describe('remove_message_by_id', () => {
-    let message_id = undefined;
+    let message_id: string = undefined;
 
     beforeEach(() => {
       const message_et = new Message(createRandomUuid());
@@ -815,7 +817,7 @@ describe('Conversation', () => {
 
     it('should remove all messages for invalid input timestamp', () => {
       expect(conversation_et.messages().length).toBe(2);
-      conversation_et.remove_messages('foo');
+      conversation_et.remove_messages(new Date().getTime());
 
       expect(conversation_et.messages().length).toBe(0);
     });
@@ -865,12 +867,12 @@ describe('Conversation', () => {
   });
 
   describe('shouldUnarchive', () => {
-    let timestamp = undefined;
-    let contentMessage = undefined;
-    let mutedTimestampMessage = undefined;
-    let outdatedMessage = undefined;
-    let pingMessage = undefined;
-    let selfMentionMessage = undefined;
+    let timestamp: number = undefined;
+    let contentMessage: ContentMessage = undefined;
+    let mutedTimestampMessage: PingMessage = undefined;
+    let outdatedMessage: PingMessage = undefined;
+    let pingMessage: PingMessage = undefined;
+    let selfMentionMessage: ContentMessage = undefined;
 
     const conversationEntity = new Conversation(createRandomUuid());
 
@@ -992,8 +994,7 @@ describe('Conversation', () => {
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      const callMessage = new CallMessage();
-      callMessage.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
+      const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED);
       callMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(callMessage);
 
@@ -1020,9 +1021,9 @@ describe('Conversation', () => {
 
   describe('_incrementTimeOnly', () => {
     it('should update only to newer timestamps', () => {
-      expect(conversation_et._incrementTimeOnly(first_timestamp, second_timestamp)).toBe(second_timestamp);
-      expect(conversation_et._incrementTimeOnly(second_timestamp, first_timestamp)).toBeFalsy();
-      expect(conversation_et._incrementTimeOnly(first_timestamp, first_timestamp)).toBeFalsy();
+      expect(conversation_et['_incrementTimeOnly'](first_timestamp, second_timestamp)).toBe(second_timestamp);
+      expect(conversation_et['_incrementTimeOnly'](second_timestamp, first_timestamp)).toBeFalsy();
+      expect(conversation_et['_incrementTimeOnly'](first_timestamp, first_timestamp)).toBeFalsy();
     });
   });
 
@@ -1045,9 +1046,9 @@ describe('Conversation', () => {
 
       // prettier-ignore
       /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
-      const payload_connection = {"status":"sent","conversation":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","to":`${connector_user_id}`,"from":"616cbbeb-1360-4e17-b333-e000662257bd","last_update":"2017-05-10T11:34:18.396Z","message":" "};
+      const payload_connection: any = {"status":"sent","conversation":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","to":`${connector_user_id}`,"from":"616cbbeb-1360-4e17-b333-e000662257bd","last_update":"2017-05-10T11:34:18.396Z","message":" "};
       // prettier-ignore
-      const payload_conversation = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
+      const payload_conversation: any = {"access":["private"],"creator":"616cbbeb-1360-4e17-b333-e000662257bd","members":{"self":{"hidden_ref":null,"status":0,"last_read":"1.800122000a73cb62","muted_time":null,"service":null,"otr_muted_ref":null,"muted":null,"status_time":"2017-05-10T11:34:18.376Z","hidden":false,"status_ref":"0.0","id":"616cbbeb-1360-4e17-b333-e000662257bd","otr_archived":false,"cleared":null,"otr_muted":false,"otr_archived_ref":null,"archived":null},"others":[]},"name":"Marco","id":"15a7f358-8eba-4b8e-bcf2-61a08eb53349","type":3,"last_event_time":"2017-05-10T11:34:18.376Z","last_event":"2.800122000a73cb63"};
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       const connectionMapper = new ConnectionMapper();
@@ -1073,13 +1074,13 @@ describe('Conversation', () => {
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      conversationEntity.mutedState('true');
+      conversationEntity.mutedState('true' as any);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      conversationEntity.mutedState(true);
+      conversationEntity.mutedState(true as any);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
-      conversationEntity.mutedState(false);
+      conversationEntity.mutedState(false as any);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);
@@ -1095,13 +1096,13 @@ describe('Conversation', () => {
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      conversationEntity.mutedState('true');
+      conversationEntity.mutedState('true' as any);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
-      conversationEntity.mutedState(true);
+      conversationEntity.mutedState(true as any);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
-      conversationEntity.mutedState(false);
+      conversationEntity.mutedState(false as any);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
       conversationEntity.mutedState(NOTIFICATION_STATES.NOTHING);

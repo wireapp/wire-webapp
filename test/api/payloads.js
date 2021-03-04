@@ -19,46 +19,90 @@
 
 /* eslint no-undef: "off", sort-keys-fix/sort-keys-fix: "off" */
 
-window.lorem_ipsum =
+export const lorem_ipsum =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
 
-window.entities = {
-  picture: [
-    {
-      content_length: 26466,
-      data: null,
-      content_type: 'image/jpeg',
-      id: '6cb67e89-d48a-50e2-88f1-1733fff5c119',
-      info: {
-        height: 280,
-        tag: 'smallProfile',
-        original_width: 1886,
-        width: 280,
-        name: null,
-        correlation_id: '0d095659-68b7-477e-a7d2-7cecd876617f',
-        original_height: 1333,
-        nonce: '0d095659-68b7-477e-a7d2-7cecd876617f',
-        public: true,
+const entityPicture = [
+  {
+    content_length: 26466,
+    data: null,
+    content_type: 'image/jpeg',
+    id: '6cb67e89-d48a-50e2-88f1-1733fff5c119',
+    info: {
+      height: 280,
+      tag: 'smallProfile',
+      original_width: 1886,
+      width: 280,
+      name: null,
+      correlation_id: '0d095659-68b7-477e-a7d2-7cecd876617f',
+      original_height: 1333,
+      nonce: '0d095659-68b7-477e-a7d2-7cecd876617f',
+      public: true,
+    },
+  },
+  {
+    content_length: 179848,
+    data: null,
+    content_type: 'image/jpeg',
+    id: '2ea9f416-28dc-5d86-9d34-a30863833c2a',
+    info: {
+      height: 1333,
+      tag: 'medium',
+      original_width: 1886,
+      width: 1886,
+      name: null,
+      correlation_id: '0d095659-68b7-477e-a7d2-7cecd876617f',
+      original_height: 1333,
+      nonce: '0d095659-68b7-477e-a7d2-7cecd876617f',
+      public: true,
+    },
+  },
+];
+
+export const entities = {
+  clients: {
+    john_doe: {
+      permanent: {
+        cookie: 'webapp@2153234453@permanent@1458071394172',
+        time: '2016-03-15T19:59:20.278Z',
+        location: {
+          lat: 52.5233,
+          lon: 13.4138,
+        },
+        address: '62.96.148.44',
+        model: 'Chrome',
+        id: '93fa36b916a91118',
+        type: 'permanent',
+        class: 'desktop',
+        label: 'Windows 10',
+      },
+      plain: {
+        class: 'desktop',
+        id: '93fa36b916a91118',
+      },
+      temporary: {
+        cookie: 'webapp@2153234453@temporary@1458070104403',
+        time: '2016-03-15T19:28:25.685Z',
+        location: {
+          lat: 52.5233,
+          lon: 13.4138,
+        },
+        address: '62.96.148.44',
+        model: 'Chrome (Temporary)',
+        id: '9d1b37cab836df45',
+        type: 'temporary',
+        class: 'desktop',
+        label: 'Windows 10',
       },
     },
-    {
-      content_length: 179848,
-      data: null,
-      content_type: 'image/jpeg',
-      id: '2ea9f416-28dc-5d86-9d34-a30863833c2a',
-      info: {
-        height: 1333,
-        tag: 'medium',
-        original_width: 1886,
-        width: 1886,
-        name: null,
-        correlation_id: '0d095659-68b7-477e-a7d2-7cecd876617f',
-        original_height: 1333,
-        nonce: '0d095659-68b7-477e-a7d2-7cecd876617f',
-        public: true,
+    jane_roe: {
+      plain: {
+        class: 'phone',
+        id: '2b22b7c59aab5f8',
       },
     },
-  ],
+  },
+  picture: entityPicture,
   connection: {
     status: 'accepted',
     conversation: '45c8f986-6c8f-465b-9ac9-bd5405e8c944',
@@ -107,73 +151,29 @@ window.entities = {
     last_event: '1.800122000a4b6e15',
     team: '537992e5-3782-4b6c-8718-a5db2cc786ee',
   },
-};
-
-entities.clients = {
-  john_doe: {
-    permanent: {
-      cookie: 'webapp@2153234453@permanent@1458071394172',
-      time: '2016-03-15T19:59:20.278Z',
-      location: {
-        lat: 52.5233,
-        lon: 13.4138,
-      },
-      address: '62.96.148.44',
-      model: 'Chrome',
-      id: '93fa36b916a91118',
-      type: 'permanent',
-      class: 'desktop',
-      label: 'Windows 10',
+  user: {
+    john_doe: {
+      email: 'jd@wire.com',
+      phone: '+49177123456',
+      accent_id: 3,
+      picture: entityPicture,
+      name: 'John Doe',
+      id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+      locale: 'en',
     },
-    plain: {
-      class: 'desktop',
-      id: '93fa36b916a91118',
-    },
-    temporary: {
-      cookie: 'webapp@2153234453@temporary@1458070104403',
-      time: '2016-03-15T19:28:25.685Z',
-      location: {
-        lat: 52.5233,
-        lon: 13.4138,
-      },
-      address: '62.96.148.44',
-      model: 'Chrome (Temporary)',
-      id: '9d1b37cab836df45',
-      type: 'temporary',
-      class: 'desktop',
-      label: 'Windows 10',
-    },
-  },
-  jane_roe: {
-    plain: {
-      class: 'phone',
-      id: '2b22b7c59aab5f8',
+    jane_roe: {
+      email: 'jr@wire.com',
+      phone: null,
+      accent_id: 1,
+      picture: entityPicture,
+      name: 'Jane Roe',
+      handle: 'jaro',
+      id: '7025598b-ffac-4993-8a81-af3f35b7147f',
     },
   },
 };
 
-entities.user = {
-  john_doe: {
-    email: 'jd@wire.com',
-    phone: '+49177123456',
-    accent_id: 3,
-    picture: entities.picture,
-    name: 'John Doe',
-    id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
-    locale: 'en',
-  },
-  jane_roe: {
-    email: 'jr@wire.com',
-    phone: null,
-    accent_id: 1,
-    picture: entities.picture,
-    name: 'Jane Roe',
-    handle: 'jaro',
-    id: '7025598b-ffac-4993-8a81-af3f35b7147f',
-  },
-};
-
-window.payload = {
+export const payload = {
   clients: {
     get: {
       one: entities.clients.john_doe.permanent,
@@ -289,3 +289,7 @@ window.payload = {
     },
   },
 };
+
+window.lorem_ipsum = lorem_ipsum;
+window.entities = entities;
+window.payload = payload;

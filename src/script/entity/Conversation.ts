@@ -109,7 +109,7 @@ export class Conversation {
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
   public readonly isClearable: ko.PureComputed<boolean>;
   public readonly isCreatedBySelf: ko.PureComputed<boolean>;
-  public readonly isGroup: ko.PureComputed<boolean>;
+  public isGroup: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isGuestRoom: ko.PureComputed<boolean>;
   public readonly isLeavable: ko.PureComputed<boolean>;

@@ -17,8 +17,11 @@
  *
  */
 
+import sinon from 'sinon';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection';
+import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {createRandomUuid} from 'Util/util';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
@@ -26,10 +29,12 @@ import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {TestFactory} from '../../helper/TestFactory';
 import {ConnectionRepository} from 'src/script/connection/ConnectionRepository';
 import {ConnectionState} from 'src/script/connection/ConnectionState';
+import {ConnectionService} from 'src/script/connection/ConnectionService';
+import {UserRepository} from 'src/script/user/UserRepository';
 
 describe('ConnectionRepository', () => {
-  let server = undefined;
-  let connectionRepository = undefined;
+  let server: sinon.SinonFakeServer = undefined;
+  let connectionRepository: ConnectionRepository = undefined;
   const testFactory = new TestFactory();
 
   beforeAll(() => testFactory.exposeConnectionActors());
@@ -41,28 +46,28 @@ describe('ConnectionRepository', () => {
   });
 
   afterEach(() => {
-    connectionRepository.connectionState.connectionEntities({});
+    connectionRepository['connectionState'].connectionEntities({});
     server.restore();
   });
 
   describe('cancelRequest', () => {
-    let userEntity = undefined;
+    let userEntity: User = undefined;
 
     beforeEach(() => {
       const userId = createRandomUuid();
-      const connectionEntity = new ConnectionEntity(createRandomUuid());
+      const connectionEntity = new ConnectionEntity();
       connectionEntity.userId = userId;
 
       userEntity = new User(userId);
       userEntity.connection(connectionEntity);
 
       connectionRepository.addConnectionEntity(connectionEntity);
-      spyOn(connectionRepository, 'updateStatus').and.returnValue(Promise.resolve());
+      spyOn<any>(connectionRepository, 'updateStatus').and.returnValue(Promise.resolve());
     });
 
     it('sets the connection status to cancelled', () => {
-      return connectionRepository.cancelRequest(userEntity).then(() => {
-        expect(connectionRepository.updateStatus).toHaveBeenCalled();
+      return connectionRepository.cancelRequest(userEntity, false, new Conversation()).then(() => {
+        expect(connectionRepository['updateStatus']).toHaveBeenCalled();
       });
     });
 
@@ -70,16 +75,16 @@ describe('ConnectionRepository', () => {
       const amplifySpy = jasmine.createSpy('conversation_show');
       amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
-      return connectionRepository.cancelRequest(userEntity, new Conversation()).then(() => {
-        expect(connectionRepository.updateStatus).toHaveBeenCalled();
+      return connectionRepository.cancelRequest(userEntity, true, new Conversation()).then(() => {
+        expect(connectionRepository['updateStatus']).toHaveBeenCalled();
         expect(amplifySpy).toHaveBeenCalled();
       });
     });
   });
 
   describe('getConnectionByConversationId', () => {
-    let firstConnectionEntity = null;
-    let secondConnectionEntity = null;
+    let firstConnectionEntity: ConnectionEntity = null;
+    let secondConnectionEntity: ConnectionEntity = null;
 
     beforeEach(() => {
       firstConnectionEntity = new ConnectionEntity();
@@ -114,19 +119,23 @@ describe('ConnectionRepository', () => {
         to: '7025598b-ffac-4993-8a81-af3f35b7147f',
       };
 
-      const connectionServiceSpy = {
+      const connectionServiceSpy: Partial<ConnectionService> = {
         getConnections: jest.fn().mockImplementation(() => {
           // Return request and duplicate
           return Promise.resolve([connectionRequest, connectionRequest]);
         }),
       };
 
-      const userRepoSpy = {
+      const userRepoSpy: Partial<UserRepository> = {
         updateUsersFromConnections: jest.fn(),
       };
 
       const connectionState = new ConnectionState();
-      const connectionRepo = new ConnectionRepository(connectionServiceSpy, userRepoSpy, connectionState);
+      const connectionRepo = new ConnectionRepository(
+        connectionServiceSpy as ConnectionService,
+        userRepoSpy as UserRepository,
+        connectionState,
+      );
 
       await connectionRepo.getConnections();
 

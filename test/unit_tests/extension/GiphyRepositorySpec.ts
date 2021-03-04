@@ -19,6 +19,7 @@
 
 import {container} from 'tsyringe';
 import {StatusCodes as HTTP_STATUS, ReasonPhrases as HTTP_MESSAGE} from 'http-status-codes';
+import sinon from 'sinon';
 
 import {GiphyRepository} from 'src/script/extension/GiphyRepository';
 import {GiphyService} from 'src/script/extension/GiphyService';
@@ -28,10 +29,10 @@ import {Config} from 'src/script/Config';
 jest.deepUnmock('axios');
 
 describe('Giphy Repository', () => {
-  let server = null;
+  let server: sinon.SinonFakeServer = null;
 
-  let giphyRepository = null;
-  let giphyService = null;
+  let giphyRepository: GiphyRepository = null;
+  let giphyService: GiphyService = null;
 
   beforeEach(() => {
     server = sinon.fakeServer.create();

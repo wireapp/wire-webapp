@@ -50,7 +50,7 @@ export class AssetRemoteData {
   public readonly sha256?: Uint8Array;
   public readonly urlData?: AssetUrlData;
 
-  constructor(identifier: string, urlData: AssetUrlData, otrKey?: Uint8Array, sha256Checksum?: Uint8Array) {
+  constructor(identifier: string, urlData?: AssetUrlData, otrKey?: Uint8Array, sha256Checksum?: Uint8Array) {
     this.identifier = identifier;
     this.otrKey = otrKey;
     this.sha256 = sha256Checksum;

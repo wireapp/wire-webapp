@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType, Location} from '@wireapp/api-client/src/client/';
 import ko from 'knockout';
 
 import {zeroPadding} from 'Util/util';
@@ -36,7 +36,7 @@ export class ClientEntity {
   id: string;
   isSelfClient: boolean;
   label?: string;
-  location?: object;
+  location?: Partial<Location>;
   meta: {
     isVerified?: ko.Observable<boolean>;
     primaryKey?: string;

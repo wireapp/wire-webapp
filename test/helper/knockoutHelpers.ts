@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-export function instantiateComponent(componentName: string, params = {}) {
+export function instantiateComponent(componentName: string, params: Record<string, any> = {}) {
   const paramsStr = `{${Object.keys(params).join(',')}}`;
   const html = `<div data-bind="component: {name: '${componentName}', params: ${paramsStr}}"></div>`;
   return bindHtml(html, params);

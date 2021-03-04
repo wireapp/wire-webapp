@@ -34,12 +34,12 @@ describe('copy-to-clipboard', () => {
 
   it('selects the whole text when clicked', () => {
     const selectionMock = window.getSelection();
-    spyOn(selectionMock, 'removeAllRanges').and.returnValue();
-    spyOn(selectionMock, 'addRange').and.returnValue();
+    spyOn(selectionMock, 'removeAllRanges').and.returnValue(undefined);
+    spyOn(selectionMock, 'addRange').and.returnValue(undefined);
     spyOn(window, 'getSelection').and.returnValue(selectionMock);
 
     return instantiateComponent('copy-to-clipboard', params).then(domContainer => {
-      const element = domContainer.querySelector('.copy-to-clipboard');
+      const element: HTMLDivElement = domContainer.querySelector('.copy-to-clipboard');
 
       element.click();
 
