@@ -115,7 +115,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -126,7 +126,7 @@ export const EventBuilder = {
       data,
       from: conversationEntity.selfUser().id,
       status: StatusType.SENDING,
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.ASSET_ADD,
     };
   },
@@ -160,7 +160,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -194,7 +194,7 @@ export const EventBuilder = {
       },
       from: user.id,
       id,
-      time: conversation.get_next_iso_date(),
+      time: conversation.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED,
     };
   },
@@ -268,7 +268,7 @@ export const EventBuilder = {
     timestamp?: number,
   ): MemberJoinEvent {
     if (!timestamp) {
-      timestamp = conversationEntity.get_last_known_timestamp() + 1;
+      timestamp = conversationEntity.getLastKnownTimestamp() + 1;
     }
     const isoDate = new Date(timestamp).toISOString();
 
@@ -295,7 +295,7 @@ export const EventBuilder = {
         user_ids: [userId],
       },
       from: removedBySelfUser ? conversationEntity.selfUser().id : userId,
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: CONVERSATION_EVENT.MEMBER_LEAVE,
     };
   },
@@ -308,7 +308,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       status: StatusType.SENDING,
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
   },
@@ -318,7 +318,7 @@ export const EventBuilder = {
       conversation: conversationEntity.id,
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MISSED_MESSAGES,
     };
   },

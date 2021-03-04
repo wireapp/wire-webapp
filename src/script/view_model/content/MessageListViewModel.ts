@@ -143,7 +143,7 @@ export class MessageListViewModel {
     this.messagesContainer = messagesContainer;
   };
 
-  readonly release_conversation = (conversation_et: Conversation): void => {
+  readonly releaseConversation = (conversation_et: Conversation): void => {
     if (conversation_et) {
       conversation_et.release();
     }
@@ -182,7 +182,7 @@ export class MessageListViewModel {
     // Clean up old conversation
     this.conversationLoaded(false);
     if (this.conversation()) {
-      this.release_conversation(this.conversation());
+      this.releaseConversation(this.conversation());
     }
 
     // Update new conversation
@@ -349,7 +349,7 @@ export class MessageListViewModel {
     if (!messageIsLoaded) {
       const conversationEntity = this.conversation();
       const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
-      conversationEntity.remove_messages();
+      conversationEntity.removeMessages();
       this.conversationRepository.getMessagesWithOffset(conversationEntity, messageEntity);
     }
   };
@@ -388,20 +388,20 @@ export class MessageListViewModel {
 
     messageEntity.is_resetting_session(true);
     try {
-      await this.messageRepository.reset_session(messageEntity.from, messageEntity.client_id, this.conversation().id);
+      await this.messageRepository.resetSession(messageEntity.from, messageEntity.client_id, this.conversation().id);
       resetProgress();
     } catch (error) {
-      this.logger.warn('Error while trying to reset_session', error);
+      this.logger.warn('Error while trying to reset session', error);
       resetProgress();
     }
   };
 
-  show_detail = async (messageEntity: Message, event: MouseEvent): Promise<void> => {
-    if (messageEntity.is_expired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
+  showDetail = async (messageEntity: Message, event: MouseEvent): Promise<void> => {
+    if (messageEntity.isExpired() || $(event.currentTarget).hasClass('image-asset--no-image')) {
       return;
     }
 
-    const items: Message[] = await this.conversationRepository.get_events_for_category(
+    const items: Message[] = await this.conversationRepository.getEventsForCategory(
       this.conversation(),
       MessageCategory.IMAGE,
     );
@@ -413,9 +413,9 @@ export class MessageListViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, imageMessageEntity || messageEntity, messageEntities);
   };
 
-  readonly get_timestamp_class = (messageEntity: ContentMessage): string => {
-    const previousMessage = this.conversation().get_previous_message(messageEntity);
-    if (!previousMessage || messageEntity.is_call()) {
+  readonly getTimestampClass = (messageEntity: ContentMessage): string => {
+    const previousMessage = this.conversation().getPreviousMessage(messageEntity);
+    if (!previousMessage || messageEntity.isCall()) {
       return '';
     }
 
@@ -443,16 +443,16 @@ export class MessageListViewModel {
 
   readonly shouldHideUserAvatar = (messageEntity: ContentMessage): boolean => {
     // @todo avoid double check
-    if (this.get_timestamp_class(messageEntity)) {
+    if (this.getTimestampClass(messageEntity)) {
       return false;
     }
 
-    if (messageEntity.is_content() && messageEntity.replacing_message_id) {
+    if (messageEntity.isContent() && messageEntity.replacing_message_id) {
       return false;
     }
 
-    const last_message = this.conversation().get_previous_message(messageEntity);
-    return last_message && last_message.is_content() && last_message.user().id === messageEntity.user().id;
+    const last_message = this.conversation().getPreviousMessage(messageEntity);
+    return last_message && last_message.isContent() && last_message.user().id === messageEntity.user().id;
   };
 
   readonly isLastDeliveredMessage = (messageEntity: Message): boolean => {
@@ -461,12 +461,12 @@ export class MessageListViewModel {
 
   readonly clickOnCancelRequest = (messageEntity: MemberMessage): void => {
     const conversationEntity = this.conversationState.activeConversation();
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
+    const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
     this.actionsViewModel.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
   };
 
   readonly clickOnLike = (messageEntity: ContentMessage): void => {
-    this.messageRepository.toggle_like(this.conversation(), messageEntity);
+    this.messageRepository.toggleLike(this.conversation(), messageEntity);
   };
 
   readonly clickOnInvitePeople = (): void => {
@@ -480,7 +480,7 @@ export class MessageListViewModel {
     const messageTimestamp = messageEntity.timestamp();
     const callbacks: Function[] = [];
 
-    if (!messageEntity.is_ephemeral()) {
+    if (!messageEntity.isEphemeral()) {
       const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
       if (conversationEntity.is1to1() && isCreationMessage) {
         this.integrationRepository.addProviderNameToParticipant((messageEntity as MemberMessage).otherUser());
@@ -502,7 +502,7 @@ export class MessageListViewModel {
       }
     };
 
-    if (messageEntity.is_ephemeral()) {
+    if (messageEntity.isEphemeral()) {
       callbacks.push(startTimer);
     }
 
@@ -542,7 +542,7 @@ export class MessageListViewModel {
 
   readonly updateConversationLastRead = (conversationEntity: Conversation, messageEntity: Message): void => {
     const conversationLastRead = conversationEntity.last_read_timestamp();
-    const lastKnownTimestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
+    const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
     if (needsUpdate && this.isLastReceivedMessage(messageEntity, conversationEntity)) {
       conversationEntity.setTimestamp(lastKnownTimestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);

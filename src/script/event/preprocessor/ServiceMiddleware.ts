@@ -65,7 +65,7 @@ export class ServiceMiddleware {
 
     const userIds = containsSelfUser
       ? await this.conversationRepository
-          .get_conversation_by_id(conversationId)
+          .getConversationById(conversationId)
           .then(conversationEntity => conversationEntity.participating_user_ids())
       : eventData.user_ids;
 

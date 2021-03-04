@@ -63,7 +63,7 @@ describe('Event Mapper', () => {
       };
 
       return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
-        expect(messageEntity.get_first_asset().text).toBe(event.data.content);
+        expect(messageEntity.getFirstAsset().text).toBe(event.data.content);
         expect(messageEntity).toBeDefined();
       });
     });
@@ -99,9 +99,9 @@ describe('Event Mapper', () => {
 
       const messageEntity = await event_mapper.mapJsonEvent(event, conversation_et);
 
-      expect(messageEntity.get_first_asset().text).toBe(event.data.content);
-      expect(messageEntity.get_first_asset().previews().length).toBe(1);
-      expect(messageEntity.get_first_asset().previews()[0].url).toBe('test.com');
+      expect(messageEntity.getFirstAsset().text).toBe(event.data.content);
+      expect(messageEntity.getFirstAsset().previews().length).toBe(1);
+      expect(messageEntity.getFirstAsset().previews()[0].url).toBe('test.com');
       expect(messageEntity).toBeDefined();
     });
 
@@ -134,9 +134,9 @@ describe('Event Mapper', () => {
 
       const messageEntity = await event_mapper.mapJsonEvent(event, conversation_et);
 
-      expect(messageEntity.get_first_asset().text).toBe(event.data.content);
-      expect(messageEntity.get_first_asset().previews().length).toBe(1);
-      expect(messageEntity.get_first_asset().previews()[0].url).toBe(link_preview.url);
+      expect(messageEntity.getFirstAsset().text).toBe(event.data.content);
+      expect(messageEntity.getFirstAsset().previews().length).toBe(1);
+      expect(messageEntity.getFirstAsset().previews()[0].url).toBe(link_preview.url);
       expect(messageEntity).toBeDefined();
     });
 
@@ -147,13 +147,13 @@ describe('Event Mapper', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
-        expect(messageEntity.get_first_asset().width).toBe(event.data.info.width);
-        expect(messageEntity.get_first_asset().height).toBe(event.data.info.height);
-        expect(messageEntity.get_first_asset().file_size).toBe(event.data.content_length);
-        expect(messageEntity.get_first_asset().file_type).toBe(event.data.content_type);
-        expect(messageEntity.get_first_asset().type).toBe(AssetType.IMAGE);
-        expect(messageEntity.get_first_asset().resource().otrKey).toBe(event.data.otr_key);
-        expect(messageEntity.get_first_asset().resource().sha256).toBe(event.data.sha256);
+        expect(messageEntity.getFirstAsset().width).toBe(event.data.info.width);
+        expect(messageEntity.getFirstAsset().height).toBe(event.data.info.height);
+        expect(messageEntity.getFirstAsset().file_size).toBe(event.data.content_length);
+        expect(messageEntity.getFirstAsset().file_type).toBe(event.data.content_type);
+        expect(messageEntity.getFirstAsset().type).toBe(AssetType.IMAGE);
+        expect(messageEntity.getFirstAsset().resource().otrKey).toBe(event.data.otr_key);
+        expect(messageEntity.getFirstAsset().resource().sha256).toBe(event.data.sha256);
         expect(messageEntity).toBeDefined();
       });
     });
@@ -202,7 +202,7 @@ describe('Event Mapper', () => {
       };
 
       const messageEntity = await event_mapper.mapJsonEvent(event, conversationEntity);
-      const mentions = messageEntity.get_first_asset().mentions();
+      const mentions = messageEntity.getFirstAsset().mentions();
 
       expect(mentions.length).toBe(1);
     });
@@ -245,7 +245,7 @@ describe('Event Mapper', () => {
       };
 
       const messageEntity = await event_mapper.mapJsonEvent(event, conversationEntity);
-      const mentions = messageEntity.get_first_asset().mentions();
+      const mentions = messageEntity.getFirstAsset().mentions();
 
       expect(mentions.length).toBe(2);
     });

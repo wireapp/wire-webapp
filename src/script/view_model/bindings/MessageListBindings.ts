@@ -214,7 +214,7 @@ ko.bindingHandlers.relative_timestamp = (function () {
   };
 
   // should be fine to update every minute
-  window.setInterval(() => timestamps.map(timestamp_func => timestamp_func()), TIME_IN_MILLIS.MINUTE);
+  window.setInterval(() => timestamps.map(timestampFunc => timestampFunc()), TIME_IN_MILLIS.MINUTE);
 
   const calculate = function (element: HTMLElement, timestamp: number | string, isDay?: boolean) {
     const parsedTimestamp = window.parseInt(timestamp.toString());
@@ -224,15 +224,15 @@ ko.bindingHandlers.relative_timestamp = (function () {
 
   return {
     init(element: HTMLElement, valueAccessor: ko.Observable<number>, allBindings: ko.AllBindings) {
-      const timestamp_func = function () {
+      const timestampFunc = function () {
         calculate(element, valueAccessor(), allBindings.get('relative_timestamp_day'));
       };
 
-      timestamp_func();
-      timestamps.push(timestamp_func);
+      timestampFunc();
+      timestamps.push(timestampFunc);
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-        const timestamp_index = timestamps.indexOf(timestamp_func);
+        const timestamp_index = timestamps.indexOf(timestampFunc);
         timestamps.splice(timestamp_index, 1);
       });
     },

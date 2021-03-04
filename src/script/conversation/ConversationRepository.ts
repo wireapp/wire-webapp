@@ -96,13 +96,13 @@ import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
-type FetchPromise = {reject_fn: (error: ConversationError) => void; resolve_fn: (conversation: Conversation) => void};
+type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
 type EventJson = any;
 type EntityObject = {conversationEntity: Conversation; messageEntity: ContentMessage};
 
 export class ConversationRepository {
   private init_handled: number;
-  private init_promise?: {reject_fn: (reason?: any) => void; resolve_fn: (value?: unknown) => void};
+  private init_promise?: {rejectFn: (reason?: any) => void; resolveFn: (value?: unknown) => void};
   private init_total: number;
   private isBlockingNotificationHandling: boolean;
   private readonly conversationMapper: ConversationMapper;
@@ -221,7 +221,7 @@ export class ConversationRepository {
     amplify.subscribe(WebAppEvents.CONVERSATION.DELETE, this.deleteConversationLocally);
     amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent);
     amplify.subscribe(WebAppEvents.CONVERSATION.MAP_CONNECTION, this.mapConnection);
-    amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, this.on_missed_events);
+    amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, this.onMissedEvents);
     amplify.subscribe(WebAppEvents.CONVERSATION.PERSIST_STATE, this.saveConversationStateInDb);
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
     amplify.subscribe(WebAppEvents.TEAM.MEMBER_LEAVE, this.teamMemberLeave);
@@ -251,21 +251,21 @@ export class ConversationRepository {
   private readonly deleteLocalMessageEntity = ({oldObj: deletedEvent}: ConversationDBChange): void => {
     const conversationEntity = this.conversationState.findConversation(deletedEvent.conversation);
     if (conversationEntity) {
-      conversationEntity.remove_message_by_id(deletedEvent.id);
+      conversationEntity.removeMessageById(deletedEvent.id);
     }
   };
 
   /**
    * Remove obsolete conversations locally.
    */
-  cleanup_conversations(): void {
+  cleanupConversations(): void {
     this.conversationState.conversations().forEach(conversationEntity => {
       if (
         conversationEntity.isGroup() &&
         conversationEntity.is_cleared() &&
         conversationEntity.removed_from_conversation()
       ) {
-        this.conversation_service.delete_conversation_from_db(conversationEntity.id);
+        this.conversation_service.deleteConversationFromDb(conversationEntity.id);
         this.deleteConversationFromRepository(conversationEntity.id);
       }
     });
@@ -359,19 +359,19 @@ export class ConversationRepository {
     const fetching_conversations: Record<string, FetchPromise[]> = {};
     if (fetching_conversations.hasOwnProperty(conversationId)) {
       return new Promise((resolve, reject) => {
-        fetching_conversations[conversationId].push({reject_fn: reject, resolve_fn: resolve});
+        fetching_conversations[conversationId].push({rejectFn: reject, resolveFn: resolve});
       });
     }
 
     fetching_conversations[conversationId] = [];
     try {
-      const response = await this.conversation_service.get_conversation_by_id(conversationId);
+      const response = await this.conversation_service.getConversationById(conversationId);
       const conversationEntity = this.mapConversations(response) as Conversation;
 
       this.logger.info(`Fetched conversation '${conversationId}' from backend`);
       this.saveConversation(conversationEntity);
 
-      fetching_conversations[conversationId].forEach(({resolve_fn}) => resolve_fn(conversationEntity));
+      fetching_conversations[conversationId].forEach(({resolveFn}) => resolveFn(conversationEntity));
       delete fetching_conversations[conversationId];
 
       return conversationEntity;
@@ -384,7 +384,7 @@ export class ConversationRepository {
         ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
         originalError,
       );
-      fetching_conversations[conversationId].forEach(({reject_fn}) => reject_fn(error));
+      fetching_conversations[conversationId].forEach(({rejectFn}) => rejectFn(error));
       delete fetching_conversations[conversationId];
 
       throw error;
@@ -398,7 +398,7 @@ export class ConversationRepository {
     });
 
     const [localConversations, remoteConversations] = await Promise.all([
-      this.conversation_service.load_conversation_states_from_db<ConversationDatabaseData>(),
+      this.conversation_service.loadConversationStatesFromDb<ConversationDatabaseData>(),
       remoteConversationsPromise,
     ]);
     let conversationsData: any[];
@@ -406,7 +406,7 @@ export class ConversationRepository {
       conversationsData = localConversations;
     } else {
       const data = this.conversationMapper.mergeConversation(localConversations, remoteConversations);
-      conversationsData = (await this.conversation_service.save_conversations_in_db(data)) as any[];
+      conversationsData = (await this.conversation_service.saveConversationsInDb(data)) as any[];
     }
     const conversationEntities = this.mapConversations(conversationsData) as Conversation[];
     this.saveConversations(conversationEntities);
@@ -436,7 +436,7 @@ export class ConversationRepository {
     }
     conversationEntities = conversationEntities.concat(handledConversationEntities);
     const handledConversationData = conversationEntities.map(conversationEntity => conversationEntity.serialize());
-    this.conversation_service.save_conversations_in_db(handledConversationData);
+    this.conversation_service.saveConversationsInDb(handledConversationData);
     return conversationEntities;
   }
 
@@ -451,7 +451,7 @@ export class ConversationRepository {
     const firstMessageEntity = conversationEntity.getFirstMessage();
     const upperBound = firstMessageEntity
       ? new Date(firstMessageEntity.timestamp())
-      : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
+      : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     const events = (await this.eventService.loadPrecedingEvents(
       conversationEntity.id,
@@ -577,7 +577,7 @@ export class ConversationRepository {
   /**
    * Get messages for given category. Category param acts as lower bound.
    */
-  async get_events_for_category(conversationEntity: Conversation, category = MessageCategory.NONE): Promise<Message[]> {
+  async getEventsForCategory(conversationEntity: Conversation, category = MessageCategory.NONE): Promise<Message[]> {
     const events = (await this.eventService.loadEventsWithCategory(conversationEntity.id, category)) as EventRecord[];
     const messageEntities = (await this.event_mapper.mapJsonEvents(events, conversationEntity)) as Message[];
     return this.updateMessagesUserEntities(messageEntities);
@@ -594,7 +594,7 @@ export class ConversationRepository {
       return Promise.resolve({});
     }
 
-    const events = await this.conversation_service.search_in_conversation(conversationEntity.id, query);
+    const events = await this.conversation_service.searchInConversation(conversationEntity.id, query);
     const mappedMessages = await this.event_mapper.mapJsonEvents(events, conversationEntity);
     const messageEntities = await this.updateMessagesUserEntities(mappedMessages);
     return {messageEntities, query};
@@ -610,7 +610,7 @@ export class ConversationRepository {
     const lower_bound = new Date(conversationEntity.last_read_timestamp());
     const upper_bound = first_message
       ? new Date(first_message.timestamp())
-      : new Date(conversationEntity.get_latest_timestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
+      : new Date(conversationEntity.getLatestTimestamp(this.serverTimeHandler.toServerTimestamp()) + 1);
 
     if (lower_bound < upper_bound) {
       conversationEntity.is_pending(true);
@@ -668,7 +668,7 @@ export class ConversationRepository {
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
-    const conversationData = await this.conversation_service.get_conversation_by_id(conversationEntity.id);
+    const conversationData = await this.conversation_service.getConversationById(conversationEntity.id);
     const {name, message_timer} = conversationData;
     this.conversationMapper.updateProperties(conversationEntity, {name} as any);
     this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
@@ -722,7 +722,7 @@ export class ConversationRepository {
       return;
     }
     if (this.conversationState.isActiveConversation(conversationEntity)) {
-      const nextConversation = this.get_next_conversation(conversationEntity);
+      const nextConversation = this.getNextConversation(conversationEntity);
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation);
     }
     if (!skipNotification) {
@@ -734,11 +734,11 @@ export class ConversationRepository {
       this.conversationLabelRepository.saveLabels();
     }
     this.deleteConversationFromRepository(conversationId);
-    this.conversation_service.delete_conversation_from_db(conversationId);
+    this.conversation_service.deleteConversationFromDb(conversationId);
   };
 
   public async getAllUsersInConversation(conversation_id: string): Promise<User[]> {
-    const conversationEntity = await this.get_conversation_by_id(conversation_id);
+    const conversationEntity = await this.getConversationById(conversation_id);
     const users = [this.userState.self()].concat(conversationEntity.participating_user_ets());
     return users;
   }
@@ -746,7 +746,7 @@ export class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    */
-  get_conversation_by_id(conversation_id: string): Promise<Conversation> {
+  getConversationById(conversation_id: string): Promise<Conversation> {
     if (typeof conversation_id !== 'string') {
       return Promise.reject(
         new ConversationError(ConversationError.TYPE.NO_CONVERSATION_ID, ConversationError.MESSAGE.NO_CONVERSATION_ID),
@@ -825,7 +825,7 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to start from
    * @returns Next conversation
    */
-  get_next_conversation(conversationEntity: Conversation) {
+  getNextConversation(conversationEntity: Conversation) {
     return getNextItem(this.conversationState.conversations_unarchived(), conversationEntity);
   }
 
@@ -845,8 +845,8 @@ export class ConversationRepository {
    * Returns a list of sorted conversation ids based on the number of messages in the last 30 days.
    * @returns Resolve with the most active conversations
    */
-  get_most_active_conversations() {
-    return this.conversation_service.get_active_conversations_from_db().then(conversation_ids => {
+  getMostActiveConversations() {
+    return this.conversation_service.getActiveConversationsFromDb().then(conversation_ids => {
       return conversation_ids
         .map(conversation_id => this.conversationState.findConversation(conversation_id))
         .filter(conversationEntity => conversationEntity);
@@ -892,7 +892,7 @@ export class ConversationRepository {
 
     const conversationId = userEntity.connection().conversationId;
     try {
-      const conversationEntity = await this.get_conversation_by_id(conversationId);
+      const conversationEntity = await this.getConversationById(conversationId);
       conversationEntity.connection(userEntity.connection());
       this.updateParticipatingUserEntities(conversationEntity);
       return conversationEntity;
@@ -918,7 +918,7 @@ export class ConversationRepository {
     }
 
     try {
-      const conversationEntity = await this.get_conversation_by_id(conversation_id);
+      const conversationEntity = await this.getConversationById(conversation_id);
       const messageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
         conversationEntity,
         message_id,
@@ -934,13 +934,13 @@ export class ConversationRepository {
     }
   }
 
-  initialize_conversations() {
+  initializeConversations() {
     this.initStateUpdates();
     this.init_total = this.receiving_queue.getLength();
 
     if (this.init_total > 5) {
       this.logger.log(`Handling '${this.init_total}' additional messages on app start`);
-      return new Promise((resolve, reject) => (this.init_promise = {reject_fn: reject, resolve_fn: resolve}));
+      return new Promise((resolve, reject) => (this.init_promise = {rejectFn: reject, resolveFn: resolve}));
     }
     return undefined;
   }
@@ -1001,7 +1001,7 @@ export class ConversationRepository {
     return Promise.all(
       this.conversationState.conversations().map(async conversation => {
         try {
-          await this.conversation_service.get_conversation_by_id(conversation.id);
+          await this.conversation_service.getConversationById(conversation.id);
         } catch ({code}) {
           if (code === HTTP_STATUS.NOT_FOUND) {
             this.deleteConversationLocally(conversation.id, true);
@@ -1015,7 +1015,7 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param connectionEntities Connections entities
    */
-  map_connections(connectionEntities: ConnectionEntity[]): Promise<Conversation | void>[] {
+  mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation | void>[] {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
     return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
@@ -1083,7 +1083,7 @@ export class ConversationRepository {
    * @returns Resolves when conversation was saved
    */
   private readonly saveConversationStateInDb = (conversationEntity: Conversation) => {
-    return this.conversation_service.save_conversation_state_in_db(conversationEntity);
+    return this.conversation_service.saveConversationStateInDb(conversationEntity);
   };
 
   /**
@@ -1228,9 +1228,9 @@ export class ConversationRepository {
    * @param conversationEntity Conversation to clear
    * @param leaveConversation Should we leave the conversation before clearing the content?
    */
-  public clear_conversation(conversationEntity: Conversation, leaveConversation = false) {
+  public clearConversation(conversationEntity: Conversation, leaveConversation = false) {
     const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
-    const nextConversationEntity = this.get_next_conversation(conversationEntity);
+    const nextConversationEntity = this.getNextConversation(conversationEntity);
 
     if (leaveConversation) {
       conversationEntity.status(ConversationStatus.PAST_MEMBER);
@@ -1238,7 +1238,7 @@ export class ConversationRepository {
     }
 
     this.messageRepositoryProvider().updateClearedTimestamp(conversationEntity);
-    this._clear_conversation(conversationEntity);
+    this._clearConversation(conversationEntity);
 
     if (leaveConversation) {
       this.removeMember(conversationEntity, this.userState.self().id);
@@ -1392,12 +1392,12 @@ export class ConversationRepository {
     const otrMuted = notificationState !== NOTIFICATION_STATE.EVERYTHING;
     const payload = {
       otr_muted: otrMuted,
-      otr_muted_ref: new Date(conversationEntity.get_last_known_timestamp(currentTimestamp)).toISOString(),
+      otr_muted_ref: new Date(conversationEntity.getLastKnownTimestamp(currentTimestamp)).toISOString(),
       otr_muted_status: notificationState,
     };
 
     try {
-      await this.conversation_service.update_member_properties(conversationEntity.id, payload);
+      await this.conversation_service.updateMemberProperties(conversationEntity.id, payload);
       const response = {data: payload, from: this.userState.self().id};
       this.onMemberUpdate(conversationEntity, response);
 
@@ -1453,7 +1453,7 @@ export class ConversationRepository {
     const stateChange = conversationEntity.is_archived() !== newState;
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const archiveTimestamp = conversationEntity.get_last_known_timestamp(currentTimestamp);
+    const archiveTimestamp = conversationEntity.getLastKnownTimestamp(currentTimestamp);
     const sameTimestamp = conversationEntity.archivedTimestamp() === archiveTimestamp;
     const skipChange = sameTimestamp && !forceChange;
 
@@ -1470,7 +1470,7 @@ export class ConversationRepository {
 
     const updatePromise = conversationEntity.removed_from_conversation()
       ? Promise.resolve()
-      : this.conversation_service.update_member_properties(conversationId, payload).catch(error => {
+      : this.conversation_service.updateMemberProperties(conversationId, payload).catch(error => {
           const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
           this.logger.error(logMessage);
 
@@ -1504,11 +1504,11 @@ export class ConversationRepository {
    * @param conversationEntity Conversation entity to delete
    * @param timestamp Optional timestamps for which messages to remove
    */
-  private _clear_conversation(conversationEntity: Conversation, timestamp?: number) {
+  private _clearConversation(conversationEntity: Conversation, timestamp?: number) {
     this.deleteMessages(conversationEntity, timestamp);
 
     if (conversationEntity.removed_from_conversation()) {
-      this.conversation_service.delete_conversation_from_db(conversationEntity.id);
+      this.conversation_service.deleteConversationFromDb(conversationEntity.id);
       this.deleteConversationFromRepository(conversationEntity.id);
     }
   }
@@ -1586,7 +1586,7 @@ export class ConversationRepository {
     if (!timestamp) {
       const conversation = conversationEntity || this.conversationState.findConversation(conversationId);
       const servertime = this.serverTimeHandler.toServerTimestamp();
-      timestamp = conversation.get_latest_timestamp(servertime);
+      timestamp = conversation.getLatestTimestamp(servertime);
     }
     const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
       conversationId || conversationEntity.id,
@@ -1654,7 +1654,7 @@ export class ConversationRepository {
     }
 
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
-    const onEventPromise = isConversationCreate ? Promise.resolve(null) : this.get_conversation_by_id(conversationId);
+    const onEventPromise = isConversationCreate ? Promise.resolve(null) : this.getConversationById(conversationId);
     let previouslyArchived = false;
 
     return onEventPromise
@@ -1664,7 +1664,7 @@ export class ConversationRepository {
           previouslyArchived = conversationEntity.is_archived();
 
           const isBackendTimestamp = eventSource !== EventRepository.SOURCE.INJECTED;
-          conversationEntity.update_timestamp_server(eventJson.server_time || eventJson.time, isBackendTimestamp);
+          conversationEntity.updateTimestampServer(eventJson.server_time || eventJson.time, isBackendTimestamp);
         }
 
         return conversationEntity;
@@ -1969,14 +1969,14 @@ export class ConversationRepository {
           }
 
           if (!this.receiving_queue.getLength() || !eventFromStream) {
-            this.init_promise.resolve_fn();
+            this.init_promise.resolveFn();
             this.init_promise = undefined;
           }
         }
       })
       .catch(error => {
         if (this.init_promise) {
-          this.init_promise.reject_fn(error);
+          this.init_promise.rejectFn(error);
           this.init_promise = undefined;
         } else {
           throw error;
@@ -1987,7 +1987,7 @@ export class ConversationRepository {
   /**
    * Add "missed events" system message to conversation.
    */
-  private readonly on_missed_events = (): void => {
+  private readonly onMissedEvents = (): void => {
     this.conversationState
       .filtered_conversations()
       .filter(conversationEntity => !conversationEntity.removed_from_conversation())
@@ -2009,7 +2009,7 @@ export class ConversationRepository {
           messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
         }
 
-        conversationEntity.add_message(messageEntity);
+        conversationEntity.addMessage(messageEntity);
         return {conversationEntity};
       });
   }
@@ -2061,7 +2061,7 @@ export class ConversationRepository {
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
 
-    const data = await this.conversation_service.get_conversation_by_id(conversationEntity.id);
+    const data = await this.conversation_service.getConversationById(conversationEntity.id);
     const allMembers = [...data.members.others, data.members.self];
     const conversationRoles = allMembers.reduce((roles, member) => {
       roles[member.id] = member.conversation_role;
@@ -2075,7 +2075,7 @@ export class ConversationRepository {
 
     const updatedMessageEntity = await this.updateMessageUserEntities(messageEntity);
     if (conversationEntity && updatedMessageEntity) {
-      conversationEntity.add_message(updatedMessageEntity);
+      conversationEntity.addMessage(updatedMessageEntity);
     }
 
     return {conversationEntity, messageEntity: updatedMessageEntity};
@@ -2213,7 +2213,7 @@ export class ConversationRepository {
     }
 
     const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
-    const nextConversationEt = isActiveConversation ? this.get_next_conversation(conversationEntity) : undefined;
+    const nextConversationEt = isActiveConversation ? this.getNextConversation(conversationEntity) : undefined;
     const previouslyArchived = conversationEntity.is_archived();
 
     this.conversationMapper.updateSelfStatus(conversationEntity, eventData);
@@ -2224,7 +2224,7 @@ export class ConversationRepository {
     }
 
     if (conversationEntity.is_cleared()) {
-      this._clear_conversation(conversationEntity, conversationEntity.cleared_timestamp());
+      this._clearConversation(conversationEntity, conversationEntity.cleared_timestamp());
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
@@ -2273,8 +2273,8 @@ export class ConversationRepository {
       }
     }
     const {messageEntity} = await this.addEventToConversation(conversationEntity, event);
-    const firstAsset = (messageEntity as ContentMessage).get_first_asset();
-    if (firstAsset.is_image() || (firstAsset as FileAsset).status() === AssetTransferState.UPLOADED) {
+    const firstAsset = (messageEntity as ContentMessage).getFirstAsset();
+    if (firstAsset.isImage() || (firstAsset as FileAsset).status() === AssetTransferState.UPLOADED) {
       return {conversationEntity, messageEntity};
     }
   }
@@ -2341,7 +2341,7 @@ export class ConversationRepository {
       if (!isFromSelf) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const conversationEntity = await this.get_conversation_by_id(eventData.conversation_id);
+      const conversationEntity = await this.getConversationById(eventData.conversation_id);
       return this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
     } catch (error) {
       this.logger.info(
@@ -2369,7 +2369,7 @@ export class ConversationRepository {
         conversationEntity,
         messageId,
       );
-      if (!messageEntity || !messageEntity.is_content()) {
+      if (!messageEntity || !messageEntity.isContent()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
         const logMessage = `Cannot react to '${type}' message '${messageId}' in conversation '${conversationId}'`;
@@ -2453,10 +2453,10 @@ export class ConversationRepository {
 
   private readonly handleMessageExpiration = (messageEntity: ContentMessage) => {
     amplify.publish(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageEntity);
-    const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.is_ping();
+    const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.isPing();
     if (shouldDeleteMessage) {
-      this.get_conversation_by_id(messageEntity.conversation_id).then(conversationEntity => {
-        const isPingFromSelf = messageEntity.user().isMe && messageEntity.is_ping();
+      this.getConversationById(messageEntity.conversation_id).then(conversationEntity => {
+        const isPingFromSelf = messageEntity.user().isMe && messageEntity.isPing();
         const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
         if (deleteForSelf) {
           return this.messageRepositoryProvider().deleteMessage(conversationEntity, messageEntity);
@@ -2499,7 +2499,7 @@ export class ConversationRepository {
   ): Promise<{conversationEntity: Conversation; messageEntity: Message}> {
     const messageEntity = (await this.initMessageEntity(conversationEntity, eventJson)) as Message;
     if (conversationEntity && messageEntity) {
-      const wasAdded = conversationEntity.add_message(messageEntity);
+      const wasAdded = conversationEntity.addMessage(messageEntity);
       if (wasAdded) {
         await this.ephemeralHandler.validateMessage(messageEntity as ContentMessage);
       }
@@ -2520,9 +2520,9 @@ export class ConversationRepository {
     const updatedEvents = (await this.updateMessagesUserEntities(mappedEvents)) as ContentMessage[];
     const validatedMessages = (await this.ephemeralHandler.validateMessages(updatedEvents)) as ContentMessage[];
     if (prepend && conversationEntity.messages().length) {
-      conversationEntity.prepend_messages(validatedMessages);
+      conversationEntity.prependMessages(validatedMessages);
     } else {
-      conversationEntity.add_messages(validatedMessages);
+      conversationEntity.addMessages(validatedMessages);
     }
     return validatedMessages;
   }
@@ -2587,7 +2587,7 @@ export class ConversationRepository {
         return messageEntity;
       });
     }
-    if (messageEntity.is_content()) {
+    if (messageEntity.isContent()) {
       const userIds = Object.keys(messageEntity.reactions());
 
       messageEntity.reactions_user_ets.removeAll();
