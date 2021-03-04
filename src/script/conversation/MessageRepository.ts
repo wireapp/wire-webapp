@@ -206,7 +206,7 @@ export class MessageRepository {
       genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
     }
 
-    await this._send_and_inject_generic_message(conversationEntity, genericMessage);
+    await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
     return genericMessage;
   }
 
@@ -232,7 +232,7 @@ export class MessageRepository {
     }
 
     try {
-      return this._send_and_inject_generic_message(conversationEntity, genericMessage);
+      return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
     } catch (error) {
       if (!this.isUserCancellationError(error)) {
         this.logger.error(`Error while sending knock: ${error.message}`, error);
@@ -313,7 +313,7 @@ export class MessageRepository {
     });
 
     try {
-      await this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+      await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
       return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
     } catch (error) {
       if (!this.isUserCancellationError(error)) {
@@ -544,7 +544,7 @@ export class MessageRepository {
       if (conversationEntity.messageTimer()) {
         genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
       }
-      return this._send_and_inject_generic_message(conversationEntity, genericMessage);
+      return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
     } catch (error) {
       const log = `Failed to upload metadata for asset in conversation '${conversationEntity.id}': ${error.message}`;
       this.logger.warn(log, error);
@@ -632,7 +632,7 @@ export class MessageRepository {
       messageId,
     });
 
-    return this._send_and_inject_generic_message(conversationEntity, generic_message);
+    return this._sendAndInjectGenericMessage(conversationEntity, generic_message);
   }
 
   /**
@@ -683,7 +683,7 @@ export class MessageRepository {
 
         if (messageContentUnchanged) {
           this.logger.debug(`Sending link preview for message '${messageId}' in conversation '${conversationId}'`);
-          return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+          return this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
         }
 
         this.logger.debug(`Skipped sending link preview as message '${messageId}' in '${conversationId}' changed`);
@@ -707,7 +707,7 @@ export class MessageRepository {
     return errorTypes.includes(error.type);
   }
 
-  private async _send_and_inject_generic_message(
+  private async _sendAndInjectGenericMessage(
     conversationEntity: Conversation,
     genericMessage: GenericMessage,
     syncTimestamp = true,
@@ -884,7 +884,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    return this._send_and_inject_generic_message(conversationEntity, genericMessage);
+    return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
   }
 
   private createTextProto(
