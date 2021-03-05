@@ -17,7 +17,7 @@
  *
  */
 
-import {STATE as CALL_STATE, CALL_TYPE} from '@wireapp/avs';
+import {STATE as CALL_STATE} from '@wireapp/avs';
 import {createRandomUuid} from 'Util/util';
 
 import {instantiateComponent} from '../../../helper/knockoutHelpers';
@@ -29,7 +29,7 @@ import {User} from 'src/script/entity/User';
 
 function createCall(state, selfUser = new User(createRandomUuid())) {
   const selfParticipant = new Participant(selfUser);
-  const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL, {
+  const call = new Call('', '', 0, selfParticipant, 0, {
     currentAvailableDeviceId: {
       audioOutput: ko.pureComputed(() => 'test'),
     },
@@ -52,7 +52,11 @@ describe('conversationListCallingCell', () => {
     const conversation = new Conversation();
     conversation.participating_user_ets([new User('id')]);
     defaultParams = {
-      call: new Call(),
+      call: new Call('', '', 0, new Participant(new User(createRandomUuid()), ''), 0, {
+        currentAvailableDeviceId: {
+          audioOutput: ko.pureComputed(() => 'test'),
+        },
+      }),
       callActions: {},
       callingRepository: mockedCallingRepository,
       conversation: () => conversation,
