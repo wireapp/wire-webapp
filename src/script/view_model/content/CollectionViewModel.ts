@@ -126,13 +126,8 @@ export class CollectionViewModel {
         const isImage = messageEntity.category & MessageCategory.IMAGE;
         const isGif = messageEntity.category & MessageCategory.GIF;
         const isFile = messageEntity.category & MessageCategory.FILE;
-        if (isFile) {
-          const isAudio = messageEntity.getFirstAsset().isAudio();
-          return isAudio ? this.audio.push(messageEntity) : this.files.push(messageEntity);
-        }
-
         const isLinkPreview = messageEntity.category & MessageCategory.LINK_PREVIEW;
-        const isAudio = messageEntity.get_first_asset().is_audio();
+        const isAudio = messageEntity.getFirstAsset().isAudio();
 
         if (isImage && !isGif) {
           this.images.push(messageEntity);
