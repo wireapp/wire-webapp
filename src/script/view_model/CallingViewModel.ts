@@ -261,81 +261,81 @@ export class CallingViewModel {
       },
     };
 
-    const currentCall = ko.pureComputed(() => {
-      return this.activeCalls()[0];
-    });
-    let currentCallSubscription: ko.Computed | undefined;
+    // const currentCall = ko.pureComputed(() => {
+    //   return this.activeCalls()[0];
+    // });
+    // let currentCallSubscription: ko.Computed | undefined;
 
-    const participantsAudioElement: Record<string, HTMLAudioElement> = {};
-    let activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
+    // const participantsAudioElement: Record<string, HTMLAudioElement> = {};
+    // let activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
 
-    this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
-      activeAudioOutput = newActiveAudioOutput;
-      const activeAudioElements = Object.values(participantsAudioElement);
-      this.logger.debug(`Switching audio output for ${activeAudioElements.length} call participants`);
-      activeAudioElements.forEach(audioElement => {
-        if (audioElement.setSinkId) {
-          audioElement.setSinkId(activeAudioOutput);
-        }
-      });
-    });
-    ko.computed(() => {
-      const call = this.callState.joinedCall();
-      if (call) {
-        call.getRemoteParticipants().forEach(participant => {
-          const stream = participant.audioStream();
-          if (!stream) {
-            return;
-          }
-          const audioId = `${participant.user.id}-${stream.id}`;
-          if (
-            participantsAudioElement[audioId] &&
-            (participantsAudioElement[audioId].srcObject as MediaStream).active
-          ) {
-            return;
-          }
-          const audioElement = new Audio();
-          audioElement.srcObject = stream;
-          audioElement.play();
-          if (activeAudioOutput && audioElement.setSinkId) {
-            audioElement.setSinkId(activeAudioOutput);
-          }
-          participantsAudioElement[audioId] = audioElement;
-        });
-      } else {
-        Object.keys(participantsAudioElement).forEach(userId => {
-          delete participantsAudioElement[userId];
-        });
-      }
-    });
+    // this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
+    //   activeAudioOutput = newActiveAudioOutput;
+    //   const activeAudioElements = Object.values(participantsAudioElement);
+    //   this.logger.debug(`Switching audio output for ${activeAudioElements.length} call participants`);
+    //   activeAudioElements.forEach(audioElement => {
+    //     if (audioElement.setSinkId) {
+    //       audioElement.setSinkId(activeAudioOutput);
+    //     }
+    //   });
+    // });
+    // ko.computed(() => {
+    //   const call = this.callState.joinedCall();
+    //   if (call) {
+    //     call.getRemoteParticipants().forEach(participant => {
+    //       const stream = participant.audioStream();
+    //       if (!stream) {
+    //         return;
+    //       }
+    //       const audioId = `${participant.user.id}-${stream.id}`;
+    //       if (
+    //         participantsAudioElement[audioId] &&
+    //         (participantsAudioElement[audioId].srcObject as MediaStream).active
+    //       ) {
+    //         return;
+    //       }
+    //       const audioElement = new Audio();
+    //       audioElement.srcObject = stream;
+    //       audioElement.play();
+    //       if (activeAudioOutput && audioElement.setSinkId) {
+    //         audioElement.setSinkId(activeAudioOutput);
+    //       }
+    //       participantsAudioElement[audioId] = audioElement;
+    //     });
+    //   } else {
+    //     Object.keys(participantsAudioElement).forEach(userId => {
+    //       delete participantsAudioElement[userId];
+    //     });
+    //   }
+    // });
 
-    let nbParticipants = 0;
-    ko.computed(() => {
-      const call = currentCall();
-      if (currentCallSubscription) {
-        currentCallSubscription.dispose();
-      }
-      if (!call) {
-        return;
-      }
-      currentCallSubscription = ko.computed(() => {
-        if (call.state() === CALL_STATE.TERM_LOCAL) {
-          audioRepository.play(AudioType.TALK_LATER);
-          return;
-        }
-        if (call.state() !== CALL_STATE.MEDIA_ESTAB) {
-          return;
-        }
-        const newNbParticipants = call.participants().filter(participant => !!participant.audioStream()).length;
-        if (nbParticipants < newNbParticipants) {
-          audioRepository.play(AudioType.READY_TO_TALK);
-        }
-        if (nbParticipants > newNbParticipants) {
-          audioRepository.play(AudioType.TALK_LATER);
-        }
-        nbParticipants = newNbParticipants;
-      });
-    });
+    // let nbParticipants = 0;
+    // ko.computed(() => {
+    //   const call = currentCall();
+    //   if (currentCallSubscription) {
+    //     currentCallSubscription.dispose();
+    //   }
+    //   if (!call) {
+    //     return;
+    //   }
+    //   currentCallSubscription = ko.computed(() => {
+    //     if (call.state() === CALL_STATE.TERM_LOCAL) {
+    //       audioRepository.play(AudioType.TALK_LATER);
+    //       return;
+    //     }
+    //     if (call.state() !== CALL_STATE.MEDIA_ESTAB) {
+    //       return;
+    //     }
+    //     const newNbParticipants = call.participants().filter(participant => !!participant.audioStream()).length;
+    //     if (nbParticipants < newNbParticipants) {
+    //       audioRepository.play(AudioType.READY_TO_TALK);
+    //     }
+    //     if (nbParticipants > newNbParticipants) {
+    //       audioRepository.play(AudioType.TALK_LATER);
+    //     }
+    //     nbParticipants = newNbParticipants;
+    //   });
+    // });
   }
 
   getVideoGrid(call: Call): ko.PureComputed<Grid> {
