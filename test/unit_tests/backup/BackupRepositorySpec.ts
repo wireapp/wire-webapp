@@ -30,7 +30,12 @@ import {
 } from 'src/script/backup/Error';
 import {ClientEvent} from 'src/script/event/Client';
 import {StorageSchemata} from 'src/script/storage/StorageSchemata';
+import {BackupService} from 'src/script/backup/BackupService';
 import {TestFactory} from '../../helper/TestFactory';
+import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
+import {ConnectionState} from 'src/script/connection/ConnectionState';
+import {ClientState} from 'src/script/client/ClientState';
+import {UserState} from 'src/script/user/UserState';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 // prettier-ignore
@@ -42,7 +47,7 @@ const conversation = {
   "creator": "1ccd93e0-0f4b-4a73-b33f-05c464b88439",
   "name": "Tom @ Staging",
   "status": 0,
-  "team_id": null,
+  "team_id": null as any,
   "type": 2,
   "others": ["a7122859-3f16-4870-b7f2-5cbca5572ab2"],
   "last_event_timestamp": 2,
@@ -60,7 +65,7 @@ const messages = [
     "id": "68a28ab1-d7f8-4014-8b52-5e99a05ea3b1",
     "from": "8b497692-7a38-4a5d-8287-e3d1006577d6",
     "time": "2016-08-04T13:27:55.182Z",
-    "data": {"content": "First message", "nonce": "68a28ab1-d7f8-4014-8b52-5e99a05ea3b1", "previews": []},
+    "data": {"content": "First message", "nonce": "68a28ab1-d7f8-4014-8b52-5e99a05ea3b1", "previews": [] as any[]},
     "type": "conversation.message-add"
   },
   {
@@ -68,7 +73,7 @@ const messages = [
     "id": "4af67f76-09f9-4831-b3a4-9df877b8c29a",
     "from": "8b497692-7a38-4a5d-8287-e3d1006577d6",
     "time": "2016-08-04T13:27:58.993Z",
-    "data": {"content": "Second message", "nonce": "4af67f76-09f9-4831-b3a4-9df877b8c29a", "previews": []},
+    "data": {"content": "Second message", "nonce": "4af67f76-09f9-4831-b3a4-9df877b8c29a", "previews": [] as any[]},
     "type": "conversation.message-add"
   },
 ];
@@ -76,8 +81,7 @@ const messages = [
 
 describe('BackupRepository', () => {
   const testFactory = new TestFactory();
-  /** @type {BackupRepository} */
-  let backupRepository;
+  let backupRepository: BackupRepository;
 
   beforeEach(async () => {
     await testFactory.exposeBackupActors();
@@ -180,7 +184,7 @@ describe('BackupRepository', () => {
 
         archive.file(BackupRepository.CONFIG.FILENAME.METADATA, JSON.stringify(meta));
 
-        const files = {};
+        const files: Record<string, Uint8Array> = {};
         for (const fileName in archive.files) {
           files[fileName] = await archive.files[fileName].async('uint8array');
         }
@@ -190,42 +194,42 @@ describe('BackupRepository', () => {
     });
 
     it('successfully imports a backup', async () => {
-      const backupService = {
+      const backupService: Partial<BackupService> = {
         getDatabaseVersion: () => 15,
         importEntities: jest.fn(),
       };
 
-      const conversationRepository = {
+      const conversationRepository: Partial<ConversationRepository> = {
         checkForDeletedConversations: jest.fn(),
         mapConnections: jest.fn().mockImplementation(() => []),
         updateConversationStates: jest.fn().mockImplementation(conversations => conversations),
         updateConversations: jest.fn().mockImplementation(async () => {}),
       };
 
-      const connectionState = {
-        connectionEntities: jest.fn().mockImplementation(() => []),
+      const connectionState: Partial<ConnectionState> = {
+        connectionEntities: jest.fn().mockImplementation(() => []) as any,
       };
 
-      const clientState = {
+      const clientState: Partial<ClientState> = {
         currentClient: jest.fn().mockImplementation(() => ({
           id: 'client-id',
-        })),
+        })) as any,
       };
 
-      const userState = {
+      const userState: Partial<UserState> = {
         self: jest.fn().mockImplementation(() => ({
           id: 'self-id',
           name: jest.fn().mockImplementation(() => 'selfName'),
           username: jest.fn().mockImplementation(() => 'selfUsername'),
-        })),
+        })) as any,
       };
 
       const backupRepo = new BackupRepository(
-        backupService,
-        conversationRepository,
-        clientState,
-        userState,
-        connectionState,
+        backupService as BackupService,
+        conversationRepository as ConversationRepository,
+        clientState as ClientState,
+        userState as UserState,
+        connectionState as ConnectionState,
       );
 
       const metadataArray = [{...backupRepo.createMetaData(), version: 15}];
@@ -240,15 +244,15 @@ describe('BackupRepository', () => {
       });
 
       for (const archive of archives) {
-        const files = {};
+        const files: Record<string, Uint8Array> = {};
         for (const fileName in archive.files) {
           files[fileName] = await archive.files[fileName].async('uint8array');
         }
 
         await backupRepo.importHistory(files, noop, noop);
 
-        expect(backupRepo.conversationRepository.updateConversationStates).toHaveBeenCalledWith([conversation]);
-        expect(backupRepo.backupService.importEntities).toHaveBeenCalledWith(
+        expect(backupRepo['conversationRepository'].updateConversationStates).toHaveBeenCalledWith([conversation]);
+        expect(backupRepo['backupService'].importEntities).toHaveBeenCalledWith(
           StorageSchemata.OBJECT_STORE.EVENTS,
           messages,
         );

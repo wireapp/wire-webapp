@@ -17,14 +17,16 @@
  *
  */
 
+import ko from 'knockout';
+import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
+
 import {getGrid} from 'src/script/calling/videoGridHandler';
 import {Participant} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
-import {CONV_TYPE} from '@wireapp/avs';
 import {User} from 'src/script/entity/User';
 
 describe('videoGridHandler', () => {
-  let participants;
+  let participants: Participant[];
 
   beforeEach(() => {
     participants = [
@@ -69,14 +71,14 @@ describe('videoGridHandler', () => {
         const selfUser = new User();
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
-        const call = new Call('', '', undefined, selfParticipant);
-        call.participants = participantsObs;
+        const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL);
+        (call as any).participants = participantsObs;
         const grid = getGrid(call);
-        tests.forEach(({oldParticipants, newParticipants, expected, scenario}) => {
+        tests.forEach(({oldParticipants, newParticipants, expected}) => {
           participantsObs([selfParticipant, ...oldParticipants]);
           participantsObs([selfParticipant, ...newParticipants]);
 
-          expect(grid().grid.map(toParticipantId)).toEqual(expected.map(toParticipantId), scenario);
+          expect(grid().grid.map(toParticipantId)).toEqual(expected.map(toParticipantId));
         });
       });
     });
@@ -84,7 +86,7 @@ describe('videoGridHandler', () => {
     describe('self user with video', () => {
       it('places the self user in the thumbnail if the call is one to one', () => {
         const selfParticipant = generateVideoParticipant('self', true);
-        const call = new Call('', '', CONV_TYPE.ONEONONE, selfParticipant);
+        const call = new Call('', '', CONV_TYPE.ONEONONE, selfParticipant, CALL_TYPE.NORMAL);
         call.addParticipant(participants[0]);
         const grid = getGrid(call);
 
@@ -95,7 +97,7 @@ describe('videoGridHandler', () => {
 
       it('places the self user in the grid for any call type with just one other participant', () => {
         const selfParticipant = generateVideoParticipant('self', true);
-        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant);
+        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, CALL_TYPE.NORMAL);
         call.addParticipant(participants[0]);
         const grid = getGrid(call);
 
@@ -106,7 +108,7 @@ describe('videoGridHandler', () => {
 
       it('places the self user in the grid if there are no other video participants', () => {
         const selfParticipant = generateVideoParticipant('self', true);
-        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant);
+        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, CALL_TYPE.NORMAL);
         const grid = getGrid(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual([selfParticipant].map(toParticipantId));
@@ -116,7 +118,7 @@ describe('videoGridHandler', () => {
 
       it('places the self user in the grid if there are more than 1 other participant', () => {
         const selfParticipant = generateVideoParticipant('self', true);
-        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant);
+        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, CALL_TYPE.NORMAL);
         call.addParticipant(participants[0]);
         call.addParticipant(participants[1]);
         const grid = getGrid(call);
@@ -130,15 +132,15 @@ describe('videoGridHandler', () => {
     });
   });
 
-  function generateVideoParticipant(id, isMe = false) {
+  function generateVideoParticipant(id: string, isMe = false) {
     const user = new User(id);
     user.isMe = isMe;
     const participant = new Participant(user, 'deviceid');
-    participant.hasActiveVideo = () => true;
+    participant.hasActiveVideo = ko.pureComputed(() => true);
     return participant;
   }
 
-  function toParticipantId(participant) {
+  function toParticipantId(participant: Participant) {
     return participant && participant.user.id;
   }
 });

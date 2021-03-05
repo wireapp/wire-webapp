@@ -17,6 +17,8 @@
  *
  */
 
+import type {ConversationMessageTimerUpdateEvent as MessageTimerUpdateEvent} from '@wireapp/api-client/src/event';
+
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationEphemeralHandler} from 'src/script/conversation/ConversationEphemeralHandler';
@@ -24,8 +26,8 @@ import {EventService} from 'src/script/event/EventService';
 
 const buildConversationEphemeralHandler = () => {
   const conversationMapper = new ConversationMapper();
-  const eventService = new EventService(null, null);
-  return new ConversationEphemeralHandler(conversationMapper, eventService, () => {});
+  const eventService = new EventService(null);
+  return new ConversationEphemeralHandler(conversationMapper, eventService, {});
 };
 
 describe('ConversationEphemeralHandler', () => {
@@ -41,8 +43,11 @@ describe('ConversationEphemeralHandler', () => {
       return Promise.all(
         testedTimers.map(timerDesc => {
           const conversationEntity = new Conversation();
-          const event = {data: {message_timer: timerDesc.value}};
-          return conversationEphemeralHandler._updateEphemeralTimer(conversationEntity, event).then(() => {
+          const event: Partial<MessageTimerUpdateEvent> = {data: {message_timer: timerDesc.value}};
+          return conversationEphemeralHandler['_updateEphemeralTimer'](
+            conversationEntity,
+            event as MessageTimerUpdateEvent,
+          ).then(() => {
             expect(conversationEntity.globalMessageTimer()).toBe(timerDesc.expected);
           });
         }),

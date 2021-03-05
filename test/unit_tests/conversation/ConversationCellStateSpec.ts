@@ -17,6 +17,8 @@
  *
  */
 
+import ko from 'knockout';
+
 import {createRandomUuid} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 
@@ -58,7 +60,7 @@ describe('ConversationCellState', () => {
   });
 
   describe('Second line description for conversations', () => {
-    const defaultUnreadState = {
+    const defaultUnreadState: any = {
       allEvents: [],
       allMessages: [],
       calls: [],
@@ -79,7 +81,7 @@ describe('ConversationCellState', () => {
 
     const contentMessage = new ContentMessage();
     const text = new Text('id', 'Hello there');
-    contentMessage.unsafeSenderName = () => 'Felix';
+    (contentMessage as any).unsafeSenderName = () => 'Felix';
     contentMessage.assets([text]);
 
     const pingMessage = new PingMessage();
@@ -130,10 +132,10 @@ describe('ConversationCellState', () => {
       },
     ];
 
-    conversationEntity.isGroup = () => false;
+    conversationEntity.isGroup = ko.pureComputed(() => false);
     tests.forEach(({description, expected, unreadState}) => {
       const expectedOne2One = expected.one2one || expected;
-      conversationEntity.unreadState = () => unreadState;
+      (conversationEntity as any).unreadState = () => unreadState;
       const state = generateCellState(conversationEntity);
 
       it(`${description} (1:1)`, () => {
@@ -141,10 +143,10 @@ describe('ConversationCellState', () => {
       });
     });
 
-    conversationEntity.isGroup = () => true;
+    conversationEntity.isGroup = ko.pureComputed(() => true);
     tests.forEach(({description, expected, unreadState}) => {
       const expectedGroup = expected.group || expected;
-      conversationEntity.unreadState = () => unreadState;
+      (conversationEntity as any).unreadState = () => unreadState;
       const state = generateCellState(conversationEntity);
 
       it(`${description} (group)`, () => {

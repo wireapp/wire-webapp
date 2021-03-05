@@ -19,11 +19,13 @@
 
 import 'jsdom-worker';
 
+import ko from 'knockout';
+import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON} from '@wireapp/avs';
+import {CONV_TYPE, CALL_TYPE, STATE as CALL_STATE, REASON, Wcall} from '@wireapp/avs';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {EventRepository} from 'src/script/event/EventRepository';
-import {Participant} from 'src/script/calling/Participant';
+import {Participant, UserId} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
 import {CallState} from 'src/script/calling/CallState';
 import {User} from 'src/script/entity/User';
@@ -33,18 +35,21 @@ import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from '../../helper/TestFactory';
 import {createRandomUuid} from 'Util/util';
+import {CallingEvent} from 'src/script/conversation/EventBuilder';
+import {CALL} from 'src/script/event/Client';
+import {MessageRepository} from 'src/script/conversation/MessageRepository';
 
 const createSelfParticipant = () => {
   const selfUser = new User();
   selfUser.isMe = true;
-  return new Participant(selfUser);
+  return new Participant(selfUser, createRandomUuid());
 };
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
-  let callingRepository;
-  let wCall;
-  let wUser;
+  let callingRepository: CallingRepository;
+  let wCall: Wcall;
+  let wUser: number;
   const selfUser = new User(createRandomUuid());
   const clientId = createRandomUuid();
 
@@ -59,7 +64,7 @@ describe('CallingRepository', () => {
   });
 
   afterEach(() => {
-    callingRepository.callState.activeCalls([]);
+    callingRepository['callState'].activeCalls([]);
   });
 
   afterAll(() => {
@@ -72,11 +77,11 @@ describe('CallingRepository', () => {
         selfUser.id,
         createRandomUuid(),
         CONV_TYPE.ONEONONE,
-        new Participant(),
+        new Participant(new User(), createRandomUuid()),
         CALL_TYPE.NORMAL,
       );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
-      spyOn(callingRepository.callState, 'activeCalls').and.returnValue([activeCall]);
+      spyOn(callingRepository['callState'], 'activeCalls').and.returnValue([activeCall]);
       spyOn(amplify, 'publish').and.returnValue(undefined);
       const conversationId = createRandomUuid();
       const conversationType = CONV_TYPE.ONEONONE;
@@ -109,26 +114,26 @@ describe('CallingRepository', () => {
   describe('joinedCall', () => {
     it('only exposes the current active call', () => {
       const selfParticipant = createSelfParticipant();
-      const incomingCall = new Call('', '', undefined, selfParticipant);
+      const incomingCall = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL);
       incomingCall.state(CALL_STATE.INCOMING);
 
-      const activeCall = new Call('', '', undefined, selfParticipant);
+      const activeCall = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL);
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
 
-      const declinedCall = new Call('', '', undefined, selfParticipant);
+      const declinedCall = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL);
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
 
-      callingRepository.callState.activeCalls([incomingCall, activeCall, declinedCall]);
+      callingRepository['callState'].activeCalls([incomingCall, activeCall, declinedCall]);
 
-      expect(callingRepository.callState.joinedCall()).toBe(activeCall);
+      expect(callingRepository['callState'].joinedCall()).toBe(activeCall);
     });
   });
 
   describe('getCallMediaStream', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
-      const call = new Call('', '', undefined, selfParticipant);
+      const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL);
       const source = new RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
@@ -137,7 +142,7 @@ describe('CallingRepository', () => {
       spyOn(callingRepository, 'findCall').and.returnValue(call);
 
       const queries = [1, 2, 3, 4].map(() => {
-        return callingRepository.getCallMediaStream('', true, false, false).then(mediaStream => {
+        return callingRepository['getCallMediaStream']('', true, false, false).then(mediaStream => {
           expect(mediaStream.getAudioTracks()[0]).toBe(audioTrack);
         });
       });
@@ -148,22 +153,22 @@ describe('CallingRepository', () => {
 
     it('asks only once for mediastream when queried multiple times', () => {
       const selfParticipant = createSelfParticipant();
-      const call = new Call('', '', undefined, selfParticipant);
+      const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL);
       const source = new RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
-      spyOn(callingRepository.mediaStreamHandler, 'requestMediaStream').and.returnValue(
+      spyOn(callingRepository['mediaStreamHandler'], 'requestMediaStream').and.returnValue(
         Promise.resolve(selfMediaStream),
       );
       spyOn(callingRepository, 'findCall').and.returnValue(call);
 
       const queries = [1, 2, 3, 4].map(() => {
-        return callingRepository.getCallMediaStream('', true, false, false).then(mediaStream => {
+        return callingRepository['getCallMediaStream']('', true, false, false).then(mediaStream => {
           expect(mediaStream.getAudioTracks()[0]).toBe(audioTrack);
         });
       });
       return Promise.all(queries).then(() => {
-        expect(callingRepository.mediaStreamHandler.requestMediaStream).toHaveBeenCalledTimes(1);
+        expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledTimes(1);
       });
     });
   });
@@ -174,7 +179,7 @@ describe('CallingRepository', () => {
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
       const call = new Call('', '', 0, selfParticipant, 0);
-      spyOn(callingRepository.callState, 'joinedCall').and.returnValue(call);
+      spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
 
       expect(selfParticipant.releaseAudioStream).toHaveBeenCalledTimes(1);
@@ -190,15 +195,15 @@ describe('CallingRepository', () => {
 
 describe('CallingRepository ISO', () => {
   describe('incoming call', () => {
-    let avsUser;
-    let avsCall;
+    let avsUser: number;
+    let avsCall: Wcall;
 
     afterEach(() => {
       return avsCall && avsCall.destroy(avsUser);
     });
 
     it('creates and stores a new call when an incoming call arrives', async done => {
-      const selfUser = new User(createRandomUuid());
+      const selfUser: User & {clientId?: string} = new User(createRandomUuid());
       selfUser.isMe = true;
       selfUser.clientId = createRandomUuid();
 
@@ -207,20 +212,20 @@ describe('CallingRepository ISO', () => {
       const callingRepo = new CallingRepository(
         {
           grantMessage: jest.fn(),
-        }, // MessageRepository
+        } as any, // MessageRepository
         {
           injectEvent: jest.fn(),
-        }, // EventRepository
-        {}, // UserRepository
-        {}, // MediaStreamHandler
+        } as any, // EventRepository
+        {} as any, // UserRepository
+        {} as any, // MediaStreamHandler
         {
           toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
-        }, // ServerTimeHandler
-        {}, // APIClient
+        } as any, // ServerTimeHandler
+        {} as any, // APIClient
         {
           findConversation: jest.fn().mockImplementation(() => conversation),
           participating_user_ets: jest.fn(),
-        }, // ConversationState
+        } as any, // ConversationState
         new CallState(),
       );
 
@@ -229,7 +234,7 @@ describe('CallingRepository ISO', () => {
       avsUser = avs.wUser;
       avsCall = avs.wCall;
 
-      const event = {
+      const event: CallingEvent = {
         content: {
           props: {
             audiocbr: 'false',
@@ -241,62 +246,59 @@ describe('CallingRepository ISO', () => {
           sessid: 'jEcO',
           type: 'SETUP',
           version: '3.0',
-        },
+        } as any,
         conversation: conversation.id,
         from: 'fdbbf5e8-b1e8-474f-b63c-f007df2b4338',
-        id: '89fb35d3-01c4-45f3-9a5b-7fbde558b6b2',
+        // id: '89fb35d3-01c4-45f3-9a5b-7fbde558b6b2',
         sender: 'dddb4f5068e8c98b',
         time: new Date().toISOString(),
-        type: 'call.e-call',
+        type: CALL.E_CALL,
       };
 
-      expect(callingRepo.callState.activeCalls().length).toBe(0);
+      expect(callingRepo['callState'].activeCalls().length).toBe(0);
 
       callingRepo.onIncomingCall(call => {
-        expect(callingRepo.callState.activeCalls().length).toBe(1);
+        expect(callingRepo['callState'].activeCalls().length).toBe(1);
 
         done();
       });
-      await callingRepo.onCallEvent(event);
+      await callingRepo.onCallEvent(event, '');
     });
   });
 });
 
 describe.skip('E2E audio call', () => {
-  const conversationRepository = {
-    find_conversation_by_id: () => new Conversation(),
+  const messageRepository: Partial<MessageRepository> = {
+    grantMessage: () => Promise.resolve(),
   };
-  const messageRepository = {
-    grantMessage: () => Promise.resolve(true),
-  };
-  const eventRepository = {injectEvent: () => {}};
+  const eventRepository: Partial<EventRepository> = {injectEvent: (): any => {}};
 
   const client = new CallingRepository(
-    conversationRepository,
-    messageRepository,
-    eventRepository,
+    messageRepository as MessageRepository,
+    eventRepository as EventRepository,
+    undefined,
     undefined,
     serverTimeHandler,
   );
   const user = new User('user-1');
-  let remoteWuser;
-  let wCall;
+  let remoteWuser: number;
+  let wCall: Wcall;
 
   beforeAll(() => {
     spyOn(client, 'fetchConfig').and.returnValue(Promise.resolve({ice_servers: []}));
-    spyOn(client, 'getCallMediaStream').and.returnValue(
+    spyOn<any>(client, 'getCallMediaStream').and.returnValue(
       Promise.resolve(new MediaStream([new RTCAudioSource().createTrack()])),
     );
-    spyOn(client, 'getMediaStream').and.returnValue(
+    spyOn<any>(client, 'getMediaStream').and.returnValue(
       Promise.resolve(new MediaStream([new RTCAudioSource().createTrack()])),
     );
     spyOn(client, 'onCallEvent').and.callThrough();
-    spyOn(client, 'updateParticipantStream').and.callThrough();
-    spyOn(client, 'incomingCallCallback').and.callFake(call => {
-      client.answerCall(call, CALL_TYPE.AUDIO);
+    spyOn<any>(client, 'updateParticipantStream').and.callThrough();
+    spyOn<any>(client, 'incomingCallCallback').and.callFake(call => {
+      client.answerCall(call, CALL_TYPE.NORMAL);
     });
-    spyOn(client, 'checkConcurrentJoinedCall').and.returnValue(Promise.resolve(true));
-    spyOn(client, 'sendMessage').and.callFake(
+    spyOn<any>(client, 'checkConcurrentJoinedCall').and.returnValue(Promise.resolve(true));
+    spyOn<any>(client, 'sendMessage').and.callFake(
       (context, convId, userId, clientid, destUserId, destDeviceId, payload) => {
         wCall.recvMsg(remoteWuser, payload, payload.length, Date.now(), Date.now(), convId, userId, clientid);
       },
@@ -307,12 +309,12 @@ describe.skip('E2E audio call', () => {
     });
   });
 
-  let joinedCallSub;
-  let activeCallsSub;
+  let joinedCallSub: ko.Subscription;
+  let activeCallsSub: ko.Subscription;
   let onCallClosed = () => {};
   let onCallConnected = () => {};
   beforeEach(() => {
-    joinedCallSub = client.joinedCall.subscribe(call => {
+    joinedCallSub = client['callState'].joinedCall.subscribe(call => {
       if (call) {
         const audioFlowingInterval = setInterval(() => {
           /* Wait for audio to start flowing before calling the onCallConnected callback.
@@ -321,7 +323,7 @@ describe.skip('E2E audio call', () => {
            */
           client
             .getStats(call.conversationId)
-            .then(extractAudioStats)
+            .then(stats => extractAudioStats(stats))
             .then(audioStats => {
               if (audioStats.length > 0) {
                 onCallConnected();
@@ -331,7 +333,7 @@ describe.skip('E2E audio call', () => {
         }, 30);
       }
     });
-    activeCallsSub = client.activeCalls.subscribe(calls => {
+    activeCallsSub = client['callState'].activeCalls.subscribe(calls => {
       if (calls.length === 0) {
         onCallClosed();
       }
@@ -346,9 +348,9 @@ describe.skip('E2E audio call', () => {
   it('calls and connect with the remote user', done => {
     onCallClosed = done;
     onCallConnected = () => {
-      expect(client.sendMessage).toHaveBeenCalledTimes(1);
+      expect(client['sendMessage']).toHaveBeenCalledTimes(1);
       expect(client.onCallEvent).toHaveBeenCalledTimes(1);
-      expect(client.updateParticipantStream).toHaveBeenCalled();
+      expect(client['updateParticipantStream']).toHaveBeenCalled();
       client
         .getStats('conv-1')
         .then(extractAudioStats)
@@ -358,19 +360,19 @@ describe.skip('E2E audio call', () => {
             expect(stats.bytesFlowing).toBeGreaterThan(0);
           });
 
-          expect(client.joinedCall()).toBeDefined();
+          expect(client['callState'].joinedCall()).toBeDefined();
           client.leaveCall('conv-1');
         })
         .catch(done.fail);
     };
-    client.startCall('conv-1', CONV_TYPE.ONEONONE, CALL_TYPE.AUDIO).catch(done.fail);
+    client.startCall('conv-1', CONV_TYPE.ONEONONE, CALL_TYPE.NORMAL).catch(done.fail);
   });
 
   it('answers an incoming call and connect with the remote peer', done => {
     onCallClosed = done;
     onCallConnected = () => {
       expect(client.onCallEvent).toHaveBeenCalled();
-      expect(client.incomingCallCallback).toHaveBeenCalled();
+      expect(client['incomingCallCallback']).toHaveBeenCalled();
       client
         .getStats('conv-1')
         .then(extractAudioStats)
@@ -383,12 +385,12 @@ describe.skip('E2E audio call', () => {
         })
         .catch(done.fail);
     };
-    wCall.start(remoteWuser, 'conv-1', CALL_TYPE.AUDIO, CONV_TYPE.ONEONONE, 0);
+    wCall.start(remoteWuser, 'conv-1', CALL_TYPE.NORMAL, CONV_TYPE.ONEONONE, 0);
   });
 });
 
-function extractAudioStats(stats) {
-  const audioStats = [];
+function extractAudioStats(stats: {stats: RTCStatsReport; userid: UserId}[]) {
+  const audioStats: {bytesFlowing: number; id: string}[] = [];
   stats.forEach(userStats => {
     userStats.stats.forEach(data => {
       if (data.kind === 'audio' || data.mediaType === 'audio') {
@@ -402,21 +404,29 @@ function extractAudioStats(stats) {
   return audioStats;
 }
 
-function createAutoAnsweringWuser(wCall, remoteCallingRepository) {
+function createAutoAnsweringWuser(wCall: Wcall, remoteCallingRepository: CallingRepository) {
   const selfUserId = createRandomUuid();
   const selfClientId = createRandomUuid();
-  const sendMsg = (context, conversationId, userId, clientId, destinationUserId, destinationClientId, payload) => {
-    const event = {
+  const sendMsg = (
+    _context: number,
+    conversationId: string,
+    userId: string,
+    clientId: string,
+    _destinationUserId: string,
+    _destinationClientId: string,
+    payload: string,
+  ) => {
+    const event: Partial<CallingEvent> = {
       content: JSON.parse(payload),
       conversation: conversationId,
       from: userId,
       sender: clientId,
-      time: Date.now(),
+      time: Date.now().toString(),
     };
-    remoteCallingRepository.onCallEvent(event, EventRepository.SOURCE.WEB_SOCKET);
+    remoteCallingRepository.onCallEvent(event as CallingEvent, EventRepository.SOURCE.WEB_SOCKET);
   };
 
-  const incoming = conversationId => wCall.answer(wUser, conversationId, CALL_TYPE.AUDIO, 0);
+  const incoming = (conversationId: string) => wCall.answer(wUser, conversationId, CALL_TYPE.NORMAL, 0);
 
   const requestConfig = () => {
     setTimeout(() => {
@@ -428,17 +438,18 @@ function createAutoAnsweringWuser(wCall, remoteCallingRepository) {
     selfUserId,
     selfClientId,
     () => {}, // `readyh`,
-    sendMsg, // `sendh`,
-    incoming, // `incomingh`,
+    sendMsg as any, // `sendh`,
+    () => undefined, // `sfth`,
+    incoming as any, // `incomingh`,
     () => {}, // `missedh`,
     () => {}, // `answerh`,
     () => {}, // `estabh`,
     () => {}, // `closeh`,
     () => {}, // `metricsh`,
-    requestConfig, // `cfg_reqh`,
-    () => {}, // `acbrh`,
+    requestConfig as any, // `cfg_reqh`,
+    () => undefined as any, // `acbrh`,
     () => {}, // `vstateh`,
-    0,
+    0, // `arg`,
   );
   return wUser;
 }

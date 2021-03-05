@@ -18,11 +18,14 @@
  */
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import type {NewOTRMessage} from '@wireapp/api-client/src/conversation';
+
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {createRandomUuid} from 'Util/util';
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ClientMismatchHandler} from 'src/script/conversation/ClientMismatchHandler';
+import {entities} from '../../api/payloads';
 
 describe('ClientMismatchHandler', () => {
   describe('onClientMismatch', () => {
@@ -70,9 +73,9 @@ describe('ClientMismatchHandler', () => {
       };
 
       const clientMismatchHandler = new ClientMismatchHandler(
-        () => conversationRepositorySpy,
-        cryptographyRepositorySpy,
-        userRepositorySpy,
+        () => conversationRepositorySpy as any,
+        cryptographyRepositorySpy as any,
+        userRepositorySpy as any,
       );
 
       const clientMismatch = {
@@ -87,7 +90,7 @@ describe('ClientMismatchHandler', () => {
 
       const timestamp = new Date(clientMismatch.time).getTime();
       const eventInfoEntity = new EventInfoEntity(undefined, conversation.id);
-      eventInfoEntity.setTimestamp(timestamp);
+      eventInfoEntity.setTimestamp(timestamp.toString());
 
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
       expect(conversationRepositorySpy.addMissingMember).toHaveBeenCalledWith(
@@ -121,9 +124,9 @@ describe('ClientMismatchHandler', () => {
       };
 
       const clientMismatchHandler = new ClientMismatchHandler(
-        () => conversationRepositorySpy,
-        cryptographyRepositorySpy,
-        userRepositorySpy,
+        () => conversationRepositorySpy as any,
+        cryptographyRepositorySpy as any,
+        userRepositorySpy as any,
       );
 
       const message = new GenericMessage({
@@ -149,7 +152,7 @@ describe('ClientMismatchHandler', () => {
         sender: '43619b6a2ec22e24',
       };
 
-      eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime());
+      eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime().toString());
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
 
       const expectedReceipients = {
@@ -172,9 +175,9 @@ describe('ClientMismatchHandler', () => {
         getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
       };
       const clientMismatchHandler = new ClientMismatchHandler(
-        () => conversationRepositorySpy,
-        {}, // CryptographyRepository
-        userRepositorySpy,
+        () => conversationRepositorySpy as any,
+        {} as any, // CryptographyRepository
+        userRepositorySpy as any,
       );
 
       const message = new GenericMessage({
@@ -200,7 +203,11 @@ describe('ClientMismatchHandler', () => {
         sender: '43619b6a2ec22e24',
       };
 
-      const updatedPayload = await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
+      const updatedPayload = (await clientMismatchHandler.onClientMismatch(
+        eventInfoEntity,
+        clientMismatch,
+        payload,
+      )) as NewOTRMessage<string>;
 
       expect(userRepositorySpy.removeClientFromUser).toHaveBeenCalled();
       expect(Object.keys(updatedPayload.recipients).length).toBe(0);
@@ -217,9 +224,9 @@ describe('ClientMismatchHandler', () => {
       };
 
       const clientMismatchHandler = new ClientMismatchHandler(
-        () => conversationRepositorySpy,
-        {}, // CryptographyRepository
-        userRepositorySpy,
+        () => conversationRepositorySpy as any,
+        {} as any, // CryptographyRepository
+        userRepositorySpy as any,
       );
 
       const message = new GenericMessage({
@@ -245,7 +252,11 @@ describe('ClientMismatchHandler', () => {
         sender: '43619b6a2ec22e24',
       };
 
-      const updated_payload = await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
+      const updated_payload = (await clientMismatchHandler.onClientMismatch(
+        eventInfoEntity,
+        clientMismatch,
+        payload,
+      )) as NewOTRMessage<string>;
 
       expect(userRepositorySpy.removeClientFromUser).not.toHaveBeenCalled();
       expect(Object.keys(updated_payload.recipients).length).toBe(0);

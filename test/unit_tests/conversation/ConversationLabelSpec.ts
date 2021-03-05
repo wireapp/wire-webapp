@@ -17,27 +17,29 @@
  *
  */
 
+import ko from 'knockout';
+
 import {createRandomUuid} from 'Util/util';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationLabelRepository} from 'src/script/conversation/ConversationLabelRepository';
 
 describe('ConversationLabelRepository', () => {
-  const createConversation = isGroup => {
+  const createConversation = (isGroup: boolean) => {
     const conversation = new Conversation(createRandomUuid());
-    conversation.isGroup = () => isGroup;
+    conversation.isGroup = ko.pureComputed(() => isGroup);
     return conversation;
   };
 
-  const conversations = () => [
+  const conversations = ko.observableArray([
     createConversation(true),
     createConversation(false),
     createConversation(true),
     createConversation(false),
     createConversation(true),
-  ];
+  ]);
 
-  const conversationLabelRepository = new ConversationLabelRepository(conversations, conversations);
+  const conversationLabelRepository = new ConversationLabelRepository(conversations, conversations, undefined);
 
   describe('getGroupsWithoutLabel', () => {
     it('returns the right amount of unlabelled group conversations', () => {
