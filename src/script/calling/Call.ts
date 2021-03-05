@@ -77,6 +77,8 @@ export class Call {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
+    console.info('fuck ', this.mediaDevicesHandler);
+    console.info('fuck 2', mediaDevicesHandler);
     this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
     this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
       this.activeAudioOutput = newActiveAudioOutput;
