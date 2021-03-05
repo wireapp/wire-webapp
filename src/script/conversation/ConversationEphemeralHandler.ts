@@ -173,7 +173,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   private _obfuscateAssetMessage(messageEntity: ContentMessage) {
     messageEntity.ephemeral_expires(true);
 
-    const assetEntity = messageEntity.get_first_asset();
+    const assetEntity = messageEntity.getFirstAsset();
     const changes: Pick<Partial<EventRecord>, 'data' | 'ephemeral_expires'> = {
       data: {
         content_type: assetEntity.file_type,
@@ -189,7 +189,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   private _obfuscateImageMessage(messageEntity: ContentMessage): void {
     messageEntity.ephemeral_expires(true);
 
-    const assetEntity = messageEntity.get_first_asset();
+    const assetEntity = messageEntity.getFirstAsset();
     const changes: Pick<Partial<EventRecord>, 'data' | 'ephemeral_expires'> = {
       data: {
         info: {
@@ -206,11 +206,11 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   async _obfuscateMessage(messageEntity: ContentMessage): Promise<void> {
-    if (messageEntity.has_asset_text()) {
+    if (messageEntity.hasAssetText()) {
       await this._obfuscateTextMessage(messageEntity);
-    } else if (messageEntity.has_asset()) {
+    } else if (messageEntity.hasAsset()) {
       this._obfuscateAssetMessage(messageEntity);
-    } else if (messageEntity.has_asset_image()) {
+    } else if (messageEntity.hasAssetImage()) {
       this._obfuscateImageMessage(messageEntity);
     } else {
       this.logger.warn(`Ephemeral message of unsupported type: ${messageEntity.type}`, messageEntity);
@@ -220,7 +220,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   async _obfuscateTextMessage(messageEntity: ContentMessage): Promise<void> {
     messageEntity.ephemeral_expires(true);
 
-    const assetEntity = messageEntity.get_first_asset() as Text;
+    const assetEntity = messageEntity.getFirstAsset() as Text;
     const obfuscatedAsset = new Text(messageEntity.id);
     const obfuscatedPreviews = await Promise.all(
       assetEntity.previews().map(linkPreview => {
@@ -254,7 +254,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
   }
 
   async _timeoutEphemeralMessage(messageEntity: ContentMessage): Promise<void> {
-    if (!messageEntity.is_expired()) {
+    if (!messageEntity.isExpired()) {
       if (messageEntity.user().isMe) {
         await this._obfuscateMessage(messageEntity);
       }

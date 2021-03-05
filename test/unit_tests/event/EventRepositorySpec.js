@@ -70,7 +70,7 @@ async function createEncodedCiphertext(
 describe('EventRepository', () => {
   let last_notification_id = undefined;
 
-  const websocket_service_mock = (() => {
+  const websocketServiceMock = (() => {
     let websocket_handler = null;
 
     return {
@@ -88,7 +88,7 @@ describe('EventRepository', () => {
 
   beforeEach(() => {
     return testFactory.exposeEventActors().then(event_repository => {
-      event_repository.webSocketService = websocket_service_mock;
+      event_repository.webSocketService = websocketServiceMock;
       last_notification_id = undefined;
     });
   });

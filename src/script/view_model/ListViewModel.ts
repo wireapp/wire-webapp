@@ -526,14 +526,14 @@ export class ListViewModel {
   clickToBlock = async (conversationEntity: Conversation): Promise<void> => {
     const userEntity = conversationEntity.firstUserEntity();
     const hideConversation = this.shouldHideConversation(conversationEntity);
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
+    const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
     await this.actionsViewModel.blockUser(userEntity, hideConversation, nextConversationEntity);
   };
 
   readonly clickToCancelRequest = (conversationEntity: Conversation): void => {
     const userEntity = conversationEntity.firstUserEntity();
     const hideConversation = this.shouldHideConversation(conversationEntity);
-    const nextConversationEntity = this.conversationRepository.get_next_conversation(conversationEntity);
+    const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
 
     this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
   };
