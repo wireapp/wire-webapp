@@ -357,9 +357,9 @@ export class Conversation {
             break;
           }
 
-          const isMissedCall = messageEntity.is_call() && !messageEntity.was_completed();
-          const isPing = messageEntity.is_ping();
-          const isMessage = messageEntity.is_content();
+          const isMissedCall = messageEntity.isCall() && !messageEntity.wasCompleted();
+          const isPing = messageEntity.isPing();
+          const isMessage = messageEntity.isContent();
           const isSelfMentioned =
             isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
           const isSelfQuoted =
@@ -507,7 +507,7 @@ export class Conversation {
    */
   release(): void {
     if (!this.unreadState().allEvents.length) {
-      this.remove_messages();
+      this.removeMessages();
       this.is_loaded(false);
       this.hasAdditionalMessages(true);
     }
@@ -581,7 +581,7 @@ export class Conversation {
    * @param messageEntity Message entity to be added to the conversation.
    * @returns If a message was replaced in the conversation
    */
-  add_message(messageEntity: Message | ContentMessage | MemberMessage): boolean | void {
+  addMessage(messageEntity: Message | ContentMessage | MemberMessage): boolean | void {
     if (messageEntity) {
       const messageWithLinkPreview = () => this._findDuplicate(messageEntity.id, messageEntity.from);
       const editedMessage = () =>
@@ -606,7 +606,7 @@ export class Conversation {
    * Adds multiple messages to the conversation.
    * @param message_ets Array of message entities to be added to the conversation
    */
-  add_messages(message_ets: ContentMessage[]): void {
+  addMessages(message_ets: ContentMessage[]): void {
     message_ets = message_ets
       .map(message_et => this._checkForDuplicate(message_et))
       .filter(message_et => !!message_et) as ContentMessage[];
@@ -629,16 +629,16 @@ export class Conversation {
     return this.unreadState().selfMentions.slice().pop();
   }
 
-  get_last_known_timestamp(currentTimestamp?: number): number {
+  getLastKnownTimestamp(currentTimestamp?: number): number {
     const last_known_timestamp = Math.max(this.last_server_timestamp(), this.last_event_timestamp());
     return last_known_timestamp || currentTimestamp;
   }
 
-  get_latest_timestamp(currentTimestamp: number): number {
+  getLatestTimestamp(currentTimestamp: number): number {
     return Math.max(this.last_server_timestamp(), this.last_event_timestamp(), currentTimestamp);
   }
 
-  get_next_iso_date(currentTimestamp?: number): string {
+  getNextIsoDate(currentTimestamp?: number): string {
     if (typeof currentTimestamp !== 'number') {
       currentTimestamp = Date.now();
     }
@@ -674,7 +674,7 @@ export class Conversation {
    * Prepends messages with new batch of messages.
    * @param message_ets Array of messages to be added to conversation
    */
-  prepend_messages(message_ets: ContentMessage[]): void {
+  prependMessages(message_ets: ContentMessage[]): void {
     message_ets = message_ets
       .map(message_et => this._checkForDuplicate(message_et))
       .filter(message_et => !!message_et) as ContentMessage[];
@@ -686,7 +686,7 @@ export class Conversation {
    * Removes message from the conversation by message id.
    * @param message_id ID of the message entity to be removed from the conversation
    */
-  remove_message_by_id(message_id: string): void {
+  removeMessageById(message_id: string): void {
     this.messages_unordered.remove(message_et => message_id && message_id === message_et.id);
   }
 
@@ -694,7 +694,7 @@ export class Conversation {
    * Removes messages from the conversation.
    * @param timestamp Optional timestamp which messages should be removed
    */
-  remove_messages(timestamp?: number): void {
+  removeMessages(timestamp?: number): void {
     if (timestamp && typeof timestamp === 'number') {
       this.messages_unordered.remove(message_et => timestamp >= message_et.timestamp());
       return;
@@ -725,7 +725,7 @@ export class Conversation {
         return false;
       }
 
-      const isCallActivation = messageEntity.is_call() && messageEntity.is_activation();
+      const isCallActivation = messageEntity.isCall() && messageEntity.isActivation();
       const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
       const wasSelfUserAdded = isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().id);
 
@@ -765,7 +765,7 @@ export class Conversation {
     return undefined;
   }
 
-  update_timestamp_server(time: number, is_backend_timestamp: boolean = false): void {
+  updateTimestampServer(time: number, is_backend_timestamp: boolean = false): void {
     if (is_backend_timestamp) {
       const timestamp = new Date(time).getTime();
 
@@ -800,7 +800,7 @@ export class Conversation {
     }
   }
 
-  get_all_messages(): (Message | ContentMessage | MemberMessage | SystemMessage)[] {
+  getAllMessages(): (Message | ContentMessage | MemberMessage | SystemMessage)[] {
     return this.messages();
   }
 
@@ -822,9 +822,7 @@ export class Conversation {
    * Get the message before a given message.
    * @param message_et Message to look up from
    */
-  get_previous_message(
-    message_et: ContentMessage,
-  ): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getPreviousMessage(message_et: ContentMessage): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     const messages_visible = this.messages_visible();
     const message_index = messages_visible.indexOf(message_et);
     if (message_index > 0) {
@@ -836,11 +834,11 @@ export class Conversation {
   /**
    * Get the last text message that was added by self user.
    */
-  get_last_editable_message(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
+  getLastEditableMessage(): Message | ContentMessage | MemberMessage | SystemMessage | undefined {
     const messages = this.messages();
     for (let index = messages.length - 1; index >= 0; index--) {
       const message_et = messages[index];
-      if (message_et.is_editable()) {
+      if (message_et.isEditable()) {
         return message_et;
       }
     }

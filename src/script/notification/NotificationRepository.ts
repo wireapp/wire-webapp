@@ -220,7 +220,7 @@ export class NotificationRepository {
     }
 
     const isUserBusy = this.selfUser().availability() === Availability.Type.BUSY;
-    const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(this.selfUser().id);
+    const isSelfMentionOrReply = messageEntity.isContent() && messageEntity.isUserTargeted(this.selfUser().id);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
 
     if (isUserBusy && !isSelfMentionOrReply && !isCallMessage && !isComposite) {
@@ -281,11 +281,11 @@ export class NotificationRepository {
    * Creates the notification body for calls.
    */
   private createBodyCall(messageEntity: CallMessage): string | void {
-    if (messageEntity.is_activation()) {
+    if (messageEntity.isActivation()) {
       return t('notificationVoiceChannelActivate');
     }
 
-    if (messageEntity.is_deactivation() && messageEntity.finished_reason === TERMINATION_REASON.MISSED) {
+    if (messageEntity.isDeactivation() && messageEntity.finished_reason === TERMINATION_REASON.MISSED) {
       return t('notificationVoiceChannelDeactivate');
     }
   }
@@ -297,9 +297,9 @@ export class NotificationRepository {
    * @returns Notification message body
    */
   private createBodyContent(messageEntity: ContentMessage): string | void {
-    if (messageEntity.has_asset_text()) {
+    if (messageEntity.hasAssetText()) {
       for (const assetEntity of messageEntity.assets()) {
-        if (assetEntity.is_text()) {
+        if (assetEntity.isText()) {
           let notificationText;
 
           if (assetEntity.isUserMentioned(this.selfUser().id)) {
@@ -315,26 +315,26 @@ export class NotificationRepository {
       }
     }
 
-    if (messageEntity.has_asset_image()) {
+    if (messageEntity.hasAssetImage()) {
       return t('notificationAssetAdd');
     }
 
-    if (messageEntity.has_asset_location()) {
+    if (messageEntity.hasAssetLocation()) {
       return t('notificationSharedLocation');
     }
 
-    if (messageEntity.has_asset()) {
-      const assetEntity = messageEntity.get_first_asset();
+    if (messageEntity.hasAsset()) {
+      const assetEntity = messageEntity.getFirstAsset();
 
-      if (assetEntity.is_audio()) {
+      if (assetEntity.isAudio()) {
         return t('notificationSharedAudio');
       }
 
-      if (assetEntity.is_video()) {
+      if (assetEntity.isVideo()) {
         return t('notificationSharedVideo');
       }
 
-      if (assetEntity.is_file()) {
+      if (assetEntity.isFile()) {
         return t('notificationSharedFile');
       }
     }
@@ -419,7 +419,7 @@ export class NotificationRepository {
    * @returns Notification message body
    */
   private createBodyObfuscated(messageEntity: ContentMessage): string {
-    if (messageEntity.is_content()) {
+    if (messageEntity.isContent()) {
       const isSelfMentioned = messageEntity.isUserMentioned(this.selfUser().id);
 
       if (isSelfMentioned) {
@@ -644,7 +644,7 @@ export class NotificationRepository {
     const conversationId = this.getConversationId(connectionEntity, conversationEntity);
 
     const containsSelfMention =
-      messageEntity.is_content() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
+      messageEntity.isContent() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
     if (containsSelfMention) {
       const showOptions = {exposeMessage: messageEntity, openFirstSelfMention: true};
       return () => amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, showOptions);
@@ -769,7 +769,7 @@ export class NotificationRepository {
   private shouldObfuscateNotificationMessage(messageEntity: Message): boolean {
     const preferencesToObfuscateMessage = [NotificationPreference.OBFUSCATE, NotificationPreference.OBFUSCATE_MESSAGE];
 
-    return preferencesToObfuscateMessage.includes(this.notificationsPreference()) || messageEntity.is_ephemeral();
+    return preferencesToObfuscateMessage.includes(this.notificationsPreference()) || messageEntity.isEphemeral();
   }
 
   /**
@@ -780,7 +780,7 @@ export class NotificationRepository {
    */
   private shouldObfuscateNotificationSender(messageEntity: Message): boolean {
     const isSetToObfuscate = this.notificationsPreference() === NotificationPreference.OBFUSCATE;
-    return isSetToObfuscate || messageEntity.is_ephemeral();
+    return isSetToObfuscate || messageEntity.isEphemeral();
   }
 
   /**
@@ -896,7 +896,7 @@ export class NotificationRepository {
       return isEventToNotify;
     }
 
-    const isSelfMentionOrReply = messageEntity.is_content() && messageEntity.isUserTargeted(userId);
+    const isSelfMentionOrReply = messageEntity.isContent() && messageEntity.isUserTargeted(userId);
     const isCallMessage = messageEntity.super_type === SuperType.CALL;
     return isEventToNotify && (isCallMessage || isSelfMentionOrReply);
   }

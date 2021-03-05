@@ -516,12 +516,12 @@ export class InputBarViewModel {
   };
 
   readonly editMessage = (messageEntity: ContentMessage): void => {
-    if (messageEntity?.is_editable() && messageEntity !== this.editMessageEntity()) {
+    if (messageEntity?.isEditable() && messageEntity !== this.editMessageEntity()) {
       this.cancelMessageReply();
       this.cancelMessageEditing();
       this.editMessageEntity(messageEntity);
-      this.input((messageEntity.get_first_asset() as Text).text);
-      const newMentions = (messageEntity.get_first_asset() as Text).mentions().slice();
+      this.input((messageEntity.getFirstAsset() as Text).text);
+      const newMentions = (messageEntity.getFirstAsset() as Text).mentions().slice();
       this.currentMentions(newMentions);
 
       if (messageEntity.quote()) {
@@ -620,7 +620,7 @@ export class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().get_last_editable_message() as ContentMessage);
+            this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
             this.updateMentions(data, keyboardEvent);
           }
           break;
@@ -851,7 +851,7 @@ export class InputBarViewModel {
         }
       }
 
-      this.messageRepository.upload_images(this.conversationEntity(), images);
+      this.messageRepository.uploadImages(this.conversationEntity(), images);
     }
   };
 
@@ -890,7 +890,7 @@ export class InputBarViewModel {
         }
       }
 
-      this.messageRepository.upload_files(this.conversationEntity(), files);
+      this.messageRepository.uploadFiles(this.conversationEntity(), files);
     }
   };
 

@@ -22,7 +22,7 @@ import {mediaParser} from 'src/script/media/MediaParser';
 
 describe('MediaEmbeds', () => {
   // Will test all common link variations
-  const test_link_variants = (site: string, regex: RegExp) => {
+  const testLinkVariants = (site: string, regex: RegExp) => {
     expect(`http://${site}.com`.match(regex)).toBe(null);
     expect(`http://${site}.com/`.match(regex)).toBe(null);
     expect(`https://${site}.com`.match(regex)).toBe(null);
@@ -39,29 +39,29 @@ describe('MediaEmbeds', () => {
     expect(`www.${site}.com/`.match(regex)).toBe(null);
   };
 
-  const build_message_with_anchor = (link: string) => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
+  const buildMessageWithAnchor = (link: string) => `<a href="${link}" target="_blank" rel="nofollow">${link}</a>`;
 
-  const build_youtube_iframe = (link: string) => {
+  const buildYoutubeIframe = (link: string) => {
     const embed_url = MediaEmbeds.generateYouTubeEmbedUrl(link);
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="${embed_url}" frameborder="0" allowfullscreen></iframe></div>`;
   };
 
-  const build_soundcloud_iframe_for_tracks = (link: string) => {
+  const buildSoundcloudIframeForTracks = (link: string) => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="soundcloud" width="100%" height="164" src="https://w.soundcloud.com/player/?url=${link}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true" frameborder="0"></iframe></div>`;
   };
 
-  const build_soundcloud_iframe_for_playlists = (link: string) => {
+  const buildSoundcloudIframeForPlaylists = (link: string) => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="soundcloud" width="100%" height="465" src="https://w.soundcloud.com/player/?url=${link}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true" frameborder="0"></iframe></div>`;
   };
 
-  const build_spotify_iframe = (link: string, partial_link: string) => {
+  const buildSpotifyIframe = (link: string, partial_link: string) => {
     partial_link = partial_link.replace(/\//g, ':');
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container"><iframe class="spotify" width="100%" height="80px" src="https://embed.spotify.com/?uri=spotify%3A${window.encodeURIComponent(
       partial_link,
     )}" frameborder="0"></iframe></div>`;
   };
 
-  const build_vimeo_iframe = (link: string, id: string) => {
+  const buildVimeoIframe = (link: string, id: string) => {
     return `<a href="${link}" target="_blank" rel="nofollow">${link}</a><div class="iframe-container iframe-container-video"><iframe class="vimeo" width="100%" height="100%" src="https://player.vimeo.com/video/${id}?portrait=0&color=333&badge=0" frameborder="0" allowfullscreen></iframe></div>`;
   };
 
@@ -81,7 +81,7 @@ describe('MediaEmbeds', () => {
       });
 
       it("doesn't match normal Spotify links", () => {
-        test_link_variants('spotify', re_spotify);
+        testLinkVariants('spotify', re_spotify);
       });
     });
 
@@ -102,7 +102,7 @@ describe('MediaEmbeds', () => {
       });
 
       it("doesn't match normal SoundCloud links", () => {
-        test_link_variants('soundcloud', re_soundcloud);
+        testLinkVariants('soundcloud', re_soundcloud);
       });
     });
 
@@ -118,7 +118,7 @@ describe('MediaEmbeds', () => {
       });
 
       it("doesn't match normal Vimeo links", () => {
-        test_link_variants('vimeo', re_vimeo);
+        testLinkVariants('vimeo', re_vimeo);
       });
     });
   });
@@ -142,21 +142,21 @@ describe('MediaEmbeds', () => {
     describe('YouTube', () => {
       it('does not render a YouTube link without video id', () => {
         const link = 'youtube-nocookie.com';
-        const message = build_message_with_anchor(link);
+        const message = buildMessageWithAnchor(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
 
       it('does not render a malicious YouTube link', () => {
         const link = 'https://xn--yutube-wqf.com/#youtu0be/v/fKopy74weus';
-        const message = build_message_with_anchor(link);
+        const message = buildMessageWithAnchor(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
 
       it('renders a playlist', () => {
         const link = 'https://www.youtube-nocookie.com/playlist?list=PLNy867I3fkD6LqNQdk5rAPb6xAI-SbZOd';
-        const message = build_message_with_anchor(link);
+        const message = buildMessageWithAnchor(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
@@ -164,8 +164,8 @@ describe('MediaEmbeds', () => {
       it('renders a link with params', () => {
         const link = 'http://www.youtube-nocookie.com/watch?v=6o-nmK9WRGE&feature=player_embedded';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -173,8 +173,8 @@ describe('MediaEmbeds', () => {
       it('renders a link with params', () => {
         const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg&feature=feedrec_grec_index';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -182,8 +182,8 @@ describe('MediaEmbeds', () => {
       it('renders a link with params', () => {
         const link = 'http://www.youtube-nocookie.com/v/0zM3nApSvMg?fs=1&hl=en_US&rel=0';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -191,8 +191,8 @@ describe('MediaEmbeds', () => {
       it('renders a link with timestamp', () => {
         const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg#t=0m10s';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -200,8 +200,8 @@ describe('MediaEmbeds', () => {
       it('renders a link with timestamp inverted', () => {
         const link = 'https://www.youtube-nocookie.com/watch?t=125&v=CfEWiV8PoZo';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -209,8 +209,8 @@ describe('MediaEmbeds', () => {
       it('renders an embed link', () => {
         const link = 'http://www.youtube-nocookie.com/embed/0zM3nApSvMg?rel=0';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -218,8 +218,8 @@ describe('MediaEmbeds', () => {
       it('renders a watch link', () => {
         const link = 'http://www.youtube-nocookie.com/watch?v=0zM3nApSvMg';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -227,8 +227,8 @@ describe('MediaEmbeds', () => {
       it('renders a short link', () => {
         const link = 'http://youtu.be/0zM3nApSvMg';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -236,8 +236,8 @@ describe('MediaEmbeds', () => {
       it('renders a short link playlist', () => {
         const link = 'https://youtu.be/oL1xf_X0W2s?list=PLuKg-WhduhkmIcFMN7wxfVWYu8qnk0jMN';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -245,8 +245,8 @@ describe('MediaEmbeds', () => {
       it('renders a mobile link', () => {
         const link = 'https://m.youtube-nocookie.com/?#/watch?v=0zM3nApSvMg';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -254,8 +254,8 @@ describe('MediaEmbeds', () => {
       it('renders another mobile link', () => {
         const link = 'https://www.youtube-nocookie.com/watch?v=1w4Gf97q2oU&feature=youtu.be';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_youtube_iframe(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildYoutubeIframe(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -272,7 +272,7 @@ describe('MediaEmbeds', () => {
       it('removes autoplay param from url', () => {
         const link = 'https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1';
 
-        const message = build_message_with_anchor(link);
+        const message = buildMessageWithAnchor(link);
         const iframe =
           '<a href="https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?v=oHg5SJYRHA0&autoplay=1</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
 
@@ -282,7 +282,7 @@ describe('MediaEmbeds', () => {
       it('removes autoplay param from url', () => {
         const link = 'https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0';
 
-        const message = build_message_with_anchor(link);
+        const message = buildMessageWithAnchor(link);
         const iframe =
           '<a href="https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0" target="_blank" rel="nofollow">https://www.youtube-nocookie.com/watch?autoplay=1&v=oHg5SJYRHA0</a><div class="iframe-container iframe-container-video"><iframe class="youtube" width="100%" height="100%" src="https://www.youtube-nocookie.com/embed/oHg5SJYRHA0?html5=1&enablejsapi=0&modestbranding=1&rel=0" frameborder="0" allowfullscreen></iframe></div>';
 
@@ -294,8 +294,8 @@ describe('MediaEmbeds', () => {
       it('renders a track', () => {
         const link = 'https://soundcloud.com/ago_music/ago-royal-oats-ft-waldo-prod';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_soundcloud_iframe_for_tracks(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSoundcloudIframeForTracks(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -303,20 +303,20 @@ describe('MediaEmbeds', () => {
       it('renders a playlist', () => {
         const link = 'https://soundcloud.com/onedirectionmusic/sets/liams-you-i-remix-playlist';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_soundcloud_iframe_for_playlists(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSoundcloudIframeForPlaylists(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
 
       it('renders profiles without embeds', () => {
-        const message = build_message_with_anchor('https://soundcloud.com/dp-conference');
+        const message = buildMessageWithAnchor('https://soundcloud.com/dp-conference');
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
 
       it('renders profiles without embeds even if profiles have a trailing slash', () => {
-        const message = build_message_with_anchor('https://soundcloud.com/dp-conference/');
+        const message = buildMessageWithAnchor('https://soundcloud.com/dp-conference/');
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
@@ -324,8 +324,8 @@ describe('MediaEmbeds', () => {
       it('renders a group', () => {
         const link = 'https://soundcloud.com/groups/playlist-digital-sintonia';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_soundcloud_iframe_for_tracks(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSoundcloudIframeForTracks(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -333,8 +333,8 @@ describe('MediaEmbeds', () => {
       it('renders a track without trailing slash', () => {
         const link = 'https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_soundcloud_iframe_for_tracks(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSoundcloudIframeForTracks(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -342,8 +342,8 @@ describe('MediaEmbeds', () => {
       it('renders a track with trailing slash', () => {
         const link = 'https://soundcloud.com/florian-paetzold/limp-bizkit-my-way-florian-paetzold-remix-free-download/';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_soundcloud_iframe_for_tracks(link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSoundcloudIframeForTracks(link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -361,8 +361,8 @@ describe('MediaEmbeds', () => {
         const link = 'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
         const partial_link = 'user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_spotify_iframe(link, partial_link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSpotifyIframe(link, partial_link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -371,8 +371,8 @@ describe('MediaEmbeds', () => {
         const link = 'https://open.spotify.com/track/26fwlVGkISUr5P91hAeTW8';
         const partial_link = 'track/26fwlVGkISUr5P91hAeTW8';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_spotify_iframe(link, partial_link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSpotifyIframe(link, partial_link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -381,8 +381,8 @@ describe('MediaEmbeds', () => {
         const link = 'https://open.spotify.com/album/7iN0r7Sl624EkOUNUCOGu9';
         const partial_link = 'album/7iN0r7Sl624EkOUNUCOGu9';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_spotify_iframe(link, partial_link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSpotifyIframe(link, partial_link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -391,8 +391,8 @@ describe('MediaEmbeds', () => {
         const link = 'https://open.spotify.com/user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
         const partial_link = 'user/1123867741/playlist/2w63WroxrrIbNg4WIxdoBn';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_spotify_iframe(link, partial_link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSpotifyIframe(link, partial_link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -402,8 +402,8 @@ describe('MediaEmbeds', () => {
           'https://play.spotify.com/track/5yEPxDjbbzUzyauGtnmVEC?play=true&utm_source=open.spotify.com&utm_medium=open';
         const partial_link = 'track/5yEPxDjbbzUzyauGtnmVEC';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_spotify_iframe(link, partial_link);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildSpotifyIframe(link, partial_link);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
@@ -414,14 +414,14 @@ describe('MediaEmbeds', () => {
         const id = '27999954';
         const link = 'https://vimeo.com/27999954';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_vimeo_iframe(link, id);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildVimeoIframe(link, id);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });
 
       it("doesn't render a user's profile page", () => {
-        const message = build_message_with_anchor('https://vimeo.com/user38597062');
+        const message = buildMessageWithAnchor('https://vimeo.com/user38597062');
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(message);
       });
@@ -430,8 +430,8 @@ describe('MediaEmbeds', () => {
         const id = '127053285';
         const link = 'https://vimeo.com/channels/staffpicks/127053285?utm_source=social&utm_campaign=9914';
 
-        const message = build_message_with_anchor(link);
-        const iframe = build_vimeo_iframe(link, id);
+        const message = buildMessageWithAnchor(link);
+        const iframe = buildVimeoIframe(link, id);
 
         expect(mediaParser.renderMediaEmbeds(message, '#333')).toBe(iframe);
       });

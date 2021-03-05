@@ -54,7 +54,7 @@ describe('MessageRepository', () => {
 
   let server: sinon.SinonFakeServer;
 
-  const generate_conversation = (
+  const generateConversation = (
     conversation_type = CONVERSATION_TYPE.REGULAR,
     connection_status = ConnectionStatus.ACCEPTED,
   ) => {
@@ -88,14 +88,14 @@ describe('MessageRepository', () => {
     let conversationEntity: Conversation;
 
     beforeEach(() => {
-      conversationEntity = generate_conversation(CONVERSATION_TYPE.REGULAR);
+      conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
 
       return testFactory.conversation_repository['saveConversation'](conversationEntity).then(() => {
         const file_et = new FileAsset();
         file_et.status(AssetTransferState.UPLOADING);
         messageEntity = new ContentMessage(createRandomUuid());
         messageEntity.assets.push(file_et);
-        conversationEntity.add_message(messageEntity);
+        conversationEntity.addMessage(messageEntity);
 
         spyOn(testFactory.event_service, 'updateEventAsUploadSucceeded');
         spyOn(testFactory.event_service, 'updateEventAsUploadFailed');
@@ -103,7 +103,7 @@ describe('MessageRepository', () => {
       });
     });
 
-    afterEach(() => conversationEntity.remove_messages());
+    afterEach(() => conversationEntity.removeMessages());
 
     it('should update original asset when asset upload is complete', () => {
       const event: Partial<AssetAddEvent> = {
@@ -135,7 +135,7 @@ describe('MessageRepository', () => {
 
   describe('sendTextWithLinkPreview', () => {
     it.skip('sends ephemeral message (within the range [1 second, 1 year])', async () => {
-      const conversation = generate_conversation();
+      const conversation = generateConversation();
       testFactory.conversation_repository['conversationState'].conversations([conversation]);
 
       const inBoundValues = [1000, 5000, 12341234, 31536000000];
@@ -147,7 +147,7 @@ describe('MessageRepository', () => {
       spyOn(testFactory.message_repository, 'getMessageInConversationById').and.returnValue(
         Promise.resolve(new Message()),
       );
-      spyOn(testFactory.conversation_service, 'post_encrypted_message').and.returnValue(Promise.resolve({}));
+      spyOn(testFactory.conversation_service, 'postEncryptedMessage').and.returnValue(Promise.resolve({}));
       spyOn(testFactory.conversation_repository['conversationMapper'], 'mapConversations').and.returnValue(
         Promise.resolve(conversation),
       );
@@ -174,13 +174,13 @@ describe('MessageRepository', () => {
         return testFactory.message_repository.sendTextWithLinkPreview(conversation, messageText, []);
       });
       const sentMessages = await Promise.all(sentPromises);
-      expect(testFactory.conversation_service.post_encrypted_message).toHaveBeenCalledTimes(sentMessages.length * 2);
+      expect(testFactory.conversation_service.postEncryptedMessage).toHaveBeenCalledTimes(sentMessages.length * 2);
     });
   });
 
   describe('shouldSendAsExternal', () => {
     it('should return true for big payload', () => {
-      const largeConversationEntity = generate_conversation();
+      const largeConversationEntity = generateConversation();
       largeConversationEntity.participating_user_ids(
         Array(128)
           .fill(undefined)
@@ -208,7 +208,7 @@ describe('MessageRepository', () => {
     });
 
     it('should return false for small payload', () => {
-      const smallConversationEntity = generate_conversation();
+      const smallConversationEntity = generateConversation();
       smallConversationEntity.participating_user_ids(['0', '1']);
 
       return testFactory.conversation_repository['saveConversation'](smallConversationEntity)
@@ -230,7 +230,7 @@ describe('MessageRepository', () => {
   describe('deleteMessageForEveryone', () => {
     let conversationEntity: Conversation;
     beforeEach(() => {
-      conversationEntity = generate_conversation(CONVERSATION_TYPE.REGULAR);
+      conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
       spyOn<any>(testFactory.message_repository, 'sendGenericMessage').and.returnValue(Promise.resolve());
     });
 
@@ -239,7 +239,7 @@ describe('MessageRepository', () => {
       user_et.isMe = false;
       const message_to_delete_et = new Message(createRandomUuid());
       message_to_delete_et.user(user_et);
-      conversationEntity.add_message(message_to_delete_et);
+      conversationEntity.addMessage(message_to_delete_et);
 
       await expect(
         testFactory.message_repository.deleteMessageForEveryone(conversationEntity, message_to_delete_et),
@@ -255,10 +255,10 @@ describe('MessageRepository', () => {
       const messageEntityToDelete = new Message();
       messageEntityToDelete.id = createRandomUuid();
       messageEntityToDelete.user(userEntity);
-      conversationEntity.add_message(messageEntityToDelete);
+      conversationEntity.addMessage(messageEntityToDelete);
 
       spyOn(testFactory.user_repository['userState'], 'self').and.returnValue(userEntity);
-      spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
+      spyOn(testFactory.conversation_repository, 'getConversationById').and.returnValue(
         Promise.resolve(conversationEntity),
       );
 
@@ -340,7 +340,7 @@ describe('MessageRepository', () => {
 
       await testFactory.conversation_repository['saveConversation'](conversationEntity);
 
-      spyOn(testFactory.conversation_service, 'post_encrypted_message').and.returnValue(
+      spyOn(testFactory.conversation_service, 'postEncryptedMessage').and.returnValue(
         Promise.reject({
           deleted: {
             // Legal hold client got removed

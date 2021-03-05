@@ -67,10 +67,10 @@ describe('NotificationRepository', () => {
   let conversation_et = null;
   let message_et = null;
   let user_et = null;
-  let verify_notification;
-  let verify_notification_ephemeral;
-  let verify_notification_obfuscated;
-  let verify_notification_system = undefined;
+  let verifyNotification;
+  let verifyNotificationEphemeral;
+  let verifyNotificationObfuscated;
+  let verifyNotificationSystem = undefined;
 
   let notification_content = null;
   const contentViewModelState = {};
@@ -125,7 +125,7 @@ describe('NotificationRepository', () => {
 
       spyOn(testFactory.notification_repository, 'showNotification');
 
-      verify_notification = (_conversation, _message, _expected_body) => {
+      verifyNotification = (_conversation, _message, _expected_body) => {
         return testFactory.notification_repository.notify(_message, undefined, _conversation).then(() => {
           expect(testFactory.notification_repository.showNotification).toHaveBeenCalledTimes(1);
 
@@ -149,7 +149,7 @@ describe('NotificationRepository', () => {
         });
       };
 
-      verify_notification_ephemeral = (_conversation, _message) => {
+      verifyNotificationEphemeral = (_conversation, _message) => {
         return testFactory.notification_repository.notify(_message, undefined, _conversation).then(() => {
           expect(testFactory.notification_repository.showNotification).toHaveBeenCalledTimes(1);
 
@@ -165,7 +165,7 @@ describe('NotificationRepository', () => {
         });
       };
 
-      verify_notification_obfuscated = (_conversation, _message, _setting) => {
+      verifyNotificationObfuscated = (_conversation, _message, _setting) => {
         return testFactory.notification_repository.notify(_message, undefined, _conversation).then(() => {
           expect(testFactory.notification_repository.showNotification).toHaveBeenCalledTimes(1);
 
@@ -191,7 +191,7 @@ describe('NotificationRepository', () => {
         });
       };
 
-      verify_notification_system = (_conversation, _message, _expected_body, _expected_title) => {
+      verifyNotificationSystem = (_conversation, _message, _expected_body, _expected_title) => {
         return testFactory.notification_repository.notify(_message, undefined, _conversation).then(() => {
           expect(testFactory.notification_repository.showNotification).toHaveBeenCalledTimes(1);
 
@@ -298,13 +298,13 @@ describe('NotificationRepository', () => {
 
     beforeEach(() => {
       const mentionMessage = new ContentMessage(createRandomUuid());
-      mentionMessage.add_asset(generateTextAsset());
+      mentionMessage.addAsset(generateTextAsset());
       spyOn(mentionMessage, 'isUserMentioned').and.returnValue(true);
 
       const textMessage = new ContentMessage(createRandomUuid());
-      textMessage.add_asset(generateTextAsset());
+      textMessage.addAsset(generateTextAsset());
       const compositeMessage = new CompositeMessage(createRandomUuid());
-      compositeMessage.add_asset(generateTextAsset());
+      compositeMessage.addAsset(generateTextAsset());
 
       const callMessage = new CallMessage();
       callMessage.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
@@ -387,11 +387,11 @@ describe('NotificationRepository', () => {
 
       it('in a 1:1 conversation', () => {
         conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
     });
 
@@ -407,11 +407,11 @@ describe('NotificationRepository', () => {
 
       it('in a 1:1 conversation', () => {
         conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
     });
   });
@@ -433,23 +433,23 @@ describe('NotificationRepository', () => {
 
       it('in a 1:1 conversation', () => {
         conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
 
       it('when preference is set to obfuscate-message', () => {
         const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
         testFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
+        return verifyNotificationObfuscated(conversation_et, message_et, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
         testFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
+        return verifyNotificationObfuscated(conversation_et, message_et, notification_preference);
       });
     });
 
@@ -461,23 +461,23 @@ describe('NotificationRepository', () => {
 
       it('in a 1:1 conversation', () => {
         conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
 
       it('when preference is set to obfuscate-message', () => {
         const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
         testFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
+        return verifyNotificationObfuscated(conversation_et, message_et, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
         testFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
+        return verifyNotificationObfuscated(conversation_et, message_et, notification_preference);
       });
     });
 
@@ -489,23 +489,23 @@ describe('NotificationRepository', () => {
 
       it('in a 1:1 conversation', () => {
         conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
 
       it('in a group conversation', () => {
-        return verify_notification(conversation_et, message_et, expected_body);
+        return verifyNotification(conversation_et, message_et, expected_body);
       });
 
       it('when preference is set to obfuscate-message', () => {
         const notification_preference = NotificationPreference.OBFUSCATE_MESSAGE;
         testFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
+        return verifyNotificationObfuscated(conversation_et, message_et, notification_preference);
       });
 
       it('when preference is set to obfuscate', () => {
         const notification_preference = NotificationPreference.OBFUSCATE;
         testFactory.notification_repository.notificationsPreference(notification_preference);
-        return verify_notification_obfuscated(conversation_et, message_et, notification_preference);
+        return verifyNotificationObfuscated(conversation_et, message_et, notification_preference);
       });
     });
 
@@ -516,17 +516,17 @@ describe('NotificationRepository', () => {
 
       it('that contains text', () => {
         message_et.assets.push(new Text('id', 'Hello world!'));
-        return verify_notification_ephemeral(conversation_et, message_et);
+        return verifyNotificationEphemeral(conversation_et, message_et);
       });
 
       it('that contains an image', () => {
         message_et.assets.push(new Location());
-        return verify_notification_ephemeral(conversation_et, message_et);
+        return verifyNotificationEphemeral(conversation_et, message_et);
       });
 
       it('that contains a location', () => {
         message_et.assets.push(new MediumImage());
-        return verify_notification_ephemeral(conversation_et, message_et);
+        return verifyNotificationEphemeral(conversation_et, message_et);
       });
     });
   });
@@ -547,7 +547,7 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
 
       const expected_body = `${user_et.name()} started a conversation`;
-      return verify_notification_system(conversation_et, message_et, expected_body);
+      return verifyNotificationSystem(conversation_et, message_et, expected_body);
     });
 
     it('if a group is renamed', () => {
@@ -556,7 +556,7 @@ describe('NotificationRepository', () => {
       message_et.name = 'Lorem Ipsum Conversation';
 
       const expected_body = `${user_et.name()} renamed the conversation to ${message_et.name}`;
-      return verify_notification_system(conversation_et, message_et, expected_body);
+      return verifyNotificationSystem(conversation_et, message_et, expected_body);
     });
 
     it('if a group message timer is updated', () => {
@@ -564,7 +564,7 @@ describe('NotificationRepository', () => {
       message_et.user(user_et);
 
       const expectedBody = `${user_et.name()} set the message timer to 5 ${t('ephemeralUnitsSeconds')}`;
-      return verify_notification_system(conversation_et, message_et, expectedBody);
+      return verifyNotificationSystem(conversation_et, message_et, expectedBody);
     });
 
     it('if a group message timer is reset', () => {
@@ -572,7 +572,7 @@ describe('NotificationRepository', () => {
       message_et.user(user_et);
 
       const expectedBody = `${user_et.name()} turned off the message timer`;
-      return verify_notification_system(conversation_et, message_et, expectedBody);
+      return verifyNotificationSystem(conversation_et, message_et, expectedBody);
     });
   });
 
@@ -601,7 +601,7 @@ describe('NotificationRepository', () => {
 
         const user_name_added = entities.user.jane_roe.name;
         const expected_body = `${user_et.name()} added ${user_name_added} to the conversation`;
-        return verify_notification_system(conversation_et, message_et, expected_body);
+        return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
 
       it('with you being added to the conversation', () => {
@@ -609,7 +609,7 @@ describe('NotificationRepository', () => {
         message_et.userEntities([other_user_et]);
 
         const expected_body = `${user_et.name()} added you to the conversation`;
-        return verify_notification_system(conversation_et, message_et, expected_body);
+        return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
 
       it('with multiple users being added to the conversation', () => {
@@ -617,7 +617,7 @@ describe('NotificationRepository', () => {
         message_et.userIds(user_ids);
 
         const expected_body = `${user_et.name()} added 2 people to the conversation`;
-        return verify_notification_system(conversation_et, message_et, expected_body);
+        return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
     });
 
@@ -643,7 +643,7 @@ describe('NotificationRepository', () => {
         message_et.userEntities([other_user_et]);
 
         const expected_body = `${user_et.name()} removed you from the conversation`;
-        return verify_notification_system(conversation_et, message_et, expected_body);
+        return verifyNotificationSystem(conversation_et, message_et, expected_body);
       });
 
       it('with multiple users being removed from the conversation', () => {
@@ -683,21 +683,21 @@ describe('NotificationRepository', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
       const expected_body = z.string.notificationConnectionRequest;
-      return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
+      return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if your connection request was accepted', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
       const expected_body = z.string.notificationConnectionAccepted;
-      return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
+      return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
 
     it('if you are automatically connected', () => {
       message_et.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
       const expected_body = z.string.notificationConnectionConnected;
-      return verify_notification_system(conversation_et, message_et, expected_body, expected_title);
+      return verifyNotificationSystem(conversation_et, message_et, expected_body, expected_title);
     });
   });
 
@@ -715,23 +715,23 @@ describe('NotificationRepository', () => {
 
     it('in a 1:1 conversation', () => {
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
-      return verify_notification(conversation_et, message_et, expected_body);
+      return verifyNotification(conversation_et, message_et, expected_body);
     });
 
     it('in a group conversation', () => {
-      return verify_notification(conversation_et, message_et, expected_body);
+      return verifyNotification(conversation_et, message_et, expected_body);
     });
 
     it('as an ephemeral message', () => {
       message_et.ephemeral_expires(5000);
-      return verify_notification_ephemeral(conversation_et, message_et);
+      return verifyNotificationEphemeral(conversation_et, message_et);
     });
   });
 
   describe('shows a well-formed composite notification', () => {
     beforeEach(() => {
       message_et = new CompositeMessage();
-      message_et.add_asset(new Text(createRandomUuid(), '## headline!'));
+      message_et.addAsset(new Text(createRandomUuid(), '## headline!'));
     });
 
     it('even if notifications are disabled in preferences', () => {
@@ -780,7 +780,7 @@ describe('NotificationRepository', () => {
     });
 
     it('returns the correct value for all notifications', () => {
-      messageEntity.add_asset(generateTextAsset());
+      messageEntity.addAsset(generateTextAsset());
       conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
@@ -788,7 +788,7 @@ describe('NotificationRepository', () => {
     });
 
     it('returns the correct value for no notifications', () => {
-      messageEntity.add_asset(generateTextAsset());
+      messageEntity.addAsset(generateTextAsset());
       conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
@@ -796,7 +796,7 @@ describe('NotificationRepository', () => {
     });
 
     it('returns the correct value for self mentioned messages', () => {
-      messageEntity.add_asset(generateTextAsset(true));
+      messageEntity.addAsset(generateTextAsset(true));
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
@@ -804,7 +804,7 @@ describe('NotificationRepository', () => {
     });
 
     it('returns the correct value for non-self mentioned messages', () => {
-      messageEntity.add_asset(generateTextAsset());
+      messageEntity.addAsset(generateTextAsset());
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
       const notifyInConversation = shouldNotifyInConversation(conversationEntity, messageEntity, userId);
 
@@ -812,7 +812,7 @@ describe('NotificationRepository', () => {
     });
 
     it('returns the correct value for self replies', () => {
-      messageEntity.add_asset(generateTextAsset());
+      messageEntity.addAsset(generateTextAsset());
 
       const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId});
       messageEntity.quote(quoteEntity);
@@ -824,7 +824,7 @@ describe('NotificationRepository', () => {
     });
 
     it('returns the correct value for non-self replies', () => {
-      messageEntity.add_asset(generateTextAsset());
+      messageEntity.addAsset(generateTextAsset());
 
       const quoteEntity = new QuoteEntity({
         messageId: createRandomUuid(),

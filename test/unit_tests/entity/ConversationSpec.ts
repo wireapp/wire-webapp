@@ -147,13 +147,13 @@ describe('Conversation', () => {
     beforeEach(() => {
       initial_message_et = new Message(createRandomUuid());
       initial_message_et.timestamp(first_timestamp);
-      conversation_et.add_message(initial_message_et);
+      conversation_et.addMessage(initial_message_et);
     });
 
-    afterEach(() => conversation_et.remove_messages());
+    afterEach(() => conversation_et.removeMessages());
 
     it('should not add message with an exisiting id', () => {
-      conversation_et.add_message(initial_message_et);
+      conversation_et.addMessage(initial_message_et);
 
       expect(conversation_et.messages().length).toBe(1);
     });
@@ -163,7 +163,7 @@ describe('Conversation', () => {
       const newMessageEntity = new Message(createRandomUuid());
       newMessageEntity.id = initial_message_et.id;
 
-      conversation_et.add_message(newMessageEntity);
+      conversation_et.addMessage(newMessageEntity);
 
       expect(conversation_et.messages().length).toBe(initialLength);
       expect(conversation_et.messages().some(message => message == newMessageEntity)).toBe(false);
@@ -173,7 +173,7 @@ describe('Conversation', () => {
       const message_et = new Message(createRandomUuid());
       message_et.timestamp(second_timestamp);
 
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
 
       expect(conversation_et.messages().length).toBe(2);
       const last_message_et = conversation_et.getLastMessage();
@@ -187,7 +187,7 @@ describe('Conversation', () => {
       const message_et = new Message(createRandomUuid());
       message_et.timestamp(older_timestamp);
 
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
 
       expect(conversation_et.messages().length).toBe(2);
       const last_message_et = conversation_et.getFirstMessage();
@@ -204,7 +204,7 @@ describe('Conversation', () => {
         conversation_et.last_event_timestamp(first_timestamp);
         conversation_et.last_server_timestamp(second_timestamp);
 
-        conversation_et.add_message(message_et);
+        conversation_et.addMessage(message_et);
 
         expect(conversation_et.last_event_timestamp()).toBe(second_timestamp);
       });
@@ -217,7 +217,7 @@ describe('Conversation', () => {
         conversation_et.last_event_timestamp(first_timestamp);
         conversation_et.last_server_timestamp(second_timestamp);
 
-        conversation_et.add_message(message_et);
+        conversation_et.addMessage(message_et);
 
         expect(conversation_et.last_event_timestamp()).toBe(first_timestamp);
       });
@@ -229,7 +229,7 @@ describe('Conversation', () => {
         conversation_et.last_event_timestamp(first_timestamp);
         conversation_et.last_server_timestamp(first_timestamp);
 
-        conversation_et.add_message(message_et);
+        conversation_et.addMessage(message_et);
 
         expect(conversation_et.last_event_timestamp()).toBe(first_timestamp);
       });
@@ -244,7 +244,7 @@ describe('Conversation', () => {
         conversation_et.last_read_timestamp(first_timestamp);
         conversation_et.last_server_timestamp(second_timestamp);
 
-        conversation_et.add_message(message_et);
+        conversation_et.addMessage(message_et);
 
         expect(conversation_et.last_read_timestamp()).toBe(second_timestamp);
       });
@@ -256,7 +256,7 @@ describe('Conversation', () => {
         conversation_et.last_read_timestamp(first_timestamp);
         conversation_et.last_server_timestamp(second_timestamp);
 
-        conversation_et.add_message(message_et);
+        conversation_et.addMessage(message_et);
 
         expect(conversation_et.last_read_timestamp()).toBe(first_timestamp);
       });
@@ -268,14 +268,14 @@ describe('Conversation', () => {
         conversation_et.last_read_timestamp(first_timestamp);
         conversation_et.last_server_timestamp(first_timestamp);
 
-        conversation_et.add_message(message_et);
+        conversation_et.addMessage(message_et);
 
         expect(conversation_et.last_read_timestamp()).toBe(first_timestamp);
       });
     });
   });
 
-  describe('add_messages', () => {
+  describe('addMessages', () => {
     const reference_timestamp = Date.now();
 
     const message1 = new Message();
@@ -289,7 +289,7 @@ describe('Conversation', () => {
 
     it('adds multiple messages', () => {
       const message_ets = [message1, message2];
-      conversation_et.add_messages(message_ets as ContentMessage[]);
+      conversation_et.addMessages(message_ets as ContentMessage[]);
 
       expect(conversation_et.messages_unordered().length).toBe(2);
     });
@@ -308,41 +308,41 @@ describe('Conversation', () => {
       const sentMessageEntity = new ContentMessage(createRandomUuid());
       sentMessageEntity.user(selfUserEntity);
       sentMessageEntity.status(StatusType.SENT);
-      conversation_et.add_message(sentMessageEntity);
+      conversation_et.addMessage(sentMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).not.toBeDefined();
 
       const deliveredMessageEntity = new ContentMessage(createRandomUuid());
       deliveredMessageEntity.user(selfUserEntity);
       deliveredMessageEntity.status(StatusType.DELIVERED);
-      conversation_et.add_message(deliveredMessageEntity);
+      conversation_et.addMessage(deliveredMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
 
       const nextSentMessageEntity = new ContentMessage(createRandomUuid());
       nextSentMessageEntity.user(selfUserEntity);
       nextSentMessageEntity.status(StatusType.SENT);
-      conversation_et.add_message(nextSentMessageEntity);
+      conversation_et.addMessage(nextSentMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(deliveredMessageEntity);
 
       const nextDeliveredMessageEntity = new ContentMessage(createRandomUuid());
       nextDeliveredMessageEntity.user(selfUserEntity);
       nextDeliveredMessageEntity.status(StatusType.DELIVERED);
-      conversation_et.add_message(nextDeliveredMessageEntity);
+      conversation_et.addMessage(nextDeliveredMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
 
       const remoteMessageEntity = new ContentMessage(createRandomUuid());
       remoteMessageEntity.user(remoteUserEntity);
       remoteMessageEntity.status(StatusType.DELIVERED);
-      conversation_et.add_message(remoteMessageEntity);
+      conversation_et.addMessage(remoteMessageEntity);
 
       expect(conversation_et.getLastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
     });
   });
 
-  describe('get_last_editable_message', () => {
+  describe('getLastEditableMessage', () => {
     let self_user_et: User = undefined;
 
     beforeEach(() => {
@@ -350,109 +350,109 @@ describe('Conversation', () => {
       self_user_et.isMe = true;
     });
 
-    afterEach(() => conversation_et.remove_messages());
+    afterEach(() => conversation_et.removeMessages());
 
     it('returns undefined if conversation has no messages', () => {
-      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
+      expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns undefined if last message is not text and not added by self user', () => {
       const message_et = new PingMessage();
       message_et.id = createRandomUuid();
       message_et.user(new User());
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
 
-      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
+      expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns undefined if last message is not text and is added by self user', () => {
       const message_et = new PingMessage();
       message_et.id = createRandomUuid();
       message_et.user(self_user_et);
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
 
-      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
+      expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns undefined if last message is text and not send by self user', () => {
       const message_et = new ContentMessage();
-      message_et.add_asset(new Text());
+      message_et.addAsset(new Text());
       message_et.id = createRandomUuid();
       message_et.user(new User());
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
 
-      expect(conversation_et.get_last_editable_message()).not.toBeDefined();
+      expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
     });
 
     it('returns message if last message is text and send by self user', () => {
       const message_et = new ContentMessage();
-      message_et.add_asset(new Text());
+      message_et.addAsset(new Text());
       message_et.id = createRandomUuid();
       message_et.user(self_user_et);
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
 
-      expect(conversation_et.get_last_editable_message()).toBeDefined();
+      expect(conversation_et.getLastEditableMessage()).toBeDefined();
     });
 
     it('returns last text message if last message is not text and send by self user', () => {
       const message_et = new ContentMessage();
-      message_et.add_asset(new Text());
+      message_et.addAsset(new Text());
       message_et.id = createRandomUuid();
       message_et.user(self_user_et);
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
 
       const ping_message_et = new PingMessage();
       ping_message_et.id = createRandomUuid();
       ping_message_et.user(new User());
-      conversation_et.add_message(ping_message_et);
+      conversation_et.addMessage(ping_message_et);
 
-      expect(conversation_et.get_last_editable_message()).toBeDefined();
-      expect(conversation_et.get_last_editable_message().id).toBe(message_et.id);
+      expect(conversation_et.getLastEditableMessage()).toBeDefined();
+      expect(conversation_et.getLastEditableMessage().id).toBe(message_et.id);
     });
 
     it('returns last message if last message is text and send by self user', () => {
       const message_et = new ContentMessage();
-      message_et.add_asset(new Text());
+      message_et.addAsset(new Text());
       message_et.id = createRandomUuid();
       message_et.user(self_user_et);
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
 
       const next_message_et = new ContentMessage();
-      next_message_et.add_asset(new Text());
+      next_message_et.addAsset(new Text());
       next_message_et.id = createRandomUuid();
       next_message_et.user(self_user_et);
-      conversation_et.add_message(next_message_et);
+      conversation_et.addMessage(next_message_et);
 
-      expect(conversation_et.get_last_editable_message()).toBeDefined();
-      expect(conversation_et.get_last_editable_message().id).toBe(next_message_et.id);
+      expect(conversation_et.getLastEditableMessage()).toBeDefined();
+      expect(conversation_et.getLastEditableMessage().id).toBe(next_message_et.id);
     });
 
     it('returns message if last message is text and ephemeral', () => {
       const message_et = new ContentMessage();
-      message_et.add_asset(new Text());
+      message_et.addAsset(new Text());
       message_et.id = createRandomUuid();
       message_et.user(self_user_et);
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
 
       const ephemeral_message_et = new ContentMessage();
-      ephemeral_message_et.add_asset(new Text());
+      ephemeral_message_et.addAsset(new Text());
       ephemeral_message_et.id = createRandomUuid();
       ephemeral_message_et.user(self_user_et);
       ephemeral_message_et.ephemeral_expires(true);
-      conversation_et.add_message(ephemeral_message_et);
+      conversation_et.addMessage(ephemeral_message_et);
 
-      expect(conversation_et.get_last_editable_message()).toBeDefined();
-      expect(conversation_et.get_last_editable_message().id).toBe(message_et.id);
+      expect(conversation_et.getLastEditableMessage()).toBeDefined();
+      expect(conversation_et.getLastEditableMessage().id).toBe(message_et.id);
     });
   });
 
-  describe('get_next_iso_date', () => {
+  describe('getNextIsoDate', () => {
     it('should return an expected ISO string', () => {
       const referenceTimestamp = Date.now() - 1;
       const reference_iso_date = new Date(referenceTimestamp).toISOString();
 
-      expect(conversation_et.get_next_iso_date(referenceTimestamp)).toBe(reference_iso_date);
-      expect(new Date(conversation_et.get_next_iso_date(new Date().getTime())).getTime()).toBeGreaterThan(
+      expect(conversation_et.getNextIsoDate(referenceTimestamp)).toBe(reference_iso_date);
+      expect(new Date(conversation_et.getNextIsoDate(new Date().getTime())).getTime()).toBeGreaterThan(
         new Date(reference_iso_date).getTime(),
       );
 
@@ -460,8 +460,8 @@ describe('Conversation', () => {
       conversation_et.last_server_timestamp(last_server_timestamp);
       const expected_iso_date = new Date(last_server_timestamp + 1).toISOString();
 
-      expect(conversation_et.get_next_iso_date(referenceTimestamp)).toEqual(expected_iso_date);
-      expect(conversation_et.get_next_iso_date(new Date().getTime())).toEqual(expected_iso_date);
+      expect(conversation_et.getNextIsoDate(referenceTimestamp)).toEqual(expected_iso_date);
+      expect(conversation_et.getNextIsoDate(new Date().getTime())).toEqual(expected_iso_date);
     });
   });
 
@@ -714,9 +714,9 @@ describe('Conversation', () => {
       ping_message_3.timestamp(timestamp);
       ping_message_3.id = createRandomUuid();
 
-      conversation_et.add_message(ping_message_1);
-      conversation_et.add_message(ping_message_2);
-      conversation_et.add_message(ping_message_3);
+      conversation_et.addMessage(ping_message_1);
+      conversation_et.addMessage(ping_message_2);
+      conversation_et.addMessage(ping_message_3);
 
       expect(conversation_et.messages_unordered().length).toBe(3);
       expect(conversation_et.messages().length).toBe(3);
@@ -728,7 +728,7 @@ describe('Conversation', () => {
     it('should not release messages if conversation has unread messages', () => {
       const message_et = new Message(createRandomUuid());
       message_et.timestamp(second_timestamp);
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
 
       expect(conversation_et.messages().length).toBe(1);
@@ -743,7 +743,7 @@ describe('Conversation', () => {
     it('should release messages if conversation has no unread messages', () => {
       const message_et = new Message(createRandomUuid());
       message_et.timestamp(first_timestamp);
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
 
       expect(conversation_et.messages().length).toBe(1);
@@ -758,20 +758,20 @@ describe('Conversation', () => {
     });
   });
 
-  describe('remove_message_by_id', () => {
+  describe('removeMessageById', () => {
     let message_id: string = undefined;
 
     beforeEach(() => {
       const message_et = new Message(createRandomUuid());
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
       message_id = message_et.id;
     });
 
-    afterEach(() => conversation_et.remove_messages());
+    afterEach(() => conversation_et.removeMessages());
 
     it('should remove message by id', () => {
       expect(conversation_et.messages().length).toBe(1);
-      conversation_et.remove_message_by_id(message_id);
+      conversation_et.removeMessageById(message_id);
 
       expect(conversation_et.messages().length).toBe(0);
     });
@@ -780,58 +780,58 @@ describe('Conversation', () => {
       const duplicated_message_et = new Message(message_id);
 
       expect(conversation_et.messages().length).toBe(1);
-      conversation_et.add_message(duplicated_message_et);
+      conversation_et.addMessage(duplicated_message_et);
 
       expect(conversation_et.messages().length).toBe(1);
       conversation_et.messages_unordered.push(duplicated_message_et);
 
       expect(conversation_et.messages().length).toBe(2);
 
-      conversation_et.remove_message_by_id(message_id);
+      conversation_et.removeMessageById(message_id);
 
       expect(conversation_et.messages().length).toBe(0);
     });
   });
 
-  describe('remove_messages', () => {
+  describe('removeMessages', () => {
     let message_et = undefined;
 
     beforeEach(() => {
       const first_message_et = new Message(createRandomUuid());
       first_message_et.timestamp(first_timestamp);
-      conversation_et.add_message(first_message_et);
+      conversation_et.addMessage(first_message_et);
 
       message_et = new Message(createRandomUuid());
       message_et.timestamp(second_timestamp);
-      conversation_et.add_message(message_et);
+      conversation_et.addMessage(message_et);
     });
 
-    afterEach(() => conversation_et.remove_messages());
+    afterEach(() => conversation_et.removeMessages());
 
     it('should remove all messages', () => {
       expect(conversation_et.messages().length).toBe(2);
-      conversation_et.remove_messages();
+      conversation_et.removeMessages();
 
       expect(conversation_et.messages().length).toBe(0);
     });
 
     it('should remove all messages for invalid input timestamp', () => {
       expect(conversation_et.messages().length).toBe(2);
-      conversation_et.remove_messages(new Date().getTime());
+      conversation_et.removeMessages(new Date().getTime());
 
       expect(conversation_et.messages().length).toBe(0);
     });
 
     it('should remove expected messages for timestamp greater than message', () => {
       expect(conversation_et.messages().length).toBe(2);
-      conversation_et.remove_messages(first_timestamp + 1);
+      conversation_et.removeMessages(first_timestamp + 1);
 
       expect(conversation_et.messages().length).toBe(1);
     });
 
     it('should remove expected messages for timestamp equal to message', () => {
       expect(conversation_et.messages().length).toBe(2);
-      conversation_et.remove_messages(first_timestamp);
+      conversation_et.removeMessages(first_timestamp);
 
       expect(conversation_et.messages().length).toBe(1);
     });

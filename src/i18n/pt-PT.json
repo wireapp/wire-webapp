@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Pessoas",
   "searchPlaceholder": "Pesquisar por nome ou nome de utilizador",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Pesquisar por nome",
   "searchServices": "Serviços",

@@ -50,7 +50,7 @@ class LinkPreviewAssetComponent {
     this.messageEntity = ko.unwrap(message);
     this.header = header;
 
-    const [firstPreview] = (this.messageEntity.get_first_asset() as Text).previews();
+    const [firstPreview] = (this.messageEntity.getFirstAsset() as Text).previews();
     this.preview = firstPreview;
     this.element = element;
 
@@ -58,13 +58,13 @@ class LinkPreviewAssetComponent {
     this.isTweet = isTypeTweet && isTweetUrl(this.preview.url);
     this.author = this.isTweet ? this.preview.meta_data.author.substring(0, 20) : '';
 
-    if (!this.messageEntity.is_expired()) {
+    if (!this.messageEntity.isExpired()) {
       this.element.addEventListener('click', this.onClick);
     }
   }
 
   readonly onClick = () => {
-    if (!this.messageEntity.is_expired()) {
+    if (!this.messageEntity.isExpired()) {
       safeWindowOpen(this.preview.url);
     }
   };

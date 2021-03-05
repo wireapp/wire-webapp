@@ -43,27 +43,27 @@ export class Asset {
     this.type = '';
   }
 
-  is_downloadable(): boolean {
-    return this.is_audio() || this.is_file() || this.is_video() || this.is_image();
+  isDownloadable(): boolean {
+    return this.isAudio() || this.isFile() || this.isVideo() || this.isImage();
   }
 
-  is_image(): this is MediumImageAsset {
+  isImage(): this is MediumImageAsset {
     return this.type === AssetType.IMAGE;
   }
 
-  is_text(): this is TextAsset {
+  isText(): this is TextAsset {
     return this.type === AssetType.TEXT;
   }
 
-  is_file(): this is FileAsset {
-    return this.type === AssetType.FILE && !this.is_video() && !this.is_audio();
+  isFile(): this is FileAsset {
+    return this.type === AssetType.FILE && !this.isVideo() && !this.isAudio();
   }
 
-  is_location(): this is LocationAsset {
+  isLocation(): this is LocationAsset {
     return this.type === AssetType.LOCATION;
   }
 
-  is_video(): boolean {
+  isVideo(): boolean {
     const is_video_asset = this.type === AssetType.FILE && this.file_type?.startsWith('video');
     if (is_video_asset) {
       const can_play = document.createElement('video').canPlayType(this.file_type);
@@ -74,7 +74,7 @@ export class Asset {
     return false;
   }
 
-  is_audio(): boolean {
+  isAudio(): boolean {
     const is_audio_asset = this.type === AssetType.FILE && this.file_type?.startsWith('audio');
     if (is_audio_asset) {
       const can_play = document.createElement('audio').canPlayType(this.file_type);
@@ -85,7 +85,7 @@ export class Asset {
     return false;
   }
 
-  is_button(): boolean {
+  isButton(): boolean {
     return this.type === AssetType.BUTTON;
   }
 }

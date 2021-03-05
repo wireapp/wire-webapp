@@ -51,13 +51,13 @@ describe('ConversationService', () => {
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const [conversation_et] = conversation_mapper.mapConversations([conversation_payload]);
 
-      return conversation_service.save_conversation_state_in_db(conversation_et).then(conversation_record => {
+      return conversation_service.saveConversationStateInDb(conversation_et).then(conversation_record => {
         expect(conversation_record.name()).toBe(conversation_payload.name);
       });
     });
   });
 
-  describe('search_in_conversation', () => {
+  describe('searchInConversation', () => {
     let events = undefined;
 
     beforeEach(() => {
@@ -72,7 +72,7 @@ describe('ConversationService', () => {
 
     it('should find query in text message', () => {
       return Promise.all(events.slice(0, 1).map(event => storage_service.save(eventStoreName, undefined, event)))
-        .then(() => conversation_service.search_in_conversation(events[0].conversation, 'https://wire.com'))
+        .then(() => conversation_service.searchInConversation(events[0].conversation, 'https://wire.com'))
         .then(result => {
           expect(result.length).toBe(1);
           expect(result[0].id).toBe('f7adaa16-38f5-483e-b621-72ff1dbd2275');
@@ -81,7 +81,7 @@ describe('ConversationService', () => {
 
     it('should find query in text message with link preview', () => {
       return Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
-        .then(() => conversation_service.search_in_conversation(events[0].conversation, 'https://wire.com'))
+        .then(() => conversation_service.searchInConversation(events[0].conversation, 'https://wire.com'))
         .then(result => {
           expect(result.length).toBe(2);
           expect(result[0].id).toBe('f7adaa16-38f5-483e-b621-72ff1dbd2275');
@@ -90,7 +90,7 @@ describe('ConversationService', () => {
     });
   });
 
-  describe('get_active_conversations_from_db', () => {
+  describe('getActiveConversationsFromDb', () => {
     let events = undefined;
 
     beforeEach(() => {
@@ -110,7 +110,7 @@ describe('ConversationService', () => {
 
     it('should return conversation ids sorted by number of messages', () => {
       return Promise.all(events.map(event => storage_service.save(eventStoreName, undefined, event)))
-        .then(() => conversation_service.get_active_conversations_from_db())
+        .then(() => conversation_service.getActiveConversationsFromDb())
         .then(result => {
           expect(result.length).toBe(3);
           expect(result[0]).toBe('34e7f58e-b834-4d84-b628-b89b295d46c1');

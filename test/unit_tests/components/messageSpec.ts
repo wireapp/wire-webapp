@@ -94,7 +94,7 @@ describe('message', () => {
 
   it('displays a link preview', () => {
     const linkPreview = new LinkPreview();
-    defaultParams.message.get_first_asset().previews([linkPreview]);
+    defaultParams.message.getFirstAsset().previews([linkPreview]);
     return instantiateComponent('message', defaultParams).then(domContainer => {
       expect(domContainer.querySelector('link-preview-asset')).not.toBe(null);
     });

@@ -33,7 +33,7 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
   const caption = useKoSubscribable(message.caption);
   const timestamp = useKoSubscribable(message.timestamp);
 
-  const isCompleted = message.was_completed();
+  const isCompleted = message.wasCompleted();
 
   return (
     <div className="message-header">

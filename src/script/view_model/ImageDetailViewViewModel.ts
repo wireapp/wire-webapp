@@ -70,7 +70,7 @@ export class ImageDetailViewViewModel {
         const isExpectedId = this.conversationEntity() ? conversationId === this.conversationEntity().id : false;
         if (!isExpectedId) {
           this.conversationRepository
-            .get_conversation_by_id(conversationId)
+            .getConversationById(conversationId)
             .then(conversationEntity => this.conversationEntity(conversationEntity));
         }
       }
@@ -170,7 +170,7 @@ export class ImageDetailViewViewModel {
 
   private readonly loadImage = () => {
     this.imageVisible(false);
-    this.assetRepository.load((this.messageEntity().get_first_asset() as MediumImage).resource()).then(blob => {
+    this.assetRepository.load((this.messageEntity().getFirstAsset() as MediumImage).resource()).then(blob => {
       if (blob) {
         this.imageSrc(window.URL.createObjectURL(blob));
         this.imageVisible(true);
@@ -187,7 +187,7 @@ export class ImageDetailViewViewModel {
   };
 
   readonly clickOnLike = () => {
-    this.messageRepository.toggle_like(this.conversationEntity(), this.messageEntity());
+    this.messageRepository.toggleLike(this.conversationEntity(), this.messageEntity());
   };
 
   readonly clickOnReply = () => {

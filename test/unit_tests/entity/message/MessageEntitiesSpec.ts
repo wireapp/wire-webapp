@@ -27,26 +27,26 @@ import {Text} from 'src/script/entity/message/Text';
 describe('Message Entities', () => {
   let message_et: ContentMessage = null;
 
-  describe('is_downloadable', () => {
+  describe('isDownloadable', () => {
     it('message with text asset should not be downloadable', () => {
       message_et = new ContentMessage();
       message_et.assets.push(new Text());
 
-      expect(message_et.is_downloadable()).toBeFalsy();
+      expect(message_et.isDownloadable()).toBeFalsy();
     });
 
     it('message with image asset should be downloadable', () => {
       message_et = new ContentMessage();
       message_et.assets.push(new MediumImage(createRandomUuid()));
 
-      expect(message_et.is_downloadable()).toBeTruthy();
+      expect(message_et.isDownloadable()).toBeTruthy();
     });
 
     it('message with file asset should be downloadable', () => {
       message_et = new ContentMessage();
       message_et.assets.push(new FileAsset());
 
-      expect(message_et.is_downloadable()).toBeTruthy();
+      expect(message_et.isDownloadable()).toBeTruthy();
     });
 
     it('ephemeral message with image asset should be downloadable', () => {
@@ -54,7 +54,7 @@ describe('Message Entities', () => {
       message_et.assets.push(new MediumImage(createRandomUuid()));
       message_et.ephemeral_expires(12312123);
 
-      expect(message_et.is_downloadable()).toBeTruthy();
+      expect(message_et.isDownloadable()).toBeTruthy();
     });
 
     it('expired ephemeral message with image asset should not be downloadable', () => {
@@ -62,7 +62,7 @@ describe('Message Entities', () => {
       message_et.assets.push(new MediumImage(createRandomUuid()));
       message_et.ephemeral_expires(true);
 
-      expect(message_et.is_downloadable()).toBeFalsy();
+      expect(message_et.isDownloadable()).toBeFalsy();
     });
   });
 
@@ -72,12 +72,12 @@ describe('Message Entities', () => {
     });
 
     describe('no asset', () => {
-      it('has_asset_medium_image return false', () => {
-        expect(message_et.has_asset_image()).toBeFalsy();
+      it('hasAssetImage return false', () => {
+        expect(message_et.hasAssetImage()).toBeFalsy();
       });
 
-      it('has_asset_text return false', () => {
-        expect(message_et.has_asset_text()).toBeFalsy();
+      it('hasAssetText return false', () => {
+        expect(message_et.hasAssetText()).toBeFalsy();
       });
     });
 
@@ -86,12 +86,12 @@ describe('Message Entities', () => {
         message_et.assets.push(new MediumImage(createRandomUuid()));
       });
 
-      it('has_asset_medium_image return true', () => {
-        expect(message_et.has_asset_image()).toBeTruthy();
+      it('hasAssetImage return true', () => {
+        expect(message_et.hasAssetImage()).toBeTruthy();
       });
 
-      it('has_asset_text return false', () => {
-        expect(message_et.has_asset_text()).toBeFalsy();
+      it('hasAssetText return false', () => {
+        expect(message_et.hasAssetText()).toBeFalsy();
       });
     });
 
@@ -100,12 +100,12 @@ describe('Message Entities', () => {
         message_et.assets.push(new Text());
       });
 
-      it('has_asset_medium_image return false', () => {
-        expect(message_et.has_asset_image()).toBeFalsy();
+      it('hasAssetImage return false', () => {
+        expect(message_et.hasAssetImage()).toBeFalsy();
       });
 
-      it('has_asset_text return true', () => {
-        expect(message_et.has_asset_text()).toBeTruthy();
+      it('hasAssetText return true', () => {
+        expect(message_et.hasAssetText()).toBeTruthy();
       });
 
       it('isObfuscated returns false if it is ephemeral and still sending', () => {

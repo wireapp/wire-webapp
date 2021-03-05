@@ -63,7 +63,7 @@ describe('ServiceMiddleware', () => {
 
         spyOn(serviceMiddleware['userState'], 'self').and.returnValue({id: 'self-id'});
         const conversation = new Conversation();
-        spyOn(testFactory.conversation_repository, 'get_conversation_by_id').and.returnValue(
+        spyOn(testFactory.conversation_repository, 'getConversationById').and.returnValue(
           Promise.resolve(conversation),
         );
         const userEntities = [{}, {isService: true}];

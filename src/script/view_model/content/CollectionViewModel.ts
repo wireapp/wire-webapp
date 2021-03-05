@@ -113,14 +113,14 @@ export class CollectionViewModel {
       this.conversationEntity(conversationEntity);
 
       this.conversationRepository
-        .get_events_for_category(conversationEntity, MessageCategory.LINK_PREVIEW)
+        .getEventsForCategory(conversationEntity, MessageCategory.LINK_PREVIEW)
         .then(messageEntities => this._populateItems(messageEntities as ContentMessage[]));
     }
   };
 
   private _populateItems(messageEntities: ContentMessage[]) {
     messageEntities.forEach((messageEntity: ContentMessage) => {
-      if (!messageEntity.is_expired()) {
+      if (!messageEntity.isExpired()) {
         // TODO: create binary map helper
         const isImage = messageEntity.category & MessageCategory.IMAGE;
         const isGif = messageEntity.category & MessageCategory.GIF;
@@ -130,7 +130,7 @@ export class CollectionViewModel {
 
         const isFile = messageEntity.category & MessageCategory.FILE;
         if (isFile) {
-          const isAudio = messageEntity.get_first_asset().is_audio();
+          const isAudio = messageEntity.getFirstAsset().isAudio();
           return isAudio ? this.audio.push(messageEntity) : this.files.push(messageEntity);
         }
 

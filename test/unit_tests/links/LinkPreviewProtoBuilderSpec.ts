@@ -52,7 +52,7 @@ const OpenGraphMocks = {
 };
 
 describe('LinkPreviewProtoBuilder', () => {
-  const compare_article_with_mock = (
+  const compareArticleWithMock = (
     url: string,
     offset: number,
     preview: LinkPreview,
@@ -94,7 +94,7 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getWireMock();
     const link_preview = buildFromOpenGraphData(mock, url);
     if (link_preview) {
-      compare_article_with_mock(url, 0, link_preview, mock);
+      compareArticleWithMock(url, 0, link_preview, mock);
     } else {
       fail('No link preview generated');
     }
@@ -106,7 +106,7 @@ describe('LinkPreviewProtoBuilder', () => {
     delete mock.image;
     const link_preview = buildFromOpenGraphData(mock, url);
     if (link_preview) {
-      compare_article_with_mock(url, 0, link_preview, mock);
+      compareArticleWithMock(url, 0, link_preview, mock);
     } else {
       fail('No link preview generated');
     }
@@ -117,7 +117,7 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getWireMock();
     const link_preview = buildFromOpenGraphData(mock, url, 12);
     if (link_preview) {
-      compare_article_with_mock(url, 12, link_preview, mock);
+      compareArticleWithMock(url, 12, link_preview, mock);
     } else {
       fail('No link preview generated');
     }
@@ -129,7 +129,7 @@ describe('LinkPreviewProtoBuilder', () => {
     delete mock.type;
     const link_preview = buildFromOpenGraphData(mock, url);
     if (link_preview) {
-      compare_article_with_mock(url, 0, link_preview, mock);
+      compareArticleWithMock(url, 0, link_preview, mock);
     } else {
       fail('No link preview generated');
     }
@@ -141,7 +141,7 @@ describe('LinkPreviewProtoBuilder', () => {
     delete mock.description;
     const link_preview = buildFromOpenGraphData(mock, url);
     if (link_preview) {
-      compare_article_with_mock(url, 0, link_preview, mock);
+      compareArticleWithMock(url, 0, link_preview, mock);
     } else {
       fail('No link preview generated');
     }
@@ -153,7 +153,7 @@ describe('LinkPreviewProtoBuilder', () => {
     mock.site_name = 'Twitter';
     const link_preview = buildFromOpenGraphData(mock, url);
     if (link_preview) {
-      compare_article_with_mock(url, 0, link_preview, mock);
+      compareArticleWithMock(url, 0, link_preview, mock);
     } else {
       fail('No link preview generated');
     }

@@ -255,7 +255,7 @@ ko.components.register('user-devices', {
         : conversationState.activeConversation().id;
       this.isResettingSession(true);
       messageRepository
-        .reset_session(userEntity().id, this.selectedClient().id, conversationId)
+        .resetSession(userEntity().id, this.selectedClient().id, conversationId)
         .then(_resetProgress)
         .catch(_resetProgress);
     };
