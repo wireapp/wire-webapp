@@ -214,7 +214,6 @@ export class CallingRepository {
     const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
-    // wCall.setMediaStreamHandler();
     wCall.setAudioStreamHandler(this.updateCallAudioStreams);
     wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
     setInterval(() => wCall.poll(), 500);
@@ -801,7 +800,7 @@ export class CallingRepository {
     const selfParticipant = activeCall.getSelfParticipant();
     switch (mediaType) {
       case MediaType.AUDIO:
-        // selfParticipant.releaseAudioStream();
+        selfParticipant.releaseAudioStream();
         break;
 
       case MediaType.VIDEO: {
@@ -1142,7 +1141,7 @@ export class CallingRepository {
     const selfParticipant = call.getSelfParticipant();
     const query: Required<MediaStreamQuery> = {audio, camera, screen};
     const cache = {
-      // audio: selfParticipant.audioStream(),
+      audio: selfParticipant.audioStream(),
       camera: selfParticipant.videoStream(),
       screen: selfParticipant.videoStream(),
     };

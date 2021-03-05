@@ -37,7 +37,7 @@ export class Participant {
   public isActivelySpeaking: ko.Observable<boolean>;
 
   // Audio
-  // public audioStream: ko.Observable<MediaStream | undefined>;
+  public audioStream: ko.Observable<MediaStream | undefined>;
   public isMuted: ko.Observable<boolean>;
 
   constructor(public user: User, public clientId: ClientId) {
@@ -55,7 +55,7 @@ export class Participant {
       return this.videoState() === VIDEO_STATE.PAUSED;
     });
     this.videoStream = ko.observable();
-    // this.audioStream = ko.observable();
+    this.audioStream = ko.observable();
     this.isActivelySpeaking = ko.observable(false);
     this.startedScreenSharingAt = ko.observable();
     this.isMuted = ko.observable(false);
@@ -64,10 +64,10 @@ export class Participant {
   readonly doesMatchIds = (userId: UserId, clientId: ClientId): boolean =>
     userId === this.user.id && clientId === this.clientId;
 
-  // setAudioStream(audioStream: MediaStream): void {
-  //   this.releaseStream(this.audioStream());
-  //   this.audioStream(audioStream);
-  // }
+  setAudioStream(audioStream: MediaStream): void {
+    this.releaseStream(this.audioStream());
+    this.audioStream(audioStream);
+  }
 
   setVideoStream(videoStream?: MediaStream): void {
     this.releaseStream(this.videoStream());
@@ -78,16 +78,16 @@ export class Participant {
     if (newStream.getVideoTracks().length) {
       this.setVideoStream(new MediaStream(newStream.getVideoTracks()));
     }
-    // if (newStream.getAudioTracks().length) {
-    //   this.setAudioStream(new MediaStream(newStream.getAudioTracks()));
-    // }
+    if (newStream.getAudioTracks().length) {
+      this.setAudioStream(new MediaStream(newStream.getAudioTracks()));
+    }
     return this.getMediaStream();
   }
 
   getMediaStream(): MediaStream {
-    // const audioTracks: MediaStreamTrack[] = this.audioStream() ? this.audioStream().getTracks() : [];
+    const audioTracks: MediaStreamTrack[] = this.audioStream() ? this.audioStream().getTracks() : [];
     const videoTracks: MediaStreamTrack[] = this.videoStream() ? this.videoStream().getTracks() : [];
-    return new MediaStream(videoTracks);
+    return new MediaStream(audioTracks.concat(videoTracks));
   }
 
   releaseVideoStream(): void {
@@ -95,14 +95,14 @@ export class Participant {
     this.videoStream(undefined);
   }
 
-  // releaseAudioStream(): void {
-  //   this.releaseStream(this.audioStream());
-  //   this.audioStream(undefined);
-  // }
+  releaseAudioStream(): void {
+    this.releaseStream(this.audioStream());
+    this.audioStream(undefined);
+  }
 
   releaseMediaStream(): void {
     this.releaseVideoStream();
-    // this.releaseAudioStream();
+    this.releaseAudioStream();
   }
 
   private releaseStream(mediaStream?: MediaStream): void {
