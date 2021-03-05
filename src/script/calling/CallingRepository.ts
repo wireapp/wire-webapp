@@ -830,7 +830,7 @@ export class CallingRepository {
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
       if (audioTracks.length > 0) {
-        // selfParticipant.setAudioStream(new MediaStream(audioTracks));
+        selfParticipant.setAudioStream(new MediaStream(audioTracks));
         this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
       }
     }
