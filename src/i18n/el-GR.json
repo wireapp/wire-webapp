@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Άτομα",
   "searchPlaceholder": "Αναζητηση ονοματος χρηστη",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Αναζήτηση βάση ονόματος",
   "searchServices": "Υπηρεσίες",

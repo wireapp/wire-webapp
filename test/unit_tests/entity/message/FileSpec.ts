@@ -34,7 +34,7 @@ describe('FileAsset', () => {
       jest
         .spyOn(document, 'createElement')
         .mockImplementationOnce(() => (({canPlayType: () => 'yes'} as unknown) as HTMLElement));
-      expect(file.is_video()).toBeTruthy();
+      expect(file.isVideo()).toBeTruthy();
     });
 
     it('should not treat images as video file', () => {
@@ -44,19 +44,19 @@ describe('FileAsset', () => {
       jest
         .spyOn(document, 'createElement')
         .mockImplementationOnce(() => (({canPlayType: () => ''} as unknown) as HTMLElement));
-      expect(file.is_video()).toBeFalsy();
+      expect(file.isVideo()).toBeFalsy();
 
       file.file_type = 'image/png';
       jest
         .spyOn(document, 'createElement')
         .mockImplementationOnce(() => (({canPlayType: () => ''} as unknown) as HTMLElement));
-      expect(file.is_video()).toBeFalsy();
+      expect(file.isVideo()).toBeFalsy();
 
       file.file_type = 'image/gif';
       jest
         .spyOn(document, 'createElement')
         .mockImplementationOnce(() => (({canPlayType: () => ''} as unknown) as HTMLElement));
-      expect(file.is_video()).toBeFalsy();
+      expect(file.isVideo()).toBeFalsy();
     });
   });
 });

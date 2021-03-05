@@ -87,7 +87,7 @@ describe('WindowTitleViewModel', () => {
       message.timestamp(Date.now());
 
       const conversationEntity = new Conversation(createRandomUuid());
-      conversationEntity.add_message(message);
+      conversationEntity.addMessage(message);
       conversationEntity.name('Birthday Bash');
       conversationEntity.type(CONVERSATION_TYPE.REGULAR);
       conversationEntity.selfUser(new User(createRandomUuid()));
@@ -135,7 +135,7 @@ describe('WindowTitleViewModel', () => {
       const message_in_muted = new ContentMessage();
       message_in_muted.id = createRandomUuid();
       message_in_muted.timestamp(Date.now());
-      muted_conversation.add_message(message_in_muted);
+      muted_conversation.addMessage(message_in_muted);
 
       expect(muted_conversation.messages().length).toBe(1);
       expect(muted_conversation.messages_unordered().length).toBe(1);
@@ -150,7 +150,7 @@ describe('WindowTitleViewModel', () => {
       const message_in_selected = new ContentMessage();
       message_in_selected.id = createRandomUuid();
       message_in_selected.timestamp(Date.now());
-      selected_conversation.add_message(message_in_selected);
+      selected_conversation.addMessage(message_in_selected);
 
       // Check title when there are messages in the selected conversation
       title_view_model.initiateTitleUpdates();
@@ -252,7 +252,7 @@ describe('WindowTitleViewModel', () => {
       contentMessage.timestamp(Date.now());
 
       const conversationEntity = new Conversation(createRandomUuid());
-      conversationEntity.add_message(contentMessage);
+      conversationEntity.addMessage(contentMessage);
       conversationEntity.name('Birthday Bash');
       conversationEntity.type(CONVERSATION_TYPE.REGULAR);
       conversationEntity.selfUser(new User(createRandomUuid()));

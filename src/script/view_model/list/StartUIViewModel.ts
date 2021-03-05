@@ -363,7 +363,7 @@ export class StartUIViewModel {
 
   private readonly getTopPeople = () => {
     return this.conversationRepository
-      .get_most_active_conversations()
+      .getMostActiveConversations()
       .then(conversationEntities => {
         return conversationEntities
           .filter((conversationEntity: Conversation) => conversationEntity.is1to1())
@@ -425,7 +425,7 @@ export class StartUIViewModel {
 
   private readonly searchRemote = async (normalizedQuery: string, isHandle: boolean): Promise<void> => {
     try {
-      const userEntities = await this.searchRepository.search_by_name(normalizedQuery, isHandle);
+      const userEntities = await this.searchRepository.searchByName(normalizedQuery, isHandle);
 
       const isCurrentQuery = normalizedQuery === SearchRepository.normalizeQuery(this.searchInput());
       if (isCurrentQuery) {

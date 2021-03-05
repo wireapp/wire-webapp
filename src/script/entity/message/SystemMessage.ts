@@ -30,7 +30,7 @@ export class SystemMessage extends Message {
     this.system_message_type = SystemMessageType.NORMAL;
   }
 
-  is_conversation_rename(): boolean {
+  isConversationRename(): boolean {
     return this.system_message_type === SystemMessageType.CONVERSATION_RENAME;
   }
 }

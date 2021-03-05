@@ -908,6 +908,7 @@
   "searchOthersFederation": "Mit {{domainName}} verbinden",
   "searchPeople": "Kontakte",
   "searchPlaceholder": "Name oder Benutzername suchen",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Unterhaltung öffnen",
   "searchServicePlaceholder": "Nach Namen suchen",
   "searchServices": "Dienste",

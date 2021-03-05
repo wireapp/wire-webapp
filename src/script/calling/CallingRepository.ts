@@ -252,7 +252,7 @@ export class CallingRepository {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients: UserClients = await this.messageRepository.create_recipients(conversationId);
+      const localClients: UserClients = await this.messageRepository.createRecipients(conversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -485,7 +485,7 @@ export class CallingRepository {
   //##############################################################################
 
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<void> {
-    const recipients = await this.messageRepository.create_recipients(conversationId, false, [userId]);
+    const recipients = await this.messageRepository.createRecipients(conversationId, false, [userId]);
     const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse

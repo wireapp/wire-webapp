@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Ihmiset",
   "searchPlaceholder": "Etsi nimellä tai käyttäjänimellä",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Hae nimellä",
   "searchServices": "Palvelut",

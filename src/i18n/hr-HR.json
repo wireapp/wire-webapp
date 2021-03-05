@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Kontakti",
   "searchPlaceholder": "Pretraži po imenu ili korisničkom imenu",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Otvori razgovor",
   "searchServicePlaceholder": "Traži po imenu",
   "searchServices": "Usluge",

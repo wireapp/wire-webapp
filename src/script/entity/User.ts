@@ -242,7 +242,7 @@ export class User {
     return !!this.email() || !!this.phone() || this.isSingleSignOn;
   }
 
-  remove_client(client_id: string): ClientEntity[] {
+  removeClient(client_id: string): ClientEntity[] {
     return this.devices.remove(client_et => client_et.id === client_id);
   }
 
