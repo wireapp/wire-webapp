@@ -43,8 +43,8 @@ describe('image-asset', () => {
 
   it('displays a dummy image when resource is not loaded', () => {
     const image = new MediumImage(createRandomUuid());
-    image.height = "10px";
-    image.width = "100px";
+    image.height = '10px';
+    image.width = '100px';
     const params = {...defaultParams, asset: image};
     return instantiateComponent('image-asset', params).then(domContainer => {
       const img = domContainer.querySelector('img');

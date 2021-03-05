@@ -28,12 +28,12 @@ import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import type {Participant} from '../../calling/Participant';
 
 export interface GroupVideoGridTileProps {
-  minimized: boolean;
-  participantCount: number;
-  participant: Participant;
-  selfParticipant: Participant;
   maximizedParticipant: Participant;
+  minimized: boolean;
   onParticipantDoubleClick: (userId: string, clientId: string) => void;
+  participant: Participant;
+  participantCount: number;
+  selfParticipant: Participant;
 }
 
 const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({

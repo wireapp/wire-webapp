@@ -35,7 +35,7 @@ class BackendError extends Error {
   public response?: {status: HTTP_STATUS};
 
   constructor(message?: string) {
-    super(message)
+    super(message);
   }
 }
 
@@ -270,21 +270,21 @@ describe('ClientRepository', () => {
     it('throws an error if current client is not set', () => {
       const functionCall = () => testFactory.client_repository['isCurrentClient'](userId, clientId);
 
-      expect(functionCall).toThrowError( ClientError.MESSAGE.CLIENT_NOT_SET);
+      expect(functionCall).toThrowError(ClientError.MESSAGE.CLIENT_NOT_SET);
     });
 
     it('throws an error if client ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient(new ClientEntity());
       const functionCall = () => testFactory.client_repository['isCurrentClient'](userId, undefined);
 
-      expect(functionCall).toThrowError( ClientError.MESSAGE.NO_CLIENT_ID);
+      expect(functionCall).toThrowError(ClientError.MESSAGE.NO_CLIENT_ID);
     });
 
     it('throws an error if user ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient(new ClientEntity());
       const functionCall = () => testFactory.client_repository['isCurrentClient'](undefined, clientId);
 
-      expect(functionCall).toThrowError( ClientError.MESSAGE.NO_USER_ID);
+      expect(functionCall).toThrowError(ClientError.MESSAGE.NO_USER_ID);
     });
   });
 });

@@ -80,13 +80,13 @@ describe('message', () => {
     return instantiateComponent('message', defaultParams).then(domContainer => {
       expect(document.querySelector('.ctx-menu')).toBe(null);
 
-      domContainer.querySelector<HTMLSpanElement>('.context-menu').click()
+      domContainer.querySelector<HTMLSpanElement>('.context-menu').click();
 
       const menu: HTMLElement = document.querySelector('.ctx-menu');
 
       expect(menu).toBeDefined();
 
-      menu.querySelector<HTMLElement>(`[title=${t('conversationContextMenuLike')}]`).click()
+      menu.querySelector<HTMLElement>(`[title=${t('conversationContextMenuLike')}]`).click();
 
       expect(defaultParams.onLike).toHaveBeenCalled();
     });
