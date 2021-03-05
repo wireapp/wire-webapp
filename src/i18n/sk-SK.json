@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Ľudia",
   "searchPlaceholder": "Vyhľadať podľa mena, alebo užívateľského mena",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Vyhľadať podľa mena",
   "searchServices": "Služby",

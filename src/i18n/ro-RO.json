@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Persoane",
   "searchPlaceholder": "Caută după nume sau nume utilizator",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Adaugă serviciu",
   "searchServicePlaceholder": "Caută după nume",
   "searchServices": "Servicii",

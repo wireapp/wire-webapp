@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Inimesed",
   "searchPlaceholder": "Otsi nime või kasutajanime järgi",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Lisa teenus",
   "searchServicePlaceholder": "Otsi nime järgi",
   "searchServices": "Teenused",

@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Personer",
   "searchPlaceholder": "Søg på navn eller brugernavn",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Tilføj tjeneste",
   "searchServicePlaceholder": "Søg ved navn",
   "searchServices": "Tjenester",
