@@ -69,7 +69,11 @@ describe('videoGridHandler', () => {
         const selfUser = new User();
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
-        const call = new Call('', '', undefined, selfParticipant);
+        const call = new Call('', '', undefined, selfParticipant, {
+          currentAvailableDeviceId: {
+            audioOutput: ko.pureComputed(() => 'test'),
+          },
+        });
         call.participants = participantsObs;
         const grid = getGrid(call);
         tests.forEach(({oldParticipants, newParticipants, expected, scenario}) => {
@@ -84,7 +88,11 @@ describe('videoGridHandler', () => {
     describe('self user with video', () => {
       it('places the self user in the thumbnail if the call is one to one', () => {
         const selfParticipant = generateVideoParticipant('self', true);
-        const call = new Call('', '', CONV_TYPE.ONEONONE, selfParticipant);
+        const call = new Call('', '', CONV_TYPE.ONEONONE, selfParticipant, {
+          currentAvailableDeviceId: {
+            audioOutput: ko.pureComputed(() => 'test'),
+          },
+        });
         call.addParticipant(participants[0]);
         const grid = getGrid(call);
 
@@ -95,7 +103,11 @@ describe('videoGridHandler', () => {
 
       it('places the self user in the grid for any call type with just one other participant', () => {
         const selfParticipant = generateVideoParticipant('self', true);
-        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant);
+        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, {
+          currentAvailableDeviceId: {
+            audioOutput: ko.pureComputed(() => 'test'),
+          },
+        });
         call.addParticipant(participants[0]);
         const grid = getGrid(call);
 
@@ -106,7 +118,11 @@ describe('videoGridHandler', () => {
 
       it('places the self user in the grid if there are no other video participants', () => {
         const selfParticipant = generateVideoParticipant('self', true);
-        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant);
+        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, {
+          currentAvailableDeviceId: {
+            audioOutput: ko.pureComputed(() => 'test'),
+          },
+        });
         const grid = getGrid(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual([selfParticipant].map(toParticipantId));
@@ -116,7 +132,11 @@ describe('videoGridHandler', () => {
 
       it('places the self user in the grid if there are more than 1 other participant', () => {
         const selfParticipant = generateVideoParticipant('self', true);
-        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant);
+        const call = new Call('', '', CONV_TYPE.GROUP, selfParticipant, {
+          currentAvailableDeviceId: {
+            audioOutput: ko.pureComputed(() => 'test'),
+          },
+        });
         call.addParticipant(participants[0]);
         call.addParticipant(participants[1]);
         const grid = getGrid(call);

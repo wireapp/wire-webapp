@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import 'Components/calling/ChooseScreen';
-import {getLogger, Logger} from 'Util/Logger';
+// import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
 import {AudioType} from '../audio/AudioType';
@@ -76,7 +76,7 @@ declare global {
 
 export class CallingViewModel {
   private onChooseScreen: (deviceId: string) => void;
-  private readonly logger: Logger;
+  // private readonly logger: Logger;
   private readonly selfUser: ko.Observable<User>;
 
   readonly activeCalls: ko.PureComputed<Call[]>;
@@ -107,7 +107,7 @@ export class CallingViewModel {
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
   ) {
-    this.logger = getLogger('CallingViewModel');
+    // this.logger = getLogger('CallingViewModel');
     this.callingRepository = callingRepository;
     this.mediaDevicesHandler = mediaDevicesHandler;
     this.mediaStreamHandler = mediaStreamHandler;

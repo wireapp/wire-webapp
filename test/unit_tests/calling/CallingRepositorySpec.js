@@ -74,6 +74,11 @@ describe('CallingRepository', () => {
         CONV_TYPE.ONEONONE,
         new Participant(),
         CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: {
+            audioOutput: ko.pureComputed(() => 'test'),
+          },
+        },
       );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
       spyOn(callingRepository.callState, 'activeCalls').and.returnValue([activeCall]);
@@ -109,13 +114,25 @@ describe('CallingRepository', () => {
   describe('joinedCall', () => {
     it('only exposes the current active call', () => {
       const selfParticipant = createSelfParticipant();
-      const incomingCall = new Call('', '', undefined, selfParticipant);
+      const incomingCall = new Call('', '', undefined, selfParticipant, {
+        currentAvailableDeviceId: {
+          audioOutput: ko.pureComputed(() => 'test'),
+        },
+      });
       incomingCall.state(CALL_STATE.INCOMING);
 
-      const activeCall = new Call('', '', undefined, selfParticipant);
+      const activeCall = new Call('', '', undefined, selfParticipant, {
+        currentAvailableDeviceId: {
+          audioOutput: ko.pureComputed(() => 'test'),
+        },
+      });
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
 
-      const declinedCall = new Call('', '', undefined, selfParticipant);
+      const declinedCall = new Call('', '', undefined, selfParticipant, {
+        currentAvailableDeviceId: {
+          audioOutput: ko.pureComputed(() => 'test'),
+        },
+      });
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
 
@@ -128,7 +145,11 @@ describe('CallingRepository', () => {
   describe('getCallMediaStream', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
-      const call = new Call('', '', undefined, selfParticipant);
+      const call = new Call('', '', undefined, selfParticipant, {
+        currentAvailableDeviceId: {
+          audioOutput: ko.pureComputed(() => 'test'),
+        },
+      });
       const source = new RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
@@ -148,7 +169,11 @@ describe('CallingRepository', () => {
 
     it('asks only once for mediastream when queried multiple times', () => {
       const selfParticipant = createSelfParticipant();
-      const call = new Call('', '', undefined, selfParticipant);
+      const call = new Call('', '', undefined, selfParticipant, {
+        currentAvailableDeviceId: {
+          audioOutput: ko.pureComputed(() => 'test'),
+        },
+      });
       const source = new RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
@@ -173,7 +198,11 @@ describe('CallingRepository', () => {
       const selfParticipant = createSelfParticipant();
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
-      const call = new Call('', '', 0, selfParticipant, 0);
+      const call = new Call('', '', 0, selfParticipant, 0, {
+        currentAvailableDeviceId: {
+          audioOutput: ko.pureComputed(() => 'test'),
+        },
+      });
       spyOn(callingRepository.callState, 'joinedCall').and.returnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
 

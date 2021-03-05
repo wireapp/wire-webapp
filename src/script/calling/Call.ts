@@ -68,15 +68,16 @@ export class Call {
     public readonly initiator: UserId,
     public readonly conversationId: ConversationId,
     public readonly conversationType: CONV_TYPE,
-    private readonly selfParticipant: Participant,
+    // private readonly selfParticipant: Participant,
+    selfParticipant: Participant,
     callType: CALL_TYPE,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
   ) {
+    console.info(selfParticipant); // just to fix lint
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
     this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
-
     this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
       this.activeAudioOutput = newActiveAudioOutput;
       this.updateAudioStreamsSink();

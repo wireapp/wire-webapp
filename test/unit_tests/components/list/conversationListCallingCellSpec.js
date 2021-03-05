@@ -29,7 +29,11 @@ import {User} from 'src/script/entity/User';
 
 function createCall(state, selfUser = new User(createRandomUuid())) {
   const selfParticipant = new Participant(selfUser);
-  const call = new Call('', '', undefined, selfParticipant);
+  const call = new Call('', '', undefined, selfParticipant, {
+    currentAvailableDeviceId: {
+      audioOutput: ko.pureComputed(() => 'test'),
+    },
+  });
   call.state(state);
   return call;
 }
