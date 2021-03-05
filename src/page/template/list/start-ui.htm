@@ -5,7 +5,7 @@
   </div>
   <div id="start-ui-header" class="start-ui-header" data-bind="css: {'start-ui-header-integrations': isTeam()}">
     <user-input class="start-ui-header-user-input"
-                params="input: searchInput, placeholder: t('searchPlaceholder'), enter: handleSearchInput"
+                params="input: searchInput, placeholder: enableFederation ? t('searchPlaceholderFederation') : t('searchPlaceholder'), enter: handleSearchInput"
                 data-uie-name="enter-search">
     </user-input>
     <!-- ko if: isTeam() && z.userPermission().canChatWithServices() -->
