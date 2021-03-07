@@ -12,7 +12,7 @@
     "classnames": "2.2.6",
     "core-js": "2.6.10",
     "countly-sdk-web": "20.11.1",
-    "date-fns": "2.17.0",
+    "date-fns": "2.19.0",
     "dexie-batch": "0.4.2",
     "highlight.js": "10.6.0",
     "http-status-codes": "2.1.4",
