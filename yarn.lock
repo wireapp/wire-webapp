@@ -2753,16 +2753,16 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@12.3.7":
-  version "12.3.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.3.7.tgz#667b256aafdf19463bac245be1cfa7024b924bde"
-  integrity sha512-dWzJAl+A84sn81mr8+GqxI1hf9qDYtfPWVzQMWLQKGeW3NrowCwVhcwvq/E5ZO6gkjRoPgtk4mfaWe3403jIGA==
+"@wireapp/api-client@12.3.9":
+  version "12.3.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.3.9.tgz#2e461d87566d951127c179e12560eedaac6aecc4"
+  integrity sha512-6lA4DY26Mj1KpIvUxDbx85lBSGgpgJ9QBQiKhCT0V6RfocnG/vI05VVKUAxIEm3VDVWQYGLtRe3PrZzO1JK0Eg==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
     "@types/tough-cookie" "4.0.0"
-    "@wireapp/commons" "4.1.1"
-    "@wireapp/priority-queue" "1.6.23"
+    "@wireapp/commons" "4.1.2"
+    "@wireapp/priority-queue" "1.6.24"
     "@wireapp/protocol-messaging" "1.29.0"
     axios "0.21.1"
     http-status-codes "2.1.4"
@@ -2782,10 +2782,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.6.27.tgz#4cedcb77cdcea53f101406704a197cf364217f4b"
   integrity sha512-pv2BmmYOuZPNaDr+4Jk/dr4kJPWIjK2ZB9r1lbcdZA9GaMc299TThwP33Pom5BRVPe79WlunMnnEuAHOk5mZ/Q==
 
-"@wireapp/commons@4.1.1":
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.1.1.tgz#ff890515892aeddd3567381408233782a6411979"
-  integrity sha512-5ZQJutkqAuXa7ByKxOOq1Tfi/Yyv9ioH2qhfWFWIHMw0/8BIUe9eVrPd1nB9V+h8a8+SxIaEtC6nQj8NFZPWTA==
+"@wireapp/commons@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.1.2.tgz#015317728dc33673a0a5ac01f7b1d39b7fa07e86"
+  integrity sha512-chrODoYElcetb/6SdoFRxC6zD2qeBzO+yEt36RYX/7oGaP/Q0NY5JV49gdciLEBch4D1o7utZhvrE05bhUtnKg==
   dependencies:
     "@types/fs-extra" "9.0.6"
     "@types/node" "~14"
@@ -2809,15 +2809,15 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.1.7":
-  version "17.1.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.1.7.tgz#4c890fc54e146e8e3097bafbbd7f7fbef0691033"
-  integrity sha512-ABmHMEj64UvbJkojoVwV3L1FjNWvgLsSbdguW2V5OwpGkOMUM9v2lhjSO6UlKcT/SwE6CHYSsQ+R0FODGVv/FA==
+"@wireapp/core@17.1.9":
+  version "17.1.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.1.9.tgz#805c8c4326f0c945ce3bd3a95965febdf4965b7c"
+  integrity sha512-7Vbi7gbQKpQNbiHhIbTlflt76p6R7CFbgj6xDEiixyO+VwSeK/QFizElUEOVNg9rTjLrZFvA3/B+tRnoqT4DJA==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "12.3.7"
-    "@wireapp/cryptobox" "12.2.53"
+    "@wireapp/api-client" "12.3.9"
+    "@wireapp/cryptobox" "12.2.54"
     bazinga64 "5.7.28"
     hash.js "1.1.7"
     http-status-codes "2.1.4"
@@ -2826,16 +2826,16 @@
     protobufjs "6.10.2"
     uuidjs "4.2.8"
 
-"@wireapp/cryptobox@12.2.53":
-  version "12.2.53"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.2.53.tgz#c27de587a900793001fee8bc4a16612a31851a99"
-  integrity sha512-U6AEK3RGk6zpB0D1TZEHGyFzeJsCNeMShBrQLcWC4uK7aZz2p4zkihfHn/oDKvTJtL//Rd92kUs/2zc2T4SheQ==
+"@wireapp/cryptobox@12.2.54":
+  version "12.2.54"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.2.54.tgz#c98be5563b842fcbaa08835ecb580e4499599ba4"
+  integrity sha512-PBsvI0D+AdxjtoE5KSMwjs0KVyEbGKMevThyxpexkSljzF4WCAik2sPQFIFiB+PQBTepKH7LMBX62AvneBOZPA==
   dependencies:
     "@types/node" "~14"
     "@wireapp/lru-cache" "3.7.12"
-    "@wireapp/priority-queue" "1.6.23"
-    "@wireapp/proteus" "9.9.2"
-    "@wireapp/store-engine" "4.5.27"
+    "@wireapp/priority-queue" "1.6.24"
+    "@wireapp/proteus" "9.9.3"
+    "@wireapp/store-engine" "4.5.28"
     bazinga64 "5.7.28"
     logdown "3.3.1"
 
@@ -2854,17 +2854,17 @@
   resolved "https://registry.yarnpkg.com/@wireapp/prettier-config/-/prettier-config-0.3.0.tgz#e8129b31021c81d90d564d9c4ff0f7f7b514e943"
   integrity sha512-BFokvX4NZlkhWq5/OoJUCS8Iels+MeRgzpd5V9QR3hj5swwCFGxJOAL7soPXkSNWo91gI1qwiTp8szB1O9aCfQ==
 
-"@wireapp/priority-queue@1.6.23":
-  version "1.6.23"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.23.tgz#324c8f4818318926001bea2c8ad6a34259f2a4dc"
-  integrity sha512-F8nNZ56D9e81ks7qGoCMpioBzBGO+iR13DlNyBrvTUhz0RE6VhWk2tpGSXwIwbNnI+0WSnh1d283VV8MUJtr+A==
+"@wireapp/priority-queue@1.6.24":
+  version "1.6.24"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.24.tgz#3edeefadb6762fbbb998879171cae05cee65fd61"
+  integrity sha512-eosQmbz2RiJQXd3qmM0K3MciI2UZv7rt41+Dg0em0UVuqT5r30RQzNG8X/O1W7tbrladdVBwcUJIacWYr7wjdg==
   dependencies:
     "@types/node" "~14"
 
-"@wireapp/proteus@9.9.2":
-  version "9.9.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-9.9.2.tgz#643ff7d212f71079233cb18b05a0b6f32f1b464e"
-  integrity sha512-UD0bwfn1JnisSoqBKvqEAN0rFFhVi40XSRIyqaCOa5XwOaUPASLOfhiUcwEZRO8NnspOKJX41y5BvfToFmev8Q==
+"@wireapp/proteus@9.9.3":
+  version "9.9.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/proteus/-/proteus-9.9.3.tgz#d27fc2597150f40a4d55441be2c94b0606c94720"
+  integrity sha512-PYOqVdljwoSiy/YsEm7WHFTehalBmY8osD3/SUr/6sZcV9mbS5fDyJU/XSOjTWmZZDHTuI9CJirTj72WQMaHeg==
   dependencies:
     "@types/chai" "4.2.14"
     "@types/ed2curve" "0.2.2"
@@ -2914,10 +2914,10 @@
     "@wireapp/websql" "0.0.17"
     uint32 "0.2.1"
 
-"@wireapp/store-engine@4.5.27":
-  version "4.5.27"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-4.5.27.tgz#561af5f4fbb9c31444d1907cdf40953050e3fba0"
-  integrity sha512-iJuxu++L9FDHEPNG3/dFUkOpUBqgh25Az05zswshCkt0Q6wNUuJO3vFRXm6Pp95KyS4T2OoewfDwqb/RZn5KlQ==
+"@wireapp/store-engine@4.5.28":
+  version "4.5.28"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine/-/store-engine-4.5.28.tgz#5455901d03481b8dab4a154446000a2004597782"
+  integrity sha512-EIMKao/QgmHEYADc7IJssQOEWR0SvsnJh1Gp+EHHEDhAe8ZqZtYgDNXir4ma34DPIrPmO1Fz10owr2gs6k2fDw==
   dependencies:
     "@types/node" "~14"
 
