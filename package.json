@@ -157,7 +157,7 @@
     "raf": "3.4.1",
     "react-hot-loader": "4.13.0",
     "react-test-renderer": "16.14.0",
-    "redux-devtools-extension": "2.13.8",
+    "redux-devtools-extension": "2.13.9",
     "redux-mock-store": "1.5.4",
     "simple-git": "2.35.2",
     "sinon": "9.2.4",
