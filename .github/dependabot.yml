@@ -29,6 +29,9 @@ updates:
       - dependency-name: 'less'
         versions:
           - '>= 4'
+      - dependency-name: 'husky'
+        versions:
+          - '>= 5.a'
   - package-ecosystem: npm
     directory: '/server'
     schedule:
