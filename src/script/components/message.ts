@@ -381,7 +381,7 @@ const normalTemplate: string = `
           <service-icon class="message-header-icon-service"></service-icon>
         <!-- /ko -->
         <!-- ko if: message.was_edited() -->
-          <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
+          <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.displayEditedTimestamp()}"></span>
         <!-- /ko -->
       </div>
     </div>
