@@ -2935,10 +2935,10 @@
   dependencies:
     dexie "3.0.3"
 
-"@wireapp/store-engine-sqleet@1.3.43":
-  version "1.3.43"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.43.tgz#0835c231ea5aeb7857c0cfb969babfe22d4fd0ec"
-  integrity sha512-nW+O1s0icinUTzIQIAnqeBALkw3qq75OKatmtXJCx/nz8FqioAwvPe9JdhRniPud7weXqDmltJ1NY9jP/SFU2g==
+"@wireapp/store-engine-sqleet@1.3.44":
+  version "1.3.44"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.44.tgz#7aed24fe962357333a7ceceea053fa010491d98e"
+  integrity sha512-tktD6xw8RPHUbnxvhAlVciJDDfEBPq/lju3/XtwPr6CmkSUQNrNPr6Yj7CC9Sli+dPlR85qvvjt1K7IU0VFgSg==
   dependencies:
     "@babel/core" "7.12.16"
     "@babel/plugin-proposal-class-properties" "7.12.13"
