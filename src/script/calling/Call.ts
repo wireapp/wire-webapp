@@ -68,12 +68,10 @@ export class Call {
     public readonly initiator: UserId,
     public readonly conversationId: ConversationId,
     public readonly conversationType: CONV_TYPE,
-    // private readonly selfParticipant: Participant,
-    selfParticipant: Participant,
+    private readonly selfParticipant: Participant,
     callType: CALL_TYPE,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
   ) {
-    console.info(selfParticipant); // just to fix lint
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
@@ -85,8 +83,7 @@ export class Call {
   }
 
   get hasWorkingAudioInput(): boolean {
-    return true;
-    // return !!this.selfParticipant.audioStream();
+    return !!this.selfParticipant.audioStream();
   }
 
   getSelfParticipant(): Participant {
@@ -102,31 +99,21 @@ export class Call {
   }
 
   playAudioStreams() {
-    Object.keys(this.audios).forEach(audioId => {
-      const audio = this.audios[audioId];
-      if (!audio) {
-        return;
-      }
-      if (audio && audio.audioElement && (audio.audioElement.srcObject as MediaStream).active) {
+    Object.values(this.audios).forEach(audio => {
+      if ((audio.audioElement?.srcObject as MediaStream).active) {
         return;
       }
       const audioElement = new Audio();
       audioElement.srcObject = audio.stream;
       audioElement.play();
-      if (this.activeAudioOutput && audioElement.setSinkId) {
-        audioElement.setSinkId(this.activeAudioOutput);
-      }
       audio.audioElement = audioElement;
     });
+    this.updateAudioStreamsSink();
   }
 
   updateAudioStreamsSink() {
-    // activeAudioOutput = newActiveAudioOutput;
-    // const activeAudioElements = Object.values(participantsAudioElement);
-    // this.logger.debug(`Switching audio output for ${activeAudioElements.length} call participants`);
-    Object.keys(this.audios).forEach(audioId => {
-      const audio = this.audios[audioId];
-      if (audio.audioElement.setSinkId) {
+    Object.values(this.audios).forEach(audio => {
+      if (this.activeAudioOutput && audio.audioElement?.setSinkId) {
         audio.audioElement.setSinkId(this.activeAudioOutput);
       }
     });

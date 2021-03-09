@@ -1243,9 +1243,6 @@ export class CallingRepository {
     }
 
     const [stream] = streams;
-    // if (stream.getAudioTracks().length > 0) {
-    //   participant.audioStream(stream);
-    // }
     if (stream.getVideoTracks().length > 0) {
       participant.videoStream(stream);
     }
