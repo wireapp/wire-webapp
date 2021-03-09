@@ -65,7 +65,7 @@
     "@testing-library/react": "11.2.5",
     "@types/adm-zip": "0.4.33",
     "@types/classnames": "2.2.11",
-    "@types/dexie-batch": "0.4.1",
+    "@types/dexie-batch": "0.4.2",
     "@types/enzyme": "3.10.8",
     "@types/faker": "5.1.7",
     "@types/generate-changelog": "1.8.0",

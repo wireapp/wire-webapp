@@ -2019,12 +2019,12 @@
   dependencies:
     "@types/color-convert" "*"
 
-"@types/dexie-batch@0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@types/dexie-batch/-/dexie-batch-0.4.1.tgz#4e83ecf216f846616c9179080dc139b70197158b"
-  integrity sha512-9mtP3BIQui9TwqW5t1GTRPWQa0OSUBdC8OLZGrdPRQQ6UZHRXRN5ZO1+u82OxH/LlpGiUpz+/E4EdJmHv0wYKg==
+"@types/dexie-batch@0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@types/dexie-batch/-/dexie-batch-0.4.2.tgz#6edd8f324234e225b6fc9118fb586b733c8e6320"
+  integrity sha512-1ZImw6YuuAQ7E9os2XSlo3P0zF//GZBD3dmj6gnfnGXyk+R2sQXOc2S6l3zdCA80wi+Yk1vNdeNHHX1PtKzfRQ==
   dependencies:
-    dexie "^2.0.0"
+    dexie latest
 
 "@types/ed2curve@0.2.2":
   version "0.2.2"
@@ -5037,15 +5037,10 @@ dexie-batch@0.4.2:
   resolved "https://registry.yarnpkg.com/dexie-batch/-/dexie-batch-0.4.2.tgz#8e457d7eb3da933802eae561e9f0141c9d84b2f9"
   integrity sha512-tDEVCArDddWtSq8EnRovbxw4CBQaBxABMFzahbI8+C6oWMG4yu0DZjMhC3kzdDjz39PIlz75/wuBHk5lgrDiTw==
 
-dexie@3.0.3:
+dexie@3.0.3, dexie@latest:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/dexie/-/dexie-3.0.3.tgz#ede63849dfe5f07e13e99bb72a040e8ac1d29dab"
   integrity sha512-BSFhGpngnCl1DOr+8YNwBDobRMH0ziJs2vts69VilwetHYOtEDcLqo7d/XiIphM0tJZ2rPPyAGd31lgH2Ln3nw==
-
-dexie@^2.0.0:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/dexie/-/dexie-2.0.4.tgz#6027a5e05879424e8f9979d8c14e7420f27e3a11"
-  integrity sha512-aQ/s1U2wHxwBKRrt2Z/mwFNHMQWhESerFsMYzE+5P5OsIe5o1kgpFMWkzKTtkvkyyEni6mWr/T4HUJuY9xIHLA==
 
 diff-sequences@^26.6.2:
   version "26.6.2"
