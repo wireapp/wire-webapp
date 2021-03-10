@@ -25,7 +25,7 @@ const ParticipantMicOnIcon: React.FC<ParticipantMicOnIconProps> = ({
   const userState = container.resolve(UserState);
   return (
     <span
-      css={{animation: isActive ? `${fadeAnimation} 0.7s ease-in-out infinite alternate` : 'initial'}}
+      css={{animation: isActive ? `${fadeAnimation} 0.7s steps(7) infinite alternate` : 'initial'}}
       className={className}
       {...props}
     >

@@ -117,7 +117,6 @@ ko.components.register('user-input', {
                  data-bind="textInput: input,
                             hasFocus: hasFocus,
                             attr: {placeholder: placeholder},
-                            css: {'search-input-show-placeholder': placeholder},
                             event: {keydown: onKeyDown},
                             enter: onEnter"
                  data-uie-name="enter-users">

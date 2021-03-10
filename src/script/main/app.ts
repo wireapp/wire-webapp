@@ -426,7 +426,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
       await Promise.all(
-        conversationRepository.map_connections(
+        conversationRepository.mapConnections(
           Object.values(connectionRepository['connectionState'].connectionEntities()),
         ),
       );
@@ -444,7 +444,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
-      await conversationRepository.initialize_conversations();
+      await conversationRepository.initializeConversations();
       loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
@@ -475,7 +475,7 @@ class App {
         startNewVersionPolling(Environment.version(false), this.update);
       }
       audioRepository.init(true);
-      conversationRepository.cleanup_conversations();
+      conversationRepository.cleanupConversations();
       callingRepository.setReady();
       this.logger.info('App fully loaded');
     } catch (error) {

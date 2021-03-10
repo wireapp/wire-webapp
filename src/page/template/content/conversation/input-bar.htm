@@ -14,38 +14,38 @@
             <!-- /ko -->
           </div>
           <!-- ko if: replyAsset() -->
-            <!-- ko if: replyAsset().is_text() -->
+            <!-- ko if: replyAsset().isText() -->
               <div class="input-bar__reply__message input-bar__reply__message__text" data-bind="html: renderMessage(replyAsset().text, null, replyAsset().mentions())" data-uie-name="media-text-reply-box"></div>
             <!-- /ko -->
 
-            <!-- ko if: replyAsset().is_image()-->
+            <!-- ko if: replyAsset().isImage()-->
               <div class="input-bar__reply__message input-bar__reply__message__image" data-bind="background_image: replyAsset().resource()" data-uie-name="media-picture-reply-box">
                 <img/>
               </div>
             <!-- /ko -->
 
-            <!-- ko if: replyAsset().is_video() -->
+            <!-- ko if: replyAsset().isVideo() -->
               <div class="input-bar__reply__message input-bar__reply__message__image input-bar__reply__video" data-bind="background_image: replyAsset().preview_resource()" data-uie-name="media-video-reply-box">
                 <img/>
                 <camera-icon></camera-icon>
               </div>
             <!-- /ko -->
 
-            <!-- ko if: replyAsset().is_audio()-->
+            <!-- ko if: replyAsset().isAudio()-->
               <div class="input-bar__reply__message" data-uie-name="media-audio-reply-box">
                 <mic-on-icon class="input-bar__reply__icon"></mic-on-icon>
                 <span data-bind="text: t('replyAudioMessage')"></span>
               </div>
             <!-- /ko -->
 
-            <!-- ko if: replyAsset().is_file()-->
+            <!-- ko if: replyAsset().isFile()-->
               <div class="input-bar__reply__message" data-uie-name="media-file-reply-box">
                 <file-icon class="input-bar__reply__icon"></file-icon>
                 <span data-bind="text: replyAsset().file_name"></span>
               </div>
             <!-- /ko -->
 
-            <!-- ko if: replyAsset().is_location()-->
+            <!-- ko if: replyAsset().isLocation()-->
               <div class="input-bar__reply__message" data-uie-name="media-location-reply-box">
                 <location-icon class="input-bar__reply__icon"></location-icon>
                 <span data-bind="text: replyAsset().name"></span>

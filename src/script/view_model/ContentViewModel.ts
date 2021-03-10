@@ -281,7 +281,7 @@ export class ContentViewModel {
 
     const conversationPromise = isConversation
       ? Promise.resolve(conversation as Conversation)
-      : this.conversationRepository.get_conversation_by_id(conversation as string);
+      : this.conversationRepository.getConversationById(conversation as string);
 
     conversationPromise
       .then(conversationEntity => {
@@ -427,7 +427,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation(null);
       }
 
-      return this.messageList.release_conversation(undefined);
+      return this.messageList.releaseConversation(undefined);
     }
 
     const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;

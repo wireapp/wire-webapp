@@ -20,14 +20,13 @@
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {USER_EVENT} from '@wireapp/api-client/src/event';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import type {Notification} from '@wireapp/api-client/src/notification';
 import {AbortHandler} from '@wireapp/api-client/src/tcp/';
 import {container} from 'tsyringe';
-
+import {AxiosError} from 'axios';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -201,6 +200,7 @@ export class EventRepository {
       }
     }
   }
+
   /**
    * Get notifications for the current client from the stream.
    *
@@ -209,6 +209,10 @@ export class EventRepository {
    * @returns Resolves when all new notifications from the stream have been handled with the latest notification ID that has been processed
    */
   private async getNotifications(notificationId: string, abortHandler: AbortHandler): Promise<string> {
+    function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
+      return errorCandidate.isAxiosError === true;
+    }
+
     const processNotifications = async (notifications: Notification[], abortHandler: AbortHandler) => {
       if (notifications.length <= 0) {
         this.logger.info(`No notifications found since '${notificationId}'`);
@@ -243,22 +247,20 @@ export class EventRepository {
         notificationId,
       );
       return processNotifications(notificationList, abortHandler);
-    } catch (errorResponse) {
+    } catch (error) {
       // When asking for /notifications with a `since` set to a notification ID that the backend doesn't know of (because it does not belong to our client or it is older than the lifetime of the notification stream),
       // we will receive a HTTP 404 status code with a `notifications` payload
       // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
-      if (errorResponse.response?.notifications) {
-        this.triggerMissedSystemEventMessageRendering();
-        return processNotifications(errorResponse.response.notifications, abortHandler);
-      }
-
-      const isNotFound = errorResponse.response?.status === HTTP_STATUS.NOT_FOUND;
-      if (isNotFound) {
-        this.logger.info(`No notifications found since '${notificationId}'`, errorResponse);
+      if (isAxiosError(error)) {
+        if (error.response.data.notifications) {
+          this.triggerMissedSystemEventMessageRendering();
+          return processNotifications(error.response.data.notifications, abortHandler);
+        }
+        this.logger.info(`No notifications found since '${notificationId}'`, error);
         throw new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS);
       }
 
-      this.logger.error(`Failed to get notifications: ${errorResponse.message}`, errorResponse);
+      this.logger.error(`Failed to get notifications: ${error.message}`, error);
       throw new EventError(EventError.TYPE.REQUEST_FAILURE, EventError.MESSAGE.REQUEST_FAILURE);
     }
   }

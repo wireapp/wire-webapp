@@ -171,7 +171,7 @@ export class DebugUtil {
       notification.from === userId && notification.data && notification.data.sender === clientId;
     const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
       notification.time === dateTime.toISOString();
-    const conversation = await this.conversationRepository.get_conversation_by_id(conversationId);
+    const conversation = await this.conversationRepository.getConversationById(conversationId);
     const message = await this.messageRepository.getMessageInConversationById(conversation, messageId);
     const notificationList = await this.eventRepository.notificationService.getNotifications(
       undefined,
@@ -202,7 +202,7 @@ export class DebugUtil {
   async getEventInfo(
     event: ConversationEvent,
   ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
-    const conversation = await this.conversationRepository.get_conversation_by_id(event.conversation);
+    const conversation = await this.conversationRepository.getConversationById(event.conversation);
     const user = await this.userRepository.getUserById(event.from);
 
     const debugInformation = {

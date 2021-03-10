@@ -168,17 +168,17 @@ ko.components.register('message-quote', {
         <div class="message-quote__sender">
           <span data-bind="text: quotedMessage().headerSenderName(), click: () => showUserDetails(quotedMessage().user)" data-uie-name="label-name-quote"></span>
           <!-- ko if: quotedMessage().was_edited() -->
-            <edit-icon data-uie-name="message-edited-quote" data-bind="attr: {title: quotedMessage().display_edited_timestamp()}"></edit-icon>
+            <edit-icon data-uie-name="message-edited-quote" data-bind="attr: {title: quotedMessage().displayEditedTimestamp()}"></edit-icon>
           <!-- /ko -->
         </div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset', afterRender: updateCanShowMore} -->
-          <!-- ko if: asset.is_image() -->
+          <!-- ko if: asset.isImage() -->
               <div class="message-quote__image" data-bind="background_image: asset.resource(), click: (data, event) => $parent.showDetail($parent.quotedMessage(), event)" data-uie-name="media-picture-quote">
                 <img data-bind="attr: {src: asset.dummy_url}"/>
               </div>
           <!-- /ko -->
 
-          <!-- ko if: asset.is_text() -->
+          <!-- ko if: asset.isText() -->
             <div class="message-quote__text" data-bind="html: asset.render($parent.selfId()),
                                                         event: {click: $parent.handleClickOnMessage},
                                                         css: {'message-quote__text--full': $parent.showFullText(),
@@ -192,19 +192,19 @@ ko.components.register('message-quote', {
             <!-- /ko -->
           <!-- /ko -->
 
-          <!-- ko if: asset.is_video() -->
+          <!-- ko if: asset.isVideo() -->
             <video-asset class="message-quote__video" params="message: $parent.quotedMessage, isQuote: true" data-uie-name="media-video-quote"></video-asset>
           <!-- /ko -->
 
-          <!-- ko if: asset.is_audio() -->
+          <!-- ko if: asset.isAudio() -->
             <audio-asset class="message-quote__audio" params="message: $parent.quotedMessage" data-uie-name="media-audio-quote"></audio-asset>
           <!-- /ko -->
 
-          <!-- ko if: asset.is_file() -->
+          <!-- ko if: asset.isFile() -->
             <file-asset class="message-quote__file" params="message: $parent.quotedMessage" data-uie-name="media-file-quote"></file-asset>
           <!-- /ko -->
 
-          <!-- ko if: asset.is_location() -->
+          <!-- ko if: asset.isLocation() -->
             <location-asset params="asset: asset" data-uie-name="media-location-quote"></location-asset>
           <!-- /ko -->
         <!-- /ko -->

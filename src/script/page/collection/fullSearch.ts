@@ -112,7 +112,7 @@ class FullSearch {
   };
 
   htmlFormatResult(messageEntity: ContentMessage & {matchesCount: number}): string {
-    const text = escape((messageEntity.get_first_asset() as Text).text);
+    const text = escape((messageEntity.getFirstAsset() as Text).text);
     const input = escape(this.input());
 
     messageEntity.matchesCount = 0;

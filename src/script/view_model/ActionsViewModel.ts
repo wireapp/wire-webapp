@@ -138,7 +138,7 @@ export class ActionsViewModel {
       amplify.publish(WebAppEvents.WARNING.MODAL, modalType, {
         primaryAction: {
           action: (leaveConversation = false) => {
-            this.conversationRepository.clear_conversation(conversationEntity, leaveConversation);
+            this.conversationRepository.clearConversation(conversationEntity, leaveConversation);
           },
           text: t('modalConversationClearAction'),
         },
@@ -259,7 +259,7 @@ export class ActionsViewModel {
         primaryAction: {
           action: (clearContent = false) => {
             if (clearContent) {
-              this.conversationRepository.clear_conversation(conversationEntity, true);
+              this.conversationRepository.clearConversation(conversationEntity, true);
             } else {
               this.conversationRepository.removeMember(conversationEntity, this.userState.self().id);
             }

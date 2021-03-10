@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Partner",
   "searchPlaceholder": "Keresés név vagy felhasználónév alapján",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Új szolgáltatás",
   "searchServicePlaceholder": "Keresés név szerint",
   "searchServices": "Szolgáltatások",

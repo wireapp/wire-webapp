@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Список контактів",
   "searchPlaceholder": "Пошук за іменем або ніком",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Додати сервіс",
   "searchServicePlaceholder": "Пошук за іменем",
   "searchServices": "Сервіси",
