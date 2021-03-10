@@ -100,7 +100,7 @@ export class Call {
 
   playAudioStreams() {
     Object.values(this.audios).forEach(audio => {
-      if ((audio.audioElement?.srcObject as MediaStream).active) {
+      if ((audio.audioElement?.srcObject as MediaStream)?.active) {
         return;
       }
       const audioElement = new Audio();
