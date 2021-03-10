@@ -299,7 +299,7 @@ export class UserRepository {
   removeClientFromUser = async (userId: string, clientId: string): Promise<void> => {
     await this.clientRepository.removeClient(userId, clientId);
     const userEntity = await this.getUserById(userId);
-    userEntity.remove_client(clientId);
+    userEntity.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
   };
 

@@ -197,7 +197,7 @@ describe('BackupRepository', () => {
 
       const conversationRepository = {
         checkForDeletedConversations: jest.fn(),
-        map_connections: jest.fn().mockImplementation(() => []),
+        mapConnections: jest.fn().mockImplementation(() => []),
         updateConversationStates: jest.fn().mockImplementation(conversations => conversations),
         updateConversations: jest.fn().mockImplementation(async () => {}),
       };

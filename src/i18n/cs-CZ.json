@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Kontakty",
   "searchPlaceholder": "Hledat podle jméno nebo uživatelského jméno",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Hledat podle jména",
   "searchServices": "Služby",

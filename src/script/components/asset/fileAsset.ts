@@ -54,7 +54,7 @@ class FileAssetComponent {
     this.assetRepository = container.resolve(AssetRepository);
 
     this.uploadProgress = this.assetRepository.getUploadProgress(this.message.id);
-    this.asset = this.message.get_first_asset() as FileAsset;
+    this.asset = this.message.getFirstAsset() as FileAsset;
     this.header = header;
     this.formattedFileSize = formatBytes(parseInt(this.asset.file_size, 10));
     this.fileName = trimFileExtension(this.asset.file_name);

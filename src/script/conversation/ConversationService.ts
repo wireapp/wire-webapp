@@ -104,7 +104,7 @@ export class ConversationService {
    * @param conversation_id ID of conversation to get
    * @returns Resolves with the server response
    */
-  get_conversation_by_id(conversationId: string): Promise<BackendConversation> {
+  getConversationById(conversationId: string): Promise<BackendConversation> {
     return this.apiClient.conversation.api.getConversation(conversationId);
   }
 
@@ -164,7 +164,7 @@ export class ConversationService {
    * @param payload Updated properties
    * @returns Resolves with the server response
    */
-  update_member_properties(conversationId: string, payload: ConversationMemberUpdateData): Promise<void> {
+  updateMemberProperties(conversationId: string, payload: ConversationMemberUpdateData): Promise<void> {
     return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
   }
 
@@ -307,7 +307,7 @@ export class ConversationService {
    * @param payload Payload to be posted
    * @returns Promise that resolves when the message was sent
    */
-  post_encrypted_message(
+  postEncryptedMessage(
     conversationId: string,
     payload: NewOTRMessage<string>,
     preconditionOption?: boolean | string[],
@@ -344,7 +344,7 @@ export class ConversationService {
    * @param conversation_id ID of conversation to be deleted
    * @returns Resolves when the entity was deleted
    */
-  delete_conversation_from_db(conversation_id: string): Promise<string> {
+  deleteConversationFromDb(conversation_id: string): Promise<string> {
     return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_id).then(primary_key => {
       this.logger.info(`State of conversation '${primary_key}' was deleted`);
       return primary_key;
@@ -359,7 +359,7 @@ export class ConversationService {
    * Get active conversations from database.
    * @returns Resolves with active conversations
    */
-  async get_active_conversations_from_db(): Promise<string[]> {
+  async getActiveConversationsFromDb(): Promise<string[]> {
     const min_date = new Date();
     min_date.setDate(min_date.getDate() - 30);
 
@@ -390,7 +390,7 @@ export class ConversationService {
    * Loads conversation states from the local database.
    * @returns Resolves with all the stored conversation states
    */
-  load_conversation_states_from_db<T>(): Promise<T[]> {
+  loadConversationStatesFromDb<T>(): Promise<T[]> {
     return this.storageService.getAll(StorageSchemata.OBJECT_STORE.CONVERSATIONS);
   }
 
@@ -399,7 +399,7 @@ export class ConversationService {
    * @param conversations Conversation entity
    * @returns Resolves with a list of conversation records
    */
-  async save_conversations_in_db(conversations: ConversationRecord[]): Promise<ConversationRecord[]> {
+  async saveConversationsInDb(conversations: ConversationRecord[]): Promise<ConversationRecord[]> {
     if (this.storageService.db) {
       const keys = conversations.map(conversation => conversation.id);
       await this.storageService.db.table(StorageSchemata.OBJECT_STORE.CONVERSATIONS).bulkPut(conversations, keys);
@@ -417,7 +417,7 @@ export class ConversationService {
    * @param conversation_et Conversation entity
    * @returns Resolves with the conversation entity
    */
-  save_conversation_state_in_db(conversation_et: ConversationEntity): Promise<ConversationEntity> {
+  saveConversationStateInDb(conversation_et: ConversationEntity): Promise<ConversationEntity> {
     const conversationData = conversation_et.serialize();
 
     return this.storageService
@@ -435,7 +435,7 @@ export class ConversationService {
    * @param query will be checked in against all text messages
    * @returns Resolves with the matching events
    */
-  search_in_conversation(conversation_id: string, query: string): Promise<any> {
+  searchInConversation(conversation_id: string, query: string): Promise<any> {
     const category_min = MessageCategory.TEXT;
     const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 

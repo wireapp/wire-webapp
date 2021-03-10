@@ -62,6 +62,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
       color="rgba(50,54,57,0.08)"
       data-uie-name="element-avatar-temporary-guest"
       data-uie-value={participant.id}
+      data-uie-status={state}
       onClick={onClick}
       title={participant.name()}
       {...props}

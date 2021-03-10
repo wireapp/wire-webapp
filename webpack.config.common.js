@@ -27,6 +27,13 @@ const auth = path.resolve(SRC_PATH, 'script/auth');
 const srcScript = path.resolve(SRC_PATH, 'script');
 
 module.exports = {
+  cache: {
+    buildDependencies: {
+      // https://webpack.js.org/blog/2020-10-10-webpack-5-release/#persistent-caching
+      config: [__filename],
+    },
+    type: 'filesystem',
+  },
   devtool: 'source-map',
   entry: {
     app: path.resolve(srcScript, 'main/app.ts'),

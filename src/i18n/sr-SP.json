@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Особе",
   "searchPlaceholder": "Тражи по имену или корисничком имену",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Отворени разговор",
   "searchServicePlaceholder": "Претрага по имену",
   "searchServices": "Услуге",

@@ -104,14 +104,14 @@ describe('fullscreenVideoCall', () => {
     expect(fullscreenVideoCall.getVideoTimer().text()).toEqual('00:01');
   });
 
-  it.skip('has no active speaker toggle for calls with more less than 3 participants', () => {
+  it('has no active speaker toggle for calls with more less than 3 participants', () => {
     const props = createProps();
     const fullscreenVideoCall = new FullscreenVideoCallPage(props);
 
     expect(fullscreenVideoCall.getActiveSpeakerToggle().exists()).toBe(false);
   });
 
-  it.skip('resets the maximized participant on active speaker switch', () => {
+  it('resets the maximized participant on active speaker switch', () => {
     const setMaximizedSpy = jasmine.createSpy();
     const props = createProps();
     props.callActions.setMaximizedTileVideoParticipant = setMaximizedSpy;

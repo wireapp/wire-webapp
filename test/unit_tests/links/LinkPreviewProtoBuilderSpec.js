@@ -51,7 +51,7 @@ const OpenGraphMocks = {
 };
 
 describe('LinkPreviewProtoBuilder', () => {
-  const compare_article_with_mock = (url, offset, preview, mock) => {
+  const compareArticleWithMock = (url, offset, preview, mock) => {
     expect(preview).toBeDefined();
     expect(preview.preview).toBe('article');
     expect(preview.url).toBe(url);
@@ -87,7 +87,7 @@ describe('LinkPreviewProtoBuilder', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    compareArticleWithMock(url, 0, link_preview, mock);
   });
 
   it('returns a link preview if type is image is missing', () => {
@@ -95,14 +95,14 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getWireMock();
     delete mock.image;
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    compareArticleWithMock(url, 0, link_preview, mock);
   });
 
   it('returns a link preview if title is present and offset is given', () => {
     const url = 'wire.com';
     const mock = OpenGraphMocks.getWireMock();
     const link_preview = buildFromOpenGraphData(mock, url, 12);
-    compare_article_with_mock(url, 12, link_preview, mock);
+    compareArticleWithMock(url, 12, link_preview, mock);
   });
 
   it('returns a link preview if type is missing and title is present', () => {
@@ -110,7 +110,7 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getHeiseMock();
     delete mock.type;
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    compareArticleWithMock(url, 0, link_preview, mock);
   });
 
   it('returns a link preview even if there is no description', () => {
@@ -118,7 +118,7 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getHeiseMock();
     delete mock.description;
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    compareArticleWithMock(url, 0, link_preview, mock);
   });
 
   it('returns a regular link preview even if site name is Twitter', () => {
@@ -126,6 +126,6 @@ describe('LinkPreviewProtoBuilder', () => {
     const mock = OpenGraphMocks.getHeiseMock();
     mock.site_name = 'Twitter';
     const link_preview = buildFromOpenGraphData(mock, url);
-    compare_article_with_mock(url, 0, link_preview, mock);
+    compareArticleWithMock(url, 0, link_preview, mock);
   });
 });

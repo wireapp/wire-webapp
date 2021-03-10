@@ -51,7 +51,7 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
     this.logger = getLogger('VideoAssetComponent');
 
     this.message = ko.unwrap(message);
-    this.asset = this.message.get_first_asset() as FileAsset;
+    this.asset = this.message.getFirstAsset() as FileAsset;
 
     this.videoElement = element.querySelector('video');
     this.videoSrc = ko.observable();

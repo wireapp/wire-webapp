@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "افراد",
   "searchPlaceholder": "جستجو بر اساس نام یا نام‌کاربری",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "جستجو بر اساس نام",
   "searchServices": "سرویس‌ها",

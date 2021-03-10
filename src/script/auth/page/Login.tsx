@@ -122,7 +122,9 @@ const Login = ({
     if (isImmediateLogin) {
       immediateLogin();
     }
-    return () => resetAuthError();
+    return () => {
+      resetAuthError();
+    };
   }, []);
 
   const immediateLogin = async () => {
