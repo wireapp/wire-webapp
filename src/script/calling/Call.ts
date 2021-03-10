@@ -112,11 +112,13 @@ export class Call {
   }
 
   updateAudioStreamsSink() {
-    Object.values(this.audios).forEach(audio => {
-      if (this.activeAudioOutput && audio.audioElement?.setSinkId) {
-        audio.audioElement.setSinkId(this.activeAudioOutput);
-      }
-    });
+    if (this.activeAudioOutput) {
+      Object.values(this.audios).forEach(audio => {
+        if (audio.audioElement?.setSinkId) {
+          audio.audioElement.setSinkId(this.activeAudioOutput);
+        }
+      });
+    }
   }
 
   setActiveSpeakers({audio_levels}: ActiveSpeakers): void {
