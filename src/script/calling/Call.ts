@@ -114,9 +114,7 @@ export class Call {
   updateAudioStreamsSink() {
     if (this.activeAudioOutput) {
       Object.values(this.audios).forEach(audio => {
-        if (audio.audioElement?.setSinkId) {
-          audio.audioElement.setSinkId(this.activeAudioOutput);
-        }
+        audio.audioElement?.setSinkId?.(this.activeAudioOutput);
       });
     }
   }
