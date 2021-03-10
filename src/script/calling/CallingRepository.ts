@@ -1212,7 +1212,7 @@ export class CallingRepository {
       return;
     }
 
-    if (streams.length === 0 || streams === null) {
+    if (streams === null || streams.length === 0) {
       call.removeAudio(streamId);
       return;
     }
