@@ -21,7 +21,7 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 
 import 'Components/AvailabilityState';
 import type {User} from '../../entity/User';

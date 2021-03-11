@@ -28,7 +28,7 @@ import type {Conversation} from '../../entity/Conversation';
 
 // show scroll borders
 ko.bindingHandlers.bordered_list = (function () {
-  const calculate_borders = throttle((element: HTMLElement) => {
+  const calculateBorders = throttle((element: HTMLElement) => {
     if (element) {
       window.requestAnimationFrame(() => {
         const list_column = $(element).parent();
@@ -45,15 +45,15 @@ ko.bindingHandlers.bordered_list = (function () {
 
   return {
     init(element: HTMLElement) {
-      element.addEventListener('scroll', () => calculate_borders(element));
-      $('.left').on('click', () => calculate_borders(element));
-      $(window).on('resize', () => calculate_borders(element));
-      amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => calculate_borders(element));
+      element.addEventListener('scroll', () => calculateBorders(element));
+      $('.left').on('click', () => calculateBorders(element));
+      $(window).on('resize', () => calculateBorders(element));
+      amplify.subscribe(WebAppEvents.LIFECYCLE.LOADED, () => calculateBorders(element));
     },
 
     update(element: HTMLElement, valueAccessor: ko.PureComputed<string> | ko.ObservableArray<Conversation>) {
       ko.unwrap(valueAccessor());
-      calculate_borders($(element) as any);
+      calculateBorders($(element) as any);
     },
   };
 })();

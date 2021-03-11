@@ -19,11 +19,10 @@
 
 import React, {Fragment} from 'react';
 import ko from 'knockout';
-import {container} from 'tsyringe';
 import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
-import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {UserlistMode} from 'Components/userList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -34,11 +33,11 @@ import {useViewPortObserver} from '../../ui/viewportObserver';
 
 import 'Components/AvailabilityState';
 import {Participant} from '../../calling/Participant';
-import {AssetRepository} from '../../assets/AssetRepository';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import NamedIcon from 'Components/NamedIcon';
 import {Availability} from '@wireapp/protocol-messaging';
+import {Config} from '../../Config';
 
 export interface ParticipantItemProps {
   badge?: boolean;
@@ -76,7 +75,6 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   showArrow = false,
 }) => {
   const [isInViewport, viewportElementRef] = useViewPortObserver();
-  const assetRepository = container.resolve(AssetRepository);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
   const isSelf = !!(participant as User).isMe;
@@ -134,11 +132,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         {isInViewport && (
           <>
             <div className="participant-item__image">
-              <ParticipantAvatar
-                assetRepository={assetRepository}
-                avatarSize={AVATAR_SIZE.SMALL}
-                participant={participant as User}
-              />
+              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant as User} />
             </div>
 
             <div className="participant-item__content">
@@ -219,15 +213,17 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={16} />
             )}
 
-            {participant instanceof User && !participant.isOnSameFederatedDomain() && (
-              <NamedIcon
-                name="federation-icon"
-                className="federation-icon"
-                data-uie-name="status-federated-user"
-                width={16}
-                height={16}
-              />
-            )}
+            {participant instanceof User &&
+              Config.getConfig().FEATURE.ENABLE_FEDERATION &&
+              !participant.isOnSameFederatedDomain() && (
+                <NamedIcon
+                  name="federation-icon"
+                  className="federation-icon"
+                  data-uie-name="status-federated-user"
+                  width={16}
+                  height={16}
+                />
+              )}
 
             {external && (
               <NamedIcon

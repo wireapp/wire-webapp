@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Osebe",
   "searchPlaceholder": "Iskanje po imenu ali uporabniškem imenu",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Iskanje po imenu",
   "searchServices": "Storitve",

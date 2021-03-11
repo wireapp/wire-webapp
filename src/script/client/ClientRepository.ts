@@ -46,8 +46,6 @@ import {ClientState} from './ClientState';
 export class ClientRepository {
   private readonly logger: Logger;
   public selfUser: ko.Observable<User>;
-  public readonly clientService: ClientService;
-  public readonly cryptographyRepository: CryptographyRepository;
 
   static get CONFIG() {
     return {
@@ -60,11 +58,10 @@ export class ClientRepository {
   }
 
   constructor(
-    clientService: ClientService,
-    cryptographyRepository: CryptographyRepository,
+    public readonly clientService: ClientService,
+    public readonly cryptographyRepository: CryptographyRepository,
     private readonly clientState = container.resolve(ClientState),
   ) {
-    this.clientService = clientService;
     this.cryptographyRepository = cryptographyRepository;
     this.selfUser = ko.observable(undefined);
     this.logger = getLogger('ClientRepository');
@@ -294,7 +291,7 @@ export class ClientRepository {
   async deleteClient(clientId: string, password: string): Promise<ClientEntity[]> {
     await this.clientService.deleteClient(clientId, password);
     await this.deleteClientFromDb(this.selfUser().id, clientId);
-    this.selfUser().remove_client(clientId);
+    this.selfUser().removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
     return this.clientState.clients();
   }

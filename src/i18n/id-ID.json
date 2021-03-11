@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Orang",
   "searchPlaceholder": "Cari dengan nama atau nama pengguna",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Open Conversation",
   "searchServicePlaceholder": "Cari berdasarkan nama",
   "searchServices": "Layanan",

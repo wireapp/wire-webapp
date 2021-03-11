@@ -48,7 +48,7 @@ describe('CallMessage', () => {
   it('shows green pickup icon for completed calls', async () => {
     const callMessagePage = new CallMessagePage({
       message: createCallMessage({
-        was_completed: () => true,
+        wasCompleted: () => true,
       }),
     });
 
@@ -59,7 +59,7 @@ describe('CallMessage', () => {
   it('shows red hangup icon for incompleted calls', async () => {
     const callMessagePage = new CallMessagePage({
       message: createCallMessage({
-        was_completed: () => false,
+        wasCompleted: () => false,
       }),
     });
 

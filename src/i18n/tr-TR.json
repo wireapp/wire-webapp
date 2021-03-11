@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "İnsanlar",
   "searchPlaceholder": "İsim veya kullanıcı adına göre ara",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Sohbet Başlat",
   "searchServicePlaceholder": "İsme göre ara",
   "searchServices": "Servisler",

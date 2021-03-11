@@ -908,6 +908,7 @@
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Deelnemers",
   "searchPlaceholder": "Zoek op naam of gebruikersnaam",
+  "searchPlaceholderFederation": "Name or @username@domainname",
   "searchServiceConfirmButton": "Service toevoegen",
   "searchServicePlaceholder": "Zoeken op naam",
   "searchServices": "Services",

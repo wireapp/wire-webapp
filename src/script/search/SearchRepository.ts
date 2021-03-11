@@ -164,7 +164,7 @@ export class SearchRepository {
    * @param maxResults Maximum number of results
    * @returns Resolves with the search results
    */
-  search_by_name(
+  searchByName(
     name: string,
     isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,

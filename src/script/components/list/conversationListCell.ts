@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {noop} from 'Util/util';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 
 import {generateCellState} from '../../conversation/ConversationCellState';
 import {ConversationStatusIcon} from '../../conversation/ConversationStatusIcon';
@@ -33,20 +33,20 @@ import 'Components/AvailabilityState';
 import type {User} from '../../entity/User';
 
 interface ConversationListCellProps {
-  click: () => void;
   conversation: Conversation;
   index: ko.Observable<number>;
   is_selected: (conversation: Conversation) => boolean;
   isVisibleFunc: (top: number, bottom: number) => boolean;
   offsetTop: ko.Observable<number>;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
+  rightClick: () => void;
   showJoinButton: boolean;
 }
 
 class ConversationListCell {
   conversation: Conversation;
   isSelected: ko.Computed<boolean>;
-  on_click: () => void;
+  rightClick: () => void;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   showJoinButton: boolean;
   isGroup: boolean;
@@ -58,13 +58,14 @@ class ConversationListCell {
   ConversationStatusIcon: typeof ConversationStatusIcon;
   onClickJoinCall: (viewModel: ConversationListCell, event: MouseEvent) => void;
   dispose: () => void;
+
   constructor(
     {
       showJoinButton,
       conversation,
       onJoinCall,
       is_selected = () => false,
-      click = noop,
+      rightClick = noop,
       index = ko.observable(0),
       isVisibleFunc = () => false,
       offsetTop = ko.observable(0),
@@ -73,8 +74,7 @@ class ConversationListCell {
   ) {
     this.conversation = conversation;
     this.isSelected = ko.computed(() => is_selected(conversation));
-    // TODO: "click" should be renamed to "right_click"
-    this.on_click = click;
+    this.rightClick = rightClick;
     this.AVATAR_SIZE = AVATAR_SIZE;
     this.showJoinButton = showJoinButton;
     this.isGroup = conversation.isGroup();
@@ -157,7 +157,7 @@ ko.components.register('conversation-list-cell', {
         <span class="conversation-list-cell-description" data-bind="text: cell_state().description" data-uie-name="secondary-line"></span>
       </div>
       <div class="conversation-list-cell-right">
-        <span class="conversation-list-cell-context-menu" data-bind="click: (_, event) => on_click(conversation, event)" data-uie-name="go-options"></span>
+        <span class="conversation-list-cell-context-menu" data-bind="click: (_, event) => rightClick(conversation, event)" data-uie-name="go-options"></span>
         <!-- ko ifnot: showJoinButton -->
           <!-- ko if: cell_state().icon === ConversationStatusIcon.PENDING_CONNECTION -->
             <span class="conversation-list-cell-badge cell-badge-dark" data-uie-name="status-pending"><pending-icon class="svg-icon"></pending-icon></span>

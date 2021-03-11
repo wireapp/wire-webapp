@@ -96,7 +96,7 @@ export class ContentMessage extends Message {
     });
   }
 
-  readonly display_edited_timestamp = () => {
+  readonly displayEditedTimestamp = () => {
     return t('conversationEditTimestamp', formatTimeShort(this.edited_timestamp()));
   };
 
@@ -104,19 +104,19 @@ export class ContentMessage extends Message {
    * Add another content asset to the message.
    * @param asset_et New content asset
    */
-  add_asset(asset_et: Asset): void {
+  addAsset(asset_et: Asset): void {
     this.assets.push(asset_et);
   }
 
   copy(): void {
-    copyText((this.get_first_asset() as TextAsset).text);
+    copyText((this.getFirstAsset() as TextAsset).text);
   }
 
   /**
    * Get the first asset attached to the message.
    * @returns The first asset attached to the message
    */
-  get_first_asset(): Asset | FileAsset | TextAsset | MediumImage {
+  getFirstAsset(): Asset | FileAsset | TextAsset | MediumImage {
     return this.assets()[0];
   }
 
@@ -152,8 +152,8 @@ export class ContentMessage extends Message {
    * @returns `true` if the message mentions the user, `false` otherwise.
    */
   isUserMentioned(userId: string): boolean {
-    return this.has_asset_text()
-      ? this.assets().some(assetEntity => assetEntity.is_text() && assetEntity.isUserMentioned(userId))
+    return this.hasAssetText()
+      ? this.assets().some(assetEntity => assetEntity.isText() && assetEntity.isUserMentioned(userId))
       : false;
   }
 
@@ -177,10 +177,10 @@ export class ContentMessage extends Message {
    * Download message content.
    */
   download(assetRepository: AssetRepository): void {
-    const asset_et = this.get_first_asset() as FileAsset | MediumImage;
+    const asset_et = this.getFirstAsset() as FileAsset | MediumImage;
 
     if (typeof (asset_et as MediumImage).resource === 'function') {
-      assetRepository.download((asset_et as MediumImage).resource(), this.get_content_name());
+      assetRepository.download((asset_et as MediumImage).resource(), this.getContentName());
     } else if (typeof (asset_et as FileAsset).original_resource === 'function') {
       const fileAsset: FileAsset = asset_et;
       assetRepository.downloadFile(fileAsset);
@@ -191,8 +191,8 @@ export class ContentMessage extends Message {
    * Get content name.
    * @returns The content/file name.
    */
-  get_content_name(): string {
-    const asset_et = this.get_first_asset() as FileAsset;
+  getContentName(): string {
+    const asset_et = this.getFirstAsset() as FileAsset;
     let {file_name} = asset_et;
 
     if (!file_name) {

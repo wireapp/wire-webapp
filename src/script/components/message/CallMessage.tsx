@@ -22,6 +22,7 @@ import NamedIcon from 'Components/NamedIcon';
 import {CallMessage as CallMessageEntity} from '../../entity/message/CallMessage';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import MessageTime from './MessageTime';
 
 export interface CallMessageProps {
   message: CallMessageEntity;
@@ -32,15 +33,7 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
   const caption = useKoSubscribable(message.caption);
   const timestamp = useKoSubscribable(message.timestamp);
 
-  const isCompleted = message.was_completed();
-  const displayTimestampShort = message.displayTimestampShort();
-  const displayTimestampLong = message.displayTimestampLong();
-
-  // Equivalent for `ko.bindingHandlers.showAllTimestamps`
-  const showAllTimestamps = (show: boolean) => {
-    const times = document.querySelectorAll('.time');
-    times.forEach(time => time.classList.toggle('show-timestamp', show));
-  };
+  const isCompleted = message.wasCompleted();
 
   return (
     <div className="message-header">
@@ -64,15 +57,7 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
         <span className="ellipsis">{caption}</span>
       </div>
       <div className="message-body-actions">
-        <time
-          className="time with-tooltip with-tooltip--top with-tooltip--time"
-          onMouseEnter={() => showAllTimestamps(true)}
-          onMouseLeave={() => showAllTimestamps(false)}
-          data-timestamp={timestamp}
-          data-tooltip={displayTimestampLong}
-        >
-          {displayTimestampShort}
-        </time>
+        <MessageTime timestamp={timestamp} data-uie-uid={message.id} data-uie-name="item-message-call-timestamp" />
       </div>
     </div>
   );

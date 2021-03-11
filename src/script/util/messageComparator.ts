@@ -31,7 +31,7 @@ import type {MentionEntity} from '../message/MentionEntity';
 export function areMentionsDifferent(originalMessageEntity: ContentMessage, updatedMentions: MentionEntity[]): boolean {
   const flattenToUserId = (mentions: MentionEntity[]): string[] => mentions.map(mention => mention.userId).sort();
 
-  const existingMentions = flattenToUserId((originalMessageEntity.get_first_asset() as TextAsset).mentions());
+  const existingMentions = flattenToUserId((originalMessageEntity.getFirstAsset() as TextAsset).mentions());
   const userIds = flattenToUserId(updatedMentions);
 
   const hasDifferentAmount = existingMentions.length !== userIds.length;
@@ -48,5 +48,5 @@ export function areMentionsDifferent(originalMessageEntity: ContentMessage, upda
  * @returns Are message and text the same
  */
 export function isTextDifferent(originalMessageEntity: ContentMessage, textMessage: string): boolean {
-  return textMessage !== (originalMessageEntity.get_first_asset() as TextAsset).text;
+  return textMessage !== (originalMessageEntity.getFirstAsset() as TextAsset).text;
 }

@@ -53,7 +53,7 @@ ko.components.register('grouped-conversations', {
             <conversation-list-cell
               data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
               data-uie-name="item-conversation"
-              params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall,offsetTop: getOffsetTop(folder, conversation), index: $index, isVisibleFunc: isVisibleFunc">
+              params="rightClick: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall,offsetTop: getOffsetTop(folder, conversation), index: $index, isVisibleFunc: isVisibleFunc">
             </conversation-list-cell>
           <!-- /ko -->
         </div>

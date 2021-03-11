@@ -9,7 +9,7 @@
     "@wireapp/copy-config": "1.1.13",
     "cpx": "1.5.0",
     "electron": "11.3.0",
-    "electron-builder": "22.9.1",
+    "electron-builder": "22.10.5",
     "globby": "11.0.2",
     "rimraf": "3.0.2",
     "ts-node": "9.1.1",

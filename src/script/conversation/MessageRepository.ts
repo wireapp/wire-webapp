@@ -103,6 +103,7 @@ import type {AssetRecord, EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
+import {ClientState} from '../client/ClientState';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -129,6 +130,7 @@ export class MessageRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly clientState = container.resolve(ClientState),
   ) {
     this.logger = getLogger('MessageRepository');
 
@@ -148,7 +150,7 @@ export class MessageRepository {
 
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
-    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancel_asset_upload);
+    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancelAssetUpload);
   }
 
   /**
@@ -204,7 +206,7 @@ export class MessageRepository {
       genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
     }
 
-    await this._send_and_inject_generic_message(conversationEntity, genericMessage);
+    await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
     return genericMessage;
   }
 
@@ -230,7 +232,7 @@ export class MessageRepository {
     }
 
     try {
-      return this._send_and_inject_generic_message(conversationEntity, genericMessage);
+      return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
     } catch (error) {
       if (!this.isUserCancellationError(error)) {
         this.logger.error(`Error while sending knock: ${error.message}`, error);
@@ -253,7 +255,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     textMessage: string,
     mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
+    quoteEntity?: QuoteEntity,
   ): Promise<ConversationEvent> {
     try {
       const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
@@ -311,7 +313,7 @@ export class MessageRepository {
     });
 
     try {
-      await this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+      await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
       return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
     } catch (error) {
       if (!this.isUserCancellationError(error)) {
@@ -344,7 +346,7 @@ export class MessageRepository {
     const blob = await loadUrlBlob(url);
     const textMessage = t('extensionsGiphyMessage', tag, {}, true);
     this.sendText(conversationEntity, textMessage, null, quoteEntity);
-    return this.upload_images(conversationEntity, [blob]);
+    return this.uploadImages(conversationEntity, [blob]);
   }
 
   /**
@@ -352,8 +354,8 @@ export class MessageRepository {
    *
    * @param conversationEntity Conversation to post the images
    */
-  public upload_images(conversationEntity: Conversation, images: File[] | Blob[]) {
-    this.upload_files(conversationEntity, images, true);
+  public uploadImages(conversationEntity: Conversation, images: File[] | Blob[]) {
+    this.uploadFiles(conversationEntity, images, true);
   }
 
   /**
@@ -363,9 +365,9 @@ export class MessageRepository {
    * @param files files
    * @param asImage whether or not the file should be treated as an image
    */
-  public upload_files(conversationEntity: Conversation, files: File[] | Blob[], asImage?: boolean) {
+  public uploadFiles(conversationEntity: Conversation, files: File[] | Blob[], asImage?: boolean) {
     if (this.canUploadAssetsToConversation(conversationEntity)) {
-      Array.from(files).forEach(file => this.upload_file(conversationEntity, file, asImage));
+      Array.from(files).forEach(file => this.uploadFile(conversationEntity, file, asImage));
     }
   }
 
@@ -387,7 +389,7 @@ export class MessageRepository {
    * @returns Resolves when file was uploaded
    */
 
-  private async upload_file(
+  private async uploadFile(
     conversationEntity: Conversation,
     file: File | Blob,
     asImage?: boolean,
@@ -409,7 +411,7 @@ export class MessageRepository {
       this.logger.error(`Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`, error);
       const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
       this.sendAssetUploadFailed(conversationEntity, messageEntity.id);
-      return this.update_message_as_upload_failed(messageEntity);
+      return this.updateMessageAsUploadFailed(messageEntity);
     }
   }
 
@@ -420,15 +422,15 @@ export class MessageRepository {
    * @param reason Failure reason
    * @returns Resolves when the message was updated
    */
-  private async update_message_as_upload_failed(message_et: ContentMessage, reason = AssetTransferState.UPLOAD_FAILED) {
+  private async updateMessageAsUploadFailed(message_et: ContentMessage, reason = AssetTransferState.UPLOAD_FAILED) {
     if (message_et) {
-      if (!message_et.is_content()) {
+      if (!message_et.isContent()) {
         throw new Error(`Tried to update wrong message type as upload failed '${(message_et as any).super_type}'`);
       }
 
-      const asset_et = message_et.get_first_asset() as FileAsset;
+      const asset_et = message_et.getFirstAsset() as FileAsset;
       if (asset_et) {
-        if (!asset_et.is_downloadable()) {
+        if (!asset_et.isDownloadable()) {
           throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
         }
 
@@ -492,7 +494,7 @@ export class MessageRepository {
   private async onAssetUploadComplete(conversationEntity: Conversation, event_json: AssetAddEvent): Promise<void> {
     try {
       const message_et = await this.getMessageInConversationById(conversationEntity, event_json.id);
-      return await this.update_message_as_upload_complete(conversationEntity, message_et, event_json);
+      return await this.updateMessageAsUploadComplete(conversationEntity, message_et, event_json);
     } catch (error) {
       if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;
@@ -542,7 +544,7 @@ export class MessageRepository {
       if (conversationEntity.messageTimer()) {
         genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
       }
-      return this._send_and_inject_generic_message(conversationEntity, genericMessage);
+      return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
     } catch (error) {
       const log = `Failed to upload metadata for asset in conversation '${conversationEntity.id}': ${error.message}`;
       this.logger.warn(log, error);
@@ -585,13 +587,13 @@ export class MessageRepository {
    * @param event_json Uploaded asset event information
    * @returns Resolve when message was updated
    */
-  private update_message_as_upload_complete(
+  private updateMessageAsUploadComplete(
     conversationEntity: Conversation,
     message_et: ContentMessage,
     event_json: EventJson,
   ): Promise<void> {
     const {id, key, otr_key, sha256, token} = event_json.data;
-    const asset_et = message_et.get_first_asset() as FileAsset;
+    const asset_et = message_et.getFirstAsset() as FileAsset;
 
     const resource = key
       ? AssetRemoteData.v3(key, otr_key, sha256, token)
@@ -630,7 +632,7 @@ export class MessageRepository {
       messageId,
     });
 
-    return this._send_and_inject_generic_message(conversationEntity, generic_message);
+    return this._sendAndInjectGenericMessage(conversationEntity, generic_message);
   }
 
   /**
@@ -676,12 +678,12 @@ export class MessageRepository {
 
       this.logger.debug(`No link preview for message '${messageId}' in conversation '${conversationId}' created`);
       if (messageEntity) {
-        const assetEntity = messageEntity.get_first_asset() as TextAsset;
+        const assetEntity = messageEntity.getFirstAsset() as TextAsset;
         const messageContentUnchanged = assetEntity.text === textMessage;
 
         if (messageContentUnchanged) {
           this.logger.debug(`Sending link preview for message '${messageId}' in conversation '${conversationId}'`);
-          return this._send_and_inject_generic_message(conversationEntity, genericMessage, false);
+          return this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
         }
 
         this.logger.debug(`Skipped sending link preview as message '${messageId}' in '${conversationId}' changed`);
@@ -705,7 +707,7 @@ export class MessageRepository {
     return errorTypes.includes(error.type);
   }
 
-  private async _send_and_inject_generic_message(
+  private async _sendAndInjectGenericMessage(
     conversationEntity: Conversation,
     genericMessage: GenericMessage,
     syncTimestamp = true,
@@ -715,7 +717,8 @@ export class MessageRepository {
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp);
+    const senderId = this.clientState.currentClient().id;
+    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp, senderId);
     const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
       genericMessage,
       optimisticEvent as EventRecord,
@@ -745,7 +748,7 @@ export class MessageRepository {
    * @param conversationEntity Conversation entity
    * @param message_et Message to react to
    */
-  public toggle_like(conversationEntity: Conversation, message_et: ContentMessage): void {
+  public toggleLike(conversationEntity: Conversation, message_et: ContentMessage): void {
     if (!conversationEntity.removed_from_conversation()) {
       const reaction = message_et.is_liked() ? ReactionType.NONE : ReactionType.LIKE;
       message_et.is_liked(!message_et.is_liked());
@@ -754,7 +757,7 @@ export class MessageRepository {
     }
   }
 
-  async reset_session(user_id: string, client_id: string, conversation_id: string): Promise<ClientMismatch> {
+  async resetSession(user_id: string, client_id: string, conversation_id: string): Promise<ClientMismatch> {
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 
     try {
@@ -855,7 +858,7 @@ export class MessageRepository {
     });
 
     this.messageSender.queueMessage(() => {
-      return this.create_recipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
+      return this.createRecipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
         return this.sendGenericMessage(eventInfoEntity, true);
@@ -881,7 +884,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    return this._send_and_inject_generic_message(conversationEntity, genericMessage);
+    return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
   }
 
   private createTextProto(
@@ -970,7 +973,7 @@ export class MessageRepository {
       });
       await this.messageSender.queueMessage(() => {
         const userIds = Array.isArray(precondition) ? precondition : undefined;
-        return this.create_recipients(conversationId, false, userIds).then(recipients => {
+        return this.createRecipients(conversationId, false, userIds).then(recipients => {
           const options = {precondition, recipients};
           const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
           this.sendGenericMessage(eventInfoEntity, true);
@@ -1023,7 +1026,7 @@ export class MessageRepository {
    * Update cleared of conversation using timestamp.
    */
   public updateClearedTimestamp(conversationEntity: Conversation): void {
-    const timestamp = conversationEntity.get_last_known_timestamp(this.serverTimeHandler.toServerTimestamp());
+    const timestamp = conversationEntity.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
 
     if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const protoCleared = new Cleared({
@@ -1066,7 +1069,7 @@ export class MessageRepository {
     });
     this.messageSender.queueMessage(async () => {
       try {
-        const recipients = await this.create_recipients(conversationEntity.id, true, [messageEntity.from]);
+        const recipients = await this.createRecipients(conversationEntity.id, true, [messageEntity.from]);
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
         await this.sendGenericMessage(eventInfoEntity, false);
@@ -1101,7 +1104,7 @@ export class MessageRepository {
 
   private sendGenericMessageToConversation(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
     return this.messageSender.queueMessage(async () => {
-      const recipients = await this.create_recipients(eventInfoEntity.conversationId);
+      const recipients = await this.createRecipients(eventInfoEntity.conversationId);
       eventInfoEntity.updateOptions({recipients});
       return this.sendGenericMessage(eventInfoEntity, true);
     });
@@ -1111,7 +1114,7 @@ export class MessageRepository {
    * Cancel asset upload.
    * @param messageId Id of the message which upload has been cancelled
    */
-  private readonly cancel_asset_upload = (messageId: string) => {
+  private readonly cancelAssetUpload = (messageId: string) => {
     this.sendAssetUploadFailed(
       this.conversationState.activeConversation(),
       messageId,
@@ -1141,12 +1144,12 @@ export class MessageRepository {
         if (!isNaN(timestamp)) {
           changes.time = isoDate;
           messageEntity.timestamp(timestamp);
-          conversationEntity.update_timestamp_server(timestamp, true);
+          conversationEntity.updateTimestampServer(timestamp, true);
           conversationEntity.updateTimestamps(messageEntity);
         }
       }
       this.conversationRepositoryProvider().checkMessageTimer(messageEntity);
-      if ((EventTypeHandling.STORE as string[]).includes(messageEntity.type) || messageEntity.has_asset_image()) {
+      if ((EventTypeHandling.STORE as string[]).includes(messageEntity.type) || messageEntity.hasAssetImage()) {
         return this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
     } catch (error) {
@@ -1164,7 +1167,7 @@ export class MessageRepository {
    * @param user_ids Optionally the intended recipient users
    * @returns Resolves with a user client map
    */
-  async create_recipients(
+  async createRecipients(
     conversation_id: string,
     skip_own_clients = false,
     user_ids: string[] = null,
@@ -1338,7 +1341,7 @@ export class MessageRepository {
     userIds: string[],
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
-    const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(
+    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
       eventInfoEntity.conversationId,
     );
     const legalHoldMessageTypes: string[] = [
@@ -1459,14 +1462,14 @@ export class MessageRepository {
     if (blockSystemMessage) {
       conversationEntity.blockLegalHoldMessage = true;
     }
-    const sender = this.clientRepository['clientState'].currentClient().id;
+    const sender = this.clientState.currentClient().id;
     try {
-      await this.conversation_service.post_encrypted_message(conversationEntity.id, {recipients: {}, sender});
+      await this.conversation_service.postEncryptedMessage(conversationEntity.id, {recipients: {}, sender});
     } catch (axiosError) {
       const error = axiosError.response?.data || axiosError;
       if (error.missing) {
         const remoteUserClients = error.missing as Recipients;
-        const localUserClients = await this.create_recipients(conversationEntity.id);
+        const localUserClients = await this.createRecipients(conversationEntity.id);
         const selfId = this.userState.self().id;
 
         const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
@@ -1577,7 +1580,7 @@ export class MessageRepository {
       const options = eventInfoEntity.options;
       const recipientsPromise = options.recipients
         ? Promise.resolve(eventInfoEntity)
-        : this.create_recipients(conversationId, false).then(recipients => {
+        : this.createRecipients(conversationId, false).then(recipients => {
             eventInfoEntity.updateOptions({recipients});
             return eventInfoEntity;
           });
@@ -1593,7 +1596,7 @@ export class MessageRepository {
    */
   private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
     const {conversationId, genericMessage} = eventInfoEntity;
-    const conversationEntity = await this.conversationRepositoryProvider().get_conversation_by_id(conversationId);
+    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(conversationId);
     const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
     return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
@@ -1674,7 +1677,7 @@ export class MessageRepository {
     }
 
     try {
-      const response = await this.conversation_service.post_encrypted_message(
+      const response = await this.conversation_service.postEncryptedMessage(
         conversationId,
         payload,
         options.precondition,
@@ -1706,9 +1709,9 @@ export class MessageRepository {
         payloadWithMissingClients,
       );
       if (payloadWithMissingClients) {
-        return this.conversation_service.post_encrypted_message(conversationId, payloadWithMissingClients, true);
+        return this.conversation_service.postEncryptedMessage(conversationId, payloadWithMissingClients, true);
       }
-      return this.conversation_service.post_encrypted_message(conversationId, payload, true);
+      return this.conversation_service.postEncryptedMessage(conversationId, payload, true);
     }
   }
 

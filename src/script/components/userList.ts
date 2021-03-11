@@ -193,7 +193,7 @@ ko.components.register('user-list', {
      * This is needed for large teams (>= 2000 members)
      */
     async function fetchMembersFromBackend(query: string, isHandle: boolean, ignoreMembers: User[]) {
-      const resultUsers = await searchRepository.search_by_name(query, isHandle);
+      const resultUsers = await searchRepository.searchByName(query, isHandle);
       const selfTeamId = userState.self().teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
       const ignoreIds = ignoreMembers.map(member => member.id);

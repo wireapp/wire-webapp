@@ -60,7 +60,7 @@ describe('ClientMismatchHandler', () => {
       };
       const conversationRepositorySpy = {
         addMissingMember: jest.fn(),
-        get_conversation_by_id: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
+        getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
         verificationStateHandler: {
           onClientsAdded: jest.fn(), // params `missingUserIds`
         },
@@ -110,7 +110,7 @@ describe('ClientMismatchHandler', () => {
       };
       const conversationRepositorySpy = {
         addMissingMember: jest.fn(),
-        get_conversation_by_id: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
+        getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
         verificationStateHandler: {
           onClientsAdded: jest.fn(), // params `missingUserIds`
         },
@@ -169,7 +169,7 @@ describe('ClientMismatchHandler', () => {
         removeClientFromUser: jest.fn(),
       };
       const conversationRepositorySpy = {
-        get_conversation_by_id: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
+        getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
       };
       const clientMismatchHandler = new ClientMismatchHandler(
         () => conversationRepositorySpy,
@@ -213,7 +213,7 @@ describe('ClientMismatchHandler', () => {
         removeClientFromUser: jest.fn(),
       };
       const conversationRepositorySpy = {
-        get_conversation_by_id: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
+        getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
       };
 
       const clientMismatchHandler = new ClientMismatchHandler(

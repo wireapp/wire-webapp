@@ -23,6 +23,7 @@ import ko from 'knockout';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
+import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 export type ConversationId = string;
 
@@ -48,6 +49,7 @@ export class Call {
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
   public blockMessages: boolean = false;
   public type?: CALL_MESSAGE_TYPE;
+  private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
   /**
    * set to `true` if anyone has enabled their video during a call (used for analytics)
    */
@@ -60,6 +62,7 @@ export class Call {
    * Maximum number of people joined in a call (used for analytics)
    */
   public analyticsMaximumParticipants: number = 0;
+  activeAudioOutput: string;
 
   constructor(
     public readonly initiator: UserId,
@@ -67,10 +70,16 @@ export class Call {
     public readonly conversationType: CONV_TYPE,
     private readonly selfParticipant: Participant,
     callType: CALL_TYPE,
+    private readonly mediaDevicesHandler: MediaDevicesHandler,
   ) {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
     this.participants = ko.observableArray([selfParticipant]);
+    this.activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
+    this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
+      this.activeAudioOutput = newActiveAudioOutput;
+      this.updateAudioStreamsSink();
+    });
   }
 
   get hasWorkingAudioInput(): boolean {
@@ -79,6 +88,47 @@ export class Call {
 
   getSelfParticipant(): Participant {
     return this.participants().find(({user, clientId}) => user.isMe && this.selfClientId === clientId);
+  }
+
+  addAudio(audioId: string, stream: MediaStream) {
+    this.audios[audioId] = {audioElement: null, stream};
+  }
+
+  removeAudio(audioId: string) {
+    this.releaseStream(this.audios[audioId].stream);
+    delete this.audios[audioId];
+  }
+
+  private releaseStream(mediaStream?: MediaStream): void {
+    if (!mediaStream) {
+      return;
+    }
+
+    mediaStream.getTracks().forEach(track => {
+      track.stop();
+      mediaStream.removeTrack(track);
+    });
+  }
+
+  playAudioStreams() {
+    Object.values(this.audios).forEach(audio => {
+      if ((audio.audioElement?.srcObject as MediaStream)?.active) {
+        return;
+      }
+      const audioElement = new Audio();
+      audioElement.srcObject = audio.stream;
+      audioElement.play();
+      audio.audioElement = audioElement;
+    });
+    this.updateAudioStreamsSink();
+  }
+
+  updateAudioStreamsSink() {
+    if (this.activeAudioOutput) {
+      Object.values(this.audios).forEach(audio => {
+        audio.audioElement?.setSinkId?.(this.activeAudioOutput);
+      });
+    }
   }
 
   setActiveSpeakers({audio_levels}: ActiveSpeakers): void {
