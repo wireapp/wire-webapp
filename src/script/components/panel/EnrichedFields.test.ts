@@ -26,7 +26,6 @@ import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 import EnrichedFields, {EnrichedFieldsProps} from './EnrichedFields';
 
-
 class EnrichedFieldsPage extends TestPage<EnrichedFieldsProps> {
   constructor(props?: EnrichedFieldsProps) {
     super(EnrichedFields, props);
@@ -84,7 +83,7 @@ describe('EnrichedFields', () => {
     const richProfileRepository = createRichProfileRepository();
     const user = new User(createRandomUuid());
     const onFieldsLoaded = jest.fn();
-    const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user, onFieldsLoaded});
+    const enrichedFields = new EnrichedFieldsPage({onFieldsLoaded, richProfileRepository, user});
 
     await act(() =>
       waitFor(() => {
