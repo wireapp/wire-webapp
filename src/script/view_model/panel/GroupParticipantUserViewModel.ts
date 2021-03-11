@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 
-import {Actions} from 'Components/panel/userActions';
+import {Actions} from 'Components/panel/UserActions';
 import 'Components/panel/EnrichedFields';
 import 'Components/panel/userDetails';
 
