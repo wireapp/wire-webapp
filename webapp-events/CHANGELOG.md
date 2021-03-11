@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.9.0...@wireapp/webapp-events@0.10.0) (2021-03-11)
+
+
+### Features
+
+* **webapp-events:** Add INJECT_CALLING_MESSAGE conversation event ([#3636](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/issues/3636)) ([40aad0c](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/commit/40aad0c5e2aa787047f520b792b5d5bbd04c1fe0))
+
+
+
+
+
 # [0.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events/compare/@wireapp/webapp-events@0.8.0...@wireapp/webapp-events@0.9.0) (2020-10-19)
 
 
