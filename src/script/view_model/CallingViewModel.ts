@@ -25,7 +25,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import 'Components/calling/ChooseScreen';
-import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 
 import {AudioType} from '../audio/AudioType';
@@ -76,45 +75,28 @@ declare global {
 
 export class CallingViewModel {
   private onChooseScreen: (deviceId: string) => void;
-  private readonly logger: Logger;
-  private readonly selfUser: ko.Observable<User>;
 
   readonly activeCalls: ko.PureComputed<Call[]>;
-  readonly audioRepository: AudioRepository;
   readonly callActions: CallActions;
-  readonly callingRepository: CallingRepository;
   readonly isChoosingScreen: ko.PureComputed<boolean>;
-  readonly mediaDevicesHandler: MediaDevicesHandler;
-  readonly mediaStreamHandler: MediaStreamHandler;
-  readonly multitasking: Multitasking;
-  readonly permissionRepository: PermissionRepository;
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
-  readonly teamRepository: TeamRepository;
   readonly videoSpeakersActiveTab: ko.Observable<string>;
   readonly maximizedTileVideoParticipant: ko.Observable<Participant | null>;
 
   constructor(
-    callingRepository: CallingRepository,
+    readonly callingRepository: CallingRepository,
     audioRepository: AudioRepository,
-    mediaDevicesHandler: MediaDevicesHandler,
-    mediaStreamHandler: MediaStreamHandler,
-    permissionRepository: PermissionRepository,
-    teamRepository: TeamRepository,
-    selfUser: ko.Observable<User>,
-    multitasking: Multitasking,
+    readonly mediaDevicesHandler: MediaDevicesHandler,
+    readonly mediaStreamHandler: MediaStreamHandler,
+    readonly permissionRepository: PermissionRepository,
+    readonly teamRepository: TeamRepository,
+    private readonly selfUser: ko.Observable<User>,
+    readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
   ) {
-    this.logger = getLogger('CallingViewModel');
-    this.callingRepository = callingRepository;
-    this.mediaDevicesHandler = mediaDevicesHandler;
-    this.mediaStreamHandler = mediaStreamHandler;
-    this.permissionRepository = permissionRepository;
-    this.teamRepository = teamRepository;
-
-    this.selfUser = selfUser;
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.activeCalls().filter(call => {
@@ -131,7 +113,6 @@ export class CallingViewModel {
     this.isChoosingScreen = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
-    this.multitasking = multitasking;
     this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTabs.all);
     this.maximizedTileVideoParticipant = ko.observable(null);
     this.onChooseScreen = () => {};
@@ -260,82 +241,6 @@ export class CallingViewModel {
         });
       },
     };
-
-    const currentCall = ko.pureComputed(() => {
-      return this.activeCalls()[0];
-    });
-    let currentCallSubscription: ko.Computed | undefined;
-
-    const participantsAudioElement: Record<string, HTMLAudioElement> = {};
-    let activeAudioOutput = this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput();
-
-    this.mediaDevicesHandler.currentAvailableDeviceId.audioOutput.subscribe((newActiveAudioOutput: string) => {
-      activeAudioOutput = newActiveAudioOutput;
-      const activeAudioElements = Object.values(participantsAudioElement);
-      this.logger.debug(`Switching audio output for ${activeAudioElements.length} call participants`);
-      activeAudioElements.forEach(audioElement => {
-        if (audioElement.setSinkId) {
-          audioElement.setSinkId(activeAudioOutput);
-        }
-      });
-    });
-    ko.computed(() => {
-      const call = this.callState.joinedCall();
-      if (call) {
-        call.getRemoteParticipants().forEach(participant => {
-          const stream = participant.audioStream();
-          if (!stream) {
-            return;
-          }
-          const audioId = `${participant.user.id}-${stream.id}`;
-          if (
-            participantsAudioElement[audioId] &&
-            (participantsAudioElement[audioId].srcObject as MediaStream).active
-          ) {
-            return;
-          }
-          const audioElement = new Audio();
-          audioElement.srcObject = stream;
-          audioElement.play();
-          if (activeAudioOutput && audioElement.setSinkId) {
-            audioElement.setSinkId(activeAudioOutput);
-          }
-          participantsAudioElement[audioId] = audioElement;
-        });
-      } else {
-        Object.keys(participantsAudioElement).forEach(userId => {
-          delete participantsAudioElement[userId];
-        });
-      }
-    });
-
-    let nbParticipants = 0;
-    ko.computed(() => {
-      const call = currentCall();
-      if (currentCallSubscription) {
-        currentCallSubscription.dispose();
-      }
-      if (!call) {
-        return;
-      }
-      currentCallSubscription = ko.computed(() => {
-        if (call.state() === CALL_STATE.TERM_LOCAL) {
-          audioRepository.play(AudioType.TALK_LATER);
-          return;
-        }
-        if (call.state() !== CALL_STATE.MEDIA_ESTAB) {
-          return;
-        }
-        const newNbParticipants = call.participants().filter(participant => !!participant.audioStream()).length;
-        if (nbParticipants < newNbParticipants) {
-          audioRepository.play(AudioType.READY_TO_TALK);
-        }
-        if (nbParticipants > newNbParticipants) {
-          audioRepository.play(AudioType.TALK_LATER);
-        }
-        nbParticipants = newNbParticipants;
-      });
-    });
   }
 
   getVideoGrid(call: Call): ko.PureComputed<Grid> {

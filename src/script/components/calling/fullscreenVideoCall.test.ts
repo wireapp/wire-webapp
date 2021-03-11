@@ -47,7 +47,11 @@ describe('fullscreenVideoCall', () => {
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User();
     selfUser.isMe = true;
-    const call = new Call('', '', 0, new Participant(selfUser, ''), 0);
+    const call = new Call('', '', 0, new Participant(selfUser, ''), 0, {
+      currentAvailableDeviceId: {
+        audioOutput: ko.pureComputed(() => 'test'),
+      },
+    } as MediaDevicesHandler);
     const props: Partial<FullscreenVideoCallProps> = {
       call,
       callActions: {} as CallActions,
