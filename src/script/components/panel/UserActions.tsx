@@ -45,6 +45,19 @@ export enum Actions {
   UNBLOCK = 'UserActions.UNBLOCK',
 }
 
+export const ActionIdentifier = {
+  [Actions.ACCEPT_REQUEST]: 'do-accept-request',
+  [Actions.BLOCK]: 'do-block',
+  [Actions.CANCEL_REQUEST]: 'do-cancel-request',
+  [Actions.IGNORE_REQUEST]: 'do-ignore-request',
+  [Actions.LEAVE]: 'do-leave',
+  [Actions.OPEN_CONVERSATION]: 'go-conversation',
+  [Actions.OPEN_PROFILE]: 'go-profile',
+  [Actions.REMOVE]: 'do-remove',
+  [Actions.SEND_REQUEST]: 'do-send-request',
+  [Actions.UNBLOCK]: 'do-unblock',
+};
+
 export interface UserActionsProps {
   actionsViewModel: ActionsViewModel;
   conversation?: Conversation;
@@ -77,7 +90,7 @@ const UserActions: React.FC<UserActionsProps> = ({
       onAction(Actions.OPEN_PROFILE);
     },
     icon: 'profile-icon',
-    identifier: 'go-profile',
+    identifier: ActionIdentifier[Actions.OPEN_PROFILE],
     label: t('groupParticipantActionSelfProfile'),
   };
 
@@ -91,7 +104,7 @@ const UserActions: React.FC<UserActionsProps> = ({
         onAction(Actions.LEAVE);
       },
       icon: 'leave-icon',
-      identifier: 'do-leave',
+      identifier: ActionIdentifier[Actions.LEAVE],
       label: t('groupParticipantActionLeave'),
     };
 
@@ -102,7 +115,7 @@ const UserActions: React.FC<UserActionsProps> = ({
         onAction(Actions.OPEN_CONVERSATION);
       },
       icon: 'message-icon',
-      identifier: 'go-conversation',
+      identifier: ActionIdentifier[Actions.OPEN_CONVERSATION],
       label: t('groupParticipantActionOpenConversation'),
     };
 
@@ -114,7 +127,7 @@ const UserActions: React.FC<UserActionsProps> = ({
         onAction(Actions.ACCEPT_REQUEST);
       },
       icon: 'check-icon',
-      identifier: 'do-accept-request',
+      identifier: ActionIdentifier[Actions.ACCEPT_REQUEST],
       label: t('groupParticipantActionIncomingRequest'),
     };
 
@@ -125,7 +138,7 @@ const UserActions: React.FC<UserActionsProps> = ({
         onAction(Actions.IGNORE_REQUEST);
       },
       icon: 'close-icon',
-      identifier: 'do-ignore-request',
+      identifier: ActionIdentifier[Actions.IGNORE_REQUEST],
       label: t('groupParticipantActionIgnoreRequest'),
     };
 
@@ -137,7 +150,7 @@ const UserActions: React.FC<UserActionsProps> = ({
         onAction(Actions.CANCEL_REQUEST);
       },
       icon: 'undo-icon',
-      identifier: 'do-cancel-request',
+      identifier: ActionIdentifier[Actions.CANCEL_REQUEST],
       label: t('groupParticipantActionCancelRequest'),
     };
 
@@ -152,7 +165,7 @@ const UserActions: React.FC<UserActionsProps> = ({
         onAction(Actions.SEND_REQUEST);
       },
       icon: 'plus-icon',
-      identifier: 'do-send-request',
+      identifier: ActionIdentifier[Actions.SEND_REQUEST],
       label: t('groupParticipantActionSendRequest'),
     };
 
@@ -164,7 +177,7 @@ const UserActions: React.FC<UserActionsProps> = ({
         onAction(Actions.BLOCK);
       },
       icon: 'block-icon',
-      identifier: 'do-block',
+      identifier: ActionIdentifier[Actions.BLOCK],
       label: t('groupParticipantActionBlock'),
     };
 
@@ -176,7 +189,7 @@ const UserActions: React.FC<UserActionsProps> = ({
         onAction(Actions.UNBLOCK);
       },
       icon: 'block-icon',
-      identifier: 'do-unblock',
+      identifier: ActionIdentifier[Actions.UNBLOCK],
       label: t('groupParticipantActionUnblock'),
     };
 

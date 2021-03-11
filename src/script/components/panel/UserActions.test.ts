@@ -22,7 +22,7 @@ import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import TestPage from 'Util/test/TestPage';
 import {noop} from 'Util/util';
 
-import UserActions, {UserActionsProps} from './UserActions';
+import UserActions, {UserActionsProps, ActionIdentifier, Actions} from './UserActions';
 import {User} from 'src/script/entity/User';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConversationRoleRepository} from 'src/script/conversation/ConversationRoleRepository';
@@ -36,7 +36,10 @@ class UserActionsPage extends TestPage<UserActionsProps> {
   }
 
   getAction = (identifier: string) => this.get(`div[data-uie-name="${identifier}"]`);
-  getAllActions = () => this.get('.panel__action-item');
+  getAllActions = () =>
+    Object.values(ActionIdentifier)
+      .map(this.getAction)
+      .filter(action => action.exists());
 }
 describe('UserActions', () => {
   it('generates actions for self user profile', () => {
@@ -55,8 +58,9 @@ describe('UserActions', () => {
     });
 
     expect(userActions.getAllActions().length).toEqual(2);
-    ['go-profile', 'do-leave'].forEach(action => {
-      expect(userActions.getAction(action).exists()).toBe(true);
+    [Actions.OPEN_PROFILE, Actions.LEAVE].forEach(action => {
+      const identifier = ActionIdentifier[action];
+      expect(userActions.getAction(identifier).exists()).toBe(true);
     });
   });
   it('generates actions for self user profile when user is not activated', () => {
@@ -75,7 +79,8 @@ describe('UserActions', () => {
 
     expect(userActions.getAllActions().length).toEqual(1);
 
-    expect(userActions.getAction('go-profile').exists()).toBe(true);
+    const identifier = ActionIdentifier[Actions.OPEN_PROFILE];
+    expect(userActions.getAction(identifier).exists()).toBe(true);
   });
   it('generates actions for another user profile to which I am connected', () => {
     const user = new User();
@@ -92,8 +97,9 @@ describe('UserActions', () => {
     });
 
     expect(userActions.getAllActions().length).toEqual(2);
-    ['go-conversation', 'do-block'].forEach(action => {
-      expect(userActions.getAction(action).exists()).toBe(true);
+    [Actions.OPEN_CONVERSATION, Actions.BLOCK].forEach(action => {
+      const identifier = ActionIdentifier[action];
+      expect(userActions.getAction(identifier).exists()).toBe(true);
     });
   });
 });
