@@ -35,7 +35,7 @@ class UserActionsPage extends TestPage<UserActionsProps> {
     super(UserActions, props);
   }
 
-  getAction = (identifier: string) => this.get(`div[data-uie-name="${identifier}"]`);
+  getAction = (identifier: string) => this.get(`[data-uie-name="${identifier}"]`);
   getAllActions = () =>
     Object.values(ActionIdentifier)
       .map(this.getAction)
