@@ -95,7 +95,19 @@ export class Call {
   }
 
   removeAudio(audioId: string) {
+    this.releaseStream(this.audios[audioId].stream);
     delete this.audios[audioId];
+  }
+
+  private releaseStream(mediaStream?: MediaStream): void {
+    if (!mediaStream) {
+      return;
+    }
+
+    mediaStream.getTracks().forEach(track => {
+      track.stop();
+      mediaStream.removeTrack(track);
+    });
   }
 
   playAudioStreams() {
