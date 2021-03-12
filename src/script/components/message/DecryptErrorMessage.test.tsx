@@ -40,7 +40,6 @@ class DecryptErrorMessagePage extends TestPage<DecryptErrorMessageProps> {
 const createDecryptErrorMessage = (partialDecryptErrorMessage: Partial<DecryptErrorMessageEntity>) => {
   const decryptErrorMessage: Partial<DecryptErrorMessageEntity> = {
     htmlCaption: ko.pureComputed(() => ''),
-    htmlErrorMessage: ko.pureComputed(() => ''),
     is_recoverable: ko.pureComputed(() => false),
     is_resetting_session: ko.observable(false),
     link: ko.pureComputed(() => ''),
