@@ -17,32 +17,12 @@
  *
  */
 
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event';
-
-import {EventSource} from './EventSource';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {EventValidation} from './EventValidation';
 
-export function validateEvent(
-  event: {time: string; type: CONVERSATION_EVENT | USER_EVENT},
-  source: EventSource,
-  lastEventDate?: string,
-): EventValidation {
-  const eventType = event.type;
-  const unhandledEvents: (CONVERSATION_EVENT | USER_EVENT)[] = [CONVERSATION_EVENT.TYPING];
-
-  if (unhandledEvents.includes(eventType)) {
+export function validateEvent(event: {time: string; type: string}): EventValidation {
+  if (event.type === CONVERSATION_EVENT.TYPING) {
     return EventValidation.IGNORED_TYPE;
-  }
-
-  const eventTime = event.time;
-  const isFromNotificationStream = source === EventSource.STREAM;
-  const shouldCheckEventDate = !!eventTime && isFromNotificationStream && lastEventDate;
-
-  if (shouldCheckEventDate) {
-    const isOutdated = new Date(lastEventDate).getTime() >= new Date(eventTime).getTime();
-    if (isOutdated) {
-      return EventValidation.OUTDATED_TIMESTAMP;
-    }
   }
 
   return EventValidation.VALID;
