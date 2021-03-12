@@ -48,7 +48,7 @@ const createCallTimeoutMessage = (partialCallTimeoutMessage: Partial<CallTimeout
 };
 
 describe('CallTimeoutMessage', () => {
-  it('shows no one joined message for no one join reason', async () => {
+  it('shows that nobody joined', async () => {
     const callMessagePage = new CallTimeoutMessagePage({
       message: createCallTimeoutMessage({
         reason: REASON.NOONE_JOINED,
