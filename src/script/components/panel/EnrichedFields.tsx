@@ -54,7 +54,7 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
       } catch {
       } finally {
         if (!cancel) {
-          onFieldsLoaded(returnFields);
+          onFieldsLoaded?.(returnFields);
           setFields(returnFields);
         }
       }
