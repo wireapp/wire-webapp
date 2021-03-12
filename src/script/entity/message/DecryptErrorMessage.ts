@@ -46,6 +46,8 @@ export class DecryptErrorMessage extends Message {
     this.error_code = '';
     this.client_id = '';
 
+    // TODO: Replace this with React Intl interpolation once we can use it in the whole project
+    // see https://formatjs.io/docs/react-intl/components/#rich-text-formatting
     this.htmlCaption = ko.pureComputed(() => {
       const userName = this.user().name();
       const replaceHighlight = {
