@@ -61,7 +61,7 @@ export const ActionIdentifier = {
 export interface UserActionsProps {
   actionsViewModel: ActionsViewModel;
   conversation?: Conversation;
-  conversationRoleRepository: ConversationRoleRepository;
+  conversationRoleRepository?: ConversationRoleRepository;
   isSelfActivated: boolean;
   onAction: (action: Actions) => void;
   user: User;
@@ -228,7 +228,7 @@ export default UserActions;
 
 registerReactComponent('user-actions', {
   component: UserActions,
-  optionalParams: ['conversation'],
+  optionalParams: ['conversation', 'conversationRoleRepository'],
   template:
     '<div data-bind="react: {user: ko.unwrap(user), isSelfActivated: ko.unwrap(isSelfActivated), onAction, conversationRoleRepository, conversation: ko.unwrap(conversation), actionsViewModel}">',
 });
