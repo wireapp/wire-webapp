@@ -22,6 +22,7 @@ import NamedIcon from 'Components/NamedIcon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../entity/message/DecryptErrorMessage';
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import DeviceId from 'Components/DeviceId';
 
 export interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;
@@ -33,7 +34,6 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
   const isResettingSession = useKoSubscribable(message.is_resetting_session);
   const link = useKoSubscribable(message.link);
   const htmlCaption = useKoSubscribable(message.htmlCaption);
-  const htmlErrorMessage = useKoSubscribable(message.htmlErrorMessage);
 
   return (
     <div data-uie-name="element-message-decrypt-error">
@@ -57,11 +57,20 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
         </div>
       </div>
       <div className="message-body message-body-decrypt-error">
-        <div
-          className="message-header-decrypt-error-label"
-          dangerouslySetInnerHTML={{__html: htmlErrorMessage}}
-          data-uie-name="status-decrypt-error"
-        />
+        <div className="message-header-decrypt-error-label" data-uie-name="status-decrypt-error">
+          {message.error_code && (
+            <>
+              {`${t('conversationUnableToDecryptErrorMessage')} `}
+              <span className="label-bold-xs">{message.error_code}</span>{' '}
+            </>
+          )}
+          {message.client_id && (
+            <>
+              {'ID: '}
+              <DeviceId deviceId={message.client_id} />
+            </>
+          )}
+        </div>
         {isRecoverable && (
           <div className="message-header-decrypt-reset-session">
             {isResettingSession ? (
