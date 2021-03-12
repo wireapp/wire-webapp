@@ -55,6 +55,7 @@ import './asset/videoAsset';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
+import './message/CallTimeoutMessage';
 import './message/MissedMessage';
 import './message/FileTypeRestrictedMessage';
 import './message/DeleteMessage';
@@ -631,6 +632,9 @@ ko.components.register('message', {
     <!-- /ko -->
     <!-- ko if: message.super_type === 'call' -->
       <call-message params="message: message"></call-message>
+      <!-- /ko -->
+    <!-- ko if: message.super_type === 'call-time-out' -->
+      <call-timeout-message params="message: message"></call-timeout-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'system' -->
       ${systemTemplate}
