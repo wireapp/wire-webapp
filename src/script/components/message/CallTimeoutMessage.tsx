@@ -33,6 +33,7 @@ export interface CallTimeoutMessageProps {
 const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
   const reason = message.reason;
   const timestamp = useKoSubscribable(message.timestamp);
+  const text = `${t('callWasEndedBecause')} `;
 
   return (
     <div className="message-header">
@@ -47,8 +48,8 @@ const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
         data-uie-value={reason === REASON.NOONE_JOINED ? 'no-one-joined' : 'everyone-left'}
       >
         <span className="ellipsis">
-          {t('callWasEndedBecause')}{' '}
-          {reason === REASON.NOONE_JOINED ? <b>{t('callNoOneJoined')}</b> : <b>{t('callEveryOneLeft')}</b>}
+          {text}
+          <b>{reason === REASON.NOONE_JOINED ? t('callNoOneJoined') : t('callEveryOneLeft')}</b>
         </span>
       </div>
       <div className="message-body-actions">
