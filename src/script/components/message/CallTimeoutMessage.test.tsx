@@ -58,7 +58,7 @@ describe('CallTimeoutMessage', () => {
     expect(callMessagePage.getCallTimeoutMessage(REASON.NOONE_JOINED).exists()).toBe(true);
   });
 
-  it('shows everyone left message for everyone left reason', async () => {
+  it('shows that all participants left', async () => {
     const callMessagePage = new CallTimeoutMessagePage({
       message: createCallTimeoutMessage({
         reason: REASON.EVERYONE_LEFT,
