@@ -89,6 +89,7 @@ export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; r
   protocol_version: number;
 };
 export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isIncoming: boolean; name: string}>;
+export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}>;
 
 export const EventBuilder = {
   build1to1Creation(conversationEntity: Conversation, timestamp: number = 0): OneToOneCreationEvent {
@@ -143,6 +144,23 @@ export const EventBuilder = {
       from: userId,
       sender: clientId,
       type: ClientEvent.CALL.E_CALL,
+    };
+  },
+
+  buildCallingTimeoutEvent(
+    reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT,
+    conversation: Conversation,
+    userId: string,
+  ): CallingTimeoutEvent {
+    return {
+      conversation: conversation.id,
+      data: {
+        reason,
+      },
+      from: userId,
+      id: createRandomUuid(),
+      time: conversation.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.CALL_TIME_OUT,
     };
   },
 

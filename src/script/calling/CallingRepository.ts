@@ -969,6 +969,16 @@ export class CallingRepository {
       return;
     }
 
+    if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
+      const conversationEntity = this.conversationState.findConversation(conversationId);
+      const callingEvent = EventBuilder.buildCallingTimeoutEvent(
+        reason,
+        conversationEntity,
+        call.getSelfParticipant().user.id,
+      );
+      this.eventRepository.injectEvent(callingEvent as EventRecord);
+    }
+
     if (reason === REASON.OUTDATED_CLIENT) {
       this.warnOutdatedClient(conversationId);
     }
