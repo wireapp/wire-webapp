@@ -428,7 +428,7 @@ export class EventMapper {
   }
 
   _mapEventCallingTimeout({data, time}: EventRecord) {
-    return new CallingTimeoutMessage(data.reason, +time);
+    return new CallingTimeoutMessage(data.reason, parseInt(time, 10));
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: EventRecord) {
