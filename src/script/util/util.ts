@@ -309,18 +309,6 @@ export const validateProfileImageResolution = (file: File, minWidth: number, min
   });
 };
 
-export const printDevicesId = (id: string): string => {
-  if (!id) {
-    return '';
-  }
-
-  const idWithPadding = zeroPadding(id, 16);
-  const parts = idWithPadding.match(/.{1,2}/g) || [];
-  const prettifiedId = parts.map(part => `<span class='device-id-part'>${part}</span>`);
-
-  return prettifiedId.join('');
-};
-
 // https://developer.mozilla.org/en-US/Firefox/Performance_best_practices_for_Firefox_fe_engineers
 export const afterRender = (callback: TimerHandler): number =>
   window.requestAnimationFrame(() => window.setTimeout(callback, 0));
