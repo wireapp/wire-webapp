@@ -301,6 +301,7 @@ class App {
       repositories.event,
       repositories.user,
       repositories.media.streamHandler,
+      repositories.media.devicesHandler,
       serverTimeHandler,
     );
     repositories.integration = new IntegrationRepository(

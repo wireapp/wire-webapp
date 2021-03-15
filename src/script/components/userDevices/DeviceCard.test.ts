@@ -25,7 +25,6 @@ import type {ClientEntity} from '../../client/ClientEntity';
 
 function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
   const device: Partial<ClientEntity> = {
-    formatId: () => ['ab', 'cd', 'ed'],
     getName: () => 'example name',
     id: 'example',
     label: 'example label',

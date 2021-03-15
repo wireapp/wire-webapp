@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,22 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
-import {EventValidation} from './EventValidation';
+import {REASON as AVS_REASON} from '@wireapp/avs';
+import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
 
-export function validateEvent(event: {time: string; type: string}): EventValidation {
-  if (event.type === CONVERSATION_EVENT.TYPING) {
-    return EventValidation.IGNORED_TYPE;
+export class CallingTimeoutMessage extends Message {
+  constructor(public reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT, time: number) {
+    super();
+    this.super_type = SuperType.CALL_TIME_OUT;
+    this.timestamp(time);
   }
 
-  return EventValidation.VALID;
+  get isNoOneJoined(): boolean {
+    return this.reason === AVS_REASON.NOONE_JOINED;
+  }
+
+  get isEveryOneLeft(): boolean {
+    return this.reason === AVS_REASON.EVERYONE_LEFT;
+  }
 }

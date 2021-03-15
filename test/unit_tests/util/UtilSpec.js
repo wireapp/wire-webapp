@@ -25,7 +25,6 @@ import {
   formatBytes,
   getContentTypeFromDataUrl,
   getFileExtension,
-  printDevicesId,
   sortGroupsByLastEvent,
   stripDataUri,
   stripUrlWrapper,
@@ -242,20 +241,6 @@ describe('stripUrlWrapper', () => {
 
   it('return the string without URL wrapper (without quotes)', () => {
     expect(stripUrlWrapper('url(/path/to/image/image.png)')).toBe('/path/to/image/image.png');
-  });
-});
-
-describe('printDevicesId', () => {
-  it('can print device id', () => {
-    expect(printDevicesId('66e66c79e8d1dea4')).toBe(
-      "<span class='device-id-part'>66</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>",
-    );
-  });
-
-  it('can print device id and apply padding', () => {
-    expect(printDevicesId('6e66c79e8d1dea4')).toBe(
-      "<span class='device-id-part'>06</span><span class='device-id-part'>e6</span><span class='device-id-part'>6c</span><span class='device-id-part'>79</span><span class='device-id-part'>e8</span><span class='device-id-part'>d1</span><span class='device-id-part'>de</span><span class='device-id-part'>a4</span>",
-    );
   });
 });
 

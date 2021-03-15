@@ -725,10 +725,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.22.tgz#0d29f382472c4ccf3bd96ff0ce47daf5b7b84b18"
   integrity sha512-g+f/qj/cNcqKkc3tFqlXOYjrmZA+jNBiDzbP3kH+B+otKFqAdPgVTGP1IeKRdMml/aE69as5S4FqtxAbl+LaMw==
 
-"@types/node@12.20.4":
-  version "12.20.4"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.4.tgz#73687043dd00fcb6962c60fbf499553a24d6bdf2"
-  integrity sha512-xRCgeE0Q4pT5UZ189TJ3SpYuX/QGl6QIAOAIeDSbAVAd2gX1NxSZup4jNVK7cxIeP8KDSbJgcckun495isP1jQ==
+"@types/node@12.20.5":
+  version "12.20.5"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.5.tgz#4ca82a766f05c359fd6c77505007e5a272f4bb9b"
+  integrity sha512-5Oy7tYZnu3a4pnJ//d4yVvOImExl4Vtwf0D40iKUlU+XlUsyV9iyFWyCFlwy489b72FMAik/EFwRkNLjjOdSPg==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -780,10 +780,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@wireapp/commons@4.1.1":
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.1.1.tgz#ff890515892aeddd3567381408233782a6411979"
-  integrity sha512-5ZQJutkqAuXa7ByKxOOq1Tfi/Yyv9ioH2qhfWFWIHMw0/8BIUe9eVrPd1nB9V+h8a8+SxIaEtC6nQj8NFZPWTA==
+"@wireapp/commons@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.1.2.tgz#015317728dc33673a0a5ac01f7b1d39b7fa07e86"
+  integrity sha512-chrODoYElcetb/6SdoFRxC6zD2qeBzO+yEt36RYX/7oGaP/Q0NY5JV49gdciLEBch4D1o7utZhvrE05bhUtnKg==
   dependencies:
     "@types/fs-extra" "9.0.6"
     "@types/node" "~14"
@@ -5054,10 +5054,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@4.1.5:
-  version "4.1.5"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.5.tgz#123a3b214aaff3be32926f0d8f1f6e704eb89a72"
-  integrity sha512-6OSu9PTIzmn9TCDiovULTnET6BgXtDYL4Gg4szY+cGsc3JP1dQL8qvE8kShTRx1NIw4Q9IBHlwODjkjWEtMUyA==
+typescript@4.2.3:
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.3.tgz#39062d8019912d43726298f09493d598048c1ce3"
+  integrity sha512-qOcYwxaByStAWrBf4x0fibwZvMRG+r4cQoTjbPtUlrWjBHbmCAww1i448U0GJ+3cNNEtebDteo/cHOR3xJ4wEw==
 
 typpy@2.3.11:
   version "2.3.11"

@@ -21,7 +21,6 @@ import {errors as ProteusErrors} from '@wireapp/proteus';
 import ko from 'knockout';
 
 import {t} from 'Util/LocalizerUtil';
-import {printDevicesId} from 'Util/util';
 
 import {URL_PATH, getWebsiteUrl} from '../../externalRoute';
 import {SuperType} from '../../message/SuperType';
@@ -30,10 +29,8 @@ import {Message} from './Message';
 export class DecryptErrorMessage extends Message {
   public client_id: string;
   public error_code: string;
-  private readonly error_message: ko.PureComputed<string>;
   private readonly is_remote_identity_changed: ko.PureComputed<boolean>;
   public readonly htmlCaption: ko.PureComputed<string>;
-  public readonly htmlErrorMessage: ko.PureComputed<string>;
   public readonly is_recoverable: ko.PureComputed<boolean>;
   public readonly is_resetting_session: ko.Observable<boolean>;
   public readonly link: ko.PureComputed<string>;
@@ -49,6 +46,8 @@ export class DecryptErrorMessage extends Message {
     this.error_code = '';
     this.client_id = '';
 
+    // TODO: Replace this with React Intl interpolation once we can use it in the whole project
+    // see https://formatjs.io/docs/react-intl/components/#rich-text-formatting
     this.htmlCaption = ko.pureComputed(() => {
       const userName = this.user().name();
       const replaceHighlight = {
@@ -73,26 +72,5 @@ export class DecryptErrorMessage extends Message {
       return this.error_code.toString() === DecryptErrorMessage.REMOTE_IDENTITY_CHANGED_ERROR;
     });
     this.is_resetting_session = ko.observable(false);
-
-    this.error_message = ko.pureComputed(() => {
-      const parts = [];
-
-      if (this.error_code) {
-        const error_text = t('conversationUnableToDecryptErrorMessage');
-        parts.push(`${error_text}: <span class='label-bold-xs'>${this.error_code}</span> `);
-      }
-
-      if (this.client_id) {
-        parts.push(`ID: ${printDevicesId(this.client_id)}`);
-      }
-
-      if (parts.length) {
-        return `(${parts.join('')})`;
-      }
-
-      return '';
-    });
-
-    this.htmlErrorMessage = this.error_message;
   }
 }

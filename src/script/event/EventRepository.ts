@@ -517,17 +517,13 @@ export class EventRepository {
    */
   private handleEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
     const logObject = {eventJson: JSON.stringify(event), eventObject: event};
-    const validationResult = validateEvent({time: event.time, type: event.type}, source, this.lastEventDate());
+    const validationResult = validateEvent(event);
     switch (validationResult) {
       default: {
         return Promise.resolve(event);
       }
       case EventValidation.IGNORED_TYPE: {
         this.logger.info(`Ignored event type '${event.type}'`, logObject);
-        return Promise.resolve(event);
-      }
-      case EventValidation.OUTDATED_TIMESTAMP: {
-        this.logger.info(`Ignored outdated event type: '${event.type}'`, logObject);
         return Promise.resolve(event);
       }
       case EventValidation.VALID:

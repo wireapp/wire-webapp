@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,25 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
-import {EventValidation} from './EventValidation';
+import React from 'react';
+import {zeroPadding} from 'Util/util';
 
-export function validateEvent(event: {time: string; type: string}): EventValidation {
-  if (event.type === CONVERSATION_EVENT.TYPING) {
-    return EventValidation.IGNORED_TYPE;
-  }
-
-  return EventValidation.VALID;
+export interface DeviceIdProps {
+  deviceId: string;
 }
+
+const DeviceId: React.FC<DeviceIdProps> = ({deviceId}) => {
+  const formattedId = deviceId ? zeroPadding(deviceId, 16).match(/../g) : [];
+
+  return (
+    <>
+      {formattedId.map((id, index) => (
+        <span key={`${index}-${id}`} className="device-id-part" data-uie-name="element-device-id-part">
+          {id}
+        </span>
+      ))}
+    </>
+  );
+};
+
+export default DeviceId;
