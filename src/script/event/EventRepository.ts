@@ -19,7 +19,6 @@
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {USER_EVENT} from '@wireapp/api-client/src/event';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event';
