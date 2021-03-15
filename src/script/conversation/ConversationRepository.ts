@@ -415,25 +415,29 @@ export class ConversationRepository {
 
   public async updateConversationStates(conversationsDataArray: ConversationRecord[]) {
     const handledConversationEntities: Conversation[] = [];
-
     const unknownConversations: ConversationRecord[] = [];
+
     conversationsDataArray.forEach(conversationData => {
       const localEntity = this.conversationState.conversations().find(({id}) => id === conversationData.id);
 
       if (localEntity) {
         const entity = this.conversationMapper.updateSelfStatus(localEntity, conversationData as any, true);
-        return handledConversationEntities.push(entity);
+        handledConversationEntities.push(entity);
+        return;
       }
 
       unknownConversations.push(conversationData);
-      return undefined;
     });
-    let conversationEntities = unknownConversations.length
-      ? (this.mapConversations(unknownConversations as any[]) as Conversation[])
-      : [];
-    if (conversationEntities.length) {
+
+    let conversationEntities: Conversation[] = [];
+
+    if (unknownConversations.length) {
+      conversationEntities = conversationEntities.concat(
+        this.mapConversations(unknownConversations as any[]) as Conversation[],
+      );
       this.saveConversations(conversationEntities);
     }
+
     conversationEntities = conversationEntities.concat(handledConversationEntities);
     const handledConversationData = conversationEntities.map(conversationEntity => conversationEntity.serialize());
     this.conversation_service.saveConversationsInDb(handledConversationData);
@@ -934,7 +938,7 @@ export class ConversationRepository {
     }
   }
 
-  initializeConversations() {
+  initializeConversations(): Promise<unknown> | undefined {
     this.initStateUpdates();
     this.init_total = this.receiving_queue.getLength();
 
@@ -945,7 +949,7 @@ export class ConversationRepository {
     return undefined;
   }
 
-  async joinConversationWithCode(key: string, code: string) {
+  async joinConversationWithCode(key: string, code: string): Promise<{conversationEntity: Conversation} | undefined> {
     const response = await this.conversation_service.postConversationJoin(key, code);
     if (response) {
       return this.onCreate(response as any);
@@ -957,10 +961,9 @@ export class ConversationRepository {
    * Maps user connection to the corresponding conversation.
    *
    * @note If there is no conversation it will request it from the backend
-   * @param connectionEntity Connections
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<void | Conversation> => {
+  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | void> => {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -1302,7 +1305,10 @@ export class ConversationRepository {
    * @param name New conversation name
    * @returns Resolves when conversation was renamed
    */
-  public async renameConversation(conversationEntity: Conversation, name: string): Promise<ConversationRenameEvent> {
+  public async renameConversation(
+    conversationEntity: Conversation,
+    name: string,
+  ): Promise<ConversationRenameEvent | undefined> {
     const response = await this.conversation_service.updateConversationName(conversationEntity.id, name);
     if (response) {
       this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
@@ -2473,7 +2479,11 @@ export class ConversationRepository {
     return this.updateMessageUserEntities(messageEntity);
   }
 
-  private async replaceMessageInConversation(conversationEntity: Conversation, eventId: string, newData: EventRecord) {
+  private async replaceMessageInConversation(
+    conversationEntity: Conversation,
+    eventId: string,
+    newData: EventRecord,
+  ): Promise<ContentMessage | undefined> {
     const originalMessage = conversationEntity.getMessage(eventId);
     if (!originalMessage) {
       return undefined;

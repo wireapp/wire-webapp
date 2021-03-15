@@ -17,10 +17,16 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
+
 import {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 import {ConversationType, UserType, PlatformType} from './attribute';
-import {Runtime} from '@wireapp/commons';
+
+export interface GuestAttributes {
+  is_allow_guests: boolean;
+  user_type: UserType;
+}
 
 /**
  * Get corresponding tracking attribute for conversation type.
@@ -34,8 +40,7 @@ export function getConversationType(conversationEntity: any): ConversationType |
     return conversationEntity.is1to1() ? ConversationType.ONE_TO_ONE : ConversationType.GROUP;
   }
 }
-
-export function getGuestAttributes(conversationEntity: Conversation): {is_allow_guests: boolean; user_type: UserType} {
+export function getGuestAttributes(conversationEntity: Conversation): GuestAttributes {
   const isTeamConversation = !!conversationEntity.team_id;
   if (isTeamConversation) {
     const isAllowGuests = !conversationEntity.isTeamOnly();
