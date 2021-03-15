@@ -95,7 +95,7 @@ export class Call {
   }
 
   removeAudio(audioId: string) {
-    this.releaseStream(this.audios[audioId].stream);
+    this.releaseStream(this.audios[audioId]?.stream);
     delete this.audios[audioId];
   }
 
