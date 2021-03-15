@@ -23,7 +23,7 @@ import {USER_EVENT} from '@wireapp/api-client/src/event';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
-import type {Notification} from '@wireapp/api-client/src/notification';
+import type {Notification, NotificationList} from '@wireapp/api-client/src/notification';
 import {AbortHandler} from '@wireapp/api-client/src/tcp/';
 import {container} from 'tsyringe';
 import {AxiosError} from 'axios';
@@ -213,6 +213,10 @@ export class EventRepository {
       return errorCandidate.isAxiosError === true;
     }
 
+    function hasMissedNotifications(data: any): data is NotificationList {
+      return !!data.notifications;
+    }
+
     const processNotifications = async (notifications: Notification[], abortHandler: AbortHandler) => {
       if (notifications.length <= 0) {
         this.logger.info(`No notifications found since '${notificationId}'`);
@@ -252,9 +256,17 @@ export class EventRepository {
       // we will receive a HTTP 404 status code with a `notifications` payload
       // TODO: In the future we should ask the backend for the last known notification id (HTTP GET /notifications/{id}) instead of using the "errorResponse.notifications" payload
       if (isAxiosError(error)) {
-        if (error.response.data.notifications) {
+        if (hasMissedNotifications(error.response.data)) {
           this.triggerMissedSystemEventMessageRendering();
-          return processNotifications(error.response.data.notifications, abortHandler);
+          const {has_more, notifications: missedNotifications} = error.response.data;
+          if (has_more) {
+            const furtherMissedNotifications = await this.notificationService.getAllNotificationsForClient(
+              this.currentClient().id,
+              missedNotifications[missedNotifications.length - 1].id,
+            );
+            missedNotifications.push(...furtherMissedNotifications);
+          }
+          return processNotifications(missedNotifications, abortHandler);
         }
         this.logger.info(`No notifications found since '${notificationId}'`, error);
         throw new EventError(EventError.TYPE.NO_NOTIFICATIONS, EventError.MESSAGE.NO_NOTIFICATIONS);
