@@ -19,10 +19,9 @@
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {USER_EVENT} from '@wireapp/api-client/src/event';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event';
 import type {Notification, NotificationList} from '@wireapp/api-client/src/notification';
 import {AbortHandler} from '@wireapp/api-client/src/tcp/';
 import {container} from 'tsyringe';
@@ -341,24 +340,22 @@ export class EventRepository {
    * @param isInitialization Set initial date to 0 if not found
    * @returns Resolves when stream state has been initialized
    */
-  private setStreamState(clientId: string, isInitialization = false) {
-    return this.notificationService.getNotificationsLast(clientId).then(
-      ({id: notificationId, payload}): Promise<(string | void)[]> => {
-        const [event] = payload;
-        const isoDateString = this.getIsoDateFromEvent(event as EventRecord, isInitialization) as string;
+  private setStreamState(clientId: string, isInitialization = false): Promise<(string | void)[] | undefined> {
+    return this.notificationService.getNotificationsLast(clientId).then(({id: notificationId, payload}) => {
+      const [event] = payload;
+      const isoDateString = this.getIsoDateFromEvent(event as EventRecord, isInitialization) as string;
 
-        if (notificationId) {
-          const logMessage = isoDateString
-            ? `Set starting point on notification stream to '${notificationId}' (isoDateString)`
-            : `Reset starting point on notification stream to '${notificationId}'`;
-          this.logger.info(logMessage);
+      if (notificationId) {
+        const logMessage = isoDateString
+          ? `Set starting point on notification stream to '${notificationId}' (isoDateString)`
+          : `Reset starting point on notification stream to '${notificationId}'`;
+        this.logger.info(logMessage);
 
-          return Promise.all([this.updateLastEventDate(isoDateString), this.updateLastNotificationId(notificationId)]);
-        }
+        return Promise.all([this.updateLastEventDate(isoDateString), this.updateLastNotificationId(notificationId)]);
+      }
 
-        return undefined;
-      },
-    );
+      return undefined;
+    });
   }
 
   private getIsoDateFromEvent(event: EventRecord, defaultValue = false): string | void {
@@ -783,7 +780,9 @@ export class EventRepository {
   }
 
   private throwValidationError(event: EventRecord, errorMessage: string, logMessage?: string): never {
-    const baseLogMessage = `Ignored '${event.type}' (${event.id}) in '${event.conversation}' from '${event.from}':'`;
+    const baseLogMessage = `Ignored '${event.type}' (${event.id || 'no ID'}) in '${event.conversation}' from '${
+      event.from
+    }':'`;
     const baseErrorMessage = 'Event validation failed:';
     this.logger.warn(`${baseLogMessage} ${logMessage || errorMessage}`, event);
     throw new EventError(EventError.TYPE.VALIDATION_FAILED, `${baseErrorMessage} ${errorMessage}`);

@@ -31,6 +31,7 @@ import {Conversation} from '../../entity/Conversation';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {ConversationState} from '../../conversation/ConversationState';
 import {MessageCategory} from '../../message/MessageCategory';
+import {Message} from '../../entity/message/Message';
 
 export class CollectionViewModel {
   collectionDetails: CollectionDetailsViewModel;
@@ -58,35 +59,35 @@ export class CollectionViewModel {
     this.searchInput = ko.observable('');
   }
 
-  onKeyDownCollection = (keyboardEvent: KeyboardEvent) => {
+  onKeyDownCollection = (keyboardEvent: KeyboardEvent): void => {
     if (isEscapeKey(keyboardEvent)) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
     }
   };
 
-  readonly addedToView = () => {
+  readonly addedToView = (): void => {
     amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
     document.addEventListener('keydown', this.onKeyDownCollection);
   };
 
-  readonly searchInConversation = (query: string) => {
+  readonly searchInConversation = (query: string): Promise<{messageEntities: Message[]; query: string} | {}> => {
     return this.conversationRepository.searchInConversation(this.conversationEntity(), query);
   };
 
-  readonly onInputChange = (input: string) => {
+  readonly onInputChange = (input: string): void => {
     this.searchInput(input || '');
   };
 
-  readonly itemAdded = (messageEntity: ContentMessage) => {
+  readonly itemAdded = (messageEntity: ContentMessage): void => {
     const isCurrentConversation = this.conversationEntity().id === messageEntity.conversation_id;
     if (isCurrentConversation) {
       this._populateItems([messageEntity]);
     }
   };
 
-  readonly itemRemoved = (messageId: string, conversationId: string) => {
+  readonly itemRemoved = (messageId: string, conversationId: string): void => {
     const isCurrentConversation = this.conversationEntity().id === conversationId;
     if (isCurrentConversation) {
       const _removeItem = (messageEntity: ContentMessage) => messageEntity.id === messageId;
@@ -94,11 +95,11 @@ export class CollectionViewModel {
     }
   };
 
-  readonly messageRemoved = (messageEntity: ContentMessage) => {
+  readonly messageRemoved = (messageEntity: ContentMessage): void => {
     this.itemRemoved(messageEntity.id, messageEntity.conversation_id);
   };
 
-  readonly removedFromView = () => {
+  readonly removedFromView = (): void => {
     amplify.unsubscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, this.messageRemoved);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, this.itemAdded);
     amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, this.itemRemoved);
@@ -108,7 +109,7 @@ export class CollectionViewModel {
     [this.images, this.files, this.links, this.audio].forEach(array => array.removeAll());
   };
 
-  readonly setConversation = (conversationEntity = this.conversationState.activeConversation()) => {
+  readonly setConversation = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (conversationEntity) {
       this.conversationEntity(conversationEntity);
 
@@ -118,45 +119,45 @@ export class CollectionViewModel {
     }
   };
 
-  private _populateItems(messageEntities: ContentMessage[]) {
+  private _populateItems(messageEntities: ContentMessage[]): void {
     messageEntities.forEach((messageEntity: ContentMessage) => {
       if (!messageEntity.isExpired()) {
         // TODO: create binary map helper
         const isImage = messageEntity.category & MessageCategory.IMAGE;
         const isGif = messageEntity.category & MessageCategory.GIF;
-        if (isImage && !isGif) {
-          return this.images.push(messageEntity);
-        }
-
         const isFile = messageEntity.category & MessageCategory.FILE;
-        if (isFile) {
-          const isAudio = messageEntity.getFirstAsset().isAudio();
-          return isAudio ? this.audio.push(messageEntity) : this.files.push(messageEntity);
-        }
-
         const isLinkPreview = messageEntity.category & MessageCategory.LINK_PREVIEW;
-        if (isLinkPreview) {
+        const isAudio = messageEntity.getFirstAsset().isAudio();
+
+        if (isImage && !isGif) {
+          this.images.push(messageEntity);
+        } else if (isFile) {
+          if (isAudio) {
+            this.audio.push(messageEntity);
+          } else {
+            this.files.push(messageEntity);
+          }
+        } else if (isLinkPreview) {
           this.links.push(messageEntity);
         }
       }
-      return undefined;
     });
   }
 
-  readonly clickOnMessage = (messageEntity: ContentMessage) => {
+  readonly clickOnMessage = (messageEntity: ContentMessage): void => {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity(), {exposeMessage: messageEntity});
   };
 
-  clickOnBackButton() {
+  clickOnBackButton(): void {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
   }
 
-  clickOnSection(category: string, items: ContentMessage[]) {
+  clickOnSection(category: string, items: ContentMessage[]): void {
     this.collectionDetails.setConversation(this.conversationEntity(), category, [].concat(items));
     amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.COLLECTION_DETAILS);
   }
 
-  clickOnImage(messageEntity: ContentMessage) {
+  clickOnImage(messageEntity: ContentMessage): void {
     amplify.publish(WebAppEvents.CONVERSATION.DETAIL_VIEW.SHOW, messageEntity, this.images(), 'collection');
   }
 }
