@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.46.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.45.9...@wireapp/react-ui-kit@7.46.0) (2021-03-16)
+
+
+### Features
+
+* **react-ui-kit:** GridIcon ([#3649](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3649)) ([b0d97c2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/b0d97c26289304671c9221777cb1340204f7bfd6))
+
+
+
+
+
 ## [7.45.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.45.8...@wireapp/react-ui-kit@7.45.9) (2021-03-03)
 
 
