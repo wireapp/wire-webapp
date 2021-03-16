@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.3.9...@wireapp/api-client@12.4.0) (2021-03-16)
+
+
+### Features
+
+* **react-ui-kit:** GridIcon ([#3649](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3649)) ([b0d97c2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/b0d97c26289304671c9221777cb1340204f7bfd6))
+
+
+
+
+
 ## [12.3.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.3.8...@wireapp/api-client@12.3.9) (2021-03-03)
 
 **Note:** Version bump only for package @wireapp/api-client
