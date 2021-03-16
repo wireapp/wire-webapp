@@ -30,13 +30,13 @@ export const DEFAULT_AVATAR_SIZE = 28;
 
 export interface AvatarProps<T = HTMLDivElement> extends IsInViewportProps<T> {
   backgroundColor?: string;
-  url?: string;
   borderColor?: string;
   fetchImage?: () => void;
   forceInitials?: boolean;
   isAvatarGridItem?: boolean;
   name?: string;
   size?: number;
+  url?: string;
 }
 
 const avatarStyle: <T>(props: AvatarProps<T>) => CSSObject = ({
