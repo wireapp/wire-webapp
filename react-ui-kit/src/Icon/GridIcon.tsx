@@ -17,21 +17,13 @@
  *
  */
 
-import {Role} from '..';
-import type {TeamContact} from './TeamContact';
+/** @jsx jsx */
+import {jsx} from '@emotion/core';
 
-export enum SearchOrder {
-  ASCENDING = 'asc',
-  DESCENDING = 'desc',
-}
+import {SVGIcon, SVGIconProps} from './SVGIcon';
 
-export interface TeamSearchOptions {
-  /** Filter results by member role */
-  frole?: Role[];
-  /** Max number of search results. Defaults to 15 results. Min 1, max 500. */
-  size?: number;
-  /** Sort results */
-  sortby?: keyof Pick<TeamContact, 'email' | 'name' | 'handle' | 'created_at' | 'role' | 'managed_by' | 'saml_idp'>;
-  /** Sort order (asc | desc | undefined) */
-  sortorder?: SearchOrder;
-}
+export const GridIcon = ({...props}: SVGIconProps) => (
+  <SVGIcon realWidth={16} realHeight={16} {...props}>
+    <path d="M2 10a2 2 0 100-4 2 2 0 000 4zm12 0a2 2 0 100-4 2 2 0 000 4zM2 12a2 2 0 110 4 2 2 0 010-4zm12 0a2 2 0 110 4 2 2 0 010-4zm-6 0a2 2 0 110 4 2 2 0 010-4zm0-6a2 2 0 110 4 2 2 0 010-4zM2 0a2 2 0 110 4 2 2 0 010-4zm12 0a2 2 0 110 4 2 2 0 010-4zM8 0a2 2 0 110 4 2 2 0 010-4z" />
+  </SVGIcon>
+);
