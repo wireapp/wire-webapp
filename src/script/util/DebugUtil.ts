@@ -307,7 +307,7 @@ export class DebugUtil {
     navigator.mediaDevices.ondevicechange(null);
   }
 
-  async reprocessNotifications(notificationId: string) {
+  async reprocessNotifications(notificationId?: string) {
     const isEncryptedEvent = (event: any): event is EventRecord => {
       return event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     };
