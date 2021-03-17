@@ -213,6 +213,7 @@
     "changelog:ci": "ts-node ./bin/changelog.ts",
     "configure": "copy-config",
     "deploy": "yarn && yarn build:prod && eb deploy",
+    "dev": "yarn start",
     "dist": "grunt build",
     "docker": "node ./bin/push_docker.js",
     "fix": "yarn fix:other && yarn fix:code",
