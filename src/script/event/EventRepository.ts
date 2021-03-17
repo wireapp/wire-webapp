@@ -809,19 +809,17 @@ export class EventRepository {
     const isTransientEvent = !!transient;
     this.logger.info(`Handling notification '${id}' from '${source}' containing '${events.length}' events`, events);
 
+    if (!isTransientEvent) {
+      this.updateLastNotificationId(id);
+    }
+
     if (!events.length) {
       this.logger.warn('Notification payload does not contain any events');
-      if (!isTransientEvent) {
-        this.updateLastNotificationId(id);
-      }
       return;
     }
 
     try {
       await Promise.all(events.map(event => this.handleEvent(event as EventRecord, source)));
-      if (!isTransientEvent) {
-        this.updateLastNotificationId(id);
-      }
       this.notificationsHandled++;
       if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.STREAM) {
         this.updateProgress();

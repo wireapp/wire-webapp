@@ -39,6 +39,7 @@ export function validateEvent(
   const shouldCheckEventDate = !!eventTime && isFromNotificationStream && lastEventDate;
 
   if (shouldCheckEventDate) {
+    /** This check prevents duplicated "You joined" system messages. */
     const isOutdated = new Date(lastEventDate).getTime() >= new Date(eventTime).getTime();
     if (isOutdated) {
       return EventValidation.OUTDATED_TIMESTAMP;
