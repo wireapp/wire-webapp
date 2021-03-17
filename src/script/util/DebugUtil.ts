@@ -314,25 +314,25 @@ export class DebugUtil {
 
     const clientId = this.eventRepository.currentClient().id;
     this.logger.log(`Your current client has ID "${clientId}".`);
+
     const notifications = await this.eventRepository.notificationService.getAllNotificationsForClient(clientId);
     this.logger.log(
       `The notification stream has "${notifications.length}" notifications in total for your current client.`,
     );
+
     if (notificationId) {
       this.logger.log(`You've set a filter, so only notification with ID "${notificationId}" will be processed...`);
     }
+
     const filteredNotifications = notifications.filter(notification =>
       notificationId ? notification.id === notificationId : true,
     );
+
     for (const {payload} of filteredNotifications) {
       for (const event of payload) {
         if (isEncryptedEvent(event)) {
           this.logger.log(`Processing event type "${event.type}" from "${event.time}"...`);
-          try {
-            await this.cryptographyRepository.handleEncryptedEvent(event);
-          } catch (error) {
-            this.logger.error(error);
-          }
+          await this.cryptographyRepository.handleEncryptedEvent(event);
         }
       }
     }
