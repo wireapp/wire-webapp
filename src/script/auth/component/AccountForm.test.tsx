@@ -84,7 +84,7 @@ describe('when entering account data', () => {
   describe('an error message', () => {
     it('appears if too few characters are entered in the name field', () => {
       const expectedName = 'M';
-      const expectedErrorMessage = 'Enter a name with at least 2 characters';
+      const expectedErrorMessage = '!Enter a name with at least 2 characters';
 
       wrapper = mountComponent(
         <AccountForm onSubmit={() => {}} />,
@@ -118,7 +118,7 @@ describe('when entering account data', () => {
     it('appears when input gets trimmed', () => {
       const actualName = '  ';
       const expectedName = '  ';
-      const expectedErrorMessage = 'Enter a name with at least 2 characters';
+      const expectedErrorMessage = '!Enter a name with at least 2 characters';
 
       wrapper = mountComponent(
         <AccountForm onSubmit={() => {}} />,
