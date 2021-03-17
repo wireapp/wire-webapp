@@ -99,7 +99,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
               {_(indexStrings.logIn)}
             </Button>
             {logoutReason && (
-              <ErrorMessage center data-uie-name="status-logout-reason">
+              <ErrorMessage data-uie-name="status-logout-reason">
                 <FormattedMessage
                   {...logoutReasonStrings[logoutReason]}
                   values={{
@@ -143,7 +143,7 @@ const Index = ({defaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
               </Button>
             )}
             {logoutReason && (
-              <ErrorMessage center data-uie-name="status-logout-reason">
+              <ErrorMessage data-uie-name="status-logout-reason">
                 <FormattedMessage
                   {...logoutReasonStrings[logoutReason]}
                   values={{
