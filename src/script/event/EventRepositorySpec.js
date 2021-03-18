@@ -23,9 +23,7 @@ import {GenericMessage, Text, Asset as ProtobufAsset} from '@wireapp/protocol-me
 import {WebAppEvents} from '@wireapp/webapp-events';
 import * as Proteus from '@wireapp/proteus';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event';
-
 import {createRandomUuid, arrayToBase64} from 'Util/util';
-
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
@@ -34,7 +32,7 @@ import {NotificationService} from 'src/script/event/NotificationService';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {EventError} from 'src/script/error/EventError';
-import {TestFactory} from '../../helper/TestFactory';
+import {TestFactory} from '../../../test/helper/TestFactory';
 import {AbortHandler} from '@wireapp/api-client/src/tcp';
 
 const testFactory = new TestFactory();
