@@ -385,7 +385,7 @@ describe('EventRepository', () => {
     });
 
     it('saves an event with a previously not used ID', () => {
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve());
+      jest.spyOn(testFactory.event_service, 'loadEvent').mockClear();
 
       return testFactory.event_repository['processEvent'](event, EventSource.STREAM).then(() => {
         expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
@@ -535,9 +535,11 @@ describe('EventRepository', () => {
         data: {...event.data, replacing_message_id: replacingId},
       } as EventRecord;
       const linkPreviewEvent = {...event};
-      spyOn(testFactory.event_service, 'loadEvent').and.callFake((conversationId, messageId) => {
-        return messageId === replacingId ? Promise.resolve() : Promise.resolve(storedEvent);
-      });
+      jest
+        .spyOn(testFactory.event_service, 'loadEvent')
+        .mockImplementation((conversationId: string, messageId: string) => {
+          return messageId === replacingId ? Promise.resolve(undefined) : Promise.resolve(storedEvent);
+        });
       jest
         .spyOn(testFactory.event_service, 'replaceEvent')
         .mockImplementation((ev: EventRecord) => Promise.resolve(ev));
@@ -604,7 +606,7 @@ describe('EventRepository', () => {
     it('saves a conversation.asset-add event', () => {
       const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
 
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve());
+      jest.spyOn(testFactory.event_service, 'loadEvent').mockClear();
 
       return testFactory.event_repository['processEvent'](assetAddEvent, EventSource.STREAM).then(updatedEvent => {
         expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
