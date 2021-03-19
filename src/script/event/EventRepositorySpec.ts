@@ -491,9 +491,7 @@ describe('EventRepository', () => {
 
     it('saves a text message with link preview with an ID previously used by the same user for a plain text message', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      jest
-        .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation(async () => previously_stored_event);
+      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(async () => previously_stored_event);
       jest
         .spyOn(testFactory.event_service, 'replaceEvent')
         .mockImplementation(() => Promise.resolve(previously_stored_event));
