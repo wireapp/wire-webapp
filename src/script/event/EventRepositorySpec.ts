@@ -190,7 +190,9 @@ describe('EventRepository', () => {
   describe('handleEvent', () => {
     beforeEach(() => {
       testFactory.event_repository.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      spyOn(testFactory.event_service, 'saveEvent').and.returnValue(Promise.resolve({data: 'dummy content'}));
+      jest
+        .spyOn(testFactory.event_service, 'saveEvent')
+        .mockReturnValue(Promise.resolve({data: 'dummy content'} as EventRecord));
       spyOn<any>(testFactory.event_repository, 'distributeEvent');
     });
 
@@ -628,8 +630,6 @@ describe('EventRepository', () => {
           time: '2017-09-06T09:43:36.528Z',
         };
 
-        // FIXME: Already spied on
-        // spyOn(testFactory.event_repository['userState'], 'self').mockImplementation({id: assetAddEvent.from});
         loadEventSpy.mockImplementation(() => Promise.resolve(assetAddEvent));
         deleteEventSpy.mockImplementation(() => Promise.resolve(1));
 
@@ -669,7 +669,9 @@ describe('EventRepository', () => {
         time: '2017-09-06T09:43:36.528Z',
       };
 
-      spyOn(testFactory.event_repository['userState'], 'self').and.returnValue({id: assetAddEvent.from});
+      jest
+        .spyOn(testFactory.event_repository['userState'], 'self')
+        .mockImplementation(() => ({id: assetAddEvent.from}));
       jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(assetAddEvent));
       jest
         .spyOn(testFactory.event_service, 'updateEventAsUploadFailed')
