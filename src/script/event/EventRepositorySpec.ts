@@ -99,11 +99,11 @@ describe('EventRepository', () => {
     const latestNotificationId = createRandomUuid();
 
     beforeEach(() => {
-      spyOn<any>(testFactory.event_repository, 'handleNotification').and.callThrough();
-      spyOn<any>(testFactory.event_repository, 'handleEvent');
-      spyOn<any>(testFactory.event_repository, 'distributeEvent');
+      jest.spyOn<EventRepository, any>(testFactory.event_repository, 'handleNotification');
+      jest.spyOn<EventRepository, any>(testFactory.event_repository, 'handleEvent');
+      jest.spyOn<EventRepository, any>(testFactory.event_repository, 'distributeEvent');
 
-      spyOn(testFactory.notification_service, 'getAllNotificationsForClient').and.callFake(() => {
+      jest.spyOn(testFactory.notification_service, 'getAllNotificationsForClient').mockImplementation(() => {
         return new Promise(resolve => {
           window.setTimeout(() => {
             resolve([
@@ -114,19 +114,20 @@ describe('EventRepository', () => {
         });
       });
 
-      spyOn(testFactory.notification_service, 'getNotificationsLast').and.returnValue(
-        Promise.resolve({id: latestNotificationId, payload: [{}]}),
-      );
+      jest.spyOn(testFactory.notification_service, 'getNotificationsLast').mockImplementation(() => {
+        const notification = {id: latestNotificationId, payload: [{}]} as Notification;
+        return Promise.resolve(notification);
+      });
 
-      spyOn(testFactory.notification_service, 'getLastNotificationIdFromDb').and.callFake(() => {
+      jest.spyOn(testFactory.notification_service, 'getLastNotificationIdFromDb').mockImplementation(() => {
         return last_notification_id
           ? Promise.resolve(last_notification_id)
           : Promise.reject(new EventError(EventError.TYPE.NO_LAST_ID, EventError.MESSAGE.NO_LAST_ID));
       });
 
-      spyOn(testFactory.notification_service, 'saveLastNotificationIdToDb').and.returnValue(
-        Promise.resolve(DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION),
-      );
+      jest
+        .spyOn(testFactory.notification_service, 'saveLastNotificationIdToDb')
+        .mockImplementation(() => Promise.resolve(DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION));
     });
 
     it('should fetch last notifications ID from backend if not found in storage', async () => {
@@ -376,7 +377,9 @@ describe('EventRepository', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       } as EventRecord;
 
-      spyOn(testFactory.event_service, 'saveEvent').and.callFake(saved_event => Promise.resolve(saved_event));
+      jest
+        .spyOn(testFactory.event_service, 'saveEvent')
+        .mockImplementation(saved_event => Promise.resolve(saved_event));
     });
 
     it('saves an event with a previously not used ID', () => {
@@ -390,7 +393,9 @@ describe('EventRepository', () => {
     it('ignores an event with an ID previously used by another user', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
       previously_stored_event.from = createRandomUuid();
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
+      jest
+        .spyOn(testFactory.event_service, 'loadEvent')
+        .mockImplementation(() => Promise.resolve(previously_stored_event));
 
       return testFactory.event_repository['processEvent'](event, EventSource.STREAM)
         .then(() => fail('Method should have thrown an error'))
@@ -404,7 +409,9 @@ describe('EventRepository', () => {
     it('ignores a non-"text message" with an ID previously used by the same user', () => {
       event.type = ClientEvent.CALL.E_CALL;
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
+      jest
+        .spyOn(testFactory.event_service, 'loadEvent')
+        .mockImplementation(() => Promise.resolve(previously_stored_event));
 
       return testFactory.event_repository['handleEventSaving'](event)
         .then(() => fail('Method should have thrown an error'))
@@ -418,7 +425,9 @@ describe('EventRepository', () => {
     it('ignores a plain text message with an ID previously used by the same user for a non-"text message"', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
       previously_stored_event.type = ClientEvent.CALL.E_CALL;
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
+      jest
+        .spyOn(testFactory.event_service, 'loadEvent')
+        .mockImplementation(() => Promise.resolve(previously_stored_event));
 
       return testFactory.event_repository['processEvent'](event, EventSource.STREAM)
         .then(() => fail('Method should have thrown an error'))
@@ -431,7 +440,9 @@ describe('EventRepository', () => {
 
     it('ignores a plain text message with an ID previously used by the same user', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
+      jest
+        .spyOn(testFactory.event_service, 'loadEvent')
+        .mockImplementation(() => Promise.resolve(previously_stored_event));
 
       return testFactory.event_repository['processEvent'](event, EventSource.STREAM)
         .then(() => fail('Method should have thrown an error'))
@@ -445,7 +456,9 @@ describe('EventRepository', () => {
     it('ignores a text message with link preview with an ID previously used by the same user for a text message with link preview', () => {
       event.data.previews.push(1);
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
+      jest
+        .spyOn(testFactory.event_service, 'loadEvent')
+        .mockImplementation(() => Promise.resolve(previously_stored_event));
 
       return testFactory.event_repository['processEvent'](event, EventSource.STREAM)
         .then(() => fail('Method should have thrown an error'))
@@ -458,7 +471,9 @@ describe('EventRepository', () => {
 
     it('ignores a text message with link preview with an ID previously used by the same user for a text message different content', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
+      jest
+        .spyOn(testFactory.event_service, 'loadEvent')
+        .mockImplementation(() => Promise.resolve(previously_stored_event));
 
       event.data.previews.push(1);
       event.data.content = 'Ipsum loren';
@@ -474,8 +489,12 @@ describe('EventRepository', () => {
 
     it('saves a text message with link preview with an ID previously used by the same user for a plain text message', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(previously_stored_event));
-      spyOn(testFactory.event_service, 'replaceEvent').and.returnValue(Promise.resolve(previously_stored_event));
+      jest
+        .spyOn(testFactory.event_service, 'loadEvent')
+        .mockImplementation(() => Promise.resolve(previously_stored_event));
+      jest
+        .spyOn(testFactory.event_service, 'replaceEvent')
+        .mockImplementation(() => Promise.resolve(previously_stored_event));
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
@@ -492,8 +511,10 @@ describe('EventRepository', () => {
 
     it('ignores edit message with missing associated original message', () => {
       const linkPreviewEvent = JSON.parse(JSON.stringify(event));
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve());
-      spyOn(testFactory.event_service, 'replaceEvent').and.returnValue(Promise.resolve());
+      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve({} as EventRecord));
+      jest
+        .spyOn(testFactory.event_service, 'replaceEvent')
+        .mockImplementation(() => Promise.resolve({} as EventRecord));
 
       linkPreviewEvent.data.replacing_message_id = 'initial_message_id';
 
@@ -510,12 +531,14 @@ describe('EventRepository', () => {
       const storedEvent = {
         ...event,
         data: {...event.data, replacing_message_id: replacingId},
-      };
+      } as EventRecord;
       const linkPreviewEvent = {...event};
       spyOn(testFactory.event_service, 'loadEvent').and.callFake((conversationId, messageId) => {
         return messageId === replacingId ? Promise.resolve() : Promise.resolve(storedEvent);
       });
-      spyOn(testFactory.event_service, 'replaceEvent').and.callFake(ev => ev);
+      jest
+        .spyOn(testFactory.event_service, 'replaceEvent')
+        .mockImplementation((ev: EventRecord) => Promise.resolve(ev));
 
       linkPreviewEvent.data.replacing_message_id = replacingId;
       linkPreviewEvent.data.previews = ['preview'];
@@ -530,8 +553,12 @@ describe('EventRepository', () => {
     it('updates edited messages', () => {
       const originalMessage = JSON.parse(JSON.stringify(event));
       originalMessage.reactions = ['user-id'];
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(originalMessage));
-      spyOn(testFactory.event_service, 'replaceEvent').and.callFake(updates => updates);
+      jest
+        .spyOn(testFactory.event_service, 'loadEvent')
+        .mockImplementation(() => Promise.resolve(originalMessage as EventRecord));
+      jest
+        .spyOn(testFactory.event_service, 'replaceEvent')
+        .mockImplementation((updates: EventRecord) => Promise.resolve(updates));
 
       const initial_time = event.time;
       const changed_time = new Date(new Date(event.time).getTime() + 60 * 1000).toISOString();
@@ -558,8 +585,10 @@ describe('EventRepository', () => {
         data: {...event.data, previews: ['preview']},
       };
       const editEvent = {...event};
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(storedEvent));
-      spyOn(testFactory.event_service, 'replaceEvent').and.callFake(ev => ev);
+      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(storedEvent));
+      jest
+        .spyOn(testFactory.event_service, 'replaceEvent')
+        .mockImplementation((ev: EventRecord) => Promise.resolve(ev));
 
       editEvent.data.replacing_message_id = replacingId;
 
@@ -589,8 +618,8 @@ describe('EventRepository', () => {
         testFactory.user_repository['userState'].self().id,
       ];
 
-      const loadEventSpy = spyOn(testFactory.event_service, 'loadEvent');
-      const deleteEventSpy = spyOn(testFactory.event_service, 'deleteEvent');
+      const loadEventSpy = jest.spyOn(testFactory.event_service, 'loadEvent');
+      const deleteEventSpy = jest.spyOn(testFactory.event_service, 'deleteEvent');
       const testPromises = froms.map(from => {
         const assetAddEvent = {...event, from, type: ClientEvent.CONVERSATION.ASSET_ADD};
         const assetCancelEvent = {
@@ -600,9 +629,9 @@ describe('EventRepository', () => {
         };
 
         // FIXME: Already spied on
-        // spyOn(testFactory.event_repository['userState'], 'self').and.returnValue({id: assetAddEvent.from});
-        loadEventSpy.and.returnValue(Promise.resolve(assetAddEvent));
-        deleteEventSpy.and.returnValue(Promise.resolve());
+        // spyOn(testFactory.event_repository['userState'], 'self').mockImplementation({id: assetAddEvent.from});
+        loadEventSpy.mockImplementation(() => Promise.resolve(assetAddEvent));
+        deleteEventSpy.mockImplementation(() => Promise.resolve(1));
 
         return testFactory.event_repository['processEvent'](assetCancelEvent, EventSource.STREAM).then(savedEvent => {
           expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
@@ -621,8 +650,8 @@ describe('EventRepository', () => {
         time: '2017-09-06T09:43:36.528Z',
       };
 
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
-      spyOn(testFactory.event_service, 'deleteEvent').and.returnValue(Promise.resolve());
+      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(assetAddEvent));
+      jest.spyOn(testFactory.event_service, 'deleteEvent').mockImplementation(() => Promise.resolve(1));
 
       return testFactory.event_repository['processEvent'](assetUploadFailedEvent, EventSource.STREAM).then(
         savedEvent => {
@@ -641,10 +670,10 @@ describe('EventRepository', () => {
       };
 
       spyOn(testFactory.event_repository['userState'], 'self').and.returnValue({id: assetAddEvent.from});
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(assetAddEvent));
-      spyOn(testFactory.event_service, 'updateEventAsUploadFailed').and.returnValue(
-        Promise.resolve(assetUploadFailedEvent),
-      );
+      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(assetAddEvent));
+      jest
+        .spyOn(testFactory.event_service, 'updateEventAsUploadFailed')
+        .mockImplementation(() => Promise.resolve(assetUploadFailedEvent));
 
       return testFactory.event_repository['processEvent'](assetUploadFailedEvent, EventSource.STREAM).then(
         savedEvent => {
@@ -663,8 +692,10 @@ describe('EventRepository', () => {
         time: '2017-09-06T09:43:36.528Z',
       };
 
-      spyOn(testFactory.event_service, 'replaceEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
+      jest
+        .spyOn(testFactory.event_service, 'replaceEvent')
+        .mockImplementation(eventToUpdate => Promise.resolve(eventToUpdate));
+      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(initialAssetEvent));
 
       return testFactory.event_repository['processEvent'](updateStatusEvent, EventSource.STREAM).then(updatedEvent => {
         expect(updatedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
@@ -682,8 +713,10 @@ describe('EventRepository', () => {
         time: '2017-09-06T09:43:36.528Z',
       };
 
-      spyOn(testFactory.event_service, 'replaceEvent').and.callFake(eventToUpdate => Promise.resolve(eventToUpdate));
-      spyOn(testFactory.event_service, 'loadEvent').and.returnValue(Promise.resolve(initialAssetEvent));
+      jest
+        .spyOn(testFactory.event_service, 'replaceEvent')
+        .mockImplementation(eventToUpdate => Promise.resolve(eventToUpdate));
+      jest.spyOn(testFactory.event_service, 'loadEvent').mockImplementation(() => Promise.resolve(initialAssetEvent));
 
       return testFactory.event_repository['processEvent'](AssetPreviewEvent, EventSource.STREAM).then(
         (updatedEvent: EventRecord) => {
