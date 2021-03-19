@@ -491,7 +491,7 @@ export class EventRepository {
    * @param event Mapped event to be distributed
    * @param source Source of notification
    */
-  private distributeEvent(event: EventRecord, source: EventSource) {
+  private distributeEvent(event: EventRecord, source: EventSource): void {
     const {conversation: conversationId, from: userId, type} = event;
 
     const hasIds = conversationId && userId;
