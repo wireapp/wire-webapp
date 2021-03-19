@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.46.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.46.0...@wireapp/react-ui-kit@7.46.1) (2021-03-19)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** RecordBoldIcon fill color ([#3657](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3657)) ([61678a9](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/61678a9b35e4eed93bdaaf99410b4f6e2d1843d7))
+
+
+
+
+
 # [7.46.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.45.9...@wireapp/react-ui-kit@7.46.0) (2021-03-16)
 
 
