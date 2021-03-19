@@ -493,7 +493,7 @@ describe('EventRepository', () => {
       previously_stored_event = JSON.parse(JSON.stringify(event));
       jest
         .spyOn(testFactory.event_service, 'loadEvent')
-        .mockImplementation(() => Promise.resolve(previously_stored_event));
+        .mockImplementation(async () => previously_stored_event);
       jest
         .spyOn(testFactory.event_service, 'replaceEvent')
         .mockImplementation(() => Promise.resolve(previously_stored_event));
