@@ -40,6 +40,7 @@ import {amplify} from 'amplify';
 import {EventSource} from './EventSource';
 import {EventRecord} from '../storage';
 import {EventService} from './EventService';
+import {CryptographyError} from '../error/CryptographyError';
 
 const testFactory = new TestFactory();
 
@@ -160,6 +161,64 @@ describe('EventRepository', () => {
     beforeEach(() => {
       last_notification_id = createRandomUuid();
       testFactory.event_repository.lastNotificationId(last_notification_id);
+    });
+
+    it('continues processing when one event fails to decrypt', async () => {
+      const notificationId = createRandomUuid();
+      const notificationWithMultipleEvents: Notification = {
+        id: notificationId,
+        payload: [
+          {
+            conversation: '7e756d05-66ea-411f-b896-3367475a08da',
+            data: {
+              recipient: 'a585dd8c2a8cff9',
+              sender: '3b9d5569809b5a8e',
+              text: 'A',
+            },
+            from: '44bd776e-8719-4320-b1a0-354ccd8e983a',
+            time: '2021-03-22T16:40:13.076Z',
+            type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+          },
+          {
+            conversation: '7e756d05-66ea-411f-b896-3367475a08da',
+            data: {
+              recipient: 'a585dd8c2a8cff9',
+              sender: '3b9d5569809b5a8e',
+              text: 'B',
+            },
+            from: '44bd776e-8719-4320-b1a0-354ccd8e983a',
+            time: '2021-03-22T16:41:13.076Z',
+            type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+          },
+          {
+            conversation: '7e756d05-66ea-411f-b896-3367475a08da',
+            data: {
+              recipient: 'a585dd8c2a8cff9',
+              sender: '3b9d5569809b5a8e',
+              text: 'C',
+            },
+            from: '44bd776e-8719-4320-b1a0-354ccd8e983a',
+            time: '2021-03-22T16:42:13.076Z',
+            type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+          },
+        ],
+        transient: false,
+      };
+
+      const spy = jest
+        .spyOn<EventRepository, any>(testFactory.event_repository, 'handleEvent')
+        .mockImplementation((event: EventRecord) => {
+          if (event.time === (notificationWithMultipleEvents.payload[1] as EventRecord).time) {
+            throw new CryptographyError(
+              CryptographyError.TYPE.UNHANDLED_TYPE,
+              'Mimic event decryption error for testing purposes.',
+            );
+          }
+          return event;
+        });
+
+      await testFactory.event_repository['handleNotification'](notificationWithMultipleEvents);
+      expect(spy).toHaveBeenCalledTimes(notificationWithMultipleEvents.payload.length);
     });
 
     it('should not update last notification id if transient is true', () => {
