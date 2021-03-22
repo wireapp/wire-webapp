@@ -819,7 +819,15 @@ export class EventRepository {
     }
 
     try {
-      await Promise.all(events.map(event => this.handleEvent(event as EventRecord, source)));
+      await Promise.all(
+        events.map(async event => {
+          try {
+            await this.handleEvent(event as EventRecord, source);
+          } catch (error) {
+            this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+          }
+        }),
+      );
       this.notificationsHandled++;
       if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.STREAM) {
         this.updateProgress();
