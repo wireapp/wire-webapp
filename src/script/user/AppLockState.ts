@@ -38,7 +38,7 @@ export class AppLockState {
 
   constructor(teamState = container.resolve(TeamState)) {
     this.isAppLockAvailable = ko.pureComputed(() =>
-      teamState.isTeam() ? teamState.teamFeatures()?.appLock?.status === 'enabled' : defaultEnabled,
+      teamState.isTeam() ? teamState.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED : defaultEnabled,
     );
 
     this.isAppLockEnforced = ko.pureComputed(
