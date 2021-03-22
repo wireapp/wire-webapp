@@ -4,7 +4,6 @@ import {ValidationUtil} from '@wireapp/commons';
 import {UrlUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
-import sodium from 'libsodium-wrappers-sumo';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
@@ -12,12 +11,13 @@ import {t} from 'Util/LocalizerUtil';
 
 import {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
-import {User} from '../entity/User';
 import {QUERY_KEY} from '../auth/route';
 import ModalComponent from 'Components/ModalComponent';
-import {TeamState} from '../team/TeamState';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientState} from '../client/ClientState';
+import {AppLockState} from '../user/AppLockState';
+import {AppLockRepository} from '../user/AppLockRepository';
+import {useKoSubscribable} from 'Util/ComponentUtil';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
@@ -39,24 +39,19 @@ const passwordRegexSpecial = /(?=.*[!@#$%^&*(),.?":{}|<>])/;
 const passwordRegexUpper = /(?=.*[A-Z])/;
 
 export interface AppLockProps {
+  appLockRepository?: AppLockRepository;
+  appLockState?: AppLockState;
   clientRepository: ClientRepository;
   clientState?: ClientState;
-  selfUser: User;
-  teamState?: TeamState;
 }
-
-const APP_LOCK_STORAGE = 'app_lock';
-const getStorageKey = (userId: string) => `${APP_LOCK_STORAGE}_${userId}`;
-const getStored = (userId: string) => window.localStorage.getItem(getStorageKey(userId));
-export const hasPassphrase = (userId: string) => !!getStored(userId);
 
 const AppLock: React.FC<AppLockProps> = ({
   clientRepository,
-  selfUser,
-  teamState = container.resolve(TeamState),
   clientState = container.resolve(ClientState),
+  appLockState = container.resolve(AppLockState),
+  appLockRepository = container.resolve(AppLockRepository),
 }) => {
-  const [appLockState, setAppLockState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
+  const [state, setState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [wipeError, setWipeError] = useState('');
   const [unlockError, setUnlockError] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -64,6 +59,7 @@ const AppLock: React.FC<AppLockProps> = ({
   const [setupPassphrase, setSetupPassphrase] = useState('');
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
+  const isAppLockActivated = useKoSubscribable(appLockState.isAppLockActivated);
 
   const focusElement = (input: HTMLInputElement) => setTimeout(() => input?.focus());
   const forceFocus = ({target}: React.FocusEvent<HTMLInputElement>) => focusElement(target);
@@ -88,7 +84,7 @@ const AppLock: React.FC<AppLockProps> = ({
 
   const getInactivityAppLockTimeoutInSeconds = () => {
     const queryTimeout = parseInt(UrlUtil.getURLParameter(QUERY_KEY.APPLOCK_INACTIVITY_TIMEOUT), 10);
-    const backendTimeout = teamState.isAppLockEnabled() && teamState.appLockInactivityTimeoutSecs();
+    const backendTimeout = appLockState.appLockInactivityTimeoutSecs();
 
     if (Number.isFinite(queryTimeout)) {
       return queryTimeout;
@@ -127,25 +123,29 @@ const AppLock: React.FC<AppLockProps> = ({
   }, [inactivityTimeoutId]);
 
   useEffect(() => {
-    if (teamState.isAppLockEnabled()) {
-      if (teamState.isAppLockEnforced() || hasPassphrase(selfUser.id)) {
-        showAppLock();
-      }
-      startPassphraseObserver();
+    if (isAppLockActivated) {
+      showAppLock();
     }
+    appLockState.isAppLockEnabled.subscribe(isEnabled => {
+      if (isEnabled) {
+        changePassphrase();
+      } else {
+        appLockRepository.removeCode();
+      }
+    });
     amplify.subscribe(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE, changePassphrase);
   }, []);
 
   useEffect(() => {
-    if (teamState.isAppLockEnabled() && hasPassphrase(selfUser.id)) {
+    if (isAppLockActivated) {
       window.addEventListener('blur', startAppLockTimeout);
       return () => window.removeEventListener('blur', startAppLockTimeout);
     }
     return undefined;
-  }, [startAppLockTimeout]);
+  }, [isAppLockActivated]);
 
   useEffect(() => {
-    if (teamState.isAppLockEnabled() && hasPassphrase(selfUser.id)) {
+    if (isAppLockActivated) {
       window.addEventListener('focus', clearAppLockTimeout);
       return () => window.removeEventListener('focus', clearAppLockTimeout);
     }
@@ -167,42 +167,18 @@ const AppLock: React.FC<AppLockProps> = ({
       modalObserver.disconnect();
       appObserver.disconnect();
     };
-  }, [appLockState, isVisible]);
+  }, [state, isVisible]);
 
   const showAppLock = () => {
-    setAppLockState(hasPassphrase(selfUser.id) ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     setIsVisible(true);
-  };
-
-  const handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent) => {
-    const storageKey = getStorageKey(selfUser.id);
-    if (key === storageKey) {
-      window.localStorage.setItem(storageKey, oldValue);
-    }
-  };
-
-  const startPassphraseObserver = () => window.addEventListener('storage', handlePassphraseStorageEvent);
-
-  const stopPassphraseObserver = () => window.removeEventListener('storage', handlePassphraseStorageEvent);
-
-  const setCode = async (code: string) => {
-    stopPassphraseObserver();
-    await sodium.ready;
-    const hashed = sodium.crypto_pwhash_str(
-      code,
-      sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
-      sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
-    );
-    window.localStorage.setItem(getStorageKey(selfUser.id), hashed);
-    startPassphraseObserver();
   };
 
   const onUnlock = async (event: React.FormEvent) => {
     event.preventDefault();
     const target = event.target as HTMLFormElement & {password: HTMLInputElement};
-    const hashedCode = getStored(selfUser.id);
-    await sodium.ready;
-    if (sodium.crypto_pwhash_str_verify(hashedCode, target.password.value)) {
+    const isCorrectCode = await appLockRepository.checkCode(target.password.value);
+    if (isCorrectCode) {
       setIsVisible(false);
       startScheduledTimeout();
       return;
@@ -219,7 +195,7 @@ const AppLock: React.FC<AppLockProps> = ({
 
   const onSetCode = async (event: React.FormEvent) => {
     event.preventDefault();
-    await setCode(setupPassphrase);
+    await appLockRepository.setCode(setupPassphrase);
     setIsVisible(false);
     startScheduledTimeout();
   };
@@ -230,8 +206,7 @@ const AppLock: React.FC<AppLockProps> = ({
       setIsLoading(true);
       const currentClientId = clientState.currentClient().id;
       await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
-      stopPassphraseObserver();
-      window.localStorage.removeItem(getStorageKey(selfUser.id));
+      appLockRepository.removeCode();
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
     } catch ({code, message}) {
       setIsLoading(false);
@@ -243,7 +218,7 @@ const AppLock: React.FC<AppLockProps> = ({
   };
 
   const changePassphrase = () => {
-    setAppLockState(APPLOCK_STATE.SETUP);
+    setState(APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
@@ -256,17 +231,17 @@ const AppLock: React.FC<AppLockProps> = ({
 
   const clearWipeError = () => setWipeError('');
   const clearUnlockError = () => setUnlockError('');
-  const onGoBack = () => setAppLockState(APPLOCK_STATE.LOCKED);
-  const onClickForgot = () => setAppLockState(APPLOCK_STATE.FORGOT);
-  const onClickWipe = () => setAppLockState(APPLOCK_STATE.WIPE_CONFIRM);
-  const onClickWipeConfirm = () => setAppLockState(APPLOCK_STATE.WIPE_PASSWORD);
+  const onGoBack = () => setState(APPLOCK_STATE.LOCKED);
+  const onClickForgot = () => setState(APPLOCK_STATE.FORGOT);
+  const onClickWipe = () => setState(APPLOCK_STATE.WIPE_CONFIRM);
+  const onClickWipeConfirm = () => setState(APPLOCK_STATE.WIPE_PASSWORD);
   const onClosed = () => {
-    setAppLockState(APPLOCK_STATE.NONE);
+    setState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
   };
 
   const headerText = () => {
-    switch (appLockState) {
+    switch (state) {
       case APPLOCK_STATE.SETUP_CHANGE:
         return t('modalAppLockSetupChangeTitle', Config.getConfig().BRAND_NAME);
       case APPLOCK_STATE.SETUP:
@@ -291,8 +266,8 @@ const AppLock: React.FC<AppLockProps> = ({
           {headerText()}
         </div>
       </div>
-      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={appLockState}>
-        {appLockState === APPLOCK_STATE.SETUP && (
+      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={state}>
+        {state === APPLOCK_STATE.SETUP && (
           <form onSubmit={onSetCode}>
             <div
               className="modal__text"
@@ -342,7 +317,7 @@ const AppLock: React.FC<AppLockProps> = ({
             </div>
           </form>
         )}
-        {appLockState === APPLOCK_STATE.SETUP_CHANGE && (
+        {state === APPLOCK_STATE.SETUP_CHANGE && (
           <form onSubmit={onSetCode}>
             <div
               className="modal__text"
@@ -399,7 +374,7 @@ const AppLock: React.FC<AppLockProps> = ({
           </form>
         )}
 
-        {appLockState === APPLOCK_STATE.LOCKED && (
+        {state === APPLOCK_STATE.LOCKED && (
           <form onSubmit={onUnlock}>
             <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
               {t('modalAppLockPasscode')}
@@ -435,7 +410,7 @@ const AppLock: React.FC<AppLockProps> = ({
           </form>
         )}
 
-        {appLockState === APPLOCK_STATE.FORGOT && (
+        {state === APPLOCK_STATE.FORGOT && (
           <React.Fragment>
             <div className="modal__text" data-uie-name="label-applock-forgot-text">
               {t('modalAppLockForgotMessage')}
@@ -455,7 +430,7 @@ const AppLock: React.FC<AppLockProps> = ({
           </React.Fragment>
         )}
 
-        {appLockState === APPLOCK_STATE.WIPE_CONFIRM && (
+        {state === APPLOCK_STATE.WIPE_CONFIRM && (
           <React.Fragment>
             <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
               {t('modalAppLockWipeConfirmMessage')}
@@ -475,7 +450,7 @@ const AppLock: React.FC<AppLockProps> = ({
           </React.Fragment>
         )}
 
-        {appLockState === APPLOCK_STATE.WIPE_PASSWORD && (
+        {state === APPLOCK_STATE.WIPE_PASSWORD && (
           <form onSubmit={onWipeDatabase}>
             <input
               className="modal__input"
@@ -517,10 +492,7 @@ const AppLock: React.FC<AppLockProps> = ({
 
 export default {
   AppLock,
-  init: (clientRepository: ClientRepository, selfUser: User) => {
-    ReactDOM.render(
-      <AppLock clientRepository={clientRepository} selfUser={selfUser} />,
-      document.getElementById('applock'),
-    );
+  init: (clientRepository: ClientRepository) => {
+    ReactDOM.render(<AppLock clientRepository={clientRepository} />, document.getElementById('applock'));
   },
 };

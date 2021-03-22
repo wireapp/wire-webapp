@@ -293,27 +293,25 @@ describe('TimeUtil', () => {
     it('renders hours and minutes correctly', () => {
       caption = formatDurationCaption(ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
 
-      expect(caption).toEqual(`01:01 ${t('ephemeralRemaining')}`);
+      expect(caption).toEqual('01:01');
     });
 
     it('renders days and hours:minutes', () => {
       caption = formatDurationCaption(ONE_DAY_IN_MILLIS + ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
 
-      expect(caption).toEqual(`1 ${t('ephemeralUnitsDay')} and 01:01 ${t('ephemeralRemaining')}`);
+      expect(caption).toEqual(`1 ${t('ephemeralUnitsDay')} and 01:01`);
     });
 
     it('renders just the days if hours are 0', () => {
       caption = formatDurationCaption(2 * ONE_DAY_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
 
-      expect(caption).toEqual(`2 ${t('ephemeralUnitsDays')} ${t('ephemeralRemaining')}`);
+      expect(caption).toEqual(`2 ${t('ephemeralUnitsDays')}`);
     });
 
     it('renders weeks and days', () => {
       caption = formatDurationCaption(3 * ONE_WEEK_IN_MILLIS + ONE_DAY_IN_MILLIS);
 
-      expect(caption).toEqual(
-        `3 ${t('ephemeralUnitsWeeks')} and 1 ${t('ephemeralUnitsDay')} ${t('ephemeralRemaining')}`,
-      );
+      expect(caption).toEqual(`3 ${t('ephemeralUnitsWeeks')} and 1 ${t('ephemeralUnitsDay')}`);
     });
   });
 

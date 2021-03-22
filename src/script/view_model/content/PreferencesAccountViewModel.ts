@@ -24,7 +24,6 @@ import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
 import {Availability, Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import {hasPassphrase} from '../../page/AppLock';
 import 'Components/AvailabilityState';
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -60,6 +59,9 @@ import {UserState} from '../../user/UserState';
 import {ContentViewModel} from '../ContentViewModel';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {HistoryExportViewModel} from './HistoryExportViewModel';
+import {AppLockState} from '../../user/AppLockState';
+import {AppLockRepository} from '../../user/AppLockRepository';
+import {formatDurationCaption} from 'Util/TimeUtil';
 
 export enum UserNameState {
   AVAILABLE = 'AVAILABLE',
@@ -91,8 +93,6 @@ export class PreferencesAccountViewModel {
   optionTelemetrySharing: ko.Observable<boolean>;
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
-  optionResetAppLock: boolean;
-  hasAppLockPassphrase: () => boolean;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   isMacOsWrapper: boolean;
   manageTeamUrl: string;
@@ -104,6 +104,7 @@ export class PreferencesAccountViewModel {
   /** The `UserNameState` exists, so that conditions in Knockout templates can make use of it. */
   UserNameState: typeof UserNameState = UserNameState;
   isCountlyEnabled: boolean = false;
+  optionsAppLockTime: string;
 
   static get CONFIG() {
     return {
@@ -122,6 +123,8 @@ export class PreferencesAccountViewModel {
     private readonly userRepository: UserRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
+    readonly appLockState = container.resolve(AppLockState),
+    private readonly appLockRepository = container.resolve(AppLockRepository),
   ) {
     this.logger = getLogger('PreferencesAccountViewModel');
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
@@ -174,8 +177,8 @@ export class PreferencesAccountViewModel {
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
-    this.optionResetAppLock = this.teamState.isAppLockEnabled();
-    this.hasAppLockPassphrase = () => hasPassphrase(this.selfUser().id);
+    this.optionsAppLockTime = formatDurationCaption(this.appLockState.appLockInactivityTimeoutSecs() * 1000);
+
     this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
@@ -537,6 +540,12 @@ export class PreferencesAccountViewModel {
     const isChecked = event.target.checked;
     const mode = isChecked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key, mode);
+    return true;
+  };
+
+  readonly onChangeAppLockEnabled = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
+    const isChecked = event.target.checked;
+    this.appLockRepository.setEnabled(isChecked);
     return true;
   };
 
