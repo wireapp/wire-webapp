@@ -142,7 +142,7 @@ describe('AppLock', () => {
       expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP).exists()).toBe(true);
     });
 
-    it.skip('shows setup state when there is no passphrase is set and enforced is enabled', () => {
+    it('shows setup state when there is no passphrase is set and enforced is enabled', () => {
       const appLockState = createAppLockState(createTeamState({enforceAppLock: true, status: 'enabled'}));
       const appLockRepository = createAppLockRepository(appLockState);
       appLockState.hasPassphrase(false);
@@ -161,20 +161,35 @@ describe('AppLock', () => {
     });
   });
 
-  it('shows the locked modal on start if timeout is set as flag and a code is stored', () => {
-    spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
+  it('shows the locked modal on start if timeout is set as flag and a code is stored', async () => {
+    const appLockState = createAppLockState();
+    const appLockRepository = createAppLockRepository(appLockState);
+    appLockState.hasPassphrase(true);
+    appLockState.isActivatedInPreferences(true);
+    jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
+
     const appLockPage = new AppLockPage({
+      appLockRepository,
+      appLockState,
       clientRepository,
     });
+
     const appLockModal = appLockPage.getAppLockModal();
     expect(appLockModal.props().style.display).toBe('flex');
   });
 
   it('shows the locked modal on start if timeout is set as query parameter and a code is stored', () => {
+    const appLockState = createAppLockState();
+    const appLockRepository = createAppLockRepository(appLockState);
+    appLockState.hasPassphrase(true);
+    appLockState.isActivatedInPreferences(true);
+    jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
+
     window.history.pushState({}, '', '?applock_unfocus_timeout=10');
-    spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
 
     const appLockPage = new AppLockPage({
+      appLockRepository,
+      appLockState,
       clientRepository,
     });
 
