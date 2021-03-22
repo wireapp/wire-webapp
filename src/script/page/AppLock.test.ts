@@ -94,7 +94,7 @@ const createAppLockRepository = (appLockState?: AppLockState) => {
 describe('AppLock', () => {
   describe('disabled feature', () => {
     it('does not shows up if applock is disabled', () => {
-      const appLockState = createAppLockState(createTeamState({status: 'disabled'}));
+      const appLockState = createAppLockState(createTeamState({status: FeatureStatus.DISABLED}));
       const appLockRepository = createAppLockRepository(appLockState);
 
       const appLockPage = new AppLockPage({
