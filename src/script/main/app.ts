@@ -462,7 +462,7 @@ class App {
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      AppLock.init(clientRepository, ko.unwrap(userRepository['userState'].self));
+      AppLock.init(clientRepository);
 
       loadingView.removeFromView();
       telemetry.report();

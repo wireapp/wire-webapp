@@ -236,7 +236,7 @@ export const formatDurationCaption = (duration: number): string => {
     }
   }
   const joiner = ` ${t('and')} `;
-  return `${validUnitStrings.join(joiner)} ${t('ephemeralRemaining')}`;
+  return validUnitStrings.join(joiner);
 };
 
 /**

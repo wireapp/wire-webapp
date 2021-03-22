@@ -810,6 +810,8 @@
   "preferencesAccountPrivacy": "Privacy",
   "preferencesAccountReadReceiptsCheckbox": "Read receipts",
   "preferencesAccountReadReceiptsDetail": "When this is off, you won’t be able to see read receipts from other people. This setting does not apply to group conversations.",
+  "preferencesAccountAppLockCheckbox": "Lock With Passcode",
+  "preferencesAccountAppLockDetail": "Lock Wire after {{locktime}} in the background. Unlock with Touch ID or enter your passcode.",
   "preferencesAccountResetAppLockPassphrase": "Reset app lock passphrase",
   "preferencesAccountResetPassword": "Reset password",
   "preferencesAccountSetAppLockPassphrase": "Set app lock passphrase",

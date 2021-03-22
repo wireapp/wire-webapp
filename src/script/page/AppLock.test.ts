@@ -17,17 +17,19 @@
  *
  */
 
-import 'src/script/util/test/mock/mutationObserverMock';
-import 'src/script/util/test/mock/LocalStorageMock';
+import ko from 'knockout';
 import {act} from '@testing-library/react';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import ko from 'knockout';
+
 import TestPage from 'Util/test/TestPage';
 import type {ClientRepository} from '../client/ClientRepository';
-import type {User} from '../entity/User';
-import {TeamState} from '../team/TeamState';
 import AppLock, {AppLockProps, APPLOCK_STATE} from './AppLock';
+import {AppLockState} from '../user/AppLockState';
+import {AppLockRepository} from '../user/AppLockRepository';
+import {UserState} from '../user/UserState';
+import {createRandomUuid} from 'Util/util';
+import {TeamState} from '../team/TeamState';
 
 // https://github.com/jedisct1/libsodium.js/issues/235
 jest.mock('libsodium-wrappers-sumo', () => ({
@@ -49,18 +51,56 @@ class AppLockPage extends TestPage<AppLockProps> {
   getForm = () => this.get('form');
   formSubmit = () => this.submit(this.getForm());
 }
+
+const clientRepository = ({} as unknown) as ClientRepository;
+
+const createTeamState = ({
+  status = 'enabled',
+  enforceAppLock = false,
+  inactivityTimeoutSecs = 10,
+}: {
+  enforceAppLock?: boolean;
+  inactivityTimeoutSecs?: number;
+  status?: string;
+} = {}) => {
+  const teamState = new TeamState();
+  jest.spyOn(teamState, 'isTeam').mockImplementation(ko.pureComputed(() => true));
+  const teamFeatures = {
+    applock: {
+      config: {
+        enforceAppLock,
+        inactivityTimeoutSecs,
+      },
+      status,
+    },
+  };
+  jest.spyOn(teamState, 'teamFeatures').mockImplementation(ko.observable(teamFeatures));
+  return teamState;
+};
+
+const createAppLockState = (teamState?: TeamState) => {
+  teamState = teamState ?? createTeamState();
+  const appLockState = new AppLockState(teamState);
+  return appLockState;
+};
+
+const createAppLockRepository = (appLockState?: AppLockState) => {
+  const userState = new UserState();
+  appLockState = appLockState ?? createAppLockState();
+  jest.spyOn(userState, 'self').mockImplementation(ko.observable({id: createRandomUuid()}));
+  const appLockRepository = new AppLockRepository(userState, appLockState);
+  return appLockRepository;
+};
 describe('AppLock', () => {
   describe('disabled feature', () => {
     it('does not shows up if applock is disabled', () => {
-      const teamState: Partial<TeamState> = {
-        appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
-        isAppLockEnabled: ko.pureComputed(() => false),
-        isAppLockEnforced: ko.pureComputed(() => false),
-      };
+      const appLockState = createAppLockState(createTeamState({status: 'disabled'}));
+      const appLockRepository = createAppLockRepository(appLockState);
+
       const appLockPage = new AppLockPage({
-        clientRepository: ({} as unknown) as ClientRepository,
-        selfUser: ({id: 'userID'} as unknown) as User,
-        teamState: teamState as TeamState,
+        appLockRepository,
+        appLockState,
+        clientRepository,
       });
       const appLockModal = appLockPage.getAppLockModal();
       expect(appLockModal.props().style.display).toBe('none');
@@ -69,32 +109,31 @@ describe('AppLock', () => {
 
   describe('modal state', () => {
     it('shows locked state when it the passphrase is set and app lock is enabled', () => {
-      const teamState: Partial<TeamState> = {
-        appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
-        isAppLockEnabled: ko.pureComputed(() => true),
-        isAppLockEnforced: ko.pureComputed(() => false),
-      };
-      spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
+      const appLockState = createAppLockState();
+      const appLockRepository = createAppLockRepository(appLockState);
+      appLockState.hasPassphrase(true);
+      appLockState.isActivatedInPreferences(true);
+      jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
 
       const appLockPage = new AppLockPage({
-        clientRepository: ({} as unknown) as ClientRepository,
-        selfUser: ({id: 'userID'} as unknown) as User,
-        teamState: teamState as TeamState,
+        appLockRepository,
+        appLockState,
+        clientRepository,
       });
       expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.LOCKED).exists()).toBe(true);
     });
 
     it('shows setup state when there is no passphrase is set and app lock is enabled', () => {
-      const teamState: Partial<TeamState> = {
-        appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
-        isAppLockEnabled: ko.pureComputed(() => true),
-        isAppLockEnforced: ko.pureComputed(() => false),
-      };
+      const appLockState = createAppLockState();
+      const appLockRepository = createAppLockRepository(appLockState);
+      appLockState.hasPassphrase(false);
+      appLockState.isActivatedInPreferences(true);
+      jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
 
       const appLockPage = new AppLockPage({
-        clientRepository: ({} as unknown) as ClientRepository,
-        selfUser: ({id: 'userID'} as unknown) as User,
-        teamState: teamState as TeamState,
+        appLockRepository,
+        appLockState,
+        clientRepository,
       });
       act(() => {
         amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
@@ -103,17 +142,16 @@ describe('AppLock', () => {
       expect(appLockPage.getAppLockModalBody(APPLOCK_STATE.SETUP).exists()).toBe(true);
     });
 
-    it('shows setup state when there is no passphrase is set and enforced is enabled', () => {
-      const teamState: Partial<TeamState> = {
-        appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
-        isAppLockEnabled: ko.pureComputed(() => true),
-        isAppLockEnforced: ko.pureComputed(() => true),
-      };
+    it.skip('shows setup state when there is no passphrase is set and enforced is enabled', () => {
+      const appLockState = createAppLockState(createTeamState({enforceAppLock: true, status: 'enabled'}));
+      const appLockRepository = createAppLockRepository(appLockState);
+      appLockState.hasPassphrase(false);
+      jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
 
       const appLockPage = new AppLockPage({
-        clientRepository: ({} as unknown) as ClientRepository,
-        selfUser: ({id: 'userID'} as unknown) as User,
-        teamState: teamState as TeamState,
+        appLockRepository,
+        appLockState,
+        clientRepository,
       });
       act(() => {
         amplify.publish(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE);
@@ -124,34 +162,20 @@ describe('AppLock', () => {
   });
 
   it('shows the locked modal on start if timeout is set as flag and a code is stored', () => {
-    const teamState: Partial<TeamState> = {
-      appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
-      isAppLockEnabled: ko.pureComputed(() => true),
-      isAppLockEnforced: ko.pureComputed(() => false),
-    };
     spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
     const appLockPage = new AppLockPage({
-      clientRepository: ({} as unknown) as ClientRepository,
-      selfUser: ({id: 'userID'} as unknown) as User,
-      teamState: teamState as TeamState,
+      clientRepository,
     });
     const appLockModal = appLockPage.getAppLockModal();
     expect(appLockModal.props().style.display).toBe('flex');
   });
 
   it('shows the locked modal on start if timeout is set as query parameter and a code is stored', () => {
-    const teamState: Partial<TeamState> = {
-      appLockInactivityTimeoutSecs: ko.pureComputed(() => 10),
-      isAppLockEnabled: ko.pureComputed(() => true),
-      isAppLockEnforced: ko.pureComputed(() => false),
-    };
     window.history.pushState({}, '', '?applock_unfocus_timeout=10');
     spyOn(window.localStorage, 'getItem').and.returnValue('savedCode');
 
     const appLockPage = new AppLockPage({
-      clientRepository: ({} as unknown) as ClientRepository,
-      selfUser: ({id: 'userID'} as unknown) as User,
-      teamState: teamState as TeamState,
+      clientRepository,
     });
 
     const appLockModal = appLockPage.getAppLockModal();
