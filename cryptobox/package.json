@@ -10,7 +10,7 @@
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
-    "@types/karma": "5.0.1",
+    "@types/karma": "6.1.0",
     "@wireapp/store-engine-fs": "2.2.32",
     "browser-sync": "2.26.14",
     "cpx": "1.5.0",
