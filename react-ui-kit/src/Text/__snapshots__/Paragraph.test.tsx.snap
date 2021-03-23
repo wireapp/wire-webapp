@@ -19,7 +19,7 @@ exports[`"Lead" renders (dark theme) 1`] = `
   margin-top: 0;
 }
 
-@media (max-width:480px) {
+@media (max-width:639px) {
   .emotion-0 {
     font-size: 20px;
   }
@@ -55,7 +55,7 @@ exports[`"Lead" renders 1`] = `
   margin-top: 0;
 }
 
-@media (max-width:480px) {
+@media (max-width:639px) {
   .emotion-0 {
     font-size: 20px;
   }

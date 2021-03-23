@@ -35,7 +35,7 @@ export type QueryMap = Record<QueryKeys, string>;
 export const QUERY: QueryMap = {
   [QueryKeys.DESKTOP]: `min-width: ${WIDTH.DESKTOP_MIN}px`,
   [QueryKeys.DESKTOP_XL]: `min-width: ${WIDTH.DESKTOP_XL_MIN}px`,
-  [QueryKeys.MOBILE]: `max-width: ${WIDTH.MOBILE}px`,
+  [QueryKeys.MOBILE]: `max-width: ${WIDTH.MOBILE_MAX}px`,
   [QueryKeys.MOBILE_DOWN]: `max-width: ${WIDTH.MOBILE_MAX}px`,
   [QueryKeys.MOBILE_UP]: `min-width: ${WIDTH.MOBILE}px`,
   [QueryKeys.TABLET]: `min-width: ${WIDTH.TABLET_MIN}px) and (max-width: ${WIDTH.TABLET_MAX}px`,
