@@ -21,7 +21,7 @@ exports[`"Heading" renders H! (dark theme) 1`] = `
   min-height: 48px;
 }
 
-@media (max-width:480px) {
+@media (max-width:639px) {
   .emotion-0 {
     font-size: 40px;
     line-height: 48px;
@@ -60,7 +60,7 @@ exports[`"Heading" renders H1 1`] = `
   min-height: 48px;
 }
 
-@media (max-width:480px) {
+@media (max-width:639px) {
   .emotion-0 {
     font-size: 40px;
     line-height: 48px;
@@ -99,7 +99,7 @@ exports[`"Heading" renders H1 2`] = `
   min-height: 48px;
 }
 
-@media (max-width:480px) {
+@media (max-width:639px) {
   .emotion-0 {
     font-size: 40px;
     line-height: 48px;
@@ -137,7 +137,7 @@ exports[`"Heading" renders H2 1`] = `
   margin-top: 32px;
 }
 
-@media (max-width:480px) {
+@media (max-width:639px) {
   .emotion-0 {
     font-size: 18px;
     line-height: 26px;
