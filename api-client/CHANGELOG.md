@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.4.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.4.1...@wireapp/api-client@12.4.2) (2021-03-23)
+
+
+### Bug Fixes
+
+* **api-client:** Get federated handles ([#3666](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3666)) ([6c12ffc](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6c12ffcd969eb6a07328202df7f49375b014621a))
+
+
+
+
+
 ## [12.4.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.4.0...@wireapp/api-client@12.4.1) (2021-03-19)
 
 **Note:** Version bump only for package @wireapp/api-client
