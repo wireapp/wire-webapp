@@ -47,6 +47,7 @@ export class UserAPI {
   public static readonly DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE = 128;
   public static readonly URL = {
     ACTIVATE: '/activate',
+    BY_HANDLE: 'by-handle',
     CALLS: '/calls',
     CLIENTS: 'clients',
     CONTACTS: 'contacts',
@@ -182,7 +183,7 @@ export class UserAPI {
     const url =
       typeof handle === 'string'
         ? `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`
-        : `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle.domain}/${handle.handle}`;
+        : `${UserAPI.URL.USERS}/${UserAPI.URL.BY_HANDLE}/${handle.domain}/${handle.handle}`;
 
     const config: AxiosRequestConfig = {
       method: 'get',
