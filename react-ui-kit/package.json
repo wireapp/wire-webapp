@@ -17,7 +17,7 @@
     "@babel/preset-typescript": "7.12.13",
     "@hot-loader/react-dom": "17.0.1",
     "@types/jest": "26.0.20",
-    "@types/react": "17.0.2",
+    "@types/react": "17.0.3",
     "@types/webpack-env": "1.16.0",
     "babel-jest": "26.6.3",
     "babel-loader": "8.2.2",
