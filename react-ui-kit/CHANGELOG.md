@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.46.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.46.1...@wireapp/react-ui-kit@7.46.2) (2021-03-23)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Mobile media query ([#3587](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3587)) ([40276df](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/40276df1b835b53089e132c32f23db0aee80062b))
+
+
+
+
+
 ## [7.46.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.46.0...@wireapp/react-ui-kit@7.46.1) (2021-03-19)
 
 
