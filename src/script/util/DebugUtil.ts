@@ -171,7 +171,7 @@ export class DebugUtil {
       notification.from === userId && notification.data && notification.data.sender === clientId;
     const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
       notification.time === dateTime.toISOString();
-    const conversation = await this.conversationRepository.get_conversation_by_id(conversationId);
+    const conversation = await this.conversationRepository.getConversationById(conversationId);
     const message = await this.messageRepository.getMessageInConversationById(conversation, messageId);
     const notificationList = await this.eventRepository.notificationService.getNotifications(
       undefined,
@@ -202,7 +202,7 @@ export class DebugUtil {
   async getEventInfo(
     event: ConversationEvent,
   ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
-    const conversation = await this.conversationRepository.get_conversation_by_id(event.conversation);
+    const conversation = await this.conversationRepository.getConversationById(event.conversation);
     const user = await this.userRepository.getUserById(event.from);
 
     const debugInformation = {
@@ -305,5 +305,36 @@ export class DebugUtil {
     }
 
     navigator.mediaDevices.ondevicechange(null);
+  }
+
+  async reprocessNotifications(notificationId?: string) {
+    const isEncryptedEvent = (event: any): event is EventRecord => {
+      return event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
+    };
+
+    const clientId = this.eventRepository.currentClient().id;
+    this.logger.log(`Your current client has ID "${clientId}".`);
+
+    const notifications = await this.eventRepository.notificationService.getAllNotificationsForClient(clientId);
+    this.logger.log(
+      `The notification stream has "${notifications.length}" notifications in total for your current client.`,
+    );
+
+    if (notificationId) {
+      this.logger.log(`You've set a filter, so only notification with ID "${notificationId}" will be processed...`);
+    }
+
+    const filteredNotifications = notifications.filter(notification =>
+      notificationId ? notification.id === notificationId : true,
+    );
+
+    for (const {payload} of filteredNotifications) {
+      for (const event of payload) {
+        if (isEncryptedEvent(event)) {
+          this.logger.log(`Processing event type "${event.type}" from "${event.time}"...`);
+          await this.cryptographyRepository.handleEncryptedEvent(event);
+        }
+      }
+    }
   }
 }

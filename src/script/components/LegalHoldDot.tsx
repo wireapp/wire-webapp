@@ -78,7 +78,7 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
 
 export default LegalHoldDot;
 
-registerReactComponent('legal-hold-dot', {
+registerReactComponent<LegalHoldDotProps>('legal-hold-dot', {
   component: LegalHoldDot,
   optionalParams: ['conversation', 'isPending', 'large', 'legalHoldModal', 'className'],
   template:

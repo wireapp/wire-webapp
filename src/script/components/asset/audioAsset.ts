@@ -51,7 +51,7 @@ class AudioAssetComponent extends AbstractAssetTransferStateTracker {
     this.logger = getLogger('AudioAssetComponent');
 
     this.message = ko.unwrap(message);
-    this.asset = this.message.get_first_asset() as FileAsset;
+    this.asset = this.message.getFirstAsset() as FileAsset;
     this.header = header;
 
     this.audioSrc = ko.observable();
@@ -115,6 +115,7 @@ ko.components.register('audio-asset', {
       <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
         <div class="audio-controls">
           <media-button params="src: audioElement,
+                                large: false,
                                 asset: asset,
                                 play: onPlayButtonClicked,
                                 pause: onPauseButtonClicked,

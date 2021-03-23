@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 
 import {scrollToBottom} from 'Util/scroll-helpers';
 import {isLastItem} from 'Util/ArrayUtil';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 
 import {MainViewModel} from '../MainViewModel';
 import {ActionsViewModel} from '../ActionsViewModel';

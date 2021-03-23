@@ -17,7 +17,7 @@
  *
  */
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 import ko from 'knockout';
 
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';

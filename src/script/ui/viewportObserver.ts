@@ -17,6 +17,8 @@
  *
  */
 
+import {useCallback, useEffect, useState} from 'react';
+
 const observedElements = new Map();
 const tolerance = 0.8;
 
@@ -74,17 +76,46 @@ const onElementInViewport = (
  * @param container the element containing the element
  */
 const trackElement = (element: HTMLElement, onChange: Function, fullyInView: boolean, container: HTMLElement): void => {
-  observedElements.set(element, {container, fullyInView, onChange});
-  return observer.observe(element);
+  if (element) {
+    observedElements.set(element, {container, fullyInView, onChange});
+    return observer.observe(element);
+  }
 };
 
 const removeElement = (element: Element) => {
-  observedElements.delete(element);
-  observer.unobserve(element);
+  if (element) {
+    observedElements.delete(element);
+    observer.unobserve(element);
+  }
 };
 
 export const viewportObserver = {
   onElementInViewport,
   removeElement,
   trackElement,
+};
+
+export const useViewPortObserver = (): [isInViewport: boolean, ref: (node: Element) => void] => {
+  const [elementRef, setElementRef] = useState(null);
+  const ref = useCallback(node => setElementRef(node), []);
+
+  const [isInViewport, setIsInViewport] = useState(false);
+  useEffect(() => {
+    viewportObserver.trackElement(
+      elementRef,
+      (isInViewport: boolean) => {
+        if (isInViewport) {
+          setIsInViewport(true);
+          viewportObserver.removeElement(elementRef);
+        }
+      },
+      false,
+      undefined,
+    );
+    return () => {
+      viewportObserver.removeElement(elementRef);
+    };
+  }, [elementRef]);
+
+  return [isInViewport, ref];
 };

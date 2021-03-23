@@ -27,6 +27,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {partition} from 'Util/ArrayUtil';
 import {sortByPriority} from 'Util/StringUtil';
+import {getDomainName} from 'Util/UrlUtil';
 
 import {UserlistMode} from 'Components/userList';
 
@@ -81,6 +82,8 @@ export class StartUIViewModel {
   readonly isInitialServiceSearch: ko.Observable<boolean>;
   readonly manageTeamUrl: string;
   readonly manageServicesUrl: string;
+  readonly federationDomain?: string;
+  readonly enableFederation: boolean;
   private submittedSearch: boolean;
   private readonly matchedUsers: ko.ObservableArray<User>;
   private readonly alreadyClickedOnContact: Record<string, boolean>;
@@ -93,6 +96,7 @@ export class StartUIViewModel {
   private readonly showMatches: ko.Observable<boolean>;
   private readonly hasSearchResults: ko.PureComputed<boolean>;
   private readonly showContent: ko.PureComputed<boolean>;
+  getDomainName: typeof getDomainName;
 
   static get STATE() {
     return {
@@ -132,6 +136,8 @@ export class StartUIViewModel {
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
     this.submittedSearch = false;
+    this.federationDomain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    this.enableFederation = Config.getConfig().FEATURE.ENABLE_FEDERATION;
 
     this.search = debounce((query: string): Promise<void> | void => {
       this.clearSearchResults();
@@ -195,6 +201,8 @@ export class StartUIViewModel {
     this.showInviteMember = ko.pureComputed(
       () => canInviteTeamMembers(this.selfUser().teamRole()) && this.teamSize() === 1,
     );
+
+    this.getDomainName = getDomainName;
 
     this.showContacts = ko.pureComputed(() => !!this.contacts().length);
 
@@ -355,7 +363,7 @@ export class StartUIViewModel {
 
   private readonly getTopPeople = () => {
     return this.conversationRepository
-      .get_most_active_conversations()
+      .getMostActiveConversations()
       .then(conversationEntities => {
         return conversationEntities
           .filter((conversationEntity: Conversation) => conversationEntity.is1to1())
@@ -417,7 +425,7 @@ export class StartUIViewModel {
 
   private readonly searchRemote = async (normalizedQuery: string, isHandle: boolean): Promise<void> => {
     try {
-      const userEntities = await this.searchRepository.search_by_name(normalizedQuery, isHandle);
+      const userEntities = await this.searchRepository.searchByName(normalizedQuery, isHandle);
 
       const isCurrentQuery = normalizedQuery === SearchRepository.normalizeQuery(this.searchInput());
       if (isCurrentQuery) {

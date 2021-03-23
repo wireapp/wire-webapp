@@ -63,7 +63,7 @@ export class WebSocketService {
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, this.disconnect);
 
     this.apiClient.transport.ws.removeAllListeners();
-    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, onNotification as any);
+    this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, onNotification);
 
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, (state: WEBSOCKET_STATE) => {
       this.logger.info(`Websocket state change: ${WEBSOCKET_STATE[state]}`);

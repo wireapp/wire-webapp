@@ -76,6 +76,7 @@ import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
@@ -124,6 +125,7 @@ export class CallingRepository {
     private readonly eventRepository: EventRepository,
     private readonly userRepository: UserRepository,
     private readonly mediaStreamHandler: MediaStreamHandler,
+    private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
@@ -212,7 +214,8 @@ export class CallingRepository {
     const avsEnv = Runtime.isFirefox() ? AVS_ENV.FIREFOX : AVS_ENV.DEFAULT;
     wCall.init(avsEnv);
     wCall.setUserMediaHandler(this.getCallMediaStream);
-    wCall.setMediaStreamHandler(this.updateParticipantStream);
+    wCall.setAudioStreamHandler(this.updateCallAudioStreams);
+    wCall.setVideoStreamHandler(this.updateParticipantVideoStream);
     setInterval(() => wCall.poll(), 500);
     return wCall;
   }
@@ -252,7 +255,7 @@ export class CallingRepository {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients: UserClients = await this.messageRepository.create_recipients(conversationId);
+      const localClients: UserClients = await this.messageRepository.createRecipients(conversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -485,7 +488,7 @@ export class CallingRepository {
   //##############################################################################
 
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<void> {
-    const recipients = await this.messageRepository.create_recipients(conversationId, false, [userId]);
+    const recipients = await this.messageRepository.createRecipients(conversationId, false, [userId]);
     const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse
@@ -636,7 +639,14 @@ export class CallingRepository {
         this.removeCall(rejectedCallInConversation);
       }
       const selfParticipant = new Participant(this.selfUser, this.selfClientId);
-      const call = new Call(this.selfUser.id, conversationId, conversationType, selfParticipant, callType);
+      const call = new Call(
+        this.selfUser.id,
+        conversationId,
+        conversationType,
+        selfParticipant,
+        callType,
+        this.mediaDevicesHandler,
+      );
       this.storeCall(call);
       const loadPreviewPromise =
         [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(conversationType) && callType === CALL_TYPE.VIDEO
@@ -959,6 +969,16 @@ export class CallingRepository {
       return;
     }
 
+    if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
+      const conversationEntity = this.conversationState.findConversation(conversationId);
+      const callingEvent = EventBuilder.buildCallingTimeoutEvent(
+        reason,
+        conversationEntity,
+        call.getSelfParticipant().user.id,
+      );
+      this.eventRepository.injectEvent(callingEvent as EventRecord);
+    }
+
     if (reason === REASON.OUTDATED_CLIENT) {
       this.warnOutdatedClient(conversationId);
     }
@@ -1035,6 +1055,7 @@ export class CallingRepository {
       conversationType,
       selfParticipant,
       hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL,
+      this.mediaDevicesHandler,
     );
     if (!canRing) {
       // an incoming call that should not ring is an ongoing group call
@@ -1185,19 +1206,36 @@ export class CallingRepository {
 
   private readonly updateActiveSpeakers = (wuser: number, conversationId: string, rawJson: string) => {
     const call = this.findCall(conversationId);
+    const activeSpeakers = JSON.parse(rawJson);
+    if (call && activeSpeakers) {
+      call.setActiveSpeakers(activeSpeakers);
+    }
+  };
+
+  private readonly updateCallAudioStreams = (
+    conversationId: string,
+    streamId: string,
+    streams: readonly MediaStream[] | null,
+  ): void => {
+    const call = this.findCall(conversationId);
     if (!call) {
       return;
     }
 
-    const activeSpeakers = JSON.parse(rawJson);
-    if (!activeSpeakers) {
+    if (streams === null || streams.length === 0) {
+      call.removeAudio(streamId);
       return;
     }
 
-    call.setActiveSpeakers(activeSpeakers);
+    const [stream] = streams;
+    if (stream.getAudioTracks().length > 0) {
+      call.addAudio(streamId, stream);
+    }
+
+    call.playAudioStreams();
   };
 
-  private readonly updateParticipantStream = (
+  private readonly updateParticipantVideoStream = (
     conversationId: ConversationId,
     userId: UserId,
     clientId: ClientId,
@@ -1215,9 +1253,6 @@ export class CallingRepository {
     }
 
     const [stream] = streams;
-    if (stream.getAudioTracks().length > 0) {
-      participant.audioStream(stream);
-    }
     if (stream.getVideoTracks().length > 0) {
       participant.videoStream(stream);
     }

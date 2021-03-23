@@ -278,7 +278,7 @@ export class PanelViewModel {
     }
   };
 
-  private readonly _showPanel = (newPanelState: string): Element => {
+  private readonly _showPanel = (newPanelState: string): Element | undefined => {
     this.state(newPanelState);
 
     const panelStateElementId = this.subViews[newPanelState].getElementId();
@@ -287,6 +287,7 @@ export class PanelViewModel {
       element?.classList.add('panel__page--visible');
       return element;
     }
+
     return undefined;
   };
 }

@@ -9,7 +9,7 @@
         <conversation-list-cell
           data-bind="click: () => clickOnConversation(conversation), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
           data-uie-name="item-conversation-archived"
-          params="click: listViewModel.onContextMenu, conversation: conversation, onJoinCall: onJoinCall">
+          params="rightClick: listViewModel.onContextMenu, conversation: conversation, onJoinCall: onJoinCall">
         </conversation-list-cell>
       </li>
     </ul>

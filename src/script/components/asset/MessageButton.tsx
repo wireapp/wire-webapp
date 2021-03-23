@@ -17,8 +17,8 @@
  *
  */
 
-import React, {useState} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import React from 'react';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
 import classNames from 'classnames';
 import type {CompositeMessage} from '../../entity/message/CompositeMessage';
@@ -32,15 +32,14 @@ export interface MessageButtonProps {
 }
 
 const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClick = noop}) => {
-  const [isSelected, setIsSelected] = useState(message.selectedButtonId() === id);
-  const [isWaiting, setIsWaiting] = useState(message.waitingButtonId() === id);
-  const [hasError, setHasError] = useState(message.errorButtonId() === id);
-  const [errorMessage, setErrorMessage] = useState(message.errorMessage());
+  const selectedButtonId = useKoSubscribable(message.selectedButtonId);
+  const waitingButtonId = useKoSubscribable(message.waitingButtonId);
+  const errorButtonId = useKoSubscribable(message.errorButtonId);
+  const errorMessage = useKoSubscribable(message.errorMessage);
 
-  message.selectedButtonId.subscribe(selectedButtonId => setIsSelected(selectedButtonId === id));
-  message.waitingButtonId.subscribe(waitingButtonId => setIsWaiting(waitingButtonId === id));
-  message.errorButtonId.subscribe(errorButtonId => setHasError(errorButtonId === id));
-  message.errorMessage.subscribe(errorMessage => setErrorMessage(errorMessage));
+  const isSelected = selectedButtonId === id;
+  const isWaiting = waitingButtonId === id;
+  const hasError = errorButtonId === id;
 
   return (
     <>

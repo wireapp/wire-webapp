@@ -17,8 +17,10 @@
  *
  */
 
+import {container} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 
+import {UserState} from '../user/UserState';
 import type {CurrentAvailableDeviceId} from './MediaDevicesHandler';
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 
@@ -45,7 +47,6 @@ export enum ScreensharingMethods {
 
 export class MediaConstraintsHandler {
   private readonly logger: Logger;
-  private readonly currentDeviceId: CurrentAvailableDeviceId;
 
   static get CONFIG(): Config {
     return {
@@ -98,9 +99,24 @@ export class MediaConstraintsHandler {
     };
   }
 
-  constructor(currentDeviceId: CurrentAvailableDeviceId) {
+  constructor(
+    private readonly currentDeviceId: CurrentAvailableDeviceId,
+    private readonly userState = container.resolve(UserState),
+  ) {
     this.logger = getLogger('MediaConstraintsHandler');
-    this.currentDeviceId = currentDeviceId;
+  }
+
+  private get agcStorageKey(): string {
+    return `agc_enabled_${this.userState.self().id}`;
+  }
+
+  setAgcPreference(agcEnabled: boolean): void {
+    window.localStorage.setItem(this.agcStorageKey, JSON.stringify(agcEnabled));
+  }
+
+  getAgcPreference(): boolean {
+    const storedValue = window.localStorage.getItem(this.agcStorageKey);
+    return JSON.parse(storedValue) ?? false;
   }
 
   getMediaStreamConstraints(
@@ -117,7 +133,7 @@ export class MediaConstraintsHandler {
     };
   }
 
-  getScreenStreamConstraints(method: ScreensharingMethods): MediaStreamConstraints {
+  getScreenStreamConstraints(method: ScreensharingMethods): MediaStreamConstraints | undefined {
     switch (method) {
       case ScreensharingMethods.DESKTOP_CAPTURER:
         this.logger.info('Enabling screen sharing from desktopCapturer');
@@ -130,7 +146,7 @@ export class MediaConstraintsHandler {
         const chromeMediaSourceId = this.currentDeviceId.screenInput();
         streamConstraints.video.mandatory = {...streamConstraints.video.mandatory, chromeMediaSourceId};
 
-        return streamConstraints as MediaStreamConstraints;
+        return streamConstraints;
       case ScreensharingMethods.DISPLAY_MEDIA:
         this.logger.info('Enabling screen sharing from getDisplayMedia');
         return {
@@ -151,8 +167,8 @@ export class MediaConstraintsHandler {
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints {
     const requireExactMediaDevice = mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
     return requireExactMediaDevice
-      ? {autoGainControl: false, deviceId: {exact: mediaDeviceId}}
-      : {autoGainControl: false};
+      ? {autoGainControl: this.getAgcPreference(), deviceId: {exact: mediaDeviceId}}
+      : {autoGainControl: this.getAgcPreference()};
   }
 
   private getVideoStreamConstraints(
@@ -167,7 +183,7 @@ export class MediaConstraintsHandler {
       streamConstraints.facingMode = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE;
     }
 
-    streamConstraints.autoGainControl = false;
+    streamConstraints.autoGainControl = this.getAgcPreference();
 
     return streamConstraints;
   }

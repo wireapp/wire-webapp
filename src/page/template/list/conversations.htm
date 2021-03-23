@@ -9,8 +9,7 @@
     <availability-state
       class="left-list-header-availability"
       data-bind="clickOrDrag: clickOnAvailability"
-      data-uie-name="status-availability"
-      params="availability: selfAvailability, label: selfUserName"
+      params="availability: selfAvailability, label: selfUserName, dataUieName: 'status-availability'"
     >
     </availability-state>
       <!-- ko if: isOnLegalHold() || hasPendingLegalHold() -->
@@ -91,7 +90,7 @@
         <conversation-list-cell
           data-bind="link_to: getConversationUrl(conversation.id), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
           data-uie-name="item-conversation"
-          params="click: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall, index: $index, isVisibleFunc: isVisibleFunc"
+          params="rightClick: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall, index: $index, isVisibleFunc: isVisibleFunc"
         >
         </conversation-list-cell>
         <!-- /ko -->

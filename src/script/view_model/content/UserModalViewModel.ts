@@ -21,7 +21,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {noop} from 'Util/util';
-import {Actions} from 'Components/panel/userActions';
+import {Actions} from 'Components/panel/UserActions';
 
 import {Config} from '../../Config';
 import type {User} from '../../entity/User';

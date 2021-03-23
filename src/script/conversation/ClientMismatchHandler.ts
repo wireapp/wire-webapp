@@ -61,7 +61,7 @@ export class ClientMismatchHandler {
     // Note: Broadcast messages have an empty conversation ID
     const conversationEntity: Conversation | undefined =
       eventInfoEntity.conversationId !== ''
-        ? await this.conversationRepositoryProvider().get_conversation_by_id(eventInfoEntity.conversationId)
+        ? await this.conversationRepositoryProvider().getConversationById(eventInfoEntity.conversationId)
         : undefined;
     await this.removeClientsFromPayload(redundant, false, conversationEntity, payload);
     await this.removeClientsFromPayload(deleted, true, conversationEntity, payload);

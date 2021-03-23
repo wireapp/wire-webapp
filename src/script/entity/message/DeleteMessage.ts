@@ -17,9 +17,6 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-import {formatTimeShort} from 'Util/TimeUtil';
-
 import {SuperType} from '../../message/SuperType';
 import {Message} from './Message';
 
@@ -32,8 +29,4 @@ export class DeleteMessage extends Message {
     this.super_type = SuperType.DELETE;
     this.deleted_timestamp = null;
   }
-
-  readonly display_deleted_timestamp = () => {
-    return t('conversationDeleteTimestamp', formatTimeShort(this.deleted_timestamp));
-  };
 }

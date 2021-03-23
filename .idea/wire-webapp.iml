@@ -23,6 +23,7 @@
       <excludeFolder url="file://$MODULE_DIR$/prod" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/test/js" />
+      <excludeFolder url="file://$MODULE_DIR$/electron/static-webapp" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

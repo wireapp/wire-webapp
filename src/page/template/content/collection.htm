@@ -26,7 +26,7 @@
                 <!-- /ko -->
               </header>
               <div class="collection-images" data-bind="foreach: {data: images.slice(0, 12), as: 'messageEntity'}">
-                <image-component class="collection-image" params="asset: messageEntity.get_first_asset().resource, click: function() {$parent.clickOnImage(messageEntity)}"></image-component>
+                <image-component params="className: 'collection-image', asset: messageEntity.getFirstAsset().resource, click: function() {$parent.clickOnImage(messageEntity)}"></image-component>
               </div>
             </section>
           <!-- /ko -->

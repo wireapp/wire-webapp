@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
@@ -32,7 +32,6 @@ import {Context, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
-import type {VerificationMessage} from '../entity/message/VerificationMessage';
 import {StatusType} from '../message/StatusType';
 import type {Text} from '../entity/message/Text';
 import type {ActionsViewModel} from '../view_model/ActionsViewModel';
@@ -54,6 +53,13 @@ import './asset/linkPreviewAsset';
 import './asset/LocationAsset';
 import './asset/videoAsset';
 import './asset/MessageButton';
+import './message/VerificationMessage';
+import './message/CallMessage';
+import './message/CallTimeoutMessage';
+import './message/MissedMessage';
+import './message/FileTypeRestrictedMessage';
+import './message/DeleteMessage';
+import './message/DecryptErrorMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -188,11 +194,11 @@ class Message {
     this.EphemeralStatusType = EphemeralStatusType;
     this.StatusType = StatusType;
 
-    if (message.has_asset_text()) {
+    if (message.hasAssetText()) {
       // add a listener to any changes to the assets. This will warn the parent that the message has changed
       this.assetSubscription = message.assets.subscribe(onContentUpdated);
       // also listen for link previews on a single Text entity
-      this.previewSubscription = (message.get_first_asset() as Text).previews.subscribe(onContentUpdated);
+      this.previewSubscription = (message.getFirstAsset() as Text).previews.subscribe(onContentUpdated);
     }
 
     this.actionsViewModel = actionsViewModel;
@@ -224,14 +230,14 @@ class Message {
       const entries: ContextMenuEntry[] = [];
 
       const canDelete =
-        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.is_deletable();
+        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
 
       const hasDetails =
         !this.conversation().is1to1() &&
-        !messageEntity.is_ephemeral() &&
+        !messageEntity.isEphemeral() &&
         !this.conversation().removed_from_conversation();
 
-      if (messageEntity.is_downloadable()) {
+      if (messageEntity.isDownloadable()) {
         entries.push({
           click: () => messageEntity.download(container.resolve(AssetRepository)),
           label: t('conversationContextMenuDownload'),
@@ -247,7 +253,7 @@ class Message {
         });
       }
 
-      if (messageEntity.is_editable() && !this.conversation().removed_from_conversation()) {
+      if (messageEntity.isEditable() && !this.conversation().removed_from_conversation()) {
         entries.push({
           click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
           label: t('conversationContextMenuEdit'),
@@ -275,7 +281,7 @@ class Message {
         });
       }
 
-      if (messageEntity.is_deletable()) {
+      if (messageEntity.isDeletable()) {
         entries.push({
           click: () => this.actionsViewModel.deleteMessage(this.conversation(), messageEntity),
           label: t('conversationContextMenuDelete'),
@@ -321,11 +327,6 @@ class Message {
       default:
         return undefined;
     }
-  }
-
-  showDevice(messageEntity: VerificationMessage): void {
-    const topic = messageEntity.isSelfClient() ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
-    amplify.publish(topic);
   }
 
   readonly showLegalHold = () => {
@@ -374,7 +375,7 @@ const normalTemplate: string = `
   <!-- ko if: shouldShowAvatar -->
     <div class="message-header">
       <div class="message-header-icon">
-        <participant-avatar class="cursor-pointer" params="participant: message.user, onClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
+        <participant-avatar class="cursor-pointer" params="participant: message.user, onAvatarClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
       </div>
       <div class="message-header-label">
         <span class="message-header-label-sender" data-bind='css: message.accent_color(), text: message.headerSenderName()' data-uie-name="sender-name"></span>
@@ -382,7 +383,7 @@ const normalTemplate: string = `
           <service-icon class="message-header-icon-service"></service-icon>
         <!-- /ko -->
         <!-- ko if: message.was_edited() -->
-          <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.display_edited_timestamp()}"></span>
+          <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.displayEditedTimestamp()}"></span>
         <!-- /ko -->
       </div>
     </div>
@@ -406,10 +407,10 @@ const normalTemplate: string = `
     <!-- /ko -->
 
     <!-- ko foreach: {data: message.assets, as: 'asset', noChildContext: true} -->
-      <!-- ko if: asset.is_image() -->
+      <!-- ko if: asset.isImage() -->
         <image-asset params="asset: asset, message: message, onClick: onClickImage"></image-asset>
       <!-- /ko -->
-      <!-- ko if: asset.is_text() -->
+      <!-- ko if: asset.isText() -->
         <!-- ko if: asset.should_render_text -->
           <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {mousedown: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
@@ -417,19 +418,19 @@ const normalTemplate: string = `
           <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: $parent.message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
-      <!-- ko if: asset.is_video() -->
+      <!-- ko if: asset.isVideo() -->
         <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
       <!-- /ko -->
-      <!-- ko if: asset.is_audio() -->
+      <!-- ko if: asset.isAudio() -->
         <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></audio-asset>
       <!-- /ko -->
-      <!-- ko if: asset.is_file() -->
+      <!-- ko if: asset.isFile() -->
         <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>
       <!-- /ko -->
-      <!-- ko if: asset.is_location() -->
+      <!-- ko if: asset.isLocation() -->
         <location-asset params="asset: asset"></location-asset>
       <!-- /ko -->
-      <!-- ko if: asset.is_button() -->
+      <!-- ko if: asset.isButton() -->
         <message-button params="onClick: () => clickButton(message, asset.id), label: asset.text, id: asset.id, message: message"></message-button>
       <!-- /ko -->
     <!-- /ko -->
@@ -472,48 +473,6 @@ const normalTemplate: string = `
   <!-- /ko -->
   `;
 
-const missedTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label" data-bind="text: t('conversationMissedMessages')"></div>
-  </div>
-  `;
-
-const fileTypeRestrictedTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label" data-bind="html: message.caption"></div>
-  </div>
-  `;
-
-const unableToDecryptTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label ellipsis">
-      <span data-bind="html: message.htmlCaption()"></span>
-      <span>&nbsp;</span>
-      <a class="accent-text" data-bind="text: t('conversationUnableToDecryptLink'), attr: {'href': message.link}" rel="nofollow noopener noreferrer" target="_blank"></a>
-      <hr class="message-header-line" />
-    </div>
-  </div>
-  <div class="message-body message-body-decrypt-error">
-    <div class="message-header-decrypt-error-label" data-bind="html: message.htmlErrorMessage()"></div>
-    <!-- ko if: message.is_recoverable -->
-      <div class="message-header-decrypt-reset-session">
-        <loading-icon class="accent-fill" data-bind="style : {visibility : message.is_resetting_session() ? 'visible' : 'hidden'}" data-uie-name="status-loading"></loading-icon>
-        <span class="message-header-decrypt-reset-session-action button-label accent-text"
-              data-bind="click: () => onClickResetSession(message), text: t('conversationUnableToDecryptResetSession'), style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
-      </div>
-    <!-- /ko -->
-  </div>
-  `;
-
 const systemTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg text-foreground">
@@ -551,21 +510,6 @@ const pingTemplate: string = `
   </div>
   `;
 
-const deleteTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <participant-avatar class="cursor-pointer" params="participant: message.user, onClick: onClickAvatar, size: AVATAR_SIZE.X_SMALL"></participant-avatar>
-    </div>
-    <div class="message-header-label">
-      <span class="message-header-label-sender" data-bind='text: message.unsafeSenderName()'></span>
-      <span class="message-header-label-icon icon-trash" data-bind="attr: {title: message.display_deleted_timestamp()}"></span>
-    </div>
-    <div class="message-body-actions message-body-actions-large">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.display_deleted_timestamp(), attr: {'data-timestamp': message.deleted_timestamp, 'data-uie-uid': message.id, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps" data-uie-name="item-message-delete-timestamp"></time>
-    </div>
-  </div>
-  `;
-
 const legalHoldTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -583,58 +527,6 @@ const legalHoldTemplate: string = `
   </div>
   `;
 
-const verificationTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <!-- ko if: message.isTypeVerified() -->
-        <verified-icon></verified-icon>
-      <!-- /ko -->
-      <!-- ko ifnot: message.isTypeVerified() -->
-        <not-verified-icon></not-verified-icon>
-      <!-- /ko -->
-    </div>
-    <div class="message-header-label">
-      <!-- ko if: message.isTypeVerified() -->
-        <span data-bind="text: t('tooltipConversationAllVerified')"></span>
-      <!-- /ko -->
-      <!-- ko if: message.isTypeUnverified() -->
-        <span class="message-header-sender-name" data-bind="text: message.unsafeSenderName()"></span>
-        <span class="ellipsis" data-bind="text: t('conversationDeviceUnverified')"></span>
-        <span class="message-verification-action accent-text" data-bind="click: () => showDevice(message), text: message.captionUnverifiedDevice" data-uie-name="go-devices"></span>
-      <!-- /ko -->
-      <!-- ko if: message.isTypeNewDevice() -->
-        <span class="message-header-plain-sender-name" data-bind='text: message.captionUser'></span>
-        <span class="ellipsis" data-bind="text: message.captionStartedUsing"></span>
-        <span class="message-verification-action accent-text" data-bind="click: () => showDevice(message), text: message.captionNewDevice" data-uie-name="go-devices"></span>
-      <!-- /ko -->
-      <!-- ko if: message.isTypeNewMember() -->
-        <span class="ellipsis" data-bind="text: t('conversationDeviceNewPeopleJoined')"></span>&nbsp;<span class="message-verification-action accent-text" data-bind="click: () => showDevice(message), text: t('conversationDeviceNewPeopleJoinedVerify')" data-uie-name="go-devices"></span>
-      <!-- /ko -->
-      <hr class="message-header-line" />
-    </div>
-  </div>
-  `;
-
-const callTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon message-header-icon--svg">
-      <!-- ko if: message.was_completed() -->
-        <div class="svg-green"><pickup-icon></pickup-icon></div>
-      <!-- /ko -->
-      <!-- ko if: !message.was_completed() -->
-        <div class="svg-red"><hangup-icon></hangup-icon></div>
-      <!-- /ko -->
-    </div>
-    <div class="message-header-label">
-      <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
-      <span class="ellipsis" data-bind="text: message.caption()"></span>
-    </div>
-    <div class="message-body-actions">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
-    </div>
-  </div>
-  `;
-
 const memberTemplate: string = `
   <!-- ko if: message.showLargeAvatar() -->
     <div class="message-connected">
@@ -643,7 +535,7 @@ const memberTemplate: string = `
         <span class="message-connected-provider-name" data-bind='text: message.otherUser().providerName()'></span>
       <!-- /ko -->
       <!-- ko ifnot: message.otherUser().isService -->
-        <span class="message-connected-username label-username" data-bind='text: message.otherUser().username()'></span>
+        <span class="message-connected-username label-username" data-bind='text: message.otherUser().handle'></span>
       <!-- /ko -->
       <participant-avatar class="message-connected-avatar cursor-default"
                    params="participant: message.otherUser, size: AVATAR_SIZE.X_LARGE, noBadge: message.otherUser().isOutgoingRequest()"></participant-avatar>
@@ -727,19 +619,22 @@ ko.components.register('message', {
       ${normalTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'missed' -->
-      ${missedTemplate}
+      <missed-message></missed-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'unable-to-decrypt' -->
-      ${unableToDecryptTemplate}
+      <decrypt-error-message params="message: message, onClickResetSession: onClickResetSession"></decrypt-error-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'verification' -->
-      ${verificationTemplate}
+      <verification-message params="message: message"></verification-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'delete' -->
-      ${deleteTemplate}
+      <delete-message params="message: message, onClickAvatar: onClickAvatar"></delete-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'call' -->
-      ${callTemplate}
+      <call-message params="message: message"></call-message>
+      <!-- /ko -->
+    <!-- ko if: message.super_type === 'call-time-out' -->
+      <call-timeout-message params="message: message"></call-timeout-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'system' -->
       ${systemTemplate}
@@ -751,7 +646,7 @@ ko.components.register('message', {
       ${pingTemplate}
     <!-- /ko -->
     <!-- ko if: message.super_type === 'file-type-restricted' -->
-      ${fileTypeRestrictedTemplate}
+      <filetype-restricted-message params="message: message"></filetype-restricted-message>
     <!-- /ko -->
     <!-- ko if: message.isLegalHold() -->
       ${legalHoldTemplate}

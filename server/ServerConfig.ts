@@ -19,8 +19,10 @@ export interface ServerConfig {
       ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
       ENABLE_DEBUG: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
+      ENABLE_FEDERATION: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
+      FEDERATION_DOMAIN: string;
       PERSIST_TEMPORARY_CLIENTS: boolean;
       SHOW_LOADING_INFORMATION: boolean;
     };

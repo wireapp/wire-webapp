@@ -23,7 +23,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
-import 'Components/receiptModeToggle';
+import 'Components/toggle/ReceiptModeToggle';
 import 'Components/panel/PanelActions';
 import {Logger, getLogger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -412,7 +412,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   clickToBlock(): void {
     if (this.activeConversation()) {
       const userEntity = this.activeConversation().firstUserEntity();
-      const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
+      const nextConversationEntity = this.conversationRepository.getNextConversation(this.activeConversation());
 
       this.actionsViewModel.blockUser(userEntity, true, nextConversationEntity);
     }
@@ -421,7 +421,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   clickToCancelRequest(): void {
     if (this.activeConversation()) {
       const userEntity = this.activeConversation().firstUserEntity();
-      const nextConversationEntity = this.conversationRepository.get_next_conversation(this.activeConversation());
+      const nextConversationEntity = this.conversationRepository.getNextConversation(this.activeConversation());
 
       this.actionsViewModel.cancelConnectionRequest(userEntity, true, nextConversationEntity);
     }
@@ -465,8 +465,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     }
   }
 
-  readonly updateConversationReceiptMode = (conversationEntity: Conversation, receiptMode: RECEIPT_MODE): void => {
-    this.conversationRepository.updateConversationReceiptMode(conversationEntity, {receipt_mode: receiptMode});
+  readonly updateConversationReceiptMode = (receiptMode: RECEIPT_MODE): void => {
+    this.conversationRepository.updateConversationReceiptMode(this.activeConversation(), {receipt_mode: receiptMode});
   };
 
   initView(): void {

@@ -25,7 +25,7 @@ import {Availability, Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import 'Components/AvailabilityState';
-import {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import {AVATAR_SIZE} from 'Components/Avatar';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {ChangeEvent} from 'react';
@@ -59,6 +59,14 @@ import {UserState} from '../../user/UserState';
 import {ContentViewModel} from '../ContentViewModel';
 import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {HistoryExportViewModel} from './HistoryExportViewModel';
+import {AppLockState} from '../../user/AppLockState';
+import {AppLockRepository} from '../../user/AppLockRepository';
+import {formatDurationCaption} from 'Util/TimeUtil';
+
+export enum UserNameState {
+  AVAILABLE = 'AVAILABLE',
+  TAKEN = 'TAKEN',
+}
 
 export class PreferencesAccountViewModel {
   logger: Logger;
@@ -74,7 +82,7 @@ export class PreferencesAccountViewModel {
   username: ko.PureComputed<string>;
   enteredUsername: ko.Observable<string>;
   submittedUsername: ko.Observable<string>;
-  usernameState: ko.Observable<string>;
+  usernameState: ko.Observable<UserNameState>;
   richProfileFields: ko.Observable<RichInfoField[]>;
   nameSaved: ko.Observable<boolean>;
   usernameSaved: ko.Observable<boolean>;
@@ -85,7 +93,6 @@ export class PreferencesAccountViewModel {
   optionTelemetrySharing: ko.Observable<boolean>;
   optionReadReceipts: ko.Observable<Confirmation.Type>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
-  optionResetAppLock: boolean;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   isMacOsWrapper: boolean;
   manageTeamUrl: string;
@@ -94,8 +101,10 @@ export class PreferencesAccountViewModel {
   isConsentCheckEnabled: () => boolean;
   canEditProfile: (user: User) => boolean;
   Config: typeof PreferencesAccountViewModel.CONFIG;
-  UserNameState: typeof PreferencesAccountViewModel.USERNAME_STATE;
+  /** The `UserNameState` exists, so that conditions in Knockout templates can make use of it. */
+  UserNameState: typeof UserNameState = UserNameState;
   isCountlyEnabled: boolean = false;
+  optionsAppLockTime: string;
 
   static get CONFIG() {
     return {
@@ -103,13 +112,6 @@ export class PreferencesAccountViewModel {
         FILE_TYPES: ['image/bmp', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'],
       },
       SAVE_ANIMATION_TIMEOUT: MotionDuration.X_LONG * 2,
-    };
-  }
-
-  static get USERNAME_STATE() {
-    return {
-      AVAILABLE: 'PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE',
-      TAKEN: 'PreferencesAccountViewModel.USERNAME_STATE.TAKEN',
     };
   }
 
@@ -121,6 +123,8 @@ export class PreferencesAccountViewModel {
     private readonly userRepository: UserRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
+    readonly appLockState = container.resolve(AppLockState),
+    private readonly appLockRepository = container.resolve(AppLockRepository),
   ) {
     this.logger = getLogger('PreferencesAccountViewModel');
     this.fileExtension = HistoryExportViewModel.CONFIG.FILE_EXTENSION;
@@ -131,7 +135,6 @@ export class PreferencesAccountViewModel {
     this.isActivatedAccount = this.userState.isActivatedAccount;
     this.selfUser = this.userState.self;
     this.Config = PreferencesAccountViewModel.CONFIG;
-    this.UserNameState = PreferencesAccountViewModel.USERNAME_STATE;
 
     this.name = ko.pureComputed(() => this.selfUser().name());
     this.email = ko.pureComputed(() => this.selfUser().email());
@@ -174,7 +177,8 @@ export class PreferencesAccountViewModel {
     this.optionReadReceipts = this.propertiesRepository.receiptMode;
     this.optionMarketingConsent = this.propertiesRepository.marketingConsent;
 
-    this.optionResetAppLock = this.teamState.isAppLockEnabled();
+    this.optionsAppLockTime = formatDurationCaption(this.appLockState.appLockInactivityTimeoutSecs() * 1000);
+
     this.AVATAR_SIZE = AVATAR_SIZE;
 
     this.isMacOsWrapper = Runtime.isDesktopApp() && Runtime.isMacOS();
@@ -219,22 +223,23 @@ export class PreferencesAccountViewModel {
   };
 
   changeUsername = async (username: string, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
-    const enteredUsername = event.target.value;
-    const normalizedUsername = enteredUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const normalizedUsername = event.target.value.toLowerCase();
 
-    const wasNormalized = enteredUsername !== normalizedUsername;
-    if (wasNormalized) {
-      event.target.value = normalizedUsername;
+    if (normalizedUsername !== event.target.value) {
+      event.target.value = event.target.value.toLowerCase();
+      this.enteredUsername(event.target.value);
     }
 
     const isUnchanged = normalizedUsername === this.selfUser().username();
     if (isUnchanged) {
-      return event.target.blur();
+      event.target.blur();
+      return;
     }
 
     const isInvalidName = normalizedUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     if (isInvalidName) {
-      return this.usernameState(null);
+      this.usernameState(null);
+      return;
     }
 
     this.submittedUsername(normalizedUsername);
@@ -253,7 +258,7 @@ export class PreferencesAccountViewModel {
       const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
       const isCurrentRequest = this.enteredUsername() === this.submittedUsername();
       if (isUsernameTaken && isCurrentRequest) {
-        this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+        this.usernameState(UserNameState.TAKEN);
       }
     }
   };
@@ -489,7 +494,7 @@ export class PreferencesAccountViewModel {
   readonly shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
   readonly verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
-    const enteredUsername = event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    const enteredUsername = event.target.value.toLowerCase();
 
     const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     const usernameUnchanged = enteredUsername === this.selfUser().username();
@@ -505,14 +510,14 @@ export class PreferencesAccountViewModel {
         .then(() => {
           const isCurrentRequest = this.enteredUsername() === enteredUsername;
           if (isCurrentRequest) {
-            this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.AVAILABLE);
+            this.usernameState(UserNameState.AVAILABLE);
           }
         })
         .catch(error => {
           const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
           const isCurrentRequest = this.enteredUsername() === enteredUsername;
           if (isUsernameTaken && isCurrentRequest) {
-            this.usernameState(PreferencesAccountViewModel.USERNAME_STATE.TAKEN);
+            this.usernameState(UserNameState.TAKEN);
           }
         });
     }
@@ -535,6 +540,12 @@ export class PreferencesAccountViewModel {
     const isChecked = event.target.checked;
     const mode = isChecked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key, mode);
+    return true;
+  };
+
+  readonly onChangeAppLockEnabled = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
+    const isChecked = event.target.checked;
+    this.appLockRepository.setEnabled(isChecked);
     return true;
   };
 

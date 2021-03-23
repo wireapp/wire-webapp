@@ -5,7 +5,7 @@
   </div>
   <div id="start-ui-header" class="start-ui-header" data-bind="css: {'start-ui-header-integrations': isTeam()}">
     <user-input class="start-ui-header-user-input"
-                params="input: searchInput, placeholder: t('searchPlaceholder'), enter: handleSearchInput"
+                params="input: searchInput, placeholder: enableFederation ? t('searchPlaceholderFederation') : t('searchPlaceholder'), enter: handleSearchInput"
                 data-uie-name="enter-search">
     </user-input>
     <!-- ko if: isTeam() && z.userPermission().canChatWithServices() -->
@@ -75,7 +75,7 @@
             <!-- ko if: showTopPeople() -->
               <div class="start-ui-list-top-people" data-uie-name="status-top-people">
                 <span class="start-ui-list-header start-ui-list-header-top-people" data-bind="text: t('searchTopPeople')"></span>
-                <top-people class="search-list-theme-black" params="users: topUsers, click: clickOnContact"></top-people>
+                <top-people class="search-list-theme-black" params="users: topUsers, clickOnUser: clickOnContact"></top-people>
               </div>
             <!-- /ko -->
             <!-- ko if: showContacts() -->
@@ -114,7 +114,7 @@
                 <group-list params="groups: searchResults.groups, click: clickOnConversation"></group-list>
               </div>
               <div class="others" data-bind="visible: searchResults.others().length > 0">
-                <span class="start-ui-list-header" data-bind="text: t('searchOthers')"></span>
+                <span class="start-ui-list-header" data-bind="text: enableFederation ? t('searchOthersFederation', federationDomain) : t('searchOthers')"></span>
                 <user-list class="search-list-theme-black" params="user: searchResults.others, click: clickOnOther, mode: UserlistMode.OTHERS, searchRepository: searchRepository, teamRepository: teamRepository, conversationRepository: conversationRepository"></user-list>
               </div>
             </div>
