@@ -40,7 +40,7 @@ import {RequestCancellationError} from './UserError';
 import type {ClientPreKey, PreKeyBundle, QualifiedPreKeyBundle} from '../auth/';
 import type {PublicClient} from '../client/';
 import type {RichInfo} from './RichInfo';
-import type {UserClients} from '../conversation/UserClients';
+import type {UserClients, QualifiedUserClients} from '../conversation/';
 
 export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
@@ -54,6 +54,7 @@ export class UserAPI {
     DELETE: '/delete',
     HANDLES: 'handles',
     LIST_CLIENTS: '/list-clients',
+    LIST_PREKEYS: 'list-prekeys',
     LIST_USERS: '/list-users',
     PASSWORDRESET: '/password-reset',
     PRE_KEYS: 'prekeys',
@@ -149,10 +150,14 @@ export class UserAPI {
    * @param clientId The client ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
    */
-  public async getClientPreKey(userId: string, clientId: string): Promise<ClientPreKey> {
+  public async getClientPreKey(userId: string, clientId: string, domain?: string): Promise<ClientPreKey> {
+    const url = domain
+      ? `${UserAPI.URL.USERS}/${domain}/${userId}/${UserAPI.URL.PRE_KEYS}/${clientId}`
+      : `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
+
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}/${clientId}`,
+      url,
     };
 
     const response = await this.client.sendJSON<ClientPreKey>(config);
@@ -463,11 +468,24 @@ export class UserAPI {
     return response.data;
   }
 
-  private async _postMultiPreKeyBundlesChunk(userClientMap: UserClients): Promise<UserPreKeyBundleMap> {
+  private async postMultiPreKeyBundlesChunk(userClientMap: UserClients): Promise<UserPreKeyBundleMap> {
     const config: AxiosRequestConfig = {
       data: userClientMap,
       method: 'post',
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.PRE_KEYS}`,
+    };
+
+    const response = await this.client.sendJSON<UserPreKeyBundleMap>(config, true);
+    return response.data;
+  }
+
+  private async postMultiQualifiedPreKeyBundlesChunk(
+    userClientMap: QualifiedUserClients,
+  ): Promise<UserPreKeyBundleMap> {
+    const config: AxiosRequestConfig = {
+      data: userClientMap,
+      method: 'post',
+      url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_PREKEYS}`,
     };
 
     const response = await this.client.sendJSON<UserPreKeyBundleMap>(config, true);
@@ -513,19 +531,30 @@ export class UserAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
    */
   public async postMultiPreKeyBundles(
-    userClientMap: UserClients,
+    userClientMap: UserClients | QualifiedUserClients,
     limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
   ): Promise<UserPreKeyBundleMap> {
-    const userIdChunks = ArrayUtil.chunk(Object.keys(userClientMap), limit);
-    const chunksPromises = userIdChunks.map(userIdChunk =>
-      this._postMultiPreKeyBundlesChunk(
-        userIdChunk.reduce<UserClients>((chunkedUserClientMap, userId) => {
-          chunkedUserClientMap[userId] = userClientMap[userId];
+    function isUserClients(obj: any): obj is UserClients {
+      return Array.isArray(Object.keys(obj)[0]);
+    }
+
+    const domainOrUserIdChunks = ArrayUtil.chunk(Object.keys(userClientMap), limit);
+    const chunksPromises = domainOrUserIdChunks.map(userIdChunk => {
+      const rebuiltMap = userIdChunk.reduce<UserClients | QualifiedUserClients>(
+        (chunkedUserClientMap, domainOrUserId) => {
+          chunkedUserClientMap[domainOrUserId] = userClientMap[domainOrUserId];
           return chunkedUserClientMap;
-        }, {}),
-      ),
-    );
+        },
+        {},
+      );
+
+      return isUserClients(userClientMap)
+        ? this.postMultiPreKeyBundlesChunk(rebuiltMap as UserClients)
+        : this.postMultiQualifiedPreKeyBundlesChunk(rebuiltMap as QualifiedUserClients);
+    });
+
     const userPreKeyBundleMapChunks = await Promise.all(chunksPromises);
+
     return userPreKeyBundleMapChunks.reduce((userPreKeyBundleMap, userPreKeyBundleMapChunk) => {
       return {
         ...userPreKeyBundleMap,
