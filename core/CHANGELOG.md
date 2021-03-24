@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.1.13...@wireapp/core@17.2.0) (2021-03-24)
+
+
+### Features
+
+* **api-client:** Add endpoint /list-prekeys ([#3670](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3670)) ([73ec4f5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/73ec4f543eb146b7960579b02c0f3b3113f72580))
+
+
+
+
+
 ## [17.1.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.1.12...@wireapp/core@17.1.13) (2021-03-23)
 
 **Note:** Version bump only for package @wireapp/core
