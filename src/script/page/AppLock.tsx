@@ -265,21 +265,41 @@ const AppLock: React.FC<AppLockProps> = ({
               onBlur={forceFocus}
               ref={focusElement}
             />
-            <div className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}>
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseLength ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseLength ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-charnumber"
+            >
               {t('modalAppLockSetupLong', {
                 minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
               })}
             </div>
-            <div className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}>
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseLower ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseLower ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-lowercase"
+            >
               {t('modalAppLockSetupLower')}
             </div>
-            <div className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}>
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseUpper ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseUpper ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-uppercase"
+            >
               {t('modalAppLockSetupUppercase')}
             </div>
-            <div className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}>
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseDigit ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseDigit ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-digit"
+            >
               {t('modalAppLockSetupDigit')}
             </div>
-            <div className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}>
+            <div
+              className={`modal__passcode__info ${isSetupPassphraseSpecial ? 'modal__passcode__info--valid' : ''}`}
+              data-uie-status={isSetupPassphraseSpecial ? 'valid' : 'invalid'}
+              data-uie-name="passcode-validation-specialchar"
+            >
               {t('modalAppLockSetupSpecial')}
             </div>
             <div className="modal__buttons">
