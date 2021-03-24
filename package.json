@@ -57,7 +57,7 @@
     "build": "yarn build:node && yarn build:browser",
     "build:browser": "webpack --progress",
     "build:node": "tsc",
-    "clean": "del-cli .tmp \"src/main/**/*{.js,.js.map,.d.ts}\" \"!src/main/**/*{.test*.(ts|js)}\" \"!src/main/test/**/*\"",
+    "clean": "del-cli .tmp \"src/main/**/*{.js,.js.map,.d.ts}\" \"!src/main/**/*.test*.(ts|js)\" \"!src/main/test/**/*\"",
     "coverage": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json istanbul cover --report html ../../node_modules/jasmine/bin/jasmine.js",
     "demo:composite": "cross-env NODE_DEBUG=@wireapp* ts-node src/demo/composite.ts",
     "dist": "yarn clean && yarn build",
