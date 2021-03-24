@@ -34,5 +34,6 @@ export * from './NewOTRMessage';
 export * from './OtherMember';
 export * from './OTRClientMap';
 export * from './OTRRecipients';
+export * from './QualifiedUserClients';
 export * from './ServiceRef';
 export * from './UserClients';
