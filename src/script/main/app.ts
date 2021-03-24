@@ -301,6 +301,7 @@ class App {
       repositories.event,
       repositories.user,
       repositories.media.streamHandler,
+      repositories.media.devicesHandler,
       serverTimeHandler,
     );
     repositories.integration = new IntegrationRepository(
@@ -461,7 +462,7 @@ class App {
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      AppLock.init(clientRepository, ko.unwrap(userRepository['userState'].self));
+      AppLock.init(clientRepository);
 
       loadingView.removeFromView();
       telemetry.report();

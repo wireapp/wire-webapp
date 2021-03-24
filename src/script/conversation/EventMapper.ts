@@ -63,6 +63,7 @@ import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
 import type {LinkPreviewMetaDataType} from '../links/LinkPreviewMetaDataType';
 import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
+import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -254,6 +255,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.CALL_TIME_OUT: {
+        messageEntity = this._mapEventCallingTimeout(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE: {
         messageEntity = this._mapEventLegalHoldUpdate(event);
         break;
@@ -419,6 +425,10 @@ export class EventMapper {
     messageEntity.userIds(eventData.userIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
+  }
+
+  _mapEventCallingTimeout({data, time}: EventRecord) {
+    return new CallingTimeoutMessage(data.reason, parseInt(time, 10));
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: EventRecord) {

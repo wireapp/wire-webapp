@@ -27,6 +27,7 @@ import type {ClientEntity} from '../../client/ClientEntity';
 import NamedIcon from '../NamedIcon';
 import LegalHoldDot from '../LegalHoldDot';
 import VerifiedIcon from '../VerifiedIcon';
+import DeviceId from 'Components/DeviceId';
 
 export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -42,7 +43,6 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
   showIcon = false,
 }) => {
   const {class: deviceClass = '?', id = '', label = '?', meta} = clientEntity;
-  const formattedId = id ? clientEntity.formatId() : [];
   const name = clientEntity.getName();
   const clickable = !!click;
   const isVerified = meta.isVerified;
@@ -94,11 +94,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         <div className="text-background label-xs">
           <span>{t('preferencesDevicesId')}</span>
           <span data-uie-name="device-id">
-            {formattedId.map(id => (
-              <span key={id} className="device-id-part">
-                {id}
-              </span>
-            ))}
+            <DeviceId deviceId={id} />
           </span>
         </div>
       </div>

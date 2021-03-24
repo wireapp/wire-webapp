@@ -42,7 +42,7 @@ export function registerReactComponent<Props>(
     viewModel: function (knockoutParams: Props) {
       optionalParams.forEach(param => {
         if (!knockoutParams.hasOwnProperty(param)) {
-          knockoutParams[param] = null;
+          knockoutParams[param] = undefined;
         }
       });
       Object.entries(injected).forEach(([injectedName, injectedClass]) => {

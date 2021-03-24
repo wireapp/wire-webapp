@@ -28,7 +28,6 @@ import {
   Columns,
   Container,
   ContainerXS,
-  ErrorMessage,
   Form,
   H1,
   IsMobile,
@@ -223,7 +222,7 @@ const Login = ({
                   {validationErrors.length ? (
                     parseValidationErrors(validationErrors)
                   ) : loginError ? (
-                    <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
+                    parseError(loginError)
                   ) : (
                     <div style={{marginTop: '4px'}}>&nbsp;</div>
                   )}

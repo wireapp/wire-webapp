@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,22 +17,22 @@
  *
  */
 
-/** Enum for different message super types */
-export enum SuperType {
-  CALL = 'call',
-  CALL_TIME_OUT = 'call-time-out',
-  CONTENT = 'normal',
-  DELETE = 'delete',
-  DEVICE = 'device',
-  FILE_TYPE_RESTRICTED = 'file-type-restricted',
-  LEGALHOLD = 'legal-hold',
-  LOCATION = 'location',
-  MEMBER = 'member',
-  MISSED = 'missed',
-  PING = 'ping',
-  REACTION = 'reaction',
-  SPECIAL = 'special',
-  SYSTEM = 'system',
-  UNABLE_TO_DECRYPT = 'unable-to-decrypt',
-  VERIFICATION = 'verification',
+import {REASON as AVS_REASON} from '@wireapp/avs';
+import {SuperType} from '../../message/SuperType';
+import {Message} from './Message';
+
+export class CallingTimeoutMessage extends Message {
+  constructor(public reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT, time: number) {
+    super();
+    this.super_type = SuperType.CALL_TIME_OUT;
+    this.timestamp(time);
+  }
+
+  get isNoOneJoined(): boolean {
+    return this.reason === AVS_REASON.NOONE_JOINED;
+  }
+
+  get isEveryOneLeft(): boolean {
+    return this.reason === AVS_REASON.EVERYONE_LEFT;
+  }
 }

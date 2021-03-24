@@ -55,9 +55,11 @@ import './asset/videoAsset';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
+import './message/CallTimeoutMessage';
 import './message/MissedMessage';
 import './message/FileTypeRestrictedMessage';
 import './message/DeleteMessage';
+import './message/DecryptErrorMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -471,30 +473,6 @@ const normalTemplate: string = `
   <!-- /ko -->
   `;
 
-const unableToDecryptTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <span class="icon-sysmsg-error text-red"></span>
-    </div>
-    <div class="message-header-label ellipsis">
-      <span data-bind="html: message.htmlCaption()"></span>
-      <span>&nbsp;</span>
-      <a class="accent-text" data-bind="text: t('conversationUnableToDecryptLink'), attr: {'href': message.link}" rel="nofollow noopener noreferrer" target="_blank"></a>
-      <hr class="message-header-line" />
-    </div>
-  </div>
-  <div class="message-body message-body-decrypt-error">
-    <div class="message-header-decrypt-error-label" data-bind="html: message.htmlErrorMessage()"></div>
-    <!-- ko if: message.is_recoverable -->
-      <div class="message-header-decrypt-reset-session">
-        <loading-icon class="accent-fill" data-bind="style : {visibility : message.is_resetting_session() ? 'visible' : 'hidden'}" data-uie-name="status-loading"></loading-icon>
-        <span class="message-header-decrypt-reset-session-action button-label accent-text"
-              data-bind="click: () => onClickResetSession(message), text: t('conversationUnableToDecryptResetSession'), style : {visibility : !message.is_resetting_session() ? 'visible' : 'hidden'}"></span>
-      </div>
-    <!-- /ko -->
-  </div>
-  `;
-
 const systemTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon message-header-icon--svg text-foreground">
@@ -644,7 +622,7 @@ ko.components.register('message', {
       <missed-message></missed-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'unable-to-decrypt' -->
-      ${unableToDecryptTemplate}
+      <decrypt-error-message params="message: message, onClickResetSession: onClickResetSession"></decrypt-error-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'verification' -->
       <verification-message params="message: message"></verification-message>
@@ -654,6 +632,9 @@ ko.components.register('message', {
     <!-- /ko -->
     <!-- ko if: message.super_type === 'call' -->
       <call-message params="message: message"></call-message>
+      <!-- /ko -->
+    <!-- ko if: message.super_type === 'call-time-out' -->
+      <call-timeout-message params="message: message"></call-timeout-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'system' -->
       ${systemTemplate}

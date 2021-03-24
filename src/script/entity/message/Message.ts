@@ -23,6 +23,7 @@ import type {ReactionType} from '@wireapp/core/src/main/conversation';
 
 import {getUserName} from 'Util/SanitizationUtil';
 import {TIME_IN_MILLIS, formatDurationCaption, formatTimeShort, formatDateNumeral, fromUnixTime} from 'Util/TimeUtil';
+import {t} from 'Util/LocalizerUtil';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetType} from '../../assets/AssetType';
@@ -90,7 +91,7 @@ export class Message {
     this.super_type = super_type;
     this.ephemeral_caption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
-      return remainingTime ? formatDurationCaption(remainingTime) : '';
+      return remainingTime ? `${formatDurationCaption(remainingTime)} ${t('ephemeralRemaining')}` : '';
     });
     this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);

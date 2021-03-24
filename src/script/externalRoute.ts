@@ -50,13 +50,13 @@ export const URL_PATH = {
   SUPPORT_USERNAME: '/support/username/',
 };
 
-const getTeamSettingsUrl = (path: string = '', utmSource?: string): string => {
+const getTeamSettingsUrl = (path: string = '', utmSource?: string): string | undefined => {
   const query = utmSource ? `?utm_source=${utmSource}&utm_term=desktop` : '';
   const teamSettingsUrl = `${URL.TEAM_SETTINGS}${path}${query}`;
   return URL.TEAM_SETTINGS ? teamSettingsUrl : undefined;
 };
 
-export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string => {
+export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string | undefined => {
   if (URL.WEBSITE) {
     const query = pkCampaign ? `?pk_campaign=${pkCampaign}&pk_kwd=desktop` : '';
     const websiteUrl = `${URL.WEBSITE}${path}${query}`;
@@ -65,7 +65,7 @@ export const getWebsiteUrl = (path: string = '', pkCampaign?: string): string =>
   return undefined;
 };
 
-export const getAccountPagesUrl = (path: string = ''): string => {
+export const getAccountPagesUrl = (path: string = ''): string | undefined => {
   const accountPagesUrl = `${URL.ACCOUNT}${path}`;
   return URL.ACCOUNT ? accountPagesUrl : undefined;
 };

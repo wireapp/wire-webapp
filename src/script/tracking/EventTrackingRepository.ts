@@ -36,7 +36,7 @@ import {Segmentation} from './Segmentation';
 import {getPlatform} from './Helpers';
 import {Config} from '../Config';
 import {EventName} from './EventName';
-import type {MessageRepository} from '../conversation/MessageRepository';
+import type {ContributedSegmentations, MessageRepository} from '../conversation/MessageRepository';
 import {ClientEvent} from '../event/Client';
 import {UserState} from '../user/UserState';
 
@@ -225,9 +225,13 @@ export class EventTrackingRepository {
   };
 
   private subscribeToProductEvents(): void {
-    amplify.subscribe(WebAppEvents.ANALYTICS.EVENT, this, (eventName: string, segmentations?: Record<string, any>) => {
-      this.trackProductReportingEvent(eventName, segmentations);
-    });
+    amplify.subscribe(
+      WebAppEvents.ANALYTICS.EVENT,
+      this,
+      (eventName: string, segmentations?: ContributedSegmentations) => {
+        this.trackProductReportingEvent(eventName, segmentations);
+      },
+    );
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession);
   }
@@ -254,7 +258,7 @@ export class EventTrackingRepository {
     return 'member';
   }
 
-  private trackProductReportingEvent(eventName: string, customSegmentations?: Record<string, any>): void {
+  private trackProductReportingEvent(eventName: string, customSegmentations?: ContributedSegmentations): void {
     if (this.isProductReportingActivated === true) {
       const userData = {
         [UserData.IS_TEAM]: this.userState.isTeam(),

@@ -104,9 +104,11 @@ import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
+import {UserType} from '../tracking/attribute';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
+export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
 export class MessageRepository {
   private readonly logger: Logger;
@@ -215,7 +217,7 @@ export class MessageRepository {
    * @param conversationEntity Conversation to send knock in
    * @returns Resolves after sending the knock
    */
-  public async sendKnock(conversationEntity: Conversation) {
+  public async sendKnock(conversationEntity: Conversation): Promise<ConversationEvent | undefined> {
     const protoKnock = new Knock({
       [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
       [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
@@ -256,7 +258,7 @@ export class MessageRepository {
     textMessage: string,
     mentionEntities: MentionEntity[],
     quoteEntity?: QuoteEntity,
-  ): Promise<ConversationEvent> {
+  ): Promise<ConversationEvent | undefined> {
     try {
       const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
       return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
@@ -283,7 +285,7 @@ export class MessageRepository {
     textMessage: string,
     originalMessageEntity: ContentMessage,
     mentionEntities: MentionEntity[],
-  ): Promise<ConversationEvent> {
+  ): Promise<ConversationEvent | undefined> {
     const hasDifferentText = isTextDifferent(originalMessageEntity, textMessage);
     const hasDifferentMentions = areMentionsDifferent(originalMessageEntity, mentionEntities);
     const wasEdited = hasDifferentText || hasDifferentMentions;
@@ -511,7 +513,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     file: File | Blob,
     allowImageDetection?: boolean,
-  ): Promise<ConversationEvent> {
+  ): Promise<ConversationEvent | undefined> {
     try {
       let metadata;
       try {
@@ -651,7 +653,7 @@ export class MessageRepository {
     genericMessage: GenericMessage,
     mentionEntities: MentionEntity[],
     quoteEntity?: QuoteEntity,
-  ): Promise<ConversationEvent> {
+  ): Promise<ConversationEvent | undefined> {
     const conversationId = conversationEntity.id;
     const messageId = genericMessage.messageId;
     let messageEntity: ContentMessage;
@@ -673,10 +675,11 @@ export class MessageRepository {
           genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
         }
 
-        messageEntity = (await this.getMessageInConversationById(conversationEntity, messageId)) as ContentMessage;
+        messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
       }
 
       this.logger.debug(`No link preview for message '${messageId}' in conversation '${conversationId}' created`);
+
       if (messageEntity) {
         const assetEntity = messageEntity.getFirstAsset() as TextAsset;
         const messageContentUnchanged = assetEntity.text === textMessage;
@@ -696,6 +699,7 @@ export class MessageRepository {
 
       this.logger.warn(`Skipped link preview for unknown message '${messageId}' in '${conversationId}'`);
     }
+
     return undefined;
   }
 
@@ -732,7 +736,7 @@ export class MessageRepository {
       amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
     }
 
-    const injectedEvent = (await this.eventRepository.injectEvent(mappedEvent)) as ConversationEvent;
+    const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
     eventInfoEntity.setTimestamp((injectedEvent as any).time as string);
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
@@ -1653,7 +1657,7 @@ export class MessageRepository {
   private async sendEncryptedMessage(
     eventInfoEntity: EventInfoEntity,
     payload: NewOTRMessage<string>,
-  ): Promise<ClientMismatch> {
+  ): Promise<ClientMismatch | undefined> {
     const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;
     let messageType = eventInfoEntity.getType();
@@ -1788,7 +1792,7 @@ export class MessageRepository {
       const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
       const services = participants.filter(user => user.isService).length;
 
-      let segmentations: Record<string, any> = {
+      let segmentations: ContributedSegmentations = {
         [Segmentation.CONVERSATION.GUESTS]: roundLogarithmic(guests, 6),
         [Segmentation.CONVERSATION.GUESTS_PRO]: roundLogarithmic(guestsPro, 6),
         [Segmentation.CONVERSATION.GUESTS_WIRELESS]: roundLogarithmic(guestsWireless, 6),

@@ -83,5 +83,5 @@ registerReactComponent<ImageProps>('image-component', {
   component: Image,
   injected: {assetRepository: AssetRepository},
   optionalParams: ['click', 'className'],
-  template: '<div data-bind="react: {className, asset: ko.unwrap(asset), assetRepository, click}"></div>',
+  template: '<span data-bind="react: {className, asset: ko.unwrap(asset), assetRepository, click}"></span>',
 });

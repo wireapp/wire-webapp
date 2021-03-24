@@ -343,6 +343,7 @@ export class TestFactory {
       this.event_repository,
       this.user_repository,
       new MediaRepository(new PermissionRepository()).streamHandler,
+      new MediaRepository(new PermissionRepository()).devicesHandler,
       serverTimeHandler,
       undefined,
       this.conversation_repository['conversationState'],

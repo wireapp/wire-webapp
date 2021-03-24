@@ -103,7 +103,7 @@ jobs:
       - name: Test
         # Run for all PRs and pushes to master/dev with DISTRIBUTION == 'wire'
         if: env.DISTRIBUTION == 'wire'
-        run: yarn test --coverage --detectOpenHandles=false --forceExit
+        run: yarn test --coverage --coverage-reporters=clover --detectOpenHandles=false --forceExit
 
       - name: Monitor coverage
         # Run for all PRs with DISTRIBUTION == 'wire'

@@ -43,7 +43,7 @@ export class BackupService {
     const collection = table.toCollection();
     const tableCount = await table.count();
     const parallelBatchDriver = new DexieBatch({batchSize: BackupService.CONFIG.BATCH_SIZE, limit: tableCount});
-    // TODO: The "collection as any" typing can be fixed once this is released: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/50408
+    // TODO: The "collection as any" typing can be fixed once this is released: https://github.com/DefinitelyTyped/DefinitelyTyped/pull/51541
     const batchCount = await parallelBatchDriver.eachBatch(collection as any, batch => onProgress(batch));
     this.logger.log(`Exported store '${table.name}' in '${batchCount}' batches`);
   }
