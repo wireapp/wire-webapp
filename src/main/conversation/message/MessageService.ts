@@ -24,9 +24,14 @@ import Long from 'long';
 import {bytesToUUID, uuidToBytes} from '@wireapp/commons/src/main/util/StringUtil';
 import {APIClient} from '@wireapp/api-client';
 import {NewOTRMessage, OTRRecipients, UserClients} from '@wireapp/api-client/src/conversation';
+import {Decoder, Encoder} from 'bazinga64';
 
 import {CryptographyService} from '../../cryptography';
-import {Decoder, Encoder} from 'bazinga64';
+
+type ClientMismatchError = AxiosError<{
+  deleted: UserClients;
+  missing: UserClients;
+}>;
 
 export class MessageService {
   constructor(private readonly apiClient: APIClient, private readonly cryptographyService: CryptographyService) {}
@@ -137,7 +142,7 @@ export class MessageService {
     plainTextArray: Uint8Array,
   ): Promise<NewOTRMessage<Uint8Array>> {
     if (error.response?.status === HTTP_STATUS.PRECONDITION_FAILED) {
-      const {missing, deleted} = (error as AxiosError<{deleted: UserClients; missing: UserClients}>).response?.data!;
+      const {missing, deleted} = (error as ClientMismatchError).response?.data!;
 
       const deletedUserIds = Object.keys(deleted);
       const missingUserIds = Object.keys(missing);
@@ -180,7 +185,7 @@ export class MessageService {
     plainTextArray: Uint8Array,
   ): Promise<NewOtrMessage> {
     if (error.response?.status === HTTP_STATUS.PRECONDITION_FAILED) {
-      const {missing, deleted} = (error as AxiosError<{deleted: UserClients; missing: UserClients}>).response?.data!;
+      const {missing, deleted} = (error as ClientMismatchError).response?.data!;
 
       const deletedUserIds = Object.keys(deleted);
       const missingUserIds = Object.keys(missing);
