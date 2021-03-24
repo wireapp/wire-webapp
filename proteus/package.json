@@ -11,7 +11,7 @@
   "description": "Axolotl protocol implementation for JavaScript.",
   "devDependencies": {
     "@types/jasmine": "3.6.3",
-    "chai": "4.3.0",
+    "chai": "4.3.4",
     "del-cli": "3.0.1",
     "jasmine": "3.6.3",
     "nyc": "15.1.0",
