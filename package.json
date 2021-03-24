@@ -14,7 +14,7 @@
     "@babel/plugin-proposal-class-properties": "7.13.0",
     "@babel/preset-env": "7.13.12",
     "@babel/preset-react": "7.12.13",
-    "@babel/preset-typescript": "7.12.13",
+    "@babel/preset-typescript": "7.13.0",
     "@hot-loader/react-dom": "17.0.1",
     "@types/jest": "26.0.20",
     "@types/react": "17.0.3",
