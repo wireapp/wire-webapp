@@ -1,7 +1,6 @@
 import React, {useState, useEffect, useRef, useCallback} from 'react';
 import ReactDOM from 'react-dom';
 import {ValidationUtil} from '@wireapp/commons';
-import {UrlUtil} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 import {amplify} from 'amplify';
@@ -11,7 +10,6 @@ import {t} from 'Util/LocalizerUtil';
 
 import {ClientRepository} from '../client/ClientRepository';
 import {Config} from '../Config';
-import {QUERY_KEY} from '../auth/route';
 import ModalComponent from 'Components/ModalComponent';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientState} from '../client/ClientState';
@@ -60,6 +58,7 @@ const AppLock: React.FC<AppLockProps> = ({
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
   const isAppLockActivated = useKoSubscribable(appLockState.isAppLockActivated);
+  const isAppLockEnabled = useKoSubscribable(appLockState.isAppLockEnabled);
 
   const focusElement = (input: HTMLInputElement) => setTimeout(() => input?.focus());
   const forceFocus = ({target}: React.FocusEvent<HTMLInputElement>) => focusElement(target);
@@ -83,29 +82,13 @@ const AppLock: React.FC<AppLockProps> = ({
   );
 
   const getInactivityAppLockTimeoutInSeconds = () => {
-    const queryTimeout = parseInt(UrlUtil.getURLParameter(QUERY_KEY.APPLOCK_INACTIVITY_TIMEOUT), 10);
     const backendTimeout = appLockState.appLockInactivityTimeoutSecs();
-
-    if (Number.isFinite(queryTimeout)) {
-      return queryTimeout;
-    }
-    if (Number.isFinite(backendTimeout)) {
-      return backendTimeout;
-    }
-    return DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC;
+    return Number.isFinite(backendTimeout) ? backendTimeout : DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC;
   };
 
   const getScheduledAppLockTimeoutInSeconds = () => {
-    const queryTimeout = parseInt(UrlUtil.getURLParameter(QUERY_KEY.APPLOCK_SCHEDULED_TIMEOUT), 10);
     const configTimeout = Config.getConfig().FEATURE?.APPLOCK_SCHEDULED_TIMEOUT;
-
-    if (Number.isFinite(queryTimeout)) {
-      return queryTimeout;
-    }
-    if (Number.isFinite(configTimeout)) {
-      return configTimeout;
-    }
-    return null;
+    return Number.isFinite(configTimeout) ? configTimeout : null;
   };
 
   const isScheduledAppLockEnabled = () => {
@@ -123,34 +106,28 @@ const AppLock: React.FC<AppLockProps> = ({
   }, [inactivityTimeoutId]);
 
   useEffect(() => {
-    if (isAppLockActivated) {
-      showAppLock();
-    }
-    appLockState.isAppLockEnabled.subscribe(isEnabled => {
-      if (isEnabled) {
-        changePassphrase();
-      } else {
-        appLockRepository.removeCode();
-      }
-    });
     amplify.subscribe(WebAppEvents.PREFERENCES.CHANGE_APP_LOCK_PASSPHRASE, changePassphrase);
   }, []);
 
   useEffect(() => {
-    if (isAppLockActivated) {
-      window.addEventListener('blur', startAppLockTimeout);
-      return () => window.removeEventListener('blur', startAppLockTimeout);
+    if (isAppLockEnabled) {
+      showAppLock();
+    } else {
+      appLockRepository.removeCode();
     }
-    return undefined;
-  }, [isAppLockActivated]);
+  }, [isAppLockEnabled]);
 
   useEffect(() => {
     if (isAppLockActivated) {
+      window.addEventListener('blur', startAppLockTimeout);
       window.addEventListener('focus', clearAppLockTimeout);
-      return () => window.removeEventListener('focus', clearAppLockTimeout);
+      return () => {
+        window.removeEventListener('blur', startAppLockTimeout);
+        window.removeEventListener('focus', clearAppLockTimeout);
+      };
     }
     return undefined;
-  }, [clearAppLockTimeout]);
+  }, [isAppLockActivated, clearAppLockTimeout, startAppLockTimeout]);
 
   useEffect(() => {
     const app = window.document.querySelector<HTMLDivElement>('#app');

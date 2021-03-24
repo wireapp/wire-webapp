@@ -178,23 +178,4 @@ describe('AppLock', () => {
     const appLockModal = appLockPage.getAppLockModal();
     expect(appLockModal.props().style.display).toBe('flex');
   });
-
-  it('shows the locked modal on start if timeout is set as query parameter and a code is stored', () => {
-    const appLockState = createAppLockState();
-    const appLockRepository = createAppLockRepository(appLockState);
-    appLockState.hasPassphrase(true);
-    appLockState.isActivatedInPreferences(true);
-    jest.spyOn(document, 'querySelector').mockReturnValue(document.createElement('div'));
-
-    window.history.pushState({}, '', '?applock_unfocus_timeout=10');
-
-    const appLockPage = new AppLockPage({
-      appLockRepository,
-      appLockState,
-      clientRepository,
-    });
-
-    const appLockModal = appLockPage.getAppLockModal();
-    expect(appLockModal.props().style.display).toBe('flex');
-  });
 });
