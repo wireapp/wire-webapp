@@ -24,10 +24,10 @@ import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {APIClient} from './src/APIClient';
 import {
+  AccessTokenData,
   AUTH_ACCESS_TOKEN_KEY,
   AUTH_COOKIE_KEY,
   AUTH_TABLE_NAME,
-  AccessTokenData,
   Context,
   Cookie,
   LoginData,
@@ -38,7 +38,15 @@ import type {Config} from './src/Config';
 
 require('dotenv').config();
 
-const {WIRE_BACKEND, WIRE_EMAIL, WIRE_PASSWORD, WIRE_CONVERSATION_ID} = process.env;
+const {WIRE_BACKEND_REST, WIRE_BACKEND_WS, WIRE_EMAIL, WIRE_PASSWORD} = process.env;
+
+declare global {
+  namespace NodeJS {
+    interface Global {
+      apiClient: APIClient;
+    }
+  }
+}
 
 const logger = logdown('Demo', {
   markdown: false,
@@ -46,8 +54,6 @@ const logger = logdown('Demo', {
 logger.state.isEnabled = true;
 
 logger.log(`Using "process.env.WIRE_EMAIL": ${WIRE_EMAIL}`);
-logger.log(`Using "process.env.WIRE_CONVERSATION_ID": ${WIRE_CONVERSATION_ID}`);
-logger.log(`Using "process.env.WIRE_BACKEND": ${WIRE_BACKEND}`);
 
 async function createContext(storeEngine: CRUDEngine, apiClient: APIClient, loginData: LoginData): Promise<Context> {
   try {
@@ -64,7 +70,7 @@ async function createContext(storeEngine: CRUDEngine, apiClient: APIClient, logi
   }
 }
 
-if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION_ID) {
+if (WIRE_EMAIL && WIRE_PASSWORD) {
   const login = {
     clientType: ClientType.PERMANENT,
     email: WIRE_EMAIL,
@@ -80,10 +86,15 @@ if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION_ID) {
     await storeEngine.init(storagePath, storeOptions);
 
     const apiConfig: Config = {
-      urls: WIRE_BACKEND === 'staging' ? APIClient.BACKEND.STAGING : APIClient.BACKEND.PRODUCTION,
+      urls: {
+        name: 'Custom',
+        rest: WIRE_BACKEND_REST!,
+        ws: WIRE_BACKEND_WS!,
+      },
     };
 
     const apiClient = new APIClient(apiConfig);
+    global.apiClient = apiClient;
 
     apiClient.on(APIClient.TOPIC.ACCESS_TOKEN_REFRESH, async (accessToken: AccessTokenData) => {
       await storeEngine.updateOrCreate(AUTH_TABLE_NAME, AUTH_ACCESS_TOKEN_KEY, accessToken);
@@ -102,11 +113,6 @@ if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION_ID) {
     logger.log(`Got self user with ID "${context.userId}".`);
 
     try {
-      const conversation = await apiClient.conversation.api.getConversation(WIRE_CONVERSATION_ID);
-      const otherParticipant = conversation.members.others[0];
-      const userData = await apiClient.user.api.getUser(otherParticipant.id);
-      logger.log(`Found participant with name "${userData.name}" by handle "${userData.handle}".`);
-
       const webSocketClient = await apiClient.connect();
 
       webSocketClient.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
