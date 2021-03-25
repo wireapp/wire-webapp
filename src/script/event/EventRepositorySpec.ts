@@ -672,7 +672,7 @@ describe('EventRepository', () => {
     });
 
     it('deletes cancelled conversation.asset-add event', () => {
-      const froms = [
+      const fromIds = [
         // cancel from an other user
         'other-user-id',
         // cancel from the self user
@@ -681,8 +681,8 @@ describe('EventRepository', () => {
 
       const loadEventSpy = jest.spyOn(testFactory.event_service, 'loadEvent');
       const deleteEventSpy = jest.spyOn(testFactory.event_service, 'deleteEvent');
-      const testPromises = froms.map(from => {
-        const assetAddEvent = {...event, from, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      const testPromises = fromIds.map(fromId => {
+        const assetAddEvent = {...event, from: fromId, type: ClientEvent.CONVERSATION.ASSET_ADD};
         const assetCancelEvent = {
           ...assetAddEvent,
           data: {reason: ProtobufAsset.NotUploaded.CANCELLED, status: AssetTransferState.UPLOAD_FAILED},
