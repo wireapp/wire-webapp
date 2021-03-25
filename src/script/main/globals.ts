@@ -48,7 +48,7 @@ import 'Components/message';
 import 'Components/message/messageQuote';
 import '../page/message-list/messageTimerButton';
 import 'Components/modal';
-import 'Components/panel/serviceDetails';
+import 'Components/panel/ServiceDetails';
 import 'Components/panel/userDetails';
 import 'Components/ServiceList';
 import '../page/start-ui/TopPeople';
