@@ -23,7 +23,7 @@ import type {ServiceEntity} from '../../integration/ServiceEntity';
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
-interface ServiceDetailsProps {
+export interface ServiceDetailsProps {
   service: ServiceEntity;
 }
 
