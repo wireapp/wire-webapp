@@ -1708,7 +1708,7 @@ export class MessageRepository {
       return NewOtrMessage.create({
         nativePush,
         recipients: userEntries,
-        reportMissing: [...reportMissing].map(userId => ({uuid: uuidToBytes(userId)})),
+        reportMissing: (reportMissing || []).map(userId => ({uuid: uuidToBytes(userId)})),
         sender: {
           client: Long.fromString(payload.sender, 16),
         },
