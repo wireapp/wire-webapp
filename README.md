@@ -27,7 +27,7 @@ Prerequisites:
 
 1. Run `yarn`
 
-- This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
+   - This will install all dependencies and fetch a [configuration](https://github.com/wireapp/wire-web-config-wire/) for the application.
 
 1. Rename `.env.localhost` to `.env` in order to configure the application. This configuration can override/extend the configuration from the previous step.
 
@@ -41,23 +41,33 @@ Prerequisites:
 ### Development
 
 1. Run `yarn start` and Wire's web app will be available at: https://localhost:8081/auth/
-1. Use a browser with disabled web security (`−−disable−web−security` in Chrome) to circumvent CORS issues when connecting to our backend from localhost
+1. Add the following entries to your hosts file (macOS / Linux: `/etc/hosts`, Windows 10: `%WINDIR%\system32\drivers\etc\hosts`):
+   - `127.0.0.1 local.wire.com` (to connect with production backend)
+   - `127.0.0.1 local.zinfra.io` (to connect with staging backend)
+1. Use Chrome or Firefox with the following settings:
+   - custom user data directory to not mess up your usual browser configuration
+     - Chrome: add `--user-data-dir=<path>` to the start parameters
+     - Firefox: add `--profile <path>` to the start parameters
+   - disabled [CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) to circumvent issues when connecting to our backend from localhost
+     - Chrome: add `--disable-web-security` to the start parameters
+     - Firefox: install the [CORS Everywhere](https://addons.mozilla.org/en-US/firefox/addon/cors-everywhere/) plugin
+   - disabled [`SameSite`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite) attribute to allow cross-site cookies
+     - Chrome: add `--disable-features=SameSiteByDefaultCookies` to the start parameters
+     - Firefox: Go to `about:config` and make sure you have the following settings:
+       - `network.cookie.sameSite.laxByDefault: false`
+       - `network.cookie.sameSite.noneRequiresSecure: false`
+   - ignored certificate errors (optional, also see [Install the self-signed certificate](#install-the-self-signed-certificate))
+     - Chrome: add `--ignore-certificate-errors` to the start parameters
+     - Firefox:
+       1. Go to Edit > Preferences > Privacy & Security
+       2. Uncheck the checkbox for "Query OCSP responder servers to confirm the current validity of certificates"
 
-#### Bypass Chrome's security restrictions for local development:
+#### Install the self-signed certificate
 
-1. Add the following entries to your hosts file: `127.0.0.1 local.wire.com` (to connect with production backend) and `127.0.0.1 local.zinfra.io` (to connect with staging backend)
-1. Restart your Chrome browser with flags: `--disable-web-security --ignore-certificate-errors --user-data-dir=...`
-1. Run `yarn start`
-
-Host file location:
-
-- On macOS / Linux the hosts file can be found at: `/etc/hosts`
-- On Windows 10 the hosts file can be found at: `%WINDIR%\system32\drivers\etc\hosts`
-
-Optional: If your browser does not trust the certificate from "local.wire.com" or "local.zinfra.io":
+If you would like your browser to trust the certificate from "local.wire.com" or "local.zinfra.io":
 
 1. Download [mkcert](https://github.com/FiloSottile/mkcert/releases/latest)
-1. Set `CAROOT` env variable to `./server/certificate`
+1. Set the `CAROOT` environment variable to `<WebApp Dir>/server/certificate`
 1. Run `mkcert -install`
 
 ## Testing
@@ -76,11 +86,11 @@ Alternatively, you can test specific parts of the app:
 
 | Stage | Branch | Action | Environment | Backend |
 | :-: | :-: | :-: | :-: | :-- |
-| 1 (Feature development) | edge | commit | [wire-webapp-edge](https://wire-webapp-edge.zinfra.io/) | Staging |
-| 2 (Nightly test automation) | dev | commit or squash merge from edge | [wire-webapp-dev](https://wire-webapp-dev.zinfra.io/) | Staging |
-| 3 (Internal release) | dev | tag (format: YYYY-MM-DD-staging.X) | [wire-webapp-staging](https://wire-webapp-staging.wire.com/) | Production |
+| 1 (feature development) | edge | commit | [wire-webapp-edge](https://wire-webapp-edge.zinfra.io/) | Staging |
+| 2 (nightly test automation) | dev | commit or squash merge from edge | [wire-webapp-dev](https://wire-webapp-dev.zinfra.io/) | Staging |
+| 3 (internal release) | dev | tag (format: `YYYY-MM-DD-staging.X`) | [wire-webapp-staging](https://wire-webapp-staging.wire.com/) | Production |
 | 4 (RC testing) | master | merge (don't squash) from "dev"; afterwards [generate release notes](#release-notes) | [wire-webapp-master](https://wire-webapp-master.zinfra.io/) | Staging |
-| 5 (Production release) | master | tag (format: YYYY-MM-DD-production.X) | [wire-webapp-prod](https://app.wire.com/) | Production |
+| 5 (production release) | master | tag (format: `YYYY-MM-DD-production.X`) | [wire-webapp-prod](https://app.wire.com/) | Production |
 
 ### Staging Bumps for internal releases
 
@@ -118,9 +128,9 @@ Based on the git branch, builds get deployed automatically by [Travis CI](https:
 
 A manual deployment requires the local setup of the Elastic Beanstalk Command Line Interface ([EB CLI](https://docs.aws.amazon.com/en_us/elasticbeanstalk/latest/dg/eb-cli3.html)). Manual deployments are also based on branch defaults which are configured [here](./.elasticbeanstalk/config.yml).
 
-## Status
+## CI Status
 
-[![Build Status](https://travis-ci.org/wireapp/wire-webapp.svg?branch=dev)](https://travis-ci.org/wireapp/wire-webapp) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![CI](https://github.com/wireapp/wire-webapp/actions/workflows/test_build_deploy.yml/badge.svg?branch=dev)](https://github.com/wireapp/wire-webapp/actions/workflows/test_build_deploy.yml) [![Lint](https://github.com/wireapp/wire-webapp/actions/workflows/lint.yml/badge.svg?branch=dev)](https://github.com/wireapp/wire-webapp/actions/workflows/lint.yml) [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
 ## Translations
 
