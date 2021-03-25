@@ -97,12 +97,12 @@ Alternatively, you can test specific parts of the app:
 **Actions**
 
 1. Get commit ID which has been approved by QA team
-1. run `yarn release:staging <commitId>` (if the commit ID is omitted, the latest commit from `dev` will be used).
+1. Run `yarn release:staging <commitId>` (if the commit ID is omitted, the latest commit from `dev` will be used)
 1. Example:
    ```
    yarn release:staging 90fda951916f0d60a5bffce69a7267830e313391
    ```
-1. Enter "yes"
+1. Check if the commit is correct, then enter "yes"
 
 ### RC testing
 
