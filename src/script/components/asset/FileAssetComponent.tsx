@@ -10,9 +10,10 @@ import {AssetTransferState} from '../../assets/AssetTransferState';
 import AssetLoader from 'Components/asset/AssetLoader';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
+import {t} from 'Util/LocalizerUtil';
 
 export interface FileAssetProps {
-  /** Does the asset have a visible header? */
   header: boolean;
   message: ContentMessage | ko.Subscribable<ContentMessage>;
 }
@@ -44,6 +45,9 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
   // UI States
   const hasVisibleHeader = props.header;
   const header = hasVisibleHeader && <AssetHeader message={message} />;
+  const fileName = trimFileExtension(asset.file_name);
+  const formattedFileSize = formatBytes(parseInt(asset.file_size, 10));
+  const fileExtension = getFileExtension(asset.file_name);
 
   const isPendingUpload = assetStatus() === AssetTransferState.UPLOAD_PENDING;
   const isNotUploading = assetStatus() !== AssetTransferState.UPLOAD_PENDING;
@@ -92,6 +96,19 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
                 {isUploading && <AssetLoader loadProgress={uploadProgress()} onCancel={cancelUpload} />}
 
                 {isFailedUpload && <div className="media-button media-button-error"></div>}
+
+                <div data-uie-name="file-name">
+                  <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                    {fileName}
+                  </div>
+                  <ul className="file-desc-meta label-xs text-foreground">
+                    <li data-uie-name="file-size">{formattedFileSize}</li>
+                    {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
+                    {isUploading && <li data-uie-name="file-type">{t('conversationAssetUploading')}</li>}
+                    {isFailedUpload && <li data-uie-name="file-type">{t('conversationAssetUploadFailed')}</li>}
+                    {isDownloading && <li data-uie-name="file-type">{t('conversationAssetDownloading')}</li>}
+                  </ul>
+                </div>
               </>
             )}
           </div>
