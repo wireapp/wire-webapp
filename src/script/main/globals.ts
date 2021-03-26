@@ -49,7 +49,7 @@ import 'Components/message/messageQuote';
 import '../page/message-list/messageTimerButton';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
-import 'Components/panel/userDetails';
+import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
 import '../page/start-ui/TopPeople';
 import 'Components/userInput';
