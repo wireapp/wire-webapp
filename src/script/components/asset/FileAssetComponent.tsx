@@ -12,14 +12,15 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
+import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface FileAssetProps {
   header: boolean;
-  message: ContentMessage | ko.Subscribable<ContentMessage>;
+  message: ContentMessage;
 }
 
 const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => {
-  const message = ko.unwrap(props.message);
+  const message = props.message;
   const asset = message.getFirstAsset() as FileAsset;
 
   const assetRepository = container.resolve(AssetRepository);
@@ -119,3 +120,8 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
 };
 
 export default FileAssetComponent;
+
+registerReactComponent('file-asset', {
+  component: FileAssetComponent,
+  template: '<div data-bind="react: {header, message: ko.unwrap(message)}"></div>',
+});
