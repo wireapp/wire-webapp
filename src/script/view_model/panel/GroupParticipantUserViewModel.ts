@@ -27,7 +27,7 @@ import {Logger, getLogger} from 'Util/Logger';
 
 import {Actions} from 'Components/panel/UserActions';
 import 'Components/panel/EnrichedFields';
-import 'Components/panel/userDetails';
+import 'Components/panel/UserDetails';
 
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
