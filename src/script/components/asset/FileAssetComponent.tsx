@@ -7,6 +7,9 @@ import {FileAsset} from '../../entity/message/FileAsset';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {container} from 'tsyringe';
 import {AssetTransferState} from '../../assets/AssetTransferState';
+import AssetLoader from 'Components/asset/AssetLoader';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 export interface FileAssetProps {
   /** Does the asset have a visible header? */
@@ -30,11 +33,24 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
     return asset.status();
   });
 
+  // Handlers
+  const downloadAsset = () => assetRepository.downloadFile(asset);
+
+  const cancelUpload = () => {
+    assetRepository.cancelUpload(message.id);
+    amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
+  };
+
   // UI States
   const hasVisibleHeader = props.header;
   const header = hasVisibleHeader && <AssetHeader message={message} />;
 
-  const downloadAsset = () => assetRepository.downloadFile(asset);
+  const isPendingUpload = assetStatus() === AssetTransferState.UPLOAD_PENDING;
+  const isNotUploading = assetStatus() !== AssetTransferState.UPLOAD_PENDING;
+  const isFailedUpload = assetStatus() === AssetTransferState.UPLOAD_FAILED;
+  const isUploaded = assetStatus() === AssetTransferState.UPLOADED;
+  const isDownloading = assetStatus() === AssetTransferState.DOWNLOADING;
+  const isUploading = assetStatus() === AssetTransferState.UPLOADING;
 
   return (
     <>
@@ -52,7 +68,33 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
                 downloadAsset();
               }
             }}
-          ></div>
+          >
+            {isPendingUpload && <div className="asset-placeholder loading-dots"></div>}
+            {isNotUploading && (
+              <>
+                {isUploaded && (
+                  <div
+                    className="file-icon icon-file"
+                    onClick={event => {
+                      event.stopPropagation();
+                      downloadAsset();
+                    }}
+                    data-uie-name="file-icon"
+                  >
+                    <span className="file-icon-ext icon-view"></span>
+                  </div>
+                )}
+
+                {isDownloading && (
+                  <AssetLoader loadProgress={asset.downloadProgress()} onCancel={asset.cancelDownload} />
+                )}
+
+                {isUploading && <AssetLoader loadProgress={uploadProgress()} onCancel={cancelUpload} />}
+
+                {isFailedUpload && <div className="media-button media-button-error"></div>}
+              </>
+            )}
+          </div>
         </>
       )}
     </>
