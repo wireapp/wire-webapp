@@ -6661,7 +6661,18 @@ grunt-aws-s3@2.0.2:
     mime-types "2.0.x"
     progress "1.1.x"
 
-grunt-cli@1.3.2, grunt-cli@~1.3.2:
+grunt-cli@1.4.1:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/grunt-cli/-/grunt-cli-1.4.1.tgz#b2189d99caa1743c50f28b51a4ca6a8bebb7750c"
+  integrity sha512-wItuI6BEBnMv1i9/PYOr7DRACeN2WTyoSvmUtAEdTVxNFLf9p3+fVmptow3/LBskvOnIB9i+kKmWg0Z4r8TXtw==
+  dependencies:
+    grunt-known-options "~1.1.1"
+    interpret "~1.1.0"
+    liftoff "~2.5.0"
+    nopt "~4.0.1"
+    v8flags "~3.2.0"
+
+grunt-cli@~1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/grunt-cli/-/grunt-cli-1.3.2.tgz#60f12d12c1b5aae94ae3469c6b5fe24e960014e8"
   integrity sha512-8OHDiZZkcptxVXtMfDxJvmN7MVJNE8L/yIcPb4HB7TlyFD1kDvjHrb62uhySsU14wJx9ORMnTuhRMQ40lH/orQ==
@@ -6724,7 +6735,7 @@ grunt-include-replace@5.0.0:
   resolved "https://registry.yarnpkg.com/grunt-include-replace/-/grunt-include-replace-5.0.0.tgz#09539163b1681a6c5609106954504e1c1a66e077"
   integrity sha1-CVORY7FoGmxWCRBpVFBOHBpm4Hc=
 
-grunt-known-options@~1.1.0:
+grunt-known-options@~1.1.0, grunt-known-options@~1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/grunt-known-options/-/grunt-known-options-1.1.1.tgz#6cc088107bd0219dc5d3e57d91923f469059804d"
   integrity sha512-cHwsLqoighpu7TuYj5RonnEuxGVFnztcUqTqp5rXFGYL4OuPFofwC4Ycg7n9fYwvK6F5WbYgeVOwph9Crs2fsQ==
@@ -13571,6 +13582,13 @@ v8flags@~3.1.1:
   version "3.1.3"
   resolved "https://registry.yarnpkg.com/v8flags/-/v8flags-3.1.3.tgz#fc9dc23521ca20c5433f81cc4eb9b3033bb105d8"
   integrity sha512-amh9CCg3ZxkzQ48Mhcb8iX7xpAfYJgePHxWMQCBWECpOSqJUXgY26ncA61UTV0BkPqfhcy6mzwCIoP4ygxpW8w==
+  dependencies:
+    homedir-polyfill "^1.0.1"
+
+v8flags@~3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/v8flags/-/v8flags-3.2.0.tgz#b243e3b4dfd731fa774e7492128109a0fe66d656"
+  integrity sha512-mH8etigqMfiGWdeXpaaqGfs6BndypxusHHcv2qSHyZkGEznCd/qAXCWWRzeowtL54147cktFOC4P5y+kl8d8Jg==
   dependencies:
     homedir-polyfill "^1.0.1"
 
