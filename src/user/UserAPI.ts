@@ -535,7 +535,7 @@ export class UserAPI {
     limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
   ): Promise<UserPreKeyBundleMap> {
     function isUserClients(obj: any): obj is UserClients {
-      return Array.isArray(Object.keys(obj)[0]);
+      return Array.isArray(Object.values(obj)[0]);
     }
 
     const domainOrUserIdChunks = ArrayUtil.chunk(Object.keys(userClientMap), limit);
