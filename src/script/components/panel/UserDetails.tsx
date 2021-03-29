@@ -17,17 +17,18 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {User} from '../../entity/User';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import NamedIcon from 'Components/NamedIcon';
 import AvailabilityState from 'Components/AvailabilityState';
+import {Availability} from '@wireapp/protocol-messaging';
 
 export interface UserDetailsProps {
   badge?: string;
@@ -38,15 +39,50 @@ export interface UserDetailsProps {
 }
 
 const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isVerified, isGroupAdmin}) => {
-  const inTeam = useKoSubscribable(participant.inTeam);
-  const isGuest = useKoSubscribable(participant.isGuest);
-  const isTemporaryGuest = useKoSubscribable(participant.isTemporaryGuest);
-  const expirationText = useKoSubscribable(participant.expirationText);
-  const name = useKoSubscribable(participant.name);
-  const availability = useKoSubscribable(participant.availability);
+  const [inTeam, setInTeam] = useState<boolean>();
+  const [isGuest, setIsGuest] = useState<boolean>();
+  const [isTemporaryGuest, setIsTemporaryGuest] = useState<boolean>();
+  const [expirationText, setExpirationText] = useState<string>();
+  const [name, setName] = useState<string>();
+  const [availability, setAvailability] = useState<Availability.Type>();
+  const [verified, setVerified] = useState<boolean>(isVerified);
 
   useEffect(() => {
     amplify.publish(WebAppEvents.USER.UPDATE, participant.id);
+
+    setInTeam(participant.inTeam());
+    const inTeamSub = participant.inTeam.subscribe(value => setInTeam(value));
+
+    setIsGuest(participant.isGuest());
+    const isGuestSub = participant.isGuest.subscribe(value => setIsGuest(value));
+
+    setIsTemporaryGuest(participant.isTemporaryGuest());
+    const isTemporaryGuestSub = participant.isTemporaryGuest.subscribe(value => setIsTemporaryGuest(value));
+
+    setExpirationText(participant.expirationText());
+    const expirationTextSub = participant.expirationText.subscribe(value => setExpirationText(value));
+
+    setName(participant.name());
+    const nameSub = participant.name.subscribe(value => setName(value));
+
+    setAvailability(participant.availability());
+    const availabilitySub = participant.availability.subscribe(value => setAvailability(value));
+
+    let verifiedSub: ko.Subscription;
+    if (isVerified === undefined) {
+      setVerified(participant.is_verified());
+      verifiedSub = participant.is_verified.subscribe(value => setVerified(value));
+    }
+
+    return () => {
+      inTeamSub.dispose();
+      isGuestSub.dispose();
+      isTemporaryGuestSub.dispose();
+      expirationTextSub.dispose();
+      nameSub.dispose();
+      availabilitySub.dispose();
+      verifiedSub?.dispose();
+    };
   }, [participant]);
 
   return (
@@ -64,7 +100,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
             {name}
           </div>
         )}
-        {isSelfVerified && isVerified && (
+        {isSelfVerified && verified && (
           <NamedIcon
             width={16}
             height={16}
@@ -124,5 +160,5 @@ registerReactComponent('panel-user-details', {
   component: UserDetails,
   optionalParams: ['badge', 'isVerified', 'isGroupAdmin'],
   template:
-    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin, isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}">',
+    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin: ko.unwrap(isGroupAdmin), isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}">',
 });
