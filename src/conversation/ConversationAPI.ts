@@ -17,7 +17,7 @@
  *
  */
 
-import {NewOtrMessage as ProtobufOTRMessage} from '@wireapp/protocol-messaging/web/otr';
+import type {NewOtrMessage as ProtobufOTRMessage} from '@wireapp/protocol-messaging/web/otr';
 import type {AxiosError, AxiosRequestConfig} from 'axios';
 
 import {ValidationError} from '../validation/';
@@ -528,7 +528,7 @@ export class ConversationAPI {
     }
 
     const config: AxiosRequestConfig = {
-      data: ProtobufOTRMessage.encode(messageData).finish(),
+      data: messageData,
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`,
     };
