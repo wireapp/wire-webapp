@@ -31,7 +31,7 @@ import AvailabilityState from 'Components/AvailabilityState';
 
 export interface UserDetailsProps {
   badge?: string;
-  isGroupAdmin: boolean;
+  isGroupAdmin?: boolean;
   isSelfVerified: boolean;
   isVerified?: boolean;
   participant: User;
@@ -122,7 +122,7 @@ export default UserDetails;
 
 registerReactComponent('panel-user-details', {
   component: UserDetails,
-  optionalParams: ['badge', 'isVerified'],
+  optionalParams: ['badge', 'isVerified', 'isGroupAdmin'],
   template:
     '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin, isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}">',
 });
