@@ -32,7 +32,7 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.js}\"",
+    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*.test.js\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node",
     "test:node": "yarn build && jasmine --config=jasmine.json"
