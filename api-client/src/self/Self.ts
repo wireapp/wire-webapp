@@ -17,9 +17,8 @@
  *
  */
 
-import type {Picture, SSOSignature} from '../self/';
-import type {QualifiedId, User} from '../user/';
-import type {ManagedSource} from '../user/ManagedSource';
+import type {SSOSignature} from '../self/';
+import type {QualifiedId, ManagedSource, User} from '../user/';
 
 export interface Self extends User {
   locale: string;
@@ -29,7 +28,6 @@ export interface Self extends User {
    */
   managed_by?: ManagedSource;
   phone?: string;
-  picture?: Picture[];
   qualified_id?: QualifiedId;
   sso_id?: SSOSignature;
 }

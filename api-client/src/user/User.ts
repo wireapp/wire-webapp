@@ -20,6 +20,7 @@
 import type {AccentColor} from '@wireapp/commons';
 
 import type {ServiceRef} from '../conversation/';
+import type {Picture} from '../self/';
 import type {UserAsset} from '../user/';
 
 export interface QualifiedId {
@@ -36,6 +37,7 @@ export interface User {
   handle?: string;
   id: string;
   name: string;
+  picture?: Picture[];
   qualified_id?: QualifiedId;
   service?: ServiceRef;
   team?: string;

@@ -184,15 +184,10 @@ export class UserAPI {
    * @param handle The user's handle
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserHandleInfo
    */
-  public async getHandle(handle: string | QualifiedHandle): Promise<HandleInfo> {
-    const url =
-      typeof handle === 'string'
-        ? `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`
-        : `${UserAPI.URL.USERS}/${UserAPI.URL.BY_HANDLE}/${handle.domain}/${handle.handle}`;
-
+  public async getHandle(handle: string): Promise<HandleInfo> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url,
+      url: `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
     };
 
     const response = await this.client.sendJSON<HandleInfo>(config);
@@ -454,17 +449,16 @@ export class UserAPI {
   }
 
   /**
-   * Get a user by handle.
+   * Get a user by fully qualified handle.
    * @param handle The handle of a user to search for
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserByHandle
    */
-  public async getUserByHandle(handle: string): Promise<HandleInfo> {
+  public async getUserByHandle(handle: QualifiedHandle): Promise<User> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.USERS}/${UserAPI.URL.HANDLES}/${handle}`,
+      url: `${UserAPI.URL.USERS}/${UserAPI.URL.BY_HANDLE}/${handle.domain}/${handle.handle}`,
     };
 
-    const response = await this.client.sendJSON<HandleInfo>(config);
+    const response = await this.client.sendJSON<User>(config);
     return response.data;
   }
 
