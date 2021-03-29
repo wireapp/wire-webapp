@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.5.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.1...@wireapp/api-client@12.5.2) (2021-03-29)
+
+
+### Bug Fixes
+
+* **api-client:** call getHandle with string, don't encode protobuf messages ([#3689](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3689)) ([62d105a](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/62d105a43a2c2b63a3aa1f7fb979dd7010109653))
+
+
+
+
+
 ## [12.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.0...@wireapp/api-client@12.5.1) (2021-03-29)
 
 
