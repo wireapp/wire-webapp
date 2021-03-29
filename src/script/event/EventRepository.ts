@@ -25,7 +25,6 @@ import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event';
 import type {Notification, NotificationList} from '@wireapp/api-client/src/notification';
 import {AbortHandler} from '@wireapp/api-client/src/tcp/';
 import {container} from 'tsyringe';
-import {AxiosError} from 'axios';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -53,6 +52,7 @@ import type {ClientEntity} from '../client/ClientEntity';
 import type {EventRecord} from '../storage';
 import type {NotificationService} from './NotificationService';
 import {UserState} from '../user/UserState';
+import {isAxiosError} from 'Util/isAxiosError';
 
 export class EventRepository {
   logger: Logger;
@@ -208,10 +208,6 @@ export class EventRepository {
    * @returns Resolves when all new notifications from the stream have been handled with the latest notification ID that has been processed
    */
   private async getNotifications(notificationId: string, abortHandler: AbortHandler): Promise<string> {
-    function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
-      return errorCandidate.isAxiosError === true;
-    }
-
     function hasMissedNotifications(data: any): data is NotificationList {
       return !!data.notifications;
     }

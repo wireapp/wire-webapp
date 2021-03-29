@@ -63,6 +63,7 @@ import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
+import {isAxiosError} from 'Util/isAxiosError';
 
 export class UserRepository {
   private readonly assetRepository: AssetRepository;
@@ -509,9 +510,9 @@ export class UserRepository {
     try {
       const {user: userId} = await this.userService.getUserByHandle(handle.toLowerCase());
       return userId;
-    } catch (axiosError) {
-      const error = axiosError.response || axiosError;
-      if (error.status !== HTTP_STATUS.NOT_FOUND) {
+    } catch (error) {
+      // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
+      if (!isAxiosError(error) || error.response.status !== HTTP_STATUS.NOT_FOUND) {
         throw error;
       }
     }
