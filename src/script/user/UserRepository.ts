@@ -511,6 +511,7 @@ export class UserRepository {
       const {user: userId} = await this.userService.getUserByHandle(handle.toLowerCase());
       return userId;
     } catch (error) {
+      // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
       if (!isAxiosError(error) || error.response.status !== HTTP_STATUS.NOT_FOUND) {
         throw error;
       }
