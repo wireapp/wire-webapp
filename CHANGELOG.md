@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.0...@wireapp/api-client@12.5.1) (2021-03-29)
+
+
+### Bug Fixes
+
+* **api-client:** Check for values when posting prekeys to new endpoint ([1598038](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/159803856380c1b731af304251a7f3bc7e3321ff))
+
+
+
+
+
 # [12.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.4.3...@wireapp/api-client@12.5.0) (2021-03-24)
 
 
