@@ -83,7 +83,7 @@ export const useKoSubscribableChildren = (parent: ParentOfObservables, children:
   const [state, setState] = useState<ChildValues>(getInitialState(parent));
   useEffect(() => {
     setState(getInitialState(parent));
-    const subscriptions = [] as ko.Subscription[];
+    const subscriptions: ko.Subscription[] = [];
     children.forEach(child => {
       subscriptions.push(
         parent[child].subscribe((value: any) => {
