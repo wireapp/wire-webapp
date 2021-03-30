@@ -21,9 +21,9 @@ import type {AxiosError} from 'axios';
 import type {BackendError} from '@wireapp/api-client/src/http';
 
 export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
-  return errorCandidate.isAxiosError === true;
+  return errorCandidate instanceof Error && (errorCandidate as AxiosError).isAxiosError === true;
 }
 
 export function isBackendError(errorCandidate: any): errorCandidate is BackendError {
-  return typeof errorCandidate.label !== 'undefined';
+  return errorCandidate instanceof Error && typeof (errorCandidate as BackendError).label === 'string';
 }
