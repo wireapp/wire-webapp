@@ -51,11 +51,7 @@ export class SearchRepository {
     if (typeof query !== 'string') {
       return '';
     }
-    return query
-      .trim()
-      .replace(/^[@]/, '')
-      .replace(/@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, '')
-      .toLowerCase();
+    return query.trim().replace(/^[@]/, '').toLowerCase();
   }
 
   /**
