@@ -52,7 +52,7 @@ import type {ClientEntity} from '../client/ClientEntity';
 import type {EventRecord} from '../storage';
 import type {NotificationService} from './NotificationService';
 import {UserState} from '../user/UserState';
-import {isAxiosError} from 'Util/isAxiosError';
+import {isAxiosError} from 'Util/TypePredicateUtil';
 
 export class EventRepository {
   logger: Logger;

@@ -17,8 +17,18 @@
  *
  */
 
-import {AxiosError} from 'axios';
+import type {AxiosError} from 'axios';
+import type {BackendError} from '@wireapp/api-client/src/http';
+import {CryptographyError} from '../error/CryptographyError';
 
 export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
   return errorCandidate.isAxiosError === true;
+}
+
+export function isBackendError(errorCandidate: any): errorCandidate is BackendError {
+  return typeof errorCandidate.label === 'string' && typeof errorCandidate.message === 'string';
+}
+
+export function isCryptographyError(errorCandidate: any): errorCandidate is CryptographyError {
+  return errorCandidate instanceof CryptographyError;
 }
