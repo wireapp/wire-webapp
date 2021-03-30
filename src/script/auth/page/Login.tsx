@@ -28,7 +28,6 @@ import {
   Columns,
   Container,
   ContainerXS,
-  ErrorMessage,
   Form,
   H1,
   IsMobile,
@@ -60,6 +59,7 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
 import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -122,7 +122,9 @@ const Login = ({
     if (isImmediateLogin) {
       immediateLogin();
     }
-    return () => resetAuthError();
+    return () => {
+      resetAuthError();
+    };
   }, []);
 
   const immediateLogin = async () => {
@@ -154,9 +156,8 @@ const Login = ({
 
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
-      if ((error as BackendError).label) {
-        const backendError = error as BackendError;
-        switch (backendError.label) {
+      if (isBackendError(error)) {
+        switch (error.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             history.push(ROUTE.CLIENTS);
@@ -168,10 +169,10 @@ const Login = ({
           }
           default: {
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              backendError.label.endsWith(errorType),
+              error.label.endsWith(errorType),
             );
             if (!isValidationError) {
-              throw backendError;
+              throw error;
             }
           }
         }
@@ -221,7 +222,7 @@ const Login = ({
                   {validationErrors.length ? (
                     parseValidationErrors(validationErrors)
                   ) : loginError ? (
-                    <ErrorMessage data-uie-name="error-message">{parseError(loginError)}</ErrorMessage>
+                    parseError(loginError)
                   ) : (
                     <div style={{marginTop: '4px'}}>&nbsp;</div>
                   )}

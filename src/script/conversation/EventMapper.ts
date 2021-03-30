@@ -63,6 +63,7 @@ import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
 import type {LinkPreviewMetaDataType} from '../links/LinkPreviewMetaDataType';
 import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
+import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -137,12 +138,12 @@ export class EventMapper {
       originalEntity.quote(new QuoteEntity({error, messageId, userId}));
     }
 
-    if (id !== originalEntity.id && originalEntity.has_asset_text()) {
+    if (id !== originalEntity.id && originalEntity.hasAssetText()) {
       originalEntity.assets.removeAll();
       const textAsset = await this._mapAssetText(eventData);
       originalEntity.assets.push(textAsset);
-    } else if (originalEntity.get_first_asset) {
-      const asset = originalEntity.get_first_asset();
+    } else if (originalEntity.getFirstAsset) {
+      const asset = originalEntity.getFirstAsset();
       if (eventData.status && (asset as FileAsset).status) {
         const assetEntity = this._mapAsset(event);
         originalEntity.assets([assetEntity]);
@@ -174,7 +175,7 @@ export class EventMapper {
 
     originalEntity.id = id;
 
-    if (originalEntity.is_content() || (originalEntity as Message).is_ping()) {
+    if (originalEntity.isContent() || (originalEntity as Message).isPing()) {
       originalEntity.status(event.status || StatusType.SENT);
     }
 
@@ -254,6 +255,11 @@ export class EventMapper {
         break;
       }
 
+      case ClientEvent.CONVERSATION.CALL_TIME_OUT: {
+        messageEntity = this._mapEventCallingTimeout(event);
+        break;
+      }
+
       case ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE: {
         messageEntity = this._mapEventLegalHoldUpdate(event);
         break;
@@ -330,7 +336,7 @@ export class EventMapper {
       messageEntity.legalHoldStatus = data.legal_hold_status;
     }
 
-    if (messageEntity.is_content() || messageEntity.is_ping()) {
+    if (messageEntity.isContent() || messageEntity.isPing()) {
       messageEntity.status(event.status || StatusType.SENT);
     }
 
@@ -419,6 +425,10 @@ export class EventMapper {
     messageEntity.userIds(eventData.userIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
+  }
+
+  _mapEventCallingTimeout({data, time}: EventRecord) {
+    return new CallingTimeoutMessage(data.reason, parseInt(time, 10));
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: EventRecord) {
@@ -650,7 +660,7 @@ export class EventMapper {
 
     if (typeof eventData.duration !== 'undefined') {
       // new message format, including duration
-      messageEntity.visible(!messageEntity.was_completed());
+      messageEntity.visible(!messageEntity.wasCompleted());
     } else {
       // legacy format that we still need to map (no migration)
       messageEntity.visible(messageEntity.finished_reason === TERMINATION_REASON.MISSED);

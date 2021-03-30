@@ -80,7 +80,7 @@ export const interpolate = (array: number[], length: number) => {
 
 export const isLastItem = <T>(array: T[], item: T) => array.indexOf(item) === array.length - 1;
 
-export const iterateIndex = <T>(array: T, currentIndex: number, reverse = false) => {
+export const iterateIndex = <T>(array: T, currentIndex: number, reverse = false): number | undefined => {
   if (Array.isArray(array) && array.length && Number.isFinite(currentIndex)) {
     if (reverse) {
       const isZeroIndex = currentIndex === 0;
@@ -92,7 +92,7 @@ export const iterateIndex = <T>(array: T, currentIndex: number, reverse = false)
   return undefined;
 };
 
-export const iterateItem = <T>(array: T[], currentItem: T, reverse = false) => {
+export const iterateItem = <T>(array: T[], currentItem: T, reverse = false): T | undefined => {
   if (Array.isArray(array) && array.length) {
     const currentIndex = array.indexOf(currentItem);
 
@@ -116,7 +116,7 @@ export const randomElement = <T>(array: T[] = []) => array[Math.floor(Math.rando
  * @param element Element which should be removed
  * @returns containing the removed element
  */
-export const removeElement = <T>(array: T[] = [], element: T) => {
+export const removeElement = <T>(array: T[] = [], element: T): T[] | undefined => {
   const index = array.indexOf(element);
   if (index > -1) {
     return array.splice(index, 1);

@@ -89,6 +89,7 @@ export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; r
   protocol_version: number;
 };
 export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isIncoming: boolean; name: string}>;
+export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}>;
 
 export const EventBuilder = {
   build1to1Creation(conversationEntity: Conversation, timestamp: number = 0): OneToOneCreationEvent {
@@ -115,7 +116,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -126,7 +127,7 @@ export const EventBuilder = {
       data,
       from: conversationEntity.selfUser().id,
       status: StatusType.SENDING,
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.ASSET_ADD,
     };
   },
@@ -146,6 +147,23 @@ export const EventBuilder = {
     };
   },
 
+  buildCallingTimeoutEvent(
+    reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT,
+    conversation: Conversation,
+    userId: string,
+  ): CallingTimeoutEvent {
+    return {
+      conversation: conversation.id,
+      data: {
+        reason,
+      },
+      from: userId,
+      id: createRandomUuid(),
+      time: conversation.getNextIsoDate(),
+      type: ClientEvent.CONVERSATION.CALL_TIME_OUT,
+    };
+  },
+
   buildDegraded(
     conversationEntity: Conversation,
     userIds: string[],
@@ -160,7 +178,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -194,7 +212,7 @@ export const EventBuilder = {
       },
       from: user.id,
       id,
-      time: conversation.get_next_iso_date(),
+      time: conversation.getNextIsoDate(),
       type: ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED,
     };
   },
@@ -268,7 +286,7 @@ export const EventBuilder = {
     timestamp?: number,
   ): MemberJoinEvent {
     if (!timestamp) {
-      timestamp = conversationEntity.get_last_known_timestamp() + 1;
+      timestamp = conversationEntity.getLastKnownTimestamp() + 1;
     }
     const isoDate = new Date(timestamp).toISOString();
 
@@ -295,18 +313,20 @@ export const EventBuilder = {
         user_ids: [userId],
       },
       from: removedBySelfUser ? conversationEntity.selfUser().id : userId,
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: CONVERSATION_EVENT.MEMBER_LEAVE,
     };
   },
 
-  buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number): MessageAddEvent {
+  buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number, senderId: string): MessageAddEvent {
     return {
       conversation: conversationEntity.id,
-      data: {},
+      data: {
+        sender: senderId,
+      },
       from: conversationEntity.selfUser().id,
       status: StatusType.SENDING,
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MESSAGE_ADD,
     };
   },
@@ -316,7 +336,7 @@ export const EventBuilder = {
       conversation: conversationEntity.id,
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: conversationEntity.get_next_iso_date(currentTimestamp),
+      time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MISSED_MESSAGES,
     };
   },

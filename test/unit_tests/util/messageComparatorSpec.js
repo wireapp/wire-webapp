@@ -39,7 +39,7 @@ describe('MessageComparator', () => {
 
     tests.forEach(({expected, newMentions, originalMentions}) => {
       const messageEntity = {
-        get_first_asset: () => ({
+        getFirstAsset: () => ({
           mentions: () => originalMentions,
         }),
       };
@@ -57,7 +57,7 @@ describe('MessageComparator', () => {
 
     tests.forEach(({expected, newText, originalText}) => {
       const assetEntity = new Text('', originalText);
-      const messageEntity = {get_first_asset: () => assetEntity};
+      const messageEntity = {getFirstAsset: () => assetEntity};
 
       expect(isTextDifferent(messageEntity, newText)).toBe(expected);
     });

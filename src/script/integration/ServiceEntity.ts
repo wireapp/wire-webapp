@@ -18,9 +18,12 @@
  */
 
 import ko from 'knockout';
+import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/src/user';
+
+import {AssetRemoteData} from '../assets/AssetRemoteData';
 
 export interface ServiceData {
-  assets?: any[];
+  assets?: APIClientUserAsset[];
   description?: string;
   enabled?: boolean;
   id?: string;
@@ -33,13 +36,14 @@ export interface ServiceData {
 export class ServiceEntity {
   description: string;
   id: string;
-  mediumPictureResource: ko.Observable<string>;
+  mediumPictureResource: ko.Observable<AssetRemoteData>;
   name: string;
-  previewPictureResource: ko.Observable<string>;
+  previewPictureResource: ko.Observable<AssetRemoteData>;
   providerId: string;
   providerName: ko.Observable<string>;
   summary: string;
   tags: string[];
+  isService: boolean;
 
   constructor(serviceData: ServiceData = {}) {
     const {description = '', id = '', name = '', provider: providerId = '', summary = '', tags = []} = serviceData;
@@ -54,5 +58,6 @@ export class ServiceEntity {
 
     this.mediumPictureResource = ko.observable();
     this.previewPictureResource = ko.observable();
+    this.isService = true;
   }
 }

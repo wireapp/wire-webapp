@@ -24,8 +24,7 @@
           <!-- ko if: isTeam() -->
             <availability-state class="preferences-account-availability"
                                 data-bind="click: clickOnAvailability"
-                                data-uie-name="status-availability-in-profile"
-                                params="availability: availability, label: availabilityLabel, showArrow: true">
+                                params="availability: availability, label: availabilityLabel, showArrow: true, dataUieName: 'status-availability-in-profile'">
             </availability-state>
           <!-- /ko -->
 
@@ -164,6 +163,15 @@
         </div>
       </div>
       <div class="preferences-detail" data-bind="text: t('preferencesAccountReadReceiptsDetail')"></div>
+      <!-- ko if: appLockState.isAppLockAvailable -->
+        <div class="preferences-option">
+          <div class="preferences-option-icon checkbox accent-text" data-uie-name="status-preference-applock">
+            <input type="checkbox" id="app-lock-checkbox" data-bind="disable: appLockState.isAppLockEnforced, checked: appLockState.isAppLockEnabled, event: {change: onChangeAppLockEnabled}">
+            <label class="preferences-options-checkbox-label" for="app-lock-checkbox" data-bind="text: t('preferencesAccountAppLockCheckbox')"></label>
+          </div>
+        </div>
+        <div class="preferences-detail" data-bind="text: t('preferencesAccountAppLockDetail', optionsAppLockTime)"></div>
+      <!-- /ko -->
     </section>
 
     <!-- ko if: isActivatedAccount() -->
@@ -192,8 +200,8 @@
           <a class="preferences-link accent-text" data-bind="attr: {href: createTeamUrl}, text: t('preferencesAccountCreateTeam')" rel="nofollow noopener noreferrer" target="_blank" data-uie-name="do-create-team"></a>
         <!-- /ko -->
 
-        <!-- ko if: optionResetAppLock -->
-          <div class="preferences-link accent-text" data-bind="click: clickOnResetAppLockPassphrase, text: hasAppLockPassphrase() ? t('preferencesAccountResetAppLockPassphrase') : t('preferencesAccountSetAppLockPassphrase')" data-uie-name="do-reset-app-lock"></div>
+        <!-- ko if: appLockState.isAppLockActivated -->
+          <div class="preferences-link accent-text" data-bind="click: clickOnResetAppLockPassphrase, text: t('preferencesAccountResetAppLockPassphrase')" data-uie-name="do-reset-app-lock"></div>
         <!-- /ko -->
 
         <!-- ko ifnot: selfUser().isSingleSignOn -->

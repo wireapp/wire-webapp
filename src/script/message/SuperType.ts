@@ -20,6 +20,7 @@
 /** Enum for different message super types */
 export enum SuperType {
   CALL = 'call',
+  CALL_TIME_OUT = 'call-time-out',
   CONTENT = 'normal',
   DELETE = 'delete',
   DEVICE = 'device',

@@ -39,7 +39,7 @@ export abstract class AbstractAssetTransferStateTracker {
     this.AssetTransferState = AssetTransferState;
 
     this.transferState = ko.pureComputed(() => {
-      const asset = message?.get_first_asset() as FileAsset;
+      const asset = message?.getFirstAsset() as FileAsset;
       const status = this.uploadProgress() > -1 ? AssetTransferState.UPLOADING : asset?.status();
       return status;
     });

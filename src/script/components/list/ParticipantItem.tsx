@@ -19,11 +19,10 @@
 
 import React, {Fragment} from 'react';
 import ko from 'knockout';
-import {container} from 'tsyringe';
 import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
-import ParticipantAvatar, {AVATAR_SIZE} from 'Components/ParticipantAvatar';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {UserlistMode} from 'Components/userList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -34,10 +33,11 @@ import {useViewPortObserver} from '../../ui/viewportObserver';
 
 import 'Components/AvailabilityState';
 import {Participant} from '../../calling/Participant';
-import {AssetRepository} from '../../assets/AssetRepository';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import NamedIcon from 'Components/NamedIcon';
+import {Availability} from '@wireapp/protocol-messaging';
+import {Config} from '../../Config';
 
 export interface ParticipantItemProps {
   badge?: boolean;
@@ -74,8 +74,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   selfInTeam,
   showArrow = false,
 }) => {
-  const {viewportElementRef, isInViewport} = useViewPortObserver<HTMLDivElement>();
-  const assetRepository = container.resolve(AssetRepository);
+  const [isInViewport, viewportElementRef] = useViewPortObserver();
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
   const isSelf = !!(participant as User).isMe;
@@ -85,21 +84,17 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const hasUsernameInfo = isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  const isGuest = useKoSubscribable((participant as User).isGuest || ko.observable());
-  const isVerified = useKoSubscribable((participant as User).is_verified || ko.observable());
-  const availability = useKoSubscribable((participant as User).availability || ko.observable());
+  const isGuest = useKoSubscribable((participant as User).isGuest ?? ko.observable(false));
+  const isVerified = useKoSubscribable((participant as User).is_verified ?? ko.observable(false));
+  const availability = useKoSubscribable((participant as User).availability ?? ko.observable<Availability.Type>());
 
   const participantName = useKoSubscribable(
     isUser ? (participant as User).name : ko.observable((participant as ServiceEntity).name),
   );
-  const callParticipantSharesCamera = useKoSubscribable(
-    callParticipant ? callParticipant.sharesCamera : ko.observable(),
-  );
-  const callParticipantSharesScreen = useKoSubscribable(
-    callParticipant ? callParticipant.sharesScreen : ko.observable(),
-  );
+  const callParticipantSharesCamera = useKoSubscribable(callParticipant?.sharesCamera ?? ko.observable(false));
+  const callParticipantSharesScreen = useKoSubscribable(callParticipant?.sharesScreen ?? ko.observable(false));
   const callParticipantIsActivelySpeaking = useKoSubscribable(
-    callParticipant ? callParticipant.isActivelySpeaking : ko.observable(),
+    callParticipant?.isActivelySpeaking ?? ko.observable(false),
   );
 
   const callParticipantIsMuted = useKoSubscribable(callParticipant ? callParticipant.isMuted : ko.observable());
@@ -137,20 +132,16 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         {isInViewport && (
           <>
             <div className="participant-item__image">
-              <ParticipantAvatar
-                participant={participant as User}
-                size={AVATAR_SIZE.SMALL}
-                assetRepository={assetRepository}
-              />
+              <Avatar avatarSize={AVATAR_SIZE.SMALL} participant={participant as User} />
             </div>
 
             <div className="participant-item__content">
               <div className="participant-item__content__name-wrapper">
                 {isUser && selfInTeam && (
                   <AvailabilityState
-                    className="participant-item__content__availability participant-item__content__name"
-                    data-uie-name="status-name"
                     availability={availability}
+                    className="participant-item__content__availability participant-item__content__name"
+                    dataUieName="status-name"
                     label={participantName}
                   />
                 )}
@@ -219,8 +210,20 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
             )}
 
             {isUser && !isOthersMode && isGuest && (
-              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" />
+              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={16} />
             )}
+
+            {participant instanceof User &&
+              Config.getConfig().FEATURE.ENABLE_FEDERATION &&
+              !participant.isOnSameFederatedDomain() && (
+                <NamedIcon
+                  name="federation-icon"
+                  className="federation-icon"
+                  data-uie-name="status-federated-user"
+                  width={16}
+                  height={16}
+                />
+              )}
 
             {external && (
               <NamedIcon
@@ -278,5 +281,5 @@ registerReactComponent<ParticipantItemProps>('participant-item', {
     'showArrow',
   ],
   template:
-    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected, isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
+    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
 });

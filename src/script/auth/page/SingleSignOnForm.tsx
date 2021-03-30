@@ -291,7 +291,7 @@ const SingleSignOnForm = ({
       ) : ssoError ? (
         parseError(ssoError)
       ) : logoutReason ? (
-        <ErrorMessage center data-uie-name="status-logout-reason">
+        <ErrorMessage data-uie-name="status-logout-reason">
           <FormattedMessage
             {...logoutReasonStrings[logoutReason]}
             values={{

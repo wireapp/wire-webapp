@@ -80,7 +80,7 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
-import 'Components/mentionSuggestions';
+import '../page/message-list/mentionSuggestions';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
@@ -95,7 +95,7 @@ import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
 import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
-import AppLock from '../components/AppLock';
+import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
 import {BroadcastService} from '../broadcast/BroadcastService';
@@ -301,6 +301,7 @@ class App {
       repositories.event,
       repositories.user,
       repositories.media.streamHandler,
+      repositories.media.devicesHandler,
       serverTimeHandler,
     );
     repositories.integration = new IntegrationRepository(
@@ -425,7 +426,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CONNECTIONS, connectionEntities.length, 50);
 
       await Promise.all(
-        conversationRepository.map_connections(
+        conversationRepository.mapConnections(
           Object.values(connectionRepository['connectionState'].connectionEntities()),
         ),
       );
@@ -443,7 +444,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, notificationsCount, 100);
 
       eventTrackerRepository.init(propertiesRepository.properties.settings.privacy.telemetry_sharing);
-      await conversationRepository.initialize_conversations();
+      await conversationRepository.initializeConversations();
       loadingView.updateProgress(97.5, t('initUpdatedFromNotifications', Config.getConfig().BRAND_NAME));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
@@ -461,7 +462,7 @@ class App {
 
       telemetry.timeStep(AppInitTimingsStep.APP_LOADED);
       this._showInterface();
-      AppLock.init(clientRepository, ko.unwrap(userRepository['userState'].self));
+      AppLock.init(clientRepository);
 
       loadingView.removeFromView();
       telemetry.report();
@@ -474,7 +475,7 @@ class App {
         startNewVersionPolling(Environment.version(false), this.update);
       }
       audioRepository.init(true);
-      conversationRepository.cleanup_conversations();
+      conversationRepository.cleanupConversations();
       callingRepository.setReady();
       this.logger.info('App fully loaded');
     } catch (error) {
@@ -688,6 +689,7 @@ class App {
       },
     });
     initRouterBindings(router);
+    container.registerInstance(Router, router);
 
     this.appContainer.dataset.uieValue = 'is-loaded';
 

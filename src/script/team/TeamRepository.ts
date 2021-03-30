@@ -345,7 +345,7 @@ export class TeamRepository {
     return this.teamService.getTeamById(this.userState.self().teamId);
   }
 
-  private getBindingTeam(): Promise<TeamData | void> {
+  private getBindingTeam(): Promise<TeamData | undefined> {
     return this.teamService.getTeams().then(({teams}) => {
       const [team] = teams;
       if (team && team.binding) {

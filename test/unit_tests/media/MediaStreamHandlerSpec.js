@@ -17,14 +17,26 @@
  *
  */
 
-import {MediaRepository} from 'src/script/media/MediaRepository';
+import {MediaStreamHandler} from 'src/script/media/MediaStreamHandler';
 import {PermissionRepository} from 'src/script/permission/PermissionRepository';
+import {MediaConstraintsHandler} from 'src/script/media/MediaConstraintsHandler';
 
 describe('MediaStreamHandler', () => {
   let streamHandler;
 
+  const availableDevices = {
+    audioInput: () => {},
+    audioOutput: () => {},
+    screenInput: () => {},
+    videoInput: () => {},
+  };
+  const userState = {
+    self: () => ({id: ''}),
+  };
+  const mediaConstraintsHandler = new MediaConstraintsHandler(availableDevices, userState);
+
   beforeEach(() => {
-    streamHandler = new MediaRepository(new PermissionRepository()).streamHandler;
+    streamHandler = new MediaStreamHandler(mediaConstraintsHandler, new PermissionRepository());
   });
 
   describe('requestMediaStream', () => {

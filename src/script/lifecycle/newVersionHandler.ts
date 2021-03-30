@@ -27,7 +27,7 @@ interface VersionListener {
   onNewVersionAvailable: OnNewVersionAvailableFn;
 }
 
-const logger = getLogger('LifecycleRepository');
+const logger = getLogger('newVersionHandler');
 const VERSION_URL = '/version/';
 const CHECK_INTERVAL = TIME_IN_MILLIS.HOUR * 3;
 

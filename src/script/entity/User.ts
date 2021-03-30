@@ -200,6 +200,10 @@ export class User {
     return !!this.domain;
   }
 
+  isOnSameFederatedDomain(otherDomain: string = Config.getConfig().FEATURE.FEDERATION_DOMAIN): boolean {
+    return this.domain === otherDomain;
+  }
+
   /**
    * Returns the fully qualified user ID.
    * @example "@handle@wire.com"
@@ -209,9 +213,9 @@ export class User {
       /** Very old user accounts don't have a handle on Wire. */
       return '';
     }
-    return this.domain
+    return this.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION
       ? `@${this.username()}@${this.domain}`.replace(`@${Config.getConfig().FEATURE.FEDERATION_DOMAIN}`, '')
-      : `@${this.username}`;
+      : `@${this.username()}`;
   }
 
   subscribeToChanges(): void {
@@ -238,7 +242,7 @@ export class User {
     return !!this.email() || !!this.phone() || this.isSingleSignOn;
   }
 
-  remove_client(client_id: string): ClientEntity[] {
+  removeClient(client_id: string): ClientEntity[] {
     return this.devices.remove(client_et => client_et.id === client_id);
   }
 
