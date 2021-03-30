@@ -199,7 +199,13 @@ export class StartUIViewModel {
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
     this.showCreateGuestRoom = ko.pureComputed(() => this.isTeam());
     this.showInvitePeople = ko.pureComputed(() => !this.isTeam());
-    this.searchOnSameFederatedDomain = ko.pureComputed(() => !this.searchOnOtherFederatedDomain());
+    this.searchOnSameFederatedDomain = ko.pureComputed(() => {
+      return (
+        Config.getConfig().FEATURE.FEDERATION_DOMAIN &&
+        isValidFederationUsername(this.searchInput()) &&
+        this.searchInput().endsWith(Config.getConfig().FEATURE.FEDERATION_DOMAIN)
+      );
+    });
     this.searchOnOtherFederatedDomain = ko.pureComputed(() => {
       return (
         Config.getConfig().FEATURE.FEDERATION_DOMAIN &&
