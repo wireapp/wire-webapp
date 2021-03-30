@@ -15,7 +15,7 @@ import {t} from 'Util/LocalizerUtil';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface FileAssetProps {
-  header: boolean;
+  header?: boolean;
   message: ContentMessage;
 }
 
@@ -123,5 +123,6 @@ export default FileAssetComponent;
 
 registerReactComponent('file-asset', {
   component: FileAssetComponent,
+  optionalParams: ['header'],
   template: '<div data-bind="react: {header, message: ko.unwrap(message)}"></div>',
 });
