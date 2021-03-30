@@ -484,7 +484,7 @@ export class PreferencesAccountViewModel {
 
       const messageString = t('modalPictureTooSmallMessage');
       const titleString = t('modalPictureTooSmallHeadline');
-      return this._showUploadWarning(titleString, messageString);
+      return await this._showUploadWarning(titleString, messageString);
     } catch (error) {
       this.logger.error('Failed to validate profile image', error);
       return false;
