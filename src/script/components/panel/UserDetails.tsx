@@ -17,18 +17,17 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {User} from '../../entity/User';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import NamedIcon from 'Components/NamedIcon';
 import AvailabilityState from 'Components/AvailabilityState';
-import {Availability} from '@wireapp/protocol-messaging';
 
 export interface UserDetailsProps {
   badge?: string;
@@ -39,68 +38,36 @@ export interface UserDetailsProps {
 }
 
 const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isVerified, isGroupAdmin}) => {
-  const [inTeam, setInTeam] = useState<boolean>();
-  const [isGuest, setIsGuest] = useState<boolean>();
-  const [isTemporaryGuest, setIsTemporaryGuest] = useState<boolean>();
-  const [expirationText, setExpirationText] = useState<string>();
-  const [name, setName] = useState<string>();
-  const [availability, setAvailability] = useState<Availability.Type>();
-  const [verified, setVerified] = useState<boolean>(isVerified);
+  const user = useKoSubscribableChildren(participant, [
+    'inTeam',
+    'isGuest',
+    'isTemporaryGuest',
+    'expirationText',
+    'name',
+    'availability',
+    'is_verified',
+  ]);
 
   useEffect(() => {
     amplify.publish(WebAppEvents.USER.UPDATE, participant.id);
-
-    setInTeam(participant.inTeam());
-    const inTeamSub = participant.inTeam.subscribe(value => setInTeam(value));
-
-    setIsGuest(participant.isGuest());
-    const isGuestSub = participant.isGuest.subscribe(value => setIsGuest(value));
-
-    setIsTemporaryGuest(participant.isTemporaryGuest());
-    const isTemporaryGuestSub = participant.isTemporaryGuest.subscribe(value => setIsTemporaryGuest(value));
-
-    setExpirationText(participant.expirationText());
-    const expirationTextSub = participant.expirationText.subscribe(value => setExpirationText(value));
-
-    setName(participant.name());
-    const nameSub = participant.name.subscribe(value => setName(value));
-
-    setAvailability(participant.availability());
-    const availabilitySub = participant.availability.subscribe(value => setAvailability(value));
-
-    let verifiedSub: ko.Subscription;
-    if (isVerified === undefined) {
-      setVerified(participant.is_verified());
-      verifiedSub = participant.is_verified.subscribe(value => setVerified(value));
-    }
-
-    return () => {
-      inTeamSub.dispose();
-      isGuestSub.dispose();
-      isTemporaryGuestSub.dispose();
-      expirationTextSub.dispose();
-      nameSub.dispose();
-      availabilitySub.dispose();
-      verifiedSub?.dispose();
-    };
   }, [participant]);
 
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
-        {inTeam ? (
+        {user.inTeam ? (
           <AvailabilityState
             className="panel-participant__head__name"
-            availability={availability}
-            label={name}
+            availability={user.availability}
+            label={user.name}
             dataUieName="status-name"
           />
         ) : (
           <div className="panel-participant__head__name" data-uie-name="status-name">
-            {name}
+            {user.name}
           </div>
         )}
-        {isSelfVerified && verified && (
+        {isSelfVerified && (isVerified ?? user.is_verified) && (
           <NamedIcon
             width={16}
             height={16}
@@ -131,16 +98,16 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
         </div>
       )}
 
-      {isGuest && (
+      {user.isGuest && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <NamedIcon name="guest-icon" width={16} height={16} />
           <span>{t('conversationGuestIndicator')}</span>
         </div>
       )}
 
-      {isTemporaryGuest && (
+      {user.isTemporaryGuest && (
         <div className="panel-participant__guest-expiration" data-uie-name="status-expiration-text">
-          {expirationText}
+          {user.expirationText}
         </div>
       )}
 

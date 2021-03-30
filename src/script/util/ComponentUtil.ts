@@ -69,3 +69,33 @@ export const useKoSubscribable = <T = any>(observable: ko.Subscribable<T>, defau
   useKoSubscribableCallback(observable, newValue => setValue(newValue));
   return value;
 };
+
+type ChildValues<T extends string | number | symbol> = Record<T, any>;
+
+type Subscribables<T> = {
+  [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
+};
+
+export const useKoSubscribableChildren = <C extends keyof Subscribables<P>, P extends Record<C, ko.Subscribable>>(
+  parent: P,
+  children: C[],
+): ChildValues<C> => {
+  const getInitialState = (root: P): ChildValues<C> =>
+    children.reduce((acc, child) => {
+      acc[child] = root[child]?.();
+      return acc;
+    }, {} as ChildValues<C>);
+
+  const [state, setState] = useState<ChildValues<C>>(getInitialState(parent));
+  useEffect(() => {
+    setState(getInitialState(parent));
+    const subscriptions = children.map(child =>
+      parent[child]?.subscribe((value: any) => {
+        setState({...state, [child]: value});
+      }),
+    );
+    return () => subscriptions.forEach(subscription => subscription?.dispose());
+  }, [parent]);
+
+  return state;
+};
