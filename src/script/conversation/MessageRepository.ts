@@ -983,7 +983,7 @@ export class MessageRepository {
           this.sendGenericMessage(eventInfoEntity, true);
         });
       });
-      return this.deleteMessageById(conversationEntity, messageId);
+      return await this.deleteMessageById(conversationEntity, messageId);
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
@@ -1201,7 +1201,7 @@ export class MessageRepository {
       const {genericMessage, options} = eventInfoEntity;
       const payload = await this.cryptography_repository.encryptGenericMessage(options.recipients, genericMessage);
       payload.native_push = options.nativePush;
-      return this.sendEncryptedMessage(eventInfoEntity, payload);
+      return await this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
       const isRequestTooLarge = error.code === HTTP_STATUS.REQUEST_TOO_LONG;
       if (isRequestTooLarge) {
@@ -1635,7 +1635,7 @@ export class MessageRepository {
       );
       payload.data = arrayToBase64(encryptedAsset.cipherText);
       payload.native_push = options.nativePush;
-      return this.sendEncryptedMessage(eventInfoEntity, payload);
+      return await this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
       this.logger.info('Failed sending external message', error);
       throw error;
