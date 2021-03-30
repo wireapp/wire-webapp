@@ -17,7 +17,7 @@
  *
  */
 
-import axios, {AxiosError} from 'axios';
+import axios from 'axios';
 import {Runtime} from '@wireapp/commons';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
@@ -26,6 +26,7 @@ import {
   CALL_TYPE,
   CONV_TYPE,
   ENV as AVS_ENV,
+  ERROR,
   getAvsInstance,
   LOG_LEVEL,
   QUALITY,
@@ -33,9 +34,8 @@ import {
   STATE as CALL_STATE,
   VIDEO_STATE,
   Wcall,
-  ERROR,
-  WcallMember,
   WcallClient,
+  WcallMember,
 } from '@wireapp/avs';
 import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -43,14 +43,12 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
 import {container} from 'tsyringe';
-
 import {t} from 'Util/LocalizerUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {flatten} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
-
 import {Config} from '../Config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
