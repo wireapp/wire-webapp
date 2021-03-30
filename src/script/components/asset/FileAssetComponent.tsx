@@ -22,6 +22,9 @@ export interface FileAssetProps {
 const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => {
   const message = props.message;
   const asset = message.getFirstAsset() as FileAsset;
+  const fileName = trimFileExtension(asset.file_name);
+  const formattedFileSize = formatBytes(parseInt(asset.file_size, 10));
+  const fileExtension = getFileExtension(asset.file_name);
 
   const assetRepository = container.resolve(AssetRepository);
   const uploadProgress = assetRepository.getUploadProgress(message.id);
@@ -44,12 +47,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
   };
 
   // UI States
-  const hasVisibleHeader = props.header;
-  const header = hasVisibleHeader && <AssetHeader message={message} />;
-  const fileName = trimFileExtension(asset.file_name);
-  const formattedFileSize = formatBytes(parseInt(asset.file_size, 10));
-  const fileExtension = getFileExtension(asset.file_name);
-
+  const hasHeader = props.header;
   const isPendingUpload = assetStatus() === AssetTransferState.UPLOAD_PENDING;
   const isNotUploading = assetStatus() !== AssetTransferState.UPLOAD_PENDING;
   const isFailedUpload = assetStatus() === AssetTransferState.UPLOAD_FAILED;
@@ -61,7 +59,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
     <>
       {!message.isObfuscated() && (
         <>
-          {header}
+          {hasHeader && <AssetHeader message={message} />}
           <div
             className={cx('file', {
               'cursor-pointer': assetStatus() === AssetTransferState.UPLOADED,
