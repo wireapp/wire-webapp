@@ -63,11 +63,17 @@ export const normalizeName = (name: string): string =>
 /**
  * Validates that an input is a valid handle.
  */
-export const validateHandle = (handle: string = ''): boolean => {
+export const validateHandle = (handle: string = '', domain?: string): boolean => {
   if (!handle.length || handle.length < MIN_HANDLE_LENGTH || handle.length > MAX_HANDLE_LENGTH) {
     return false;
   }
-  return handle.split('').every(validateCharacter);
+
+  const isValidDomain =
+    !domain ||
+    /^((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(domain);
+  const isValidName = handle.split('').every(validateCharacter);
+
+  return isValidDomain && isValidName;
 };
 
 /**
