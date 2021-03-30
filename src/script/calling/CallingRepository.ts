@@ -80,6 +80,7 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
+import {isAxiosError} from 'Util/TypePredicateUtil';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -254,7 +255,7 @@ export class CallingRepository {
     try {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
-      const mismatch: ClientMismatch = (error as AxiosError).response!.data;
+      const mismatch: ClientMismatch = isAxiosError(error) && error.response?.data;
       const localClients: UserClients = await this.messageRepository.createRecipients(conversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
