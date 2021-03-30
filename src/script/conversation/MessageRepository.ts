@@ -1203,7 +1203,7 @@ export class MessageRepository {
       payload.native_push = options.nativePush;
       return this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
-      const isRequestTooLarge = error?.code === HTTP_STATUS.REQUEST_TOO_LONG;
+      const isRequestTooLarge = error.code === HTTP_STATUS.REQUEST_TOO_LONG;
       if (isRequestTooLarge) {
         return this.sendExternalGenericMessage(eventInfoEntity);
       }

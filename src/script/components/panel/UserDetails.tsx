@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {User} from '../../entity/User';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
@@ -38,12 +38,15 @@ export interface UserDetailsProps {
 }
 
 const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isVerified, isGroupAdmin}) => {
-  const inTeam = useKoSubscribable(participant.inTeam);
-  const isGuest = useKoSubscribable(participant.isGuest);
-  const isTemporaryGuest = useKoSubscribable(participant.isTemporaryGuest);
-  const expirationText = useKoSubscribable(participant.expirationText);
-  const name = useKoSubscribable(participant.name);
-  const availability = useKoSubscribable(participant.availability);
+  const user = useKoSubscribableChildren(participant, [
+    'inTeam',
+    'isGuest',
+    'isTemporaryGuest',
+    'expirationText',
+    'name',
+    'availability',
+    'is_verified',
+  ]);
 
   useEffect(() => {
     amplify.publish(WebAppEvents.USER.UPDATE, participant.id);
@@ -52,19 +55,19 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
-        {inTeam ? (
+        {user.inTeam ? (
           <AvailabilityState
             className="panel-participant__head__name"
-            availability={availability}
-            label={name}
+            availability={user.availability}
+            label={user.name}
             dataUieName="status-name"
           />
         ) : (
           <div className="panel-participant__head__name" data-uie-name="status-name">
-            {name}
+            {user.name}
           </div>
         )}
-        {isSelfVerified && isVerified && (
+        {isSelfVerified && (isVerified ?? user.is_verified) && (
           <NamedIcon
             width={16}
             height={16}
@@ -95,16 +98,16 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
         </div>
       )}
 
-      {isGuest && (
+      {user.isGuest && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <NamedIcon name="guest-icon" width={16} height={16} />
           <span>{t('conversationGuestIndicator')}</span>
         </div>
       )}
 
-      {isTemporaryGuest && (
+      {user.isTemporaryGuest && (
         <div className="panel-participant__guest-expiration" data-uie-name="status-expiration-text">
-          {expirationText}
+          {user.expirationText}
         </div>
       )}
 
@@ -124,5 +127,5 @@ registerReactComponent('panel-user-details', {
   component: UserDetails,
   optionalParams: ['badge', 'isVerified', 'isGroupAdmin'],
   template:
-    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin, isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}">',
+    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin: ko.unwrap(isGroupAdmin), isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}">',
 });

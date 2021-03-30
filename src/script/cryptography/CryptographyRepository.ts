@@ -42,6 +42,7 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {isAxiosError, isCryptographyError} from 'Util/TypePredicateUtil';
 
 export interface SignalingKeys {
   enckey: string;
@@ -483,8 +484,8 @@ export class CryptographyRepository {
     error: AxiosError | CryptographyError | ProteusErrors.DecryptError,
     event: EventRecord,
   ) {
-    const errorCode = (error as AxiosError).code
-      ? parseInt((error as AxiosError).code, 10)
+    const errorCode = isAxiosError(error)
+      ? error.response?.status
       : CryptographyRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
 
     const {data: eventData, from: remoteUserId, time: formattedTime} = event;
@@ -497,8 +498,7 @@ export class CryptographyRepository {
       throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }
 
-    const isCryptographyError = error instanceof CryptographyError;
-    if (isCryptographyError && (error as CryptographyError).type === CryptographyError.TYPE.PREVIOUSLY_STORED) {
+    if (isCryptographyError(error) && error.type === CryptographyError.TYPE.PREVIOUSLY_STORED) {
       const message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is already persisted.`;
       throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }
