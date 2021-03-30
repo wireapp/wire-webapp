@@ -13,7 +13,7 @@
     "@types/jasmine": "3.6.9",
     "chai": "4.3.4",
     "del-cli": "3.0.1",
-    "jasmine": "3.6.3",
+    "jasmine": "3.7.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-node": "9.1.1",

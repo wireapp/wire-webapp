@@ -9,7 +9,7 @@
     "@types/node": "~14",
     "@wireapp/store-engine": "4.5.31",
     "del-cli": "3.0.1",
-    "jasmine": "3.6.3",
+    "jasmine": "3.7.0",
     "karma": "6.3.2",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "3.1.1",

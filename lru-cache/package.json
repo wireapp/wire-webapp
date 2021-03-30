@@ -4,7 +4,7 @@
     "@types/jasmine": "3.6.9",
     "copyfiles": "2.4.1",
     "cross-env": "7.0.3",
-    "jasmine": "3.6.3",
+    "jasmine": "3.7.0",
     "make-dir-cli": "2.0.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
