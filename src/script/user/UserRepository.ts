@@ -28,7 +28,7 @@ import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {AxiosError} from 'axios';
-import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
+import type {TraceState, BackendError} from '@wireapp/api-client/src/http';
 import type {PublicClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 
@@ -36,6 +36,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -63,7 +64,6 @@ import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
-import {isAxiosError} from 'Util/isAxiosError';
 
 export class UserRepository {
   private readonly assetRepository: AssetRepository;
@@ -416,7 +416,7 @@ export class UserRepository {
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error) {
         const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
-        const isBadRequest = Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
+        const isBadRequest = (error as BackendError).code === HTTP_STATUS.BAD_REQUEST;
         if (isNotFound || isBadRequest) {
           return [];
         }
@@ -512,7 +512,7 @@ export class UserRepository {
       return userId;
     } catch (error) {
       // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
-      if (!isAxiosError(error) || error.response.status !== HTTP_STATUS.NOT_FOUND) {
+      if (!isBackendError(error) || error.code !== HTTP_STATUS.NOT_FOUND) {
         throw error;
       }
     }
