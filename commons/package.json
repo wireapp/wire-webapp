@@ -10,7 +10,7 @@
     "url-search-params-polyfill": "8.1.1"
   },
   "devDependencies": {
-    "@types/jest": "26.0.21",
+    "@types/jest": "26.0.22",
     "del-cli": "3.0.1",
     "jest": "26.6.3",
     "rimraf": "3.0.2",
