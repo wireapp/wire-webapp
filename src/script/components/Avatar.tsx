@@ -17,12 +17,11 @@
  *
  */
 
-import ko from 'knockout';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {ParentOfObservables, registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import UserAvatar from './avatar/UserAvatar';
 import ServiceAvatar from './avatar/ServiceAvatar';
@@ -84,37 +83,20 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   participant,
   ...props
 }) => {
-  const [avatarState, setAvatarState] = useState(STATE.NONE);
-  const user = participant as User;
-
-  const isTemporaryGuest = useKoSubscribable(user.isTemporaryGuest ?? ko.observable(false));
-  const isTeamMember = useKoSubscribable(user.isTeamMember ?? ko.observable(false));
-  const isBlocked = useKoSubscribable(user.isBlocked ?? ko.observable(false));
-  const isRequest = useKoSubscribable(user.isRequest ?? ko.observable(false));
-  const isIgnored = useKoSubscribable(user.isIgnored ?? ko.observable(false));
-  const isCanceled = useKoSubscribable(user.isCanceled ?? ko.observable(false));
-  const isUnknown = useKoSubscribable(user.isUnknown ?? ko.observable(false));
-  const isMe = user.isMe;
+  const user = useKoSubscribableChildren((participant as unknown) as ParentOfObservables, [
+    'isTemporaryGuest',
+    'isTeamMember',
+    'isBlocked',
+    'isRequest',
+    'isIgnored',
+    'isCanceled',
+    'isUnknown',
+  ]);
+  const isMe = (participant as User).isMe;
 
   const clickHandler = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     onAvatarClick?.(participant, event.currentTarget.parentNode);
   };
-
-  useEffect(() => {
-    if (isMe) {
-      setAvatarState(STATE.SELF);
-    } else if (isTeamMember) {
-      setAvatarState(STATE.NONE);
-    } else if (isBlocked) {
-      setAvatarState(STATE.BLOCKED);
-    } else if (isRequest) {
-      setAvatarState(STATE.PENDING);
-    } else if (isIgnored) {
-      setAvatarState(STATE.IGNORED);
-    } else if (isCanceled || isUnknown) {
-      setAvatarState(STATE.UNKNOWN);
-    }
-  }, [participant, isTemporaryGuest, isTeamMember, isBlocked, isRequest, isIgnored, isCanceled, isUnknown]);
 
   if (participant instanceof ServiceEntity || participant.isService) {
     return (
@@ -127,7 +109,23 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
     );
   }
 
-  if (isTemporaryGuest) {
+  let avatarState = STATE.NONE;
+
+  if (isMe) {
+    avatarState = STATE.SELF;
+  } else if (user.isTeamMember) {
+    avatarState = STATE.NONE;
+  } else if (user.isBlocked) {
+    avatarState = STATE.BLOCKED;
+  } else if (user.isRequest) {
+    avatarState = STATE.PENDING;
+  } else if (user.isIgnored) {
+    avatarState = STATE.IGNORED;
+  } else if (user.isCanceled || user.isUnknown) {
+    avatarState = STATE.UNKNOWN;
+  }
+
+  if (user.isTemporaryGuest) {
     return (
       <TemporaryGuestAvatar
         avatarSize={avatarSize}
