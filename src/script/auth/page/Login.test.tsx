@@ -102,7 +102,7 @@ describe('Login', () => {
     const password = 'password';
 
     spyOn(actionRoot.authAction, 'doLogin').and.returnValue(() =>
-      Promise.reject({label: BackendError.LABEL.TOO_MANY_CLIENTS}),
+      Promise.reject({label: BackendError.LABEL.TOO_MANY_CLIENTS, message: 'Too many clients'}),
     );
 
     const loginPage = new LoginPage(
