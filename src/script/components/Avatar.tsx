@@ -21,7 +21,7 @@ import React from 'react';
 
 import {User} from '../entity/User';
 import {ServiceEntity} from '../integration/ServiceEntity';
-import {ParentOfObservables, registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import UserAvatar from './avatar/UserAvatar';
 import ServiceAvatar from './avatar/ServiceAvatar';
@@ -83,7 +83,7 @@ const Avatar: React.FunctionComponent<AvatarProps> = ({
   participant,
   ...props
 }) => {
-  const user = useKoSubscribableChildren((participant as unknown) as ParentOfObservables, [
+  const user = useKoSubscribableChildren(participant as User, [
     'isTemporaryGuest',
     'isTeamMember',
     'isBlocked',

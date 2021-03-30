@@ -22,7 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {t} from 'Util/LocalizerUtil';
-import {ParentOfObservables, registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {User} from '../../entity/User';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
@@ -38,7 +38,7 @@ export interface UserDetailsProps {
 }
 
 const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isVerified, isGroupAdmin}) => {
-  const user = useKoSubscribableChildren((participant as unknown) as ParentOfObservables, [
+  const user = useKoSubscribableChildren(participant, [
     'inTeam',
     'isGuest',
     'isTemporaryGuest',
