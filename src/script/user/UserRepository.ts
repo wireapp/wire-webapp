@@ -36,6 +36,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -509,9 +510,9 @@ export class UserRepository {
     try {
       const {user: userId} = await this.userService.getUserByHandle(handle.toLowerCase());
       return userId;
-    } catch (axiosError) {
-      const error = axiosError.response || axiosError;
-      if (error.status !== HTTP_STATUS.NOT_FOUND) {
+    } catch (error) {
+      // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
+      if (!isBackendError(error) || error.code !== HTTP_STATUS.NOT_FOUND) {
         throw error;
       }
     }
