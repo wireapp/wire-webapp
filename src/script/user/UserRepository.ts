@@ -68,9 +68,9 @@ export class UserRepository {
   private readonly logger: Logger;
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
-  private readonly userMapper: UserMapper;
   private readonly userService: UserService;
 
+  public readonly userMapper: UserMapper;
   public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
   public shouldSetUsername: boolean;
 
@@ -503,10 +503,9 @@ export class UserRepository {
     return user;
   }
 
-  async getUserIdByHandle(handle: string): Promise<void | string> {
+  async getUserByHandle(fqn: {domain?: string; handle: string}): Promise<void | APIClientUser> {
     try {
-      const {user: userId} = await this.userService.getUserByHandle(handle.toLowerCase());
-      return userId;
+      return this.userService.getUserByFQN(fqn);
     } catch (error) {
       // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
       if (!isBackendError(error) || error.code !== HTTP_STATUS.NOT_FOUND) {
