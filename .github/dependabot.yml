@@ -32,6 +32,9 @@ updates:
       - dependency-name: 'husky'
         versions:
           - '>= 5.a'
+      - dependency-name: 'tsyringe'
+        versions:
+          - '> 4.3.0'
   - package-ecosystem: npm
     directory: '/server'
     schedule:
