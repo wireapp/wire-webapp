@@ -90,19 +90,19 @@ jobs:
         # Run for all PRs with DISTRIBUTION == 'wire', all pushes to master/dev
         # and when a desktop version should be built
         if: |
-          env.DISTRIBUTION == 'wire' ||
+          matrix.DISTRIBUTION == 'DISTRIBUTION_0' ||
           github.event_name != 'pull_request' ||
           env.BUILD_DESKTOP == 'true'
         run: yarn --frozen-lockfile
 
       - name: Test
         # Run for all PRs and pushes to master/dev with DISTRIBUTION == 'wire'
-        if: env.DISTRIBUTION == 'wire'
+        if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         run: yarn test --coverage --coverage-reporters=clover --detectOpenHandles=false --forceExit
 
       - name: Monitor coverage
         # Run for all PRs with DISTRIBUTION == 'wire'
-        if: env.DISTRIBUTION == 'wire' && github.event_name == 'pull_request'
+        if: matrix.DISTRIBUTION == 'DISTRIBUTION_0' && github.event_name == 'pull_request'
         uses: slavcodev/coverage-monitor-action@1.2.0
         with:
           github_token: ${{github.token}}
@@ -120,7 +120,7 @@ jobs:
 
       # https://wire-webapp-avs.zinfra.io/
       - name: Deploy avs build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'avs' && env.DISTRIBUTION == 'wire'
+        if: env.BRANCH_NAME == 'avs' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -137,7 +137,7 @@ jobs:
 
       # Stage 1: https://wire-webapp-edge.zinfra.io/
       - name: Deploy edge build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'edge' && env.DISTRIBUTION == 'wire'
+        if: env.BRANCH_NAME == 'edge' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -154,7 +154,7 @@ jobs:
 
       # Stage 2: https://wire-webapp-dev.zinfra.io/
       - name: Deploy dev build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'dev' && env.DISTRIBUTION == 'wire'
+        if: env.BRANCH_NAME == 'dev' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -171,7 +171,7 @@ jobs:
 
       # Stage 3: https://wire-webapp-staging.zinfra.io/
       - name: Deploy staging build to Elastic Beanstalk
-        if: contains(env.TAG, 'staging') && env.DISTRIBUTION == 'wire'
+        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -188,7 +188,7 @@ jobs:
 
       # Stage 4: https://wire-webapp-master.zinfra.io/
       - name: Deploy master build to Elastic Beanstalk
-        if: env.BRANCH_NAME == 'master' && env.DISTRIBUTION == 'wire'
+        if: env.BRANCH_NAME == 'master' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -205,7 +205,7 @@ jobs:
 
       # Stage 5: https://app.wire.com/
       - name: Deploy production build to Elastic Beanstalk
-        if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
+        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: einaregilsson/beanstalk-deploy@v14
         with:
           application_name: ${{env.AWS_APPLICATION_NAME}}
@@ -258,12 +258,12 @@ jobs:
           fi
 
       - name: Generate changelog
-        if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
+        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         run: yarn changelog:ci
 
       - name: Create GitHub production release
         id: create_release_production
-        if: contains(env.TAG, 'production') && env.DISTRIBUTION == 'wire'
+        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
@@ -276,7 +276,7 @@ jobs:
 
       - name: Create GitHub staging release draft
         id: create_release_staging
-        if: contains(env.TAG, 'staging') && env.DISTRIBUTION == 'wire'
+        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{github.token}}
@@ -287,7 +287,7 @@ jobs:
           prerelease: true
 
       - name: Notify staging bump
-        if: contains(env.TAG, 'staging') && env.DISTRIBUTION == 'wire'
+        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: wireapp/github-action-wire-messenger@v1
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
@@ -296,7 +296,7 @@ jobs:
           text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
       - name: Notify AVS commit
-        if: env.BRANCH_NAME == 'avs' && env.DISTRIBUTION == 'wire'
+        if: env.BRANCH_NAME == 'avs' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: wireapp/github-action-wire-messenger@v1
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
@@ -305,7 +305,7 @@ jobs:
           text: 'Deployed commit **${{github.sha}}** ("${{env.TITLE}}") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁'
 
       - name: Notify CI error
-        if: failure() && github.event_name != 'pull_request' && env.DISTRIBUTION == 'wire'
+        if: failure() && github.event_name != 'pull_request' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: wireapp/github-action-wire-messenger@v1
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
