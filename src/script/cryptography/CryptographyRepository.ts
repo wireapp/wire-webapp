@@ -485,7 +485,7 @@ export class CryptographyRepository {
     event: EventRecord,
   ) {
     const errorCode = isAxiosError(error)
-      ? error.response?.status
+      ? parseInt(error.code, 10)
       : CryptographyRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
 
     const {data: eventData, from: remoteUserId, time: formattedTime} = event;
