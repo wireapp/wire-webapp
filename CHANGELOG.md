@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.46.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.46.3...@wireapp/react-ui-kit@7.46.4) (2021-04-01)
+
+**Note:** Version bump only for package @wireapp/react-ui-kit
+
+
+
+
+
 ## [7.46.3](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.46.2...@wireapp/react-ui-kit@7.46.3) (2021-03-24)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
