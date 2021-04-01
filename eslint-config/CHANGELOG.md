@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.9.0...@wireapp/eslint-config@1.10.0) (2021-04-01)
+
+
+### Features
+
+* **eslint-config:** Automatically remove unused imports ([#3700](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/3700)) ([f7a7a9f](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/f7a7a9fce2c2f2be82db56a94e52c802241761c0))
+
+
+
+
+
 # [1.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.8.0...@wireapp/eslint-config@1.9.0) (2021-04-01)
 
 
