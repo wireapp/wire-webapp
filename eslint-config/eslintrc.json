@@ -15,6 +15,7 @@
         "@typescript-eslint/no-floating-promises": "error",
         "@typescript-eslint/no-this-alias": "error",
         "@typescript-eslint/prefer-readonly": "error",
+        "@typescript-eslint/return-await": ["error", "in-try-catch"],
         "@typescript-eslint/typedef": "error"
       }
     }
@@ -62,7 +63,7 @@
         "name": "fdescribe"
       }
     ],
-    "no-return-await": "error",
+    "no-return-await": "off",
     "no-sequences": "error",
     "no-sparse-arrays": "error",
     "no-trailing-spaces": "error",
