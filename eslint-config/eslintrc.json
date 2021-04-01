@@ -28,7 +28,7 @@
     "ecmaVersion": 6,
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "jsdoc", "no-unsanitized", "prettier", "react", "react-hooks", "sort-keys-fix", "typescript-sort-keys"],
+  "plugins": ["@typescript-eslint", "jsdoc", "no-unsanitized", "prettier", "react", "react-hooks", "sort-keys-fix", "typescript-sort-keys", "unused-imports"],
   "rules": {
     "constructor-super": "error",
     "curly": "error",
@@ -89,9 +89,10 @@
     "react/jsx-uses-vars": "error",
     "react/prefer-stateless-function": "error",
     "react/prop-types": "off",
-    "sort-keys-fix/sort-keys-fix": "error",
+    "sort-keys-fix/sort-keys-fix": "warn",
     "sort-vars": "error",
     "strict": ["error", "global"],
+    "unused-imports/no-unused-imports": "error",
     "typescript-sort-keys/interface": [
       "warn",
       "asc",
