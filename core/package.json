@@ -16,7 +16,7 @@
     "uuidjs": "4.2.8"
   },
   "devDependencies": {
-    "@types/faker": "5.1.7",
+    "@types/faker": "5.5.0",
     "@types/jasmine": "3.6.9",
     "@types/karma": "6.1.0",
     "@wireapp/commons": "4.1.5",
