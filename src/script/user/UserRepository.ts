@@ -505,7 +505,7 @@ export class UserRepository {
 
   async getUserByHandle(fqn: {domain?: string; handle: string}): Promise<void | APIClientUser> {
     try {
-      return this.userService.getUserByFQN(fqn);
+      return await this.userService.getUserByFQN(fqn);
     } catch (error) {
       // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
       if (!isBackendError(error) || error.code !== HTTP_STATUS.NOT_FOUND) {
