@@ -36,6 +36,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -63,7 +64,6 @@ import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
-import {isAxiosError} from 'Util/TypePredicateUtil';
 
 export class UserRepository {
   private readonly assetRepository: AssetRepository;
@@ -511,7 +511,7 @@ export class UserRepository {
       return await this.userService.getUserByFQN(fqn);
     } catch (error) {
       // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
-      if (!isAxiosError(error) || error.response.status !== HTTP_STATUS.NOT_FOUND) {
+      if (!isBackendError(error) || error.code !== HTTP_STATUS.NOT_FOUND) {
         throw error;
       }
     }
