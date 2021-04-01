@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.1.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@4.1.4...@wireapp/commons@4.1.5) (2021-04-01)
+
+**Note:** Version bump only for package @wireapp/commons
+
+
+
+
+
 ## [4.1.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@4.1.3...@wireapp/commons@4.1.4) (2021-03-24)
 
 **Note:** Version bump only for package @wireapp/commons

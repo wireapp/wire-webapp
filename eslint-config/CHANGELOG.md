@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.8.0...@wireapp/eslint-config@1.9.0) (2021-04-01)
+
+
+### Features
+
+* **eslint-config:** Add return-await rule ([#3703](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/3703)) ([e1c3086](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/e1c3086399bdb75b3bc435ec2149aaa41d7fe6d4))
+
+
+
+
+
 # 1.8.0 (2020-08-27)
 
 
