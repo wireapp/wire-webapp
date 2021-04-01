@@ -1,3 +1,22 @@
+/*
+ * Wire
+ * Copyright (C) 2018 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import React from 'react';
 import cx from 'classnames';
@@ -29,8 +48,9 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
   const assetRepository = container.resolve(AssetRepository);
   const uploadProgress = assetRepository.getUploadProgress(message.id);
 
-  // This is a hack since we don't have a FileAsset available before it's uploaded completely
-  // we have to check if there is upload progress to transition into the AssetTransferState.UPLOADING state.
+  /**
+   * This is a hack since we don't have a FileAsset available before it's uploaded completely we have to check if there is upload progress to transition into the AssetTransferState.UPLOADING state.
+   */
   const assetStatus = ko.computed(() => {
     if (uploadProgress() > 0 && uploadProgress() < 100) {
       return AssetTransferState.UPLOADING;
@@ -38,7 +58,6 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
     return asset.status();
   });
 
-  // Handlers
   const downloadAsset = () => assetRepository.downloadFile(asset);
 
   const cancelUpload = () => {
@@ -46,7 +65,6 @@ const FileAssetComponent: React.FC<FileAssetProps> = (props: FileAssetProps) => 
     amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
   };
 
-  // UI States
   const hasHeader = props.header;
   const isPendingUpload = assetStatus() === AssetTransferState.UPLOAD_PENDING;
   const isNotUploading = assetStatus() !== AssetTransferState.UPLOAD_PENDING;
