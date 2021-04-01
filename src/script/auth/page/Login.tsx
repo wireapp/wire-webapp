@@ -59,7 +59,6 @@ import {parseError, parseValidationErrors} from '../util/errorUtil';
 import {UrlUtil} from '@wireapp/commons';
 import * as URLUtil from '../util/urlUtil';
 import Page from './Page';
-import {isBackendError} from 'Util/TypePredicateUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -156,8 +155,9 @@ const Login = ({
 
       return history.push(ROUTE.HISTORY_INFO);
     } catch (error) {
-      if (isBackendError(error)) {
-        switch (error.label) {
+      if ((error as BackendError).label) {
+        const backendError = error as BackendError;
+        switch (backendError.label) {
           case BackendError.LABEL.TOO_MANY_CLIENTS: {
             resetAuthError();
             history.push(ROUTE.CLIENTS);
@@ -169,10 +169,10 @@ const Login = ({
           }
           default: {
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>
-              error.label.endsWith(errorType),
+              backendError.label.endsWith(errorType),
             );
             if (!isValidationError) {
-              throw error;
+              throw backendError;
             }
           }
         }
