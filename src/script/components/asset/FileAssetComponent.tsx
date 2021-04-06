@@ -49,9 +49,9 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header}) => {
   const uploadProgress = useKoSubscribable(assetRepository.getUploadProgress(message.id));
   const downloadProgress = useKoSubscribable(asset.downloadProgress);
 
-  /**
-   * This is a hack since we don't have a FileAsset available before it's uploaded completely we have to check if there is upload progress to transition into the AssetTransferState.UPLOADING state.
-   */
+  // This is a hack since we don't have a FileAsset available before it's
+  // uploaded completely we have to check if there is upload progress to
+  // transition into the `AssetTransferState.UPLOADING` state.
   useEffect(() => {
     if (uploadProgress > 0 && uploadProgress < 100) {
       setAssetStatus(AssetTransferState.UPLOADING);
