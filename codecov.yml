@@ -12,7 +12,7 @@ coverage:
         only_pulls: true
 
 comment:
-  layout: 'reach,diff,flags,tree'
+  layout: 'diff,tree'
   behavior: default
   require_changes: no
 
