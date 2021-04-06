@@ -18,13 +18,12 @@
  */
 
 import cx from 'classnames';
-import ko from 'knockout';
 import AssetLoader from 'Components/asset/AssetLoader';
 import React, {useEffect, useState} from 'react';
 import type {FileAsset} from '../../../entity/message/FileAsset';
 import {AssetTransferState} from '../../../assets/AssetTransferState';
 import {noop} from 'Util/util';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export interface MediaButtonProps {
   asset: FileAsset;
@@ -50,6 +49,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const onPlay = () => setIsPlaying(true);
   const onPause = () => setIsPlaying(false);
+  const unwrappedAsset = useKoSubscribableChildren(asset, ['downloadProgress']);
 
   const mediaElement = src;
 
@@ -74,18 +74,12 @@ const MediaButton: React.FC<MediaButtonProps> = ({
       })}
     >
       {isUploaded && !isPlaying && (
-        <div className="media-button media-button-play icon-play" onClick={play} data-uie-name="do-play-media"></div>
+        <div className="media-button media-button-play icon-play" onClick={play} data-uie-name="do-play-media" />
       )}
       {isUploaded && isPlaying && (
-        <div
-          className="media-button media-button-pause icon-pause"
-          onClick={pause}
-          data-uie-name="do-pause-media"
-        ></div>
+        <div className="media-button media-button-pause icon-pause" onClick={pause} data-uie-name="do-pause-media" />
       )}
-      {isDownloading && (
-        <AssetLoader large={large} loadProgress={ko.unwrap(asset.downloadProgress)} onCancel={cancel} />
-      )}
+      {isDownloading && <AssetLoader large={large} loadProgress={unwrappedAsset.downloadProgress} onCancel={cancel} />}
       {isUploading && <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel} />}
     </div>
   );
