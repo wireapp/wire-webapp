@@ -5,6 +5,11 @@ coverage:
   precision: 2
   round: down
   range: '45...80'
+  status:
+    project:
+      default:
+        informational: true
+        only_pulls: true
 
 comment:
   layout: 'reach,diff,flags,tree'
