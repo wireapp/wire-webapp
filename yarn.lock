@@ -12237,10 +12237,10 @@ slice-ansi@^4.0.0:
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
 
-snabbdom@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/snabbdom/-/snabbdom-2.1.0.tgz#cef6d44f1170574582bffdce128cfbb46d2b5f6b"
-  integrity sha512-3GPeO80A2/bob5ADrkRX8FtvW8kHbJ0aRb4XAN2MIN4bY2dprNJkhp87AgfjWgVhIkwgX9DOsuTLjWwBhMXMkQ==
+snabbdom@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/snabbdom/-/snabbdom-3.0.1.tgz#9355339e7c970be7fcd54128ccde9ee57301f222"
+  integrity sha512-H4gKokDT1HPe3dlGyTihNw0NtEH9FxZy55MXp3ODM4O30NBRe+11veox1wf/CP9NfGcbStDM3BmO1DFC9/5wRw==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
