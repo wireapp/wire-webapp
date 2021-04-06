@@ -172,7 +172,11 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
           />
           <div className="group-video-grid__element__label" css={{padding: 4}}>
             {selfIsMuted ? (
-              <span className="group-video-grid__element__label__icon" css={{'> svg': {width: 12}, height: 12}}>
+              <span
+                className="group-video-grid__element__label__icon"
+                css={{'> svg': {width: 12}, height: 12}}
+                data-uie-name="status-call-audio-muted"
+              >
                 <NamedIcon name="mic-off-icon" data-uie-name="mic-icon-off" />
               </span>
             ) : (
