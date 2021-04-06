@@ -22,7 +22,7 @@
     "babel-jest": "26.6.3",
     "babel-loader": "8.2.2",
     "babel-plugin-emotion": "10.0.33",
-    "eslint-plugin-jest": "24.3.2",
+    "eslint-plugin-jest": "24.3.4",
     "jest": "26.6.1",
     "jest-emotion": "10.0.32",
     "react": "17.0.1",
