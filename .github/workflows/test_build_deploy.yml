@@ -333,8 +333,7 @@ jobs:
 
     strategy:
       matrix:
-        # os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        os: ['ubuntu-latest', 'windows-latest']
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
 
     steps:
       - name: Checkout
@@ -419,12 +418,12 @@ jobs:
           echo "OS=linux" >> $GITHUB_ENV
           yarn build:linux
 
-      # - name: Build desktop app for macOS
-      #   if: env.BUILD_DESKTOP == 'true' && matrix.os == 'macos-latest'
-      #   working-directory: electron
-      #   run: |
-      #     echo "OS=macos" >> $GITHUB_ENV
-      #     yarn build:macos
+      - name: Build desktop app for macOS
+        if: env.BUILD_DESKTOP == 'true' && matrix.os == 'macos-latest'
+        working-directory: electron
+        run: |
+          echo "OS=macos" >> $GITHUB_ENV
+          yarn build:macos
 
       - name: Attach desktop build to staging release assets
         if: contains(env.TAG, 'staging')
