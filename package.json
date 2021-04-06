@@ -67,7 +67,7 @@
     "@types/classnames": "2.2.11",
     "@types/dexie-batch": "0.4.2",
     "@types/enzyme": "3.10.8",
-    "@types/faker": "5.1.7",
+    "@types/faker": "5.5.0",
     "@types/generate-changelog": "1.8.0",
     "@types/geolite2": "2.0.0",
     "@types/highlight.js": "10.1.0",
