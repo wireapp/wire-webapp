@@ -27,7 +27,7 @@
     "@babel/preset-typescript": "7.13.0",
     "@types/jasmine": "3.6.9",
     "@types/karma": "6.1.0",
-    "@types/ws": "7.4.0",
+    "@types/ws": "7.4.1",
     "@wireapp/react-ui-kit": "7.46.5",
     "@wireapp/store-engine": "4.5.32",
     "@wireapp/store-engine-fs": "2.2.36",
