@@ -2383,10 +2383,10 @@
   resolved "https://registry.yarnpkg.com/@types/sdp-transform/-/sdp-transform-2.4.4.tgz#e7d3b4323d1ae9fab8199508effa1620279bbf1a"
   integrity sha512-cTpXVbNaN1YL++3mYArwlaujujeVe8ty66rbZPdFWx94fxM7jFjs5X621esca40yRe45htNdXROMIr2cgI+xGg==
 
-"@types/simplebar@5.1.1":
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/@types/simplebar/-/simplebar-5.1.1.tgz#9e9a69bf86fc5225141141031d8954acdd1eae0d"
-  integrity sha512-nC9iBQ4dfvvzJ3iAbL1qCfwjUyaF8EO56l/ApcRXUFK2zLOb8GDXC55V08JZvpzkUxGHtWVunp17KKH/3/KFJA==
+"@types/simplebar@5.1.2":
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/@types/simplebar/-/simplebar-5.1.2.tgz#abfea267a227e330f0603aa9361f46eda8b72ee6"
+  integrity sha512-U5UXkL8XR3NjAZ4LNyk9slJyS6V/hGCipWc5/uwZRbDGODetQH/XxSu7M5FPCyOxBprptZVmyMRVTHBd3j5UtA==
 
 "@types/sinon@9.0.11":
   version "9.0.11"
