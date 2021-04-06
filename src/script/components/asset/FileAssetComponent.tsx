@@ -114,18 +114,16 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header}) => {
               {isFailedUpload && <div className="media-button media-button-error"></div>}
 
               <div className="file-desc">
-                <div data-uie-name="file-name">
-                  <div className="label-bold-xs ellipsis" data-uie-name="file-name">
-                    {fileName}
-                  </div>
-                  <ul className="file-desc-meta label-xs text-foreground">
-                    <li data-uie-name="file-size">{formattedFileSize}</li>
-                    {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
-                    {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
-                    {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
-                    {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
-                  </ul>
+                <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                  {fileName}
                 </div>
+                <ul className="file-desc-meta label-xs text-foreground">
+                  <li data-uie-name="file-size">{formattedFileSize}</li>
+                  {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
+                  {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
+                  {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
+                  {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
+                </ul>
               </div>
             </>
           )}
