@@ -677,7 +677,7 @@ export class UserRepository {
       try {
         await this.selfService.putSelfHandle(username);
         this.shouldSetUsername = false;
-        return this.userUpdate({user: {handle: username, id: this.userState.self().id}});
+        return await this.userUpdate({user: {handle: username, id: this.userState.self().id}});
       } catch ({code: errorCode}) {
         if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(errorCode)) {
           throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);
