@@ -20,13 +20,14 @@
 import React, {useState, useEffect, CSSProperties} from 'react';
 import {css} from '@emotion/core';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import NamedIcon from 'Components/NamedIcon';
 import type {Grid} from '../../calling/videoGridHandler';
 import Video from './Video';
 import type {Participant} from '../../calling/Participant';
 import GroupVideoGridTile from './GroupVideoGridTile';
+import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 
 export interface GroupVideoGripProps {
   grid: Grid;
@@ -93,6 +94,10 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   useEffect(() => {
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
+
+  const selfName = useKoSubscribable(selfParticipant.user.name);
+  const selfIsMuted = useKoSubscribable(selfParticipant.isMuted);
+  const selfIsActivelySpeaking = useKoSubscribable(selfParticipant.isActivelySpeaking);
 
   return (
     <div className="group-video">
@@ -165,13 +170,28 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             }}
             srcObject={thumbnailVideoStream}
           />
-          {muted && (
-            <div className="group-video-grid__mute-overlay" data-uie-name="status-call-audio-muted">
-              <span>
+          <div className="group-video-grid__element__label" css={{padding: 4}}>
+            {selfIsMuted ? (
+              <span className="group-video-grid__element__label__icon" css={{'> svg': {width: 12}, height: 12}}>
                 <NamedIcon name="mic-off-icon" data-uie-name="mic-icon-off" />
               </span>
-            </div>
-          )}
+            ) : (
+              <ParticipantMicOnIcon
+                isActive={selfIsActivelySpeaking}
+                className="group-video-grid__element__label__icon"
+                css={{'> svg': {width: 12}}}
+              />
+            )}
+            <span
+              data-uie-name={
+                selfIsActivelySpeaking ? 'status-active-speaking' : selfIsMuted ? 'status-audio-off' : 'status-audio-on'
+              }
+              className="group-video-grid__element__label__name"
+              css={{fontSize: 10}}
+            >
+              {selfName}
+            </span>
+          </div>
         </div>
       )}
     </div>
