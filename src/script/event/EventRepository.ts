@@ -245,7 +245,7 @@ export class EventRepository {
         this.currentClient().id,
         notificationId,
       );
-      return processNotifications(notificationList, abortHandler);
+      return await processNotifications(notificationList, abortHandler);
     } catch (error) {
       // When asking for /notifications with a `since` set to a notification ID that the backend doesn't know of (because it does not belong to our client or it is older than the lifetime of the notification stream),
       // we will receive a HTTP 404 status code with a `notifications` payload
@@ -317,7 +317,7 @@ export class EventRepository {
     try {
       const {notificationId} = await this.getStreamState();
       this.logger.info(`Retrieving messages from notification stream. Starting with ID "${notificationId}"...`);
-      return this.updateFromStream(notificationId, abortHandler);
+      return await this.updateFromStream(notificationId, abortHandler);
     } catch (error) {
       const isNoLastId = error.type === EventError.TYPE.NO_LAST_ID;
       if (isNoLastId) {

@@ -24,17 +24,20 @@ import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {USER_EVENT} from '@wireapp/api-client/src/event';
-import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
-import type {TraceState} from '@wireapp/api-client/src/http';
+import type {AxiosError} from 'axios';
+import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
 import type {PublicClient} from '@wireapp/api-client/src/client';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
+
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientEvent} from '../event/Client';
@@ -68,9 +71,9 @@ export class UserRepository {
   private readonly logger: Logger;
   private readonly propertyRepository: PropertiesRepository;
   private readonly selfService: SelfService;
-  private readonly userMapper: UserMapper;
   private readonly userService: UserService;
 
+  public readonly userMapper: UserMapper;
   public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
   public shouldSetUsername: boolean;
 
@@ -412,8 +415,8 @@ export class UserRepository {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error) {
-        const isNotFound = isAxiosError(error) && error.response.status === HTTP_STATUS.NOT_FOUND;
-        const isBadRequest = isBackendError(error) && error.code === HTTP_STATUS.BAD_REQUEST;
+        const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
+        const isBadRequest = Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
         if (isNotFound || isBadRequest) {
           return [];
         }
@@ -503,10 +506,9 @@ export class UserRepository {
     return user;
   }
 
-  async getUserIdByHandle(handle: string): Promise<void | string> {
+  async getUserByHandle(fqn: {domain?: string; handle: string}): Promise<void | APIClientUser> {
     try {
-      const {user: userId} = await this.userService.getUserByHandle(handle.toLowerCase());
-      return userId;
+      return await this.userService.getUserByFQN(fqn);
     } catch (error) {
       // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
       if (!isBackendError(error) || error.code !== HTTP_STATUS.NOT_FOUND) {
@@ -675,7 +677,7 @@ export class UserRepository {
       try {
         await this.selfService.putSelfHandle(username);
         this.shouldSetUsername = false;
-        return this.userUpdate({user: {handle: username, id: this.userState.self().id}});
+        return await this.userUpdate({user: {handle: username, id: this.userState.self().id}});
       } catch ({code: errorCode}) {
         if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(errorCode)) {
           throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);

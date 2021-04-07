@@ -17,6 +17,7 @@
  *
  */
 
+import ko from 'knockout';
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import TestPage from 'Util/test/TestPage';
 import MediaButton, {MediaButtonProps} from 'Components/asset/controls/MediaButton';
@@ -39,7 +40,7 @@ describe('MediaButton', () => {
     const videoElement = document.createElement('video');
 
     return {
-      asset: {downloadProgress: () => 0} as FileAsset,
+      asset: {downloadProgress: ko.pureComputed(() => 0)} as FileAsset,
       cancel: () => {},
       large: false,
       pause: () => {

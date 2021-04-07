@@ -159,35 +159,40 @@ export class SearchRepository {
    * Search for users on the backend by name.
    * @note We skip a few results as connection changes need a while to reflect on the backend.
    *
-   * @param name Search query
+   * @param query Search query
    * @param isHandle Is query a user handle
    * @param maxResults Maximum number of results
    * @returns Resolves with the search results
    */
-  searchByName(
-    name: string,
+  async searchByName(
+    query: string,
     isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
   ): Promise<User[]> {
-    const directorySearch = this.searchService
-      .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
+    const matchedUserIdsFromDirectorySearch: string[] = await this.searchService
+      .getContacts(query, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
       .then(({documents}) => documents.map(match => match.id));
 
-    const searchPromises: Promise<any>[] = [directorySearch];
+    const userIds: string[] = [...matchedUserIdsFromDirectorySearch];
+    const userEntities = await this.userRepository.getUsersById(userIds);
 
-    if (validateHandle(name)) {
-      searchPromises.push(this.userRepository.getUserIdByHandle(name));
+    const domain = query.includes('@') ? query.substr(query.lastIndexOf('@') + 1) : undefined;
+    const name = domain ? query.substr(0, query.indexOf('@')) : query;
+
+    if (validateHandle(name, domain)) {
+      const apiUser = await this.userRepository.getUserByHandle({domain, handle: name});
+      if (apiUser) {
+        const knownUser = userEntities.find(
+          user => user.id === apiUser.id && user.domain === apiUser.qualified_id?.domain,
+        );
+        if (!knownUser) {
+          const matchedUser = this.userRepository.userMapper.mapUserFromJson(apiUser);
+          userEntities.push(matchedUser);
+        }
+      }
     }
 
-    return Promise.all(searchPromises)
-      .then(([directoryResults, usernameResult]) => {
-        if (usernameResult && !directoryResults.includes(usernameResult)) {
-          directoryResults.push(usernameResult);
-        }
-
-        return directoryResults;
-      })
-      .then(userIds => this.userRepository.getUsersById(userIds))
+    return Promise.resolve(userEntities)
       .then(userEntities => {
         return userEntities.filter(userEntity => {
           return !userEntity.isMe && !userEntity.isConnected() && !userEntity.isTeamMember();
@@ -195,14 +200,14 @@ export class SearchRepository {
       })
       .then(userEntities => {
         if (isHandle) {
-          userEntities = userEntities.filter(userEntity => startsWith(userEntity.username(), name));
+          userEntities = userEntities.filter(userEntity => startsWith(userEntity.username(), query));
         }
 
         return userEntities
           .sort((userA, userB) => {
             return isHandle
-              ? sortByPriority(userA.username(), userB.username(), name)
-              : sortByPriority(userA.name(), userB.name(), name);
+              ? sortByPriority(userA.username(), userB.username(), query)
+              : sortByPriority(userA.name(), userB.name(), query);
           })
           .slice(0, maxResults);
       });
