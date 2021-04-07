@@ -24,17 +24,20 @@ import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {USER_EVENT} from '@wireapp/api-client/src/event';
-import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
-import type {TraceState} from '@wireapp/api-client/src/http';
+import type {AxiosError} from 'axios';
+import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
 import type {PublicClient} from '@wireapp/api-client/src/client';
+import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError} from 'Util/TypePredicateUtil';
+
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
 import {ClientEvent} from '../event/Client';
@@ -412,8 +415,8 @@ export class UserRepository {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error) {
-        const isNotFound = isAxiosError(error) && error.response.status === HTTP_STATUS.NOT_FOUND;
-        const isBadRequest = isBackendError(error) && error.code === HTTP_STATUS.BAD_REQUEST;
+        const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
+        const isBadRequest = Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
         if (isNotFound || isBadRequest) {
           return [];
         }
@@ -674,7 +677,7 @@ export class UserRepository {
       try {
         await this.selfService.putSelfHandle(username);
         this.shouldSetUsername = false;
-        return this.userUpdate({user: {handle: username, id: this.userState.self().id}});
+        return await this.userUpdate({user: {handle: username, id: this.userState.self().id}});
       } catch (error) {
         if ([HTTP_STATUS.CONFLICT, HTTP_STATUS.BAD_REQUEST].includes(error.code)) {
           throw new UserError(UserError.TYPE.USERNAME_TAKEN, UserError.MESSAGE.USERNAME_TAKEN);

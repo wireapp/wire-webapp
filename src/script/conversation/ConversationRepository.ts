@@ -2349,7 +2349,7 @@ export class ConversationRepository {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
       const conversationEntity = await this.getConversationById(eventData.conversation_id);
-      return this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
+      return await this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
     } catch (error) {
       this.logger.info(
         `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
@@ -2390,7 +2390,7 @@ export class ConversationRepository {
         this.logger.debug(logMessage, {changes, event: eventJson});
 
         this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
-        return this.prepareReactionNotification(conversationEntity, messageEntity, eventJson);
+        return await this.prepareReactionNotification(conversationEntity, messageEntity, eventJson);
       }
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
