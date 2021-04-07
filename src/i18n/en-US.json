@@ -921,7 +921,7 @@
   "searchTeamMembers": "Team members",
   "searchTopPeople": "Top people",
   "searchTrySearch": "Find people by\nname or username",
-  "searchTrySearchFederation": "Find people in Wire by name or\n@username.\n\nFind people from another domain\nby @username@domainname.",
+  "searchTrySearchFederation": "Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname",
   "searchTrySearchLearnMore": "Learn more",
   "setEmail.button": "Set email",
   "setEmail.emailPlaceholder": "Email",
