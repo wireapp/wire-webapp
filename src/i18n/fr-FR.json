@@ -921,6 +921,8 @@
   "searchTeamMembers": "Membres de l’équipe",
   "searchTopPeople": "Contacts favoris",
   "searchTrySearch": "Trouver des contacts par\nnom ou identifiant",
+  "searchTrySearchFederation": "Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname",
+  "searchTrySearchLearnMore": "Learn more",
   "setEmail.button": "Définir une adresse e-mail",
   "setEmail.emailPlaceholder": "E-mail",
   "setEmail.headline": "Définir une adresse e-mail",
