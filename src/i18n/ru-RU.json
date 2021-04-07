@@ -443,7 +443,7 @@
   "groupParticipantActionSendRequest": "Связаться",
   "groupParticipantActionUnblock": "Разблокировать…",
   "groupSizeInfo": "К групповой беседе могут присоединиться до {{count}} человек.",
-  "guestOptionsCopyLink": "Копировать ссылку",
+  "guestOptionsCopyLink": "Скопировать ссылку",
   "guestOptionsCopyLinkDone": "Ссылка скопирована!",
   "guestOptionsCreateLink": "Создать ссылку",
   "guestOptionsInfoHeader": "Пригласить других пользователей ссылкой",
