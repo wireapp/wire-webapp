@@ -44,13 +44,16 @@
             <!-- /ko -->
             <!-- ko ifnot: showOnlyConnectedUsers() -->
               <!-- ko if: enableFederation -->
-                <people-icon class="start-ui-no-contacts__icon"></people-icon>
-              <!-- /ko -->
-                <div class="start-ui-no-search-results" data-bind="text: enableFederation ? t('searchTrySearchFederation') : t('searchTrySearch')"></div>
-              <!-- ko if: enableFederation -->
-                <div class="start-ui-learn-more-button">
-                  <button class="button" data-bind="click: () => {}, text: t('searchTrySearchLearnMore')" data-uie-name="do-search-learn-more" />
+                <div class="start-ui-fed-wrapper">
+                  <profile-icon class="start-ui-fed-wrapper__icon"></profile-icon>
+                  <div class="start-ui-fed-wrapper__text" data-bind="text: t('searchTrySearchFederation')"></div>
+                  <div class="start-ui-fed-wrapper__button">
+                    <button data-bind="click: () => {}, text: t('searchTrySearchLearnMore')" data-uie-name="do-search-learn-more" />
+                  </div>
                 </div>
+              <!-- /ko -->
+              <!-- ko ifnot: enableFederation -->
+                <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
               <!-- /ko -->
             <!-- /ko -->
           <!-- /ko -->

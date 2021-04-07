@@ -232,18 +232,6 @@
   font-weight: normal;
 }
 
-.start-ui-learn-more-button {
-  display: flex;
-  justify-content: center;
-  margin: auto;
-  margin-top: 32px;
-  text-align: center;
-
-  button + button {
-    margin-left: 16px;
-  }
-}
-
 .start-ui-import-buttons {
   display: flex;
   align-items: center;
@@ -304,6 +292,52 @@
 
     &--alternate {
       background-color: @separator-color;
+    }
+  }
+}
+
+.start-ui-fed-wrapper {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  &__icon {
+    opacity: 0.24;
+
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  &__text {
+    margin-top: 24px;
+    font-size: 12px;
+    font-weight: @font-weight-bold;
+    text-align: center;
+    white-space: pre;
+  }
+
+  &__button {
+    display: flex;
+    justify-content: center;
+    margin: 16px;
+    text-align: center;
+
+    button {
+      display: inline-block;
+      padding: 4px 16px;
+      border: none;
+      background-color: rgba(186, 200, 209, 0.24);
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: @font-weight-bold;
+
+      & + button {
+        margin-left: 16px;
+      }
     }
   }
 }
