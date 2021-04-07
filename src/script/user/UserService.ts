@@ -78,8 +78,16 @@ export class UserService {
     return this.apiClient.user.api.headHandle(handle);
   }
 
-  getUserByHandle(handle: string): Promise<{user: string}> {
-    return this.apiClient.user.api.getHandle(handle);
+  async getUserByFQN(fqn: {domain?: string; handle: string}): Promise<APIClientUser> {
+    const {domain, handle} = fqn;
+    if (domain) {
+      return this.apiClient.user.api.getUserByHandle({
+        domain,
+        handle,
+      });
+    }
+    const {user: userId} = await this.apiClient.user.api.getHandle(fqn.handle);
+    return this.apiClient.user.api.getUser(userId);
   }
 
   /**

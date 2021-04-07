@@ -479,7 +479,7 @@ export class PreferencesAccountViewModel {
     try {
       const isValid = await validateProfileImageResolution(newUserPicture, minWidth, minHeight);
       if (isValid) {
-        return this.userRepository.changePicture(newUserPicture);
+        return await this.userRepository.changePicture(newUserPicture);
       }
 
       const messageString = t('modalPictureTooSmallMessage');

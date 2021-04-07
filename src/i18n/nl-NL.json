@@ -921,6 +921,8 @@
   "searchTeamMembers": "Teamleden",
   "searchTopPeople": "Frequente personen",
   "searchTrySearch": "Vind mensen met hun \nnaam of gebruikersnaam",
+  "searchTrySearchFederation": "Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname",
+  "searchTrySearchLearnMore": "Learn more",
   "setEmail.button": "Set email",
   "setEmail.emailPlaceholder": "Email",
   "setEmail.headline": "Set email",

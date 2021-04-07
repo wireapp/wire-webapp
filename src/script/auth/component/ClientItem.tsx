@@ -22,7 +22,6 @@ import {
   COLOR,
   ContainerXS,
   DeviceIcon,
-  ErrorMessage,
   Form,
   Input,
   InputSubmitCombo,
@@ -275,9 +274,9 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       {validationError && selected ? (
         <div style={{margin: '16px 0 0 0'}}>{parseValidationErrors(validationError)}</div>
       ) : clientError && selected ? (
-        <ErrorMessage style={{margin: '16px 0 0 0'}} data-uie-name="error-message">
+        <div style={{margin: '16px 0 0 0'}} data-uie-name="error-message">
           {parseError(clientError)}
-        </ErrorMessage>
+        </div>
       ) : null}
     </ContainerXS>
   );

@@ -47,7 +47,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 import './asset/audioAsset';
-import './asset/fileAsset';
+import './asset/FileAssetComponent';
 import './asset/imageAsset';
 import './asset/linkPreviewAsset';
 import './asset/LocationAsset';

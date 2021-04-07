@@ -17,7 +17,7 @@
  *
  */
 
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import {Runtime} from '@wireapp/commons';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
@@ -43,12 +43,14 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import 'webrtc-adapter';
 import {container} from 'tsyringe';
+
 import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {flatten} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
+
 import {Config} from '../Config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -78,7 +80,6 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
-import {isAxiosError} from 'Util/TypePredicateUtil';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -253,7 +254,7 @@ export class CallingRepository {
     try {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
-      const mismatch: ClientMismatch = isAxiosError(error) && error.response?.data;
+      const mismatch: ClientMismatch = (error as AxiosError).response!.data;
       const localClients: UserClients = await this.messageRepository.createRecipients(conversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>

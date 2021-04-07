@@ -2390,7 +2390,7 @@ export class ConversationRepository {
         this.logger.debug(logMessage, {changes, event: eventJson});
 
         this.eventService.updateEventSequentially(messageEntity.primary_key, changes);
-        return this.prepareReactionNotification(conversationEntity, messageEntity, eventJson);
+        return await this.prepareReactionNotification(conversationEntity, messageEntity, eventJson);
       }
     } catch (error) {
       const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;

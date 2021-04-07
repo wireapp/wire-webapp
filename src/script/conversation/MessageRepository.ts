@@ -686,7 +686,7 @@ export class MessageRepository {
 
         if (messageContentUnchanged) {
           this.logger.debug(`Sending link preview for message '${messageId}' in conversation '${conversationId}'`);
-          return this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
+          return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
         }
 
         this.logger.debug(`Skipped sending link preview as message '${messageId}' in '${conversationId}' changed`);
@@ -1154,7 +1154,7 @@ export class MessageRepository {
       }
       this.conversationRepositoryProvider().checkMessageTimer(messageEntity);
       if ((EventTypeHandling.STORE as string[]).includes(messageEntity.type) || messageEntity.hasAssetImage()) {
-        return this.eventService.updateEvent(messageEntity.primary_key, changes);
+        return await this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
     } catch (error) {
       if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
@@ -1195,7 +1195,7 @@ export class MessageRepository {
       await this.grantOutgoingMessage(eventInfoEntity, undefined, checkLegalHold);
       const sendAsExternal = await this.shouldSendAsExternal(eventInfoEntity);
       if (sendAsExternal) {
-        return this.sendExternalGenericMessage(eventInfoEntity);
+        return await this.sendExternalGenericMessage(eventInfoEntity);
       }
 
       const {genericMessage, options} = eventInfoEntity;

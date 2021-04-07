@@ -42,7 +42,6 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
-import {isAxiosError, isCryptographyError} from 'Util/TypePredicateUtil';
 
 export interface SignalingKeys {
   enckey: string;
@@ -337,7 +336,7 @@ export class CryptographyRepository {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
         const sessionId = this.constructSessionId(userId, clientId);
         const preKeyArray = base64ToArray(preKey.key);
-        return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
+        return await this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
       const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
@@ -484,8 +483,8 @@ export class CryptographyRepository {
     error: AxiosError | CryptographyError | ProteusErrors.DecryptError,
     event: EventRecord,
   ) {
-    const errorCode = isAxiosError(error)
-      ? error.response?.status
+    const errorCode = (error as AxiosError).code
+      ? parseInt((error as AxiosError).code, 10)
       : CryptographyRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
 
     const {data: eventData, from: remoteUserId, time: formattedTime} = event;
@@ -498,7 +497,8 @@ export class CryptographyRepository {
       throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }
 
-    if (isCryptographyError(error) && error.type === CryptographyError.TYPE.PREVIOUSLY_STORED) {
+    const isCryptographyError = error instanceof CryptographyError;
+    if (isCryptographyError && (error as CryptographyError).type === CryptographyError.TYPE.PREVIOUSLY_STORED) {
       const message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is already persisted.`;
       throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }
