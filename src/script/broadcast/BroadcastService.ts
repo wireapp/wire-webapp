@@ -17,10 +17,13 @@
  *
  */
 
-import type {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/src/conversation';
+import type {ClientMismatch, NewOTRMessage, OTRRecipients} from '@wireapp/api-client/src/conversation';
+import {NewOtrMessage, IUserEntry, IClientEntry} from '@wireapp/protocol-messaging/web/otr';
+import Long from 'long';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
+import {uuidToBytes} from '../util/StringUtil';
 
 export class BroadcastService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
@@ -46,5 +49,61 @@ export class BroadcastService {
     }
 
     return this.apiClient.broadcast.api.postBroadcastMessage(payload.sender, payload, ignoreMissing);
+  }
+
+  /**
+   * Post an encrypted message to broadcast it.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/postOtrBroadcast
+   *
+   * @param payload Payload to be posted
+   * @param preconditionOption Level that backend checks for missing clients
+   * @returns Promise that resolves when the message was sent
+   */
+  postBroadcastProtobufMessage(
+    payload: NewOTRMessage<Uint8Array>,
+    preconditionOption: string[] | boolean,
+  ): Promise<ClientMismatch> {
+    const reportMissing = Array.isArray(preconditionOption) ? preconditionOption : undefined;
+    const ignoreMissing = preconditionOption === true ? true : undefined;
+
+    if (reportMissing) {
+      payload.report_missing = reportMissing;
+    }
+
+    function buildProtobuf(recipients: OTRRecipients<Uint8Array>, nativePush: boolean): NewOtrMessage {
+      const userEntries: IUserEntry[] = Object.entries(recipients).map(([userId, otrClientMap]) => {
+        const clients: IClientEntry[] = Object.entries(otrClientMap).map(([clientId, payload]) => {
+          return {
+            client: {
+              client: Long.fromString(clientId, 16),
+            },
+            text: payload,
+          };
+        });
+
+        return {
+          clients,
+          user: {
+            uuid: uuidToBytes(userId),
+          },
+        };
+      });
+
+      return NewOtrMessage.create({
+        nativePush,
+        recipients: userEntries,
+        reportMissing: (reportMissing || []).map(userId => ({uuid: uuidToBytes(userId)})),
+        sender: {
+          client: Long.fromString(payload.sender, 16),
+        },
+      });
+    }
+
+    return this.apiClient.broadcast.api.postBroadcastProtobufMessage(
+      payload.sender,
+      buildProtobuf(payload.recipients, payload.native_push),
+      ignoreMissing,
+    );
   }
 }
