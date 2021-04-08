@@ -910,6 +910,7 @@
   "searchNoServicesManager": "Сервіси та помічники, які можуть поліпшити ваш робочий процес.",
   "searchNoServicesMember": "Сервіси та помічники, які можуть поліпшити ваш робочий процес. Щоб увімкнути їх, зверніться до адміністратора вашої команди.",
   "searchOthers": "Додати до контактів",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Список контактів",
   "searchPlaceholder": "Пошук за іменем або ніком",
