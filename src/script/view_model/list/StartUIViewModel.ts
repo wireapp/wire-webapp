@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -49,6 +50,7 @@ import type {Conversation} from '../../entity/Conversation';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationState} from '../../conversation/ConversationState';
+import {isBackendError} from '../../util/TypePredicateUtil';
 
 export class StartUIViewModel {
   readonly brandName: string;
@@ -64,6 +66,7 @@ export class StartUIViewModel {
   readonly shouldUpdateScrollbar: ko.Computed<number>;
   readonly showSearchResults: ko.PureComputed<boolean>;
   readonly showContacts: ko.PureComputed<boolean>;
+  readonly showFederatedDomainNotAvailable: ko.Observable<boolean>;
   readonly searchInput: ko.Observable<string>;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly peopleTabActive: ko.PureComputed<boolean>;
@@ -196,6 +199,7 @@ export class StartUIViewModel {
     this.showContent = ko.pureComputed(() => this.showContacts() || this.showMatches() || this.showSearchResults());
     this.showCreateGuestRoom = ko.pureComputed(() => this.isTeam());
     this.showInvitePeople = ko.pureComputed(() => !this.isTeam());
+    this.showFederatedDomainNotAvailable = ko.observable(false);
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
     this.showInviteMember = ko.pureComputed(
@@ -424,6 +428,7 @@ export class StartUIViewModel {
   };
 
   private readonly searchRemote = async (normalizedQuery: string, isHandle: boolean): Promise<void> => {
+    this.showFederatedDomainNotAvailable(false);
     try {
       const userEntities = await this.searchRepository.searchByName(normalizedQuery, isHandle);
 
@@ -447,6 +452,9 @@ export class StartUIViewModel {
         }
       }
     } catch (error) {
+      if (isBackendError(error) && error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+        this.showFederatedDomainNotAvailable(true);
+      }
       this.logger.error(`Error searching for contacts: ${error.message}`, error);
     }
   };
