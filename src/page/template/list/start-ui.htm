@@ -35,6 +35,13 @@
             <!-- /ko -->
           <!-- /ko -->
 
+          <!-- ko if: showFederatedDomainNotAvailable() -->
+            <div class="start-ui-list-search-results">
+              <span data-bind="text: t('searchFederatedDomainNotAvailable')"></span>
+              <a rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
+            </div>
+          <!-- /ko -->
+
           <!-- ko if: showNoSearchResults() -->
             <!-- ko if: showOnlyConnectedUsers() -->
               <div class="start-ui-no-search-results__content">
@@ -103,13 +110,6 @@
               </div>
             <!-- /ko -->
           <!-- /ko -->
-
-        <!-- ko if: showFederatedDomainNotAvailable() -->
-          <div class="start-ui-list-search-results">
-            <span data-bind="text: t('searchFederatedDomainNotAvailable')"></span>
-            <a rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
-          </div>
-        <!-- /ko -->
 
           <!-- ko if: showSearchResults() -->
             <div class="start-ui-list-search-results">
