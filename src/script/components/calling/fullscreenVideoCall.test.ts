@@ -120,11 +120,10 @@ describe('fullscreenVideoCall', () => {
     const props = createProps();
     props.callActions.setMaximizedTileVideoParticipant = setMaximizedSpy;
     props.callActions.setVideoSpeakersActiveTab = () => {};
-    props.call.participants([
-      new Participant(new User('a'), 'a'),
-      new Participant(new User('b'), 'b'),
-      new Participant(new User('c'), 'c'),
-    ]);
+    props.call.addParticipant(new Participant(new User('a'), 'a'));
+    props.call.addParticipant(new Participant(new User('b'), 'b'));
+    props.call.addParticipant(new Participant(new User('c'), 'c'));
+
     const fullscreenVideoCall = new FullscreenVideoCallPage(props);
     const activeSpeakerToggle = fullscreenVideoCall.getActiveSpeakerToggle();
 

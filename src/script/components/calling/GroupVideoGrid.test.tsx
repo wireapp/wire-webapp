@@ -31,7 +31,7 @@ class GroupVideoGridPage extends TestPage<GroupVideoGripProps> {
   getGridsWrapper = () => this.get('div[data-uie-name="grids-wrapper"]');
   getPausedGrid = () => this.get('div[data-uie-name="status-video-paused"]');
   getThumbnail = () => this.get('div[data-uie-name="self-video-thumbnail-wrapper"]');
-  getThumbnailMutedIcon = () => this.get('div[data-uie-name="status-call-audio-muted"]');
+  getThumbnailMutedIcon = () => this.get('[data-uie-name="status-call-audio-muted"]');
 
   doubleClickOnGridFirstChild = () => this.doubleClick(this.getGridsWrapper().childAt(0));
 }
@@ -113,6 +113,7 @@ describe('GroupVideoGrid', () => {
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     participant.setVideoStream(new MediaStream());
+    participant.isMuted(true);
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [],
@@ -135,6 +136,7 @@ describe('GroupVideoGrid', () => {
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     participant.setVideoStream(new MediaStream());
+    participant.isMuted(true);
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [],
