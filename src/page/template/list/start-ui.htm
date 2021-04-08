@@ -43,7 +43,18 @@
               </div>
             <!-- /ko -->
             <!-- ko ifnot: showOnlyConnectedUsers() -->
-              <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
+              <!-- ko if: enableFederation -->
+                <div class="start-ui-fed-wrapper">
+                  <profile-icon class="start-ui-fed-wrapper__icon"></profile-icon>
+                  <div class="start-ui-fed-wrapper__text" data-bind="text: t('searchTrySearchFederation')"></div>
+                  <div class="start-ui-fed-wrapper__button">
+                    <button data-bind="click: () => {}, text: t('searchTrySearchLearnMore')" data-uie-name="do-search-learn-more" />
+                  </div>
+                </div>
+              <!-- /ko -->
+              <!-- ko ifnot: enableFederation -->
+                <div class="start-ui-no-search-results" data-bind="text: t('searchTrySearch')"></div>
+              <!-- /ko -->
             <!-- /ko -->
           <!-- /ko -->
 
@@ -126,12 +137,6 @@
               </div>
             </div>
           <!-- /ko -->
-        <!-- /ko -->
-
-        <!-- ko if: showFederatedDomainNotAvailable() -->
-          <div class="start-ui-list-search-results">
-            The federated domain is currently not available. Learn more
-          </div>
         <!-- /ko -->
 
         <!-- ko ifnot: peopleTabActive() -->
