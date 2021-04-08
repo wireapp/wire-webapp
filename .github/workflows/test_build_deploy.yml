@@ -106,7 +106,7 @@ jobs:
         uses: codecov/codecov-action@v1.3.2
         with:
           fail_ci_if_error: false
-          files: coverage/clover.xml
+          files: ./coverage/lcov-report/lcov.info
           flags: unittests
 
       - name: Build
