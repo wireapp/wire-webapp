@@ -983,7 +983,7 @@ export class MessageRepository {
           this.sendGenericMessage(eventInfoEntity, true);
         });
       });
-      return this.deleteMessageById(conversationEntity, messageId);
+      return await this.deleteMessageById(conversationEntity, messageId);
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
