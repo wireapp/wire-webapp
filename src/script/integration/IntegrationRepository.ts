@@ -134,7 +134,7 @@ export class IntegrationRepository {
       );
 
       if (conversationEntity) {
-        return this.addService(conversationEntity, serviceEntity).then(() => conversationEntity);
+        return await this.addService(conversationEntity, serviceEntity).then(() => conversationEntity);
       }
 
       throw new ConversationError(

@@ -234,7 +234,7 @@ export class MessageRepository {
     }
 
     try {
-      return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
+      return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
     } catch (error) {
       if (!this.isUserCancellationError(error)) {
         this.logger.error(`Error while sending knock: ${error.message}`, error);
@@ -261,7 +261,7 @@ export class MessageRepository {
   ): Promise<ConversationEvent | undefined> {
     try {
       const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
-      return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
+      return await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
     } catch (error) {
       if (!this.isUserCancellationError(error)) {
         this.logger.error(`Error while sending text message: ${error.message}`, error);
@@ -316,7 +316,7 @@ export class MessageRepository {
 
     try {
       await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
-      return this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
+      return await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
     } catch (error) {
       if (!this.isUserCancellationError(error)) {
         this.logger.error(`Error while editing message: ${error.message}`, error);
@@ -546,7 +546,7 @@ export class MessageRepository {
       if (conversationEntity.messageTimer()) {
         genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
       }
-      return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
+      return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
     } catch (error) {
       const log = `Failed to upload metadata for asset in conversation '${conversationEntity.id}': ${error.message}`;
       this.logger.warn(log, error);
@@ -686,7 +686,7 @@ export class MessageRepository {
 
         if (messageContentUnchanged) {
           this.logger.debug(`Sending link preview for message '${messageId}' in conversation '${conversationId}'`);
-          return this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
+          return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
         }
 
         this.logger.debug(`Skipped sending link preview as message '${messageId}' in '${conversationId}' changed`);
@@ -771,7 +771,7 @@ export class MessageRepository {
       } else {
         this.logger.warn('No local session found to delete.');
       }
-      return this.sendSessionReset(user_id, client_id, conversation_id);
+      return await this.sendSessionReset(user_id, client_id, conversation_id);
     } catch (error) {
       const logMessage = `Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`;
       this.logger.warn(logMessage, error);
@@ -983,7 +983,7 @@ export class MessageRepository {
           this.sendGenericMessage(eventInfoEntity, true);
         });
       });
-      return this.deleteMessageById(conversationEntity, messageId);
+      return await this.deleteMessageById(conversationEntity, messageId);
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
@@ -1016,7 +1016,7 @@ export class MessageRepository {
 
       const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
       await this.sendGenericMessageToConversation(eventInfoEntity);
-      return this.deleteMessageById(conversationEntity, messageEntity.id);
+      return await this.deleteMessageById(conversationEntity, messageEntity.id);
     } catch (error) {
       this.logger.info(
         `Failed to send delete message with id '${messageEntity.id}' for conversation '${conversationEntity.id}'`,
@@ -1154,7 +1154,7 @@ export class MessageRepository {
       }
       this.conversationRepositoryProvider().checkMessageTimer(messageEntity);
       if ((EventTypeHandling.STORE as string[]).includes(messageEntity.type) || messageEntity.hasAssetImage()) {
-        return this.eventService.updateEvent(messageEntity.primary_key, changes);
+        return await this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
     } catch (error) {
       if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
@@ -1195,13 +1195,13 @@ export class MessageRepository {
       await this.grantOutgoingMessage(eventInfoEntity, undefined, checkLegalHold);
       const sendAsExternal = await this.shouldSendAsExternal(eventInfoEntity);
       if (sendAsExternal) {
-        return this.sendExternalGenericMessage(eventInfoEntity);
+        return await this.sendExternalGenericMessage(eventInfoEntity);
       }
 
       const {genericMessage, options} = eventInfoEntity;
       const payload = await this.cryptography_repository.encryptGenericMessage(options.recipients, genericMessage);
       payload.native_push = options.nativePush;
-      return this.sendEncryptedMessage(eventInfoEntity, payload);
+      return await this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
       const isRequestTooLarge = error.code === HTTP_STATUS.REQUEST_TOO_LONG;
       if (isRequestTooLarge) {
@@ -1635,7 +1635,7 @@ export class MessageRepository {
       );
       payload.data = arrayToBase64(encryptedAsset.cipherText);
       payload.native_push = options.nativePush;
-      return this.sendEncryptedMessage(eventInfoEntity, payload);
+      return await this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
       this.logger.info('Failed sending external message', error);
       throw error;

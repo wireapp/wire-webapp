@@ -921,6 +921,8 @@
   "searchTeamMembers": "团队成员",
   "searchTopPeople": "常用联系人",
   "searchTrySearch": "通过昵称或用户名寻找好友",
+  "searchTrySearchFederation": "Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname",
+  "searchTrySearchLearnMore": "Learn more",
   "setEmail.button": "Set email",
   "setEmail.emailPlaceholder": "Email",
   "setEmail.headline": "Set email",

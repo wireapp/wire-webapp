@@ -921,6 +921,8 @@
   "searchTeamMembers": "Учасники команди",
   "searchTopPeople": "Топ-контакти",
   "searchTrySearch": "Шукайте людай\nза іменем або ніком",
+  "searchTrySearchFederation": "Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname",
+  "searchTrySearchLearnMore": "Learn more",
   "setEmail.button": "Ввести Email",
   "setEmail.emailPlaceholder": "Email",
   "setEmail.headline": "Ввести Email",

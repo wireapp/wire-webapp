@@ -202,7 +202,7 @@ export class EventService {
     try {
       const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
       return this.storageService.db
-        ? (events as Dexie.Collection<any, any>).reverse().sortBy('time')
+        ? await (events as Dexie.Collection<any, any>).reverse().sortBy('time')
         : (events as EventRecord[]).reverse().sort(compareEventsByTime);
     } catch (error) {
       const message = `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`;

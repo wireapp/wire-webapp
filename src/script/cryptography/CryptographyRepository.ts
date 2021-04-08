@@ -336,7 +336,7 @@ export class CryptographyRepository {
         this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
         const sessionId = this.constructSessionId(userId, clientId);
         const preKeyArray = base64ToArray(preKey.key);
-        return this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
+        return await this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
       const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;

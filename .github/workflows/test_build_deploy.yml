@@ -103,14 +103,11 @@ jobs:
       - name: Monitor coverage
         # Run for all PRs with DISTRIBUTION == 'wire'
         if: matrix.DISTRIBUTION == 'DISTRIBUTION_0' && github.event_name == 'pull_request'
-        uses: slavcodev/coverage-monitor-action@1.2.0
+        uses: codecov/codecov-action@v1.3.2
         with:
-          # This needs Otto's GitHub token since a user who created a PR might not be able
-          # to post here (e.g. Dependabot)
-          github_token: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
-          clover_file: coverage/clover.xml
-          threshold_alert: ${{env.TEST_COVERAGE_FAIL_THRESHOLD}}
-          threshold_warning: ${{env.TEST_COVERAGE_WARNING_THRESHOLD}}
+          fail_ci_if_error: false
+          files: coverage/clover.xml
+          flags: unittests
 
       - name: Build
         # Run for all pushes to master/dev with DISTRIBUTION == 'wire'
@@ -333,8 +330,7 @@ jobs:
 
     strategy:
       matrix:
-        # os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
-        os: ['ubuntu-latest', 'windows-latest']
+        os: ['ubuntu-latest', 'windows-latest', 'macos-latest']
 
     steps:
       - name: Checkout
@@ -419,12 +415,12 @@ jobs:
           echo "OS=linux" >> $GITHUB_ENV
           yarn build:linux
 
-      # - name: Build desktop app for macOS
-      #   if: env.BUILD_DESKTOP == 'true' && matrix.os == 'macos-latest'
-      #   working-directory: electron
-      #   run: |
-      #     echo "OS=macos" >> $GITHUB_ENV
-      #     yarn build:macos
+      - name: Build desktop app for macOS
+        if: env.BUILD_DESKTOP == 'true' && matrix.os == 'macos-latest'
+        working-directory: electron
+        run: |
+          echo "OS=macos" >> $GITHUB_ENV
+          yarn build:macos
 
       - name: Attach desktop build to staging release assets
         if: contains(env.TAG, 'staging')

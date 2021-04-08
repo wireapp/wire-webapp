@@ -921,6 +921,8 @@
   "searchTeamMembers": "Komandos dalyviai",
   "searchTopPeople": "Svarbiausi žmonės",
   "searchTrySearch": "Raskite žmones pagal vardą arba naudotojo vardą",
+  "searchTrySearchFederation": "Find people in Wire by name or\n@username\n\nFind people from another domain\nby @username@domainname",
+  "searchTrySearchLearnMore": "Learn more",
   "setEmail.button": "Set email",
   "setEmail.emailPlaceholder": "Email",
   "setEmail.headline": "Set email",

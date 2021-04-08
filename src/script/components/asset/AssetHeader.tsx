@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 import cx from 'classnames';
 
 import {formatDayMonthNumeral, formatTimeShort} from 'Util/TimeUtil';
@@ -34,14 +34,14 @@ const AssetHeader: React.FC<AssetHeaderProps> = ({message}) => {
   const timeText = `${formatDayMonthNumeral(timestamp)} ${formatTimeShort(timestamp)}`;
 
   return (
-    <Fragment>
-      <span className={cx('asset-header-name', message.accent_color)} data-uie-name="asset-header-user-name">
+    <div className="asset-header">
+      <span className={cx('asset-header-name', message.accent_color())} data-uie-name="asset-header-user-name">
         {message.user().name()}
       </span>
       <span className="asset-header-time" data-uie-name="asset-header-time">
         {timeText}
       </span>
-    </Fragment>
+    </div>
   );
 };
 
@@ -49,5 +49,5 @@ export default AssetHeader;
 
 registerReactComponent('asset-header', {
   component: AssetHeader,
-  template: '<div class="asset-header" data-bind="react: {message}"></div>',
+  template: '<div data-bind="react: {message}"></div>',
 });
