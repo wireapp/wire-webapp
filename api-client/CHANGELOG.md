@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.5.5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.4...@wireapp/api-client@12.5.5) (2021-04-09)
+
+
+### Bug Fixes
+
+* **api-client:** Correct return type to list clients ([#3723](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3723)) ([82c9cbe](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/82c9cbe067dff67f7848063e3ba5861ff4a651e6))
+
+
+
+
+
 ## [12.5.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.3...@wireapp/api-client@12.5.4) (2021-04-01)
 
 **Note:** Version bump only for package @wireapp/api-client
