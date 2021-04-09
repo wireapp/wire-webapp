@@ -233,7 +233,7 @@ exports[`"Text" renders with color 1`] = `
 }
 
 .emotion-0 {
-  color: #0c78ba;
+  color: #0772de;
   display: inline;
   font-size: 16px;
   font-weight: 300;
