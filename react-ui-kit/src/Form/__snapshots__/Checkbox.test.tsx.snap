@@ -25,11 +25,11 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #0c78ba url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
-  border-color: #0c78ba;
+  border-color: #0772de;
 }
 
 .emotion-1::before {
@@ -46,7 +46,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 .emotion-1 a {
-  color: #0c78ba;
+  color: #0772de;
   display: inline;
   font-size: 16px;
   font-weight: 300;
@@ -61,13 +61,13 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 .emotion-1 a:hover {
-  color: rgb(10,101,156);
+  color: rgb(6,96,187);
 }
 
 .emotion-1 a:visited,
 .emotion-1 a:link,
 .emotion-1 a:active {
-  color: #0c78ba;
+  color: #0772de;
 }
 
 .emotion-3 {
@@ -81,7 +81,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #bac8d1;
-  caret-color: #0c78ba;
+  caret-color: #0772de;
   color: #fff;
   font-weight: 300;
   height: 56px;
@@ -112,7 +112,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #0c78ba;
+  box-shadow: 0 0 0 1px #0772de;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -175,7 +175,7 @@ exports[`"Checkbox" renders 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #bac8d1;
-  caret-color: #0c78ba;
+  caret-color: #0772de;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -206,7 +206,7 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #0c78ba;
+  box-shadow: 0 0 0 1px #0772de;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -222,11 +222,11 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #0c78ba url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
-  border-color: #0c78ba;
+  border-color: #0772de;
 }
 
 .emotion-1::before {
@@ -243,7 +243,7 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .emotion-1 a {
-  color: #0c78ba;
+  color: #0772de;
   display: inline;
   font-size: 16px;
   font-weight: 300;
@@ -258,13 +258,13 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .emotion-1 a:hover {
-  color: rgb(10,101,156);
+  color: rgb(6,96,187);
 }
 
 .emotion-1 a:visited,
 .emotion-1 a:link,
 .emotion-1 a:active {
-  color: #0c78ba;
+  color: #0772de;
 }
 
 <div
@@ -323,7 +323,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #bac8d1;
-  caret-color: #0c78ba;
+  caret-color: #0772de;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -354,7 +354,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #0c78ba;
+  box-shadow: 0 0 0 1px #0772de;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -370,11 +370,11 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #0c78ba url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
-  border-color: #0c78ba;
+  border-color: #0772de;
 }
 
 .emotion-1::before {
@@ -391,7 +391,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .emotion-1 a {
-  color: #0c78ba;
+  color: #0772de;
   display: inline;
   font-size: 16px;
   font-weight: 300;
@@ -406,13 +406,13 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .emotion-1 a:hover {
-  color: rgb(10,101,156);
+  color: rgb(6,96,187);
 }
 
 .emotion-1 a:visited,
 .emotion-1 a:link,
 .emotion-1 a:active {
-  color: #0c78ba;
+  color: #0772de;
 }
 
 <div
@@ -471,7 +471,7 @@ exports[`"Checkbox" renders disabled 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #bac8d1;
-  caret-color: #0c78ba;
+  caret-color: #0772de;
   color: rgb(52,56,59);
   font-weight: 300;
   height: 56px;
@@ -502,7 +502,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #0c78ba;
+  box-shadow: 0 0 0 1px #0772de;
 }
 
 .emotion-0:invalid:not(:focus) {
@@ -518,11 +518,11 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #0c78ba url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
-  border-color: #0c78ba;
+  border-color: #0772de;
 }
 
 .emotion-1::before {
@@ -539,7 +539,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .emotion-1 a {
-  color: #0c78ba;
+  color: #0772de;
   display: inline;
   font-size: 16px;
   font-weight: 300;
@@ -554,13 +554,13 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .emotion-1 a:hover {
-  color: rgb(10,101,156);
+  color: rgb(6,96,187);
 }
 
 .emotion-1 a:visited,
 .emotion-1 a:link,
 .emotion-1 a:active {
-  color: #0c78ba;
+  color: #0772de;
 }
 
 <div

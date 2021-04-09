@@ -12,7 +12,7 @@ exports[`"TextArea" renders 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #bac8d1;
-  caret-color: #0c78ba;
+  caret-color: #0772de;
   color: rgb(52,56,59);
   font-weight: 300;
   line-height: 24px;
@@ -43,7 +43,7 @@ exports[`"TextArea" renders 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #0c78ba;
+  box-shadow: 0 0 0 1px #0772de;
 }
 
 .emotion-0:invalid {
@@ -73,7 +73,7 @@ exports[`"TextArea" renders as disabled 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #bac8d1;
-  caret-color: #0c78ba;
+  caret-color: #0772de;
   color: rgb(52,56,59);
   font-weight: 300;
   line-height: 24px;
@@ -104,7 +104,7 @@ exports[`"TextArea" renders as disabled 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #0c78ba;
+  box-shadow: 0 0 0 1px #0772de;
 }
 
 .emotion-0:invalid {
@@ -135,7 +135,7 @@ exports[`"TextArea" renders as invalid 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #e02020;
-  caret-color: #0c78ba;
+  caret-color: #0772de;
   color: rgb(52,56,59);
   font-weight: 300;
   line-height: 24px;
@@ -166,7 +166,7 @@ exports[`"TextArea" renders as invalid 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #0c78ba;
+  box-shadow: 0 0 0 1px #0772de;
 }
 
 <div
@@ -192,7 +192,7 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
   border: none;
   border-radius: 4px;
   box-shadow: 0 0 0 1px #bac8d1;
-  caret-color: #0c78ba;
+  caret-color: #0772de;
   color: rgb(52,56,59);
   font-weight: 300;
   line-height: 24px;
@@ -223,7 +223,7 @@ exports[`"TextArea" renders with placeholderTextTransform 1`] = `
 }
 
 .emotion-0:focus {
-  box-shadow: 0 0 0 1px #0c78ba;
+  box-shadow: 0 0 0 1px #0772de;
 }
 
 .emotion-0:invalid {

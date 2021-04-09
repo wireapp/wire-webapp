@@ -158,7 +158,7 @@ exports[`"Switch" renders checked 1`] = `
 
 .emotion-1:before,
 .emotion-1:after {
-  background-color: #0c78ba;
+  background-color: #0772de;
   box-sizing: border-box;
   display: block;
   float: left;
