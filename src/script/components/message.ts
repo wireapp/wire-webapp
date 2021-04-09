@@ -58,6 +58,7 @@ import './message/MissedMessage';
 import './message/FileTypeRestrictedMessage';
 import './message/DeleteMessage';
 import './message/DecryptErrorMessage';
+import './message/LegalHoldMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
