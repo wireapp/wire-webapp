@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.47.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.46.6...@wireapp/react-ui-kit@7.47.0) (2021-04-09)
+
+
+### Features
+
+* **react-ui-kit:** New blue ([#3725](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3725)) ([827625a](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/827625aed1bea1fee13c65c250a411da63c5a756))
+
+
+
+
+
 ## [7.46.6](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.46.5...@wireapp/react-ui-kit@7.46.6) (2021-04-09)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
