@@ -41,6 +41,7 @@ import type {ClientPreKey, PreKeyBundle, QualifiedPreKeyBundle} from '../auth/';
 import type {PublicClient} from '../client/';
 import type {RichInfo} from './RichInfo';
 import type {UserClients, QualifiedUserClients} from '../conversation/';
+import {QualifiedPublicClients} from '../client/QualifiedPublicClients';
 
 export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
@@ -56,7 +57,7 @@ export class UserAPI {
     LIST_CLIENTS: '/list-clients',
     LIST_PREKEYS: 'list-prekeys',
     LIST_USERS: '/list-users',
-    PASSWORDRESET: '/password-reset',
+    PASSWORD_RESET: '/password-reset',
     PRE_KEYS: 'prekeys',
     PROPERTIES: '/properties',
     RICH_INFO: 'rich-info',
@@ -489,7 +490,6 @@ export class UserAPI {
   /**
    * List users.
    * Note: The 'qualified_ids' and 'qualified_handles' parameters are mutually exclusive.
-   * @param handles The user ids to check.
    */
   public async postListUsers(
     users: {qualified_ids: QualifiedId[]} | {qualified_handles: QualifiedHandle[]},
@@ -505,17 +505,16 @@ export class UserAPI {
   }
 
   /**
-   * List users.
-   * @param handles The user ids to check.
+   * Get client infos from a list of users.
    */
-  public async postListClients(userIds: QualifiedId[]): Promise<User[]> {
+  public async postListClients(userIds: QualifiedId[]): Promise<QualifiedPublicClients> {
     const config: AxiosRequestConfig = {
       data: userIds,
       method: 'post',
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}`,
     };
 
-    const response = await this.client.sendJSON<User[]>(config);
+    const response = await this.client.sendJSON<QualifiedPublicClients>(config);
     return response.data;
   }
 
@@ -567,7 +566,7 @@ export class UserAPI {
     const config: AxiosRequestConfig = {
       data: resetData,
       method: 'post',
-      url: UserAPI.URL.PASSWORDRESET,
+      url: UserAPI.URL.PASSWORD_RESET,
     };
 
     await this.client.sendJSON(config);
