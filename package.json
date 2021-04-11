@@ -109,7 +109,7 @@
     "dotenv": "8.2.0",
     "enzyme": "3.11.0",
     "enzyme-adapter-react-16": "1.15.6",
-    "enzyme-to-json": "3.6.1",
+    "enzyme-to-json": "3.6.2",
     "eslint": "7.23.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-babel": "5.3.1",
