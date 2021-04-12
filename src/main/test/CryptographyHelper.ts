@@ -18,8 +18,7 @@
  */
 
 import {Cryptobox} from '@wireapp/cryptobox';
-import * as Proteus from '@wireapp/proteus';
-import type {PreKey} from '@wireapp/proteus/src/main/keys';
+import {init, keys} from '@wireapp/proteus';
 import * as bazinga64 from 'bazinga64';
 
 import type {CryptographyService} from '../cryptography';
@@ -27,10 +26,11 @@ import type {CryptographyService} from '../cryptography';
 const StoreHelper = require('./StoreHelper');
 
 export async function createEncodedCipherText(
-  receiver: Proteus.keys.IdentityKeyPair,
-  preKey: PreKey,
+  receiver: keys.IdentityKeyPair,
+  preKey: keys.PreKey,
   text: string,
 ): Promise<string> {
+  await init();
   const senderEngine = await StoreHelper.createMemoryEngine();
   const sender = new Cryptobox(senderEngine, 1);
   await sender.create();
@@ -38,7 +38,7 @@ export async function createEncodedCipherText(
   const sessionId = `from-${sender.identity!.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
 
   const alicePublicKey = receiver.public_key;
-  const publicPreKeyBundle = new Proteus.keys.PreKeyBundle(alicePublicKey, preKey);
+  const publicPreKeyBundle = new keys.PreKeyBundle(alicePublicKey, preKey);
   const encryptedPreKeyMessage = await sender.encrypt(sessionId, text, publicPreKeyBundle.serialise());
   return bazinga64.Encoder.toBase64(encryptedPreKeyMessage).asString;
 }
