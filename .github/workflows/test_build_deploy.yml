@@ -98,7 +98,7 @@ jobs:
       - name: Test
         # Run for all PRs and pushes to master/dev with DISTRIBUTION == 'wire'
         if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        run: yarn test --coverage --coverage-reporters=clover --detectOpenHandles=false --forceExit
+        run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false --forceExit
 
       - name: Monitor coverage
         # Run for all PRs with DISTRIBUTION == 'wire'
@@ -106,7 +106,7 @@ jobs:
         uses: codecov/codecov-action@v1.3.2
         with:
           fail_ci_if_error: false
-          files: coverage/clover.xml
+          files: ./coverage/lcov.info
           flags: unittests
 
       - name: Build

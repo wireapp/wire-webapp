@@ -43,8 +43,6 @@ import type {ConversationRepository} from '../conversation/ConversationRepositor
 import type {SystemMessage} from '../entity/message/SystemMessage';
 import {AssetRepository} from '../assets/AssetRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
-import {ConversationState} from '../conversation/ConversationState';
-import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
 import './asset/audioAsset';
 import './asset/FileAssetComponent';
@@ -60,12 +58,12 @@ import './message/MissedMessage';
 import './message/FileTypeRestrictedMessage';
 import './message/DeleteMessage';
 import './message/DecryptErrorMessage';
+import './message/LegalHoldMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
   conversation: ko.Observable<Conversation>;
   conversationRepository: ConversationRepository;
-  conversationState?: ConversationState;
   isLastDeliveredMessage: ko.Observable<boolean>;
   isMarked: ko.Observable<boolean>;
   isSelfTemporaryGuest: ko.Observable<boolean>;
@@ -90,8 +88,6 @@ interface MessageParams {
 }
 
 class Message {
-  private readonly conversationState: ConversationState;
-
   accentColor: ko.PureComputed<string>;
   actionsViewModel: ActionsViewModel;
   assetSubscription: ko.Subscription;
@@ -151,11 +147,9 @@ class Message {
       conversationRepository,
       messageRepository,
       actionsViewModel,
-      conversationState = container.resolve(ConversationState),
     }: MessageParams,
     componentInfo: {element: HTMLElement},
   ) {
-    this.conversationState = conversationState;
     this.message = message;
     this.conversation = conversation;
 
@@ -328,10 +322,6 @@ class Message {
         return undefined;
     }
   }
-
-  readonly showLegalHold = () => {
-    amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS, this.conversationState.activeConversation());
-  };
 
   showContextMenu(event: MouseEvent) {
     const entries = this.contextMenuEntries();
@@ -510,23 +500,6 @@ const pingTemplate: string = `
   </div>
   `;
 
-const legalHoldTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <legal-hold-dot></legal-hold-dot>
-    </div>
-    <div class="message-header-label">
-      <!-- ko if: message.isActivationMessage -->
-        <span data-bind="text: t('legalHoldActivated')"></span>
-        <span class="message-header-label__learn-more" data-bind="click: showLegalHold, text: t('legalHoldActivatedLearnMore')"></span>
-      <!-- /ko -->
-      <!-- ko ifnot: message.isActivationMessage -->
-        <span class="message-header-label" data-bind="text: t('legalHoldDeactivated')"></span>
-      <!-- /ko -->
-    </div>
-  </div>
-  `;
-
 const memberTemplate: string = `
   <!-- ko if: message.showLargeAvatar() -->
     <div class="message-connected">
@@ -649,7 +622,7 @@ ko.components.register('message', {
       <filetype-restricted-message params="message: message"></filetype-restricted-message>
     <!-- /ko -->
     <!-- ko if: message.isLegalHold() -->
-      ${legalHoldTemplate}
+      <legalhold-message params="message: message"></legalhold-message>
     <!-- /ko -->
     `,
   viewModel: {

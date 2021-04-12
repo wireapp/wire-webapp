@@ -11,6 +11,14 @@ coverage:
         informational: true
         only_pulls: true
 
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
+
 comment:
   layout: 'diff'
   behavior: default
