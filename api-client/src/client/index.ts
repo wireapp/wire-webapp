@@ -23,4 +23,5 @@ export * from './ClientType';
 export * from './Location';
 export * from './NewClient';
 export * from './PublicClient';
+export * from './QualifiedPublicClients';
 export * from './RegisteredClient';

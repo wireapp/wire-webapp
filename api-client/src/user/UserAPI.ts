@@ -38,10 +38,9 @@ import type {
 } from '../user/';
 import {RequestCancellationError} from './UserError';
 import type {ClientPreKey, PreKeyBundle, QualifiedPreKeyBundle} from '../auth/';
-import type {PublicClient} from '../client/';
+import type {PublicClient, QualifiedPublicClients} from '../client/';
 import type {RichInfo} from './RichInfo';
 import type {UserClients, QualifiedUserClients} from '../conversation/';
-import {QualifiedPublicClients} from '../client/QualifiedPublicClients';
 
 export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
