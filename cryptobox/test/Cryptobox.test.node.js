@@ -24,6 +24,10 @@ const Proteus = require('@wireapp/proteus');
 const {Cryptobox} = require('@wireapp/cryptobox');
 const {MemoryEngine} = require('@wireapp/store-engine');
 
+beforeAll(async () => {
+  await Proteus.init();
+});
+
 describe('Cryptobox', () => {
   async function createCryptobox(storeName, amountOfPreKeys = 1) {
     const engine = new MemoryEngine();

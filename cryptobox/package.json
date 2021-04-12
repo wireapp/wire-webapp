@@ -3,7 +3,7 @@
     "@types/node": "~14",
     "@wireapp/lru-cache": "3.7.16",
     "@wireapp/priority-queue": "1.6.29",
-    "@wireapp/proteus": "9.9.8",
+    "@wireapp/proteus": "9.10.1",
     "@wireapp/store-engine": "4.5.33",
     "bazinga64": "5.7.32",
     "logdown": "3.3.1"
@@ -43,8 +43,9 @@
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",
+    "test:node": "cross-env NODE_DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json",
     "test:project": "yarn dist && yarn test",
-    "test:node": "cross-env NODE_DEBUG=@wireapp/cryptobox* jasmine --config=test/jasmine.node.json"
+    "test:types": "tsc --noEmit"
   },
   "version": "12.2.60"
 }

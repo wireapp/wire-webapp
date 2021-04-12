@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "noImplicitAny": true,
-    "outDir": "src/main",
-    "rootDir": "src/main"
-  },
-  "exclude": ["node_modules", "spec", "src/demo"],
-  "extends": "../../tsconfig.json"
-}

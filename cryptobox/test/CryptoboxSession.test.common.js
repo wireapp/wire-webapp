@@ -24,6 +24,10 @@ const cryptobox = require('@wireapp/cryptobox');
 const Proteus = require('@wireapp/proteus');
 const sodium = require('libsodium-wrappers-sumo');
 
+beforeAll(async () => {
+  await Proteus.init();
+});
+
 describe('cryptobox.CryptoboxSession', () => {
   let alice = undefined;
   let bob = undefined;
