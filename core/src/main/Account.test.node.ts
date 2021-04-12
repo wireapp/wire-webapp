@@ -26,7 +26,7 @@ import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Notification, NotificationAPI} from '@wireapp/api-client/src/notification';
 import {ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
-
+import * as Proteus from '@wireapp/proteus';
 import {MemoryEngine} from '@wireapp/store-engine';
 import nock = require('nock');
 import {Account} from './Account';
@@ -45,6 +45,10 @@ async function createAccount(storageName = `test-${Date.now()}`): Promise<Accoun
   await account.initServices(new MemoryEngine());
   return account;
 }
+
+beforeAll(async () => {
+  await Proteus.init();
+});
 
 describe('Account', () => {
   const CLIENT_ID = '4e37b32f57f6da55';
