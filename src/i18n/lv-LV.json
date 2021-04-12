@@ -912,6 +912,7 @@
   "searchNoServicesManager": "Services are helpers that can improve your workflow.",
   "searchNoServicesMember": "Services are helpers that can improve your workflow. To enable them, ask your administrator.",
   "searchOthers": "Pievienoties",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Personas",
   "searchPlaceholder": "Search by name or username",

@@ -912,6 +912,7 @@
   "searchNoServicesManager": "Hizmetler, iş akışınızı iyileştirebilecek yardımcılardır.",
   "searchNoServicesMember": "Hizmetler, iş akışınızı iyileştirebilecek yardımcılardır. Onları etkinleştirmek için yöneticinize sorun.",
   "searchOthers": "Bağlan",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "İnsanlar",
   "searchPlaceholder": "İsim veya kullanıcı adına göre ara",

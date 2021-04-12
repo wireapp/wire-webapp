@@ -912,6 +912,7 @@
   "searchNoServicesManager": "Serviços são ajudantes que podem melhorar seu fluxo de trabalho.",
   "searchNoServicesMember": "Serviços são ajudantes que podem melhorar seu fluxo de trabalho. Para ativá-los, fale com seu administrador.",
   "searchOthers": "Conectar",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Conectar com o {{domainName}}",
   "searchPeople": "Pessoas",
   "searchPlaceholder": "Pesquisar por nome ou nome de usuário",

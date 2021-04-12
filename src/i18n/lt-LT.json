@@ -912,6 +912,7 @@
   "searchNoServicesManager": "Tarnybos yra pagalbininkai, kurie padeda pagerinti darbo eigą.",
   "searchNoServicesMember": "Tarnybos yra pagalbininkai, kurie padeda pagerinti darbo eigą. Norėdami jomis naudotis, prašykite savo administratoriaus.",
   "searchOthers": "Užmegzti kontaktą",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Žmonės",
   "searchPlaceholder": "Ieškokite pagal vardą ar naudotojo vardą",

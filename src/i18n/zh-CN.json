@@ -912,6 +912,7 @@
   "searchNoServicesManager": "Services are helpers that can improve your workflow.",
   "searchNoServicesMember": "Services are helpers that can improve your workflow. To enable them, ask your administrator.",
   "searchOthers": "好友请求",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "联系人",
   "searchPlaceholder": "通过昵称或用户名搜索",

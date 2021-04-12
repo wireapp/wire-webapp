@@ -29,6 +29,7 @@ import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {partition} from 'Util/ArrayUtil';
 import {sortByPriority} from 'Util/StringUtil';
 import {getDomainName} from 'Util/UrlUtil';
+import {isValidFederationUsername} from 'Util/ValidationUtil';
 
 import {UserlistMode} from 'Components/userList';
 
@@ -39,6 +40,10 @@ import {generatePermissionHelpers} from '../../user/UserPermission';
 import {validateHandle} from '../../user/UserHandleGenerator';
 import {SearchRepository} from '../../search/SearchRepository';
 import {ListViewModel} from '../ListViewModel';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
+import {ConversationState} from '../../conversation/ConversationState';
+import {isBackendError} from '../../util/TypePredicateUtil';
 import type {MainViewModel} from '../MainViewModel';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';
@@ -47,10 +52,6 @@ import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import type {ServiceEntity} from '../../integration/ServiceEntity';
 import type {Conversation} from '../../entity/Conversation';
-import {UserState} from '../../user/UserState';
-import {TeamState} from '../../team/TeamState';
-import {ConversationState} from '../../conversation/ConversationState';
-import {isBackendError} from '../../util/TypePredicateUtil';
 
 export class StartUIViewModel {
   readonly brandName: string;
@@ -99,6 +100,8 @@ export class StartUIViewModel {
   private readonly showMatches: ko.Observable<boolean>;
   private readonly hasSearchResults: ko.PureComputed<boolean>;
   private readonly showContent: ko.PureComputed<boolean>;
+  readonly searchOnSameFederatedDomain: ko.PureComputed<boolean>;
+  readonly searchOnOtherFederatedDomain: ko.PureComputed<boolean>;
   getDomainName: typeof getDomainName;
 
   static get STATE() {
@@ -200,6 +203,20 @@ export class StartUIViewModel {
     this.showCreateGuestRoom = ko.pureComputed(() => this.isTeam());
     this.showInvitePeople = ko.pureComputed(() => !this.isTeam());
     this.showFederatedDomainNotAvailable = ko.observable(false);
+    this.searchOnSameFederatedDomain = ko.pureComputed(() => {
+      return (
+        Config.getConfig().FEATURE.FEDERATION_DOMAIN &&
+        isValidFederationUsername(this.searchInput()) &&
+        this.searchInput().endsWith(Config.getConfig().FEATURE.FEDERATION_DOMAIN)
+      );
+    });
+    this.searchOnOtherFederatedDomain = ko.pureComputed(() => {
+      return (
+        Config.getConfig().FEATURE.FEDERATION_DOMAIN &&
+        isValidFederationUsername(this.searchInput()) &&
+        !this.searchInput().endsWith(Config.getConfig().FEATURE.FEDERATION_DOMAIN)
+      );
+    });
 
     this.showNoContacts = ko.pureComputed(() => !this.isTeam() && !this.showContent());
     this.showInviteMember = ko.pureComputed(
