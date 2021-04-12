@@ -891,6 +891,8 @@
   "searchContacts": "Kişiler",
   "searchCreateGroup": "Grup oluştur",
   "searchCreateGuestRoom": "Misafir odası oluştur",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Gruplar",
   "searchInvite": "İnsanları {{brandName}}’a katılmaya davet edin",
   "searchInviteButtonContacts": "Kişilerden",

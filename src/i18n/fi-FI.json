@@ -891,6 +891,8 @@
   "searchContacts": "Yhteystiedot",
   "searchCreateGroup": "Luo ryhmä",
   "searchCreateGuestRoom": "Create guest room",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Ryhmät",
   "searchInvite": "Kutsu henkilöitä Wireen",
   "searchInviteButtonContacts": "Kontakteista",

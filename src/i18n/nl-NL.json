@@ -891,6 +891,8 @@
   "searchContacts": "Contacten",
   "searchCreateGroup": "Maak groep",
   "searchCreateGuestRoom": "Create guest room",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Groepen",
   "searchInvite": "Nodig andere mensen uit voor {{brandName}}",
   "searchInviteButtonContacts": "Van contacten",

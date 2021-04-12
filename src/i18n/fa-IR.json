@@ -891,6 +891,8 @@
   "searchContacts": "دفترچه تلفن",
   "searchCreateGroup": "ایجاد گروه",
   "searchCreateGuestRoom": "Create guest room",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "گروه‌ها",
   "searchInvite": "دوستانتان را برای پیوستن به وایر دعوت کنید",
   "searchInviteButtonContacts": "از دفترچه تلفن",

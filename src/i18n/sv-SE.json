@@ -891,6 +891,8 @@
   "searchContacts": "Kontakter",
   "searchCreateGroup": "Skapa grupp",
   "searchCreateGuestRoom": "Skapa gästrum",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Grupper",
   "searchInvite": "Bjud in personer att använda {{brandName}}",
   "searchInviteButtonContacts": "Från kontakter",

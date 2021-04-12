@@ -891,6 +891,8 @@
   "searchContacts": "Kontakty",
   "searchCreateGroup": "Vytvořit skupinu",
   "searchCreateGuestRoom": "Create guest room",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Skupiny",
   "searchInvite": "Pozvat lidi do aplikace {{brandName}}",
   "searchInviteButtonContacts": "Z kontaktů",

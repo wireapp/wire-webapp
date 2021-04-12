@@ -891,6 +891,8 @@
   "searchContacts": "Contactos",
   "searchCreateGroup": "Crear grupo",
   "searchCreateGuestRoom": "Crear una sala de invitados",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Grupos",
   "searchInvite": "Invitar amigos a {{brandName}}",
   "searchInviteButtonContacts": "Desde los contactos",

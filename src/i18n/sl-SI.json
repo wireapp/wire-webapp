@@ -891,6 +891,8 @@
   "searchContacts": "Stiki",
   "searchCreateGroup": "Ustvari skupino",
   "searchCreateGuestRoom": "Create guest room",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Skupine",
   "searchInvite": "Povabi ostale osebe na {{brandName}}",
   "searchInviteButtonContacts": "Iz imenika stikov",

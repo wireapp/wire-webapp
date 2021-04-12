@@ -891,6 +891,8 @@
   "searchContacts": "Kontaktai",
   "searchCreateGroup": "Sukurti grupę",
   "searchCreateGuestRoom": "Kurti svečio kambarį",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Grupės",
   "searchInvite": "Pakvieskite žmones į {{brandName}}",
   "searchInviteButtonContacts": "Iš kontaktų",

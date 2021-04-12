@@ -891,6 +891,8 @@
   "searchContacts": "联系人",
   "searchCreateGroup": "创建群聊",
   "searchCreateGuestRoom": "创建访客聊天室",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "群组",
   "searchInvite": "邀请好友使用{{brandName}}",
   "searchInviteButtonContacts": "从您的联系人",

@@ -891,6 +891,8 @@
   "searchContacts": "連絡先",
   "searchCreateGroup": "グループを作成する",
   "searchCreateGuestRoom": "ゲストルームを作成する",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "グループ",
   "searchInvite": "{{brandName}}に招待する",
   "searchInviteButtonContacts": "連絡先から",

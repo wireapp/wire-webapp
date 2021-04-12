@@ -891,6 +891,8 @@
   "searchContacts": "Contacte",
   "searchCreateGroup": "Creează grup",
   "searchCreateGuestRoom": "Create guest room",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Grupuri",
   "searchInvite": "Invită persoane pe {{brandName}}",
   "searchInviteButtonContacts": "Din Contacte",

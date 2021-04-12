@@ -891,6 +891,8 @@
   "searchContacts": "Kontaktid",
   "searchCreateGroup": "Loo grupp",
   "searchCreateGuestRoom": "Loo külalistetuba",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Grupid",
   "searchInvite": "Kutsu inimesi {{brandName}}’iga liituma",
   "searchInviteButtonContacts": "Kontaktidest",

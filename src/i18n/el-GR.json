@@ -891,6 +891,8 @@
   "searchContacts": "Επαφές",
   "searchCreateGroup": "Δημιουργία ομάδας",
   "searchCreateGuestRoom": "Create guest room",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Ομάδες",
   "searchInvite": "Πρόσκληση ατόμων για συμμετοχή στο {{brandName}}",
   "searchInviteButtonContacts": "Από τις Επαφές",

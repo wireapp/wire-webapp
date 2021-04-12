@@ -891,6 +891,8 @@
   "searchContacts": "Контакти",
   "searchCreateGroup": "Направи групу",
   "searchCreateGuestRoom": "Направите собу за госте",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Групе",
   "searchInvite": "Позовите људе у Вајер",
   "searchInviteButtonContacts": "из именика",
