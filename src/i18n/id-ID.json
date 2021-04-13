@@ -891,6 +891,8 @@
   "searchContacts": "Kontak",
   "searchCreateGroup": "Buat grup",
   "searchCreateGuestRoom": "Create guest room",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Grup",
   "searchInvite": "Undang orang untuk bergabung dengan {{brandName}}",
   "searchInviteButtonContacts": "Dari Kontak",

@@ -891,6 +891,8 @@
   "searchContacts": "Kontakter",
   "searchCreateGroup": "Opprett gruppe",
   "searchCreateGuestRoom": "Create guest room",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Groups",
   "searchInvite": "Invite people to join {{brandName}}",
   "searchInviteButtonContacts": "From Contacts",

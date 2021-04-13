@@ -891,6 +891,8 @@
   "searchContacts": "جهات الاتصال",
   "searchCreateGroup": "إنشاء مجموعة",
   "searchCreateGuestRoom": "أنشئ غرفة ضيوف",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "المجموعات",
   "searchInvite": "ادعُ أشخاصًا إلى الانضمام إلى واير",
   "searchInviteButtonContacts": "من قائمة جهات الاتصال",

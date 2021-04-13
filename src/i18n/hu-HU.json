@@ -891,6 +891,8 @@
   "searchContacts": "Névjegyek",
   "searchCreateGroup": "Csoport létrehozása",
   "searchCreateGuestRoom": "Vendégszoba létrehozása",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Csoportok",
   "searchInvite": "Hívj meg másokat is a {{brandName}}-re",
   "searchInviteButtonContacts": "Névjegyekből",

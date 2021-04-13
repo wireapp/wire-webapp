@@ -35,7 +35,15 @@
             <!-- /ko -->
           <!-- /ko -->
 
-          <!-- ko if: showNoSearchResults() -->
+          <!-- ko if: showFederatedDomainNotAvailable() -->
+            <div class="start-ui-fed-domain-unavailable">
+              <div class="start-ui-fed-domain-unavailable__head" data-bind="text: 'Connect with other domain'"></div>
+              <span class="start-ui-fed-domain-unavailable__text" data-bind="text: t('searchFederatedDomainNotAvailable')"></span>
+              <a class="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
+            </div>
+          <!-- /ko -->
+
+          <!-- ko if: !showFederatedDomainNotAvailable() && showNoSearchResults() -->
             <!-- ko if: showOnlyConnectedUsers() -->
               <div class="start-ui-no-search-results__content">
                 <message-icon class="start-ui-no-search-results__icon"></message-icon>

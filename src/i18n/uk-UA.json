@@ -891,6 +891,8 @@
   "searchContacts": "Контакти",
   "searchCreateGroup": "Створити групу",
   "searchCreateGuestRoom": "Створити гостьову кімнату",
+  "searchFederatedDomainNotAvailable": "The federated domain is currently not available.",
+  "searchFederatedDomainNotAvailableLearnMore": "Learn more",
   "searchGroups": "Групи",
   "searchInvite": "Запросіть людей в {{brandName}}",
   "searchInviteButtonContacts": "З контактів",
