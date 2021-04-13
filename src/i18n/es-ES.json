@@ -910,6 +910,7 @@
   "searchNoServicesManager": "Los servicios son auxiliares que pueden mejorar su flujo de trabajo.",
   "searchNoServicesMember": "Los servicios son auxiliares que pueden mejorar su flujo de trabajo. Para activarlos, póngase en contacto con el administrador.",
   "searchOthers": "Conectar",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Personas",
   "searchPlaceholder": "Buscar por nombre o usuario",

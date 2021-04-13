@@ -910,6 +910,7 @@
   "searchNoServicesManager": "Dienste sind Helfer, die den Workflow verbessern können.",
   "searchNoServicesMember": "Dienste sind Helfer, die den Workflow verbessern können. Bitte an den Administrator wenden, um diese für das Team zu aktivieren.",
   "searchOthers": "Suchergebnisse",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Mit {{domainName}} verbinden",
   "searchPeople": "Kontakte",
   "searchPlaceholder": "Name oder Benutzername suchen",

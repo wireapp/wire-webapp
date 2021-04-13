@@ -910,6 +910,7 @@
   "searchNoServicesManager": "Teenused on abistajad, mis võivad aidata sul töid teha.",
   "searchNoServicesMember": "Teenused on abistajad, mis võivad aidata sul töid teha. Nende lubamiseks küsi oma administraatorilt.",
   "searchOthers": "Ühendu",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Inimesed",
   "searchPlaceholder": "Otsi nime või kasutajanime järgi",

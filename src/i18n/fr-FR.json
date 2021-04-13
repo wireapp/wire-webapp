@@ -910,6 +910,7 @@
   "searchNoServicesManager": "Les services sont des programmes qui peuvent améliorer votre flux de travail.",
   "searchNoServicesMember": "Les services sont des programmes qui peuvent améliorer votre flux de travail. Pour les activer, contactez votre administrateur.",
   "searchOthers": "Se connecter",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Se connecter à {{domainName}}",
   "searchPeople": "Contacts",
   "searchPlaceholder": "Chercher par nom ou par identifiant",

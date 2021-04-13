@@ -910,6 +910,7 @@
   "searchNoServicesManager": "Сервисы - это помощники, которые могут улучшить ваш рабочий процесс.",
   "searchNoServicesMember": "Сервисы - это помощники, которые могут улучшить ваш рабочий процесс. Чтобы включить их, обратитесь к администратору.",
   "searchOthers": "Связаться",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Участники",
   "searchPlaceholder": "Поиск по имени или псевдониму",

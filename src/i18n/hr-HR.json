@@ -910,6 +910,7 @@
   "searchNoServicesManager": "Usluge su pomagači koji mogu poboljšati Vaš tijek rada.",
   "searchNoServicesMember": "Usluge su pomagači koji mogu poboljšati Vaš tijek rada. Da biste ih omogućili, obratite se administratoru.",
   "searchOthers": "Poveži se",
+  "searchOtherDomainFederation": "Connect with other domain",
   "searchOthersFederation": "Connect with {{domainName}}",
   "searchPeople": "Kontakti",
   "searchPlaceholder": "Pretraži po imenu ili korisničkom imenu",
