@@ -77,7 +77,7 @@ export class CollectionViewModel {
   };
 
   readonly onInputChange = (input: string = ''): void => {
-    this.searchInput(input || '');
+    this.searchInput(input);
   };
 
   readonly itemAdded = (messageEntity: ContentMessage): void => {
