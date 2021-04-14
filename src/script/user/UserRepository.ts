@@ -184,10 +184,13 @@ export class UserRepository {
   /**
    * Retrieves meta information about all the clients of a given user.
    */
-  getClientsByUserId(userId: string, updateClients: false): Promise<PublicClient[]>;
-  getClientsByUserId(userId: string, updateClients?: boolean): Promise<ClientEntity[]>;
-  getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[] | PublicClient[]> {
-    return this.clientRepository.getClientsByUserId(userId, updateClients);
+  getClientsByUserIds(userId: string[], updateClients: false): Promise<Record<string, PublicClient[]>>;
+  getClientsByUserIds(userId: string[], updateClients?: boolean): Promise<Record<string, ClientEntity[]>>;
+  getClientsByUserIds(
+    userId: string[],
+    updateClients: boolean = true,
+  ): Promise<Record<string, ClientEntity[] | PublicClient[]>> {
+    return this.clientRepository.getClientsByUserIds(userId, updateClients);
   }
 
   /**

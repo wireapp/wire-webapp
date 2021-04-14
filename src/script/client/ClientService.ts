@@ -17,7 +17,7 @@
  *
  */
 
-import type {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/src/client';
+import type {NewClient, QualifiedPublicClients, RegisteredClient} from '@wireapp/api-client/src/client';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -100,8 +100,14 @@ export class ClientService {
    * @param userId ID of user to retrieve clients for
    * @returns Resolves with the clients of a user
    */
-  getClientsByUserId(userId: string): Promise<PublicClient[]> {
-    return this.apiClient.user.api.getClients(userId);
+  async getClientsByUserIds(userIds: string[]): Promise<QualifiedPublicClients> {
+    const clients: QualifiedPublicClients = {none: {}};
+
+    for (const userId of userIds) {
+      clients.none[userId] = await this.apiClient.user.api.getClients(userId);
+    }
+
+    return clients;
   }
 
   /**

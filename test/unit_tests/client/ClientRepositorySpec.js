@@ -60,7 +60,7 @@ describe('ClientRepository', () => {
         Promise.resolve(allClients),
       );
 
-      const clientEntities = await testFactory.client_repository.getClientsByUserId(entities.user.john_doe.id);
+      const clientEntities = await testFactory.client_repository.getClientsByUserIds([entities.user.john_doe.id]);
       expect(clientEntities.length).toBe(allClients.length);
     });
   });
