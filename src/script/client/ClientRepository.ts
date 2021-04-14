@@ -346,14 +346,25 @@ export class ClientRepository {
    * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
-  async getClientsByUserId(userId: string, updateClients: false): Promise<PublicClient[]>;
-  async getClientsByUserId(userId: string, updateClients?: boolean): Promise<ClientEntity[]>;
-  async getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[] | PublicClient[]> {
-    const clientsData = await this.clientService.getClientsByUserId(userId);
+  async getClientsByUserIds(userId: string[], updateClients: false): Promise<Record<string, PublicClient[]>>;
+  async getClientsByUserIds(userId: string[], updateClients?: boolean): Promise<Record<string, ClientEntity[]>>;
+  async getClientsByUserIds(
+    userId: string[],
+    updateClients: boolean = true,
+  ): Promise<Record<string, ClientEntity[]> | Record<string, PublicClient[]>> {
+    const userClientsMap = await this.clientService.getClientsByUserIds(userId);
+
     if (updateClients) {
-      return this.updateClientsOfUserById(userId, clientsData);
+      const clientEntityMap: Record<string, ClientEntity[]> = {};
+      await Promise.all(
+        Object.entries(userClientsMap.none).map(async ([userId, clients]) => {
+          clientEntityMap[userId] = await this.updateClientsOfUserById(userId, clients);
+        }),
+      );
+      return clientEntityMap;
     }
-    return clientsData;
+
+    return userClientsMap.none;
   }
 
   private async getClientByUserIdFromDb(requestedUserId: string): Promise<ClientRecord[]> {

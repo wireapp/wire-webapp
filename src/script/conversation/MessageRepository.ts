@@ -1504,10 +1504,10 @@ export class MessageRepository {
           return missing;
         }, []);
 
+        const userClientMap = await this.userRepository.getClientsByUserIds(missingUserIds, false);
         await Promise.all(
-          missingUserIds.map(async userId => {
-            const clients = await this.userRepository.getClientsByUserId(userId, false);
-            await Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+          Object.entries(userClientMap).map(([userId, clients]) => {
+            return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
           }),
         );
       }

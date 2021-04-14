@@ -184,10 +184,13 @@ export class UserRepository {
   /**
    * Retrieves meta information about all the clients of a given user.
    */
-  getClientsByUserId(userId: string, updateClients: false): Promise<PublicClient[]>;
-  getClientsByUserId(userId: string, updateClients?: boolean): Promise<ClientEntity[]>;
-  getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[] | PublicClient[]> {
-    return this.clientRepository.getClientsByUserId(userId, updateClients);
+  getClientsByUserIds(userId: string[], updateClients: false): Promise<Record<string, PublicClient[]>>;
+  getClientsByUserIds(userId: string[], updateClients?: boolean): Promise<Record<string, ClientEntity[]>>;
+  getClientsByUserIds(
+    userId: string[],
+    updateClients: boolean = true,
+  ): Promise<Record<string, ClientEntity[]> | Record<string, PublicClient[]>> {
+    return this.clientRepository.getClientsByUserIds(userId, updateClients);
   }
 
   /**
@@ -275,7 +278,11 @@ export class UserRepository {
    *
    * @returns Resolves with `true` when a client has been added
    */
-  addClientToUser = async (userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> => {
+  addClientToUser = async (
+    userId: string,
+    clientPayload: PublicClient,
+    publishClient: boolean = false,
+  ): Promise<boolean> => {
     const userEntity = await this.getUserById(userId);
     const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.isMe);
     const wasClientAdded = userEntity.addClient(clientEntity);

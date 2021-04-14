@@ -96,11 +96,10 @@ export class ClientMismatchHandler {
       }
     }
 
+    const userClientMap = await this.userRepository.getClientsByUserIds(missingUserIds, false);
     await Promise.all(
-      missingUserIds.map(userId => {
-        return this.userRepository.getClientsByUserId(userId, false).then(clients => {
-          return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
-        });
+      Object.entries(userClientMap).map(([userId, clients]) => {
+        return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
       }),
     );
 
