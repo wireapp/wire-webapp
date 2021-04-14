@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.126](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/compare/@wireapp/bot-handler-wizard@0.2.125...@wireapp/bot-handler-wizard@0.2.126) (2021-04-14)
+
+**Note:** Version bump only for package @wireapp/bot-handler-wizard
+
+
+
+
+
 ## [0.2.125](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-wizard/compare/@wireapp/bot-handler-wizard@0.2.124...@wireapp/bot-handler-wizard@0.2.125) (2021-04-14)
 
 **Note:** Version bump only for package @wireapp/bot-handler-wizard

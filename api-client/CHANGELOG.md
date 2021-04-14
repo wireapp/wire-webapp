@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.5.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.8...@wireapp/api-client@12.5.9) (2021-04-14)
+
+
+### Bug Fixes
+
+* **api-client:** QualifiedPublicClients includes multiple clients ([3f390cb](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/3f390cbcc59c46af02f959438c3149fdd16c8f99))
+
+
+
+
+
 ## [12.5.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.7...@wireapp/api-client@12.5.8) (2021-04-14)
 
 **Note:** Version bump only for package @wireapp/api-client

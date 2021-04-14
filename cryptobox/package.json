@@ -2,16 +2,16 @@
   "dependencies": {
     "@types/node": "~14",
     "@wireapp/lru-cache": "3.7.17",
-    "@wireapp/priority-queue": "1.6.30",
+    "@wireapp/priority-queue": "1.6.31",
     "@wireapp/proteus": "9.10.2",
-    "@wireapp/store-engine": "4.5.34",
+    "@wireapp/store-engine": "4.5.35",
     "bazinga64": "5.7.33",
     "logdown": "3.3.1"
   },
   "description": "High-level API with persistent storage for Proteus.",
   "devDependencies": {
     "@types/karma": "6.3.0",
-    "@wireapp/store-engine-fs": "2.2.39",
+    "@wireapp/store-engine-fs": "2.2.40",
     "browser-sync": "2.26.14",
     "cpx": "1.5.0",
     "cross-env": "7.0.3",
@@ -47,5 +47,5 @@
     "test:project": "yarn dist && yarn test",
     "test:types": "tsc --noEmit"
   },
-  "version": "12.2.61"
+  "version": "12.2.62"
 }
