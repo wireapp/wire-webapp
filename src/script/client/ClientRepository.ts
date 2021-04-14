@@ -44,6 +44,8 @@ import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
 import {ClientState} from './ClientState';
 
+export type QualifiedUserClientMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
+
 export class ClientRepository {
   private readonly logger: Logger;
   public selfUser: ko.Observable<User>;
@@ -343,23 +345,20 @@ export class ClientRepository {
    * Retrieves meta information about all the clients of a given user.
    * @note If you want to get very detailed information about the devices from the own user, then use `getClients()`.
    *
-   * @param userIds User ID to retrieve client information for
+   * @param userIds User IDs to retrieve client information for
    * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
   async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
-  async getClientsByUserIds(
-    userIds: (QualifiedId | string)[],
-    updateClients: true,
-  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}}>;
+  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
   async getClientsByUserIds(
     userIds: (QualifiedId | string)[],
     updateClients: boolean,
-  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}} | QualifiedPublicClients> {
+  ): Promise<QualifiedPublicClients | QualifiedUserClientMap> {
     const userClientsMap = await this.clientService.getClientsByUserIds(userIds);
 
     if (updateClients) {
-      const clientEntityMap: {[domain: string]: {[userId: string]: ClientEntity[]}} = {};
+      const clientEntityMap: QualifiedUserClientMap = {};
       await Promise.all(
         Object.entries(userClientsMap).map(([domain, userClientMap]) =>
           Object.entries(userClientMap).map(async ([userId, clients]) => {
