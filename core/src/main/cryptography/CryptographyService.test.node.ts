@@ -34,6 +34,10 @@ async function createEngine(storeName: string): Promise<CRUDEngine> {
   return engine;
 }
 
+beforeAll(async () => {
+  await Proteus.init();
+});
+
 describe('CryptographyService', () => {
   let cryptographyService: CryptographyService;
   let aliceLastResortPreKey: Proteus.keys.PreKey;
