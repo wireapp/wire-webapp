@@ -4,7 +4,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "3.6.9",
-    "@types/karma": "6.1.0",
+    "@types/karma": "6.3.0",
     "jasmine": "3.7.0",
     "karma": "6.3.2",
     "karma-chrome-launcher": "3.1.0",
