@@ -98,7 +98,9 @@ export class ClientMismatchHandler {
 
     const userClientMap = await this.userRepository.getClientsByUserIds(missingUserIds, false);
     await Promise.all(
-      Object.entries(userClientMap).map(([userId, clientId]) => this.userRepository.addClientToUser(userId, clientId)),
+      Object.entries(userClientMap).map(([userId, clients]) => {
+        return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+      }),
     );
 
     this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(missingUserIds);

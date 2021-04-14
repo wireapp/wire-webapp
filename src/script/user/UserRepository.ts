@@ -278,7 +278,11 @@ export class UserRepository {
    *
    * @returns Resolves with `true` when a client has been added
    */
-  addClientToUser = async (userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> => {
+  addClientToUser = async (
+    userId: string,
+    clientPayload: PublicClient,
+    publishClient: boolean = false,
+  ): Promise<boolean> => {
     const userEntity = await this.getUserById(userId);
     const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.isMe);
     const wasClientAdded = userEntity.addClient(clientEntity);
