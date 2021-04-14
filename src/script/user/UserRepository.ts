@@ -61,7 +61,7 @@ import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {UserMapper} from './UserMapper';
 import {UserState} from './UserState';
-import type {ClientRepository} from '../client/ClientRepository';
+import type {ClientRepository, QualifiedUserClientMap} from '../client/ClientRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -189,14 +189,11 @@ export class UserRepository {
    * Retrieves meta information about all the clients of a given user.
    */
   getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
-  getClientsByUserIds(
-    userIds: (QualifiedId | string)[],
-    updateClients: true,
-  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}}>;
+  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
   getClientsByUserIds(
     userIds: (QualifiedId | string)[],
     updateClients: boolean,
-  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}} | QualifiedPublicClients> {
+  ): Promise<QualifiedUserClientMap | QualifiedPublicClients> {
     return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
   }
 
@@ -204,14 +201,11 @@ export class UserRepository {
    * Retrieves meta information about all the clients of a given user.
    */
   getClientsByUsers(userEntities: User[], updateClients: false): Promise<QualifiedPublicClients>;
-  getClientsByUsers(
-    userEntities: User[],
-    updateClients: true,
-  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}}>;
+  getClientsByUsers(userEntities: User[], updateClients: true): Promise<QualifiedUserClientMap>;
   getClientsByUsers(
     userEntities: User[],
     updateClients: boolean,
-  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}} | QualifiedPublicClients> {
+  ): Promise<QualifiedUserClientMap | QualifiedPublicClients> {
     const userIds: (QualifiedId | string)[] = userEntities.map(userEntity => {
       if (userEntity.domain) {
         return {domain: userEntity.domain, id: userEntity.id};
