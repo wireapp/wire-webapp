@@ -46,8 +46,8 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
-import {MessageRepository} from './MessageRepository';
-import {AssetAddEvent} from './EventBuilder';
+import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {AssetAddEvent} from 'src/script/conversation/EventBuilder';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
