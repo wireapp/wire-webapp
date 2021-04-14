@@ -3646,11 +3646,6 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
-bazinga64@5.7.31:
-  version "5.7.31"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.31.tgz#2ec47a4319221e45b7187dbd7d0e19b42a25a0c5"
-  integrity sha512-uaX6CNmTtWDkxg7QvWeQ8GkWXnVa9+7BsvmhJZubbJqKA2gVF9Vyvntil7qld7ueR5NzJHONJmxi0njLk9wqIA==
-
 bazinga64@5.7.32:
   version "5.7.32"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.32.tgz#df519eb5f852c421b2df33e4404fb386cbe1f33f"
@@ -4821,10 +4816,10 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
-date-fns@2.19.0, date-fns@^2.16.1:
-  version "2.19.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.19.0.tgz#65193348635a28d5d916c43ec7ce6fbd145059e1"
-  integrity sha512-X3bf2iTPgCAQp9wvjOQytnf5vO5rESYRXlPIVcgSbtT5OTScPcsf9eZU+B/YIkKAtYr5WeCii58BgATrNitlWg==
+date-fns@2.20.3, date-fns@^2.16.1:
+  version "2.20.3"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.20.3.tgz#5a28718edb95a80db96187b25340959867d36bc8"
+  integrity sha512-BbiJSlfmr1Fnfi1OHY8arklKdwtZ9n3NkjCeK8G9gtEe0ZSUwJuwHc6gYBl0uoC0Oa5RdpJV1gBBdXcZi8Efdw==
 
 dateformat@~3.0.3:
   version "3.0.3"
