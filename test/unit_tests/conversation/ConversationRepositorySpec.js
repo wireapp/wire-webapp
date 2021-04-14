@@ -21,6 +21,7 @@ import {ConnectionStatus} from '@wireapp/api-client/src/connection';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import {ClientClassification} from '@wireapp/api-client/src/client';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {createRandomUuid} from 'Util/util';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -182,15 +183,15 @@ describe('ConversationRepository', () => {
           none: {
             [eventJson.id]: [
               {
-                class: 'desktop',
+                class: ClientClassification.DESKTOP,
                 id: '1e66e04948938c2c',
               },
               {
-                class: 'legalhold',
+                class: ClientClassification.LEGAL_HOLD,
                 id: '53761bec3f10a6d9',
               },
               {
-                class: 'desktop',
+                class: ClientClassification.DESKTOP,
                 id: 'a9c8c385737b14fe',
               },
             ],

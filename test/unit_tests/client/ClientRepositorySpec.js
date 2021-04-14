@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientType} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {User} from 'src/script/entity/User';
@@ -50,16 +50,14 @@ describe('ClientRepository', () => {
       testFactory.client_repository['clientState'].currentClient(client);
 
       const allClients = [
-        {class: 'desktop', id: '706f64373b1bcf79'},
-        {class: 'phone', id: '809fd276d6709474'},
-        {class: 'desktop', id: '8e11e06549c8cf1a'},
-        {class: 'tablet', id: 'c411f97b139c818b'},
-        {class: 'desktop', id: 'cbf3ea49214702d8'},
+        {class: ClientClassification.DESKTOP, id: '706f64373b1bcf79'},
+        {class: ClientClassification.PHONE, id: '809fd276d6709474'},
+        {class: ClientClassification.DESKTOP, id: '8e11e06549c8cf1a'},
+        {class: ClientClassification.TABLET, id: 'c411f97b139c818b'},
+        {class: ClientClassification.DESKTOP, id: 'cbf3ea49214702d8'},
       ];
       const userClientMap = {
-        none: {
-          [entities.user.john_doe.id]: allClients,
-        },
+        [entities.user.john_doe.id]: allClients,
       };
       spyOn(testFactory.client_repository.clientService, 'getClientsByUserIds').and.callFake(() =>
         Promise.resolve(userClientMap),
@@ -73,7 +71,7 @@ describe('ClientRepository', () => {
   describe('getValidLocalClient', () => {
     const clientPayloadServer = {
       address: '62.96.148.44',
-      class: 'desktop',
+      class: ClientClassification.DESKTOP,
       id: clientId,
       label: 'Windows 10',
       location: {

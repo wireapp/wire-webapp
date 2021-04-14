@@ -18,6 +18,7 @@
  */
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
+import {ClientClassification} from '@wireapp/api-client/src/client/';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {createRandomUuid} from 'Util/util';
 import {Conversation} from 'src/script/entity/Conversation';
@@ -53,12 +54,10 @@ describe('ClientMismatchHandler', () => {
         addClientToUser: jest.fn(),
         getClientsByUserIds: jest.fn().mockImplementation(clientId =>
           Promise.resolve({
-            none: {
-              knownUserId: [
-                {class: 'desktop', id: clientId},
-                {class: 'phone', id: '809fd276d6709474'},
-              ],
-            },
+            [knownUserId]: [
+              {class: ClientClassification.DESKTOP, id: clientId},
+              {class: ClientClassification.PHONE, id: '809fd276d6709474'},
+            ],
           }),
         ),
       };
@@ -107,12 +106,10 @@ describe('ClientMismatchHandler', () => {
         addClientToUser: jest.fn(),
         getClientsByUserIds: jest.fn().mockImplementation(clientId =>
           Promise.resolve({
-            none: {
-              [johnDoe.user_id]: [
-                {class: 'desktop', id: clientId},
-                {class: 'phone', id: '809fd276d6709474'},
-              ],
-            },
+            [johnDoe.user_id]: [
+              {class: ClientClassification.DESKTOP, id: clientId},
+              {class: ClientClassification.PHONE, id: '809fd276d6709474'},
+            ],
           }),
         ),
       };
