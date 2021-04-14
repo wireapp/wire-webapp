@@ -19,25 +19,23 @@
 
 import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Runtime} from '@wireapp/commons';
 
 import {User} from 'src/script/entity/User';
-
 import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';
 import {TestFactory} from '../../helper/TestFactory';
-import {Runtime} from '@wireapp/commons';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';
   let userId = undefined;
 
-  beforeAll(() => {
-    return testFactory.exposeClientActors().then(() => {
-      userId = testFactory.client_repository.selfUser().id;
-    });
+  beforeAll(async () => {
+    await testFactory.exposeClientActors();
+    userId = testFactory.client_repository.selfUser().id;
   });
 
   beforeEach(() => testFactory.storage_repository.clearStores());
@@ -49,6 +47,7 @@ describe('ClientRepository', () => {
 
       testFactory.client_repository['clientState'].currentClient(client);
 
+      /** @type {import('@wireapp/api-client/src/client').PublicClient[]} */
       const allClients = [
         {class: ClientClassification.DESKTOP, id: '706f64373b1bcf79'},
         {class: ClientClassification.PHONE, id: '809fd276d6709474'},
@@ -56,8 +55,11 @@ describe('ClientRepository', () => {
         {class: ClientClassification.TABLET, id: 'c411f97b139c818b'},
         {class: ClientClassification.DESKTOP, id: 'cbf3ea49214702d8'},
       ];
+      /** @type {import('@wireapp/api-client/src/client').QualifiedPublicClients} */
       const userClientMap = {
-        [entities.user.john_doe.id]: allClients,
+        none: {
+          [entities.user.john_doe.id]: allClients,
+        },
       };
       spyOn(testFactory.client_repository.clientService, 'getClientsByUserIds').and.callFake(() =>
         Promise.resolve(userClientMap),
