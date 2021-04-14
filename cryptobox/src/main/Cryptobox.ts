@@ -237,7 +237,7 @@ export class Cryptobox extends EventEmitter {
 
   private async create_new_identity(): Promise<ProteusKeys.IdentityKeyPair> {
     await this.store.delete_all();
-    const identity = await ProteusKeys.IdentityKeyPair.new();
+    const identity = new ProteusKeys.IdentityKeyPair();
 
     this.logger.warn('Cleaned cryptographic items prior to saving a new local identity.');
     this.logger.log(`Created new local identity. Fingerprint is "${identity.public_key.fingerprint()}".`);
@@ -275,7 +275,7 @@ export class Cryptobox extends EventEmitter {
       }
 
       if (this.identity) {
-        const session = await ProteusSession.Session.init_from_prekey(this.identity, bundle);
+        const session = ProteusSession.Session.init_from_prekey(this.identity, bundle);
         const cryptobox_session = new CryptoboxSession(sessionId, session);
         return this.session_save(cryptobox_session);
       }
@@ -339,7 +339,7 @@ export class Cryptobox extends EventEmitter {
   private async create_last_resort_prekey(): Promise<ProteusKeys.PreKey> {
     this.logger.log(`Creating Last Resort PreKey with ID "${ProteusKeys.PreKey.MAX_PREKEY_ID}"...`);
 
-    this.lastResortPreKey = await ProteusKeys.PreKey.last_resort();
+    this.lastResortPreKey = ProteusKeys.PreKey.last_resort();
     const preKeys = await this.store.save_prekeys([this.lastResortPreKey]);
 
     return preKeys[0];
@@ -361,7 +361,7 @@ export class Cryptobox extends EventEmitter {
       return [];
     }
 
-    const newPreKeys = await ProteusKeys.PreKey.generate_prekeys(start, size);
+    const newPreKeys = ProteusKeys.PreKey.generate_prekeys(start, size);
     return this.store.save_prekeys(newPreKeys);
   }
 

@@ -41,8 +41,8 @@ export class CryptoboxSession {
     return this.session.decrypt(pk_store, envelope);
   }
 
-  public async encrypt(plaintext: string | Uint8Array): Promise<ArrayBuffer> {
-    const ciphertext = await this.session.encrypt(plaintext);
+  public encrypt(plaintext: string | Uint8Array): ArrayBuffer {
+    const ciphertext = ProteusSession.Session.encrypt(this.session, plaintext);
     return ciphertext.serialise();
   }
 
