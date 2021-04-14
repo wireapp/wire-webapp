@@ -22,7 +22,7 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf src/**/*{.js,.js.map,.d.ts} .nyc_output coverage .tmp",
+    "clean": "rimraf .nyc_output coverage .tmp \"src/**/*.{js?(.map),d.ts}\"",
     "dist": "yarn clean && yarn build",
     "test": "make-dir .tmp && copyfiles -f \"src/!(*.d).ts\" .tmp && nyc --exclude src jasmine --config=jasmine.json && rimraf .tmp"
   },

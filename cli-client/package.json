@@ -26,7 +26,7 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
+    "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
     "dist": "yarn clean && yarn build",
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "test": "yarn test:node",

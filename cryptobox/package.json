@@ -39,7 +39,7 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf src/main/**/*{.js,.js.map,.d.ts}",
+    "clean": "rimraf \"src/main/**/*.{js?(.map),d.ts}\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",

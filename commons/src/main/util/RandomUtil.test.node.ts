@@ -29,7 +29,7 @@ describe('RandomUtil', () => {
       const randomLimit = 10;
       for (let index = 0; index < iterations; index++) {
         if (RandomUtil.randomInt(randomLimit) > randomLimit) {
-          return fail(`randomInt() exeeded limit "${randomLimit}"`);
+          fail(`randomInt() exeeded limit "${randomLimit}"`);
         }
       }
     });

@@ -11,7 +11,6 @@
   },
   "devDependencies": {
     "@types/jest": "26.0.22",
-    "del-cli": "3.0.1",
     "jest": "26.6.3",
     "rimraf": "3.0.2",
     "ts-jest": "26.5.4",
@@ -34,9 +33,9 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js}\" \"!src/test/**/*\"",
+    "clean": "rimraf \"src/!(test)/**/*.{js?(.map),d.ts}\"",
     "dist": "yarn clean && yarn build",
-    "test": "yarn jest",
+    "test": "jest",
     "test:coverage": "yarn test --coverage",
     "test:watch": "yarn test --watch"
   },

@@ -7,7 +7,6 @@
   "devDependencies": {
     "@types/jasmine": "3.6.9",
     "cross-env": "7.0.3",
-    "del-cli": "3.0.1",
     "dotenv-defaults": "2.0.1",
     "jasmine": "3.7.0",
     "rimraf": "3.0.2",
@@ -27,7 +26,7 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
+    "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
     "demo:admin": "ts-node src/demo/admin.ts",
     "dist": "yarn clean && yarn build",
     "test": "yarn build && yarn test:node",

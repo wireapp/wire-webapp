@@ -5,7 +5,6 @@
   "devDependencies": {
     "@types/karma": "6.1.0",
     "cross-env": "7.0.3",
-    "del-cli": "3.0.1",
     "jasmine": "3.7.0",
     "karma": "6.3.2",
     "karma-chrome-launcher": "3.1.0",
@@ -32,7 +31,7 @@
     "build": "yarn build:node && yarn build:browser",
     "build:browser": "webpack --progress",
     "build:node": "tsc",
-    "clean": "del-cli \"src/**/*{.js,.js.map,.d.ts}\" \"!src/**/*{.test.node.js,.test.js}\" \"!src/test/**/*\"",
+    "clean": "rimraf \"src/(!test)/**/{!(test*).js,*.js.map,*.d.ts}\"",
     "dist": "yarn clean && yarn build",
     "test": "yarn build && yarn test:node && yarn test:browser",
     "test:browser": "webpack && karma start",

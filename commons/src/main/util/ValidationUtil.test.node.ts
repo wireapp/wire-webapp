@@ -39,7 +39,7 @@ describe('isUUIDv4', () => {
   it('exports the regular expression pattern so it can be reused by external applications', () => {
     const uuid = '221b6959-6d97-483e-bb4a-e9643292a4c1';
     const url = `wire://conversation/${uuid}`;
-    const actual = url.match(ValidationUtil.PATTERN.UUID_V4)[0];
+    const actual = url.match(ValidationUtil.PATTERN.UUID_V4)?.[0];
     expect(actual).toBe(uuid);
   });
 });

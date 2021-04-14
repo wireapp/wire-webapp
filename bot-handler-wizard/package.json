@@ -31,7 +31,7 @@
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",
-    "clean": "rimraf src/**/*{.js,.js.map,.d.ts}",
+    "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
     "demo:setup": "cross-env NODE_DEBUG=@wireapp/* ts-node ./src/demo/setup.ts",
     "dist": "yarn clean && yarn build",
     "test": "yarn test:node",
