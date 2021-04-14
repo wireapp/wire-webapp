@@ -56,12 +56,17 @@ describe('ClientRepository', () => {
         {class: 'tablet', id: 'c411f97b139c818b'},
         {class: 'desktop', id: 'cbf3ea49214702d8'},
       ];
-      spyOn(testFactory.client_repository.clientService, 'getClientsByUserId').and.callFake(() =>
-        Promise.resolve(allClients),
+      const userClientMap = {
+        none: {
+          [entities.user.john_doe.id]: allClients,
+        },
+      };
+      spyOn(testFactory.client_repository.clientService, 'getClientsByUserIds').and.callFake(() =>
+        Promise.resolve(userClientMap),
       );
 
       const clientEntities = await testFactory.client_repository.getClientsByUserIds([entities.user.john_doe.id]);
-      expect(clientEntities.length).toBe(allClients.length);
+      expect(clientEntities[entities.user.john_doe.id].length).toBe(allClients.length);
     });
   });
 
