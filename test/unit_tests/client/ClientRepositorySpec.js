@@ -42,7 +42,7 @@ describe('ClientRepository', () => {
 
   beforeEach(() => testFactory.storage_repository.clearStores());
 
-  describe('getClientsByUserId', () => {
+  describe('getClientsByUserIds', () => {
     it('maps client entities from client payloads by the backend', async () => {
       const client = new ClientEntity();
       client.id = clientId;

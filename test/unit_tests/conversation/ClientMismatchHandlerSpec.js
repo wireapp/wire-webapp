@@ -51,11 +51,15 @@ describe('ClientMismatchHandler', () => {
 
       const userRepositorySpy = {
         addClientToUser: jest.fn(),
-        getClientsByUserId: jest.fn().mockImplementation(clientId =>
-          Promise.resolve([
-            {class: 'desktop', id: clientId},
-            {class: 'phone', id: '809fd276d6709474'},
-          ]),
+        getClientsByUserIds: jest.fn().mockImplementation(clientId =>
+          Promise.resolve({
+            none: {
+              knownUserId: [
+                {class: 'desktop', id: clientId},
+                {class: 'phone', id: '809fd276d6709474'},
+              ],
+            },
+          }),
         ),
       };
       const conversationRepositorySpy = {
@@ -101,11 +105,15 @@ describe('ClientMismatchHandler', () => {
       const conversation = new Conversation(createRandomUuid());
       const userRepositorySpy = {
         addClientToUser: jest.fn(),
-        getClientsByUserId: jest.fn().mockImplementation(clientId =>
-          Promise.resolve([
-            {class: 'desktop', id: clientId},
-            {class: 'phone', id: '809fd276d6709474'},
-          ]),
+        getClientsByUserIds: jest.fn().mockImplementation(clientId =>
+          Promise.resolve({
+            none: {
+              [johnDoe.user_id]: [
+                {class: 'desktop', id: clientId},
+                {class: 'phone', id: '809fd276d6709474'},
+              ],
+            },
+          }),
         ),
       };
       const conversationRepositorySpy = {
