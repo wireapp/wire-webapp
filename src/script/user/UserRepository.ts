@@ -189,7 +189,7 @@ export class UserRepository {
   getClientsByUserIds(
     userId: string[],
     updateClients: boolean = true,
-  ): Promise<Record<string, ClientEntity[] | PublicClient[]>> {
+  ): Promise<Record<string, ClientEntity[]> | Record<string, PublicClient[]>> {
     return this.clientRepository.getClientsByUserIds(userId, updateClients);
   }
 
