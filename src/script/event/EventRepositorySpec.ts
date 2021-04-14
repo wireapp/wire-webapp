@@ -21,7 +21,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {Asset as ProtobufAsset, GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import * as Proteus from '@wireapp/proteus';
+import {keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event';
 import {arrayToBase64, createRandomUuid} from 'Util/util';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
@@ -45,7 +45,7 @@ import {CryptographyError} from '../error/CryptographyError';
 const testFactory = new TestFactory();
 
 async function createEncodedCiphertext(
-  preKey: Proteus.keys.PreKey,
+  preKey: ProteusKeys.PreKey,
   text = 'Hello, World!',
   receivingIdentity = testFactory.cryptography_repository.cryptobox.identity,
 ) {
@@ -61,7 +61,7 @@ async function createEncodedCiphertext(
   });
 
   const sessionId = `from-${sender.identity.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
-  const preKeyBundle = new Proteus.keys.PreKeyBundle(receivingIdentity.public_key, preKey);
+  const preKeyBundle = new ProteusKeys.PreKeyBundle(receivingIdentity.public_key, preKey);
 
   const cipherText = await sender.encrypt(
     sessionId,
@@ -71,6 +71,10 @@ async function createEncodedCiphertext(
 
   return arrayToBase64(cipherText);
 }
+
+beforeAll(async () => {
+  await proteusInit();
+});
 
 describe('EventRepository', () => {
   let last_notification_id: string;
