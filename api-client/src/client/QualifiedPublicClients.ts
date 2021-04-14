@@ -21,6 +21,6 @@ import {PublicClient} from './PublicClient';
 
 export interface QualifiedPublicClients {
   [domain: string]: {
-    [userId: string]: PublicClient;
+    [userId: string]: PublicClient[];
   };
 }
