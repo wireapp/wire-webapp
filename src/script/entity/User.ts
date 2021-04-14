@@ -82,6 +82,7 @@ export class User {
   public readonly username: ko.Observable<string>;
   public serviceId?: string;
   public teamId?: string;
+  /** The federated domain (when the user is on a federated server) */
   public domain?: string;
 
   static get ACCENT_COLOR() {

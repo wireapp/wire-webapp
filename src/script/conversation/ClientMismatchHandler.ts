@@ -59,10 +59,13 @@ export class ClientMismatchHandler {
   ): Promise<NewOTRMessage<string> | void> {
     const {deleted, missing, redundant} = clientMismatch;
     // Note: Broadcast messages have an empty conversation ID
-    const conversationEntity: Conversation | undefined =
-      eventInfoEntity.conversationId !== ''
-        ? await this.conversationRepositoryProvider().getConversationById(eventInfoEntity.conversationId)
-        : undefined;
+    let conversationEntity: Conversation | undefined;
+
+    if (eventInfoEntity.conversationId !== '') {
+      conversationEntity = await this.conversationRepositoryProvider().getConversationById(
+        eventInfoEntity.conversationId,
+      );
+    }
     await this.removeClientsFromPayload(redundant, false, conversationEntity, payload);
     await this.removeClientsFromPayload(deleted, true, conversationEntity, payload);
     return this.handleMissing(missing, eventInfoEntity, conversationEntity, payload);
@@ -96,11 +99,18 @@ export class ClientMismatchHandler {
       }
     }
 
-    const userClientMap = await this.userRepository.getClientsByUserIds(missingUserIds, false);
+    // we are using the User entity here to make use of a user's domain (if it exists).
+    // if we ignore the domain, we might find two users with the same id from two different
+    // federated servers.
+    const missingUserEntities = missingUserIds.map(missingUserId => this.userRepository.findUserById(missingUserId));
+
+    const qualifiedUsersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
     await Promise.all(
-      Object.entries(userClientMap).map(([userId, clients]) => {
-        return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
-      }),
+      Object.values(qualifiedUsersMap).map(userClientMap =>
+        Object.entries(userClientMap).map(([userId, clients]) => {
+          return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+        }),
+      ),
     );
 
     this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(missingUserIds);

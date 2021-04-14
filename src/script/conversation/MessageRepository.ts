@@ -1504,11 +1504,20 @@ export class MessageRepository {
           return missing;
         }, []);
 
-        const userClientMap = await this.userRepository.getClientsByUserIds(missingUserIds, false);
+        // we are using the User entity here to make use of a user's domain (if it exists).
+        // if we ignore the domain, we might find two users with the same id from two different
+        // federated servers.
+        const missingUserEntities = missingUserIds.map(missingUserId =>
+          this.userRepository.findUserById(missingUserId),
+        );
+
+        const qualifiedUsersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
         await Promise.all(
-          Object.entries(userClientMap).map(([userId, clients]) => {
-            return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
-          }),
+          Object.values(qualifiedUsersMap).map(userClientMap =>
+            Object.entries(userClientMap).map(([userId, clients]) => {
+              return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+            }),
+          ),
         );
       }
     }

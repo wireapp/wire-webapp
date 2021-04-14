@@ -24,12 +24,16 @@ import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {USER_EVENT} from '@wireapp/api-client/src/event';
-import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/src/user';
+import {
+  UserAsset as APIClientUserAsset,
+  UserAssetType as APIClientUserAssetType,
+  QualifiedId,
+} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {AxiosError} from 'axios';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
-import type {PublicClient} from '@wireapp/api-client/src/client';
+import type {QualifiedPublicClients, PublicClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser} from '@wireapp/api-client/src/user';
 
 import {chunk, partition} from 'Util/ArrayUtil';
@@ -184,13 +188,38 @@ export class UserRepository {
   /**
    * Retrieves meta information about all the clients of a given user.
    */
-  getClientsByUserIds(userId: string[], updateClients: false): Promise<Record<string, PublicClient[]>>;
-  getClientsByUserIds(userId: string[], updateClients?: boolean): Promise<Record<string, ClientEntity[]>>;
+  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
   getClientsByUserIds(
-    userId: string[],
-    updateClients: boolean = true,
-  ): Promise<Record<string, ClientEntity[]> | Record<string, PublicClient[]>> {
-    return this.clientRepository.getClientsByUserIds(userId, updateClients);
+    userIds: (QualifiedId | string)[],
+    updateClients: true,
+  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}}>;
+  getClientsByUserIds(
+    userIds: (QualifiedId | string)[],
+    updateClients: boolean,
+  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}} | QualifiedPublicClients> {
+    return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
+  }
+
+  /**
+   * Retrieves meta information about all the clients of a given user.
+   */
+  getClientsByUsers(userEntities: User[], updateClients: false): Promise<QualifiedPublicClients>;
+  getClientsByUsers(
+    userEntities: User[],
+    updateClients: true,
+  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}}>;
+  getClientsByUsers(
+    userEntities: User[],
+    updateClients: boolean,
+  ): Promise<{[domain: string]: {[userId: string]: ClientEntity[]}} | QualifiedPublicClients> {
+    const userIds: (QualifiedId | string)[] = userEntities.map(userEntity => {
+      if (userEntity.domain) {
+        return {domain: userEntity.domain, id: userEntity.id};
+      }
+      return userEntity.id;
+    });
+
+    return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
   }
 
   /**
