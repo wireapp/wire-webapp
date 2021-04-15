@@ -9,7 +9,7 @@
                    id="name" type="text"
                    data-bind="value: name, event: {blur: resetNameInput}, enter: changeName, attr: {placeholder: t('preferencesAccountUsernamePlaceholder'), readonly: !canEditProfile(selfUser())}"
                    data-uie-name="enter-name"
-                   maxlength="64"
+                   maxlength="128"
                    spellcheck="false" />
             <!-- ko if: canEditProfile(selfUser()) -->
               <!-- ko if: nameSaved() -->

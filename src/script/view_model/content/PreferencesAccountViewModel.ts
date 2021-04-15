@@ -209,8 +209,7 @@ export class PreferencesAccountViewModel {
       return event.target.blur();
     }
 
-    const isValidName = newName.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
-    if (isValidName) {
+    if (newName.length) {
       try {
         await this.userRepository.changeName(newName);
         this.nameSaved(true);
