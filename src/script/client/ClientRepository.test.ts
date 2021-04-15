@@ -64,7 +64,7 @@ describe('ClientRepository', () => {
       );
 
       const clientEntities = await testFactory.client_repository.getClientsByUserIds([entities.user.john_doe.id], true);
-      expect(clientEntities[entities.user.john_doe.id].length).toBe(allClients.length);
+      expect(clientEntities.none[entities.user.john_doe.id].length).toBe(allClients.length);
     });
   });
 
