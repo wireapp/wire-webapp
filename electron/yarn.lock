@@ -168,10 +168,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@wireapp/copy-config@1.1.18":
-  version "1.1.18"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.1.18.tgz#3d95075e919d23c86785fe1781d8c7ea03f2bdc2"
-  integrity sha512-n8Y8YSg8xcUo7n/QXbS8aacFIHGiYaX35fhBVxetmIQW4EqEylImtxPIRtIvvrcbmyEJ9tChFxAnqJm5bZ2hMw==
+"@wireapp/copy-config@1.1.19":
+  version "1.1.19"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.1.19.tgz#e2fb21238fb2d68d841ca571f96b0b3f2ba9d74b"
+  integrity sha512-tFgQtRGroeXNZMw9tkeXH8CB5ZJP0qkBFGvqxk/VIsEko+UCD5ggIFCtxMdmsVvjLBAnp1TGZ2G5Xe0eCwmE5Q==
   dependencies:
     axios "0.21.1"
     copy "0.3.2"
