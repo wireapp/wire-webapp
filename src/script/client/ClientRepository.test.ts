@@ -63,7 +63,10 @@ describe('ClientRepository', () => {
         Promise.resolve(userClientMap),
       );
 
-      const clientEntities = await testFactory.client_repository.getClientsByUserIds([entities.user.john_doe.id], true);
+      const clientEntities = await testFactory.client_repository.getClientsByUserIds(
+        [entities.user.john_doe.id],
+        false,
+      );
       expect(clientEntities.none[entities.user.john_doe.id].length).toBe(allClients.length);
     });
   });
