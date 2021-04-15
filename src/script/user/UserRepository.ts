@@ -188,8 +188,8 @@ export class UserRepository {
   /**
    * Retrieves meta information about all the clients of a given user.
    */
-  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
   getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
+  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
   getClientsByUserIds(
     userIds: (QualifiedId | string)[],
     updateClients: boolean,
@@ -200,8 +200,8 @@ export class UserRepository {
   /**
    * Retrieves meta information about all the clients of a given user.
    */
-  getClientsByUsers(userEntities: User[], updateClients: false): Promise<QualifiedPublicClients>;
   getClientsByUsers(userEntities: User[], updateClients: true): Promise<QualifiedUserClientMap>;
+  getClientsByUsers(userEntities: User[], updateClients: false): Promise<QualifiedPublicClients>;
   getClientsByUsers(
     userEntities: User[],
     updateClients: boolean,

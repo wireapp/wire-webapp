@@ -349,8 +349,8 @@ export class ClientRepository {
    * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
-  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
   async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
+  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
   async getClientsByUserIds(
     userIds: (QualifiedId | string)[],
     updateClients: boolean,
