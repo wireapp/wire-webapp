@@ -17,9 +17,13 @@
  *
  */
 
-import type {BackendEvent, ConversationEvent, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
+import {
+  CONVERSATION_EVENT,
+  BackendEvent,
+  ConversationEvent,
+  ConversationOtrMessageAddEvent,
+} from '@wireapp/api-client/src/event/';
 import type {Notification} from '@wireapp/api-client/src/notification/';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {util as ProteusUtil} from '@wireapp/proteus';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';

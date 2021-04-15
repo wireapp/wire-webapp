@@ -17,7 +17,7 @@
  *
  */
 
-import type {RegisteredClient} from '@wireapp/api-client/src/client/index';
+import type {RegisteredClient} from '@wireapp/api-client/src/client/';
 
 import {AUTH_ACTION, AppActions, CLIENT_ACTION, NOTIFICATION_ACTION} from '../action/creator/';
 

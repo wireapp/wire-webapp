@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {Notification} from '@wireapp/api-client/src/notification';
+import type {Notification} from '@wireapp/api-client/src/notification/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
