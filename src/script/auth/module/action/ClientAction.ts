@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/src/client/index';
+import {ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/src/client/';
 import type {ClientInfo} from '@wireapp/core/src/main/client/';
 
 import {Runtime} from '@wireapp/commons';

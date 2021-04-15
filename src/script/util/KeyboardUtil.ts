@@ -37,7 +37,7 @@ export const KEY = {
 
 export const isOneOfKeys = (keyboardEvent: KeyboardEvent, expectedKeys: string[] = []) => {
   expectedKeys = expectedKeys.map(key => key.toLowerCase());
-  const eventKey = keyboardEvent.key ? keyboardEvent.key.toLowerCase() : '';
+  const eventKey = keyboardEvent.key?.toLowerCase() || '';
   return !!expectedKeys.find(key => key === eventKey);
 };
 
@@ -48,7 +48,7 @@ export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.PAGE_UP, KEY.PAGE_DOWN]);
 
 export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
-  const eventKey = keyboardEvent?.key.toLowerCase() || '';
+  const eventKey = keyboardEvent?.key?.toLowerCase() || '';
   return eventKey === expectedKey.toLowerCase();
 };
 

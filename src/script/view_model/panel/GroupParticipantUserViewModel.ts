@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
-import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation';
+import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/src/conversation/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 

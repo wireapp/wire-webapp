@@ -17,7 +17,7 @@
  *
  */
 
-import {WebappProperties} from '@wireapp/api-client/src/user/data';
+import {WebappProperties} from '@wireapp/api-client/src/user/data/';
 import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import {Logger, Runtime} from '@wireapp/commons';
 import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
@@ -35,6 +35,7 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {loadValue} from 'Util/StorageUtil';
+import {formatDurationCaption} from 'Util/TimeUtil';
 import {isTemporaryClientAndNonPersistent, validateProfileImageResolution} from 'Util/util';
 import type {ClientEntity} from '../../client/ClientEntity';
 import {ClientRepository} from '../../client/ClientRepository';
@@ -61,7 +62,6 @@ import {modals, ModalsViewModel} from '../ModalsViewModel';
 import {HistoryExportViewModel} from './HistoryExportViewModel';
 import {AppLockState} from '../../user/AppLockState';
 import {AppLockRepository} from '../../user/AppLockRepository';
-import {formatDurationCaption} from 'Util/TimeUtil';
 
 export enum UserNameState {
   AVAILABLE = 'AVAILABLE',
@@ -209,8 +209,7 @@ export class PreferencesAccountViewModel {
       return event.target.blur();
     }
 
-    const isValidName = newName.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH;
-    if (isValidName) {
+    if (newName.length) {
       try {
         await this.userRepository.changeName(newName);
         this.nameSaved(true);

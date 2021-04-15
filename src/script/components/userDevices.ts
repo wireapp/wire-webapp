@@ -21,7 +21,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {DexieError} from 'dexie';
 import ko from 'knockout';
-import {ClientClassification} from '@wireapp/api-client/src/client';
+import {ClientClassification} from '@wireapp/api-client/src/client/';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
@@ -200,12 +200,14 @@ ko.components.register('user-devices', {
     this.showDevicesNotFound = () => showDeviceList() && this.deviceMode() === FIND_MODE.NOT_FOUND;
 
     clientRepository
-      .getClientsByUserId(userEntity().id)
-      .then((clientEntities: ClientEntity[]) => {
-        this.clientEntities(sortUserDevices(clientEntities));
-        const hasDevices = clientEntities.length > 0;
-        const deviceMode = hasDevices ? FIND_MODE.FOUND : FIND_MODE.NOT_FOUND;
-        this.deviceMode(deviceMode);
+      .getClientsByUserIds([userEntity().id])
+      .then(clientEntityMap => {
+        for (const clientEntities of Object.values(clientEntityMap)) {
+          this.clientEntities(sortUserDevices(clientEntities));
+          const hasDevices = clientEntities.length > 0;
+          const deviceMode = hasDevices ? FIND_MODE.FOUND : FIND_MODE.NOT_FOUND;
+          this.deviceMode(deviceMode);
+        }
       })
       .catch(error => {
         logger.error(`Unable to retrieve clients for user '${userEntity().id}': ${error.message || error}`);

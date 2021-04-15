@@ -21,10 +21,10 @@ import ko from 'knockout';
 import type {AxiosError} from 'axios';
 import {amplify} from 'amplify';
 import {error as StoreEngineError} from '@wireapp/store-engine';
-import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
-import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation';
+import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
-import {errors as ProteusErrors, keys as ProteusKeys} from '@wireapp/proteus';
+import {errors as ProteusErrors, keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
@@ -95,6 +95,8 @@ export class CryptographyRepository {
    * @returns Resolves with an array of PreKeys
    */
   async initCryptobox(): Promise<ProteusKeys.PreKey[]> {
+    await proteusInit();
+
     const storeEngine = this.storageRepository['storageService']['engine'];
     this.cryptobox = new Cryptobox(storeEngine, 10);
 

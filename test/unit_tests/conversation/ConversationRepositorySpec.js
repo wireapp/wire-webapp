@@ -17,10 +17,11 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {ClientClassification} from '@wireapp/api-client/src/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {createRandomUuid} from 'Util/util';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -177,21 +178,25 @@ describe('ConversationRepository', () => {
         return Promise.reject(missingClientsError);
       });
 
-      spyOn(testFactory.client_service, 'getClientsByUserId').and.returnValue(
-        Promise.resolve([
-          {
-            class: 'desktop',
-            id: '1e66e04948938c2c',
+      spyOn(testFactory.client_service, 'getClientsByUserIds').and.returnValue(
+        Promise.resolve({
+          none: {
+            [eventJson.id]: [
+              {
+                class: ClientClassification.DESKTOP,
+                id: '1e66e04948938c2c',
+              },
+              {
+                class: ClientClassification.LEGAL_HOLD,
+                id: '53761bec3f10a6d9',
+              },
+              {
+                class: ClientClassification.DESKTOP,
+                id: 'a9c8c385737b14fe',
+              },
+            ],
           },
-          {
-            class: 'legalhold',
-            id: '53761bec3f10a6d9',
-          },
-          {
-            class: 'desktop',
-            id: 'a9c8c385737b14fe',
-          },
-        ]),
+        }),
       );
 
       const injectLegalHoldMessageSpy = spyOn(testFactory.conversation_repository, 'injectLegalHoldMessage');

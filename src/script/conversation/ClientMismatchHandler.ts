@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation';
+import type {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
@@ -96,11 +96,10 @@ export class ClientMismatchHandler {
       }
     }
 
+    const userClientMap = await this.userRepository.getClientsByUserIds(missingUserIds, false);
     await Promise.all(
-      missingUserIds.map(userId => {
-        return this.userRepository.getClientsByUserId(userId, false).then(clients => {
-          return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
-        });
+      Object.entries(userClientMap).map(([userId, clients]) => {
+        return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
       }),
     );
 

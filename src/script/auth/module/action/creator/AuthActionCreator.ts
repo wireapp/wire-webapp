@@ -18,7 +18,7 @@
  */
 
 import type {SSOSettings} from '@wireapp/api-client/src/account/SSOSettings';
-import type {LoginData, RegisterData} from '@wireapp/api-client/src/auth';
+import type {LoginData, RegisterData} from '@wireapp/api-client/src/auth/';
 
 import type {AppAction} from '.';
 import type {RegistrationDataState} from '../../reducer/authReducer';

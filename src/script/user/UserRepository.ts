@@ -19,18 +19,21 @@
 
 import {amplify} from 'amplify';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self';
+import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {USER_EVENT} from '@wireapp/api-client/src/event';
-import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/src/user';
+import {USER_EVENT} from '@wireapp/api-client/src/event/';
+import {
+  UserAsset as APIClientUserAsset,
+  UserAssetType as APIClientUserAssetType,
+  User as APIClientUser,
+} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {AxiosError} from 'axios';
-import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
-import type {PublicClient} from '@wireapp/api-client/src/client';
-import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+import type {BackendError, TraceState} from '@wireapp/api-client/src/http/';
+import type {PublicClient} from '@wireapp/api-client/src/client/';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -80,7 +83,6 @@ export class UserRepository {
   static get CONFIG() {
     return {
       MAXIMUM_TEAM_SIZE_BROADCAST: 500,
-      MINIMUM_NAME_LENGTH: 2,
       MINIMUM_PICTURE_SIZE: {
         HEIGHT: 320,
         WIDTH: 320,
@@ -184,10 +186,13 @@ export class UserRepository {
   /**
    * Retrieves meta information about all the clients of a given user.
    */
-  getClientsByUserId(userId: string, updateClients: false): Promise<PublicClient[]>;
-  getClientsByUserId(userId: string, updateClients?: boolean): Promise<ClientEntity[]>;
-  getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[] | PublicClient[]> {
-    return this.clientRepository.getClientsByUserId(userId, updateClients);
+  getClientsByUserIds(userId: string[], updateClients: false): Promise<Record<string, PublicClient[]>>;
+  getClientsByUserIds(userId: string[], updateClients?: boolean): Promise<Record<string, ClientEntity[]>>;
+  getClientsByUserIds(
+    userId: string[],
+    updateClients: boolean = true,
+  ): Promise<Record<string, ClientEntity[]> | Record<string, PublicClient[]>> {
+    return this.clientRepository.getClientsByUserIds(userId, updateClients);
   }
 
   /**
@@ -275,7 +280,11 @@ export class UserRepository {
    *
    * @returns Resolves with `true` when a client has been added
    */
-  addClientToUser = async (userId: string, clientPayload: object, publishClient: boolean = false): Promise<boolean> => {
+  addClientToUser = async (
+    userId: string,
+    clientPayload: PublicClient,
+    publishClient: boolean = false,
+  ): Promise<boolean> => {
     const userEntity = await this.getUserById(userId);
     const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.isMe);
     const wasClientAdded = userEntity.addClient(clientEntity);
@@ -632,12 +641,8 @@ export class UserRepository {
    * Change name.
    */
   async changeName(name: string): Promise<User> {
-    if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      await this.selfService.putSelf({name});
-      return this.userUpdate({user: {id: this.userState.self().id, name}});
-    }
-
-    throw new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE);
+    await this.selfService.putSelf({name});
+    return this.userUpdate({user: {id: this.userState.self().id, name}});
   }
 
   async changeEmail(email: string): Promise<void> {

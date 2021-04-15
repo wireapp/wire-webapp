@@ -19,7 +19,7 @@
 
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
-import * as Proteus from '@wireapp/proteus';
+import {keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {arrayToBase64, createRandomUuid} from 'Util/util';
@@ -32,7 +32,10 @@ import {CryptographyError} from 'src/script/error/CryptographyError';
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
 
-  beforeAll(() => testFactory.exposeCryptographyActors(false));
+  beforeAll(async () => {
+    await proteusInit();
+    await testFactory.exposeCryptographyActors(false);
+  });
 
   describe('encryptGenericMessage', () => {
     let jane_roe = undefined;
@@ -164,7 +167,7 @@ describe('CryptographyRepository', () => {
 
       expect(alice).toBeDefined();
 
-      const aliceBundle = new Proteus.keys.PreKeyBundle(alice.public_key, preKeys[0]);
+      const aliceBundle = new ProteusKeys.PreKeyBundle(alice.public_key, preKeys[0]);
 
       const bobEngine = new MemoryEngine();
       await bobEngine.init('bob');

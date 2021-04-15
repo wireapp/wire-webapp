@@ -17,9 +17,8 @@
  *
  */
 
-import type {RegisteredClient} from '@wireapp/api-client/src/client/index';
-
-import type {AppAction} from './index';
+import type {RegisteredClient} from '@wireapp/api-client/src/client/';
+import type {AppAction} from './';
 
 export enum CLIENT_ACTION {
   CLIENT_INIT_FAILED = 'CLIENT_INIT_FAILED',
