@@ -56,7 +56,7 @@ export class ClientMismatchHandler {
     eventInfoEntity: EventInfoEntity,
     clientMismatch: ClientMismatch,
     payload?: NewOTRMessage<string>,
-  ): Promise<NewOTRMessage<string> | void> {
+  ): Promise<NewOTRMessage<string> | undefined> {
     const {deleted, missing, redundant} = clientMismatch;
     // Note: Broadcast messages have an empty conversation ID
     let conversationEntity: Conversation | undefined;
@@ -66,6 +66,7 @@ export class ClientMismatchHandler {
         eventInfoEntity.conversationId,
       );
     }
+
     await this.removeClientsFromPayload(redundant, false, conversationEntity, payload);
     await this.removeClientsFromPayload(deleted, true, conversationEntity, payload);
     return this.handleMissing(missing, eventInfoEntity, conversationEntity, payload);
@@ -79,7 +80,7 @@ export class ClientMismatchHandler {
     eventInfoEntity: EventInfoEntity,
     conversationEntity?: Conversation,
     payload?: NewOTRMessage<string>,
-  ): Promise<NewOTRMessage<string> | void> {
+  ): Promise<NewOTRMessage<string> | undefined> {
     const missingUserIds = Object.keys(recipients);
 
     if (missingUserIds.length === 0) {
@@ -118,6 +119,8 @@ export class ClientMismatchHandler {
     if (payload) {
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);
     }
+
+    return undefined;
   }
 
   /**

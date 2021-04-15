@@ -738,7 +738,7 @@ export class MessageRepository {
 
     const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
-    eventInfoEntity.setTimestamp((injectedEvent as any).time as string);
+    eventInfoEntity.setTimestamp(injectedEvent.time);
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
     this.trackContributed(conversationEntity, genericMessage);
     const backendIsoDate = syncTimestamp ? sentPayload.time : '';
