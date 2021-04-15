@@ -32,7 +32,7 @@ import 'Components/asset/AssetHeader';
 import 'Components/asset/controls/AudioSeekBar';
 import 'Components/asset/controls/MediaButton';
 import 'Components/asset/controls/SeekBar';
-import 'Components/copyToClipboard';
+import 'Components/CopyToClipboard';
 import 'Components/message/EphemeralTimer';
 import '../page/collection/fullSearch';
 import '../page/start-ui/GroupList';

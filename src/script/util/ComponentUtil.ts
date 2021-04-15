@@ -19,34 +19,40 @@
 
 import ko from 'knockout';
 import {useEffect, useState} from 'react';
-import {container, InjectionToken} from 'tsyringe';
 import {TypeUtil} from '@wireapp/commons';
+
+interface RegisterReactComponent<Props> {
+  component: React.ComponentType<Props>;
+  /** The optional knockout params */
+  optionalParams?: TypeUtil.OptionalKeys<Props>[];
+}
+
+interface RegisterReactComponentWithTemplate<T> extends RegisterReactComponent<T> {
+  bindings?: never;
+  template: string;
+}
+
+interface RegisterReactComponentWithBindings<T> extends RegisterReactComponent<T> {
+  bindings: string;
+  template?: never;
+}
 
 export function registerReactComponent<Props>(
   name: string,
   {
     template,
+    bindings,
     component,
     optionalParams = [],
-    injected = {},
-  }: {
-    component: React.ComponentType<Props>;
-    injected?: Record<string, InjectionToken>;
-    /** The optional knockout params */
-    optionalParams?: TypeUtil.OptionalKeys<Props>[];
-    template: string;
-  },
+  }: RegisterReactComponentWithBindings<Props> | RegisterReactComponentWithTemplate<Props>,
 ) {
   ko.components.register(name, {
-    template,
+    template: template ?? `<!-- ko react: {${bindings}} --><!-- /ko -->`,
     viewModel: function (knockoutParams: Props) {
       optionalParams.forEach(param => {
         if (!knockoutParams.hasOwnProperty(param)) {
           knockoutParams[param] = undefined;
         }
-      });
-      Object.entries(injected).forEach(([injectedName, injectedClass]) => {
-        knockoutParams[injectedName as keyof Props] = container.resolve(injectedClass);
       });
       Object.assign(this, knockoutParams);
       this.reactComponent = component;
