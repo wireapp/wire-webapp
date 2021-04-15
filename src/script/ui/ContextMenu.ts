@@ -67,7 +67,7 @@ const _onMouseDown = (event: MouseEvent): void => {
 
 const _onWheel = (event: MouseEvent): void => event.preventDefault();
 
-const _rotateItem = (key: string): void => {
+const _rotateItem = (key?: string): void => {
   const entries = Array.from(document.querySelectorAll('.ctx-menu-item'));
   const entry = document.querySelector('.ctx-menu-item.selected');
 
