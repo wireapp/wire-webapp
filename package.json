@@ -91,7 +91,7 @@
     "@types/sinon": "10.0.0",
     "@types/speakingurl": "13.0.2",
     "@types/uint32": "0.2.0",
-    "@types/underscore": "1.11.0",
+    "@types/underscore": "1.11.1",
     "@types/webpack-env": "1.16.0",
     "@typescript-eslint/eslint-plugin": "4.22.0",
     "@typescript-eslint/parser": "4.21.0",
