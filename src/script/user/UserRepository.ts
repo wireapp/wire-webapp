@@ -34,7 +34,7 @@ import type {AccentColor} from '@wireapp/commons';
 import type {AxiosError} from 'axios';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
 import type {QualifiedPublicClients, PublicClient} from '@wireapp/api-client/src/client';
-import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -472,8 +472,12 @@ export class UserRepository {
   /**
    * Find a local user.
    */
-  findUserById(userId: string): User | undefined {
-    return this.userState.users().find(userEntity => userEntity.id === userId);
+  findUserById(userId: string | QualifiedId): User | undefined {
+    return this.userState.users().find(userEntity => {
+      return typeof userId === 'string'
+        ? userEntity.id === userId
+        : userEntity.id === userId.id && userEntity.domain === userId.domain;
+    });
   }
 
   /**
@@ -535,7 +539,7 @@ export class UserRepository {
     return user;
   }
 
-  async getUserByHandle(fqn: {domain?: string; handle: string}): Promise<void | APIClientUser> {
+  async getUserByHandle(fqn: QualifiedHandle): Promise<void | APIClientUser> {
     try {
       return await this.userService.getUserByFQN(fqn);
     } catch (error) {
@@ -595,7 +599,7 @@ export class UserRepository {
    * @param isMe `true` if self user
    */
   private saveUser(userEntity: User, isMe: boolean = false): User {
-    const user = this.findUserById(userEntity.id);
+    const user = this.findUserById({domain: userEntity.domain, id: userEntity.id});
     if (!user) {
       if (isMe) {
         userEntity.isMe = true;
@@ -611,7 +615,9 @@ export class UserRepository {
    * @returns Resolves with users passed as parameter
    */
   private saveUsers(userEntities: User[]): User[] {
-    const newUsers = userEntities.filter(userEntity => !this.findUserById(userEntity.id));
+    const newUsers = userEntities.filter(
+      userEntity => !this.findUserById({domain: userEntity.domain, id: userEntity.id}),
+    );
     this.userState.users.push(...newUsers);
     return userEntities;
   }
@@ -619,9 +625,10 @@ export class UserRepository {
   /**
    * Update a local user from the backend by ID.
    */
-  updateUserById = async (userId: string): Promise<void> => {
+  updateUserById = async (userId: string | QualifiedId): Promise<void> => {
     const localUserEntity = this.findUserById(userId) || new User();
-    const updatedUserData = await this.userService.getUser(userId);
+    const updatedUserData =
+      typeof userId === 'string' ? await this.userService.getUser(userId) : await this.userService.getUser(userId.id);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);
