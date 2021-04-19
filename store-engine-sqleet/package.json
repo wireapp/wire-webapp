@@ -11,10 +11,10 @@
   "devDependencies": {
     "@types/jasmine": "3.6.9",
     "@types/karma": "6.3.0",
-    "@types/karma-webpack": "2.0.8",
+    "@types/karma-webpack": "2.0.9",
     "@types/node": "~14",
     "@types/uint32": "0.2.0",
-    "@types/webpack": "4.41.26",
+    "@types/webpack": "4.41.27",
     "@wireapp/store-engine": "4.5.35",
     "babel-loader": "8.2.2",
     "bazinga64": "5.7.33",

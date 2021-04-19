@@ -18,6 +18,7 @@
  */
 
 import type {Config, ConfigOptions} from 'karma';
+import 'karma-webpack';
 
 import * as jasmineConfig from './jasmine.json';
 import webpackConfig from './webpack.config';
