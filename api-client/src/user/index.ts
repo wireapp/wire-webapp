@@ -26,6 +26,7 @@ export * from './HandleInfo';
 export * from './ManagedSource';
 export * from './NewPasswordReset';
 export * from './QualifiedHandle';
+export * from './QualifiedId';
 export * from './RichInfo';
 export * from './RTCIceServer';
 export * from './SearchResult';
