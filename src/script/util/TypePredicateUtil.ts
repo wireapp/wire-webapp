@@ -18,7 +18,6 @@
  */
 
 import type {BackendError} from '@wireapp/api-client/src/http/';
-import type {QualifiedId, QualifiedHandle} from '@wireapp/api-client/src/user/';
 import {AxiosError} from 'axios';
 
 export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
