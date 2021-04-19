@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from './User';
+import {QualifiedId} from './QualifiedId';
 
 export interface HandleInfo {
   qualified_id?: QualifiedId;
