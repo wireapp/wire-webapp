@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.9...@wireapp/api-client@12.6.0) (2021-04-19)
+
+
+### Features
+
+* **api-client:** Add "none" domain for non-federated users ([#3746](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3746)) ([f53a739](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/f53a739df33433630f3a4f1ca554d6d99256ee91))
+
+
+
+
+
 ## [12.5.9](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.8...@wireapp/api-client@12.5.9) (2021-04-14)
 
 
