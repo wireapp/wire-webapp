@@ -168,10 +168,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@wireapp/copy-config@1.1.18":
-  version "1.1.18"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.1.18.tgz#3d95075e919d23c86785fe1781d8c7ea03f2bdc2"
-  integrity sha512-n8Y8YSg8xcUo7n/QXbS8aacFIHGiYaX35fhBVxetmIQW4EqEylImtxPIRtIvvrcbmyEJ9tChFxAnqJm5bZ2hMw==
+"@wireapp/copy-config@1.1.19":
+  version "1.1.19"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.1.19.tgz#e2fb21238fb2d68d841ca571f96b0b3f2ba9d74b"
+  integrity sha512-tFgQtRGroeXNZMw9tkeXH8CB5ZJP0qkBFGvqxk/VIsEko+UCD5ggIFCtxMdmsVvjLBAnp1TGZ2G5Xe0eCwmE5Q==
   dependencies:
     axios "0.21.1"
     copy "0.3.2"
@@ -3301,10 +3301,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@4.2.3:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.3.tgz#39062d8019912d43726298f09493d598048c1ce3"
-  integrity sha512-qOcYwxaByStAWrBf4x0fibwZvMRG+r4cQoTjbPtUlrWjBHbmCAww1i448U0GJ+3cNNEtebDteo/cHOR3xJ4wEw==
+typescript@4.2.4:
+  version "4.2.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
+  integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
 
 unc-path-regex@^0.1.0:
   version "0.1.2"

@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self';
+import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -84,7 +84,6 @@ export class UserRepository {
   static get CONFIG() {
     return {
       MAXIMUM_TEAM_SIZE_BROADCAST: 500,
-      MINIMUM_NAME_LENGTH: 2,
       MINIMUM_PICTURE_SIZE: {
         HEIGHT: 320,
         WIDTH: 320,
@@ -662,12 +661,8 @@ export class UserRepository {
    * Change name.
    */
   async changeName(name: string): Promise<User> {
-    if (name.length >= UserRepository.CONFIG.MINIMUM_NAME_LENGTH) {
-      await this.selfService.putSelf({name});
-      return this.userUpdate({user: {id: this.userState.self().id, name}});
-    }
-
-    throw new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE);
+    await this.selfService.putSelf({name});
+    return this.userUpdate({user: {id: this.userState.self().id, name}});
   }
 
   async changeEmail(email: string): Promise<void> {

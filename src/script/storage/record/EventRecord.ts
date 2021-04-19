@@ -55,6 +55,7 @@ export interface EventRecord<T = any> {
   selected_button_id?: string;
   server_time?: string;
   status?: StatusType;
+  /** The time as ISO date string */
   time: string;
   timestamp?: number;
   type: string;

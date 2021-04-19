@@ -17,7 +17,7 @@
  *
  */
 import ko from 'knockout';
-import {ConnectionStatus} from '@wireapp/api-client/src/connection';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 
 import TestPage from 'Util/test/TestPage';
 import {noop} from 'Util/util';

@@ -23,7 +23,7 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import type {Availability} from '@wireapp/protocol-messaging';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
 
 import 'Components/AvailabilityState';
 import 'Components/LegalHoldDot';

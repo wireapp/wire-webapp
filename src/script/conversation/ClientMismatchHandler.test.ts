@@ -101,7 +101,7 @@ describe('ClientMismatchHandler', () => {
 
       const timestamp = new Date(clientMismatch.time).getTime();
       const eventInfoEntity = new EventInfoEntity(undefined, conversation.id);
-      eventInfoEntity.setTimestamp(timestamp.toString());
+      eventInfoEntity.setTimestamp(clientMismatch.time);
 
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
       expect(conversationRepositorySpy.addMissingMember).toHaveBeenCalledWith(
@@ -172,7 +172,7 @@ describe('ClientMismatchHandler', () => {
         sender: '43619b6a2ec22e24',
       };
 
-      eventInfoEntity.setTimestamp(new Date(clientMismatch.time).getTime().toString());
+      eventInfoEntity.setTimestamp(clientMismatch.time);
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
 
       const expectedReceipients: Recipients = {
