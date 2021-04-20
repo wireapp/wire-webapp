@@ -206,10 +206,7 @@ export class UserRepository {
     updateClients: boolean,
   ): Promise<QualifiedUserClientMap | QualifiedPublicClients> {
     const userIds: (QualifiedId | string)[] = userEntities.map(userEntity => {
-      if (userEntity.domain) {
-        return {domain: userEntity.domain, id: userEntity.id};
-      }
-      return userEntity.id;
+      return userEntity.domain ? {domain: userEntity.domain, id: userEntity.id} : userEntity.id;
     });
 
     return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
