@@ -690,6 +690,13 @@ ko.bindingHandlers.react = {
   },
   update(element, valueAccessor, _allBindings, _viewModel, context) {
     const props = valueAccessor();
-    ReactDOM.render(React.createElement(context.$component.reactComponent, props), element);
+    let mountRoot = element;
+    if (element.nodeType === Node.COMMENT_NODE) {
+      mountRoot = document.createComment(' react-mount-point-unstable ');
+      ko.virtualElements.setDomNodeChildren(element, [mountRoot]);
+    }
+    ReactDOM.render(React.createElement(context.$component.reactComponent, props), mountRoot);
   },
 };
+
+ko.virtualElements.allowedBindings.react = true;

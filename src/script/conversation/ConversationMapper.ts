@@ -21,13 +21,13 @@ import {isObject} from 'underscore';
 import ko from 'knockout';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {
+  Conversation as ConversationBackendData,
   ConversationCode,
   DefaultConversationRoleName,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/src/conversation';
-import {Conversation as ConversationBackendData} from '@wireapp/api-client/src/conversation/';
 
 import {ACCESS_STATE} from './AccessState';
 import {NOTIFICATION_STATE} from './NotificationSetting';

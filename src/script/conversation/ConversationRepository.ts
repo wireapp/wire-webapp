@@ -27,7 +27,7 @@ import {
   CONVERSATION_EVENT,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
-} from '@wireapp/api-client/src/event';
+} from '@wireapp/api-client/src/event/';
 import {
   DefaultConversationRoleName as DefaultRole,
   CONVERSATION_ACCESS_ROLE,
@@ -35,9 +35,9 @@ import {
   CONVERSATION_TYPE,
   NewConversation,
   Conversation as BackendConversation,
-} from '@wireapp/api-client/src/conversation';
+} from '@wireapp/api-client/src/conversation/';
 import {container} from 'tsyringe';
-import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data';
+import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';

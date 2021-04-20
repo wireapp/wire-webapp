@@ -17,7 +17,7 @@
  *
  */
 
-import type {NewClient, QualifiedPublicClients, RegisteredClient} from '@wireapp/api-client/src/client';
+import type {NewClient, QualifiedPublicClients, RegisteredClient} from '@wireapp/api-client/src/client/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';

@@ -17,8 +17,8 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {PublicClient, ClientClassification} from '@wireapp/api-client/src/client/';
 import * as sinon from 'sinon';

@@ -19,18 +19,21 @@
 
 import {amplify} from 'amplify';
 import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
-import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self';
+import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {USER_EVENT} from '@wireapp/api-client/src/event';
-import {UserAsset as APIClientUserAsset, UserAssetType as APIClientUserAssetType} from '@wireapp/api-client/src/user';
+import {USER_EVENT} from '@wireapp/api-client/src/event/';
+import {
+  UserAsset as APIClientUserAsset,
+  UserAssetType as APIClientUserAssetType,
+  User as APIClientUser,
+} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {AxiosError} from 'axios';
-import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
-import type {PublicClient} from '@wireapp/api-client/src/client';
-import type {User as APIClientUser} from '@wireapp/api-client/src/user';
+import type {BackendError, TraceState} from '@wireapp/api-client/src/http/';
+import type {PublicClient} from '@wireapp/api-client/src/client/';
 
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';

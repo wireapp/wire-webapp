@@ -17,9 +17,9 @@
  *
  */
 
-import type {ClientPreKey, PreKey} from '@wireapp/api-client/src/auth';
-import type {UserClients} from '@wireapp/api-client/src/conversation';
-import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
+import type {ClientPreKey, PreKey} from '@wireapp/api-client/src/auth/';
+import type {UserClients} from '@wireapp/api-client/src/conversation/';
+import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';

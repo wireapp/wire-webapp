@@ -39,12 +39,12 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {ReactionType} from '@wireapp/core/src/main/conversation';
+import {ReactionType} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
+import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation/';
+import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content';
+import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -738,7 +738,7 @@ export class MessageRepository {
 
     const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
-    eventInfoEntity.setTimestamp((injectedEvent as any).time as string);
+    eventInfoEntity.setTimestamp(injectedEvent.time);
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
     this.trackContributed(conversationEntity, genericMessage);
     const backendIsoDate = syncTimestamp ? sentPayload.time : '';

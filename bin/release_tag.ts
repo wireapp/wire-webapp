@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client';
+import {ClientType} from '@wireapp/api-client/src/client/';
 import {GIPHY_RATING} from '@wireapp/api-client/src/giphy/';
 import {Account} from '@wireapp/core';
 import {execSync} from 'child_process';

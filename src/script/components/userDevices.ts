@@ -21,7 +21,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {DexieError} from 'dexie';
 import ko from 'knockout';
-import {ClientClassification} from '@wireapp/api-client/src/client';
+import {ClientClassification} from '@wireapp/api-client/src/client/';
 import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
