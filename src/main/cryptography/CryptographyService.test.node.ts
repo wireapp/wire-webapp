@@ -34,14 +34,14 @@ async function createEngine(storeName: string): Promise<CRUDEngine> {
   return engine;
 }
 
-beforeAll(async () => {
-  await Proteus.init();
-});
-
 describe('CryptographyService', () => {
   let cryptographyService: CryptographyService;
   let aliceLastResortPreKey: Proteus.keys.PreKey;
   let bob: Cryptobox;
+
+  beforeAll(async () => {
+    await Proteus.init();
+  });
 
   beforeEach(async () => {
     cryptographyService = new CryptographyService(new APIClient(), await createEngine('wire'));
