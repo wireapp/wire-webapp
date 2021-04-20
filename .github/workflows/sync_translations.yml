@@ -46,7 +46,7 @@ jobs:
           localization_branch_name: 'translations'
           pull_request_title: 'chore: Update translations'
           commit_message: 'chore: Update translations'
-          token: ${{secrets.WEB_CROWDIN_TOKEN}}
+          token: ${{secrets.WEBTEAM_CROWDIN_TOKEN}}
           source: '/src/i18n/en-US.json'
           translation: '/src/i18n/%locale%.json'
           base_path: '.'
