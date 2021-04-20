@@ -46,10 +46,6 @@ async function createAccount(storageName = `test-${Date.now()}`): Promise<Accoun
   return account;
 }
 
-beforeAll(async () => {
-  await Proteus.init();
-});
-
 describe('Account', () => {
   const CLIENT_ID = '4e37b32f57f6da55';
 
@@ -60,6 +56,10 @@ describe('Account', () => {
     token_type: 'Bearer',
     user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
   };
+
+  beforeAll(async () => {
+    await Proteus.init();
+  });
 
   beforeEach(() => {
     nock(MOCK_BACKEND.rest)

@@ -24,10 +24,6 @@ const cryptobox = require('@wireapp/cryptobox');
 const Proteus = require('@wireapp/proteus');
 const sodium = require('libsodium-wrappers-sumo');
 
-beforeAll(async () => {
-  await Proteus.init();
-});
-
 describe('cryptobox.CryptoboxSession', () => {
   let alice = undefined;
   let bob = undefined;
@@ -52,6 +48,10 @@ describe('cryptobox.CryptoboxSession', () => {
     const sessionWithBob = await alice.session_from_prekey('alice-to-bob', bobBundle.serialise());
     return sessionWithBob;
   }
+
+  beforeAll(async () => {
+    await Proteus.init();
+  });
 
   describe('"fingerprints"', () => {
     it('returns the local & remote fingerpint', async () => {

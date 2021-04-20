@@ -32,6 +32,10 @@ describe('cryptobox.store.CryptoboxCRUDStore', () => {
   let engine = undefined;
   let fileStore = undefined;
 
+  beforeAll(async () => {
+    await Proteus.init();
+  });
+
   beforeEach(async () => {
     await fs.ensureDir(TEMP_DIRECTORY);
     storagePath = fs.mkdtempSync(path.join(TEMP_DIRECTORY, 'test'));

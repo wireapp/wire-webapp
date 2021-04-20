@@ -22,12 +22,12 @@ import * as bazinga64 from './index';
 
 let sodium: typeof _sodium;
 
-beforeAll(async () => {
-  await _sodium.ready;
-  sodium = _sodium;
-});
-
 describe('decode Base64', () => {
+  beforeAll(async () => {
+    await _sodium.ready;
+    sodium = _sodium;
+  });
+
   it('is compliant with libsodium on short sequences', () => {
     const encoded = 'SGVsbG8=';
 

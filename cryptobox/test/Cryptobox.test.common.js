@@ -33,6 +33,10 @@ describe('cryptobox.Cryptobox', () => {
     return new cryptobox.Cryptobox(memoryEngine, amountOfPreKeys);
   }
 
+  beforeAll(async () => {
+    await Proteus.init();
+  });
+
   beforeEach(async () => {
     engine = new MemoryEngine();
     await engine.init('cache');
