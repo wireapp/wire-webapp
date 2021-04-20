@@ -30,7 +30,6 @@ import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {Context, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
-import {SystemMessageType} from '../message/SystemMessageType';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import {StatusType} from '../message/StatusType';
 import type {Text} from '../entity/message/Text';
@@ -40,7 +39,6 @@ import type {User} from '../entity/User';
 import type {MessageListViewModel} from '../view_model/content/MessageListViewModel';
 import type {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
-import type {SystemMessage} from '../entity/message/SystemMessage';
 import {AssetRepository} from '../assets/AssetRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 
@@ -59,6 +57,7 @@ import './message/FileTypeRestrictedMessage';
 import './message/DeleteMessage';
 import './message/DecryptErrorMessage';
 import './message/LegalHoldMessage';
+import './message/SystemMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -307,22 +306,6 @@ class Message {
     }
   }
 
-  getSystemMessageIconComponent(message: SystemMessage): string | undefined {
-    switch (message.system_message_type) {
-      case SystemMessageType.CONVERSATION_RENAME:
-        return 'edit-icon';
-
-      case SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE:
-        return 'timer-icon';
-
-      case SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE:
-        return 'read-icon';
-
-      default:
-        return undefined;
-    }
-  }
-
   showContextMenu(event: MouseEvent) {
     const entries = this.contextMenuEntries();
     Context.from(event, entries, 'message-options-menu');
@@ -463,25 +446,6 @@ const normalTemplate: string = `
   <!-- /ko -->
   `;
 
-const systemTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon message-header-icon--svg text-foreground">
-      <span data-bind="component: getSystemMessageIconComponent(message)"></span>
-    </div>
-    <div class="message-header-label">
-      <span class="message-header-label__multiline">
-        <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
-        <span class="ellipsis" data-bind="text: message.caption()"></span>
-      </span>
-      <hr class="message-header-line" />
-    </div>
-    <div class="message-body-actions">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
-    </div>
-  </div>
-  <div class="message-body font-weight-bold" data-bind="text: message.name"></div>
-  `;
-
 const pingTemplate: string = `
   <div class="message-header">
     <div class="message-header-icon">
@@ -610,7 +574,7 @@ ko.components.register('message', {
       <call-timeout-message params="message: message"></call-timeout-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'system' -->
-      ${systemTemplate}
+      <system-message params="message: message"></system-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'member' -->
       ${memberTemplate}
