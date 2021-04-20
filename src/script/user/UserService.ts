@@ -17,7 +17,7 @@
  *
  */
 
-import type {User as APIClientUser} from '@wireapp/api-client/src/user/';
+import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -78,15 +78,14 @@ export class UserService {
     return this.apiClient.user.api.headHandle(handle);
   }
 
-  async getUserByFQN(fqn: {domain?: string; handle: string}): Promise<APIClientUser> {
-    const {domain, handle} = fqn;
+  async getUserByFQN({domain, handle}: QualifiedHandle): Promise<APIClientUser> {
     if (domain) {
       return this.apiClient.user.api.getUserByHandle({
         domain,
         handle,
       });
     }
-    const {user: userId} = await this.apiClient.user.api.getHandle(fqn.handle);
+    const {user: userId} = await this.apiClient.user.api.getHandle(handle);
     return this.apiClient.user.api.getUser(userId);
   }
 
