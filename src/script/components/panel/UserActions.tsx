@@ -230,5 +230,5 @@ registerReactComponent('user-actions', {
   component: UserActions,
   optionalParams: ['conversation', 'conversationRoleRepository'],
   template:
-    '<div data-bind="react: {user: ko.unwrap(user), isSelfActivated: ko.unwrap(isSelfActivated), onAction, conversationRoleRepository, conversation: ko.unwrap(conversation), actionsViewModel}">',
+    '<div data-bind="react: {user: ko.unwrap(user), isSelfActivated: ko.unwrap(isSelfActivated), onAction, conversationRoleRepository, conversation: ko.unwrap(conversation), actionsViewModel}"></div>',
 });
