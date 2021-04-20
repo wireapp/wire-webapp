@@ -1504,9 +1504,6 @@ export class MessageRepository {
           return missing;
         }, []);
 
-        // we are using the User entity here to make use of a user's domain (if it exists).
-        // if we ignore the domain, we might find two users with the same id from two different
-        // federated servers.
         const missingUserEntities = missingUserIds.map(missingUserId =>
           this.userRepository.findUserById(missingUserId),
         );
