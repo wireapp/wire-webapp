@@ -20,13 +20,14 @@
 import React from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
-interface CopyToClipboardProps {
+export interface CopyToClipboardProps {
   text: string;
 }
 
 const CopyToClipboard: React.FC<CopyToClipboardProps> = ({text}) => {
   return (
     <div
+      data-uie-name="copy-to-clipboard"
       className="copy-to-clipboard"
       onClick={({currentTarget}) => {
         if (window.getSelection) {
