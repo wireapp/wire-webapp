@@ -22,8 +22,7 @@ import * as Events from '@wireapp/api-client/src/event';
 import type {Notification} from '@wireapp/api-client/src/notification/';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {EventEmitter} from 'events';
-import logdown = require('logdown');
-
+import logdown from 'logdown';
 import {PayloadBundle, PayloadBundleSource, PayloadBundleType} from '../conversation';
 import type {AssetContent} from '../conversation/content';
 import {ConversationMapper} from '../conversation/ConversationMapper';
