@@ -53,7 +53,7 @@ export class UserAPI {
     CONTACTS: 'contacts',
     DELETE: '/delete',
     HANDLES: 'handles',
-    LIST_CLIENTS: '/list-clients',
+    LIST_CLIENTS: 'list-clients',
     LIST_PREKEYS: 'list-prekeys',
     LIST_USERS: '/list-users',
     PASSWORD_RESET: '/password-reset',

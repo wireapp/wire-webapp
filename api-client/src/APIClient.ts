@@ -61,6 +61,7 @@ import {
 import {UserAPI} from './user/';
 import type {Config} from './Config';
 import {TeamSearchAPI} from './team/search';
+import {parseAccessToken} from './auth/parseAccessToken';
 
 const {version}: {version: string} = require('../package.json');
 
@@ -258,6 +259,23 @@ export class APIClient extends EventEmitter {
     await this.accessTokenStore.updateToken(accessToken);
 
     return this.createContext(accessToken.user, loginData.clientType);
+  }
+
+  public async loginWithToken(accessTokenString: string) {
+    const {userId, clientId} = parseAccessToken(accessTokenString);
+
+    const accessTokenData: AccessTokenData = {
+      access_token: accessTokenString,
+      expires_in: 1,
+      token_type: 'Bearer',
+      user: userId,
+    };
+
+    await this.accessTokenStore.updateToken(accessTokenData);
+
+    const {type} = await this.client.api.getClient(clientId);
+
+    return this.createContext(userId, type);
   }
 
   public async register(userAccount: RegisterData, clientType: ClientType = ClientType.PERMANENT): Promise<Context> {

@@ -21,12 +21,13 @@
 
 import {APIClient} from './APIClient';
 import {ClientType} from './client';
+import type {AccessTokenData} from './auth';
 
 describe('Client', () => {
   describe('connect', () => {
     it('processes WebSocket messages when executed in a web browser.', async () => {
       const apiClient = new APIClient({urls: APIClient.BACKEND.STAGING});
-      const accessTokenData = {
+      const accessTokenData: AccessTokenData = {
         access_token:
           'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
         expires_in: 900,
