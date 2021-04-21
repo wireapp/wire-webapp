@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.6.0...@wireapp/api-client@12.7.0) (2021-04-21)
+
+
+### Features
+
+* **api-client:** Login with access token ([#3747](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3747)) ([d9c11c5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/d9c11c5eb5a10ac8212a7d2cc85fcddd7656d5c6))
+
+
+
+
+
 # [12.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.5.9...@wireapp/api-client@12.6.0) (2021-04-19)
 
 
