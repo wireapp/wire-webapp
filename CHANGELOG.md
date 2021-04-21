@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.2.11...@wireapp/core@17.3.0) (2021-04-21)
+
+
+### Features
+
+* **core:** Test publication with local NPM token ([#3748](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3748)) ([3504802](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/35048024be83865fcaf58d101187722c63791c4c))
+
+
+
+
+
 ## [17.2.11](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.2.10...@wireapp/core@17.2.11) (2021-04-21)
 
 **Note:** Version bump only for package @wireapp/core
