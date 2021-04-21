@@ -5,7 +5,7 @@
     "@wireapp/priority-queue": "1.6.31",
     "@wireapp/proteus": "9.10.2",
     "@wireapp/store-engine": "4.5.35",
-    "bazinga64": "5.7.33",
+    "bazinga64": "5.7.34",
     "logdown": "3.3.1"
   },
   "description": "High-level API with persistent storage for Proteus.",
@@ -47,5 +47,5 @@
     "test:project": "yarn dist && yarn test",
     "test:types": "tsc --noEmit"
   },
-  "version": "12.2.62"
+  "version": "12.2.63"
 }
