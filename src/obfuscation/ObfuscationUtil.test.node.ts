@@ -20,9 +20,10 @@
 import {Cookie as ToughCookie} from 'tough-cookie';
 
 import {ObfuscationUtil} from './ObfuscationUtil';
+import type {AccessTokenData} from '../auth';
 
-describe('"ObfuscationUtil"', () => {
-  const accessTokenData = {
+describe('ObfuscationUtil', () => {
+  const accessTokenData: AccessTokenData = {
     access_token:
       'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
     expires_in: 900,
