@@ -36,6 +36,10 @@ describe('CryptographyService', () => {
   let aliceLastResortPreKey;
   let bob;
 
+  beforeAll(async () => {
+    await Proteus.init();
+  });
+
   beforeEach(async () => {
     cryptography = new CryptographyService(undefined, await createEngine('wire'), undefined);
     const preKeys = await cryptography.cryptobox.create();
