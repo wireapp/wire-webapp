@@ -182,7 +182,7 @@ ko.components.register('user-devices', {
     this.noPadding = noPadding;
 
     const brandName = Config.getConfig().BRAND_NAME;
-    const logger = getLogger('UserDevices');
+    const logger = getLogger('UserDevicesComponent');
 
     this.isResettingSession = ko.observable(false);
     this.fingerprintLocal = ko.observableArray([]);

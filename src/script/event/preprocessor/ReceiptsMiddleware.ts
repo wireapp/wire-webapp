@@ -41,7 +41,7 @@ export class ReceiptsMiddleware {
   ) {
     this.eventService = eventService;
     this.conversationRepository = conversationRepository;
-    this.logger = getLogger('ReadReceiptMiddleware');
+    this.logger = getLogger('ReceiptsMiddleware');
   }
 
   /**
