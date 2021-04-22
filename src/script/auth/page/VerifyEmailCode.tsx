@@ -53,7 +53,7 @@ const VerifyEmailCode = ({
   const {history} = useReactRouter();
   const {formatMessage: _} = useIntl();
 
-  const logger = getLogger('Verify');
+  const logger = getLogger('VerifyEmailCode');
   const createAccount = async (email_code: string) => {
     switch (currentFlow) {
       case AuthSelector.REGISTER_FLOW.TEAM: {
