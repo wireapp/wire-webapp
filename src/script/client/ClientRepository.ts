@@ -361,12 +361,14 @@ export class ClientRepository {
       const clientEntityMap: QualifiedUserClientMap = {};
       await Promise.all(
         Object.entries(userClientsMap).map(([domain, userClientMap]) =>
-          Object.entries(userClientMap).map(async ([userId, clients]) => {
-            if (!clientEntityMap[domain]) {
-              clientEntityMap[domain] = {};
-            }
-            clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients);
-          }),
+          Promise.all(
+            Object.entries(userClientMap).map(async ([userId, clients]) => {
+              if (!clientEntityMap[domain]) {
+                clientEntityMap[domain] = {};
+              }
+              clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients);
+            }),
+          ),
         ),
       );
       return clientEntityMap;
