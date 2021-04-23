@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.3.0...@wireapp/core@17.4.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 # [17.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.2.11...@wireapp/core@17.3.0) (2021-04-21)
 
 
