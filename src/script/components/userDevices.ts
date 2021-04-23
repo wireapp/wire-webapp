@@ -182,7 +182,7 @@ ko.components.register('user-devices', {
     this.noPadding = noPadding;
 
     const brandName = Config.getConfig().BRAND_NAME;
-    const logger = getLogger('UserDevices');
+    const logger = getLogger('UserDevicesComponent');
 
     this.isResettingSession = ko.observable(false);
     this.fingerprintLocal = ko.observableArray([]);
@@ -200,13 +200,15 @@ ko.components.register('user-devices', {
     this.showDevicesNotFound = () => showDeviceList() && this.deviceMode() === FIND_MODE.NOT_FOUND;
 
     clientRepository
-      .getClientsByUserIds([userEntity().id])
-      .then(clientEntityMap => {
-        for (const clientEntities of Object.values(clientEntityMap)) {
-          this.clientEntities(sortUserDevices(clientEntities));
-          const hasDevices = clientEntities.length > 0;
-          const deviceMode = hasDevices ? FIND_MODE.FOUND : FIND_MODE.NOT_FOUND;
-          this.deviceMode(deviceMode);
+      .getClientsByUserIds([userEntity().id], true)
+      .then(qualifiedUsersMap => {
+        for (const userClientMaps of Object.values(qualifiedUsersMap)) {
+          for (const clientEntities of Object.values(userClientMaps)) {
+            this.clientEntities(sortUserDevices(clientEntities));
+            const hasDevices = clientEntities.length > 0;
+            const deviceMode = hasDevices ? FIND_MODE.FOUND : FIND_MODE.NOT_FOUND;
+            this.deviceMode(deviceMode);
+          }
         }
       })
       .catch(error => {

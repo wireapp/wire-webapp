@@ -72,7 +72,7 @@ export class ConversationRoleRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    this.logger = getLogger('ConversationRepository');
+    this.logger = getLogger('ConversationRoleRepository');
     this.conversationRoles = {};
     this.teamRoles = [defaultAdminRole, defaultMemberRole];
   }

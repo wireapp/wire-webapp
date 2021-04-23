@@ -2699,10 +2699,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@12.5.9":
-  version "12.5.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.5.9.tgz#6c7e6d49dc438420945ff0f025926d548535eb7e"
-  integrity sha512-RRPFA1mjOTyeRRH1M4e2UuASCyMnX8fI6Ht07aZnzCzy7Zqlk1kI0aI4u4HJjyfgisA3HuzKNVxrBDLEL/6eHA==
+"@wireapp/api-client@12.7.0":
+  version "12.7.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.7.0.tgz#6ecbc95467d9d67f09c5b6a0fda18dd881e6c089"
+  integrity sha512-XHuFnBhTMmShnQJvQhPDzolxTZtF4eL6ZoDG8R6qgLDuQFdnwsYPkeb9gcLTrVfuKRJPQ4OhuR0euBvN5tVHZg==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2755,16 +2755,16 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.2.9":
-  version "17.2.9"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.2.9.tgz#d6305fd019bd31c81b103649cd304925fc080353"
-  integrity sha512-jQ37DaZdRLtzv472asSlZOY4xywC1vaELGh+yfDTlxgAH4/a5zsz1phQgXMagxLzVDRaPRpARsYgnSGgsjRfVQ==
+"@wireapp/core@17.3.0":
+  version "17.3.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.3.0.tgz#013e0f9b7c83b2cd2f40fb1c0fbeb589d8714056"
+  integrity sha512-mq7O708gkGCvYGDvfLsCsIdgJmfBT3A8RvuCI+1g1zwluUKMPRLUDi06c04r3b5D4hERThNXOyABOxXcdkCweg==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "12.5.9"
-    "@wireapp/cryptobox" "12.2.62"
-    bazinga64 "5.7.33"
+    "@wireapp/api-client" "12.7.0"
+    "@wireapp/cryptobox" "12.2.63"
+    bazinga64 "5.7.34"
     hash.js "1.1.7"
     http-status-codes "2.1.4"
     logdown "3.3.1"
@@ -2772,23 +2772,23 @@
     protobufjs "6.10.2"
     uuidjs "4.2.8"
 
-"@wireapp/cryptobox@12.2.62":
-  version "12.2.62"
-  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.2.62.tgz#fca2d95b4c9b8b900458d3b48856cbec68a23d1f"
-  integrity sha512-HxRADpRd5Xf1S45TLrfFumxCcJTsUcyRZzhPRny7v+nimH2DUYLv44yPBv+mTzm8Xus4M3b5UcjhYW/S/l66eg==
+"@wireapp/cryptobox@12.2.63":
+  version "12.2.63"
+  resolved "https://registry.yarnpkg.com/@wireapp/cryptobox/-/cryptobox-12.2.63.tgz#ab168c3f793c495c99abba24202b2a8d8518c4ae"
+  integrity sha512-6hPV8utr3JwXhqovZ2QVIPWxLP+XeRI8Xe7hkPbIoyPRxsZPInCflPjKYdU366IzZFSmdjG8ddG0IV1NuKbBhw==
   dependencies:
     "@types/node" "~14"
     "@wireapp/lru-cache" "3.7.17"
     "@wireapp/priority-queue" "1.6.31"
     "@wireapp/proteus" "9.10.2"
     "@wireapp/store-engine" "4.5.35"
-    bazinga64 "5.7.33"
+    bazinga64 "5.7.34"
     logdown "3.3.1"
 
-"@wireapp/eslint-config@1.9.0":
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.9.0.tgz#67f6f293a32dd3cb5f0228cae08c0ca4a8f5f125"
-  integrity sha512-xmV/Wyd9KKJVMXtG4MbJ1uz00lv2vikfADZHhpLQgn6fqS8mcQ5bpkssZxVp7LaaHVqxXJoxAvO5NSmoDa2rUg==
+"@wireapp/eslint-config@1.10.0":
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/eslint-config/-/eslint-config-1.10.0.tgz#28f86e8aca1d315893c32afd3e45ed00c92ab48f"
+  integrity sha512-7Z3yFLD/xdsj/auEeN7qmB21dswNi8uKWzHJiZGjRgyyw4CK+j66tzjyis1S5AUC3ILpJiEACQrAL2Habe3BQQ==
 
 "@wireapp/lru-cache@3.7.17":
   version "3.7.17"
@@ -2824,14 +2824,14 @@
   dependencies:
     protobufjs "6.10.2"
 
-"@wireapp/react-ui-kit@7.47.1":
-  version "7.47.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.47.1.tgz#af11c57f8235e81d149a82aa761577ea0ed3970b"
-  integrity sha512-kJDLwbf3KdkDRhEYD3TQ5cAQjP+/DQRQoOdQZah6Xladj1lGMcziT9MNyAu9fmkQncwS3QqYoUzJLSH1ApEB9Q==
+"@wireapp/react-ui-kit@7.47.2":
+  version "7.47.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.47.2.tgz#7dc217d88204e9e53bcb2ae97eee16efd6a4906d"
+  integrity sha512-tH0QtdM/LIXCTJUSmFCuWK9fsiqqXrbDIvbLEVnJmOzmd1/LsgJVtdjUQr1W7WXZCanlyZzgjP1X2vynoqhlaQ==
   dependencies:
     "@emotion/core" "10.1.1"
     "@types/color" "3.0.1"
-    bazinga64 "5.7.33"
+    bazinga64 "5.7.34"
     color "3.1.3"
     emotion-normalize "10.1.0"
     emotion-theming "10.0.27"
@@ -2844,10 +2844,10 @@
   dependencies:
     dexie "3.0.3"
 
-"@wireapp/store-engine-sqleet@1.3.52":
-  version "1.3.52"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.52.tgz#cadb68ae1b7323143fefd242b2d4e0a3c720c537"
-  integrity sha512-JKMK6shwVdD+3gl2c8X+mCP/3WT3vG7XbQaUZLi2hVIIOdb7mP5ULEtMbznmHNtla8TCnFxZGAC580JwT2W4IA==
+"@wireapp/store-engine-sqleet@1.3.53":
+  version "1.3.53"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.3.53.tgz#3b05ac2d08e1be75e0b32de97616e85a73c76f93"
+  integrity sha512-0wcWRly7OnSqMdoqtHEWCf6W7bET6CyHQgt2zF8kQRU6frJag/gaf6xK4ioRaIVM1Ne3mWShe2TjYjvJJpLcNw==
   dependencies:
     "@babel/core" "7.13.15"
     "@babel/plugin-proposal-class-properties" "7.13.0"
@@ -3633,10 +3633,10 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
-bazinga64@5.7.33:
-  version "5.7.33"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.33.tgz#09f17c5cdf9c38fbbac931f0d1b3d2359071d84b"
-  integrity sha512-lJVZgVUvGcZoUBBnK+aUBCKhWbOOX8UmaZgV3UZSTFFncjDtduuJp7XFgqsxnyqgw7Jn7cG4n0C1X8xjHUyvXw==
+bazinga64@5.7.34:
+  version "5.7.34"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.34.tgz#9f7a4b9325857551d24986b53a81f0bf1c531e46"
+  integrity sha512-MyfBZwravFf29f9hoQsOSnHDnIRuqmi3OR7k+6BNi610K2ObX4V7Bmo0xYnZEpWaSjkH8scZTpDWm9FVjaM0Ug==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
@@ -5532,6 +5532,13 @@ eslint-plugin-typescript-sort-keys@1.6.0:
     "@typescript-eslint/experimental-utils" "^2.32.0"
     json-schema "^0.2.5"
     natural-compare-lite "^1.4.0"
+
+eslint-plugin-unused-imports@1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-unused-imports/-/eslint-plugin-unused-imports-1.1.1.tgz#a5433f8b394461201129a246d8d92d9613e69597"
+  integrity sha512-EApvRx9Q3XQI96Tg7xPPqY6OuOy95wWMXAtc8RrwdIRk9bv8vkJKwOVoE4HeWJOQhHeHcI8lUbOqmup/PxjfOw==
+  dependencies:
+    eslint-rule-composer "^0.3.0"
 
 eslint-rule-composer@^0.3.0:
   version "0.3.0"

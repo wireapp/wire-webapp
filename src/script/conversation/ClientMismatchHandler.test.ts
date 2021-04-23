@@ -19,11 +19,15 @@
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {ClientClassification} from '@wireapp/api-client/src/client/';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
+import type {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/src/conversation';
 import {createRandomUuid} from 'Util/util';
+import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ClientMismatchHandler} from 'src/script/conversation/ClientMismatchHandler';
+import type {ConversationRepository} from './ConversationRepository';
+import type {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
+import type {UserRepository} from '../user/UserRepository';
 
 describe('ClientMismatchHandler', () => {
   describe('onClientMismatch', () => {
@@ -50,35 +54,42 @@ describe('ClientMismatchHandler', () => {
       const conversation = new Conversation(createRandomUuid());
       conversation.participating_user_ids([knownUserId]);
 
-      const userRepositorySpy = {
+      const userRepositorySpy: Partial<UserRepository> = {
         addClientToUser: jest.fn(),
-        getClientsByUserIds: jest.fn().mockImplementation(clientId =>
+        findUserById: jest.fn().mockImplementation((userId: string) => {
+          return {
+            id: userId,
+          };
+        }),
+        getClientsByUsers: jest.fn().mockImplementation(() =>
           Promise.resolve({
-            [knownUserId]: [
-              {class: ClientClassification.DESKTOP, id: clientId},
-              {class: ClientClassification.PHONE, id: '809fd276d6709474'},
-            ],
+            none: {
+              [johnDoe.user_id]: [
+                {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
+                {class: ClientClassification.PHONE, id: '809fd276d6709474'},
+              ],
+            },
           }),
         ),
       };
-      const conversationRepositorySpy = {
+      const conversationRepositorySpy: Partial<ConversationRepository> = {
         addMissingMember: jest.fn(),
         getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
         verificationStateHandler: {
           onClientsAdded: jest.fn(), // params `missingUserIds`
-        },
+        } as any,
       };
-      const cryptographyRepositorySpy = {
+      const cryptographyRepositorySpy: Partial<CryptographyRepository> = {
         encryptGenericMessage: jest.fn(),
       };
 
       const clientMismatchHandler = new ClientMismatchHandler(
-        () => conversationRepositorySpy,
-        cryptographyRepositorySpy,
-        userRepositorySpy,
+        () => conversationRepositorySpy as ConversationRepository,
+        cryptographyRepositorySpy as CryptographyRepository,
+        userRepositorySpy as UserRepository,
       );
 
-      const clientMismatch = {
+      const clientMismatch: ClientMismatch = {
         deleted: {},
         missing: {
           [knownUserId]: [johnDoe.client_id],
@@ -102,33 +113,40 @@ describe('ClientMismatchHandler', () => {
 
     it('should add missing clients to the payload', async () => {
       const conversation = new Conversation(createRandomUuid());
-      const userRepositorySpy = {
+      const userRepositorySpy: Partial<UserRepository> = {
         addClientToUser: jest.fn(),
-        getClientsByUserIds: jest.fn().mockImplementation(clientId =>
+        findUserById: jest.fn().mockImplementation((userId: string) => {
+          return {
+            id: userId,
+          };
+        }),
+        getClientsByUsers: jest.fn().mockImplementation(() =>
           Promise.resolve({
-            [johnDoe.user_id]: [
-              {class: ClientClassification.DESKTOP, id: clientId},
-              {class: ClientClassification.PHONE, id: '809fd276d6709474'},
-            ],
+            none: {
+              [johnDoe.user_id]: [
+                {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
+                {class: ClientClassification.PHONE, id: '809fd276d6709474'},
+              ],
+            },
           }),
         ),
       };
-      const conversationRepositorySpy = {
+      const conversationRepositorySpy: Partial<ConversationRepository> = {
         addMissingMember: jest.fn(),
         getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
         verificationStateHandler: {
           onClientsAdded: jest.fn(), // params `missingUserIds`
-        },
+        } as any,
       };
-      const cryptographyRepositorySpy = {
+      const cryptographyRepositorySpy: Partial<CryptographyRepository> = {
         encryptGenericMessage: jest.fn(),
         getUsersPreKeys: jest.fn().mockImplementation(() => Promise.resolve()),
       };
 
       const clientMismatchHandler = new ClientMismatchHandler(
-        () => conversationRepositorySpy,
-        cryptographyRepositorySpy,
-        userRepositorySpy,
+        () => conversationRepositorySpy as ConversationRepository,
+        cryptographyRepositorySpy as CryptographyRepository,
+        userRepositorySpy as UserRepository,
       );
 
       const message = new GenericMessage({
@@ -137,7 +155,7 @@ describe('ClientMismatchHandler', () => {
       });
       const eventInfoEntity = new EventInfoEntity(message, conversation.id);
 
-      const clientMismatch = {
+      const clientMismatch: ClientMismatch = {
         deleted: {},
         missing: {
           [johnDoe.user_id]: [`${johnDoe.client_id}`],
@@ -145,7 +163,7 @@ describe('ClientMismatchHandler', () => {
         redundant: {},
         time: '2016-04-29T10:38:23.002Z',
       };
-      const payload = {
+      const payload: NewOTRMessage<string> = {
         recipients: {
           [janeRoe.user_id]: {
             [janeRoe.client_id]: '💣',
@@ -157,7 +175,7 @@ describe('ClientMismatchHandler', () => {
       eventInfoEntity.setTimestamp(clientMismatch.time);
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
 
-      const expectedReceipients = {
+      const expectedReceipients: Recipients = {
         [johnDoe.user_id]: [johnDoe.client_id],
       };
       expect(cryptographyRepositorySpy.encryptGenericMessage).toHaveBeenCalledWith(
@@ -169,17 +187,17 @@ describe('ClientMismatchHandler', () => {
 
     it('should remove the payload of deleted clients', async () => {
       const conversation = new Conversation(createRandomUuid());
-      const userRepositorySpy = {
+      const userRepositorySpy: Partial<UserRepository> = {
         getUserFromBackend: jest.fn().mockImplementation(() => Promise.resolve({deleted: true})),
         removeClientFromUser: jest.fn(),
       };
-      const conversationRepositorySpy = {
+      const conversationRepositorySpy: Partial<ConversationRepository> = {
         getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
       };
       const clientMismatchHandler = new ClientMismatchHandler(
-        () => conversationRepositorySpy,
-        {}, // CryptographyRepository
-        userRepositorySpy,
+        () => conversationRepositorySpy as ConversationRepository,
+        {} as CryptographyRepository,
+        userRepositorySpy as UserRepository,
       );
 
       const message = new GenericMessage({
@@ -188,7 +206,7 @@ describe('ClientMismatchHandler', () => {
       });
       const eventInfoEntity = new EventInfoEntity(message, conversation.id);
 
-      const clientMismatch = {
+      const clientMismatch: ClientMismatch = {
         deleted: {
           [janeRoe.user_id]: [`${janeRoe.client_id}`],
         },
@@ -196,7 +214,7 @@ describe('ClientMismatchHandler', () => {
         redundant: {},
         time: '2016-04-29T10:38:23.002Z',
       };
-      const payload = {
+      const payload: NewOTRMessage<string> = {
         recipients: {
           [janeRoe.user_id]: {
             [janeRoe.client_id]: '💣',
@@ -207,24 +225,25 @@ describe('ClientMismatchHandler', () => {
 
       const updatedPayload = await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
 
+      expect(updatedPayload).toBeDefined();
       expect(userRepositorySpy.removeClientFromUser).toHaveBeenCalled();
       expect(Object.keys(updatedPayload.recipients).length).toBe(0);
     });
 
     it('should remove the payload of redundant clients', async () => {
       const conversation = new Conversation(createRandomUuid());
-      const userRepositorySpy = {
+      const userRepositorySpy: Partial<UserRepository> = {
         getUserFromBackend: jest.fn().mockImplementation(() => Promise.resolve({deleted: true})),
         removeClientFromUser: jest.fn(),
       };
-      const conversationRepositorySpy = {
+      const conversationRepositorySpy: Partial<ConversationRepository> = {
         getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
       };
 
       const clientMismatchHandler = new ClientMismatchHandler(
-        () => conversationRepositorySpy,
-        {}, // CryptographyRepository
-        userRepositorySpy,
+        () => conversationRepositorySpy as ConversationRepository,
+        {} as CryptographyRepository,
+        userRepositorySpy as UserRepository,
       );
 
       const message = new GenericMessage({
@@ -233,7 +252,7 @@ describe('ClientMismatchHandler', () => {
       });
       const eventInfoEntity = new EventInfoEntity(message, conversation.id);
 
-      const clientMismatch = {
+      const clientMismatch: ClientMismatch = {
         deleted: {},
         missing: {},
         redundant: {
@@ -241,7 +260,7 @@ describe('ClientMismatchHandler', () => {
         },
         time: '2016-04-29T10:38:23.002Z',
       };
-      const payload = {
+      const payload: NewOTRMessage<string> = {
         recipients: {
           [janeRoe.user_id]: {
             [janeRoe.client_id]: '💣',
