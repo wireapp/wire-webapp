@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.7.0...@wireapp/api-client@12.8.0) (2021-04-23)
+
+
+### Features
+
+* **core:** Bump ws from 7.4.4 to 7.4.5 ([#3758](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3758)) ([9ae91e2](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/9ae91e289f13b195e2434a25d1197e6f737d233c))
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 # [12.7.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.6.0...@wireapp/api-client@12.7.0) (2021-04-21)
 
 
