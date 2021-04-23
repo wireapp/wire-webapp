@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.48.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.47.2...@wireapp/react-ui-kit@7.48.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 ## [7.47.2](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.47.1...@wireapp/react-ui-kit@7.47.2) (2021-04-21)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
