@@ -2334,10 +2334,10 @@ hbs@4.1.1:
     handlebars "4.7.6"
     walk "2.3.14"
 
-helmet@*, helmet@4.4.1:
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/helmet/-/helmet-4.4.1.tgz#a17e1444d81d7a83ddc6e6f9bc6e2055b994efe7"
-  integrity sha512-G8tp0wUMI7i8wkMk2xLcEvESg5PiCitFMYgGRc/PwULB0RVhTP5GFdxOwvJwp9XVha8CuS8mnhmE8I/8dx/pbw==
+helmet@*, helmet@4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/helmet/-/helmet-4.5.0.tgz#da5a75d30cbd9f60628e9463a85dc7725806c2ea"
+  integrity sha512-GfxdTaKarneWOpxmiVb/1YsY+fIwDOxVUGrvNEM1MC8W6Z2PREfkXiWF4XHQdvkyXwUTHuY4DRwB0uH/Q6BVyQ==
 
 hosted-git-info@^2.1.4:
   version "2.8.8"
