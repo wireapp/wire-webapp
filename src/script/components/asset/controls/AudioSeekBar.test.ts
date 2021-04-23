@@ -26,6 +26,8 @@ class AudioSeekBarPage extends TestPage<AudioSeekBarProps> {
   constructor(props?: AudioSeekBarProps) {
     super(AudioSeekBar, props);
   }
+
+  getClipRect = () => this.get('svg clipPath rect');
 }
 
 describe('AudioSeekBar', () => {
@@ -58,16 +60,15 @@ describe('AudioSeekBar', () => {
     const audioElement = createAudioElement(500);
     const audioSeekBar = new AudioSeekBarPage({...getDefaultProps(), audioElement});
 
-    const clipPath = () =>
-      audioSeekBar.get('svg').getDOMNode<SVGSVGElement>().style.getPropertyValue('--seek-bar-clip');
+    const clipPathWidth = () => audioSeekBar.getClipRect().getDOMNode().getAttribute('width');
 
     audioElement.dispatchEvent(new Event('timeupdate'));
 
-    expect(clipPath()).toEqual('polygon(0 0, 50% 0, 50% 100%, 0 100%)');
+    expect(clipPathWidth()).toEqual('0.5');
 
     audioElement.dispatchEvent(new Event('ended'));
 
-    expect(clipPath()).toEqual('polygon(0 0, 0% 0, 0% 100%, 0 100%)');
+    expect(clipPathWidth()).toEqual('0');
   });
 
   it('updates the currentTime on click', () => {
