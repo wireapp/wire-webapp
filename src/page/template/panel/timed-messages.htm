@@ -1,5 +1,5 @@
-<div id="timed-messages" class="panel__page timed-messages" data-bind="with: $root.subViews[$root.STATE.TIMED_MESSAGES]">
-  <!-- ko if: isVisible() -->
-    <TimedMessagesPanel ></TimedMessagesPanel>
+<div id="timed-messages" class="panel__page timed-messages">
+  <!-- ko if: _isStateVisible(STATE.TIMED_MESSAGES) -->
+    <timed-messages-panel params="onClose: closePanel, onGoBack: _goBack, repositories: repositories"></timed-messages-panel>
   <!-- /ko -->
 </div>

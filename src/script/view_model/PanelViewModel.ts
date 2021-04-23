@@ -43,6 +43,8 @@ import type {ServiceEntity} from '../integration/ServiceEntity';
 import {ConversationState} from '../conversation/ConversationState';
 import {container} from 'tsyringe';
 
+import './panel/TimedMessagesPanel';
+
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 
 export type PanelParams = {

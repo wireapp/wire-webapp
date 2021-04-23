@@ -20,9 +20,9 @@
 import DragableClickWrapper from 'Components/DragableClickWrapper';
 import NamedIcon from 'Components/NamedIcon';
 import React, {useEffect, useState} from 'react';
-import {useFadingScrollbar} from 'src/script/ui/fadingScrollbar';
+import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {container} from 'tsyringe';
-import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 import useEffectRef from 'Util/useEffectRef';
@@ -92,7 +92,9 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
     <>
       <div className="panel__header">
         <DragableClickWrapper onClick={onGoBack}>
-          <NamedIcon name="arrow-left-icon" className="icon-button" data-uie-name="go-back-timed-messages-options" />
+          <div className="icon-button" data-uie-name="go-back-timed-messages-options">
+            <NamedIcon width={16} height={16} name="arrow-left-icon" />
+          </div>
         </DragableClickWrapper>
         <div className="panel__header__title">{t('timedMessagesTitle')}</div>
         <DragableClickWrapper onClick={onClose}>
@@ -124,3 +126,9 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
 };
 
 export default TimedMessagesPanel;
+
+registerReactComponent('timed-messages-panel', {
+  bindings: 'onClose, onGoBack, repositories',
+  component: TimedMessagesPanel,
+  //template: '<div data-bind="react: {onClose, onGoBack, repositories}"></div>',
+});
