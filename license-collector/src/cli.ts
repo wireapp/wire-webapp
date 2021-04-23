@@ -19,6 +19,8 @@
  *
  */
 
+/* eslint-disable header/header */
+
 import * as fs from 'fs-extra';
 import * as path from 'path';
 

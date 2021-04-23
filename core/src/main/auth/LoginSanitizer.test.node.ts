@@ -16,6 +16,7 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+
 import {LoginData} from '@wireapp/api-client/src/auth/';
 import {ClientType} from '@wireapp/api-client/src/client';
 

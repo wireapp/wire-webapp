@@ -19,6 +19,8 @@
  *
  */
 
+/* eslint-disable header/header */
+
 import {cosmiconfig} from 'cosmiconfig';
 import logdown from 'logdown';
 

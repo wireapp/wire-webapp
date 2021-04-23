@@ -19,6 +19,8 @@
  *
  */
 
+/* eslint-disable header/header */
+
 import commander from 'commander';
 import logdown from 'logdown';
 
