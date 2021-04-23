@@ -1,3 +1,22 @@
+/*
+ * Wire
+ * Copyright (C) 2021 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
 /* eslint-disable sort-keys-fix/sort-keys-fix */
 const fs = require('fs');
 const path = require('path');
@@ -9,12 +28,9 @@ function resolve(...paths) {
 }
 
 module.exports = {
-  title: `React UI Kit v${packageJson.version}`,
-  serverPort: 8090,
-  skipComponentsWithoutExample: true,
+  resolver: docgen.resolver.findAllExportedComponentDefinitions,
   sections: [
     {
-      name: 'Forms',
       components: 'src/Form/**/*.tsx',
       ignore: [
         'src/Form/ShakeBox.tsx',
@@ -23,9 +39,9 @@ module.exports = {
         'src/Form/RoundIconButton.tsx',
         'src/Form/InputSubmitCombo.tsx',
       ],
+      name: 'Forms',
     },
     {
-      name: 'Layout',
       components: 'src/Layout/**/*.tsx',
       ignore: [
         'src/Layout/headerMenu/HeaderSubMenu.tsx',
@@ -36,25 +52,27 @@ module.exports = {
         'src/Layout/headerMenu/MenuScrollableItems.tsx',
         'src/Layout/headerMenu/MenuSubLink.tsx',
       ],
+      name: 'Layout',
     },
-    {name: 'Identity', components: 'src/Identity/**/*.tsx'},
-    {name: 'Menu', components: 'src/Menu/**/*.tsx', ignore: ['src/Menu/MenuModal.tsx']},
-    {name: 'Modal', components: 'src/Modal/**/*.tsx', ignore: ['src/Modal/Overlay.tsx']},
-    {name: 'Misc', components: 'src/Misc/**/*.tsx', ignore: ['src/Misc/IsInViewport.tsx']},
-    {name: 'Typography', components: 'src/Text/**/*.tsx'},
+    {components: 'src/Identity/**/*.tsx', name: 'Identity'},
+    {components: 'src/Menu/**/*.tsx', ignore: ['src/Menu/MenuModal.tsx'], name: 'Menu'},
+    {components: 'src/Modal/**/*.tsx', ignore: ['src/Modal/Overlay.tsx'], name: 'Modal'},
+    {components: 'src/Misc/**/*.tsx', ignore: ['src/Misc/IsInViewport.tsx'], name: 'Misc'},
+    {components: 'src/Text/**/*.tsx', name: 'Typography'},
     {
-      name: 'Icons',
       components: 'src/Icon/SVGIcon.tsx',
+      name: 'Icons',
     },
     {
-      name: 'Colors',
       content: 'src/Identity/colors.md',
+      name: 'Colors',
     },
   ],
+  serverPort: 8090,
+  skipComponentsWithoutExample: true,
   styleguideComponents: {
     Wrapper: resolve('styleguide/wrapper.js'),
   },
-  resolver: docgen.resolver.findAllExportedComponentDefinitions,
   styles: {
     Playground: {
       preview: {
@@ -62,5 +80,6 @@ module.exports = {
       },
     },
   },
+  title: `React UI Kit v${packageJson.version}`,
   usageMode: 'expand',
 };
