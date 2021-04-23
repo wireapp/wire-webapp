@@ -27,11 +27,6 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import {FileAsset} from '../../../entity/message/FileAsset';
 import {createRandomUuid} from 'Util/util';
 
-/**
- * A float that must be between 0 and 1
- */
-type Fraction = number;
-
 export interface AudioSeekBarProps {
   asset: FileAsset;
   audioElement: HTMLAudioElement;
