@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.2.40...@wireapp/store-engine-web-storage@1.3.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 ## [1.2.40](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.2.39...@wireapp/store-engine-web-storage@1.2.40) (2021-04-14)
 
 **Note:** Version bump only for package @wireapp/store-engine-web-storage

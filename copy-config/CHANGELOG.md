@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@1.1.19...@wireapp/copy-config@1.2.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 ## [1.1.19](https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config/compare/@wireapp/copy-config@1.1.18...@wireapp/copy-config@1.1.19) (2021-04-14)
 
 **Note:** Version bump only for package @wireapp/copy-config

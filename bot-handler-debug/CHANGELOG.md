@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/compare/@wireapp/bot-handler-debug@0.3.123...@wireapp/bot-handler-debug@0.4.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 ## [0.3.123](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug/compare/@wireapp/bot-handler-debug@0.3.122...@wireapp/bot-handler-debug@0.3.123) (2021-04-21)
 
 **Note:** Version bump only for package @wireapp/bot-handler-debug

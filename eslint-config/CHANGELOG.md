@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.10.0...@wireapp/eslint-config@1.11.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 # [1.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config/compare/@wireapp/eslint-config@1.9.0...@wireapp/eslint-config@1.10.0) (2021-04-01)
 
 

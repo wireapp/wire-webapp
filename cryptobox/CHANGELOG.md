@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.2.63...@wireapp/cryptobox@12.3.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 ## [12.2.63](https://github.com/wireapp/wire-web-packages/tree/master/packages/cryptobox/compare/@wireapp/cryptobox@12.2.62...@wireapp/cryptobox@12.2.63) (2021-04-21)
 
 **Note:** Version bump only for package @wireapp/cryptobox

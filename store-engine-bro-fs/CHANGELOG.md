@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@1.3.40...@wireapp/store-engine-bro-fs@1.4.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 ## [1.3.40](https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@1.3.39...@wireapp/store-engine-bro-fs@1.3.40) (2021-04-14)
 
 **Note:** Version bump only for package @wireapp/store-engine-bro-fs

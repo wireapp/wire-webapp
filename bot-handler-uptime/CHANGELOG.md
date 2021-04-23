@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.154...@wireapp/bot-handler-uptime@0.2.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 ## [0.1.154](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-uptime/compare/@wireapp/bot-handler-uptime@0.1.153...@wireapp/bot-handler-uptime@0.1.154) (2021-04-21)
 
 **Note:** Version bump only for package @wireapp/bot-handler-uptime

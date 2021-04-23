@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.8.13...@wireapp/license-collector@0.9.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 ## [0.8.13](https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector/compare/@wireapp/license-collector@0.8.12...@wireapp/license-collector@0.8.13) (2021-04-14)
 
 **Note:** Version bump only for package @wireapp/license-collector

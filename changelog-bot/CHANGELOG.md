@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.3.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@4.2.123...@wireapp/changelog-bot@4.3.0) (2021-04-23)
+
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+
+
+
+
 ## [4.2.123](https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot/compare/@wireapp/changelog-bot@4.2.122...@wireapp/changelog-bot@4.2.123) (2021-04-21)
 
 **Note:** Version bump only for package @wireapp/changelog-bot
