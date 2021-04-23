@@ -17,8 +17,6 @@
  *
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
 import ko from 'knockout';
 import $ from 'jquery';
 import SimpleBar from 'simplebar';
@@ -683,20 +681,3 @@ ko.bindingHandlers.clickOrDrag = {
     });
   },
 };
-
-ko.bindingHandlers.react = {
-  init() {
-    return {controlsDescendantBindings: true};
-  },
-  update(element, valueAccessor, _allBindings, _viewModel, context) {
-    const props = valueAccessor();
-    let mountRoot = element;
-    if (element.nodeType === Node.COMMENT_NODE) {
-      mountRoot = document.createComment(' react-mount-point-unstable ');
-      ko.virtualElements.setDomNodeChildren(element, [mountRoot]);
-    }
-    ReactDOM.render(React.createElement(context.$component.reactComponent, props), mountRoot);
-  },
-};
-
-ko.virtualElements.allowedBindings.react = true;
