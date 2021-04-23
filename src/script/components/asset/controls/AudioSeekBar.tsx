@@ -104,7 +104,7 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
 
   const updateSeekClip = (position: Fraction) => {
     const percent = position * 100;
-    svgNode.current.style.setProperty('--seek-bar-clip', `polygon(0 0, ${percent}% 0, ${percent}% 100%, 0 100%)`);
+    svgNode.current.style.setProperty('--seek-bar-clip', `polygon(0 0, ${percent}% 0, ${percent}% 40px, 0 40px)`);
   };
 
   return (
@@ -126,6 +126,6 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
 export default AudioSeekBar;
 
 registerReactComponent('audio-seek-bar', {
+  bindings: 'asset, disabled: ko.unwrap(disabled), audioElement: src',
   component: AudioSeekBar,
-  template: '<div data-bind="react: {asset, disabled: ko.unwrap(disabled), audioElement: src}"></div>',
 });
