@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.2.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@4.1.8...@wireapp/commons@4.2.0) (2021-04-26)
+
+
+### Features
+
+* **cryptobox:** Bump ts-jest from 26.5.4 to 26.5.5 ([#3755](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/issues/3755)) ([cb37324](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/commit/cb37324d9c7cb58c0667b8072dc379f882abb083))
+
+
+
+
+
 ## [4.1.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/commons/compare/@wireapp/commons@4.1.7...@wireapp/commons@4.1.8) (2021-04-14)
 
 **Note:** Version bump only for package @wireapp/commons
