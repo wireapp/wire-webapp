@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.49.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.48.0...@wireapp/react-ui-kit@7.49.0) (2021-04-26)
+
+
+### Features
+
+* **core:** Bump @babel/core from 7.13.15 to 7.13.16 ([#3759](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3759)) ([13133ab](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/13133ab81c7380983397c28a33df25d43575d96a))
+* **react-ui-kit:** Bump @babel/cli from 7.13.14 to 7.13.16 ([#3752](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3752)) ([f0ef2ca](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/f0ef2ca595b01eb8de554713b9cf2ec82771600f))
+
+
+
+
+
 # [7.48.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.47.2...@wireapp/react-ui-kit@7.48.0) (2021-04-23)
 
 
