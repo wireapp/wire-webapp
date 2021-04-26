@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.8.0...@wireapp/api-client@12.9.0) (2021-04-26)
+
+
+### Features
+
+* **core:** Bump @babel/core from 7.13.15 to 7.13.16 ([#3759](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3759)) ([13133ab](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/13133ab81c7380983397c28a33df25d43575d96a))
+
+
+
+
+
 # [12.8.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.7.0...@wireapp/api-client@12.8.0) (2021-04-23)
 
 
