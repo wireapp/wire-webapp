@@ -34,7 +34,7 @@
     "resolveJsonModule": true,
     "rootDirs": ["src/script"],
     "sourceMap": true,
-    "target": "es6"
+    "target": "es2017"
   },
   "exclude": ["node_modules", "server", "electron", "src/sw.js"]
 }
