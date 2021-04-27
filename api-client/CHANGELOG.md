@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.9.0...@wireapp/api-client@12.10.0) (2021-04-27)
+
+
+### Features
+
+* **api-client:** Download member CSV list ([#3751](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3751)) ([da13dba](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/da13dba08bfb6cc8672bee9ffe445abd749e0417))
+
+
+
+
+
 # [12.9.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.8.0...@wireapp/api-client@12.9.0) (2021-04-26)
 
 

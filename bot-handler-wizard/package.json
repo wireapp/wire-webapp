@@ -5,7 +5,7 @@
   "devDependencies": {
     "@types/jasmine": "3.6.9",
     "@types/node": "~14",
-    "@wireapp/bot-api": "7.11.128",
+    "@wireapp/bot-api": "7.11.129",
     "cross-env": "7.0.3",
     "dotenv-defaults": "2.0.1",
     "jasmine": "3.7.0",
@@ -38,5 +38,5 @@
     "test:node": "tsc --noEmit",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "0.2.132"
+  "version": "0.2.133"
 }
