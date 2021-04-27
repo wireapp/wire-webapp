@@ -543,7 +543,7 @@ class App {
         }
 
         default: {
-          this.logger.warn(`Caused by: ${error?.message || error || 'unknown'}`, error);
+          this.logger.warn(`Caused by: ${error?.message || 'unknown'}`, error);
 
           const isNetworkError = (error.name = 'NetworkError');
           if (isNetworkError) {
