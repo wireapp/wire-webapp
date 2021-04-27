@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "downlevelIteration": true,
-    "outDir": "src",
-    "rootDir": "src"
-  },
-  "exclude": ["node_modules", "src/**/*.test.ts"],
-  "extends": "../../tsconfig.json"
-}

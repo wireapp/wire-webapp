@@ -1,6 +1,0 @@
-{
-  "random": true,
-  "spec_dir": ".tmp",
-  "spec_files": ["*.test.ts"],
-  "stopSpecOnExpectationFailure": false
-}
