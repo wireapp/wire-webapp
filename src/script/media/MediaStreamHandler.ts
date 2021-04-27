@@ -28,7 +28,7 @@ import {PermissionError} from '../error/PermissionError';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import {PermissionType} from '../permission/PermissionType';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {WarningType} from '../view_model/WarningsViewModel';
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
@@ -253,22 +253,22 @@ export class MediaStreamHandler {
 
   private selectPermissionDeniedWarningType(audio: boolean, video: boolean, screen: boolean): string {
     if (video) {
-      return WarningsViewModel.TYPE.DENIED_CAMERA;
+      return WarningType.DENIED_CAMERA;
     }
     if (screen) {
-      return WarningsViewModel.TYPE.DENIED_SCREEN;
+      return WarningType.DENIED_SCREEN;
     }
-    return WarningsViewModel.TYPE.DENIED_MICROPHONE;
+    return WarningType.DENIED_MICROPHONE;
   }
 
   private selectPermissionRequestWarningType(audio: boolean, video: boolean, screen: boolean): string {
     if (video) {
-      return WarningsViewModel.TYPE.REQUEST_CAMERA;
+      return WarningType.REQUEST_CAMERA;
     }
     if (screen) {
-      return WarningsViewModel.TYPE.REQUEST_SCREEN;
+      return WarningType.REQUEST_SCREEN;
     }
-    return WarningsViewModel.TYPE.REQUEST_MICROPHONE;
+    return WarningType.REQUEST_MICROPHONE;
   }
 
   private showPermissionRequestHint(audio: boolean, video: boolean, screen: boolean): void {

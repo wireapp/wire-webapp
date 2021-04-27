@@ -93,7 +93,7 @@ import {showInitialModal} from '../user/AvailabilityModal';
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import {WarningType} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
@@ -456,7 +456,7 @@ class App {
 
       userRepository['userState'].self().devices(clientEntities);
       this.logger.info('App pre-loading completed');
-      await this._handleUrlParams();
+      this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
@@ -528,7 +528,7 @@ class App {
       }
 
       if (isAccessTokenError) {
-        this.logger.warn('Connectivity issues. Trigger reload.', error);
+        this.logger.warn('Connectivity issues. Triggering reload.', error);
         return window.location.reload();
       }
     }
@@ -543,11 +543,19 @@ class App {
         }
 
         default: {
-          this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
+          this.logger.warn(`Caused by: ${(error ? error.message : undefined) || error}`, error);
+
+          const isNetworkError = (error.name = 'NetworkError');
+          if (isNetworkError) {
+            this.logger.warn('Backend is not reachable. Reloading page.', error);
+            window.location.reload();
+            return;
+          }
 
           const isAccessTokenError = error instanceof AccessTokenError;
           if (isAccessTokenError) {
             this.logger.error(`Could not get access token: ${error.message}. Logging out user.`, error);
+            return this.logout(SIGN_OUT_REASON.ACCESS_TOKEN, false);
           }
 
           return this.logout(SIGN_OUT_REASON.APP_INIT, false);
@@ -555,7 +563,7 @@ class App {
       }
     }
 
-    this.logger.warn("No internet connectivity. Refreshing the page to show the browser's offline page...", error);
+    this.logger.warn("No internet connectivity. Refreshing the page to show the browser's offline page ...", error);
     window.location.reload();
   }
 
@@ -836,7 +844,7 @@ class App {
    * Notify about found update
    */
   readonly update = (): void => {
-    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
+    amplify.publish(WebAppEvents.WARNING.SHOW, WarningType.LIFECYCLE_UPDATE);
   };
 
   /**
@@ -844,7 +852,7 @@ class App {
    * @param signOutReason Redirect triggered by session expiration
    */
   private _redirectToLogin(signOutReason: SIGN_OUT_REASON): void {
-    this.logger.info(`Redirecting to login after connectivity verification. Reason: ${signOutReason}`);
+    this.logger.info(`Redirecting to login after connectivity verification. Reason: "${signOutReason}"`);
     const isTemporaryGuestReason = App.CONFIG.SIGN_OUT_REASONS.TEMPORARY_GUEST.includes(signOutReason);
     const isLeavingGuestRoom = isTemporaryGuestReason && this.repository.user['userState'].isTemporaryGuest();
     if (isLeavingGuestRoom) {

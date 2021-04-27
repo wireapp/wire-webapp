@@ -18,6 +18,7 @@
  */
 
 export enum SIGN_OUT_REASON {
+  ACCESS_TOKEN = 'access_token',
   ACCOUNT_DELETED = 'deleted',
   APP_INIT = 'app_init',
   CLIENT_REMOVED = 'client_removed',

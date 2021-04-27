@@ -18,6 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {Runtime} from '@wireapp/commons';
 import ko from 'knockout';
 import {amplify} from 'amplify';
 
@@ -29,57 +30,54 @@ import {afterRender} from 'Util/util';
 import {Config, Configuration} from '../Config';
 import {ModalsViewModel} from './ModalsViewModel';
 import {PermissionState} from '../notification/PermissionState';
-import {Runtime} from '@wireapp/commons';
+
+export enum WarningType {
+  CALL_QUALITY_POOR = 'call_quality_poor',
+  CONNECTIVITY_RECONNECT = 'connectivity_reconnect',
+  CONNECTIVITY_RECOVERY = 'connectivity_recovery',
+  DENIED_CAMERA = 'camera_access_denied',
+  DENIED_MICROPHONE = 'mic_access_denied',
+  DENIED_SCREEN = 'screen_access_denied',
+  LIFECYCLE_UPDATE = 'lifecycle_update',
+  NO_INTERNET = 'no_internet',
+  NOT_FOUND_CAMERA = 'not_found_camera',
+  NOT_FOUND_MICROPHONE = 'not_found_microphone',
+  REQUEST_CAMERA = 'request_camera',
+  REQUEST_MICROPHONE = 'request_microphone',
+  REQUEST_NOTIFICATION = 'request_notification',
+  REQUEST_SCREEN = 'request_screen',
+  UNSUPPORTED_INCOMING_CALL = 'unsupported_incoming_call',
+  UNSUPPORTED_OUTGOING_CALL = 'unsupported_outgoing_call',
+}
 
 export class WarningsViewModel {
-  elementId: 'warnings';
-  logger: Logger;
-  warnings: ko.ObservableArray<any>;
-  visibleWarning: ko.PureComputed<any>;
-  Config: Configuration;
-  name: ko.Observable<string>;
-  warningDimmed: ko.PureComputed<boolean>;
-  brandName: string;
-  Runtime: typeof Runtime;
-  isDesktop: boolean;
-  type: typeof WarningsViewModel.TYPE;
-  lifeCycleRefresh: string;
+  private readonly elementId: 'warnings';
+  private readonly logger: Logger;
+  private readonly warnings: ko.ObservableArray<WarningType>;
+  private readonly visibleWarning: ko.PureComputed<WarningType>;
+  private readonly name: ko.Observable<string>;
+  readonly Config: Configuration;
+  readonly warningDimmed: ko.PureComputed<boolean>;
+  readonly brandName: string;
+  readonly Runtime: typeof Runtime;
+  readonly isDesktop: boolean;
+  readonly type: typeof WarningType;
+  readonly lifeCycleRefresh: string;
 
   static get CONFIG() {
     return {
       DIMMED_MODES: [
-        WarningsViewModel.TYPE.REQUEST_CAMERA,
-        WarningsViewModel.TYPE.REQUEST_MICROPHONE,
-        WarningsViewModel.TYPE.REQUEST_NOTIFICATION,
-        WarningsViewModel.TYPE.REQUEST_SCREEN,
+        WarningType.REQUEST_CAMERA,
+        WarningType.REQUEST_MICROPHONE,
+        WarningType.REQUEST_NOTIFICATION,
+        WarningType.REQUEST_SCREEN,
       ],
       MINI_MODES: [
-        WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT,
-        WarningsViewModel.TYPE.LIFECYCLE_UPDATE,
-        WarningsViewModel.TYPE.NO_INTERNET,
-        WarningsViewModel.TYPE.CALL_QUALITY_POOR,
+        WarningType.CONNECTIVITY_RECONNECT,
+        WarningType.LIFECYCLE_UPDATE,
+        WarningType.NO_INTERNET,
+        WarningType.CALL_QUALITY_POOR,
       ],
-    };
-  }
-
-  static get TYPE() {
-    return {
-      CALL_QUALITY_POOR: 'call_quality_poor',
-      CONNECTIVITY_RECONNECT: 'connectivity_reconnect',
-      CONNECTIVITY_RECOVERY: 'connectivity_recovery',
-      DENIED_CAMERA: 'camera_access_denied',
-      DENIED_MICROPHONE: 'mic_access_denied',
-      DENIED_SCREEN: 'screen_access_denied',
-      LIFECYCLE_UPDATE: 'lifecycle_update',
-      NOT_FOUND_CAMERA: 'not_found_camera',
-      NOT_FOUND_MICROPHONE: 'not_found_microphone',
-      NO_INTERNET: 'no_internet',
-      REQUEST_CAMERA: 'request_camera',
-      REQUEST_MICROPHONE: 'request_microphone',
-      REQUEST_NOTIFICATION: 'request_notification',
-      REQUEST_SCREEN: 'request_screen',
-      UNSUPPORTED_INCOMING_CALL: 'unsupported_incoming_call',
-      UNSUPPORTED_OUTGOING_CALL: 'unsupported_outgoing_call',
     };
   }
 
@@ -91,12 +89,12 @@ export class WarningsViewModel {
     this.warnings = ko.observableArray();
     this.visibleWarning = ko.pureComputed(() => this.warnings()[this.warnings().length - 1]);
     this.Runtime = Runtime;
-    this.type = WarningsViewModel.TYPE;
+    this.type = WarningType;
     this.Config = Config.getConfig();
 
     this.warnings.subscribe(warnings => {
       const visibleWarning = warnings[warnings.length - 1];
-      const isConnectivityRecovery = visibleWarning === WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY;
+      const isConnectivityRecovery = visibleWarning === WarningType.CONNECTIVITY_RECOVERY;
       const hasOffset = warnings.length > 0 && !isConnectivityRecovery;
       const isMiniMode = WarningsViewModel.CONFIG.MINI_MODES.includes(visibleWarning);
 
@@ -110,15 +108,7 @@ export class WarningsViewModel {
     this.name = ko.observable();
 
     this.warningDimmed = ko
-      .pureComputed(() => {
-        for (const warning of this.warnings()) {
-          const isDimmedMode = WarningsViewModel.CONFIG.DIMMED_MODES.includes(warning);
-          if (isDimmedMode) {
-            return true;
-          }
-        }
-        return false;
-      })
+      .pureComputed(() => this.warnings().some(warning => WarningsViewModel.CONFIG.DIMMED_MODES.includes(warning)))
       .extend({rateLimit: 200});
 
     amplify.subscribe(WebAppEvents.WARNING.SHOW, this.showWarning);
@@ -139,7 +129,7 @@ export class WarningsViewModel {
     this.dismissWarning(warningToClose);
 
     switch (warningToClose) {
-      case WarningsViewModel.TYPE.REQUEST_MICROPHONE: {
+      case WarningType.REQUEST_MICROPHONE: {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           primaryAction: {
             action: () => {
@@ -155,14 +145,15 @@ export class WarningsViewModel {
         break;
       }
 
-      case WarningsViewModel.TYPE.REQUEST_NOTIFICATION: {
+      case WarningType.REQUEST_NOTIFICATION: {
         // We block subsequent permission requests for notifications when the user ignores the request.
         amplify.publish(WebAppEvents.NOTIFICATION.PERMISSION_STATE, PermissionState.IGNORED);
         break;
       }
 
-      default:
+      default: {
         break;
+      }
     }
   };
 
@@ -173,10 +164,10 @@ export class WarningsViewModel {
     }
   };
 
-  readonly showWarning = (type: string, info: {name: string}) => {
-    const connectivityTypes = [WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT, WarningsViewModel.TYPE.NO_INTERNET];
+  readonly showWarning = (type: WarningType, info: {name: string}) => {
+    const connectivityTypes = [WarningType.CONNECTIVITY_RECONNECT, WarningType.NO_INTERNET];
     const isConnectivityWarning = connectivityTypes.includes(type);
-    const visibleWarningIsLifecycleUpdate = this.visibleWarning() === WarningsViewModel.TYPE.LIFECYCLE_UPDATE;
+    const visibleWarningIsLifecycleUpdate = this.visibleWarning() === WarningType.LIFECYCLE_UPDATE;
     if (isConnectivityWarning && !visibleWarningIsLifecycleUpdate) {
       this.dismissWarning(this.visibleWarning());
     }
