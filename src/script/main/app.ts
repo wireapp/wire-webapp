@@ -545,7 +545,7 @@ class App {
         default: {
           this.logger.warn(`Caused by: ${error?.message || 'unknown'}`, error);
 
-          const isNetworkError = (error.name = 'NetworkError');
+          const isNetworkError = error.name === 'NetworkError';
           if (isNetworkError) {
             this.logger.warn('Backend is not reachable. Reloading page.', error);
             window.location.reload();
