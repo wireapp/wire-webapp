@@ -181,7 +181,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                     className="camera-icon"
                     data-uie-name="status-video"
                     width={16}
-                    height={12}
+                    height={16}
                   />
                 )}
                 {callParticipantSharesScreen && (
@@ -203,7 +203,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                     data-uie-name="status-audio-off"
                     width={16}
                     height={16}
-                    style={{height: 12}}
+                    style={{height: 12, width: 12}}
                   />
                 )}
               </Fragment>

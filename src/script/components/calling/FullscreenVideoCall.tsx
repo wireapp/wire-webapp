@@ -196,7 +196,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 css={selfSharesCamera ? videoControlActiveStyles : undefined}
                 data-uie-name="do-call-controls-toggle-video"
               >
-                <NamedIcon name="camera-icon" width={16} height={12} />
+                <NamedIcon name="camera-icon" width={16} height={16} />
                 {showSwitchCamera ? (
                   <DeviceToggleButton
                     styles={css`
