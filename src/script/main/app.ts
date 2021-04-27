@@ -528,7 +528,7 @@ class App {
       }
 
       if (isAccessTokenError) {
-        this.logger.warn('Connectivity issues. Triggering reload.', error);
+        this.logger.warn('Connectivity issues. Reloading page.', error);
         return window.location.reload();
       }
     }
@@ -543,7 +543,7 @@ class App {
         }
 
         default: {
-          this.logger.warn(`Caused by: ${(error ? error.message : undefined) || error}`, error);
+          this.logger.warn(`Caused by: ${error?.message || error || 'unknown'}`, error);
 
           const isNetworkError = (error.name = 'NetworkError');
           if (isNetworkError) {
