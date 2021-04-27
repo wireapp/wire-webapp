@@ -17,12 +17,14 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import axios, {AxiosRequestConfig} from 'axios';
 import {ArrayUtil} from '@wireapp/commons';
 
 import {TeamAPI} from '../team/TeamAPI';
-import type {HttpClient} from '../../http/';
+import {handleProgressEvent, HttpClient, ProgressCallback, RequestCancelable, SyntheticErrorLabel} from '../../http/';
 import type {MemberData, Members} from '../member/';
+import {RequestCancellationError} from '../../user';
+import {MemberCSVResponse} from './MemberCSVResponse';
 
 export class MemberAPI {
   // Maximum 1600 due to "413 Request Entity Too Large" response
@@ -31,6 +33,7 @@ export class MemberAPI {
 
   public static readonly URL = {
     MEMBERS: 'members',
+    CSV: 'csv',
     MEMBERS_BY_ID_LIST: 'get-members-by-ids-using-post',
   };
 
@@ -125,5 +128,39 @@ export class MemberAPI {
 
     const response = await this.client.sendJSON<Members>(config);
     return response.data;
+  }
+
+  public async getMemberListCSV(
+    teamId: string,
+    progressCallback?: ProgressCallback,
+  ): Promise<RequestCancelable<MemberCSVResponse>> {
+    const cancelSource = axios.CancelToken.source();
+    const config: AxiosRequestConfig = {
+      cancelToken: cancelSource.token,
+      method: 'get',
+      onDownloadProgress: handleProgressEvent(progressCallback),
+      responseType: 'arraybuffer',
+      url: `${TeamAPI.URL.TEAMS}/${teamId}/${MemberAPI.URL.MEMBERS}/${MemberAPI.URL.CSV}`,
+    };
+
+    const handleRequest = async (): Promise<MemberCSVResponse> => {
+      try {
+        const response = await this.client.sendRequest<ArrayBuffer>(config, true);
+        return {
+          buffer: response.data,
+          mimeType: response.headers['content-type'],
+        };
+      } catch (error) {
+        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+          throw new RequestCancellationError('Member CSV download got cancelled.');
+        }
+        throw error;
+      }
+    };
+
+    return {
+      cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
+      response: handleRequest(),
+    };
   }
 }
