@@ -17,10 +17,10 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/src/conversation';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+import {PublicClient, ClientClassification} from '@wireapp/api-client/src/client/';
 import * as sinon from 'sinon';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -46,8 +46,8 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
-import {MessageRepository} from './MessageRepository';
-import {AssetAddEvent} from './EventBuilder';
+import {MessageRepository} from 'src/script/conversation/MessageRepository';
+import {AssetAddEvent} from 'src/script/conversation/EventBuilder';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
@@ -306,17 +306,17 @@ describe('MessageRepository', () => {
         verification_state: ConversationVerificationState.UNVERIFIED,
       } as ConversationDatabaseData;
 
-      const clientsPayload = [
+      const clientsPayload: PublicClient[] = [
         {
-          class: 'desktop',
+          class: ClientClassification.DESKTOP,
           id: '1e66e04948938c2c',
         },
         {
-          class: 'legalhold',
+          class: ClientClassification.LEGAL_HOLD,
           id: '53761bec3f10a6d9',
         },
         {
-          class: 'desktop',
+          class: ClientClassification.DESKTOP,
           id: 'a9c8c385737b14fe',
         },
       ];

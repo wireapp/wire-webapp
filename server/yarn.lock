@@ -647,13 +647,6 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/fs-extra@9.0.10":
-  version "9.0.10"
-  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.10.tgz#8023a72e3d06cf54929ea47ec7634e47f33f4046"
-  integrity sha512-O9T2LLkRDiTlalOBdjEkcnT0MRdT2+wglCl7pJUJ3mkWkR8hX4K+5bg2raQNJcLv4V8zGuTXe7Ud3wSqkTyuyQ==
-  dependencies:
-    "@types/node" "*"
-
 "@types/fs-extra@9.0.11":
   version "9.0.11"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.11.tgz#8cc99e103499eab9f347dbc6ca4e99fb8d2c2b87"
@@ -711,10 +704,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.22.tgz#0d29f382472c4ccf3bd96ff0ce47daf5b7b84b18"
   integrity sha512-g+f/qj/cNcqKkc3tFqlXOYjrmZA+jNBiDzbP3kH+B+otKFqAdPgVTGP1IeKRdMml/aE69as5S4FqtxAbl+LaMw==
 
-"@types/node@12.20.7":
-  version "12.20.7"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.7.tgz#1cb61fd0c85cb87e728c43107b5fd82b69bc9ef8"
-  integrity sha512-gWL8VUkg8VRaCAUgG9WmhefMqHmMblxe2rVpMF86nZY/+ZysU+BkAp+3cz03AixWDSSz0ks5WX59yAhv/cDwFA==
+"@types/node@12.20.10":
+  version "12.20.10"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.10.tgz#4dcb8a85a8f1211acafb88d72fafc7e3d2685583"
+  integrity sha512-TxCmnSSppKBBOzYzPR2BR25YlX5Oay8z2XGwFBInuA/Co0V9xJhLlW4kjbxKtgeNo3NOMbQP1A5Rc03y+XecPw==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -766,12 +759,12 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@wireapp/commons@4.1.7":
-  version "4.1.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.1.7.tgz#fdd94657b53441004402f1dc19f5188de9b292cf"
-  integrity sha512-4vjy6/xoMcQ3EzXCg0MuYBa5kLtVbcJnNohXT5VXuPTHASC4PItUj67HrrfU/7kaF4IwtuqMEdNJS/+gqTodJw==
+"@wireapp/commons@4.1.8":
+  version "4.1.8"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.1.8.tgz#f42d99b668823a767e87dcd0edd8a23042ba7e7a"
+  integrity sha512-X2gMwh9Z3d0shXXkku/AqPXWg0qhUYY3Ps/XcwCu/3AqfR8dz7RCmQ9zduSAdl/PR1+hRLMnhZbMPzZqc6x77A==
   dependencies:
-    "@types/fs-extra" "9.0.10"
+    "@types/fs-extra" "9.0.11"
     "@types/node" "~14"
     "@types/platform" "1.3.3"
     ansi-regex "5.0.0"
@@ -2252,10 +2245,10 @@ growly@^1.3.0:
   resolved "https://registry.yarnpkg.com/growly/-/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
   integrity sha1-8QdIy+dq+WS3yWyTxrzCivEgwIE=
 
-handlebars@4.7.6, handlebars@^4.1.0:
-  version "4.7.6"
-  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.6.tgz#d4c05c1baf90e9945f77aa68a7a219aa4a7df74e"
-  integrity sha512-1f2BACcBfiwAfStCKZNrUCgqNZkGsAT7UM3kkYtXuLo0KnaVfjKOyf7PRzB6++aK9STyT1Pd2ZCPe3EGOXleXA==
+handlebars@4.7.7, handlebars@^4.1.0:
+  version "4.7.7"
+  resolved "https://registry.yarnpkg.com/handlebars/-/handlebars-4.7.7.tgz#9ce33416aad02dbd6c8fafa8240d5d98004945a1"
+  integrity sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA==
   dependencies:
     minimist "^1.2.5"
     neo-async "^2.6.0"
@@ -2333,18 +2326,18 @@ hasha@^5.0.0:
     is-stream "^2.0.0"
     type-fest "^0.8.0"
 
-hbs@4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/hbs/-/hbs-4.1.1.tgz#8aab17ca6ae70f9aaa225278bed7af31011254b7"
-  integrity sha512-6QsbB4RwbpL4cb4DNyjEEPF+suwp+3yZqFVlhILEn92ScC0U4cDCR+FDX53jkfKJPhutcqhAvs+rOLZw5sQrDA==
+hbs@4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/hbs/-/hbs-4.1.2.tgz#8d8c07b50d985b580a3d6eae9bf52393a47b9aaf"
+  integrity sha512-WfBnQbozbdiTLjJu6P6Wturgvy0FN8xtRmIjmP0ebX9OGQrt+2S6UC7xX0IebHTCS1sXe20zfTzQ7yhjrEvrfQ==
   dependencies:
-    handlebars "4.7.6"
+    handlebars "4.7.7"
     walk "2.3.14"
 
-helmet@*, helmet@4.4.1:
-  version "4.4.1"
-  resolved "https://registry.yarnpkg.com/helmet/-/helmet-4.4.1.tgz#a17e1444d81d7a83ddc6e6f9bc6e2055b994efe7"
-  integrity sha512-G8tp0wUMI7i8wkMk2xLcEvESg5PiCitFMYgGRc/PwULB0RVhTP5GFdxOwvJwp9XVha8CuS8mnhmE8I/8dx/pbw==
+helmet@*, helmet@4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/helmet/-/helmet-4.5.0.tgz#da5a75d30cbd9f60628e9463a85dc7725806c2ea"
+  integrity sha512-GfxdTaKarneWOpxmiVb/1YsY+fIwDOxVUGrvNEM1MC8W6Z2PREfkXiWF4XHQdvkyXwUTHuY4DRwB0uH/Q6BVyQ==
 
 hosted-git-info@^2.1.4:
   version "2.8.8"
@@ -4864,10 +4857,10 @@ tr46@^2.0.2:
   dependencies:
     punycode "^2.1.1"
 
-ts-jest@26.5.4:
-  version "26.5.4"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-26.5.4.tgz#207f4c114812a9c6d5746dd4d1cdf899eafc9686"
-  integrity sha512-I5Qsddo+VTm94SukBJ4cPimOoFZsYTeElR2xy6H2TOVs+NsvgYglW8KuQgKoApOKuaU/Ix/vrF9ebFZlb5D2Pg==
+ts-jest@26.5.5:
+  version "26.5.5"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-26.5.5.tgz#e40481b6ee4dd162626ba481a2be05fa57160ea5"
+  integrity sha512-7tP4m+silwt1NHqzNRAPjW1BswnAhopTdc2K3HEkRZjF0ZG2F/e/ypVH0xiZIMfItFtD3CX0XFbwPzp9fIEUVg==
   dependencies:
     bs-logger "0.x"
     buffer-from "1.x"
@@ -4961,10 +4954,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@4.2.3:
-  version "4.2.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.3.tgz#39062d8019912d43726298f09493d598048c1ce3"
-  integrity sha512-qOcYwxaByStAWrBf4x0fibwZvMRG+r4cQoTjbPtUlrWjBHbmCAww1i448U0GJ+3cNNEtebDteo/cHOR3xJ4wEw==
+typescript@4.2.4:
+  version "4.2.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.2.4.tgz#8610b59747de028fda898a8aef0e103f156d0961"
+  integrity sha512-V+evlYHZnQkaz8TRBuxTA92yZBPotr5H+WhQ7bD3hZUndx5tGOa1fuCgeSjxAzM1RiN5IzvadIXTVefuuwZCRg==
 
 typpy@2.3.11:
   version "2.3.11"

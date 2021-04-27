@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';

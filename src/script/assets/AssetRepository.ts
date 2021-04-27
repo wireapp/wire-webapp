@@ -21,8 +21,7 @@ import ko from 'knockout';
 import {Asset} from '@wireapp/protocol-messaging';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/src/asset';
-import {AssetUploadData} from '@wireapp/api-client/src/asset';
+import {AssetOptions, AssetRetentionPolicy, AssetUploadData} from '@wireapp/api-client/src/asset/';
 import {singleton, container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -65,14 +64,15 @@ export class AssetRepository {
     this.logger = getLogger('AssetRepository');
   }
 
-  getObjectUrl(asset: AssetRemoteData): Promise<string> {
+  async getObjectUrl(asset: AssetRemoteData): Promise<string> {
     const objectUrl = getAssetUrl(asset.identifier);
-    return objectUrl
-      ? Promise.resolve(objectUrl)
-      : this.load(asset).then(blob => {
-          const url = window.URL.createObjectURL(blob);
-          return setAssetUrl(asset.identifier, url);
-        });
+    if (objectUrl) {
+      return objectUrl;
+    }
+
+    const blob = await this.load(asset);
+    const url = window.URL.createObjectURL(blob);
+    return setAssetUrl(asset.identifier, url);
   }
 
   public async load(asset: AssetRemoteData): Promise<void | Blob> {

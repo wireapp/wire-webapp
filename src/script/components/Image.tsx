@@ -81,7 +81,6 @@ export default Image;
 
 registerReactComponent<ImageProps>('image-component', {
   component: Image,
-  injected: {assetRepository: AssetRepository},
-  optionalParams: ['click', 'className'],
+  optionalParams: ['click', 'className', 'assetRepository'],
   template: '<span data-bind="react: {className, asset: ko.unwrap(asset), assetRepository, click}"></span>',
 });

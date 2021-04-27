@@ -19,9 +19,9 @@
 
 import axios, {AxiosError} from 'axios';
 import {Runtime} from '@wireapp/commons';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
-import type {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation';
+import type {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation/';
 import {
   CALL_TYPE,
   CONV_TYPE,

@@ -17,7 +17,7 @@
  *
  */
 
-import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/src/conversation';
+import {DefaultConversationRoleName as DefaultRole, ConversationRole} from '@wireapp/api-client/src/conversation/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -72,7 +72,7 @@ export class ConversationRoleRepository {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    this.logger = getLogger('ConversationRepository');
+    this.logger = getLogger('ConversationRoleRepository');
     this.conversationRoles = {};
     this.teamRoles = [defaultAdminRole, defaultMemberRole];
   }

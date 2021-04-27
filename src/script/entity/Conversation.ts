@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';

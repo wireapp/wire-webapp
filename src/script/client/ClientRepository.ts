@@ -18,8 +18,9 @@
  */
 
 import ko from 'knockout';
-import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {ClientType, PublicClient, QualifiedPublicClients, RegisteredClient} from '@wireapp/api-client/src/client/';
 import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/src/event';
+import {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Runtime} from '@wireapp/commons';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -42,6 +43,8 @@ import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
 import {ClientState} from './ClientState';
+
+export type QualifiedUserClientMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
 
 export class ClientRepository {
   private readonly logger: Logger;
@@ -342,18 +345,36 @@ export class ClientRepository {
    * Retrieves meta information about all the clients of a given user.
    * @note If you want to get very detailed information about the devices from the own user, then use `getClients()`.
    *
-   * @param userId User ID to retrieve client information for
+   * @param userIds User IDs to retrieve client information for
    * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
-  async getClientsByUserId(userId: string, updateClients: false): Promise<PublicClient[]>;
-  async getClientsByUserId(userId: string, updateClients?: boolean): Promise<ClientEntity[]>;
-  async getClientsByUserId(userId: string, updateClients: boolean = true): Promise<ClientEntity[] | PublicClient[]> {
-    const clientsData = await this.clientService.getClientsByUserId(userId);
+  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
+  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
+  async getClientsByUserIds(
+    userIds: (QualifiedId | string)[],
+    updateClients: boolean,
+  ): Promise<QualifiedPublicClients | QualifiedUserClientMap> {
+    const userClientsMap = await this.clientService.getClientsByUserIds(userIds);
+
     if (updateClients) {
-      return this.updateClientsOfUserById(userId, clientsData);
+      const clientEntityMap: QualifiedUserClientMap = {};
+      await Promise.all(
+        Object.entries(userClientsMap).map(([domain, userClientMap]) =>
+          Promise.all(
+            Object.entries(userClientMap).map(async ([userId, clients]) => {
+              if (!clientEntityMap[domain]) {
+                clientEntityMap[domain] = {};
+              }
+              clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients);
+            }),
+          ),
+        ),
+      );
+      return clientEntityMap;
     }
-    return clientsData;
+
+    return userClientsMap;
   }
 
   private async getClientByUserIdFromDb(requestedUserId: string): Promise<ClientRecord[]> {

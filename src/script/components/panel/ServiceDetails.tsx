@@ -55,5 +55,5 @@ export default ServiceDetails;
 
 registerReactComponent('panel-service-details', {
   component: ServiceDetails,
-  template: '<div data-bind="react: {service: ko.unwrap(service)}">',
+  template: '<div data-bind="react: {service: ko.unwrap(service)}"></div>',
 });

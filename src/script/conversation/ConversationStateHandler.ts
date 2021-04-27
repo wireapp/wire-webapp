@@ -17,9 +17,9 @@
  *
  */
 
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, ConversationCode} from '@wireapp/api-client/src/conversation';
-import {ConversationAccessUpdateData} from '@wireapp/api-client/src/conversation/data';
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, ConversationCode} from '@wireapp/api-client/src/conversation/';
+import {ConversationAccessUpdateData} from '@wireapp/api-client/src/conversation/data/';
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';

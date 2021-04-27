@@ -32,7 +32,7 @@ import 'Components/asset/AssetHeader';
 import 'Components/asset/controls/AudioSeekBar';
 import 'Components/asset/controls/MediaButton';
 import 'Components/asset/controls/SeekBar';
-import 'Components/copyToClipboard';
+import 'Components/CopyToClipboard';
 import 'Components/message/EphemeralTimer';
 import '../page/collection/fullSearch';
 import '../page/start-ui/GroupList';
@@ -62,6 +62,7 @@ import '../view_model/bindings/ConversationListBindings';
 import '../view_model/bindings/ListBackgroundBindings';
 import '../view_model/bindings/MessageListBindings';
 import '../view_model/bindings/VideoCallingBindings';
+import '../view_model/bindings/ReactBindings';
 
 import '../view_model/MainViewModel';
 import '../view_model/PanelViewModel';

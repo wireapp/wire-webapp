@@ -62,8 +62,8 @@ export class EventInfoEntity {
     return this.type || (this.genericMessage && this.genericMessage.content);
   }
 
-  setTimestamp(time: string): void {
-    this.timestamp = new Date(time).getTime();
+  setTimestamp(isoDate: string): void {
+    this.timestamp = new Date(isoDate).getTime();
   }
 
   setType(type: GENERIC_MESSAGE_TYPE): void {

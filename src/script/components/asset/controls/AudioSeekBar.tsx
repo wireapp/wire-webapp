@@ -25,11 +25,7 @@ import {clamp} from 'Util/NumberUtil';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 import {FileAsset} from '../../../entity/message/FileAsset';
-
-/**
- * A float that must be between 0 and 1
- */
-type Fraction = number;
+import {createRandomUuid} from 'Util/util';
 
 export interface AudioSeekBarProps {
   asset: FileAsset;
@@ -41,7 +37,9 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   const [svgWidth, setSvgWidth] = useState(0);
   const [path, setPath] = useState('');
   const [loudness, setLoudness] = useState<number[]>([]);
+  const [position, setPosition] = useState(0);
   const svgNode = useRef<SVGSVGElement>();
+  const [clipId] = useState(`clip-${createRandomUuid()}`);
 
   useEffect(() => {
     window.addEventListener('resize', updateSvgWidth);
@@ -94,17 +92,12 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
     onTimeUpdate();
   };
 
-  const onAudioEnded = () => updateSeekClip(0);
+  const onAudioEnded = () => setPosition(0);
 
   const onTimeUpdate = () => {
     if (audioElement.duration) {
-      updateSeekClip(audioElement.currentTime / audioElement.duration);
+      setPosition(audioElement.currentTime / audioElement.duration);
     }
-  };
-
-  const updateSeekClip = (position: Fraction) => {
-    const percent = position * 100;
-    svgNode.current.style.setProperty('--seek-bar-clip', `polygon(0 0, ${percent}% 0, ${percent}% 100%, 0 100%)`);
   };
 
   return (
@@ -117,8 +110,11 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
       ref={svgNode}
       onClick={onLevelClick}
     >
+      <clipPath id={clipId}>
+        <rect x={0} y={0} height={1} width={position} />
+      </clipPath>
       <path d={path} />
-      <path className="active" d={path} />
+      <path clipPath={`url(#${clipId})`} className="active" d={path} />
     </svg>
   );
 };
@@ -126,6 +122,6 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
 export default AudioSeekBar;
 
 registerReactComponent('audio-seek-bar', {
+  bindings: 'asset, disabled: ko.unwrap(disabled), audioElement: src',
   component: AudioSeekBar,
-  template: '<div data-bind="react: {asset, disabled: ko.unwrap(disabled), audioElement: src}"></div>',
 });

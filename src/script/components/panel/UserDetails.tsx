@@ -127,5 +127,5 @@ registerReactComponent('panel-user-details', {
   component: UserDetails,
   optionalParams: ['badge', 'isVerified', 'isGroupAdmin'],
   template:
-    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin: ko.unwrap(isGroupAdmin), isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}">',
+    '<div data-bind="react: {badge: ko.unwrap(badge), isGroupAdmin: ko.unwrap(isGroupAdmin), isSelfVerified: ko.unwrap(isSelfVerified), isVerified: ko.unwrap(isVerified), participant: ko.unwrap(participant)}"></div>',
 });

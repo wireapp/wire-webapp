@@ -17,7 +17,7 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {container, singleton} from 'tsyringe';
 import ko from 'knockout';
 

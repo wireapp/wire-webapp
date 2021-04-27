@@ -17,7 +17,8 @@
  *
  */
 
-import type {NewClient, PublicClient, RegisteredClient} from '@wireapp/api-client/src/client';
+import type {NewClient, QualifiedPublicClients, RegisteredClient} from '@wireapp/api-client/src/client';
+import type {QualifiedId} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -100,8 +101,32 @@ export class ClientService {
    * @param userId ID of user to retrieve clients for
    * @returns Resolves with the clients of a user
    */
-  getClientsByUserId(userId: string): Promise<PublicClient[]> {
-    return this.apiClient.user.api.getClients(userId);
+  async getClientsByUserIds(userIds: (QualifiedId | string)[]): Promise<QualifiedPublicClients> {
+    // Add 'none' as domain for non-federated users
+    let clients: QualifiedPublicClients = {none: {}};
+
+    const {qualifiedIds, stringIds} = userIds.reduce(
+      (result, userId) => {
+        if (typeof userId === 'string') {
+          result.stringIds.push(userId);
+        } else {
+          result.qualifiedIds.push(userId);
+        }
+        return result;
+      },
+      {qualifiedIds: [], stringIds: []},
+    );
+
+    for (const userId of stringIds) {
+      clients.none[userId] = await this.apiClient.user.api.getClients(userId);
+    }
+
+    if (qualifiedIds.length) {
+      const listedClients = await this.apiClient.user.api.postListClients(qualifiedIds);
+      clients = {...clients, ...listedClients};
+    }
+
+    return clients;
   }
 
   /**
