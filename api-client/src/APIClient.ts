@@ -62,6 +62,7 @@ import {UserAPI} from './user/';
 import type {Config} from './Config';
 import {TeamSearchAPI} from './team/search';
 import {parseAccessToken} from './auth/parseAccessToken';
+import {ScimAPI} from './team/scim/ScimAPI';
 
 const {version}: {version: string} = require('../package.json');
 
@@ -108,6 +109,7 @@ export class APIClient extends EventEmitter {
     legalhold: {api: LegalHoldAPI};
     member: {api: MemberAPI};
     payment: {api: PaymentAPI};
+    scim: {api: ScimAPI};
     search: {api: TeamSearchAPI};
     service: {api: ServiceAPI};
     team: {api: TeamAPI};
@@ -217,6 +219,9 @@ export class APIClient extends EventEmitter {
       },
       payment: {
         api: new PaymentAPI(this.transport.http),
+      },
+      scim: {
+        api: new ScimAPI(this.transport.http),
       },
       search: {
         api: new TeamSearchAPI(this.transport.http),
