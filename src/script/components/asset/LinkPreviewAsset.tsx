@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect} from 'react';
+import React from 'react';
 import cx from 'classnames';
 
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -45,6 +45,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
   const author = isTweet ? preview?.meta_data.author.substring(0, 20) : '';
   const previewImage = useKoSubscribable(preview?.image_resource);
+  const isObfuscated = useKoSubscribable(message.isObfuscated);
 
   const onClick = () => {
     if (!message.isExpired()) {
@@ -52,16 +53,8 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
     }
   };
 
-  if (!message.isExpired()) {
-    addEventListener('click', onClick);
-  }
-
-  useEffect(() => {
-    return () => removeEventListener('click', onClick);
-  });
-
-  return message.isObfuscated() ? (
-    <>
+  return isObfuscated ? (
+    <div className="link-preview-asset ephemeral-asset-expired">
       <div className="link-preview-image-container">
         <div className="link-preview-image-placeholder icon-link bg-color-ephemeral text-white" />
       </div>
@@ -77,9 +70,9 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
         </div>
         <div className="link-preview-info-link ephemeral-message-obfuscated ellipsis">{preview?.url}</div>
       </div>
-    </>
+    </div>
   ) : (
-    <>
+    <div className="link-preview-asset" onClick={onClick}>
       <div className="link-preview-image-container">
         {preview && previewImage ? (
           <Image className="link-preview-image" asset={previewImage} data-uie-name="link-preview-image" />
@@ -121,14 +114,14 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
           </>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
 export default LinkPreviewAsset;
 
 registerReactComponent('link-preview-asset', {
+  bindings: 'header, message: ko.unwrap(message)',
   component: LinkPreviewAsset,
   optionalParams: ['header'],
-  template: '<span data-bind="react: {header, message: ko.unwrap(message)}"></div>',
 });
