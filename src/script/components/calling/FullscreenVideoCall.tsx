@@ -181,11 +181,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               className="video-controls__button"
               data-uie-value={!isMuted ? 'inactive' : 'active'}
               onClick={() => callActions.toggleMute(call, !isMuted)}
-              css={isMuted ? videoControlActiveStyles : undefined}
+              css={!isMuted ? videoControlActiveStyles : undefined}
               data-uie-name="do-call-controls-video-call-mute"
             >
-              <NamedIcon name="mic-off-icon" width={16} height={16} />
-              <div className="video-controls__button__label">{t('videoCallOverlayMute')}</div>
+              <NamedIcon name={isMuted ? 'mic-off-icon' : 'mic-on-icon'} width={16} height={16} />
+              <div className="video-controls__button__label">{t('videoCallOverlayMicrophone')}</div>
             </div>
 
             {showToggleVideo && (
@@ -196,7 +196,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 css={selfSharesCamera ? videoControlActiveStyles : undefined}
                 data-uie-name="do-call-controls-toggle-video"
               >
-                <NamedIcon name="camera-icon" width={16} height={16} />
+                <NamedIcon name={selfSharesCamera ? 'camera-icon' : 'camera-off-icon'} width={16} height={16} />
                 {showSwitchCamera ? (
                   <DeviceToggleButton
                     styles={css`
@@ -210,7 +210,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     onChooseDevice={deviceId => switchCameraSource(call, deviceId)}
                   />
                 ) : (
-                  <div className="video-controls__button__label">{t('videoCallOverlayVideo')}</div>
+                  <div className="video-controls__button__label">{t('videoCallOverlayCamera')}</div>
                 )}
               </div>
             )}
@@ -226,7 +226,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               data-uie-enabled={canShareScreen ? 'true' : 'false'}
               data-uie-name="do-toggle-screen"
             >
-              <NamedIcon name="screenshare-icon" width={16} height={16} />
+              <NamedIcon name={selfSharesScreen ? 'screenshare-icon' : 'screenshare-off-icon'} width={16} height={16} />
               <div className="video-controls__button__label">{t('videoCallOverlayShareScreen')}</div>
             </div>
 
