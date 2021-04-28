@@ -17,19 +17,8 @@
  *
  */
 
-import {PublicClient} from './PublicClient';
+import {QualifiedId} from './QualifiedId';
 
-export type QualifiedUserMap = {
-  [domain: string]: {
-    [userId: string]: PublicClient[];
-  };
-} & {
-  /** users without federated domain */
-  none?: {
-    [userId: string]: PublicClient[];
-  };
-};
-
-export interface QualifiedPublicClients {
-  qualified_user_map: QualifiedUserMap;
+export interface LimitedQualifiedUserIdList {
+  qualified_users: QualifiedId[];
 }

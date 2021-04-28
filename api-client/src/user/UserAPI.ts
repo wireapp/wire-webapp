@@ -27,6 +27,7 @@ import type {
   CheckHandles,
   CompletePasswordReset,
   HandleInfo,
+  LimitedQualifiedUserIdList,
   NewPasswordReset,
   QualifiedHandle,
   QualifiedId,
@@ -62,6 +63,7 @@ export class UserAPI {
     RICH_INFO: 'rich-info',
     SEARCH: '/search',
     SEND: 'send',
+    V2: 'v2',
     USERS: '/users',
   };
 
@@ -506,11 +508,11 @@ export class UserAPI {
   /**
    * Get client infos from a list of users.
    */
-  public async postListClients(userIds: QualifiedId[]): Promise<QualifiedPublicClients> {
+  public async postListClients(userIdList: LimitedQualifiedUserIdList): Promise<QualifiedPublicClients> {
     const config: AxiosRequestConfig = {
-      data: userIds,
+      data: userIdList,
       method: 'post',
-      url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}`,
+      url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_CLIENTS}/${UserAPI.URL.V2}`,
     };
 
     const response = await this.client.sendJSON<QualifiedPublicClients>(config);
