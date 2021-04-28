@@ -203,7 +203,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                     data-uie-name="status-audio-off"
                     width={16}
                     height={16}
-                    style={{height: 12, width: 12}}
+                    style={{height: 12}}
                   />
                 )}
               </Fragment>

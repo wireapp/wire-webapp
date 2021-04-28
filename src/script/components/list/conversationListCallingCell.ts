@@ -315,22 +315,12 @@ ko.components.register('conversation-list-calling-cell', {
       <!-- ko if: !isDeclined() -->
         <div class="conversation-list-calling-cell-controls">
           <div class="conversation-list-calling-cell-controls-left">
-            <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': !isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
-              <!-- ko if: isMuted() -->
-                <mic-off-icon class="small-icon"></mic-off-icon>
-              <!-- /ko -->
-              <!-- ko ifnot: isMuted() -->
-                <mic-on-icon class="small-icon"></mic-on-icon>
-              <!-- /ko -->
+            <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
+              <mic-off-icon class="small-icon"></mic-off-icon>
             </button>
             <!-- ko if: showVideoButton() -->
             <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
-              <!-- ko if: selfParticipant.sharesCamera() -->
-                <camera-icon class="small-icon"></camera-icon>
-              <!-- /ko -->
-              <!-- ko ifnot: selfParticipant.sharesCamera() -->
-                <camera-off-icon class="small-icon"></camera-off-icon>
-              <!-- /ko -->
+              <camera-icon class="small-icon"></camera-icon>
             </button>
             <!-- /ko -->
             <!-- ko if: isOngoing() -->
@@ -341,13 +331,7 @@ ko.components.register('conversation-list-calling-cell', {
                   css: {'call-ui__button--active': selfParticipant.sharesScreen(), 'call-ui__button--disabled': disableScreenButton},
                   attr: {'data-uie-value': selfParticipant.sharesScreen() ? 'active' : 'inactive', 'data-uie-enabled': disableScreenButton ? 'false' : 'true', title: t('videoCallOverlayShareScreen')}"
                 data-uie-name="do-call-controls-toggle-screenshare">
-                <!-- ko if: selfParticipant.sharesScreen() -->
-                  <screenshare-icon class="small-icon"></screenshare-icon>
-                <!-- /ko -->
-                <!-- ko ifnot: selfParticipant.sharesScreen() -->
-                  <screenshare-off-icon class="small-icon"></screenshare-off-icon>
-                <!-- /ko -->
-                
+                <screenshare-icon class="small-icon"></screenshare-icon>
               </div>
             <!-- /ko -->
           </div>
