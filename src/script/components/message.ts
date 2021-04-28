@@ -45,7 +45,7 @@ import type {MessageRepository} from '../conversation/MessageRepository';
 import './asset/audioAsset';
 import './asset/FileAssetComponent';
 import './asset/imageAsset';
-import './asset/LinkPreviewAsset';
+import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
 import './asset/videoAsset';
 import './asset/MessageButton';

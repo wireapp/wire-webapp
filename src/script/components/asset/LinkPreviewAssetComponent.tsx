@@ -38,12 +38,12 @@ export interface LinkPreviewAssetProps {
   message: ContentMessage;
 }
 
-const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
+const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
   const [preview] = (message.getFirstAsset() as Text).previews();
 
   const isTypeTweet = preview?.meta_data_type === LinkPreviewMetaDataType.TWEET;
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
-  const author = isTweet ? preview?.meta_data.author.substring(0, 20) : '';
+  const author = isTweet ? preview?.meta_data?.author?.substring(0, 20) : '';
   const previewImage = useKoSubscribable(preview?.image_resource);
   const isObfuscated = useKoSubscribable(message.isObfuscated);
 
@@ -118,10 +118,10 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, mess
   );
 };
 
-export default LinkPreviewAsset;
+export default LinkPreviewAssetComponent;
 
 registerReactComponent('link-preview-asset', {
   bindings: 'header, message: ko.unwrap(message)',
-  component: LinkPreviewAsset,
+  component: LinkPreviewAssetComponent,
   optionalParams: ['header'],
 });
