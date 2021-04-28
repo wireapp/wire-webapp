@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.11.0...@wireapp/api-client@12.12.0) (2021-04-28)
+
+
+### Features
+
+* **api-client:** Implement postListClients v2 ([#3775](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3775)) ([a121c14](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/a121c147816f899c02cdef94cd5bc44df0f41861))
+
+
+
+
+
 # [12.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.10.0...@wireapp/api-client@12.11.0) (2021-04-28)
 
 
