@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.11.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.10.0...@wireapp/api-client@12.11.0) (2021-04-28)
+
+
+### Features
+
+* **api-client:** SCIM API ([#3768](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3768)) ([34d04ee](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/34d04ee18d71ce380e9066a6bbfff5c53a23376f))
+
+
+
+
+
 # [12.10.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.9.0...@wireapp/api-client@12.10.0) (2021-04-27)
 
 
