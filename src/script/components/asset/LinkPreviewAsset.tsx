@@ -34,11 +34,11 @@ import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
 export interface LinkPreviewAssetProps {
   /** Does the asset have a visible header? */
-  header: boolean;
+  header?: boolean;
   message: ContentMessage;
 }
 
-const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header, message}) => {
+const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
   const [preview] = (message.getFirstAsset() as Text).previews();
 
   const isTypeTweet = preview?.meta_data_type === LinkPreviewMetaDataType.TWEET;
@@ -81,7 +81,7 @@ const LinkPreviewAsset: React.FC<LinkPreviewAssetProps> = ({header, message}) =>
   ) : (
     <>
       <div className="link-preview-image-container">
-        {previewImage ? (
+        {preview && previewImage ? (
           <Image className="link-preview-image" asset={previewImage} data-uie-name="link-preview-image" />
         ) : (
           <div className="link-preview-image-placeholder icon-link" />
@@ -129,5 +129,6 @@ export default LinkPreviewAsset;
 
 registerReactComponent('link-preview-asset', {
   component: LinkPreviewAsset,
-  template: '<div data-bind="react: {header, message: ko.unwrap(message)}"></div>',
+  optionalParams: ['header'],
+  template: '<span data-bind="react: {header, message: ko.unwrap(message)}"></div>',
 });
