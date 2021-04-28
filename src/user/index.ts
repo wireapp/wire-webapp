@@ -23,6 +23,7 @@ export * from './CheckHandles';
 export * from './CompletePasswordReset';
 export * from './Contact';
 export * from './HandleInfo';
+export * from './LimitedQualifiedUserIdList';
 export * from './ManagedSource';
 export * from './NewPasswordReset';
 export * from './QualifiedHandle';
