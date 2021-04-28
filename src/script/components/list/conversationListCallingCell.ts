@@ -315,7 +315,7 @@ ko.components.register('conversation-list-calling-cell', {
       <!-- ko if: !isDeclined() -->
         <div class="conversation-list-calling-cell-controls">
           <div class="conversation-list-calling-cell-controls-left">
-            <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
+            <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': !isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
               <!-- ko if: isMuted() -->
                 <mic-off-icon class="small-icon"></mic-off-icon>
               <!-- /ko -->
