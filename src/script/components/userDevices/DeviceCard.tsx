@@ -24,7 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {ClientEntity} from '../../client/ClientEntity';
-import NamedIcon from '../NamedIcon';
+import Icon from '../Icon';
 import LegalHoldDot from '../LegalHoldDot';
 import VerifiedIcon from '../VerifiedIcon';
 import DeviceId from 'Components/DeviceId';
@@ -69,24 +69,8 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
           dataUieName="status-legal-hold-device"
         />
       )}
-      {showDesktopIcon && (
-        <NamedIcon
-          width={16}
-          height={16}
-          name="desktop-icon"
-          className="device-card__icon"
-          data-uie-name="status-desktop-device"
-        />
-      )}
-      {showMobileIcon && (
-        <NamedIcon
-          width={16}
-          height={16}
-          name="devices-icon"
-          className="device-card__icon"
-          data-uie-name="status-mobile-device"
-        />
-      )}
+      {showDesktopIcon && <Icon.Desktop className="device-card__icon" data-uie-name="status-desktop-device" />}
+      {showMobileIcon && <Icon.Devices className="device-card__icon" data-uie-name="status-mobile-device" />}
       <div className="device-card__info" data-uie-name="device-card-info" data-uie-value={label}>
         <div className="label-xs">
           <span className="device-card__model">{name}</span>
@@ -99,9 +83,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
         </div>
       </div>
       {showVerified && <VerifiedIcon isVerified={isVerified()} />}
-      {clickable && (
-        <NamedIcon width={5} height={8} name="disclose-icon" className="disclose-icon" data-uie-name="disclose-icon" />
-      )}
+      {clickable && <Icon.Disclose className="disclose-icon" data-uie-name="disclose-icon" />}
     </div>
   );
 };

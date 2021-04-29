@@ -22,7 +22,7 @@ import {css} from '@emotion/core';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 import type {Grid} from '../../calling/videoGridHandler';
 import Video from './Video';
 import type {Participant} from '../../calling/Participant';
@@ -116,7 +116,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               justifyContent: 'center',
             }}
           >
-            <NamedIcon
+            <Icon.Loading
               css={{
                 '> path': {
                   fill: '#fff',
@@ -125,7 +125,6 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                 marginBottom: 32,
                 width: 32,
               }}
-              name="loading-icon"
             />
             <div data-uie-name="no-active-speakers" css={{color: '#fff', fontSize: 11, fontWeight: 500}}>
               {t('noActiveVideoSpeakers')}
@@ -177,7 +176,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
                 css={{'> svg': {width: 12}, height: 12}}
                 data-uie-name="status-call-audio-muted"
               >
-                <NamedIcon name="mic-off-icon" data-uie-name="mic-icon-off" />
+                <Icon.MicOff data-uie-name="mic-icon-off" />
               </span>
             ) : (
               <ParticipantMicOnIcon

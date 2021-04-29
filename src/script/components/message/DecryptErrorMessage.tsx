@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from '../../entity/message/DecryptErrorMessage';
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -74,13 +74,7 @@ const DecryptErrorMessage: React.FC<DecryptErrorMessageProps> = ({message, onCli
         {isRecoverable && (
           <div className="message-header-decrypt-reset-session">
             {isResettingSession ? (
-              <NamedIcon
-                className="accent-fill"
-                name="loading-icon"
-                width="16"
-                height="16"
-                data-uie-name="status-loading"
-              />
+              <Icon.Loading className="accent-fill" data-uie-name="status-loading" />
             ) : (
               <span
                 className="message-header-decrypt-reset-session-action button-label accent-text"

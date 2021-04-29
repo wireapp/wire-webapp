@@ -17,4 +17,20 @@
  *
  */
 
-jest.mock('../../../auth/util/SVGProvider');
+import fs from 'fs';
+import path from 'path';
+const parser = new DOMParser();
+const mockSVG = parser.parseFromString(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M0 7v2h7v7h2V9h7V7H9V0H7v7z"/></svg>',
+  'image/svg+xml',
+);
+
+const fileList = fs
+  .readdirSync(path.resolve(__dirname, '../../../../../resource/image/icon'))
+  .filter(file => file.endsWith('.svg'))
+  .reduce((list, file: string) => {
+    const iconName = file.substring(file.lastIndexOf('/') + 1).replace(/\.svg$/i, '');
+    return Object.assign(list, {[iconName]: mockSVG});
+  }, {});
+
+jest.mock('../../../auth/util/SVGProvider', () => fileList);
