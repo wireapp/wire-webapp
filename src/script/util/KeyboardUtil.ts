@@ -35,40 +35,43 @@ export const KEY = {
   TAB: 'Tab',
 };
 
-export const isOneOfKeys = (keyboardEvent: KeyboardEvent, expectedKeys: string[] = []) => {
+export const isOneOfKeys = (keyboardEvent: KeyboardEvent | React.KeyboardEvent<any>, expectedKeys: string[] = []) => {
   expectedKeys = expectedKeys.map(key => key.toLowerCase());
   const eventKey = keyboardEvent.key?.toLowerCase() || '';
   return !!expectedKeys.find(key => key === eventKey);
 };
 
-export const isArrowKey = (keyboardEvent: KeyboardEvent): boolean =>
+export const isArrowKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.ARROW_DOWN, KEY.ARROW_LEFT, KEY.ARROW_RIGHT, KEY.ARROW_UP]);
 
-export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean =>
+export const isPageUpDownKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.PAGE_UP, KEY.PAGE_DOWN]);
 
-export const isKey = (keyboardEvent?: KeyboardEvent, expectedKey = '') => {
+export const isKey = (keyboardEvent?: KeyboardEvent | React.KeyboardEvent, expectedKey = '') => {
   const eventKey = keyboardEvent?.key?.toLowerCase() || '';
   return eventKey === expectedKey.toLowerCase();
 };
 
-export const isEnterKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ENTER);
+export const isEnterKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent<any>): boolean =>
+  isKey(keyboardEvent, KEY.ENTER);
 
-export const isSpaceKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.SPACE);
+export const isSpaceKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
+  isKey(keyboardEvent, KEY.SPACE);
 
-export const isEscapeKey = (keyboardEvent: KeyboardEvent): boolean => isKey(keyboardEvent, KEY.ESC);
+export const isEscapeKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
+  isKey(keyboardEvent, KEY.ESC);
 
-export const isFunctionKey = (keyboardEvent: KeyboardEvent): boolean =>
+export const isFunctionKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
   keyboardEvent.altKey || keyboardEvent.ctrlKey || keyboardEvent.metaKey || keyboardEvent.shiftKey;
 
 /** On macOS the meta key is '⌘', which represents 'Ctrl' in the Windows world: https://www.oreilly.com/library/view/switching-to-the/9781449372927/ch01s08.html */
-export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
+export const isMetaKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
   keyboardEvent.metaKey || keyboardEvent.ctrlKey || keyboardEvent.key?.toLowerCase() === 'control';
 
-export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
+export const isPasteAction = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-export const isRemovalAction = (keyboardEvent: KeyboardEvent): boolean =>
+export const isRemovalAction = (keyboardEvent: KeyboardEvent | React.KeyboardEvent<any>): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.BACKSPACE, KEY.DELETE]);
 
 export const insertAtCaret = (areaId: string, text: string) => {
@@ -114,7 +117,7 @@ export const insertAtCaret = (areaId: string, text: string) => {
   textArea.scrollTop = scrollPos;
 };
 
-type KeyboardHandler = (event: KeyboardEvent) => void;
+type KeyboardHandler = (event: KeyboardEvent | React.KeyboardEvent) => void;
 
 const escKeyHandlers: KeyboardHandler[] = [];
 
