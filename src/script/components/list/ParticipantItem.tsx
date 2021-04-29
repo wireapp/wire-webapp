@@ -35,7 +35,7 @@ import 'Components/AvailabilityState';
 import {Participant} from '../../calling/Participant';
 import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 import {Availability} from '@wireapp/protocol-messaging';
 import {Config} from '../../Config';
 
@@ -175,17 +175,9 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
             </div>
             {callParticipant && (
               <Fragment>
-                {callParticipantSharesCamera && (
-                  <NamedIcon
-                    name="camera-icon"
-                    className="camera-icon"
-                    data-uie-name="status-video"
-                    width={16}
-                    height={16}
-                  />
-                )}
+                {callParticipantSharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
                 {callParticipantSharesScreen && (
-                  <NamedIcon name="screenshare-icon" className="screenshare-icon" data-uie-name="status-screenshare" />
+                  <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />
                 )}
 
                 {!callParticipantIsMuted && (
@@ -197,52 +189,23 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 )}
 
                 {callParticipantIsMuted && (
-                  <NamedIcon
-                    name="mic-off-icon"
-                    className="mic-off-icon"
-                    data-uie-name="status-audio-off"
-                    width={16}
-                    height={16}
-                    style={{height: 12}}
-                  />
+                  <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12}} />
                 )}
               </Fragment>
             )}
 
-            {isUser && !isOthersMode && isGuest && (
-              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={16} />
-            )}
+            {isUser && !isOthersMode && isGuest && <Icon.Guest className="guest-icon" data-uie-name="status-guest" />}
 
             {participant instanceof User &&
               Config.getConfig().FEATURE.ENABLE_FEDERATION &&
               !participant.isOnSameFederatedDomain() && (
-                <NamedIcon
-                  name="federation-icon"
-                  className="federation-icon"
-                  data-uie-name="status-federated-user"
-                  width={16}
-                  height={16}
-                />
+                <Icon.Federation className="federation-icon" data-uie-name="status-federated-user" />
               )}
 
-            {external && (
-              <NamedIcon
-                name="partner-icon"
-                className="partner-icon"
-                data-uie-name="status-external"
-                width={16}
-                height={16}
-              />
-            )}
+            {external && <Icon.Partner className="partner-icon" data-uie-name="status-external" />}
 
             {isUser && isSelfVerified && isVerified && (
-              <NamedIcon
-                name="verified-icon"
-                className="verified-icon"
-                data-uie-name="status-verified"
-                width={14}
-                height={16}
-              />
+              <Icon.Verified className="verified-icon" data-uie-name="status-verified" />
             )}
 
             {canSelect && (
@@ -252,7 +215,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               />
             )}
 
-            <NamedIcon name="disclose-icon" className="disclose-icon" width={5} height={8} />
+            <Icon.Disclose className="disclose-icon" />
           </>
         )}
       </div>

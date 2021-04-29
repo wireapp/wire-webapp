@@ -20,14 +20,13 @@
 import React, {Fragment} from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
-import NamedIcon from '../NamedIcon';
+import Icon from '../Icon';
 
 export interface MenuItem {
   click: () => void;
   icon: string;
   identifier: string;
   label: string;
-  size?: {height: number; width: number};
 }
 
 export interface PanelActionsProps {
@@ -37,10 +36,10 @@ export interface PanelActionsProps {
 const PanelActions: React.FC<PanelActionsProps> = ({items}) => {
   return (
     <Fragment>
-      {items.map(({click, identifier, icon, label, size}) => (
+      {items.map(({click, identifier, icon, label}) => (
         <div className="panel__action-item" key={identifier} onClick={click} data-uie-name={identifier}>
           <div className="panel__action-item__icon">
-            <NamedIcon name={icon} width={size?.width || 16} height={size?.height || 16} />
+            <Icon name={icon} />
           </div>
           <div data-uie-name={`${identifier}-item-text`} className="panel__action-item__text">
             {label}

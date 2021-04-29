@@ -21,7 +21,7 @@ import {css} from '@emotion/core';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 import React, {useEffect, useMemo, useState} from 'react';
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -162,17 +162,14 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           <div className="video-controls__wrapper">
             <div className="video-controls__button" onClick={minimize} data-uie-name="do-call-controls-video-minimize">
               {hasUnreadMessages ? (
-                <NamedIcon
-                  name="message-unread-icon"
+                <Icon.MessageUnread
                   css={{
                     marginRight: '-2px',
                     marginTop: '-2px',
                   }}
-                  width={18}
-                  height={18}
                 />
               ) : (
-                <NamedIcon name="message-icon" width={16} height={16} />
+                <Icon.Message />
               )}
               <div className="video-controls__button__label">{t('videoCallOverlayConversations')}</div>
             </div>
@@ -185,7 +182,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               data-uie-name="do-call-controls-video-call-mute"
             >
               <div className="video-controls__button__label">{t('videoCallOverlayMute')}</div>
-              <NamedIcon name="mic-off-icon" width={16} height={16} />
+              <Icon.MicOff />
             </div>
 
             {showToggleVideo && (
@@ -196,7 +193,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 css={selfSharesCamera ? videoControlActiveStyles : undefined}
                 data-uie-name="do-call-controls-toggle-video"
               >
-                <NamedIcon name="camera-icon" width={16} height={16} />
+                <Icon.Camera />
                 {showSwitchCamera ? (
                   <DeviceToggleButton
                     styles={css`
@@ -226,7 +223,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               data-uie-enabled={canShareScreen ? 'true' : 'false'}
               data-uie-name="do-toggle-screen"
             >
-              <NamedIcon name="screenshare-icon" width={16} height={16} />
+              <Icon.Screenshare />
               <div className="video-controls__button__label">{t('videoCallOverlayShareScreen')}</div>
             </div>
 
@@ -235,7 +232,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               onClick={() => callActions.leave(call)}
               data-uie-name="do-call-controls-video-call-cancel"
             >
-              <NamedIcon name="hangup-icon" width={20} height={8} />
+              <Icon.Hangup />
               <div className="video-controls__button__label">{t('videoCallOverlayHangUp')}</div>
             </div>
           </div>

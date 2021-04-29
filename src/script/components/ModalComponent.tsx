@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/core';
 import React, {useEffect, useState} from 'react';
 import {noop} from 'Util/util';
-import NamedIcon from './NamedIcon';
+import Icon from './Icon';
 
 interface ModalComponentProps {
   isShown: boolean;
@@ -109,7 +109,7 @@ const ModalComponent: React.FC<ModalComponentProps> = ({
       {...rest}
     >
       {showLoading ? (
-        <NamedIcon name="loading-icon" width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
+        <Icon.Loading width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
       ) : (
         <div
           onClick={event => event.stopPropagation()}
