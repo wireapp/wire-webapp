@@ -39,7 +39,6 @@ const UserInput: React.FC<UserInputParams> = ({
   placeholder: placeholderText,
   selected: selectedUsers,
 }) => {
-  let selectedSubscription: ko.Subscription;
   const noSelectedUsers = !selectedUsers.length;
   // TODO
   //
@@ -76,11 +75,12 @@ const UserInput: React.FC<UserInputParams> = ({
   }
 
   useEffect(() => {
-    return () => {
-      if (selectedSubscription) {
-        selectedSubscription.dispose();
-      }
-    };
+    // TODO
+    // return () => {
+    //   if (selectedSubscription) {
+    //     selectedSubscription.dispose();
+    //   }
+    // };
   });
 
   return (
