@@ -315,13 +315,13 @@ ko.components.register('conversation-list-calling-cell', {
       <!-- ko if: !isDeclined() -->
         <div class="conversation-list-calling-cell-controls">
           <div class="conversation-list-calling-cell-controls-left">
-            <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
+            <button class="call-ui__button" data-bind="click: () => callActions.toggleMute(call, !isMuted()), css: {'call-ui__button--active': isMuted()}, attr: {'data-uie-value': !isMuted() ? 'inactive' : 'active', 'title': t('videoCallOverlayMute')}" data-uie-name="do-toggle-mute">
               <mic-off-icon class="small-icon"></mic-off-icon>
             </button>
             <!-- ko if: showVideoButton() -->
-            <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
-              <camera-icon class="small-icon"></camera-icon>
-            </button>
+              <button class="call-ui__button" data-bind="click: () => callActions.toggleCamera(call), css: {'call-ui__button--active': selfParticipant.sharesCamera()}, disable: disableVideoButton(), attr: {'data-uie-value': selfParticipant.sharesCamera() ? 'active' : 'inactive', 'title': t('videoCallOverlayVideo')}" data-uie-name="do-toggle-video">
+                <camera-icon class="small-icon"></camera-icon>
+              </button>
             <!-- /ko -->
             <!-- ko if: isOngoing() -->
               <div class="call-ui__button"
