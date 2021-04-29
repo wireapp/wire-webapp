@@ -51,9 +51,9 @@ export class ScimAPI {
     await this.client.sendJSON(config);
   }
 
-  public async postToken(password?: string, description?: string): Promise<NewScimToken> {
+  public async postToken(description: string, password?: string): Promise<NewScimToken> {
     const config: AxiosRequestConfig = {
-      data: {password, description},
+      data: {description, password},
       method: 'post',
       url: `${ScimAPI.URL.SCIM}/${ScimAPI.URL.AUTH_TOKENS}`,
     };
