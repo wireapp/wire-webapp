@@ -51,7 +51,11 @@ export const getParameter = (parameterName: string, locationSearch = window.loca
   return null;
 };
 
-export const forwardParameter = (url: string, parameterName: string, locationSearch = window.location.search) => {
+export const forwardParameter = (
+  url: string,
+  parameterName: string,
+  locationSearch = window.location.search,
+): string => {
   const parameterValue = getParameter(parameterName, locationSearch);
   const hasValue = parameterValue != null;
   return hasValue ? appendParameter(url, `${parameterName}=${parameterValue}`) : url;
@@ -62,12 +66,12 @@ export const forwardParameter = (url: string, parameterName: string, locationSea
  * @param url URL to be cleaned
  * @returns Plain URL
  */
-export const cleanURL = (url = '') => {
+export const cleanURL = (url: string = ''): string => {
   // force a protocol if there is none
   url = url.replace(/^(?!https?:\/\/)/i, 'http://');
   try {
     const {hostname, pathname, search, hash} = new URL(url);
-    return hostname.replace(/^www./, '') + pathname.replace(/\/$/, '') + search + hash;
+    return `${hostname.replace(/^www./, '')}${pathname.replace(/\/$/, '')}${search}${hash}`;
   } catch (error) {
     return '';
   }
