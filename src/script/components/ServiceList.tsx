@@ -20,7 +20,6 @@
 import React, {Fragment} from 'react';
 import cx from 'classnames';
 
-import 'Components/list/ParticipantItem';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import ParticipantItem from 'Components/list/ParticipantItem';
 

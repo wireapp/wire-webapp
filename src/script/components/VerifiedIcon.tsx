@@ -9,7 +9,7 @@ export interface VerifiedIconProps {
   width?: number;
 }
 
-const VerifiedIcon: React.FC<VerifiedIconProps> = ({isVerified, dataUieName, className, width = 14, height = 16}) => {
+const VerifiedIcon: React.FC<VerifiedIconProps> = ({isVerified, dataUieName, className, width, height}) => {
   return (
     <NamedIcon
       width={width}

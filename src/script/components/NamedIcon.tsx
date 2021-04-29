@@ -26,12 +26,23 @@ export interface NamedIconProps extends React.SVGProps<SVGSVGElement> {
 }
 
 const NamedIcon: React.FC<NamedIconProps> = ({name, children, ...otherProps}) => {
+  const svg = SVGProvider[name]?.documentElement;
+  if (!svg) {
+    return null;
+  }
+
+  const viewBox = svg.getAttribute('viewBox');
+  const regex = /0 0 (?<width>\d+) (?<height>\d+)/;
+  const {width, height} = regex.exec(viewBox).groups;
+
   const props = {
-    viewBox: `0 0 ${otherProps.width || 16} ${otherProps.height || 16}`,
+    height: otherProps.height ?? height,
+    viewBox,
+    width: otherProps.width ?? width,
     ...otherProps,
   };
 
-  return <svg {...props} dangerouslySetInnerHTML={{__html: SVGProvider[name]?.documentElement?.innerHTML}} />;
+  return <svg {...props} dangerouslySetInnerHTML={{__html: svg.innerHTML}} />;
 };
 
 export default NamedIcon;

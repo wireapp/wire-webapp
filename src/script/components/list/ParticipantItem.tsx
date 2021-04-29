@@ -201,48 +201,27 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                     name="mic-off-icon"
                     className="mic-off-icon"
                     data-uie-name="status-audio-off"
-                    width={16}
-                    height={16}
-                    style={{height: 12, width: 12}}
+                    width={12}
+                    height={12}
                   />
                 )}
               </Fragment>
             )}
 
             {isUser && !isOthersMode && isGuest && (
-              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" width={14} height={16} />
+              <NamedIcon name="guest-icon" className="guest-icon" data-uie-name="status-guest" />
             )}
 
             {participant instanceof User &&
               Config.getConfig().FEATURE.ENABLE_FEDERATION &&
               !participant.isOnSameFederatedDomain() && (
-                <NamedIcon
-                  name="federation-icon"
-                  className="federation-icon"
-                  data-uie-name="status-federated-user"
-                  width={16}
-                  height={16}
-                />
+                <NamedIcon name="federation-icon" className="federation-icon" data-uie-name="status-federated-user" />
               )}
 
-            {external && (
-              <NamedIcon
-                name="partner-icon"
-                className="partner-icon"
-                data-uie-name="status-external"
-                width={16}
-                height={16}
-              />
-            )}
+            {external && <NamedIcon name="external-icon" className="partner-icon" data-uie-name="status-external" />}
 
             {isUser && isSelfVerified && isVerified && (
-              <NamedIcon
-                name="verified-icon"
-                className="verified-icon"
-                data-uie-name="status-verified"
-                width={14}
-                height={16}
-              />
+              <NamedIcon name="verified-icon" className="verified-icon" data-uie-name="status-verified" />
             )}
 
             {canSelect && (
@@ -252,7 +231,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               />
             )}
 
-            <NamedIcon name="disclose-icon" className="disclose-icon" width={5} height={8} />
+            <NamedIcon name="disclose-icon" className="disclose-icon" />
           </>
         )}
       </div>

@@ -24,6 +24,7 @@ import {CSSObject} from '@emotion/core';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
 import NamedIcon from './NamedIcon';
+import Icon from './Icon';
 
 export interface AvailabilityStateProps {
   availability: Availability.Type;
@@ -57,11 +58,8 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
   const content = (
     <span data-uie-name={dataUieName} css={{alignItems: 'center', display: 'flex', overflow: 'hidden'}}>
       {isAvailable && (
-        <NamedIcon
+        <Icon.AvailabilityAvailable
           className="availability-state-icon"
-          name="availability-available-icon"
-          width={10}
-          height={10}
           css={iconStyles}
           data-uie-name="status-availability-icon"
           data-uie-value="available"
@@ -72,8 +70,6 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
         <NamedIcon
           className="availability-state-icon"
           name="availability-away-icon"
-          width={10}
-          height={10}
           css={iconStyles}
           data-uie-name="status-availability-icon"
           data-uie-value="away"
@@ -84,8 +80,6 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
         <NamedIcon
           className="availability-state-icon"
           name="availability-busy-icon"
-          width={10}
-          height={10}
           css={iconStyles}
           data-uie-name="status-availability-icon"
           data-uie-value="busy"

@@ -52,7 +52,7 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
           />
         </svg>
         <div className="media-button__icon">
-          <NamedIcon name="close-icon" width="14" height="14" />
+          <NamedIcon name="close-icon" />
         </div>
       </div>
     </Fragment>
