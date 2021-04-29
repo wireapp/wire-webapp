@@ -186,7 +186,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             >
               <div className="video-controls__button__label">{t('videoCallOverlayMute')}</div>
               <NamedIcon name="mic-off-icon" width={16} height={16} />
-              <div className="video-controls__button__label">{t('videoCallOverlayMicrophone')}</div>
             </div>
 
             {showToggleVideo && (
