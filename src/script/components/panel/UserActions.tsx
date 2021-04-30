@@ -205,7 +205,6 @@ const UserActions: React.FC<UserActionsProps> = ({
       icon: 'minus-icon',
       identifier: 'do-remove',
       label: t('groupParticipantActionRemove'),
-      size: {height: 2, width: 16},
     };
 
   const items = [

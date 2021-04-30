@@ -23,7 +23,7 @@ import cx from 'classnames';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {ConversationLabel} from '../../conversation/ConversationLabelRepository';
-import NamedIcon from '../NamedIcon';
+import Icon from '../Icon';
 
 export interface GroupedConversationHeaderProps {
   conversationLabel: ConversationLabel;
@@ -39,7 +39,7 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({co
       data-uie-name="conversation-folder-head"
     >
       <div className="disclose-icon">
-        <NamedIcon name="disclose-icon" width="5" height="8" />
+        <Icon.Disclose />
       </div>
       <span className="conversation-folder__head__name">{conversationLabel.name}</span>
       {badge > 0 && (

@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import React from 'react';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import MessageTime from './MessageTime';
@@ -46,15 +46,9 @@ const SystemMessage: React.FC<SystemMessageProps> = ({message}) => {
     <>
       <div className="message-header" data-uie-name="element-message-system">
         <div className="message-header-icon message-header-icon--svg text-foreground">
-          {message.system_message_type === SystemMessageType.CONVERSATION_RENAME && (
-            <NamedIcon name="edit-icon" width="16" height="16" />
-          )}
-          {message.system_message_type === SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE && (
-            <NamedIcon name="timer-icon" width="15" height="16" />
-          )}
-          {message.system_message_type === SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE && (
-            <NamedIcon name="read-icon" width="16" height="12" />
-          )}
+          {message.system_message_type === SystemMessageType.CONVERSATION_RENAME && <Icon.Edit />}
+          {message.system_message_type === SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE && <Icon.Timer />}
+          {message.system_message_type === SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE && <Icon.Read />}
         </div>
         <div className="message-header-label">
           <span className="message-header-label__multiline">

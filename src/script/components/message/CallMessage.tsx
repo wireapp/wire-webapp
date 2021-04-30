@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 import {CallMessage as CallMessageEntity} from '../../entity/message/CallMessage';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
@@ -40,11 +40,11 @@ const CallMessage: React.FC<CallMessageProps> = ({message}) => {
       <div className="message-header-icon message-header-icon--svg">
         {isCompleted ? (
           <div className="svg-green">
-            <NamedIcon name="pickup-icon" width="16" height="16" />
+            <Icon.Pickup />
           </div>
         ) : (
           <div className="svg-red">
-            <NamedIcon name="hangup-icon" width="20" height="8" />
+            <Icon.Hangup />
           </div>
         )}
       </div>

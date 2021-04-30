@@ -45,7 +45,7 @@ import type {MessageRepository} from '../conversation/MessageRepository';
 import './asset/audioAsset';
 import './asset/FileAssetComponent';
 import './asset/imageAsset';
-import './asset/linkPreviewAsset';
+import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
 import './asset/videoAsset';
 import './asset/MessageButton';
@@ -388,7 +388,7 @@ const normalTemplate: string = `
           <div class="text" data-bind="html: asset.render(selfId(), accentColor()), event: {mousedown: (data, event) => onClickMessage(asset, event)}, css: {'text-large': includesOnlyEmojis(asset.text), 'text-foreground': message.status() === StatusType.SENDING, 'ephemeral-message-obfuscated': message.isObfuscated()}" dir="auto"></div>
         <!-- /ko -->
         <!-- ko foreach: asset.previews() -->
-          <link-preview-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': $parent.message.isObfuscated()}" params="message: $parent.message"></link-preview-asset>
+          <link-preview-asset class="message-asset" params="message: $parent.message"></link-preview-asset>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: asset.isVideo() -->

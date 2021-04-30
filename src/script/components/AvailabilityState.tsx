@@ -23,7 +23,6 @@ import {CSSObject} from '@emotion/core';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {CSS_SQUARE} from 'Util/CSSMixin';
-import NamedIcon from './NamedIcon';
 import Icon from './Icon';
 
 export interface AvailabilityStateProps {
@@ -67,9 +66,8 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
       )}
 
       {isAway && (
-        <NamedIcon
+        <Icon.AvailabilityAway
           className="availability-state-icon"
-          name="availability-away-icon"
           css={iconStyles}
           data-uie-name="status-availability-icon"
           data-uie-value="away"
@@ -77,9 +75,8 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
       )}
 
       {isBusy && (
-        <NamedIcon
+        <Icon.AvailabilityBusy
           className="availability-state-icon"
-          name="availability-busy-icon"
           css={iconStyles}
           data-uie-name="status-availability-icon"
           data-uie-value="busy"

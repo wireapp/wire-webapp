@@ -25,17 +25,19 @@ type IconProps = React.SVGProps<SVGSVGElement>;
 
 type IconList = Record<string, React.FC<IconProps>>;
 
+interface NamedIconProps extends IconProps {
+  name: string;
+}
+
 const normalizeIconName = (name: string) =>
   name
     .replace(/-icon$/, '')
     .replace(/\b\w/g, found => found.toUpperCase())
     .replace(/-/g, '');
 
-const Icon = Object.entries(SVGProvider).reduce((list, [key, svg]) => {
-  const subComponentName = normalizeIconName(key);
-
-  const component: React.FC<IconProps> = oProps => {
-    const viewBox = svg.documentElement.getAttribute('viewBox');
+const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<IconProps> => {
+  const SVGComponent: React.FC<IconProps> = oProps => {
+    const viewBox = svg.getAttribute('viewBox');
     const regex = /0 0 (?<width>\d+) (?<height>\d+)/;
     const {width, height} = regex.exec(viewBox).groups;
 
@@ -46,10 +48,24 @@ const Icon = Object.entries(SVGProvider).reduce((list, [key, svg]) => {
       ...oProps,
     };
 
-    return <svg {...props} dangerouslySetInnerHTML={{__html: svg.documentElement.innerHTML}} />;
+    return <svg {...props} dangerouslySetInnerHTML={{__html: svg.innerHTML}} />;
   };
-  list[subComponentName] = component;
-  return list;
+  SVGComponent.displayName = displayName;
+  return SVGComponent;
+};
+
+const icons: IconList = Object.entries(SVGProvider).reduce((list, [key, svg]) => {
+  const name = normalizeIconName(key);
+  return Object.assign(list, {[name]: createSvgComponent(svg.documentElement, `Icon.${name}`)});
 }, {} as IconList);
 
-export default Icon;
+const Icon: React.FC<NamedIconProps> = ({name, ...props}) => {
+  const componentName = normalizeIconName(name);
+  const Component = icons[componentName];
+  if (!Component) {
+    return null;
+  }
+  return <Component {...props} />;
+};
+
+export default Object.assign(Icon, icons);

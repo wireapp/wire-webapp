@@ -20,7 +20,7 @@
 import React, {Fragment} from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
-import NamedIcon from '../NamedIcon';
+import Icon from '../Icon';
 
 export interface AssetLoaderProps {
   large?: boolean;
@@ -52,7 +52,7 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
           />
         </svg>
         <div className="media-button__icon">
-          <NamedIcon name="close-icon" />
+          <Icon.Close />
         </div>
       </div>
     </Fragment>
