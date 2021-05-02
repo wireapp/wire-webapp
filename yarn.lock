@@ -2786,10 +2786,10 @@
     platform "1.3.6"
     url-search-params-polyfill "8.1.1"
 
-"@wireapp/copy-config@1.1.19":
-  version "1.1.19"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.1.19.tgz#e2fb21238fb2d68d841ca571f96b0b3f2ba9d74b"
-  integrity sha512-tFgQtRGroeXNZMw9tkeXH8CB5ZJP0qkBFGvqxk/VIsEko+UCD5ggIFCtxMdmsVvjLBAnp1TGZ2G5Xe0eCwmE5Q==
+"@wireapp/copy-config@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.2.0.tgz#1a3bf7449ccca9b169c6f66ef28b503a2a255ce1"
+  integrity sha512-QUXeyjgOW2Xn33PSel+eV8X9X/rmJnQdndNS9YupziUBTgUu2IP7yW5Wuxu9/eV7ZbieWh7X82fRztBchciR8g==
   dependencies:
     axios "0.21.1"
     copy "0.3.2"
