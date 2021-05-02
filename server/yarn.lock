@@ -759,10 +759,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@wireapp/commons@4.1.8":
-  version "4.1.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.1.8.tgz#f42d99b668823a767e87dcd0edd8a23042ba7e7a"
-  integrity sha512-X2gMwh9Z3d0shXXkku/AqPXWg0qhUYY3Ps/XcwCu/3AqfR8dz7RCmQ9zduSAdl/PR1+hRLMnhZbMPzZqc6x77A==
+"@wireapp/commons@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.2.0.tgz#9ca83b26329f8454cd038485e79949796dff5b2a"
+  integrity sha512-lbwNNHPvwZZtnwHw083dwtShq8WTPO7bXDDrtpv6U5nWim5RIgRghxjOi25gCBZSZJxY8hP6xN9B6Xvx8o/SJg==
   dependencies:
     "@types/fs-extra" "9.0.11"
     "@types/node" "~14"
