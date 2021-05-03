@@ -34,6 +34,7 @@ import {
 import {BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
 import {ObfuscationUtil} from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
+import {Config} from '../Config';
 
 enum TOPIC {
   ON_CONNECTION_STATE_CHANGE = 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
@@ -48,14 +49,16 @@ export interface HttpClient {
 const FILE_SIZE_100_MB = 104857600;
 
 export class HttpClient extends EventEmitter {
+  private readonly baseUrl: string;
   private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
   public static readonly TOPIC = TOPIC;
 
-  constructor(private readonly baseUrl: string, public accessTokenStore: AccessTokenStore) {
+  constructor(private readonly config: Config, public accessTokenStore: AccessTokenStore) {
     super();
 
+    this.baseUrl = config.urls.rest;
     this.connectionState = ConnectionState.UNDEFINED;
 
     this.logger = logdown('@wireapp/api-client/http/HttpClient', {
@@ -99,6 +102,11 @@ export class HttpClient extends EventEmitter {
     firstTry = true,
   ): Promise<AxiosResponse<T>> {
     config.baseURL = this.baseUrl;
+    config.headers = {
+      ...config.headers,
+      'X-Client-Platform': this.config.platform,
+      'X-Client-Version': this.config.version,
+    };
 
     if (this.accessTokenStore.accessToken) {
       const {token_type, access_token} = this.accessTokenStore.accessToken;

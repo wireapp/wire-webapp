@@ -75,6 +75,8 @@ enum TOPIC {
 
 const defaultConfig: Config = {
   urls: Backend.PRODUCTION,
+  platform: 'web-api-client',
+  version: version,
 };
 
 export interface APIClient {
@@ -144,7 +146,7 @@ export class APIClient extends EventEmitter {
       markdown: false,
     });
 
-    const httpClient = new HttpClient(this.config.urls.rest, this.accessTokenStore);
+    const httpClient = new HttpClient(this.config, this.accessTokenStore);
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
 
     const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError) => {
