@@ -194,7 +194,14 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               </Fragment>
             )}
 
-            {isUser && !isOthersMode && isGuest && <Icon.Guest className="guest-icon" data-uie-name="status-guest" />}
+            {isUser && !isOthersMode && isGuest && (
+              <span
+                className="guest-icon with-tooltip with-tooltip--external"
+                data-tooltip={t('conversationGuestIndicator')}
+              >
+                <Icon.Guest data-uie-name="status-guest" />
+              </span>
+            )}
 
             {participant instanceof User &&
               Config.getConfig().FEATURE.ENABLE_FEDERATION &&
@@ -202,7 +209,11 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 <Icon.Federation className="federation-icon" data-uie-name="status-federated-user" />
               )}
 
-            {external && <Icon.External className="partner-icon" data-uie-name="status-external" />}
+            {external && (
+              <span className="partner-icon with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>
+                <Icon.External data-uie-name="status-external" />
+              </span>
+            )}
 
             {isUser && isSelfVerified && isVerified && (
               <Icon.Verified className="verified-icon" data-uie-name="status-verified" />
@@ -226,6 +237,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 export default ParticipantItem;
 
 registerReactComponent<ParticipantItemProps>('participant-item', {
+  bindings:
+    'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam',
   component: ParticipantItem,
   optionalParams: [
     'badge',
@@ -243,6 +256,4 @@ registerReactComponent<ParticipantItemProps>('participant-item', {
     'selfInTeam',
     'showArrow',
   ],
-  template:
-    '<div data-bind="react: {badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam}"></div>',
 });
