@@ -84,7 +84,7 @@
     "test:node": "cross-env NODE_DEBUG=@wireapp/api-client* nyc jasmine --config=jasmine.json",
     "test:project": "yarn dist && yarn test",
     "test:types": "tsc --noEmit",
-    "watch": "webpack-dev-server --config webpack.browser.js"
+    "watch": "webpack serve --config webpack.browser.js"
   },
   "version": "12.12.0"
 }

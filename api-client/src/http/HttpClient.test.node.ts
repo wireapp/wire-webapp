@@ -24,6 +24,7 @@ import {BackendErrorLabel} from './BackendErrorLabel';
 import {StatusCode} from '.';
 
 describe('HttpClient', () => {
+  const testConfig = {urls: {rest: 'https://test.zinfra.io', ws: '', name: 'test'}};
   describe('"_sendRequest"', () => {
     it('retries on 401 unauthorized error', async () => {
       const mockedAccessTokenStore: any = {
@@ -36,7 +37,7 @@ describe('HttpClient', () => {
         },
       };
 
-      const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
+      const client = new HttpClient(testConfig, mockedAccessTokenStore);
       const requestSpy = spyOn(axios, 'request');
       // eslint-disable-next-line prefer-promise-reject-errors
       requestSpy.and.returnValue(Promise.reject({response: {status: StatusCode.UNAUTHORIZED}}));
@@ -59,7 +60,7 @@ describe('HttpClient', () => {
         },
       };
 
-      const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
+      const client = new HttpClient(testConfig, mockedAccessTokenStore);
       const requestSpy = spyOn(axios, 'request');
       requestSpy.and.returnValue(
         // eslint-disable-next-line prefer-promise-reject-errors
@@ -88,7 +89,7 @@ describe('HttpClient', () => {
           user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
         },
       };
-      const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
+      const client = new HttpClient(testConfig, mockedAccessTokenStore);
       spyOn(axios, 'request').and.returnValue(
         // eslint-disable-next-line prefer-promise-reject-errors
         Promise.reject({
@@ -125,7 +126,7 @@ describe('HttpClient', () => {
         user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
       },
     };
-    const client = new HttpClient('https://test.zinfra.io', mockedAccessTokenStore);
+    const client = new HttpClient(testConfig, mockedAccessTokenStore);
     spyOn(axios, 'request').and.returnValue(
       // eslint-disable-next-line prefer-promise-reject-errors
       Promise.reject({
