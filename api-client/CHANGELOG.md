@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.13.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.12.0...@wireapp/api-client@12.13.0) (2021-05-03)
+
+
+### Bug Fixes
+
+* **api-client:** Require SCIM token description on creation ([#3779](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3779)) ([8882b23](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/8882b23b35be6f6b2b8800f777944840e19dc5b8))
+
+
+### Features
+
+* **api-client:** Provide client platform and version headers (SQSERVICES-417) ([#3785](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3785)) ([e871402](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/e871402a86ae6050145d0dbe016bd30a69c6cf68))
+
+
+
+
+
 # [12.12.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.11.0...@wireapp/api-client@12.12.0) (2021-04-28)
 
 
