@@ -31,6 +31,7 @@ export * from './ChevronIcon';
 export * from './CloseIcon';
 export * from './DeviceIcon';
 export * from './DownloadIcon';
+export * from './EditDocumentIcon';
 export * from './EditIcon';
 export * from './EnterIcon';
 export * from './ErrorIcon';
