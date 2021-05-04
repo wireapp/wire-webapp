@@ -17,7 +17,7 @@
  *
  */
 
-export {CRUDEngine, MemoryEngine} from './engine/';
+export {CRUDEngine, CRUDEngineBase, CRUDEngineBaseCollection, MemoryEngine} from './engine/';
 import * as error from './engine/error/';
 import * as Store from './store/';
 
