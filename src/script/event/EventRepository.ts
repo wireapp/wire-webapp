@@ -463,7 +463,7 @@ export class EventRepository {
    * @param source Source of injection
    * @returns Resolves when the event has been processed
    */
-  injectEvent(event: EventRecord, source = EventRepository.SOURCE.INJECTED): Promise<EventRecord> {
+  async injectEvent(event: EventRecord, source = EventRepository.SOURCE.INJECTED): Promise<EventRecord> {
     if (!event) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
@@ -479,7 +479,7 @@ export class EventRepository {
       this.logger.info(`Injected event ID '${id}' of type '${type}' with source '${source}'`, event);
       return this.handleEvent(event, source);
     }
-    return Promise.resolve(event);
+    return event;
   }
 
   /**

@@ -593,9 +593,9 @@ export class ConversationRepository {
   public async searchInConversation(
     conversationEntity: Conversation,
     query: string,
-  ): Promise<{messageEntities: Message[]; query: string} | {}> {
+  ): Promise<{messageEntities?: Message[]; query?: string}> {
     if (!conversationEntity || !query.length) {
-      return Promise.resolve({});
+      return {};
     }
 
     const events = await this.conversation_service.searchInConversation(conversationEntity.id, query);
@@ -750,24 +750,27 @@ export class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    */
-  getConversationById(conversation_id: string): Promise<Conversation> {
+  async getConversationById(conversation_id: string): Promise<Conversation> {
     if (typeof conversation_id !== 'string') {
-      return Promise.reject(
-        new ConversationError(ConversationError.TYPE.NO_CONVERSATION_ID, ConversationError.MESSAGE.NO_CONVERSATION_ID),
+      throw new ConversationError(
+        ConversationError.TYPE.NO_CONVERSATION_ID,
+        ConversationError.MESSAGE.NO_CONVERSATION_ID,
       );
     }
     const conversationEntity = this.conversationState.findConversation(conversation_id);
     if (conversationEntity) {
-      return Promise.resolve(conversationEntity);
+      return conversationEntity;
     }
-    return this.fetchConversationById(conversation_id).catch(error => {
+    try {
+      return await this.fetchConversationById(conversation_id);
+    } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
         this.logger.warn(`Failed to get conversation '${conversation_id}': ${error.message}`, error);
       }
 
       throw error;
-    });
+    }
   }
 
   /**
@@ -916,9 +919,9 @@ export class ConversationRepository {
    * @param message_id Message ID
    * @returns Resolves with `true` if message is marked as read
    */
-  async isMessageRead(conversation_id: string, message_id: string) {
+  async isMessageRead(conversation_id: string, message_id: string): Promise<boolean> {
     if (!conversation_id || !message_id) {
-      return Promise.resolve(false);
+      return false;
     }
 
     try {
