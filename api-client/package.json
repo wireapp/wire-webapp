@@ -25,7 +25,7 @@
     "@babel/plugin-proposal-optional-chaining": "7.13.12",
     "@babel/preset-react": "7.13.13",
     "@babel/preset-typescript": "7.13.0",
-    "@types/jasmine": "3.6.9",
+    "@types/jasmine": "3.6.10",
     "@types/karma": "6.3.0",
     "@types/ws": "7.4.2",
     "@wireapp/react-ui-kit": "7.50.0",
