@@ -19,6 +19,7 @@
 
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -33,6 +34,7 @@ import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {StorageError} from '../error/StorageError';
 import {StorageService, DatabaseListenerCallback, EventRecord} from '../storage';
+import {AssetData} from '../cryptography/CryptographyMapper';
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
@@ -364,8 +366,14 @@ export class EventService {
    * @param primaryKey Primary key used to find an event in the database
    * @param reason Failure reason
    */
-  async updateEventAsUploadFailed(primaryKey: string, reason: string): Promise<EventRecord | void> {
-    const record = (await this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey)) as EventRecord;
+  async updateEventAsUploadFailed(
+    primaryKey: string,
+    reason: ProtobufAsset.NotUploaded | AssetTransferState,
+  ): Promise<EventRecord | void> {
+    const record = await this.storageService.load<EventRecord<AssetData>>(
+      StorageSchemata.OBJECT_STORE.EVENTS,
+      primaryKey,
+    );
     if (!record) {
       this.logger.warn('Did not find message to update asset (failed)', primaryKey);
       return;
