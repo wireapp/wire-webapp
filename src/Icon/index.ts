@@ -23,6 +23,7 @@ export * from './ArrowIcon';
 export * from './AttachmentIcon';
 export * from './AudioVideoIcon';
 export * from './BlockIcon';
+export * from './CopyIcon';
 export * from './CallIcon';
 export * from './CameraIcon';
 export * from './CamIcon';
