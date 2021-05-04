@@ -394,8 +394,8 @@ export class EventService {
    */
   updateEvent<T extends Partial<EventRecord>>(primaryKey: string, updates: T): Promise<T & {primary_key: string}> {
     return Promise.resolve().then(() => {
-      const hasNoChanges = !updates || !Object.keys(updates).length;
-      if (hasNoChanges) {
+      const hasChanges = updates && !!Object.keys(updates).length;
+      if (!hasChanges) {
         throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
       const hasVersionedUpdates = !!updates.version;
