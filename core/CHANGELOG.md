@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.5.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.4.8...@wireapp/core@17.5.0) (2021-05-04)
+
+
+### Features
+
+* **core:** Bump @wireapp/cryptobox from 12.5.1 to 12.5.6 ([#3791](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3791)) ([6d5acbd](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/6d5acbd14369aa020bcab5eedd634dfd241ad4cc))
+
+
+
+
+
 ## [17.4.8](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.4.7...@wireapp/core@17.4.8) (2021-05-04)
 
 **Note:** Version bump only for package @wireapp/core
