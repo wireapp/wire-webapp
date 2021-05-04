@@ -355,6 +355,12 @@ const normalTemplate: string = `
         <!-- ko if: message.user().isService -->
           <service-icon class="message-header-icon-service"></service-icon>
         <!-- /ko -->
+        <!-- ko if: message.user().isExternal() -->
+          <external-icon class="message-header-icon-service with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('rolePartner')}" data-uie-name="sender-external"></external-icon>
+        <!-- /ko -->
+        <!-- ko if: message.user().isGuest() -->
+          <guest-icon class="message-header-icon-service with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('conversationGuestIndicator')}" data-uie-name="sender-guest"></guest-icon>
+        <!-- /ko -->
         <!-- ko if: message.was_edited() -->
           <span class="message-header-label-icon icon-edit" data-bind="attr: {title: message.displayEditedTimestamp()}"></span>
         <!-- /ko -->
