@@ -75,6 +75,28 @@ export interface MappedAsset {
   type: CONVERSATION;
 }
 
+export interface AssetData {
+  content_length: number;
+  content_type: string;
+  info: {
+    height?: number;
+    name?: string;
+    tag?: string;
+    width?: number;
+  };
+  key?: string;
+  meta?: MappedAssetMetaData;
+  otr_key?: Uint8Array;
+  preview_key?: string;
+  preview_otr_key?: Uint8Array;
+  preview_sha256?: Uint8Array;
+  preview_token?: string;
+  reason?: Asset.NotUploaded;
+  sha256?: Uint8Array;
+  status?: AssetTransferState;
+  token?: string;
+}
+
 export class CryptographyMapper {
   private readonly logger: Logger;
 
@@ -273,27 +295,7 @@ export class CryptographyMapper {
 
   _mapAsset(asset: Asset) {
     const {original, preview, uploaded, notUploaded} = asset;
-    let data: {
-      content_length: number;
-      content_type: string;
-      info: {
-        height?: number;
-        name?: string;
-        tag?: string;
-        width?: number;
-      };
-      key?: string;
-      meta?: MappedAssetMetaData;
-      otr_key?: Uint8Array;
-      preview_key?: string;
-      preview_otr_key?: Uint8Array;
-      preview_sha256?: Uint8Array;
-      preview_token?: string;
-      reason?: Asset.NotUploaded;
-      sha256?: Uint8Array;
-      status?: AssetTransferState;
-      token?: string;
-    };
+    let data: AssetData;
 
     if (original) {
       data = {
