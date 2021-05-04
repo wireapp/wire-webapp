@@ -366,7 +366,10 @@ export class EventService {
    * @param primaryKey Primary key used to find an event in the database
    * @param reason Failure reason
    */
-  async updateEventAsUploadFailed(primaryKey: string, reason: ProtobufAsset.NotUploaded): Promise<EventRecord | void> {
+  async updateEventAsUploadFailed(
+    primaryKey: string,
+    reason: ProtobufAsset.NotUploaded | AssetTransferState,
+  ): Promise<EventRecord | void> {
     const record = await this.storageService.load<EventRecord<AssetData>>(
       StorageSchemata.OBJECT_STORE.EVENTS,
       primaryKey,

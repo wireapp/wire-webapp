@@ -91,7 +91,7 @@ export interface AssetData {
   preview_otr_key?: Uint8Array;
   preview_sha256?: Uint8Array;
   preview_token?: string;
-  reason?: Asset.NotUploaded;
+  reason?: Asset.NotUploaded | AssetTransferState;
   sha256?: Uint8Array;
   status?: AssetTransferState;
   token?: string;
