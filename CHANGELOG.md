@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.51.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.50.0...@wireapp/react-ui-kit@7.51.0) (2021-05-04)
+
+
+### Features
+
+* **react-ui-kit:** Add CopyIcon ([#3794](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/issues/3794)) ([188258a](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/commit/188258a4331f117b1d37a08b38e1162591643b99))
+
+
+
+
+
 # [7.50.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.49.1...@wireapp/react-ui-kit@7.50.0) (2021-05-03)
 
 
