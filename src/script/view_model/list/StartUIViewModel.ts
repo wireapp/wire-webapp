@@ -259,7 +259,7 @@ export class StartUIViewModel {
     }
     this.alreadyClickedOnContact[userEntity.id] = true;
     const conversationEntity = await this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
-    await this.actionsViewModel.open1to1Conversation(conversationEntity);
+    this.actionsViewModel.open1to1Conversation(conversationEntity);
     this.closeList();
     delete this.alreadyClickedOnContact[userEntity.id];
   };
