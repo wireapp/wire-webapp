@@ -32,16 +32,14 @@ try {
   currentBranch = execSync('git rev-parse HEAD').toString().trim();
 } catch (error) {}
 
-const distributionParam = process.argv[2];
-const stageParam = process.argv[3];
-const suffix = distributionParam ? `-${distributionParam}` : '';
-const stage = stageParam ? `-${stageParam}` : '';
+const distributionParam = process.argv[2] ? process.argv[2] : '';
+const stageParam = process.argv[3] ? process.argv[3] : '';
 const commitSha = process.env.GITHUB_SHA || 'COMMIT_ID';
 const commitShaLength = 7;
 const commitShortSha = commitSha.substring(0, commitShaLength - 1);
-const configurationEntry = suffix
-  ? `wire-web-config-default${suffix}`
-  : `wire-web-config-default${currentBranch === 'master' ? '-master' : '-staging'}`;
+const configurationEntry = distributionParam
+  ? `wire-web-config-default${distributionParam ? `-${distributionParam}` : ''}`
+  : `wire-web-config-default-${currentBranch === 'master' ? 'master' : 'staging'}`;
 const dependencies = {
   ...appConfigPkg.dependencies,
   ...appConfigPkg.devDependencies,
@@ -51,19 +49,21 @@ const dependencies = {
 
 const configVersion = dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
-const repository = `${dockerRegistryDomain}/wire/webapp${suffix}`;
+const repository = `${dockerRegistryDomain}/wire/webapp${distributionParam ? `-${distributionParam}` : ''}`;
 
 const dockerImageTag = `${repository}:${pkg.version}-${commitShortSha}-${configVersion}${stage}`;
-const dockerImageStageTag = stageParam ? `${repository}:${stageParam}` : '';
 
 const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
-  `docker build . -t ${dockerImageTag} ${dockerImageStageTag ? `-t ${dockerImageStageTag}` : ''}`,
+  `docker build . -t ${dockerImageTag}`,
   `docker push ${dockerImageTag}`,
 ];
 
-if (dockerImageStageTag) {
-  dockerCommands.push(`docker push ${dockerImageStageTag}`);
+if (stageParam) {
+  dockerCommands.push(...[
+    `docker tag ${dockerImageTag} ${repository}:${stageParam}`,
+    `docker push ${repository}:${stageParam}`
+  ]);
 }
 
 dockerCommands.push(`docker logout ${dockerRegistryDomain}`);
