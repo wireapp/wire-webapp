@@ -17,14 +17,11 @@
  *
  */
 
-export interface CRUDEngine {
-  [index: string]: any;
-  /**
-   * Clears all tables without deleting them.
-   * @returns Resolves when all tables are cleared.
-   */
-  clearTables(): Promise<void>;
-
+/**
+ * Interface definition for pure CRUD operations.
+ * @see https://en.wikipedia.org/wiki/Create,_read,_update_and_delete
+ */
+export interface CRUDEngineBase {
   /**
    * Creates a record by its primary key within a table.
    * @param tableName Table name
@@ -39,12 +36,49 @@ export interface CRUDEngine {
   ): Promise<PrimaryKey>;
 
   /**
+   * Finds a record by its primary key within a table.
+   * @param tableName Table name
+   * @param primaryKey Primary key to query the record
+   * @throws {RecordNotFoundError} Will be thrown, if the record could not be found.
+   * @returns Resolves with the record.
+   */
+  read<EntityType = Object, PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<EntityType>;
+
+  /**
+   * Updates a record with a set of properties.
+   * @param tableName Table name
+   * @param primaryKey Primary key of record which should get updated
+   * @param changes Updated properties that should be saved for the record
+   * @returns Resolves with the primary key of the updated record.
+   */
+  update<PrimaryKey = string, ChangesType = Object>(
+    tableName: string,
+    primaryKey: PrimaryKey,
+    changes: ChangesType,
+  ): Promise<PrimaryKey>;
+
+  /**
    * Deletes a record by its primary key within a table.
    * @param tableName Table name
    * @param primaryKey Primary key to be used to delete the record
    * @returns Resolves with the primary key of the deleted record.
    */
   delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey>;
+}
+
+/**
+ * Interface definition for CRUD operations with support for collections.
+ */
+export interface CRUDEngineBaseCollection extends CRUDEngineBase {
+  /**
+   * Reads all records from a table.
+   */
+  readAll<EntityType>(tableName: string): Promise<EntityType[]>;
+
+  /**
+   * Returns all primary keys of records that are stored in a table.
+   */
+  readAllPrimaryKeys(tableName: string): Promise<string[]>;
 
   /**
    * Deletes all records within a table.
@@ -52,6 +86,18 @@ export interface CRUDEngine {
    * @returns Resolves with `true`, if all records have been removed.
    */
   deleteAll(tableName: string): Promise<boolean>;
+}
+
+/**
+ * Extends collection-aware CRUD operations with convenience methods for practical usage in web applications (such as "Wire for Web").
+ */
+export interface CRUDEngine extends CRUDEngineBaseCollection {
+  [index: string]: any;
+  /**
+   * Clears all tables without deleting them.
+   * @returns Resolves when all tables are cleared.
+   */
+  clearTables(): Promise<void>;
 
   /**
    * Initializes the store engine. This needs to be done prior to operating with it.
@@ -74,43 +120,7 @@ export interface CRUDEngine {
    */
   purge(): Promise<void>;
 
-  /**
-   * Finds a record by its primary key within a table.
-   * @param tableName Table name
-   * @param primaryKey Primary key to query the record
-   * @throws {RecordNotFoundError} Will be thrown, if the record could not be found.
-   * @returns Resolves with the record.
-   */
-  read<EntityType = Object, PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<EntityType>;
-
-  /**
-   * Reads all records from a table.
-   * @param tableName Table name
-   * @returns Resolves with an array of records from a table.
-   */
-  readAll<EntityType>(tableName: string): Promise<EntityType[]>;
-
-  /**
-   * Returns all primary keys of records that are stored in a table.
-   * @param tableName Table name
-   * @returns Returns an array of primary keys.
-   */
-  readAllPrimaryKeys(tableName: string): Promise<string[]>;
-
   storeName: string;
-
-  /**
-   * Updates a record with a set of properties.
-   * @param tableName Table name
-   * @param primaryKey Primary key of record which should get updated
-   * @param changes Updated properties that should be saved for the record
-   * @returns Resolves with the primary key of the updated record.
-   */
-  update<PrimaryKey = string, ChangesType = Object>(
-    tableName: string,
-    primaryKey: PrimaryKey,
-    changes: ChangesType,
-  ): Promise<PrimaryKey>;
 
   /**
    * Updates a record with a set of properties.
