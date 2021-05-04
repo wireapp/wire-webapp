@@ -87,7 +87,7 @@ describe('CryptographyService', () => {
 
     it('is resistant to duplicated message errors', async () => {
       const receiver = cryptographyService.cryptobox.identity!;
-      const preKey = await cryptographyService.cryptobox.get_prekey();
+      const preKey = await cryptographyService.cryptobox['get_prekey']();
       const text = 'Hi!';
       const encodedPreKeyMessage = await CryptographyHelper.createEncodedCipherText(receiver, preKey!, text);
       const sessionId = 'alice-to-bob';
