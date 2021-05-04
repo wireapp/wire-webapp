@@ -709,8 +709,7 @@ export class EventRepository {
           await this.eventService.deleteEvent(newEvent.conversation, newEvent.id);
           return newEvent;
         }
-        await this.eventService.updateEventAsUploadFailed(originalEvent.primary_key, newEvent.data.reason);
-        return;
+        return this.eventService.updateEventAsUploadFailed(originalEvent.primary_key, newEvent.data.reason);
       }
 
       default: {
