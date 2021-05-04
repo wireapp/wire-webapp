@@ -63,6 +63,7 @@ export class User {
   public readonly isCanceled: ko.PureComputed<boolean>;
   public readonly isConnected: ko.PureComputed<boolean>;
   public readonly isExpired: ko.Observable<boolean>;
+  public readonly isExternal: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isIgnored: ko.PureComputed<boolean>;
   public readonly isIncomingRequest: ko.PureComputed<boolean>;
@@ -158,6 +159,7 @@ export class User {
     this.isIncomingRequest = ko.pureComputed(() => this.connection().isIncomingRequest());
     this.isOutgoingRequest = ko.pureComputed(() => this.connection().isOutgoingRequest());
     this.isUnknown = ko.pureComputed(() => this.connection().isUnknown());
+    this.isExternal = ko.pureComputed(() => this.teamRole() === TEAM_ROLE.PARTNER);
 
     this.inTeam = ko.observable(false);
     this.isGuest = ko.observable(false);
