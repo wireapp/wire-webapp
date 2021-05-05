@@ -21,7 +21,6 @@
 
 const child = require('child_process');
 const appConfigPkg = require('../app-config/package.json');
-const pkg = require('../package.json');
 const {execSync} = require('child_process');
 
 require('dotenv').config();
@@ -32,13 +31,14 @@ try {
   currentBranch = execSync('git rev-parse HEAD').toString().trim();
 } catch (error) {}
 
-const distributionParam = process.argv[2] ? process.argv[2] : '';
-const stageParam = process.argv[3] ? process.argv[3] : '';
+const distributionParam = process.argv[2] || '';
+const stageParam = process.argv[3] || '';
+const releaseParam = process.argv[4] || '';
 const commitSha = process.env.GITHUB_SHA || 'COMMIT_ID';
 const commitShaLength = 7;
 const commitShortSha = commitSha.substring(0, commitShaLength - 1);
 const configurationEntry = distributionParam
-  ? `wire-web-config-default${distributionParam ? `-${distributionParam}` : ''}`
+  ? `wire-web-config-default-${distributionParam}`
   : `wire-web-config-default-${currentBranch === 'master' ? 'master' : 'staging'}`;
 const dependencies = {
   ...appConfigPkg.dependencies,
@@ -51,20 +51,26 @@ const configVersion = dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp${distributionParam ? `-${distributionParam}` : ''}`;
 
-const dockerImageTag = `${repository}:${pkg.version}-${commitShortSha}-${configVersion}${stage}`;
+const tags = [];
+if (stageParam) {
+  tags.push(`${repository}:${stageParam}`);
+}
+if (releaseParam) {
+  tags.push(`${repository}:${releaseParam}-${configVersion}-${commitShortSha}`);
+}
 
 const dockerCommands = [
   `echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin ${dockerRegistryDomain}`,
-  `docker build . -t ${dockerImageTag}`,
-  `docker push ${dockerImageTag}`,
+  `docker build . --tag ${commitShortSha}`,
 ];
 
-if (stageParam) {
-  dockerCommands.push(...[
-    `docker tag ${dockerImageTag} ${repository}:${stageParam}`,
-    `docker push ${repository}:${stageParam}`
-  ]);
-}
+// prettier-ignore
+tags.forEach( tag => {
+  dockerCommands.push(
+    `docker tag ${commitShortSha} ${tag}`,
+    `docker push ${tag}`
+  );
+});
 
 dockerCommands.push(`docker logout ${dockerRegistryDomain}`);
 
