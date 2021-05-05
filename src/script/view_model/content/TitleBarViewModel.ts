@@ -77,6 +77,9 @@ export class TitleBarViewModel {
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
+      if (this.conversationEntity().is1to1()) {
+        return '';
+      }
       const hasExternal = this.conversationEntity().hasExternal();
       const hasGuest = this.conversationEntity().hasGuest();
       const hasService = this.conversationEntity().hasService();
