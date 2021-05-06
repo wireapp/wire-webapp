@@ -17,98 +17,59 @@
  *
  */
 
-import axios from 'axios';
+import nock from 'nock';
 
 import {HttpClient} from './HttpClient';
 import {BackendErrorLabel} from './BackendErrorLabel';
 import {StatusCode} from '.';
+import {AccessTokenStore, AuthAPI} from '../auth';
 
 describe('HttpClient', () => {
   const testConfig = {urls: {rest: 'https://test.zinfra.io', ws: '', name: 'test'}};
+  const mockedAccessTokenStore: Partial<AccessTokenStore> = {
+    accessToken: {
+      access_token:
+        'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsd' +
+        'DPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c2' +
+        '2-86a0-9adc8a15b3b4.c=15037015562284012115',
+      expires_in: 900,
+      token_type: 'Bearer',
+      user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
+    },
+  };
+
   describe('"_sendRequest"', () => {
-    it('retries on 401 unauthorized error', async () => {
-      const mockedAccessTokenStore: any = {
-        accessToken: {
-          access_token:
-            'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-          expires_in: 900,
-          token_type: 'Bearer',
-          user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
-        },
-      };
-
-      const client = new HttpClient(testConfig, mockedAccessTokenStore);
-      const requestSpy = spyOn(axios, 'request');
-      // eslint-disable-next-line prefer-promise-reject-errors
-      requestSpy.and.returnValue(Promise.reject({response: {status: StatusCode.UNAUTHORIZED}}));
-      client.refreshAccessToken = () => {
-        requestSpy.and.returnValue(Promise.resolve());
-        return Promise.resolve(mockedAccessTokenStore.accessToken.access_token);
-      };
-
-      await client._sendRequest({});
-    });
-
     it('retries on 403 token expired error', async () => {
-      const mockedAccessTokenStore: any = {
-        accessToken: {
-          access_token:
-            'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-          expires_in: 900,
-          token_type: 'Bearer',
-          user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
-        },
-      };
+      nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).once().reply(StatusCode.FORBIDDEN, {
+        code: StatusCode.FORBIDDEN,
+        label: BackendErrorLabel.INVALID_CREDENTIALS,
+        message: 'Token expired',
+      });
 
-      const client = new HttpClient(testConfig, mockedAccessTokenStore);
-      const requestSpy = spyOn(axios, 'request');
-      requestSpy.and.returnValue(
-        // eslint-disable-next-line prefer-promise-reject-errors
-        Promise.reject({
-          response: {
-            data: {code: StatusCode.FORBIDDEN, label: BackendErrorLabel.INVALID_CREDENTIALS, message: 'Token expired'},
-            status: StatusCode.FORBIDDEN,
-          },
-        }),
-      );
+      nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).reply(StatusCode.OK, mockedAccessTokenStore.accessToken);
+
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
       client.refreshAccessToken = () => {
-        requestSpy.and.returnValue(Promise.resolve());
-        return Promise.resolve(mockedAccessTokenStore.accessToken.access_token);
+        return Promise.resolve(mockedAccessTokenStore.accessToken!);
       };
 
-      await client._sendRequest({});
+      await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
     });
 
     it('does not retry on 403 invalid token', async () => {
-      const mockedAccessTokenStore: any = {
-        accessToken: {
-          access_token:
-            'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-          expires_in: 900,
-          token_type: 'Bearer',
-          user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
-        },
-      };
-      const client = new HttpClient(testConfig, mockedAccessTokenStore);
-      spyOn(axios, 'request').and.returnValue(
-        // eslint-disable-next-line prefer-promise-reject-errors
-        Promise.reject({
-          response: {
-            data: {
-              code: StatusCode.FORBIDDEN,
-              label: BackendErrorLabel.INVALID_CREDENTIALS,
-              message: 'Invalid token',
-            },
-            status: StatusCode.FORBIDDEN,
-          },
-        }),
-      );
+      nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).reply(StatusCode.FORBIDDEN, {
+        code: StatusCode.FORBIDDEN,
+        label: BackendErrorLabel.INVALID_CREDENTIALS,
+        message: 'Invalid token',
+      });
+
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
       client.refreshAccessToken = () => {
         return Promise.reject(new Error('Should not refresh access token'));
       };
 
       try {
-        await client._sendRequest({});
+        await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
         fail();
       } catch (error) {
         expect(error.message).toBe('Authentication failed because the token is invalid.');
@@ -117,35 +78,20 @@ describe('HttpClient', () => {
   });
 
   it('does not retry on 403 missing cookie', async () => {
-    const mockedAccessTokenStore: any = {
-      accessToken: {
-        access_token:
-          'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
-        expires_in: 900,
-        token_type: 'Bearer',
-        user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
-      },
-    };
-    const client = new HttpClient(testConfig, mockedAccessTokenStore);
-    spyOn(axios, 'request').and.returnValue(
-      // eslint-disable-next-line prefer-promise-reject-errors
-      Promise.reject({
-        response: {
-          data: {
-            code: StatusCode.FORBIDDEN,
-            label: BackendErrorLabel.INVALID_CREDENTIALS,
-            message: 'Missing cookie',
-          },
-          status: StatusCode.FORBIDDEN,
-        },
-      }),
-    );
+    nock(testConfig.urls.rest).get(AuthAPI.URL.ACCESS).reply(StatusCode.FORBIDDEN, {
+      code: StatusCode.FORBIDDEN,
+      label: BackendErrorLabel.INVALID_CREDENTIALS,
+      message: 'Missing cookie',
+    });
+
+    const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore);
+
     client.refreshAccessToken = () => {
       return Promise.reject(new Error('Should not refresh access token'));
     };
 
     try {
-      await client._sendRequest({});
+      await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
       fail();
     } catch (error) {
       expect(error.message).toBe('Authentication failed because the cookie is missing.');

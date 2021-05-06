@@ -19,6 +19,7 @@
 
 import {APIClient} from '../APIClient';
 import {ClientType} from '../client/ClientType';
+import {StatusCode} from '../http';
 
 describe('AuthAPI', () => {
   const apiClient = new APIClient();
@@ -35,7 +36,7 @@ describe('AuthAPI', () => {
         config: {},
         data: '',
         headers: {},
-        status: 200,
+        status: StatusCode.OK,
         statusText: 'OK',
       }),
     );
@@ -68,7 +69,7 @@ describe('AuthAPI', () => {
         config: {},
         data: '',
         headers: {},
-        status: 200,
+        status: StatusCode.OK,
         statusText: 'OK',
       }),
     );

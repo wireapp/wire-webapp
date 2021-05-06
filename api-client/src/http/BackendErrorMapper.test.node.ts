@@ -17,6 +17,7 @@
  *
  */
 
+import {StatusCode} from '.';
 import {ConversationIsUnknownError} from '../conversation/ConversationError';
 import {UserIsUnknownError} from '../user/UserError';
 import {BackendErrorLabel} from './BackendErrorLabel';
@@ -26,7 +27,7 @@ describe('BackendErrorMapper', () => {
   describe('"map"', () => {
     it('maps backend error payloads into error objects', () => {
       const userIdError = {
-        code: 400,
+        code: StatusCode.BAD_REQUEST,
         label: BackendErrorLabel.CLIENT_ERROR,
         message: "[path] 'usr' invalid: Failed reading: Invalid UUID",
         name: '',
@@ -36,7 +37,7 @@ describe('BackendErrorMapper', () => {
       expect(userError).toEqual(jasmine.any(UserIsUnknownError));
 
       const conversationIdError = {
-        code: 400,
+        code: StatusCode.BAD_REQUEST,
         label: BackendErrorLabel.CLIENT_ERROR,
         message: "[path] 'cnv' invalid: Failed reading: Invalid UUID",
         name: '',
