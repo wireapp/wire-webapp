@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.14.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.13.4...@wireapp/api-client@12.14.0) (2021-05-06)
+
+
+### Features
+
+* **api-client:** Recover from HTTP request errors (SQCORE-591)  ([#3805](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3805)) ([13315c5](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/13315c5378239e456b83c7ead83ebd31590c3b7c))
+
+
+
+
+
 ## [12.13.4](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.13.3...@wireapp/api-client@12.13.4) (2021-05-04)
 
 **Note:** Version bump only for package @wireapp/api-client
