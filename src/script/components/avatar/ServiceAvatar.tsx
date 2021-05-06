@@ -21,7 +21,7 @@ import ko from 'knockout';
 import React from 'react';
 
 import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 
 import AvatarBackground from './AvatarBackground';
 import AvatarBorder from './AvatarBorder';
@@ -58,9 +58,7 @@ const ServiceAvatar: React.FunctionComponent<ServiceAvatarProps> = ({participant
         }}
         data-uie-name="element-avatar-service-icon"
       >
-        <NamedIcon
-          name="service-icon"
-          viewBox="0 0 32 32"
+        <Icon.Service
           css={{
             '& > path': {
               fill: 'rgba(141, 152, 159, 0.24)',

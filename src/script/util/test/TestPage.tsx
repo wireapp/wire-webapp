@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {ReactWrapper} from 'enzyme';
+import {EnzymePropSelector, ReactWrapper} from 'enzyme';
 import {mountComponent} from './TestUtil';
 import {act} from '@testing-library/react';
 
@@ -31,9 +31,10 @@ export default class TestPage<T> {
     this.driver = mountComponent(<Component {...this.props} />);
   }
 
+  get = (selector: string | EnzymePropSelector) => this.driver.find(selector as EnzymePropSelector);
+
   getProps = () => this.props;
 
-  get = (selector: string) => this.driver.find(selector);
   getText = () => this.driver.text();
 
   private readonly do = (action: Function) => {

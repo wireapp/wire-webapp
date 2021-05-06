@@ -97,7 +97,7 @@ export class NotificationRepository {
   private readonly notifications: any[];
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
-  private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState>;
+  private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
   private readonly selfUser: ko.Observable<User>;
   private readonly assetRepository: AssetRepository;
 
@@ -169,7 +169,7 @@ export class NotificationRepository {
    * @returns Promise that resolves with the permission state
    */
   async checkPermission(): Promise<boolean | void> {
-    const isPermitted = await this.checkPermissionState();
+    const isPermitted = this.checkPermissionState();
 
     if (typeof isPermitted === 'boolean') {
       return isPermitted;
@@ -272,7 +272,7 @@ export class NotificationRepository {
    * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
-  readonly updatePermissionState = (permissionState: PermissionState | PermissionStatusState): Promise<boolean> => {
+  readonly updatePermissionState = (permissionState: PermissionState | NotificationPermission): boolean => {
     this.permissionState(permissionState);
     return this.checkPermissionState();
   };
@@ -676,22 +676,22 @@ export class NotificationRepository {
 
   /**
    * Evaluates the current permission state.
-   * @returns Resolves with `true` if notifications are permitted
+   * @returns Returns `true` if notifications are permitted
    */
-  private checkPermissionState(): Promise<boolean | undefined> {
+  private checkPermissionState(): boolean | undefined {
     switch (this.permissionState()) {
       case PermissionStatusState.GRANTED: {
-        return Promise.resolve(true);
+        return true;
       }
 
       case PermissionState.IGNORED:
       case PermissionState.UNSUPPORTED:
       case PermissionStatusState.DENIED: {
-        return Promise.resolve(false);
+        return false;
       }
 
       default: {
-        return Promise.resolve(undefined);
+        return undefined;
       }
     }
   }
@@ -754,9 +754,9 @@ export class NotificationRepository {
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
     if (window.Notification.requestPermission) {
-      const permissionState = (await window.Notification.requestPermission()) as PermissionState;
+      const permissionState = await window.Notification.requestPermission();
       amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
-      await this.updatePermissionState(permissionState);
+      this.updatePermissionState(permissionState);
     }
   }
 

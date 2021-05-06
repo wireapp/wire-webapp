@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {t} from 'Util/LocalizerUtil';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 import {useKoSubscribable} from 'Util/ComponentUtil';
 
 import Video from './Video';
@@ -89,7 +89,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         <div className="group-video-grid__element__label">
           {isMuted ? (
             <span className="group-video-grid__element__label__icon">
-              <NamedIcon name="mic-off-icon" data-uie-name="mic-icon-off" />
+              <Icon.MicOff data-uie-name="mic-icon-off" />
             </span>
           ) : (
             <ParticipantMicOnIcon isActive={isActivelySpeaking} className="group-video-grid__element__label__icon" />

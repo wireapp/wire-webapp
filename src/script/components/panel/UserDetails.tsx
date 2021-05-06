@@ -26,7 +26,7 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 
 import type {User} from '../../entity/User';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 import AvailabilityState from 'Components/AvailabilityState';
 
 export interface UserDetailsProps {
@@ -68,10 +68,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
           </div>
         )}
         {isSelfVerified && (isVerified ?? user.is_verified) && (
-          <NamedIcon
-            width={16}
-            height={16}
-            name="verified-icon"
+          <Icon.Verified
             className="panel-participant__head__verified-icon"
             data-uie-name="status-verified-participant"
           />
@@ -92,15 +89,15 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
       />
 
       {badge && (
-        <div className="panel-participant__label" data-uie-name="status-external">
-          <NamedIcon name="partner-icon" width={16} height={16} />
+        <div className="panel-participant__label panel-participant__label--external" data-uie-name="status-external">
+          <Icon.External />
           <span>{badge}</span>
         </div>
       )}
 
       {user.isGuest && (
         <div className="panel-participant__label" data-uie-name="status-guest">
-          <NamedIcon name="guest-icon" width={16} height={16} />
+          <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>
         </div>
       )}
@@ -113,7 +110,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
 
       {isGroupAdmin && (
         <div className="panel-participant__label" data-uie-name="status-admin">
-          <NamedIcon name="group-admin-icon" width={16} height={16} />
+          <Icon.GroupAdmin />
           <span>{t('conversationDetailsGroupAdmin')}</span>
         </div>
       )}

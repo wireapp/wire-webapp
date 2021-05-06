@@ -70,13 +70,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 
 export class UserRepository {
-  private readonly assetRepository: AssetRepository;
-  private readonly clientRepository: ClientRepository;
   private readonly logger: Logger;
-  private readonly propertyRepository: PropertiesRepository;
-  private readonly selfService: SelfService;
-  private readonly userService: UserService;
-
   public readonly userMapper: UserMapper;
   public getTeamMembersFromUsers: (users: User[]) => Promise<void>;
   public shouldSetUsername: boolean;
@@ -93,21 +87,15 @@ export class UserRepository {
   }
 
   constructor(
-    userService: UserService,
-    assetRepository: AssetRepository,
-    selfService: SelfService,
-    clientRepository: ClientRepository,
+    private readonly userService: UserService,
+    private readonly assetRepository: AssetRepository,
+    private readonly selfService: SelfService,
+    private readonly clientRepository: ClientRepository,
     serverTimeHandler: ServerTimeHandler,
-    propertyRepository: PropertiesRepository,
+    private readonly propertyRepository: PropertiesRepository,
     private readonly userState = container.resolve(UserState),
   ) {
     this.logger = getLogger('UserRepository');
-
-    this.assetRepository = assetRepository;
-    this.clientRepository = clientRepository;
-    this.propertyRepository = propertyRepository;
-    this.selfService = selfService;
-    this.userService = userService;
 
     this.userMapper = new UserMapper(serverTimeHandler);
     this.shouldSetUsername = false;

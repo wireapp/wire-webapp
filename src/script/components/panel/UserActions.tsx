@@ -80,7 +80,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const create1to1Conversation = async (userEntity: User, showConversation: boolean): Promise<void> => {
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
     if (showConversation) {
-      await actionsViewModel.open1to1Conversation(conversationEntity);
+      actionsViewModel.open1to1Conversation(conversationEntity);
     }
   };
 
@@ -205,7 +205,6 @@ const UserActions: React.FC<UserActionsProps> = ({
       icon: 'minus-icon',
       identifier: 'do-remove',
       label: t('groupParticipantActionRemove'),
-      size: {height: 2, width: 16},
     };
 
   const items = [

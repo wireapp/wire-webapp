@@ -25,6 +25,7 @@ import {RenameMessage} from 'src/script/entity/message/RenameMessage';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import TestPage from 'Util/test/TestPage';
 import SystemMessage, {SystemMessageProps} from './SystemMessage';
+import Icon from 'Components/Icon';
 
 type SystemMessageUnion =
   | DeleteConversationMessage
@@ -38,7 +39,9 @@ class SystemMessagePage extends TestPage<SystemMessageProps> {
   }
 
   getSystemMessage = () => this.get('[data-uie-name="element-message-system"]');
-  getSystemIcon = (name: 'edit-icon' | 'timer-icon' | 'read-icon') => this.get(`NamedIcon[name="${name}"]`);
+  getEditIcon = () => this.get(Icon.Edit);
+  getTimerIcon = () => this.get(Icon.Timer);
+  getReadIcon = () => this.get(Icon.Read);
 }
 
 const createSystemMessage = (partialSystemMessage: Partial<SystemMessageUnion>) => {
@@ -60,7 +63,7 @@ describe('SystemMessage', () => {
     });
 
     expect(systemMessagePage.getSystemMessage().exists()).toBe(true);
-    expect(systemMessagePage.getSystemIcon('edit-icon').exists()).toBe(true);
+    expect(systemMessagePage.getEditIcon().exists()).toBe(true);
   });
 
   it('shows timer icon for MessageTimerUpdateMessage', async () => {
@@ -71,7 +74,7 @@ describe('SystemMessage', () => {
     });
 
     expect(systemMessagePage.getSystemMessage().exists()).toBe(true);
-    expect(systemMessagePage.getSystemIcon('timer-icon').exists()).toBe(true);
+    expect(systemMessagePage.getTimerIcon().exists()).toBe(true);
   });
 
   it('shows read icon for ReceiptModeUpdateMessage', async () => {
@@ -82,6 +85,6 @@ describe('SystemMessage', () => {
     });
 
     expect(systemMessagePage.getSystemMessage().exists()).toBe(true);
-    expect(systemMessagePage.getSystemIcon('read-icon').exists()).toBe(true);
+    expect(systemMessagePage.getReadIcon().exists()).toBe(true);
   });
 });

@@ -283,23 +283,15 @@ export class TeamRepository {
 
     const members = await this.teamService.getTeamMembersByIds(teamId, memberIds);
     const mappedMembers = this.teamMapper.mapMemberFromArray(members);
-    memberIds = mappedMembers.map(member => member.userId);
+    const selfId = this.userState.self().id;
+    memberIds = mappedMembers.map(member => member.userId).filter(id => id !== selfId);
 
     if (!append) {
       this.teamState.memberRoles({});
       this.teamState.memberInviters({});
     }
-    this.updateMemberRoles(mappedMembers);
-
-    const selfId = this.userState.self().id;
-    const includesSelfId = memberIds.includes(selfId);
-    if (includesSelfId) {
-      memberIds = memberIds.filter(id => id !== selfId);
-      const selfMember = mappedMembers.find(({userId}) => userId === selfId);
-      this.teamMapper.mapRole(this.userState.self(), selfMember.permissions);
-    }
-
     const userEntities = await this.userRepository.getUsersById(memberIds);
+
     if (append) {
       const knownUserIds = teamEntity.members().map(({id}) => id);
       const newUserEntities = userEntities.filter(({id}) => !knownUserIds.includes(id));
@@ -307,6 +299,7 @@ export class TeamRepository {
     } else {
       teamEntity.members(userEntities);
     }
+    this.updateMemberRoles(teamEntity, mappedMembers);
   }
 
   async updateTeamMembers(teamEntity: TeamEntity): Promise<void> {
@@ -314,22 +307,14 @@ export class TeamRepository {
     if (teamMembers) {
       this.teamState.memberRoles({});
       this.teamState.memberInviters({});
-      this.updateMemberRoles(teamMembers);
 
       const memberIds = teamMembers
-        .filter(memberEntity => {
-          const isSelfUser = memberEntity.userId === this.userState.self().id;
-
-          if (isSelfUser) {
-            this.teamMapper.mapRole(this.userState.self(), memberEntity.permissions);
-          }
-
-          return !isSelfUser;
-        })
+        .filter(({userId}) => userId !== this.userState.self().id)
         .map(memberEntity => memberEntity.userId);
 
       const userEntities = await this.userRepository.getUsersById(memberIds);
       teamEntity.members(userEntities);
+      this.updateMemberRoles(teamEntity, teamMembers);
     }
   }
 
@@ -382,7 +367,7 @@ export class TeamRepository {
 
     if (isLocalTeam && isOtherUser) {
       this.userRepository.getUserById(userId).then(userEntity => this.addUserToTeam(userEntity));
-      this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(member));
+      this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), member));
     }
   }
 
@@ -419,12 +404,19 @@ export class TeamRepository {
       await this.sendAccountInfo();
     }
     if (isLocalTeam && !isSelfUser) {
-      this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(member));
+      const member = await this.getTeamMember(teamId, userId);
+      this.updateMemberRoles(this.teamState.team(), member);
     }
   }
 
-  private updateMemberRoles(memberEntities: TeamMemberEntity | TeamMemberEntity[] = []): void {
+  private updateMemberRoles(team: TeamEntity, memberEntities: TeamMemberEntity | TeamMemberEntity[] = []): void {
     const memberArray = [].concat(memberEntities);
+    memberArray.forEach(member => {
+      const user = team.members().find(({id}) => member.userId === id);
+      if (user) {
+        this.teamMapper.mapRole(user, member.permissions);
+      }
+    });
 
     const memberRoles = memberArray.reduce((accumulator, member) => {
       accumulator[member.userId] = member.permissions ? roleFromTeamPermissions(member.permissions) : ROLE.INVALID;
