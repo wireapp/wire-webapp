@@ -48,11 +48,15 @@
   z-index: @z-index-badge;
   top: 56px;
   padding: 5px 16px;
-  background-color: #95989a;
+  background-color: var(--accent-color);
   border-radius: 6px;
   box-shadow: 0 2px 16px 0 fade(#000, 8%);
   font-size: 12px;
-  font-weight: 600;
+  font-weight: @font-weight-light;
+
+  strong {
+    font-weight: @font-weight-bold;
+  }
 }
 
 .conversation-title-bar-icons,

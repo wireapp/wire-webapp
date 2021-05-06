@@ -84,7 +84,6 @@ export class MessageListViewModel {
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
   ) {
-    this.mainViewModel = mainViewModel;
     this.logger = getLogger('MessageListViewModel');
 
     this.actionsViewModel = this.mainViewModel.actions;

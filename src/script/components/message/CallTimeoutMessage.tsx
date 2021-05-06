@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {CallingTimeoutMessage} from '../../entity/message/CallingTimeoutMessage';
 
@@ -39,7 +39,7 @@ const CallTimeoutMessage: React.FC<CallTimeoutMessageProps> = ({message}) => {
     <div className="message-header">
       <div className="message-header-icon message-header-icon--svg">
         <div className="svg-red">
-          <NamedIcon name="hangup-icon" width="20" height="8" />
+          <Icon.Hangup />
         </div>
       </div>
       <div

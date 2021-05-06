@@ -668,13 +668,6 @@
   dependencies:
     handlebars "^4.1.0"
 
-"@types/helmet@4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@types/helmet/-/helmet-4.0.0.tgz#af7af46de26abe368b85360769ae9938bfb2318a"
-  integrity sha512-ONIn/nSNQA57yRge3oaMQESef/6QhoeX7llWeDli0UZIfz8TQMkfNPTXA8VnnyeA1WUjG2pGqdjEIueYonMdfQ==
-  dependencies:
-    helmet "*"
-
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0", "@types/istanbul-lib-coverage@^2.0.1":
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/@types/istanbul-lib-coverage/-/istanbul-lib-coverage-2.0.3.tgz#4ba8ddb720221f432e443bd5f9117fd22cfd4762"
@@ -704,10 +697,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.22.tgz#0d29f382472c4ccf3bd96ff0ce47daf5b7b84b18"
   integrity sha512-g+f/qj/cNcqKkc3tFqlXOYjrmZA+jNBiDzbP3kH+B+otKFqAdPgVTGP1IeKRdMml/aE69as5S4FqtxAbl+LaMw==
 
-"@types/node@12.20.10":
-  version "12.20.10"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.10.tgz#4dcb8a85a8f1211acafb88d72fafc7e3d2685583"
-  integrity sha512-TxCmnSSppKBBOzYzPR2BR25YlX5Oay8z2XGwFBInuA/Co0V9xJhLlW4kjbxKtgeNo3NOMbQP1A5Rc03y+XecPw==
+"@types/node@12.20.11":
+  version "12.20.11"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.11.tgz#980832cd56efafff8c18aa148c4085eb02a483f4"
+  integrity sha512-gema+apZ6qLQK7k7F0dGkGCWQYsL0qqKORWOQO6tq46q+x+1C0vbOiOqOwRVlh4RAdbQwV/j/ryr3u5NOG1fPQ==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -759,10 +752,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@wireapp/commons@4.1.8":
-  version "4.1.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.1.8.tgz#f42d99b668823a767e87dcd0edd8a23042ba7e7a"
-  integrity sha512-X2gMwh9Z3d0shXXkku/AqPXWg0qhUYY3Ps/XcwCu/3AqfR8dz7RCmQ9zduSAdl/PR1+hRLMnhZbMPzZqc6x77A==
+"@wireapp/commons@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.2.0.tgz#9ca83b26329f8454cd038485e79949796dff5b2a"
+  integrity sha512-lbwNNHPvwZZtnwHw083dwtShq8WTPO7bXDDrtpv6U5nWim5RIgRghxjOi25gCBZSZJxY8hP6xN9B6Xvx8o/SJg==
   dependencies:
     "@types/fs-extra" "9.0.11"
     "@types/node" "~14"
@@ -2334,10 +2327,10 @@ hbs@4.1.2:
     handlebars "4.7.7"
     walk "2.3.14"
 
-helmet@*, helmet@4.5.0:
-  version "4.5.0"
-  resolved "https://registry.yarnpkg.com/helmet/-/helmet-4.5.0.tgz#da5a75d30cbd9f60628e9463a85dc7725806c2ea"
-  integrity sha512-GfxdTaKarneWOpxmiVb/1YsY+fIwDOxVUGrvNEM1MC8W6Z2PREfkXiWF4XHQdvkyXwUTHuY4DRwB0uH/Q6BVyQ==
+helmet@4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/helmet/-/helmet-4.6.0.tgz#579971196ba93c5978eb019e4e8ec0e50076b4df"
+  integrity sha512-HVqALKZlR95ROkrnesdhbbZJFi/rIVSoNq6f3jA/9u6MIbTsPh3xZwihjeI5+DO/2sOV6HMHooXcEOuwskHpTg==
 
 hosted-git-info@^2.1.4:
   version "2.8.8"

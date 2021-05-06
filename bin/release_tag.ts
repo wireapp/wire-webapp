@@ -198,6 +198,7 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
     if (!isDryRun) {
       if (stage === DeploymentStage.PRODUCTION) {
         exec('npm version minor --no-git-tag-version');
+        exec('git commit -am "chore: Bump application version"');
       }
       exec(`git tag ${tagName} ${commitId}`);
     }

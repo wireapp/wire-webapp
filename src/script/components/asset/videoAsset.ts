@@ -170,7 +170,7 @@ ko.components.register('video-asset', {
                                       asset: asset,
                                       play: onPlayButtonClicked,
                                       pause: onPauseButtonClicked,
-                                      cancel: () => cancelUpload(message),
+                                      cancel: () => transferState() === AssetTransferState.UPLOADING ? cancelUpload(message) : asset.cancelDownload(),
                                       transferState: transferState,
                                       uploadProgress: uploadProgress
                                       ">

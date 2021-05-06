@@ -21,7 +21,7 @@ import React from 'react';
 import cx from 'classnames';
 import type {Conversation} from '../entity/Conversation';
 import type {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 export interface LegalHoldDotProps {
@@ -71,7 +71,7 @@ const LegalHoldDot: React.FC<LegalHoldDotProps> = ({
         }
       }}
     >
-      {isPending && <NamedIcon name="pending-icon" data-uie-name={dataUieName} />}
+      {isPending && <Icon.Pending data-uie-name={dataUieName} />}
     </div>
   );
 };

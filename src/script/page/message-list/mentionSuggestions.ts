@@ -210,6 +210,9 @@ ko.components.register('mention-suggestions', {
           <!-- ko ifnot: suggestion.isTemporaryGuest() -->
             <div class="mention-suggestion-list__item__username" data-bind="text: suggestion.handle" data-uie-name="status-username"></div>
           <!-- /ko -->
+          <!-- ko if: suggestion.isExternal() -->
+            <external-icon class="mention-suggestion-list__item__guest-badge" data-uie-name="status-external"></external-icon>
+          <!-- /ko -->
           <!-- ko if: suggestion.isGuest() -->
             <guest-icon class="mention-suggestion-list__item__guest-badge" data-uie-name="status-guest"></guest-icon>
           <!-- /ko -->

@@ -22,7 +22,7 @@ import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
 import classNames from 'classnames';
 import type {CompositeMessage} from '../../entity/message/CompositeMessage';
-import NamedIcon from 'Components/NamedIcon';
+import Icon from 'Components/Icon';
 
 export interface MessageButtonProps {
   id: string;
@@ -59,7 +59,7 @@ const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClic
             'message-button__waiting-overlay--visible': isWaiting,
           })}
         >
-          <NamedIcon width={20} height={20} name="loading-icon" data-uie-name="message-button-loading-icon" />
+          <Icon.Loading data-uie-name="message-button-loading-icon" />
         </div>
       </button>
       {hasError && errorMessage && (

@@ -23,7 +23,7 @@ import {Confirmation} from '@wireapp/protocol-messaging';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import NamedIcon from '../NamedIcon';
+import Icon from '../Icon';
 
 export interface ReceiptModeToggleProps {
   onReceiptModeChanged: (receiptMode: Confirmation.Type) => void;
@@ -40,7 +40,7 @@ const ReceiptModeToggle: React.FC<ReceiptModeToggleProps> = ({receiptMode, onRec
     <Fragment>
       <div className="panel__action-item">
         <div className="panel__action-item__icon">
-          <NamedIcon width={16} height={12} name="read-icon" />
+          <Icon.Read />
         </div>
         <div className="panel__action-item__summary">
           <div className="panel__action-item__text">{t('receiptToggleLabel')}</div>
