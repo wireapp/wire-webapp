@@ -59,6 +59,7 @@
     "clean": "rimraf .tmp \"src/main/!(test)/**/{!(*.test*).js,*.js.map,*.d.ts}\"",
     "coverage": "cross-env JASMINE_CONFIG_PATH=src/test/node/support/jasmine.json istanbul cover --report html ../../node_modules/jasmine/bin/jasmine.js",
     "demo:composite": "cross-env NODE_DEBUG=@wireapp* ts-node src/demo/composite.ts",
+    "demo:sendCounter": "cross-env NODE_DEBUG=@wireapp* ts-node src/demo/sendCounter.ts",
     "dist": "yarn clean && yarn build",
     "start": "yarn dist && node index.js",
     "start:echo": "cross-env NODE_DEBUG=@wireapp/core* node src/demo/echo.js",
