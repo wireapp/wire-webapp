@@ -2819,10 +2819,10 @@
     tough-cookie "4.0.0"
     ws "7.4.4"
 
-"@wireapp/avs@7.1.5":
-  version "7.1.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.1.5.tgz#1883c95811b7b7e9d81e2a7d91a45b7e4fe212e2"
-  integrity sha512-xT8HD2/GYLKKdNhxzXBXsXQrBNwmwxAdTlaFD8JeSz4WFwH+twxMkyjUd+BStDprP7/HSK8d2VsZ+89tDYMLCg==
+"@wireapp/avs@7.1.6":
+  version "7.1.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.1.6.tgz#9a2a4380ec9cb46bca38f5bc0e6a67aeea2b01f4"
+  integrity sha512-+VBIm6H/Ag+o0pGuMucDK1WbVR26J1APmaBsgOxuJFB9Xa/EKeuI/y5kHuGnyYAGSAD9uh336iaP95G7F2733g==
 
 "@wireapp/cbor@4.7.0":
   version "4.7.0"
