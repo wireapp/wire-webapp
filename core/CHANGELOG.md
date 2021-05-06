@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.6.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.5.1...@wireapp/core@17.6.0) (2021-05-06)
+
+
+### Features
+
+* **api-client:** Recover from HTTP request errors (SQCORE-591)  ([#3805](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/issues/3805)) ([13315c5](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/commit/13315c5378239e456b83c7ead83ebd31590c3b7c))
+
+
+
+
+
 ## [17.5.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/core/compare/@wireapp/core@17.5.0...@wireapp/core@17.5.1) (2021-05-04)
 
 **Note:** Version bump only for package @wireapp/core
