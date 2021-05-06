@@ -35,7 +35,7 @@ export const KEY = {
   TAB: 'Tab',
 };
 
-export const isOneOfKeys = (keyboardEvent: KeyboardEvent | React.KeyboardEvent<any>, expectedKeys: string[] = []) => {
+export const isOneOfKeys = (keyboardEvent: KeyboardEvent | React.KeyboardEvent, expectedKeys: string[] = []) => {
   expectedKeys = expectedKeys.map(key => key.toLowerCase());
   const eventKey = keyboardEvent.key?.toLowerCase() || '';
   return !!expectedKeys.find(key => key === eventKey);
@@ -52,7 +52,7 @@ export const isKey = (keyboardEvent?: KeyboardEvent | React.KeyboardEvent, expec
   return eventKey === expectedKey.toLowerCase();
 };
 
-export const isEnterKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent<any>): boolean =>
+export const isEnterKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
   isKey(keyboardEvent, KEY.ENTER);
 
 export const isSpaceKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
@@ -71,7 +71,7 @@ export const isMetaKey = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): b
 export const isPasteAction = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-export const isRemovalAction = (keyboardEvent: KeyboardEvent | React.KeyboardEvent<any>): boolean =>
+export const isRemovalAction = (keyboardEvent: KeyboardEvent | React.KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.BACKSPACE, KEY.DELETE]);
 
 export const insertAtCaret = (areaId: string, text: string) => {

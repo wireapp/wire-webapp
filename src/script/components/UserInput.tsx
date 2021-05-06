@@ -87,11 +87,9 @@ const UserInput: React.FC<UserInputParams> = ({
     <form autoComplete="off" className="search-outer">
       <div className="search-inner-wrap">
         <div className="search-inner">
-          <div className="search-icon icon-search"></div>
+          <div className="search-icon icon-search" />
           {!noSelectedUsers &&
-            selectedUsers.forEach(() => {
-              <span data-bind="text: name()" data-uie-name="item-selected"></span>;
-            })}
+            selectedUsers.map(user => <span key={user.id} data-bind="text: name()" data-uie-name="item-selected" />)}
           <input
             className="search-input"
             max="128"
