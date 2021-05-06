@@ -89,7 +89,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
       />
 
       {badge && (
-        <div className="panel-participant__label" data-uie-name="status-external">
+        <div className="panel-participant__label panel-participant__label--external" data-uie-name="status-external">
           <Icon.External />
           <span>{badge}</span>
         </div>
