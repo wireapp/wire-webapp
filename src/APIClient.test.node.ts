@@ -24,6 +24,7 @@ import nock from 'nock';
 import {APIClient} from './APIClient';
 import {AuthAPI} from './auth/AuthAPI';
 import {ClientType} from './client';
+import {BackendErrorLabel, StatusCode} from './http';
 import {UserAPI} from './user/UserAPI';
 
 describe('APIClient', () => {
@@ -31,7 +32,9 @@ describe('APIClient', () => {
 
   let accessTokenData = {
     access_token:
-      'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
+      'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDP' +
+      'OBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86' +
+      'a0-9adc8a15b3b4.c=15037015562284012115',
     expires_in: 900,
     token_type: 'Bearer',
     user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
@@ -40,19 +43,19 @@ describe('APIClient', () => {
   describe('constructor', () => {
     it('constructs a client with production backend and StoreEngine by default', () => {
       const client = new APIClient();
-      expect(client.transport.http['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs StoreEngine when only the URLs is provided', () => {
       const client = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
-      expect(client.transport.http['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
 
     it('constructs URLs when only the StoreEngine is provided', () => {
       const client = new APIClient();
-      expect(client.transport.http['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.rest);
+      expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
   });
@@ -60,7 +63,9 @@ describe('APIClient', () => {
   describe('login', () => {
     accessTokenData = {
       access_token:
-        'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c22-86a0-9adc8a15b3b4.c=15037015562284012115',
+        'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsd' +
+        'DPOBfBP-uz_b0gAKBQ==.v=1.k=1.d=1498600993.t=a.l=.u=aaf9a833-ef30-4c2' +
+        '2-86a0-9adc8a15b3b4.c=15037015562284012115',
       expires_in: 900,
       token_type: 'Bearer',
       user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
@@ -123,9 +128,9 @@ describe('APIClient', () => {
           password: loginData.password,
         })
         .query({persist: loginData.clientType === 'permanent'})
-        .reply(200, accessTokenData);
+        .reply(StatusCode.OK, accessTokenData);
 
-      nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(200, undefined);
+      nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(StatusCode.OK, undefined);
     });
 
     it('creates a context from a successful login', async () => {
@@ -144,11 +149,15 @@ describe('APIClient', () => {
     it('refreshes an access token when it becomes invalid', async () => {
       const queriedHandle = 'webappbot';
 
-      nock(baseUrl).get(UserAPI.URL.USERS).query({handles: queriedHandle}).once().reply(401);
+      nock(baseUrl).get(UserAPI.URL.USERS).query({handles: queriedHandle}).once().reply(StatusCode.FORBIDDEN, {
+        code: StatusCode.FORBIDDEN,
+        label: BackendErrorLabel.INVALID_CREDENTIALS,
+        message: 'Token expired',
+      });
 
-      nock(baseUrl).get(UserAPI.URL.USERS).query({handles: queriedHandle}).twice().reply(200, userData);
+      nock(baseUrl).get(UserAPI.URL.USERS).query({handles: queriedHandle}).reply(StatusCode.OK, userData);
 
-      nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(200, accessTokenData);
+      nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(StatusCode.OK, accessTokenData);
 
       const client = new APIClient();
       const context = await client.login(loginData);
@@ -163,7 +172,7 @@ describe('APIClient', () => {
 
   describe('logout', () => {
     beforeEach(() => {
-      nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(200);
+      nock(baseUrl).post(`${AuthAPI.URL.ACCESS}/${AuthAPI.URL.LOGOUT}`).reply(StatusCode.OK);
     });
 
     it('can logout a user', async () => {
@@ -216,9 +225,9 @@ describe('APIClient', () => {
     };
 
     beforeEach(() => {
-      nock(baseUrl).post(AuthAPI.URL.REGISTER, registerData).reply(200, registerData);
+      nock(baseUrl).post(AuthAPI.URL.REGISTER, registerData).reply(StatusCode.OK, registerData);
 
-      nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(200, accessTokenData);
+      nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(StatusCode.OK, accessTokenData);
     });
 
     it('automatically gets an access token after registration', async () => {

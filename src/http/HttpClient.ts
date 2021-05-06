@@ -20,7 +20,7 @@
 import {EventEmitter} from 'events';
 import {PriorityQueue} from '@wireapp/priority-queue';
 import {TimeUtil} from '@wireapp/commons';
-import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios, {AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 import logdown from 'logdown';
 
 import {
@@ -31,10 +31,11 @@ import {
   MissingCookieError,
   TokenExpiredError,
 } from '../auth/';
-import {BackendErrorMapper, ConnectionState, ContentType, NetworkError, StatusCode} from '../http/';
+import {BackendError, BackendErrorMapper, ConnectionState, ContentType, StatusCode} from '../http/';
 import {ObfuscationUtil} from '../obfuscation/';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 import {Config} from '../Config';
+import axiosRetry, {isNetworkOrIdempotentRequestError} from 'axios-retry';
 
 enum TOPIC {
   ON_CONNECTION_STATE_CHANGE = 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
@@ -43,13 +44,14 @@ enum TOPIC {
 
 export interface HttpClient {
   on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
+
   on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: InvalidTokenError | MissingCookieError) => void): this;
 }
 
 const FILE_SIZE_100_MB = 104857600;
 
 export class HttpClient extends EventEmitter {
-  private readonly baseUrl: string;
+  private readonly client: AxiosInstance;
   private readonly logger: logdown.Logger;
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
@@ -58,7 +60,26 @@ export class HttpClient extends EventEmitter {
   constructor(private readonly config: Config, public accessTokenStore: AccessTokenStore) {
     super();
 
-    this.baseUrl = config.urls.rest;
+    this.client = axios.create({
+      baseURL: config.urls.rest,
+    });
+    axiosRetry(this.client, {
+      retries: Infinity,
+      retryCondition: (error: AxiosError) => {
+        const {response, request} = error;
+
+        const isNetworkError = !response && request && !Object.keys(request).length;
+        if (isNetworkError) {
+          this.logger.warn('Disconnected from backend');
+          this.updateConnectionState(ConnectionState.DISCONNECTED);
+          return true;
+        }
+
+        return isNetworkOrIdempotentRequestError(error);
+      },
+      shouldResetTimeout: true,
+    });
+
     this.connectionState = ConnectionState.UNDEFINED;
 
     this.logger = logdown('@wireapp/api-client/http/HttpClient', {
@@ -69,23 +90,6 @@ export class HttpClient extends EventEmitter {
     this.requestQueue = new PriorityQueue({
       maxRetries: 0,
       retryDelay: TimeUtil.TimeInMillis.SECOND,
-    });
-
-    // Log all failing HTTP requests
-    axios.interceptors.response.use(undefined, (error: AxiosError) => {
-      let backendResponse = '';
-
-      if (error.response) {
-        try {
-          backendResponse = JSON.stringify(error.response.data);
-        } finally {
-          this.logger.error(
-            `HTTP Error (${error.response.status}) on '${error.response.config.url}': ${error.message} (${backendResponse})`,
-          );
-        }
-      }
-
-      return Promise.reject(error);
     });
   }
 
@@ -101,12 +105,13 @@ export class HttpClient extends EventEmitter {
     tokenAsParam = false,
     firstTry = true,
   ): Promise<AxiosResponse<T>> {
-    config.baseURL = this.baseUrl;
-    config.headers = {
-      ...config.headers,
-      'X-Client-Platform': this.config.platform,
-      'X-Client-Version': this.config.version,
-    };
+    if (this.config.platform) {
+      config.headers['X-Client-Platform'] = this.config.platform;
+    }
+
+    if (this.config.version) {
+      config.headers['X-Client-Version'] = this.config.version;
+    }
 
     if (this.accessTokenStore.accessToken) {
       const {token_type, access_token} = this.accessTokenStore.accessToken;
@@ -125,56 +130,62 @@ export class HttpClient extends EventEmitter {
     }
 
     try {
-      const response = await axios.request<T>({
+      const response = await this.client.request<T>({
         ...config,
         maxBodyLength: FILE_SIZE_100_MB,
         maxContentLength: FILE_SIZE_100_MB,
       });
 
       this.updateConnectionState(ConnectionState.CONNECTED);
+
       return response;
     } catch (error) {
-      const {response, request} = error;
-      // Map Axios errors
-      const isNetworkError = !response && request && !Object.keys(request).length;
-      if (isNetworkError) {
-        const message = `Cannot do "${error.config.method}" request to "${error.config.url}".`;
-        const networkError = new NetworkError(message);
-        this.updateConnectionState(ConnectionState.DISCONNECTED);
-        throw networkError;
-      }
+      if (HttpClient.isBackendError(error)) {
+        const mappedError = BackendErrorMapper.map(
+          new BackendError(error.response.data.message, error.response.data.label, error.response.data.code),
+        );
 
-      if (response) {
-        const {data: errorData, status: errorStatus} = response;
-        const isBackendError = errorData?.code && errorData?.label && errorData?.message;
-        if (isBackendError) {
-          error = BackendErrorMapper.map(errorData);
-        }
-
-        const isExpiredTokenError = error instanceof TokenExpiredError;
-        const isUnauthorized = errorStatus === StatusCode.UNAUTHORIZED;
+        const isUnauthorized = mappedError.code === StatusCode.UNAUTHORIZED;
+        const isExpiredTokenError = mappedError instanceof TokenExpiredError;
         const hasAccessToken = !!this.accessTokenStore?.accessToken;
 
         if ((isExpiredTokenError || isUnauthorized) && hasAccessToken && firstTry) {
           this.logger.warn(
-            `Access token refresh triggered (isExpiredTokenError: ${isExpiredTokenError}, isUnauthorized: ${isUnauthorized}) for "${config.method}" request to "${config.url}".`,
+            `Access token refresh triggered (isExpiredTokenError: ${isExpiredTokenError}) for "${config.method}" request to "${config.url}".`,
           );
           await this.refreshAccessToken();
+          config['axios-retry'] = {
+            retries: 0,
+          };
           return this._sendRequest<T>(config, tokenAsParam, false);
         }
 
-        if (error instanceof InvalidTokenError || error instanceof MissingCookieError) {
+        if (mappedError instanceof InvalidTokenError || mappedError instanceof MissingCookieError) {
           // On invalid cookie the application is supposed to logout.
           this.logger.warn(
-            `Cannot renew access token for "${config.method}" request to "${config.url}" because cookie/token is invalid: ${error.message}`,
-            error,
+            `Cannot renew access token for "${config.method}" request to "${config.url}" because cookie/token is invalid: ${mappedError.message}`,
+            mappedError,
           );
-          this.emit(HttpClient.TOPIC.ON_INVALID_TOKEN, error);
+          this.emit(HttpClient.TOPIC.ON_INVALID_TOKEN, mappedError);
         }
+
+        throw mappedError;
       }
 
       throw error;
     }
+  }
+
+  static isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
+    return errorCandidate.isAxiosError === true;
+  }
+
+  static isBackendError(errorCandidate: any): errorCandidate is AxiosError<BackendError> & {response: BackendError} {
+    if (errorCandidate.response) {
+      const {data} = errorCandidate.response;
+      return !!data?.code && !!data?.label && !!data?.message;
+    }
+    return false;
   }
 
   public async refreshAccessToken(): Promise<AccessTokenData> {
@@ -227,12 +238,12 @@ export class HttpClient extends EventEmitter {
     return this.sendRequest<T>(config, false, isSynchronousRequest);
   }
 
-  public sendXML<T>(config: AxiosRequestConfig, isSynchronousRequest: boolean = false): Promise<AxiosResponse<T>> {
+  public sendXML<T>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {
     config.headers = {
       ...config.headers,
       'Content-Type': ContentType.APPLICATION_XML,
     };
-    return this.sendRequest<T>(config, false, isSynchronousRequest);
+    return this.sendRequest<T>(config, false, false);
   }
 
   public sendProtocolBuffer<T>(

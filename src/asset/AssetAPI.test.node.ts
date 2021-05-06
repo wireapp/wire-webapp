@@ -18,6 +18,7 @@
  */
 
 import {APIClient} from '../APIClient';
+import {StatusCode} from '../http';
 
 describe('"AssetAPI"', () => {
   const apiClient = new APIClient();
@@ -28,7 +29,7 @@ describe('"AssetAPI"', () => {
         config: {},
         data: '',
         headers: {},
-        status: 200,
+        status: StatusCode.OK,
         statusText: 'OK',
       }),
     );
@@ -54,7 +55,7 @@ describe('"AssetAPI"', () => {
         config: {},
         data: '',
         headers: {},
-        status: 200,
+        status: StatusCode.OK,
         statusText: 'OK',
       }),
     );
