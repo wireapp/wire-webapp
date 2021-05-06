@@ -33,13 +33,13 @@ import {SystemMessage} from './SystemMessage';
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
   private readonly exceedsMaxVisibleUsers: ko.PureComputed<boolean>;
-  private readonly hasUsers: ko.PureComputed<boolean>;
+  public readonly hasUsers: ko.PureComputed<boolean>;
   private readonly hiddenUserCount: ko.PureComputed<number>;
   private readonly joinedUserEntities: ko.PureComputed<User[]>;
   public readonly name: ko.Observable<string>;
   public readonly otherUser: ko.PureComputed<User>;
   private readonly senderName: ko.PureComputed<string>;
-  private readonly showNamedCreation: ko.PureComputed<boolean>;
+  public readonly showNamedCreation: ko.PureComputed<boolean>;
   private readonly visibleUsers: ko.Observable<User[]>;
   public readonly highlightedUsers: ko.PureComputed<User[]>;
   public readonly htmlCaption: ko.PureComputed<string>;
