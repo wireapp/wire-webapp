@@ -39,7 +39,7 @@ const UserInput: React.FC<UserInputParams> = ({
   placeholder: placeholderText,
   selected: selectedUsers,
 }) => {
-  const noSelectedUsers = !selectedUsers.length;
+  const hasSelectedUsers = !!selectedUsers.length;
   // TODO
   //
   // const innerElement = $(this).find('.search-inner');
@@ -63,7 +63,7 @@ const UserInput: React.FC<UserInputParams> = ({
   //   window.setTimeout(() => innerElement.scrollTop(innerElement[0].scrollHeight));
   // });
 
-  const placeholder = !textInput.length && !selectedUsers.length ? placeholderText : '';
+  const placeholder = !textInput.length && hasSelectedUsers ? placeholderText : '';
 
   function onKeyDown(keyboardEvent: React.KeyboardEvent<HTMLInputElement>): true {
     if (isRemovalAction(keyboardEvent) && !textInput.length) {
@@ -88,7 +88,7 @@ const UserInput: React.FC<UserInputParams> = ({
       <div className="search-inner-wrap">
         <div className="search-inner">
           <div className="search-icon icon-search" />
-          {!noSelectedUsers &&
+          {hasSelectedUsers &&
             selectedUsers.map(user => <span key={user.id} data-bind="text: name()" data-uie-name="item-selected" />)}
           <input
             className="search-input"
