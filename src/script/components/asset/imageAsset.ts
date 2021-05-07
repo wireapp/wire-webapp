@@ -24,6 +24,7 @@ import type {MediumImage} from '../../entity/message/MediumImage';
 import {viewportObserver} from '../../ui/viewportObserver';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 import './AssetLoader';
+import {Config} from '../../Config';
 
 interface Params {
   asset: MediumImage;
@@ -60,8 +61,16 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
         if (this.isVisible() && asset.resource()) {
           this.assetRepository
             .load(asset.resource())
-            .then(blob => {
-              this.imageUrl(window.URL.createObjectURL(blob));
+            .then((blob: Blob) => {
+              const allowedImageTypes = [
+                'application/octet-stream', // Octet-stream is required to paste images from clipboard
+                ...Config.getConfig().ALLOWED_IMAGE_TYPES,
+              ];
+              if (allowedImageTypes.includes(blob.type)) {
+                this.imageUrl(window.URL.createObjectURL(blob));
+              } else {
+                throw new Error(`Unsupported image type "${blob.type}".`);
+              }
             })
             .catch(error => console.error(error));
         }
