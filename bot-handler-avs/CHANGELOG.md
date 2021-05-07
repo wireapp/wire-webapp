@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.151](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/compare/@wireapp/bot-handler-avs@0.2.150...@wireapp/bot-handler-avs@0.2.151) (2021-05-07)
+
+**Note:** Version bump only for package @wireapp/bot-handler-avs
+
+
+
+
+
 ## [0.2.150](https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs/compare/@wireapp/bot-handler-avs@0.2.149...@wireapp/bot-handler-avs@0.2.150) (2021-05-06)
 
 **Note:** Version bump only for package @wireapp/bot-handler-avs
