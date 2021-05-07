@@ -33,6 +33,7 @@
     "rimraf": "3.0.2",
     "typescript": "4.2.4"
   },
+  "homepage": "https://wire-react-ui-kit.netlify.app/",
   "peerDependencies": {
     "@types/react": "^17.0.0",
     "react": "^17.0.1",
