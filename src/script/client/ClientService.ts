@@ -28,6 +28,8 @@ import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
 
+export type QualifiedPublicUserMap = QualifiedPublicClients['qualified_user_map'];
+
 export class ClientService {
   private readonly logger: Logger;
   private readonly CLIENT_STORE_NAME: string;
@@ -101,9 +103,9 @@ export class ClientService {
    * @param userId ID of user to retrieve clients for
    * @returns Resolves with the clients of a user
    */
-  async getClientsByUserIds(userIds: (QualifiedId | string)[]): Promise<QualifiedPublicClients> {
+  async getClientsByUserIds(userIds: (QualifiedId | string)[]): Promise<QualifiedPublicUserMap> {
     // Add 'none' as domain for non-federated users
-    let clients: QualifiedPublicClients = {none: {}};
+    let clients: QualifiedPublicUserMap = {none: {}};
 
     const {qualifiedIds, stringIds} = userIds.reduce(
       (result, userId) => {
@@ -122,8 +124,8 @@ export class ClientService {
     }
 
     if (qualifiedIds.length) {
-      const listedClients = await this.apiClient.user.api.postListClients(qualifiedIds);
-      clients = {...clients, ...listedClients};
+      const listedClients = await this.apiClient.user.api.postListClients({qualified_users: qualifiedIds});
+      clients = {...clients, ...listedClients.qualified_user_map};
     }
 
     return clients;

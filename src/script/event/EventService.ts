@@ -19,6 +19,7 @@
 
 import type {Dexie} from 'dexie';
 import {container} from 'tsyringe';
+import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 
@@ -33,6 +34,7 @@ import {BaseError, BASE_ERROR_TYPE} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {StorageError} from '../error/StorageError';
 import {StorageService, DatabaseListenerCallback, EventRecord} from '../storage';
+import {AssetData} from '../cryptography/CryptographyMapper';
 
 export type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
@@ -364,8 +366,14 @@ export class EventService {
    * @param primaryKey Primary key used to find an event in the database
    * @param reason Failure reason
    */
-  async updateEventAsUploadFailed(primaryKey: string, reason: string): Promise<EventRecord | void> {
-    const record = (await this.storageService.load(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey)) as EventRecord;
+  async updateEventAsUploadFailed(
+    primaryKey: string,
+    reason: ProtobufAsset.NotUploaded | AssetTransferState,
+  ): Promise<EventRecord | void> {
+    const record = await this.storageService.load<EventRecord<AssetData>>(
+      StorageSchemata.OBJECT_STORE.EVENTS,
+      primaryKey,
+    );
     if (!record) {
       this.logger.warn('Did not find message to update asset (failed)', primaryKey);
       return;
@@ -384,24 +392,22 @@ export class EventService {
    * @param primaryKey event's primary key
    * @param updates Updates to perform on the message.
    */
-  updateEvent<T extends Partial<EventRecord>>(primaryKey: string, updates: T): Promise<T & {primary_key: string}> {
-    return Promise.resolve().then(() => {
-      const hasChanges = updates && !!Object.keys(updates).length;
-      if (!hasChanges) {
-        throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
-      }
-      const hasVersionedUpdates = !!updates.version;
-      if (hasVersionedUpdates) {
-        const error = new ConversationError(
-          ConversationError.TYPE.WRONG_CHANGE,
-          ConversationError.MESSAGE.WRONG_CHANGE,
-        );
-        error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
-        throw error;
-      }
-      const identifiedUpdates = {...updates, primary_key: primaryKey};
-      return this.replaceEvent(identifiedUpdates);
-    });
+  async updateEvent<T extends Partial<EventRecord>>(
+    primaryKey: string,
+    updates: T,
+  ): Promise<T & {primary_key: string}> {
+    const hasNoChanges = !updates || !Object.keys(updates).length;
+    if (hasNoChanges) {
+      throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
+    }
+    const hasVersionedUpdates = !!updates.version;
+    if (hasVersionedUpdates) {
+      const error = new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
+      error.message += ' Use the `updateEventSequentially` method to perform a versioned update of an event';
+      throw error;
+    }
+    const identifiedUpdates = {...updates, primary_key: primaryKey};
+    return this.replaceEvent(identifiedUpdates);
   }
 
   /**
@@ -411,35 +417,33 @@ export class EventService {
    * @param changes Changes to update message with
    */
   async updateEventSequentially(primaryKey: string, changes: Partial<EventRecord> = {}): Promise<number> {
-    return Promise.resolve().then(() => {
-      const hasVersionedChanges = !!changes.version;
-      if (!hasVersionedChanges) {
-        throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
-      }
+    const hasVersionedChanges = !!changes.version;
+    if (!hasVersionedChanges) {
+      throw new ConversationError(ConversationError.TYPE.WRONG_CHANGE, ConversationError.MESSAGE.WRONG_CHANGE);
+    }
 
-      if (this.storageService.db) {
-        // Create a DB transaction to avoid concurrent sequential update.
-        return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
-          const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
-          if (!record) {
-            throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
-          }
-          const databaseVersion = record.version || 1;
-          const isSequentialUpdate = changes.version === databaseVersion + 1;
-          if (isSequentialUpdate) {
-            return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
-          }
-          const logMessage = 'Failed sequential database update';
-          const logObject = {
-            databaseVersion: databaseVersion,
-            updateVersion: changes.version,
-          };
-          this.logger.error(logMessage, logObject);
-          throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
-        });
-      }
-      return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
-    });
+    if (this.storageService.db) {
+      // Create a DB transaction to avoid concurrent sequential update.
+      return this.storageService.db.transaction('rw', StorageSchemata.OBJECT_STORE.EVENTS, async () => {
+        const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
+        if (!record) {
+          throw new StorageError(StorageError.TYPE.NOT_FOUND, StorageError.MESSAGE.NOT_FOUND);
+        }
+        const databaseVersion = record.version || 1;
+        const isSequentialUpdate = changes.version === databaseVersion + 1;
+        if (isSequentialUpdate) {
+          return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
+        }
+        const logMessage = 'Failed sequential database update';
+        const logObject = {
+          databaseVersion: databaseVersion,
+          updateVersion: changes.version,
+        };
+        this.logger.error(logMessage, logObject);
+        throw new StorageError(StorageError.TYPE.NON_SEQUENTIAL_UPDATE, StorageError.MESSAGE.NON_SEQUENTIAL_UPDATE);
+      });
+    }
+    return this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey, changes);
   }
 
   /**

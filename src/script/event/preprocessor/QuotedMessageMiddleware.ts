@@ -44,19 +44,22 @@ export class QuotedMessageMiddleware {
    * @param event event in the DB format
    * @returns the original event if no quote is found (or does not validate). The decorated event if the quote is valid
    */
-  processEvent(event: EventRecord): Promise<EventRecord> {
+  async processEvent(event: EventRecord): Promise<EventRecord> {
     switch (event.type) {
-      case ClientEvent.CONVERSATION.MESSAGE_ADD:
+      case ClientEvent.CONVERSATION.MESSAGE_ADD: {
         if (event.data.replacing_message_id) {
           return this._handleEditEvent(event);
         }
         return this._handleAddEvent(event);
+      }
 
-      case ClientEvent.CONVERSATION.MESSAGE_DELETE:
+      case ClientEvent.CONVERSATION.MESSAGE_DELETE: {
         return this._handleDeleteEvent(event);
+      }
 
-      default:
-        return Promise.resolve(event);
+      default: {
+        return event;
+      }
     }
   }
 

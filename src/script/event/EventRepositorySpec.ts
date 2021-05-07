@@ -675,17 +675,17 @@ describe('EventRepository', () => {
       });
     });
 
-    it('deletes cancelled conversation.asset-add event', () => {
+    it('deletes cancelled conversation.asset-add event', async () => {
       const fromIds = [
         // cancel from an other user
-        'other-user-id',
+        createRandomUuid(),
         // cancel from the self user
         testFactory.user_repository['userState'].self().id,
       ];
 
       const loadEventSpy = jest.spyOn(testFactory.event_service, 'loadEvent');
       const deleteEventSpy = jest.spyOn(testFactory.event_service, 'deleteEvent');
-      const testPromises = fromIds.map(fromId => {
+      for (const fromId of fromIds) {
         const assetAddEvent = {...event, from: fromId, type: ClientEvent.CONVERSATION.ASSET_ADD};
         const assetCancelEvent = {
           ...assetAddEvent,
@@ -696,13 +696,10 @@ describe('EventRepository', () => {
         loadEventSpy.mockImplementation(() => Promise.resolve(assetAddEvent));
         deleteEventSpy.mockImplementation(() => Promise.resolve(1));
 
-        return testFactory.event_repository['processEvent'](assetCancelEvent, EventSource.STREAM).then(savedEvent => {
-          expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
-          expect(testFactory.event_service.deleteEvent).toHaveBeenCalled();
-        });
-      });
-
-      return Promise.all(testPromises);
+        const savedEvent = await testFactory.event_repository['processEvent'](assetCancelEvent, EventSource.STREAM);
+        expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
+        expect(testFactory.event_service.deleteEvent).toHaveBeenCalled();
+      }
     });
 
     it('deletes other user failed upload for conversation.asset-add event', () => {
@@ -724,9 +721,9 @@ describe('EventRepository', () => {
       );
     });
 
-    it('updates self failed upload for conversation.asset-add event', () => {
-      const assetAddEvent = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
-      const assetUploadFailedEvent = {
+    it('updates self failed upload for conversation.asset-add event', async () => {
+      const assetAddEvent: EventRecord = {...event, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      const assetUploadFailedEvent: EventRecord = {
         ...assetAddEvent,
         data: {reason: ProtobufAsset.NotUploaded.FAILED, status: AssetTransferState.UPLOAD_FAILED},
         time: '2017-09-06T09:43:36.528Z',
@@ -740,12 +737,9 @@ describe('EventRepository', () => {
         .spyOn(testFactory.event_service, 'updateEventAsUploadFailed')
         .mockImplementation(() => Promise.resolve(assetUploadFailedEvent));
 
-      return testFactory.event_repository['processEvent'](assetUploadFailedEvent, EventSource.STREAM).then(
-        savedEvent => {
-          expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
-          expect(testFactory.event_service.updateEventAsUploadFailed).toHaveBeenCalled();
-        },
-      );
+      const savedEvent = await testFactory.event_repository['processEvent'](assetUploadFailedEvent, EventSource.STREAM);
+      expect(savedEvent.type).toEqual(ClientEvent.CONVERSATION.ASSET_ADD);
+      expect(testFactory.event_service.updateEventAsUploadFailed).toHaveBeenCalled();
     });
 
     it('handles conversation.asset-add state update event', () => {
