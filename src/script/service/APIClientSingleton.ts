@@ -17,6 +17,8 @@
  *
  */
 
+// TODO: Use Config.getConfig().VERSION when SemVer is available
+const {version} = require('../../../package.json');
 import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 import {singleton} from 'tsyringe';
 
@@ -26,11 +28,13 @@ import {Config} from '../Config';
 export class APIClient extends APIClientUnconfigured {
   constructor() {
     super({
+      platform: 'webapp',
       urls: {
         name: 'backend',
         rest: Config.getConfig().BACKEND_REST,
         ws: Config.getConfig().BACKEND_WS,
       },
+      version,
     });
   }
 }
