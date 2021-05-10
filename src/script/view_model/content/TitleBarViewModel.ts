@@ -77,17 +77,34 @@ export class TitleBarViewModel {
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
-      let string;
-
-      if (this.conversationEntity().hasGuest()) {
-        string = this.conversationEntity().hasService()
-          ? t('guestRoomConversationBadgeGuestAndService')
-          : t('guestRoomConversationBadge');
-      } else if (this.conversationEntity().hasService()) {
-        string = t('guestRoomConversationBadgeService');
+      if (this.conversationEntity().is1to1()) {
+        return '';
       }
-
-      return string || '';
+      const hasExternal = this.conversationEntity().hasExternal();
+      const hasGuest = this.conversationEntity().hasGuest();
+      const hasService = this.conversationEntity().hasService();
+      if (hasExternal && hasGuest && hasService) {
+        return t('guestRoomConversationBadgeExternalAndGuestAndService');
+      }
+      if (hasExternal && hasGuest) {
+        return t('guestRoomConversationBadgeExternalAndGuest');
+      }
+      if (hasExternal && hasService) {
+        return t('guestRoomConversationBadgeExternalAndService');
+      }
+      if (hasExternal) {
+        return t('guestRoomConversationBadgeExternal');
+      }
+      if (hasGuest && hasService) {
+        return t('guestRoomConversationBadgeGuestAndService');
+      }
+      if (hasGuest) {
+        return t('guestRoomConversationBadge');
+      }
+      if (hasService) {
+        return t('guestRoomConversationBadgeService');
+      }
+      return '';
     });
 
     this.showCallControls = ko.pureComputed(() => {

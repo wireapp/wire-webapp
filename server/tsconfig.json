@@ -14,7 +14,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "sourceMap": true,
-    "target": "es6"
+    "target": "es2017"
   },
   "files": ["index.ts"],
   "include": ["./**/*.test.ts"],

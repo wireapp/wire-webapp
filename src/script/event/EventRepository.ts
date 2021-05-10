@@ -53,6 +53,7 @@ import type {EventRecord} from '../storage';
 import type {NotificationService} from './NotificationService';
 import {UserState} from '../user/UserState';
 import {isAxiosError} from 'Util/TypePredicateUtil';
+import {AssetData} from '../cryptography/CryptographyMapper';
 
 export class EventRepository {
   logger: Logger;
@@ -462,7 +463,7 @@ export class EventRepository {
    * @param source Source of injection
    * @returns Resolves when the event has been processed
    */
-  injectEvent(event: EventRecord, source = EventRepository.SOURCE.INJECTED): Promise<EventRecord> {
+  async injectEvent(event: EventRecord, source = EventRepository.SOURCE.INJECTED): Promise<EventRecord> {
     if (!event) {
       throw new EventError(EventError.TYPE.NO_EVENT, EventError.MESSAGE.NO_EVENT);
     }
@@ -478,7 +479,7 @@ export class EventRepository {
       this.logger.info(`Injected event ID '${id}' of type '${type}' with source '${source}'`, event);
       return this.handleEvent(event, source);
     }
-    return Promise.resolve(event);
+    return event;
   }
 
   /**
@@ -679,14 +680,17 @@ export class EventRepository {
     }
   }
 
-  private handleAssetUpdate(originalEvent: EventRecord, newEvent: EventRecord): Promise<EventRecord | void> {
+  private async handleAssetUpdate(
+    originalEvent: EventRecord<AssetData>,
+    newEvent: EventRecord<AssetData>,
+  ): Promise<EventRecord | void> {
     const newEventData = newEvent.data;
     // the preview status is not sent by the client so we fake a 'preview' status in order to cleanly handle it in the switch statement
     const ASSET_PREVIEW = 'preview';
-    const isPreviewEvent = !newEventData.status && newEventData.preview_key;
-    const status = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
+    const isPreviewEvent = !newEventData.status && !!newEventData.preview_key;
+    const previewStatus = isPreviewEvent ? ASSET_PREVIEW : newEventData.status;
 
-    switch (status) {
+    switch (previewStatus) {
       case ASSET_PREVIEW:
       case AssetTransferState.UPLOADED: {
         const updatedData = {...originalEvent.data, ...newEventData};
@@ -697,16 +701,20 @@ export class EventRepository {
       case AssetTransferState.UPLOAD_FAILED: {
         // case of both failed or canceled upload
         const fromOther = newEvent.from !== this.userState.self().id;
+        const sameSender = newEvent.from === originalEvent.from;
         const selfCancel = !fromOther && newEvent.data.reason === ProtobufAsset.NotUploaded.CANCELLED;
         // we want to delete the event in the case of an error from the remote client or a cancel on the user's own client
-        const shouldDeleteEvent = fromOther || selfCancel;
-        return shouldDeleteEvent
-          ? this.eventService.deleteEvent(newEvent.conversation, newEvent.id).then(() => newEvent)
-          : this.eventService.updateEventAsUploadFailed(originalEvent.primary_key, newEvent.data.reason);
+        const shouldDeleteEvent = (fromOther || selfCancel) && sameSender;
+        if (shouldDeleteEvent) {
+          await this.eventService.deleteEvent(newEvent.conversation, newEvent.id);
+          return newEvent;
+        }
+        return this.eventService.updateEventAsUploadFailed(originalEvent.primary_key, newEvent.data.reason);
       }
 
-      default:
+      default: {
         this.throwValidationError(newEvent, `Unhandled asset status update '${newEvent.data.status}'`);
+      }
     }
   }
 

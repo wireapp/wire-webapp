@@ -105,7 +105,8 @@ export class Configuration {
   /** measured in pixel */
   readonly SCROLL_TO_LAST_MESSAGE_THRESHOLD = 100;
 
-  readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];
+  /** Image MIME types */
+  readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
 }
 
 let instance: Configuration;

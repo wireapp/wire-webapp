@@ -33,6 +33,7 @@ self.addEventListener('message', (/** @type {MessageEvent<Data>} */ event) => {
     MAX_FILE_SIZE = 1024 * 1024;
   }
 
+  // Unfortunately, Jimp doesn't support MIME type "image/webp": https://github.com/oliver-moran/jimp/issues/144
   Jimp.read(event.data.buffer).then(image => {
     if (event.data.useProfileImageSize) {
       image.cover(MAX_SIZE, MAX_SIZE);

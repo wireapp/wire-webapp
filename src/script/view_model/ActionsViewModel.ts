@@ -305,24 +305,23 @@ export class ActionsViewModel {
     throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.id}".`);
   };
 
-  open1to1Conversation = async (conversationEntity: Conversation): Promise<void> => {
+  open1to1Conversation = (conversationEntity: Conversation): void => {
     return this.openConversation(conversationEntity);
   };
 
-  readonly open1to1ConversationWithService = (serviceEntity: ServiceEntity): Promise<void> => {
+  readonly open1to1ConversationWithService = async (serviceEntity: ServiceEntity): Promise<void> => {
     if (!serviceEntity) {
-      return Promise.reject();
+      throw new Error();
     }
-    return this.integrationRepository
-      .get1To1ConversationWithService(serviceEntity)
-      .then(conversationEntity => this.openConversation(conversationEntity));
+    const conversationEntity = await this.integrationRepository.get1To1ConversationWithService(serviceEntity);
+    return this.openConversation(conversationEntity);
   };
 
-  readonly openGroupConversation = (conversationEntity?: Conversation): Promise<void> => {
+  readonly openGroupConversation = async (conversationEntity?: Conversation): Promise<void> => {
     if (!conversationEntity) {
-      return Promise.reject();
+      throw new Error();
     }
-    return Promise.resolve().then(() => this.openConversation(conversationEntity));
+    return this.openConversation(conversationEntity);
   };
 
   private readonly openConversation = (conversationEntity: Conversation): void => {
@@ -393,16 +392,13 @@ export class ActionsViewModel {
     return new Promise(resolve => {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         primaryAction: {
-          action: () => {
-            this.connectionRepository
-              .unblockUser(userEntity)
-              .then(() => this.conversationRepository.get1To1Conversation(userEntity))
-              .then(conversationEntity => {
-                resolve();
-                if (typeof conversationEntity !== 'boolean') {
-                  this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
-                }
-              });
+          action: async () => {
+            await this.connectionRepository.unblockUser(userEntity);
+            const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
+            resolve();
+            if (typeof conversationEntity !== 'boolean') {
+              this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+            }
           },
           text: t('modalUserUnblockAction'),
         },

@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {ClientType, PublicClient, QualifiedPublicClients, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/src/client/';
 import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/src/event';
 import {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Runtime} from '@wireapp/commons';
@@ -37,7 +37,7 @@ import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
-import type {ClientService} from './ClientService';
+import type {ClientService, QualifiedPublicUserMap} from './ClientService';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
@@ -350,11 +350,11 @@ export class ClientRepository {
    * @returns Resolves with an array of client entities
    */
   async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
-  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
+  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicUserMap>;
   async getClientsByUserIds(
     userIds: (QualifiedId | string)[],
     updateClients: boolean,
-  ): Promise<QualifiedPublicClients | QualifiedUserClientMap> {
+  ): Promise<QualifiedPublicUserMap | QualifiedUserClientMap> {
     const userClientsMap = await this.clientService.getClientsByUserIds(userIds);
 
     if (updateClients) {

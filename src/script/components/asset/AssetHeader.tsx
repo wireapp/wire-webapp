@@ -25,7 +25,7 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {Message} from '../../entity/message/Message';
 
-export interface AssetHeaderProps {
+export interface AssetHeaderProps extends Partial<HTMLDivElement> {
   message: Message;
 }
 
