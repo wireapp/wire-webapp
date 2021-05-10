@@ -184,6 +184,6 @@ export class TitleBarViewModel {
   readonly showDetails = (addParticipants: boolean): void => {
     const panelId = addParticipants ? PanelViewModel.STATE.ADD_PARTICIPANTS : PanelViewModel.STATE.CONVERSATION_DETAILS;
 
-    this.panelViewModel.togglePanel(panelId, undefined);
+    this.panelViewModel.togglePanel(panelId, {entity: this.conversationEntity()});
   };
 }

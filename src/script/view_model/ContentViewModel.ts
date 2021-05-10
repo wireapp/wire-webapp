@@ -297,7 +297,7 @@ export class ContentViewModel {
 
         if (isOpenedConversation) {
           if (openNotificationSettings) {
-            this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
+            this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: conversationEntity});
           }
           return;
         }
@@ -328,7 +328,9 @@ export class ContentViewModel {
             this.showContent(ContentViewModel.STATE.CONVERSATION);
             this.previousConversation = this.conversationState.activeConversation();
             if (openNotificationSettings) {
-              this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
+              this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {
+                entity: this.conversationState.activeConversation(),
+              });
             }
           });
         });
