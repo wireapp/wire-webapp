@@ -65,6 +65,7 @@ export class HttpClient extends EventEmitter {
     });
     axiosRetry(this.client, {
       retries: Infinity,
+      retryDelay: axiosRetry.exponentialDelay,
       retryCondition: (error: AxiosError) => {
         const {response, request} = error;
 
