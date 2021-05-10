@@ -44,7 +44,7 @@ const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
         cx={4}
         cy={4}
         r={2}
-        style={{'--offset': remaining / duration} as React.CSSProperties}
+        style={{'--offset': remaining / duration || 0} as React.CSSProperties}
         transform="rotate(-90 4 4)"
       />
     </svg>
