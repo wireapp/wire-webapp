@@ -13,4 +13,3 @@ jobs:
         uses: ahmadnassri/action-dependabot-auto-merge@v2.4.0
         with:
           github-token: ${{ secrets.GH_AUTOMERGE_TOKEN }}
-          node-version: 12.x
