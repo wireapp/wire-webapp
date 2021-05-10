@@ -6,12 +6,11 @@ on: [pull_request_target]
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
+    # Guarantee that commit comes from Dependabot (don't blindly trust external GitHub Actions)
     if: github.actor == 'dependabot[bot]'
     steps:
       - name: 'Automerge dependency updates from Dependabot'
         uses: ahmadnassri/action-dependabot-auto-merge@v2.4.0
-        # Guarantee that commit comes from Dependabot (don't blindly trust external GitHub Actions)
-        if: github.actor == 'dependabot[bot]'
         with:
           github-token: ${{ secrets.GH_AUTOMERGE_TOKEN }}
           node-version: 12.x
