@@ -57,7 +57,6 @@ export class Message {
   public reaction: ReactionType;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly ephemeral_caption: ko.PureComputed<string>;
-  public readonly ephemeral_duration: ko.Observable<number>;
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
   public readonly ephemeral_remaining: ko.Observable<number>;
   public readonly ephemeral_started: ko.Observable<number>;
@@ -93,7 +92,6 @@ export class Message {
       const remainingTime = this.ephemeral_remaining();
       return remainingTime ? `${formatDurationCaption(remainingTime)} ${t('ephemeralRemaining')}` : '';
     });
-    this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);
     this.ephemeral_expires = ko.observable(false);
     this.ephemeral_started = ko.observable(0);

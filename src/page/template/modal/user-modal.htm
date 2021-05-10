@@ -17,7 +17,7 @@
           params="user: user, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: isActivatedAccount()"
         ></user-actions>
       <!-- /ko -->
-      <!-- ko if: !user() && !userNotFound()  -->
+      <!-- ko if: isVisible() && !user() && !userNotFound()  -->
         <div class="loading-wrapper">
           <loading-icon></loading-icon>
         </div>
