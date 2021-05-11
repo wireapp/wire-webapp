@@ -64,6 +64,7 @@
   "description": "Wire API Client to send and receive data.",
   "files": [
     "src",
+    "!src/demo",
     "!src/**/*.test.*",
     "!src/**/!(*.d).ts"
   ],
@@ -78,6 +79,7 @@
     "clean": "rimraf \"src/**/*.{js?(.map),d.ts}\"",
     "coverage": "istanbul cover --report html ./node_modules/jasmine/bin/jasmine.js",
     "dist": "yarn clean && yarn build",
+    "demo:self": "cross-env NODE_DEBUG=@wireapp/api-client* ts-node src/demo/self.ts",
     "start": "yarn build:node && concurrently \"tsc -w\" \"webpack -w\" \"browser-sync start -c bs-config.js\"",
     "start:node": "cross-env NODE_DEBUG=@wireapp* node --inspect -r ts-node/register demo.ts",
     "test": "yarn test:node && yarn test:browser",
