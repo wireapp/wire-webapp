@@ -124,7 +124,7 @@ export class SQLeetEngine implements CRUDEngine {
 
     // If the table contains the single magic column then convert it
     const entities = isSingleColumnTable(table)
-      ? (({[RESERVED_COLUMN]: providedEntities} as any) as EntityType)
+      ? ({[RESERVED_COLUMN]: providedEntities} as any as EntityType)
       : (providedEntities as EntityType);
 
     const columns: Record<string, string> = {};
@@ -182,7 +182,7 @@ export class SQLeetEngine implements CRUDEngine {
       throw new StoreEngineError.RecordTypeError(message);
     }
     if (primaryKey === undefined) {
-      primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+      primaryKey = this.autoIncrementedPrimaryKey as unknown as PrimaryKey;
       this.autoIncrementedPrimaryKey += 1;
     }
     const {columns, values} = this.buildValues(tableName, entity);

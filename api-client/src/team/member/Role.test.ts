@@ -122,15 +122,15 @@ describe('Role', () => {
     });
 
     it('string is false', () => {
-      expect(isPartner(({copy: 0, self: 'MEMBER'} as unknown) as PermissionsData)).toBe(false);
+      expect(isPartner({copy: 0, self: 'MEMBER'} as unknown as PermissionsData)).toBe(false);
     });
 
     it('empty permissionsData is false', () => {
-      expect(isPartner(({} as unknown) as PermissionsData)).toBe(false);
+      expect(isPartner({} as unknown as PermissionsData)).toBe(false);
     });
 
     it('undefined permissionsData is false', () => {
-      expect(isPartner((undefined as unknown) as PermissionsData)).toBe(false);
+      expect(isPartner(undefined as unknown as PermissionsData)).toBe(false);
     });
   });
 
@@ -164,15 +164,15 @@ describe('Role', () => {
     });
 
     it('string is false', () => {
-      expect(isMember(({copy: 0, self: 'MEMBER'} as unknown) as PermissionsData)).toBe(false);
+      expect(isMember({copy: 0, self: 'MEMBER'} as unknown as PermissionsData)).toBe(false);
     });
 
     it('empty permissionsData is false', () => {
-      expect(isMember(({} as unknown) as PermissionsData)).toBe(false);
+      expect(isMember({} as unknown as PermissionsData)).toBe(false);
     });
 
     it('undefined permissionsData is false', () => {
-      expect(isMember((undefined as unknown) as PermissionsData)).toBe(false);
+      expect(isMember(undefined as unknown as PermissionsData)).toBe(false);
     });
   });
 
@@ -206,15 +206,15 @@ describe('Role', () => {
     });
 
     it('string is false', () => {
-      expect(isAdmin(({copy: 0, self: 'ADMIN'} as unknown) as PermissionsData)).toBe(false);
+      expect(isAdmin({copy: 0, self: 'ADMIN'} as unknown as PermissionsData)).toBe(false);
     });
 
     it('empty permissionsData is false', () => {
-      expect(isAdmin(({} as unknown) as PermissionsData)).toBe(false);
+      expect(isAdmin({} as unknown as PermissionsData)).toBe(false);
     });
 
     it('undefined permissionsData is false', () => {
-      expect(isAdmin((undefined as unknown) as PermissionsData)).toBe(false);
+      expect(isAdmin(undefined as unknown as PermissionsData)).toBe(false);
     });
   });
 
@@ -248,15 +248,15 @@ describe('Role', () => {
     });
 
     it('string is false', () => {
-      expect(isOwner(({copy: 0, self: 'OWNER'} as unknown) as PermissionsData)).toBe(false);
+      expect(isOwner({copy: 0, self: 'OWNER'} as unknown as PermissionsData)).toBe(false);
     });
 
     it('empty permissionsData is false', () => {
-      expect(isOwner(({} as unknown) as PermissionsData)).toBe(false);
+      expect(isOwner({} as unknown as PermissionsData)).toBe(false);
     });
 
     it('undefined permissionsData is false', () => {
-      expect(isOwner((undefined as unknown) as PermissionsData)).toBe(false);
+      expect(isOwner(undefined as unknown as PermissionsData)).toBe(false);
     });
   });
 
@@ -294,15 +294,15 @@ describe('Role', () => {
     });
 
     it('string is false', () => {
-      expect(isAtLeastPartner(({copy: 0, self: 'OWNER'} as unknown) as PermissionsData)).toBe(false);
+      expect(isAtLeastPartner({copy: 0, self: 'OWNER'} as unknown as PermissionsData)).toBe(false);
     });
 
     it('empty permissionsData is false', () => {
-      expect(isAtLeastPartner(({} as unknown) as PermissionsData)).toBe(false);
+      expect(isAtLeastPartner({} as unknown as PermissionsData)).toBe(false);
     });
 
     it('undefined permissionsData is false', () => {
-      expect(isAtLeastPartner((undefined as unknown) as PermissionsData)).toBe(false);
+      expect(isAtLeastPartner(undefined as unknown as PermissionsData)).toBe(false);
     });
   });
 
@@ -340,15 +340,15 @@ describe('Role', () => {
     });
 
     it('string is false', () => {
-      expect(isAtLeastMember(({copy: 0, self: 'OWNER'} as unknown) as PermissionsData)).toBe(false);
+      expect(isAtLeastMember({copy: 0, self: 'OWNER'} as unknown as PermissionsData)).toBe(false);
     });
 
     it('empty permissionsData is false', () => {
-      expect(isAtLeastMember(({} as unknown) as PermissionsData)).toBe(false);
+      expect(isAtLeastMember({} as unknown as PermissionsData)).toBe(false);
     });
 
     it('undefined permissionsData is false', () => {
-      expect(isAtLeastMember((undefined as unknown) as PermissionsData)).toBe(false);
+      expect(isAtLeastMember(undefined as unknown as PermissionsData)).toBe(false);
     });
   });
 
@@ -386,15 +386,15 @@ describe('Role', () => {
     });
 
     it('string is false', () => {
-      expect(isAtLeastAdmin(({copy: 0, self: 'OWNER'} as unknown) as PermissionsData)).toBe(false);
+      expect(isAtLeastAdmin({copy: 0, self: 'OWNER'} as unknown as PermissionsData)).toBe(false);
     });
 
     it('empty permissionsData is false', () => {
-      expect(isAtLeastAdmin(({} as unknown) as PermissionsData)).toBe(false);
+      expect(isAtLeastAdmin({} as unknown as PermissionsData)).toBe(false);
     });
 
     it('undefined permissionsData is false', () => {
-      expect(isAtLeastAdmin((undefined as unknown) as PermissionsData)).toBe(false);
+      expect(isAtLeastAdmin(undefined as unknown as PermissionsData)).toBe(false);
     });
   });
 });

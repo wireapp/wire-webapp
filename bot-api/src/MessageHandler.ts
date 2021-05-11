@@ -87,10 +87,11 @@ export abstract class MessageHandler {
         referenceMessageId,
       };
 
-      const buttonActionConfirmationMessage = this.account.service.conversation.messageBuilder.createButtonActionConfirmationMessage(
-        conversationId,
-        buttonActionConfirmationContent,
-      );
+      const buttonActionConfirmationMessage =
+        this.account.service.conversation.messageBuilder.createButtonActionConfirmationMessage(
+          conversationId,
+          buttonActionConfirmationContent,
+        );
 
       await this.account.service.conversation.send(buttonActionConfirmationMessage, [userId]);
     }

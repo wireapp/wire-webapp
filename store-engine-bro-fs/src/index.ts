@@ -85,7 +85,7 @@ export class FileSystemEngine implements CRUDEngine {
     }
 
     if (primaryKey === undefined) {
-      primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+      primaryKey = this.autoIncrementedPrimaryKey as unknown as PrimaryKey;
       this.autoIncrementedPrimaryKey += 1;
     }
 

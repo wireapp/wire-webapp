@@ -179,7 +179,7 @@ export class IndexedDBEngine implements CRUDEngine {
 
   public async readAllPrimaryKeys<PrimaryKey = string>(tableName: string): Promise<PrimaryKey[]> {
     const keys = await this.db.table<PrimaryKey>(tableName).toCollection().keys();
-    return keys.map(key => (key as any) as PrimaryKey);
+    return keys.map(key => key as any as PrimaryKey);
   }
 
   /**

@@ -199,10 +199,10 @@ export class WebStorageEngine implements CRUDEngine {
 
   private createKey<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): PrimaryKey {
     if (primaryKey === undefined) {
-      primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+      primaryKey = this.autoIncrementedPrimaryKey as unknown as PrimaryKey;
       this.autoIncrementedPrimaryKey += 1;
     }
-    return (`${this.createPrefix(tableName)}${primaryKey}` as unknown) as PrimaryKey;
+    return `${this.createPrefix(tableName)}${primaryKey}` as unknown as PrimaryKey;
   }
 
   private createPrefix(tableName: string): string {

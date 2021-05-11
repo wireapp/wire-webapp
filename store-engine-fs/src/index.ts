@@ -97,7 +97,7 @@ export class FileEngine implements CRUDEngine {
   ): Promise<PrimaryKey> {
     if (entity) {
       if (primaryKey === undefined) {
-        primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+        primaryKey = this.autoIncrementedPrimaryKey as unknown as PrimaryKey;
         this.autoIncrementedPrimaryKey += 1;
       }
 

@@ -207,10 +207,10 @@ describe('Account', () => {
     });
 
     await account.service!.notification.handleNotification(
-      ({
+      {
         payload: [{}],
         transient: true,
-      } as unknown) as Notification,
+      } as unknown as Notification,
       PayloadBundleSource.WEBSOCKET,
     );
   });

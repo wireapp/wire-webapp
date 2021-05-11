@@ -36,7 +36,7 @@ export class MemoryEngine implements CRUDEngine {
       this.prepareTable(tableName);
 
       if (primaryKey === undefined) {
-        primaryKey = (this.autoIncrementedPrimaryKey as unknown) as PrimaryKey;
+        primaryKey = this.autoIncrementedPrimaryKey as unknown as PrimaryKey;
         this.autoIncrementedPrimaryKey += 1;
       }
 

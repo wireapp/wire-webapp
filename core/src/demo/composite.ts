@@ -66,10 +66,11 @@ const login: LoginData = {
       buttonId,
       referenceMessageId,
     };
-    const buttonActionConfirmationMessage = account.service!.conversation.messageBuilder.createButtonActionConfirmationMessage(
-      conversation,
-      buttonActionConfirmationContent,
-    );
+    const buttonActionConfirmationMessage =
+      account.service!.conversation.messageBuilder.createButtonActionConfirmationMessage(
+        conversation,
+        buttonActionConfirmationContent,
+      );
     await account.service!.conversation.send(buttonActionConfirmationMessage, [from]);
 
     console.info(

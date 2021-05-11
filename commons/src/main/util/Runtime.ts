@@ -44,7 +44,7 @@ export interface BrowserVersion {
 
 export class Runtime {
   public static getPlatform(): typeof platform {
-    const unsetPlatform = ({} as unknown) as typeof platform;
+    const unsetPlatform = {} as unknown as typeof platform;
     return platform || unsetPlatform;
   }
 
@@ -172,7 +172,7 @@ export class Runtime {
 
   public static isSupportingScreensharing = (): boolean => {
     const hasScreenCaptureAPI =
-      !!((window as unknown) as any).desktopCapturer ||
+      !!(window as unknown as any).desktopCapturer ||
       (Runtime.isSupportingUserMedia() && Runtime.isSupportingDisplayMedia());
     return hasScreenCaptureAPI || Runtime.isFirefox();
   };

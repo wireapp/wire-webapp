@@ -269,9 +269,8 @@ export class GenericMessageMapper {
         };
       }
       case GenericMessageType.LOCATION: {
-        const {expectsReadConfirmation, latitude, legalHoldStatus, longitude, name, zoom} = genericMessage[
-          GenericMessageType.LOCATION
-        ];
+        const {expectsReadConfirmation, latitude, legalHoldStatus, longitude, name, zoom} =
+          genericMessage[GenericMessageType.LOCATION];
 
         const content: LocationContent = {
           expectsReadConfirmation,
@@ -296,15 +295,8 @@ export class GenericMessageMapper {
         };
       }
       case GenericMessageType.ASSET: {
-        const {
-          expectsReadConfirmation,
-          legalHoldStatus,
-          notUploaded,
-          original,
-          preview,
-          status,
-          uploaded,
-        } = genericMessage[GenericMessageType.ASSET];
+        const {expectsReadConfirmation, legalHoldStatus, notUploaded, original, preview, status, uploaded} =
+          genericMessage[GenericMessageType.ASSET];
         const isImage = !!uploaded?.assetId && !!original?.image;
 
         const content: AssetContent = {
