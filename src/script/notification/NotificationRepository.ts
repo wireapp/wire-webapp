@@ -63,9 +63,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 
 export interface Multitasking {
-  autoMinimize?: ko.Observable<boolean>;
   isMinimized: ko.Observable<boolean> | (() => false);
-  resetMinimize?: ko.Observable<boolean>;
 }
 
 interface ContentViewModelState {

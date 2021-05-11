@@ -92,7 +92,7 @@
   <!-- /ko -->
   <!-- ko using: calling -->
     <!-- ko foreach: {data: activeCalls, as: 'call', noChildContext: true} -->
-      <!-- ko if: isOngoing(call) && !multitasking.isMinimized() && hasVideos(call) -->
+      <!-- ko if: isOngoing(call) && !multitasking.isMinimized() -->
         <fullscreen-video-call params="
           videoGrid: getVideoGrid(call),
           call: call,

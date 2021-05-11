@@ -26,6 +26,7 @@ import {useKoSubscribable} from 'Util/ComponentUtil';
 import Video from './Video';
 import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import type {Participant} from '../../calling/Participant';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 export interface GroupVideoGridTileProps {
   maximizedParticipant: Participant;
@@ -50,6 +51,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   const sharesScreen = useKoSubscribable(participant.sharesScreen);
   const sharesCamera = useKoSubscribable(participant.sharesCamera);
   const hasPausedVideo = useKoSubscribable(participant.hasPausedVideo);
+  const hasActiveVideo = useKoSubscribable(participant.hasActiveVideo);
   const selfColor = useKoSubscribable(selfParticipant.user.accent_color);
   const isActivelySpeaking = useKoSubscribable(participant.isActivelySpeaking);
 
@@ -61,16 +63,30 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
       className="group-video-grid__element"
       onDoubleClick={() => onParticipantDoubleClick(participant.user.id, participant.clientId)}
     >
-      <Video
-        autoPlay
-        playsInline
-        srcObject={videoStream}
-        className="group-video-grid__element-video"
-        css={{
-          objectFit: !!maximizedParticipant || sharesScreen ? 'contain' : 'cover',
-          transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
-        }}
-      />
+      {hasActiveVideo ? (
+        <Video
+          autoPlay
+          playsInline
+          srcObject={videoStream}
+          className="group-video-grid__element-video"
+          css={{
+            objectFit: !!maximizedParticipant || sharesScreen ? 'contain' : 'cover',
+            transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
+          }}
+        />
+      ) : (
+        <div
+          css={{
+            alignItems: 'center',
+            display: 'flex',
+            height: '100%',
+            justifyContent: 'center',
+            width: '100%',
+          }}
+        >
+          <Avatar avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE} participant={participant.user} />
+        </div>
+      )}
       <div
         css={{
           bottom: 0,
