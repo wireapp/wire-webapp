@@ -268,8 +268,8 @@ export class APIClient extends EventEmitter {
     return this.createContext(accessToken.user, loginData.clientType);
   }
 
-  public async loginWithToken(accessTokenString: string) {
-    const {userId, clientId} = parseAccessToken(accessTokenString);
+  public async loginWithToken(accessTokenString: string, clientType: ClientType = ClientType.NONE) {
+    const {userId} = parseAccessToken(accessTokenString);
 
     const accessTokenData: AccessTokenData = {
       access_token: accessTokenString,
@@ -280,9 +280,7 @@ export class APIClient extends EventEmitter {
 
     await this.accessTokenStore.updateToken(accessTokenData);
 
-    const {type} = await this.client.api.getClient(clientId);
-
-    return this.createContext(userId, type);
+    return this.createContext(userId, clientType);
   }
 
   public async register(userAccount: RegisterData, clientType: ClientType = ClientType.PERMANENT): Promise<Context> {
