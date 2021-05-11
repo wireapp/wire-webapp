@@ -125,7 +125,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             videoSpeakersActiveTab === VideoSpeakersTabs.speakers
               ? {
                   grid: activeVideoSpeakers,
-                  hasRemoteVideo: activeVideoSpeakers.length > 0,
                   thumbnail: null,
                 }
               : videoGrid

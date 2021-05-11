@@ -247,10 +247,6 @@ export class CallingViewModel {
     return getGrid(call);
   }
 
-  hasVideos(call: Call): boolean {
-    return !!call.participants().find(participant => participant.hasActiveVideo());
-  }
-
   isIdle(call: Call): boolean {
     return call.state() === CALL_STATE.NONE;
   }
