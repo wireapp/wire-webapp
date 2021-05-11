@@ -382,6 +382,7 @@ export class CallingRepository {
     const index = this.callState.activeCalls().indexOf(call);
     call.getSelfParticipant().releaseMediaStream();
     call.participants.removeAll();
+    call.removeAllAudio();
     if (index !== -1) {
       this.callState.activeCalls.splice(index, 1);
     }
@@ -1023,6 +1024,7 @@ export class CallingRepository {
       return;
     }
     selfParticipant.releaseMediaStream();
+    call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
   };
