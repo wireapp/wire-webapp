@@ -71,7 +71,7 @@
   "license": "GPL-3.0",
   "main": "src/APIClient",
   "name": "@wireapp/api-client",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client",
   "scripts": {
     "build": "yarn build:node && yarn build:browser",
     "build:browser": "webpack --config ./webpack.browser.js",
