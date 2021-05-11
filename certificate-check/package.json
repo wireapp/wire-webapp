@@ -1,0 +1,31 @@
+{
+  "dependencies": {
+    "jsrsasign": "10.0.2"
+  },
+  "description": "Utilities to check that Wire's domains use the expected certificate.",
+  "devDependencies": {
+    "@types/jasmine": "3.6.10",
+    "@types/jsrsasign": "8.0.12",
+    "@types/node": "~14",
+    "jasmine": "3.7.0",
+    "nyc": "15.1.0",
+    "rimraf": "3.0.2"
+  },
+  "files": [
+    "src",
+    "!src/!(*.d).ts"
+  ],
+  "license": "GPL-3.0",
+  "main": "src/CertUtil.js",
+  "name": "@wireapp/certificate-check",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/certificate-check",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf \"src/*.{js?(.map),d.ts}\"",
+    "dist": "yarn clean && yarn build",
+    "test": "yarn test:node",
+    "test:project": "yarn dist && yarn test",
+    "test:node": "nyc jasmine --config=jasmine.json"
+  },
+  "version": "0.1.12"
+}
