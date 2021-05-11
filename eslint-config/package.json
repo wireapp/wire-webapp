@@ -19,6 +19,6 @@
     "eslint-plugin-unused-imports": ">=1.1",
     "prettier": ">=2"
   },
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/eslint-config",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config",
   "version": "1.11.0"
 }

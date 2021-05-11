@@ -25,7 +25,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-avs",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-handler-avs",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

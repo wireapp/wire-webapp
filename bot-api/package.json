@@ -22,7 +22,7 @@
   "license": "GPL-3.0",
   "main": "src/index",
   "name": "@wireapp/bot-api",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-api",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

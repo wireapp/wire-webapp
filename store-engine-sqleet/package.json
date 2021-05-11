@@ -39,7 +39,7 @@
   "peerDependencies": {
     "@wireapp/store-engine": "4.x.x"
   },
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-sqleet",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-sqleet",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

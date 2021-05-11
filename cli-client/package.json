@@ -22,7 +22,7 @@
   "license": "GPL-3.0",
   "main": "src/index",
   "name": "@wireapp/cli-client",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/cli-client",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

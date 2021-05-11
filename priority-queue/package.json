@@ -26,7 +26,7 @@
   "license": "GPL-3.0",
   "main": "src/main/index",
   "name": "@wireapp/priority-queue",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/priority-queue",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/priority-queue",
   "scripts": {
     "build": "yarn build:node && yarn build:browser",
     "build:browser": "webpack --progress",

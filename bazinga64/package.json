@@ -34,7 +34,7 @@
   "license": "GPL-3.0",
   "main": "src/index",
   "name": "bazinga64",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bazinga64",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/bazinga64",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

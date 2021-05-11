@@ -27,7 +27,7 @@
   "license": "GPL-3.0",
   "main": "src/main/index",
   "name": "@wireapp/copy-config",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/copy-config",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/copy-config",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

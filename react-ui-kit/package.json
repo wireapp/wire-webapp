@@ -54,7 +54,7 @@
     "!src/test"
   ],
   "name": "@wireapp/react-ui-kit",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/react-ui-kit",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit",
   "scripts": {
     "build": "tsc && babel --config-file ./babel.config.js --extensions .ts,.tsx ./src -d ./src --source-maps",
     "build:styleguide": "styleguidist build",

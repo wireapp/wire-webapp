@@ -11,7 +11,7 @@
   "license": "GPL-3.0",
   "main": "src/index",
   "name": "@wireapp/webapp-events",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/webapp-events",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events",
   "scripts": {
     "build": "tsc",
     "build:node": "tsc",

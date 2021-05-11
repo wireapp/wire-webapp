@@ -19,7 +19,7 @@
   "peerDependencies": {
     "@wireapp/bot-api": "7.x.x"
   },
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/bot-handler-debug",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-handler-debug",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

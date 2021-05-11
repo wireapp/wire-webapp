@@ -22,7 +22,7 @@
   "license": "GPL-3.0",
   "main": "src/main/ChangelogBot",
   "name": "@wireapp/changelog-bot",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/changelog-bot",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

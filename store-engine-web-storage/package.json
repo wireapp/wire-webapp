@@ -23,7 +23,7 @@
   "peerDependencies": {
     "@wireapp/store-engine": "4.x.x"
   },
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/store-engine-web-storage",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-web-storage",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

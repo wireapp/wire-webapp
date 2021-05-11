@@ -23,7 +23,7 @@
   "license": "GPL-3.0",
   "main": "src/index",
   "name": "@wireapp/license-collector",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/license-collector",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/license-collector",
   "scripts": {
     "build": "yarn build:node",
     "build:node": "tsc",

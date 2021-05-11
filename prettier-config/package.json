@@ -3,6 +3,6 @@
   "license": "GPL-3.0",
   "main": "index.json",
   "name": "@wireapp/prettier-config",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/prettier-config",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config",
   "version": "0.3.0"
 }

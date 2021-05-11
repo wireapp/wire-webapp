@@ -18,7 +18,7 @@
   "license": "GPL-3.0",
   "main": "src/CertUtil.js",
   "name": "@wireapp/certificate-check",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/master/packages/certificate-check",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/certificate-check",
   "scripts": {
     "build": "tsc",
     "clean": "rimraf \"src/*.{js?(.map),d.ts}\"",
