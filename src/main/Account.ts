@@ -360,7 +360,7 @@ export class Account extends EventEmitter {
         const {
           data: {message_timer},
           conversation,
-        } = (payload as unknown) as Events.ConversationMessageTimerUpdateEvent;
+        } = payload as unknown as Events.ConversationMessageTimerUpdateEvent;
         const expireAfterMillis = Number(message_timer);
         this.service!.conversation.messageTimer.setConversationLevelTimer(conversation, expireAfterMillis);
         break;
