@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/wireapp/wire-web-packages/tree/master/packages/certificate-check/compare/@wireapp/certificate-check@0.2.0...@wireapp/certificate-check@0.2.1) (2021-05-11)
+
+
+### Bug Fixes
+
+* **certificate-check:** Import jsrsasign with equal sign ([aa72052](https://github.com/wireapp/wire-web-packages/tree/master/packages/certificate-check/commit/aa7205293ebe0f7580136096fa6361039e2a08b4))
+
+
+
+
+
 # 0.2.0 (2021-05-11)
 
 
