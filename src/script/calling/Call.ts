@@ -100,7 +100,7 @@ export class Call {
   }
 
   removeAllAudio() {
-    Object.entries(this.audios).forEach(([audioId, a]) => {
+    Object.keys(this.audios).forEach(audioId => {
       this.removeAudio(audioId);
     });
   }
