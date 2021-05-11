@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.2.0 (2021-05-11)
+
+
+### Features
+
+* **certificate-check:** Add certificate-check ([#3824](https://github.com/wireapp/wire-web-packages/tree/master/packages/certificate-check/issues/3824)) ([e9659c5](https://github.com/wireapp/wire-web-packages/tree/master/packages/certificate-check/commit/e9659c5693df9a293134598e0f3bd6dd9fd6bed7))
+
+
+
+
+
 ## [0.1.12](https://github.com/wireapp/wire-desktop-packages/tree/master/packages/certificate-check/compare/@wireapp/certificate-check@0.1.11...@wireapp/certificate-check@0.1.12) (2020-06-29)
 
 **Note:** Version bump only for package @wireapp/certificate-check
