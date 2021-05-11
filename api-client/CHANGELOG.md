@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.16.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.15.0...@wireapp/api-client@12.16.0) (2021-05-11)
+
+
+### Features
+
+* **api-client:** Support qualified conversations and users ([#3836](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/issues/3836)) ([049faa7](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/commit/049faa7c354f936e977acd583a0d44f93c08613c))
+
+
+
+
+
 # [12.15.0](https://github.com/wireapp/wire-web-packages/tree/master/packages/api-client/compare/@wireapp/api-client@12.14.2...@wireapp/api-client@12.15.0) (2021-05-10)
 
 

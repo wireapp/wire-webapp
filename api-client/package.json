@@ -7,7 +7,7 @@
     "@types/node": "~14",
     "@types/spark-md5": "3.0.2",
     "@types/tough-cookie": "4.0.0",
-    "@wireapp/commons": "4.2.2",
+    "@wireapp/commons": "4.2.3",
     "@wireapp/priority-queue": "1.6.31",
     "@wireapp/protocol-messaging": "1.34.0",
     "axios": "0.21.1",
@@ -30,8 +30,8 @@
     "@types/karma": "6.3.0",
     "@types/ws": "7.4.2",
     "@wireapp/react-ui-kit": "7.51.2",
-    "@wireapp/store-engine": "4.7.0",
-    "@wireapp/store-engine-fs": "2.2.44",
+    "@wireapp/store-engine": "4.7.1",
+    "@wireapp/store-engine-fs": "2.2.45",
     "babel-loader": "8.2.2",
     "browser-sync": "2.26.14",
     "concurrently": "6.0.2",
@@ -87,5 +87,5 @@
     "test:types": "tsc --noEmit",
     "watch": "webpack serve --config webpack.browser.js"
   },
-  "version": "12.15.0"
+  "version": "12.16.0"
 }
