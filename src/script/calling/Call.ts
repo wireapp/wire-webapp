@@ -99,6 +99,12 @@ export class Call {
     delete this.audios[audioId];
   }
 
+  removeAllAudio() {
+    Object.entries(this.audios).forEach(([audioId, a]) => {
+      this.removeAudio(audioId);
+    });
+  }
+
   private releaseStream(mediaStream?: MediaStream): void {
     if (!mediaStream) {
       return;
