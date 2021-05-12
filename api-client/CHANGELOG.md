@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.18.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.16.1...@wireapp/api-client@12.18.0) (2021-05-12)
+
+
+### Bug Fixes
+
+* **api-client:** Don't fetch client when logging in with token ([#3839](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3839)) ([1997ecd](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/1997ecdcd608f698dc2715d3517b9f6902f27217))
+
+
+### Features
+
+* **api-client:** Bump @types/jasmine from 3.6.10 to 3.7.2 ([#3835](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3835)) ([308ab5d](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/308ab5d359824ef3b6e4c032e918ff8f8f324b99))
+* **core:** Add cipher options for encrypting assets and use named parameters (SQCORE-644) ([#3842](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3842)) ([580d5cd](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/580d5cd3249ff08a2a4e328ac557ec3afd6d395f))
+
+
+
+
+
 ## [12.16.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.16.0...@wireapp/api-client@12.16.1) (2021-05-11)
 
 **Note:** Version bump only for package @wireapp/api-client

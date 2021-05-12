@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.3.4...@wireapp/store-engine-web-storage@1.5.0) (2021-05-12)
+
+
+### Features
+
+* **api-client:** Bump @types/jasmine from 3.6.10 to 3.7.2 ([#3835](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-web-storage/issues/3835)) ([308ab5d](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-web-storage/commit/308ab5d359824ef3b6e4c032e918ff8f8f324b99))
+
+
+
+
+
 ## [1.3.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.3.3...@wireapp/store-engine-web-storage@1.3.4) (2021-05-11)
 
 **Note:** Version bump only for package @wireapp/store-engine-web-storage

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-handler-wizard/compare/@wireapp/bot-handler-wizard@0.2.146...@wireapp/bot-handler-wizard@0.4.0) (2021-05-12)
+
+
+### Features
+
+* **api-client:** Bump @types/jasmine from 3.6.10 to 3.7.2 ([#3835](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-handler-wizard/issues/3835)) ([308ab5d](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-handler-wizard/commit/308ab5d359824ef3b6e4c032e918ff8f8f324b99))
+
+
+
+
+
 ## [0.2.146](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-handler-wizard/compare/@wireapp/bot-handler-wizard@0.2.145...@wireapp/bot-handler-wizard@0.2.146) (2021-05-11)
 
 **Note:** Version bump only for package @wireapp/bot-handler-wizard

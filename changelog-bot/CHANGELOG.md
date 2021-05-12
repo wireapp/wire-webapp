@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/compare/@wireapp/changelog-bot@4.3.16...@wireapp/changelog-bot@4.4.0) (2021-05-12)
+
+
+### Features
+
+* **core:** Add cipher options for encrypting assets and use named parameters (SQCORE-644) ([#3842](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/issues/3842)) ([580d5cd](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/commit/580d5cd3249ff08a2a4e328ac557ec3afd6d395f))
+
+
+
+
+
 ## [4.3.16](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/compare/@wireapp/changelog-bot@4.3.15...@wireapp/changelog-bot@4.3.16) (2021-05-11)
 
 **Note:** Version bump only for package @wireapp/changelog-bot

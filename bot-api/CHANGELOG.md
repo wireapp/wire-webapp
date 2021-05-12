@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.11.142...@wireapp/bot-api@7.13.0) (2021-05-12)
+
+
+### Features
+
+* **api-client:** Bump @types/jasmine from 3.6.10 to 3.7.2 ([#3835](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/3835)) ([308ab5d](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/308ab5d359824ef3b6e4c032e918ff8f8f324b99))
+* **core:** Add cipher options for encrypting assets and use named parameters (SQCORE-644) ([#3842](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/3842)) ([580d5cd](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/580d5cd3249ff08a2a4e328ac557ec3afd6d395f))
+
+
+
+
+
 ## [7.11.142](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.11.141...@wireapp/bot-api@7.11.142) (2021-05-11)
 
 **Note:** Version bump only for package @wireapp/bot-api

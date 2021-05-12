@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/certificate-check/compare/@wireapp/certificate-check@0.2.1...@wireapp/certificate-check@0.4.0) (2021-05-12)
+
+
+### Features
+
+* **api-client:** Bump @types/jasmine from 3.6.10 to 3.7.2 ([#3835](https://github.com/wireapp/wire-web-packages/tree/main/packages/certificate-check/issues/3835)) ([308ab5d](https://github.com/wireapp/wire-web-packages/tree/main/packages/certificate-check/commit/308ab5d359824ef3b6e4c032e918ff8f8f324b99))
+
+
+
+
+
 ## [0.2.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/certificate-check/compare/@wireapp/certificate-check@0.2.0...@wireapp/certificate-check@0.2.1) (2021-05-11)
 
 

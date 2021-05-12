@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.5.4...@wireapp/store-engine-sqleet@1.7.0) (2021-05-12)
+
+
+### Features
+
+* **api-client:** Bump @types/jasmine from 3.6.10 to 3.7.2 ([#3835](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-sqleet/issues/3835)) ([308ab5d](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-sqleet/commit/308ab5d359824ef3b6e4c032e918ff8f8f324b99))
+
+
+
+
+
 ## [1.5.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.5.3...@wireapp/store-engine-sqleet@1.5.4) (2021-05-11)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet
