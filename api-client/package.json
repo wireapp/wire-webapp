@@ -36,7 +36,7 @@
     "browser-sync": "2.26.14",
     "concurrently": "6.1.0",
     "cross-env": "7.0.3",
-    "dotenv": "9.0.1",
+    "dotenv": "9.0.2",
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "3.7.0",
     "karma": "6.3.2",
