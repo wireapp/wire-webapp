@@ -2889,13 +2889,6 @@
     "@wireapp/cbor" "4.7.1"
     libsodium-wrappers-sumo "0.7.9"
 
-"@wireapp/protocol-messaging@1.29.0":
-  version "1.29.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.29.0.tgz#271e9fb5a14b67c250ada9adc79e8d907f606cba"
-  integrity sha512-mej3JlFKRLgaMFqVlKhSqXdoPchd7XAwEpu9kTbvUB5MPF6cPK/Thmxfs4CVb4gPmG3wGW6sK3cTNfTYMpIwYw==
-  dependencies:
-    protobufjs "6.10.2"
-
 "@wireapp/protocol-messaging@1.34.0":
   version "1.34.0"
   resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.34.0.tgz#8f85920461d4500582b92162f90f250dd90404a0"
@@ -2916,17 +2909,17 @@
     emotion-theming "10.0.27"
     react-transition-group "4.4.1"
 
-"@wireapp/store-engine-dexie@1.4.3":
-  version "1.4.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.4.3.tgz#feac7aae15840e7c1414e9c4c376d6f1c1196b00"
-  integrity sha512-YZPItzk6ynMB5UDSW4TwKn7eOu5TrS5EvAqoU5y1xdAn4eDs8/fZ9N9liSGBrNu1GZiCKw3mIEEZmy+bYqKNLw==
+"@wireapp/store-engine-dexie@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-dexie/-/store-engine-dexie-1.6.0.tgz#460c9316be65237836f822653d13dde446c1882c"
+  integrity sha512-whhysNJ2ci4qCHvygN//t58YxHjyaS2+NLyWg+owyqsqOxvtLrkfoB43nXmAe63J7h9U6+jvX6Bo4sob3Rtf6g==
   dependencies:
     dexie "3.0.3"
 
-"@wireapp/store-engine-sqleet@1.5.3":
-  version "1.5.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.5.3.tgz#9fd8d9b233fdf1025577e62ae9139f6c0d2078e2"
-  integrity sha512-nEUTXMi7e1vHNE7cObHOmew5HxTEOSllwN1J43St8vgubKEpy7D5/Yl0zKLYGCttQxkTu2GOPTm+167BQOBKNw==
+"@wireapp/store-engine-sqleet@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.7.0.tgz#49cd851189e2543b6b35f103c2c8c357aadb18aa"
+  integrity sha512-ntAERnEVP9xquoaUv0qUat22uEz3ugEpE8ofYo8Gv63WhEkoHixA3w/MHWS2911RMl1GLsALkLfakRupR9WIHg==
   dependencies:
     "@babel/core" "7.14.0"
     "@babel/plugin-proposal-class-properties" "7.13.0"
@@ -2943,10 +2936,10 @@
   dependencies:
     "@types/node" "~14"
 
-"@wireapp/webapp-events@0.10.2":
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.10.2.tgz#12fc293bbf3432dd6fbdd7e243acd78765df4982"
-  integrity sha512-DDojhdqfKQGqOQXgMROlmZS0uQBzCYi0tSjlwq3M/3JZMrnsescdE2Sug/vygVB5RIR3bhRn975Mfjh96Ksxbw==
+"@wireapp/webapp-events@0.10.4":
+  version "0.10.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.10.4.tgz#f0416774558f5fa37df977719b2db2c1344a2942"
+  integrity sha512-yNeir84X6MDg+2Ysou2FntB5MOS1z1S4XBKtL73u4bxWWc/XgxLuz+vPT2Ju5qm84St71K+ChLGrgPyXbQKLsg==
 
 "@wireapp/websql@0.0.17":
   version "0.0.17"
