@@ -27,9 +27,16 @@ import {RequestCancellationError} from '../user';
 import {unsafeAlphanumeric} from '../shims/node/random';
 import type {AssetUploadData} from './AssetUploadData';
 
-export interface AssetOptions {
-  public: boolean;
-  retention: AssetRetentionPolicy;
+export interface CipherOptions {
+  /** Set a custom algorithm for encryption */
+  algorithm?: string;
+  /** Set a custom hash for encryption */
+  hash?: Buffer;
+}
+
+export interface AssetOptions extends CipherOptions {
+  public?: boolean;
+  retention?: AssetRetentionPolicy;
 }
 
 export interface AssetResponse {
@@ -101,29 +108,25 @@ export class AssetAPI {
     asset: Uint8Array,
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
-    customAssetUrl?: string,
   ): Promise<RequestCancelable<AssetUploadData>> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
     const metadata = JSON.stringify({
-      public: true,
-      retention: AssetRetentionPolicy.PERSISTENT,
-      ...options,
+      public: options?.public ?? true,
+      retention: options?.retention || AssetRetentionPolicy.PERSISTENT,
     });
 
-    let body = '';
-
-    body += `--${BOUNDARY}\r\n`;
-    body += 'Content-Type: application/json;charset=utf-8\r\n';
-    body += `Content-length: ${metadata.length}\r\n`;
-    body += '\r\n';
-    body += `${metadata}\r\n`;
-
-    body += `--${BOUNDARY}\r\n`;
-    body += 'Content-Type: application/octet-stream\r\n';
-    body += `Content-length: ${asset.length}\r\n`;
-    body += `Content-MD5: ${base64MD5FromBuffer(asset.buffer)}\r\n`;
-    body += '\r\n';
+    const body =
+      `--${BOUNDARY}\r\n` +
+      'Content-Type: application/json;charset=utf-8\r\n' +
+      `Content-length: ${metadata.length}\r\n` +
+      '\r\n' +
+      `${metadata}\r\n` +
+      `--${BOUNDARY}\r\n` +
+      'Content-Type: application/octet-stream\r\n' +
+      `Content-length: ${asset.length}\r\n` +
+      `Content-MD5: ${base64MD5FromBuffer(asset.buffer)}\r\n` +
+      '\r\n';
 
     const footer = `\r\n--${BOUNDARY}--\r\n`;
 
