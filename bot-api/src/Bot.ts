@@ -82,7 +82,9 @@ export class Bot {
    */
   public async sendText(conversationId: string, message: string, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
-      const textPayload = this.account.service.conversation.messageBuilder.createText(conversationId, message).build();
+      const textPayload = this.account.service.conversation.messageBuilder
+        .createText({conversationId, text: message})
+        .build();
       await this.account.service.conversation.send(textPayload, userIds);
     }
   }

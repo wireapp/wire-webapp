@@ -187,7 +187,7 @@ describe('CryptographyService', () => {
       await promisify(crypto.randomFill)(bytes);
       const byteBuffer = Buffer.from(bytes.buffer);
 
-      const encryptedAsset = await encryptAsset(byteBuffer);
+      const encryptedAsset = await encryptAsset({plainText: byteBuffer});
       const decryptedBuffer = await decryptAsset(encryptedAsset);
 
       expect(decryptedBuffer).toEqual(byteBuffer);

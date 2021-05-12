@@ -221,7 +221,7 @@ export class ConversationService {
     const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds);
 
     if (this.shouldSendAsExternal(plainTextArray, preKeyBundles)) {
-      const encryptedAsset = await AssetCryptography.encryptAsset(plainTextArray);
+      const encryptedAsset = await AssetCryptography.encryptAsset({plainText: plainTextArray});
       return this.sendExternalGenericMessage(
         this.apiClient.validatedClientId,
         conversationId,

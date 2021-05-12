@@ -96,10 +96,10 @@ describe('MessageHandler', () => {
 
       await mainHandler.sendText(conversationId, messageText, mentionData);
 
-      expect(mainHandler.account!.service!.conversation.messageBuilder.createText).toHaveBeenCalledWith(
+      expect(mainHandler.account!.service!.conversation.messageBuilder.createText).toHaveBeenCalledWith({
         conversationId,
-        messageText,
-      );
+        text: messageText,
+      });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({content: jasmine.objectContaining({mentions: mentionData, text: messageText})}),
         undefined,
@@ -114,10 +114,10 @@ describe('MessageHandler', () => {
 
       await mainHandler.sendText(conversationId, message);
 
-      expect(mainHandler.account!.service!.conversation.messageBuilder.createText).toHaveBeenCalledWith(
+      expect(mainHandler.account!.service!.conversation.messageBuilder.createText).toHaveBeenCalledWith({
         conversationId,
-        message,
-      );
+        text: message,
+      });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
         undefined,
@@ -133,10 +133,10 @@ describe('MessageHandler', () => {
 
       await mainHandler.sendText(conversationId, message, undefined, undefined, userIds);
 
-      expect(mainHandler.account!.service!.conversation.messageBuilder.createText).toHaveBeenCalledWith(
+      expect(mainHandler.account!.service!.conversation.messageBuilder.createText).toHaveBeenCalledWith({
         conversationId,
-        message,
-      );
+        text: message,
+      });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
         jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
         userIds,

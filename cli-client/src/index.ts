@@ -60,7 +60,7 @@ if (!loginData.email || !loginData.password) {
   commander.help();
 }
 
-const conversationID = conversation || process.env.WIRE_CONVERSATION_ID;
+const conversationId = conversation || process.env.WIRE_CONVERSATION_ID;
 
 const directory = path.join(os.homedir(), '.wire-cli', loginData.email);
 
@@ -111,7 +111,7 @@ account.on(PayloadBundleType.TEXT, textMessage => {
   stdin.addListener('data', async data => {
     const message = data.toString().trim();
     if (account.service) {
-      const payload = account.service.conversation.messageBuilder.createText(conversationID, message).build();
+      const payload = account.service.conversation.messageBuilder.createText({conversationId, text: message}).build();
       await account.service.conversation.send(payload);
     }
   });

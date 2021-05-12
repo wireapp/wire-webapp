@@ -88,10 +88,10 @@ export abstract class MessageHandler {
       };
 
       const buttonActionConfirmationMessage =
-        this.account.service.conversation.messageBuilder.createButtonActionConfirmationMessage(
+        this.account.service.conversation.messageBuilder.createButtonActionConfirmationMessage({
           conversationId,
-          buttonActionConfirmationContent,
-        );
+          content: buttonActionConfirmationContent,
+        });
 
       await this.account.service.conversation.send(buttonActionConfirmationMessage, [userId]);
     }
@@ -102,7 +102,7 @@ export abstract class MessageHandler {
    */
   async sendCall(conversationId: string, content: CallingContent, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
-      const callPayload = this.account.service.conversation.messageBuilder.createCall(conversationId, content);
+      const callPayload = this.account.service.conversation.messageBuilder.createCall({conversationId, content});
       await this.account.service.conversation.send(callPayload, userIds);
     }
   }
@@ -118,7 +118,7 @@ export abstract class MessageHandler {
   ): Promise<void> {
     if (this.account?.service) {
       const message = this.account.service.conversation.messageBuilder
-        .createComposite(conversationId)
+        .createComposite({conversationId})
         .addText(Text.create({content: text}));
       buttons.forEach(button => message.addButton(button));
       await this.account.service.conversation.send(message.build(), userIds);
@@ -134,11 +134,11 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClientsMap,
   ): Promise<void> {
     if (this.account?.service) {
-      const confirmationPayload = this.account.service.conversation.messageBuilder.createConfirmation(
+      const confirmationPayload = this.account.service.conversation.messageBuilder.createConfirmation({
         conversationId,
         firstMessageId,
-        Confirmation.Type.DELIVERED,
-      );
+        type: Confirmation.Type.DELIVERED,
+      });
       await this.account.service.conversation.send(confirmationPayload, userIds);
     }
   }
@@ -172,7 +172,7 @@ export abstract class MessageHandler {
   ): Promise<void> {
     if (this.account?.service) {
       const editedPayload = this.account.service.conversation.messageBuilder
-        .createEditedText(conversationId, newMessageText, originalMessageId)
+        .createEditedText({conversationId, newMessageText, originalMessageId})
         .withMentions(newMentions)
         .build();
 
@@ -183,7 +183,7 @@ export abstract class MessageHandler {
           newLinkPreview,
         );
         const editedWithPreviewPayload = this.account.service.conversation.messageBuilder
-          .createEditedText(conversationId, newMessageText, originalMessageId, editedMessage.id)
+          .createEditedText({conversationId, newMessageText, originalMessageId, messageId: editedMessage.id})
           .withLinkPreviews([linkPreviewPayload])
           .withMentions(newMentions)
           .build();
@@ -203,25 +203,25 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClientsMap,
   ): Promise<void> {
     if (this.account?.service) {
-      const metadataPayload = this.account.service.conversation.messageBuilder.createFileMetadata(
+      const metadataPayload = this.account.service.conversation.messageBuilder.createFileMetadata({
         conversationId,
-        metadata,
-      );
+        metaData: metadata,
+      });
       await this.account.service.conversation.send(metadataPayload, userIds);
 
       try {
-        const filePayload = await this.account.service.conversation.messageBuilder.createFileData(
+        const filePayload = await this.account.service.conversation.messageBuilder.createFileData({
           conversationId,
           file,
-          metadataPayload.id,
-        );
+          originalMessageId: metadataPayload.id,
+        });
         await this.account.service.conversation.send(filePayload, userIds);
       } catch (error) {
-        const abortPayload = await this.account.service.conversation.messageBuilder.createFileAbort(
+        const abortPayload = await this.account.service.conversation.messageBuilder.createFileAbort({
           conversationId,
-          Asset.NotUploaded.FAILED,
-          metadataPayload.id,
-        );
+          reason: Asset.NotUploaded.FAILED,
+          originalMessageId: metadataPayload.id,
+        });
         await this.account.service.conversation.send(abortPayload, userIds);
       }
     }
@@ -232,7 +232,7 @@ export abstract class MessageHandler {
    */
   async sendImage(conversationId: string, image: ImageContent, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
-      const imagePayload = await this.account.service.conversation.messageBuilder.createImage(conversationId, image);
+      const imagePayload = await this.account.service.conversation.messageBuilder.createImage({conversationId, image});
       await this.account.service.conversation.send(imagePayload, userIds);
     }
   }
@@ -246,7 +246,10 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClientsMap,
   ): Promise<void> {
     if (this.account?.service) {
-      const locationPayload = this.account.service.conversation.messageBuilder.createLocation(conversationId, location);
+      const locationPayload = this.account.service.conversation.messageBuilder.createLocation({
+        conversationId,
+        location,
+      });
       await this.account.service.conversation.send(locationPayload, userIds);
     }
   }
@@ -256,7 +259,7 @@ export abstract class MessageHandler {
    */
   async sendPing(conversationId: string, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
-      const pingPayload = this.account.service.conversation.messageBuilder.createPing(conversationId);
+      const pingPayload = this.account.service.conversation.messageBuilder.createPing({conversationId});
       await this.account.service.conversation.send(pingPayload, userIds);
     }
   }
@@ -271,9 +274,12 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClientsMap,
   ): Promise<void> {
     if (this.account?.service) {
-      const reactionPayload = this.account.service.conversation.messageBuilder.createReaction(conversationId, {
-        originalMessageId,
-        type,
+      const reactionPayload = this.account.service.conversation.messageBuilder.createReaction({
+        conversationId,
+        reaction: {
+          originalMessageId,
+          type,
+        },
       });
       await this.account.service.conversation.send(reactionPayload, userIds);
     }
@@ -287,7 +293,7 @@ export abstract class MessageHandler {
   ): Promise<void> {
     if (this.account?.service) {
       const replyPayload = this.account.service.conversation.messageBuilder
-        .createText(conversationId, text)
+        .createText({conversationId, text})
         .withQuote(quotedMessage)
         .build();
       await this.account.service.conversation.send(replyPayload, userIds);
@@ -303,7 +309,7 @@ export abstract class MessageHandler {
     text: string,
     userIds?: string[] | UserClientsMap,
   ): Promise<void> {
-    return this.sendQuote(conversationId, quotedMessage, text);
+    return this.sendQuote(conversationId, quotedMessage, text, userIds);
   }
 
   /**
@@ -318,7 +324,7 @@ export abstract class MessageHandler {
   ): Promise<void> {
     if (this.account?.service) {
       const payload = this.account.service.conversation.messageBuilder
-        .createText(conversationId, text)
+        .createText({conversationId, text})
         .withMentions(mentions)
         .build();
       const sentMessage = await this.account.service.conversation.send(payload, userIds);
@@ -328,7 +334,7 @@ export abstract class MessageHandler {
           linkPreview,
         );
         const editedWithPreviewPayload = this.account.service.conversation.messageBuilder
-          .createText(conversationId, text, sentMessage.id)
+          .createText({conversationId, text, messageId: sentMessage.id})
           .withLinkPreviews([linkPreviewPayload])
           .withMentions(mentions)
           .build();

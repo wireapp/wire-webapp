@@ -92,7 +92,7 @@ const {
 
   async function sendAndDeleteMessage(): Promise<void> {
     const deleteTextPayload = account
-      .service!.conversation.messageBuilder.createText(WIRE_CONVERSATION_ID, 'Delete me!')
+      .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text: 'Delete me!'})
       .build();
     const {id: messageId} = await account.service!.conversation.send(deleteTextPayload, undefined, useProtobuf);
 
@@ -111,7 +111,10 @@ const {
   async function sendEphemeralText(expiry = MESSAGE_TIMER): Promise<void> {
     account.service!.conversation.messageTimer.setMessageLevelTimer(WIRE_CONVERSATION_ID, expiry);
     const payload = account
-      .service!.conversation.messageBuilder.createText(WIRE_CONVERSATION_ID, `Expires after ${expiry}ms ...`)
+      .service!.conversation.messageBuilder.createText({
+        conversationId: WIRE_CONVERSATION_ID,
+        text: `Expires after ${expiry}ms ...`,
+      })
       .build();
     await account.service!.conversation.send(payload, undefined, useProtobuf);
     account.service!.conversation.messageTimer.setMessageLevelTimer(WIRE_CONVERSATION_ID, 0);
@@ -126,19 +129,23 @@ const {
 
   async function sendText(): Promise<void> {
     const payload = account
-      .service!.conversation.messageBuilder.createText(WIRE_CONVERSATION_ID, 'Hello, World!')
+      .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text: 'Hello, World!'})
       .build();
     await account.service!.conversation.send(payload, undefined, useProtobuf);
   }
 
   async function sendAndEdit(): Promise<void> {
     const payload = account
-      .service!.conversation.messageBuilder.createText(WIRE_CONVERSATION_ID, 'Hello, Wolrd!')
+      .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text: 'Hello, Wolrd!'})
       .build();
     const {id: originalMessageId} = await account.service!.conversation.send(payload, undefined, useProtobuf);
     setInterval(async () => {
       const editedPayload = account
-        .service!.conversation.messageBuilder.createEditedText(WIRE_CONVERSATION_ID, 'Hello, World!', originalMessageId)
+        .service!.conversation.messageBuilder.createEditedText({
+          conversationId: WIRE_CONVERSATION_ID,
+          newMessageText: 'Hello, World!',
+          originalMessageId,
+        })
         .build();
       await account.service!.conversation.send(editedPayload, undefined, useProtobuf);
     }, TimeUtil.TimeInMillis.SECOND * 2);
@@ -152,25 +159,31 @@ const {
       type: 'image/png',
       width: 500,
     };
-    const imagePayload = await account.service!.conversation.messageBuilder.createImage(WIRE_CONVERSATION_ID, image);
+    const imagePayload = await account.service!.conversation.messageBuilder.createImage({
+      conversationId: WIRE_CONVERSATION_ID,
+      image,
+    });
     await account.service!.conversation.send(imagePayload, undefined, useProtobuf);
   }
 
   async function sendFile(): Promise<void> {
     const filename = 'wire_logo.png';
     const data = await readFileAsync(path.join(__dirname, filename));
-    const metadataPayload = account.service!.conversation.messageBuilder.createFileMetadata(WIRE_CONVERSATION_ID, {
-      length: data.length,
-      name: filename,
-      type: 'image/png',
+    const metadataPayload = account.service!.conversation.messageBuilder.createFileMetadata({
+      conversationId: WIRE_CONVERSATION_ID,
+      metaData: {
+        length: data.length,
+        name: filename,
+        type: 'image/png',
+      },
     });
     await account.service!.conversation.send(metadataPayload, undefined, useProtobuf);
 
-    const filePayload = await account.service!.conversation.messageBuilder.createFileData(
-      WIRE_CONVERSATION_ID,
-      {data},
-      metadataPayload.id,
-    );
+    const filePayload = await account.service!.conversation.messageBuilder.createFileData({
+      conversationId: WIRE_CONVERSATION_ID,
+      file: {data},
+      originalMessageId: metadataPayload.id,
+    });
     await account.service!.conversation.send(filePayload, undefined, useProtobuf);
   }
 
@@ -198,7 +211,7 @@ const {
     });
 
     const payload = account
-      .service!.conversation.messageBuilder.createText(WIRE_CONVERSATION_ID, text)
+      .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text})
       .withMentions(mentions)
       .build();
 
@@ -208,7 +221,9 @@ const {
   async function sendQuote(): Promise<void> {
     const text = 'Hello';
 
-    const textPayload = account.service!.conversation.messageBuilder.createText(WIRE_CONVERSATION_ID, text).build();
+    const textPayload = account
+      .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text})
+      .build();
 
     const {id: messageId} = await account.service!.conversation.send(textPayload, undefined, useProtobuf);
 
@@ -220,7 +235,7 @@ const {
     };
 
     const quotePayload = account
-      .service!.conversation.messageBuilder.createText(WIRE_CONVERSATION_ID, quoteText)
+      .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text: quoteText})
       .withQuote(quote)
       .build();
 
