@@ -104,30 +104,25 @@ describe('CryptographyService', () => {
         [firstUserID]: {
           '5e80ea7886680975': {
             id: 1337,
-            key:
-              'pQABARn//wKhAFggJ1Fbpg5l6wnzKOJE+vXpRnkqUYhIvVnR5lNXEbO2o/0DoQChAFggHxZvgvtDktY/vqBcpjjo6rQnXvcNQhfwmy8AJQJKlD0E9g==',
+            key: 'pQABARn//wKhAFggJ1Fbpg5l6wnzKOJE+vXpRnkqUYhIvVnR5lNXEbO2o/0DoQChAFggHxZvgvtDktY/vqBcpjjo6rQnXvcNQhfwmy8AJQJKlD0E9g==',
           },
           be67218b77d02d30: {
             id: 72,
-            key:
-              'pQABARn//wKhAFggTWwHUoppQ8aXWhbH95YWnNp6uOYMxo2y4wbarWbF+EEDoQChAFggUiFoPtsiR0WFowIvl0myD+bVnFQJBYarqieI0Gly46QE9g==',
+            key: 'pQABARn//wKhAFggTWwHUoppQ8aXWhbH95YWnNp6uOYMxo2y4wbarWbF+EEDoQChAFggUiFoPtsiR0WFowIvl0myD+bVnFQJBYarqieI0Gly46QE9g==',
           },
           [firstClientId]: {
             id: 42,
-            key:
-              'pQABARn//wKhAFggWcbwny0jdqlcnnn0j4QSENIVVq/KgyQ3mmdpunfvGZQDoQChAFggrsQBkQkrVZ8sWhr8wTeaC+dmctuJ3oRqfdHsymTtKmgE9g==',
+            key: 'pQABARn//wKhAFggWcbwny0jdqlcnnn0j4QSENIVVq/KgyQ3mmdpunfvGZQDoQChAFggrsQBkQkrVZ8sWhr8wTeaC+dmctuJ3oRqfdHsymTtKmgE9g==',
           },
         },
         [secondUserID]: {
           '5bad8cdeddc5a90f': {
             id: 1,
-            key:
-              'pQABARn//wKhAFggEYATUNJBQ7E2tfHT7HMLxa4O3Ckd7PciUdyKiGNNWbYDoQChAFggP/s0BHmHQDNwrO4pC1dqdNHsW7bnpmF9mBadrbep4PoE9g==',
+            key: 'pQABARn//wKhAFggEYATUNJBQ7E2tfHT7HMLxa4O3Ckd7PciUdyKiGNNWbYDoQChAFggP/s0BHmHQDNwrO4pC1dqdNHsW7bnpmF9mBadrbep4PoE9g==',
           },
           bc78eded90386d20: {
             id: 65535,
-            key:
-              'pQABARn//wKhAFgg1xOfzMpWmpN2aBGW+0RG23L0I301pncd/HXqUm+pVyoDoQChAFggnl+dmwGW45AArcPutjUkAjYmhIbXBPrqkVrNyg0ZI08E9g==',
+            key: 'pQABARn//wKhAFgg1xOfzMpWmpN2aBGW+0RG23L0I301pncd/HXqUm+pVyoDoQChAFggnl+dmwGW45AArcPutjUkAjYmhIbXBPrqkVrNyg0ZI08E9g==',
           },
         },
       };
@@ -147,7 +142,7 @@ describe('CryptographyService', () => {
       window.crypto.getRandomValues(bytes);
       const byteBuffer = Buffer.from(bytes.buffer);
 
-      const encryptedAsset = await encryptAsset(byteBuffer);
+      const encryptedAsset = await encryptAsset({plaintext: byteBuffer});
       const decryptedBuffer = await decryptAsset(encryptedAsset);
 
       expect(decryptedBuffer).toEqual(byteBuffer);
@@ -158,7 +153,7 @@ describe('CryptographyService', () => {
       window.crypto.getRandomValues(bytes);
       const byteBuffer = Buffer.from(bytes.buffer);
 
-      const {cipherText, keyBytes} = await encryptAsset(byteBuffer);
+      const {cipherText, keyBytes} = await encryptAsset({plaintext: byteBuffer});
 
       try {
         await decryptAsset(cipherText, keyBytes, null);
@@ -171,7 +166,7 @@ describe('CryptographyService', () => {
       window.crypto.getRandomValues(bytes);
       const byteBuffer = Buffer.from(bytes.buffer);
 
-      const {cipherText, keyBytes} = await encryptAsset(byteBuffer);
+      const {cipherText, keyBytes} = await encryptAsset({plaintext: byteBuffer});
 
       try {
         await decryptAsset(cipherText, keyBytes, new Uint8Array([]));

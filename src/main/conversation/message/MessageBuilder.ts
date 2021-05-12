@@ -18,6 +18,7 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
+import type {CipherOptions} from '@wireapp/api-client/src/asset';
 import {ClientAction, Confirmation} from '@wireapp/protocol-messaging';
 import UUID from 'uuidjs';
 
@@ -66,6 +67,80 @@ import type {
 } from './OtrMessage';
 import {TextContentBuilder} from './TextContentBuilder';
 
+interface BaseOptions {
+  conversationId: string;
+  messageId?: string;
+}
+
+interface CreateImageOptions extends BaseOptions {
+  cipherOptions?: CipherOptions;
+  expectsReadConfirmation?: boolean;
+  image: ImageContent;
+  legalHoldStatus?: LegalHoldStatus;
+}
+
+interface CreateFileOptions {
+  cipherOptions?: CipherOptions;
+  conversationId: string;
+  expectsReadConfirmation?: boolean;
+  file: FileContent;
+  legalHoldStatus?: LegalHoldStatus;
+  originalMessageId: string;
+}
+
+interface CreateEditedTextOptions extends BaseOptions {
+  newMessageText: string;
+  originalMessageId: string;
+}
+
+interface CreateFileMetadataOptions extends BaseOptions {
+  expectsReadConfirmation?: boolean;
+  legalHoldStatus?: LegalHoldStatus;
+  metaData: FileMetaDataContent;
+}
+
+interface CreateFileAbortOptions {
+  conversationId: string;
+  expectsReadConfirmation?: boolean;
+  legalHoldStatus?: LegalHoldStatus;
+  originalMessageId: string;
+  reason: AbortReason;
+}
+
+interface CreateLocationOptions extends BaseOptions {
+  location: LocationContent;
+}
+
+interface CreateCallOptions extends BaseOptions {
+  content: CallingContent;
+}
+
+interface CreateReactionOptions extends BaseOptions {
+  reaction: ReactionContent;
+}
+
+interface CreateTextOptions extends BaseOptions {
+  text: string;
+}
+
+interface CreateConfirmationOptions extends BaseOptions {
+  firstMessageId: string;
+  moreMessageIds?: string[];
+  type: Confirmation.Type;
+}
+
+interface CreatePingOptions extends BaseOptions {
+  ping?: KnockContent;
+}
+
+interface CreateButtonActionConfirmationOptions extends BaseOptions {
+  content: ButtonActionConfirmationContent;
+}
+
+interface CreateActionMessageOptions extends BaseOptions {
+  content: ButtonActionContent;
+}
+
 export class MessageBuilder {
   private readonly apiClient: APIClient;
   private readonly assetService: AssetService;
@@ -75,12 +150,12 @@ export class MessageBuilder {
     this.assetService = assetService;
   }
 
-  public createEditedText(
-    conversationId: string,
-    newMessageText: string,
-    originalMessageId: string,
+  public createEditedText({
+    conversationId,
     messageId = MessageBuilder.createId(),
-  ): TextContentBuilder {
+    newMessageText,
+    originalMessageId,
+  }: CreateEditedTextOptions): TextContentBuilder {
     const content: EditedTextContent = {
       originalMessageId,
       text: newMessageText,
@@ -100,14 +175,15 @@ export class MessageBuilder {
     return new TextContentBuilder(payloadBundle);
   }
 
-  public async createFileData(
-    conversationId: string,
-    file: FileContent,
-    originalMessageId: string,
-    expectsReadConfirmation?: boolean,
-    legalHoldStatus?: LegalHoldStatus,
-  ): Promise<FileAssetMessage> {
-    const imageAsset = await this.assetService.uploadFileAsset(file);
+  public async createFileData({
+    conversationId,
+    cipherOptions,
+    expectsReadConfirmation,
+    file,
+    legalHoldStatus,
+    originalMessageId,
+  }: CreateFileOptions): Promise<FileAssetMessage> {
+    const imageAsset = await this.assetService.uploadFileAsset(file, {...cipherOptions});
 
     const content: FileAssetContent = {
       asset: imageAsset,
@@ -128,13 +204,13 @@ export class MessageBuilder {
     };
   }
 
-  public createFileMetadata(
-    conversationId: string,
-    metaData: FileMetaDataContent,
+  public createFileMetadata({
+    conversationId,
+    expectsReadConfirmation,
+    legalHoldStatus,
     messageId = MessageBuilder.createId(),
-    expectsReadConfirmation?: boolean,
-    legalHoldStatus?: LegalHoldStatus,
-  ): FileAssetMetaDataMessage {
+    metaData,
+  }: CreateFileMetadataOptions): FileAssetMetaDataMessage {
     const content: FileAssetMetaDataContent = {
       expectsReadConfirmation,
       legalHoldStatus,
@@ -153,13 +229,13 @@ export class MessageBuilder {
     };
   }
 
-  public async createFileAbort(
-    conversationId: string,
-    reason: AbortReason,
-    originalMessageId: string,
-    expectsReadConfirmation?: boolean,
-    legalHoldStatus?: LegalHoldStatus,
-  ): Promise<FileAssetAbortMessage> {
+  public async createFileAbort({
+    conversationId,
+    expectsReadConfirmation,
+    legalHoldStatus,
+    originalMessageId,
+    reason,
+  }: CreateFileAbortOptions): Promise<FileAssetAbortMessage> {
     const content: FileAssetAbortContent = {
       expectsReadConfirmation,
       legalHoldStatus,
@@ -178,14 +254,15 @@ export class MessageBuilder {
     };
   }
 
-  public async createImage(
-    conversationId: string,
-    image: ImageContent,
+  public async createImage({
+    conversationId,
+    cipherOptions,
+    expectsReadConfirmation,
+    image,
+    legalHoldStatus,
     messageId = MessageBuilder.createId(),
-    expectsReadConfirmation?: boolean,
-    legalHoldStatus?: LegalHoldStatus,
-  ): Promise<ImageAssetMessageOutgoing> {
-    const imageAsset = await this.assetService.uploadImageAsset(image);
+  }: CreateImageOptions): Promise<ImageAssetMessageOutgoing> {
+    const imageAsset = await this.assetService.uploadImageAsset(image, {...cipherOptions});
 
     const content: ImageAssetContent = {
       asset: imageAsset,
@@ -206,11 +283,11 @@ export class MessageBuilder {
     };
   }
 
-  public createLocation(
-    conversationId: string,
-    location: LocationContent,
+  public createLocation({
+    conversationId,
+    location,
     messageId = MessageBuilder.createId(),
-  ): LocationMessage {
+  }: CreateLocationOptions): LocationMessage {
     return {
       content: location,
       conversation: conversationId,
@@ -223,11 +300,7 @@ export class MessageBuilder {
     };
   }
 
-  public createCall(
-    conversationId: string,
-    content: CallingContent,
-    messageId = MessageBuilder.createId(),
-  ): CallMessage {
+  public createCall({content, conversationId, messageId = MessageBuilder.createId()}: CreateCallOptions): CallMessage {
     return {
       content,
       conversation: conversationId,
@@ -240,11 +313,11 @@ export class MessageBuilder {
     };
   }
 
-  public createReaction(
-    conversationId: string,
-    reaction: ReactionContent,
+  public createReaction({
+    conversationId,
     messageId = MessageBuilder.createId(),
-  ): ReactionMessage {
+    reaction,
+  }: CreateReactionOptions): ReactionMessage {
     return {
       content: reaction,
       conversation: conversationId,
@@ -257,7 +330,11 @@ export class MessageBuilder {
     };
   }
 
-  public createText(conversationId: string, text: string, messageId = MessageBuilder.createId()): TextContentBuilder {
+  public createText({
+    conversationId,
+    messageId = MessageBuilder.createId(),
+    text,
+  }: CreateTextOptions): TextContentBuilder {
     const content: TextContent = {text};
 
     const payloadBundle: TextMessage = {
@@ -274,13 +351,13 @@ export class MessageBuilder {
     return new TextContentBuilder(payloadBundle);
   }
 
-  public createConfirmation(
-    conversationId: string,
-    firstMessageId: string,
-    type: Confirmation.Type,
+  public createConfirmation({
+    conversationId,
+    firstMessageId,
     messageId = MessageBuilder.createId(),
-    moreMessageIds?: string[],
-  ): ConfirmationMessage {
+    moreMessageIds,
+    type,
+  }: CreateConfirmationOptions): ConfirmationMessage {
     const content: ConfirmationContent = {firstMessageId, moreMessageIds, type};
     return {
       content,
@@ -294,11 +371,11 @@ export class MessageBuilder {
     };
   }
 
-  createButtonActionMessage(
-    conversationId: string,
-    content: ButtonActionContent,
+  createButtonActionMessage({
+    content,
+    conversationId,
     messageId = MessageBuilder.createId(),
-  ): ButtonActionMessage {
+  }: CreateActionMessageOptions): ButtonActionMessage {
     return {
       content,
       conversation: conversationId,
@@ -311,11 +388,11 @@ export class MessageBuilder {
     };
   }
 
-  createButtonActionConfirmationMessage(
-    conversationId: string,
-    content: ButtonActionConfirmationContent,
+  createButtonActionConfirmationMessage({
+    content,
+    conversationId,
     messageId = MessageBuilder.createId(),
-  ): ButtonActionConfirmationMessage {
+  }: CreateButtonActionConfirmationOptions): ButtonActionConfirmationMessage {
     return {
       content,
       conversation: conversationId,
@@ -328,7 +405,7 @@ export class MessageBuilder {
     };
   }
 
-  createComposite(conversationId: string, messageId = MessageBuilder.createId()): CompositeContentBuilder {
+  createComposite({conversationId, messageId = MessageBuilder.createId()}: BaseOptions): CompositeContentBuilder {
     const content: CompositeContent = {};
 
     const payloadBundle: CompositeMessage = {
@@ -344,13 +421,13 @@ export class MessageBuilder {
     return new CompositeContentBuilder(payloadBundle);
   }
 
-  public createPing(
-    conversationId: string,
-    ping: KnockContent = {
+  public createPing({
+    conversationId,
+    messageId = MessageBuilder.createId(),
+    ping = {
       hotKnock: false,
     },
-    messageId = MessageBuilder.createId(),
-  ): PingMessage {
+  }: CreatePingOptions): PingMessage {
     return {
       content: ping,
       conversation: conversationId,
@@ -363,10 +440,11 @@ export class MessageBuilder {
     };
   }
 
-  public createSessionReset(conversationId: string, messageId = MessageBuilder.createId()): ResetSessionMessage {
+  public createSessionReset({conversationId, messageId = MessageBuilder.createId()}: BaseOptions): ResetSessionMessage {
     const content: ClientActionContent = {
       clientAction: ClientAction.RESET_SESSION,
     };
+
     return {
       content,
       conversation: conversationId,

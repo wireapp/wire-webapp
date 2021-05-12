@@ -112,7 +112,7 @@ describe('ConversationService', () => {
         urlOffset,
       });
       const textMessage = account
-        .service!.conversation.messageBuilder.createText('', text)
+        .service!.conversation.messageBuilder.createText({conversationId: '', text})
         .withLinkPreviews([linkPreview])
         .build();
 
@@ -139,7 +139,7 @@ describe('ConversationService', () => {
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service!.conversation.messageBuilder.createText('', text).build();
+      const textMessage = account.service!.conversation.messageBuilder.createText({conversationId: '', text}).build();
 
       expect(textMessage.content.linkPreviews).toBeUndefined();
     });
@@ -172,7 +172,7 @@ describe('ConversationService', () => {
 
       const linkPreview = await account.service!.conversation.messageBuilder.createLinkPreview({image, url, urlOffset});
       const textMessage = account
-        .service!.conversation.messageBuilder.createText('', text)
+        .service!.conversation.messageBuilder.createText({conversationId: '', text})
         .withLinkPreviews([linkPreview])
         .build();
 
@@ -204,7 +204,7 @@ describe('ConversationService', () => {
       };
 
       const textMessage = account
-        .service!.conversation.messageBuilder.createText('', text)
+        .service!.conversation.messageBuilder.createText({conversationId: '', text})
         .withMentions([mention])
         .build();
 
@@ -222,7 +222,7 @@ describe('ConversationService', () => {
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service!.conversation.messageBuilder.createText('', text).build();
+      const textMessage = account.service!.conversation.messageBuilder.createText({conversationId: '', text}).build();
 
       expect(textMessage.content.mentions).toBeUndefined();
     });
@@ -240,7 +240,10 @@ describe('ConversationService', () => {
         quotedMessageId: quoteId,
       };
 
-      const replyMessage = account.service!.conversation.messageBuilder.createText('', text).withQuote(quote).build();
+      const replyMessage = account
+        .service!.conversation.messageBuilder.createText({conversationId: '', text})
+        .withQuote(quote)
+        .build();
 
       expect(replyMessage.content.text).toEqual(text);
       expect(replyMessage.content.quote).toEqual(jasmine.objectContaining({quotedMessageId: quoteId}));
@@ -254,7 +257,7 @@ describe('ConversationService', () => {
       };
 
       const text = 'Hello, world!';
-      const textMessage = account.service!.conversation.messageBuilder.createText('', text).build();
+      const textMessage = account.service!.conversation.messageBuilder.createText({conversationId: '', text}).build();
 
       expect(textMessage.content.quote).toBeUndefined();
     });
@@ -268,7 +271,7 @@ describe('ConversationService', () => {
       const text = 'Please read me';
 
       const replyMessage = account
-        .service!.conversation.messageBuilder.createText('', text)
+        .service!.conversation.messageBuilder.createText({conversationId: '', text})
         .withReadConfirmation(true)
         .build();
 
@@ -285,14 +288,14 @@ describe('ConversationService', () => {
       const text = 'Please read me';
 
       const firstMessage = account
-        .service!.conversation.messageBuilder.createText('', text)
+        .service!.conversation.messageBuilder.createText({conversationId: '', text})
         .withLegalHoldStatus()
         .build();
 
       expect(firstMessage.content.legalHoldStatus).toEqual(LegalHoldStatus.UNKNOWN);
 
       const replyMessage = account
-        .service!.conversation.messageBuilder.createText('', text)
+        .service!.conversation.messageBuilder.createText({conversationId: '', text})
         .withLegalHoldStatus(LegalHoldStatus.ENABLED)
         .build();
 

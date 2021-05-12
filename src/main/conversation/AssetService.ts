@@ -29,11 +29,15 @@ export class AssetService {
   constructor(private readonly apiClient: APIClient) {}
 
   private async postAsset(
-    buffer: Buffer,
+    plainText: Buffer | Uint8Array,
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
   ): Promise<EncryptedAssetUploaded> {
-    const {cipherText, keyBytes, sha256} = await AssetCryptography.encryptAsset(buffer);
+    const {cipherText, keyBytes, sha256} = await AssetCryptography.encryptAsset({
+      plainText,
+      algorithm: options?.algorithm,
+      hash: options?.hash,
+    });
     const request = await this.apiClient.asset.api.postAsset(new Uint8Array(cipherText), options, progressCallback);
     const {key, token} = await request.response;
 
