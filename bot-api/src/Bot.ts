@@ -89,6 +89,19 @@ export class Bot {
     }
   }
 
+  public async sendPing(conversationId: string, userIds?: string[] | UserClientsMap): Promise<void> {
+    if (this.account?.service) {
+      const pingPayload = this.account.service.conversation.messageBuilder.createPing({
+        conversationId,
+        ping: {
+          hotKnock: false,
+        },
+      });
+
+      await this.account.service.conversation.send(pingPayload, userIds);
+    }
+  }
+
   public async setAdminRole(conversationId: string, userId: string): Promise<void> {
     return this.account!.service!.conversation.setMemberConversationRole(
       conversationId,
