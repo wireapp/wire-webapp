@@ -125,7 +125,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     <div className="group-video">
       <div
         className="group-video-grid"
-        css={{backgroundColor: '#323739'}}
+        css={{backgroundColor: '#000'}}
         style={rowsAndColumns}
         data-uie-name="grids-wrapper"
       >
@@ -205,7 +205,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
           </div>
         </GroupVideoThumbnailWrapper>
       )}
-      {grid.grid.length === 1 && !thumbnailHasActiveVideo && (
+      {!!grid.thumbnail && !thumbnailHasActiveVideo && (
         <GroupVideoThumbnailWrapper minimized={minimized}>
           <div
             css={{
