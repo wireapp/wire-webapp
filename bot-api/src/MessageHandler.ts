@@ -39,6 +39,7 @@ import {promisify} from 'util';
 import fs from 'fs';
 import path from 'path';
 import FileType = require('file-type');
+import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation';
 
 export abstract class MessageHandler {
   account: Account | undefined = undefined;
@@ -77,6 +78,22 @@ export abstract class MessageHandler {
     if (this.account?.service) {
       await this.account.service.conversation.removeUser(conversationId, userId);
     }
+  }
+
+  public async setAdminRole(conversationId: string, userId: string): Promise<void> {
+    return this.account!.service!.conversation.setMemberConversationRole(
+      conversationId,
+      userId,
+      DefaultConversationRoleName.WIRE_ADMIN,
+    );
+  }
+
+  public async setMemberRole(conversationId: string, userId: string): Promise<void> {
+    return this.account!.service!.conversation.setMemberConversationRole(
+      conversationId,
+      userId,
+      DefaultConversationRoleName.WIRE_MEMBER,
+    );
   }
 
   async sendButtonActionConfirmation(

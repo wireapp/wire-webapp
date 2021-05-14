@@ -21,20 +21,18 @@ import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client/';
 import type {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
 import {Account} from '@wireapp/core';
-import {PayloadBundle, PayloadBundleType, UserClientsMap} from '@wireapp/core/src/main/conversation/';
+import {PayloadBundle, PayloadBundleType} from '@wireapp/core/src/main/conversation/';
 import type {CRUDEngine} from '@wireapp/store-engine';
 import logdown from 'logdown';
 import UUID from 'uuidjs';
-
 import type {BotConfig, BotCredentials} from './Interfaces';
-import type {MessageHandler} from './MessageHandler';
-import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation';
+import {MessageHandler} from './MessageHandler';
 import {
-  AUTH_TABLE_NAME,
-  AUTH_COOKIE_KEY,
-  Cookie,
   AccessTokenData,
   AUTH_ACCESS_TOKEN_KEY,
+  AUTH_COOKIE_KEY,
+  AUTH_TABLE_NAME,
+  Cookie,
 } from '@wireapp/api-client/src/auth';
 
 const defaultConfig: Required<BotConfig> = {
@@ -44,14 +42,15 @@ const defaultConfig: Required<BotConfig> = {
   owners: [],
 };
 
-export class Bot {
-  public account?: Account;
+export class Bot extends MessageHandler {
+  public account: Account | undefined = undefined;
 
   private readonly config: Required<BotConfig>;
   private readonly handlers: Map<string, MessageHandler>;
   private readonly logger: logdown.Logger;
 
   constructor(private readonly credentials: BotCredentials, config?: BotConfig) {
+    super();
     this.config = {...defaultConfig, ...config};
     this.credentials = credentials;
     this.handlers = new Map();
@@ -77,47 +76,6 @@ export class Bot {
     return this.config.owners.length === 0 ? true : this.config.owners.includes(userId);
   }
 
-  /**
-   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
-   */
-  public async sendText(conversationId: string, message: string, userIds?: string[] | UserClientsMap): Promise<void> {
-    if (this.account?.service) {
-      const textPayload = this.account.service.conversation.messageBuilder
-        .createText({conversationId, text: message})
-        .build();
-      await this.account.service.conversation.send(textPayload, userIds);
-    }
-  }
-
-  public async sendPing(conversationId: string, userIds?: string[] | UserClientsMap): Promise<void> {
-    if (this.account?.service) {
-      const pingPayload = this.account.service.conversation.messageBuilder.createPing({
-        conversationId,
-        ping: {
-          hotKnock: false,
-        },
-      });
-
-      await this.account.service.conversation.send(pingPayload, userIds);
-    }
-  }
-
-  public async setAdminRole(conversationId: string, userId: string): Promise<void> {
-    return this.account!.service!.conversation.setMemberConversationRole(
-      conversationId,
-      userId,
-      DefaultConversationRoleName.WIRE_ADMIN,
-    );
-  }
-
-  public async setMemberRole(conversationId: string, userId: string): Promise<void> {
-    return this.account!.service!.conversation.setMemberConversationRole(
-      conversationId,
-      userId,
-      DefaultConversationRoleName.WIRE_MEMBER,
-    );
-  }
-
   public async start(storeEngine?: CRUDEngine): Promise<APIClient> {
     const login = {
       clientType: this.config.clientType,
@@ -137,7 +95,7 @@ export class Bot {
 
     for (const payloadType of Object.values(PayloadBundleType)) {
       this.account.removeAllListeners(payloadType);
-      this.account.on(payloadType as any, this.handlePayload.bind(this));
+      this.account.on(payloadType as any, this.handleEvent.bind(this));
     }
 
     try {
@@ -164,7 +122,7 @@ export class Bot {
     return cookie;
   }
 
-  private handlePayload(payload: PayloadBundle | ConversationEvent | UserEvent | TeamEvent): void {
+  handleEvent(payload: PayloadBundle | ConversationEvent | UserEvent | TeamEvent): void {
     if ('conversation' in payload && this.validateMessage(payload.conversation, payload.from)) {
       this.handlers.forEach(handler => handler.handleEvent(payload));
     }
