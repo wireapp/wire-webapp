@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.14.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.13.0...@wireapp/bot-api@7.14.0) (2021-05-14)
+
+
+### Features
+
+* **bot-api:** Expose sending pings ([#3852](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/3852)) ([03451db](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/03451dbbdedc6a3627bca303562f9e429557c74e))
+
+
+
+
+
 # [7.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.11.142...@wireapp/bot-api@7.13.0) (2021-05-12)
 
 

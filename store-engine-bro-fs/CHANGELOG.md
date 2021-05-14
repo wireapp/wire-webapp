@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@1.6.0...@wireapp/store-engine-bro-fs@1.6.1) (2021-05-14)
+
+**Note:** Version bump only for package @wireapp/store-engine-bro-fs
+
+
+
+
+
 # [1.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-bro-fs/compare/@wireapp/store-engine-bro-fs@1.4.4...@wireapp/store-engine-bro-fs@1.6.0) (2021-05-12)
 
 

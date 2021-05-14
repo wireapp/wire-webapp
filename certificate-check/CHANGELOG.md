@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/certificate-check/compare/@wireapp/certificate-check@0.4.0...@wireapp/certificate-check@0.4.1) (2021-05-14)
+
+**Note:** Version bump only for package @wireapp/certificate-check
+
+
+
+
+
 # [0.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/certificate-check/compare/@wireapp/certificate-check@0.2.1...@wireapp/certificate-check@0.4.0) (2021-05-12)
 
 
