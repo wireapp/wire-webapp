@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.15.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.14.0...@wireapp/bot-api@7.15.0) (2021-05-14)
+
+
+### Features
+
+* **bot-api:** Send file from path ([#3853](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/3853)) ([dccb005](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/dccb0059deefea67d00748baf609e074f1c49c0a))
+
+
+
+
+
 # [7.14.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.13.0...@wireapp/bot-api@7.14.0) (2021-05-14)
 
 
