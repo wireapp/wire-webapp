@@ -35,6 +35,10 @@ import type {
 } from '@wireapp/core/src/main/conversation/content/';
 import type {QuotableMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {Asset, Confirmation, Text} from '@wireapp/protocol-messaging';
+import {promisify} from 'util';
+import fs from 'fs';
+import path from 'path';
+import FileType = require('file-type');
 
 export abstract class MessageHandler {
   account: Account | undefined = undefined;
@@ -191,6 +195,24 @@ export abstract class MessageHandler {
         await this.account.service.conversation.send(editedWithPreviewPayload, userIds);
       }
     }
+  }
+
+  async sendFileByPath(conversationId: string, filePath: string, userIds?: string[] | UserClientsMap): Promise<void> {
+    const data = await promisify(fs.readFile)(filePath);
+    const fileType = await FileType.fromBuffer(data);
+    const metadata: FileMetaDataContent = {
+      length: data.length,
+      name: path.basename(filePath),
+      type: fileType ? fileType.mime : 'text/plain',
+    };
+    return this.sendFile(
+      conversationId,
+      {
+        data,
+      },
+      metadata,
+      userIds,
+    );
   }
 
   /**
