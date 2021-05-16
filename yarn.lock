@@ -1388,10 +1388,10 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@es-joy/jsdoccomment@^0.4.3":
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/@es-joy/jsdoccomment/-/jsdoccomment-0.4.3.tgz#c66b42aa66d2e0718f77fccc8d9061cf0b1092ac"
-  integrity sha512-t0JWZfQiG+Qkr6+tl05dlGcgE/MMPqs7QfNlFkTsbpcCu2Zfukcan/fIiHKTc0iOs4Yh3cnfklMayJnlmKaOwQ==
+"@es-joy/jsdoccomment@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@es-joy/jsdoccomment/-/jsdoccomment-0.6.0.tgz#8926a8184df0968860f8c69b3bfc52efa6aeaa30"
+  integrity sha512-zT1EtysKMITJ7vE4RvOJqitxk/Str6It8hq+fykxkwLuTyzgak+TnVuVSIyovT/qrEz3i46ypCSXgNtIDYwNOg==
   dependencies:
     comment-parser "^1.1.5"
     esquery "^1.4.0"
@@ -5558,12 +5558,12 @@ eslint-plugin-jest@24.3.6:
   dependencies:
     "@typescript-eslint/experimental-utils" "^4.0.1"
 
-eslint-plugin-jsdoc@33.1.0:
-  version "33.1.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-33.1.0.tgz#9aa52d0eb0126ea42528aa352265007dce320565"
-  integrity sha512-nyH1qAj5f4uDnDpg4aiAS65wJSfxfBDf0lIgNfxtew31z3VRaM8WsVmpe4UhI2u27oOD/ChRuye6KAzzuHn6Jw==
+eslint-plugin-jsdoc@34.6.1:
+  version "34.6.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-34.6.1.tgz#328a72bb450083dc6c0a46e802f72580bcc737c0"
+  integrity sha512-9FPCKDRBNv4akNIc+XNWR+zaiPBEumhH2Wce9TTQA7X3UBNiPbDTAiqfM9jHslMQBTsdI64S0AaKa0XY1AIUVg==
   dependencies:
-    "@es-joy/jsdoccomment" "^0.4.3"
+    "@es-joy/jsdoccomment" "^0.6.0"
     comment-parser "1.1.5"
     debug "^4.3.1"
     esquery "^1.4.0"
