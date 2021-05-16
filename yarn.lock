@@ -2791,10 +2791,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@12.18.0":
-  version "12.18.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.18.0.tgz#d3aac84eecff5525f0c8cd07522c998b8c639c2d"
-  integrity sha512-5RiwZdnY/DvO63w08JgeFoGPYoc6cn6HNfXRd6H5MUymtDtceXMYq/gnOdxr1LD6epXKxDUdYcC12Pp5wZ5w4Q==
+"@wireapp/api-client@12.18.2":
+  version "12.18.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.18.2.tgz#f309d6833a5ba1130fcdcd4b99b0d67536002be1"
+  integrity sha512-QakeIXvnw7thzBlumory+1WtJm2pYtg8IAAjKI/+MlXQ+nvHfDjzBl7qrFpK/8hoHSy3Nciz2vcfIwvpkGo+JQ==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2848,16 +2848,16 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.8.0":
-  version "17.8.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.8.0.tgz#41eb3aa03c11b775a2fbb8bb1c89c41d624ea46c"
-  integrity sha512-Q9tyJpDqZ47ZioPo54DHVHN6OJKgm5j8HDx+axI9Pp8aoWaVDUi2taZ8R075UBgGCwS6ekaM/Kq5X1jAqgMTdA==
+"@wireapp/core@17.8.2":
+  version "17.8.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.8.2.tgz#a72b9fadf5d01940b03f7c1eec3eb1d67972d169"
+  integrity sha512-/OKsz1CJBpcMdPZcZUHRSyIl/fGaveCFMT5M320TWufXMUrQ2yDzo6IZ7DjPTo9m8ML0WuRVebh6h1BhgY40Wg==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "12.18.0"
+    "@wireapp/api-client" "12.18.2"
     "@wireapp/cryptobox" "12.5.9"
-    bazinga64 "5.9.0"
+    bazinga64 "5.9.1"
     hash.js "1.1.7"
     http-status-codes "2.1.4"
     logdown "3.3.1"
@@ -3742,11 +3742,6 @@ bazinga64@5.7.33:
   version "5.7.33"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.7.33.tgz#09f17c5cdf9c38fbbac931f0d1b3d2359071d84b"
   integrity sha512-lJVZgVUvGcZoUBBnK+aUBCKhWbOOX8UmaZgV3UZSTFFncjDtduuJp7XFgqsxnyqgw7Jn7cG4n0C1X8xjHUyvXw==
-
-bazinga64@5.9.0:
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.9.0.tgz#3d7ed978910f8b79c52447baa37c799d9711b171"
-  integrity sha512-qGWWJwiokZkGTnN8cPJzd0eNPC8mTRk0UZ0PDlOjwanbk/U8tBqaB7X/s6hNDILhf722MzNApYC2rNz0IQZvMw==
 
 bazinga64@5.9.1:
   version "5.9.1"
