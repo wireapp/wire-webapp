@@ -2811,10 +2811,10 @@
     tough-cookie "4.0.0"
     ws "7.4.5"
 
-"@wireapp/avs@7.1.6":
-  version "7.1.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.1.6.tgz#9a2a4380ec9cb46bca38f5bc0e6a67aeea2b01f4"
-  integrity sha512-+VBIm6H/Ag+o0pGuMucDK1WbVR26J1APmaBsgOxuJFB9Xa/EKeuI/y5kHuGnyYAGSAD9uh336iaP95G7F2733g==
+"@wireapp/avs@7.2.1":
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.2.1.tgz#7b6b2fc6b68b815d144a77bf10b147aaa9e19399"
+  integrity sha512-rMQh7b/Llv+fLOuazKk66PsZeb4E3GQBE0P81BMtT7UMsn4AcZ43QHIPAl0XOZeIeYaQUyTMp3Jg+IznXPnzPA==
 
 "@wireapp/cbor@4.7.1":
   version "4.7.1"
