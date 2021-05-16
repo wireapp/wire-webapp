@@ -2406,10 +2406,12 @@
   resolved "https://registry.yarnpkg.com/@types/sdp-transform/-/sdp-transform-2.4.4.tgz#e7d3b4323d1ae9fab8199508effa1620279bbf1a"
   integrity sha512-cTpXVbNaN1YL++3mYArwlaujujeVe8ty66rbZPdFWx94fxM7jFjs5X621esca40yRe45htNdXROMIr2cgI+xGg==
 
-"@types/simplebar@5.1.2":
-  version "5.1.2"
-  resolved "https://registry.yarnpkg.com/@types/simplebar/-/simplebar-5.1.2.tgz#abfea267a227e330f0603aa9361f46eda8b72ee6"
-  integrity sha512-U5UXkL8XR3NjAZ4LNyk9slJyS6V/hGCipWc5/uwZRbDGODetQH/XxSu7M5FPCyOxBprptZVmyMRVTHBd3j5UtA==
+"@types/simplebar@5.3.3":
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/@types/simplebar/-/simplebar-5.3.3.tgz#59c4f16521a3ff8507c1f6d98188c09becbc242a"
+  integrity sha512-0RbZBLnc1Iwr5TxDZY3LYgcxmK2LasZWZMoPIWm6f6mOjdUYbw3HMgM4NIBXpSk8oJSlLxbSrxT8JluygCqilA==
+  dependencies:
+    simplebar "*"
 
 "@types/sinon@10.0.0":
   version "10.0.0"
@@ -12211,7 +12213,7 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
-simplebar@5.3.3:
+simplebar@*, simplebar@5.3.3:
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/simplebar/-/simplebar-5.3.3.tgz#7d89fa4374a637da96c493b2662ab5af4408d02e"
   integrity sha512-OfuSX47Axq9aR6rp9WK3YefAg+1Qw3UKKxS46PdElPpd+FWXMj17/nispYxsHtU3F7mv+ilmqELWmRt7KUgHgg==
