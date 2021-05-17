@@ -17,6 +17,8 @@
  *
  */
 
+export type FalsyType = false | null | undefined | '' | 0;
+
 /**
  * Makes all properties of a type recursively optional
  * @see https://stackoverflow.com/a/51365037

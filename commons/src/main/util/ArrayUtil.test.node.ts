@@ -137,4 +137,11 @@ describe('ArrayUtil', () => {
       expect(ArrayUtil.flatten(arrays)).toEqual([1, 2, 3, 4, 5, 6]);
     });
   });
+
+  describe('"filterFalsy"', () => {
+    it('returns a filtered array', () => {
+      const array = [0, 1, 2, '', undefined, null, 3, NaN];
+      expect(array.filter(ArrayUtil.filterFalsy)).toEqual([1, 2, 3]);
+    });
+  });
 });

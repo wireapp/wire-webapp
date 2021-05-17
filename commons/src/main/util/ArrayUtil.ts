@@ -17,6 +17,8 @@
  *
  */
 
+import * as TypeUtil from './TypeUtil';
+
 export function chunk<T>(array: T[], chunkSize: number): T[][] {
   const chunks = [];
   for (let index = 0, length = array.length; index < length; index += chunkSize) {
@@ -42,3 +44,7 @@ export function removeDuplicates<T>(array: T[]): T[] {
 }
 
 export const flatten = <T>(arrays: T[][]): T[] => ([] as T[]).concat(...arrays);
+
+export function filterFalsy<T>(value: T): value is Exclude<T, TypeUtil.FalsyType> {
+  return Boolean(value);
+}
