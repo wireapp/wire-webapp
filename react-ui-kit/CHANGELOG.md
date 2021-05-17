@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.51.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.51.6...@wireapp/react-ui-kit@7.51.7) (2021-05-17)
+
+
+### Bug Fixes
+
+* **commons,react-ui-kit:** Filter falsy values of user name ([#3857](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/3857)) ([a785efe](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/a785efed38d2ae7a16981eb5ad78add17fca1687))
+
+
+
+
+
 ## [7.51.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.51.5...@wireapp/react-ui-kit@7.51.6) (2021-05-17)
 
 
