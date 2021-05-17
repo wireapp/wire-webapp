@@ -92,6 +92,7 @@ export const Avatar = (props: AvatarProps) => {
   }, [url]);
   const getInitials = (name: string = '') =>
     name
+      .trim()
       .split(' ')
       .map(([initial]) => initial && initial.toUpperCase())
       .join('')
