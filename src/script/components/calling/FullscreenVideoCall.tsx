@@ -17,7 +17,7 @@
  *
  */
 
-import {css} from '@emotion/core';
+import {css, CSSObject} from '@emotion/core';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
@@ -38,6 +38,7 @@ import ButtonGroup from './ButtonGroup';
 import DeviceToggleButton from './DeviceToggleButton';
 import Duration from './Duration';
 import GroupVideoGrid from './GroupVideoGrid';
+import Pagination from './Pagination';
 
 export interface FullscreenVideoCallProps {
   call: Call;
@@ -72,6 +73,19 @@ const videoControlDisabledStyles = css`
     opacity: 0.4;
   }
 `;
+
+const paginationButtonStyles: CSSObject = {
+  alignItems: 'center',
+  backdropFilter: 'blur(10px)',
+  backgroundColor: 'rgba(255, 255, 255, 0.24)',
+  cursor: 'pointer',
+  display: 'flex',
+  height: 56,
+  justifyContent: 'center',
+  position: 'absolute',
+  top: 'calc(50% - 26px)',
+  width: 56,
+};
 
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
@@ -237,6 +251,34 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           </div>
         </div>
       )}
+      <div
+        className="hide-controls-hidden"
+        css={{bottom: 16, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}
+      >
+        <Pagination currentPage={1} totalPages={10} onChangePage={() => {}} />
+      </div>
+      <div
+        className="hide-controls-hidden"
+        css={{
+          ...paginationButtonStyles,
+          borderBottomLeftRadius: 32,
+          borderTopLeftRadius: 32,
+          right: 0,
+        }}
+      >
+        <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
+      </div>
+      <div
+        className="hide-controls-hidden"
+        css={{
+          ...paginationButtonStyles,
+          borderBottomRightRadius: 32,
+          borderTopRightRadius: 32,
+          left: 0,
+        }}
+      >
+        <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
+      </div>
     </div>
   );
 };

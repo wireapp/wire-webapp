@@ -38,6 +38,9 @@ const normalizeIconName = (name: string) =>
 const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<IconProps> => {
   const SVGComponent: React.FC<IconProps> = oProps => {
     const viewBox = svg.getAttribute('viewBox');
+    if (!viewBox) {
+      console.error('Svg icon must have a viewBox attribute');
+    }
     const regex = /0 0 (?<width>\d+) (?<height>\d+)/;
     const {width, height} = regex.exec(viewBox).groups;
 
