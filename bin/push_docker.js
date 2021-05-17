@@ -64,11 +64,10 @@ const dockerCommands = [
   `docker build . --tag ${commitShortSha}`,
 ];
 
-// prettier-ignore
-tags.forEach( tag => {
+tags.forEach( containerImageTag => {
   dockerCommands.push(
-    `docker tag ${commitShortSha} ${tag}`,
-    `docker push ${tag}`
+    `docker tag ${commitShortSha} ${containerImageTag}`,
+    `docker push ${containerImageTag}`
   );
 });
 
