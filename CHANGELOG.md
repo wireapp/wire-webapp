@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.51.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.51.5...@wireapp/react-ui-kit@7.51.6) (2021-05-17)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Trim name in Avatar component ([#3843](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/3843)) ([fd12f36](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/fd12f361c065b6c4204789c24222aa3f298cc767))
+
+
+
+
+
 ## [7.51.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.51.4...@wireapp/react-ui-kit@7.51.5) (2021-05-14)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
