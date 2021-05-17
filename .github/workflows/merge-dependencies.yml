@@ -12,4 +12,4 @@ jobs:
       - name: 'Automerge dependency updates from Dependabot'
         uses: ahmadnassri/action-dependabot-auto-merge@v2.4.0
         with:
-          github-token: ${{ secrets.GH_AUTOMERGE_TOKEN }}
+          github-token: ${{ secrets.WEBTEAM_AUTOMERGE_TOKEN }}
