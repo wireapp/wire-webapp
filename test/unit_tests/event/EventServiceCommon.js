@@ -550,14 +550,32 @@ const testEventServiceClass = (testedServiceName, className) => {
     describe('deleteEventByKey', () => {
       let primary_keys = undefined;
 
-      // prettier-ignore
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const messages = [
-        {"conversation":conversationId,"id":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:55.182Z","data":{"content":"First message","nonce":"68a28ab1-d7f8-4014-8b52-5e99a05ea3b1","previews":[]},"type":"conversation.message-add"},
-        {"conversation":conversationId,"id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
-        {"conversation":conversationId,"id":"4af67f76-09f9-4831-b3a4-9df877b8c29a","from":"8b497692-7a38-4a5d-8287-e3d1006577d6","time":"2016-08-04T13:27:58.993Z","data":{"content":"Second message (Duplicate)","nonce":"4af67f76-09f9-4831-b3a4-9df877b8c29a","previews":[]},"type":"conversation.message-add"},
+        {
+          conversation: conversationId,
+          id: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1',
+          from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
+          time: '2016-08-04T13:27:55.182Z',
+          data: {content: 'First message', nonce: '68a28ab1-d7f8-4014-8b52-5e99a05ea3b1', previews: []},
+          type: 'conversation.message-add',
+        },
+        {
+          conversation: conversationId,
+          id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
+          from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
+          time: '2016-08-04T13:27:58.993Z',
+          data: {content: 'Second message', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: []},
+          type: 'conversation.message-add',
+        },
+        {
+          conversation: conversationId,
+          id: '4af67f76-09f9-4831-b3a4-9df877b8c29a',
+          from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
+          time: '2016-08-04T13:27:58.993Z',
+          data: {content: 'Second message (Duplicate)', nonce: '4af67f76-09f9-4831-b3a4-9df877b8c29a', previews: []},
+          type: 'conversation.message-add',
+        },
       ];
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       beforeEach(async () => {
         const ids = await Promise.all(
