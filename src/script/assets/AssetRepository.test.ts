@@ -36,7 +36,7 @@ describe('AssetRepository', () => {
   const options = {} as AssetUploadOptions;
 
   beforeEach(() => {
-    const mockedAPIClient = ({
+    const mockedAPIClient = {
       asset: {
         api: {
           postAsset: jest.fn().mockImplementation(() =>
@@ -47,7 +47,7 @@ describe('AssetRepository', () => {
           ),
         },
       },
-    } as unknown) as APIClient;
+    } as unknown as APIClient;
     assetRepository = new AssetRepository(new AssetService(mockedAPIClient));
   });
 
@@ -105,7 +105,7 @@ describe('AssetRepository', () => {
   });
 
   it('keeps track of current uploads', async () => {
-    const assetServiceSpy = ({
+    const assetServiceSpy = {
       uploadFile: jest.fn().mockImplementation(() => {
         expect(assetRepo.getNumberOfOngoingUploads()).toBe(1);
 
@@ -117,7 +117,7 @@ describe('AssetRepository', () => {
           } as AssetUploadData),
         });
       }),
-    } as unknown) as AssetService;
+    } as unknown as AssetService;
     const assetRepo = new AssetRepository(assetServiceSpy);
 
     await assetRepo.uploadFile(messageId, file, options, false);
@@ -136,7 +136,7 @@ describe('AssetRepository', () => {
         });
       }),
     };
-    const assetRepo = new AssetRepository((assetServiceSpy as unknown) as AssetService);
+    const assetRepo = new AssetRepository(assetServiceSpy as unknown as AssetService);
 
     await assetRepo.uploadFile(messageId, file, options, false);
     expect(assetRepo.getNumberOfOngoingUploads()).toBe(0);

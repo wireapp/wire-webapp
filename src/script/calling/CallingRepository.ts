@@ -864,7 +864,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private injectDeactivateEvent(
@@ -883,7 +883,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private readonly sendMessage = (

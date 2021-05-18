@@ -69,7 +69,7 @@ describe('ConversationAction', () => {
   });
 
   it('joins conversation by code', async () => {
-    const conversationEvent = ({} as unknown) as ConversationEvent;
+    const conversationEvent = {} as unknown as ConversationEvent;
     const key = 'key';
     const code = 'code';
     const mockedActions = {};

@@ -730,7 +730,7 @@ export class MessageRepository {
     const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = GENERIC_MESSAGE_TYPE;
     const isPing = (message: GenericMessage) => message.content === TYPE_KNOCK;
     const isEphemeralPing = (message: GenericMessage) =>
-      message.content === TYPE_EPHEMERAL && isPing((message.ephemeral as unknown) as GenericMessage);
+      message.content === TYPE_EPHEMERAL && isPing(message.ephemeral as unknown as GenericMessage);
     const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
     if (shouldPlayPingAudio) {
       amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
