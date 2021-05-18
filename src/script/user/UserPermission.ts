@@ -146,15 +146,7 @@ export enum ROLE {
 }
 
 /** Roles sorted by priority, highest first. */
-// prettier-ignore
-const RolesByPriority = [
-  ROLE.OWNER,
-  ROLE.ADMIN,
-  ROLE.MEMBER,
-  ROLE.PARTNER,
-  ROLE.NONE,
-  ROLE.INVALID,
-]
+const RolesByPriority = [ROLE.OWNER, ROLE.ADMIN, ROLE.MEMBER, ROLE.PARTNER, ROLE.NONE, ROLE.INVALID];
 
 export function roleFromTeamPermissions(permissions: PermissionsData): ROLE {
   if (!permissions) {
