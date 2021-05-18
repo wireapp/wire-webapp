@@ -493,9 +493,9 @@ describe('Conversation', () => {
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.participating_user_ets.push(third_user);
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
-      const expected_display_name = `${conversation_et
-        .participating_user_ets()[0]
-        .name()}, ${conversation_et.participating_user_ets()[1].name()}`;
+      const expected_display_name = `${conversation_et.participating_user_ets()[0].name()}, ${conversation_et
+        .participating_user_ets()[1]
+        .name()}`;
 
       expect(conversation_et.display_name()).toBe(expected_display_name);
     });

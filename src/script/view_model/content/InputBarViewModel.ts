@@ -422,7 +422,7 @@ export class InputBarViewModel {
     });
 
     const replyMessageId = draftMessage.reply
-      ? ((draftMessage.reply as unknown) as {messageId: string}).messageId
+      ? (draftMessage.reply as unknown as {messageId: string}).messageId
       : undefined;
 
     if (replyMessageId) {

@@ -122,7 +122,7 @@ export class HistoryImportViewModel {
       const files = await worker.post<Record<string, Uint8Array>>(fileBuffer);
       const unzipTimeEnd = performance.now();
       if (files.error) {
-        throw new ImportError((files.error as unknown) as string);
+        throw new ImportError(files.error as unknown as string);
       }
       const unzipTimeMillis = Math.round(unzipTimeEnd - unzipTimeStart);
       const unzipTimeFormatted = formatDuration(unzipTimeMillis);
