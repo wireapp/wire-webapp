@@ -264,7 +264,71 @@ describe('CallingRepository ISO', () => {
             videosend: 'false',
           },
           resp: false,
-          sdp: 'v=0\r\no=- 3219012230 175353000 IN IP4 192.168.121.208\r\ns=-\r\nc=IN IP4 192.168.121.208\r\nt=0 0\r\na=tool:avs 4.9.9 (arm/linux)\r\na=ice-options:trickle\r\na=x-OFFER\r\na=group:BUNDLE audio video data\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\nb=AS:50\r\na=rtpmap:111 opus/48000/2\r\na=fmtp:111 stereo=0;sprop-stereo=0;useinbandfec=1\r\na=rtcp:9\r\na=sendrecv\r\na=mid:audio\r\na=ssrc:2640746628 cname:p5CtZYSnfvxMinp\r\na=rtcp-mux\r\na=ice-ufrag:cnLOdLEowwh6PnM\r\na=ice-pwd:li7K4QBbAX9RUKrTDNSBUcIRCIxEDHP\r\na=fingerprint:sha-256 69:75:F9:77:B2:00:5B:3F:E6:90:FB:FF:BA:39:82:AC:34:C8:08:4E:BF:69:5D:44:C2:FD:4E:E8:A0:7A:A9:12\r\na=x-KASEv1:q15D6p9nxIR37JjnOiXVyPqIXUZF9uASOlJ9Itye9B8=\r\na=setup:actpass\r\na=candidate:c0a879d0 1 UDP 2114126591 192.168.121.208 40416 typ host\r\na=candidate:3e60942d 1 UDP 1677722623 62.96.148.44 41175 typ srflx raddr 192.168.121.208 rport 9\r\na=candidate:12c37439 1 UDP 1023 18.195.116.58 36555 typ relay raddr 62.96.148.44 rport 41175\r\na=end-of-candidates\r\nm=video 9 UDP/TLS/RTP/SAVPF 100 96\r\nb=AS:800\r\na=rtpmap:100 VP8/90000\r\na=rtcp-fb:100 ccm fir\r\na=rtcp-fb:100 nack\r\na=rtcp-fb:100 nack pli\r\na=rtcp-fb:100 goog-remb\r\na=extmap:1 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\r\na=extmap:2 urn:3gpp:video-orientation\r\na=rtpmap:96 rtx/90000\r\na=fmtp:96 apt=100\r\na=rtcp:9\r\na=sendrecv\r\na=mid:video\r\na=rtcp-mux\r\na=ice-ufrag:cnLOdLEowwh6PnM\r\na=ice-pwd:li7K4QBbAX9RUKrTDNSBUcIRCIxEDHP\r\na=fingerprint:sha-256 69:75:F9:77:B2:00:5B:3F:E6:90:FB:FF:BA:39:82:AC:34:C8:08:4E:BF:69:5D:44:C2:FD:4E:E8:A0:7A:A9:12\r\na=setup:actpass\r\na=ssrc-group:FID 4068473288 2807269560\r\na=ssrc:4068473288 cname:p5CtZYSnfvxMinp\r\na=ssrc:4068473288 msid:U7GC2rpv2vK5m163DdYPHfZG7TwekvApvrB 3ff0fc9b-c15f-9bee-eed8-94b42625795e\r\na=ssrc:4068473288 mslabel:U7GC2rpv2vK5m163DdYPHfZG7TwekvApvrB\r\na=ssrc:4068473288 label:3ff0fc9b-c15f-9bee-eed8-94b42625795e\r\na=ssrc:2807269560 cname:p5CtZYSnfvxMinp\r\na=ssrc:2807269560 msid:U7GC2rpv2vK5m163DdYPHfZG7TwekvApvrB 3ff0fc9b-c15f-9bee-eed8-94b42625795e\r\na=ssrc:2807269560 mslabel:U7GC2rpv2vK5m163DdYPHfZG7TwekvApvrB\r\na=ssrc:2807269560 label:3ff0fc9b-c15f-9bee-eed8-94b42625795e\r\nm=application 9 DTLS/SCTP 5000\r\na=sendrecv\r\na=mid:data\r\na=ice-ufrag:cnLOdLEowwh6PnM\r\na=ice-pwd:li7K4QBbAX9RUKrTDNSBUcIRCIxEDHP\r\na=fingerprint:sha-256 69:75:F9:77:B2:00:5B:3F:E6:90:FB:FF:BA:39:82:AC:34:C8:08:4E:BF:69:5D:44:C2:FD:4E:E8:A0:7A:A9:12\r\na=setup:actpass\r\na=sctpmap:5000 webrtc-datachannel 16\r\n',
+          sdp:
+            'v=0\r\n' +
+            'o=- 3219012230 175353000 IN IP4 192.168.121.208\r\n' +
+            's=-\r\n' +
+            'c=IN IP4 192.168.121.208\r\n' +
+            't=0 0\r\n' +
+            'a=tool:avs 4.9.9 (arm/linux)\r\n' +
+            'a=ice-options:trickle\r\n' +
+            'a=x-OFFER\r\n' +
+            'a=group:BUNDLE audio video data\r\n' +
+            'm=audio 9 UDP/TLS/RTP/SAVPF 111\r\n' +
+            'b=AS:50\r\n' +
+            'a=rtpmap:111 opus/48000/2\r\n' +
+            'a=fmtp:111 stereo=0;sprop-stereo=0;useinbandfec=1\r\n' +
+            'a=rtcp:9\r\n' +
+            'a=sendrecv\r\n' +
+            'a=mid:audio\r\n' +
+            'a=ssrc:2640746628 cname:p5CtZYSnfvxMinp\r\n' +
+            'a=rtcp-mux\r\n' +
+            'a=ice-ufrag:cnLOdLEowwh6PnM\r\n' +
+            'a=ice-pwd:li7K4QBbAX9RUKrTDNSBUcIRCIxEDHP\r\n' +
+            'a=fingerprint:sha-256 69:75:F9:77:B2:00:5B:3F:E6:90:FB:FF:BA:39:82:AC:34:C8:08:4E:BF:69:5D:44:C2:FD:4E:E8:A0:7A:A9:12\r\n' +
+            'a=x-KASEv1:q15D6p9nxIR37JjnOiXVyPqIXUZF9uASOlJ9Itye9B8=\r\n' +
+            'a=setup:actpass\r\n' +
+            'a=candidate:c0a879d0 1 UDP 2114126591 192.168.121.208 40416 typ host\r\n' +
+            'a=candidate:3e60942d 1 UDP 1677722623 62.96.148.44 41175 typ srflx raddr 192.168.121.208 rport 9\r\n' +
+            'a=candidate:12c37439 1 UDP 1023 18.195.116.58 36555 typ relay raddr 62.96.148.44 rport 41175\r\n' +
+            'a=end-of-candidates\r\n' +
+            'm=video 9 UDP/TLS/RTP/SAVPF 100 96\r\n' +
+            'b=AS:800\r\n' +
+            'a=rtpmap:100 VP8/90000\r\n' +
+            'a=rtcp-fb:100 ccm fir\r\n' +
+            'a=rtcp-fb:100 nack\r\n' +
+            'a=rtcp-fb:100 nack pli\r\n' +
+            'a=rtcp-fb:100 goog-remb\r\n' +
+            'a=extmap:1 http://www.webrtc.org/experiments/rtp-hdrext/abs-send-time\r\n' +
+            'a=extmap:2 urn:3gpp:video-orientation\r\n' +
+            'a=rtpmap:96 rtx/90000\r\n' +
+            'a=fmtp:96 apt=100\r\n' +
+            'a=rtcp:9\r\n' +
+            'a=sendrecv\r\n' +
+            'a=mid:video\r\n' +
+            'a=rtcp-mux\r\n' +
+            'a=ice-ufrag:cnLOdLEowwh6PnM\r\n' +
+            'a=ice-pwd:li7K4QBbAX9RUKrTDNSBUcIRCIxEDHP\r\n' +
+            'a=fingerprint:sha-256 69:75:F9:77:B2:00:5B:3F:E6:90:FB:FF:BA:39:82:AC:34:C8:08:4E:BF:69:5D:44:C2:FD:4E:E8:A0:7A:A9:12\r\n' +
+            'a=setup:actpass\r\n' +
+            'a=ssrc-group:FID 4068473288 2807269560\r\n' +
+            'a=ssrc:4068473288 cname:p5CtZYSnfvxMinp\r\n' +
+            'a=ssrc:4068473288 msid:U7GC2rpv2vK5m163DdYPHfZG7TwekvApvrB 3ff0fc9b-c15f-9bee-eed8-94b42625795e\r\n' +
+            'a=ssrc:4068473288 mslabel:U7GC2rpv2vK5m163DdYPHfZG7TwekvApvrB\r\n' +
+            'a=ssrc:4068473288 label:3ff0fc9b-c15f-9bee-eed8-94b42625795e\r\n' +
+            'a=ssrc:2807269560 cname:p5CtZYSnfvxMinp\r\n' +
+            'a=ssrc:2807269560 msid:U7GC2rpv2vK5m163DdYPHfZG7TwekvApvrB 3ff0fc9b-c15f-9bee-eed8-94b42625795e\r\n' +
+            'a=ssrc:2807269560 mslabel:U7GC2rpv2vK5m163DdYPHfZG7TwekvApvrB\r\n' +
+            'a=ssrc:2807269560 label:3ff0fc9b-c15f-9bee-eed8-94b42625795e\r\n' +
+            'm=application 9 DTLS/SCTP 5000\r\n' +
+            'a=sendrecv\r\n' +
+            'a=mid:data\r\n' +
+            'a=ice-ufrag:cnLOdLEowwh6PnM\r\n' +
+            'a=ice-pwd:li7K4QBbAX9RUKrTDNSBUcIRCIxEDHP\r\n' +
+            'a=fingerprint:sha-256 69:75:F9:77:B2:00:5B:3F:E6:90:FB:FF:BA:39:82:AC:34:C8:08:4E:BF:69:5D:44:C2:FD:4E:E8:A0:7A:A9:12\r\n' +
+            'a=setup:actpass\r\n' +
+            'a=sctpmap:5000 webrtc-datachannel 16\r\n' +
+            '',
           sessid: 'jEcO',
           type: 'SETUP',
           version: '3.0',
