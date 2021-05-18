@@ -78,6 +78,8 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
         <div
           css={{
             alignItems: 'center',
+            backgroundColor: '#33373a',
+            boxShadow: 'inset 0px 0px 0px 1px #33373a',
             display: 'flex',
             height: '100%',
             justifyContent: 'center',
