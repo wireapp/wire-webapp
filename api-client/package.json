@@ -89,5 +89,5 @@
     "test:types": "tsc --noEmit",
     "watch": "webpack serve --config webpack.browser.js"
   },
-  "version": "12.18.7"
+  "version": "12.18.8"
 }
