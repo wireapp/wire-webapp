@@ -1049,7 +1049,11 @@
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
   "wire_for_web": "{{brandName}} for Web",
-  "modalLegalHoldConversationNeedsConsentMessage": "You cannot invite a user with a legalhold device, because the conversation contains users that have not granted consent to being put under legalhold.",
-  "modalLegalHoldUserNeedsConsentMessage": "You cannot invite a user that has not granted consent to being put under legalhold, because the conversatoin contains users under legalhold.",
-  "modalUserCannotBeAddedHeadline": "This user cannot be added"
+  "modalLegalHoldConversationNeedsConsentMessage": "You cannot invite a user with a legal hold device, because the conversation contains users that have not granted consent to being put under legal hold.",
+  "modalLegalHoldUserNeedsConsentMessage": "You cannot invite a user that has not granted consent to being put under legal hold, because the conversatoin contains users under legal hold.",
+  "modalUserCannotBeAddedHeadline": "This user cannot be added",
+  "conversationMemberRemovedMissingLegalHoldConsent": "{{user}} was removed from this conversation, because there are users with legal hold.",
+  "conversationYouRemovedMissingLegalHoldConsent": "[bold]You[/bold] were removed from this conversation, because there are users with legal hold.",
+  "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} were removed from this conversation, because there are users with legal hold.",
+  "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "{{users}} and {{count}} more were removed from this conversation, because there are users with legal hold."
 }
