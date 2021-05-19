@@ -26,7 +26,9 @@
 export enum BackendErrorLabel {
   ACCESS_DENIED = 'access-denied',
   BAD_REQUEST = 'bad-request',
+  BAD_GATEWAY = 'bad-gateway',
   CLIENT_ERROR = 'client-error',
+  SERVER_ERROR = 'server-error',
   INSUFFICIENT_PERMISSIONS = 'insufficient-permissions',
   INTERNAL_ERROR = 'internal-error',
   INVALID_OPERATION = 'invalid-op',
@@ -83,6 +85,7 @@ export enum BackendErrorLabel {
   INVALID_TEAM_STATUS_UPDATE = 'invalid-team-status-update',
   NO_MANAGED_CONVERSATION = 'no-managed-team-conv',
   NO_ADD_TO_MANAGED = 'no-add-to-managed',
+  ACCOUNT_SUSPENDED = 'suspended',
 
   // Feature errors
   APP_LOCK_INVALID_TIMEOUT = 'inactivity-timeout-too-low',
@@ -96,6 +99,10 @@ export enum BackendErrorLabel {
   // Legalhold errors
   LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT = 'conv-needs-lh-consent',
   LEGAL_HOLD_USER_NEEDS_CONSENT = 'they-need-lh-consent',
+
+  // Service errors
+  SERVICE_DISABLED = 'service-disabled',
+  TOO_MANY_SERVICES = 'too-many-bots',
 }
 
 export enum SyntheticErrorLabel {
