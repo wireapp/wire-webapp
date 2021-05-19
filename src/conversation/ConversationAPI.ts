@@ -45,7 +45,7 @@ import type {
   ConversationReceiptModeUpdateEvent,
   ConversationRenameEvent,
 } from '../event/';
-import type {HttpClient} from '../http/';
+import {BackendErrorLabel, HttpClient} from '../http/';
 import type {
   ConversationAccessUpdateData,
   ConversationMemberUpdateData,
@@ -55,6 +55,10 @@ import type {
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
 } from './data';
+import {
+  ConversationLegalholdConsentNeededError,
+  ConversationLegalHoldUserConsentNeededError,
+} from './ConversationError';
 
 export class ConversationAPI {
   public static readonly MAX_CHUNK_SIZE = 500;
@@ -341,8 +345,20 @@ export class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`,
     };
 
-    const response = await this.client.sendJSON<ConversationEvent>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<ConversationEvent>(config);
+      return response.data;
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT: {
+          throw new ConversationLegalholdConsentNeededError(error.message);
+        }
+        case BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT: {
+          throw new ConversationLegalHoldUserConsentNeededError(error.message);
+        }
+      }
+      throw error;
+    }
   }
 
   /**
@@ -683,8 +699,20 @@ export class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`,
     };
 
-    const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
+      return response.data;
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT: {
+          throw new ConversationLegalholdConsentNeededError(error.message);
+        }
+        case BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT: {
+          throw new ConversationLegalHoldUserConsentNeededError(error.message);
+        }
+      }
+      throw error;
+    }
   }
 
   /**
