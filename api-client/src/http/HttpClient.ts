@@ -104,7 +104,7 @@ export class HttpClient extends EventEmitter {
   public async _sendRequest<T>(
     config: AxiosRequestConfig,
     tokenAsParam = false,
-    firstTry = true,
+    isFirstTry = true,
   ): Promise<AxiosResponse<T>> {
     if (this.accessTokenStore.accessToken) {
       const {token_type, access_token} = this.accessTokenStore.accessToken;
@@ -133,6 +133,21 @@ export class HttpClient extends EventEmitter {
 
       return response;
     } catch (error) {
+      const retryWithTokenRefresh = async () => {
+        this.logger.warn(`Access token refresh triggered for "${config.method}" request to "${config.url}".`);
+        await this.refreshAccessToken();
+        config['axios-retry'] = {
+          retries: 0,
+        };
+        return this._sendRequest<T>(config, tokenAsParam, false);
+      };
+
+      const hasAccessToken = !!this.accessTokenStore?.accessToken;
+
+      if (HttpClient.isAxiosError(error) && error.response?.status === StatusCode.UNAUTHORIZED) {
+        return retryWithTokenRefresh();
+      }
+
       if (HttpClient.isBackendError(error)) {
         const mappedError = BackendErrorMapper.map(
           new BackendError(error.response.data.message, error.response.data.label, error.response.data.code),
@@ -140,17 +155,9 @@ export class HttpClient extends EventEmitter {
 
         const isUnauthorized = mappedError.code === StatusCode.UNAUTHORIZED;
         const isExpiredTokenError = mappedError instanceof TokenExpiredError;
-        const hasAccessToken = !!this.accessTokenStore?.accessToken;
 
-        if ((isExpiredTokenError || isUnauthorized) && hasAccessToken && firstTry) {
-          this.logger.warn(
-            `Access token refresh triggered (isExpiredTokenError: ${isExpiredTokenError}) for "${config.method}" request to "${config.url}".`,
-          );
-          await this.refreshAccessToken();
-          config['axios-retry'] = {
-            retries: 0,
-          };
-          return this._sendRequest<T>(config, tokenAsParam, false);
+        if ((isExpiredTokenError || isUnauthorized) && hasAccessToken && isFirstTry) {
+          return retryWithTokenRefresh();
         }
 
         if (mappedError instanceof InvalidTokenError || mappedError instanceof MissingCookieError) {
@@ -226,6 +233,7 @@ export class HttpClient extends EventEmitter {
   public sendJSON<T>(config: AxiosRequestConfig, isSynchronousRequest: boolean = false): Promise<AxiosResponse<T>> {
     config.headers = {
       ...config.headers,
+      Accept: ContentType.APPLICATION_JSON,
       'Content-Type': ContentType.APPLICATION_JSON,
     };
     return this.sendRequest<T>(config, false, isSynchronousRequest);
