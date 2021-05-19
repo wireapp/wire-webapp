@@ -21,27 +21,6 @@
   resolved "https://registry.yarnpkg.com/@babel/compat-data/-/compat-data-7.14.0.tgz#a901128bce2ad02565df95e6ecbf195cf9465919"
   integrity sha512-vu9V3uMM/1o5Hl5OekMUowo3FqXLJSw+s+66nt0fSWVWTtmosdzn45JHOB3cPtZoe6CTBDzvSw0RdOY85Q37+Q==
 
-"@babel/core@7.14.2":
-  version "7.14.2"
-  resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.14.2.tgz#54e45334ffc0172048e5c93ded36461d3ad4c417"
-  integrity sha512-OgC1mON+l4U4B4wiohJlQNUU3H73mpTyYY3j/c8U9dr9UagGGSm+WFpzjy/YLdoyjiG++c1kIDgxCo/mLwQJeQ==
-  dependencies:
-    "@babel/code-frame" "^7.12.13"
-    "@babel/generator" "^7.14.2"
-    "@babel/helper-compilation-targets" "^7.13.16"
-    "@babel/helper-module-transforms" "^7.14.2"
-    "@babel/helpers" "^7.14.0"
-    "@babel/parser" "^7.14.2"
-    "@babel/template" "^7.12.13"
-    "@babel/traverse" "^7.14.2"
-    "@babel/types" "^7.14.2"
-    convert-source-map "^1.7.0"
-    debug "^4.1.0"
-    gensync "^1.0.0-beta.2"
-    json5 "^2.1.2"
-    semver "^6.3.0"
-    source-map "^0.5.0"
-
 "@babel/core@7.14.3", "@babel/core@>=7.9.0", "@babel/core@^7.1.0", "@babel/core@^7.11.1", "@babel/core@^7.7.5":
   version "7.14.3"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.14.3.tgz#5395e30405f0776067fbd9cf0884f15bfb770a38"
@@ -2920,12 +2899,12 @@
   dependencies:
     dexie "3.0.3"
 
-"@wireapp/store-engine-sqleet@1.7.2":
-  version "1.7.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.7.2.tgz#c8c9c65835b2723665835bcffcb7a62099550771"
-  integrity sha512-ADE8Eyu5QOVDTa+He+dmqi9hnQaQbKzLaSHJJX/FEzlFJfM1gpfBvH4xQrBJJlAppexPPEc/whErZF99Ay+eNg==
+"@wireapp/store-engine-sqleet@1.7.3":
+  version "1.7.3"
+  resolved "https://registry.yarnpkg.com/@wireapp/store-engine-sqleet/-/store-engine-sqleet-1.7.3.tgz#8c257a774bf8b8abf7f9ed385740ca72eecbaf5b"
+  integrity sha512-VqSEzQ4oX/H623/ohceq0kz+XHQCBQUe+F0/TCiM4+JR80UlFpAxrMFaOztGercB8lBM96NIqh0XrTX1uEWRBw==
   dependencies:
-    "@babel/core" "7.14.2"
+    "@babel/core" "7.14.3"
     "@babel/plugin-proposal-class-properties" "7.13.0"
     "@babel/plugin-proposal-object-rest-spread" "7.14.2"
     "@babel/plugin-proposal-optional-chaining" "7.14.2"
