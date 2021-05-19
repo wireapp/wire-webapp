@@ -23,6 +23,7 @@ export enum LegalHoldMemberStatus {
   DISABLED = 'disabled',
   ENABLED = 'enabled',
   PENDING = 'pending',
+  NO_CONSENT = 'no_consent',
 }
 
 export interface LegalHoldEnabledMemberData {
@@ -34,7 +35,7 @@ export interface LegalHoldEnabledMemberData {
 }
 
 export interface LegalHoldDisabledMemberData {
-  status: LegalHoldMemberStatus.DISABLED;
+  status: LegalHoldMemberStatus.DISABLED | LegalHoldMemberStatus.NO_CONSENT;
 }
 
 export type LegalHoldMemberData = LegalHoldEnabledMemberData | LegalHoldDisabledMemberData;
