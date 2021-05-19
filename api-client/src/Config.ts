@@ -21,6 +21,4 @@ import type {BackendData} from './env/';
 
 export interface Config {
   urls: BackendData;
-  platform?: string;
-  version?: string;
 }

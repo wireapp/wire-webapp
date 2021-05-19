@@ -75,8 +75,6 @@ enum TOPIC {
 
 const defaultConfig: Config = {
   urls: Backend.PRODUCTION,
-  platform: 'web-api-client',
-  version: version,
 };
 
 export interface APIClient {
