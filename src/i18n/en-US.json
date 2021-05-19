@@ -1048,5 +1048,8 @@
   "wireLinux": "{{brandName}} for Linux",
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
-  "wire_for_web": "{{brandName}} for Web"
+  "wire_for_web": "{{brandName}} for Web",
+  "modalLegalHoldConversationNeedsConsentMessage": "You cannot invite a user with a legalhold device, because the conversation contains users that have not granted consent to being put under legalhold.",
+  "modalLegalHoldUserNeedsConsentMessage": "You cannot invite a user that has not granted consent to being put under legalhold, because the conversatoin contains users under legalhold.",
+  "modalUserCannotBeAddedHeadline": "This user cannot be added"
 }
