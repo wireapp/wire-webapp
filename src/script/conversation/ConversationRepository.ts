@@ -38,6 +38,7 @@ import {
 } from '@wireapp/api-client/src/conversation/';
 import {container} from 'tsyringe';
 import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -1198,7 +1199,7 @@ export class ConversationRepository {
 
   private handleAddToConversationError(error: BackendClientError, conversationEntity: Conversation, userIds: string[]) {
     switch (error.label) {
-      case BackendClientError.LABEL.NOT_CONNECTED: {
+      case BackendErrorLabel.NOT_CONNECTED: {
         this.handleUsersNotConnected(userIds);
         break;
       }
@@ -1214,8 +1215,22 @@ export class ConversationRepository {
         break;
       }
 
-      case BackendClientError.LABEL.TOO_MANY_MEMBERS: {
+      case BackendErrorLabel.TOO_MANY_MEMBERS: {
         this.handleTooManyMembersError(conversationEntity.getNumberOfParticipants());
+        break;
+      }
+      case BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT: {
+        const messageText = t('modalLegalHoldConversationNeedsConsentMessage');
+        const titleText = t('modalUserCannotBeAddedHeadline');
+
+        this.showModal(messageText, titleText);
+        break;
+      }
+      case BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT: {
+        const messageText = t('modalLegalHoldUserNeedsConsentMessage');
+        const titleText = t('modalUserCannotBeAddedHeadline');
+
+        this.showModal(messageText, titleText);
         break;
       }
 
