@@ -31,7 +31,7 @@ import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {User} from '../User';
 import {SystemMessage} from './SystemMessage';
-import {Config} from 'src/script/Config';
+import {Config} from '../../Config';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
