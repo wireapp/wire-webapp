@@ -20,7 +20,8 @@
 import type {AxiosRequestConfig} from 'axios';
 
 import type {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
-import type {HttpClient} from '../http/';
+import {BackendErrorLabel, HttpClient} from '../http/';
+import {ConnectionLegalholdConsentNeededError, ConnectionLegalHoldUserConsentNeededError} from './ConnectionError';
 
 export class ConnectionAPI {
   constructor(private readonly client: HttpClient) {}
@@ -104,8 +105,20 @@ export class ConnectionAPI {
       url: ConnectionAPI.URL.CONNECTIONS,
     };
 
-    const response = await this.client.sendJSON<Connection>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<Connection>(config);
+      return response.data;
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT: {
+          throw new ConnectionLegalholdConsentNeededError(error.message);
+        }
+        case BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT: {
+          throw new ConnectionLegalHoldUserConsentNeededError(error.message);
+        }
+      }
+      throw error;
+    }
   }
 
   /**
