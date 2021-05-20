@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.20.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.19.0...@wireapp/api-client@12.20.0) (2021-05-20)
+
+
+### Features
+
+* **api-client:** Map feature for legalhold ([#3879](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3879)) ([958c795](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/958c79566b14fba011b8556d3e40d5fa30556475))
+
+
+
+
+
 # [12.19.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.18.10...@wireapp/api-client@12.19.0) (2021-05-20)
 
 
