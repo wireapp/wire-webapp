@@ -279,7 +279,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
             </div>
           )}
-          {currentPage === totalPages && (
+          {currentPage !== totalPages && (
             <div
               className="hide-controls-hidden"
               css={{
