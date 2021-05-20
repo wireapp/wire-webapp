@@ -266,28 +266,32 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               onChangePage={newPage => callActions.changePage(newPage, call)}
             />
           </div>
-          <div
-            className="hide-controls-hidden"
-            css={{
-              ...paginationButtonStyles,
-              borderBottomLeftRadius: 32,
-              borderTopLeftRadius: 32,
-              right: 0,
-            }}
-          >
-            <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
-          </div>
-          <div
-            className="hide-controls-hidden"
-            css={{
-              ...paginationButtonStyles,
-              borderBottomRightRadius: 32,
-              borderTopRightRadius: 32,
-              left: 0,
-            }}
-          >
-            <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
-          </div>
+          {currentPage !== 0 && (
+            <div
+              className="hide-controls-hidden"
+              css={{
+                ...paginationButtonStyles,
+                borderBottomLeftRadius: 32,
+                borderTopLeftRadius: 32,
+                right: 0,
+              }}
+            >
+              <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
+            </div>
+          )}
+          {currentPage === totalPages && (
+            <div
+              className="hide-controls-hidden"
+              css={{
+                ...paginationButtonStyles,
+                borderBottomRightRadius: 32,
+                borderTopRightRadius: 32,
+                left: 0,
+              }}
+            >
+              <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
+            </div>
+          )}
         </>
       )}
     </div>
