@@ -21,7 +21,7 @@ import type {AxiosRequestConfig} from 'axios';
 
 import {BackendErrorLabel, HttpClient} from '../../http';
 import {InvalidAppLockTimeoutError} from './FeatureError';
-import type {FeatureAppLock, FeatureDigitalSignature, FeatureSSO} from './Feature';
+import type {FeatureAppLock, FeatureDigitalSignature, FeatureLegalhold, FeatureSSO} from './Feature';
 import type {FeatureList} from './FeatureList';
 
 export class FeatureAPI {
@@ -30,6 +30,7 @@ export class FeatureAPI {
   public static readonly URL = {
     APPLOCK: 'appLock',
     DIGITAL_SIGNATURES: 'digitalSignatures',
+    LEGAL_HOLD: 'legalhold',
     FEATURES: 'features',
     SSO: 'sso',
     TEAMS: '/teams',
@@ -42,6 +43,16 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureList>(config);
+    return response.data;
+  }
+
+  public async getLegalholdFeature(teamId: string): Promise<FeatureLegalhold> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.LEGAL_HOLD}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureLegalhold>(config);
     return response.data;
   }
 

@@ -38,4 +38,5 @@ export interface FeatureAppLockConfig extends FeatureConfig {
 
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
 export type FeatureDigitalSignature = FeatureWithoutConfig;
+export type FeatureLegalhold = FeatureWithoutConfig;
 export type FeatureSSO = FeatureWithoutConfig;
