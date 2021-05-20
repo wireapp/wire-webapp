@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.19.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.18.10...@wireapp/api-client@12.19.0) (2021-05-20)
+
+
+### Features
+
+* Add reason for blocking connections (SQSERVICES-429) ([#3878](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3878)) ([93bb44f](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/93bb44f072244c3881ce6583964eb5ed5937c98d))
+
+
+
+
+
 ## [12.18.10](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.18.9...@wireapp/api-client@12.18.10) (2021-05-19)
 
 
