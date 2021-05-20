@@ -18,6 +18,8 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
+
 import ko from 'knockout';
 
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
@@ -49,6 +51,7 @@ export class MemberMessage extends SystemMessage {
   public readonly userEntities: ko.ObservableArray<User>;
   public readonly userIds: ko.ObservableArray<string>;
   public memberMessageType: SystemMessageType;
+  public reason: MemberLeaveReason;
 
   static get CONFIG() {
     return {
@@ -207,6 +210,9 @@ export class MemberMessage extends SystemMessage {
         }
 
         case CONVERSATION_EVENT.MEMBER_LEAVE: {
+          if (this.reason === MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT) {
+            return this.generateLegalHoldLeaveMessage();
+          }
           const temporaryGuestRemoval = this.otherUser().isMe && this.otherUser().isTemporaryGuest();
           if (temporaryGuestRemoval) {
             return t('temporaryGuestLeaveMessage');
@@ -247,6 +253,24 @@ export class MemberMessage extends SystemMessage {
       return '';
     });
   }
+
+  private readonly generateLegalHoldLeaveMessage = () => {
+    if (this.userEntities().some(user => user.isMe)) {
+      return t('conversationYouRemovedMissingLegalHoldConsent');
+    }
+    const users = this.generateNameString(this.exceedsMaxVisibleUsers());
+
+    if (this.userEntities().length === 1) {
+      return t('conversationMemberRemovedMissingLegalHoldConsent', users);
+    }
+    if (this.exceedsMaxVisibleUsers()) {
+      return t('conversationMultipleMembersRemovedMissingLegalHoldConsentMore', {
+        count: this.hiddenUserCount().toString(10),
+        users,
+      });
+    }
+    return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users);
+  };
 
   readonly showLargeAvatar = (): boolean => {
     const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];

@@ -24,6 +24,7 @@ import {
   ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/src/event/';
 import type {Notification} from '@wireapp/api-client/src/notification/';
+import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
 import {util as ProteusUtil} from '@wireapp/proteus';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
@@ -31,7 +32,7 @@ import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {downloadFile} from './util';
+import {createRandomUuid, downloadFile} from './util';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -50,6 +51,7 @@ import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
+import {MessageCategory} from '../message/MessageCategory';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -352,5 +354,27 @@ export class DebugUtil {
         }
       }
     }
+  }
+
+  injectLegalHoldLeaveEvent(includeSelf = false, maxUsers = Infinity) {
+    const conversation = this.conversationState.activeConversation();
+    let users = [];
+    if (includeSelf) {
+      users.push(this.userState.self().id);
+    }
+    users.push(...conversation.participating_user_ids());
+    users = users.slice(0, maxUsers);
+    return this.eventRepository['handleEvent'](
+      {
+        category: MessageCategory.NONE,
+        conversation: conversation.id,
+        data: {reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT, user_ids: users},
+        from: this.userState.self().id,
+        id: createRandomUuid(),
+        time: conversation.getNextIsoDate(),
+        type: CONVERSATION_EVENT.MEMBER_LEAVE,
+      } as EventRecord,
+      EventRepository.SOURCE.WEB_SOCKET,
+    );
   }
 }
