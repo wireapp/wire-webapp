@@ -1052,8 +1052,9 @@
   "modalLegalHoldConversationNeedsConsentMessage": "You cannot invite a user with a legal hold device, because the conversation contains users that have not granted consent to being put under legal hold.",
   "modalLegalHoldUserNeedsConsentMessage": "You cannot invite a user that has not granted consent to being put under legal hold, because the conversatoin contains users under legal hold.",
   "modalUserCannotBeAddedHeadline": "This user cannot be added",
-  "conversationMemberRemovedMissingLegalHoldConsent": "{{user}} was removed from this conversation, because there are users with legal hold.",
-  "conversationYouRemovedMissingLegalHoldConsent": "[bold]You[/bold] were removed from this conversation, because there are users with legal hold.",
-  "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} were removed from this conversation, because there are users with legal hold.",
-  "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "{{users}} and {{count}} more were removed from this conversation, because there are users with legal hold."
+  "conversationMemberRemovedMissingLegalHoldConsent": "{{user}} was removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
+  "conversationYouRemovedMissingLegalHoldConsent": "[bold]You[/bold] were removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
+  "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} were removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
+  "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "{{users}} and {{count}} more were removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
+  "modalUserBlockedForLegalHold": "This user is blocked because of legal hold. [readMore]Read more[/readMore]"
 }

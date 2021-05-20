@@ -31,6 +31,7 @@ import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {User} from '../User';
 import {SystemMessage} from './SystemMessage';
+import {Config} from 'src/script/Config';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
@@ -255,21 +256,31 @@ export class MemberMessage extends SystemMessage {
   }
 
   private readonly generateLegalHoldLeaveMessage = () => {
+    const replaceReadMoreLegalHold = {
+      '/readMore': '</a>',
+      readMore: `<a href="${
+        Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK
+      }" data-uie-name="read-more-legal-hold" rel="nofollow noopener noreferrer" target="_blank">`,
+    };
     if (this.userEntities().some(user => user.isMe)) {
-      return t('conversationYouRemovedMissingLegalHoldConsent');
+      return t('conversationYouRemovedMissingLegalHoldConsent', {}, replaceReadMoreLegalHold);
     }
     const users = this.generateNameString(this.exceedsMaxVisibleUsers());
 
     if (this.userEntities().length === 1) {
-      return t('conversationMemberRemovedMissingLegalHoldConsent', users);
+      return t('conversationMemberRemovedMissingLegalHoldConsent', users, replaceReadMoreLegalHold);
     }
     if (this.exceedsMaxVisibleUsers()) {
-      return t('conversationMultipleMembersRemovedMissingLegalHoldConsentMore', {
-        count: this.hiddenUserCount().toString(10),
-        users,
-      });
+      return t(
+        'conversationMultipleMembersRemovedMissingLegalHoldConsentMore',
+        {
+          count: this.hiddenUserCount().toString(10),
+          users,
+        },
+        replaceReadMoreLegalHold,
+      );
     }
-    return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users);
+    return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceReadMoreLegalHold);
   };
 
   readonly showLargeAvatar = (): boolean => {
