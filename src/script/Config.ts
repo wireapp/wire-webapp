@@ -59,7 +59,7 @@ export class Configuration {
       EMAIL_EXISTS: 'https://support.wire.com/hc/articles/115004082129',
       HISTORY: 'https://support.wire.com/hc/articles/207834645',
       INDEX: 'https://support.wire.com/',
-      LEGAL_HOLD_BLOCK: '/',
+      LEGAL_HOLD_BLOCK: '#',
       MICROPHONE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202590081',
       SCREEN_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
     },
