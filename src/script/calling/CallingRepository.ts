@@ -33,6 +33,7 @@ import {
   REASON,
   STATE as CALL_STATE,
   VIDEO_STATE,
+  VSTREAMS,
   Wcall,
   WcallClient,
   WcallMember,
@@ -746,6 +747,16 @@ export class CallingRepository {
     this.wCall.reject(this.wUser, conversationId);
   }
 
+  changeCallPage(newPage: number, call: Call): void {
+    const nextPageParticipants = call.pages()[newPage];
+    const payload = {
+      clients: nextPageParticipants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      convid: call.conversationId,
+    };
+    this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
+    call.currentPage(newPage);
+  }
+
   readonly leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
@@ -1117,6 +1128,8 @@ export class CallingRepository {
     if (call.participants().length > call.analyticsMaximumParticipants) {
       call.analyticsMaximumParticipants = call.participants().length;
     }
+
+    call.updatePages();
   }
 
   private readonly handleCallParticipantChanges = (conversationId: ConversationId, membersJson: string) => {
@@ -1239,18 +1252,19 @@ export class CallingRepository {
 
   private readonly updateParticipantVideoStream = (
     conversationId: ConversationId,
-    userId: UserId,
-    clientId: ClientId,
-    streams: MediaStream[],
+    remoteUserid: UserId,
+    remoteClientid: ClientId,
+    streams: readonly MediaStream[] | null,
   ): void => {
-    let participant = this.findParticipant(conversationId, userId, clientId);
+    let participant = this.findParticipant(conversationId, remoteUserid, remoteClientid);
     if (!participant) {
-      participant = new Participant(this.userRepository.findUserById(userId), clientId);
+      participant = new Participant(this.userRepository.findUserById(remoteUserid), remoteClientid);
       const call = this.findCall(conversationId);
       call.addParticipant(participant);
     }
 
-    if (streams.length === 0) {
+    if (streams === null || streams.length === 0) {
+      participant.releaseVideoStream();
       return;
     }
 

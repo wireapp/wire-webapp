@@ -31,6 +31,13 @@ export interface Grid {
 
 export function getGrid(call: Call): ko.PureComputed<Grid> {
   return ko.pureComputed(() => {
+    if (call.pages().length > 1) {
+      return {
+        grid: call.pages()[call.currentPage()],
+        thumbnail: null,
+      };
+    }
+
     let inGridParticipants: Participant[];
     let thumbnailParticipant: Participant | null;
     const selfParticipant = call.getSelfParticipant();

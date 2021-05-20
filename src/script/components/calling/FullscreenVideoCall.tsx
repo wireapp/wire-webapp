@@ -127,6 +127,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   }, []);
 
   const activeVideoSpeakers = useKoSubscribable(call.activeSpeakers);
+  const currentPage = useKoSubscribable(call.currentPage);
+  const callPages = useKoSubscribable(call.pages);
+  const totalPages = callPages.length;
 
   return (
     <div id="video-calling" className="video-calling" ref={wrapper}>
@@ -251,34 +254,42 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           </div>
         </div>
       )}
-      <div
-        className="hide-controls-hidden"
-        css={{bottom: 16, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}
-      >
-        <Pagination currentPage={1} totalPages={10} onChangePage={() => {}} />
-      </div>
-      <div
-        className="hide-controls-hidden"
-        css={{
-          ...paginationButtonStyles,
-          borderBottomLeftRadius: 32,
-          borderTopLeftRadius: 32,
-          right: 0,
-        }}
-      >
-        <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
-      </div>
-      <div
-        className="hide-controls-hidden"
-        css={{
-          ...paginationButtonStyles,
-          borderBottomRightRadius: 32,
-          borderTopRightRadius: 32,
-          left: 0,
-        }}
-      >
-        <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
-      </div>
+      {totalPages > 1 && (
+        <>
+          <div
+            className="hide-controls-hidden"
+            css={{bottom: 16, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}
+          >
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onChangePage={newPage => callActions.changePage(newPage, call)}
+            />
+          </div>
+          <div
+            className="hide-controls-hidden"
+            css={{
+              ...paginationButtonStyles,
+              borderBottomLeftRadius: 32,
+              borderTopLeftRadius: 32,
+              right: 0,
+            }}
+          >
+            <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
+          </div>
+          <div
+            className="hide-controls-hidden"
+            css={{
+              ...paginationButtonStyles,
+              borderBottomRightRadius: 32,
+              borderTopRightRadius: 32,
+              left: 0,
+            }}
+          >
+            <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
+          </div>
+        </>
+      )}
     </div>
   );
 };

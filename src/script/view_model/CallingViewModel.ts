@@ -47,6 +47,7 @@ import {CallState} from '../calling/CallState';
 
 export interface CallActions {
   answer: (call: Call) => void;
+  changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
   setMaximizedTileVideoParticipant: (participant: Participant) => void;
@@ -56,8 +57,8 @@ export interface CallActions {
   switchCameraInput: (call: Call, deviceId: string) => void;
   switchScreenInput: (call: Call, deviceId: string) => void;
   toggleCamera: (call: Call) => void;
-  toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
+  toggleMute: (call: Call, muteState: boolean) => void;
 }
 
 export const VideoSpeakersTabs = {
@@ -181,6 +182,9 @@ export class CallingViewModel {
         this.callingRepository.leaveCall(call.conversationId);
         this.videoSpeakersActiveTab(VideoSpeakersTabs.all);
         this.maximizedTileVideoParticipant(null);
+      },
+      changePage: (newPage, call) => {
+        this.callingRepository.changeCallPage(newPage, call);
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
