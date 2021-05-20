@@ -17,12 +17,12 @@
  *
  */
 
-import type {FeatureAppLock, FeatureDigitalSignature, FeatureWithoutConfig} from './Feature';
+import type {FeatureAppLock, FeatureDigitalSignature, FeatureWithoutConfig, FeatureLegalhold} from './Feature';
 
 export type FeatureList = {
   appLock?: FeatureAppLock;
   digitalSignatures?: FeatureDigitalSignature;
-  legalhold?: FeatureWithoutConfig;
+  legalhold?: FeatureLegalhold;
   searchVisibility?: FeatureWithoutConfig;
   sso?: FeatureWithoutConfig;
   validateSAMLemails?: FeatureWithoutConfig;
