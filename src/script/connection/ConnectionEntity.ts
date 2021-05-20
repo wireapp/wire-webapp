@@ -35,6 +35,7 @@ export class ConnectionEntity {
   message: string;
   status: ko.Observable<ConnectionStatus>;
   userId: string;
+  reason: string;
 
   constructor() {
     this.conversationId = null;

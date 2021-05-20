@@ -59,6 +59,7 @@ export class ConnectionMapper {
     connectionEntity.from = from;
     connectionEntity.lastUpdate = last_update;
     connectionEntity.message = message;
+    connectionEntity.reason = connectionData.reason;
 
     return connectionEntity;
   }
