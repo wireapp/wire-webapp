@@ -136,9 +136,9 @@ export function t(
 
 export const joinNames = LocalizerUtil.joinNames;
 
-export const replaceReadMore = (href: string, className: string = '', uieName: string = '') => ({
-  '/readMore': '</a>',
-  readMore: `<a href="${href}" data-uie-name="${uieName}" class="${className}" rel="nofollow noopener noreferrer" target="_blank">`,
+export const replaceLink = (href: string, className: string = '', uieName: string = '') => ({
+  '/link': '</a>',
+  link: `<a href="${href}" data-uie-name="${uieName}" class="${className}" rel="nofollow noopener noreferrer" target="_blank">`,
 });
 
 window.t = LocalizerUtil.translate;
