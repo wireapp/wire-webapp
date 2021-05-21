@@ -19,7 +19,7 @@
 
 import type {PreKey} from '../auth/';
 import type {ClientClassification, ClientType, Location} from './';
-import {ClientCapability} from './ClientCapability';
+import {ClientCapabilityData} from './ClientCapabilityData';
 
 interface SharedClientModel {
   label?: string;
@@ -36,10 +36,4 @@ export interface NewClient extends SharedClientModel {
   type: ClientType.PERMANENT | ClientType.TEMPORARY;
 }
 
-export type UpdatedClient = Partial<
-  SharedClientModel & {
-    capabilities?: {
-      feature_list: ClientCapability[];
-    }[];
-  }
->;
+export type UpdatedClient = Partial<SharedClientModel & ClientCapabilityData>;
