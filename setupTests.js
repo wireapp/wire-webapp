@@ -40,6 +40,7 @@ jest.mock('axios', () => {
           request: {eject: jest.fn(), use: jest.fn()},
           response: {eject: jest.fn(), use: jest.fn()},
         },
+        request: jest.fn(),
       };
     },
   };
