@@ -17,14 +17,24 @@
  *
  */
 
-export * from './ClientAPI';
-export * from './ClientCapability';
-export * from './ClientCapabilityData';
-export * from './ClientClassification';
-export * from './ClientError';
-export * from './ClientType';
-export * from './Location';
-export * from './NewClient';
-export * from './PublicClient';
-export * from './QualifiedPublicClients';
-export * from './RegisteredClient';
+import {BackendError, BackendErrorLabel, StatusCode} from '../http';
+
+export class ClientError extends BackendError {
+  constructor(message: string, label: BackendErrorLabel, code: StatusCode) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'ClientError';
+  }
+}
+
+export class ClientCapabilityRemovedError extends ClientError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.CLIENT_CAPABILITY_REMOVED,
+    code: StatusCode = StatusCode.CONFLICT,
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'ClientCapabilityRemovedError';
+  }
+}

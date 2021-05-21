@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,6 @@
  *
  */
 
-export * from './ClientAPI';
-export * from './ClientCapability';
-export * from './ClientCapabilityData';
-export * from './ClientClassification';
-export * from './ClientError';
-export * from './ClientType';
-export * from './Location';
-export * from './NewClient';
-export * from './PublicClient';
-export * from './QualifiedPublicClients';
-export * from './RegisteredClient';
+export enum ClientCapability {
+  LEGAL_HOLD_IMPLICIT_CONSENT = 'legalhold-implicit-consent',
+}

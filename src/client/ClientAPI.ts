@@ -21,13 +21,16 @@ import type {AxiosRequestConfig} from 'axios';
 
 import type {PreKeyBundle} from '../auth/';
 import type {NewClient, RegisteredClient, UpdatedClient} from '../client/';
-import type {HttpClient} from '../http/';
+import {ClientCapabilityRemovedError} from './ClientError';
+import {BackendErrorLabel, HttpClient} from '../http/';
+import {ClientCapabilityData} from './ClientCapabilityData';
 
 export class ClientAPI {
   constructor(private readonly client: HttpClient) {}
 
   public static readonly URL = {
     CLIENTS: '/clients',
+    CAPABILITIES: 'capabilities',
   };
 
   public async postClient(newClient: NewClient): Promise<RegisteredClient> {
@@ -48,7 +51,26 @@ export class ClientAPI {
       url: `${ClientAPI.URL.CLIENTS}/${clientId}`,
     };
 
-    await this.client.sendJSON(config);
+    try {
+      await this.client.sendJSON(config);
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.CLIENT_CAPABILITY_REMOVED: {
+          throw new ClientCapabilityRemovedError(error.message);
+        }
+      }
+      throw error;
+    }
+  }
+
+  public async getClientCapabilities(clientId: string): Promise<ClientCapabilityData> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${ClientAPI.URL.CLIENTS}/${clientId}/${ClientAPI.URL.CAPABILITIES}`,
+    };
+
+    const response = await this.client.sendJSON<ClientCapabilityData>(config);
+    return response.data;
   }
 
   public async deleteClient(clientId: string, password?: string): Promise<void> {
