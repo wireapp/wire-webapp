@@ -1253,7 +1253,7 @@ export class CallingRepository {
   private readonly updateParticipantVideoStream = (
     conversationId: ConversationId,
     remoteUserId: UserId,
-    remoteClientid: ClientId,
+    remoteClientId: ClientId,
     streams: readonly MediaStream[] | null,
   ): void => {
     let participant = this.findParticipant(conversationId, remoteUserId, remoteClientId);
