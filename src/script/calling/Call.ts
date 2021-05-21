@@ -20,12 +20,15 @@
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
+import {chunk} from 'Util/ArrayUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 export type ConversationId = string;
+
+const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 3;
 
 interface ActiveSpeaker {
   audio_level: number;
@@ -49,6 +52,9 @@ export class Call {
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
   public blockMessages: boolean = false;
   public type?: CALL_MESSAGE_TYPE;
+  public currentPage?: ko.Observable<number> = ko.observable(0);
+  public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
+
   private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
   /**
    * set to `true` if anyone has enabled their video during a call (used for analytics)
@@ -175,6 +181,7 @@ export class Call {
 
   addParticipant(participant: Participant): void {
     this.participants.push(participant);
+    this.updatePages();
   }
 
   getParticipant(userId: UserId, clientId: ClientId): Participant | undefined {
@@ -187,5 +194,14 @@ export class Call {
 
   removeParticipant(participant: Participant): void {
     this.participants.remove(participant);
+    this.updatePages();
+  }
+
+  updatePages() {
+    const newPages = chunk<Participant>(this.participants(), NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE);
+    if (newPages.length < this.pages().length) {
+      this.currentPage(this.pages.length - 1);
+    }
+    this.pages(newPages);
   }
 }
