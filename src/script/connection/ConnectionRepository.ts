@@ -27,7 +27,7 @@ import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {replaceReadMore, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
@@ -178,14 +178,14 @@ export class ConnectionRepository {
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {
       if (error.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT) {
-        const replaceReadMoreLegalHold = replaceReadMore(
+        const replaceLinkLegalHold = replaceLink(
           Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
           '',
           'read-more-legal-hold',
         );
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
-            htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceReadMoreLegalHold),
+            htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
             title: t('modalUserCannotConnectLegalHoldHeadline'),
           },
         });

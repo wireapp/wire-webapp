@@ -22,7 +22,7 @@ import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
 
 import ko from 'knockout';
 
-import {Declension, joinNames, replaceReadMore, t} from 'Util/LocalizerUtil';
+import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {getUserName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
@@ -256,18 +256,18 @@ export class MemberMessage extends SystemMessage {
   }
 
   private readonly generateLegalHoldLeaveMessage = () => {
-    const replaceReadMoreLegalHold = replaceReadMore(
+    const replaceLinkLegalHold = replaceLink(
       Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
       '',
       'read-more-legal-hold',
     );
     if (this.userEntities().some(user => user.isMe)) {
-      return t('conversationYouRemovedMissingLegalHoldConsent', {}, replaceReadMoreLegalHold);
+      return t('conversationYouRemovedMissingLegalHoldConsent', {}, replaceLinkLegalHold);
     }
     const users = this.generateNameString(this.exceedsMaxVisibleUsers());
 
     if (this.userEntities().length === 1) {
-      return t('conversationMemberRemovedMissingLegalHoldConsent', users, replaceReadMoreLegalHold);
+      return t('conversationMemberRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
     }
     if (this.exceedsMaxVisibleUsers()) {
       return t(
@@ -276,10 +276,10 @@ export class MemberMessage extends SystemMessage {
           count: this.hiddenUserCount().toString(10),
           users,
         },
-        replaceReadMoreLegalHold,
+        replaceLinkLegalHold,
       );
     }
-    return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceReadMoreLegalHold);
+    return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
   };
 
   readonly showLargeAvatar = (): boolean => {

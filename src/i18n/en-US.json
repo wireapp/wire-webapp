@@ -1049,13 +1049,13 @@
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
   "wire_for_web": "{{brandName}} for Web",
-  "modalLegalHoldConversationMissingConsentMessage": "Guests cannot be added to this group because of legal hold. [readMore]Read more[/readMore]",
+  "modalLegalHoldConversationMissingConsentMessage": "Due to legal hold, only team members can be added to this conversation. [link]Learn more[/link]",
   "modalUserCannotBeAddedHeadline": "Guests cannot be added",
-  "conversationMemberRemovedMissingLegalHoldConsent": "{{user}} was removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
-  "conversationYouRemovedMissingLegalHoldConsent": "[bold]You[/bold] were removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
-  "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} were removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
-  "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "{{users}} and {{count}} more were removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
-  "modalUserBlockedForLegalHold": "This user is blocked because of legal hold. [readMore]Read more[/readMore]",
+  "conversationMemberRemovedMissingLegalHoldConsent": "{{user}} was removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
+  "conversationYouRemovedMissingLegalHoldConsent": "[bold]You[/bold] were removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
+  "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} were removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
+  "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "{{users}} and {{count}} more were removed from this conversation because legal hold has been activated. [link]Learn more[/link]",
+  "modalUserBlockedForLegalHold": "This user is blocked due to legal hold. [link]Learn more[/link]",
   "modalUserCannotConnectLegalHoldHeadline": "Cannot connect to this user",
-  "modalUserCannotConnectLegalHoldMessage": "You cannot connect to this user because of legal hold. [readMore]Read more[/readMore]"
+  "modalUserCannotConnectLegalHoldMessage": "You cannot connect to this user due to legal hold. [link]Learn more[/link]"
 }
