@@ -58,6 +58,7 @@ export enum BackendErrorLabel {
   // Client errors
   TOO_MANY_CLIENTS = 'too-many-clients',
   UNKNOWN_CLIENT = 'unknown-client',
+  CLIENT_CAPABILITY_REMOVED = 'client-feature-cannot-be-removed',
 
   // Conversation errors
   TOO_MANY_MEMBERS = 'too-many-members',
