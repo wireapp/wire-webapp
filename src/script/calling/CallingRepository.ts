@@ -1258,7 +1258,7 @@ export class CallingRepository {
   ): void => {
     let participant = this.findParticipant(conversationId, remoteUserId, remoteClientId);
     if (!participant) {
-      participant = new Participant(this.userRepository.findUserById(remoteUserid), remoteClientid);
+      participant = new Participant(this.userRepository.findUserById(remoteUserId), remoteClientId);
       const call = this.findCall(conversationId);
       call.addParticipant(participant);
     }
