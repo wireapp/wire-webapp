@@ -266,8 +266,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               onChangePage={newPage => callActions.changePage(newPage, call)}
             />
           </div>
-          {currentPage !== 0 && (
+          {currentPage !== totalPages - 1 && (
             <div
+              onClick={() => callActions.changePage(currentPage + 1, call)}
               className="hide-controls-hidden"
               css={{
                 ...paginationButtonStyles,
@@ -279,8 +280,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
             </div>
           )}
-          {currentPage !== totalPages && (
+          {currentPage !== 0 && (
             <div
+              onClick={() => callActions.changePage(currentPage - 1, call)}
               className="hide-controls-hidden"
               css={{
                 ...paginationButtonStyles,
