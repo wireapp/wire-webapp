@@ -21,7 +21,7 @@ import type {AxiosRequestConfig} from 'axios';
 
 import type {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
 import {BackendErrorLabel, HttpClient} from '../http/';
-import {ConnectionLegalholdConsentNeededError, ConnectionLegalHoldUserConsentNeededError} from './ConnectionError';
+import {ConnectionLegalholdMissingConsentError} from './ConnectionError';
 
 export class ConnectionAPI {
   constructor(private readonly client: HttpClient) {}
@@ -110,11 +110,8 @@ export class ConnectionAPI {
       return response.data;
     } catch (error) {
       switch (error.label) {
-        case BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT: {
-          throw new ConnectionLegalholdConsentNeededError(error.message);
-        }
-        case BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT: {
-          throw new ConnectionLegalHoldUserConsentNeededError(error.message);
+        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
+          throw new ConnectionLegalholdMissingConsentError(error.message);
         }
       }
       throw error;

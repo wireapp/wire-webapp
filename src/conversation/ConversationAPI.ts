@@ -55,10 +55,7 @@ import type {
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
 } from './data';
-import {
-  ConversationLegalholdConsentNeededError,
-  ConversationLegalHoldUserConsentNeededError,
-} from './ConversationError';
+import {ConversationLegalholdMissingConsentError} from './ConversationError';
 
 export class ConversationAPI {
   public static readonly MAX_CHUNK_SIZE = 500;
@@ -350,11 +347,8 @@ export class ConversationAPI {
       return response.data;
     } catch (error) {
       switch (error.label) {
-        case BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT: {
-          throw new ConversationLegalholdConsentNeededError(error.message);
-        }
-        case BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT: {
-          throw new ConversationLegalHoldUserConsentNeededError(error.message);
+        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
+          throw new ConversationLegalholdMissingConsentError(error.message);
         }
       }
       throw error;
@@ -704,11 +698,8 @@ export class ConversationAPI {
       return response.data;
     } catch (error) {
       switch (error.label) {
-        case BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT: {
-          throw new ConversationLegalholdConsentNeededError(error.message);
-        }
-        case BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT: {
-          throw new ConversationLegalHoldUserConsentNeededError(error.message);
+        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
+          throw new ConversationLegalholdMissingConsentError(error.message);
         }
       }
       throw error;

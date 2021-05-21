@@ -51,25 +51,14 @@ export class ConversationOperationError extends ConversationError {
   }
 }
 
-export class ConversationLegalholdConsentNeededError extends ConversationError {
+export class ConversationLegalholdMissingConsentError extends ConversationError {
   constructor(
     message: string,
-    label: BackendErrorLabel = BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT,
+    label: BackendErrorLabel = BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT,
     code: StatusCode = StatusCode.PRECONDITION_FAILED,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ConversationLegalholdConsentNeededError';
-  }
-}
-export class ConversationLegalHoldUserConsentNeededError extends ConversationError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT,
-    code: StatusCode = StatusCode.PRECONDITION_FAILED,
-  ) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'ConversationLegalHoldUserConsentNeededError';
   }
 }

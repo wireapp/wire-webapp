@@ -27,25 +27,14 @@ export class ConnectionError extends BackendError {
   }
 }
 
-export class ConnectionLegalholdConsentNeededError extends ConnectionError {
+export class ConnectionLegalholdMissingConsentError extends ConnectionError {
   constructor(
     message: string,
-    label: BackendErrorLabel = BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT,
+    label: BackendErrorLabel = BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT,
     code: StatusCode = StatusCode.PRECONDITION_FAILED,
   ) {
     super(message, label, code);
     Object.setPrototypeOf(this, new.target.prototype);
     this.name = 'ConnectionLegalholdConsentNeededError';
-  }
-}
-export class ConnectionLegalHoldUserConsentNeededError extends ConnectionError {
-  constructor(
-    message: string,
-    label: BackendErrorLabel = BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT,
-    code: StatusCode = StatusCode.PRECONDITION_FAILED,
-  ) {
-    super(message, label, code);
-    Object.setPrototypeOf(this, new.target.prototype);
-    this.name = 'ConnectionLegalHoldUserConsentNeededError';
   }
 }
