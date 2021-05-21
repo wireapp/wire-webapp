@@ -43,7 +43,7 @@ import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
-import {t} from 'Util/LocalizerUtil';
+import {replaceReadMore, t} from 'Util/LocalizerUtil';
 import {getNextItem} from 'Util/ArrayUtil';
 import {createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
@@ -1220,16 +1220,21 @@ export class ConversationRepository {
         break;
       }
       case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
-        const replaceReadMoreLegalHold = {
-          '/readMore': '</a>',
-          readMore: `<a href="${
-            Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK
-          }" data-uie-name="read-more-legal-hold" rel="nofollow noopener noreferrer" target="_blank">`,
-        };
+        const replaceReadMoreLegalHold = replaceReadMore(
+          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+          '',
+          'read-more-legal-hold',
+        );
+
         const messageText = t('modalLegalHoldConversationMissingConsentMessage', {}, replaceReadMoreLegalHold);
         const titleText = t('modalUserCannotBeAddedHeadline');
 
-        this.showModal(messageText, titleText);
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            htmlMessage: messageText,
+            title: titleText,
+          },
+        });
         break;
       }
 
