@@ -97,8 +97,7 @@ export enum BackendErrorLabel {
   CUSTOM_BACKEND_NOT_FOUND = 'custom-backend-not-found',
 
   // Legalhold errors
-  LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT = 'conv-needs-lh-consent',
-  LEGAL_HOLD_USER_NEEDS_CONSENT = 'they-need-lh-consent',
+  LEGAL_HOLD_MISSING_CONSENT = 'missing-legalhold-consent',
 
   // Service errors
   SERVICE_DISABLED = 'service-disabled',
