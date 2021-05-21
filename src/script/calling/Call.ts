@@ -198,7 +198,7 @@ export class Call {
   }
 
   updatePages() {
-    const newPages = chunk(this.participants(), NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE) as Participant[][];
+    const newPages = chunk<Participant[][]>(this.participants(), NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE);
     if (newPages.length < this.pages().length) {
       this.currentPage(this.pages.length - 1);
     }
