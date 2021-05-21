@@ -1252,7 +1252,7 @@ export class CallingRepository {
 
   private readonly updateParticipantVideoStream = (
     conversationId: ConversationId,
-    remoteUserid: UserId,
+    remoteUserId: UserId,
     remoteClientid: ClientId,
     streams: readonly MediaStream[] | null,
   ): void => {
