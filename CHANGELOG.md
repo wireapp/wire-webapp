@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.21.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.20.1...@wireapp/api-client@12.21.0) (2021-05-21)
+
+
+### Features
+
+* **api-client:** Add client capability endpoints (SQSERVICES-417) ([#3881](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3881)) ([c399971](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/c399971db4ba4047c8bfe52d2f0985dba4630d5b))
+
+
+
+
+
 ## [12.20.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.20.0...@wireapp/api-client@12.20.1) (2021-05-21)
 
 **Note:** Version bump only for package @wireapp/api-client
