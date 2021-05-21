@@ -22,7 +22,7 @@ import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
 
 import ko from 'knockout';
 
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {Declension, joinNames, replaceReadMore, t} from 'Util/LocalizerUtil';
 import {getUserName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
@@ -256,12 +256,11 @@ export class MemberMessage extends SystemMessage {
   }
 
   private readonly generateLegalHoldLeaveMessage = () => {
-    const replaceReadMoreLegalHold = {
-      '/readMore': '</a>',
-      readMore: `<a href="${
-        Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK
-      }" data-uie-name="read-more-legal-hold" rel="nofollow noopener noreferrer" target="_blank">`,
-    };
+    const replaceReadMoreLegalHold = replaceReadMore(
+      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+      '',
+      'read-more-legal-hold',
+    );
     if (this.userEntities().some(user => user.isMe)) {
       return t('conversationYouRemovedMissingLegalHoldConsent', {}, replaceReadMoreLegalHold);
     }

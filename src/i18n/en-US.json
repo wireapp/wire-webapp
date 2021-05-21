@@ -1050,10 +1050,12 @@
   "wireWindows": "{{brandName}} for Windows",
   "wire_for_web": "{{brandName}} for Web",
   "modalLegalHoldConversationMissingConsentMessage": "Guests cannot be added to this group because of legal hold. [readMore]Read more[/readMore]",
-  "modalUserCannotBeAddedHeadline": "This user cannot be added",
+  "modalUserCannotBeAddedHeadline": "Guests cannot be added",
   "conversationMemberRemovedMissingLegalHoldConsent": "{{user}} was removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
   "conversationYouRemovedMissingLegalHoldConsent": "[bold]You[/bold] were removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
   "conversationMultipleMembersRemovedMissingLegalHoldConsent": "{{users}} were removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
   "conversationMultipleMembersRemovedMissingLegalHoldConsentMore": "{{users}} and {{count}} more were removed from this conversation, because there are users with legal hold. [readMore]Read more[/readMore]",
-  "modalUserBlockedForLegalHold": "This user is blocked because of legal hold. [readMore]Read more[/readMore]"
+  "modalUserBlockedForLegalHold": "This user is blocked because of legal hold. [readMore]Read more[/readMore]",
+  "modalUserCannotConnectLegalHoldHeadline": "Cannot connect to this user",
+  "modalUserCannotConnectLegalHoldMessage": "You cannot connect to this user because of legal hold. [readMore]Read more[/readMore]"
 }
