@@ -1219,15 +1219,14 @@ export class ConversationRepository {
         this.handleTooManyMembersError(conversationEntity.getNumberOfParticipants());
         break;
       }
-      case BackendErrorLabel.LEGAL_HOLD_CONVERSATION_NEEDS_CONSENT: {
-        const messageText = t('modalLegalHoldConversationNeedsConsentMessage');
-        const titleText = t('modalUserCannotBeAddedHeadline');
-
-        this.showModal(messageText, titleText);
-        break;
-      }
-      case BackendErrorLabel.LEGAL_HOLD_USER_NEEDS_CONSENT: {
-        const messageText = t('modalLegalHoldUserNeedsConsentMessage');
+      case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
+        const replaceReadMoreLegalHold = {
+          '/readMore': '</a>',
+          readMore: `<a href="${
+            Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK
+          }" data-uie-name="read-more-legal-hold" rel="nofollow noopener noreferrer" target="_blank">`,
+        };
+        const messageText = t('modalLegalHoldConversationMissingConsentMessage', {}, replaceReadMoreLegalHold);
         const titleText = t('modalUserCannotBeAddedHeadline');
 
         this.showModal(messageText, titleText);
