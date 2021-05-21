@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import {ClientType, PublicClient, RegisteredClient} from '@wireapp/api-client/src/client/';
+import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/src/client/';
 import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/src/event';
 import {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Runtime} from '@wireapp/commons';
@@ -250,21 +250,26 @@ export class ClientRepository {
    * Get and validate the local client.
    * @returns Resolves with an observable containing the client if valid
    */
-  getValidLocalClient(): Promise<ko.Observable<ClientEntity>> {
-    return this.getCurrentClientFromDb()
-      .then(clientEntity => this.getClientByIdFromBackend(clientEntity.id))
-      .then(clientPayload => {
-        this.logger.info(`Client with ID '${clientPayload.id}' (${clientPayload.type}) validated on backend`);
-        return this.clientState.currentClient;
-      })
-      .catch(error => {
-        const clientNotValidated = error.type === ClientError.TYPE.NO_VALID_CLIENT;
-        if (!clientNotValidated) {
-          this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
-        }
+  async getValidLocalClient(): Promise<ko.Observable<ClientEntity>> {
+    try {
+      const clientEntity = await this.getCurrentClientFromDb();
+      const clientPayload = await this.getClientByIdFromBackend(clientEntity.id);
+      this.logger.info(`Client with ID '${clientPayload.id}' (${clientPayload.type}) validated on backend`);
+      const currentClient = this.clientState.currentClient;
 
-        throw error;
+      await this.clientService.putClientCapabilities(currentClient().id, {
+        capabilities: [ClientCapability.LEGAL_HOLD_IMPLICIT_CONSENT],
       });
+
+      return currentClient;
+    } catch (error) {
+      const clientNotValidated = error.type === ClientError.TYPE.NO_VALID_CLIENT;
+      if (!clientNotValidated) {
+        this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
+      }
+
+      throw error;
+    }
   }
 
   /**
