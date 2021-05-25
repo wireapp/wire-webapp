@@ -233,7 +233,6 @@ export class HttpClient extends EventEmitter {
   public sendJSON<T>(config: AxiosRequestConfig, isSynchronousRequest: boolean = false): Promise<AxiosResponse<T>> {
     config.headers = {
       ...config.headers,
-      Accept: ContentType.APPLICATION_JSON,
       'Content-Type': ContentType.APPLICATION_JSON,
     };
     return this.sendRequest<T>(config, false, isSynchronousRequest);
