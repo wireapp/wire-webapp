@@ -9,7 +9,6 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
   display: inline-flex !important;
   font-size: 16px;
   font-weight: 600;
-  opacity: 1;
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
@@ -24,6 +23,7 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
   margin-bottom: 16px;
   max-width: 100%;
   min-width: 150px;
+  opacity: 1;
   outline: none;
   padding: 0 32px;
   -webkit-text-decoration: none;
@@ -60,7 +60,7 @@ exports[`"ButtonLink" renders (dark theme) 1`] = `
 
 exports[`"ButtonLink" renders 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -73,7 +73,6 @@ exports[`"ButtonLink" renders 1`] = `
   display: inline-flex !important;
   font-size: 16px;
   font-weight: 600;
-  opacity: 1;
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
@@ -88,6 +87,7 @@ exports[`"ButtonLink" renders 1`] = `
   margin-bottom: 16px;
   max-width: 100%;
   min-width: 150px;
+  opacity: 1;
   outline: none;
   padding: 0 32px;
   -webkit-text-decoration: none;
@@ -142,7 +142,7 @@ exports[`"ButtonLink" renders in loading state 1`] = `
 }
 
 .emotion-2 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -155,7 +155,6 @@ exports[`"ButtonLink" renders in loading state 1`] = `
   display: inline-flex !important;
   font-size: 16px;
   font-weight: 600;
-  opacity: 1;
   overflow: hidden;
   text-align: center;
   text-overflow: ellipsis;
@@ -170,6 +169,7 @@ exports[`"ButtonLink" renders in loading state 1`] = `
   margin-bottom: 16px;
   max-width: 100%;
   min-width: 150px;
+  opacity: 1;
   outline: none;
   padding: 0 32px;
   -webkit-text-decoration: none;

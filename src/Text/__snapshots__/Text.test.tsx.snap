@@ -12,7 +12,6 @@ exports[`"Text" renders (dark theme) 1`] = `
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -30,17 +29,16 @@ exports[`"Text" renders (dark theme) 1`] = `
 
 exports[`"Text" renders 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -58,17 +56,16 @@ exports[`"Text" renders 1`] = `
 
 exports[`"Text" renders as block 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: block;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -86,17 +83,16 @@ exports[`"Text" renders as block 1`] = `
 
 exports[`"Text" renders bold 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 16px;
   font-weight: 600;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -114,17 +110,16 @@ exports[`"Text" renders bold 1`] = `
 
 exports[`"Text" renders centered 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: center;
   text-transform: none;
 }
@@ -142,17 +137,16 @@ exports[`"Text" renders centered 1`] = `
 
 exports[`"Text" renders light 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 16px;
   font-weight: 200;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -170,17 +164,16 @@ exports[`"Text" renders light 1`] = `
 
 exports[`"Text" renders muted 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: #696c6e;
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 0.56;
   text-align: left;
   text-transform: none;
 }
@@ -198,17 +191,16 @@ exports[`"Text" renders muted 1`] = `
 
 exports[`"Text" renders no wrap 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: none;
   white-space: nowrap;
@@ -227,7 +219,7 @@ exports[`"Text" renders no wrap 1`] = `
 
 exports[`"Text" renders with color 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
@@ -237,7 +229,6 @@ exports[`"Text" renders with color 1`] = `
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -255,17 +246,16 @@ exports[`"Text" renders with color 1`] = `
 
 exports[`"Text" renders with size 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 2px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -283,17 +273,16 @@ exports[`"Text" renders with size 1`] = `
 
 exports[`"Text" renders with textTransform 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: uppercase;
 }
@@ -311,17 +300,16 @@ exports[`"Text" renders with textTransform 1`] = `
 
 exports[`"Text" renders with truncation 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: uppercase;
 }
@@ -339,17 +327,16 @@ exports[`"Text" renders with truncation 1`] = `
 
 exports[`Utility components renders Bold 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 16px;
   font-weight: 600;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -367,17 +354,16 @@ exports[`Utility components renders Bold 1`] = `
 
 exports[`Utility components renders Large 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 48px;
   font-weight: 200;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -395,17 +381,16 @@ exports[`Utility components renders Large 1`] = `
 
 exports[`Utility components renders Muted 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: #696c6e;
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 0.56;
   text-align: left;
   text-transform: none;
 }
@@ -423,17 +408,16 @@ exports[`Utility components renders Muted 1`] = `
 
 exports[`Utility components renders Small 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 12px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: none;
 }
@@ -451,17 +435,16 @@ exports[`Utility components renders Small 1`] = `
 
 exports[`Utility components renders Uppercase 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: inline;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: uppercase;
 }

@@ -4,5 +4,10 @@ Demo:
 import React from 'react';
 import {Text} from '@wireapp/react-ui-kit';
 
-<Text>Normal text</Text>;
+<div>
+  <Text block>Normal text</Text>
+  <Text block muted>
+    Muted text
+  </Text>
+</div>;
 ```

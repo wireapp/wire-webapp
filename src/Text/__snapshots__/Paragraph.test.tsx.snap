@@ -12,7 +12,6 @@ exports[`"Lead" renders (dark theme) 1`] = `
   display: block;
   font-size: 24px;
   font-weight: 300;
-  opacity: 1;
   text-align: center;
   text-transform: none;
   margin-bottom: 56px;
@@ -38,17 +37,16 @@ exports[`"Lead" renders (dark theme) 1`] = `
 
 exports[`"Lead" renders 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: block;
   font-size: 24px;
   font-weight: 300;
-  opacity: 1;
   text-align: center;
   text-transform: none;
   margin-bottom: 56px;
@@ -84,7 +82,6 @@ exports[`"Paragraph" renders (dark theme) 1`] = `
   display: block;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: none;
   margin-bottom: 16px;
@@ -104,17 +101,16 @@ exports[`"Paragraph" renders (dark theme) 1`] = `
 
 exports[`"Paragraph" renders 1`] = `
 .emotion-1 {
-  background: rgb(247,248,250);
+  background: rgb(237,237,238);
   -webkit-transition: background 0.15s;
   transition: background 0.15s;
 }
 
 .emotion-0 {
-  color: rgb(52,56,59);
+  color: rgb(29,30,31);
   display: block;
   font-size: 16px;
   font-weight: 300;
-  opacity: 1;
   text-align: left;
   text-transform: none;
   margin-bottom: 16px;
