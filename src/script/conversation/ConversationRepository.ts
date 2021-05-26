@@ -1220,21 +1220,7 @@ export class ConversationRepository {
         break;
       }
       case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
-        const replaceLinkLegalHold = replaceLink(
-          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-          '',
-          'read-more-legal-hold',
-        );
-
-        const messageText = t('modalLegalHoldConversationMissingConsentMessage', {}, replaceLinkLegalHold);
-        const titleText = t('modalUserCannotBeAddedHeadline');
-
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          text: {
-            htmlMessage: messageText,
-            title: titleText,
-          },
-        });
+        this.showLegalHoldConsentError();
         break;
       }
 
@@ -1549,6 +1535,9 @@ export class ConversationRepository {
       case BackendClientError.LABEL.NOT_CONNECTED:
         this.handleUsersNotConnected(userIds);
         break;
+      case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT:
+        this.showLegalHoldConsentError();
+        break;
       default:
         throw error;
     }
@@ -1584,6 +1573,24 @@ export class ConversationRepository {
     amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
       text: {
         message: messageText,
+        title: titleText,
+      },
+    });
+  }
+
+  private showLegalHoldConsentError() {
+    const replaceLinkLegalHold = replaceLink(
+      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+      '',
+      'read-more-legal-hold',
+    );
+
+    const messageText = t('modalLegalHoldConversationMissingConsentMessage', {}, replaceLinkLegalHold);
+    const titleText = t('modalUserCannotBeAddedHeadline');
+
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        htmlMessage: messageText,
         title: titleText,
       },
     });
