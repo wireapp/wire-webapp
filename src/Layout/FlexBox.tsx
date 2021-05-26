@@ -24,7 +24,7 @@ import React from 'react';
 
 import {filterProps} from '../util';
 
-export interface FlexBoxProps<T = HTMLDivElement> extends React.HTMLProps<T> {
+export interface FlexBoxProps<T = HTMLDivElement> extends React.PropsWithRef<React.HTMLProps<T>> {
   align?: string;
   column?: boolean;
   flexWrap?: Property.FlexWrap;
