@@ -29,7 +29,7 @@
     "@types/jasmine": "3.7.4",
     "@types/karma": "6.3.0",
     "@types/ws": "7.4.4",
-    "@wireapp/react-ui-kit": "7.52.0",
+    "@wireapp/react-ui-kit": "7.52.1",
     "@wireapp/store-engine": "4.9.1",
     "@wireapp/store-engine-fs": "2.4.1",
     "babel-loader": "8.2.2",
@@ -90,5 +90,5 @@
     "test:types": "tsc --noEmit",
     "watch": "webpack serve --config webpack.browser.js"
   },
-  "version": "12.22.1"
+  "version": "12.22.2"
 }
