@@ -92,12 +92,12 @@ export const MobileStyledHeaderSubMenu = (props: MobileStyledHeaderSubMenuProps)
   <span css={mobileStyledHeaderSubMenuStyle(props)} {...props} />
 );
 
-export interface HeaderSubMenuProps<T = HTMLParagraphElement> extends React.HTMLProps<T> {
+export interface HeaderSubMenuProps<T = HTMLParagraphElement> extends React.PropsWithRef<React.HTMLProps<T>> {
   caption: string;
   isOpen: boolean;
 }
 
-export const HeaderSubMenu: React.SFC<HeaderSubMenuProps> = ({caption, isOpen, children, ...props}) => {
+export const HeaderSubMenu: React.FC<HeaderSubMenuProps> = ({caption, isOpen, children, ...props}) => {
   const isDesktop = typeof window !== 'undefined' && window.matchMedia(`(${QUERY.desktop})`).matches;
   return (
     <MenuSubLink

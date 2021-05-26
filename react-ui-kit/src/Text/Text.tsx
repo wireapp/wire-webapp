@@ -26,7 +26,7 @@ import type {Theme} from '../Layout';
 import {filterProps} from '../util';
 import {COLOR} from '../Identity';
 
-export interface TextProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
+export interface TextProps<T = HTMLSpanElement> extends React.PropsWithRef<React.HTMLProps<T>> {
   block?: boolean;
   bold?: boolean;
   center?: boolean;
@@ -80,10 +80,22 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
   whiteSpace: noWrap ? 'nowrap' : undefined,
 });
 
-export const Text = (props: TextProps) => <span css={theme => textStyle(theme, props)} {...filterTextProps(props)} />;
+export const Text = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
+  <span ref={ref} css={theme => textStyle(theme, props)} {...filterTextProps(props)} />
+));
 
-export const Bold = (props: TextProps) => <Text bold {...props} />;
-export const Small = (props: TextProps) => <Text fontSize={'12px'} {...props} />;
-export const Muted = (props: TextProps) => <Text muted {...props} />;
-export const Uppercase = (props: TextProps) => <Text textTransform={'uppercase'} {...props} />;
-export const Large = (props: TextProps) => <Text fontSize={'48px'} light {...props} />;
+export const Bold = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
+  <Text ref={ref} bold {...props} />
+));
+export const Small = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
+  <Text ref={ref} fontSize={'12px'} {...props} />
+));
+export const Muted = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
+  <Text ref={ref} muted {...props} />
+));
+export const Uppercase = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
+  <Text ref={ref} textTransform={'uppercase'} {...props} />
+));
+export const Large = React.forwardRef<HTMLSpanElement, TextProps<HTMLSpanElement>>((props, ref) => (
+  <Text ref={ref} fontSize={'48px'} light {...props} />
+));
