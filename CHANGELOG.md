@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.52.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.51.10...@wireapp/react-ui-kit@7.52.0) (2021-05-26)
+
+
+### Features
+
+* **react-ui-kit:** Fixed color for muted text ([#3898](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/3898)) ([46f0fee](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/46f0feee580e2fa770adda15d9551de216308305))
+
+
+
+
+
 ## [7.51.10](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.51.9...@wireapp/react-ui-kit@7.51.10) (2021-05-19)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
