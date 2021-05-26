@@ -397,9 +397,17 @@ export class ConversationAPI {
       method: 'post',
       url: ConversationAPI.URL.CONVERSATIONS,
     };
-
-    const response = await this.client.sendJSON<Conversation>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<Conversation>(config);
+      return response.data;
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
+          throw new ConversationLegalholdMissingConsentError(error.message);
+        }
+      }
+      throw error;
+    }
   }
 
   /**
