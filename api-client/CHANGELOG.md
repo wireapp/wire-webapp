@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.22.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.21.2...@wireapp/api-client@12.22.0) (2021-05-26)
+
+
+### Features
+
+* Handle `post conversation` legal hold error (SQSERVICES-428) ([#3897](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3897)) ([65b8ce3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/65b8ce392d0903e7cdeb336e46afc97225bae6ee))
+
+
+
+
+
 ## [12.21.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.21.1...@wireapp/api-client@12.21.2) (2021-05-25)
 
 
