@@ -24,6 +24,7 @@ import type {Property} from 'csstype';
 
 import type {Theme} from '../Layout';
 import {filterProps} from '../util';
+import {COLOR} from '../Identity';
 
 export interface TextProps<T = HTMLSpanElement> extends React.HTMLProps<T> {
   block?: boolean;
@@ -68,11 +69,10 @@ export const textStyle: <T>(theme: Theme, props: TextProps<T>) => CSSObject = (
     truncate = false,
   },
 ) => ({
-  color: color,
+  color: muted ? COLOR.GRAY : color,
   display: block ? 'block' : 'inline',
   fontSize: fontSize,
   fontWeight: bold ? 600 : light ? 200 : 300,
-  opacity: muted ? 0.56 : 1,
   overflow: truncate ? 'hidden' : undefined,
   textAlign: center ? 'center' : 'left',
   textOverflow: truncate ? 'ellipsis' : undefined,
