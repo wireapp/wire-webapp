@@ -200,7 +200,7 @@ export class Call {
   updatePages() {
     const newPages = chunk<Participant>(this.participants(), NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE);
     if (newPages.length < this.pages().length) {
-      this.currentPage(this.pages.length - 1);
+      this.currentPage(newPages.length - 1);
     }
     this.pages(newPages);
   }

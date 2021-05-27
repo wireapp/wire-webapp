@@ -122,6 +122,8 @@ describe('fullscreenVideoCall', () => {
     props.callActions.setVideoSpeakersActiveTab = () => {};
     props.call.addParticipant(new Participant(new User('a'), 'a'));
     props.call.addParticipant(new Participant(new User('b'), 'b'));
+    props.call.addParticipant(new Participant(new User('c'), 'd'));
+    props.call.addParticipant(new Participant(new User('e'), 'f'));
 
     const fullscreenVideoCall = new FullscreenVideoCallPage(props);
     const activeSpeakerToggle = fullscreenVideoCall.getActiveSpeakerToggle();
