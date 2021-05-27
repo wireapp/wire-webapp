@@ -59,6 +59,7 @@ export class Configuration {
       EMAIL_EXISTS: 'https://support.wire.com/hc/articles/115004082129',
       HISTORY: 'https://support.wire.com/hc/articles/207834645',
       INDEX: 'https://support.wire.com/',
+      LEGAL_HOLD_BLOCK: '#',
       MICROPHONE_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202590081',
       SCREEN_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
     },
@@ -105,7 +106,8 @@ export class Configuration {
   /** measured in pixel */
   readonly SCROLL_TO_LAST_MESSAGE_THRESHOLD = 100;
 
-  readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png', '.jpg-large'];
+  /** Image MIME types */
+  readonly ALLOWED_IMAGE_TYPES = ['image/bmp', 'image/gif', 'image/jpeg', 'image/jpg', 'image/png'];
 }
 
 let instance: Configuration;

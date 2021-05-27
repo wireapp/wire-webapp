@@ -137,31 +137,37 @@ const sendRandomGif = async (account: Account, conversationId: string, query: st
   const {data: fileBuffer} = await axios.get<Buffer>(imageURL, {responseType: 'arraybuffer'});
 
   const payload = account.service.conversation.messageBuilder
-    .createText(conversationId, `${query} • via giphy.com`)
+    .createText({
+      conversationId,
+      text: `${query} • via giphy.com`,
+    })
     .build();
   await account.service.conversation.send(payload);
 
-  const fileMetaDataPayload = account.service.conversation.messageBuilder.createFileMetadata(conversationId, {
-    length: fileBuffer.length,
-    name: `${id}.gif`,
-    type: 'image/gif',
+  const fileMetaDataPayload = account.service.conversation.messageBuilder.createFileMetadata({
+    conversationId,
+    metaData: {
+      length: fileBuffer.length,
+      name: `${id}.gif`,
+      type: 'image/gif',
+    },
   });
   await account.service.conversation.send(fileMetaDataPayload);
 
   try {
-    const filePayload = await account.service.conversation.messageBuilder.createImage(
+    const filePayload = await account.service.conversation.messageBuilder.createImage({
       conversationId,
-      {data: fileBuffer, height: Number(imageHeight), type: 'image/gif', width: Number(imageWidth)},
-      fileMetaDataPayload.id,
-    );
+      image: {data: fileBuffer, height: Number(imageHeight), type: 'image/gif', width: Number(imageWidth)},
+      messageId: fileMetaDataPayload.id,
+    });
     await account.service.conversation.send(filePayload);
   } catch (error) {
     logger.warn(`Error while sending asset: "${error.stack}"`);
-    const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort(
+    const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort({
       conversationId,
-      0,
-      fileMetaDataPayload.id,
-    );
+      originalMessageId: fileMetaDataPayload.id,
+      reason: 0,
+    });
     await account.service.conversation.send(fileAbortPayload);
   }
 };
@@ -180,7 +186,12 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
       password: WIRE_PASSWORD,
     });
     const message = `Released tag "${tagName}" based on commit ID "${commitId}".`;
-    const payload = account.service.conversation.messageBuilder.createText(WIRE_CONVERSATION, message).build();
+    const payload = account.service.conversation.messageBuilder
+      .createText({
+        conversationId: WIRE_CONVERSATION,
+        text: message,
+      })
+      .build();
     await sendRandomGif(account, WIRE_CONVERSATION, 'in the oven');
     await account.service.conversation.send(payload);
     logger.info(`Sent announcement to conversation "${process.env.WIRE_CONVERSATION}".`);

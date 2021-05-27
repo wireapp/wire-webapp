@@ -56,7 +56,9 @@ describe('image-asset', () => {
 
   it('displays the image url when resource is loaded', () => {
     const assetRepository = container.resolve(AssetRepository);
-    spyOn(assetRepository, 'load').and.returnValue(Promise.resolve(new Blob()));
+    spyOn(assetRepository, 'load').and.returnValue(
+      Promise.resolve(new Blob([new Uint8Array()], {type: 'application/octet-stream'})),
+    );
 
     const image = new MediumImage();
     image.resource(new AssetRemoteData());

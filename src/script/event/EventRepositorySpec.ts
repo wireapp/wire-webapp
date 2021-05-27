@@ -344,10 +344,10 @@ describe('EventRepository', () => {
     });
 
     it('accepts "conversation.voice-channel-deactivate" (missed call) events', async () => {
-      const eventServiceSpy = ({
+      const eventServiceSpy = {
         loadEvent: jest.fn().mockImplementation(() => Promise.resolve()),
         saveEvent: jest.fn().mockImplementation(() => Promise.resolve({data: 'dummy content'})),
-      } as unknown) as EventService;
+      } as unknown as EventService;
       const fakeProp: any = undefined;
       const eventRepo = new EventRepository(eventServiceSpy, fakeProp, fakeProp, fakeProp, fakeProp, fakeProp);
       eventRepo.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
@@ -371,7 +371,7 @@ describe('EventRepository', () => {
 
     it('accepts plain decryption error events', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
-      const event = ({
+      const event = {
         conversation: '7f0939c8-dbd9-48f5-839e-b0ebcfffec8c',
         id: 'f518d6ff-19d3-48a0-b0c1-cc71c6e81136',
         type: 'conversation.unable-to-decrypt',
@@ -379,7 +379,7 @@ describe('EventRepository', () => {
         time: '2016-08-09T12:58:49.485Z',
         error: 'Offset is outside the bounds of the DataView (17cd13b4b2a3a98)',
         errorCode: '1778 (17cd13b4b2a3a98)',
-      } as unknown) as EventRecord;
+      } as unknown as EventRecord;
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return testFactory.event_repository['handleEvent'](event, EventSource.STREAM).then(() => {

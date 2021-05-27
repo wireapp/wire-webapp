@@ -13,11 +13,16 @@
       <!-- ko if: user() -->
         <panel-user-details params="participant: user, isSelfVerified: isSelfVerified"></panel-user-details>
         <enriched-fields params="user: user"></enriched-fields>
-        <user-actions
-          params="user: user, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: isActivatedAccount()"
-        ></user-actions>
+        <!-- ko if: user().isBlockedLegalHold() -->
+          <div class="modal__message" data-bind="html: blockedForLegalHoldText"></div>
+        <!-- /ko -->
+        <!-- ko ifnot: user().isBlockedLegalHold() -->   
+          <user-actions
+            params="user: user, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: isActivatedAccount()"
+          ></user-actions>
+        <!-- /ko -->
       <!-- /ko -->
-      <!-- ko if: isVisible && !user() && !userNotFound()  -->
+      <!-- ko if: isVisible() && !user() && !userNotFound()  -->
         <div class="loading-wrapper">
           <loading-icon></loading-icon>
         </div>

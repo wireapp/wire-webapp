@@ -53,7 +53,7 @@ class AppLockPage extends TestPage<AppLockProps> {
   formSubmit = () => this.submit(this.getForm());
 }
 
-const clientRepository = ({} as unknown) as ClientRepository;
+const clientRepository = {} as unknown as ClientRepository;
 
 const createTeamState = ({
   status = 'enabled',

@@ -239,9 +239,9 @@ jobs:
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
         run: |
           if [ "$DISTRIBUTION" == "wire" ]; then
-            yarn docker '' staging
+            yarn docker '' staging "$TAG"
           else
-            yarn docker "$DISTRIBUTION" staging
+            yarn docker "$DISTRIBUTION" staging "$TAG"
           fi
 
       - name: Push production Docker image
@@ -251,9 +251,9 @@ jobs:
           DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
         run: |
           if [ "$DISTRIBUTION" == "wire" ]; then
-            yarn docker '' production
+            yarn docker '' production "$TAG"
           else
-            yarn docker "$DISTRIBUTION" production
+            yarn docker "$DISTRIBUTION" production "$TAG"
           fi
 
       - name: Generate changelog

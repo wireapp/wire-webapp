@@ -251,7 +251,7 @@ ko.bindingHandlers.scrollSync = {
 ko.bindingHandlers.enter = {
   init(element, valueAccessor, _allBindings, data, context) {
     function wrapper(_data: unknown, event: KOEvent<KeyboardEvent>) {
-      const keyboardEvent = event.originalEvent || ((event as unknown) as KeyboardEvent);
+      const keyboardEvent = event.originalEvent || (event as unknown as KeyboardEvent);
 
       if (isEnterKey(keyboardEvent) && !keyboardEvent.shiftKey && !keyboardEvent.altKey) {
         const callback = valueAccessor();

@@ -32,7 +32,19 @@ require('src/script/util/test/mock/ResponseMock');
 require('src/script/util/test/mock/SVGProviderMock');
 require('src/script/util/test/mock/WebRTCMock');
 
-jest.mock('axios');
+jest.mock('axios', () => {
+  return {
+    create: () => {
+      return {
+        interceptors: {
+          request: {eject: jest.fn(), use: jest.fn()},
+          response: {eject: jest.fn(), use: jest.fn()},
+        },
+        request: jest.fn(),
+      };
+    },
+  };
+});
 
 require('test/api/payloads');
 
