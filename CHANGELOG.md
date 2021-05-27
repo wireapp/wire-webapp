@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.23.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.22.2...@wireapp/api-client@12.23.0) (2021-05-27)
+
+
+### Features
+
+* Add new connection for legal hold issues (SQSERVICES-429) ([#3904](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3904)) ([3ea521b](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/3ea521b0d9337d20de3f4649e6299c1d6ff460c4))
+
+
+
+
+
 ## [12.22.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.22.1...@wireapp/api-client@12.22.2) (2021-05-26)
 
 **Note:** Version bump only for package @wireapp/api-client
