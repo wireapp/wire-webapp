@@ -23,8 +23,11 @@ import type {BackendEventType} from '@wireapp/api-client/src/event/BackendEvent'
 import type {UserConnectionData} from '@wireapp/api-client/src/user/data/';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
+import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/Logger';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
@@ -37,7 +40,8 @@ import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';
 import type {ConnectionService} from './ConnectionService';
 import {ConnectionState} from './ConnectionState';
-import {container} from 'tsyringe';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {Config} from '../Config';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -173,6 +177,19 @@ export class ConnectionRepository {
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {
+      if (error.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT) {
+        const replaceLinkLegalHold = replaceLink(
+          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+          '',
+          'read-more-legal-hold',
+        );
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            htmlMessage: t('modalUserCannotConnectLegalHoldMessage', {}, replaceLinkLegalHold),
+            title: t('modalUserCannotConnectLegalHoldHeadline'),
+          },
+        });
+      }
       this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
     }
   }

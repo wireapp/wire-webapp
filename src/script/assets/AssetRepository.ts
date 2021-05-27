@@ -126,9 +126,7 @@ export class AssetRepository {
     }
   }
 
-  private async loadBuffer(
-    asset: AssetRemoteData,
-  ): Promise<{
+  private async loadBuffer(asset: AssetRemoteData): Promise<{
     buffer: ArrayBuffer;
     mimeType: string;
   }> {
@@ -204,9 +202,7 @@ export class AssetRepository {
     }
   }
 
-  async uploadProfileImage(
-    image: Blob | File,
-  ): Promise<{
+  async uploadProfileImage(image: Blob | File): Promise<{
     mediumImageKey: string;
     previewImageKey: string;
   }> {

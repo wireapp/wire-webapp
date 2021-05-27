@@ -440,10 +440,10 @@ export class CryptographyMapper {
 
   async _mapEphemeral(genericMessage: GenericMessage, event: EventRecord) {
     const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
-    ((genericMessage.ephemeral as unknown) as GenericMessage).messageId = genericMessage.messageId;
+    (genericMessage.ephemeral as unknown as GenericMessage).messageId = genericMessage.messageId;
 
     const embeddedMessage: any = await this._mapGenericMessage(
-      (genericMessage.ephemeral as unknown) as GenericMessage,
+      genericMessage.ephemeral as unknown as GenericMessage,
       event,
     );
     embeddedMessage.ephemeral_expires = ConversationEphemeralHandler.validateTimer(messageTimer as number);

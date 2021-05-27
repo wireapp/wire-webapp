@@ -20,15 +20,20 @@
 import React from 'react';
 
 import type {Message} from '../../entity/message/Message';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export interface EphemeralTimerProps {
   message: Message;
 }
 
 const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
-  const started = message.ephemeral_started();
-  const duration = ((message.ephemeral_expires() as number) - started) / 1000;
+  const {
+    ephemeral_remaining: remaining,
+    ephemeral_started: started,
+    ephemeral_expires: expires,
+  } = useKoSubscribableChildren(message, ['ephemeral_remaining', 'ephemeral_started', 'ephemeral_expires']);
+
+  const duration = expires - started;
 
   return (
     <svg className="ephemeral-timer" viewBox="0 0 8 8" width={8} height={8}>
@@ -39,7 +44,7 @@ const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
         cx={4}
         cy={4}
         r={2}
-        style={{animationDelay: `${(started - Date.now()) / 1000}s`, animationDuration: `${duration}s`}}
+        style={{'--offset': remaining / duration || 0} as React.CSSProperties}
         transform="rotate(-90 4 4)"
       />
     </svg>
@@ -49,6 +54,6 @@ const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
 export default EphemeralTimer;
 
 registerReactComponent('ephemeral-timer', {
+  bindings: 'message',
   component: EphemeralTimer,
-  template: '<div data-bind="react: {message}"></div>',
 });

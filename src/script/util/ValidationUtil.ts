@@ -36,7 +36,8 @@ export class ValidationUtilError extends Error {
 
 export const isValidUsername = (username: string) => /^@?[a-z_0-9.-]{2,256}$/.test(username);
 export const isValidFederationUsername = (username: string) => {
-  const federationUsernameRegex = /^(@?[a-z_0-9.-]{2,256})@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const federationUsernameRegex =
+    /^(@?[a-z_0-9.-]{2,256})@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return federationUsernameRegex.test(username);
 };
 
@@ -54,7 +55,8 @@ export const isValidPhoneNumber = (phoneNumber: string): boolean => {
 };
 
 export const isValidEmail = (email: string): boolean => {
-  const regExp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const regExp =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return regExp.test(email);
 };
 
@@ -84,7 +86,8 @@ export const isValidApiPath = (path: string): boolean => {
 };
 
 export const isTweetUrl = (url: string): boolean => {
-  const regex = /^http(?:s)?:\/\/(?:(?:www|mobile|0)\.)?twitter\.com\/(?:(?:\w{1,15})\/status(?:es|\/i)?|i\/moments)\/(?:\d{2,21})(?:(?:\?|\/).*)?$/;
+  const regex =
+    /^http(?:s)?:\/\/(?:(?:www|mobile|0)\.)?twitter\.com\/(?:(?:\w{1,15})\/status(?:es|\/i)?|i\/moments)\/(?:\d{2,21})(?:(?:\?|\/).*)?$/;
   return regex.test(url);
 };
 

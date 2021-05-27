@@ -73,8 +73,7 @@ describe('CryptographyRepository', () => {
                 client_ids.forEach(client_id => {
                   prekey_map[user_id][client_id] = {
                     id: 65535,
-                    key:
-                      'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g==',
+                    key: 'pQABARn//wKhAFgg3OpuTCUwDZMt1fklZB4M+fjDx/3fyx78gJ6j3H3dM2YDoQChAFggQU1orulueQHLv5YDYqEYl3D4O0zA9d+TaGGXXaBJmK0E9g==',
                   };
                 });
               }
@@ -110,8 +109,7 @@ describe('CryptographyRepository', () => {
       const clientId = '689ce2df236eb2be';
       const preKey = {
         id: 3,
-        key:
-          'pQABAQMCoQBYIFycSfcOATSpOIkJz8ntEnFAZ+YWtzVaJ7RLeDAqGU+0A6EAoQBYIMEJnklbfFFvnFC41rmjDMqx6L0oVX5RMab3uGwBgbkaBPY=',
+        key: 'pQABAQMCoQBYIFycSfcOATSpOIkJz8ntEnFAZ+YWtzVaJ7RLeDAqGU+0A6EAoQBYIMEJnklbfFFvnFC41rmjDMqx6L0oVX5RMab3uGwBgbkaBPY=',
       };
       const fingerprint = await testFactory.cryptography_repository.getRemoteFingerprint(userId, clientId, preKey);
 

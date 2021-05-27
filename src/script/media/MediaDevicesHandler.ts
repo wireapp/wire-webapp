@@ -175,9 +175,7 @@ export class MediaDevicesHandler {
     });
   }
 
-  private filterMediaDevices(
-    mediaDevices: MediaDeviceInfo[],
-  ): {
+  private filterMediaDevices(mediaDevices: MediaDeviceInfo[]): {
     cameras: MediaDeviceInfo[];
     microphones: MediaDeviceInfo[];
     speakers: MediaDeviceInfo[];

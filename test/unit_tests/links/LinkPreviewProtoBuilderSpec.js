@@ -40,8 +40,7 @@ const OpenGraphMocks = {
       description:
         'HD quality calls, private and group chats with inline photos, music and video. Secure and perfectly synced across your devices.',
       image: {
-        url:
-          'https://lh3.ggpht.com/ElqTCcY1N0c3EAX27MRFoXynZlbTaJD2KEqYNXAPn5YQPZa6Bvsux4NCgEMoUhazdIWWelAU__Kzmr55j55EsgM=s1024',
+        url: 'https://lh3.ggpht.com/ElqTCcY1N0c3EAX27MRFoXynZlbTaJD2KEqYNXAPn5YQPZa6Bvsux4NCgEMoUhazdIWWelAU__Kzmr55j55EsgM=s1024',
       },
       title: 'Wire · Modern communication, full privacy. For iOS, Android, macOS, Windows and web.',
       type: 'website',

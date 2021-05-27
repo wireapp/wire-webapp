@@ -17,7 +17,12 @@
  *
  */
 
-import type {NewClient, QualifiedPublicClients, RegisteredClient} from '@wireapp/api-client/src/client';
+import type {
+  NewClient,
+  QualifiedPublicClients,
+  RegisteredClient,
+  ClientCapabilityData,
+} from '@wireapp/api-client/src/client';
 import type {QualifiedId} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
@@ -27,6 +32,8 @@ import type {ClientRecord} from '../storage';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
+
+export type QualifiedPublicUserMap = QualifiedPublicClients['qualified_user_map'];
 
 export class ClientService {
   private readonly logger: Logger;
@@ -66,6 +73,17 @@ export class ClientService {
   }
 
   /**
+   * Updates capabilities of a client.
+   *
+   * @param clientId ID of client to be updated
+   * @param clientCapabilities New capabilities of the client
+   * @returns Resolves once the update of the client is complete
+   */
+  putClientCapabilities(clientId: string, clientCapabilities: ClientCapabilityData): Promise<void> {
+    return this.apiClient.client.api.putClient(clientId, clientCapabilities);
+  }
+
+  /**
    * Deletes the temporary client of a user.
    * @param clientId ID of the temporary client to be deleted
    * @returns Resolves once the deletion of the temporary client is complete
@@ -101,9 +119,9 @@ export class ClientService {
    * @param userId ID of user to retrieve clients for
    * @returns Resolves with the clients of a user
    */
-  async getClientsByUserIds(userIds: (QualifiedId | string)[]): Promise<QualifiedPublicClients> {
+  async getClientsByUserIds(userIds: (QualifiedId | string)[]): Promise<QualifiedPublicUserMap> {
     // Add 'none' as domain for non-federated users
-    let clients: QualifiedPublicClients = {none: {}};
+    let clients: QualifiedPublicUserMap = {none: {}};
 
     const {qualifiedIds, stringIds} = userIds.reduce(
       (result, userId) => {
@@ -122,8 +140,8 @@ export class ClientService {
     }
 
     if (qualifiedIds.length) {
-      const listedClients = await this.apiClient.user.api.postListClients(qualifiedIds);
-      clients = {...clients, ...listedClients};
+      const listedClients = await this.apiClient.user.api.postListClients({qualified_users: qualifiedIds});
+      clients = {...clients, ...listedClients.qualified_user_map};
     }
 
     return clients;
