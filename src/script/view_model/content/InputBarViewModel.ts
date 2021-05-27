@@ -104,7 +104,8 @@ export class InputBarViewModel {
   readonly renderMessage: typeof renderMessage;
   readonly input: ko.Observable<string>;
   private readonly showAvailabilityTooltip: ko.PureComputed<boolean>;
-  readonly allowedImageTypes: string;
+  /** MIME types and file extensions are accepted */
+  readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
 
   static get CONFIG() {
@@ -130,7 +131,7 @@ export class InputBarViewModel {
   ) {
     this.shadowInput = null;
     this.textarea = null;
-    this.allowedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
+    this.acceptedImageTypes = Config.getConfig().ALLOWED_IMAGE_TYPES.join(',');
     this.allowedFileTypes = Config.getConfig().FEATURE.ALLOWED_FILE_UPLOAD_EXTENSIONS.join(',');
 
     this.selectionStart = ko.observable(0);
@@ -421,7 +422,7 @@ export class InputBarViewModel {
     });
 
     const replyMessageId = draftMessage.reply
-      ? ((draftMessage.reply as unknown) as {messageId: string}).messageId
+      ? (draftMessage.reply as unknown as {messageId: string}).messageId
       : undefined;
 
     if (replyMessageId) {

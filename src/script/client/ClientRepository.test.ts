@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification, ClientType, PublicClient, QualifiedPublicClients} from '@wireapp/api-client/src/client/';
+import {ClientClassification, ClientType, PublicClient} from '@wireapp/api-client/src/client/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Runtime} from '@wireapp/commons';
 
@@ -26,6 +26,7 @@ import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';
+import {QualifiedPublicUserMap} from 'src/script/client/ClientService';
 import {TestFactory} from '../../../test/helper/TestFactory';
 
 describe('ClientRepository', () => {
@@ -54,7 +55,7 @@ describe('ClientRepository', () => {
         {class: ClientClassification.TABLET, id: 'c411f97b139c818b'},
         {class: ClientClassification.DESKTOP, id: 'cbf3ea49214702d8'},
       ];
-      const userClientMap: QualifiedPublicClients = {
+      const userClientMap: QualifiedPublicUserMap = {
         none: {
           [entities.user.john_doe.id]: allClients,
         },

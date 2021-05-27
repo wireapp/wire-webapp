@@ -382,6 +382,7 @@ export class CallingRepository {
     const index = this.callState.activeCalls().indexOf(call);
     call.getSelfParticipant().releaseMediaStream();
     call.participants.removeAll();
+    call.removeAllAudio();
     if (index !== -1) {
       this.callState.activeCalls.splice(index, 1);
     }
@@ -863,7 +864,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private injectDeactivateEvent(
@@ -882,7 +883,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private readonly sendMessage = (
@@ -1023,6 +1024,7 @@ export class CallingRepository {
       return;
     }
     selfParticipant.releaseMediaStream();
+    call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
   };

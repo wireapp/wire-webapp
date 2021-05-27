@@ -43,6 +43,7 @@ export interface ServerConfig {
         EMAIL_EXISTS: string;
         HISTORY: string;
         INDEX: string;
+        LEGAL_HOLD_BLOCK: string;
         MICROPHONE_ACCESS_DENIED: string;
         SCREEN_ACCESS_DENIED: string;
       };

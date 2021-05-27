@@ -33,7 +33,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {AxiosError} from 'axios';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
-import type {QualifiedPublicClients, PublicClient} from '@wireapp/api-client/src/client';
+import type {PublicClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
 
 import {chunk, partition} from 'Util/ArrayUtil';
@@ -68,6 +68,7 @@ import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
+import {QualifiedPublicUserMap} from '../client/ClientService';
 
 export class UserRepository {
   private readonly logger: Logger;
@@ -176,11 +177,11 @@ export class UserRepository {
    * Retrieves meta information about all the clients of a given user.
    */
   getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
-  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicClients>;
+  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicUserMap>;
   getClientsByUserIds(
     userIds: (QualifiedId | string)[],
     updateClients: boolean,
-  ): Promise<QualifiedUserClientMap | QualifiedPublicClients> {
+  ): Promise<QualifiedUserClientMap | QualifiedPublicUserMap> {
     return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
   }
 
@@ -188,11 +189,11 @@ export class UserRepository {
    * Retrieves meta information about all the clients of a given user.
    */
   getClientsByUsers(userEntities: User[], updateClients: true): Promise<QualifiedUserClientMap>;
-  getClientsByUsers(userEntities: User[], updateClients: false): Promise<QualifiedPublicClients>;
+  getClientsByUsers(userEntities: User[], updateClients: false): Promise<QualifiedPublicUserMap>;
   getClientsByUsers(
     userEntities: User[],
     updateClients: boolean,
-  ): Promise<QualifiedUserClientMap | QualifiedPublicClients> {
+  ): Promise<QualifiedUserClientMap | QualifiedPublicUserMap> {
     const userIds: (QualifiedId | string)[] = userEntities.map(userEntity => {
       return userEntity.domain ? {domain: userEntity.domain, id: userEntity.id} : userEntity.id;
     });

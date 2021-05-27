@@ -32,18 +32,23 @@ class EphemeralTimerPage extends TestPage<EphemeralTimerProps> {
 describe('EphemeralTimer', () => {
   it('shows the icon', () => {
     const message = new Message();
-    message.ephemeral_started(Date.now());
-    message.ephemeral_expires(new Date(new Date().getTime() + 10 * 60000).getTime());
+    const remaining = 600_000;
+    const now = Date.now();
+    message.ephemeral_started(now);
+    message.ephemeral_expires(now + remaining);
+    message.ephemeral_remaining(remaining);
 
     const ephemeralTimer = new EphemeralTimerPage({message});
     const circle = ephemeralTimer.getCircle();
-    expect(circle.props().style.animationDuration).toBe('600s');
+
+    expect(circle.props().style['--offset']).toBe(1);
   });
   it('hides the icon when no ephemeral timer was started', () => {
     const message = new Message();
 
     const ephemeralTimer = new EphemeralTimerPage({message});
     const circle = ephemeralTimer.getCircle();
-    expect(circle.props().style.animationDuration).toBe('0s');
+
+    expect(circle.props().style['--offset']).toBe(0);
   });
 });

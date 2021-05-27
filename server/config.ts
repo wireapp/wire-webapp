@@ -169,6 +169,7 @@ const config: ServerConfig = {
         EMAIL_EXISTS: process.env.URL_SUPPORT_EMAIL_EXISTS,
         HISTORY: process.env.URL_SUPPORT_HISTORY,
         INDEX: process.env.URL_SUPPORT_INDEX,
+        LEGAL_HOLD_BLOCK: process.env.URL_SUPPORT_LEGAL_HOLD_BLOCK,
         MICROPHONE_ACCESS_DENIED: process.env.URL_SUPPORT_MICROPHONE_ACCESS_DENIED,
         SCREEN_ACCESS_DENIED: process.env.URL_SUPPORT_SCREEN_ACCESS_DENIED,
       },

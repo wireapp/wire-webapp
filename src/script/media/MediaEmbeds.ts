@@ -165,7 +165,8 @@ export const MediaEmbeds = {
     soundcloud: /(https?:\/\/(?:www\.|m\.)?)?soundcloud\.com(\/[\w-]+){2,3}/g,
     spotify: /https?:\/\/(?:play\.|open\.)*spotify\.com\/([^?]+)/g,
     vimeo: /https?:\/\/(?:(?:player\.)?vimeo\.com\/)(?:channels(?:\/[^/]+)?\/|video\/)?([0-9]+)/g,
-    youtube: /(?:youtube(?:-nocookie)?\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g,
+    youtube:
+      /(?:youtube(?:-nocookie)?\.com\/\S*(?:(?:\/e(?:mbed))?\/|watch\/?\?(?:\S*?&?v=))|youtu\.be\/)([a-zA-Z0-9_-]{6,11})/g,
   },
 
   /**
@@ -200,8 +201,7 @@ export const MediaEmbeds = {
 
       const iFrame = _createIFrameContainer({
         height: height.toString(),
-        src:
-          'https://w.soundcloud.com/player/?url={1}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true',
+        src: 'https://w.soundcloud.com/player/?url={1}&visual=false&show_comments=false&buying=false&show_playcount=false&liking=false&sharing=false&hide_related=true',
         type: 'soundcloud',
         video: false,
       });

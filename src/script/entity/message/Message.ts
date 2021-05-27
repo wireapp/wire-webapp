@@ -57,7 +57,6 @@ export class Message {
   public reaction: ReactionType;
   public readonly accent_color: ko.PureComputed<string>;
   public readonly ephemeral_caption: ko.PureComputed<string>;
-  public readonly ephemeral_duration: ko.Observable<number>;
   public readonly ephemeral_expires: ko.Observable<boolean | number | string>;
   public readonly ephemeral_remaining: ko.Observable<number>;
   public readonly ephemeral_started: ko.Observable<number>;
@@ -93,7 +92,6 @@ export class Message {
       const remainingTime = this.ephemeral_remaining();
       return remainingTime ? `${formatDurationCaption(remainingTime)} ${t('ephemeralRemaining')}` : '';
     });
-    this.ephemeral_duration = ko.observable(0);
     this.ephemeral_remaining = ko.observable(0);
     this.ephemeral_expires = ko.observable(false);
     this.ephemeral_started = ko.observable(0);
@@ -262,7 +260,7 @@ export class Message {
   isLinkPreview(): this is LinkPreview {
     return (
       this.hasAssetText() &&
-      ((this as unknown) as ContentMessage)
+      (this as unknown as ContentMessage)
         .assets()
         .some(assetEntity => assetEntity.isText() && assetEntity.previews().length)
     );
@@ -349,7 +347,7 @@ export class Message {
    */
   hasUnavailableAsset(includeFailedState = true): boolean {
     if (this.hasAsset()) {
-      return ((this as unknown) as ContentMessage).assets().some(asset => {
+      return (this as unknown as ContentMessage).assets().some(asset => {
         const unavailableStatus = [AssetTransferState.UPLOAD_PENDING, AssetTransferState.UPLOADING];
         if (includeFailedState) {
           unavailableStatus.push(AssetTransferState.UPLOAD_FAILED);
