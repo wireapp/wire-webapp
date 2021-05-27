@@ -235,9 +235,7 @@ export class PanelViewModel {
   };
 
   private readonly _switchState = (toState: string, fromState: string, params: PanelParams, fromLeft = false): void => {
-    const toViewModel = this.subViews[toState];
-    const fromViewModel = this.subViews[fromState];
-    toViewModel?.initView?.(params);
+    this.subViews[toState]?.initView?.(params);
     this.currentEntityId = params.entity.id;
 
     const isSameState = fromState === toState;
@@ -245,7 +243,7 @@ export class PanelViewModel {
       return;
     }
 
-    if (!fromViewModel) {
+    if (!fromState) {
       this._showPanel(toState);
       return;
     }
@@ -254,14 +252,16 @@ export class PanelViewModel {
 
     const fromPanel = document.querySelector(`#${this.elementIds[fromState]}`);
     const toPanel = this._showPanel(toState);
+    window.requestAnimationFrame(() => {
+      toPanel?.classList.add(`panel__page--move-in${fromLeft ? '--left' : '--right'}`);
+      fromPanel?.classList.add(`panel__page--move-out${fromLeft ? '--left' : '--right'}`);
 
-    toPanel?.classList.add(`panel__page--move-in${fromLeft ? '--left' : '--right'}`);
-    fromPanel?.classList.add(`panel__page--move-out${fromLeft ? '--left' : '--right'}`);
-
-    window.setTimeout(() => {
-      toPanel?.classList.remove('panel__page--move-in--left', 'panel__page--move-in--right');
-      this._hidePanel(fromState);
-    }, MotionDuration.MEDIUM);
+      window.setTimeout(() => {
+        toPanel?.classList.remove('panel__page--move-in--left', 'panel__page--move-in--right');
+        fromPanel?.classList.remove('panel__page--move-out--left', 'panel__page--move-out--right');
+        this._hidePanel(fromState);
+      }, MotionDuration.MEDIUM);
+    });
   };
 
   private readonly _hidePanel = (state: string, forceInvisible = false): void => {

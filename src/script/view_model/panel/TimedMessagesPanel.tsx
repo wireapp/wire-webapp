@@ -51,14 +51,11 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
   useFadingScrollbar(scrollbarRef);
 
   const activeConversation = useKoSubscribable(conversationState.activeConversation);
-  const {hasGlobalMessageTimer, messageTimer} = useKoSubscribableChildren(activeConversation, [
-    'hasGlobalMessageTimer',
-    'messageTimer',
-  ]);
+  const {globalMessageTimer} = useKoSubscribableChildren(activeConversation, ['globalMessageTimer']);
 
   useEffect(() => {
-    const _messageTimer = hasGlobalMessageTimer ? messageTimer : 0;
-    setCurrentMessageTimer(_messageTimer);
+    const messageTimer = globalMessageTimer ?? 0;
+    setCurrentMessageTimer(messageTimer);
 
     const mappedTimes = EphemeralTimings.VALUES.map(time => ({
       isCustom: false,
@@ -66,11 +63,11 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
       value: time,
     }));
 
-    if (!!_messageTimer && !EphemeralTimings.VALUES.includes(_messageTimer)) {
+    if (!!messageTimer && !EphemeralTimings.VALUES.includes(messageTimer)) {
       mappedTimes.push({
         isCustom: true,
-        text: formatDuration(_messageTimer).text,
-        value: _messageTimer,
+        text: formatDuration(messageTimer).text,
+        value: messageTimer,
       });
     }
     mappedTimes.unshift({
@@ -79,7 +76,7 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
       value: 0,
     });
     setMessageTimes(mappedTimes);
-  }, [hasGlobalMessageTimer, messageTimer]);
+  }, [globalMessageTimer]);
 
   const timedMessageChange = (value: number): void => {
     if (activeConversation) {
@@ -98,7 +95,9 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
         </DragableClickWrapper>
         <div className="panel__header__title">{t('timedMessagesTitle')}</div>
         <DragableClickWrapper onClick={onClose}>
-          <Icon.Close className="right-panel-close icon-button" data-uie-name="do-close" />
+          <div className="icon-button" data-uie-name="do-close">
+            <Icon.Close className="right-panel-close" />
+          </div>
         </DragableClickWrapper>
       </div>
       <div ref={setScrollbarRef} className="panel__content">
