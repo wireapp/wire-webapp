@@ -19,16 +19,11 @@
 
 import type {ConnectionStatus} from '../connection/';
 
-export enum ConnectionReason {
-  MISSING_LEGAL_HOLD_CONSENT = 'missing-legalhold-consent',
-}
-
 export interface Connection {
   conversation: string;
   from: string;
   last_update: string;
   message?: string;
-  reason?: ConnectionReason;
   status: ConnectionStatus;
   to: string;
 }
