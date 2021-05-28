@@ -65,15 +65,11 @@ export class ConversationParticipantsViewModel extends BasePanelViewModel {
     this.MotionDuration = MotionDuration;
   }
 
-  getElementId(): string {
-    return 'conversation-participants';
-  }
-
   readonly clickOnShowUser = (userEntity: User): void => {
     this.navigateTo(PanelViewModel.STATE.GROUP_PARTICIPANT_USER, {entity: userEntity});
   };
 
-  initView({highlighted}: PanelParams = {highlighted: []}): void {
+  initView({highlighted}: PanelParams = {entity: null, highlighted: []}): void {
     this.searchInput('');
     this.highlightedUsers(highlighted);
   }

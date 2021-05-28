@@ -30,7 +30,7 @@ import type {User} from '../../entity/User';
 export interface PanelViewModelProps {
   isVisible: ko.PureComputed<boolean>;
   mainViewModel: MainViewModel;
-  navigateTo: (target: string, params?: {addMode?: boolean; entity?: User | ServiceEntity}) => void;
+  navigateTo: (target: string, params?: {addMode?: boolean; entity: Conversation | User | ServiceEntity}) => void;
   onClose: () => void;
   onGoBack: () => void;
   onGoToRoot: () => void;
@@ -59,16 +59,4 @@ export class BasePanelViewModel {
   }
 
   initView(params?: PanelParams): void {}
-
-  getElementId(): string {
-    return 'conversation-details';
-  }
-
-  getEntityId(): string | false {
-    return this.activeConversation()?.id ?? false;
-  }
-
-  shouldSkipTransition(): boolean {
-    return false;
-  }
 }

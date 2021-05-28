@@ -25,7 +25,6 @@ interface ReactWrapperProps {
   component: React.FC;
   componentProps: Object;
 }
-
 class ReactWrapper extends React.Component<ReactWrapperProps> {
   component: React.FC;
   constructor(props: ReactWrapperProps) {

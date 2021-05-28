@@ -73,14 +73,6 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     });
   }
 
-  getElementId(): string {
-    return 'group-participant-service';
-  }
-
-  getEntityId(): string {
-    return this.selectedParticipant().id;
-  }
-
   clickOnAdd(): void {
     this.integrationRepository.addService(this.activeConversation(), this.selectedService());
     this.onGoToRoot();

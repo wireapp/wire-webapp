@@ -51,7 +51,7 @@ export class ConnectionMapper {
    * @param connectionEntity Connection entity that the info shall be mapped to
    */
   updateConnectionFromJson(connectionEntity: ConnectionEntity, connectionData: ConnectionData): ConnectionEntity {
-    const {conversation, from, last_update, message, status, to: remoteUserId, reason} = connectionData;
+    const {conversation, from, last_update, message, status, to: remoteUserId} = connectionData;
 
     connectionEntity.status(status);
     connectionEntity.conversationId = conversation;
@@ -59,7 +59,6 @@ export class ConnectionMapper {
     connectionEntity.from = from;
     connectionEntity.lastUpdate = last_update;
     connectionEntity.message = message;
-    connectionEntity.reason = reason;
 
     return connectionEntity;
   }

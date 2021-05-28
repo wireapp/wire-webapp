@@ -309,7 +309,11 @@ export class ConnectionRepository {
     previousStatus: ConnectionStatus,
   ): Promise<void> {
     // We accepted the connection request or unblocked the user
-    const expectedPreviousStatus = [ConnectionStatus.BLOCKED, ConnectionStatus.PENDING];
+    const expectedPreviousStatus = [
+      ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
+      ConnectionStatus.BLOCKED,
+      ConnectionStatus.PENDING,
+    ];
     const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
     const selfUserAccepted = connectionEntity.isConnected() && wasExpectedPreviousStatus;
     const isWebSocketEvent = source === EventRepository.SOURCE.WEB_SOCKET;

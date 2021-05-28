@@ -56,8 +56,4 @@ export class NotificationsViewModel extends BasePanelViewModel {
     const notificationState = parseInt((event.target as HTMLInputElement).value, 10);
     this.conversationRepository.setNotificationState(this.activeConversation(), notificationState);
   };
-
-  getElementId(): string {
-    return 'notification-settings';
-  }
 }

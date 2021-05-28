@@ -95,7 +95,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     if (
       this.isVisible() &&
       type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE &&
-      data.user_ids.includes(this.getEntityId())
+      data.user_ids.includes(this.selectedParticipant()?.id)
     ) {
       this.onGoToRoot();
     }
@@ -122,14 +122,6 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
       this.onGoBack();
     }
   };
-
-  getElementId(): string {
-    return 'group-participant-user';
-  }
-
-  getEntityId(): string {
-    return this.selectedParticipant()?.id;
-  }
 
   clickOnDevices(): void {
     this.navigateTo(PanelViewModel.STATE.PARTICIPANT_DEVICES, {entity: this.selectedParticipant()});

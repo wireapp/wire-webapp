@@ -230,6 +230,13 @@ export class ContentViewModel {
       }
     });
 
+    this.conversationState.filtered_conversations.subscribe(conversations => {
+      const activeConversation = this.conversationState.activeConversation();
+      if (!conversations.some(conversation => conversation === activeConversation)) {
+        this.showConversation(this.conversationRepository.getMostRecentConversation());
+      }
+    });
+
     this._initSubscriptions();
     if (this.teamState.supportsLegalHold()) {
       this.legalHoldModal.showRequestModal();
@@ -297,7 +304,7 @@ export class ContentViewModel {
 
         if (isOpenedConversation) {
           if (openNotificationSettings) {
-            this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
+            this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: conversationEntity});
           }
           return;
         }
@@ -328,7 +335,9 @@ export class ContentViewModel {
             this.showContent(ContentViewModel.STATE.CONVERSATION);
             this.previousConversation = this.conversationState.activeConversation();
             if (openNotificationSettings) {
-              this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
+              this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {
+                entity: this.conversationState.activeConversation(),
+              });
             }
           });
         });

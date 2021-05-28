@@ -21,7 +21,6 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Availability} from '@wireapp/protocol-messaging';
-import {ConnectionReason} from '@wireapp/api-client/src/connection/';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -154,10 +153,8 @@ export class User {
 
     this.connection = ko.observable(new ConnectionEntity());
 
-    this.isBlocked = ko.pureComputed(() => this.connection().isBlocked());
-    this.isBlockedLegalHold = ko.pureComputed(
-      () => this.isBlocked() && this.connection().reason === ConnectionReason.MISSING_LEGAL_HOLD_CONSENT,
-    );
+    this.isBlocked = ko.pureComputed(() => this.connection().isBlocked() || this.isBlockedLegalHold());
+    this.isBlockedLegalHold = ko.pureComputed(() => this.connection().isMissingLegalHoldConsent());
     this.isCanceled = ko.pureComputed(() => this.connection().isCanceled());
     this.isConnected = ko.pureComputed(() => this.connection().isConnected());
     this.isIgnored = ko.pureComputed(() => this.connection().isIgnored());
