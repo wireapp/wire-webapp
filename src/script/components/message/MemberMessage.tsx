@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import Icon from 'Components/Icon';
 import {MemberMessage as MemberMessageEntity} from '../../entity/message/MemberMessage';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
@@ -25,6 +25,7 @@ import MessageTime from './MessageTime';
 import {t} from 'Util/LocalizerUtil';
 import ConnectedMessage from './memberMessage/ConnectedMessage';
 import {User} from 'src/script/entity/User';
+import useEffectRef from 'Util/useEffectRef';
 
 export interface MemberMessageProps {
   hasReadReceiptsTurnedOn: boolean;
@@ -74,7 +75,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
   const isMemberLeave = message.isMemberLeave();
   const isMemberChange = message.isMemberChange();
 
-  const [messageHeaderLabelRef, setMessageHeaderLabelRef] = useState<HTMLDivElement>(null);
+  const [messageHeaderLabelRef, setMessageHeaderLabelRef] = useEffectRef(null);
   useEffect(() => {
     if (messageHeaderLabelRef) {
       const link = messageHeaderLabelRef.querySelector('.message-header-show-more');

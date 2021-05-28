@@ -20,7 +20,7 @@
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import React from 'react';
 import {User} from 'src/script/entity/User';
-import {useKoSubscribable} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface ConnectedMessageProps {
@@ -34,9 +34,11 @@ const ConnectedMessage: React.FC<ConnectedMessageProps> = ({
   onClickCancelRequest,
   showServicesWarning = false,
 }) => {
-  const name = useKoSubscribable(user.name);
-  const providerName = useKoSubscribable(user.providerName);
-  const isOutgoingRequest = useKoSubscribable(user.isOutgoingRequest);
+  const {name, providerName, isOutgoingRequest} = useKoSubscribableChildren(user, [
+    'name',
+    'providerName',
+    'isOutgoingRequest',
+  ]);
   const handle = user.handle;
   const isService = user.isService;
 
