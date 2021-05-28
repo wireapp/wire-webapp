@@ -195,16 +195,8 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     this.isReceiptsOpen(false);
   }
 
-  getEntityId(): string {
-    return this.messageId();
-  }
-
   initView({entity: {id}, showLikes}: PanelParams): void {
     this.isReceiptsOpen(!showLikes);
     this.messageId(id);
-  }
-
-  getElementId(): string {
-    return 'message-details';
   }
 }

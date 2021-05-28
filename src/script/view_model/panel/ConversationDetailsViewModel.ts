@@ -365,10 +365,6 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     return allMenuElements.filter(menuElement => menuElement.condition()).map(menuElement => menuElement.item);
   }
 
-  getElementId(): string {
-    return 'conversation-details';
-  }
-
   clickOnAddParticipants(): void {
     this.navigateTo(PanelViewModel.STATE.ADD_PARTICIPANTS);
   }
@@ -390,7 +386,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnTimedMessages(): void {
-    this.navigateTo(PanelViewModel.STATE.TIMED_MESSAGES);
+    this.navigateTo(PanelViewModel.STATE.TIMED_MESSAGES, {entity: this.activeConversation()});
   }
 
   clickOnNotifications(): void {

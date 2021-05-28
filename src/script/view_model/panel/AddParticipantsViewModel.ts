@@ -150,10 +150,6 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
     this.manageServicesUrl = getManageServicesUrl('client_landing');
   }
 
-  getElementId(): string {
-    return 'add-participants';
-  }
-
   clickOnAddPeople(): void {
     this.state(AddParticipantsViewModel.STATE.ADD_PEOPLE);
   }
