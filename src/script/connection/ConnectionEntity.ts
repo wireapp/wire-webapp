@@ -28,6 +28,7 @@ export class ConnectionEntity {
   isConnected: ko.PureComputed<boolean>;
   isIgnored: ko.PureComputed<boolean>;
   isIncomingRequest: ko.PureComputed<boolean>;
+  isMissingLegalHoldConsent: ko.PureComputed<boolean>;
   isOutgoingRequest: ko.PureComputed<boolean>;
   isRequest: ko.PureComputed<boolean>;
   isUnknown: ko.PureComputed<boolean>;
@@ -35,7 +36,6 @@ export class ConnectionEntity {
   message: string;
   status: ko.Observable<ConnectionStatus>;
   userId: string;
-  reason: string;
 
   constructor() {
     this.conversationId = null;
@@ -46,6 +46,9 @@ export class ConnectionEntity {
     this.userId = null;
 
     this.isBlocked = ko.pureComputed(() => this.status() === ConnectionStatus.BLOCKED);
+    this.isMissingLegalHoldConsent = ko.pureComputed(
+      () => this.status() === ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
+    );
     this.isCanceled = ko.pureComputed(() => this.status() === ConnectionStatus.CANCELLED);
     this.isConnected = ko.pureComputed(() => this.status() === ConnectionStatus.ACCEPTED);
     this.isIgnored = ko.pureComputed(() => this.status() === ConnectionStatus.IGNORED);
