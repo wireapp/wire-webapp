@@ -230,6 +230,13 @@ export class ContentViewModel {
       }
     });
 
+    this.conversationState.filtered_conversations.subscribe(conversations => {
+      const activeConversation = this.conversationState.activeConversation();
+      if (!conversations.some(conversation => conversation === activeConversation)) {
+        this.showConversation(this.conversationRepository.getMostRecentConversation());
+      }
+    });
+
     this._initSubscriptions();
     if (this.teamState.supportsLegalHold()) {
       this.legalHoldModal.showRequestModal();

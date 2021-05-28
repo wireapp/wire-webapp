@@ -26,7 +26,7 @@ import {
 } from '@wireapp/api-client/src/event/';
 import type {Notification} from '@wireapp/api-client/src/notification/';
 import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
-import {ConnectionStatus, ConnectionReason} from '@wireapp/api-client/src/connection/';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {util as ProteusUtil} from '@wireapp/proteus';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
@@ -389,8 +389,7 @@ export class DebugUtil {
           from: this.userState.self().id,
           last_update: conversation.getNextIsoDate(),
           message: ' ',
-          reason: ConnectionReason.MISSING_LEGAL_HOLD_CONSENT,
-          status: ConnectionStatus.BLOCKED,
+          status: ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
           to: userId,
         },
         type: USER_EVENT.CONNECTION,
