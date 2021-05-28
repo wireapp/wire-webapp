@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2020 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,8 @@
  *
  */
 
-import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
-import {singleton} from 'tsyringe';
+import {useState} from 'react';
 
-import {Config} from '../Config';
-
-@singleton()
-export class APIClient extends APIClientUnconfigured {
-  constructor() {
-    super({
-      urls: {
-        name: 'backend',
-        rest: Config.getConfig().BACKEND_REST,
-        ws: Config.getConfig().BACKEND_WS,
-      },
-    });
-  }
+export default function useEffectRef<T extends Element>(value?: T): [T, (node: T) => void] {
+  return useState<T>(value);
 }

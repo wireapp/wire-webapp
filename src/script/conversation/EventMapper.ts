@@ -501,6 +501,7 @@ export class EventMapper {
   private _mapEventMemberLeave({data: eventData}: EventRecord) {
     const messageEntity = new MemberMessage();
     messageEntity.userIds(eventData.user_ids);
+    messageEntity.reason = eventData.reason;
     return messageEntity;
   }
 

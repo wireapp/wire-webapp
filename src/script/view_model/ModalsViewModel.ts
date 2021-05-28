@@ -23,7 +23,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {noop, afterRender} from 'Util/util';
 import {formatLocale} from 'Util/TimeUtil';
 import {onEscKey, offEscKey, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
@@ -258,16 +258,7 @@ export class ModalsViewModel {
       case ModalType.SESSION_RESET: {
         content.titleText = t('modalSessionResetHeadline');
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-        content.messageHtml = t(
-          'modalSessionResetMessage',
-          {},
-          {
-            '/link': '</a>',
-            link: `<a href="${
-              Config.getConfig().URL.SUPPORT.BUG_REPORT
-            }" rel="nofollow noopener noreferrer" target="_blank">`,
-          },
-        );
+        content.messageHtml = t('modalSessionResetMessage', {}, replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT));
         break;
       }
       case ModalType.MULTI_ACTIONS: {

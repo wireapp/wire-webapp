@@ -21,6 +21,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {noop} from 'Util/util';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {Actions} from 'Components/panel/UserActions';
 
 import {Config} from '../../Config';
@@ -41,6 +42,7 @@ export class UserModalViewModel {
   brandName: string;
   isSelfVerified: ko.PureComputed<boolean>;
   isActivatedAccount: ko.PureComputed<boolean>;
+  blockedForLegalHoldText: string;
 
   constructor(
     userRepository: UserRepository,
@@ -63,6 +65,13 @@ export class UserModalViewModel {
     this.hide = () => this.isVisible(false);
     this.brandName = Config.getConfig().BRAND_NAME;
     this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
+    const replaceLinkLegalHold = replaceLink(
+      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+      '',
+      'read-more-legal-hold',
+    );
+
+    this.blockedForLegalHoldText = t('modalUserBlockedForLegalHold', {}, replaceLinkLegalHold);
   }
 
   readonly onUserAction = (action: Actions): void => {

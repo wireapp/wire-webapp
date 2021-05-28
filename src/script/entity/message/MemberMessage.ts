@@ -18,9 +18,11 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
+
 import ko from 'knockout';
 
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {getUserName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
@@ -29,6 +31,7 @@ import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {User} from '../User';
 import {SystemMessage} from './SystemMessage';
+import {Config} from '../../Config';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
@@ -49,6 +52,7 @@ export class MemberMessage extends SystemMessage {
   public readonly userEntities: ko.ObservableArray<User>;
   public readonly userIds: ko.ObservableArray<string>;
   public memberMessageType: SystemMessageType;
+  public reason: MemberLeaveReason;
 
   static get CONFIG() {
     return {
@@ -207,6 +211,9 @@ export class MemberMessage extends SystemMessage {
         }
 
         case CONVERSATION_EVENT.MEMBER_LEAVE: {
+          if (this.reason === MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT) {
+            return this.generateLegalHoldLeaveMessage();
+          }
           const temporaryGuestRemoval = this.otherUser().isMe && this.otherUser().isTemporaryGuest();
           if (temporaryGuestRemoval) {
             return t('temporaryGuestLeaveMessage');
@@ -247,6 +254,33 @@ export class MemberMessage extends SystemMessage {
       return '';
     });
   }
+
+  private readonly generateLegalHoldLeaveMessage = () => {
+    const replaceLinkLegalHold = replaceLink(
+      Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+      '',
+      'read-more-legal-hold',
+    );
+    if (this.userEntities().some(user => user.isMe)) {
+      return t('conversationYouRemovedMissingLegalHoldConsent', {}, replaceLinkLegalHold);
+    }
+    const users = this.generateNameString(this.exceedsMaxVisibleUsers());
+
+    if (this.userEntities().length === 1) {
+      return t('conversationMemberRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
+    }
+    if (this.exceedsMaxVisibleUsers()) {
+      return t(
+        'conversationMultipleMembersRemovedMissingLegalHoldConsentMore',
+        {
+          count: this.hiddenUserCount().toString(10),
+          users,
+        },
+        replaceLinkLegalHold,
+      );
+    }
+    return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', users, replaceLinkLegalHold);
+  };
 
   readonly showLargeAvatar = (): boolean => {
     const largeAvatarTypes = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST];

@@ -17,21 +17,17 @@
  *
  */
 
-// TODO: Use Config.getConfig().VERSION when SemVer is available
-const {version} = require('../../../package.json');
 import {APIClient} from '@wireapp/api-client';
 
 import {Config} from '../Config';
 
 const configureClient = () => {
   return new APIClient({
-    platform: 'webapp',
     urls: {
       name: Config.getConfig().ENVIRONMENT,
       rest: Config.getConfig().BACKEND_REST,
       ws: Config.getConfig().BACKEND_WS,
     },
-    version,
   });
 };
 

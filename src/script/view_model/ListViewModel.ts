@@ -221,7 +221,9 @@ export class ListViewModel {
 
   readonly changeNotificationSetting = () => {
     if (this.isProAccount()) {
-      this.panelViewModel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
+      this.panelViewModel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {
+        entity: this.conversationState.activeConversation(),
+      });
     } else {
       this.clickToToggleMute();
     }

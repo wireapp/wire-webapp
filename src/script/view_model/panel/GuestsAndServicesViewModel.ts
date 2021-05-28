@@ -71,10 +71,6 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     this.brandName = Config.getConfig().BRAND_NAME;
   }
 
-  getElementId(): string {
-    return 'guest-options';
-  }
-
   copyLink = async (): Promise<void> => {
     if (!this.isLinkCopied() && this.activeConversation()) {
       await copyText(this.activeConversation().accessCode());

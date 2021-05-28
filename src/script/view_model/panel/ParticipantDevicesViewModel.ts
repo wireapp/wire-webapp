@@ -56,10 +56,6 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.userEntity = ko.observable();
   }
 
-  getElementId(): string {
-    return 'participant-devices';
-  }
-
   clickOnBack(): void {
     if (!this.showDeviceList()) {
       return this.userDevicesHistory.goBack();
