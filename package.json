@@ -125,7 +125,7 @@
     "fake-indexeddb": "3.1.2",
     "faker": "5.5.3",
     "generate-changelog": "1.8.0",
-    "grunt": "1.4.0",
+    "grunt": "1.4.1",
     "grunt-aws-s3": "2.0.2",
     "grunt-cli": "1.4.2",
     "grunt-contrib-clean": "2.0.0",
