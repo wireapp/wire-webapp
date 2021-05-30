@@ -160,7 +160,7 @@
     "redux-devtools-extension": "2.13.9",
     "redux-mock-store": "1.5.4",
     "simple-git": "2.39.0",
-    "sinon": "10.0.0",
+    "sinon": "11.1.1",
     "snabbdom": "3.0.1",
     "stylelint": "13.13.1",
     "stylelint-config-idiomatic-order": "8.1.0",
