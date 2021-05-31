@@ -28,7 +28,7 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 export type ConversationId = string;
 
-const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 3;
+const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 9;
 
 interface ActiveSpeaker {
   audio_level: number;
