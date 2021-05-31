@@ -383,7 +383,7 @@ export class DebugUtil {
   blockUserForLegalHold(userId: string) {
     const conversation = this.conversationState.activeConversation();
     return this.eventRepository['handleEvent'](
-      ({
+      {
         connection: {
           conversation: conversation.id,
           from: this.userState.self().id,
@@ -393,7 +393,7 @@ export class DebugUtil {
           to: userId,
         },
         type: USER_EVENT.CONNECTION,
-      } as unknown) as EventRecord,
+      } as unknown as EventRecord,
       EventRepository.SOURCE.WEB_SOCKET,
     );
   }

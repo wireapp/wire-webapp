@@ -36,7 +36,7 @@ describe('AssetRepository', () => {
   const options = {} as AssetUploadOptions;
 
   beforeEach(() => {
-    const mockedAPIClient = ({
+    const mockedAPIClient = {
       asset: {
         api: {
           postAsset: jest.fn().mockImplementation(() =>
@@ -47,7 +47,7 @@ describe('AssetRepository', () => {
           ),
         },
       },
-    } as unknown) as APIClient;
+    } as unknown as APIClient;
     assetRepository = new AssetRepository(new AssetService(mockedAPIClient));
   });
 
@@ -126,12 +126,12 @@ describe('AssetRepository', () => {
           '26': 179,
           '27': 69,
           '28': 127,
-          '3': 125,
           '29': 113,
-          '4': 202,
+          '3': 125,
           '30': 248,
-          '5': 165,
           '31': 74,
+          '4': 202,
+          '5': 165,
           '6': 197,
           '7': 175,
           '8': 79,
@@ -160,12 +160,12 @@ describe('AssetRepository', () => {
           '26': 98,
           '27': 222,
           '28': 75,
-          '3': 166,
           '29': 56,
-          '4': 242,
+          '3': 166,
           '30': 159,
-          '5': 222,
           '31': 66,
+          '4': 242,
+          '5': 222,
           '6': 42,
           '7': 96,
           '8': 44,
@@ -187,7 +187,7 @@ describe('AssetRepository', () => {
   });
 
   it('keeps track of current uploads', async () => {
-    const assetServiceSpy = ({
+    const assetServiceSpy = {
       uploadFile: jest.fn().mockImplementation(() => {
         expect(assetRepo.getNumberOfOngoingUploads()).toBe(1);
 
@@ -199,7 +199,7 @@ describe('AssetRepository', () => {
           } as AssetUploadData),
         });
       }),
-    } as unknown) as AssetService;
+    } as unknown as AssetService;
     const assetRepo = new AssetRepository(assetServiceSpy);
 
     await assetRepo.uploadFile(messageId, file, options, false);
@@ -218,7 +218,7 @@ describe('AssetRepository', () => {
         });
       }),
     };
-    const assetRepo = new AssetRepository((assetServiceSpy as unknown) as AssetService);
+    const assetRepo = new AssetRepository(assetServiceSpy as unknown as AssetService);
 
     await assetRepo.uploadFile(messageId, file, options, false);
     expect(assetRepo.getNumberOfOngoingUploads()).toBe(0);

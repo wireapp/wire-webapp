@@ -57,8 +57,8 @@ export interface CallActions {
   switchCameraInput: (call: Call, deviceId: string) => void;
   switchScreenInput: (call: Call, deviceId: string) => void;
   toggleCamera: (call: Call) => void;
-  toggleScreenshare: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
+  toggleScreenshare: (call: Call) => void;
 }
 
 export const VideoSpeakersTabs = {
@@ -178,13 +178,13 @@ export class CallingViewModel {
           this.callingRepository.answerCall(call);
         }
       },
+      changePage: (newPage, call) => {
+        this.callingRepository.changeCallPage(newPage, call);
+      },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
         this.videoSpeakersActiveTab(VideoSpeakersTabs.all);
         this.maximizedTileVideoParticipant(null);
-      },
-      changePage: (newPage, call) => {
-        this.callingRepository.changeCallPage(newPage, call);
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);

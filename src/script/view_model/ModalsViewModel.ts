@@ -219,7 +219,7 @@ export class ModalsViewModel {
         content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
         content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
         content.messageText = t('modalAccountNewDevicesMessage');
-        const deviceList = ((data as unknown) as ClientEntity[])
+        const deviceList = (data as unknown as ClientEntity[])
           .map(device => {
             const deviceTime = formatLocale(device.time || new Date(), 'PP, p');
             const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;

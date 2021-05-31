@@ -26,9 +26,9 @@ import {SelfActionCreator} from './creator/';
 
 describe('SelfAction', () => {
   it('fetches the self user', async () => {
-    const selfUser = ({assets: [], id: 'selfUserId'} as unknown) as Self;
+    const selfUser = {assets: [], id: 'selfUserId'} as unknown as Self;
     const team = {teams: [{binding: true, id: 'team'}]};
-    const expectedSelfUser = ({assets: [], id: 'selfUserId', team: 'team'} as unknown) as Self;
+    const expectedSelfUser = {assets: [], id: 'selfUserId', team: 'team'} as unknown as Self;
     const spies = {
       doCheckPasswordState: jasmine.createSpy().and.returnValue(() => Promise.resolve()),
     };
@@ -123,7 +123,7 @@ describe('SelfAction', () => {
   });
 
   it('handles failed password check', async () => {
-    const error = ({response: {status: HTTP_STATUS.BAD_REQUEST}} as unknown) as Error;
+    const error = {response: {status: HTTP_STATUS.BAD_REQUEST}} as unknown as Error;
     const mockedApiClient = {
       self: {api: {headPassword: () => Promise.reject(error)}},
     };
