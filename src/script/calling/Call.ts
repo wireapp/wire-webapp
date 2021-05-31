@@ -198,7 +198,13 @@ export class Call {
   }
 
   updatePages() {
-    const newPages = chunk<Participant>(this.participants(), NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE);
+    const selfParticipant = this.getSelfParticipant();
+    const remoteParticipants = this.getRemoteParticipants()
+      .sort((p1, p2) => sortUsersByPriority(p1.user, p2.user))
+      .sort((p1, p2) => (p1.hasActiveVideo() === p2.hasActiveVideo() ? 0 : p1.hasActiveVideo() ? -1 : 1));
+
+    const newPages = chunk<Participant>([selfParticipant, ...remoteParticipants], NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE);
+
     if (newPages.length < this.pages().length) {
       this.currentPage(newPages.length - 1);
     }
