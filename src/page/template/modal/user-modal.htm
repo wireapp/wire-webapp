@@ -14,7 +14,7 @@
         <panel-user-details params="participant: user, isSelfVerified: isSelfVerified"></panel-user-details>
         <enriched-fields params="user: user"></enriched-fields>
         <!-- ko if: user().isBlockedLegalHold() -->
-          <div class="modal__message" data-bind="html: blockedForLegalHoldText"></div>
+          <div class="modal__message" data-bind="html: blockedForLegalHoldText" data-uie-name="status-blocked-legal-hold"></div>
         <!-- /ko -->
         <!-- ko ifnot: user().isBlockedLegalHold() -->   
           <user-actions
