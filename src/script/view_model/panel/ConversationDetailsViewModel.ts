@@ -366,11 +366,11 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnAddParticipants(): void {
-    this.navigateTo(PanelViewModel.STATE.ADD_PARTICIPANTS);
+    this.navigateTo(PanelViewModel.STATE.ADD_PARTICIPANTS, {entity: this.activeConversation()});
   }
 
   clickOnShowAll(): void {
-    this.navigateTo(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS);
+    this.navigateTo(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {entity: this.activeConversation()});
   }
 
   clickOnCreateGroup(): void {
@@ -382,7 +382,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnGuestOptions(): void {
-    this.navigateTo(PanelViewModel.STATE.GUEST_OPTIONS);
+    this.navigateTo(PanelViewModel.STATE.GUEST_OPTIONS, {entity: this.activeConversation()});
   }
 
   clickOnTimedMessages(): void {
@@ -390,7 +390,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   }
 
   clickOnNotifications(): void {
-    this.navigateTo(PanelViewModel.STATE.NOTIFICATIONS);
+    this.navigateTo(PanelViewModel.STATE.NOTIFICATIONS, {entity: this.activeConversation()});
   }
 
   readonly clickOnShowUser = (userEntity: User): void => {

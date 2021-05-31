@@ -30,7 +30,7 @@ import type {User} from '../../entity/User';
 export interface PanelViewModelProps {
   isVisible: ko.PureComputed<boolean>;
   mainViewModel: MainViewModel;
-  navigateTo: (target: string, params?: {addMode?: boolean; entity: Conversation | User | ServiceEntity}) => void;
+  navigateTo: (target: string, params: {addMode?: boolean; entity: Conversation | User | ServiceEntity}) => void;
   onClose: () => void;
   onGoBack: () => void;
   onGoToRoot: () => void;
