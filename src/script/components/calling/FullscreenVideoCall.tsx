@@ -126,7 +126,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     };
   }, []);
 
-  const activeVideoSpeakers = useKoSubscribable(call.activeSpeakers);
+  const activeSpeakers = useKoSubscribable(call.activeSpeakers);
   const currentPage = useKoSubscribable(call.currentPage);
   const callPages = useKoSubscribable(call.pages);
   const totalPages = callPages.length;
@@ -141,7 +141,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           grid={
             videoSpeakersActiveTab === VideoSpeakersTabs.speakers
               ? {
-                  grid: activeVideoSpeakers,
+                  grid: activeSpeakers,
                   thumbnail: null,
                 }
               : videoGrid

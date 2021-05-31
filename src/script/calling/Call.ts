@@ -163,8 +163,6 @@ export class Call {
     const activeSpeakers = uniqueAudioLevels
       // Get the participants.
       .map(({userid, clientid}) => this.getParticipant(userid, clientid))
-      // Make sure there was a participant found.
-      .filter(participant => participant?.hasActiveVideo())
       // Limit them to 4.
       .slice(0, 4)
       // Sort them by name
@@ -174,10 +172,7 @@ export class Call {
     this.activeSpeakers(activeSpeakers);
   }
 
-  getActiveVideoSpeakers = () =>
-    this.activeSpeakers()
-      .filter(p => p.hasActiveVideo())
-      .slice(0, 4);
+  getActiveSpeakers = () => this.activeSpeakers();
 
   addParticipant(participant: Participant): void {
     this.participants.push(participant);

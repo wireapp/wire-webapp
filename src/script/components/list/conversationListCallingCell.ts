@@ -222,9 +222,9 @@ class ConversationListCallingCell {
       return this.videoGrid();
     }
 
-    const activeVideoSpeakers = this.call.getActiveVideoSpeakers();
+    const activeSpeakers = this.call.getActiveSpeakers();
     return {
-      grid: activeVideoSpeakers,
+      grid: activeSpeakers,
       thumbnail: null,
     };
   }
