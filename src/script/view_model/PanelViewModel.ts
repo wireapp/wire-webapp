@@ -224,7 +224,7 @@ export class PanelViewModel {
   };
 
   private readonly _goToRoot = (): void => {
-    this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS, undefined, true);
+    this._openPanel(PanelViewModel.STATE.CONVERSATION_DETAILS, {entity: this.conversationEntity()}, true);
   };
 
   private readonly _switchContent = (newContentState: string): void => {
