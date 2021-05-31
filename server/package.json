@@ -16,13 +16,13 @@
     "helmet": "4.6.0",
     "http-status-codes": "2.1.4",
     "logdown": "3.3.1",
-    "maxmind": "4.3.1",
+    "maxmind": "4.3.2",
     "nocache": "2.1.0",
     "opn": "6.0.0",
     "pm2": "4.5.6"
   },
   "devDependencies": {
-    "@types/express": "4.17.11",
+    "@types/express": "4.17.12",
     "@types/express-sitemap-xml": "1.1.1",
     "@types/express-useragent": "1.0.0",
     "@types/fs-extra": "9.0.11",
