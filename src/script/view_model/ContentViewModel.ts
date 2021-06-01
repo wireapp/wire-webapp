@@ -18,6 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -230,9 +231,11 @@ export class ContentViewModel {
       }
     });
 
-    this.conversationState.filtered_conversations.subscribe(conversations => {
-      const activeConversation = this.conversationState.activeConversation();
-      if (!conversations.some(conversation => conversation === activeConversation)) {
+    ko.computed(() => {
+      if (
+        this.conversationState.activeConversation()?.connection().status() ===
+        ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
+      ) {
         this.showConversation(this.conversationRepository.getMostRecentConversation());
       }
     });
