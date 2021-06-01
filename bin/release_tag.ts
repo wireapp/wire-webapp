@@ -208,7 +208,7 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
         .build();
       await account.service.conversation.send(payload);
     }
-    logger.info(`Sent "${stage}" announcement to conversation "${process.env.WIRE_CONVERSATION}".`);
+    logger.info(`Sent "${stage}" announcement.`);
   } else {
     logger.info(`WIRE_EMAIL, WIRE_PASSWORD or WIRE_CONVERSATION missing. No announcement sent.`);
   }
