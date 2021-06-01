@@ -174,7 +174,7 @@ const sendRandomGif = async (account: Account, conversationId: string, query: st
 
 const announceRelease = async (tagName: string, commitId: string): Promise<void> => {
   const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_CONVERSATION, WIRE_RELEASE_NOTES_CONVERSATION_ID} = process.env;
-  if (WIRE_EMAIL && WIRE_PASSWORD) {
+  if (WIRE_EMAIL && WIRE_PASSWORD && (WIRE_CONVERSATION || WIRE_RELEASE_NOTES_CONVERSATION_ID)) {
     if (isDryRun) {
       return;
     }
