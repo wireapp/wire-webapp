@@ -199,7 +199,7 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
       await account.service.conversation.send(payload);
     } else if (stage === DeploymentStage.PRODUCTION && WIRE_RELEASE_NOTES_CONVERSATION_ID) {
       // Production Release
-      const message = `The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find the release notes as usual [on Medium](https://medium.com/wire-news/webapp-updates/home).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version`;
+      const message = `The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version`;
       const payload = account.service.conversation.messageBuilder
         .createText({
           conversationId: WIRE_RELEASE_NOTES_CONVERSATION_ID,
