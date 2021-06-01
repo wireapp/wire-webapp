@@ -58,7 +58,7 @@ export class PanelViewModel {
   repositories: ViewModelRepositories;
   elementId: string;
   conversationEntity: ko.Observable<Conversation>;
-  stateHistory: {params?: PanelParams; state: string}[];
+  stateHistory: {params: PanelParams; state: string}[];
   isAnimating: ko.Observable<boolean>;
   isVisible: ko.PureComputed<boolean>;
   exitingState: ko.Observable<string>;
@@ -136,11 +136,11 @@ export class PanelViewModel {
     this.stateHistory = [];
 
     this.isAnimating = ko.observable(false);
-    this.state = ko.observable(null);
-    this.isVisible = ko.pureComputed(() => this.state() !== null);
-    this.exitingState = ko.observable(undefined);
+    this.state = ko.observable();
+    this.isVisible = ko.pureComputed(() => !!this.state());
+    this.exitingState = ko.observable();
 
-    this.conversationEntity.subscribe(this._forceClosePanel, null, 'beforeChange');
+    this.conversationEntity.subscribe(this._forceClosePanel, undefined, 'beforeChange');
     this.subViews = this.buildSubViews();
     this.STATE = PanelViewModel.STATE;
 
@@ -206,8 +206,9 @@ export class PanelViewModel {
   private readonly _resetState = (): void => {
     this.isAnimating(false);
     this._hidePanel(this.state(), true);
-    this.state(null);
+    this.state(undefined);
     this.stateHistory = [];
+    this.currentEntityId = undefined;
   };
 
   private readonly _isStateVisible = (state: string): boolean => {
@@ -269,7 +270,6 @@ export class PanelViewModel {
       return;
     }
     this.exitingState(undefined);
-    this.currentEntityId = undefined;
 
     const panelStateElementId = this.elementIds[state];
     const exitPanel = document.querySelector(`#${panelStateElementId}`);
@@ -283,10 +283,14 @@ export class PanelViewModel {
     if (!this.isAnimating() || overrideAnimating) {
       this._hidePanel(this.state(), true);
       const rootState = PanelViewModel.STATE.CONVERSATION_DETAILS;
-      this.stateHistory = [{state: rootState}, {params, state: newState}];
+      const rootParams = {entity: this.conversationEntity()};
+      this.stateHistory = [
+        {params: rootParams, state: rootState},
+        {params, state: newState},
+      ];
       this.isAnimating(true);
       this.exitingState(undefined);
-      this._switchState(newState, null, params, true);
+      this._switchState(newState, undefined, params, true);
       this.mainViewModel.openPanel().then(() => this.isAnimating(false));
     }
   };
