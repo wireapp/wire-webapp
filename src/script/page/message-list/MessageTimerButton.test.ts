@@ -86,7 +86,7 @@ describe('MessageTimerButton', () => {
 
     expect(messageTimerButtonPage.getMessageTimerButton().exists()).toBe(true);
     expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(false);
-    expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toEqual(minutes);
+    expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toBe(minutes.toString());
     expect(messageTimerButtonPage.getMessageTimerButtonSymbol().text()).toBe('m');
     expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('enabled');
   });
@@ -106,7 +106,7 @@ describe('MessageTimerButton', () => {
 
     expect(messageTimerButtonPage.getMessageTimerButton().exists()).toBe(true);
     expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(false);
-    expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toEqual(minutes);
+    expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toBe(minutes.toString());
     expect(messageTimerButtonPage.getMessageTimerButtonSymbol().text()).toBe('m');
     expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('disabled');
   });
