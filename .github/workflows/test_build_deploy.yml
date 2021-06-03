@@ -101,8 +101,8 @@ jobs:
         run: yarn test --coverage --coverage-reporters=lcov --detectOpenHandles=false --forceExit
 
       - name: Monitor coverage
-        # Run for all PRs with DISTRIBUTION == 'wire'
-        if: matrix.DISTRIBUTION == 'DISTRIBUTION_0' && github.event_name == 'pull_request'
+        # Run for all PRs and merges with DISTRIBUTION == 'wire'
+        if: matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: codecov/codecov-action@v1.3.2
         with:
           fail_ci_if_error: false
@@ -399,7 +399,6 @@ jobs:
         shell: bash
         run: |
           echo "PR: ${{ steps.create-pr.outputs.pull-request-url }}"
-
 
   build_desktop_binaries:
     name: Build desktop binaries
