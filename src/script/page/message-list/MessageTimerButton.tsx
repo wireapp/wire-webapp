@@ -41,10 +41,6 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversat
 
   // Click on ephemeral button
   const onClick = (event: React.MouseEvent<HTMLSpanElement>): void => {
-    if (isTimerDisabled) {
-      return event.preventDefault();
-    }
-
     const entries = [
       {
         click: () => conversation.localMessageTimer(0),
@@ -68,7 +64,7 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversat
     <span
       id="conversation-input-bar-message-timer"
       className="controls-right-button conversation-input-bar-message-timer"
-      onClick={onClick}
+      onClick={isTimerDisabled ? undefined : onClick}
       title={t('tooltipConversationEphemeral')}
       data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
       data-uie-name="do-set-ephemeral-timer"
