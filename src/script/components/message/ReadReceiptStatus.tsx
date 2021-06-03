@@ -39,8 +39,8 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
   is1to1Conversation,
   isLastDeliveredMessage,
 }) => {
-  const [readReceiptText, setReadReceiptText] = useState<string>('');
-  const [readReceiptTooltip, setReadReceiptTooltip] = useState<string>('');
+  const [readReceiptText, setReadReceiptText] = useState('');
+  const [readReceiptTooltip, setReadReceiptTooltip] = useState('');
   const {readReceipts} = useKoSubscribableChildren(message, ['readReceipts']);
 
   useEffect(() => {

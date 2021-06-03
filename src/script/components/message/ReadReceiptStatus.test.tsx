@@ -48,7 +48,7 @@ const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntit
 };
 
 describe('ReadReceiptStatus', () => {
-  it('is not shown when message is not last delivered message', async () => {
+  it('is not shown when message is not last delivered message', () => {
     const readReceiptStatusPage = new ReadReceiptStatusPage({
       is1to1Conversation: false,
       isLastDeliveredMessage: false,
@@ -60,7 +60,8 @@ describe('ReadReceiptStatus', () => {
 
     expect(readReceiptStatusPage.getReadReceiptStatusDelivered().exists()).toBe(false);
   });
-  it('shows "delivered" when noone read the message', async () => {
+
+  it('shows "delivered" when noone read the message', () => {
     const readReceiptStatusPage = new ReadReceiptStatusPage({
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
@@ -73,7 +74,8 @@ describe('ReadReceiptStatus', () => {
     expect(readReceiptStatusPage.getReadReceiptStatusDelivered().exists()).toBe(true);
     expect(readReceiptStatusPage.getReadIcon().exists()).toBe(false);
   });
-  it('shows read icon', async () => {
+
+  it('shows the read icon', () => {
     const readReceiptStatusPage = new ReadReceiptStatusPage({
       is1to1Conversation: false,
       isLastDeliveredMessage: true,
@@ -88,7 +90,7 @@ describe('ReadReceiptStatus', () => {
   });
 
   describe('1to1 conversation', () => {
-    it('has no click handler', async () => {
+    it('has no click handler', () => {
       const onClickReceiptsSpy = jest.fn();
       const readReceiptTime = new Date().toISOString();
       const readReceiptStatusPage = new ReadReceiptStatusPage({
@@ -106,7 +108,7 @@ describe('ReadReceiptStatus', () => {
       expect(onClickReceiptsSpy).toHaveBeenCalledTimes(0);
     });
 
-    it('shows timestamp instead of read count', async () => {
+    it('shows timestamp instead of read count', () => {
       const readReceiptTime = new Date().toISOString();
       const readReceiptStatusPage = new ReadReceiptStatusPage({
         is1to1Conversation: true,
@@ -123,7 +125,7 @@ describe('ReadReceiptStatus', () => {
   });
 
   describe('group conversation', () => {
-    it('has click handler', async () => {
+    it('has a click handler', () => {
       const onClickReceiptsSpy = jest.fn();
       const readReceiptTime = new Date().toISOString();
       const readReceiptStatusPage = new ReadReceiptStatusPage({
