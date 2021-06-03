@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+import cx from 'classnames';
 
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration, DurationUnit} from 'Util/TimeUtil';
@@ -74,7 +75,12 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversat
     >
       {hasMessageTimer ? (
         conversation && (
-          <div className={`message-timer-button message-timer-button--${isTimerDisabled ? 'disabled' : 'enabled'}`}>
+          <div
+            className={cx(
+              'message-timer-button',
+              isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
+            )}
+          >
             <span className="message-timer-button-unit">{duration.symbol}</span>
             <span className="full-screen">{duration.value}</span>
           </div>

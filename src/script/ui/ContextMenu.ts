@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import type React from 'react';
 
 import {KEY, isOneOfKeys, isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
 
@@ -167,7 +168,7 @@ export const Context = {
    * @param entries configuration to build the menu
    * @param identifier data-uie-name added to all entries
    */
-  from: (event: MouseEvent, entries: ContextMenuEntry[], identifier: string): void => {
+  from: (event: MouseEvent | React.MouseEvent, entries: ContextMenuEntry[], identifier: string): void => {
     event.preventDefault();
     event.stopPropagation();
 
