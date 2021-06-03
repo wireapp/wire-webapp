@@ -120,7 +120,7 @@ describe('ReadReceiptStatus', () => {
 
       expect(readReceiptStatusPage.getReadReceiptStatus().exists()).toBe(true);
       expect(readReceiptStatusPage.getReadReceiptStatusCount().exists()).toBe(true);
-      expect(readReceiptStatusPage.getReadReceiptStatusCount().text()).toEqual(formatTimeShort(readReceiptTime));
+      expect(readReceiptStatusPage.getReadReceiptStatusCount().text()).toBe(formatTimeShort(readReceiptTime));
     });
   });
 
