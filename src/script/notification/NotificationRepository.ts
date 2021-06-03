@@ -130,7 +130,10 @@ export class NotificationRepository {
     this.assetRepository = container.resolve(AssetRepository);
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
-    this.contentViewModelState = {multitasking: {isMinimized: () => false}, state: () => false};
+    this.contentViewModelState = {
+      multitasking: {isMinimized: (() => false) as ko.Observable<boolean>},
+      state: () => false,
+    };
 
     this.logger = getLogger('NotificationRepository');
 
