@@ -28,6 +28,7 @@ class MessageTimerButtonPage extends TestPage<MessageTimerButtonProps> {
     super(MessageTimerButton, props);
   }
 
+  getMessageTimerElement = () => this.get('[data-uie-name="do-set-ephemeral-timer"]');
   getMessageTimerButton = () => this.get('[data-uie-name="message-timer-button"]');
   getMessageTimerIcon = () => this.get('[data-uie-name="message-timer-icon"]');
   getMessageTimerButtonSymbol = () => this.get('[data-uie-name="message-timer-button-symbol"]');
@@ -66,5 +67,25 @@ describe('MessageTimerButton', () => {
     expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(false);
     expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toBe(minutes.toString());
     expect(messageTimerButtonPage.getMessageTimerButtonSymbol().text()).toBe('m');
+  });
+
+  it('disables message timer button', () => {
+    const minutes = 10;
+    const duration = TIME_IN_MILLIS.MINUTE * minutes;
+
+    const conversation: Partial<Conversation> = {
+      hasGlobalMessageTimer: ko.pureComputed(() => true),
+      messageTimer: ko.pureComputed(() => duration),
+    };
+
+    const messageTimerButtonPage = new MessageTimerButtonPage({
+      conversation: conversation as Conversation,
+    });
+
+    expect(messageTimerButtonPage.getMessageTimerButton().exists()).toBe(true);
+    expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(false);
+    expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toBe(minutes.toString());
+    expect(messageTimerButtonPage.getMessageTimerButtonSymbol().text()).toBe('m');
+    expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('disabled');
   });
 });
