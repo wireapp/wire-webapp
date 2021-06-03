@@ -52,12 +52,14 @@ export interface ParticipantItemProps {
   mode?: UserlistMode;
   noInteraction?: boolean;
   noUnderline?: boolean;
+  onClick?: (user: User) => void;
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
   showArrow?: boolean;
 }
 
 const ParticipantItem: React.FC<ParticipantItemProps> = ({
+  onClick,
   badge,
   callParticipant,
   canSelect,
@@ -116,6 +118,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 
   return (
     <div
+      onClick={() => onClick(participant as User)}
       className={cx('participant-item-wrapper', {
         highlighted,
         'no-interaction': noInteraction,
