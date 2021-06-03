@@ -52,7 +52,7 @@ export interface UserDevicesHistory {
   reset: () => void;
 }
 
-interface UserDevicesProps {
+export interface UserDevicesProps {
   clientRepository: ClientRepository;
   clientState?: ClientState;
   conversationState?: ConversationState;
@@ -74,33 +74,6 @@ export enum UserDevicesState {
   DEVICE_LIST = 'UserDevices.DEVICE_LIST',
   SELF_FINGERPRINT = 'UserDevices.SELF_FINGERPRINT',
 }
-
-export const createUserDevicesHistory = (): UserDevicesHistory => {
-  const history = ko.observableArray();
-  const headlineHistory = ko.observableArray();
-  const current = ko.pureComputed(() => history()[history().length - 1]);
-  const headline = ko.pureComputed(() => headlineHistory()[headlineHistory().length - 1]);
-  const reset = () => {
-    history.removeAll();
-    history.push(UserDevicesState.DEVICE_LIST);
-  };
-
-  reset();
-
-  return {
-    current,
-    goBack: () => {
-      history.pop();
-      headlineHistory.pop();
-    },
-    goTo: (to: UserDevicesState, head: string) => {
-      history.push(to);
-      headlineHistory.push(head);
-    },
-    headline,
-    reset,
-  };
-};
 
 export const sortUserDevices = (devices: ClientEntity[]): ClientEntity[] => {
   const legalholdDevices = devices.filter(device => device.class === ClientClassification.LEGAL_HOLD);

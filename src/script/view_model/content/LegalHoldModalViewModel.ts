@@ -24,7 +24,8 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
-import {UserDevicesHistory, UserDevicesState, createUserDevicesHistory} from 'Components/UserDevices';
+import {UserDevicesHistory, UserDevicesState} from 'Components/UserDevices';
+import {createUserDevicesHistory} from 'Components/createUserDevicesHistory';
 import {t} from 'Util/LocalizerUtil';
 
 import {UserState} from '../../user/UserState';

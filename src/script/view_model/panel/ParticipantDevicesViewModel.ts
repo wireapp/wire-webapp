@@ -19,7 +19,8 @@
 
 import ko from 'knockout';
 
-import {createUserDevicesHistory, UserDevicesState, UserDevicesHistory} from 'Components/UserDevices';
+import {UserDevicesState, UserDevicesHistory} from 'Components/UserDevices';
+import {createUserDevicesHistory} from 'Components/createUserDevicesHistory';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import type {User} from '../../entity/User';
