@@ -22,6 +22,7 @@ import TestPage from 'Util/test/TestPage';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import MessageTimerButton, {MessageTimerButtonProps} from './MessageTimerButton';
 import type {Conversation} from '../../entity/Conversation';
+import {Context} from '../../ui/ContextMenu';
 
 class MessageTimerButtonPage extends TestPage<MessageTimerButtonProps> {
   constructor(props?: MessageTimerButtonProps) {
@@ -29,6 +30,7 @@ class MessageTimerButtonPage extends TestPage<MessageTimerButtonProps> {
   }
 
   getMessageTimerElement = () => this.get('[data-uie-name="do-set-ephemeral-timer"]');
+  clickMessageTimerElement = () => this.click(this.getMessageTimerElement());
   getMessageTimerButton = () => this.get('[data-uie-name="message-timer-button"]');
   getMessageTimerIcon = () => this.get('[data-uie-name="message-timer-icon"]');
   getMessageTimerButtonSymbol = () => this.get('[data-uie-name="message-timer-button-symbol"]');
@@ -50,6 +52,25 @@ describe('MessageTimerButton', () => {
     expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(true);
   });
 
+  it('activates the context menu', () => {
+    jest.spyOn(Context, 'from').mockClear();
+
+    const conversation: Partial<Conversation> = {
+      hasGlobalMessageTimer: ko.pureComputed(() => false),
+      messageTimer: ko.pureComputed(() => 0),
+    };
+
+    const messageTimerButtonPage = new MessageTimerButtonPage({
+      conversation: conversation as Conversation,
+    });
+
+    expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('enabled');
+
+    expect(Context.from).toHaveBeenCalledTimes(0);
+    messageTimerButtonPage.clickMessageTimerElement();
+    expect(Context.from).toHaveBeenCalledTimes(1);
+  });
+
   it('shows the active message timer button', () => {
     const minutes = 5;
     const duration = TIME_IN_MILLIS.MINUTE * minutes;
@@ -67,9 +88,10 @@ describe('MessageTimerButton', () => {
     expect(messageTimerButtonPage.getMessageTimerIcon().exists()).toBe(false);
     expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toBe(minutes.toString());
     expect(messageTimerButtonPage.getMessageTimerButtonSymbol().text()).toBe('m');
+    expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('enabled');
   });
 
-  it('disables message timer button', () => {
+  it('shows the disabled message timer button', () => {
     const minutes = 10;
     const duration = TIME_IN_MILLIS.MINUTE * minutes;
 
@@ -87,5 +109,26 @@ describe('MessageTimerButton', () => {
     expect(messageTimerButtonPage.getMessageTimerButtonValue().text()).toBe(minutes.toString());
     expect(messageTimerButtonPage.getMessageTimerButtonSymbol().text()).toBe('m');
     expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('disabled');
+  });
+
+  it(`doesn't activate the context menu on a disabled message timer button`, () => {
+    jest.spyOn(Context, 'from').mockClear();
+    const minutes = 10;
+    const duration = TIME_IN_MILLIS.MINUTE * minutes;
+
+    const conversation: Partial<Conversation> = {
+      hasGlobalMessageTimer: ko.pureComputed(() => true),
+      messageTimer: ko.pureComputed(() => duration),
+    };
+
+    const messageTimerButtonPage = new MessageTimerButtonPage({
+      conversation: conversation as Conversation,
+    });
+
+    expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('disabled');
+
+    expect(Context.from).toHaveBeenCalledTimes(0);
+    messageTimerButtonPage.clickMessageTimerElement();
+    expect(Context.from).toHaveBeenCalledTimes(0);
   });
 });
