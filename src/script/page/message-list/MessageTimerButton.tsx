@@ -35,7 +35,7 @@ export interface MessageTimerButtonProps {
 
 export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversation}) => {
   const messageTimer = useKoSubscribable(conversation.messageTimer);
-  const hasMessageTimer = messageTimer || false;
+  const hasMessageTimer = !!messageTimer;
   const isTimerDisabled = useKoSubscribable(conversation.hasGlobalMessageTimer);
   const duration = hasMessageTimer ? formatDuration(messageTimer) : ({} as DurationUnit);
 
