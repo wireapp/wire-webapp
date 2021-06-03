@@ -18,6 +18,7 @@
  */
 
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -230,6 +231,15 @@ export class ContentViewModel {
       }
     });
 
+    ko.computed(() => {
+      if (
+        this.conversationState.activeConversation()?.connection().status() ===
+        ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
+      ) {
+        this.showConversation(this.conversationRepository.getMostRecentConversation());
+      }
+    });
+
     this._initSubscriptions();
     if (this.teamState.supportsLegalHold()) {
       this.legalHoldModal.showRequestModal();
@@ -297,7 +307,7 @@ export class ContentViewModel {
 
         if (isOpenedConversation) {
           if (openNotificationSettings) {
-            this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
+            this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: conversationEntity});
           }
           return;
         }
@@ -328,7 +338,9 @@ export class ContentViewModel {
             this.showContent(ContentViewModel.STATE.CONVERSATION);
             this.previousConversation = this.conversationState.activeConversation();
             if (openNotificationSettings) {
-              this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, undefined);
+              this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {
+                entity: this.conversationState.activeConversation(),
+              });
             }
           });
         });

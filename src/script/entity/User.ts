@@ -85,6 +85,7 @@ export class User {
   public teamId?: string;
   /** The federated domain (when the user is on a federated server) */
   public domain?: string;
+  public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
 
   static get ACCENT_COLOR() {
     return {
@@ -152,7 +153,8 @@ export class User {
 
     this.connection = ko.observable(new ConnectionEntity());
 
-    this.isBlocked = ko.pureComputed(() => this.connection().isBlocked());
+    this.isBlocked = ko.pureComputed(() => this.connection().isBlocked() || this.isBlockedLegalHold());
+    this.isBlockedLegalHold = ko.pureComputed(() => this.connection().isMissingLegalHoldConsent());
     this.isCanceled = ko.pureComputed(() => this.connection().isCanceled());
     this.isConnected = ko.pureComputed(() => this.connection().isConnected());
     this.isIgnored = ko.pureComputed(() => this.connection().isIgnored());

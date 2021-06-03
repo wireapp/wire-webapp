@@ -55,7 +55,12 @@ export class ConversationState {
 
     this.filtered_conversations = ko.pureComputed(() => {
       return this.conversations().filter(conversationEntity => {
-        const states_to_filter = [ConnectionStatus.BLOCKED, ConnectionStatus.CANCELLED, ConnectionStatus.PENDING];
+        const states_to_filter = [
+          ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
+          ConnectionStatus.BLOCKED,
+          ConnectionStatus.CANCELLED,
+          ConnectionStatus.PENDING,
+        ];
 
         if (conversationEntity.isSelf() || states_to_filter.includes(conversationEntity.connection().status())) {
           return false;

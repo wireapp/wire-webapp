@@ -48,7 +48,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
 
   static get CONFIG() {
     return {
-      INTERVAL_TIME: TIME_IN_MILLIS.SECOND * 0.25,
+      INTERVAL_TIME: TIME_IN_MILLIS.SECOND,
       TIMER_RANGE: {
         MAX: TIME_IN_MILLIS.YEAR,
         MIN: TIME_IN_MILLIS.SECOND,

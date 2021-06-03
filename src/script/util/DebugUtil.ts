@@ -19,11 +19,14 @@
 
 import {
   CONVERSATION_EVENT,
+  USER_EVENT,
   BackendEvent,
   ConversationEvent,
   ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/src/event/';
 import type {Notification} from '@wireapp/api-client/src/notification/';
+import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {util as ProteusUtil} from '@wireapp/proteus';
 import Dexie from 'dexie';
 import {container} from 'tsyringe';
@@ -31,7 +34,7 @@ import {container} from 'tsyringe';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {downloadFile} from './util';
+import {createRandomUuid, downloadFile} from './util';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {EventRepository} from '../event/EventRepository';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
@@ -50,6 +53,7 @@ import {ClientState} from '../client/ClientState';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
+import {MessageCategory} from '../message/MessageCategory';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -142,7 +146,19 @@ export class DebugUtil {
       return Promise.resolve({
         image: {
           data:
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAYAAAA8AXHiAAADiUlEQVR4nO3dS67cMAwEwHeWuf8dkxOMDVDTJiVXA1pq+FF5EyDJ3+fz+XfCuUp3bzv3Wj1/3Q288bF26rV6wNJr5ICl18gBS6+RA5ZeIwcsvUbOJaxpSTxW9V5HzWkBC6xIwAIrErDAigQssCIBC6xIwAIrkgisu6VXT7Vm4l5HTnkPsIbllPcAa1hOeQ+whuWU9wBrWE55D7CG5ZT3AGtYTnmP18PqmGOnGas1wQILrGm9ggUWWGDts3SwwAILrH2WDhZYYIH1+6V35JSPp1oTrFDAOmSQaQHrkEGmBaxDBpkWsA4ZZFrAOmSQaQHr5Y+1Mn9id6e8B1hglQMWWJGABVYkYIEVCVhgRQIWWJGUYe10qguo3uuqucsBCyywpj0yWGCBBRZYJxywwAJr2iODdQHrcsoXZNpHcErAAisSsMCKBCywIgELrEjAAisSsMCKpPznWCuZ9Fgrv/k0nmq9jo8HLLDAAgusxwdN9JK8+2SvYIEVqQcWWJF6YIEVqbcVrBSCSXg65u+YI7EDsAJLBQusyFLBAiuyVLDAiiwVLLAiSwULrMhSwbr5yxQdgySG7IA1acaOOcAK1Zs0I1g3AQusbZaeqjdpRrBuAhZY2yw9VW/SjGDdBCywtll6qt6kGY+BdZfU706pt9JP4iPo6AeshoAF1uP9gLUQsMAC6+F+wFoIWGCB9XA/r4CVGqT6u4mz0svTc6SS6BWshV6eniMVsMCKBCywIgELrEjAAisSsMCKZBSsnQLWdRI1wSreA+s6YBXvgXUdsIr3wLoOWMV7YF0HrOI9sK4DVvEeWNd5xX/dW00HrGmp9gpWcalggRVZKlhgRZYKFliRpYIFVmSpYIEVWSpYC7CmJfHI1XsdH0FqjkRNsIr3wAILLLCuAxZYkYAFViRggRUJWC+A1bH0ab0+jWenAxZYYE3rFSywwAKrVnPaY1XTDQKsAb2CBRZYYNVq7vSQiV5XZkzsByywIvsBC6zIfsACK7IfsMCK7AcssCL7AQusyH7AAiuyn9fDSs3YUXPSRwBWaMaOmmCBFakJFliRmmCBFakJFliRmmCBFal5BKyO7PQRJPpJ7Gb17reABRZYYP1+N6t3vwUssMAC6/e7Wb37LWCBBRZYv9/N6t1vecU/btvx8UyCvNJr9R5YoYA1AAVYYI09icWtBKwBKMACa+xJLG4lYA1AAdZ5sP4Df5GjbWdSI2IAAAAASUVORK5CYII=',
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAYAAAA8AXHiAAADiUlEQVR4nO3dS67cMAwEwHeWuf8dkxOMDV' +
+            'DTJiVXA1pq+FF5EyDJ3+fz+XfCuUp3bzv3Wj1/3Q288bF26rV6wNJr5ICl18gBS6+RA5ZeIwcsvUbOJaxpSTxW9V5HzWkBC6xIwAIrEr' +
+            'DAigQssCIBC6xIwAIrkgisu6VXT7Vm4l5HTnkPsIbllPcAa1hOeQ+whuWU9wBrWE55D7CG5ZT3AGtYTnmP18PqmGOnGas1wQILrGm9gg' +
+            'UWWGDts3SwwAILrH2WDhZYYIH1+6V35JSPp1oTrFDAOmSQaQHrkEGmBaxDBpkWsA4ZZFrAOmSQaQHr5Y+1Mn9id6e8B1hglQMWWJGABV' +
+            'YkYIEVCVhgRQIWWJGUYe10qguo3uuqucsBCyywpj0yWGCBBRZYJxywwAJr2iODdQHrcsoXZNpHcErAAisSsMCKBCywIgELrEjAAisSsM' +
+            'CKpPznWCuZ9Fgrv/k0nmq9jo8HLLDAAgusxwdN9JK8+2SvYIEVqQcWWJF6YIEVqbcVrBSCSXg65u+YI7EDsAJLBQusyFLBAiuyVLDAii' +
+            'wVLLAiSwULrMhSwbr5yxQdgySG7IA1acaOOcAK1Zs0I1g3AQusbZaeqjdpRrBuAhZY2yw9VW/SjGDdBCywtll6qt6kGY+BdZfU706pt9' +
+            'JP4iPo6AeshoAF1uP9gLUQsMAC6+F+wFoIWGCB9XA/r4CVGqT6u4mz0svTc6SS6BWshV6eniMVsMCKBCywIgELrEjAAisSsMCKZBSsnQ' +
+            'LWdRI1wSreA+s6YBXvgXUdsIr3wLoOWMV7YF0HrOI9sK4DVvEeWNd5xX/dW00HrGmp9gpWcalggRVZKlhgRZYKFliRpYIFVmSpYIEVWS' +
+            'pYC7CmJfHI1XsdH0FqjkRNsIr3wAILLLCuAxZYkYAFViRggRUJWC+A1bH0ab0+jWenAxZYYE3rFSywwAKrVnPaY1XTDQKsAb2CBRZYYN' +
+            'Vq7vSQiV5XZkzsByywIvsBC6zIfsACK7IfsMCK7AcssCL7AQusyH7AAiuyn9fDSs3YUXPSRwBWaMaOmmCBFakJFliRmmCBFakJFliRmm' +
+            'CBFal5BKyO7PQRJPpJ7Gb17reABRZYYP1+N6t3vwUssMAC6/e7Wb37LWCBBRZYv9/N6t1vecU/btvx8UyCvNJr9R5YoYA1AAVYYI09ic' +
+            'WtBKwBKMACa+xJLG4lYA1AAdZ5sP4Df5GjbWdSI2IAAAAASUVORK5CYII=',
         },
         title: 'A link to the past',
         url,
@@ -340,5 +356,45 @@ export class DebugUtil {
         }
       }
     }
+  }
+
+  injectLegalHoldLeaveEvent(includeSelf = false, maxUsers = Infinity) {
+    const conversation = this.conversationState.activeConversation();
+    let users = [];
+    if (includeSelf) {
+      users.push(this.userState.self().id);
+    }
+    users.push(...conversation.participating_user_ids());
+    users = users.slice(0, maxUsers);
+    return this.eventRepository['handleEvent'](
+      {
+        category: MessageCategory.NONE,
+        conversation: conversation.id,
+        data: {reason: MemberLeaveReason.LEGAL_HOLD_POLICY_CONFLICT, user_ids: users},
+        from: this.userState.self().id,
+        id: createRandomUuid(),
+        time: conversation.getNextIsoDate(),
+        type: CONVERSATION_EVENT.MEMBER_LEAVE,
+      } as EventRecord,
+      EventRepository.SOURCE.WEB_SOCKET,
+    );
+  }
+
+  blockUserForLegalHold(userId: string) {
+    const conversation = this.conversationState.activeConversation();
+    return this.eventRepository['handleEvent'](
+      {
+        connection: {
+          conversation: conversation.id,
+          from: this.userState.self().id,
+          last_update: conversation.getNextIsoDate(),
+          message: ' ',
+          status: ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT,
+          to: userId,
+        },
+        type: USER_EVENT.CONNECTION,
+      } as unknown as EventRecord,
+      EventRepository.SOURCE.WEB_SOCKET,
+    );
   }
 }

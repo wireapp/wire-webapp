@@ -85,16 +85,14 @@ export class EventMapper {
   async mapJsonEvents(events: EventRecord[], conversationEntity: Conversation): Promise<Message[]> {
     const reversedEvents = events.filter(event => !!event).reverse();
     const mappedEvents = await Promise.all(
-      reversedEvents.map(
-        async (event): Promise<Message | void> => {
-          try {
-            return await this._mapJsonEvent(event, conversationEntity);
-          } catch (error) {
-            const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
-            this.logger.error(errorMessage, {error, event});
-          }
-        },
-      ),
+      reversedEvents.map(async (event): Promise<Message | void> => {
+        try {
+          return await this._mapJsonEvent(event, conversationEntity);
+        } catch (error) {
+          const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+          this.logger.error(errorMessage, {error, event});
+        }
+      }),
     );
     return mappedEvents.filter(messageEntity => !!messageEntity) as Message[];
   }
@@ -501,6 +499,7 @@ export class EventMapper {
   private _mapEventMemberLeave({data: eventData}: EventRecord) {
     const messageEntity = new MemberMessage();
     messageEntity.userIds(eventData.user_ids);
+    messageEntity.reason = eventData.reason;
     return messageEntity;
   }
 
@@ -531,16 +530,16 @@ export class EventMapper {
     const {data: eventData} = event;
     const messageEntity = new CompositeMessage();
     const assets: (Asset | FileAsset | Text | MediumImage)[] = await Promise.all(
-      eventData.items.map(
-        async (item: {button: {id: string; text: string}; text: EventRecord}): Promise<void | Button | Text> => {
-          if (item.button) {
-            return new Button(item.button.id, item.button.text);
-          }
-          if (item.text) {
-            return this._mapAssetText(item.text);
-          }
-        },
-      ),
+      eventData.items.map(async (item: {button: {id: string; text: string}; text: EventRecord}): Promise<
+        void | Button | Text
+      > => {
+        if (item.button) {
+          return new Button(item.button.id, item.button.text);
+        }
+        if (item.text) {
+          return this._mapAssetText(item.text);
+        }
+      }),
     );
     messageEntity.assets.push(...assets);
     return messageEntity;
@@ -852,7 +851,7 @@ export class EventMapper {
       assetEntity.mentions(mappedMentions);
     }
     if (previews && previews.length) {
-      const mappedLinkPreviews = ((await this._mapAssetLinkPreviews(previews)) as unknown) as LinkPreviewEntity[];
+      const mappedLinkPreviews = (await this._mapAssetLinkPreviews(previews)) as unknown as LinkPreviewEntity[];
       assetEntity.previews(mappedLinkPreviews);
     }
 
