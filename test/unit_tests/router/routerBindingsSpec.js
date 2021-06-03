@@ -31,7 +31,7 @@ describe('routerBindings', () => {
   it('handles click and triggers router navigation', async () => {
     const url = '/conversation/uuid';
     const domElement = await bindHtml(`<a data-bind="link_to: '${url}'">click me</a>`);
-    domElement.querySelector('a').click();
+    domElement.querySelector('a').onClick();
 
     expect(mockRouter.navigate).toHaveBeenCalledWith(url);
   });

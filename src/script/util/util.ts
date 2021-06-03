@@ -240,7 +240,7 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   // Firefox needs the element to be in the DOM for the download to start:
   // @see https://stackoverflow.com/a/32226068
   document.body.appendChild(anchor);
-  anchor.click();
+  anchor.onClick();
 
   // Wait before removing resource and link. Needed in FF.
   return window.setTimeout(() => {

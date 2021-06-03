@@ -24,7 +24,7 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
-import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
+import {UserDevicesHistory, UserDevicesState, createUserDevicesHistory} from 'Components/UserDevices';
 import {t} from 'Util/LocalizerUtil';
 
 import {UserState} from '../../user/UserState';
@@ -75,7 +75,7 @@ export class LegalHoldModalViewModel {
     this.isSelfInfo = ko.observable(false);
     this.users = ko.observable([]);
     this.devicesUser = ko.observable();
-    this.userDevicesHistory = makeUserDevicesHistory();
+    this.userDevicesHistory = createUserDevicesHistory();
     this.requiresPassword = ko.observable(true);
     this.passwordValue = ko.observable('');
     this.requestError = ko.observable('');

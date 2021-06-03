@@ -77,13 +77,13 @@ describe('DeviceCard', () => {
 
   it('shows disclose icon when component is clickable', async () => {
     const deviceCard = new DeviceCardPage({
-      click: () => undefined,
       device: createClientEntity({
         class: ClientClassification.PHONE,
         meta: {
           isVerified: ko.observable(false),
         },
       }),
+      onClick: () => undefined,
       showIcon: true,
     });
 

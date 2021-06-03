@@ -286,7 +286,7 @@ export class ModalsViewModel {
   readonly handleEnterKey = (event: KeyboardEvent) => {
     if ((event.target as HTMLElement).tagName === 'BUTTON') {
       if (isSpaceKey(event) || isEnterKey(event)) {
-        (event.target as HTMLElement).click();
+        (event.target as HTMLElement).onClick();
       }
       event.stopPropagation();
       event.preventDefault();

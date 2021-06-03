@@ -96,7 +96,7 @@ const _removeListeners = (): void => {
 const _triggerItem = (): void => {
   const entry = document.querySelector<HTMLButtonElement>('.ctx-menu-item.selected');
   if (entry) {
-    entry.click();
+    entry.onClick();
   }
 };
 

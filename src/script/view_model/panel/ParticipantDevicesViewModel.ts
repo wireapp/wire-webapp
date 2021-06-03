@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {makeUserDevicesHistory, UserDevicesState, UserDevicesHistory} from 'Components/userDevices';
+import {createUserDevicesHistory, UserDevicesState, UserDevicesHistory} from 'Components/UserDevices';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import type {User} from '../../entity/User';
@@ -47,7 +47,7 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.conversationRepository = conversation;
     this.cryptographyRepository = cryptography;
     this.messageRepository = message;
-    this.userDevicesHistory = makeUserDevicesHistory();
+    this.userDevicesHistory = createUserDevicesHistory();
 
     this.showSelfFingerprint = () => this.userDevicesHistory.current() === UserDevicesState.SELF_FINGERPRINT;
     this.showDeviceDetails = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_DETAILS;
@@ -66,6 +66,6 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
 
   initView({entity: userEntity}: PanelParams): void {
     this.userEntity(userEntity as User);
-    this.userDevicesHistory = makeUserDevicesHistory();
+    this.userDevicesHistory = createUserDevicesHistory();
   }
 }

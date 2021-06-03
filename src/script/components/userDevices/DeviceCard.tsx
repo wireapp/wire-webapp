@@ -29,22 +29,22 @@ import LegalHoldDot from '../LegalHoldDot';
 import VerifiedIcon from '../VerifiedIcon';
 import DeviceId from 'Components/DeviceId';
 
-export interface DeviceCardProps {
-  click?: (device: ClientEntity) => void;
+export interface DeviceCardProps extends Partial<HTMLElement> {
   device: ClientEntity;
+  onClick?: (device: ClientEntity) => void;
   showIcon?: boolean;
   showVerified?: boolean;
 }
 
 const DeviceCard: React.FC<DeviceCardProps> = ({
-  click,
+  onClick,
   device: clientEntity,
   showVerified = false,
   showIcon = false,
 }) => {
   const {class: deviceClass = '?', id = '', label = '?', meta} = clientEntity;
   const name = clientEntity.getName();
-  const clickable = !!click;
+  const clickable = !!onClick;
   const isVerified = meta.isVerified;
   const showLegalHoldIcon = showIcon && deviceClass === ClientClassification.LEGAL_HOLD;
   const showDesktopIcon = showIcon && deviceClass === ClientClassification.DESKTOP;
@@ -52,7 +52,7 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
 
   const clickOnDevice = () => {
     if (clickable) {
-      click(clientEntity);
+      onClick(clientEntity);
     }
   };
 
