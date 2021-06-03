@@ -80,9 +80,14 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversat
               'message-timer-button',
               isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
             )}
+            data-uie-name="message-timer-button"
           >
-            <span className="message-timer-button-unit">{duration.symbol}</span>
-            <span className="full-screen">{duration.value}</span>
+            <span className="message-timer-button-unit" data-uie-name="message-timer-button-symbol">
+              {duration.symbol}
+            </span>
+            <span className="full-screen" data-uie-name="message-timer-button-value">
+              {duration.value}
+            </span>
           </div>
         )
       ) : (

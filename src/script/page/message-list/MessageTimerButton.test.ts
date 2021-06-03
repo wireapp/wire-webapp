@@ -28,10 +28,10 @@ class MessageTimerButtonPage extends TestPage<MessageTimerButtonProps> {
     super(MessageTimerButton, props);
   }
 
-  getMessageTimerButton = () => this.get('.message-timer-button');
+  getMessageTimerButton = () => this.get('[data-uie-name="message-timer-button"]');
   getMessageTimerIcon = () => this.get('[data-uie-name="message-timer-icon"]');
-  getMessageTimerButtonSymbol = () => this.get('.message-timer-button .message-timer-button-unit');
-  getMessageTimerButtonValue = () => this.get('.message-timer-button .full-screen');
+  getMessageTimerButtonSymbol = () => this.get('[data-uie-name="message-timer-button-symbol"]');
+  getMessageTimerButtonValue = () => this.get('[data-uie-name="message-timer-button-value"]');
 }
 
 describe('MessageTimerButton', () => {
