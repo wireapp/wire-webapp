@@ -59,6 +59,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   }, [previewPicture, mediumPicture, avatarSize]);
 
   const loadAvatarPicture = async () => {
+    let isWaiting = true;
     if (!avatarLoadingBlocked) {
       setAvatarLoadingBlocked(true);
 
@@ -69,19 +70,23 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
       if (pictureResource) {
         const isCached = pictureResource.downloadProgress() === 100;
         setShowTransition(!isCached && !isSmall);
-        try {
-          const url = await assetRepository.getObjectUrl(pictureResource);
-          if (url) {
-            setAvatarImage(url);
-          }
-          setAvatarLoadingBlocked(false);
-        } catch (error) {
-          console.warn('Failed to load avatar picture.', error);
-        }
+        assetRepository
+          .getObjectUrl(pictureResource)
+          .then(url => {
+            if (!isWaiting) {
+              return;
+            }
+            if (url) {
+              setAvatarImage(url);
+            }
+            setAvatarLoadingBlocked(false);
+          })
+          .catch(error => console.warn('Failed to load avatar picture.', error));
       } else {
         setAvatarLoadingBlocked(false);
       }
     }
+    return () => (isWaiting = false);
   };
 
   const transitionImageStyles: Record<string, CSSObject> = {

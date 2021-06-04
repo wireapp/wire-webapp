@@ -21,7 +21,7 @@ import React from 'react';
 
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
-import {useKoSubscribable} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import Video from './Video';
 import ParticipantMicOnIcon from './ParticipantMicOnIcon';
@@ -45,23 +45,27 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   maximizedParticipant,
   onParticipantDoubleClick,
 }) => {
-  const name = useKoSubscribable(participant.user.name);
-  const isMuted = useKoSubscribable(participant.isMuted);
-  const videoStream = useKoSubscribable(participant.videoStream);
-  const sharesScreen = useKoSubscribable(participant.sharesScreen);
-  const sharesCamera = useKoSubscribable(participant.sharesCamera);
-  const hasPausedVideo = useKoSubscribable(participant.hasPausedVideo);
-  const hasActiveVideo = useKoSubscribable(participant.hasActiveVideo);
-  const selfColor = useKoSubscribable(selfParticipant.user.accent_color);
-  const isActivelySpeaking = useKoSubscribable(participant.isActivelySpeaking);
+  const {isMuted, videoStream, sharesScreen, sharesCamera, hasPausedVideo, hasActiveVideo, isActivelySpeaking} =
+    useKoSubscribableChildren(participant, [
+      'isMuted',
+      'videoStream',
+      'sharesScreen',
+      'sharesCamera',
+      'hasPausedVideo',
+      'hasActiveVideo',
+      'isActivelySpeaking',
+    ]);
+
+  const {name} = useKoSubscribableChildren(participant?.user, ['name']);
+  const {accent_color: selfColor} = useKoSubscribableChildren(selfParticipant?.user, ['accent_color']);
 
   return (
     <div
       data-uie-name="item-grid"
       css={{position: 'relative'}}
-      data-user-id={participant.user.id}
+      data-user-id={participant?.user.id}
       className="group-video-grid__element"
-      onDoubleClick={() => onParticipantDoubleClick(participant.user.id, participant.clientId)}
+      onDoubleClick={() => onParticipantDoubleClick(participant?.user.id, participant?.clientId)}
     >
       {hasActiveVideo ? (
         <Video
@@ -86,7 +90,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
             width: '100%',
           }}
         >
-          <Avatar avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE} participant={participant.user} />
+          <Avatar avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE} participant={participant?.user} />
         </div>
       )}
       <div
