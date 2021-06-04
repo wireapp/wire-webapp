@@ -72,7 +72,9 @@ const UserInput: React.FC<UserInputProps> = (params: UserInputProps) => {
         <div className="search-inner" ref={innerElement}>
           <div className="search-icon icon-search"></div>
           {selectedUsers.map(({name}, index) => (
-            <span key={index} data-bind="text: name" data-uie-name="item-selected"></span>
+            <span key={index} data-uie-name="item-selected">
+              ${name()}
+            </span>
           ))}
           <input
             className="search-input"
