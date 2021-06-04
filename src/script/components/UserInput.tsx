@@ -18,11 +18,11 @@
  */
 
 import ko from 'knockout';
-import React, {useLayoutEffect, useRef} from 'react';
+import React, {useLayoutEffect, useRef, useState} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
-import {isRemovalAction} from 'Util/KeyboardUtil';
+import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
 
 interface UserInputProps {
   enter: () => void | Promise<void>;
@@ -33,10 +33,9 @@ interface UserInputProps {
 }
 
 const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
-  const input = props.input;
   const onEnter = props.enter;
-  const placeholderText = props.placeholder;
-  const selectedUsers = props.selected;
+  const [textInput, setTextInput] = useState(props.input);
+  const [selectedUsers, setSelectedUsers] = useState(props.selected);
 
   const innerElement = useRef<HTMLDivElement>();
   const inputElement = useRef<HTMLInputElement>();
@@ -48,8 +47,7 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
     hasFocus(true);
   }
 
-  const emptyInput = input.length === 0;
-
+  const emptyInput = textInput.length === 0;
   const noSelectedUsers = selectedUsers.length === 0;
 
   useLayoutEffect(() => {
@@ -63,31 +61,34 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
     };
   }, [selectedUsers]);
 
-  const placeholder = emptyInput && noSelectedUsers ? placeholderText : '';
+  const placeHolderText = emptyInput && noSelectedUsers ? props.placeholder : '';
 
   return (
     <form autoComplete="off" className="search-outer">
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
           <div className="search-icon icon-search"></div>
-          {selectedUsers.map(({name}, index) => (
-            <span key={index} data-uie-name="item-selected">
+          {selectedUsers.map(({name, id}) => (
+            <span key={id} data-uie-name="item-selected">
               ${name()}
             </span>
           ))}
           <input
+            onChange={event => {
+              setTextInput(event.target.value);
+            }}
             className="search-input"
             maxLength={MAX_HANDLE_LENGTH}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
               if (isRemovalAction(event.nativeEvent) && emptyInput) {
                 selectedUsers.pop();
+                setSelectedUsers(selectedUsers);
+              } else if (isEnterKey(event.nativeEvent)) {
+                onEnter();
               }
               return true;
             }}
-            onMouseEnter={() => {
-              onEnter();
-            }}
-            placeholder={placeholder}
+            placeholder={placeHolderText}
             ref={inputElement}
             required={true}
             spellCheck={false}

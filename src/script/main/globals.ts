@@ -52,7 +52,7 @@ import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
 import '../page/start-ui/TopPeople';
-import 'Components/userInput';
+import 'Components/UserInput';
 
 import 'Util/LocalizerUtil';
 
