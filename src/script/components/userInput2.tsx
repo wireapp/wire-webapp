@@ -33,18 +33,18 @@ interface UserInputProps {
   selected: User[];
 }
 
-const UserInput: React.FC<UserInputProps> = (params: UserInputProps) => {
-  const input = params.input;
-  const onEnter = params.enter;
-  const placeholderText = params.placeholder;
-  const selectedUsers = params.selected;
+const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
+  const input = props.input;
+  const onEnter = props.enter;
+  const placeholderText = props.placeholder;
+  const selectedUsers = props.selected;
 
   const innerElement = useRef<HTMLDivElement>();
   const inputElement = useRef<HTMLInputElement>();
 
   const hasFocus = ko.observable(false);
-  if (params.focusDelay) {
-    window.setTimeout(() => hasFocus(true), params.focusDelay);
+  if (props.focusDelay) {
+    window.setTimeout(() => hasFocus(true), props.focusDelay);
   } else {
     hasFocus(true);
   }
@@ -104,6 +104,7 @@ export default UserInput;
 
 registerReactComponent<UserInputProps>('user-input', {
   component: UserInput,
-  optionalParams: [],
-  template: '<div data-bind="react: {}"></div>',
+  optionalParams: ['focusDelay'],
+  template:
+    '<div data-bind="react: {enter, input: ko.unwrap(input), focusDelay, placeholder, selected: ko.unwrap(selected)}"></div>',
 });
