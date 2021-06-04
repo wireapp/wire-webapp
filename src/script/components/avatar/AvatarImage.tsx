@@ -55,24 +55,20 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   const [avatarLoadingBlocked, setAvatarLoadingBlocked] = useState(false);
 
   useEffect(() => {
-    loadAvatarPicture();
-  }, [previewPicture, mediumPicture, avatarSize]);
-
-  const loadAvatarPicture = async () => {
     let isWaiting = true;
     if (!avatarLoadingBlocked) {
       setAvatarLoadingBlocked(true);
 
-      const isSmall = avatarSize !== AVATAR_SIZE.LARGE && avatarSize !== AVATAR_SIZE.X_LARGE;
+      const isSmall = ![AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(avatarSize);
       const loadHiRes = !isSmall && devicePixelRatio > 1;
       const pictureResource: AssetRemoteData = loadHiRes ? mediumPicture : previewPicture;
 
-      if (pictureResource) {
-        const isCached = pictureResource.downloadProgress() === 100;
-        setShowTransition(!isCached && !isSmall);
-        assetRepository
-          .getObjectUrl(pictureResource)
-          .then(url => {
+      (async () => {
+        if (pictureResource) {
+          const isCached = pictureResource.downloadProgress() === 100;
+          setShowTransition(!isCached && !isSmall);
+          try {
+            const url = await assetRepository.getObjectUrl(pictureResource);
             if (!isWaiting) {
               return;
             }
@@ -80,14 +76,18 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
               setAvatarImage(url);
             }
             setAvatarLoadingBlocked(false);
-          })
-          .catch(error => console.warn('Failed to load avatar picture.', error));
-      } else {
-        setAvatarLoadingBlocked(false);
-      }
+          } catch (error) {
+            console.warn('Failed to load avatar picture.', error);
+          }
+        } else {
+          setAvatarLoadingBlocked(false);
+        }
+      })();
     }
-    return () => (isWaiting = false);
-  };
+    return () => {
+      isWaiting = false;
+    };
+  }, [previewPicture, mediumPicture, avatarSize]);
 
   const transitionImageStyles: Record<string, CSSObject> = {
     entered: {opacity: 1, transform: 'scale(1)'},
