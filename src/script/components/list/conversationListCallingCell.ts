@@ -37,7 +37,7 @@ import type {CallingRepository} from '../../calling/CallingRepository';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
-import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
+import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import {Participant} from '../../calling/Participant';
@@ -218,7 +218,7 @@ class ConversationListCallingCell {
   }
 
   calculateGrid(): Grid {
-    if (this.videoSpeakersActiveTab() === VideoSpeakersTabs.all) {
+    if (this.videoSpeakersActiveTab() === VideoSpeakersTab.ALL) {
       return this.videoGrid();
     }
 

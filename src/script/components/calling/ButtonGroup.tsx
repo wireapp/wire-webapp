@@ -20,11 +20,17 @@
 import React from 'react';
 import {CSSObject} from '@emotion/core';
 
+export interface ButtonGroupTab {
+  getText: (substitution?: string | Record<string, string>) => string;
+  value: string;
+}
+
 export interface ButtonGroupProps {
   currentItem: string;
-  items: string[];
+  items: ButtonGroupTab[];
   onChangeItem: (item: string) => void;
   style?: CSSObject;
+  textSubstitute?: string | Record<string, string>;
 }
 
 const buttonGroupWrapperStyles: CSSObject = {
@@ -59,22 +65,22 @@ const buttonGroupItemActiveStyles: CSSObject = {
   color: '#33373a',
 };
 
-const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onChangeItem}) => {
+const ButtonGroup: React.FC<ButtonGroupProps> = ({style, items, currentItem, onChangeItem, textSubstitute}) => {
   return (
     <div css={{...buttonGroupWrapperStyles, ...style}} data-uie-name="button-group-wrapper">
-      {items.map(item => (
+      {items.map(({value, getText}) => (
         <div
-          key={item}
-          css={item === currentItem ? buttonGroupItemActiveStyles : buttonGroupItemStyles}
+          key={value}
+          css={value === currentItem ? buttonGroupItemActiveStyles : buttonGroupItemStyles}
           onClick={() => {
-            if (item !== currentItem) {
-              onChangeItem(item);
+            if (value !== currentItem) {
+              onChangeItem(value);
             }
           }}
           data-uie-name="button-group-item"
-          data-uie-value={item === currentItem ? 'active' : 'inactive'}
+          data-uie-value={value === currentItem ? 'active' : 'inactive'}
         >
-          {item}
+          {getText(textSubstitute)}
         </div>
       ))}
     </div>
