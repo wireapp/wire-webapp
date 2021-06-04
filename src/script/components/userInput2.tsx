@@ -18,17 +18,19 @@
  */
 
 import ko from 'knockout';
-import React, {useRef} from 'react';
+import React, {useLayoutEffect, useRef} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {User} from '../entity/User';
+import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
+import {isRemovalAction} from 'Util/KeyboardUtil';
 
 interface UserInputProps {
   enter: () => void | Promise<void>;
   focusDelay?: number;
-  input: ko.Observable<string>;
+  input: string;
   placeholder: string;
-  selected: ko.ObservableArray<User>;
+  selected: User[];
 }
 
 const UserInput: React.FC<UserInputProps> = (params: UserInputProps) => {
@@ -47,16 +49,49 @@ const UserInput: React.FC<UserInputProps> = (params: UserInputProps) => {
     hasFocus(true);
   }
 
-  const noSelectedUsers = ko.pureComputed(() => {
-    return typeof selectedUsers !== 'function' || !selectedUsers().length;
-  });
+  const emptyInput = input.length === 0;
+
+  const noSelectedUsers = selectedUsers.length === 0;
+
+  useLayoutEffect(() => {
+    inputElement.current.focus();
+    const handle = window.requestAnimationFrame(() => {
+      innerElement.current.scrollTop = inputElement.current.scrollHeight;
+    });
+
+    return () => {
+      window.cancelAnimationFrame(handle);
+    };
+  }, [selectedUsers]);
+
+  const placeholder = emptyInput && noSelectedUsers ? placeholderText : '';
 
   return (
     <form autoComplete="off" className="search-outer">
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
           <div className="search-icon icon-search"></div>
-          <input className="search-input" ref={inputElement} />
+          {selectedUsers.map(({name}, index) => (
+            <span key={index} data-bind="text: name" data-uie-name="item-selected"></span>
+          ))}
+          <input
+            className="search-input"
+            maxLength={MAX_HANDLE_LENGTH}
+            onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
+              if (isRemovalAction(event.nativeEvent) && emptyInput) {
+                selectedUsers.pop();
+              }
+              return true;
+            }}
+            onMouseEnter={() => {
+              onEnter();
+            }}
+            placeholder={placeholder}
+            ref={inputElement}
+            required={true}
+            spellCheck={false}
+            type="text"
+          />
         </div>
       </div>
     </form>
