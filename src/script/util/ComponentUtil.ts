@@ -88,7 +88,7 @@ export const useKoSubscribableChildren = <C extends keyof Subscribables<P>, P ex
 ): ChildValues<C> => {
   const getInitialState = (root: P): ChildValues<C> =>
     children.reduce((acc, child) => {
-      acc[child] = root[child]?.();
+      acc[child] = root?.[child]?.();
       return acc;
     }, {} as ChildValues<C>);
 

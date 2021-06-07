@@ -20,7 +20,7 @@
 import React, {useState, useEffect, CSSProperties} from 'react';
 import {css} from '@emotion/core';
 
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 import type {Grid} from '../../calling/videoGridHandler';
@@ -117,9 +117,11 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
 
-  const selfName = useKoSubscribable(selfParticipant.user.name);
-  const selfIsMuted = useKoSubscribable(selfParticipant.isMuted);
-  const selfIsActivelySpeaking = useKoSubscribable(selfParticipant.isActivelySpeaking);
+  const {isMuted: selfIsMuted, isActivelySpeaking: selfIsActivelySpeaking} = useKoSubscribableChildren(
+    selfParticipant,
+    ['isMuted', 'isActivelySpeaking'],
+  );
+  const {name: selfName} = useKoSubscribableChildren(selfParticipant?.user, ['name']);
 
   return (
     <div className="group-video">
