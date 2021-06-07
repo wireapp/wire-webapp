@@ -27,7 +27,9 @@ class UserInputPage extends TestPage<UserInputProps> {
     super(UserInput, props);
   }
 
+  getInput = () => this.get('input').first();
   getSelectedUsers = () => this.get('[data-uie-name="item-selected"]');
+  pressBackSpace = () => this.keyCodeDown(this.getInput(), 8);
 }
 
 describe('UserInput', () => {
@@ -42,5 +44,29 @@ describe('UserInput', () => {
     });
 
     expect(userInputPage.getSelectedUsers().length).toBe(4);
+  });
+
+  it('allows to deselect a user when pressing "backspace"', () => {
+    const selectedUsers = ko.observableArray([new User('1'), new User('2'), new User('3'), new User('4')]);
+
+    const props = {
+      enter: () => {},
+      input: '',
+      placeholder: '',
+      selectedUsers: ko.unwrap(selectedUsers),
+      setInput: ko.observable(''),
+      setSelectedUsers: selectedUsers,
+    };
+
+    const userInputPage = new UserInputPage(props);
+    expect(userInputPage.getSelectedUsers().length).toBe(4);
+
+    userInputPage.pressBackSpace();
+    userInputPage.setProps({
+      ...props,
+      selectedUsers: ko.unwrap(selectedUsers),
+    });
+
+    expect(userInputPage.getSelectedUsers().length).toBe(3);
   });
 });

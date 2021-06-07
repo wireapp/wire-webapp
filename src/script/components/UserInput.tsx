@@ -82,7 +82,7 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
             className="search-input"
             maxLength={MAX_HANDLE_LENGTH}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-              if (isRemovalAction(event.nativeEvent) && emptyInput) {
+              if (isRemovalAction(event.keyCode) && emptyInput) {
                 setSelectedUsers(selectedUsers.slice(0, -1));
               } else if (isEnterKey(event.nativeEvent)) {
                 onEnter();

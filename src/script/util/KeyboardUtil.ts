@@ -68,8 +68,12 @@ export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-export const isRemovalAction = (keyboardEvent: KeyboardEvent): boolean =>
-  isOneOfKeys(keyboardEvent, [KEY.BACKSPACE, KEY.DELETE]);
+export const isRemovalAction = (keyboardEvent: KeyboardEvent | number): boolean => {
+  if (typeof keyboardEvent === 'number') {
+    return [8, 46].includes(keyboardEvent);
+  }
+  return isOneOfKeys(keyboardEvent, [KEY.BACKSPACE, KEY.DELETE]);
+};
 
 export const insertAtCaret = (areaId: string, text: string) => {
   // http://stackoverflow.com/a/1064139
