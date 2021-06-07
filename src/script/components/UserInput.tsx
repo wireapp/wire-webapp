@@ -18,7 +18,7 @@
  */
 
 import ko from 'knockout';
-import React, {useLayoutEffect, useRef, useState} from 'react';
+import React, {useLayoutEffect, useRef} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import type {User} from '../entity/User';
 import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
@@ -29,13 +29,15 @@ interface UserInputProps {
   focusDelay?: number;
   input: string;
   placeholder: string;
-  selected: User[];
+  selectedUsers: User[];
+  setInput: ko.Observable<string>;
+  setSelectedUsers: ko.ObservableArray<User>;
 }
 
 const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
   const onEnter = props.enter;
-  const [textInput, setTextInput] = useState(props.input);
-  const [selectedUsers, setSelectedUsers] = useState(props.selected);
+  const input = props.input;
+  const {selectedUsers, setSelectedUsers} = props;
 
   const innerElement = useRef<HTMLDivElement>();
   const inputElement = useRef<HTMLInputElement>();
@@ -47,7 +49,7 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
     hasFocus(true);
   }
 
-  const emptyInput = textInput.length === 0;
+  const emptyInput = input.length === 0;
   const noSelectedUsers = selectedUsers.length === 0;
 
   useLayoutEffect(() => {
@@ -70,19 +72,18 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
           <div className="search-icon icon-search"></div>
           {selectedUsers.map(({name, id}) => (
             <span key={id} data-uie-name="item-selected">
-              ${name()}
+              {name()}
             </span>
           ))}
           <input
             onChange={event => {
-              setTextInput(event.target.value);
+              props.setInput(event.target.value);
             }}
             className="search-input"
             maxLength={MAX_HANDLE_LENGTH}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
               if (isRemovalAction(event.nativeEvent) && emptyInput) {
-                selectedUsers.pop();
-                setSelectedUsers(selectedUsers);
+                setSelectedUsers(selectedUsers.slice(0, -1));
               } else if (isEnterKey(event.nativeEvent)) {
                 onEnter();
               }
@@ -93,6 +94,7 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
             required={true}
             spellCheck={false}
             type="text"
+            value={input}
           />
         </div>
       </div>
@@ -106,5 +108,5 @@ registerReactComponent<UserInputProps>('user-input', {
   component: UserInput,
   optionalParams: ['focusDelay'],
   template:
-    '<div data-bind="react: {enter, input: ko.unwrap(input), focusDelay, placeholder, selected: ko.unwrap(selected)}"></div>',
+    '<div data-bind="react: {enter, input: ko.unwrap(input), setInput: input, focusDelay, placeholder, selectedUsers: ko.unwrap(selected), setSelectedUsers: selected}"></div>',
 });
