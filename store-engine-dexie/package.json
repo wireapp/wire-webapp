@@ -3,7 +3,7 @@
     "dexie": "3.0.3"
   },
   "devDependencies": {
-    "@types/jasmine": "3.7.6",
+    "@types/jasmine": "3.7.7",
     "@types/karma": "6.3.0",
     "@types/node": "~14",
     "@wireapp/store-engine": "4.9.1",
