@@ -6,7 +6,7 @@
     "@types/karma": "6.3.0",
     "cross-env": "7.0.3",
     "jasmine": "3.7.0",
-    "karma": "6.3.2",
+    "karma": "6.3.3",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "4.0.1",
     "karma-jasmine-diff-reporter": "2.0.1",
