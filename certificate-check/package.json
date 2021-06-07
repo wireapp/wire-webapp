@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "jsrsasign": "10.2.0"
+    "jsrsasign": "10.3.0"
   },
   "description": "Utilities to check that Wire's domains use the expected certificate.",
   "devDependencies": {
