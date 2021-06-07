@@ -19,6 +19,11 @@
 
 import {Runtime} from '@wireapp/commons';
 
+export const KEY_CODE = {
+  BACKSPACE: 8,
+  DELETE: 46,
+};
+
 export const KEY = {
   ARROW_DOWN: Runtime.isEdge() ? 'Down' : 'ArrowDown',
   ARROW_LEFT: Runtime.isEdge() ? 'Left' : 'ArrowLeft',
@@ -70,7 +75,7 @@ export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
 
 export const isRemovalAction = (keyboardEvent: KeyboardEvent | number): boolean => {
   if (typeof keyboardEvent === 'number') {
-    return [8, 46].includes(keyboardEvent);
+    return [KEY_CODE.BACKSPACE, KEY_CODE.DELETE].includes(keyboardEvent);
   }
   return isOneOfKeys(keyboardEvent, [KEY.BACKSPACE, KEY.DELETE]);
 };
