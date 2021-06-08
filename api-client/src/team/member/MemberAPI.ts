@@ -25,6 +25,7 @@ import {handleProgressEvent, HttpClient, ProgressCallback, RequestCancelable, Sy
 import type {MemberData, Members} from '../member/';
 import {RequestCancellationError} from '../../user';
 import {MemberCSVResponse} from './MemberCSVResponse';
+import {UpdatedMemberData} from './UpdatedMemberData';
 
 export class MemberAPI {
   // Maximum 1600 due to "413 Request Entity Too Large" response
@@ -71,7 +72,7 @@ export class MemberAPI {
     await this.client.sendJSON(config);
   }
 
-  public async putMembers(teamId: string, member: MemberData): Promise<void> {
+  public async putMembers(teamId: string, member: UpdatedMemberData): Promise<void> {
     const config: AxiosRequestConfig = {
       data: {
         member: member,
