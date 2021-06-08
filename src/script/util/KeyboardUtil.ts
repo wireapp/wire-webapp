@@ -73,11 +73,8 @@ export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-export const isRemovalAction = (keyboardEvent: KeyboardEvent | number): boolean => {
-  if (typeof keyboardEvent === 'number') {
-    return [KEY_CODE.BACKSPACE, KEY_CODE.DELETE].includes(keyboardEvent);
-  }
-  return isOneOfKeys(keyboardEvent, [KEY.BACKSPACE, KEY.DELETE]);
+export const isRemovalAction = (keyCode: number): boolean => {
+  return [KEY_CODE.BACKSPACE, KEY_CODE.DELETE].includes(keyCode);
 };
 
 export const insertAtCaret = (areaId: string, text: string) => {
