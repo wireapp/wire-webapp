@@ -28,7 +28,7 @@ class UserInputPage extends TestPage<UserInputProps> {
     super(UserInput, props);
   }
 
-  getInput = () => this.get('input').first();
+  getInput = () => this.get('[data-uie-name="enter-users"]');
   getSelectedUsers = () => this.get('[data-uie-name="item-selected"]');
   pressBackSpace = () => this.keyCodeDown(this.getInput(), KEY_CODE.BACKSPACE);
 }

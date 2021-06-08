@@ -76,11 +76,12 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
             </span>
           ))}
           <input
+            className="search-input"
+            data-uie-name="enter-users"
+            maxLength={MAX_HANDLE_LENGTH}
             onChange={event => {
               props.setInput(event.target.value);
             }}
-            className="search-input"
-            maxLength={MAX_HANDLE_LENGTH}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
               if (isRemovalAction(event.keyCode) && emptyInput) {
                 setSelectedUsers(selectedUsers.slice(0, -1));
