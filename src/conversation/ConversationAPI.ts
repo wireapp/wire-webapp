@@ -56,6 +56,7 @@ import type {
   ConversationTypingData,
 } from './data';
 import {ConversationLegalholdMissingConsentError} from './ConversationError';
+import {QualifiedId} from '../user';
 
 export class ConversationAPI {
   public static readonly MAX_CHUNK_SIZE = 500;
@@ -76,6 +77,7 @@ export class ConversationAPI {
     ROLES: 'roles',
     SELF: 'self',
     TYPING: 'typing',
+    V2: 'v2',
   };
 
   constructor(private readonly client: HttpClient) {}
@@ -699,6 +701,34 @@ export class ConversationAPI {
       },
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}`,
+    };
+
+    try {
+      const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
+      return response.data;
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
+          throw new ConversationLegalholdMissingConsentError(error.message);
+        }
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Add qualified members to an existing conversation.
+   * @param conversationId The conversation ID to add the users to
+   * @param users List of users to add to a conversation
+   */
+  public async postMembersV2(conversationId: string, users: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
+    const config: AxiosRequestConfig = {
+      data: {
+        conversation_role: DefaultConversationRoleName.WIRE_MEMBER,
+        qualified_users: users,
+      },
+      method: 'post',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.MEMBERS}/${ConversationAPI.URL.V2}`,
     };
 
     try {
