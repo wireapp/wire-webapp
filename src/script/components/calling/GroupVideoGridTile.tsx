@@ -18,6 +18,7 @@
  */
 
 import React from 'react';
+import {VIDEO_STATE} from '@wireapp/avs';
 
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
@@ -45,19 +46,19 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   maximizedParticipant,
   onParticipantDoubleClick,
 }) => {
-  const {isMuted, videoStream, sharesScreen, sharesCamera, hasPausedVideo, hasActiveVideo, isActivelySpeaking} =
-    useKoSubscribableChildren(participant, [
-      'isMuted',
-      'videoStream',
-      'sharesScreen',
-      'sharesCamera',
-      'hasPausedVideo',
-      'hasActiveVideo',
-      'isActivelySpeaking',
-    ]);
-
+  const {isMuted, videoState, videoStream, isActivelySpeaking} = useKoSubscribableChildren(participant, [
+    'isMuted',
+    'videoStream',
+    'isActivelySpeaking',
+    'videoState',
+  ]);
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
   const {accent_color: selfColor} = useKoSubscribableChildren(selfParticipant?.user, ['accent_color']);
+
+  const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
+  const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
+  const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
+  const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
 
   return (
     <div
