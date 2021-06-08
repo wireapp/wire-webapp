@@ -57,10 +57,10 @@ const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<Ico
   return SVGComponent;
 };
 
-const icons: IconList = Object.entries(SVGProvider).reduce((list, [key, svg]) => {
+const icons = Object.entries(SVGProvider).reduce<IconList>((list, [key, svg]) => {
   const name = normalizeIconName(key);
   return Object.assign(list, {[name]: createSvgComponent(svg.documentElement, `Icon.${name}`)});
-}, {} as IconList);
+}, {});
 
 const Icon: React.FC<NamedIconProps> = ({name, ...props}) => {
   const componentName = normalizeIconName(name);

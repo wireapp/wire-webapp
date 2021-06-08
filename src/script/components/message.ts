@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
-import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {Context, ContextMenuEntry} from '../ui/ContextMenu';
@@ -59,6 +58,7 @@ import './message/DecryptErrorMessage';
 import './message/LegalHoldMessage';
 import './message/SystemMessage';
 import './message/MemberMessage';
+import './message/ReadReceiptStatus';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -114,8 +114,6 @@ class Message {
   onLike: (message: ContentMessage, button?: boolean) => void;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   previewSubscription: ko.Subscription;
-  readReceiptText: ko.PureComputed<string>;
-  readReceiptTooltip: ko.PureComputed<string>;
   selfId: ko.Observable<string>;
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
@@ -198,26 +196,6 @@ class Message {
     this.actionsViewModel = actionsViewModel;
 
     this.hasReadReceiptsTurnedOn = this.conversationRepository.expectReadReceipt(this.conversation());
-
-    this.readReceiptTooltip = ko.pureComputed(() => {
-      const receipts = this.message.readReceipts();
-      if (!receipts.length || !this.conversation().is1to1()) {
-        return '';
-      }
-      return formatDateNumeral(receipts[0].time);
-    });
-
-    this.readReceiptText = ko.pureComputed(() => {
-      if (!this.message.expectsReadConfirmation) {
-        return '';
-      }
-      const receipts = this.message.readReceipts();
-      if (!receipts.length) {
-        return '';
-      }
-      const is1to1 = this.conversation().is1to1();
-      return is1to1 ? formatTimeShort(receipts[0].time) : receipts.length.toString(10);
-    });
 
     this.contextMenuEntries = ko.pureComputed(() => {
       const messageEntity = this.message;
@@ -316,22 +294,7 @@ class Message {
 // If this is not explicitly defined as string,
 // TS will define this as the string's content.
 const receiptStatusTemplate: string = `
-  <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
-    <span class="message-status" data-bind="text: t('conversationMessageDelivered')"></span>
-  <!-- /ko -->
-  <!-- ko if: readReceiptText() -->
-    <span class="message-status-read" data-bind="
-        css: {'message-status-read--visible': isLastDeliveredMessage(),
-          'with-tooltip with-tooltip--receipt': readReceiptTooltip(),
-          'message-status-read--clickable': !conversation().is1to1()},
-        attr: {'data-tooltip': readReceiptTooltip()},
-        click: conversation().is1to1() ? null : onClickReceipts
-        "
-        data-uie-name="status-message-read-receipts">
-      <read-icon></read-icon>
-      <span class="message-status-read__count" data-bind="text: readReceiptText()" data-uie-name="status-message-read-receipt-count"></span>
-    </span>
-  <!-- /ko -->
+  <read-receipt-status params="message: message, is1to1Conversation: conversation().is1to1, isLastDeliveredMessage: isLastDeliveredMessage, onClickReceipts: onClickReceipts">
 `;
 
 const normalTemplate: string = `

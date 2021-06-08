@@ -12,8 +12,8 @@
     "electron-builder": "22.11.1",
     "globby": "11.0.3",
     "rimraf": "3.0.2",
-    "ts-node": "9.1.1",
-    "typescript": "4.2.4"
+    "ts-node": "10.0.0",
+    "typescript": "4.3.2"
   },
   "license": "GPL-3.0",
   "main": "dist/main.js",
