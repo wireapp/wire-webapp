@@ -17,7 +17,6 @@
  *
  */
 
-import ko from 'knockout';
 import React, {useLayoutEffect, useRef} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import type {User} from '../entity/User';
@@ -30,24 +29,20 @@ export interface UserInputProps {
   input: string;
   placeholder: string;
   selectedUsers: User[];
-  setInput: ko.Observable<string>;
-  setSelectedUsers: ko.ObservableArray<User>;
+  setInput: (input: string) => void;
+  setSelectedUsers: (users: User[]) => void;
 }
 
-const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
-  const onEnter = props.enter;
-  const input = props.input;
-  const {selectedUsers, setSelectedUsers} = props;
-
+const UserInput: React.FC<UserInputProps> = ({
+  enter: onEnter,
+  input,
+  selectedUsers,
+  setSelectedUsers,
+  placeholder,
+  setInput,
+}: UserInputProps) => {
   const innerElement = useRef<HTMLDivElement>();
   const inputElement = useRef<HTMLInputElement>();
-
-  const hasFocus = ko.observable(false);
-  if (props.focusDelay) {
-    window.setTimeout(() => hasFocus(true), props.focusDelay);
-  } else {
-    hasFocus(true);
-  }
 
   const emptyInput = input.length === 0;
   const noSelectedUsers = selectedUsers.length === 0;
@@ -63,13 +58,13 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
     };
   }, [selectedUsers]);
 
-  const placeHolderText = emptyInput && noSelectedUsers ? props.placeholder : '';
+  const placeHolderText = emptyInput && noSelectedUsers ? placeholder : '';
 
   return (
     <form autoComplete="off" className="search-outer">
       <div className="search-inner-wrap">
         <div className="search-inner" ref={innerElement}>
-          <div className="search-icon icon-search"></div>
+          <div className="search-icon icon-search" />
           {selectedUsers.map(({name, id}) => (
             <span key={id} data-uie-name="item-selected">
               {name()}
@@ -79,9 +74,7 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
             className="search-input"
             data-uie-name="enter-users"
             maxLength={MAX_HANDLE_LENGTH}
-            onChange={event => {
-              props.setInput(event.target.value);
-            }}
+            onChange={event => setInput(event.target.value)}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
               if (isRemovalAction(event.keyCode) && emptyInput) {
                 setSelectedUsers(selectedUsers.slice(0, -1));
@@ -92,7 +85,7 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
             }}
             placeholder={placeHolderText}
             ref={inputElement}
-            required={true}
+            required
             spellCheck={false}
             type="text"
             value={input}
