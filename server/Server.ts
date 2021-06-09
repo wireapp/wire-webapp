@@ -62,6 +62,8 @@ class Server {
     this.initLatestBrowserRequired();
     this.initStaticRoutes();
     this.initWebpack();
+    this.initProxy();
+    this.open();
     this.initSiteMap(this.config);
     this.app.use(Root());
     this.app.use(HealthCheckRoute());
@@ -83,6 +85,39 @@ class Server {
 
     this.app.use(webpackDevMiddleware(webpackCompiler));
     this.app.use(webpackHotMiddleware(webpackCompiler));
+  }
+
+  initProxy() {
+    if (this.config.SERVER.ENVIRONMENT === 'development') {
+      const {createProxyMiddleware} = require('http-proxy-middleware');
+      this.app.use(
+        '/api',
+        createProxyMiddleware({
+          changeOrigin: true,
+          pathRewrite: {
+            '^/api': '',
+          },
+          target: 'https://staging-nginz-https.zinfra.io',
+        }),
+      );
+      this.app.use(
+        '/ws',
+        createProxyMiddleware({
+          changeOrigin: true,
+          pathRewrite: {
+            '^/ws': '',
+          },
+          target: 'wss://staging-nginz-ssl.zinfra.io',
+          ws: true,
+        }),
+      );
+    }
+  }
+
+  open() {
+    if (this.config.SERVER.ENVIRONMENT === 'development') {
+      require('opn')(this.config.SERVER.APP_BASE);
+    }
   }
 
   private initCaching() {

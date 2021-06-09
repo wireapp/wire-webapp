@@ -27,9 +27,6 @@ server
   .start()
   .then(port => {
     console.info(`[${formatDate()}] Server is running on port ${port}.`);
-    if (config.SERVER.DEVELOPMENT) {
-      require('opn')(config.SERVER.APP_BASE);
-    }
   })
   .catch(error => console.error(`[${formatDate()}] ${error.stack}`));
 
