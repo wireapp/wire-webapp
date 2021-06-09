@@ -46,13 +46,13 @@ import 'Components/list/conversationListCell';
 import 'Components/avatar/GroupAvatar';
 import 'Components/message';
 import 'Components/message/messageQuote';
-import '../page/message-list/messageTimerButton';
+import '../page/message-list/MessageTimerButton';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
 import '../page/start-ui/TopPeople';
-import 'Components/userInput';
+import 'Components/UserInput';
 
 import 'Util/LocalizerUtil';
 

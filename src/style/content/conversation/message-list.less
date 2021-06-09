@@ -543,18 +543,10 @@ image-asset {
   }
 
   .message-status-read {
-    read-icon {
-      display: flex;
-      width: 16px;
-      height: 16px;
-      align-items: center;
-      justify-content: center;
-
-      svg {
-        max-width: 12px;
-        max-height: 12px;
-        fill: currentColor;
-      }
+    svg {
+      max-width: 12px;
+      max-height: 12px;
+      fill: currentColor;
     }
 
     &__count {
@@ -567,6 +559,7 @@ image-asset {
   .message-status-read {
     .action-pill-style;
     position: absolute;
+    bottom: 3px;
     color: var(--background-fade-40);
     font-size: @font-size-xs;
     pointer-events: none;

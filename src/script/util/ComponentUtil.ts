@@ -96,8 +96,8 @@ export const useKoSubscribableChildren = <C extends keyof Subscribables<P>, P ex
   useEffect(() => {
     setState(getInitialState(parent));
     const subscriptions = children.map(child =>
-      parent[child]?.subscribe((value: any) => {
-        setState({...state, [child]: value});
+      parent?.[child]?.subscribe((value: any) => {
+        setState(prevState => ({...prevState, [child]: value}));
       }),
     );
     return () => subscriptions.forEach(subscription => subscription?.dispose());

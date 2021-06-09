@@ -173,8 +173,8 @@ const sendRandomGif = async (account: Account, conversationId: string, query: st
 };
 
 const announceRelease = async (tagName: string, commitId: string): Promise<void> => {
-  const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_CONVERSATION} = process.env;
-  if (WIRE_EMAIL && WIRE_PASSWORD && WIRE_CONVERSATION) {
+  const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_CONVERSATION, WIRE_RELEASE_NOTES_CONVERSATION_ID} = process.env;
+  if (WIRE_EMAIL && WIRE_PASSWORD && (WIRE_CONVERSATION || WIRE_RELEASE_NOTES_CONVERSATION_ID)) {
     if (isDryRun) {
       return;
     }
@@ -185,16 +185,30 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
       email: WIRE_EMAIL,
       password: WIRE_PASSWORD,
     });
-    const message = `Released tag "${tagName}" based on commit ID "${commitId}".`;
-    const payload = account.service.conversation.messageBuilder
-      .createText({
-        conversationId: WIRE_CONVERSATION,
-        text: message,
-      })
-      .build();
-    await sendRandomGif(account, WIRE_CONVERSATION, 'in the oven');
-    await account.service.conversation.send(payload);
-    logger.info(`Sent announcement to conversation "${process.env.WIRE_CONVERSATION}".`);
+
+    if (stage === DeploymentStage.STAGING && WIRE_CONVERSATION) {
+      // Staging Bump
+      const message = `Released tag "${tagName}" based on commit ID "${commitId}".`;
+      const payload = account.service.conversation.messageBuilder
+        .createText({
+          conversationId: WIRE_CONVERSATION,
+          text: message,
+        })
+        .build();
+      await sendRandomGif(account, WIRE_CONVERSATION, 'in the oven');
+      await account.service.conversation.send(payload);
+    } else if (stage === DeploymentStage.PRODUCTION && WIRE_RELEASE_NOTES_CONVERSATION_ID) {
+      // Production Release
+      const message = `The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version`;
+      const payload = account.service.conversation.messageBuilder
+        .createText({
+          conversationId: WIRE_RELEASE_NOTES_CONVERSATION_ID,
+          text: message,
+        })
+        .build();
+      await account.service.conversation.send(payload);
+    }
+    logger.info(`Sent "${stage}" announcement.`);
   } else {
     logger.info(`WIRE_EMAIL, WIRE_PASSWORD or WIRE_CONVERSATION missing. No announcement sent.`);
   }

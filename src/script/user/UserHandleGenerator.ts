@@ -23,7 +23,7 @@ import {randomElement} from 'Util/ArrayUtil';
 import {getRandomNumber} from 'Util/NumberUtil';
 
 const MIN_HANDLE_LENGTH = 2;
-const MAX_HANDLE_LENGTH = 256;
+export const MAX_HANDLE_LENGTH = 256;
 
 const RANDOM_WORDS_1 = [
   ...['acid', 'agate', 'agile', 'amber', 'aqua', 'arid', 'avid', 'azure', 'baby', 'basic', 'beige', 'best', 'black'],
