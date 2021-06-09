@@ -91,21 +91,21 @@ class Server {
     if (this.config.SERVER.ENVIRONMENT === 'development') {
       const {createProxyMiddleware} = require('http-proxy-middleware');
       this.app.use(
-        '/api',
+        '/access/api',
         createProxyMiddleware({
           changeOrigin: true,
           pathRewrite: {
-            '^/api': '',
+            '^/access/api': '',
           },
           target: 'https://staging-nginz-https.zinfra.io',
         }),
       );
       this.app.use(
-        '/ws',
+        '/access/ws',
         createProxyMiddleware({
           changeOrigin: true,
           pathRewrite: {
-            '^/ws': '',
+            '^/access/ws': '',
           },
           target: 'wss://staging-nginz-ssl.zinfra.io',
           ws: true,
