@@ -25,7 +25,7 @@ import {MAX_HANDLE_LENGTH} from '../user/UserHandleGenerator';
 import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
 
 export interface UserInputProps {
-  enter: () => void | Promise<void>;
+  enter?: () => void | Promise<void>;
   focusDelay?: number;
   input: string;
   placeholder: string;
@@ -86,7 +86,7 @@ const UserInput: React.FC<UserInputProps> = (props: UserInputProps) => {
               if (isRemovalAction(event.keyCode) && emptyInput) {
                 setSelectedUsers(selectedUsers.slice(0, -1));
               } else if (isEnterKey(event.nativeEvent)) {
-                onEnter();
+                onEnter?.();
               }
               return true;
             }}
@@ -107,7 +107,7 @@ export default UserInput;
 
 registerReactComponent<UserInputProps>('user-input', {
   component: UserInput,
-  optionalParams: ['focusDelay'],
+  optionalParams: ['focusDelay', 'enter'],
   template:
     '<div data-bind="react: {enter, input: ko.unwrap(input), setInput: input, focusDelay, placeholder, selectedUsers: ko.unwrap(selected), setSelectedUsers: selected}"></div>',
 });
