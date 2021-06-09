@@ -25,7 +25,6 @@ import {isEnterKey, isRemovalAction} from 'Util/KeyboardUtil';
 
 export interface UserInputProps {
   enter?: () => void | Promise<void>;
-  focusDelay?: number;
   input: string;
   placeholder: string;
   selectedUsers: User[];
@@ -100,7 +99,7 @@ export default UserInput;
 
 registerReactComponent<UserInputProps>('user-input', {
   component: UserInput,
-  optionalParams: ['focusDelay', 'enter'],
+  optionalParams: ['enter'],
   template:
-    '<div data-bind="react: {enter, input: ko.unwrap(input), setInput: input, focusDelay, placeholder, selectedUsers: ko.unwrap(selected), setSelectedUsers: selected}"></div>',
+    '<div data-bind="react: {enter, input: ko.unwrap(input), setInput: input, placeholder, selectedUsers: ko.unwrap(selected), setSelectedUsers: selected}"></div>',
 });
