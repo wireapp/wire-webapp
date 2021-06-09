@@ -99,6 +99,5 @@ export default SeekBar;
 
 registerReactComponent('seek-bar', {
   component: SeekBar,
-  optionalParams: ['dark', 'disabled'],
   template: '<div data-bind="react: {dark, disabled: ko.unwrap(disabled), src}"></div>',
 });

@@ -49,6 +49,5 @@ export default ParticipantMicOnIcon;
 
 registerReactComponent('participant-mic-on-icon', {
   component: ParticipantMicOnIcon,
-  optionalParams: ['className', 'isActive', 'color'],
   template: '<span data-bind="react: {className, isActive: ko.unwrap(isActive), color}"></span>',
 });

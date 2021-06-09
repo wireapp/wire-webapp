@@ -107,7 +107,6 @@ export default UserInput;
 
 registerReactComponent<UserInputProps>('user-input', {
   component: UserInput,
-  optionalParams: ['focusDelay', 'enter'],
   template:
     '<div data-bind="react: {enter, input: ko.unwrap(input), setInput: input, focusDelay, placeholder, selectedUsers: ko.unwrap(selected), setSelectedUsers: selected}"></div>',
 });
