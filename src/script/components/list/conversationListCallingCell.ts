@@ -125,7 +125,10 @@ class ConversationListCallingCell {
     this.videoSpeakersActiveTab = videoSpeakersActiveTab;
     this.maximizedTileVideoParticipant = maximizedTileVideoParticipant;
     this.conversationUrl = generateConversationUrl(conversation().id);
-    this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
+
+    if (this.callState.activeCalls().length <= 1) {
+      this.multitasking.isMinimized(false); // reset multitasking default value, the call will be fullscreen if there are some remote videos
+    }
 
     this.videoGrid = videoGrid;
     this.conversationParticipants = ko.pureComputed(
