@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.25.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.24.0...@wireapp/api-client@12.25.0) (2021-06-10)
+
+
+### Features
+
+* **api-client:** Add GET /conversation/join endpoint ([#3938](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3938)) ([0a3be50](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/0a3be50adecd31d8fdb295a5de9361cd0600846a))
+
+
+
+
+
 # [12.24.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.23.1...@wireapp/api-client@12.24.0) (2021-06-08)
 
 
