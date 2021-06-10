@@ -21,7 +21,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {Asset as ProtobufAsset, GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
+import {init as proteusInit, keys as ProteusKeys} from '@wireapp/proteus';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
 import type {Notification} from '@wireapp/api-client/src/notification/';
 import {DatabaseKeys} from '@wireapp/core/src/main/notification/NotificationDatabaseRepository';
@@ -41,6 +41,7 @@ import {EventSource} from './EventSource';
 import {EventRecord} from '../storage';
 import {EventService} from './EventService';
 import {CryptographyError} from '../error/CryptographyError';
+import {StatusType} from '../message/StatusType';
 
 const testFactory = new TestFactory();
 
@@ -156,6 +157,58 @@ describe('EventRepository', () => {
       );
 
       expect(missedEventsSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('getUpdatesForEditMessage', () => {
+    /** @see https://wearezeta.atlassian.net/browse/SQCORE-732 */
+    it('does not overwrite the seen status if a message gets edited', () => {
+      const originalEvent = {
+        category: 16,
+        conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
+        data: {
+          content: 'Original Text Which Has Been Seen By Someone Else',
+          expects_read_confirmation: true,
+          legal_hold_status: 1,
+          mentions: [],
+          previews: [],
+        },
+        from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
+        from_client_id: '79618bbe93e6821c',
+        id: 'c6269e58-fa82-4f6e-8264-263e09154871',
+        primary_key: '17',
+        read_receipts: [
+          {
+            time: '2021-06-10T19:47:19.570Z',
+            userId: 'b661e27f-24c6-4c52-a425-87a7b7f3df61',
+          },
+        ],
+        status: StatusType.SEEN,
+        time: '2021-06-10T19:47:16.071Z',
+        type: 'conversation.message-add',
+      } as EventRecord;
+
+      const editedEvent = {
+        conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
+        data: {
+          content: 'Edited Text Which Replaces The Original Text',
+          expects_read_confirmation: true,
+          mentions: [],
+          previews: [],
+          replacing_message_id: 'c6269e58-fa82-4f6e-8264-263e09154871',
+        },
+        from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
+        from_client_id: '79618bbe93e6821c',
+        id: 'caff044b-cb9c-47c6-833a-d4b76c678bcd',
+        status: StatusType.SENT,
+        time: '2021-06-10T19:47:23.706Z',
+        type: 'conversation.message-add',
+      } as EventRecord;
+
+      const updatedEvent = EventRepository['getUpdatesForEditMessage'](originalEvent, editedEvent);
+      expect(updatedEvent.data.content).toBe('Edited Text Which Replaces The Original Text');
+      expect(updatedEvent.status).toBe(StatusType.SEEN);
+      expect(Object.keys(updatedEvent.read_receipts).length).toBe(1);
     });
   });
 

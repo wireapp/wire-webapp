@@ -655,13 +655,13 @@ export class EventRepository {
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
     const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
 
-    const commonUpdates = this.getCommonMessageUpdates(originalEvent, newEvent);
+    const commonUpdates = EventRepository.getCommonMessageUpdates(originalEvent, newEvent);
 
     const specificUpdates = isLinkPreviewEdit
       ? this.getUpdatesForLinkPreview(originalEvent, newEvent)
-      : this.getUpdatesForEditMessage(originalEvent, newEvent);
+      : EventRepository.getUpdatesForEditMessage(originalEvent, newEvent);
 
-    const updates = {...specificUpdates, ...commonUpdates};
+    const updates = {...commonUpdates, ...specificUpdates};
 
     const identifiedUpdates = {...primaryKeyUpdate, ...updates};
     return this.eventService.replaceEvent(identifiedUpdates);
@@ -750,7 +750,7 @@ export class EventRepository {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private getCommonMessageUpdates(originalEvent: EventRecord, newEvent: EventRecord) {
+  private static getCommonMessageUpdates(originalEvent: EventRecord, newEvent: EventRecord) {
     return {
       ...newEvent,
       data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
@@ -760,8 +760,22 @@ export class EventRepository {
     };
   }
 
-  private getUpdatesForEditMessage(originalEvent: EventRecord, newEvent: EventRecord): EventRecord & {reactions: {}} {
-    return {...newEvent, reactions: {}};
+  private static getUpdatesForEditMessage(
+    originalEvent: EventRecord,
+    newEvent: EventRecord,
+  ): EventRecord & {reactions: {}} {
+    // Remove reactions, so that likes (hearts) don't stay on an edited text
+    const updates = {...newEvent, reactions: {}};
+
+    if (!newEvent.status || newEvent.status < originalEvent.status) {
+      updates.status = originalEvent.status;
+    }
+
+    if (!newEvent.read_receipts) {
+      updates.read_receipts = originalEvent.read_receipts;
+    }
+
+    return updates;
   }
 
   private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: EventRecord): EventRecord {
