@@ -661,7 +661,7 @@ export class EventRepository {
       ? this.getUpdatesForLinkPreview(originalEvent, newEvent)
       : EventRepository.getUpdatesForEditMessage(originalEvent, newEvent);
 
-    const updates = {...commonUpdates, ...specificUpdates};
+    const updates = {...specificUpdates, ...commonUpdates};
 
     const identifiedUpdates = {...primaryKeyUpdate, ...updates};
     return this.eventService.replaceEvent(identifiedUpdates);
@@ -755,6 +755,8 @@ export class EventRepository {
       ...newEvent,
       data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
       edited_time: newEvent.time,
+      read_receipts: !newEvent.read_receipts ? originalEvent.read_receipts : newEvent.read_receipts,
+      status: !newEvent.status || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
       time: originalEvent.time,
       version: 1,
     };
@@ -764,18 +766,8 @@ export class EventRepository {
     originalEvent: EventRecord,
     newEvent: EventRecord,
   ): EventRecord & {reactions: {}} {
-    // Remove reactions, so that likes (hearts) don't stay on an edited text
-    const updates = {...newEvent, reactions: {}};
-
-    if (!newEvent.status || newEvent.status < originalEvent.status) {
-      updates.status = originalEvent.status;
-    }
-
-    if (!newEvent.read_receipts) {
-      updates.read_receipts = originalEvent.read_receipts;
-    }
-
-    return updates;
+    // Remove reactions, so that likes (hearts) don't stay when a message's text gets edited
+    return {...newEvent, reactions: {}};
   }
 
   private getUpdatesForLinkPreview(originalEvent: EventRecord, newEvent: EventRecord): EventRecord {
