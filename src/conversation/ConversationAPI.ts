@@ -48,6 +48,7 @@ import type {
 import {BackendErrorLabel, HttpClient} from '../http/';
 import type {
   ConversationAccessUpdateData,
+  ConversationJoinData,
   ConversationMemberUpdateData,
   ConversationMessageTimerUpdateData,
   ConversationNameUpdateData,
@@ -455,6 +456,22 @@ export class ConversationAPI {
     };
 
     const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
+    return response.data;
+  }
+
+  /**
+   * Get information about a conversation by conversation code.
+   * @param conversationCode The conversation code
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/joinConversationByCode
+   */
+  public async getJoinByCode(conversationCode: Omit<ConversationCode, 'uri'>): Promise<ConversationJoinData> {
+    const config: AxiosRequestConfig = {
+      params: conversationCode,
+      method: 'get',
+      url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.JOIN}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationJoinData>(config);
     return response.data;
   }
 
