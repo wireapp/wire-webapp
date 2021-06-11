@@ -62,3 +62,27 @@ export class ConversationLegalholdMissingConsentError extends ConversationError 
     this.name = 'ConversationLegalholdConsentNeededError';
   }
 }
+
+export class ConversationCodeNotFoundError extends ConversationError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.NO_CONVERSATION_CODE,
+    code: StatusCode = StatusCode.NOT_FOUND,
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'ConversationCodeNotFoundError';
+  }
+}
+
+export class ConversationFullError extends ConversationError {
+  constructor(
+    message: string,
+    label: BackendErrorLabel = BackendErrorLabel.TOO_MANY_MEMBERS,
+    code: StatusCode = StatusCode.NOT_FOUND,
+  ) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'ConversationFullError';
+  }
+}

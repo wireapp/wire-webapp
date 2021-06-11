@@ -56,7 +56,11 @@ import type {
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
 } from './data';
-import {ConversationLegalholdMissingConsentError} from './ConversationError';
+import {
+  ConversationFullError,
+  ConversationCodeNotFoundError,
+  ConversationLegalholdMissingConsentError,
+} from './ConversationError';
 import {QualifiedId} from '../user';
 
 export class ConversationAPI {
@@ -440,7 +444,16 @@ export class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.CODE_CHECK}`,
     };
 
-    await this.client.sendJSON(config);
+    try {
+      await this.client.sendJSON(config);
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.NO_CONVERSATION_CODE: {
+          throw new ConversationCodeNotFoundError(error.message);
+        }
+      }
+      throw error;
+    }
   }
 
   /**
@@ -455,8 +468,20 @@ export class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.JOIN}`,
     };
 
-    const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<ConversationMemberJoinEvent>(config);
+      return response.data;
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.NO_CONVERSATION_CODE: {
+          throw new ConversationCodeNotFoundError(error.message);
+        }
+        case BackendErrorLabel.TOO_MANY_MEMBERS: {
+          throw new ConversationFullError(error.message);
+        }
+      }
+      throw error;
+    }
   }
 
   /**
@@ -471,8 +496,17 @@ export class ConversationAPI {
       url: `${ConversationAPI.URL.CONVERSATIONS}${ConversationAPI.URL.JOIN}`,
     };
 
-    const response = await this.client.sendJSON<ConversationJoinData>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<ConversationJoinData>(config);
+      return response.data;
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.NO_CONVERSATION_CODE: {
+          throw new ConversationCodeNotFoundError(error.message);
+        }
+      }
+      throw error;
+    }
   }
 
   /**
