@@ -57,13 +57,7 @@ export class EventService {
     this.logger = getLogger('EventService');
   }
 
-  /**
-   * Load events from database.
-   *
-   * @param conversationId ID of conversation
-   * @param eventIds ID of events to retrieve
-   */
-  async loadEvents(conversationId: string, eventIds: string[]): Promise<DBEvents> {
+  async loadEvents(conversationId: string, eventIds: string[]): Promise<EventRecord[]> {
     if (!conversationId || !eventIds) {
       this.logger.error(`Cannot get events '${eventIds}' in conversation '${conversationId}' without IDs`);
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -318,11 +312,6 @@ export class EventService {
     return event;
   }
 
-  /**
-   * Update an unencrypted event.
-   *
-   * @param event JSON event to be stored
-   */
   async replaceEvent<T extends Partial<EventRecord>>(event: T): Promise<T> {
     await this.storageService.update(StorageSchemata.OBJECT_STORE.EVENTS, event.primary_key, event);
     return event;
