@@ -57,7 +57,7 @@
     "@babel/plugin-syntax-dynamic-import": "7.8.3",
     "@babel/preset-env": "7.14.5",
     "@babel/preset-react": "7.13.13",
-    "@babel/preset-typescript": "7.13.0",
+    "@babel/preset-typescript": "7.14.5",
     "@emotion/babel-preset-css-prop": "10.2.1",
     "@formatjs/cli": "4.2.20",
     "@hot-loader/react-dom": "16.14.0",
