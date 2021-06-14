@@ -57,31 +57,30 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
   }, [is1to1Conversation, readReceipts]);
 
   return (
-    isLastDeliveredMessage && (
-      <>
-        {!readReceiptText ? (
-          <span className="message-status" data-uie-name="status-message-read-receipt-delivered">
-            {t('conversationMessageDelivered')}
+    <>
+      {isLastDeliveredMessage && readReceiptText === '' && (
+        <span className="message-status" data-uie-name="status-message-read-receipt-delivered">
+          {t('conversationMessageDelivered')}
+        </span>
+      )}
+      {readReceiptText && (
+        <span
+          className={cx('message-status-read', {
+            'message-status-read--clickable': !is1to1Conversation,
+            'message-status-read--visible': isLastDeliveredMessage,
+            'with-tooltip with-tooltip--receipt': readReceiptTooltip,
+          })}
+          data-tooltip={readReceiptTooltip}
+          onClick={!is1to1Conversation ? () => onClickReceipts({message}) : undefined}
+          data-uie-name="status-message-read-receipts"
+        >
+          <Icon.Read />
+          <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
+            {readReceiptText}
           </span>
-        ) : (
-          <span
-            className={cx('message-status-read', {
-              'message-status-read--clickable': !is1to1Conversation,
-              'message-status-read--visible': isLastDeliveredMessage,
-              'with-tooltip with-tooltip--receipt': readReceiptTooltip,
-            })}
-            data-tooltip={readReceiptTooltip}
-            onClick={!is1to1Conversation ? () => onClickReceipts({message}) : undefined}
-            data-uie-name="status-message-read-receipts"
-          >
-            <Icon.Read />
-            <span className="message-status-read__count" data-uie-name="status-message-read-receipt-count">
-              {readReceiptText}
-            </span>
-          </span>
-        )}
-      </>
-    )
+        </span>
+      )}
+    </>
   );
 };
 
