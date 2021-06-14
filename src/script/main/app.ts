@@ -126,7 +126,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
-import CallingContainer from 'Components/calling/CallingContainer';
+import CallingContainer from 'Components/calling/CallingOverlayContainer';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
