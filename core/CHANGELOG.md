@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.9.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.9.2...@wireapp/core@17.9.3) (2021-06-14)
+
+
+### Bug Fixes
+
+* **core:** Check if QualifiedIdArray is an array ([#3953](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/3953)) ([5306d73](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/5306d73025a100ba81ecdfef1a2adac07f58e906))
+
+
+
+
+
 ## [17.9.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.9.1...@wireapp/core@17.9.2) (2021-06-11)
 
 **Note:** Version bump only for package @wireapp/core
