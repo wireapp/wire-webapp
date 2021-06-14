@@ -41,11 +41,18 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
   user,
 }) => {
   const [fields, setFields] = useState<RichInfoField[]>([]);
-  const email: string = useKoSubscribable(user?.email || ko.observable());
+  const email: string = useKoSubscribable(user.email || ko.observable());
 
   useEffect(() => {
     let cancel = false;
     const returnFields: RichInfoField[] = email ? [{type: t('userProfileEmail'), value: email}] : [];
+
+    if (!!user.domain) {
+      returnFields.push({
+        type: t('userProfileDomain'),
+        value: user.domain,
+      });
+    }
 
     const loadRichFields = async () => {
       try {
