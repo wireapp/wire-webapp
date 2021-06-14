@@ -40,7 +40,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -410,22 +410,20 @@ export class UserRepository {
   /**
    * Get a user from the backend.
    */
-  private async fetchUserById(userId: string): Promise<User> {
-    const [userEntity] = await this.fetchUsersById([userId]);
+  private async fetchUserById(userId: string | QualifiedId): Promise<User> {
+    const [userEntity] = await this.fetchUsersById([userId] as [string] | [QualifiedId]);
     return userEntity;
   }
 
   /**
    * Get users from the backend.
    */
-  private async fetchUsersById(userIds: string[] = []): Promise<User[]> {
-    userIds = userIds.filter(userId => !!userId);
-
+  private async fetchUsersById(userIds: string[] | QualifiedId[]): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
 
-    const getUsers = async (chunkOfUserIds: string[]): Promise<User[]> => {
+    const getUsers = async (chunkOfUserIds: string[] | QualifiedId[]): Promise<User[]> => {
       try {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
@@ -439,8 +437,10 @@ export class UserRepository {
       }
     };
 
-    const chunksOfUserIds = chunk(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST) as string[][];
-    const resolveArray = await Promise.all(chunksOfUserIds.map(userChunk => getUsers(userChunk)));
+    const chunksOfUserIds = chunk<string | QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
+    const resolveArray = await Promise.all(
+      chunksOfUserIds.map(userChunk => getUsers(userChunk as string[] | QualifiedId[])),
+    );
     const newUserEntities = flatten(resolveArray);
     if (this.userState.isTeam()) {
       this.mapGuestStatus(newUserEntities);
@@ -460,9 +460,9 @@ export class UserRepository {
    */
   findUserById(userId: string | QualifiedId): User | undefined {
     return this.userState.users().find(userEntity => {
-      return typeof userId === 'string'
-        ? userEntity.id === userId
-        : userEntity.id === userId.id && userEntity.domain === userId.domain;
+      return isQualifiedId(userId)
+        ? userEntity.id === userId.id && userEntity.domain === userId.domain
+        : userEntity.id === userId;
     });
   }
 
@@ -508,7 +508,7 @@ export class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  async getUserById(userId: string): Promise<User> {
+  async getUserById(userId: string | QualifiedId): Promise<User> {
     let user = this.findUserById(userId);
     if (!user) {
       try {
@@ -624,19 +624,38 @@ export class UserRepository {
     }
   };
 
+  static createDeletedUser(userId: string | QualifiedId): User {
+    const userEntity = new User();
+    userEntity.isDeleted = true;
+    userEntity.name(t('nonexistentUser'));
+    if (isQualifiedId(userId)) {
+      userEntity.id = userId.id;
+      userEntity.domain = userId.domain;
+    } else {
+      userEntity.id = userId;
+    }
+    return userEntity;
+  }
+
+  static findMatchingUser(userId: string | QualifiedId, userEntities: User[]): User | undefined {
+    if (isQualifiedId(userId)) {
+      return userEntities.find(userEntity => {
+        return userEntity.domain === userId.domain && userEntity.id === userId.id;
+      });
+    }
+    return userEntities.find(userEntity => userEntity.id === userId);
+  }
+
   /**
    * Add user entities for suspended users.
    * @returns User entities
    */
-  private addSuspendedUsers(userIds: string[], userEntities: User[]): User[] {
+  private addSuspendedUsers(userIds: string[] | QualifiedId[], userEntities: User[]): User[] {
     for (const userId of userIds) {
-      const matchingUserIds = userEntities.find(userEntity => userEntity.id === userId);
+      const matchingUserIds = UserRepository.findMatchingUser(userId, userEntities);
 
       if (!matchingUserIds) {
-        const userEntity = new User(userId);
-        userEntity.isDeleted = true;
-        userEntity.name(t('nonexistentUser'));
-        userEntities.push(userEntity);
+        userEntities.push(UserRepository.createDeletedUser(userId));
       }
     }
     return userEntities;

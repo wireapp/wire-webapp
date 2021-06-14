@@ -895,6 +895,7 @@ export class ConversationRepository {
       if (matchingConversationEntity) {
         return matchingConversationEntity;
       }
+
       return this.createGroupConversation([userEntity]);
     }
 
