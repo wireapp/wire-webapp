@@ -56,14 +56,17 @@ const ReadReceiptStatus: React.FC<ReadReceiptStatusProps> = ({
     }
   }, [is1to1Conversation, readReceipts]);
 
+  const showDeliveredMessage = isLastDeliveredMessage && readReceiptText === '';
+  const showEyeIndicator = !!readReceiptText;
+
   return (
     <>
-      {isLastDeliveredMessage && readReceiptText === '' && (
+      {showDeliveredMessage && (
         <span className="message-status" data-uie-name="status-message-read-receipt-delivered">
           {t('conversationMessageDelivered')}
         </span>
       )}
-      {readReceiptText && (
+      {showEyeIndicator && (
         <span
           className={cx('message-status-read', {
             'message-status-read--clickable': !is1to1Conversation,
