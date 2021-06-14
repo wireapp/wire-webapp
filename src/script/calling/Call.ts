@@ -54,6 +54,7 @@ export class Call {
   public type?: CALL_MESSAGE_TYPE;
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
+  readonly maximizedParticipant: ko.Observable<Participant | null>;
 
   private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
   /**

@@ -21,6 +21,7 @@ import {singleton} from 'tsyringe';
 import ko from 'knockout';
 import {Call} from './Call';
 import {STATE as CALL_STATE} from '@wireapp/avs';
+import {VideoSpeakersTab} from '../view_model/CallingViewModel';
 
 @singleton()
 export class CallState {
@@ -29,6 +30,7 @@ export class CallState {
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
   public readonly acceptedVersionWarnings: ko.ObservableArray<string>;
   public readonly cbrEncoding: ko.Observable<number>;
+  public readonly videoSpeakersActiveTab: ko.Observable<string>;
 
   constructor() {
     this.activeCalls = ko.observableArray();
@@ -43,5 +45,6 @@ export class CallState {
       this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
     this.cbrEncoding = ko.observable(0);
+    this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTab.ALL);
   }
 }

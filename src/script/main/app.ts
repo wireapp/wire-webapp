@@ -126,6 +126,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
+import CallingContainer from 'Components/calling/CallingContainer';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -696,6 +697,13 @@ class App {
     this.repository.properties.checkPrivacyPermission().then(() => {
       window.setTimeout(() => this.repository.notification.checkPermission(), App.CONFIG.NOTIFICATION_CHECK);
     });
+
+    CallingContainer.init(
+      mainView.multitasking,
+      this.repository.calling,
+      this.repository.media.streamHandler,
+      this.repository.media.devicesHandler,
+    );
   }
 
   /**
