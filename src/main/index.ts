@@ -22,6 +22,7 @@ import * as auth from './auth/';
 import * as conversation from './conversation/';
 import type {CoreError} from './CoreError';
 import * as cryptography from './cryptography/';
+import * as util from './util';
 
 export = {
   Account,
@@ -29,4 +30,5 @@ export = {
   auth,
   conversation,
   cryptography,
+  util,
 };

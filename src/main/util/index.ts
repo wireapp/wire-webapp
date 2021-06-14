@@ -17,12 +17,4 @@
  *
  */
 
-import type {QualifiedId} from '@wireapp/api-client/src/user/QualifiedId';
-
-export function isStringArray(obj: any): obj is string[] {
-  return Array.isArray(obj) && typeof obj[0] === 'string';
-}
-
-export function isQualifiedIdArray(obj: any): obj is QualifiedId[] {
-  return Array.isArray(obj) && typeof obj[0] === 'object' && typeof obj[0]['domain'] === 'string';
-}
+export * from './TypePredicateUtil';

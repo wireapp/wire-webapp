@@ -23,6 +23,7 @@ import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
 import UUID from 'uuidjs';
 
 import type {AvailabilityType, BroadcastService} from '../broadcast/';
+import {isQualifiedIdArray} from '../util/TypePredicateUtil';
 
 export class UserService {
   private readonly apiClient: APIClient;
@@ -41,9 +42,9 @@ export class UserService {
     if (!userIds.length) {
       return [];
     }
-    return typeof userIds[0] === 'string'
-      ? this.apiClient.user.api.getUsers({ids: userIds as string[]})
-      : this.apiClient.user.api.postListUsers({qualified_ids: userIds as QualifiedId[]});
+    return isQualifiedIdArray(userIds)
+      ? this.apiClient.user.api.postListUsers({qualified_ids: userIds})
+      : this.apiClient.user.api.getUsers({ids: userIds});
   }
 
   public setAvailability(teamId: string, type: AvailabilityType, sendAsProtobuf?: boolean): Promise<void> {
