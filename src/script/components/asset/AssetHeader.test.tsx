@@ -41,7 +41,7 @@ describe('AssetHeader', () => {
     jest.spyOn(TimeUtil, 'formatTimeShort').mockReturnValue('3:08 PM');
     jest.spyOn(TimeUtil, 'formatDateShort').mockReturnValue('01/21');
 
-    const user = new User(createRandomUuid());
+    const user = new User(createRandomUuid(), null);
     user.name(userName);
 
     const message = new Message(createRandomUuid());

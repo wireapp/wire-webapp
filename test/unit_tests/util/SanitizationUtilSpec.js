@@ -39,14 +39,14 @@ describe('SanitizationUtil', () => {
 
   describe('getUserName', () => {
     it('will return the name of the given user', () => {
-      const userEntity = new User();
-      userEntity.name(`<script>alert('Unsanitzed');</script>`);
+      const userEntity = new User('', null);
+      userEntity.name(`<script>alert('Unsanitized');</script>`);
       const escapedFirstName = getUserName(userEntity);
 
-      expect(escapedFirstName).toEqual('&lt;script&gt;alert(&#x27;Unsanitzed&#x27;);&lt;/script&gt;');
+      expect(escapedFirstName).toEqual('&lt;script&gt;alert(&#x27;Unsanitized&#x27;);&lt;/script&gt;');
       const unescapedFirstName = getUserName(userEntity, undefined, true);
 
-      expect(unescapedFirstName).toEqual(`<script>alert('Unsanitzed');</script>`);
+      expect(unescapedFirstName).toEqual(`<script>alert('Unsanitized');</script>`);
       userEntity.isMe = true;
       const escapedSelfName = getUserName(userEntity);
 

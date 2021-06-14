@@ -39,7 +39,7 @@ describe('message', () => {
       spyOn(conversationRepository, 'expectReadReceipt').and.returnValue(false);
       const message = new ContentMessage();
 
-      message.user(new User());
+      message.user(new User('', null));
       const textAsset = new Text('', textValue);
       spyOn(textAsset, 'render').and.returnValue(`<span>${textValue}</span>`);
       message.assets.push(textAsset);

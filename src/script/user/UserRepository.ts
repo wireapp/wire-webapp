@@ -31,7 +31,6 @@ import {
 } from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
-import type {AxiosError} from 'axios';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
 import type {PublicClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
@@ -40,7 +39,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {isBackendError, isQualifiedId, isUser} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isQualifiedId, isUser} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -428,8 +427,12 @@ export class UserRepository {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error) {
-        const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
-        const isBadRequest = Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
+        const isNotFound =
+          (isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND) ||
+          Number((error as BackendError).code) === HTTP_STATUS.NOT_FOUND;
+        const isBadRequest =
+          (isAxiosError(error) && error.response?.status === HTTP_STATUS.BAD_REQUEST) ||
+          Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
         if (isNotFound || isBadRequest) {
           return [];
         }

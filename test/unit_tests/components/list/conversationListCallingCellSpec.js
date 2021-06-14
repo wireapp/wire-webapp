@@ -50,7 +50,7 @@ describe('conversationListCallingCell', () => {
       isExternal: () => false,
     };
     const conversation = new Conversation();
-    conversation.participating_user_ets([new User('id')]);
+    conversation.participating_user_ets([new User('id', null)]);
     defaultParams = {
       call: new Call('', '', 0, new Participant(new User(createRandomUuid()), ''), CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: {
@@ -95,7 +95,7 @@ describe('conversationListCallingCell', () => {
   it('displays the running time of an ongoing call', () => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
-    const selfUserEntity = new User(createRandomUuid());
+    const selfUserEntity = new User(createRandomUuid(), null);
     selfUserEntity.isMe = true;
     conversation.selfUser(selfUserEntity);
     const call = createCall(CALL_STATE.MEDIA_ESTAB, selfUserEntity);

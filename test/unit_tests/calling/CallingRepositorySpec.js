@@ -35,7 +35,7 @@ import {TestFactory} from '../../helper/TestFactory';
 import {createRandomUuid} from 'Util/util';
 
 const createSelfParticipant = () => {
-  const selfUser = new User();
+  const selfUser = new User('', null);
   selfUser.isMe = true;
   return new Participant(selfUser);
 };
@@ -45,7 +45,7 @@ describe('CallingRepository', () => {
   let callingRepository;
   let wCall;
   let wUser;
-  const selfUser = new User(createRandomUuid());
+  const selfUser = new User(createRandomUuid(), null);
   const clientId = createRandomUuid();
 
   beforeAll(() => {
@@ -221,7 +221,7 @@ describe('CallingRepository ISO', () => {
     });
 
     it('creates and stores a new call when an incoming call arrives', async done => {
-      const selfUser = new User(createRandomUuid());
+      const selfUser = new User(createRandomUuid(), null);
       selfUser.isMe = true;
       selfUser.clientId = createRandomUuid();
 
@@ -369,7 +369,7 @@ describe.skip('E2E audio call', () => {
     undefined,
     serverTimeHandler,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', null);
   let remoteWuser;
   let wCall;
 

@@ -327,7 +327,7 @@ describe('ConversationRepository', () => {
 
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members.others[0].id;
-      const userEntity = new User(teamMemberId);
+      const userEntity = new User(teamMemberId, null);
 
       const selfUser = UserGenerator.getRandomUser();
       selfUser.teamId = teamId;
@@ -351,7 +351,7 @@ describe('ConversationRepository', () => {
       group_b.name('René, Benny, Gregor, Lipis');
 
       const group_c = _generateConversation(CONVERSATION_TYPE.REGULAR);
-      self_user_et = new User();
+      self_user_et = new User('', null);
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
@@ -411,7 +411,7 @@ describe('ConversationRepository', () => {
 
   describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', async () => {
-      spyOn(testFactory.user_repository, 'getUserById').and.returnValue(Promise.resolve(new User()));
+      spyOn(testFactory.user_repository, 'getUserById').and.returnValue(Promise.resolve(new User('', null)));
       const selfUser = UserGenerator.getRandomUser();
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 
@@ -1056,16 +1056,16 @@ describe('ConversationRepository', () => {
     let lara = undefined;
 
     beforeEach(() => {
-      anne = new User();
+      anne = new User('', null);
       anne.name('Anne');
 
-      bob = new User('532af01e-1e24-4366-aacf-33b67d4ee376');
+      bob = new User('532af01e-1e24-4366-aacf-33b67d4ee376', null);
       bob.name('Bob');
 
-      jane = new User(entities.user.jane_roe.id);
+      jane = new User(entities.user.jane_roe.id, null);
       jane.name('Jane');
 
-      john = new User(entities.user.john_doe.id);
+      john = new User(entities.user.john_doe.id, null);
       john.name('John');
 
       const johns_computer = new ClientEntity();
@@ -1073,7 +1073,7 @@ describe('ConversationRepository', () => {
       johns_computer.class = 'tabconst';
       john.devices.push(johns_computer);
 
-      lara = new User();
+      lara = new User('', null);
       lara.name('Lara');
 
       const bobs_computer = new ClientEntity();

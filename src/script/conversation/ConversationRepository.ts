@@ -296,17 +296,16 @@ export class ConversationRepository {
     const sameFederatedDomainUserIds = userEntities
       .filter(userEntity => userEntity.isOnSameFederatedDomain())
       .map(userEntity => userEntity.id);
-    // const otherFederatedDomainUserIds = userEntities.filter(userEntity => !userEntity.isOnSameFederatedDomain()).map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+    const otherFederatedDomainUserIds = userEntities
+      .filter(userEntity => !userEntity.isOnSameFederatedDomain())
+      .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      users: [],
+      qualified_users: otherFederatedDomainUserIds,
+      users: sameFederatedDomainUserIds,
       ...options,
     };
-
-    if (sameFederatedDomainUserIds.length) {
-      payload.users = sameFederatedDomainUserIds;
-    }
 
     if (this.teamState.team().id) {
       payload.team = {
@@ -905,7 +904,7 @@ export class ConversationRepository {
         return matchingConversationEntity;
       }
 
-      return this.createGroupConversation([]);
+      return this.createGroupConversation([userEntity]);
     }
 
     const conversationId = userEntity.connection().conversationId;
