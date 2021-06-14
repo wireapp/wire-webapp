@@ -40,7 +40,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
+import {isBackendError, isQualifiedId, isUser} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -541,7 +541,7 @@ export class UserRepository {
    * @param userIds List of user ID
    * @param offline Should we only look for cached contacts
    */
-  async getUsersById(userIds: string[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: string[] | QualifiedId[], offline: boolean = false): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
@@ -549,9 +549,9 @@ export class UserRepository {
     const findUsers = userIds.map(userId => this.findUserById(userId) || userId);
 
     const resolveArray = await Promise.all(findUsers);
-    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => typeof item !== 'string') as [
+    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => isUser(item)) as [
       User[],
-      string[],
+      string[] | QualifiedId[],
     ];
 
     if (offline || !unknownUserIds.length) {

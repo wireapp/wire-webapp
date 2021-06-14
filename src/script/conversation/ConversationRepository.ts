@@ -95,6 +95,7 @@ import {TeamState} from '../team/TeamState';
 import {TeamRepository} from '../team/TeamRepository';
 import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {is1To1WithUser, isInTeam, isRemovedFromConversation} from './ConversationFilter';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -292,13 +293,20 @@ export class ConversationRepository {
     accessState?: string,
     options = {},
   ): Promise<Conversation | undefined> {
-    const userIds = userEntities.map(userEntity => userEntity.id);
+    const sameFederatedDomainUserIds = userEntities
+      .filter(userEntity => userEntity.isOnSameFederatedDomain())
+      .map(userEntity => userEntity.id);
+    // const otherFederatedDomainUserIds = userEntities.filter(userEntity => !userEntity.isOnSameFederatedDomain()).map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      users: userIds,
+      users: [],
       ...options,
     };
+
+    if (sameFederatedDomainUserIds.length) {
+      payload.users = sameFederatedDomainUserIds;
+    }
 
     if (this.teamState.team().id) {
       payload.team = {
@@ -310,20 +318,23 @@ export class ConversationRepository {
         let accessPayload;
 
         switch (accessState) {
-          case ACCESS_STATE.TEAM.GUEST_ROOM:
+          case ACCESS_STATE.TEAM.GUEST_ROOM: {
             accessPayload = {
               access: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
               access_role: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
             };
             break;
-          case ACCESS_STATE.TEAM.TEAM_ONLY:
+          }
+          case ACCESS_STATE.TEAM.TEAM_ONLY: {
             accessPayload = {
               access: [CONVERSATION_ACCESS.INVITE],
               access_role: CONVERSATION_ACCESS_ROLE.TEAM,
             };
             break;
-          default:
+          }
+          default: {
             break;
+          }
         }
 
         if (accessPayload) {
@@ -340,7 +351,7 @@ export class ConversationRepository {
       });
       return conversationEntity as Conversation;
     } catch (error) {
-      this.handleConversationCreateError(error, userIds);
+      this.handleConversationCreateError(error, sameFederatedDomainUserIds);
       return undefined;
     }
   }
@@ -871,25 +882,11 @@ export class ConversationRepository {
 
     if (inCurrentTeam) {
       const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
-        if (!conversationEntity.is1to1()) {
-          // Disregard conversations that are not 1:1
-          return false;
-        }
-
-        const inTeam = userEntity.teamId === conversationEntity.team_id;
-        if (!inTeam) {
-          // Disregard conversations that are not in the team
-          return false;
-        }
-
-        const isActiveConversation = !conversationEntity.removed_from_conversation();
-        if (!isActiveConversation) {
-          // Disregard conversations that self is no longer part of
-          return false;
-        }
-
-        const [userId] = conversationEntity.participating_user_ids();
-        return userEntity.id === userId;
+        return (
+          isInTeam(conversationEntity, userEntity) &&
+          !isRemovedFromConversation(conversationEntity) &&
+          is1To1WithUser(conversationEntity, userEntity)
+        );
       });
 
       if (matchingConversationEntity) {
@@ -897,6 +894,18 @@ export class ConversationRepository {
       }
 
       return this.createGroupConversation([userEntity]);
+    }
+
+    if (!userEntity.isOnSameFederatedDomain()) {
+      const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
+        return !isRemovedFromConversation(conversationEntity) && is1To1WithUser(conversationEntity, userEntity);
+      });
+
+      if (matchingConversationEntity) {
+        return matchingConversationEntity;
+      }
+
+      return this.createGroupConversation([]);
     }
 
     const conversationId = userEntity.connection().conversationId;
