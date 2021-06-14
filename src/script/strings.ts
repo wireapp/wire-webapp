@@ -457,7 +457,7 @@ export const errorHandlerStrings = defineMessages({
     id: 'BackendError.LABEL.BLACKLISTED_PHONE',
   },
   [BackendError.LABEL.INVALID_CODE]: {
-    defaultMessage: 'Please enter a valid code',
+    defaultMessage: 'Invalid code, or maximum attempts exceeded. Please retry, or request another code.',
     id: 'BackendError.LABEL.INVALID_CODE',
   },
   [BackendError.LABEL.INVALID_CREDENTIALS]: {
