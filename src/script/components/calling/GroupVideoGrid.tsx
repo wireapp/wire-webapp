@@ -205,7 +205,6 @@ export default GroupVideoGrid;
 
 registerReactComponent('group-video-grid', {
   component: GroupVideoGrid,
-  optionalParams: ['muted', 'minimized'],
   template:
     '<div class="group-video-wrapper" data-bind="react: {grid: ko.unwrap(grid), selfParticipant: ko.unwrap(selfParticipant), maximizedParticipant: ko.unwrap(maximizedParticipant), minimized, muted: ko.unwrap(muted)}"></div>',
 });
