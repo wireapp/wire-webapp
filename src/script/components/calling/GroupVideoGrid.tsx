@@ -207,7 +207,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
           </div>
         </GroupVideoThumbnailWrapper>
       )}
-      {!!grid.thumbnail && !thumbnailHasActiveVideo && selfParticipant && (
+      {!!grid.thumbnail && !thumbnailHasActiveVideo && !!selfParticipant && (
         <GroupVideoThumbnailWrapper minimized={minimized}>
           <div
             css={{

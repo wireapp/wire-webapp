@@ -1130,6 +1130,7 @@ export class CallingRepository {
     }
 
     call.updatePages();
+    this.changeCallPage(call.currentPage(), call);
   }
 
   private readonly handleCallParticipantChanges = (conversationId: ConversationId, membersJson: string) => {
