@@ -51,6 +51,7 @@ export interface CallingCellProps {
   call: Call;
   callActions: CallActions;
   callingRepository: CallingRepository;
+  callState?: CallState;
   conversation: Conversation;
   hasAccessToCamera: boolean;
   isSelfVerified: boolean;
@@ -75,9 +76,8 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   isSelfVerified,
   teamRepository,
   callingRepository,
+  callState = container.resolve(CallState),
 }) => {
-  const callState = container.resolve(CallState);
-
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
