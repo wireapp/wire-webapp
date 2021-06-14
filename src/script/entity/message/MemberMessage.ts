@@ -115,7 +115,7 @@ export class MemberMessage extends SystemMessage {
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length > 0);
 
-    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User()));
+    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User('', null)));
 
     this.htmlCaption = ko.pureComputed(() => {
       if (!this.hasUsers()) {

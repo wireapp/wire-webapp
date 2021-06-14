@@ -615,9 +615,8 @@ export class UserRepository {
    * Update a local user from the backend by ID.
    */
   updateUserById = async (userId: string | QualifiedId): Promise<void> => {
-    const localUserEntity = this.findUserById(userId) || new User();
-    const updatedUserData =
-      typeof userId === 'string' ? await this.userService.getUser(userId) : await this.userService.getUser(userId.id);
+    const localUserEntity = this.findUserById(userId);
+    const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);
@@ -628,15 +627,9 @@ export class UserRepository {
   };
 
   static createDeletedUser(userId: string | QualifiedId): User {
-    const userEntity = new User();
+    const userEntity = isQualifiedId(userId) ? new User(userId.id, userId.domain) : new User(userId, null);
     userEntity.isDeleted = true;
     userEntity.name(t('nonexistentUser'));
-    if (isQualifiedId(userId)) {
-      userEntity.id = userId.id;
-      userEntity.domain = userId.domain;
-    } else {
-      userEntity.id = userId;
-    }
     return userEntity;
   }
 
