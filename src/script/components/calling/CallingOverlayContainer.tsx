@@ -24,18 +24,18 @@ import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/av
 
 import FullscreenVideoCall from './FullscreenVideoCall';
 import ChooseScreen, {Screen} from './ChooseScreen';
-import {CallState} from 'src/script/calling/CallState';
-import {ConversationState} from 'src/script/conversation/ConversationState';
+import {ConversationState} from '../../conversation/ConversationState';
 import {useKoSubscribable} from 'Util/ComponentUtil';
-import {Call} from 'src/script/calling/Call';
-import {Multitasking} from 'src/script/notification/NotificationRepository';
-import {getGrid, Grid} from 'src/script/calling/videoGridHandler';
-import {Conversation} from 'src/script/entity/Conversation';
-import {CallingRepository} from 'src/script/calling/CallingRepository';
-import {MediaDevicesHandler, ElectronDesktopCapturerSource} from 'src/script/media/MediaDevicesHandler';
-import {Participant} from 'src/script/calling/Participant';
-import {VideoSpeakersTab} from 'src/script/view_model/CallingViewModel';
-import {MediaStreamHandler} from 'src/script/media/MediaStreamHandler';
+import {Call} from '../../calling/Call';
+import {Multitasking} from '../../notification/NotificationRepository';
+import {getGrid, Grid} from '../../calling/videoGridHandler';
+import {Conversation} from '../../entity/Conversation';
+import {CallingRepository} from '../../calling/CallingRepository';
+import {MediaDevicesHandler, ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
+import {Participant} from '../../calling/Participant';
+import {VideoSpeakersTab} from '../../view_model/CallingViewModel';
+import {MediaStreamHandler} from '../../media/MediaStreamHandler';
+import {CallState} from '../../calling/CallState';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
