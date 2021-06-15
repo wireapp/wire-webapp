@@ -56,8 +56,10 @@ export class ConnectRequestsViewModel {
     await this.actionsViewModel.acceptConnectionRequest(userEntity);
     const conversationEntity = await this.actionsViewModel.getOrCreate1to1Conversation(userEntity);
     if (isLastItem(this.connectRequests(), userEntity)) {
-      /**
-       * In the connect request view modal, we show an overview of all incoming connection requests. When there are multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When the last open connection request gets accepted, we want the user to switch to this conversation.
+      /*
+       * In the connect request view modal, we show an overview of all incoming connection requests. When there are
+       * multiple open connection requests, we want that the user sees them all and can accept them one-by-one. When
+       * the last open connection request gets accepted, we want the user to switch to this conversation.
        */
       this.actionsViewModel.open1to1Conversation(conversationEntity);
     }

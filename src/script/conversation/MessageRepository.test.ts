@@ -239,7 +239,7 @@ describe('MessageRepository', () => {
     });
 
     it('should not delete other users messages', async () => {
-      const user_et = new User('', null);
+      const user_et = new User(undefined, null);
       user_et.isMe = false;
       const message_to_delete_et = new Message(createRandomUuid());
       message_to_delete_et.user(user_et);
@@ -254,7 +254,7 @@ describe('MessageRepository', () => {
 
     it('should send delete and deletes message for own messages', () => {
       spyOn(testFactory.event_service, 'deleteEvent');
-      const userEntity = new User('', null);
+      const userEntity = new User(undefined, null);
       userEntity.isMe = true;
       const messageEntityToDelete = new Message();
       messageEntityToDelete.id = createRandomUuid();

@@ -351,7 +351,7 @@ describe('ConversationRepository', () => {
       group_b.name('René, Benny, Gregor, Lipis');
 
       const group_c = _generateConversation(CONVERSATION_TYPE.REGULAR);
-      self_user_et = new User('', null);
+      self_user_et = new User(undefined, null);
       self_user_et.name('John');
       group_c.participating_user_ets.push(self_user_et);
 
@@ -411,7 +411,7 @@ describe('ConversationRepository', () => {
 
   describe('getPrecedingMessages', () => {
     it('gets messages which are not broken by design', async () => {
-      spyOn(testFactory.user_repository, 'getUserById').and.returnValue(Promise.resolve(new User('', null)));
+      spyOn(testFactory.user_repository, 'getUserById').and.returnValue(Promise.resolve(new User(undefined, null)));
       const selfUser = UserGenerator.getRandomUser();
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 
@@ -1056,7 +1056,7 @@ describe('ConversationRepository', () => {
     let lara = undefined;
 
     beforeEach(() => {
-      anne = new User('', null);
+      anne = new User(undefined, null);
       anne.name('Anne');
 
       bob = new User('532af01e-1e24-4366-aacf-33b67d4ee376', null);
@@ -1073,7 +1073,7 @@ describe('ConversationRepository', () => {
       johns_computer.class = 'tabconst';
       john.devices.push(johns_computer);
 
-      lara = new User('', null);
+      lara = new User(undefined, null);
       lara.name('Lara');
 
       const bobs_computer = new ClientEntity();

@@ -185,7 +185,7 @@ describe('UserRepository', () => {
       afterEach(() => testFactory.user_repository.userState.users.removeAll());
 
       it('saves a user', () => {
-        const user = new User('', null);
+        const user = new User(undefined, null);
         user.id = entities.user.jane_roe.id;
 
         testFactory.user_repository.saveUser(user);
@@ -195,7 +195,7 @@ describe('UserRepository', () => {
       });
 
       it('saves self user', () => {
-        const user = new User('', null);
+        const user = new User(undefined, null);
         user.id = entities.user.jane_roe.id;
 
         testFactory.user_repository.saveUser(user, true);

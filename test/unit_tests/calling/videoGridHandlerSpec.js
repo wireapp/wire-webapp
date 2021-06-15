@@ -66,7 +66,7 @@ describe('videoGridHandler', () => {
         ];
 
         const participantsObs = ko.observable([]);
-        const selfUser = new User('', null);
+        const selfUser = new User(undefined, null);
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
         const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL, {

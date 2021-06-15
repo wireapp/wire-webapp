@@ -344,7 +344,7 @@ describe('Conversation', () => {
     let self_user_et = undefined;
 
     beforeEach(() => {
-      self_user_et = new User('', null);
+      self_user_et = new User(undefined, null);
       self_user_et.isMe = true;
     });
 
@@ -357,7 +357,7 @@ describe('Conversation', () => {
     it('returns undefined if last message is not text and not added by self user', () => {
       const message_et = new PingMessage();
       message_et.id = createRandomUuid();
-      message_et.user(new User('', null));
+      message_et.user(new User(undefined, null));
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
@@ -376,7 +376,7 @@ describe('Conversation', () => {
       const message_et = new ContentMessage();
       message_et.addAsset(new Text());
       message_et.id = createRandomUuid();
-      message_et.user(new User('', null));
+      message_et.user(new User(undefined, null));
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
@@ -401,7 +401,7 @@ describe('Conversation', () => {
 
       const ping_message_et = new PingMessage();
       ping_message_et.id = createRandomUuid();
-      ping_message_et.user(new User('', null));
+      ping_message_et.user(new User(undefined, null));
       conversation_et.addMessage(ping_message_et);
 
       expect(conversation_et.getLastEditableMessage()).toBeDefined();
@@ -538,11 +538,11 @@ describe('Conversation', () => {
       const third_client = new ClientEntity();
       third_client.id = '6c0daa855d6b8b6e';
 
-      const user_et = new User('', null);
+      const user_et = new User(undefined, null);
       user_et.devices.push(first_client);
       user_et.devices.push(second_client);
 
-      const second_user_et = new User('', null);
+      const second_user_et = new User(undefined, null);
       second_user_et.devices.push(third_client);
 
       conversation_et.participating_user_ets.push(user_et);
@@ -565,7 +565,7 @@ describe('Conversation', () => {
       self_user_et.isMe = true;
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User('', null);
+      const user_et = new User(undefined, null);
       user_et.devices.push(verified_client_et);
       conversation_et.participating_user_ets.push(user_et);
 
@@ -577,16 +577,16 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User('', null);
+      const self_user_et = new User(undefined, null);
       self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User('', null);
+      const user_et = new User(undefined, null);
       user_et.devices.push(unverified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new User('', null);
+      const user_et_two = new User(undefined, null);
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
@@ -598,16 +598,16 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User('', null);
+      const self_user_et = new User(undefined, null);
       self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User('', null);
+      const user_et = new User(undefined, null);
       user_et.devices.push(verified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new User('', null);
+      const user_et_two = new User(undefined, null);
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);

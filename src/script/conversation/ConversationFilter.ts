@@ -20,15 +20,15 @@
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 
-export function isTeamConversation(conversationEntity: Conversation, userEntity: User) {
+export function isTeamConversation(conversationEntity: Conversation, userEntity: User): boolean {
   return userEntity.teamId === conversationEntity.team_id;
 }
 
-export function isRemovedFromConversation(conversationEntity: Conversation) {
+export function isRemovedFromConversation(conversationEntity: Conversation): boolean {
   return conversationEntity.removed_from_conversation();
 }
 
-export function is1To1WithUser(conversationEntity: Conversation, userEntity: User) {
+export function is1To1WithUser(conversationEntity: Conversation, userEntity: User): boolean {
   if (conversationEntity.is1to1()) {
     const [userId] = conversationEntity.participating_user_ids();
     return userEntity.id === userId;
@@ -36,6 +36,6 @@ export function is1To1WithUser(conversationEntity: Conversation, userEntity: Use
   return false;
 }
 
-export function isInTeam(conversationEntity: Conversation, userEntity: User) {
+export function isInTeam(conversationEntity: Conversation, userEntity: User): boolean {
   return userEntity.teamId === conversationEntity.team_id;
 }

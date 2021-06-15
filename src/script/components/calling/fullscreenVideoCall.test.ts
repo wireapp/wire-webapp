@@ -45,7 +45,7 @@ describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
-    const selfUser = new User('', null);
+    const selfUser = new User(undefined, null);
     selfUser.isMe = true;
     const call = new Call('', '', 0, new Participant(selfUser, ''), 0, {
       currentAvailableDeviceId: {

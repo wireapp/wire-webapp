@@ -35,7 +35,7 @@ import {TestFactory} from '../../helper/TestFactory';
 import {createRandomUuid} from 'Util/util';
 
 const createSelfParticipant = () => {
-  const selfUser = new User('', null);
+  const selfUser = new User(undefined, null);
   selfUser.isMe = true;
   return new Participant(selfUser);
 };

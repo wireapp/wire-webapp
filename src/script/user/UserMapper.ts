@@ -79,7 +79,7 @@ export class UserMapper {
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
   updateUserFromObject(
-    userEntity: User = new User('', null),
+    userEntity: User = new User(undefined, null),
     userData: Partial<APIClientUser | APIClientSelf>,
   ): User | undefined {
     if (!userData) {

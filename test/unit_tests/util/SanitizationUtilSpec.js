@@ -39,7 +39,7 @@ describe('SanitizationUtil', () => {
 
   describe('getUserName', () => {
     it('will return the name of the given user', () => {
-      const userEntity = new User('', null);
+      const userEntity = new User(undefined, null);
       userEntity.name(`<script>alert('Unsanitized');</script>`);
       const escapedFirstName = getUserName(userEntity);
 
