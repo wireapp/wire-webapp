@@ -155,7 +155,6 @@ export default Avatar;
 
 registerReactComponent('participant-avatar', {
   component: Avatar,
-  optionalParams: ['avatarSize', 'onAvatarClick', 'noBadge', 'noFilter'],
   template:
     '<span data-bind="react: {participant: ko.unwrap(participant), avatarSize: size, onAvatarClick, noBadge, noFilter}"></span>',
 });

@@ -45,6 +45,5 @@ export default TopPeople;
 
 registerReactComponent<TopPeopleProps>('top-people', {
   component: TopPeople,
-  optionalParams: ['max'],
   template: '<div data-bind="react: {clickOnUser, users: ko.unwrap(users), max}"></div>',
 });

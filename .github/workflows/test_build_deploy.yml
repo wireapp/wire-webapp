@@ -348,6 +348,12 @@ jobs:
     needs: test_build_deploy
 
     steps:
+      # NOTE: on average, this step will throw an error, because the artifact is generated
+      #       conditionally; see the if-statement of 'Assembling release information'. The
+      #       flag continue-on-error facilitates this design. Overall, the approach is
+      #       basically the vehicle to allow putting the PR creation into a separate, more
+      #       loosely coupled job. The existence of the artifact is used to conditionally
+      #       run all subsequent steps.
       - name: Obtaining release information artifact
         id: release-info-artifact
         uses: actions/download-artifact@v2
