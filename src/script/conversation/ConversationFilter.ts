@@ -31,7 +31,8 @@ export function isRemovedFromConversation(conversationEntity: Conversation): boo
 export function is1To1WithUser(conversationEntity: Conversation, userEntity: User): boolean {
   if (conversationEntity.is1to1()) {
     const [userId] = conversationEntity.participating_user_ids();
-    return userEntity.id === userId;
+    const [qualifiedUserId] = conversationEntity.participatingQualifiedUserIds();
+    return userEntity.id === userId || userEntity.id === qualifiedUserId.id;
   }
   return false;
 }
