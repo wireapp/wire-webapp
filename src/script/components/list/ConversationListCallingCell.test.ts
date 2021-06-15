@@ -92,6 +92,7 @@ describe('ConversationListCallingCell', () => {
     expect(callingCellPage.getAcceptButton().exists()).toBe(true);
     expect(callingCellPage.getDeclineButton().exists()).toBe(true);
   });
+
   it('displays an outgoing ringing call', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.OUTGOING);
@@ -99,6 +100,7 @@ describe('ConversationListCallingCell', () => {
 
     expect(callingCellPage.getOutgoingLabel().exists()).toBe(true);
   });
+
   it('displays a call that is connecting', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.ANSWERED);
@@ -106,6 +108,7 @@ describe('ConversationListCallingCell', () => {
 
     expect(callingCellPage.getConnectingLabel().exists()).toBe(true);
   });
+
   it('displays the running time of an ongoing call', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.MEDIA_ESTAB);
