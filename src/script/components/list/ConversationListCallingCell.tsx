@@ -360,7 +360,6 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
 registerReactComponent('conversation-list-calling-cell', {
   component: ConversationListCallingCell,
-  optionalParams: ['temporaryUserStyle'],
   template: `<div data-bind="react: {
     call, 
     callActions, 
