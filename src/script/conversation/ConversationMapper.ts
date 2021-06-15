@@ -229,12 +229,14 @@ export class ConversationMapper {
     }
 
     // Active participants from database or backend payload
-    const participatingUserIds = others || members.others.filter(other => !other.qualified_id).map(other => other.id);
+    const participatingUserIds =
+      others || members?.others.filter(other => !other.qualified_id).map(other => other.id) || [];
     const participatingQualifiedUserIds =
       qualified_users ||
-      members.others
+      members?.others
         .filter(other => !!other.qualified_id)
-        .map(other => ({domain: other.qualified_id.domain, id: other.qualified_id.id}));
+        .map(other => ({domain: other.qualified_id.domain, id: other.qualified_id.id})) ||
+      [];
     conversationEntity.participating_user_ids(participatingUserIds);
     conversationEntity.participatingQualifiedUserIds(participatingQualifiedUserIds);
 
