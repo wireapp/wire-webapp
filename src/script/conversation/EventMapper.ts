@@ -375,7 +375,7 @@ export class EventMapper {
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
-    messageEntity.qualifiedUserIds(qualifiedUserIds);
+    messageEntity.qualifiedUserIds(qualifiedUserIds || []);
 
     if (hasService) {
       messageEntity.showServicesWarning = true;

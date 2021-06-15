@@ -71,7 +71,7 @@ export class MemberMessage extends SystemMessage {
 
     this.userEntities = ko.observableArray();
     this.userIds = ko.observableArray();
-    this.qualifiedUserIds = ko.observableArray();
+    this.qualifiedUserIds = ko.observableArray([]);
     this.name = ko.observable('');
 
     this.exceedsMaxVisibleUsers = ko.pureComputed(() => {
