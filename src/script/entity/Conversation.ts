@@ -73,7 +73,6 @@ export class Conversation {
   private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
   private readonly isManaged: boolean;
   private readonly isTeam1to1: ko.PureComputed<boolean>;
-  private readonly isFederated1to1: ko.PureComputed<boolean>;
   public readonly last_server_timestamp: ko.Observable<number>;
   private readonly logger: Logger;
   public readonly mutedState: ko.Observable<number>;
@@ -194,19 +193,13 @@ export class Conversation {
         this.participating_user_ids().length === 1 && this.participatingQualifiedUserIds().length === 0;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
-    this.isFederated1to1 = ko.pureComputed(() => {
-      const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
-      const hasOneParticipant =
-        this.participating_user_ids().length === 0 && this.participatingQualifiedUserIds().length === 1;
-      return isGroupConversation && hasOneParticipant && !this.name();
-    });
     this.isGroup = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
-      return isGroupConversation && !this.isTeam1to1() && !this.isFederated1to1();
+      return isGroupConversation && !this.isTeam1to1();
     });
     this.is1to1 = ko.pureComputed(() => {
       const is1to1Conversation = this.type() === CONVERSATION_TYPE.ONE_TO_ONE;
-      return is1to1Conversation || this.isTeam1to1() || this.isFederated1to1();
+      return is1to1Conversation || this.isTeam1to1();
     });
     this.isRequest = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.CONNECT);
     this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
