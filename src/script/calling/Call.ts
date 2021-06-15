@@ -87,6 +87,7 @@ export class Call {
       this.activeAudioOutput = newActiveAudioOutput;
       this.updateAudioStreamsSink();
     });
+    this.maximizedParticipant(null);
   }
 
   get hasWorkingAudioInput(): boolean {

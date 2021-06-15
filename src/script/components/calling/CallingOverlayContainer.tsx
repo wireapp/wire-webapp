@@ -207,7 +207,7 @@ export default {
         mediaStreamHandler={mediaStreamHandler}
         mediaDevicesHandler={mediaDevicesHandler}
       />,
-      document.getElementById('calling-container'),
+      document.getElementById('calling-overlay-container'),
     );
   },
 };
