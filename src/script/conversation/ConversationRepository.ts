@@ -95,7 +95,7 @@ import {TeamState} from '../team/TeamState';
 import {TeamRepository} from '../team/TeamRepository';
 import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {is1To1WithUser, isInTeam, isRemovedFromConversation} from './ConversationFilter';
+import {is1To1WithUser, isGroupWithFederatedUser, isInTeam, isRemovedFromConversation} from './ConversationFilter';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -898,7 +898,9 @@ export class ConversationRepository {
 
     if (!userEntity.isOnSameFederatedDomain()) {
       const matchingConversationEntity = this.conversationState.conversations().find(conversationEntity => {
-        return !isRemovedFromConversation(conversationEntity) && is1To1WithUser(conversationEntity, userEntity);
+        return (
+          !isRemovedFromConversation(conversationEntity) && isGroupWithFederatedUser(conversationEntity, userEntity)
+        );
       });
 
       if (matchingConversationEntity) {

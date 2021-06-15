@@ -31,8 +31,15 @@ export function isRemovedFromConversation(conversationEntity: Conversation): boo
 export function is1To1WithUser(conversationEntity: Conversation, userEntity: User): boolean {
   if (conversationEntity.is1to1()) {
     const [userId] = conversationEntity.participating_user_ids();
-    const [qualifiedUserId] = conversationEntity.participatingQualifiedUserIds();
-    return userEntity.id === userId || userEntity.id === qualifiedUserId.id;
+    return userEntity.id === userId;
+  }
+  return false;
+}
+
+export function isGroupWithFederatedUser(conversationEntity: Conversation, userEntity: User): boolean {
+  if (!conversationEntity.is1to1()) {
+    const [userId] = conversationEntity.participatingQualifiedUserIds();
+    return userEntity.id === userId?.id;
   }
   return false;
 }
