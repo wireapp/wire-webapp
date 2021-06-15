@@ -19,12 +19,8 @@
 
 import ko from 'knockout';
 import {useEffect, useState} from 'react';
-import {TypeUtil} from '@wireapp/commons';
-
 interface RegisterReactComponent<Props> {
   component: React.ComponentType<Props>;
-  /** The optional knockout params */
-  optionalParams?: TypeUtil.OptionalKeys<Props>[];
 }
 
 interface RegisterReactComponentWithTemplate<T> extends RegisterReactComponent<T> {
@@ -43,13 +39,19 @@ export function registerReactComponent<Props>(
     template,
     bindings,
     component,
-    optionalParams = [],
   }: RegisterReactComponentWithBindings<Props> | RegisterReactComponentWithTemplate<Props>,
 ) {
   ko.components.register(name, {
     template: template ?? `<!-- ko react: {${bindings}} --><!-- /ko -->`,
     viewModel: function (knockoutParams: Props) {
-      optionalParams.forEach(param => {
+      const bindingsString = bindings ?? /react: ?{(.*)}/.exec(template)[1];
+      const pairs = bindingsString?.split(',');
+      const neededParams = pairs?.map(pair => {
+        const [name, value = name] = pair.split(':');
+        return value.replace(/ko\.unwrap\(|\)/g, '').trim();
+      }) as (keyof Props)[];
+
+      neededParams.forEach(param => {
         if (!knockoutParams.hasOwnProperty(param)) {
           knockoutParams[param] = undefined;
         }

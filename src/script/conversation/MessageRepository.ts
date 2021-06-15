@@ -1142,8 +1142,11 @@ export class MessageRepository {
   ): Promise<Pick<Partial<EventRecord>, 'status' | 'time'> | void> {
     try {
       const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
-      messageEntity.status(StatusType.SENT);
-      const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {status: StatusType.SENT};
+      const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
+      messageEntity.status(updatedStatus);
+      const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {
+        status: updatedStatus,
+      };
       if (isoDate) {
         const timestamp = new Date(isoDate).getTime();
         if (!isNaN(timestamp)) {

@@ -655,11 +655,11 @@ export class EventRepository {
     const primaryKeyUpdate = {primary_key: originalEvent.primary_key};
     const isLinkPreviewEdit = newData.previews && !!newData.previews.length;
 
-    const commonUpdates = this.getCommonMessageUpdates(originalEvent, newEvent);
+    const commonUpdates = EventRepository.getCommonMessageUpdates(originalEvent, newEvent);
 
     const specificUpdates = isLinkPreviewEdit
       ? this.getUpdatesForLinkPreview(originalEvent, newEvent)
-      : this.getUpdatesForEditMessage(originalEvent, newEvent);
+      : EventRepository.getUpdatesForEditMessage(originalEvent, newEvent);
 
     const updates = {...specificUpdates, ...commonUpdates};
 
@@ -750,17 +750,23 @@ export class EventRepository {
     return this.eventService.replaceEvent(identifiedUpdates);
   }
 
-  private getCommonMessageUpdates(originalEvent: EventRecord, newEvent: EventRecord) {
+  private static getCommonMessageUpdates(originalEvent: EventRecord, newEvent: EventRecord) {
     return {
       ...newEvent,
       data: {...newEvent.data, expects_read_confirmation: originalEvent.data.expects_read_confirmation},
       edited_time: newEvent.time,
+      read_receipts: !newEvent.read_receipts ? originalEvent.read_receipts : newEvent.read_receipts,
+      status: !newEvent.status || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
       time: originalEvent.time,
       version: 1,
     };
   }
 
-  private getUpdatesForEditMessage(originalEvent: EventRecord, newEvent: EventRecord): EventRecord & {reactions: {}} {
+  private static getUpdatesForEditMessage(
+    originalEvent: EventRecord,
+    newEvent: EventRecord,
+  ): EventRecord & {reactions: {}} {
+    // Remove reactions, so that likes (hearts) don't stay when a message's text gets edited
     return {...newEvent, reactions: {}};
   }
 

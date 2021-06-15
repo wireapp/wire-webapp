@@ -235,5 +235,4 @@ registerReactComponent('group-video-grid', {
   bindings:
     'grid: ko.unwrap(grid), selfParticipant: ko.unwrap(selfParticipant), maximizedParticipant: ko.unwrap(maximizedParticipant), minimized, muted: ko.unwrap(muted)',
   component: GroupVideoGrid,
-  optionalParams: ['muted', 'minimized'],
 });

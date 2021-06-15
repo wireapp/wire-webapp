@@ -21,7 +21,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {Asset as ProtobufAsset, GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
+import {init as proteusInit, keys as ProteusKeys} from '@wireapp/proteus';
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
 import type {Notification} from '@wireapp/api-client/src/notification/';
 import {DatabaseKeys} from '@wireapp/core/src/main/notification/NotificationDatabaseRepository';
@@ -41,6 +41,7 @@ import {EventSource} from './EventSource';
 import {EventRecord} from '../storage';
 import {EventService} from './EventService';
 import {CryptographyError} from '../error/CryptographyError';
+import {StatusType} from '../message/StatusType';
 
 const testFactory = new TestFactory();
 
@@ -156,6 +157,58 @@ describe('EventRepository', () => {
       );
 
       expect(missedEventsSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('getCommonMessageUpdates', () => {
+    /** @see https://wearezeta.atlassian.net/browse/SQCORE-732 */
+    it('does not overwrite the seen status if a message gets edited', () => {
+      const originalEvent = {
+        category: 16,
+        conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
+        data: {
+          content: 'Original Text Which Has Been Seen By Someone Else',
+          expects_read_confirmation: true,
+          legal_hold_status: 1,
+          mentions: [],
+          previews: [],
+        },
+        from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
+        from_client_id: '79618bbe93e6821c',
+        id: 'c6269e58-fa82-4f6e-8264-263e09154871',
+        primary_key: '17',
+        read_receipts: [
+          {
+            time: '2021-06-10T19:47:19.570Z',
+            userId: 'b661e27f-24c6-4c52-a425-87a7b7f3df61',
+          },
+        ],
+        status: StatusType.SEEN,
+        time: '2021-06-10T19:47:16.071Z',
+        type: 'conversation.message-add',
+      } as EventRecord;
+
+      const editedEvent = {
+        conversation: 'a7f1187e-9396-44c9-8242-db9d3051dc89',
+        data: {
+          content: 'Edited Text Which Replaces The Original Text',
+          expects_read_confirmation: true,
+          mentions: [],
+          previews: [],
+          replacing_message_id: 'c6269e58-fa82-4f6e-8264-263e09154871',
+        },
+        from: '24de8432-03ba-439f-88f8-95bdc68b7bdd',
+        from_client_id: '79618bbe93e6821c',
+        id: 'caff044b-cb9c-47c6-833a-d4b76c678bcd',
+        status: StatusType.SENT,
+        time: '2021-06-10T19:47:23.706Z',
+        type: 'conversation.message-add',
+      } as EventRecord;
+
+      const updatedEvent = EventRepository['getCommonMessageUpdates'](originalEvent, editedEvent);
+      expect(updatedEvent.data.content).toBe('Edited Text Which Replaces The Original Text');
+      expect(updatedEvent.status).toBe(StatusType.SEEN);
+      expect(Object.keys(updatedEvent.read_receipts).length).toBe(1);
     });
   });
 
@@ -290,16 +343,14 @@ describe('EventRepository', () => {
     });
 
     it('accepts "conversation.rename" events', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
-        time: '2016-08-09T11:57:37.498Z',
         data: {name: 'Renamed'},
         from: '532af01e-1e24-4366-aacf-33b67d4ee376',
         id: '7.800122000b2f7cca',
+        time: '2016-08-09T11:57:37.498Z',
         type: 'conversation.rename',
       } as EventRecord;
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return testFactory.event_repository['handleEvent'](event, EventSource.STREAM).then(() => {
         expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
@@ -308,16 +359,14 @@ describe('EventRepository', () => {
     });
 
     it('accepts "conversation.member-join" events', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
-        time: '2016-08-09T12:01:14.688Z',
         data: {user_ids: ['e47bfafa-03dc-43ed-aadb-ad6c4d9f3d86']},
         from: '532af01e-1e24-4366-aacf-33b67d4ee376',
         id: '8.800122000b2f7d20',
+        time: '2016-08-09T12:01:14.688Z',
         type: 'conversation.member-join',
       } as EventRecord;
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return testFactory.event_repository['handleEvent'](event, EventSource.STREAM).then(() => {
         expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
@@ -326,16 +375,14 @@ describe('EventRepository', () => {
     });
 
     it('accepts "conversation.member-leave" events', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
-        time: '2016-08-09T12:01:56.363Z',
         data: {user_ids: ['e47bfafa-03dc-43ed-aadb-ad6c4d9f3d86']},
         from: '532af01e-1e24-4366-aacf-33b67d4ee376',
         id: '9.800122000b3d69bc',
+        time: '2016-08-09T12:01:56.363Z',
         type: 'conversation.member-leave',
       } as EventRecord;
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return testFactory.event_repository['handleEvent'](event, EventSource.STREAM).then(() => {
         expect(testFactory.event_service.saveEvent).toHaveBeenCalled();
@@ -353,16 +400,14 @@ describe('EventRepository', () => {
       eventRepo.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       jest.spyOn(eventRepo as any, 'distributeEvent').mockImplementation(() => {});
 
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',
-        time: '2016-08-09T12:09:28.294Z',
         data: {reason: 'missed'},
         from: '0410795a-58dc-40d8-b216-cbc2360be21a',
         id: '16.800122000b3d4ade',
+        time: '2016-08-09T12:09:28.294Z',
         type: 'conversation.voice-channel-deactivate',
       } as EventRecord;
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       await eventRepo['handleEvent'](event, EventSource.STREAM);
 
       expect(eventServiceSpy.saveEvent).toHaveBeenCalled();
@@ -370,17 +415,15 @@ describe('EventRepository', () => {
     });
 
     it('accepts plain decryption error events', () => {
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event = {
         conversation: '7f0939c8-dbd9-48f5-839e-b0ebcfffec8c',
-        id: 'f518d6ff-19d3-48a0-b0c1-cc71c6e81136',
-        type: 'conversation.unable-to-decrypt',
-        from: '532af01e-1e24-4366-aacf-33b67d4ee376',
-        time: '2016-08-09T12:58:49.485Z',
         error: 'Offset is outside the bounds of the DataView (17cd13b4b2a3a98)',
         errorCode: '1778 (17cd13b4b2a3a98)',
+        from: '532af01e-1e24-4366-aacf-33b67d4ee376',
+        id: 'f518d6ff-19d3-48a0-b0c1-cc71c6e81136',
+        time: '2016-08-09T12:58:49.485Z',
+        type: 'conversation.unable-to-decrypt',
       } as unknown as EventRecord;
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       return testFactory.event_repository['handleEvent'](event, EventSource.STREAM).then(() => {
         expect(testFactory.event_service.saveEvent).toHaveBeenCalled();

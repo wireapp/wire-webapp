@@ -240,20 +240,4 @@ registerReactComponent<ParticipantItemProps>('participant-item', {
   bindings:
     'badge, callParticipant, showArrow, highlighted, noInteraction, noUnderline, canSelect, customInfo, external: ko.unwrap(external), hideInfo, isSelected: ko.unwrap(isSelected), isSelfVerified: ko.unwrap(isSelfVerified), mode, participant, selfInTeam',
   component: ParticipantItem,
-  optionalParams: [
-    'badge',
-    'callParticipant',
-    'canSelect',
-    'customInfo',
-    'external',
-    'hideInfo',
-    'highlighted',
-    'isSelected',
-    'isSelfVerified',
-    'mode',
-    'noInteraction',
-    'noUnderline',
-    'selfInTeam',
-    'showArrow',
-  ],
 });

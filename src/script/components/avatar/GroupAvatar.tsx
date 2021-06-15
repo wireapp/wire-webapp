@@ -76,6 +76,5 @@ export default GroupAvatar;
 
 registerReactComponent('group-avatar', {
   component: GroupAvatar,
-  optionalParams: ['isLight'],
   template: '<div data-bind="react: {users: ko.unwrap(users), isLight}"></div>',
 });

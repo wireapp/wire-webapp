@@ -89,7 +89,6 @@ export default MediaButton;
 
 registerReactComponent<MediaButtonProps>('media-button', {
   component: MediaButton,
-  optionalParams: ['cancel', 'pause'],
   template:
     '<div data-bind="react: {asset, cancel, large, pause, play, src, transferState: ko.unwrap(transferState), uploadProgress: ko.unwrap(uploadProgress)}"></div>',
 });
