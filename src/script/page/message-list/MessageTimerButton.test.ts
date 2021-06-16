@@ -118,6 +118,7 @@ describe('MessageTimerButton', () => {
 
     const conversation: Partial<Conversation> = {
       hasGlobalMessageTimer: ko.pureComputed(() => true),
+      isFederated: ko.pureComputed(() => false),
       messageTimer: ko.pureComputed(() => duration),
     };
 
