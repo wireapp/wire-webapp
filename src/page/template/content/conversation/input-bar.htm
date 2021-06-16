@@ -87,30 +87,30 @@
         </div>
         <mention-suggestions params="suggestions: mentionSuggestions, targetInputSelector: '#conversation-input-bar-text', onSelectionValidated: addMention"></mention-suggestions>
 
-        <div class="controls-right" data-bind="css: {'disabled': conversationEntity().isFederated()}">
+        <div class="controls-right">
           <!-- ko ifnot: isEditing() -->
             <!-- ko if: showGiphyButton() -->
               <gif-icon class="controls-right-button button-icon-large"
-                    data-bind="click: clickToShowGiphy, attr: {title: t('extensionsBubbleButtonGif')}"
+                    data-bind="click: clickToShowGiphy, disabled: disableControls, attr: {title: t('extensionsBubbleButtonGif')}, css: {'disabled': disableControls}"
                     data-uie-name="do-giphy-popover">
               </gif-icon>
             <!-- /ko -->
 
             <!-- ko ifnot: input().length -->
-              <message-timer-button params="conversation: conversationEntity"></message-timer-button>
+              <message-timer-button params="conversation: conversationEntity, disabled: disableControls" data-bind="css: {'disabled': disableControls}"></message-timer-button>
 
-              <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large">
+              <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large" data-bind="css: {'disabled': disableControls}">
                 <image-icon></image-icon>
-                <input data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
+                <input data-bind="attr: {accept: acceptedImageTypes}, disabled: disableControls, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
               </label>
 
-              <label id="conversation-input-bar-files" class="controls-right-button button-icon-large" data-bind="attr: {title: t('tooltipConversationFile')}">
+              <label id="conversation-input-bar-files" class="controls-right-button button-icon-large" data-bind="attr: {title: t('tooltipConversationFile')}, css: {'disabled': disableControls}">
                 <attachment-icon></attachment-icon>
-                <input data-bind="attr: {accept: allowedFileTypes}, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
+                <input data-bind="disabled: disableControls, attr: {accept: allowedFileTypes}, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
               </label>
 
               <span class="controls-right-button button-icon-large"
-                    data-bind="click: clickToPing, attr: {'title': pingTooltip}, css: {'disabled': pingDisabled}"
+                    data-bind="click: clickToPing, disabled: disableControls, attr: {'title': pingTooltip}, css: {'disabled': pingDisabled() || disableControls()}"
                     data-uie-name="do-ping">
                 <ping-icon></ping-icon>
               </span>
@@ -119,7 +119,7 @@
 
           <!-- ko if: isEditing() -->
             <span class="controls-right-button button-icon-large"
-                  data-bind="click: cancelMessageEditing"
+                  data-bind="click: cancelMessageEditing, css: {'disabled': disableControls}"
                   data-uie-name="do-cancel-edit">
               <close-icon></close-icon>
             </span>
