@@ -144,7 +144,6 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const conversation = conversationState.findConversation(currentOngoingCall?.conversationId);
   if (!currentOngoingCall || !conversation || conversation.removed_from_conversation()) {
-    console.info('bardia null');
     return null;
   }
 
