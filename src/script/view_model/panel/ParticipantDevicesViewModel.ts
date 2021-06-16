@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {makeUserDevicesHistory, UserDevicesState, UserDevicesHistory} from 'Components/userDevices';
+import {makeUserDevicesHistory, UserDevicesState} from 'Components/UserDevices';
 
 import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
 import type {User} from '../../entity/User';
@@ -34,7 +34,7 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
   cryptographyRepository: CryptographyRepository;
   messageRepository: MessageRepository;
-  userDevicesHistory: UserDevicesHistory;
+  userDevicesHistory;
   showSelfFingerprint: () => boolean;
   showDeviceDetails: () => boolean;
   showDeviceList: () => boolean;
@@ -49,9 +49,9 @@ export class ParticipantDevicesViewModel extends BasePanelViewModel {
     this.messageRepository = message;
     this.userDevicesHistory = makeUserDevicesHistory();
 
-    this.showSelfFingerprint = () => this.userDevicesHistory.current() === UserDevicesState.SELF_FINGERPRINT;
-    this.showDeviceDetails = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_DETAILS;
-    this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
+    this.showSelfFingerprint = () => this.userDevicesHistory.current().state === UserDevicesState.SELF_FINGERPRINT;
+    this.showDeviceDetails = () => this.userDevicesHistory.current().state === UserDevicesState.DEVICE_DETAILS;
+    this.showDeviceList = () => this.userDevicesHistory.current().state === UserDevicesState.DEVICE_LIST;
 
     this.userEntity = ko.observable();
   }

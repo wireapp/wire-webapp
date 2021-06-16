@@ -24,7 +24,7 @@ import {t} from 'Util/LocalizerUtil';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 
-import {sortUserDevices} from 'Components/userDevices';
+import {sortUserDevices} from 'Components/UserDevices';
 
 import {ActionsViewModel} from '../ActionsViewModel';
 import {ClientEntity} from '../../client/ClientEntity';

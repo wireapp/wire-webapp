@@ -24,7 +24,7 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
-import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
+import {UserDevicesState, makeUserDevicesHistory} from 'Components/UserDevices';
 import {t} from 'Util/LocalizerUtil';
 
 import {UserState} from '../../user/UserState';
@@ -48,7 +48,7 @@ export class LegalHoldModalViewModel {
   devicesUser: ko.Observable<User>;
   onBgClick: () => void;
   onClosed: () => void;
-  userDevicesHistory: UserDevicesHistory;
+  userDevicesHistory;
   showDeviceList: () => boolean;
   isLoading: ko.Observable<boolean>;
   showRequest: ko.Observable<boolean>;
@@ -82,7 +82,7 @@ export class LegalHoldModalViewModel {
     this.isLoading = ko.observable(false);
     this.isSendingApprove = ko.observable(false);
     this.skipShowUsers = ko.observable(false);
-    this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
+    this.showDeviceList = () => this.userDevicesHistory.current().state === UserDevicesState.DEVICE_LIST;
     this.conversationId = null;
 
     this.onBgClick = () => {
