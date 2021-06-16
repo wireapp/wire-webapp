@@ -110,6 +110,7 @@ export class Conversation {
   public readonly isActiveParticipant: ko.PureComputed<boolean>;
   public readonly isClearable: ko.PureComputed<boolean>;
   public readonly isCreatedBySelf: ko.PureComputed<boolean>;
+  public readonly isFederated: ko.PureComputed<boolean>;
   public readonly isGroup: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
   public readonly isGuestRoom: ko.PureComputed<boolean>;
@@ -300,6 +301,10 @@ export class Conversation {
 
     this.isCreatedBySelf = ko.pureComputed(
       () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
+    );
+
+    this.isFederated = ko.pureComputed(() =>
+      this.participatingQualifiedUserIds().some(userId => userId.domain !== this.selfUser().domain),
     );
 
     this.showNotificationsEverything = ko.pureComputed(() => {
