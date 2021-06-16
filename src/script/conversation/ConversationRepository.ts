@@ -907,7 +907,7 @@ export class ConversationRepository {
         return matchingConversationEntity;
       }
 
-      return this.createGroupConversation([userEntity]);
+      return this.createGroupConversation([userEntity], `${userEntity.name()} & ${this.userState.self().name()}`);
     }
 
     const conversationId = userEntity.connection().conversationId;
