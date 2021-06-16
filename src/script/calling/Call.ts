@@ -87,7 +87,7 @@ export class Call {
       this.activeAudioOutput = newActiveAudioOutput;
       this.updateAudioStreamsSink();
     });
-    this.maximizedParticipant(null);
+    this.maximizedParticipant = ko.observable(null);
   }
 
   get hasWorkingAudioInput(): boolean {

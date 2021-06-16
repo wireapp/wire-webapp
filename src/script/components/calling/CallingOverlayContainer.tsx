@@ -20,12 +20,12 @@
 import ReactDOM from 'react-dom';
 import React, {Fragment, useState} from 'react';
 import {container} from 'tsyringe';
-import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
+import {CALL_TYPE} from '@wireapp/avs';
 
 import FullscreenVideoCall from './FullscreenVideoCall';
 import ChooseScreen, {Screen} from './ChooseScreen';
 import {ConversationState} from '../../conversation/ConversationState';
-import {useKoSubscribable} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Call} from '../../calling/Call';
 import {Multitasking} from '../../notification/NotificationRepository';
 import {getGrid, Grid} from '../../calling/videoGridHandler';
@@ -59,25 +59,17 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const [selectableWindows, setSelectableWindows] = useState<ElectronDesktopCapturerSource[]>([]);
   const isChoosingScreen = selectableScreens.length > 0 || selectableWindows.length > 0;
 
-  const videoSpeakersActiveTab = useKoSubscribable(callState.videoSpeakersActiveTab);
-  const isMuted = useKoSubscribable(callState.isMuted);
+  const {isMinimized} = useKoSubscribableChildren(multitasking as {isMinimized: ko.Observable}, ['isMinimized']);
+  const {isMuted, videoSpeakersActiveTab, joinedCall} = useKoSubscribableChildren(callState, [
+    'isMuted',
+    'videoSpeakersActiveTab',
+    'joinedCall',
+  ]);
+  const currentOngoingCall = joinedCall as Call;
 
   const onCancelScreenSelection = () => {
     setSelectableScreens([]);
     setSelectableWindows([]);
-  };
-
-  const activeCalls = useKoSubscribable(callState.activeCalls).filter(call => {
-    const conversation = conversationState.findConversation(call.conversationId);
-    if (!conversation || conversation.removed_from_conversation()) {
-      return false;
-    }
-
-    return call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
-  });
-
-  const isOngoing = (call: Call) => {
-    return call.state() === CALL_STATE.MEDIA_ESTAB;
   };
 
   const getVideoGrid = (call: Call): Grid => {
@@ -150,40 +142,43 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     });
   };
 
+  const conversation = conversationState.findConversation(currentOngoingCall?.conversationId);
+  if (!currentOngoingCall || !conversation || conversation.removed_from_conversation()) {
+    console.info('bardia null');
+    return null;
+  }
+
   return (
     <Fragment>
-      {activeCalls.map(call =>
-        isOngoing(call) && !multitasking.isMinimized() ? (
-          <FullscreenVideoCall
-            key={call.conversationId}
-            videoGrid={getVideoGrid(call)}
-            call={call}
-            videoSpeakersActiveTab={videoSpeakersActiveTab}
-            conversation={getConversationById(call.conversationId)}
-            multitasking={multitasking}
-            canShareScreen={callingRepository.supportsScreenSharing}
-            maximizedParticipant={call.maximizedParticipant()}
-            videoInput={mediaDevicesHandler.availableDevices.videoInput()}
-            mediaDevicesHandler={mediaDevicesHandler}
-            isMuted={isMuted}
-            isChoosingScreen={isChoosingScreen}
-            switchCameraInput={switchCameraInput}
-            setMaximizedParticipant={setMaximizedParticipant}
-            setVideoSpeakersActiveTab={setVideoSpeakersActiveTab}
-            toggleMute={toggleMute}
-            toggleCamera={toggleCamera}
-            toggleScreenshare={toggleScreenshare}
-            leave={leave}
-            changePage={changePage}
-          />
-        ) : null,
+      {!isMinimized && (
+        <FullscreenVideoCall
+          key={currentOngoingCall.conversationId}
+          videoGrid={getVideoGrid(currentOngoingCall)}
+          call={currentOngoingCall}
+          videoSpeakersActiveTab={videoSpeakersActiveTab}
+          conversation={getConversationById(currentOngoingCall.conversationId)}
+          multitasking={multitasking}
+          canShareScreen={callingRepository.supportsScreenSharing}
+          maximizedParticipant={currentOngoingCall.maximizedParticipant()}
+          videoInput={mediaDevicesHandler.availableDevices.videoInput()}
+          mediaDevicesHandler={mediaDevicesHandler}
+          isMuted={isMuted}
+          isChoosingScreen={isChoosingScreen}
+          switchCameraInput={switchCameraInput}
+          setMaximizedParticipant={setMaximizedParticipant}
+          setVideoSpeakersActiveTab={setVideoSpeakersActiveTab}
+          toggleMute={toggleMute}
+          toggleCamera={toggleCamera}
+          toggleScreenshare={toggleScreenshare}
+          leave={leave}
+          changePage={changePage}
+        />
       )}
 
       {isChoosingScreen && (
         <ChooseScreen
           cancel={onCancelScreenSelection}
           choose={onChooseScreen}
-          // needs discussion
           screens={selectableScreens as unknown as Screen[]}
           windows={selectableWindows as unknown as Screen[]}
         />
