@@ -19,5 +19,5 @@
     "dist": "yarn clean && yarn build",
     "test": "exit 0"
   },
-  "version": "0.10.4"
+  "version": "0.11.0"
 }

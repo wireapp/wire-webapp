@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.10.4...@wireapp/webapp-events@0.11.0) (2021-06-16)
+
+
+### Features
+
+* **webapp-events:** Add conversation join event ([#3959](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3959)) ([e488bad](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/e488bad58cffa7069d099b515d81bc48f101d356))
+
+
+
+
+
 ## [0.10.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.10.2...@wireapp/webapp-events@0.10.4) (2021-05-12)
 
 **Note:** Version bump only for package @wireapp/webapp-events
