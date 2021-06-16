@@ -85,6 +85,7 @@ export const WebAppEvents = {
   },
   CONTEXT_MENU: 'wire.webapp.context_menu',
   CONVERSATION: {
+    JOIN: 'wire.webapp.conversation.join',
     ASSET: {
       CANCEL: 'wire.webapp.conversation.asset.cancel',
     },
