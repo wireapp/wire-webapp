@@ -75,6 +75,5 @@ export default MessageButton;
 
 registerReactComponent('message-button', {
   component: MessageButton,
-  optionalParams: ['onClick'],
   template: '<span data-bind="react: {message: ko.unwrap(message), id, label, onClick}"></span>',
 });

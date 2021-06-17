@@ -99,7 +99,6 @@ export default UserInput;
 
 registerReactComponent<UserInputProps>('user-input', {
   component: UserInput,
-  optionalParams: ['enter'],
   template:
     '<div data-bind="react: {enter, input: ko.unwrap(input), setInput: input, placeholder, selectedUsers: ko.unwrap(selected), setSelectedUsers: selected}"></div>',
 });
