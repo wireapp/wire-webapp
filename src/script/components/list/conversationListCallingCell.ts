@@ -37,7 +37,7 @@ import type {CallingRepository} from '../../calling/CallingRepository';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {User} from '../../entity/User';
-import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
+import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import {Participant} from '../../calling/Participant';
@@ -82,13 +82,11 @@ class ConversationListCallingCell {
   readonly multitasking: Multitasking;
   readonly AVATAR_SIZE: typeof AVATAR_SIZE;
   readonly participantsButtonLabel: ko.PureComputed<string>;
-  readonly showMaximize: ko.PureComputed<boolean>;
   readonly showNoCameraPreview: ko.Computed<boolean>;
   readonly showParticipants: ko.Observable<boolean>;
   readonly showParticipantsButton: ko.PureComputed<boolean>;
   readonly showVideoButton: ko.PureComputed<boolean>;
   readonly showJoinButton: ko.PureComputed<boolean>;
-  readonly showVideoGrid: ko.PureComputed<boolean>;
   readonly temporaryUserStyle: boolean;
   readonly videoGrid: ko.PureComputed<Grid>;
   readonly isSelfVerified: ko.Subscribable<boolean>;
@@ -169,15 +167,6 @@ class ConversationListCallingCell {
     this.participantsButtonLabel = ko.pureComputed(() => {
       return t('callParticipants', this.participants().length);
     });
-    this.showMaximize = ko.pureComputed(() => this.multitasking.isMinimized() && this.isOngoing());
-
-    const hasVideoGrid = () => {
-      const grid = this.videoGrid();
-      return grid.grid.filter(participant => !!participant).length > 0 || grid.thumbnail;
-    };
-    this.showVideoGrid = ko.pureComputed(() => {
-      return hasVideoGrid() && (this.multitasking.isMinimized() || !this.isOngoing());
-    });
 
     this.showVideoButton = ko.pureComputed(() => call.initialType === CALL_TYPE.VIDEO || this.isOngoing());
     this.showJoinButton = ko.pureComputed(() => conversation() && this.isStillOngoing() && temporaryUserStyle);
@@ -192,7 +181,7 @@ class ConversationListCallingCell {
     });
 
     this.showNoCameraPreview = ko.computed(() => {
-      return !hasAccessToCamera() && call.initialType === CALL_TYPE.VIDEO && !this.showVideoGrid() && !this.isOngoing();
+      return !hasAccessToCamera() && call.initialType === CALL_TYPE.VIDEO && !this.isOngoing();
     });
 
     this.participants = ko.pureComputed(() =>
@@ -220,7 +209,6 @@ class ConversationListCallingCell {
   }
 
   showFullscreenVideoGrid(): void {
-    this.multitasking.autoMinimize(false);
     this.multitasking.isMinimized(false);
   }
 
@@ -233,14 +221,13 @@ class ConversationListCallingCell {
   }
 
   calculateGrid(): Grid {
-    if (this.videoSpeakersActiveTab() === VideoSpeakersTabs.all) {
+    if (this.videoSpeakersActiveTab() === VideoSpeakersTab.ALL) {
       return this.videoGrid();
     }
 
-    const activeVideoSpeakers = this.call.getActiveVideoSpeakers();
+    const activeSpeakers = this.call.getActiveSpeakers();
     return {
-      grid: activeVideoSpeakers,
-      hasRemoteVideo: activeVideoSpeakers.length > 0,
+      grid: activeSpeakers,
       thumbnail: null,
     };
   }
@@ -300,14 +287,12 @@ ko.components.register('conversation-list-calling-cell', {
         </div>
       </div>
 
-      <!-- ko if: showVideoGrid() -->
+      <!-- ko if: isOngoing() && multitasking.isMinimized() -->
         <div class="group-video__minimized-wrapper" data-bind="click: showFullscreenVideoGrid">
           <group-video-grid params="minimized: true, maximizedParticipant: maximizedTileVideoParticipant, setMaximizedParticipant: callActions.setMaximizedTileVideoParticipant, grid: calculateGrid(), selfParticipant: selfParticipant"></group-video-grid>
-          <!-- ko if: showMaximize() -->
-            <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-              <fullscreen-icon></fullscreen-icon>
-            </div>
-          <!-- /ko -->
+          <div class="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
+            <fullscreen-icon></fullscreen-icon>
+          </div>
         </div>
       <!-- /ko -->
 

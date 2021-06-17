@@ -35,10 +35,14 @@ class ButtonGroupPage extends TestPage<ButtonGroupProps> {
 }
 
 describe('ButtonGroup', () => {
+  const items = [
+    {getText: () => 'one', value: 'one'},
+    {getText: () => 'two', value: 'two'},
+  ];
   it('renders buttons', async () => {
     const buttonGroup = new ButtonGroupPage({
-      currentItem: 'all',
-      items: ['all', 'active'],
+      currentItem: 'one',
+      items,
       onChangeItem: () => {},
     });
 
@@ -47,8 +51,8 @@ describe('ButtonGroup', () => {
 
   it('changes active button on click', async () => {
     const props = {
-      currentItem: 'all',
-      items: ['all', 'active'],
+      currentItem: 'one',
+      items,
       onChangeItem: (currentItem: string) => {
         buttonGroup.setProps({...props, currentItem});
       },
@@ -57,17 +61,17 @@ describe('ButtonGroup', () => {
     const buttonGroup = new ButtonGroupPage(props);
 
     expect(buttonGroup.getWrapper().children().length).toBe(2);
-    expect(buttonGroup.getActiveButton().text()).toBe('all');
+    expect(buttonGroup.getActiveButton().text()).toBe('one');
 
     buttonGroup.clickOnInactiveButton();
-    expect(buttonGroup.getActiveButton().text()).toBe('active');
+    expect(buttonGroup.getActiveButton().text()).toBe('two');
   });
 
   it('triggers onChangeItem only on inactive buttons', () => {
     const onChangeSpy = jasmine.createSpy();
     const props = {
       currentItem: 'one',
-      items: ['one', 'two'],
+      items,
       onChangeItem: onChangeSpy,
     };
     const buttonGroup = new ButtonGroupPage(props);

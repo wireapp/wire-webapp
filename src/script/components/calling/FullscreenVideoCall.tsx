@@ -17,13 +17,13 @@
  *
  */
 
-import {css} from '@emotion/core';
+import {css, CSSObject} from '@emotion/core';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import Icon from 'Components/Icon';
 import React, {useEffect, useMemo, useState} from 'react';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {Call} from '../../calling/Call';
 import type {Participant} from '../../calling/Participant';
@@ -33,11 +33,12 @@ import useHideElement from '../../hooks/useHideElement';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {t} from '../../util/LocalizerUtil';
-import {CallActions, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
+import {CallActions, VideoSpeakersTab, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
 import ButtonGroup from './ButtonGroup';
 import DeviceToggleButton from './DeviceToggleButton';
 import Duration from './Duration';
 import GroupVideoGrid from './GroupVideoGrid';
+import Pagination from './Pagination';
 
 export interface FullscreenVideoCallProps {
   call: Call;
@@ -73,6 +74,19 @@ const videoControlDisabledStyles = css`
   }
 `;
 
+const paginationButtonStyles: CSSObject = {
+  alignItems: 'center',
+  backdropFilter: 'blur(10px)',
+  backgroundColor: 'rgba(255, 255, 255, 0.24)',
+  cursor: 'pointer',
+  display: 'flex',
+  height: 56,
+  justifyContent: 'center',
+  position: 'absolute',
+  top: 'calc(50% - 26px)',
+  width: 56,
+};
+
 const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   call,
   callActions,
@@ -87,8 +101,20 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   maximizedParticipant,
   videoSpeakersActiveTab,
 }) => {
-  const selfSharesScreen = call.getSelfParticipant()?.sharesScreen() ?? false;
-  const selfSharesCamera = call.getSelfParticipant()?.sharesCamera() ?? false;
+  const selfParticipant = call.getSelfParticipant();
+  const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
+    'sharesScreen',
+    'sharesCamera',
+  ]);
+
+  const {
+    activeSpeakers,
+    currentPage,
+    pages: callPages,
+    startedAt,
+    participants,
+  } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
+  const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
   const currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput();
   const switchCameraSource = (call: Call, deviceId: string) => callActions.switchCameraInput(call, deviceId);
   const minimize = () => multitasking.isMinimized(true);
@@ -112,7 +138,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     };
   }, []);
 
-  const activeVideoSpeakers = useKoSubscribable(call.activeSpeakers);
+  const totalPages = callPages.length;
 
   return (
     <div id="video-calling" className="video-calling" ref={wrapper}>
@@ -120,12 +146,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         <GroupVideoGrid
           muted={isMuted}
           maximizedParticipant={maximizedParticipant}
-          selfParticipant={call.getSelfParticipant()}
+          selfParticipant={selfParticipant}
           grid={
-            videoSpeakersActiveTab === VideoSpeakersTabs.speakers
+            videoSpeakersActiveTab === VideoSpeakersTab.SPEAKERS
               ? {
-                  grid: activeVideoSpeakers,
-                  hasRemoteVideo: activeVideoSpeakers.length > 0,
+                  grid: activeSpeakers,
                   thumbnail: null,
                 }
               : videoGrid
@@ -137,15 +162,15 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       {!isChoosingScreen && <div className="video-element-overlay hide-controls-hidden"></div>}
 
       <div id="video-title" className="video-title hide-controls-hidden">
-        <div className="video-remote-name">{conversation.display_name()}</div>
+        <div className="video-remote-name">{conversationName}</div>
         <div data-uie-name="video-timer" className="video-timer label-xs">
-          <Duration startedAt={call.startedAt()} />
+          <Duration startedAt={startedAt} />
         </div>
       </div>
 
       {!isChoosingScreen && (
         <div id="video-controls" className="video-controls hide-controls-hidden">
-          {call.participants().length > 2 && (
+          {participants.length > 2 && (
             <ButtonGroup
               items={Object.values(VideoSpeakersTabs)}
               onChangeItem={item => {
@@ -154,6 +179,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               }}
               currentItem={videoSpeakersActiveTab}
               style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
+              textSubstitute={participants.length}
             />
           )}
           <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
@@ -237,6 +263,48 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
             </div>
           </div>
         </div>
+      )}
+      {videoSpeakersActiveTab === VideoSpeakersTab.ALL && totalPages > 1 && (
+        <>
+          <div
+            className="hide-controls-hidden"
+            css={{bottom: 16, display: 'flex', justifyContent: 'center', position: 'absolute', width: '100%'}}
+          >
+            <Pagination
+              totalPages={totalPages}
+              currentPage={currentPage}
+              onChangePage={newPage => callActions.changePage(newPage, call)}
+            />
+          </div>
+          {currentPage !== totalPages - 1 && (
+            <div
+              onClick={() => callActions.changePage(currentPage + 1, call)}
+              className="hide-controls-hidden"
+              css={{
+                ...paginationButtonStyles,
+                borderBottomLeftRadius: 32,
+                borderTopLeftRadius: 32,
+                right: 0,
+              }}
+            >
+              <Icon.ArrowNext css={{left: 4, position: 'relative'}} />
+            </div>
+          )}
+          {currentPage !== 0 && (
+            <div
+              onClick={() => callActions.changePage(currentPage - 1, call)}
+              className="hide-controls-hidden"
+              css={{
+                ...paginationButtonStyles,
+                borderBottomRightRadius: 32,
+                borderTopRightRadius: 32,
+                left: 0,
+              }}
+            >
+              <Icon.ArrowNext css={{position: 'relative', right: 4, transform: 'rotate(180deg)'}} />
+            </div>
+          )}
+        </>
       )}
     </div>
   );

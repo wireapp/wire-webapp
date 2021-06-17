@@ -18,14 +18,16 @@
  */
 
 import React from 'react';
+import {VIDEO_STATE} from '@wireapp/avs';
 
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
-import {useKoSubscribable} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import Video from './Video';
 import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import type {Participant} from '../../calling/Participant';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 export interface GroupVideoGridTileProps {
   maximizedParticipant: Participant;
@@ -44,33 +46,54 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   maximizedParticipant,
   onParticipantDoubleClick,
 }) => {
-  const name = useKoSubscribable(participant.user.name);
-  const isMuted = useKoSubscribable(participant.isMuted);
-  const videoStream = useKoSubscribable(participant.videoStream);
-  const sharesScreen = useKoSubscribable(participant.sharesScreen);
-  const sharesCamera = useKoSubscribable(participant.sharesCamera);
-  const hasPausedVideo = useKoSubscribable(participant.hasPausedVideo);
-  const selfColor = useKoSubscribable(selfParticipant.user.accent_color);
-  const isActivelySpeaking = useKoSubscribable(participant.isActivelySpeaking);
+  const {isMuted, videoState, videoStream, isActivelySpeaking} = useKoSubscribableChildren(participant, [
+    'isMuted',
+    'videoStream',
+    'isActivelySpeaking',
+    'videoState',
+  ]);
+  const {name} = useKoSubscribableChildren(participant?.user, ['name']);
+  const {accent_color: selfColor} = useKoSubscribableChildren(selfParticipant?.user, ['accent_color']);
+
+  const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
+  const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
+  const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
+  const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
 
   return (
     <div
       data-uie-name="item-grid"
       css={{position: 'relative'}}
-      data-user-id={participant.user.id}
+      data-user-id={participant?.user.id}
       className="group-video-grid__element"
-      onDoubleClick={() => onParticipantDoubleClick(participant.user.id, participant.clientId)}
+      onDoubleClick={() => onParticipantDoubleClick(participant?.user.id, participant?.clientId)}
     >
-      <Video
-        autoPlay
-        playsInline
-        srcObject={videoStream}
-        className="group-video-grid__element-video"
-        css={{
-          objectFit: !!maximizedParticipant || sharesScreen ? 'contain' : 'cover',
-          transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
-        }}
-      />
+      {hasActiveVideo ? (
+        <Video
+          autoPlay
+          playsInline
+          srcObject={videoStream}
+          className="group-video-grid__element-video"
+          css={{
+            objectFit: !!maximizedParticipant || sharesScreen ? 'contain' : 'cover',
+            transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
+          }}
+        />
+      ) : (
+        <div
+          css={{
+            alignItems: 'center',
+            backgroundColor: '#33373a',
+            boxShadow: participantCount > 1 ? 'inset 0px 0px 0px 1px #000' : 'initial',
+            display: 'flex',
+            height: '100%',
+            justifyContent: 'center',
+            width: '100%',
+          }}
+        >
+          <Avatar avatarSize={minimized ? AVATAR_SIZE.MEDIUM : AVATAR_SIZE.LARGE} participant={participant?.user} />
+        </div>
+      )}
       <div
         css={{
           bottom: 0,
