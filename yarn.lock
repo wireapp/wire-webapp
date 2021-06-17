@@ -2945,10 +2945,10 @@
   dependencies:
     "@types/node" "~14"
 
-"@wireapp/webapp-events@0.10.4":
-  version "0.10.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.10.4.tgz#f0416774558f5fa37df977719b2db2c1344a2942"
-  integrity sha512-yNeir84X6MDg+2Ysou2FntB5MOS1z1S4XBKtL73u4bxWWc/XgxLuz+vPT2Ju5qm84St71K+ChLGrgPyXbQKLsg==
+"@wireapp/webapp-events@0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.11.0.tgz#c95dd482d194b4cef68c096a7aa440581d2ae189"
+  integrity sha512-CcEb4B1JRvr0Pqm7AWk4FzQKXZbISOffGchXkEDNcBj+nsixLkRQAfNqecDzvZogYRSfI4TvCC/gEFhybt6LWA==
 
 "@wireapp/websql@0.0.17":
   version "0.0.17"
@@ -4570,10 +4570,10 @@ cosmiconfig@^6.0.0:
     path-type "^4.0.0"
     yaml "^1.7.2"
 
-countly-sdk-web@20.11.1:
-  version "20.11.1"
-  resolved "https://registry.yarnpkg.com/countly-sdk-web/-/countly-sdk-web-20.11.1.tgz#e3d8c8edfea85d43f6be274367ee2d47e29a1aa0"
-  integrity sha512-X6Wl592NV3cdacTSsEIm6eCf/MjczU7MSYI+pkHfvW0kfYz/GWv0rjJ+kroAJHxEvv0SdlrO3FebRWQfmlGUvA==
+countly-sdk-web@20.11.2:
+  version "20.11.2"
+  resolved "https://registry.yarnpkg.com/countly-sdk-web/-/countly-sdk-web-20.11.2.tgz#26ad9c6fe27f36b6a12c0aaabb0c56bde7cd58ea"
+  integrity sha512-tPSUZabJAGBFI+9V44bv2emL4lvwOd8pJhwtqe8AROg0/mrWKnQHOIYzwhDf+A+TcalxMrdEzW7ctit/d/zl4g==
 
 cpr@3.0.1:
   version "3.0.1"
@@ -5602,10 +5602,10 @@ eslint-plugin-jest@24.3.6:
   dependencies:
     "@typescript-eslint/experimental-utils" "^4.0.1"
 
-eslint-plugin-jsdoc@35.2.0:
-  version "35.2.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-35.2.0.tgz#ee5fc4def4f3fda7546f0c06ac4bada6a7444a3a"
-  integrity sha512-kMka7QWeQkgenwfazdgmdiYojS2QMI+pWtv/+3gjQJBdCWGPNXPmPQr+WO5slhiTRA+3MO3b2ZnBflXtUmq7wA==
+eslint-plugin-jsdoc@35.3.0:
+  version "35.3.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-35.3.0.tgz#375410bc990b54d1a394b545b9faa92d8e05a065"
+  integrity sha512-caPF26GcTqU8e83kj6Zp5RLCNgf9ya8rGNxtk1aDAiUCF5KMqTKmOt28sjcejL99b0py3EC0ds8dOXsoFDVahA==
   dependencies:
     "@es-joy/jsdoccomment" "^0.8.0-alpha.2"
     comment-parser "1.1.5"
@@ -9241,10 +9241,10 @@ micromatch@^4.0.2, micromatch@^4.0.4:
     braces "^3.0.1"
     picomatch "^2.2.3"
 
-mime-db@1.47.0:
-  version "1.47.0"
-  resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.47.0.tgz#8cb313e59965d3c05cfbf898915a267af46a335c"
-  integrity sha512-QBmA/G2y+IfeS4oktet3qRZ+P5kPhCKRXxXnQEudYqUaEioAU1/Lq2us3D/t1Jfo4hE9REQPrbB7K5sOczJVIw==
+mime-db@1.48.0:
+  version "1.48.0"
+  resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.48.0.tgz#e35b31045dd7eada3aaad537ed88a33afbef2d1d"
+  integrity sha512-FM3QwxV+TnZYQ2aRqhlKBMHxk10lTbMt3bBkMAp54ddrNeVSfcQYOOKuGuy3Ddrm38I04If834fOUSq1yzslJQ==
 
 mime-db@~1.12.0:
   version "1.12.0"
@@ -9258,12 +9258,12 @@ mime-types@2.0.x:
   dependencies:
     mime-db "~1.12.0"
 
-mime-types@^2.1.12, mime-types@^2.1.27, mime-types@^2.1.30, mime-types@~2.1.19:
-  version "2.1.30"
-  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.30.tgz#6e7be8b4c479825f85ed6326695db73f9305d62d"
-  integrity sha512-crmjA4bLtR8m9qLpHvgxSChT+XoSlZi8J4n/aIdn3z92e/U47Z0V/yl+Wh9W046GgFVAmoNR/fmdbZYcSSIUeg==
+mime-types@^2.1.12, mime-types@^2.1.27, mime-types@^2.1.31, mime-types@~2.1.19:
+  version "2.1.31"
+  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.31.tgz#a00d76b74317c61f9c2db2218b8e9f8e9c5c9e6b"
+  integrity sha512-XGZnNzm3QvgKxa8dpzyhFTHmpP3l5YNusmne07VUOXxou9CqUqYa/HBy124RqtVh/O2pECas/MOcsDgpilPOPg==
   dependencies:
-    mime-db "1.47.0"
+    mime-db "1.48.0"
 
 mime@^1.4.1:
   version "1.6.0"
@@ -13963,15 +13963,15 @@ webpack-cli@4.7.2:
     v8-compile-cache "^2.2.0"
     webpack-merge "^5.7.3"
 
-webpack-dev-middleware@4.3.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-4.3.0.tgz#179cc40795882cae510b1aa7f3710cbe93c9333e"
-  integrity sha512-PjwyVY95/bhBh6VUqt6z4THplYcsvQ8YNNBTBM873xLVmw8FLeALn0qurHbs9EmcfhzQis/eoqypSnZeuUz26w==
+webpack-dev-middleware@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/webpack-dev-middleware/-/webpack-dev-middleware-5.0.0.tgz#0abe825275720e0a339978aea5f0b03b140c1584"
+  integrity sha512-9zng2Z60pm6A98YoRcA0wSxw1EYn7B7y5owX/Tckyt9KGyULTkLtiavjaXlWqOMkM0YtqGgL3PvMOFgyFLq8vw==
   dependencies:
     colorette "^1.2.2"
     mem "^8.1.1"
     memfs "^3.2.2"
-    mime-types "^2.1.30"
+    mime-types "^2.1.31"
     range-parser "^1.2.1"
     schema-utils "^3.0.0"
 
