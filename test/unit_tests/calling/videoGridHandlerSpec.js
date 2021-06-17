@@ -66,7 +66,7 @@ describe('videoGridHandler', () => {
         ];
 
         const participantsObs = ko.observable([]);
-        const selfUser = new User();
+        const selfUser = new User('self_id');
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
         const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL, {
@@ -79,8 +79,11 @@ describe('videoGridHandler', () => {
         tests.forEach(({oldParticipants, newParticipants, expected, scenario}) => {
           participantsObs([selfParticipant, ...oldParticipants]);
           participantsObs([selfParticipant, ...newParticipants]);
-
-          expect(grid().grid.map(toParticipantId)).toEqual(expected.map(toParticipantId), scenario);
+          let result = expected.map(toParticipantId);
+          if (expected.length > 1) {
+            result = [selfParticipant.user.id, ...expected.map(toParticipantId)];
+          }
+          expect(grid().grid.map(toParticipantId)).toEqual(result, scenario);
         });
       });
     });

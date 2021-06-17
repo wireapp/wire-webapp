@@ -67,8 +67,8 @@ describe('fullscreenVideoCall', () => {
           videoInput: ko.observable(''),
         },
       } as MediaDevicesHandler,
-      multitasking: {autoMinimize: ko.observable(false), isMinimized: ko.observable(false)},
-      videoGrid: {grid: [], hasRemoteVideo: false, thumbnail: null} as Grid,
+      multitasking: {isMinimized: ko.observable(false)},
+      videoGrid: {grid: [], thumbnail: null} as Grid,
       videoInput: [],
     };
     return props as FullscreenVideoCallProps;
@@ -122,7 +122,8 @@ describe('fullscreenVideoCall', () => {
     props.callActions.setVideoSpeakersActiveTab = () => {};
     props.call.addParticipant(new Participant(new User('a'), 'a'));
     props.call.addParticipant(new Participant(new User('b'), 'b'));
-    props.call.addParticipant(new Participant(new User('c'), 'c'));
+    props.call.addParticipant(new Participant(new User('c'), 'd'));
+    props.call.addParticipant(new Participant(new User('e'), 'f'));
 
     const fullscreenVideoCall = new FullscreenVideoCallPage(props);
     const activeSpeakerToggle = fullscreenVideoCall.getActiveSpeakerToggle();

@@ -152,9 +152,7 @@ export class MainViewModel {
     this.modals = modals;
 
     this.multitasking = {
-      autoMinimize: ko.observable(true),
       isMinimized: ko.observable(false),
-      resetMinimize: ko.observable(false),
     };
 
     this.selfUser = this.userState.self;

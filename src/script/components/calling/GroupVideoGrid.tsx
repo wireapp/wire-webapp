@@ -20,7 +20,7 @@
 import React, {useState, useEffect, CSSProperties} from 'react';
 import {css} from '@emotion/core';
 
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 import type {Grid} from '../../calling/videoGridHandler';
@@ -28,6 +28,7 @@ import Video from './Video';
 import type {Participant} from '../../calling/Participant';
 import GroupVideoGridTile from './GroupVideoGridTile';
 import ParticipantMicOnIcon from './ParticipantMicOnIcon';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 export interface GroupVideoGripProps {
   grid: Grid;
@@ -48,6 +49,27 @@ const calculateRowsAndColumns = (totalCount: number): RowsAndColumns => {
   const rows = Math.ceil(totalCount / columns);
   return {'--columns': columns, '--rows': rows};
 };
+
+const GroupVideoThumbnailWrapper: React.FC<{minimized: boolean}> = ({minimized, children}) => (
+  <div
+    className="group-video__thumbnail"
+    css={
+      minimized
+        ? css`
+            top: unset;
+            right: 8px;
+            bottom: 8px;
+            width: 80px;
+            height: 60px;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+          `
+        : undefined
+    }
+    data-uie-name="self-video-thumbnail-wrapper"
+  >
+    {children}
+  </div>
+);
 
 const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   minimized = false,
@@ -95,15 +117,17 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
 
-  const selfName = useKoSubscribable(selfParticipant.user.name);
-  const selfIsMuted = useKoSubscribable(selfParticipant.isMuted);
-  const selfIsActivelySpeaking = useKoSubscribable(selfParticipant.isActivelySpeaking);
+  const {isMuted: selfIsMuted, isActivelySpeaking: selfIsActivelySpeaking} = useKoSubscribableChildren(
+    selfParticipant,
+    ['isMuted', 'isActivelySpeaking'],
+  );
+  const {name: selfName} = useKoSubscribableChildren(selfParticipant?.user, ['name']);
 
   return (
     <div className="group-video">
       <div
         className="group-video-grid"
-        css={{backgroundColor: '#323739'}}
+        css={{backgroundColor: '#000'}}
         style={rowsAndColumns}
         data-uie-name="grids-wrapper"
       >
@@ -144,21 +168,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
         ))}
       </div>
       {thumbnailVideoStream && !maximizedParticipant && (
-        <div
-          className="group-video__thumbnail"
-          css={
-            minimized
-              ? css`
-                  top: unset;
-                  right: 8px;
-                  bottom: 8px;
-                  width: 80px;
-                  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
-                `
-              : undefined
-          }
-          data-uie-name="self-video-thumbnail-wrapper"
-        >
+        <GroupVideoThumbnailWrapper minimized={minimized}>
           <Video
             className="group-video__thumbnail-video"
             autoPlay
@@ -195,7 +205,25 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               {selfName}
             </span>
           </div>
-        </div>
+        </GroupVideoThumbnailWrapper>
+      )}
+      {!!grid.thumbnail && !thumbnailHasActiveVideo && !!selfParticipant && (
+        <GroupVideoThumbnailWrapper minimized={minimized}>
+          <div
+            css={{
+              alignItems: 'center',
+              display: 'flex',
+              height: '100%',
+              justifyContent: 'center',
+              width: '100%',
+            }}
+          >
+            <Avatar
+              avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
+              participant={selfParticipant.user}
+            />
+          </div>
+        </GroupVideoThumbnailWrapper>
       )}
     </div>
   );
@@ -204,7 +232,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
 export default GroupVideoGrid;
 
 registerReactComponent('group-video-grid', {
+  bindings:
+    'grid: ko.unwrap(grid), selfParticipant: ko.unwrap(selfParticipant), maximizedParticipant: ko.unwrap(maximizedParticipant), minimized, muted: ko.unwrap(muted)',
   component: GroupVideoGrid,
-  template:
-    '<div class="group-video-wrapper" data-bind="react: {grid: ko.unwrap(grid), selfParticipant: ko.unwrap(selfParticipant), maximizedParticipant: ko.unwrap(maximizedParticipant), minimized, muted: ko.unwrap(muted)}"></div>',
 });
