@@ -70,6 +70,6 @@ const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({reposi
 export default ParticipantDevicesPanel;
 
 registerReactComponent('participant-devices-panel', {
-  bindings: 'onClose, onGoBack, repositories, user: ko.unwrap(user)',
+  bindings: 'onClose, onGoBack, repositories, user',
   component: ParticipantDevicesPanel,
 });
