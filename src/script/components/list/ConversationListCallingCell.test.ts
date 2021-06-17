@@ -58,13 +58,14 @@ const createCall = (state: CALL_STATE, selfUser = new User(createRandomUuid()), 
 };
 
 const createProps = async () => {
-  const mockCallingRepository = {
+  const mockCallingRepository: Partial<CallingRepository> = {
     supportsScreenSharing: true,
-  } as unknown as CallingRepository;
+  };
 
-  const mockTeamState = {
+  const mockTeamState: Partial<TeamState> = {
     isExternal: () => false,
-  } as unknown as TeamState;
+  };
+
   const conversation = new Conversation();
   conversation.participating_user_ets([new User('id')]);
   return {
