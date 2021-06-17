@@ -312,7 +312,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       <Icon.Hangup className="small-icon" style={{maxWidth: 17}} />
                     </div>
                   )}
-                  {isIncoming && !isDeclined && (
+                  {isIncoming && (
                     <div
                       className="call-ui__button call-ui__button--green call-ui__button--large"
                       onClick={() => callActions.answer(call)}
