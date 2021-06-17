@@ -34,6 +34,7 @@ import {validateHandle} from '../user/UserHandleGenerator';
 import 'Components/list/ParticipantItem';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
+import {TeamState} from '../team/TeamState';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -63,6 +64,7 @@ interface UserListParams {
   showEmptyAdmin: boolean;
   skipSearch: boolean;
   teamRepository: TeamRepository;
+  teamState: TeamState;
   truncate: boolean;
   user: ko.Observable<User[]>;
   userState?: UserState;
@@ -75,12 +77,12 @@ const listTemplate = (data: string, uieName: string = ''): string => `
       ${uieName ? ` data-uie-name="${uieName}"` : ''}>
     <!-- ko if: noSelfInteraction && user.isMe -->
       <participant-item
-        params="participant: user, noUnderline: noUnderline, highlighted: highlightedUserIds.includes(user.id), noInteraction: true, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified">
+        params="participant: user, noUnderline: noUnderline, highlighted: highlightedUserIds.includes(user.id), noInteraction: true, customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamState.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified">
       </participant-item>
     <!-- /ko -->
     <!-- ko ifnot: noSelfInteraction && user.isMe -->
       <participant-item
-        params="participant: user, noUnderline: noUnderline, showArrow: arrow, highlighted: highlightedUserIds.includes(user.id), customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamRepository.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
+        params="participant: user, noUnderline: noUnderline, showArrow: arrow, highlighted: highlightedUserIds.includes(user.id), customInfo: infos && infos()[user.id], canSelect: isSelectEnabled, isSelected: isSelected(user), mode: mode, external: teamState.isExternal(user.id), selfInTeam: selfInTeam, isSelfVerified: isSelfVerified"
         data-bind="click: (viewmodel, event) => onUserClick(user, event)">
       </participant-item>
     <!-- /ko -->
@@ -146,9 +148,11 @@ ko.components.register('user-list', {
     noSelfInteraction = false,
     userState = container.resolve(UserState),
     conversationState = container.resolve(ConversationState),
+    teamState = container.resolve(TeamState),
   }: UserListParams): void {
     this.userState = userState;
     this.conversationState = conversationState;
+    this.teamState = teamState;
 
     this.filter = filter;
     this.mode = mode;

@@ -31,7 +31,8 @@ import {CallingCellProps, ConversationListCallingCell} from './ConversationListC
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 import {CallActions, VideoSpeakersTab} from 'src/script/view_model/CallingViewModel';
-import {TestFactory} from 'test/helper/TestFactory';
+import {CallingRepository} from 'src/script/calling/CallingRepository';
+import {TeamState} from 'src/script/team/TeamState';
 
 class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   constructor(props?: CallingCellProps) {
@@ -57,27 +58,25 @@ const createCall = (state: CALL_STATE, selfUser = new User(createRandomUuid()), 
 };
 
 const createProps = async () => {
-  const testFactory = new TestFactory();
+  const mockCallingRepository = {
+    supportsScreenSharing: true,
+  } as unknown as CallingRepository;
 
-  await testFactory.exposeCallingActors();
-  testFactory.calling_repository['callState'].isMuted(false);
-  jest.spyOn(testFactory.calling_repository, 'supportsScreenSharing', 'get').mockReturnValue(true);
-
-  await testFactory.exposeTeamActors();
-  jest.spyOn(testFactory.team_repository, 'isExternal').mockImplementation(() => false);
-
+  const mockTeamState = {
+    isExternal: () => false,
+  } as unknown as TeamState;
   const conversation = new Conversation();
   conversation.participating_user_ets([new User('id')]);
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,
-    callingRepository: testFactory.calling_repository,
+    callingRepository: mockCallingRepository,
     conversation,
     hasAccessToCamera: true,
     isSelfVerified: true,
     maximizedTileVideoParticipant: undefined,
     multitasking: {isMinimized: ko.observable(false)},
-    teamRepository: testFactory.team_repository,
+    teamState: mockTeamState,
     videoGrid: {grid: [], thumbnail: undefined},
     videoSpeakersActiveTab: VideoSpeakersTab.ALL,
   } as CallingCellProps;

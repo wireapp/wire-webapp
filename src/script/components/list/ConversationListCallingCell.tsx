@@ -41,11 +41,11 @@ import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
-import type {TeamRepository} from '../../team/TeamRepository';
 import {Participant} from '../../calling/Participant';
 import {createNavigate} from '../../router/routerBindings';
 import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {TeamState} from '../../team/TeamState';
 
 export interface CallingCellProps {
   call: Call;
@@ -57,7 +57,7 @@ export interface CallingCellProps {
   isSelfVerified: boolean;
   maximizedTileVideoParticipant: Participant;
   multitasking: Multitasking;
-  teamRepository: TeamRepository;
+  teamState?: TeamState;
   temporaryUserStyle?: boolean;
   videoGrid: Grid;
   videoSpeakersActiveTab: VideoSpeakersTab;
@@ -74,8 +74,8 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   videoGrid,
   hasAccessToCamera,
   isSelfVerified,
-  teamRepository,
   callingRepository,
+  teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }) => {
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
@@ -345,7 +345,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         callParticipant={participant}
                         selfInTeam={selfUser?.inTeam()}
                         isSelfVerified={isSelfVerified}
-                        external={teamRepository.isExternal(participant.user.id)}
+                        external={teamState.isExternal(participant.user.id)}
                       />
                     ))}
                 </div>
@@ -369,7 +369,6 @@ registerReactComponent('conversation-list-calling-cell', {
     isSelfVerified: ko.unwrap(isSelfVerified), 
     maximizedTileVideoParticipant: ko.unwrap(maximizedTileVideoParticipant),
     multitasking,
-    teamRepository,
     temporaryUserStyle,
     videoGrid: ko.unwrap(videoGrid),
     videoSpeakersActiveTab: ko.unwrap(videoSpeakersActiveTab)
