@@ -26,6 +26,7 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 import {User} from '../entity/User';
 import {UserState} from '../user/UserState';
 import {TeamEntity} from './TeamEntity';
+import {ROLE} from '../user/UserPermission';
 
 @singleton()
 export class TeamState {
@@ -86,4 +87,8 @@ export class TeamState {
       return appLock?.config?.inactivityTimeoutSecs;
     });
   }
+
+  readonly isExternal = (userId: string): boolean => {
+    return this.memberRoles()[userId] === ROLE.PARTNER;
+  };
 }
