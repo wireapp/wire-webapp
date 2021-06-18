@@ -131,6 +131,6 @@ describe('fullscreenVideoCall', () => {
     const inactiveButton = activeSpeakerToggle.find('[data-uie-value="inactive"]');
     fullscreenVideoCall.click(inactiveButton.first());
 
-    expect(setMaximizedSpy).toHaveBeenCalledWith(null);
+    expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
   });
 });
