@@ -18,10 +18,14 @@
  */
 
 import ko from 'knockout';
+import React from 'react';
 
 import type {Router} from './Router';
 
+let router: Router;
+
 export function initRouterBindings(routerInstance: Router): void {
+  router = routerInstance;
   ko.bindingHandlers.link_to = {
     init(element: Node, valueAccessor): void {
       const navigate = (event: Event) => {
@@ -34,3 +38,10 @@ export function initRouterBindings(routerInstance: Router): void {
     },
   };
 }
+
+export const createNavigate =
+  (link: string): React.MouseEventHandler =>
+  (event: React.MouseEvent<Element, MouseEvent>) => {
+    router?.navigate(link);
+    event.preventDefault();
+  };
