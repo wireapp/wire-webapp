@@ -1015,9 +1015,6 @@ export class ConversationRepository {
           },
           text: t('modalConversationJoinConfirm'),
         },
-        secondaryAction: {
-          action: () => {},
-        },
         text: {
           message: t('modalConversationJoinMessage', {conversationName}),
           title: t('modalConversationJoinHeadline'),
