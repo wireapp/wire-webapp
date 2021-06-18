@@ -60,7 +60,6 @@ export interface CallingCellProps {
   teamState?: TeamState;
   temporaryUserStyle?: boolean;
   videoGrid: Grid;
-  videoSpeakersActiveTab: VideoSpeakersTab;
 }
 
 export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
@@ -70,7 +69,6 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   callActions,
   multitasking,
   maximizedTileVideoParticipant,
-  videoSpeakersActiveTab,
   videoGrid,
   hasAccessToCamera,
   isSelfVerified,
@@ -97,7 +95,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
 
-  const {isMuted} = useKoSubscribableChildren(callState, ['isMuted']);
+  const {isMuted, videoSpeakersActiveTab} = useKoSubscribableChildren(callState, ['isMuted', 'videoSpeakersActiveTab']);
 
   const isStillOngoing = reason === CALL_REASON.STILL_ONGOING;
   const isDeclined = [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
@@ -370,8 +368,7 @@ registerReactComponent('conversation-list-calling-cell', {
     maximizedTileVideoParticipant: ko.unwrap(maximizedTileVideoParticipant),
     multitasking,
     temporaryUserStyle,
-    videoGrid: ko.unwrap(videoGrid),
-    videoSpeakersActiveTab: ko.unwrap(videoSpeakersActiveTab)
+    videoGrid: ko.unwrap(videoGrid)
   }"></div>
     `,
 });
