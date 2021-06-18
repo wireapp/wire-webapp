@@ -120,7 +120,6 @@ export class CallingViewModel {
     );
     this.maximizedTileVideoParticipant = ko.observable(null);
     this.onChooseScreen = () => {};
-    this.videoSpeakersActiveTab = callState.videoSpeakersActiveTab;
 
     const ring = (call: Call): void => {
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {
