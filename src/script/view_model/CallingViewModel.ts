@@ -118,7 +118,6 @@ export class CallingViewModel {
     this.isChoosingScreen = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
-    this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTab.ALL);
     this.maximizedTileVideoParticipant = ko.observable(null);
     this.onChooseScreen = () => {};
 
@@ -187,7 +186,7 @@ export class CallingViewModel {
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
-        this.videoSpeakersActiveTab(VideoSpeakersTab.ALL);
+        callState.videoSpeakersActiveTab(VideoSpeakersTab.ALL);
         this.maximizedTileVideoParticipant(null);
       },
       reject: (call: Call) => {
@@ -197,7 +196,7 @@ export class CallingViewModel {
         this.maximizedTileVideoParticipant(participant);
       },
       setVideoSpeakersActiveTab: (tab: string) => {
-        this.videoSpeakersActiveTab(tab);
+        callState.videoSpeakersActiveTab(tab);
       },
       startAudio: (conversationEntity: Conversation): void => {
         startCall(conversationEntity, CALL_TYPE.NORMAL);
