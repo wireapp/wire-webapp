@@ -37,17 +37,10 @@ const releaseParam = process.argv[4] || '';
 const commitSha = process.env.GITHUB_SHA || 'COMMIT_ID';
 const commitShaLength = 7;
 const commitShortSha = commitSha.substring(0, commitShaLength - 1);
-const configurationEntry = distributionParam
-  ? `wire-web-config-default-${distributionParam}`
-  : `wire-web-config-default-${currentBranch === 'master' ? 'master' : 'staging'}`;
-const dependencies = {
-  ...appConfigPkg.dependencies,
-  ...appConfigPkg.devDependencies,
-  ...appConfigPkg.peerDependencies,
-  ...appConfigPkg.optionalDependencies,
-};
-
-const configVersion = dependencies[configurationEntry].split('#')[1];
+const configurationEntry = `wire-web-config-default-${
+  distributionParam ? distributionParam : currentBranch === 'master' ? 'master' : 'staging'
+}`;
+const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
 const repository = `${dockerRegistryDomain}/wire/webapp${distributionParam ? `-${distributionParam}` : ''}`;
 

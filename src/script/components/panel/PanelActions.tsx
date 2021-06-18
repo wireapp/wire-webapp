@@ -54,6 +54,5 @@ export default PanelActions;
 
 registerReactComponent('panel-actions', {
   component: PanelActions,
-  optionalParams: ['items'],
   template: '<div class="panel-actions" data-bind="react: {items: ko.unwrap(items)}"></div>',
 });

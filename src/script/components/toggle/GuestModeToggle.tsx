@@ -68,7 +68,6 @@ export default GuestModeToggle;
 
 registerReactComponent('guest-mode-toggle', {
   component: GuestModeToggle,
-  optionalParams: ['extendedInfo', 'isDisabled'],
   template:
     '<div class="guest-mode-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle, extendedInfo}"></div>',
 });

@@ -63,7 +63,6 @@ export default AssetLoader;
 
 registerReactComponent('asset-loader', {
   component: AssetLoader,
-  optionalParams: ['large'],
   template:
     '<div class="asset-loader" data-bind="react: {large, loadProgress: ko.unwrap(loadProgress), onCancel}"></div>',
 });
