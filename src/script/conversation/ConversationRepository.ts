@@ -976,22 +976,21 @@ export class ConversationRepository {
     };
 
     try {
-      // const {id: conversationId, name: conversationName} = await this.conversation_service.getConversationJoin(
-      //   key,
-      //   code,
-      // );
-      // const knownConversation = this.conversationState.findConversation(conversationId);
-      // if (knownConversation) {
-      //   amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation);
-      //   return;
-      // }
+      const {id: conversationId, name: conversationName} = await this.conversation_service.getConversationJoin(
+        key,
+        code,
+      );
+      const knownConversation = this.conversationState.findConversation(conversationId);
+      if (knownConversation) {
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation);
+        return;
+      }
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
         primaryAction: {
           action: async () => {
             try {
               const response = await this.conversation_service.postConversationJoin(key, code);
-              // const conversationEntity = await this.getConversationById(conversationId);
-              const conversationEntity = await this.getConversationById(response.conversation);
+              const conversationEntity = await this.getConversationById(conversationId);
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }
@@ -1020,8 +1019,8 @@ export class ConversationRepository {
           action: () => {},
         },
         text: {
-          message: t('modalConversationJoinMessage', {conversationName: 'unknown'}),
-          title: '', //t('modalConversationJoinHeadline'),
+          message: t('modalConversationJoinMessage', {conversationName}),
+          title: t('modalConversationJoinHeadline'),
         },
       });
     } catch (error) {
