@@ -981,7 +981,7 @@ export class ConversationRepository {
         code,
       );
       const knownConversation = this.conversationState.findConversation(conversationId);
-      if (knownConversation) {
+      if (knownConversation && knownConversation.status() === ConversationStatus.CURRENT_MEMBER) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation);
         return;
       }
