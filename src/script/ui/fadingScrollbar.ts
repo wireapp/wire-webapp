@@ -26,11 +26,14 @@ export const useFadingScrollbar = (element: HTMLElement): void => {
       return undefined;
     }
     const animationSpeed = 12;
+
     function parseColor(color: string) {
-      const ctx = document.createElement('canvas').getContext('2d');
-      ctx.fillStyle = color;
-      ctx.fillRect(0, 0, 1, 1);
-      return ctx.getImageData(0, 0, 1, 1).data;
+      const el = document.body.appendChild(document.createElement('thiselementdoesnotexist'));
+      el.style.color = color;
+      const col = getComputedStyle(el).color;
+      document.body.removeChild(el);
+      const [, r, g, b, a = 1] = /rgba?\((\d+), *(\d+), *(\d+),? *(\d*\.?\d*)?\)/.exec(col) ?? [0, 0, 0, 0, 1];
+      return [+r, +g, +b, +a];
     }
 
     const initialColor = parseColor(window.getComputedStyle(element).getPropertyValue('--scrollbar-color'));

@@ -1064,5 +1064,7 @@
   "modalConversationJoinFullMessage": "The conversation is full.",
   "modalConversationJoinConfirm": "Join",
   "modalConversationJoinMessage": "You have been invited to a conversation: {{conversationName}}",
-  "modalConversationJoinHeadline": ""
+  "modalConversationJoinHeadline": "",
+  "videoSpeakersTabSpeakers": "Speakers",
+  "videoSpeakersTabAll": "All ({{count}})"
 }

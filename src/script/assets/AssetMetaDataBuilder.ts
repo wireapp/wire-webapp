@@ -141,7 +141,7 @@ const normalizeLoudness = (audioBuffer: AudioBuffer): Uint8Array => {
   const AMPLIFIER = 700; // in favour of iterating all samples before we interpolate them
   const channel = audioBuffer.getChannelData(0);
   const bucketSize = channel.length / MAX_SAMPLES;
-  const buckets = chunk(channel, bucketSize) as Float32Array[];
+  const buckets = chunk(channel, bucketSize);
 
   const audioPreview = buckets.map(bucket => {
     return capToByte(AMPLIFIER * rootMeanSquare(bucket));

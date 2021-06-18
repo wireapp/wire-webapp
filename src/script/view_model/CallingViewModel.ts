@@ -44,9 +44,11 @@ import type {Participant} from '../calling/Participant';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
+import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 
 export interface CallActions {
   answer: (call: Call) => void;
+  changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
   setMaximizedTileVideoParticipant: (participant: Participant) => void;
@@ -60,12 +62,15 @@ export interface CallActions {
   toggleScreenshare: (call: Call) => void;
 }
 
-export const VideoSpeakersTabs = {
-  speakers: 'speakers',
-  // explicitly disabled.
-  // eslint-disable-next-line sort-keys-fix/sort-keys-fix
-  all: 'all',
-};
+export enum VideoSpeakersTab {
+  ALL = 'all',
+  SPEAKERS = 'speakers',
+}
+
+export const VideoSpeakersTabs: ButtonGroupTab[] = [
+  {getText: () => t('videoSpeakersTabSpeakers'), value: VideoSpeakersTab.SPEAKERS},
+  {getText: substitute => t('videoSpeakersTabAll', substitute), value: VideoSpeakersTab.ALL},
+];
 
 declare global {
   interface HTMLAudioElement {
@@ -113,7 +118,7 @@ export class CallingViewModel {
     this.isChoosingScreen = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
-    this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTabs.all);
+    this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTab.ALL);
     this.maximizedTileVideoParticipant = ko.observable(null);
     this.onChooseScreen = () => {};
 
@@ -177,9 +182,12 @@ export class CallingViewModel {
           this.callingRepository.answerCall(call);
         }
       },
+      changePage: (newPage, call) => {
+        this.callingRepository.changeCallPage(newPage, call);
+      },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
-        this.videoSpeakersActiveTab(VideoSpeakersTabs.all);
+        this.videoSpeakersActiveTab(VideoSpeakersTab.ALL);
         this.maximizedTileVideoParticipant(null);
       },
       reject: (call: Call) => {
@@ -245,10 +253,6 @@ export class CallingViewModel {
 
   getVideoGrid(call: Call): ko.PureComputed<Grid> {
     return getGrid(call);
-  }
-
-  hasVideos(call: Call): boolean {
-    return !!call.participants().find(participant => participant.hasActiveVideo());
   }
 
   isIdle(call: Call): boolean {

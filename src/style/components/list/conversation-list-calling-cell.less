@@ -74,17 +74,17 @@
     &--participants {
       font-weight: @font-weight-regular;
 
-      chevron-icon {
+      .chevron {
         margin-left: 8px;
 
-        svg path {
+        path {
           fill: currentcolor;
         }
       }
     }
 
     &--active&--participants {
-      chevron-icon {
+      .chevron {
         transform: rotate(-180deg);
       }
     }
@@ -161,17 +161,10 @@
   }
 }
 
-.small-icon {
-  > svg {
-    max-width: 12px;
-    max-height: 12px;
-  }
-}
-
-hangup-icon.small-icon {
-  > svg {
-    max-width: 17px;
-  }
+.small-icon > svg,
+svg.small-icon {
+  max-width: 12px;
+  max-height: 12px;
 }
 
 conversation-list-calling-cell {
