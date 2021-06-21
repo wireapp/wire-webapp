@@ -24,7 +24,7 @@ import {instantiateComponent} from '../../../helper/knockoutHelpers';
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
-import 'src/script/components/list/conversationListCallingCell';
+import 'src/script/components/list/ConversationListCallingCell';
 import {User} from 'src/script/entity/User';
 
 function createCall(state, selfUser = new User(createRandomUuid())) {
