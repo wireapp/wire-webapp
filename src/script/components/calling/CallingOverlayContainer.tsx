@@ -160,7 +160,6 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
           maximizedParticipant={maximizedParticipant}
-          videoInput={mediaDevicesHandler.availableDevices.videoInput()}
           mediaDevicesHandler={mediaDevicesHandler}
           isMuted={isMuted}
           isChoosingScreen={isChoosingScreen}
