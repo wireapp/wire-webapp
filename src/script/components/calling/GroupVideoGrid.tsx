@@ -45,8 +45,8 @@ interface RowsAndColumns extends CSSProperties {
 }
 
 const calculateRowsAndColumns = (totalCount: number): RowsAndColumns => {
-  const columns = Math.ceil(Math.sqrt(totalCount));
-  const rows = Math.ceil(totalCount / columns);
+  const columns = totalCount ? Math.ceil(Math.sqrt(totalCount)) : 1;
+  const rows = totalCount ? Math.ceil(totalCount / columns) : 1;
   return {'--columns': columns, '--rows': rows};
 };
 
@@ -97,7 +97,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     };
   }, [grid]);
 
-  const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid.grid.length));
+  const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid?.grid.length));
 
   const doubleClickedOnVideo = (userId: string, clientId: string) => {
     if (maximizedParticipant !== null) {

@@ -30,7 +30,7 @@ import {t} from 'Util/LocalizerUtil';
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import type {CallingRepository} from '../calling/CallingRepository';
-import {getGrid, Grid} from '../calling/videoGridHandler';
+import {getGridComputed, Grid} from '../calling/videoGridHandler';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
@@ -251,7 +251,7 @@ export class CallingViewModel {
   }
 
   getVideoGrid(call: Call): ko.PureComputed<Grid> {
-    return getGrid(call);
+    return getGridComputed(call);
   }
 
   isIdle(call: Call): boolean {
