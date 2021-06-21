@@ -17,7 +17,7 @@
     "@types/fs-extra": "9.0.11",
     "@types/rimraf": "3.0.0",
     "jasmine": "3.7.0",
-    "typescript": "4.2.4"
+    "typescript": "4.3.4"
   },
   "files": [
     "src",

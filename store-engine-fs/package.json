@@ -9,7 +9,7 @@
     "@wireapp/store-engine": "4.9.2",
     "jasmine": "3.7.0",
     "nyc": "15.1.0",
-    "typescript": "4.2.4"
+    "typescript": "4.3.4"
   },
   "description": "Store Engine implementation for Node.js' File System.",
   "files": [
