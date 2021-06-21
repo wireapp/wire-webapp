@@ -66,6 +66,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     'joinedCall',
   ]);
   const currentOngoingCall = joinedCall as Call;
+  const {maximizedParticipant} = useKoSubscribableChildren(joinedCall, ['maximizedParticipant']);
 
   const onCancelScreenSelection = () => {
     setSelectableScreens([]);
@@ -158,7 +159,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           conversation={getConversationById(currentOngoingCall.conversationId)}
           multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
-          maximizedParticipant={currentOngoingCall.maximizedParticipant()}
+          maximizedParticipant={maximizedParticipant}
           videoInput={mediaDevicesHandler.availableDevices.videoInput()}
           mediaDevicesHandler={mediaDevicesHandler}
           isMuted={isMuted}
