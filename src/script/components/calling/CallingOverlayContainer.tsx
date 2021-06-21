@@ -18,7 +18,7 @@
  */
 
 import ReactDOM from 'react-dom';
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, useMemo, useState} from 'react';
 import {container} from 'tsyringe';
 import {CALL_TYPE} from '@wireapp/avs';
 
@@ -28,7 +28,7 @@ import {ConversationState} from '../../conversation/ConversationState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Call} from '../../calling/Call';
 import {Multitasking} from '../../notification/NotificationRepository';
-import {getGrid, Grid} from '../../calling/videoGridHandler';
+import {getGrid} from '../../calling/videoGridHandler';
 import {Conversation} from '../../entity/Conversation';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {MediaDevicesHandler, ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
@@ -60,20 +60,27 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const isChoosingScreen = selectableScreens.length > 0 || selectableWindows.length > 0;
 
   const {isMinimized} = useKoSubscribableChildren(multitasking as {isMinimized: ko.Observable}, ['isMinimized']);
-  const {isMuted, videoSpeakersActiveTab, joinedCall} = useKoSubscribableChildren(callState, [
+  const {
+    isMuted,
+    videoSpeakersActiveTab,
+    joinedCall,
+  }: {isMuted: boolean; joinedCall: Call; videoSpeakersActiveTab: string} = useKoSubscribableChildren(callState, [
     'isMuted',
     'videoSpeakersActiveTab',
     'joinedCall',
   ]);
-  const currentOngoingCall = joinedCall as Call;
+  const {maximizedParticipant, pages, currentPage, participants} = useKoSubscribableChildren(joinedCall, [
+    'maximizedParticipant',
+    'pages',
+    'currentPage',
+    'participants',
+  ]);
+
+  const videoGrid = useMemo(() => joinedCall && getGrid(joinedCall), [joinedCall, participants, pages, currentPage]);
 
   const onCancelScreenSelection = () => {
     setSelectableScreens([]);
     setSelectableWindows([]);
-  };
-
-  const getVideoGrid = (call: Call): Grid => {
-    return getGrid(call)();
   };
 
   const getConversationById = (conversationId: string): Conversation => {
@@ -142,23 +149,23 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     });
   };
 
-  const conversation = conversationState.findConversation(currentOngoingCall?.conversationId);
-  if (!currentOngoingCall || !conversation || conversation.removed_from_conversation()) {
+  const conversation = conversationState.findConversation(joinedCall?.conversationId);
+  if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
   }
 
   return (
     <Fragment>
-      {!isMinimized && (
+      {!isMinimized && videoGrid && (
         <FullscreenVideoCall
-          key={currentOngoingCall.conversationId}
-          videoGrid={getVideoGrid(currentOngoingCall)}
-          call={currentOngoingCall}
+          key={joinedCall.conversationId}
+          videoGrid={videoGrid}
+          call={joinedCall}
           videoSpeakersActiveTab={videoSpeakersActiveTab}
-          conversation={getConversationById(currentOngoingCall.conversationId)}
+          conversation={getConversationById(joinedCall.conversationId)}
           multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
-          maximizedParticipant={currentOngoingCall.maximizedParticipant()}
+          maximizedParticipant={maximizedParticipant}
           videoInput={mediaDevicesHandler.availableDevices.videoInput()}
           mediaDevicesHandler={mediaDevicesHandler}
           isMuted={isMuted}
