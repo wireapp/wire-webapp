@@ -17,7 +17,7 @@
  *
  */
 
-import {getGrid} from 'src/script/calling/videoGridHandler';
+import {getGridComputed} from 'src/script/calling/videoGridHandler';
 import {Participant} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
 import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
@@ -35,7 +35,7 @@ describe('videoGridHandler', () => {
     ];
   });
 
-  describe('getGrid', () => {
+  describe('getGridComputed', () => {
     describe('people leaving call', () => {
       it('removes people from the grid', () => {
         const tests = [
@@ -75,7 +75,7 @@ describe('videoGridHandler', () => {
           },
         });
         call.participants = participantsObs;
-        const grid = getGrid(call);
+        const grid = getGridComputed(call);
         tests.forEach(({oldParticipants, newParticipants, expected, scenario}) => {
           participantsObs([selfParticipant, ...oldParticipants]);
           participantsObs([selfParticipant, ...newParticipants]);
@@ -97,7 +97,7 @@ describe('videoGridHandler', () => {
           },
         });
         call.addParticipant(participants[0]);
-        const grid = getGrid(call);
+        const grid = getGridComputed(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
 
@@ -112,7 +112,7 @@ describe('videoGridHandler', () => {
           },
         });
         call.addParticipant(participants[0]);
-        const grid = getGrid(call);
+        const grid = getGridComputed(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
 
@@ -126,7 +126,7 @@ describe('videoGridHandler', () => {
             audioOutput: ko.pureComputed(() => 'test'),
           },
         });
-        const grid = getGrid(call);
+        const grid = getGridComputed(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual([selfParticipant].map(toParticipantId));
 
@@ -142,7 +142,7 @@ describe('videoGridHandler', () => {
         });
         call.addParticipant(participants[0]);
         call.addParticipant(participants[1]);
-        const grid = getGrid(call);
+        const grid = getGridComputed(call);
 
         expect(grid().grid.map(toParticipantId)).toEqual(
           [selfParticipant, participants[0], participants[1]].map(toParticipantId),
