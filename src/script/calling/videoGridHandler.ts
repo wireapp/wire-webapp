@@ -26,32 +26,35 @@ import {Call} from './Call';
 
 export interface Grid {
   grid: Participant[];
-  hasRemoteVideo: boolean;
   thumbnail: Participant | null;
 }
 
 export function getGrid(call: Call): ko.PureComputed<Grid> {
   return ko.pureComputed(() => {
+    if (call.pages().length > 1) {
+      return {
+        grid: call.pages()[call.currentPage()],
+        thumbnail: null,
+      };
+    }
+
     let inGridParticipants: Participant[];
     let thumbnailParticipant: Participant | null;
     const selfParticipant = call.getSelfParticipant();
     const remoteParticipants = call
       .getRemoteParticipants()
       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
-    const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
-    if (remoteParticipants.length === 1 && remoteVideoParticipants.length === 1) {
-      inGridParticipants = remoteVideoParticipants;
-      thumbnailParticipant = selfParticipant?.hasActiveVideo() ? selfParticipant : null;
+
+    if (remoteParticipants.length === 1) {
+      inGridParticipants = remoteParticipants;
+      thumbnailParticipant = selfParticipant;
     } else {
-      inGridParticipants = selfParticipant?.hasActiveVideo()
-        ? [selfParticipant, ...remoteVideoParticipants]
-        : remoteVideoParticipants;
+      inGridParticipants = [selfParticipant, ...remoteParticipants];
       thumbnailParticipant = null;
     }
 
     return {
       grid: inGridParticipants,
-      hasRemoteVideo: remoteVideoParticipants.length > 0,
       thumbnail: thumbnailParticipant,
     };
   });

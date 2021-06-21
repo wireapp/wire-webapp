@@ -28,7 +28,6 @@ import FullscreenVideoCall, {FullscreenVideoCallProps} from './FullscreenVideoCa
 import TestPage from 'Util/test/TestPage';
 import {Grid} from 'src/script/calling/videoGridHandler';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {CallActions} from 'src/script/view_model/CallingViewModel';
 
 class FullscreenVideoCallPage extends TestPage<FullscreenVideoCallProps> {
   constructor(props?: FullscreenVideoCallProps) {
@@ -54,7 +53,6 @@ describe('fullscreenVideoCall', () => {
     } as MediaDevicesHandler);
     const props: Partial<FullscreenVideoCallProps> = {
       call,
-      callActions: {} as CallActions,
       canShareScreen: false,
       conversation: conversation,
       isChoosingScreen: false,
@@ -67,8 +65,8 @@ describe('fullscreenVideoCall', () => {
           videoInput: ko.observable(''),
         },
       } as MediaDevicesHandler,
-      multitasking: {autoMinimize: ko.observable(false), isMinimized: ko.observable(false)},
-      videoGrid: {grid: [], hasRemoteVideo: false, thumbnail: null} as Grid,
+      multitasking: {isMinimized: ko.observable(false)},
+      videoGrid: {grid: [], thumbnail: null} as Grid,
       videoInput: [],
     };
     return props as FullscreenVideoCallProps;
@@ -118,11 +116,12 @@ describe('fullscreenVideoCall', () => {
   it('resets the maximized participant on active speaker switch', () => {
     const setMaximizedSpy = jasmine.createSpy();
     const props = createProps();
-    props.callActions.setMaximizedTileVideoParticipant = setMaximizedSpy;
-    props.callActions.setVideoSpeakersActiveTab = () => {};
+    props.setMaximizedParticipant = setMaximizedSpy;
+    props.setVideoSpeakersActiveTab = () => {};
     props.call.addParticipant(new Participant(new User('a', null), 'a'));
     props.call.addParticipant(new Participant(new User('b', null), 'b'));
-    props.call.addParticipant(new Participant(new User('c', null), 'c'));
+    props.call.addParticipant(new Participant(new User('c', null), 'd'));
+    props.call.addParticipant(new Participant(new User('e', null), 'f'));
 
     const fullscreenVideoCall = new FullscreenVideoCallPage(props);
     const activeSpeakerToggle = fullscreenVideoCall.getActiveSpeakerToggle();
@@ -132,6 +131,6 @@ describe('fullscreenVideoCall', () => {
     const inactiveButton = activeSpeakerToggle.find('[data-uie-value="inactive"]');
     fullscreenVideoCall.click(inactiveButton.first());
 
-    expect(setMaximizedSpy).toHaveBeenCalledWith(null);
+    expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
   });
 });

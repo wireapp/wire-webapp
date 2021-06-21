@@ -104,11 +104,7 @@ export class TeamRepository {
   }
 
   readonly getRoleBadge = (userId: string): string => {
-    return this.isExternal(userId) ? t('rolePartner') : '';
-  };
-
-  readonly isExternal = (userId: string): boolean => {
-    return this.teamState.memberRoles()[userId] === ROLE.PARTNER;
+    return this.teamState.isExternal(userId) ? t('rolePartner') : '';
   };
 
   readonly isSelfConnectedTo = (userId: string): boolean => {

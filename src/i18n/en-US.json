@@ -1058,5 +1058,14 @@
   "wireLinux": "{{brandName}} for Linux",
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
-  "wire_for_web": "{{brandName}} for Web"
+  "wire_for_web": "{{brandName}} for Web",
+  "modalConversationJoinNotFoundHeadline": "You could not join the conversation",
+  "modalConversationJoinNotFoundMessage": "The conversation link is invalid.",
+  "modalConversationJoinFullHeadline": "You could not join the conversation",
+  "modalConversationJoinFullMessage": "The conversation is full.",
+  "modalConversationJoinConfirm": "Join",
+  "modalConversationJoinMessage": "You have been invited to a conversation: {{conversationName}}",
+  "modalConversationJoinHeadline": "",
+  "videoSpeakersTabSpeakers": "Speakers",
+  "videoSpeakersTabAll": "All ({{count}})"
 }

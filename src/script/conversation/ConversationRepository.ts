@@ -232,6 +232,8 @@ export class ConversationRepository {
 
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
+
+    window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
   }
 
   private readonly updateLocalMessageEntity = async ({
@@ -955,13 +957,84 @@ export class ConversationRepository {
     return undefined;
   }
 
-  async joinConversationWithCode(key: string, code: string): Promise<{conversationEntity: Conversation} | undefined> {
-    const response = await this.conversation_service.postConversationJoin(key, code);
-    if (response) {
-      return this.onCreate(response as any);
+  /**
+   * Starts the join public conversation flow.
+   * Opens conversation directly when it is already known.
+   *
+   * @param event Custom event containing join key/code
+   */
+  private readonly onConversationJoin = async (event: {detail: {code: string; key: string}}) => {
+    const {key, code} = event.detail;
+
+    const showNoConversationModal = () => {
+      const titleText = t('modalConversationJoinNotFoundHeadline');
+      const messageText = t('modalConversationJoinNotFoundMessage');
+      this.showModal(messageText, titleText);
+    };
+    const showTooManyMembersModal = () => {
+      const titleText = t('modalConversationJoinFullHeadline');
+      const messageText = t('modalConversationJoinFullMessage');
+      this.showModal(messageText, titleText);
+    };
+
+    try {
+      const {id: conversationId, name: conversationName} = await this.conversation_service.getConversationJoin(
+        key,
+        code,
+      );
+      const knownConversation = this.conversationState.findConversation(conversationId);
+      if (knownConversation && knownConversation.status() === ConversationStatus.CURRENT_MEMBER) {
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation);
+        return;
+      }
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            try {
+              const response = await this.conversation_service.postConversationJoin(key, code);
+              const conversationEntity = await this.getConversationById(conversationId);
+              if (response) {
+                await this.onMemberJoin(conversationEntity, response);
+              }
+              amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+            } catch (error) {
+              switch (error.label) {
+                case BackendErrorLabel.NO_CONVERSATION:
+                case BackendErrorLabel.NO_CONVERSATION_CODE: {
+                  showNoConversationModal();
+                  break;
+                }
+                case BackendErrorLabel.TOO_MANY_MEMBERS: {
+                  showTooManyMembersModal();
+                  break;
+                }
+
+                default: {
+                  throw error;
+                }
+              }
+            }
+          },
+          text: t('modalConversationJoinConfirm'),
+        },
+        text: {
+          message: t('modalConversationJoinMessage', {conversationName}),
+          title: t('modalConversationJoinHeadline'),
+        },
+      });
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.NO_CONVERSATION:
+        case BackendErrorLabel.NO_CONVERSATION_CODE: {
+          showNoConversationModal();
+          break;
+        }
+        default: {
+          throw error;
+        }
+      }
     }
-    return undefined;
-  }
+  };
 
   /**
    * Maps user connection to the corresponding conversation.
