@@ -60,7 +60,7 @@ const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({reposi
           messageRepository={repositories.message}
           current={history.current}
           goTo={history.goTo}
-          userEntity={user}
+          user={user}
         />
       </div>
     </>
