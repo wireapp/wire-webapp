@@ -20,7 +20,6 @@
 import {
   ArrowIcon,
   Button,
-  COLOR,
   ContainerXS,
   Form,
   H2,
@@ -195,19 +194,11 @@ const ConversationJoin = ({
       >
         {isFullConversation ? (
           <ContainerXS style={{margin: 'auto 0'}}>
-            <H2
-              style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
-              color={COLOR.GRAY}
-              data-uie-name="status-full-headline"
-            >
+            <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
               <FormattedMessage
                 {...conversationJoinStrings.fullConversationHeadline}
                 values={{
                   brandName: Config.getConfig().BRAND_NAME,
-                  // eslint-disable-next-line react/display-name
-                  newline: <br />,
-                  // eslint-disable-next-line react/display-name
-                  strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
                 }}
               />
             </H2>
@@ -218,15 +209,11 @@ const ConversationJoin = ({
         ) : renderTemporaryGuestAccountCreation ? (
           <ContainerXS style={{margin: 'auto 0'}}>
             <AppAlreadyOpen fullscreen={isPwaEnabled} />
-            <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+            <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}>
               <FormattedMessage
                 {...conversationJoinStrings.headline}
                 values={{
                   brandName: Config.getConfig().BRAND_NAME,
-                  // eslint-disable-next-line react/display-name
-                  newline: <br />,
-                  // eslint-disable-next-line react/display-name
-                  strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
                 }}
               />
             </H2>
@@ -285,31 +272,16 @@ const ConversationJoin = ({
         ) : (
           <ContainerXS style={{margin: 'auto 0'}}>
             <AppAlreadyOpen fullscreen={isPwaEnabled} />
-            <H2
-              style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
-              color={COLOR.GRAY}
-              data-uie-name="status-join-headline"
-            >
-              {selfName ? (
-                <FormattedMessage
-                  {...conversationJoinStrings.existentAccountHeadline}
-                  values={{
+            <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-join-headline">
+              {selfName
+                ? _(conversationJoinStrings.existentAccountHeadline, {
                     brandName: Config.getConfig().BRAND_NAME,
                     name: StringUtil.capitalize(selfName),
-                    newline: <br />,
-                    // eslint-disable-next-line react/display-name
-                    strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
-                  }}
-                />
-              ) : (
-                <FormattedMessage
-                  {...conversationJoinStrings.headline}
-                  values={{brandName: Config.getConfig().BRAND_NAME}}
-                />
-              )}
+                  })
+                : _(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME, newline: <br />})}
             </H2>
             <Text block style={{fontSize: '16px', marginTop: '10px'}}>
-              {_(conversationJoinStrings.existentAccountSubhead)}
+              {_(conversationJoinStrings.subhead, {newline: <br />})}
             </Text>
             <Button
               style={{marginTop: 16}}
@@ -327,14 +299,17 @@ const ConversationJoin = ({
             </Button>
             {error ? parseValidationErrors(error) : parseError(conversationError)}
             <Small block>
-              <Link
-                onClick={() => setForceNewTemporaryGuestAccount(true)}
-                textTransform={'none'}
-                data-uie-name="go-join"
-              >
-                {_(conversationJoinStrings.existentAccountJoinWithoutLink)}
-              </Link>
-              {` ${_(conversationJoinStrings.existentAccountJoinWithoutText)}`}
+              {_(conversationJoinStrings.existentAccountJoinWithoutText, {
+                existentAccountJoinWithoutLink: (
+                  <Link
+                    onClick={() => setForceNewTemporaryGuestAccount(true)}
+                    textTransform={'none'}
+                    data-uie-name="go-join"
+                  >
+                    {_(conversationJoinStrings.existentAccountJoinWithoutLink)}
+                  </Link>
+                ),
+              })}
             </Small>
           </ContainerXS>
         )}

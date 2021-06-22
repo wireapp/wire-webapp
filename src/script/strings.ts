@@ -347,7 +347,7 @@ export const unsupportedStrings = defineMessages({
 
 export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinHeadline: {
-    defaultMessage: 'You have been invited {newline}to join a <strong>{brandName} guest room.</strong>',
+    defaultMessage: 'You have been invited to join a {brandName} conversation',
     id: 'conversationJoin.unsupportedJoinHeadline',
   },
   unsupportedJoinMobileSubhead: {
@@ -358,27 +358,23 @@ export const unsupportedJoinStrings = defineMessages({
 
 export const conversationJoinStrings = defineMessages({
   existentAccountHeadline: {
-    defaultMessage: '{name}, you have been invited {newline}to join a <strong>{brandName} guest room.</strong>',
+    defaultMessage: '{name}, you have been invited to join a {brandName} conversation',
     id: 'conversationJoin.existentAccountHeadline',
   },
   existentAccountJoinWithoutLink: {
-    defaultMessage: 'Join the conversation',
+    defaultMessage: 'temporary guest',
     id: 'conversationJoin.existentAccountJoinWithoutLink',
   },
   existentAccountJoinWithoutText: {
-    defaultMessage: 'without an account.',
+    defaultMessage: 'Join conversation as {existentAccountJoinWithoutLink} instead',
     id: 'conversationJoin.existentAccountJoinWithoutText',
   },
   existentAccountOpenButton: {
     defaultMessage: 'Open in {brandName}',
     id: 'conversationJoin.buttonExistentAccountOpen',
   },
-  existentAccountSubhead: {
-    defaultMessage: 'Guest rooms let you have conversations with people who are not on your team.',
-    id: 'conversationJoin.subheadExistentAccount',
-  },
   fullConversationHeadline: {
-    defaultMessage: 'This <strong>{brandName} guest room</strong>{newline}is full.',
+    defaultMessage: 'This {brandName} conversation is full.',
     id: 'conversationJoin.fullConversationHeadline',
   },
   fullConversationSubhead: {
@@ -390,7 +386,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.hasAccount',
   },
   headline: {
-    defaultMessage: 'You have been invited {newline}to join a <strong>{brandName} guest room.</strong>',
+    defaultMessage: 'Join conversation as temporary guest',
     id: 'conversationJoin.headline',
   },
   invalidCreateAccountLink: {
@@ -402,11 +398,11 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.invalidCreateAccountText',
   },
   invalidHeadline: {
-    defaultMessage: 'This <strong>{brandName} guest room</strong>{newline}is now closed.',
+    defaultMessage: 'Conversation not found',
     id: 'conversationJoin.invalidHeadline',
   },
   invalidSubhead: {
-    defaultMessage: 'Ask the person who invited you how to join.',
+    defaultMessage: 'The link to this group conversation expired or the conversation was set to private.',
     id: 'conversationJoin.invalidSubhead',
   },
   loginLink: {
@@ -418,7 +414,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.namePlaceholder',
   },
   subhead: {
-    defaultMessage: 'Encrypted group messaging and conference calls. {newline}No account necessary.',
+    defaultMessage: 'Encrypted group messaging and conference calls.{newline}No account necessary.',
     id: 'conversationJoin.subhead',
   },
 });
