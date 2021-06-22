@@ -517,9 +517,6 @@
   "legalHoldWarningSecondaryInformation": "What is legal hold?",
   "legalHoldWarningSecondaryVerify": "Verify devices...",
   "legalHoldWarningTitle": "Legal hold",
-  "login": {
-    "passwordPlaceholder": ""
-  },
   "login.emailPlaceholder": "Email or username",
   "login.forgotPassword": "Forgot password?",
   "login.headline": "Log in",
