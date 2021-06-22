@@ -6,7 +6,6 @@ coverage:
   round: down
   range: '45...80'
   status:
-    patch: off
     project:
       default:
         informational: true
