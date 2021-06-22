@@ -218,12 +218,7 @@ const ConversationJoin = ({
               />
             </H2>
             <Text style={{fontSize: '16px', marginTop: '10px'}}>
-              <FormattedMessage
-                {...conversationJoinStrings.subhead}
-                values={{
-                  newline: <br />,
-                }}
-              />
+              <FormattedMessage {...conversationJoinStrings.subhead} />
             </Text>
             <Form style={{marginTop: 30}}>
               <InputSubmitCombo>
@@ -278,10 +273,10 @@ const ConversationJoin = ({
                     brandName: Config.getConfig().BRAND_NAME,
                     name: StringUtil.capitalize(selfName),
                   })
-                : _(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME, newline: <br />})}
+                : _(conversationJoinStrings.headline, {brandName: Config.getConfig().BRAND_NAME})}
             </H2>
             <Text block style={{fontSize: '16px', marginTop: '10px'}}>
-              {_(conversationJoinStrings.subhead, {newline: <br />})}
+              {_(conversationJoinStrings.existentAccountSubhead)}
             </Text>
             <Button
               style={{marginTop: 16}}

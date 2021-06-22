@@ -347,7 +347,7 @@ export const unsupportedStrings = defineMessages({
 
 export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinHeadline: {
-    defaultMessage: 'You have been invited to join a {brandName} conversation',
+    defaultMessage: 'You have been invited to join a conversation in {brandName}',
     id: 'conversationJoin.unsupportedJoinHeadline',
   },
   unsupportedJoinMobileSubhead: {
@@ -358,20 +358,25 @@ export const unsupportedJoinStrings = defineMessages({
 
 export const conversationJoinStrings = defineMessages({
   existentAccountHeadline: {
-    defaultMessage: '{name}, you have been invited to join a {brandName} conversation',
+    defaultMessage: '{name}, you have been invited to join a conversation in {brandName}',
     id: 'conversationJoin.existentAccountHeadline',
   },
   existentAccountJoinWithoutLink: {
-    defaultMessage: 'temporary guest',
+    defaultMessage: 'Join the conversation',
     id: 'conversationJoin.existentAccountJoinWithoutLink',
   },
   existentAccountJoinWithoutText: {
-    defaultMessage: 'Join conversation as {existentAccountJoinWithoutLink} instead',
+    defaultMessage: '{existentAccountJoinWithoutLink} without an account',
     id: 'conversationJoin.existentAccountJoinWithoutText',
   },
   existentAccountOpenButton: {
     defaultMessage: 'Open in {brandName}',
     id: 'conversationJoin.buttonExistentAccountOpen',
+  },
+  existentAccountSubhead: {
+    defaultMessage:
+      'Audio and video conferencing, text messaging, file sharing, and screen sharing, all end-to-end-encrypted.',
+    id: 'conversationJoin.existentAccountSubhead',
   },
   fullConversationHeadline: {
     defaultMessage: 'This {brandName} conversation is full.',
@@ -386,7 +391,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.hasAccount',
   },
   headline: {
-    defaultMessage: 'Join conversation as temporary guest',
+    defaultMessage: 'You have been invited to join a conversation in {brandName}',
     id: 'conversationJoin.headline',
   },
   invalidCreateAccountLink: {
@@ -414,7 +419,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.namePlaceholder',
   },
   subhead: {
-    defaultMessage: 'Encrypted group messaging and conference calls.{newline}No account necessary.',
+    defaultMessage: 'Join conversation as temporary guest (access expires after 24 hours)',
     id: 'conversationJoin.subhead',
   },
 });
