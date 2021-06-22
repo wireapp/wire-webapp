@@ -75,7 +75,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   grid,
   selfParticipant,
   maximizedParticipant,
-  setMaximizedParticipant = () => {},
+  setMaximizedParticipant,
 }) => {
   const [thumbnailHasActiveVideo, setThumbnailHasActiveVideo] = useState(false);
   const [thumbnailSharesScreen, setThumbnailSharesScreen] = useState(false);
@@ -98,6 +98,9 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid?.grid.length));
 
   const doubleClickedOnVideo = (userId: string, clientId: string) => {
+    if (typeof setMaximizedParticipant !== 'function') {
+      return;
+    }
     if (maximizedParticipant !== null) {
       setMaximizedParticipant(null);
       return;
