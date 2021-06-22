@@ -157,7 +157,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     <div id="video-calling" className="video-calling" ref={wrapper}>
       <div id="video-element-remote" className="video-element-remote">
         <GroupVideoGrid
-          muted={isMuted}
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
           grid={

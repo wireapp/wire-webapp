@@ -40,7 +40,6 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
-import type {Participant} from '../calling/Participant';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
@@ -51,7 +50,6 @@ export interface CallActions {
   changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
-  setMaximizedTileVideoParticipant: (participant: Participant) => void;
   setVideoSpeakersActiveTab: (tab: string) => void;
   startAudio: (conversationEntity: Conversation) => void;
   startVideo: (conversationEntity: Conversation) => void;
@@ -88,7 +86,6 @@ export class CallingViewModel {
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
   readonly videoSpeakersActiveTab: ko.Observable<string>;
-  readonly maximizedTileVideoParticipant: ko.Observable<Participant | null>;
 
   constructor(
     readonly callingRepository: CallingRepository,
@@ -118,7 +115,6 @@ export class CallingViewModel {
     this.isChoosingScreen = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
-    this.maximizedTileVideoParticipant = ko.observable(null);
     this.onChooseScreen = () => {};
 
     const ring = (call: Call): void => {
@@ -187,13 +183,9 @@ export class CallingViewModel {
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
         callState.videoSpeakersActiveTab(VideoSpeakersTab.ALL);
-        this.maximizedTileVideoParticipant(null);
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
-      },
-      setMaximizedTileVideoParticipant: (participant: Participant) => {
-        this.maximizedTileVideoParticipant(participant);
       },
       setVideoSpeakersActiveTab: (tab: string) => {
         callState.videoSpeakersActiveTab(tab);

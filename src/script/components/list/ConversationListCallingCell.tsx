@@ -55,7 +55,6 @@ export interface CallingCellProps {
   conversation: Conversation;
   hasAccessToCamera: boolean;
   isSelfVerified: boolean;
-  maximizedTileVideoParticipant: Participant;
   multitasking: Multitasking;
   teamState?: TeamState;
   temporaryUserStyle?: boolean;
@@ -68,7 +67,6 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   call,
   callActions,
   multitasking,
-  maximizedTileVideoParticipant,
   videoGrid,
   hasAccessToCamera,
   isSelfVerified,
@@ -79,12 +77,13 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  const {reason, state, isCbrEnabled, startedAt, participants} = useKoSubscribableChildren(call, [
+  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant} = useKoSubscribableChildren(call, [
     'reason',
     'state',
     'isCbrEnabled',
     'startedAt',
     'participants',
+    'maximizedParticipant',
   ]);
   const {
     isGroup,
@@ -224,9 +223,8 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                     : {grid: call.getActiveSpeakers(), thumbnail: null}
                 }
                 minimized
-                maximizedParticipant={maximizedTileVideoParticipant}
+                maximizedParticipant={maximizedParticipant}
                 selfParticipant={selfParticipant}
-                setMaximizedParticipant={callActions.setMaximizedTileVideoParticipant}
               />
               <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
                 <Icon.Fullscreen />
@@ -365,7 +363,6 @@ registerReactComponent('conversation-list-calling-cell', {
     conversation: ko.unwrap(conversation), 
     hasAccessToCamera: ko.unwrap(hasAccessToCamera), 
     isSelfVerified: ko.unwrap(isSelfVerified), 
-    maximizedTileVideoParticipant: ko.unwrap(maximizedTileVideoParticipant),
     multitasking,
     temporaryUserStyle,
     videoGrid: ko.unwrap(videoGrid)

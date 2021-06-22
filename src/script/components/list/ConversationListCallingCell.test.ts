@@ -75,7 +75,6 @@ const createProps = async () => {
     conversation,
     hasAccessToCamera: true,
     isSelfVerified: true,
-    maximizedTileVideoParticipant: undefined,
     multitasking: {isMinimized: ko.observable(false)},
     teamState: mockTeamState,
     videoGrid: {grid: [], thumbnail: undefined},
