@@ -20,7 +20,7 @@
 import React, {useState, useEffect, CSSProperties} from 'react';
 import {css} from '@emotion/core';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 import type {Grid} from '../../calling/videoGridHandler';
@@ -34,9 +34,8 @@ export interface GroupVideoGripProps {
   grid: Grid;
   maximizedParticipant: Participant;
   minimized?: boolean;
-  muted?: boolean;
   selfParticipant: Participant;
-  setMaximizedParticipant: (participant: Participant) => void;
+  setMaximizedParticipant?: (participant: Participant) => void;
 }
 
 interface RowsAndColumns extends CSSProperties {
@@ -74,10 +73,9 @@ const GroupVideoThumbnailWrapper: React.FC<{minimized: boolean}> = ({minimized, 
 const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   minimized = false,
   grid,
-  muted = false,
   selfParticipant,
   maximizedParticipant,
-  setMaximizedParticipant,
+  setMaximizedParticipant = () => {},
 }) => {
   const [thumbnailHasActiveVideo, setThumbnailHasActiveVideo] = useState(false);
   const [thumbnailSharesScreen, setThumbnailSharesScreen] = useState(false);
@@ -111,7 +109,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setMaximizedParticipant(participant);
   };
 
-  const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(p => !!p);
+  const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(Boolean);
 
   useEffect(() => {
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
@@ -162,7 +160,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             key={participant.clientId}
             selfParticipant={selfParticipant}
             participantCount={participants.length}
-            maximizedParticipant={maximizedParticipant}
+            isMaximized={!!maximizedParticipant}
             onParticipantDoubleClick={doubleClickedOnVideo}
           />
         ))}
@@ -230,9 +228,3 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
 };
 
 export default GroupVideoGrid;
-
-registerReactComponent('group-video-grid', {
-  bindings:
-    'grid: ko.unwrap(grid), selfParticipant: ko.unwrap(selfParticipant), maximizedParticipant: ko.unwrap(maximizedParticipant), minimized, muted: ko.unwrap(muted)',
-  component: GroupVideoGrid,
-});
