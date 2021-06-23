@@ -18,9 +18,9 @@
  */
 
 import ReactDOM from 'react-dom';
-import React, {Fragment, useMemo, useState} from 'react';
+import React, {Fragment, useEffect, useMemo, useState} from 'react';
 import {container} from 'tsyringe';
-import {CALL_TYPE} from '@wireapp/avs';
+import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
 import FullscreenVideoCall from './FullscreenVideoCall';
 import ChooseScreen, {Screen} from './ChooseScreen';
@@ -69,13 +69,19 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     'videoSpeakersActiveTab',
     'joinedCall',
   ]);
-  const {maximizedParticipant, pages, currentPage, participants} = useKoSubscribableChildren(joinedCall, [
+  const {maximizedParticipant, pages, currentPage, participants, state} = useKoSubscribableChildren(joinedCall, [
     'maximizedParticipant',
     'pages',
     'currentPage',
     'participants',
+    'state',
   ]);
-
+  const currentCallState = state as CALL_STATE;
+  useEffect(() => {
+    if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
+      multitasking.isMinimized(false);
+    }
+  }, [currentCallState]);
   const videoGrid = useMemo(() => joinedCall && getGrid(joinedCall), [joinedCall, participants, pages, currentPage]);
 
   const onCancelScreenSelection = () => {
