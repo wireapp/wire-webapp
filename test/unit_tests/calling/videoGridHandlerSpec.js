@@ -17,7 +17,7 @@
  *
  */
 
-import {getGridComputed} from 'src/script/calling/videoGridHandler';
+import {getGrid} from 'src/script/calling/videoGridHandler';
 import {Participant} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
 import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
@@ -35,7 +35,7 @@ describe('videoGridHandler', () => {
     ];
   });
 
-  describe('getGridComputed', () => {
+  describe('getGrid', () => {
     describe('people leaving call', () => {
       it('removes people from the grid', () => {
         const tests = [
@@ -75,7 +75,6 @@ describe('videoGridHandler', () => {
           },
         });
         call.participants = participantsObs;
-        const grid = getGridComputed(call);
         tests.forEach(({oldParticipants, newParticipants, expected, scenario}) => {
           participantsObs([selfParticipant, ...oldParticipants]);
           participantsObs([selfParticipant, ...newParticipants]);
@@ -83,7 +82,7 @@ describe('videoGridHandler', () => {
           if (expected.length > 1) {
             result = [selfParticipant.user.id, ...expected.map(toParticipantId)];
           }
-          expect(grid().grid.map(toParticipantId)).toEqual(result, scenario);
+          expect(getGrid(call).grid.map(toParticipantId)).toEqual(result, scenario);
         });
       });
     });
@@ -97,11 +96,11 @@ describe('videoGridHandler', () => {
           },
         });
         call.addParticipant(participants[0]);
-        const grid = getGridComputed(call);
+        const grid = getGrid(call);
 
-        expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
+        expect(grid.grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
 
-        expect(grid().thumbnail).toBe(selfParticipant);
+        expect(grid.thumbnail).toBe(selfParticipant);
       });
 
       it('places the self user in the grid for any call type with just one other participant', () => {
@@ -112,11 +111,11 @@ describe('videoGridHandler', () => {
           },
         });
         call.addParticipant(participants[0]);
-        const grid = getGridComputed(call);
+        const grid = getGrid(call);
 
-        expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
+        expect(grid.grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
 
-        expect(grid().thumbnail).toBe(selfParticipant);
+        expect(grid.thumbnail).toBe(selfParticipant);
       });
 
       it('places the self user in the grid if there are no other video participants', () => {
@@ -126,11 +125,11 @@ describe('videoGridHandler', () => {
             audioOutput: ko.pureComputed(() => 'test'),
           },
         });
-        const grid = getGridComputed(call);
+        const grid = getGrid(call);
 
-        expect(grid().grid.map(toParticipantId)).toEqual([selfParticipant].map(toParticipantId));
+        expect(grid.grid.map(toParticipantId)).toEqual([selfParticipant].map(toParticipantId));
 
-        expect(grid().thumbnail).toBe(null);
+        expect(grid.thumbnail).toBe(null);
       });
 
       it('places the self user in the grid if there are more than 1 other participant', () => {
@@ -142,13 +141,13 @@ describe('videoGridHandler', () => {
         });
         call.addParticipant(participants[0]);
         call.addParticipant(participants[1]);
-        const grid = getGridComputed(call);
+        const grid = getGrid(call);
 
-        expect(grid().grid.map(toParticipantId)).toEqual(
+        expect(grid.grid.map(toParticipantId)).toEqual(
           [selfParticipant, participants[0], participants[1]].map(toParticipantId),
         );
 
-        expect(grid().thumbnail).toBe(null);
+        expect(grid.thumbnail).toBe(null);
       });
     });
   });

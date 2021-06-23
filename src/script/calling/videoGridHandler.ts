@@ -17,8 +17,6 @@
  *
  */
 
-import ko from 'knockout';
-
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import type {Participant} from '../calling/Participant';
@@ -27,10 +25,6 @@ import {Call} from './Call';
 export interface Grid {
   grid: Participant[];
   thumbnail: Participant | null;
-}
-
-export function getGridComputed(call: Call): ko.PureComputed<Grid> {
-  return ko.pureComputed(() => getGrid(call));
 }
 
 export function getGrid(call: Call) {
