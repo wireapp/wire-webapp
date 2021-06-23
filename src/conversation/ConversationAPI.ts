@@ -17,7 +17,7 @@
  *
  */
 
-import type {NewOtrMessage as ProtobufOTRMessage} from '@wireapp/protocol-messaging/web/otr';
+import type {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import type {AxiosError, AxiosRequestConfig} from 'axios';
 
 import {ValidationError} from '../validation/';
@@ -591,7 +591,7 @@ export class ConversationAPI {
   public async postOTRProtobufMessage(
     sendingClientId: string,
     conversationId: string,
-    messageData: ProtobufOTRMessage,
+    messageData: ProtobufOTR.NewOtrMessage,
     ignoreMissing?: boolean | string[],
   ): Promise<ClientMismatch> {
     if (!sendingClientId) {
