@@ -32,7 +32,6 @@
           data-bind="attr: {'data-uie-uid': $data.id, 'data-uie-value': getConversationById(activeCall.conversationId).display_name}"
           params="
             call: activeCall,
-            videoGrid: getVideoGrid(activeCall),
             conversation: getConversationById(activeCall.conversationId),
             multitasking: multitasking,
             callingRepository: callingRepository,

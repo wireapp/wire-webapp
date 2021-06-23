@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -37,7 +37,7 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import type {Grid} from '../../calling/videoGridHandler';
+import {getGrid, Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
@@ -67,7 +67,6 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   call,
   callActions,
   multitasking,
-  videoGrid,
   hasAccessToCamera,
   isSelfVerified,
   callingRepository,
@@ -77,14 +76,17 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant} = useKoSubscribableChildren(call, [
-    'reason',
-    'state',
-    'isCbrEnabled',
-    'startedAt',
-    'participants',
-    'maximizedParticipant',
-  ]);
+  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, pages, currentPage} =
+    useKoSubscribableChildren(call, [
+      'reason',
+      'state',
+      'isCbrEnabled',
+      'startedAt',
+      'participants',
+      'maximizedParticipant',
+      'pages',
+      'currentPage',
+    ]);
   const {
     isGroup,
     participating_user_ets: userEts,
@@ -107,6 +109,8 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showNoCameraPreview = !hasAccessToCamera && call.initialType === CALL_TYPE.VIDEO && !isOngoing;
   const showVideoButton = call.initialType === CALL_TYPE.VIDEO || isOngoing;
   const showParticipantsButton = isOngoing && isGroup;
+
+  const videoGrid = useMemo(() => call && getGrid(call), [call, participants, pages, currentPage]);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
   const conversationUrl = generateConversationUrl(conversation.id);
@@ -214,7 +218,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 ))}
             </div>
           </div>
-          {isOngoing && isMinimized && (
+          {isOngoing && isMinimized && videoGrid?.grid.length && (
             <div className="group-video__minimized-wrapper" onClick={() => multitasking.isMinimized(false)}>
               <GroupVideoGrid
                 grid={
@@ -365,7 +369,6 @@ registerReactComponent('conversation-list-calling-cell', {
     isSelfVerified: ko.unwrap(isSelfVerified), 
     multitasking,
     temporaryUserStyle,
-    videoGrid: ko.unwrap(videoGrid)
   }"></div>
     `,
 });
