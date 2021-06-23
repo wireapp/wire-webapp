@@ -218,7 +218,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 ))}
             </div>
           </div>
-          {isOngoing && isMinimized && videoGrid?.grid.length && (
+          {(isOngoing || selfParticipant?.hasActiveVideo()) && isMinimized && videoGrid?.grid.length && (
             <div className="group-video__minimized-wrapper" onClick={() => multitasking.isMinimized(false)}>
               <GroupVideoGrid
                 grid={
