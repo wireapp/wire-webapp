@@ -48,6 +48,9 @@ function checkOverlayedElements() {
  */
 const isOverlayed = (domElement: HTMLElement): boolean => {
   const box = domElement.getBoundingClientRect();
+  if (isNaN(box.right + box.left + box.bottom + box.top)) {
+    return true;
+  }
   const middlePointX = (box.right + box.left) / 2;
   const middlePointY = (box.bottom + box.top) / 2;
   const elementAtPoint = document.elementFromPoint(middlePointX, middlePointY);
