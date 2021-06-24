@@ -77,7 +77,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
       multitasking.isMinimized(false);
     }
+    if (currentCallState === undefined) {
+      multitasking.isMinimized(true);
+    }
   }, [currentCallState]);
+
   const videoGrid = useMemo(() => joinedCall && getGrid(joinedCall), [joinedCall, participants, pages, currentPage]);
 
   const onCancelScreenSelection = () => {
