@@ -59,24 +59,20 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   const [selectableWindows, setSelectableWindows] = useState<ElectronDesktopCapturerSource[]>([]);
   const isChoosingScreen = selectableScreens.length > 0 || selectableWindows.length > 0;
 
-  const {isMinimized} = useKoSubscribableChildren(multitasking as {isMinimized: ko.Observable}, ['isMinimized']);
-  const {
-    isMuted,
-    videoSpeakersActiveTab,
-    joinedCall,
-  }: {isMuted: boolean; joinedCall: Call; videoSpeakersActiveTab: string} = useKoSubscribableChildren(callState, [
+  const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
+  const {isMuted, videoSpeakersActiveTab, joinedCall} = useKoSubscribableChildren(callState, [
     'isMuted',
     'videoSpeakersActiveTab',
     'joinedCall',
   ]);
-  const {maximizedParticipant, pages, currentPage, participants, state} = useKoSubscribableChildren(joinedCall, [
-    'maximizedParticipant',
-    'pages',
-    'currentPage',
-    'participants',
-    'state',
-  ]);
-  const currentCallState = state as CALL_STATE;
+  const {
+    maximizedParticipant,
+    pages,
+    currentPage,
+    participants,
+    state: currentCallState,
+  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'pages', 'currentPage', 'participants', 'state']);
+
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
       multitasking.isMinimized(false);
