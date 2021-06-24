@@ -191,7 +191,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               }}
               currentItem={videoSpeakersActiveTab}
               style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
-              textSubstitute={participants.length}
+              textSubstitute={participants.length.toString()}
             />
           )}
           <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
