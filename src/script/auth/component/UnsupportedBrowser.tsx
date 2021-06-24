@@ -17,7 +17,7 @@
  *
  */
 
-import {COLOR, Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
+import {Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, MessageDescriptor} from 'react-intl';
 import {connect} from 'react-redux';
@@ -33,7 +33,7 @@ interface UnsupportedProps extends React.HTMLProps<HTMLDivElement> {
   subhead: MessageDescriptor;
 }
 
-const UnsupportedMessage: React.SFC<UnsupportedProps> = ({headline, subhead}) => (
+const UnsupportedMessage: React.FC<UnsupportedProps> = ({headline, subhead}) => (
   <ContainerXS verticalCenter centerText>
     <Logo height={20} />
     <H1 center style={{marginBottom: '48px', marginTop: '24px'}}>
@@ -61,17 +61,13 @@ export const UnsupportedBrowser = ({
     return (
       <WirelessContainer>
         <Container verticalCenter>
-          <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} color={COLOR.GRAY}>
+          <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}>
             <FormattedMessage
               {...(isTemporaryGuest
                 ? unsupportedJoinStrings.unsupportedJoinHeadline
                 : unsupportedStrings.headlineBrowser)}
               values={{
                 brandName: Config.getConfig().BRAND_NAME,
-                // eslint-disable-next-line react/display-name
-                newline: <br />,
-                // eslint-disable-next-line react/display-name
-                strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
               }}
             />
           </H2>

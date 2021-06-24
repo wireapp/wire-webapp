@@ -30,7 +30,7 @@ import type {Participant} from '../../calling/Participant';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 export interface GroupVideoGridTileProps {
-  maximizedParticipant: Participant;
+  isMaximized: boolean;
   minimized: boolean;
   onParticipantDoubleClick: (userId: string, clientId: string) => void;
   participant: Participant;
@@ -43,7 +43,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
   participant,
   selfParticipant,
   participantCount,
-  maximizedParticipant,
+  isMaximized,
   onParticipantDoubleClick,
 }) => {
   const {isMuted, videoState, videoStream, isActivelySpeaking} = useKoSubscribableChildren(participant, [
@@ -75,7 +75,7 @@ const GroupVideoGridTile: React.FC<GroupVideoGridTileProps> = ({
           srcObject={videoStream}
           className="group-video-grid__element-video"
           css={{
-            objectFit: !!maximizedParticipant || sharesScreen ? 'contain' : 'cover',
+            objectFit: isMaximized || sharesScreen ? 'contain' : 'cover',
             transform: participant === selfParticipant && sharesCamera ? 'rotateY(180deg)' : 'initial',
           }}
         />

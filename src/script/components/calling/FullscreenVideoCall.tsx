@@ -23,7 +23,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import Icon from 'Components/Icon';
 import React, {useEffect, useMemo, useState} from 'react';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {Call} from '../../calling/Call';
 import type {Participant} from '../../calling/Participant';
@@ -53,13 +53,12 @@ export interface FullscreenVideoCallProps {
   multitasking: Multitasking;
   setMaximizedParticipant: (call: Call, participant: Participant) => void;
   setVideoSpeakersActiveTab: (tab: string) => void;
-  videoGrid: Grid;
-  videoSpeakersActiveTab: string;
-  videoInput: (ElectronDesktopCapturerSource | MediaDeviceInfo)[];
   switchCameraInput: (call: Call, deviceId: string) => void;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
+  videoGrid: Grid;
+  videoSpeakersActiveTab: string;
 }
 
 const FullscreenVideoCallConfig = {
@@ -103,7 +102,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   mediaDevicesHandler,
   multitasking,
   videoGrid,
-  videoInput,
   maximizedParticipant,
   videoSpeakersActiveTab,
   switchCameraInput,
@@ -132,6 +130,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput();
   const switchCameraSource = (call: Call, deviceId: string) => switchCameraInput(call, deviceId);
   const minimize = () => multitasking.isMinimized(true);
+  const videoInput = useKoSubscribable(mediaDevicesHandler.availableDevices.videoInput);
   const showToggleVideo =
     call.initialType === CALL_TYPE.VIDEO ||
     conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE);
@@ -158,7 +157,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     <div id="video-calling" className="video-calling" ref={wrapper}>
       <div id="video-element-remote" className="video-element-remote">
         <GroupVideoGrid
-          muted={isMuted}
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
           grid={

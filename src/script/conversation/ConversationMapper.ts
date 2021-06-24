@@ -386,7 +386,7 @@ export class ConversationMapper {
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
 
     if (accessCode.uri && isTeamConversation) {
-      const accessCodeUrl = `${window.wire.env.APP_BASE}/join/?key=${accessCode.key}&code=${accessCode.code}`;
+      const accessCodeUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
       conversationEntity.accessCode(accessCodeUrl);
     }
   }

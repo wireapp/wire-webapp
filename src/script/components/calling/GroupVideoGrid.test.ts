@@ -48,7 +48,6 @@ describe('GroupVideoGrid', () => {
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: false,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
@@ -72,7 +71,6 @@ describe('GroupVideoGrid', () => {
       },
       maximizedParticipant,
       minimized: false,
-      muted: false,
       selfParticipant: participantOne,
       setMaximizedParticipant: () => {
         maximizedParticipant = participantTwo;
@@ -97,7 +95,6 @@ describe('GroupVideoGrid', () => {
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: false,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
@@ -118,7 +115,6 @@ describe('GroupVideoGrid', () => {
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: true,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
@@ -140,7 +136,6 @@ describe('GroupVideoGrid', () => {
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: true,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
