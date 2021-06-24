@@ -33,7 +33,7 @@ const EphemeralTimer: React.FC<EphemeralTimerProps> = ({message}) => {
     ephemeral_expires: expires,
   } = useKoSubscribableChildren(message, ['ephemeral_remaining', 'ephemeral_started', 'ephemeral_expires']);
 
-  const duration = +expires - started;
+  const duration = Number(expires) - started;
 
   return (
     <svg className="ephemeral-timer" viewBox="0 0 8 8" width={8} height={8}>
