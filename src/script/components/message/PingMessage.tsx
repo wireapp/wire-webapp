@@ -82,7 +82,7 @@ const PingMessage: React.FC<PingMessageProps> = ({
 export default PingMessage;
 
 registerReactComponent('ping-message', {
+  bindings:
+    'message: ko.unwrap(message), is1to1Conversation: ko.unwrap(is1to1Conversation), isLastDeliveredMessage: ko.unwrap(isLastDeliveredMessage), onClickReceipts: onClickReceipts',
   component: PingMessage,
-  template:
-    '<div data-bind="react: {message: ko.unwrap(message), is1to1Conversation: ko.unwrap(is1to1Conversation), isLastDeliveredMessage: ko.unwrap(isLastDeliveredMessage), onClickReceipts: onClickReceipts}"></div>',
 });
