@@ -26,7 +26,7 @@ process.on('unhandledRejection', (reason, promise) =>
   console.error('Unhandled Rejection at:', promise, 'reason:', reason),
 );
 
-import commander from 'commander';
+import {program as commander} from 'commander';
 import logdown from 'logdown';
 import * as fs from 'fs';
 import * as path from 'path';

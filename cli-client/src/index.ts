@@ -23,7 +23,7 @@ import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import {Account} from '@wireapp/core';
 import {PayloadBundleType} from '@wireapp/core/src/main/conversation/';
 import {FileEngine} from '@wireapp/store-engine-fs';
-import commander from 'commander';
+import {program as commander} from 'commander';
 import dotenv from 'dotenv';
 import fs from 'fs-extra';
 import os from 'os';

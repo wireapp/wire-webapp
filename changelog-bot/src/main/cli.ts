@@ -21,7 +21,7 @@
 
 /* eslint-disable header/header */
 
-import commander from 'commander';
+import {program as commander} from 'commander';
 import logdown from 'logdown';
 
 import type {Parameters} from './Interfaces';
