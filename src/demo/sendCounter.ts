@@ -26,7 +26,7 @@ process.on('unhandledRejection', (reason, promise) =>
   console.error('Unhandled Rejection at:', promise, 'reason:', reason),
 );
 
-import commander from 'commander';
+import {program as commander} from 'commander';
 import logdown from 'logdown';
 import * as path from 'path';
 import {TimeUtil} from '@wireapp/commons';
@@ -86,7 +86,9 @@ const {
   logger.log('Client ID', account['apiClient'].context!.clientId);
 
   async function sendText(message: string): Promise<void> {
-    const payload = account.service!.conversation.messageBuilder.createText(WIRE_CONVERSATION_ID, message).build();
+    const payload = account
+      .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text: message})
+      .build();
     await account.service!.conversation.send(payload, undefined, useProtobuf);
   }
 
