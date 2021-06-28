@@ -33,7 +33,7 @@
     "@wireapp/store-engine": "4.9.2",
     "@wireapp/store-engine-fs": "2.4.2",
     "babel-loader": "8.2.2",
-    "browser-sync": "2.26.14",
+    "browser-sync": "2.27.3",
     "concurrently": "6.2.0",
     "cross-env": "7.0.3",
     "dotenv": "10.0.0",
