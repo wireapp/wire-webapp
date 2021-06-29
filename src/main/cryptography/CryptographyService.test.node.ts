@@ -54,7 +54,7 @@ describe('CryptographyService', () => {
 
   describe('"constructor"', () => {
     it('creates an instance.', () => {
-      expect(cryptographyService.cryptobox.identity!.public_key.fingerprint()).toBeDefined();
+      expect(cryptographyService.cryptobox['identity']!.public_key.fingerprint()).toBeDefined();
       expect(cryptographyService).toBeDefined();
     });
   });
@@ -71,7 +71,7 @@ describe('CryptographyService', () => {
 
   describe('"decrypt"', () => {
     it('decrypts a Base64-encoded cipher message.', async () => {
-      const alicePublicKey = cryptographyService.cryptobox.identity!.public_key;
+      const alicePublicKey = cryptographyService.cryptobox['identity']!.public_key;
       const publicPreKeyBundle = new Proteus.keys.PreKeyBundle(alicePublicKey, aliceLastResortPreKey);
       const text = 'Hello Alice!';
       const encryptedPreKeyMessage = await bob.encrypt(
@@ -86,7 +86,7 @@ describe('CryptographyService', () => {
     });
 
     it('is resistant to duplicated message errors', async () => {
-      const receiver = cryptographyService.cryptobox.identity!;
+      const receiver = cryptographyService.cryptobox['identity']!;
       const preKey = await cryptographyService.cryptobox['get_prekey']();
       const text = 'Hi!';
       const encodedPreKeyMessage = await CryptographyHelper.createEncodedCipherText(receiver, preKey!, text);
