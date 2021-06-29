@@ -685,7 +685,6 @@ class App {
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      // does not work with qualified IDs
       '/user/:userId': userId => {
         mainView.content.userModal.showUser(userId, () => router.navigate('/'));
       },

@@ -22,7 +22,6 @@ import type {Dexie, Transaction} from 'dexie';
 import {base64ToArray} from 'Util/util';
 
 import {categoryFromEvent} from '../message/MessageCategorization';
-import type {ClientRecord} from './record';
 
 interface DexieSchema {
   schema: Record<string, string>;
@@ -95,7 +94,7 @@ export class StorageSchemata {
           transaction
             .table(StorageSchemata.OBJECT_STORE.CLIENTS)
             .toCollection()
-            .modify((client: ClientRecord) => {
+            .modify(client => {
               client.meta = {is_verified: true, primary_key: 'local_identity'};
             });
         },

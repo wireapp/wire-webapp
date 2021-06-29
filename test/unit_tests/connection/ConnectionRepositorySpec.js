@@ -53,7 +53,7 @@ describe('ConnectionRepository', () => {
       const connectionEntity = new ConnectionEntity(createRandomUuid());
       connectionEntity.userId = userId;
 
-      userEntity = new User(userId, null);
+      userEntity = new User(userId);
       userEntity.connection(connectionEntity);
 
       connectionRepository.addConnectionEntity(connectionEntity);

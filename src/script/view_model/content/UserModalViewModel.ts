@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {container} from 'tsyringe';
 
 import {noop} from 'Util/util';
@@ -79,7 +78,7 @@ export class UserModalViewModel {
     this.hide();
   };
 
-  showUser(userId: string | QualifiedId, onModalClosed: () => void = noop): void {
+  showUser(userId: string, onModalClosed: () => void = noop): void {
     this.onClosedCallback = onModalClosed;
     this.user(null);
     this.userNotFound(false);
@@ -93,7 +92,7 @@ export class UserModalViewModel {
           this.user(user);
         })
         .catch(() => this.userNotFound(true));
+      this.isVisible(true);
     }
-    this.isVisible(true);
   }
 }

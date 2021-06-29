@@ -107,7 +107,6 @@ export class InputBarViewModel {
   /** MIME types and file extensions are accepted */
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
-  readonly disableControls: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -328,8 +327,6 @@ export class InputBarViewModel {
       const conversationEntity = this.conversationEntity();
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
-
-    this.disableControls = ko.pureComputed(() => this.conversationEntity().isFederated());
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {
@@ -624,9 +621,7 @@ export class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            if (!this.conversationEntity().isFederated) {
-              this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
-            }
+            this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
             this.updateMentions(data, keyboardEvent);
           }
           break;

@@ -43,7 +43,7 @@ class UserActionsPage extends TestPage<UserActionsProps> {
 }
 describe('UserActions', () => {
   it('generates actions for self user profile', () => {
-    const user = new User(undefined, null);
+    const user = new User();
     user.isMe = true;
     const conversation = new Conversation();
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
@@ -64,7 +64,7 @@ describe('UserActions', () => {
     });
   });
   it('generates actions for self user profile when user is not activated', () => {
-    const user = new User(undefined, null);
+    const user = new User();
     user.isMe = true;
     const conversation = new Conversation();
 
@@ -83,7 +83,7 @@ describe('UserActions', () => {
     expect(userActions.getAction(identifier).exists()).toBe(true);
   });
   it('generates actions for another user profile to which I am connected', () => {
-    const user = new User(undefined, null);
+    const user = new User();
     const conversation = new Conversation();
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
     user.connection().status(ConnectionStatus.ACCEPTED);
