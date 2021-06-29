@@ -148,7 +148,7 @@ describe('SearchRepository', () => {
 });
 
 function generateUser(handle, name) {
-  const user = new User(undefined, null);
+  const user = new User();
   user.username(handle);
   user.name(name);
   return user;

@@ -91,7 +91,7 @@ describe('ConversationRoleRepository', () => {
   describe('canAddParticipants', () => {
     it('checks if a user can add participants to a group', async () => {
       const conversationEntity = new Conversation(createRandomUuid());
-      const userEntity = new User(createRandomUuid(), null);
+      const userEntity = new User(createRandomUuid());
       conversationEntity.participating_user_ets.push(userEntity);
 
       let canAddParticipants = roleRepository.canAddParticipants(conversationEntity, userEntity);

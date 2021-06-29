@@ -370,12 +370,11 @@ export class EventMapper {
    * @returns Member message entity
    */
   private _mapEvent1to1Creation({data: eventData}: EventRecord) {
-    const {has_service: hasService, userIds, qualifiedUserIds} = eventData;
+    const {has_service: hasService, userIds} = eventData;
 
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
-    messageEntity.qualifiedUserIds(qualifiedUserIds || []);
 
     if (hasService) {
       messageEntity.showServicesWarning = true;
@@ -422,7 +421,6 @@ export class EventMapper {
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
     messageEntity.userIds(eventData.userIds);
-    messageEntity.qualifiedUserIds(eventData.qualifiedUserIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
   }

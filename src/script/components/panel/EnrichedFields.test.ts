@@ -52,7 +52,7 @@ const createRichProfileRepository = () => {
 describe('EnrichedFields', () => {
   it('displays all the given fields', async () => {
     const richProfileRepository = createRichProfileRepository();
-    const user = new User(createRandomUuid(), null);
+    const user = new User(createRandomUuid());
     const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user});
 
     await act(() =>
@@ -66,7 +66,7 @@ describe('EnrichedFields', () => {
 
   it('displays the email if set on user', async () => {
     const richProfileRepository = createRichProfileRepository();
-    const user = new User(createRandomUuid(), null);
+    const user = new User(createRandomUuid());
     user.email('user@inter.net');
     const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user});
 
@@ -81,7 +81,7 @@ describe('EnrichedFields', () => {
 
   it('calls the `onFieldsLoaded` function when fields are loaded', async () => {
     const richProfileRepository = createRichProfileRepository();
-    const user = new User(createRandomUuid(), null);
+    const user = new User(createRandomUuid());
     const onFieldsLoaded = jest.fn();
     const enrichedFields = new EnrichedFieldsPage({onFieldsLoaded, richProfileRepository, user});
 
