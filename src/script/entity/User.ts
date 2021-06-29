@@ -113,7 +113,7 @@ export class User {
     };
   }
 
-  constructor(id: string = '') {
+  constructor(id: string = '', domain: string | null) {
     this.id = id;
     this.isMe = false;
     this.isService = false;
@@ -121,6 +121,7 @@ export class User {
     this.isDeleted = false;
     this.providerId = undefined;
     this.serviceId = undefined;
+    this.domain = domain;
     this.providerName = ko.observable(undefined);
 
     this.joaatHash = -1;

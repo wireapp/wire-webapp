@@ -43,7 +43,7 @@ import {ListViewModel} from '../ListViewModel';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationState} from '../../conversation/ConversationState';
-import {isBackendError} from '../../util/TypePredicateUtil';
+import {isBackendError, isUser} from '../../util/TypePredicateUtil';
 import type {MainViewModel} from '../MainViewModel';
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {IntegrationRepository} from '../../integration/IntegrationRepository';
@@ -292,14 +292,20 @@ export class StartUIViewModel {
   };
 
   readonly clickOnOther = (participantEntity: User | ServiceEntity): Promise<void> | void => {
-    const isUser = participantEntity instanceof User;
-    if (isUser && (participantEntity as User).isOutgoingRequest()) {
-      return this.clickOnContact(participantEntity as User);
+    if (isUser(participantEntity)) {
+      if (participantEntity.isOutgoingRequest()) {
+        return this.clickOnContact(participantEntity);
+      }
+      if (!participantEntity.isOnSameFederatedDomain()) {
+        return this.clickOnContact(participantEntity);
+      }
+      const userId = participantEntity.domain
+        ? {domain: participantEntity.domain, id: participantEntity.id}
+        : participantEntity.id;
+      return this.mainViewModel.content.userModal.showUser(userId);
     }
-    if (isUser) {
-      return this.mainViewModel.content.userModal.showUser(participantEntity.id);
-    }
-    return this.mainViewModel.content.serviceModal.showService(participantEntity as ServiceEntity);
+
+    return this.mainViewModel.content.serviceModal.showService(participantEntity);
   };
 
   readonly clickOnShowPeople = (): void => {

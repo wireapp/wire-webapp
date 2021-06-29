@@ -84,7 +84,7 @@ describe('NotificationRepository', () => {
       user_et = testFactory.user_repository.userMapper.mapUserFromJson(payload.users.get.one[0]);
       [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
       conversation_et.team_id = undefined;
-      const selfUserEntity = new User(createRandomUuid());
+      const selfUserEntity = new User(createRandomUuid(), null);
       selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
@@ -768,7 +768,7 @@ describe('NotificationRepository', () => {
     }
 
     beforeEach(() => {
-      const selfUserEntity = new User(userId);
+      const selfUserEntity = new User(userId, null);
       selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
 

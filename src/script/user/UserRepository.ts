@@ -31,7 +31,6 @@ import {
 } from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
-import type {AxiosError} from 'axios';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
 import type {PublicClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
@@ -40,7 +39,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isQualifiedId, isUser} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -410,28 +409,30 @@ export class UserRepository {
   /**
    * Get a user from the backend.
    */
-  private async fetchUserById(userId: string): Promise<User> {
-    const [userEntity] = await this.fetchUsersById([userId]);
+  private async fetchUserById(userId: string | QualifiedId): Promise<User> {
+    const [userEntity] = await this.fetchUsersById([userId] as [string] | [QualifiedId]);
     return userEntity;
   }
 
   /**
    * Get users from the backend.
    */
-  private async fetchUsersById(userIds: string[] = []): Promise<User[]> {
-    userIds = userIds.filter(userId => !!userId);
-
+  private async fetchUsersById(userIds: string[] | QualifiedId[]): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
 
-    const getUsers = async (chunkOfUserIds: string[]): Promise<User[]> => {
+    const getUsers = async (chunkOfUserIds: string[] | QualifiedId[]): Promise<User[]> => {
       try {
         const response = await this.userService.getUsers(chunkOfUserIds);
         return response ? this.userMapper.mapUsersFromJson(response) : [];
       } catch (error) {
-        const isNotFound = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
-        const isBadRequest = Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
+        const isNotFound =
+          (isAxiosError(error) && error.response?.status === HTTP_STATUS.NOT_FOUND) ||
+          Number((error as BackendError).code) === HTTP_STATUS.NOT_FOUND;
+        const isBadRequest =
+          (isAxiosError(error) && error.response?.status === HTTP_STATUS.BAD_REQUEST) ||
+          Number((error as BackendError).code) === HTTP_STATUS.BAD_REQUEST;
         if (isNotFound || isBadRequest) {
           return [];
         }
@@ -439,8 +440,10 @@ export class UserRepository {
       }
     };
 
-    const chunksOfUserIds = chunk(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST) as string[][];
-    const resolveArray = await Promise.all(chunksOfUserIds.map(userChunk => getUsers(userChunk)));
+    const chunksOfUserIds = chunk<string | QualifiedId>(userIds, Config.getConfig().MAXIMUM_USERS_PER_REQUEST);
+    const resolveArray = await Promise.all(
+      chunksOfUserIds.map(userChunk => getUsers(userChunk as string[] | QualifiedId[])),
+    );
     const newUserEntities = flatten(resolveArray);
     if (this.userState.isTeam()) {
       this.mapGuestStatus(newUserEntities);
@@ -460,9 +463,9 @@ export class UserRepository {
    */
   findUserById(userId: string | QualifiedId): User | undefined {
     return this.userState.users().find(userEntity => {
-      return typeof userId === 'string'
-        ? userEntity.id === userId
-        : userEntity.id === userId.id && userEntity.domain === userId.domain;
+      return isQualifiedId(userId)
+        ? userEntity.id === userId.id && userEntity.domain === userId.domain
+        : userEntity.id === userId;
     });
   }
 
@@ -508,7 +511,7 @@ export class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  async getUserById(userId: string): Promise<User> {
+  async getUserById(userId: string | QualifiedId): Promise<User> {
     let user = this.findUserById(userId);
     if (!user) {
       try {
@@ -541,7 +544,7 @@ export class UserRepository {
    * @param userIds List of user ID
    * @param offline Should we only look for cached contacts
    */
-  async getUsersById(userIds: string[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: string[] | QualifiedId[], offline: boolean = false): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
@@ -549,9 +552,9 @@ export class UserRepository {
     const findUsers = userIds.map(userId => this.findUserById(userId) || userId);
 
     const resolveArray = await Promise.all(findUsers);
-    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => typeof item !== 'string') as [
+    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => isUser(item)) as [
       User[],
-      string[],
+      string[] | QualifiedId[],
     ];
 
     if (offline || !unknownUserIds.length) {
@@ -612,9 +615,8 @@ export class UserRepository {
    * Update a local user from the backend by ID.
    */
   updateUserById = async (userId: string | QualifiedId): Promise<void> => {
-    const localUserEntity = this.findUserById(userId) || new User();
-    const updatedUserData =
-      typeof userId === 'string' ? await this.userService.getUser(userId) : await this.userService.getUser(userId.id);
+    const localUserEntity = this.findUserById(userId);
+    const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);
@@ -624,19 +626,32 @@ export class UserRepository {
     }
   };
 
+  static createDeletedUser(userId: string | QualifiedId): User {
+    const userEntity = isQualifiedId(userId) ? new User(userId.id, userId.domain) : new User(userId, null);
+    userEntity.isDeleted = true;
+    userEntity.name(t('nonexistentUser'));
+    return userEntity;
+  }
+
+  static findMatchingUser(userId: string | QualifiedId, userEntities: User[]): User | undefined {
+    if (isQualifiedId(userId)) {
+      return userEntities.find(userEntity => {
+        return userEntity.domain === userId.domain && userEntity.id === userId.id;
+      });
+    }
+    return userEntities.find(userEntity => userEntity.id === userId);
+  }
+
   /**
    * Add user entities for suspended users.
    * @returns User entities
    */
-  private addSuspendedUsers(userIds: string[], userEntities: User[]): User[] {
+  private addSuspendedUsers(userIds: string[] | QualifiedId[], userEntities: User[]): User[] {
     for (const userId of userIds) {
-      const matchingUserIds = userEntities.find(userEntity => userEntity.id === userId);
+      const matchingUserIds = UserRepository.findMatchingUser(userId, userEntities);
 
       if (!matchingUserIds) {
-        const userEntity = new User(userId);
-        userEntity.isDeleted = true;
-        userEntity.name(t('nonexistentUser'));
-        userEntities.push(userEntity);
+        userEntities.push(UserRepository.createDeletedUser(userId));
       }
     }
     return userEntities;
