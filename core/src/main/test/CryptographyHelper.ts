@@ -35,7 +35,9 @@ export async function createEncodedCipherText(
   const sender = new Cryptobox(senderEngine, 1);
   await sender.create();
 
-  const sessionId = `from-${sender.identity!.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
+  const sessionId = `from-${sender[
+    'identity'
+  ]!.public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
 
   const alicePublicKey = receiver.public_key;
   const publicPreKeyBundle = new keys.PreKeyBundle(alicePublicKey, preKey);
