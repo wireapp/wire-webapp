@@ -19,7 +19,7 @@
     "babel-loader": "8.2.2",
     "bazinga64": "5.9.2",
     "jasmine": "3.7.0",
-    "karma": "6.3.3",
+    "karma": "6.3.4",
     "karma-chrome-launcher": "3.1.0",
     "karma-jasmine": "4.0.1",
     "karma-webpack": "4.0.2",
