@@ -26,6 +26,7 @@ import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {UserlistMode} from 'Components/userList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
+import {noop} from 'Util/util';
 
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
@@ -39,7 +40,7 @@ import Icon from 'Components/Icon';
 import {Availability} from '@wireapp/protocol-messaging';
 import {Config} from '../../Config';
 
-export interface ParticipantItemProps {
+export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
   badge?: boolean;
   callParticipant?: Participant;
   canSelect?: boolean;
@@ -73,6 +74,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   participant,
   selfInTeam,
   showArrow = false,
+  onContextMenu = noop,
 }) => {
   const [isInViewport, viewportElementRef] = useViewPortObserver();
   const isUser = participant instanceof User && !participant.isService;
@@ -122,6 +124,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         'no-underline': noUnderline,
         'show-arrow': showArrow,
       })}
+      onContextMenu={onContextMenu}
     >
       <div
         className="participant-item"

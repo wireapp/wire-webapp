@@ -555,6 +555,13 @@ export class CallingRepository {
         }
         break;
       }
+      case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
+        const call = this.findCall(conversationId);
+        if (call) {
+          this.muteCall(call, true);
+        }
+        break;
+      }
     }
 
     await validatedPromise.catch(() => this.abortCall(conversationId));
@@ -906,11 +913,6 @@ export class CallingRepository {
     _unused: null,
     payload: string,
   ): number => {
-    const protoCalling = new Calling({content: payload});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-      messageId: createRandomUuid(),
-    });
     const call = this.findCall(conversationId);
     if (call?.blockMessages) {
       return 0;
@@ -934,12 +936,37 @@ export class CallingRepository {
           };
         }
 
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-        return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
+        return this.sendCallingMessage(conversationId, payload, options);
       })
       .catch(() => this.abortCall(conversationId));
 
     return 0;
+  };
+
+  private readonly sendCallingMessage = (
+    conversationId: ConversationId,
+    payload: string | Object,
+    options?: MessageSendingOptions,
+  ): Promise<ClientMismatch> => {
+    const protoCalling = new Calling({content: typeof payload === 'string' ? payload : JSON.stringify(payload)});
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+      messageId: createRandomUuid(),
+    });
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
+    return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
+  };
+
+  readonly sendModeratorMute = (conversationId: ConversationId, userId: UserId, clientId: ClientId) => {
+    this.sendCallingMessage(
+      conversationId,
+      {type: CALL_MESSAGE_TYPE.REMOTE_MUTE},
+      {
+        nativePush: true,
+        precondition: true,
+        recipients: {[userId]: [clientId]},
+      },
+    );
   };
 
   private readonly sendSFTRequest = (

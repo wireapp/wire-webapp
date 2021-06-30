@@ -21,6 +21,7 @@ import React, {useEffect, useMemo, useState} from 'react';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {container} from 'tsyringe';
+import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -45,6 +46,7 @@ import {createNavigate} from '../../router/routerBindings';
 import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {TeamState} from '../../team/TeamState';
+import {Context, ContextMenuEntry} from '../../ui/ContextMenu';
 
 export interface CallingCellProps {
   call: Call;
@@ -130,6 +132,18 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [showParticipants, setShowParticipants] = useState(false);
 
   const [callDuration, setCallDuration] = useState('');
+
+  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, userId: string, clientId: string) => {
+    event.preventDefault();
+    const entries: ContextMenuEntry[] = [
+      {
+        click: () => callingRepository.sendModeratorMute(conversation.id, userId, clientId),
+        isDisabled: conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
+        label: 'Mute',
+      },
+    ];
+    Context.from(event.nativeEvent, entries, 'participant-moderator-menu');
+  };
 
   useEffect(() => {
     let intervalId: number;
@@ -345,6 +359,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         selfInTeam={selfUser?.inTeam()}
                         isSelfVerified={isSelfVerified}
                         external={teamState.isExternal(participant.user.id)}
+                        onContextMenu={event => getParticipantContext(event, participant.user.id, participant.clientId)}
                       />
                     ))}
                 </div>
