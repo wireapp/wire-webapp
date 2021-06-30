@@ -47,6 +47,7 @@ import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {TeamState} from '../../team/TeamState';
 import {Context, ContextMenuEntry} from '../../ui/ContextMenu';
+import type {Participant} from '../../calling/Participant';
 
 export interface CallingCellProps {
   call: Call;
@@ -133,12 +134,14 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const [callDuration, setCallDuration] = useState('');
 
-  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, userId: string, clientId: string) => {
+  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
     const entries: ContextMenuEntry[] = [
       {
-        click: () => callingRepository.sendModeratorMute(conversation.id, userId, clientId),
-        isDisabled: conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
+        click: () => callingRepository.sendModeratorMute(conversation.id, participant.user.id, participant.clientId),
+        icon: 'mic-off-icon',
+        isDisabled:
+          participant.isMuted() || conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
         label: 'Mute',
       },
     ];
@@ -359,7 +362,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         selfInTeam={selfUser?.inTeam()}
                         isSelfVerified={isSelfVerified}
                         external={teamState.isExternal(participant.user.id)}
-                        onContextMenu={event => getParticipantContext(event, participant.user.id, participant.clientId)}
+                        onContextMenu={event => getParticipantContext(event, participant)}
                       />
                     ))}
                 </div>
