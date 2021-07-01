@@ -27,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
-import {Context, ContextMenuEntry} from '../ui/ContextMenu';
+import {showContextMenu as showContext, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import {StatusType} from '../message/StatusType';
@@ -288,7 +288,7 @@ class Message {
 
   showContextMenu(event: MouseEvent) {
     const entries = this.contextMenuEntries();
-    Context.from(event, entries, 'message-options-menu');
+    showContext(event, entries, 'message-options-menu');
   }
 }
 
