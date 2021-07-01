@@ -123,5 +123,4 @@ export default LinkPreviewAssetComponent;
 registerReactComponent('link-preview-asset', {
   bindings: 'header, message: ko.unwrap(message)',
   component: LinkPreviewAssetComponent,
-  optionalParams: ['header'],
 });

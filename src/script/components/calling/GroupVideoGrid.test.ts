@@ -44,12 +44,10 @@ describe('GroupVideoGrid', () => {
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [participant, participant],
-        hasRemoteVideo: false,
         thumbnail: null,
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: false,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
@@ -69,12 +67,10 @@ describe('GroupVideoGrid', () => {
     const props: GroupVideoGripProps = {
       grid: {
         grid: [participantOne, participantTwo],
-        hasRemoteVideo: false,
         thumbnail: null,
       },
       maximizedParticipant,
       minimized: false,
-      muted: false,
       selfParticipant: participantOne,
       setMaximizedParticipant: () => {
         maximizedParticipant = participantTwo;
@@ -95,12 +91,10 @@ describe('GroupVideoGrid', () => {
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [participant],
-        hasRemoteVideo: false,
         thumbnail: null,
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: false,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
@@ -117,12 +111,10 @@ describe('GroupVideoGrid', () => {
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [],
-        hasRemoteVideo: false,
         thumbnail: participant,
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: true,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
@@ -140,12 +132,10 @@ describe('GroupVideoGrid', () => {
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [],
-        hasRemoteVideo: false,
         thumbnail: participant,
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: true,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });

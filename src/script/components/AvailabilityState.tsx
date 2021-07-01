@@ -126,7 +126,6 @@ export default AvailabilityState;
 
 registerReactComponent<AvailabilityStateProps>('availability-state', {
   component: AvailabilityState,
-  optionalParams: ['showArrow', 'theme', 'className'],
   template:
     '<span class="availability-state" data-bind="react: {availability: ko.unwrap(availability), label: ko.unwrap(label), showArrow, dataUieName, theme: ko.unwrap(theme)}"></span>',
 });

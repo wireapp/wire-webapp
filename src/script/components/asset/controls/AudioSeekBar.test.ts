@@ -32,11 +32,11 @@ class AudioSeekBarPage extends TestPage<AudioSeekBarProps> {
 
 describe('AudioSeekBar', () => {
   const getAudioAsset = () =>
-    (({
+    ({
       meta: {
         loudness: new Uint8Array(Array.from({length: 200}, (item, index) => index)),
       },
-    } as unknown) as FileAsset);
+    } as unknown as FileAsset);
 
   const createAudioElement = (currentTime = 0) => {
     const audioElement = document.createElement('audio');

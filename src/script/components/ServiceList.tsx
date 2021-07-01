@@ -70,7 +70,6 @@ export default ServiceList;
 
 registerReactComponent('service-list', {
   component: ServiceList,
-  optionalParams: ['isSearching', 'mode'],
   template:
     '<div data-bind="react: {arrow, click, isSearching: ko.unwrap(isSearching), mode, noUnderline, services: ko.unwrap(services)}"></div>',
 });

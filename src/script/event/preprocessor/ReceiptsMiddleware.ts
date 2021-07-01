@@ -47,7 +47,7 @@ export class ReceiptsMiddleware {
   /**
    * Handles incoming (and injected outgoing) events.
    */
-  processEvent(event: EventRecord): Promise<EventRecord> {
+  async processEvent(event: EventRecord): Promise<EventRecord> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ASSET_ADD:
       case ClientEvent.CONVERSATION.KNOCK:
@@ -63,18 +63,14 @@ export class ReceiptsMiddleware {
       }
       case ClientEvent.CONVERSATION.CONFIRMATION: {
         const messageIds = event.data.more_message_ids.concat(event.data.message_id);
-        return this.eventService
-          .loadEvents(event.conversation, messageIds)
-          .then((originalEvents: EventRecord[]) => {
-            originalEvents.forEach(originalEvent => this._updateConfirmationStatus(originalEvent, event));
-            this.logger.info(
-              `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
-              originalEvents,
-            );
-          })
-          .then(() => event);
+        const originalEvents: EventRecord[] = await this.eventService.loadEvents(event.conversation, messageIds);
+        originalEvents.forEach(originalEvent => this.updateConfirmationStatus(originalEvent, event));
+        this.logger.info(
+          `Confirmed '${originalEvents.length}' messages with status '${event.data.status}' from '${event.from}'`,
+          originalEvents,
+        );
+        return event;
       }
-
       default: {
         return Promise.resolve(event);
       }
@@ -85,7 +81,7 @@ export class ReceiptsMiddleware {
     return this.userState.self() && this.userState.self().id === originalEvent.from;
   }
 
-  private _updateConfirmationStatus(
+  private updateConfirmationStatus(
     originalEvent: EventRecord,
     confirmationEvent: EventRecord,
   ): Promise<EventRecord | void> {

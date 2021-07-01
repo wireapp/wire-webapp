@@ -260,7 +260,7 @@ export class Message {
   isLinkPreview(): this is LinkPreview {
     return (
       this.hasAssetText() &&
-      ((this as unknown) as ContentMessage)
+      (this as unknown as ContentMessage)
         .assets()
         .some(assetEntity => assetEntity.isText() && assetEntity.previews().length)
     );
@@ -347,7 +347,7 @@ export class Message {
    */
   hasUnavailableAsset(includeFailedState = true): boolean {
     if (this.hasAsset()) {
-      return ((this as unknown) as ContentMessage).assets().some(asset => {
+      return (this as unknown as ContentMessage).assets().some(asset => {
         const unavailableStatus = [AssetTransferState.UPLOAD_PENDING, AssetTransferState.UPLOADING];
         if (includeFailedState) {
           unavailableStatus.push(AssetTransferState.UPLOAD_FAILED);

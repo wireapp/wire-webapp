@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
-import {formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {Context, ContextMenuEntry} from '../ui/ContextMenu';
@@ -58,6 +57,9 @@ import './message/DeleteMessage';
 import './message/DecryptErrorMessage';
 import './message/LegalHoldMessage';
 import './message/SystemMessage';
+import './message/MemberMessage';
+import './message/ReadReceiptStatus';
+import './message/PingMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -113,8 +115,6 @@ class Message {
   onLike: (message: ContentMessage, button?: boolean) => void;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   previewSubscription: ko.Subscription;
-  readReceiptText: ko.PureComputed<string>;
-  readReceiptTooltip: ko.PureComputed<string>;
   selfId: ko.Observable<string>;
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
@@ -197,26 +197,6 @@ class Message {
     this.actionsViewModel = actionsViewModel;
 
     this.hasReadReceiptsTurnedOn = this.conversationRepository.expectReadReceipt(this.conversation());
-
-    this.readReceiptTooltip = ko.pureComputed(() => {
-      const receipts = this.message.readReceipts();
-      if (!receipts.length || !this.conversation().is1to1()) {
-        return '';
-      }
-      return formatDateNumeral(receipts[0].time);
-    });
-
-    this.readReceiptText = ko.pureComputed(() => {
-      if (!this.message.expectsReadConfirmation) {
-        return '';
-      }
-      const receipts = this.message.readReceipts();
-      if (!receipts.length) {
-        return '';
-      }
-      const is1to1 = this.conversation().is1to1();
-      return is1to1 ? formatTimeShort(receipts[0].time) : receipts.length.toString(10);
-    });
 
     this.contextMenuEntries = ko.pureComputed(() => {
       const messageEntity = this.message;
@@ -310,38 +290,17 @@ class Message {
     const entries = this.contextMenuEntries();
     Context.from(event, entries, 'message-options-menu');
   }
-
-  readonly bindShowMore = (elements: HTMLElement[], scope: Message) => {
-    const label = elements.find(element => element.className === 'message-header-label');
-    if (!label) {
-      return;
-    }
-    const link = label.querySelector('.message-header-show-more');
-    if (link) {
-      link.addEventListener('click', () => this.onClickParticipants((scope.message as any).highlightedUsers()));
-    }
-  };
 }
 
 // If this is not explicitly defined as string,
 // TS will define this as the string's content.
 const receiptStatusTemplate: string = `
-  <!-- ko if: isLastDeliveredMessage() && readReceiptText() === '' -->
-    <span class="message-status" data-bind="text: t('conversationMessageDelivered')"></span>
-  <!-- /ko -->
-  <!-- ko if: readReceiptText() -->
-    <span class="message-status-read" data-bind="
-        css: {'message-status-read--visible': isLastDeliveredMessage(),
-          'with-tooltip with-tooltip--receipt': readReceiptTooltip(),
-          'message-status-read--clickable': !conversation().is1to1()},
-        attr: {'data-tooltip': readReceiptTooltip()},
-        click: conversation().is1to1() ? null : onClickReceipts
-        "
-        data-uie-name="status-message-read-receipts">
-      <read-icon></read-icon>
-      <span class="message-status-read__count" data-bind="text: readReceiptText()" data-uie-name="status-message-read-receipt-count"></span>
-    </span>
-  <!-- /ko -->
+  <read-receipt-status params="
+    message: message,
+    is1to1Conversation: conversation().is1to1,
+    isLastDeliveredMessage: isLastDeliveredMessage,
+    onClickReceipts: onClickReceipts,
+  "></read-receipt-status>
 `;
 
 const normalTemplate: string = `
@@ -452,110 +411,6 @@ const normalTemplate: string = `
   <!-- /ko -->
   `;
 
-const pingTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
-    </div>
-    <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
-      <span class="message-header-label__multiline">
-        <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
-        <span class="ellipsis" data-bind="text: message.caption"></span>
-      </span>
-    </div>
-    <div class="message-body-actions">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
-      ${receiptStatusTemplate}
-    </div>
-  </div>
-  `;
-
-const memberTemplate: string = `
-  <!-- ko if: message.showLargeAvatar() -->
-    <div class="message-connected">
-      <span class="message-connected-header" data-bind='text: message.otherUser().name()'></span>
-      <!-- ko if: message.otherUser().isService -->
-        <span class="message-connected-provider-name" data-bind='text: message.otherUser().providerName()'></span>
-      <!-- /ko -->
-      <!-- ko ifnot: message.otherUser().isService -->
-        <span class="message-connected-username label-username" data-bind='text: message.otherUser().handle'></span>
-      <!-- /ko -->
-      <participant-avatar class="message-connected-avatar cursor-default"
-                   params="participant: message.otherUser, size: AVATAR_SIZE.X_LARGE, noBadge: message.otherUser().isOutgoingRequest()"></participant-avatar>
-      <!-- ko if: message.otherUser().isOutgoingRequest() -->
-        <div class="message-connected-cancel accent-text"
-             data-bind="click: () => onClickCancelRequest(message),
-                        text: t('conversationConnectionCancelRequest')"
-             data-uie-name="do-cancel-request"></div>
-      <!-- /ko -->
-      <!-- ko if: message.showServicesWarning -->
-        <div class="message-services-warning" data-bind="text: t('conversationServicesWarning')" data-uie-name="label-services-warning"></div>
-      <!-- /ko -->
-    </div>
-  <!-- /ko -->
-  <!-- ko ifnot: message.showLargeAvatar() -->
-    <!-- ko if: message.showNamedCreation() -->
-      <div class="message-group-creation-header">
-        <div class="message-group-creation-header-text" data-bind="html: message.htmlGroupCreationHeader()"></div>
-        <div class="message-group-creation-header-name" data-bind="text: message.name()"></div>
-      </div>
-    <!-- /ko -->
-
-    <!-- ko if: message.hasUsers() -->
-      <div class="message-header" data-bind="template: {afterRender: bindShowMore}">
-        <div class="message-header-icon message-header-icon--svg text-foreground">
-          <message-icon data-bind="visible: message.isGroupCreation()"></message-icon>
-          <span class="icon-minus" data-bind="visible: message.isMemberRemoval()"></span>
-          <span class="icon-plus" data-bind="visible: message.isMemberJoin()"></span>
-        </div>
-        <div class="message-header-label">
-          <span class="message-header-caption" data-bind="html: message.htmlCaption()"></span>
-          <hr class="message-header-line" />
-        </div>
-        <!-- ko if: message.isMemberChange() -->
-          <div class="message-body-actions">
-            <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
-          </div>
-        <!-- /ko -->
-      </div>
-      <!-- ko if: message.showServicesWarning -->
-        <div class="message-services-warning" data-bind="text: t('conversationServicesWarning')" data-uie-name="label-services-warning"></div>
-      <!-- /ko -->
-    <!-- /ko -->
-
-    <!-- ko if: message.isGroupCreation() -->
-      <!-- ko if: shouldShowInvitePeople -->
-        <div class="message-member-footer">
-          <div data-bind="text: t('guestRoomConversationHead')"></div>
-          <div class="message-member-footer-button" data-bind="click: onClickInvitePeople, text: t('guestRoomConversationButton')" data-uie-name="do-invite-people"></div>
-        </div>
-      <!-- /ko -->
-      <!-- ko if: isSelfTemporaryGuest -->
-        <div class="message-member-footer">
-          <div class="message-member-footer-message" data-bind="text: t('temporaryGuestJoinMessage')"></div>
-          <div class="message-member-footer-description" data-bind="text: t('temporaryGuestJoinDescription')"></div>
-        </div>
-      <!-- /ko -->
-      <!-- ko if: hasReadReceiptsTurnedOn -->
-        <div class="message-header" data-uie-name="label-group-creation-receipts">
-          <div class="message-header-icon message-header-icon--svg text-foreground">
-            <read-icon></read-icon>
-          </div>
-          <div class="message-header-label">
-            <span class="ellipsis" data-bind="text: t('conversationCreateReceiptsEnabled')"></span>
-            <hr class="message-header-line" />
-          </div>
-        </div>
-      <!-- /ko -->
-    <!-- /ko -->
-
-    <!-- ko if: message.isMemberLeave() && message.user().isMe && isSelfTemporaryGuest -->
-      <div class="message-member-footer">
-        <div class="message-member-footer-description" data-bind="text: t('temporaryGuestLeaveDescription')"></div>
-      </div>
-    <!-- /ko -->
-  <!-- /ko -->  `;
-
 ko.components.register('message', {
   template: `
     <!-- ko if: message.super_type === 'normal' -->
@@ -583,10 +438,23 @@ ko.components.register('message', {
       <system-message params="message: message"></system-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'member' -->
-      ${memberTemplate}
+      <member-message params="
+        message: message,
+        onClickInvitePeople: onClickInvitePeople,
+        onClickParticipants: onClickParticipants,
+        onClickCancelRequest: onClickCancelRequest,
+        hasReadReceiptsTurnedOn: hasReadReceiptsTurnedOn,
+        shouldShowInvitePeople: shouldShowInvitePeople,
+        isSelfTemporaryGuest: isSelfTemporaryGuest
+      "></member-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
-      ${pingTemplate}
+      <ping-message params="
+        message: message,
+        is1to1Conversation: conversation().is1to1,
+        isLastDeliveredMessage: isLastDeliveredMessage,
+        onClickReceipts: onClickReceipts,
+      "></ping-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'file-type-restricted' -->
       <filetype-restricted-message params="message: message"></filetype-restricted-message>

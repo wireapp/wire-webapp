@@ -17,14 +17,10 @@
  *
  */
 
-import ko from 'knockout';
+import ko, {Unwrapped} from 'knockout';
 import {useEffect, useState} from 'react';
-import {TypeUtil} from '@wireapp/commons';
-
 interface RegisterReactComponent<Props> {
   component: React.ComponentType<Props>;
-  /** The optional knockout params */
-  optionalParams?: TypeUtil.OptionalKeys<Props>[];
 }
 
 interface RegisterReactComponentWithTemplate<T> extends RegisterReactComponent<T> {
@@ -43,13 +39,19 @@ export function registerReactComponent<Props>(
     template,
     bindings,
     component,
-    optionalParams = [],
   }: RegisterReactComponentWithBindings<Props> | RegisterReactComponentWithTemplate<Props>,
 ) {
   ko.components.register(name, {
     template: template ?? `<!-- ko react: {${bindings}} --><!-- /ko -->`,
     viewModel: function (knockoutParams: Props) {
-      optionalParams.forEach(param => {
+      const bindingsString = bindings ?? /react: ?{([^]*)}/.exec(template)[1];
+      const pairs = bindingsString?.split(',');
+      const neededParams = pairs?.map(pair => {
+        const [name, value = name] = pair.split(':');
+        return value.replace(/ko\.unwrap\(|\)/g, '').trim();
+      }) as (keyof Props)[];
+
+      neededParams.forEach(param => {
         if (!knockoutParams.hasOwnProperty(param)) {
           knockoutParams[param] = undefined;
         }
@@ -76,30 +78,33 @@ export const useKoSubscribable = <T = any>(observable: ko.Subscribable<T>, defau
   return value;
 };
 
-type ChildValues<T extends string | number | symbol> = Record<T, any>;
-
 type Subscribables<T> = {
   [Key in keyof T]: T[Key] extends ko.Subscribable ? T[Key] : never;
+};
+
+type UnwrappedValues<T, S = Subscribables<T>> = {
+  [Key in keyof S]: Unwrapped<S[Key]>;
 };
 
 export const useKoSubscribableChildren = <C extends keyof Subscribables<P>, P extends Record<C, ko.Subscribable>>(
   parent: P,
   children: C[],
-): ChildValues<C> => {
-  const getInitialState = (root: P): ChildValues<C> =>
+): UnwrappedValues<P> => {
+  const getInitialState = (root: P): UnwrappedValues<P> =>
     children.reduce((acc, child) => {
-      acc[child] = root[child]?.();
+      acc[child] = root?.[child]?.();
       return acc;
-    }, {} as ChildValues<C>);
+    }, {} as UnwrappedValues<P>);
 
-  const [state, setState] = useState<ChildValues<C>>(getInitialState(parent));
+  const [state, setState] = useState<UnwrappedValues<P>>(getInitialState(parent));
   useEffect(() => {
     setState(getInitialState(parent));
-    const subscriptions = children.map(child =>
-      parent[child]?.subscribe((value: any) => {
-        setState({...state, [child]: value});
-      }),
-    );
+    const subscriptions = children.map(child => {
+      const subscribable = parent?.[child];
+      return subscribable?.subscribe((value: Unwrapped<typeof subscribable>) => {
+        setState(prevState => ({...prevState, [child]: value}));
+      });
+    });
     return () => subscriptions.forEach(subscription => subscription?.dispose());
   }, [parent]);
 

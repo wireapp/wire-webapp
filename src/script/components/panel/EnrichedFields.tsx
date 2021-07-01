@@ -88,6 +88,5 @@ export default EnrichedFields;
 
 registerReactComponent<EnrichedFieldsProps>('enriched-fields', {
   component: EnrichedFields,
-  optionalParams: ['onFieldsLoaded', 'richProfileRepository'],
   template: '<div data-bind="react: {user: ko.unwrap(user), onFieldsLoaded, richProfileRepository}"></div>',
 });

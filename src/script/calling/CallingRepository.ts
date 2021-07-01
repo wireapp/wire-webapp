@@ -33,6 +33,7 @@ import {
   REASON,
   STATE as CALL_STATE,
   VIDEO_STATE,
+  VSTREAMS,
   Wcall,
   WcallClient,
   WcallMember,
@@ -382,6 +383,7 @@ export class CallingRepository {
     const index = this.callState.activeCalls().indexOf(call);
     call.getSelfParticipant().releaseMediaStream();
     call.participants.removeAll();
+    call.removeAllAudio();
     if (index !== -1) {
       this.callState.activeCalls.splice(index, 1);
     }
@@ -745,6 +747,16 @@ export class CallingRepository {
     this.wCall.reject(this.wUser, conversationId);
   }
 
+  changeCallPage(newPage: number, call: Call): void {
+    const nextPageParticipants = call.pages()[newPage];
+    const payload = {
+      clients: nextPageParticipants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      convid: call.conversationId,
+    };
+    this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
+    call.currentPage(newPage);
+  }
+
   readonly leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
@@ -863,7 +875,7 @@ export class CallingRepository {
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
-    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private injectDeactivateEvent(
@@ -882,7 +894,7 @@ export class CallingRepository {
       time,
       this.avsVersion,
     );
-    this.eventRepository.injectEvent((event as unknown) as EventRecord, source as EventSource);
+    this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private readonly sendMessage = (
@@ -1023,6 +1035,7 @@ export class CallingRepository {
       return;
     }
     selfParticipant.releaseMediaStream();
+    call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
   };
@@ -1115,6 +1128,9 @@ export class CallingRepository {
     if (call.participants().length > call.analyticsMaximumParticipants) {
       call.analyticsMaximumParticipants = call.participants().length;
     }
+
+    call.updatePages();
+    this.changeCallPage(call.currentPage(), call);
   }
 
   private readonly handleCallParticipantChanges = (conversationId: ConversationId, membersJson: string) => {
@@ -1237,18 +1253,19 @@ export class CallingRepository {
 
   private readonly updateParticipantVideoStream = (
     conversationId: ConversationId,
-    userId: UserId,
-    clientId: ClientId,
-    streams: MediaStream[],
+    remoteUserId: UserId,
+    remoteClientId: ClientId,
+    streams: readonly MediaStream[] | null,
   ): void => {
-    let participant = this.findParticipant(conversationId, userId, clientId);
+    let participant = this.findParticipant(conversationId, remoteUserId, remoteClientId);
     if (!participant) {
-      participant = new Participant(this.userRepository.findUserById(userId), clientId);
+      participant = new Participant(this.userRepository.findUserById(remoteUserId), remoteClientId);
       const call = this.findCall(conversationId);
       call.addParticipant(participant);
     }
 
-    if (streams.length === 0) {
+    if (streams === null || streams.length === 0) {
+      participant.releaseVideoStream();
       return;
     }
 

@@ -43,7 +43,7 @@ describe('AvatarImage', () => {
     const assetRepoSpy = {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
-    const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
+    const assetRepo = assetRepoSpy as unknown as AssetRepository;
     const participant = new User('id');
     const resource = {
       downloadProgress: () => 0,
@@ -67,7 +67,7 @@ describe('AvatarImage', () => {
     const assetRepoSpy = {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
-    const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
+    const assetRepo = assetRepoSpy as unknown as AssetRepository;
     const participant = new User('id');
     const resource = {
       downloadProgress: () => 0,
@@ -91,7 +91,7 @@ describe('AvatarImage', () => {
     const assetRepoSpy = {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
-    const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
+    const assetRepo = assetRepoSpy as unknown as AssetRepository;
     const participant = new User('id');
     participant.previewPictureResource({
       downloadProgress: () => 0,
@@ -116,7 +116,7 @@ describe('AvatarImage', () => {
     const assetRepoSpy = {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
     };
-    const assetRepo = (assetRepoSpy as unknown) as AssetRepository;
+    const assetRepo = assetRepoSpy as unknown as AssetRepository;
     const participant = new User('id');
 
     const avatarImage = new AvatarImagePage({

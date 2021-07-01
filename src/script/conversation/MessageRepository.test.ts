@@ -191,13 +191,17 @@ describe('MessageRepository', () => {
         .then(() => {
           const text = new Text({
             content:
-              /* cspell:disable-next-line */
-              'massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external messagemassive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message massive external message',
+              'massive external message massive external message massive external message massive external message ' +
+              'massive external message massive external message massive external message massive external message ' +
+              'massive external message massive external message massive external message massive external message ' +
+              'massive external message massive external message massive external message massive external message ' +
+              'massive external message massive external message massive external message massive external message ' +
+              'massive external message massive external message massive external message massive external message ' +
+              'massive external message massive external message massive external message massive external message ' +
+              'massive external message massive external message massive external message massive external message ' +
+              'massive external message massive external message massive external message massive external message',
           });
-          const genericMessage = new GenericMessage({
-            [GENERIC_MESSAGE_TYPE.TEXT]: text,
-            messageId: createRandomUuid(),
-          });
+          const genericMessage = new GenericMessage({[GENERIC_MESSAGE_TYPE.TEXT]: text, messageId: createRandomUuid()});
 
           const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
           return testFactory.message_repository['shouldSendAsExternal'](eventInfoEntity);

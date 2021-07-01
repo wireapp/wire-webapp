@@ -277,17 +277,8 @@ export class ConversationMapper {
         const localConversationData: ConversationDatabaseData =
           localConversations.find(({id}) => id === conversationId) || newLocalConversation;
 
-        const {
-          access,
-          access_role,
-          creator,
-          members,
-          message_timer,
-          receipt_mode,
-          name,
-          team,
-          type,
-        } = remoteConversationData;
+        const {access, access_role, creator, members, message_timer, receipt_mode, name, team, type} =
+          remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
         const updates: Record<string, any> = {
@@ -374,7 +365,7 @@ export class ConversationMapper {
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
 
     if (accessCode.uri && isTeamConversation) {
-      const accessCodeUrl = `${window.wire.env.APP_BASE}/join/?key=${accessCode.key}&code=${accessCode.code}`;
+      const accessCodeUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
       conversationEntity.accessCode(accessCodeUrl);
     }
   }

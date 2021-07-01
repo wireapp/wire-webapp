@@ -17,7 +17,7 @@
  *
  */
 
-import {COLOR, ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
+import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {Config} from '../../Config';
@@ -33,19 +33,11 @@ const ConversationJoinInvalid = ({}: Props) => {
     <UnsupportedBrowser isTemporaryGuest>
       <WirelessContainer>
         <ContainerXS style={{margin: 'auto 0'}}>
-          <H2
-            style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}
-            color={COLOR.GRAY}
-            data-uie-name="status-invalid-headline"
-          >
+          <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-invalid-headline">
             <FormattedMessage
               {...conversationJoinStrings.invalidHeadline}
               values={{
                 brandName: Config.getConfig().BRAND_NAME,
-                // eslint-disable-next-line react/display-name
-                newline: <br />,
-                // eslint-disable-next-line react/display-name
-                strong: (...chunks: any[]) => <strong style={{color: 'black'}}>{chunks}</strong>,
               }}
             />
           </H2>

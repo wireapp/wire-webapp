@@ -63,9 +63,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 
 export interface Multitasking {
-  autoMinimize?: ko.Observable<boolean>;
-  isMinimized: ko.Observable<boolean> | (() => false);
-  resetMinimize?: ko.Observable<boolean>;
+  isMinimized: ko.Observable<boolean>;
 }
 
 interface ContentViewModelState {
@@ -130,7 +128,10 @@ export class NotificationRepository {
     this.assetRepository = container.resolve(AssetRepository);
     this.conversationRepository = conversationRepository;
     this.permissionRepository = permissionRepository;
-    this.contentViewModelState = {multitasking: {isMinimized: () => false}, state: () => false};
+    this.contentViewModelState = {
+      multitasking: {isMinimized: (() => false) as ko.Observable<boolean>},
+      state: () => false,
+    };
 
     this.logger = getLogger('NotificationRepository');
 
@@ -149,10 +150,7 @@ export class NotificationRepository {
     this.selfUser = this.userState.self;
   }
 
-  setContentViewModelStates(
-    state: () => string,
-    multitasking: {isMinimized: ko.Observable<boolean> | (() => false)},
-  ): void {
+  setContentViewModelStates(state: () => string, multitasking: {isMinimized: ko.Observable<boolean>}): void {
     this.contentViewModelState = {multitasking, state};
   }
 

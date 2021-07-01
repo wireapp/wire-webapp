@@ -175,9 +175,8 @@ export class ConversationListViewModel {
       if (!activeConversation) {
         return;
       }
-      const activeLabelIds = this.conversationRepository.conversationLabelRepository.getConversationLabelIds(
-        activeConversation,
-      );
+      const activeLabelIds =
+        this.conversationRepository.conversationLabelRepository.getConversationLabelIds(activeConversation);
 
       const isAlreadyOpen = activeLabelIds.some(labelId => this.expandedFoldersIds().includes(labelId));
 

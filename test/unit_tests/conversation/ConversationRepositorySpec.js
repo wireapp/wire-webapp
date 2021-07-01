@@ -294,34 +294,32 @@ describe('ConversationRepository', () => {
     beforeEach(() => testFactory.conversation_repository.conversationState.conversations([]));
 
     it('finds an existing 1:1 conversation within a team', () => {
-      // prettier-ignore
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const team1to1Conversation = {
-        'access': ['invite'],
-        'creator': '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
-        'members': {
-          'self': {
-            'hidden_ref': null,
-            'status': 0,
-            'service': null,
-            'otr_muted_ref': null,
-            'status_time': '1970-01-01T00:00:00.000Z',
-            'hidden': false,
-            'status_ref': '0.0',
-            'id': '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
-            'otr_archived': false,
-            'otr_muted': false,
-            'otr_archived_ref': null,
-          }, 'others': [{'status': 0, 'id': 'f718410c-3833-479d-bd80-a5df03f38414'}],
+        access: ['invite'],
+        creator: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
+        id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e',
+        last_event: '0.0',
+        last_event_time: '1970-01-01T00:00:00.000Z',
+        members: {
+          others: [{id: 'f718410c-3833-479d-bd80-a5df03f38414', status: 0}],
+          self: {
+            hidden: false,
+            hidden_ref: null,
+            id: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
+            otr_archived: false,
+            otr_archived_ref: null,
+            otr_muted: false,
+            otr_muted_ref: null,
+            service: null,
+            status: 0,
+            status_ref: '0.0',
+            status_time: '1970-01-01T00:00:00.000Z',
+          },
         },
-        'name': null,
-        'team': 'cf162e22-20b8-4533-a5ab-d3f5dde39d2c',
-        'id': '04ab891e-ccf1-4dba-9d74-bacec64b5b1e',
-        'type': 0,
-        'last_event_time': '1970-01-01T00:00:00.000Z',
-        'last_event': '0.0',
+        name: null,
+        team: 'cf162e22-20b8-4533-a5ab-d3f5dde39d2c',
+        type: 0,
       };
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       const conversationMapper = testFactory.conversation_repository.conversationMapper;
       const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation]);
@@ -418,25 +416,21 @@ describe('ConversationRepository', () => {
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
 
       conversation_et = new Conversation(createRandomUuid());
-      // prettier-ignore
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const messageWithoutTime = {
-        'conversation': `${conversation_et.id}`,
-        'id': 'aeac8355-739b-4dfc-a119-891a52c6a8dc',
-        'from': '532af01e-1e24-4366-aacf-33b67d4ee376',
-        'data': {'content': 'Hello World :)', 'nonce': 'aeac8355-739b-4dfc-a119-891a52c6a8dc'},
-        'type': 'conversation.message-add',
+        conversation: `${conversation_et.id}`,
+        data: {content: 'Hello World :)', nonce: 'aeac8355-739b-4dfc-a119-891a52c6a8dc'},
+        from: '532af01e-1e24-4366-aacf-33b67d4ee376',
+        id: 'aeac8355-739b-4dfc-a119-891a52c6a8dc',
+        type: 'conversation.message-add',
       };
-      // prettier-ignore
       const messageWithTime = {
-        'conversation': `${conversation_et.id}`,
-        'id': '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb',
-        'from': '8b497692-7a38-4a5d-8287-e3d1006577d6',
-        'time': '2016-08-04T13:28:33.389Z',
-        'data': {'content': 'Fifth message', 'nonce': '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb', 'previews': []},
-        'type': 'conversation.message-add',
+        conversation: `${conversation_et.id}`,
+        data: {content: 'Fifth message', nonce: '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb', previews: []},
+        from: '8b497692-7a38-4a5d-8287-e3d1006577d6',
+        id: '5a8cd79a-82bb-49ca-a59e-9a8e76df77fb',
+        time: '2016-08-04T13:28:33.389Z',
+        type: 'conversation.message-add',
       };
-      /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       const bad_message_key = `${conversation_et.id}@${messageWithoutTime.from}@NaN`;
       /**
@@ -460,29 +454,27 @@ describe('ConversationRepository', () => {
       connectionEntity = new ConnectionEntity();
       connectionEntity.conversationId = conversation_et.id;
 
-      // prettier-ignore
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const conversation_payload = {
-        'creator': conversation_et.id,
-        'members': {
-          'self': {
-            'status': 0,
-            'last_read': '1.800122000a54449c',
-            'muted_time': null,
-            'muted': null,
-            'status_time': '2015-01-28T12:53:41.847Z',
-            'status_ref': '0.0',
-            'id': conversation_et.id,
-            'archived': null,
-          }, 'others': [],
+        creator: conversation_et.id,
+        id: conversation_et.id,
+        last_event: '25.800122000a0b0bc9',
+        last_event_time: '2015-03-20T13:41:12.580Z',
+        members: {
+          others: [],
+          self: {
+            archived: null,
+            id: conversation_et.id,
+            last_read: '1.800122000a54449c',
+            muted: null,
+            muted_time: null,
+            status: 0,
+            status_ref: '0.0',
+            status_time: '2015-01-28T12:53:41.847Z',
+          },
         },
-        'name': null,
-        'id': conversation_et.id,
-        'type': 0,
-        'last_event_time': '2015-03-20T13:41:12.580Z',
-        'last_event': '25.800122000a0b0bc9',
+        name: null,
+        type: 0,
       };
-      /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
       spyOn(testFactory.conversation_repository, 'fetchConversationById').and.callThrough();
       spyOn(testFactory.conversation_service, 'getConversationById').and.returnValue(
@@ -534,10 +526,10 @@ describe('ConversationRepository', () => {
       const conversationEntity = _generateConversation(CONVERSATION_TYPE.REGULAR);
       const event = {
         conversation: conversationEntity.id,
+        data: {},
         from: messageSenderId,
         id: createRandomUuid(),
         time: '2017-09-06T09:43:36.528Z',
-        data: {},
         type: 'conversation.message-add',
       };
 
@@ -565,46 +557,46 @@ describe('ConversationRepository', () => {
           const users = [];
           for (const userId of ids.split(',')) {
             users.push({
-              handle: `handle_${userId}`,
-              locale: 'en',
               accent_id: 0,
+              assets: [],
+              handle: `handle_${userId}`,
+              id: userId,
+              locale: 'en',
+              name: `name_${userId}`,
               picture: [
                 {
                   content_length: 19190,
-                  data: null,
                   content_type: 'image/jpeg',
+                  data: null,
                   id: 'ab7eb2f7-7c5b-4e55-ab16-dfc206891e67',
                   info: {
-                    height: 280,
-                    tag: 'smallProfile',
-                    original_width: 620,
-                    width: 280,
                     correlation_id: '7dfa4adf-454e-4372-a06a-7403baa36e5c',
-                    original_height: 960,
+                    height: 280,
                     nonce: '7dfa4adf-454e-4372-a06a-7403baa36e5c',
+                    original_height: 960,
+                    original_width: 620,
                     public: true,
+                    tag: 'smallProfile',
+                    width: 280,
                   },
                 },
                 {
                   content_length: 82690,
-                  data: null,
                   content_type: 'image/jpeg',
+                  data: null,
                   id: '87c95372-fce7-4215-861a-a3e0fe262e48',
                   info: {
-                    height: 960,
-                    tag: 'medium',
-                    original_width: 620,
-                    width: 620,
                     correlation_id: '7dfa4adf-454e-4372-a06a-7403baa36e5c',
-                    original_height: 960,
+                    height: 960,
                     nonce: '7dfa4adf-454e-4372-a06a-7403baa36e5c',
+                    original_height: 960,
+                    original_width: 620,
                     public: true,
+                    tag: 'medium',
+                    width: 620,
                   },
                 },
               ],
-              name: `name_${userId}`,
-              id: userId,
-              assets: [],
             });
           }
           xhr.respond(HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(users));
@@ -615,28 +607,28 @@ describe('ConversationRepository', () => {
           const conversation = {
             access: ['private'],
             creator: '6761450e-1bd6-4027-a338-1191fe5e349f',
+            id: conversationId,
+            last_event: '0.0',
+            last_event_time: '1970-01-01T00:00:00.000Z',
             members: {
+              others: [{id: '6761450e-1bd6-4027-a338-1191fe5e349f', status: 0}],
               self: {
-                hidden_ref: null,
-                status: 0,
-                service: null,
-                otr_muted_ref: null,
-                status_time: '1970-01-01T00:00:00.000Z',
                 hidden: false,
-                status_ref: '0.0',
+                hidden_ref: null,
                 id: '8a88604a-430a-42ed-966e-19a35c3d292a',
                 otr_archived: false,
-                otr_muted: false,
                 otr_archived_ref: null,
+                otr_muted: false,
+                otr_muted_ref: null,
+                service: null,
+                status: 0,
+                status_ref: '0.0',
+                status_time: '1970-01-01T00:00:00.000Z',
               },
-              others: [{status: 0, id: '6761450e-1bd6-4027-a338-1191fe5e349f'}],
             },
             name: null,
             team: null,
-            id: conversationId,
             type: 2,
-            last_event_time: '1970-01-01T00:00:00.000Z',
-            last_event: '0.0',
           };
           xhr.respond(HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(conversation));
         });
@@ -650,31 +642,29 @@ describe('ConversationRepository', () => {
         spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
         spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']}});
 
-        // prettier-ignore
         const upload_start = {
-          'conversation': conversation_id,
-          'from': sending_user_id,
-          'id': message_id,
-          'status': 1,
-          'time': '2017-09-06T09:43:32.278Z',
-          'data': {
-            'content_length': 23089240,
-            'content_type': 'application/x-msdownload',
-            'info': {'name': 'AirDroid_Desktop_Client_3.4.2.0.exe', 'nonce': '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
+          category: 512,
+          conversation: conversation_id,
+          data: {
+            content_length: 23089240,
+            content_type: 'application/x-msdownload',
+            info: {name: 'AirDroid_Desktop_Client_3.4.2.0.exe', nonce: '79072f78-15ee-4d54-a63c-fd46cd5607ae'},
           },
-          'type': 'conversation.asset-add',
-          'category': 512,
-          'primary_key': 107,
+          from: sending_user_id,
+          id: message_id,
+          primary_key: 107,
+          status: 1,
+          time: '2017-09-06T09:43:32.278Z',
+          type: 'conversation.asset-add',
         };
-        // prettier-ignore
         const upload_failed = {
-          'conversation': conversation_id,
-          'from': sending_user_id,
-          'id': message_id,
-          'status': 1,
-          'time': '2017-09-06T16:14:08.165Z',
-          'data': {'reason': 1, 'status': 'upload-failed'},
-          'type': 'conversation.asset-add',
+          conversation: conversation_id,
+          data: {reason: 1, status: 'upload-failed'},
+          from: sending_user_id,
+          id: message_id,
+          status: 1,
+          time: '2017-09-06T16:14:08.165Z',
+          type: 'conversation.asset-add',
         };
 
         return testFactory.conversation_repository
@@ -926,8 +916,8 @@ describe('ConversationRepository', () => {
         const messageHiddenEvent = {
           conversation: conversation_et.id,
           data: {
-            message_id: messageId,
             conversation_id: conversation_et.id,
+            message_id: messageId,
           },
           from: createRandomUuid(),
           id: createRandomUuid(),
@@ -953,8 +943,8 @@ describe('ConversationRepository', () => {
         const messageHiddenEvent = {
           conversation: conversation_et.id,
           data: {
-            message_id: messageId,
             conversation_id: conversation_et.id,
+            message_id: messageId,
           },
           from: selfUser.id,
           id: createRandomUuid(),
@@ -977,8 +967,8 @@ describe('ConversationRepository', () => {
         const messageHiddenEvent = {
           conversation: createRandomUuid(),
           data: {
-            message_id: messageId,
             conversation_id: conversation_et.id,
+            message_id: messageId,
           },
           from: selfUser.id,
           id: createRandomUuid(),

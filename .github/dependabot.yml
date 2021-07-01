@@ -4,7 +4,8 @@ updates:
     directory: '/app-config'
     schedule:
       interval: daily
-      time: '01:00'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
       - "type: chore \U0001F9F9"
@@ -13,7 +14,8 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: '01:00'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
       - "type: chore \U0001F9F9"
@@ -40,7 +42,8 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: '01:00'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
       - "type: chore \U0001F9F9"
@@ -57,7 +60,8 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: '01:00'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
       - "type: chore \U0001F9F9"

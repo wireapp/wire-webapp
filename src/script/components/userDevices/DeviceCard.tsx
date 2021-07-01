@@ -92,7 +92,6 @@ export default DeviceCard;
 
 registerReactComponent('device-card', {
   component: DeviceCard,
-  optionalParams: ['click', 'showIcon', 'showVerified'],
   template:
     '<div class="device-card" data-bind="react: {device: ko.unwrap(device), click, showIcon, showVerified}"></div>',
 });

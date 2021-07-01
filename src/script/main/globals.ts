@@ -41,18 +41,19 @@ import 'Components/icons';
 import 'Components/Image';
 import 'Components/toggle/InfoToggle';
 import '../page/preferences/InputLevel';
-import 'Components/list/conversationListCallingCell';
+import 'Components/calling/FullscreenVideoCall';
+import 'Components/list/ConversationListCallingCell';
 import 'Components/list/conversationListCell';
 import 'Components/avatar/GroupAvatar';
 import 'Components/message';
 import 'Components/message/messageQuote';
-import '../page/message-list/messageTimerButton';
+import '../page/message-list/MessageTimerButton';
 import 'Components/modal';
 import 'Components/panel/ServiceDetails';
 import 'Components/panel/UserDetails';
 import 'Components/ServiceList';
 import '../page/start-ui/TopPeople';
-import 'Components/userInput';
+import 'Components/UserInput';
 
 import 'Util/LocalizerUtil';
 
@@ -126,6 +127,7 @@ declare global {
             EMAIL_EXISTS: string;
             HISTORY: string;
             INDEX: string;
+            LEGAL_HOLD_BLOCK: string;
             MICROPHONE_ACCESS_DENIED: string;
             SCREEN_ACCESS_DENIED: string;
           };

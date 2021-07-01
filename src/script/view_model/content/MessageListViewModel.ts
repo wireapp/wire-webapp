@@ -367,7 +367,9 @@ export class MessageListViewModel {
     const isSingleModeConversation = conversationEntity.is1to1() || conversationEntity.isRequest();
 
     if (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe)) {
-      return this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_DETAILS, undefined);
+      return this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_DETAILS, {
+        entity: conversationEntity,
+      });
     }
 
     const params = {entity: userEntity};
@@ -469,7 +471,7 @@ export class MessageListViewModel {
   };
 
   readonly clickOnInvitePeople = (): void => {
-    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, undefined);
+    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.GUEST_OPTIONS, {entity: this.conversation()});
   };
 
   readonly getInViewportCallback = (
@@ -603,7 +605,10 @@ export class MessageListViewModel {
   };
 
   readonly showParticipants = (participants: User[]): void => {
-    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {highlighted: participants});
+    this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.CONVERSATION_PARTICIPANTS, {
+      entity: this.conversation(),
+      highlighted: participants,
+    });
   };
 
   readonly showMessageDetails = (view: {message: {id: string}}, showLikes: boolean): void => {
