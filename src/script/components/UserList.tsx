@@ -38,6 +38,7 @@ import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import ParticipantItem from 'Components/list/ParticipantItem';
+import {TeamState} from '../team/TeamState';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -69,6 +70,7 @@ export interface UserListProps {
   showEmptyAdmin: boolean;
   skipSearch: boolean;
   teamRepository: TeamRepository;
+  teamState: TeamState;
   truncate: boolean;
   user: User[];
   userState?: UserState;
@@ -99,6 +101,7 @@ const UserList: React.FC<UserListProps> = ({
   noSelfInteraction = false,
   userState = container.resolve(UserState),
   conversationState = container.resolve(ConversationState),
+  teamState = container.resolve(TeamState),
 }) => {
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
   const [adminCount, setAdminCount] = useState(0);
@@ -260,7 +263,7 @@ const UserList: React.FC<UserListProps> = ({
                       canSelect={isSelectEnabled}
                       isSelected={isSelected(user)}
                       mode={mode}
-                      external={teamRepository.isExternal(user.id)}
+                      external={teamState.isExternal(user.id)}
                       selfInTeam={selfInTeam}
                       isSelfVerified={isSelfVerified}
                       onClick={noSelfInteraction && user.isMe ? onUserClick : undefined}
@@ -292,7 +295,7 @@ const UserList: React.FC<UserListProps> = ({
                     canSelect={isSelectEnabled}
                     isSelected={isSelected(user)}
                     mode={mode}
-                    external={teamRepository.isExternal(user.id)}
+                    external={teamState.isExternal(user.id)}
                     selfInTeam={selfInTeam}
                     isSelfVerified={isSelfVerified}
                     onClick={noSelfInteraction && user.isMe ? onUserClick : undefined}
@@ -319,7 +322,7 @@ const UserList: React.FC<UserListProps> = ({
                 canSelect={isSelectEnabled}
                 isSelected={isSelected(user)}
                 mode={mode}
-                external={teamRepository.isExternal(user.id)}
+                external={teamState.isExternal(user.id)}
                 selfInTeam={selfInTeam}
                 isSelfVerified={isSelfVerified}
                 onClick={noSelfInteraction && user.isMe ? onUserClick : undefined}
@@ -357,7 +360,6 @@ export default UserList;
 
 registerReactComponent('user-list', {
   bindings:
-    'user: ko.unwrap(‍user), selected: ko.unwrap(‍selected), addToSelected: selected, removeFromSelected: selected, filter: ko.unwrap(‍filter), conversation: ko.unwrap(‍conversation), ‍infos: ko.unwrap(‍infos), arrow, userState, conversationState, ‍click, ‍conversationRepository, ‍highlightedUsers, ‍maxVisibleUsers, ‍mode, ‍noSelfInteraction, ‍noUnderline, ‍reducedUserCount, ‍searchRepository, ‍selfFirst, ‍showEmptyAdmin, ‍skipSearch, ‍teamRepository, ‍truncate',
+    'user: ko.unwrap(‍user), selected: ko.unwrap(‍selected), addToSelected: selected, removeFromSelected: selected, filter: ko.unwrap(‍filter), conversation: ko.unwrap(‍conversation), ‍infos: ko.unwrap(‍infos), arrow, userState, teamState, conversationState, ‍click, ‍conversationRepository, ‍highlightedUsers, ‍maxVisibleUsers, ‍mode, ‍noSelfInteraction, ‍noUnderline, ‍reducedUserCount, ‍searchRepository, ‍selfFirst, ‍showEmptyAdmin, ‍skipSearch, ‍teamRepository, ‍truncate',
   component: UserList,
-  optionalParams: ['userState', 'conversationState'],
 });
