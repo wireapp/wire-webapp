@@ -30,6 +30,7 @@ import type {
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
   ConversationReceiptModeUpdateData,
+  ConversationJoinData,
 } from '@wireapp/api-client/src/conversation/data';
 import type {
   ConversationCodeDeleteEvent,
@@ -215,6 +216,18 @@ export class ConversationService {
    */
   postConversationJoin(key: string, code: string): Promise<ConversationMemberJoinEvent> {
     return this.apiClient.conversation.api.postJoinByCode({code, key});
+  }
+
+  /**
+   * Join a conversation using a code.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/joinConversationByCode
+   * @param key Conversation identifier
+   * @param code Conversation access code
+   * @returns Resolves with the server response
+   */
+  getConversationJoin(key: string, code: string): Promise<ConversationJoinData> {
+    return this.apiClient.conversation.api.getJoinByCode({code, key});
   }
 
   /**

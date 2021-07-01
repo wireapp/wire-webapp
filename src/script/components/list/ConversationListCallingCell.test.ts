@@ -30,7 +30,7 @@ import {Conversation} from 'src/script/entity/Conversation';
 import {CallingCellProps, ConversationListCallingCell} from './ConversationListCallingCell';
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
-import {CallActions, VideoSpeakersTab} from 'src/script/view_model/CallingViewModel';
+import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {CallingRepository} from 'src/script/calling/CallingRepository';
 import {TeamState} from 'src/script/team/TeamState';
 
@@ -75,11 +75,9 @@ const createProps = async () => {
     conversation,
     hasAccessToCamera: true,
     isSelfVerified: true,
-    maximizedTileVideoParticipant: undefined,
     multitasking: {isMinimized: ko.observable(false)},
     teamState: mockTeamState,
     videoGrid: {grid: [], thumbnail: undefined},
-    videoSpeakersActiveTab: VideoSpeakersTab.ALL,
   } as CallingCellProps;
 };
 
