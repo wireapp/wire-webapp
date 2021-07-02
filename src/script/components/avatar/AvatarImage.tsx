@@ -48,6 +48,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   devicePixelRatio = window.devicePixelRatio,
   isGrey = false,
   mediumPicture,
+  userId,
   previewPicture,
 }) => {
   const [avatarImage, setAvatarImage] = useState('');
@@ -55,7 +56,6 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   const [avatarLoadingBlocked, setAvatarLoadingBlocked] = useState(false);
 
   useEffect(() => {
-    let isWaiting = true;
     if (!avatarLoadingBlocked) {
       setAvatarLoadingBlocked(true);
 
@@ -69,9 +69,6 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
           setShowTransition(!isCached && !isSmall);
           try {
             const url = await assetRepository.getObjectUrl(pictureResource);
-            if (!isWaiting) {
-              return;
-            }
             if (url) {
               setAvatarImage(url);
             }
@@ -84,9 +81,6 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
         }
       })();
     }
-    return () => {
-      isWaiting = false;
-    };
   }, [previewPicture, mediumPicture, avatarSize]);
 
   const transitionImageStyles: Record<string, CSSObject> = {
