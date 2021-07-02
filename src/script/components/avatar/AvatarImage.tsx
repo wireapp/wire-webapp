@@ -48,7 +48,6 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
   devicePixelRatio = window.devicePixelRatio,
   isGrey = false,
   mediumPicture,
-  userId,
   previewPicture,
 }) => {
   const [avatarImage, setAvatarImage] = useState('');
