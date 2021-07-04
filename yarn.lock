@@ -1419,10 +1419,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@formatjs/cli@4.2.23":
-  version "4.2.23"
-  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.2.23.tgz#04e066c8967be2e721d228c1b4045ab1428bbd7d"
-  integrity sha512-OE1Lq0f5FPnNJ0N8PGHtDOM1K7WWY/a97sOZ127qZDw9fQ887PUR2pjomOhRfnPCVGy8XFDM8jjJ0Vxo1BK6OQ==
+"@formatjs/cli@4.2.25":
+  version "4.2.25"
+  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.2.25.tgz#4a585babcba8a6366d41752038c9fd891cba6257"
+  integrity sha512-n30V4RK6lw9lJcyrQLQxHpBaf95q8h9UpUAKwAQtwr+rE0PMmFYYOHWffVR2Qdhvlu9exDpjvzbnSWOiPPXucw==
   dependencies:
     "@formatjs/icu-messageformat-parser" "2.0.7"
     "@formatjs/ts-transformer" "3.4.4"
@@ -1432,7 +1432,7 @@
     "@vue/compiler-core" "^3.0.0"
     "@vue/compiler-sfc" "^3.0.5"
     chalk "^4.0.0"
-    commander "7"
+    commander "8"
     fast-glob "^3.2.4"
     fs-extra "^9.0.0"
     json-stable-stringify "^1.0.1"
@@ -4380,10 +4380,10 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   dependencies:
     delayed-stream "~1.0.0"
 
-commander@7, commander@^7.0.0, commander@^7.2.0:
-  version "7.2.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
-  integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
+commander@8:
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-8.0.0.tgz#1da2139548caef59bd23e66d18908dfb54b02258"
+  integrity sha512-Xvf85aAtu6v22+E5hfVoLHqyul/jyxh91zvqk/ioJTQuJR7Z78n7H558vMPKanPSRgIEeZemT92I2g9Y8LPbSQ==
 
 commander@^2.15.1, commander@^2.19.0, commander@^2.20.0, commander@^2.9.0:
   version "2.20.3"
@@ -4394,6 +4394,11 @@ commander@^6.2.0:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-6.2.1.tgz#0792eb682dfbc325999bb2b84fddddba110ac73c"
   integrity sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==
+
+commander@^7.0.0, commander@^7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
+  integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
 
 comment-json@^4.1.0:
   version "4.1.0"
