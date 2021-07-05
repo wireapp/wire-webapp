@@ -1706,6 +1706,10 @@ export class MessageRepository {
 
       const hasNoLegalholdConsent = error?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
       if (hasNoLegalholdConsent && messageType !== GENERIC_MESSAGE_TYPE.CONFIRMATION) {
+        const legalholdCancellationError = new ConversationError(
+          ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+          ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+        );
         const replaceLinkLegalHold = replaceLink(
           Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
           '',
@@ -1715,21 +1719,16 @@ export class MessageRepository {
           amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
-                reject(
-                  new ConversationError(
-                    ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-                    ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-                  ),
-                );
+                reject(legalholdCancellationError);
               },
             },
             text: {
-              message: t('legalHoldMessageSendingMissingConsentMessage', {}, replaceLinkLegalHold),
+              htmlMessage: t('legalHoldMessageSendingMissingConsentMessage', {}, replaceLinkLegalHold),
               title: t('legalHoldMessageSendingMissingConsentTitle'),
             },
           });
         });
-        return undefined;
+        throw legalholdCancellationError;
       }
 
       const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
