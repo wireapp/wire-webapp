@@ -211,7 +211,7 @@ export class User {
   }
 
   /**
-   * Returns the fully qualified user ID.
+   * Returns the fully qualified user handle.
    * @example "@handle@wire.com"
    */
   get handle(): string {
