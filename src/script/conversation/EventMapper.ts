@@ -422,7 +422,7 @@ export class EventMapper {
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
     messageEntity.userIds(eventData.userIds);
-    messageEntity.qualifiedUserIds(eventData.qualifiedUserIds);
+    messageEntity.qualifiedUserIds(eventData.qualifiedUserIds || []);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
   }
