@@ -624,9 +624,7 @@ export class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            if (!this.conversationEntity().isFederated) {
-              this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
-            }
+            this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
             this.updateMentions(data, keyboardEvent);
           }
           break;
