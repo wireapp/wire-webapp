@@ -1705,7 +1705,8 @@ export class MessageRepository {
       const error = axiosError.response?.data;
 
       const hasNoLegalholdConsent = error?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
-      if (hasNoLegalholdConsent && messageType !== GENERIC_MESSAGE_TYPE.CONFIRMATION) {
+      const ignoredMessageTypes = [GENERIC_MESSAGE_TYPE.CONFIRMATION];
+      if (hasNoLegalholdConsent && !ignoredMessageTypes.includes(messageType as GENERIC_MESSAGE_TYPE)) {
         const legalholdCancellationError = new ConversationError(
           ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
           ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
