@@ -307,6 +307,10 @@ export class Conversation {
       this.participatingQualifiedUserIds().some(userId => userId.domain !== this.selfUser().domain),
     );
 
+    this.hasUsers = ko.pureComputed(() =>
+      Boolean(this.participating_user_ids().length + this.participatingQualifiedUserIds().length),
+    );
+
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
     });

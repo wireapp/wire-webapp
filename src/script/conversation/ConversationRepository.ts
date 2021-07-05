@@ -700,8 +700,7 @@ export class ConversationRepository {
   public async updateConversations(conversationEntities: Conversation[]): Promise<void> {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
     const userIds = flatten(mapOfUserIds);
-
-    // TODO: why is this not used?
+    // Update user entities
     await this.userRepository.getUsersById(userIds);
     conversationEntities.forEach(conversationEntity => this.fetchUsersAndEvents(conversationEntity));
   }
