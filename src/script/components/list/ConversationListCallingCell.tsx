@@ -41,7 +41,6 @@ import {getGrid, Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
-import {Participant} from '../../calling/Participant';
 import {createNavigate} from '../../router/routerBindings';
 import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
@@ -333,7 +332,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   ref={setScrollbarRef}
                   data-uie-name="list-call-ui-participants"
                 >
-                  {(participants as Participant[])
+                  {participants
                     .slice()
                     .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
                     .map(participant => (

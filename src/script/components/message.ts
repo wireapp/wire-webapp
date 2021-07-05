@@ -59,6 +59,7 @@ import './message/LegalHoldMessage';
 import './message/SystemMessage';
 import './message/MemberMessage';
 import './message/ReadReceiptStatus';
+import './message/PingMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -302,7 +303,12 @@ class Message {
 // If this is not explicitly defined as string,
 // TS will define this as the string's content.
 const receiptStatusTemplate: string = `
-  <read-receipt-status params="message: message, is1to1Conversation: conversation().is1to1, isLastDeliveredMessage: isLastDeliveredMessage, onClickReceipts: onClickReceipts">
+  <read-receipt-status params="
+    message: message,
+    is1to1Conversation: conversation().is1to1,
+    isLastDeliveredMessage: isLastDeliveredMessage,
+    onClickReceipts: onClickReceipts,
+  "></read-receipt-status>
 `;
 
 const normalTemplate: string = `
@@ -413,24 +419,6 @@ const normalTemplate: string = `
   <!-- /ko -->
   `;
 
-const pingTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
-    </div>
-    <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
-      <span class="message-header-label__multiline">
-        <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
-        <span class="ellipsis" data-bind="text: message.caption"></span>
-      </span>
-    </div>
-    <div class="message-body-actions">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
-      ${receiptStatusTemplate}
-    </div>
-  </div>
-  `;
-
 ko.components.register('message', {
   template: `
     <!-- ko if: message.super_type === 'normal' -->
@@ -469,7 +457,12 @@ ko.components.register('message', {
       "></member-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
-      ${pingTemplate}
+      <ping-message params="
+        message: message,
+        is1to1Conversation: conversation().is1to1,
+        isLastDeliveredMessage: isLastDeliveredMessage,
+        onClickReceipts: onClickReceipts,
+      "></ping-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'file-type-restricted' -->
       <filetype-restricted-message params="message: message"></filetype-restricted-message>

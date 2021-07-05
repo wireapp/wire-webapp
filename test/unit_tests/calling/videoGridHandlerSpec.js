@@ -20,9 +20,8 @@
 import {getGrid} from 'src/script/calling/videoGridHandler';
 import {Participant} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
-import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
+import {CONV_TYPE, CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 import {User} from 'src/script/entity/User';
-
 describe('videoGridHandler', () => {
   let participants;
 
@@ -69,6 +68,8 @@ describe('videoGridHandler', () => {
         const selfUser = new User('self_id', null);
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
+        selfParticipant.videoState(VIDEO_STATE.STARTED);
+        selfParticipant.videoStream({});
         const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
             audioOutput: ko.pureComputed(() => 'test'),
