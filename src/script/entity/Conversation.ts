@@ -191,7 +191,7 @@ export class Conversation {
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
       const hasOneParticipant =
-        this.participating_user_ids().length === 1 && this.participatingQualifiedUserIds().length === 0;
+        this.participating_user_ids().length === 1 || this.participatingQualifiedUserIds().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
