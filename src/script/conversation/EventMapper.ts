@@ -634,7 +634,7 @@ export class EventMapper {
     const messageEntity = new VerificationMessage();
 
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
-    messageEntity.userIds(eventData.userIds || eventData.user_ids);
+    messageEntity.userIds(eventData.userIds || eventData.user_ids || []);
     messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
