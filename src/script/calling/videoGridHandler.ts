@@ -42,16 +42,17 @@ export function getGrid(call: Call) {
     .getRemoteParticipants()
     .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
   const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
-  if (remoteParticipants.length === 1) {
-    inGridParticipants = remoteVideoParticipants;
+
+  if (remoteParticipants.length === 1 && remoteVideoParticipants.length === 1) {
+    inGridParticipants = remoteParticipants;
     thumbnailParticipant = selfParticipant;
   } else {
-    inGridParticipants = [selfParticipant, ...remoteVideoParticipants];
+    inGridParticipants = [selfParticipant, ...remoteParticipants];
     thumbnailParticipant = null;
   }
 
   return {
-    grid: inGridParticipants,
-    thumbnail: thumbnailParticipant,
+    grid: inGridParticipants.filter(p => p?.hasActiveVideo()),
+    thumbnail: thumbnailParticipant?.hasActiveVideo() ? thumbnailParticipant : null,
   };
 }
