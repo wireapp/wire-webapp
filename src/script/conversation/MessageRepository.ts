@@ -1707,20 +1707,16 @@ export class MessageRepository {
       const hasNoLegalholdConsent = error?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
       const ignoredMessageTypes = [GENERIC_MESSAGE_TYPE.CONFIRMATION];
       if (hasNoLegalholdConsent && !ignoredMessageTypes.includes(messageType as GENERIC_MESSAGE_TYPE)) {
-        const legalholdCancellationError = new ConversationError(
-          ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-          ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-        );
         const replaceLinkLegalHold = replaceLink(
           Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
           '',
           'read-more-legal-hold',
         );
-        await new Promise((resolve, reject) => {
+        await new Promise<void>(resolve => {
           amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
             primaryAction: {
               action: () => {
-                reject(legalholdCancellationError);
+                resolve();
               },
             },
             text: {
@@ -1729,7 +1725,10 @@ export class MessageRepository {
             },
           });
         });
-        throw legalholdCancellationError;
+        throw new ConversationError(
+          ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+          ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+        );
       }
 
       const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
