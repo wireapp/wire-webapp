@@ -49,7 +49,7 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {getDifference} from 'Util/ArrayUtil';
 import {arrayToBase64, createRandomUuid, loadUrlBlob} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -106,6 +106,8 @@ import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
 import {isBackendError} from 'Util/TypePredicateUtil';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http';
+import {Config} from '../Config';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -1701,6 +1703,34 @@ export class MessageRepository {
       return response;
     } catch (axiosError) {
       const error = axiosError.response?.data;
+
+      const hasNoLegalholdConsent = error?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
+      const ignoredMessageTypes = [GENERIC_MESSAGE_TYPE.CONFIRMATION];
+      if (hasNoLegalholdConsent && !ignoredMessageTypes.includes(messageType as GENERIC_MESSAGE_TYPE)) {
+        const replaceLinkLegalHold = replaceLink(
+          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+          '',
+          'read-more-legal-hold',
+        );
+        await new Promise<void>(resolve => {
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+            primaryAction: {
+              action: () => {
+                resolve();
+              },
+            },
+            text: {
+              htmlMessage: t('legalHoldMessageSendingMissingConsentMessage', {}, replaceLinkLegalHold),
+              title: t('legalHoldMessageSendingMissingConsentTitle'),
+            },
+          });
+        });
+        throw new ConversationError(
+          ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+          ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+        );
+      }
+
       const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
       if (isUnknownClient) {
         this.clientRepository.removeLocalClient();
