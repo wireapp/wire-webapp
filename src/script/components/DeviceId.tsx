@@ -18,18 +18,16 @@
  */
 
 import React from 'react';
-import {zeroPadding} from 'Util/util';
+import {splitFingerprint} from 'Util/StringUtil';
 
 export interface DeviceIdProps {
   deviceId: string;
 }
 
 const DeviceId: React.FC<DeviceIdProps> = ({deviceId}) => {
-  const formattedId = deviceId ? zeroPadding(deviceId, 16).match(/../g) : [];
-
   return (
     <>
-      {formattedId.map((id, index) => (
+      {splitFingerprint(deviceId).map((id, index) => (
         <span key={`${index}-${id}`} className="device-id-part" data-uie-name="element-device-id-part">
           {id}
         </span>

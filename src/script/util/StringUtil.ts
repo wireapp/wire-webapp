@@ -150,3 +150,5 @@ export const utf8ToUtf16BE = (str = ''): number[] => {
 
   return bytes;
 };
+
+export const splitFingerprint = (fingerprint: string): string[] => fingerprint?.padStart(16, '0').match(/(..?)/g) ?? [];

@@ -20,14 +20,14 @@
 import React from 'react';
 import cx from 'classnames';
 import {ClientClassification} from '@wireapp/api-client/src/client';
+
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import DeviceId from 'Components/DeviceId';
 
 import type {ClientEntity} from '../../client/ClientEntity';
 import Icon from '../Icon';
 import LegalHoldDot from '../LegalHoldDot';
 import VerifiedIcon from '../VerifiedIcon';
-import DeviceId from 'Components/DeviceId';
 
 export interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -89,9 +89,3 @@ const DeviceCard: React.FC<DeviceCardProps> = ({
 };
 
 export default DeviceCard;
-
-registerReactComponent('device-card', {
-  component: DeviceCard,
-  template:
-    '<div class="device-card" data-bind="react: {device: ko.unwrap(device), click, showIcon, showVerified}"></div>',
-});

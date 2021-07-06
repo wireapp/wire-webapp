@@ -30,7 +30,6 @@ import {GroupParticipantUserViewModel} from './panel/GroupParticipantUserViewMod
 import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
 import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
 import {NotificationsViewModel} from './panel/NotificationsViewModel';
-import {ParticipantDevicesViewModel} from './panel/ParticipantDevicesViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -43,12 +42,15 @@ import {ConversationState} from '../conversation/ConversationState';
 import {container} from 'tsyringe';
 
 import './panel/TimedMessagesPanel';
+import './panel/ParticipantDevicesPanel';
 
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 
+type PanelEntity = Conversation | User | Message | ServiceEntity;
+
 export type PanelParams = {
   addMode?: boolean;
-  entity: Conversation | User | Message | ServiceEntity;
+  entity: PanelEntity;
   highlighted?: User[];
   showLikes?: boolean;
 };
@@ -65,7 +67,7 @@ export class PanelViewModel {
   state: ko.Observable<string>;
   subViews: Record<string, BasePanelViewModel>;
   STATE: Record<string, string>;
-  currentEntityId: string;
+  currentEntity: PanelEntity;
 
   static get STATE() {
     return {
@@ -105,7 +107,6 @@ export class PanelViewModel {
       [PanelViewModel.STATE.GUEST_OPTIONS]: GuestsAndServicesViewModel,
       [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
       [PanelViewModel.STATE.NOTIFICATIONS]: NotificationsViewModel,
-      [PanelViewModel.STATE.PARTICIPANT_DEVICES]: ParticipantDevicesViewModel,
     };
 
     return Object.entries(viewModels).reduce((subViews, [state, viewModel]) => {
@@ -147,8 +148,8 @@ export class PanelViewModel {
     amplify.subscribe(WebAppEvents.CONTENT.SWITCH, this._switchContent);
     amplify.subscribe(OPEN_CONVERSATION_DETAILS, this._goToRoot);
     amplify.subscribe(WebAppEvents.CONVERSATION.MESSAGE.UPDATED, (oldId: string, updatedMessageEntity: Message) => {
-      if (this.state() === PanelViewModel.STATE.MESSAGE_DETAILS && oldId === this.currentEntityId) {
-        this.currentEntityId = updatedMessageEntity.id;
+      if (this.state() === PanelViewModel.STATE.MESSAGE_DETAILS && oldId === this.currentEntity.id) {
+        this.currentEntity = updatedMessageEntity;
       }
     });
 
@@ -165,7 +166,7 @@ export class PanelViewModel {
   readonly togglePanel = (state: string, params: PanelParams): void => {
     const isStateChange = this.state() !== state;
     if (!isStateChange) {
-      const isNewParams = params?.entity?.id !== this.currentEntityId;
+      const isNewParams = params?.entity !== this.currentEntity;
       if (!isNewParams) {
         this.closePanel();
         return;
@@ -208,7 +209,7 @@ export class PanelViewModel {
     this._hidePanel(this.state(), true);
     this.state(undefined);
     this.stateHistory = [];
-    this.currentEntityId = undefined;
+    this.currentEntity = undefined;
   };
 
   private readonly _isStateVisible = (state: string): boolean => {
@@ -236,8 +237,8 @@ export class PanelViewModel {
   };
 
   private readonly _switchState = (toState: string, fromState: string, params: PanelParams, fromLeft = false): void => {
+    this.currentEntity = params.entity;
     this.subViews[toState]?.initView?.(params);
-    this.currentEntityId = params.entity.id;
 
     const isSameState = fromState === toState;
     if (isSameState) {
