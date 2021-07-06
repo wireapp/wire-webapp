@@ -21,7 +21,14 @@ import type {AxiosRequestConfig} from 'axios';
 
 import {BackendErrorLabel, HttpClient} from '../../http';
 import {InvalidAppLockTimeoutError} from './FeatureError';
-import type {FeatureAppLock, FeatureDigitalSignature, FeatureLegalhold, FeatureSSO} from './Feature';
+import type {
+  FeatureAppLock,
+  FeatureVideoCalling,
+  FeatureConferenceCalling,
+  FeatureDigitalSignature,
+  FeatureLegalhold,
+  FeatureSSO,
+} from './Feature';
 import type {FeatureList} from './FeatureList';
 
 export class FeatureAPI {
@@ -30,6 +37,8 @@ export class FeatureAPI {
   public static readonly URL = {
     APPLOCK: 'appLock',
     DIGITAL_SIGNATURES: 'digitalSignatures',
+    CALLING_CONFERENCE: 'conferenceCalling',
+    CALLING_VIDEO: 'videoCalling',
     LEGAL_HOLD: 'legalhold',
     FEATURES: 'features',
     SSO: 'sso',
@@ -53,6 +62,54 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureLegalhold>(config);
+    return response.data;
+  }
+
+  public async getConferenceCallingFeature(teamId: string): Promise<FeatureConferenceCalling> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_CONFERENCE}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
+    return response.data;
+  }
+
+  public async putConferenceCallingFeature(
+    teamId: string,
+    conferenceCallingFeature: FeatureConferenceCalling,
+  ): Promise<FeatureConferenceCalling> {
+    const config: AxiosRequestConfig = {
+      data: conferenceCallingFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_CONFERENCE}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
+    return response.data;
+  }
+
+  public async getVideoCallingFeature(teamId: string): Promise<FeatureVideoCalling> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_VIDEO}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
+    return response.data;
+  }
+
+  public async putVideoCallingFeature(
+    teamId: string,
+    videoCallingFeature: FeatureVideoCalling,
+  ): Promise<FeatureVideoCalling> {
+    const config: AxiosRequestConfig = {
+      data: videoCallingFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_VIDEO}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureVideoCalling>(config);
     return response.data;
   }
 
