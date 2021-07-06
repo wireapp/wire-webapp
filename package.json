@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
-    "@wireapp/avs": "7.2.3",
+    "@wireapp/avs": "7.1.6",
     "@wireapp/core": "17.9.4",
     "@wireapp/react-ui-kit": "7.52.3",
     "@wireapp/store-engine-dexie": "1.6.2",
@@ -59,7 +59,7 @@
     "@babel/preset-react": "7.14.5",
     "@babel/preset-typescript": "7.14.5",
     "@emotion/babel-preset-css-prop": "10.2.1",
-    "@formatjs/cli": "4.2.25",
+    "@formatjs/cli": "4.2.27",
     "@hot-loader/react-dom": "16.14.0",
     "@testing-library/react": "11.2.7",
     "@types/adm-zip": "0.4.34",

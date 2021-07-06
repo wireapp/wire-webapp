@@ -1419,13 +1419,13 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@formatjs/cli@4.2.25":
-  version "4.2.25"
-  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.2.25.tgz#4a585babcba8a6366d41752038c9fd891cba6257"
-  integrity sha512-n30V4RK6lw9lJcyrQLQxHpBaf95q8h9UpUAKwAQtwr+rE0PMmFYYOHWffVR2Qdhvlu9exDpjvzbnSWOiPPXucw==
+"@formatjs/cli@4.2.27":
+  version "4.2.27"
+  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.2.27.tgz#b452ce68895741ccf6f4c27415e4d133f17b8250"
+  integrity sha512-P+y3nIBa+IMfv8dKPdZ38xhF/l9AghsU8kKi2onUJLpvjjDdjTEUTleaPpVghZKhe6BqNbso+anludxlZUdKoA==
   dependencies:
     "@formatjs/icu-messageformat-parser" "2.0.7"
-    "@formatjs/ts-transformer" "3.4.4"
+    "@formatjs/ts-transformer" "3.4.5"
     "@types/json-stable-stringify" "^1.0.32"
     "@types/lodash" "^4.14.150"
     "@types/node" "14"
@@ -1499,12 +1499,13 @@
     intl-messageformat "9.7.1"
     tslib "^2.1.0"
 
-"@formatjs/ts-transformer@3.4.4":
-  version "3.4.4"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-3.4.4.tgz#bc66e53bb4ae9ba8911b4f68a283a6c9a1992bf8"
-  integrity sha512-23QAwecL1emi0RWuV1w+FhsF7Xp6eJTSkXgWHSV94Ff0hfwfjLZMNNSiYQBT1CEHKzerRvuGi4rrbj4Zc46/pg==
+"@formatjs/ts-transformer@3.4.5":
+  version "3.4.5"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-3.4.5.tgz#53423dbb606f88e7e7637d941f9d19d508dd10c4"
+  integrity sha512-VzjT9jbpizZhwvtX/jaoTOeHQ/nvEx9ttzDrRXcFIGXyxupBZKTxr/+v6j3NjUmeiuN3JfaXhZUYmG+zsS0kxw==
   dependencies:
     "@formatjs/icu-messageformat-parser" "2.0.7"
+    chalk "^4.1.1"
     tslib "^2.1.0"
 
 "@hapi/address@^2.1.2":
@@ -2811,10 +2812,10 @@
     tough-cookie "4.0.0"
     ws "7.4.6"
 
-"@wireapp/avs@7.2.3":
-  version "7.2.3"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.2.3.tgz#301c8b0f1c9f76e5b58485c6d496e4b0a8363e8b"
-  integrity sha512-RLk7OUkfZ2vWtYq0KDG7Gl0TataxFj9qDBzVGW9DEFeTcpyaqJlh2KTu2rN8lKR/cKaC4OHYwJXXKRt0ADfx4g==
+"@wireapp/avs@7.1.6":
+  version "7.1.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.1.6.tgz#9a2a4380ec9cb46bca38f5bc0e6a67aeea2b01f4"
+  integrity sha512-+VBIm6H/Ag+o0pGuMucDK1WbVR26J1APmaBsgOxuJFB9Xa/EKeuI/y5kHuGnyYAGSAD9uh336iaP95G7F2733g==
 
 "@wireapp/cbor@4.7.1":
   version "4.7.1"
