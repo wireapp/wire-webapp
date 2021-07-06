@@ -18,6 +18,7 @@
  */
 
 import type {
+  TeamFeatureConfigurationUpdateEventData,
   TeamConversationCreateData,
   TeamConversationDeleteData,
   TeamMemberJoinData,
@@ -35,6 +36,7 @@ export enum TEAM_EVENT {
   MEMBER_LEAVE = 'team.member-leave',
   MEMBER_UPDATE = 'team.member-update',
   UPDATE = 'team.update',
+  FEATURE_CONFIG_UPDATE = 'feature-config.update',
 }
 
 export type TeamEventData =
@@ -43,6 +45,7 @@ export type TeamEventData =
   | TeamMemberLeaveData
   | TeamMemberUpdateData
   | TeamUpdateData
+  | TeamFeatureConfigurationUpdateEventData
   | null;
 
 export type TeamEvent =
@@ -53,6 +56,7 @@ export type TeamEvent =
   | TeamMemberJoinEvent
   | TeamMemberLeaveEvent
   | TeamMemberUpdateEvent
+  | TeamFeatureConfigurationUpdateEvent
   | TeamUpdateEvent;
 
 export interface BaseTeamEvent {
@@ -100,4 +104,9 @@ export interface TeamMemberUpdateEvent extends BaseTeamEvent {
 export interface TeamUpdateEvent extends BaseTeamEvent {
   data: TeamUpdateData;
   type: TEAM_EVENT.UPDATE;
+}
+
+export interface TeamFeatureConfigurationUpdateEvent extends BaseTeamEvent {
+  data: TeamFeatureConfigurationUpdateEventData;
+  type: TEAM_EVENT.FEATURE_CONFIG_UPDATE;
 }

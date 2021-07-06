@@ -25,18 +25,20 @@ export enum FeatureStatus {
 export interface FeatureWithoutConfig {
   status: FeatureStatus;
 }
-
-export interface FeatureConfig {}
 export interface Feature<T extends FeatureConfig> {
   config: T;
   status: FeatureStatus;
 }
+
+export interface FeatureConfig {}
 export interface FeatureAppLockConfig extends FeatureConfig {
   enforceAppLock: boolean;
   inactivityTimeoutSecs: number;
 }
 
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
+export type FeatureConferenceCalling = FeatureWithoutConfig;
+export type FeatureVideoCalling = FeatureWithoutConfig;
 export type FeatureDigitalSignature = FeatureWithoutConfig;
 export type FeatureLegalhold = FeatureWithoutConfig;
 export type FeatureSSO = FeatureWithoutConfig;
