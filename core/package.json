@@ -6,7 +6,7 @@
     "@types/long": "4.0.1",
     "@types/node": "~14",
     "@wireapp/api-client": "12.27.0",
-    "@wireapp/cryptobox": "12.6.0",
+    "@wireapp/cryptobox": "12.7.1",
     "bazinga64": "5.9.3",
     "hash.js": "1.1.7",
     "http-status-codes": "2.1.4",
