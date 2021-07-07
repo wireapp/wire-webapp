@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/webrtc": "0.0.28",
+    "@types/webrtc": "0.0.29",
     "@wireapp/avs": "6.4.14",
     "wrtc": "0.4.7"
   },
