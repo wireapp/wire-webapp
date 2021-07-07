@@ -82,7 +82,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
   }, [currentCallState]);
 
-  const videoGrid = useMemo(() => joinedCall && getGrid(joinedCall), [joinedCall, participants, pages, currentPage]);
+  const videoGrid = useMemo(
+    () => joinedCall && getGrid(joinedCall),
+    [joinedCall, participants, pages, currentPage, participants?.map(p => p.hasActiveVideo())],
+  );
 
   const onCancelScreenSelection = () => {
     setSelectableScreens([]);
