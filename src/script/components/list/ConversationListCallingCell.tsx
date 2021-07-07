@@ -109,7 +109,10 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showVideoButton = call.initialType === CALL_TYPE.VIDEO || isOngoing;
   const showParticipantsButton = isOngoing && isGroup;
 
-  const videoGrid = useMemo(() => call && getGrid(call), [call, participants, pages, currentPage]);
+  const videoGrid = useMemo(
+    () => call && getGrid(call),
+    [call, participants, pages, currentPage, participants.map(p => p.hasActiveVideo())],
+  );
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
   const conversationUrl = generateConversationUrl(conversation.id);
