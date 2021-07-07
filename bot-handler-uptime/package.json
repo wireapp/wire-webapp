@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/moment-duration-format": "2.2.2",
+    "@types/moment-duration-format": "2.2.3",
     "moment": "2.29.1",
     "moment-duration-format": "2.3.2"
   },
