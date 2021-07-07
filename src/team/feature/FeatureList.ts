@@ -26,13 +26,24 @@ import type {
   FeatureVideoCalling,
 } from './Feature';
 
+export enum FEATURE_KEY {
+  APPLOCK = 'appLock',
+  DIGITAL_SIGNATURES = 'digitalSignatures',
+  CONFERENCE_CALLING = 'conferenceCalling',
+  VIDEO_CALLING = 'videoCalling',
+  LEGALHOLD = 'legalhold',
+  SEARCH_VISIBILITY = 'searchVisibility',
+  SSO = 'sso',
+  VALIDATE_SAML_EMAILS = 'validateSAMLemails',
+}
+
 export type FeatureList = {
-  appLock?: FeatureAppLock;
-  digitalSignatures?: FeatureDigitalSignature;
-  conferenceCalling?: FeatureConferenceCalling;
-  videoCalling?: FeatureVideoCalling;
-  legalhold?: FeatureLegalhold;
-  searchVisibility?: FeatureWithoutConfig;
-  sso?: FeatureWithoutConfig;
-  validateSAMLemails?: FeatureWithoutConfig;
+  [FEATURE_KEY.APPLOCK]?: FeatureAppLock;
+  [FEATURE_KEY.DIGITAL_SIGNATURES]?: FeatureDigitalSignature;
+  [FEATURE_KEY.CONFERENCE_CALLING]?: FeatureConferenceCalling;
+  [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
+  [FEATURE_KEY.LEGALHOLD]?: FeatureLegalhold;
+  [FEATURE_KEY.SEARCH_VISIBILITY]?: FeatureWithoutConfig;
+  [FEATURE_KEY.SSO]?: FeatureWithoutConfig;
+  [FEATURE_KEY.VALIDATE_SAML_EMAILS]?: FeatureWithoutConfig;
 };
