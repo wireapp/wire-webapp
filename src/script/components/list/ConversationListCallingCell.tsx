@@ -111,7 +111,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const videoGrid = useMemo(
     () => call && getGrid(call),
-    [call, participants, pages, currentPage, participants.map(p => p.hasActiveVideo())],
+    [call, participants, pages, currentPage, participants?.map(p => p.hasActiveVideo())],
   );
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
