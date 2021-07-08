@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {UserlistMode} from 'Components/userList';
+import {UserlistMode} from 'Components/UserList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
