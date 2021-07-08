@@ -31,7 +31,7 @@ import {sortByPriority} from 'Util/StringUtil';
 import {getDomainName} from 'Util/UrlUtil';
 import {isValidFederationUsername} from 'Util/ValidationUtil';
 
-import {UserlistMode} from 'Components/userList';
+import {UserlistMode} from 'Components/UserList';
 
 import {getManageTeamUrl, getManageServicesUrl} from '../../externalRoute';
 import {Config} from '../../Config';
