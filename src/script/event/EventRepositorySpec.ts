@@ -48,7 +48,7 @@ const testFactory = new TestFactory();
 async function createEncodedCiphertext(
   preKey: ProteusKeys.PreKey,
   text = 'Hello, World!',
-  receivingIdentity = testFactory.cryptography_repository.cryptobox['identity'],
+  receivingIdentity = testFactory.cryptography_repository.cryptobox.getIdentity(),
 ) {
   const bobEngine = new MemoryEngine();
   await bobEngine.init('bob');
@@ -61,9 +61,9 @@ async function createEncodedCiphertext(
     messageId: createRandomUuid(),
   });
 
-  const sessionId = `from-${sender[
-    'identity'
-  ].public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
+  const sessionId = `from-${sender
+    .getIdentity()
+    .public_key.fingerprint()}-to-${preKey.key_pair.public_key.fingerprint()}`;
   const preKeyBundle = new ProteusKeys.PreKeyBundle(receivingIdentity.public_key, preKey);
 
   const cipherText = await sender.encrypt(
@@ -451,7 +451,7 @@ describe('EventRepository', () => {
       const preKeys = await cryptobox.create();
       testFactory.cryptography_repository.cryptobox = cryptobox;
 
-      const ciphertext = await createEncodedCiphertext(preKeys[0], text, cryptobox['identity']);
+      const ciphertext = await createEncodedCiphertext(preKeys[0], text, cryptobox.getIdentity());
       const event = {
         conversation: 'fdc6cf1a-4e37-424e-a106-ab3d2cc5c8e0',
         data: {

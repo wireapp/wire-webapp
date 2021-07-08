@@ -136,7 +136,7 @@ export class CryptographyRepository {
    * @returns Fingerprint of local identity public key
    */
   getLocalFingerprint() {
-    return this.formatFingerprint(this.cryptobox['identity'].public_key.fingerprint());
+    return this.formatFingerprint(this.cryptobox.getIdentity().public_key.fingerprint());
   }
 
   /**
