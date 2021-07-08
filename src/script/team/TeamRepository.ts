@@ -51,12 +51,13 @@ import {User} from '../entity/User';
 import {TeamService} from './TeamService';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
-import {EventRepository} from '../event/EventRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
 import {TeamState} from './TeamState';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {EventSource} from '../event/EventSource';
 
 export interface AccountInfo {
   accentID: number;
@@ -100,6 +101,7 @@ export class TeamRepository {
     };
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent);
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.onNotificationHandlingStateChange);
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
@@ -198,7 +200,7 @@ export class TeamRepository {
     return IntegrationMapper.mapServicesFromArray(servicesData);
   }
 
-  readonly onTeamEvent = (eventJson: any, source: typeof EventRepository.SOURCE): void => {
+  readonly onTeamEvent = (eventJson: any, source: EventSource): void => {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
@@ -227,6 +229,10 @@ export class TeamRepository {
       }
       case TEAM_EVENT.UPDATE: {
         this.onUpdate(eventJson);
+        break;
+      }
+      case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
+        this.onFeatureConfigUpdate(eventJson, source);
         break;
       }
       case TEAM_EVENT.CONVERSATION_CREATE:
@@ -366,6 +372,28 @@ export class TeamRepository {
       this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), member));
     }
   }
+
+  private readonly onNotificationHandlingStateChange = async (
+    handlingNotifications: NOTIFICATION_HANDLING_STATE,
+  ): Promise<void> => {
+    const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+    const teamId = this.userState.self().teamId;
+
+    if (shouldFetchConfig && teamId) {
+      this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures(teamId));
+    }
+  };
+
+  private readonly onFeatureConfigUpdate = async (eventJson: TeamEvent, source: EventSource): Promise<void> => {
+    if (source !== EventSource.WEB_SOCKET) {
+      // Ignore notification stream events
+      return;
+    }
+    const teamId = this.userState.self().teamId;
+    if (teamId) {
+      this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures(teamId));
+    }
+  };
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {
