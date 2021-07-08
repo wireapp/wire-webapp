@@ -35,6 +35,7 @@ import type {CryptographyRepository} from '../../cryptography/CryptographyReposi
 import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import type {User} from '../../entity/User';
+import {KEY} from 'Util/KeyboardUtil';
 
 export class LegalHoldModalViewModel {
   static SHOW_REQUEST = 'LegalHold.showRequestModal';
@@ -242,7 +243,7 @@ export class LegalHoldModalViewModel {
     _data: LegalHoldModalViewModel,
     {key}: JQuery.Event<HTMLElement, KeyboardEvent>,
   ): boolean => {
-    if (key !== 'Enter') {
+    if (key !== KEY.ENTER) {
       return true;
     }
     this.acceptRequest();

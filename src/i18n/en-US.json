@@ -1065,5 +1065,7 @@
   "wireLinux": "{{brandName}} for Linux",
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
-  "wire_for_web": "{{brandName}} for Web"
+  "wire_for_web": "{{brandName}} for Web",
+  "legalHoldMessageSendingMissingConsentTitle": "Message cannot be sent",
+  "legalHoldMessageSendingMissingConsentMessage": "You cannot send this message because you have at least one outdated device that does not support legal hold. Please update all your devices or remove them from the app settings. [link]Learn more[/link]"
 }
