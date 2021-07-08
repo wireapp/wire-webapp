@@ -231,7 +231,7 @@ export class TeamRepository {
         this.onUpdate(eventJson);
         break;
       }
-      case (TEAM_EVENT as any).FEATURE_CONFIG_UPDATE: {
+      case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
         this.onFeatureConfigUpdate(eventJson, source);
         break;
       }
