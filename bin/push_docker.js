@@ -30,7 +30,7 @@ const versionParam = process.argv[4] || '';
 const commitSha = process.env.GITHUB_SHA || 'COMMIT_ID';
 const commitShortSha = commitSha.substring(0, 7);
 const configurationEntry = `wire-web-config-default-${
-  distributionParam ? distributionParam : stageParam === 'production' ? 'master' : 'staging'
+  distributionParam || stageParam === 'production' ? 'master' : 'staging'
 }`;
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
