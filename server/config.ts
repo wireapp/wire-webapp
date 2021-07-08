@@ -145,6 +145,7 @@ const config: ServerConfig = {
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true',
       ENABLE_DOMAIN_DISCOVERY: process.env.FEATURE_ENABLE_DOMAIN_DISCOVERY != 'false',
       ENABLE_FEDERATION: process.env.FEATURE_ENABLE_FEDERATION == 'true',
+      ENABLE_MEDIA_EMBEDS: process.env.FEATURE_ENABLE_MEDIA_EMBEDS != 'false',
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN != 'false',
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true',
       FEDERATION_DOMAIN: process.env.FEATURE_FEDERATION_DOMAIN,

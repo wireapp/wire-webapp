@@ -22,6 +22,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 
 import {getLinksFromHtml} from 'Util/UrlUtil';
+import {Config} from '../Config';
 
 import {MediaEmbeds} from './MediaEmbeds';
 
@@ -39,7 +40,9 @@ class MediaParser {
       this.showEmbed = value;
     });
 
-    this.embeds = [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube];
+    this.embeds = Config.getConfig().FEATURE.ENABLE_MEDIA_EMBEDS
+      ? [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube]
+      : [];
   }
 
   /**

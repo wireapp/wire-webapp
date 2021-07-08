@@ -20,6 +20,7 @@ export interface ServerConfig {
       ENABLE_DEBUG: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_FEDERATION: boolean;
+      ENABLE_MEDIA_EMBEDS: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
       FEDERATION_DOMAIN: string;
