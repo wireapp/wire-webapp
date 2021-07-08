@@ -507,6 +507,8 @@
   "legalHoldDescriptionOthers": "В даній розмові правовий захист активовано, як мінімум, для одного учасника.<br />Всі повідомлення будуть збережені для доступу в майбутньому, включно з видаленими та тимчасованими повідомленнями.",
   "legalHoldDescriptionSelf": "Правовий захист було активовано для вашого акаунту.<br />Всі повідомлення будуть збережені для доступу в майбутньому, включно з видаленими та тимчасованими повідомленнями.<br />Ваші співрозмовники будуть повідомлені про це.",
   "legalHoldHeadline": "Правовий захист",
+  "legalHoldMessageSendingMissingConsentMessage": "You cannot send this message because you have at least one outdated device that does not support legal hold. Please update all your devices or remove them from the app settings. [link]Learn more[/link]",
+  "legalHoldMessageSendingMissingConsentTitle": "Message cannot be sent",
   "legalHoldModalPrimaryAction": "Прийняти",
   "legalHoldModalSecondaryAction": "Не зараз",
   "legalHoldModalText": "Усі майбутні повідомлення будуть записані пристроєм з ідентифікатором:[br][fingerprint][br]В тому числі видалені, відредаговані та тимчасові повідомлення в усіх розмовах.",

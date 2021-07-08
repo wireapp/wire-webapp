@@ -507,6 +507,8 @@
   "legalHoldDescriptionOthers": "легално задржавање је активиран за најмање једну особу у овом разговору. <br /> Све поруке биће сачуване за будући приступ, укључујући избрисане, уређене и темпиране поруке.",
   "legalHoldDescriptionSelf": "легално задржавање је активиран за ваш налог. <br /> Све поруке биће сачуване за будући приступ, укључујући избрисане, уређене и временске поруке. <br /> Ваши партнери за разговор биће свесни снимања.",
   "legalHoldHeadline": "легално задржавање",
+  "legalHoldMessageSendingMissingConsentMessage": "You cannot send this message because you have at least one outdated device that does not support legal hold. Please update all your devices or remove them from the app settings. [link]Learn more[/link]",
+  "legalHoldMessageSendingMissingConsentTitle": "Message cannot be sent",
   "legalHoldModalPrimaryAction": "Прихвати",
   "legalHoldModalSecondaryAction": "Не сада",
   "legalHoldModalText": "Све наредне поруке уређај ће снимити отиском прста: [br][fingerprint][br]Ово укључује избрисане, уређене и темпиране поруке у свим разговорима.",
