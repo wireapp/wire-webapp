@@ -552,20 +552,22 @@ export class UserRepository {
     const findUsers = userIds.map(userId => this.findUserById(userId) || userId);
 
     const resolveArray = await Promise.all(findUsers);
-    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => isUser(item)) as [
-      User[],
-      string[] | QualifiedId[],
-    ];
+    const partitionedUsers = partition(resolveArray, item => isUser(item)) as [User[], string[] | QualifiedId[]];
+
+    let knownUserEntities = partitionedUsers[0];
+
+    const unknownUserIds = partitionedUsers[1];
+
+    knownUserEntities = knownUserEntities.filter(
+      (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
+    );
 
     if (offline || !unknownUserIds.length) {
       return knownUserEntities;
     }
 
     const userEntities = await this.fetchUsersById(unknownUserIds);
-    const allUsers = knownUserEntities.concat(userEntities);
-    return allUsers.filter(
-      (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
-    );
+    return knownUserEntities.concat(userEntities);
   }
 
   getUserFromBackend(userId: string): Promise<APIClientUser> {
