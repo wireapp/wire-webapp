@@ -65,7 +65,7 @@
     "@types/adm-zip": "0.4.34",
     "@types/classnames": "2.3.1",
     "@types/dexie-batch": "0.4.2",
-    "@types/enzyme": "3.10.8",
+    "@types/enzyme": "3.10.9",
     "@types/faker": "5.5.6",
     "@types/generate-changelog": "1.8.1",
     "@types/geolite2": "2.0.0",
