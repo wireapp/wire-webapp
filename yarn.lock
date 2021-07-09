@@ -2065,10 +2065,10 @@
   dependencies:
     "@types/color-convert" "*"
 
-"@types/dexie-batch@0.4.2":
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/@types/dexie-batch/-/dexie-batch-0.4.2.tgz#6edd8f324234e225b6fc9118fb586b733c8e6320"
-  integrity sha512-1ZImw6YuuAQ7E9os2XSlo3P0zF//GZBD3dmj6gnfnGXyk+R2sQXOc2S6l3zdCA80wi+Yk1vNdeNHHX1PtKzfRQ==
+"@types/dexie-batch@0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@types/dexie-batch/-/dexie-batch-0.4.3.tgz#0535449aeb91d7ab1a78a29047f97067a8665871"
+  integrity sha512-biCiBSMGUlAckV4RDTlVTME020gzd6u2VRgLNv1dEmU2RtyJ7UDc0lZdrqzqB+gxt3YOz6pk+YCVpDJt/PwOWQ==
   dependencies:
     dexie latest
 
