@@ -46,7 +46,11 @@ class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   getCallDuration = () => this.get('[data-uie-name="call-duration"]');
 }
 
-const createCall = (state: CALL_STATE, selfUser = new User(createRandomUuid()), selfClientId = createRandomUuid()) => {
+const createCall = (
+  state: CALL_STATE,
+  selfUser = new User(createRandomUuid(), null),
+  selfClientId = createRandomUuid(),
+) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call('', '', 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {
@@ -67,7 +71,7 @@ const createProps = async () => {
   };
 
   const conversation = new Conversation();
-  conversation.participating_user_ets([new User('id')]);
+  conversation.participating_user_ets([new User('id', null)]);
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,

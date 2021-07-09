@@ -54,14 +54,14 @@ describe('ConversationVerificationStateHandler', () => {
       conversationB = new Conversation(createRandomUuid());
       conversationC = new Conversation(createRandomUuid());
 
-      selfUserEntity = new User(createRandomUuid());
+      selfUserEntity = new User(createRandomUuid(), null);
       selfUserEntity.isMe = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
       spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUserEntity);
 
-      userA = new User(createRandomUuid());
-      userB = new User(createRandomUuid());
+      userA = new User(createRandomUuid(), null);
+      userB = new User(createRandomUuid(), null);
 
       clientA = new ClientEntity();
       clientA.meta.isVerified(true);
@@ -208,7 +208,7 @@ describe('ConversationVerificationStateHandler', () => {
       const degradedEvent = {type: 'degraded'};
       spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
 
-      const new_user = new User(createRandomUuid());
+      const new_user = new User(createRandomUuid(), null);
       const new_client_b = new ClientEntity();
       new_client_b.meta.isVerified(false);
       new_user.devices.push(new_client_b);
@@ -227,7 +227,7 @@ describe('ConversationVerificationStateHandler', () => {
     it('should not change state if new user with verified client was added to conversation', () => {
       spyOn(EventBuilder, 'buildDegraded');
 
-      const new_user = new User(createRandomUuid());
+      const new_user = new User(createRandomUuid(), null);
       const new_client_b = new ClientEntity();
       new_client_b.meta.isVerified(true);
       new_user.devices.push(new_client_b);

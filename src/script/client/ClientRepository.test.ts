@@ -240,7 +240,7 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity();
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
-      testFactory.client_repository.selfUser(new User(userId));
+      testFactory.client_repository.selfUser(new User(userId, null));
       const result = testFactory.client_repository['isCurrentClient'](userId, clientId);
 
       expect(result).toBeTruthy();

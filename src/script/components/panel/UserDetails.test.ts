@@ -41,7 +41,7 @@ describe('UserDetails', () => {
   it('renders the correct infos for a user', () => {
     const name = 'test-name';
     const userName = 'test-user-name';
-    const participant = new User(createRandomUuid());
+    const participant = new User(createRandomUuid(), null);
     participant.name(name);
     participant.username(userName);
     const userDetails = new UserDetailsPage({
@@ -60,7 +60,7 @@ describe('UserDetails', () => {
   });
 
   it('renders the correct infos for a verified group admin', () => {
-    const participant = new User(createRandomUuid());
+    const participant = new User(createRandomUuid(), null);
     const userDetails = new UserDetailsPage({isGroupAdmin: true, isSelfVerified: true, isVerified: true, participant});
     expect(userDetails.getVerifiedIcon().exists()).toBeTruthy();
 
@@ -69,7 +69,7 @@ describe('UserDetails', () => {
 
   it('renders the badge for a user', () => {
     const badge = 'badgeText';
-    const participant = new User(createRandomUuid());
+    const participant = new User(createRandomUuid(), null);
     const userDetails = new UserDetailsPage({
       badge,
       isGroupAdmin: false,
@@ -82,7 +82,7 @@ describe('UserDetails', () => {
 
   it('renders the badge for a guest', () => {
     const expirationText = '1h remaining';
-    const participant = new User(createRandomUuid());
+    const participant = new User(createRandomUuid(), null);
     participant.isGuest(true);
     participant.isTemporaryGuest(true);
     participant.expirationText(expirationText);

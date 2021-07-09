@@ -33,7 +33,7 @@ describe('EventBuilder', () => {
   let self_user_et = undefined;
 
   beforeEach(() => {
-    self_user_et = new User(createRandomUuid());
+    self_user_et = new User(createRandomUuid(), null);
     self_user_et.isMe = true;
 
     conversation_et = new Conversation(createRandomUuid());

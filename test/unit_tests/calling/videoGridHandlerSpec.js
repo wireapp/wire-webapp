@@ -65,7 +65,7 @@ describe('videoGridHandler', () => {
         ];
 
         const participantsObs = ko.observable([]);
-        const selfUser = new User('self_id');
+        const selfUser = new User('self_id', null);
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
         selfParticipant.videoState(VIDEO_STATE.STARTED);
@@ -154,7 +154,7 @@ describe('videoGridHandler', () => {
   });
 
   function generateVideoParticipant(id, isMe = false) {
-    const user = new User(id);
+    const user = new User(id, null);
     user.isMe = isMe;
     const participant = new Participant(user, 'deviceid');
     participant.hasActiveVideo = () => true;

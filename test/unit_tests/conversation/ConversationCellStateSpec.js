@@ -33,7 +33,7 @@ describe('ConversationCellState', () => {
   describe('Notification state icon', () => {
     const conversationEntity = new Conversation(createRandomUuid());
 
-    const selfUserEntity = new User(createRandomUuid());
+    const selfUserEntity = new User(createRandomUuid(), null);
     selfUserEntity.isMe = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
@@ -70,7 +70,7 @@ describe('ConversationCellState', () => {
 
     const conversationEntity = new Conversation(createRandomUuid());
 
-    const selfUserEntity = new User(createRandomUuid());
+    const selfUserEntity = new User(createRandomUuid(), null);
     selfUserEntity.isMe = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
