@@ -507,6 +507,8 @@
   "legalHoldDescriptionOthers": "Yasal tutma bu konuşmada en az bir kişi için aktive edildi.\n<br />Silinen, düzenlenmiş ve zamanlanmış mesajlar dahil olmak üzere tüm mesajlar ileride erişilebilecek şekilde korunur.",
   "legalHoldDescriptionSelf": "Hesabınız için Yasal Tutma etkinleştirildi.\n<br />Silinen, düzenlenmiş ve zamanlanmış mesajlar dahil olmak üzere tüm mesajlar ileride erişilebilecek şekilde korunur.\n<br />Konuşma ortaklarınız kaydın farkında olacak.",
   "legalHoldHeadline": "Kanuni Durdurma",
+  "legalHoldMessageSendingMissingConsentMessage": "You cannot send this message because you have at least one outdated device that does not support legal hold. Please update all your devices or remove them from the app settings. [link]Learn more[/link]",
+  "legalHoldMessageSendingMissingConsentTitle": "Message cannot be sent",
   "legalHoldModalPrimaryAction": "Kabul et",
   "legalHoldModalSecondaryAction": "Şimdi değil",
   "legalHoldModalText": "Gelecekteki tüm mesajlar parmak izi ile cihaz tarafından kaydedilecek:[br] [fingerprint][br] Bu, tüm konuşmalarda silinmiş, düzenlenmiş ve zamanlanmış mesajları içerir.",
