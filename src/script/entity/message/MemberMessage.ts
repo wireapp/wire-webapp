@@ -51,6 +51,7 @@ export class MemberMessage extends SystemMessage {
   public showServicesWarning: boolean;
   public readonly userEntities: ko.ObservableArray<User>;
   public readonly userIds: ko.ObservableArray<string>;
+  public readonly qualifiedUserIds: ko.ObservableArray<string>;
   public memberMessageType: SystemMessageType;
   public reason: MemberLeaveReason;
 
@@ -70,6 +71,7 @@ export class MemberMessage extends SystemMessage {
 
     this.userEntities = ko.observableArray();
     this.userIds = ko.observableArray();
+    this.qualifiedUserIds = ko.observableArray([]);
     this.name = ko.observable('');
 
     this.exceedsMaxVisibleUsers = ko.pureComputed(() => {
@@ -115,7 +117,7 @@ export class MemberMessage extends SystemMessage {
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length > 0);
 
-    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User()));
+    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User(undefined, null)));
 
     this.htmlCaption = ko.pureComputed(() => {
       if (!this.hasUsers()) {

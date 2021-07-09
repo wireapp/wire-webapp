@@ -149,16 +149,10 @@ describe('UserRepository', () => {
 
   describe('User handling', () => {
     describe('fetchUsersById', () => {
-      it('should handle malformed input', () => {
-        return testFactory.user_repository
-          .fetchUsersById()
-          .then(response => {
-            expect(response.length).toBe(0);
-            return testFactory.user_repository.fetchUsersById([undefined, undefined, undefined]);
-          })
-          .then(response => {
-            expect(response.length).toBe(0);
-          });
+      it('handles empty arrays', () => {
+        return testFactory.user_repository.fetchUsersById([]).then(response => {
+          expect(response.length).toBe(0);
+        });
       });
     });
 
@@ -166,7 +160,7 @@ describe('UserRepository', () => {
       let user = null;
 
       beforeEach(() => {
-        user = new User(entities.user.john_doe.id);
+        user = new User(entities.user.john_doe.id, null);
         return testFactory.user_repository.saveUser(user);
       });
 
@@ -191,7 +185,7 @@ describe('UserRepository', () => {
       afterEach(() => testFactory.user_repository.userState.users.removeAll());
 
       it('saves a user', () => {
-        const user = new User();
+        const user = new User(undefined, null);
         user.id = entities.user.jane_roe.id;
 
         testFactory.user_repository.saveUser(user);
@@ -201,7 +195,7 @@ describe('UserRepository', () => {
       });
 
       it('saves self user', () => {
-        const user = new User();
+        const user = new User(undefined, null);
         user.id = entities.user.jane_roe.id;
 
         testFactory.user_repository.saveUser(user, true);
@@ -218,8 +212,8 @@ describe('UserRepository', () => {
 
       beforeEach(() => {
         testFactory.user_repository.userState.users.removeAll();
-        userJaneRoe = new User(entities.user.jane_roe.id);
-        userJohnDoe = new User(entities.user.john_doe.id);
+        userJaneRoe = new User(entities.user.jane_roe.id, null);
+        userJohnDoe = new User(entities.user.john_doe.id, null);
 
         testFactory.user_repository.saveUsers([userJaneRoe, userJohnDoe]);
         const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent);
