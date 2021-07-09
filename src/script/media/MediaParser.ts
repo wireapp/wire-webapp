@@ -26,23 +26,21 @@ import {Config} from '../Config';
 
 import {MediaEmbeds} from './MediaEmbeds';
 
-class MediaParser {
+export class MediaParser {
   showEmbed: boolean;
   embeds: ((link: HTMLAnchorElement, message: string, themeColor: string) => string)[];
 
   constructor() {
-    this.showEmbed = true;
+    this.showEmbed = Config.getConfig().FEATURE.ENABLE_MEDIA_EMBEDS;
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, ({settings}: WebappProperties) => {
-      this.showEmbed = settings.previews.send;
+      this.showEmbed = settings.previews.send && Config.getConfig().FEATURE.ENABLE_MEDIA_EMBEDS;
     });
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.PREVIEWS.SEND, (value: boolean) => {
-      this.showEmbed = value;
+      this.showEmbed = value && Config.getConfig().FEATURE.ENABLE_MEDIA_EMBEDS;
     });
 
-    this.embeds = Config.getConfig().FEATURE.ENABLE_MEDIA_EMBEDS
-      ? [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube]
-      : [];
+    this.embeds = [MediaEmbeds.soundcloud, MediaEmbeds.spotify, MediaEmbeds.vimeo, MediaEmbeds.youtube];
   }
 
   /**
@@ -53,7 +51,7 @@ class MediaParser {
    * @param themeColor Accent color to be applied to the embed
    * @returns Message with rendered media embeds
    */
-  readonly renderMediaEmbeds = (message: string, themeColor: string): string => {
+  readonly renderMediaEmbeds = (message: string, themeColor?: string): string => {
     if (this.showEmbed) {
       getLinksFromHtml<HTMLAnchorElement>(message).forEach(link => {
         this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
