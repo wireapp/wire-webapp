@@ -33,6 +33,7 @@ import {
   REASON,
   STATE as CALL_STATE,
   VIDEO_STATE,
+  VSTREAMS,
   Wcall,
   WcallClient,
   WcallMember,
@@ -753,7 +754,15 @@ export class CallingRepository {
     this.wCall.reject(this.wUser, conversationId);
   }
 
-  changeCallPage(newPage: number, call: Call): void {}
+  changeCallPage(newPage: number, call: Call): void {
+    const nextPageParticipants = call.pages()[newPage];
+    const payload = {
+      clients: nextPageParticipants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      convid: call.conversationId,
+    };
+    this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
+    call.currentPage(newPage);
+  }
 
   readonly leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
