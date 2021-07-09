@@ -562,7 +562,10 @@ export class UserRepository {
     }
 
     const userEntities = await this.fetchUsersById(unknownUserIds);
-    return knownUserEntities.concat(userEntities);
+    const allUsers = knownUserEntities.concat(userEntities);
+    return allUsers.filter(
+      (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
+    );
   }
 
   getUserFromBackend(userId: string): Promise<APIClientUser> {
