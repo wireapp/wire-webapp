@@ -29,6 +29,7 @@ import {RootState} from '../module/reducer';
 import * as ClientSelector from '../module/selector/ClientSelector';
 import {ROUTE} from '../route';
 import Page from './Page';
+import {KEY} from 'Util/KeyboardUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {}
 
@@ -81,7 +82,7 @@ const HistoryInfo = ({hasHistory, clients, currentSelfClient, isNewCurrentSelfCl
           autoFocus
           data-uie-name="do-history-confirm"
           onKeyDown={(event: React.KeyboardEvent) => {
-            if (event.key === 'Enter') {
+            if (event.key === KEY.ENTER) {
               onContinue();
             }
           }}

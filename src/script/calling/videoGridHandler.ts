@@ -41,8 +41,9 @@ export function getGrid(call: Call) {
   const remoteParticipants = call
     .getRemoteParticipants()
     .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+  const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
 
-  if (remoteParticipants.length === 1) {
+  if (remoteParticipants.length === 1 && remoteVideoParticipants.length === 1) {
     inGridParticipants = remoteParticipants;
     thumbnailParticipant = selfParticipant;
   } else {
