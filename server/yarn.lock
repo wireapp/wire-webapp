@@ -644,10 +644,10 @@
     "@types/qs" "*"
     "@types/range-parser" "*"
 
-"@types/express-sitemap-xml@1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-1.1.1.tgz#be4c20cd458e8d22cd742db34623100579cc1c49"
-  integrity sha512-D0zeqqRNrZnmYZxnWJLvZzMSVv13+AmsBOQUg9iDBOVPbYqCDwCFp52x/DxBwLVpUSAOFpbiFmue+U5NsmHB1A==
+"@types/express-sitemap-xml@3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@types/express-sitemap-xml/-/express-sitemap-xml-3.0.1.tgz#05252e83a92d2ab27e13e24d49ed94c89226f968"
+  integrity sha512-A5eT23SY7GqUM1dodNwEcPCsYly++Y0h2CDXzi1gln0fjpqBZ+f7KbbHljz5G+ZMZR1OcXwyd71y+CRX2tZfpg==
   dependencies:
     "@types/express" "*"
 
