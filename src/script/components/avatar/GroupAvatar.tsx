@@ -51,22 +51,24 @@ const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false}) => {
         }}
         data-uie-name="group-avatar-box-wrapper"
       >
-        {slicedUsers.map(user => (
-          <div
-            key={user.id}
-            className="group-avatar-box"
-            css={{
-              ...CSS_FLEX_CENTER,
-              ...CSS_SQUARE(14),
-              color: user.accent_color(),
-              flex: '0 0 auto',
-              fontSize: 9,
-              fontWeight: 900,
-            }}
-          >
-            {Array.from(user.initials())[0]}
-          </div>
-        ))}
+        {slicedUsers.map(user => {
+          return (
+            <div
+              key={`${user.id}@${user.domain}`}
+              className="group-avatar-box"
+              css={{
+                ...CSS_FLEX_CENTER,
+                ...CSS_SQUARE(14),
+                color: user.accent_color(),
+                flex: '0 0 auto',
+                fontSize: 9,
+                fontWeight: 900,
+              }}
+            >
+              {Array.from(user.initials())[0]}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

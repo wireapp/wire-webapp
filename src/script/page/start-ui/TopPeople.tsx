@@ -36,7 +36,12 @@ const TopPeople: React.FC<TopPeopleProps> = ({clickOnUser, max, users}) => {
   max ??= 9;
   const displayedUsers = users.slice(0, max);
   const searchListItems = displayedUsers.map(user => (
-    <TopContact assetRepository={assetRepository} clickOnUser={clickOnUser} key={user.id} user={user} />
+    <TopContact
+      assetRepository={assetRepository}
+      clickOnUser={clickOnUser}
+      key={`${user.id}@${user.domain}`}
+      user={user}
+    />
   ));
   return <div className="search-list search-list-sm">{searchListItems}</div>;
 };
