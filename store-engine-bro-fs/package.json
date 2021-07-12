@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@types/bro-fs": "0.6.0",
+    "@types/bro-fs": "0.6.1",
     "bro-fs": "0.6.0"
   },
   "devDependencies": {
