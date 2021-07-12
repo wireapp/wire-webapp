@@ -43,11 +43,10 @@ export class BroadcastService {
 
     const preKeys = await Promise.all(members.map(member => this.apiClient.user.api.getUserPreKeys(member.id)));
 
-    return preKeys.reduce((bundleMap: UserPreKeyBundleMap, bundle) => {
-      const userId = typeof bundle.user == 'string' ? bundle.user : bundle.user.id;
-      bundleMap[userId] = {};
+    return preKeys.reduce<UserPreKeyBundleMap>((bundleMap, bundle) => {
+      bundleMap[bundle.user] = {};
       for (const client of bundle.clients) {
-        bundleMap[userId][client.client] = client.prekey;
+        bundleMap[bundle.user][client.client] = client.prekey;
       }
       return bundleMap;
     }, {});

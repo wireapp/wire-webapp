@@ -19,7 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
+import {QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/src/user';
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
 
@@ -36,16 +36,18 @@ const createMessage = (content: string) => {
   return GenericMessage.encode(customTextMessage).finish();
 };
 
-const generatePreKeyBundle = (userCount: number, clientsPerUser: number): UserPreKeyBundleMap => {
-  const prekeyBundle: UserPreKeyBundleMap = {};
+const generatePreKeyBundle = (userCount: number, clientsPerUser: number): QualifiedUserPreKeyBundleMap => {
+  const prekeyBundle: QualifiedUserPreKeyBundleMap = {};
   for (let userIndex = 0; userIndex < userCount; userIndex++) {
     const userId = PayloadHelper.getUUID();
     prekeyBundle[userId] = {};
     for (let clientIndex = 0; clientIndex < clientsPerUser; clientIndex++) {
       const clientId = PayloadHelper.getUUID();
       prekeyBundle[userId][clientId] = {
-        id: -1,
-        key: '',
+        none: {
+          id: -1,
+          key: '',
+        },
       };
     }
   }

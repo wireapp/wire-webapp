@@ -17,14 +17,12 @@
  *
  */
 
-import {PublicClient} from './PublicClient';
+import {QualifiedUserClients} from './QualifiedUserClients';
 
-export interface QualifiedUserMap {
-  [domain: string]: {
-    [userId: string]: PublicClient[];
-  };
-}
-
-export interface QualifiedPublicClients {
-  qualified_user_map: QualifiedUserMap;
+export interface MessageSendingStatus {
+  deleted: QualifiedUserClients;
+  failed_to_send: QualifiedUserClients;
+  missing: QualifiedUserClients;
+  redundant: QualifiedUserClients;
+  time: string;
 }

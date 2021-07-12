@@ -20,9 +20,9 @@
 import type {APIClient} from '@wireapp/api-client';
 import type {PreKey as SerializedPreKey} from '@wireapp/api-client/src/auth/';
 import type {RegisteredClient} from '@wireapp/api-client/src/client/';
-import type {OTRClientMap, OTRRecipients} from '@wireapp/api-client/src/conversation/';
+import type {OTRClientMap, OTRRecipients, QualifiedOTRRecipients} from '@wireapp/api-client/src/conversation/';
 import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
-import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
 import {keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -109,6 +109,19 @@ export class CryptographyService {
 
   private static dismantleSessionId(sessionId: string): string[] {
     return sessionId.split('@');
+  }
+
+  public async encryptQualified(
+    plainText: Uint8Array,
+    preKeyBundles: QualifiedUserPreKeyBundleMap,
+  ): Promise<QualifiedOTRRecipients> {
+    const qualifiedOTRRecipients: QualifiedOTRRecipients = {};
+
+    for (const [domain, preKeyBundleMap] of Object.entries(preKeyBundles)) {
+      qualifiedOTRRecipients[domain] = await this.encrypt(plainText, preKeyBundleMap);
+    }
+
+    return qualifiedOTRRecipients;
   }
 
   public async encrypt(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): Promise<OTRRecipients<Uint8Array>> {

@@ -101,8 +101,11 @@ describe('MessageHandler', () => {
         text: messageText,
       });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
-        jasmine.objectContaining({content: jasmine.objectContaining({mentions: mentionData, text: messageText})}),
-        undefined,
+        jasmine.objectContaining({
+          payloadBundle: jasmine.objectContaining({
+            content: jasmine.objectContaining({mentions: mentionData, text: messageText}),
+          }),
+        }),
       );
     });
 
@@ -119,8 +122,9 @@ describe('MessageHandler', () => {
         text: message,
       });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
-        jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
-        undefined,
+        jasmine.objectContaining({
+          payloadBundle: jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
+        }),
       );
     });
 
@@ -138,8 +142,10 @@ describe('MessageHandler', () => {
         text: message,
       });
       expect(mainHandler.account!.service!.conversation.send).toHaveBeenCalledWith(
-        jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
-        userIds,
+        jasmine.objectContaining({
+          payloadBundle: jasmine.objectContaining({content: jasmine.objectContaining({text: message})}),
+          userIds,
+        }),
       );
     });
   });

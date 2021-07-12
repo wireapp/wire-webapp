@@ -79,7 +79,7 @@ export class ChangelogBot {
         const textPayload = account.service.conversation.messageBuilder
           .createText({conversationId, text: this.message})
           .build();
-        await account.service.conversation.send(textPayload);
+        await account.service.conversation.send({payloadBundle: textPayload});
       }
     }
   }

@@ -18,7 +18,6 @@
  */
 
 export interface QualifiedId {
-  /** users without federated domain will have 'none' as domain */
   domain: string;
   id: string;
 }

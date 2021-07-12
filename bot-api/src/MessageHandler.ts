@@ -114,7 +114,7 @@ export abstract class MessageHandler {
           content: buttonActionConfirmationContent,
         });
 
-      await this.account.service.conversation.send(buttonActionConfirmationMessage, [userId]);
+      await this.account.service.conversation.send({payloadBundle: buttonActionConfirmationMessage, userIds: [userId]});
     }
   }
 
@@ -124,7 +124,7 @@ export abstract class MessageHandler {
   async sendCall(conversationId: string, content: CallingContent, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
       const callPayload = this.account.service.conversation.messageBuilder.createCall({conversationId, content});
-      await this.account.service.conversation.send(callPayload, userIds);
+      await this.account.service.conversation.send({payloadBundle: callPayload, userIds});
     }
   }
 
@@ -142,7 +142,7 @@ export abstract class MessageHandler {
         .createComposite({conversationId})
         .addText(Text.create({content: text}));
       buttons.forEach(button => message.addButton(button));
-      await this.account.service.conversation.send(message.build(), userIds);
+      await this.account.service.conversation.send({payloadBundle: message.build(), userIds});
     }
   }
 
@@ -160,7 +160,7 @@ export abstract class MessageHandler {
         firstMessageId,
         type: Confirmation.Type.DELIVERED,
       });
-      await this.account.service.conversation.send(confirmationPayload, userIds);
+      await this.account.service.conversation.send({payloadBundle: confirmationPayload, userIds});
     }
   }
 
@@ -197,7 +197,7 @@ export abstract class MessageHandler {
         .withMentions(newMentions)
         .build();
 
-      const editedMessage = await this.account.service.conversation.send(editedPayload, userIds);
+      const editedMessage = await this.account.service.conversation.send({payloadBundle: editedPayload, userIds});
 
       if (newLinkPreview) {
         const linkPreviewPayload = await this.account.service.conversation.messageBuilder.createLinkPreview(
@@ -209,7 +209,7 @@ export abstract class MessageHandler {
           .withMentions(newMentions)
           .build();
 
-        await this.account.service.conversation.send(editedWithPreviewPayload, userIds);
+        await this.account.service.conversation.send({payloadBundle: editedWithPreviewPayload, userIds});
       }
     }
   }
@@ -246,7 +246,7 @@ export abstract class MessageHandler {
         conversationId,
         metaData: metadata,
       });
-      await this.account.service.conversation.send(metadataPayload, userIds);
+      await this.account.service.conversation.send({payloadBundle: metadataPayload, userIds});
 
       try {
         const filePayload = await this.account.service.conversation.messageBuilder.createFileData({
@@ -254,14 +254,14 @@ export abstract class MessageHandler {
           file,
           originalMessageId: metadataPayload.id,
         });
-        await this.account.service.conversation.send(filePayload, userIds);
+        await this.account.service.conversation.send({payloadBundle: filePayload, userIds});
       } catch (error) {
         const abortPayload = await this.account.service.conversation.messageBuilder.createFileAbort({
           conversationId,
           reason: Asset.NotUploaded.FAILED,
           originalMessageId: metadataPayload.id,
         });
-        await this.account.service.conversation.send(abortPayload, userIds);
+        await this.account.service.conversation.send({payloadBundle: abortPayload, userIds});
       }
     }
   }
@@ -272,7 +272,7 @@ export abstract class MessageHandler {
   async sendImage(conversationId: string, image: ImageContent, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
       const imagePayload = await this.account.service.conversation.messageBuilder.createImage({conversationId, image});
-      await this.account.service.conversation.send(imagePayload, userIds);
+      await this.account.service.conversation.send({payloadBundle: imagePayload, userIds});
     }
   }
 
@@ -289,7 +289,7 @@ export abstract class MessageHandler {
         conversationId,
         location,
       });
-      await this.account.service.conversation.send(locationPayload, userIds);
+      await this.account.service.conversation.send({payloadBundle: locationPayload, userIds});
     }
   }
 
@@ -299,7 +299,7 @@ export abstract class MessageHandler {
   async sendPing(conversationId: string, userIds?: string[] | UserClientsMap): Promise<void> {
     if (this.account?.service) {
       const pingPayload = this.account.service.conversation.messageBuilder.createPing({conversationId});
-      await this.account.service.conversation.send(pingPayload, userIds);
+      await this.account.service.conversation.send({payloadBundle: pingPayload, userIds});
     }
   }
 
@@ -320,7 +320,7 @@ export abstract class MessageHandler {
           type,
         },
       });
-      await this.account.service.conversation.send(reactionPayload, userIds);
+      await this.account.service.conversation.send({payloadBundle: reactionPayload, userIds});
     }
   }
 
@@ -335,7 +335,7 @@ export abstract class MessageHandler {
         .createText({conversationId, text})
         .withQuote(quotedMessage)
         .build();
-      await this.account.service.conversation.send(replyPayload, userIds);
+      await this.account.service.conversation.send({payloadBundle: replyPayload, userIds});
     }
   }
 
@@ -366,7 +366,7 @@ export abstract class MessageHandler {
         .createText({conversationId, text})
         .withMentions(mentions)
         .build();
-      const sentMessage = await this.account.service.conversation.send(payload, userIds);
+      const sentMessage = await this.account.service.conversation.send({payloadBundle: payload, userIds});
 
       if (linkPreview) {
         const linkPreviewPayload = await this.account.service.conversation.messageBuilder.createLinkPreview(
@@ -378,7 +378,7 @@ export abstract class MessageHandler {
           .withMentions(mentions)
           .build();
 
-        await this.account.service.conversation.send(editedWithPreviewPayload, userIds);
+        await this.account.service.conversation.send({payloadBundle: editedWithPreviewPayload, userIds});
       }
     }
   }

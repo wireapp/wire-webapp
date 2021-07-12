@@ -17,7 +17,7 @@
  *
  */
 
-import type {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
+import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import type {AxiosError, AxiosRequestConfig} from 'axios';
 
 import {ValidationError} from '../validation/';
@@ -31,6 +31,7 @@ import type {
   Conversations,
   Invite,
   Member,
+  MessageSendingStatus,
   NewConversation,
   NewOTRMessage,
 } from './';
@@ -78,6 +79,7 @@ export class ConversationAPI {
     MESSAGE_TIMER: 'message-timer',
     NAME: 'name',
     OTR: 'otr',
+    PROTEUS: 'proteus',
     RECEIPT_MODE: 'receipt-mode',
     ROLES: 'roles',
     SELF: 'self',
@@ -185,10 +187,14 @@ export class ConversationAPI {
    * @param conversationId The conversation ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
-  public async getConversation(conversationId: string): Promise<Conversation> {
+  public async getConversation(conversationId: string, domain?: string): Promise<Conversation> {
+    const url = domain
+      ? `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${conversationId}`
+      : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`;
+
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`,
+      url,
     };
 
     const response = await this.client.sendJSON<Conversation>(config);
@@ -547,12 +553,10 @@ export class ConversationAPI {
       throw new ValidationError('Unable to send OTR message without client ID.');
     }
 
-    if (!messageData) {
-      messageData = {
-        recipients: {},
-        sender: sendingClientId,
-      };
-    }
+    messageData ||= {
+      recipients: {},
+      sender: sendingClientId,
+    };
 
     const config: AxiosRequestConfig = {
       data: messageData,
@@ -572,6 +576,41 @@ export class ConversationAPI {
     }
 
     const response = await this.client.sendJSON<ClientMismatch>(config, true);
+    return response.data;
+  }
+
+  /**
+   * This endpoint ensures that the list of clients is correct and only sends the message if the list is correct.
+   * To override this, the endpoint accepts `client_mismatch_strategy` in the body. It can have these values:
+   *
+   * - `report_all`: When set, the message is not sent if any clients are missing. The missing clients are reported
+   * in the response.
+   * - `ignore_all`: When set, no checks about missing clients are carried out.
+   * - `report_only`: Takes a list of qualified UserIDs. If any clients of the listed users are missing, the message is
+   * not sent. The missing clients are reported in the response.
+   * - `ignore_only`: Takes a list of qualified UserIDs. If any clients of the non-listed users are missing, the message
+   * is not sent. The missing clients are reported in the response.
+   *
+   * The sending of messages in a federated conversation could theorectically fail partially. To make this case
+   * unlikely, the backend first gets a list of clients from all the involved backends and then tries to send a message.
+   * So, if any backend is down, the message is not propagated to anyone. But the actual message fan out to multiple
+   * backends could still fail partially. This type of failure is reported as a 201, the clients for which the message
+   * sending failed are part of the response body.
+   *
+   * This endpoint can lead to OtrMessageAdd event being sent to the recipients.
+   */
+  public async postOTRMessageV2(
+    conversationId: string,
+    domain: string,
+    messageData: ProtobufOTR.QualifiedNewOtrMessage,
+  ): Promise<MessageSendingStatus> {
+    const config: AxiosRequestConfig = {
+      data: ProtobufOTR.QualifiedNewOtrMessage.encode(messageData).finish(),
+      method: 'post',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${conversationId}/${ConversationAPI.URL.PROTEUS}/${ConversationAPI.URL.MESSAGES}`,
+    };
+
+    const response = await this.client.sendProtocolBuffer<MessageSendingStatus>(config, true);
     return response.data;
   }
 
@@ -599,7 +638,7 @@ export class ConversationAPI {
     }
 
     const config: AxiosRequestConfig = {
-      data: messageData,
+      data: ProtobufOTR.NewOtrMessage.encode(messageData).finish(),
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`,
     };
@@ -635,7 +674,7 @@ export class ConversationAPI {
   public async postSelf(): Promise<Conversation> {
     const config: AxiosRequestConfig = {
       method: 'post',
-      url: `${ConversationAPI.URL.CONVERSATIONS}/self`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.SELF}`,
     };
 
     const response = await this.client.sendJSON<Conversation>(config);

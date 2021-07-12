@@ -28,6 +28,7 @@ export * from './Conversations';
 export * from './ConversationRole';
 export * from './Invite';
 export * from './Member';
+export * from './MessageSendingStatus';
 export * from './MutedStatus';
 export * from './NewConversation';
 export * from './NewOTRMessage';
