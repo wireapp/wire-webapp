@@ -31,6 +31,7 @@ import type {
   ConversationRenameData,
   ConversationTypingData,
 } from '../conversation/data/';
+import {QualifiedId} from '../user';
 
 export enum CONVERSATION_EVENT {
   ACCESS_UPDATE = 'conversation.access-update',
@@ -83,6 +84,8 @@ export interface BaseConversationEvent {
   conversation: string;
   data: ConversationEventData;
   from: string;
+  qualified_conversation?: QualifiedId;
+  qualified_from?: QualifiedId;
   time: string;
   type: CONVERSATION_EVENT;
 }
