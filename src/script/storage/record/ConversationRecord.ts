@@ -48,6 +48,7 @@ export interface ConversationRecord {
   muted_timestamp: number;
   name: string;
   others: string[];
+  qualified_id?: QualifiedId;
   qualified_users?: QualifiedId[];
   receipt_mode?: Confirmation.Type;
   roles: {[userId: string]: DefaultConversationRoleName | string};

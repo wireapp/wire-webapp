@@ -368,7 +368,7 @@ export class ConversationRepository {
   /**
    * Get a conversation from the backend.
    */
-  private async fetchConversationById(conversationId: string): Promise<Conversation> {
+  private async fetchConversationById(conversationId: string, domain?: string): Promise<Conversation> {
     const fetching_conversations: Record<string, FetchPromise[]> = {};
     if (fetching_conversations.hasOwnProperty(conversationId)) {
       return new Promise((resolve, reject) => {
@@ -378,7 +378,7 @@ export class ConversationRepository {
 
     fetching_conversations[conversationId] = [];
     try {
-      const response = await this.conversation_service.getConversationById(conversationId);
+      const response = await this.conversation_service.getConversationById(conversationId, domain);
       const conversationEntity = this.mapConversations(response);
 
       this.logger.info(`Fetched conversation '${conversationId}' from backend`);
@@ -685,7 +685,10 @@ export class ConversationRepository {
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
-    const conversationData = await this.conversation_service.getConversationById(conversationEntity.id);
+    const conversationData = await this.conversation_service.getConversationById(
+      conversationEntity.id,
+      conversationEntity.domain,
+    );
     const {name, message_timer} = conversationData;
     this.conversationMapper.updateProperties(conversationEntity, {name} as any);
     this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
@@ -1082,7 +1085,7 @@ export class ConversationRepository {
     return Promise.all(
       this.conversationState.conversations().map(async conversation => {
         try {
-          await this.conversation_service.getConversationById(conversation.id);
+          await this.conversation_service.getConversationById(conversation.id, conversation.domain);
         } catch ({code}) {
           if (code === HTTP_STATUS.NOT_FOUND) {
             this.deleteConversationLocally(conversation.id, true);
@@ -2181,7 +2184,7 @@ export class ConversationRepository {
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
 
-    const data = await this.conversation_service.getConversationById(conversationEntity.id);
+    const data = await this.conversation_service.getConversationById(conversationEntity.id, conversationEntity.domain);
     const allMembers = [...data.members.others, data.members.self];
     const conversationRoles = allMembers.reduce((roles, member) => {
       roles[member.id] = member.conversation_role;

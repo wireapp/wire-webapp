@@ -240,6 +240,11 @@ export class ConversationMapper {
     conversationEntity.participating_user_ids(participatingUserIds);
     conversationEntity.participatingQualifiedUserIds(participatingQualifiedUserIds);
 
+    // Add domain
+    if (conversationData.qualified_id) {
+      conversationEntity.domain = conversationData.qualified_id.domain;
+    }
+
     // Team ID from database or backend payload
     const teamId = conversationData.team_id || conversationData.team;
     if (teamId) {
