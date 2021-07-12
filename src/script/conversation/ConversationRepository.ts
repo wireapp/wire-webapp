@@ -1214,6 +1214,10 @@ export class ConversationRepository {
       offline,
     );
     userEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
+    // TODO Federation fix: Filter duplicated users
+    userEntities = userEntities.filter(
+      (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
+    );
     conversationEntity.participating_user_ets(userEntities);
 
     if (updateGuests) {
