@@ -17,7 +17,7 @@
  *
  */
 
-import type {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
+import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import type {AxiosRequestConfig} from 'axios';
 
 import {ValidationError} from '../validation/';
@@ -95,7 +95,7 @@ export class BroadcastAPI {
     }
 
     const config: AxiosRequestConfig = {
-      data: messageData,
+      data: ProtobufOTR.NewOtrMessage.encode(messageData).finish(),
       method: 'post',
       url: BroadcastAPI.URL.BROADCAST,
     };

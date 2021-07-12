@@ -17,10 +17,14 @@
  *
  */
 
-import type {PreKey} from '../auth/';
+import type {PreKey} from '../auth';
 
 export interface UserPreKeyBundleMap {
   [userId: string]: {
     [clientId: string]: PreKey;
   };
+}
+
+export interface QualifiedUserPreKeyBundleMap {
+  [domain: string]: UserPreKeyBundleMap;
 }

@@ -18,7 +18,6 @@
  */
 
 export interface QualifiedHandle {
-  /** users without federated domain will have 'none' as domain */
   domain: string;
   handle: string;
 }

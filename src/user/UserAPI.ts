@@ -38,10 +38,11 @@ import type {
   VerifyDelete,
 } from '../user/';
 import {RequestCancellationError} from './UserError';
-import type {ClientPreKey, PreKeyBundle, QualifiedPreKeyBundle} from '../auth/';
+import type {ClientPreKey, PreKeyBundle} from '../auth/';
 import type {PublicClient, QualifiedPublicClients} from '../client/';
 import type {RichInfo} from './RichInfo';
 import type {UserClients, QualifiedUserClients} from '../conversation/';
+import type {QualifiedUserPreKeyBundleMap} from './UserPreKeyBundleMap';
 
 export class UserAPI {
   public static readonly DEFAULT_USERS_CHUNK_SIZE = 50;
@@ -285,9 +286,7 @@ export class UserAPI {
     return response.data;
   }
 
-  public async getUserPreKeys(userId: string): Promise<PreKeyBundle | QualifiedPreKeyBundle>;
-  public async getUserPreKeys(userId: QualifiedId): Promise<QualifiedPreKeyBundle>;
-  public async getUserPreKeys(userId: string | QualifiedId): Promise<PreKeyBundle | QualifiedPreKeyBundle> {
+  public async getUserPreKeys(userId: string | QualifiedId): Promise<PreKeyBundle> {
     const url =
       typeof userId === 'string'
         ? `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}`
@@ -298,7 +297,7 @@ export class UserAPI {
       url,
     };
 
-    const response = await this.client.sendJSON<PreKeyBundle | QualifiedPreKeyBundle>(config, true);
+    const response = await this.client.sendJSON<PreKeyBundle>(config, true);
     return response.data;
   }
 
@@ -477,14 +476,14 @@ export class UserAPI {
 
   private async postMultiQualifiedPreKeyBundlesChunk(
     userClientMap: QualifiedUserClients,
-  ): Promise<UserPreKeyBundleMap> {
+  ): Promise<QualifiedUserPreKeyBundleMap> {
     const config: AxiosRequestConfig = {
       data: userClientMap,
       method: 'post',
       url: `${UserAPI.URL.USERS}/${UserAPI.URL.LIST_PREKEYS}`,
     };
 
-    const response = await this.client.sendJSON<UserPreKeyBundleMap>(config, true);
+    const response = await this.client.sendJSON<QualifiedUserPreKeyBundleMap>(config, true);
     return response.data;
   }
 
@@ -525,26 +524,47 @@ export class UserAPI {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
    */
   public async postMultiPreKeyBundles(
-    userClientMap: UserClients | QualifiedUserClients,
+    userClientMap: UserClients,
     limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
   ): Promise<UserPreKeyBundleMap> {
-    function isUserClients(obj: any): obj is UserClients {
-      return Array.isArray(Object.values(obj)[0]);
-    }
+    const userIdChunks = ArrayUtil.chunk(Object.keys(userClientMap), limit);
 
-    const domainOrUserIdChunks = ArrayUtil.chunk(Object.keys(userClientMap), limit);
-    const chunksPromises = domainOrUserIdChunks.map(userIdChunk => {
-      const rebuiltMap = userIdChunk.reduce<UserClients | QualifiedUserClients>(
-        (chunkedUserClientMap, domainOrUserId) => {
-          chunkedUserClientMap[domainOrUserId] = userClientMap[domainOrUserId];
-          return chunkedUserClientMap;
-        },
-        {},
-      );
+    const chunksPromises = userIdChunks.map(userIdChunk => {
+      const rebuiltMap = userIdChunk.reduce<UserClients>((chunkedUserClientMap, userId) => {
+        chunkedUserClientMap[userId] = userClientMap[userId];
+        return chunkedUserClientMap;
+      }, {});
 
-      return isUserClients(userClientMap)
-        ? this.postMultiPreKeyBundlesChunk(rebuiltMap as UserClients)
-        : this.postMultiQualifiedPreKeyBundlesChunk(rebuiltMap as QualifiedUserClients);
+      return this.postMultiPreKeyBundlesChunk(rebuiltMap);
+    });
+
+    const userPreKeyBundleMapChunks = await Promise.all(chunksPromises);
+
+    return userPreKeyBundleMapChunks.reduce((userPreKeyBundleMap, userPreKeyBundleMapChunk) => {
+      return {
+        ...userPreKeyBundleMap,
+        ...userPreKeyBundleMapChunk,
+      };
+    }, {});
+  }
+
+  /**
+   * Given a map of qualified user IDs to client IDs return a prekey for each one.
+   * @param userClientMap A map of the qualified user's clients
+   */
+  public async postQualifiedMultiPreKeyBundles(
+    userClientMap: QualifiedUserClients,
+    limit: number = UserAPI.DEFAULT_USERS_PREKEY_BUNDLE_CHUNK_SIZE,
+  ): Promise<QualifiedUserPreKeyBundleMap> {
+    const domainChunks = ArrayUtil.chunk(Object.keys(userClientMap), limit);
+
+    const chunksPromises = domainChunks.map(userIdChunk => {
+      const rebuiltMap = userIdChunk.reduce<QualifiedUserClients>((chunkedUserClientMap, domainOrUserId) => {
+        chunkedUserClientMap[domainOrUserId] = userClientMap[domainOrUserId];
+        return chunkedUserClientMap;
+      }, {});
+
+      return this.postMultiQualifiedPreKeyBundlesChunk(rebuiltMap);
     });
 
     const userPreKeyBundleMapChunks = await Promise.all(chunksPromises);
