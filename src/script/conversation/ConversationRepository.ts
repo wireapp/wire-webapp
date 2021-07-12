@@ -2156,10 +2156,7 @@ export class ConversationRepository {
 
       const conversationEntity = this.mapConversations(eventData, initialTimestamp) as Conversation;
       if (conversationEntity) {
-        if (
-          conversationEntity.participating_user_ids().length ||
-          conversationEntity.participatingQualifiedUserIds().length
-        ) {
+        if (conversationEntity.hasUsers()) {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);

@@ -462,8 +462,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        const hasUserIds = this.participating_user_ids().length + this.participatingQualifiedUserIds().length > 0;
-        if (!hasUserIds) {
+        if (!this.hasUsers()) {
           return t('conversationsEmptyConversation');
         }
       }
