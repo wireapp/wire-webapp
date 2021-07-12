@@ -273,9 +273,9 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                     onClick={() => callActions.toggleMute(call, !isMuted)}
                     data-uie-name="do-toggle-mute"
                     data-uie-value={isMuted ? 'active' : 'inactive'}
-                    title={t('videoCallOverlayMute')}
+                    title={t('videoCallOverlayMicrophone')}
                   >
-                    <Icon.MicOff className="small-icon" />
+                    {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
                   </button>
                   {showVideoButton && (
                     <button
@@ -283,10 +283,14 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       onClick={() => callActions.toggleCamera(call)}
                       disabled={disableVideoButton}
                       data-uie-name="do-toggle-video"
-                      title={t('videoCallOverlayVideo')}
+                      title={t('videoCallOverlayCamera')}
                       data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                     >
-                      <Icon.Camera className="small-icon" />
+                      {selfSharesCamera ? (
+                        <Icon.Camera className="small-icon" />
+                      ) : (
+                        <Icon.CameraOff className="small-icon" />
+                      )}
                     </button>
                   )}
                   {isOngoing && (
@@ -303,7 +307,11 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       data-uie-enabled={disableScreenButton ? 'false' : 'true'}
                       title={t('videoCallOverlayShareScreen')}
                     >
-                      <Icon.Screenshare className="small-icon" />
+                      {selfSharesScreen ? (
+                        <Icon.Screenshare className="small-icon" />
+                      ) : (
+                        <Icon.ScreenshareOff className="small-icon" />
+                      )}
                     </div>
                   )}
                 </div>

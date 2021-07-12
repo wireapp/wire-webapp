@@ -192,7 +192,11 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 )}
 
                 {callParticipantIsMuted && (
-                  <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12}} />
+                  <Icon.MicOff
+                    className="mic-off-icon"
+                    data-uie-name="status-audio-off"
+                    style={{height: 12, width: 12}}
+                  />
                 )}
               </Fragment>
             )}
