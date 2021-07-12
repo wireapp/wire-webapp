@@ -195,12 +195,7 @@ const ConversationJoin = ({
         {isFullConversation ? (
           <ContainerXS style={{margin: 'auto 0'}}>
             <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}} data-uie-name="status-full-headline">
-              <FormattedMessage
-                {...conversationJoinStrings.fullConversationHeadline}
-                values={{
-                  brandName: Config.getConfig().BRAND_NAME,
-                }}
-              />
+              <FormattedMessage {...conversationJoinStrings.fullConversationHeadline} />
             </H2>
             <Text style={{fontSize: '16px', marginTop: '10px'}} data-uie-name="status-full-text">
               {_(conversationJoinStrings.fullConversationSubhead)}
