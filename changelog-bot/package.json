@@ -3,7 +3,7 @@
     "wire-changelog-bot": "src/main/cli.js"
   },
   "dependencies": {
-    "@types/generate-changelog": "1.8.0",
+    "@types/generate-changelog": "1.8.1",
     "@types/node": "~14",
     "@wireapp/core": "17.10.1",
     "commander": "8.0.0",
