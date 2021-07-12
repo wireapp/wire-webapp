@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.29.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.28.0...@wireapp/api-client@12.29.0) (2021-07-12)
+
+
+### Features
+
+* **api-client:** Expose attributes from federated events ([#4047](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4047)) ([804a83b](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/804a83b48e0db19dc5ce53b7d7c2f3fe2a1b063c))
+
+
+
+
+
 # [12.28.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.27.0...@wireapp/api-client@12.28.0) (2021-07-12)
 
 
