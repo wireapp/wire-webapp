@@ -290,7 +290,7 @@ export class User {
     const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
     if (checkExpiration) {
       if (this.isExpired()) {
-        amplify.publish(WebAppEvents.USER.UPDATE, this.id);
+        amplify.publish(WebAppEvents.USER.UPDATE, this.id, this.domain);
         return;
       }
 
