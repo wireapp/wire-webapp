@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.10.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.10.0...@wireapp/core@17.10.1) (2021-07-12)
+
+
+### Bug Fixes
+
+* **core:** Remove unused empty object ([1081045](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/108104527269e4feba38aa5db4945d0d0ff1488a))
+
+
+
+
+
 # [17.10.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.9.5...@wireapp/core@17.10.0) (2021-07-12)
 
 
