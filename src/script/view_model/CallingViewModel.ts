@@ -202,7 +202,7 @@ export class CallingViewModel {
         }
         const showScreenSelection = (): Promise<void> => {
           return new Promise(resolve => {
-            this.callState.onChooseScreen = (deviceId: string): void => {
+            this.callingRepository.onChooseScreen = (deviceId: string): void => {
               this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
               this.callState.selectableScreens([]);
               this.callState.selectableWindows([]);
@@ -210,7 +210,7 @@ export class CallingViewModel {
             };
             this.mediaDevicesHandler.getScreenSources().then((sources: ElectronDesktopCapturerSource[]) => {
               if (sources.length === 1) {
-                return this.callState.onChooseScreen(sources[0].id);
+                return this.callingRepository.onChooseScreen(sources[0].id);
               }
               this.callState.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
               this.callState.selectableWindows(sources.filter(source => source.id.startsWith('window')));

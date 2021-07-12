@@ -131,7 +131,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
     const showScreenSelection = (): Promise<void> => {
       return new Promise(resolve => {
-        callState.onChooseScreen = (deviceId: string): void => {
+        callingRepository.onChooseScreen = (deviceId: string): void => {
           mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
           callState.selectableScreens([]);
           callState.selectableWindows([]);
@@ -139,7 +139,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
         };
         mediaDevicesHandler.getScreenSources().then((sources: ElectronDesktopCapturerSource[]) => {
           if (sources.length === 1) {
-            return callState.onChooseScreen(sources[0].id);
+            return callingRepository.onChooseScreen(sources[0].id);
           }
           callState.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
           callState.selectableWindows(sources.filter(source => source.id.startsWith('window')));
@@ -191,7 +191,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
       {isChoosingScreen && (
         <ChooseScreen
           cancel={onCancelScreenSelection}
-          choose={callState.onChooseScreen}
+          choose={callingRepository.onChooseScreen}
           screens={selectableScreens as unknown as Screen[]}
           windows={selectableWindows as unknown as Screen[]}
         />

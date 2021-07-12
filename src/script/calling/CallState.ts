@@ -35,7 +35,6 @@ export class CallState {
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isChoosingScreen: ko.PureComputed<boolean>;
-  onChooseScreen: (deviceId: string) => void;
 
   constructor() {
     this.activeCalls = ko.observableArray();
@@ -51,7 +50,6 @@ export class CallState {
     this.cbrEncoding = ko.observable(0);
     this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTab.ALL);
 
-    this.onChooseScreen = (deviceId: string) => {};
     this.selectableScreens = ko.observable([]);
     this.selectableWindows = ko.observable([]);
     this.isChoosingScreen = ko.pureComputed(
