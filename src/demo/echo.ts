@@ -114,7 +114,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
         `Sending: "${deliveredPayload.type}" ("${deliveredPayload.id}") in "${conversationId}"`,
         deliveredPayload.content,
       );
-      await account.service.conversation.send(deliveredPayload);
+      await account.service.conversation.send({payloadBundle: deliveredPayload});
 
       if (content.expectsReadConfirmation) {
         const readPayload = account.service.conversation.messageBuilder.createConfirmation({
@@ -123,7 +123,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
           type: Confirmation.Type.READ,
         });
         logger.log(`Sending: "${readPayload.type}" ("${readPayload.id}") in "${conversationId}"`, readPayload.content);
-        await account.service.conversation.send(readPayload);
+        await account.service.conversation.send({payloadBundle: readPayload});
       }
 
       if (messageTimer) {
@@ -146,7 +146,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
     );
 
     account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, messageTimer);
-    await account.service.conversation.send(payload);
+    await account.service.conversation.send({payloadBundle: payload});
     account.service.conversation.messageTimer.setMessageLevelTimer(conversationId, 0);
   };
 

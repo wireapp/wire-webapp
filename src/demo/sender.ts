@@ -94,7 +94,10 @@ const {
     const deleteTextPayload = account
       .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text: 'Delete me!'})
       .build();
-    const {id: messageId} = await account.service!.conversation.send(deleteTextPayload, undefined, useProtobuf);
+    const {id: messageId} = await account.service!.conversation.send({
+      payloadBundle: deleteTextPayload,
+      sendAsProtobuf: useProtobuf,
+    });
 
     const fiveSecondsInMillis = TimeUtil.TimeInMillis.SECOND * 5;
     setTimeout(async () => {
@@ -116,14 +119,14 @@ const {
         text: `Expires after ${expiry}ms ...`,
       })
       .build();
-    await account.service!.conversation.send(payload, undefined, useProtobuf);
+    await account.service!.conversation.send({payloadBundle: payload, sendAsProtobuf: useProtobuf});
     account.service!.conversation.messageTimer.setMessageLevelTimer(WIRE_CONVERSATION_ID, 0);
   }
 
   async function sendPing(expiry = MESSAGE_TIMER): Promise<void> {
     account.service!.conversation.messageTimer.setMessageLevelTimer(WIRE_CONVERSATION_ID, expiry);
     const payload = account.service!.conversation.messageBuilder.createPing(WIRE_CONVERSATION_ID);
-    await account.service!.conversation.send(payload, undefined, useProtobuf);
+    await account.service!.conversation.send({payloadBundle: payload, sendAsProtobuf: useProtobuf});
     account.service!.conversation.messageTimer.setMessageLevelTimer(WIRE_CONVERSATION_ID, 0);
   }
 
@@ -131,14 +134,17 @@ const {
     const payload = account
       .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text: 'Hello, World!'})
       .build();
-    await account.service!.conversation.send(payload, undefined, useProtobuf);
+    await account.service!.conversation.send({payloadBundle: payload, sendAsProtobuf: useProtobuf});
   }
 
   async function sendAndEdit(): Promise<void> {
     const payload = account
       .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text: 'Hello, Wolrd!'})
       .build();
-    const {id: originalMessageId} = await account.service!.conversation.send(payload, undefined, useProtobuf);
+    const {id: originalMessageId} = await account.service!.conversation.send({
+      payloadBundle: payload,
+      sendAsProtobuf: useProtobuf,
+    });
     setInterval(async () => {
       const editedPayload = account
         .service!.conversation.messageBuilder.createEditedText({
@@ -147,7 +153,7 @@ const {
           originalMessageId,
         })
         .build();
-      await account.service!.conversation.send(editedPayload, undefined, useProtobuf);
+      await account.service!.conversation.send({payloadBundle: editedPayload, sendAsProtobuf: useProtobuf});
     }, TimeUtil.TimeInMillis.SECOND * 2);
   }
 
@@ -163,7 +169,7 @@ const {
       conversationId: WIRE_CONVERSATION_ID,
       image,
     });
-    await account.service!.conversation.send(imagePayload, undefined, useProtobuf);
+    await account.service!.conversation.send({payloadBundle: imagePayload, sendAsProtobuf: useProtobuf});
   }
 
   async function sendFile(): Promise<void> {
@@ -177,14 +183,14 @@ const {
         type: 'image/png',
       },
     });
-    await account.service!.conversation.send(metadataPayload, undefined, useProtobuf);
+    await account.service!.conversation.send({payloadBundle: metadataPayload, sendAsProtobuf: useProtobuf});
 
     const filePayload = await account.service!.conversation.messageBuilder.createFileData({
       conversationId: WIRE_CONVERSATION_ID,
       file: {data},
       originalMessageId: metadataPayload.id,
     });
-    await account.service!.conversation.send(filePayload, undefined, useProtobuf);
+    await account.service!.conversation.send({payloadBundle: filePayload, sendAsProtobuf: useProtobuf});
   }
 
   async function clearConversation(): Promise<void> {
@@ -215,7 +221,7 @@ const {
       .withMentions(mentions)
       .build();
 
-    await account.service!.conversation.send(payload, undefined, useProtobuf);
+    await account.service!.conversation.send({payloadBundle: payload, sendAsProtobuf: useProtobuf});
   }
 
   async function sendQuote(): Promise<void> {
@@ -225,7 +231,10 @@ const {
       .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text})
       .build();
 
-    const {id: messageId} = await account.service!.conversation.send(textPayload, undefined, useProtobuf);
+    const {id: messageId} = await account.service!.conversation.send({
+      payloadBundle: textPayload,
+      sendAsProtobuf: useProtobuf,
+    });
 
     const quoteText = 'Hello again';
 
@@ -239,7 +248,7 @@ const {
       .withQuote(quote)
       .build();
 
-    await account.service!.conversation.send(quotePayload, undefined, useProtobuf);
+    await account.service!.conversation.send({payloadBundle: quotePayload, sendAsProtobuf: useProtobuf});
   }
 
   const methods = [

@@ -68,7 +68,7 @@ if (!message) {
 
   const text = message || `I am posting from ${name} v${version}. 🌞`;
   for (const conversationId of conversationIds) {
-    const payload = account.service.conversation.messageBuilder.createText(conversationId, text).build();
-    await account.service.conversation.send(payload);
+    const payload = account.service.conversation.messageBuilder.createText({conversationId, text}).build();
+    await account.service.conversation.send({payloadBundle: payload});
   }
 })().catch(error => logger.error(error));

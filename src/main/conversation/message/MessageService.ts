@@ -23,7 +23,14 @@ import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import Long from 'long';
 import {bytesToUUID, uuidToBytes} from '@wireapp/commons/src/main/util/StringUtil';
 import {APIClient} from '@wireapp/api-client';
-import {NewOTRMessage, OTRRecipients, UserClients} from '@wireapp/api-client/src/conversation';
+import {
+  MessageSendingStatus,
+  NewOTRMessage,
+  OTRRecipients,
+  QualifiedOTRRecipients,
+  QualifiedUserClients,
+  UserClients,
+} from '@wireapp/api-client/src/conversation';
 import {Decoder, Encoder} from 'bazinga64';
 
 import {CryptographyService} from '../../cryptography';
@@ -73,6 +80,128 @@ export class MessageService {
         recipients: CryptographyService.convertArrayRecipientsToBase64(reEncryptedMessage.recipients),
         sender: reEncryptedMessage.sender,
       });
+    }
+  }
+
+  private checkFederatedClientsMismatch(
+    messageData: ProtobufOTR.QualifiedNewOtrMessage,
+    messageSendingStatus: MessageSendingStatus,
+  ): MessageSendingStatus | null {
+    const updatedMessageSendingStatus = {...messageSendingStatus};
+    const sendingStatusKeys: (keyof Omit<typeof updatedMessageSendingStatus, 'time'>)[] = [
+      'deleted',
+      'failed_to_send',
+      'missing',
+      'redundant',
+    ];
+
+    if (messageData.ignoreOnly?.userIds?.length) {
+      const allFailed: QualifiedUserClients = {
+        ...messageSendingStatus.deleted,
+        ...messageSendingStatus.failed_to_send,
+        ...messageSendingStatus.missing,
+        ...messageSendingStatus.redundant,
+      };
+
+      for (const [domainFailed, userClientsFailed] of Object.entries(allFailed) || {}) {
+        for (const userIdMissing of Object.keys(userClientsFailed)) {
+          const userIsIgnored = messageData.ignoreOnly.userIds.find(({domain: domainIgnore, id: userIdIgnore}) => {
+            return userIdIgnore === userIdMissing && domainIgnore === domainFailed;
+          });
+          if (userIsIgnored) {
+            for (const sendingStatusKey of sendingStatusKeys) {
+              delete updatedMessageSendingStatus[sendingStatusKey][domainFailed][userIdMissing];
+            }
+          }
+        }
+      }
+    } else if (messageData.reportOnly?.userIds?.length) {
+      for (const [reportDomain, reportUserId] of Object.entries(messageData.reportOnly.userIds)) {
+        for (const sendingStatusKey of sendingStatusKeys) {
+          for (const [domainDeleted, userClientsDeleted] of Object.entries(
+            updatedMessageSendingStatus[sendingStatusKey],
+          )) {
+            for (const userIdDeleted of Object.keys(userClientsDeleted)) {
+              if (userIdDeleted !== reportUserId.id && domainDeleted !== reportDomain) {
+                delete updatedMessageSendingStatus[sendingStatusKey][domainDeleted][userIdDeleted];
+              }
+            }
+          }
+        }
+      }
+    } else if (!!messageData.ignoreAll) {
+      // report nothing
+      return null;
+    }
+
+    return updatedMessageSendingStatus;
+  }
+
+  public async sendFederatedOTRMessage(
+    sendingClientId: string,
+    conversationId: string,
+    conversationDomain: string,
+    recipients: QualifiedOTRRecipients,
+    plainTextArray: Uint8Array,
+    assetData?: Uint8Array,
+  ): Promise<void> {
+    const qualifiedUserEntries = Object.entries(recipients).map<ProtobufOTR.IQualifiedUserEntry>(
+      ([domain, otrRecipients]) => {
+        const userEntries = Object.entries(otrRecipients).map<ProtobufOTR.IUserEntry>(([userId, otrClientMap]) => {
+          const clientEntries = Object.entries(otrClientMap).map<ProtobufOTR.IClientEntry>(([clientId, payload]) => {
+            return {
+              client: {
+                client: Long.fromString(clientId, 16),
+              },
+              text: payload,
+            };
+          });
+
+          return {
+            user: {
+              uuid: uuidToBytes(userId),
+            },
+            clients: clientEntries,
+          };
+        });
+
+        return {domain, entries: userEntries};
+      },
+    );
+
+    const protoMessage = ProtobufOTR.QualifiedNewOtrMessage.create({
+      recipients: qualifiedUserEntries,
+      sender: {
+        client: Long.fromString(sendingClientId, 16),
+      },
+    });
+
+    if (assetData) {
+      protoMessage.blob = assetData;
+    }
+
+    /*
+     * When creating the PreKey bundles we already found out to which users we want to send a message, so we can ignore
+     * missing clients. We have to ignore missing clients because there can be the case that there are clients that
+     * don't provide PreKeys (clients from the Pre-E2EE era).
+     */
+    protoMessage.ignoreAll = {};
+
+    const messageSendingStatus = await this.apiClient.conversation.api.postOTRMessageV2(
+      conversationId,
+      conversationDomain,
+      protoMessage,
+    );
+
+    const federatedClientsMismatch = this.checkFederatedClientsMismatch(protoMessage, messageSendingStatus);
+
+    if (federatedClientsMismatch) {
+      const reEncryptedMessage = await this.onFederatedClientMismatch(
+        protoMessage,
+        federatedClientsMismatch,
+        plainTextArray,
+      );
+      await this.apiClient.conversation.api.postOTRMessageV2(conversationId, conversationDomain, reEncryptedMessage);
     }
   }
 
@@ -132,7 +261,16 @@ export class MessageService {
       }
     } catch (error) {
       const reEncryptedMessage = await this.onClientProtobufMismatch(error, protoMessage, plainTextArray);
-      await this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, reEncryptedMessage);
+      if (conversationId === null) {
+        await this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, reEncryptedMessage);
+      } else {
+        await this.apiClient.conversation.api.postOTRProtobufMessage(
+          sendingClientId,
+          conversationId,
+          reEncryptedMessage,
+          ignoreMissing,
+        );
+      }
     }
   }
 
@@ -235,5 +373,91 @@ export class MessageService {
     }
 
     throw error;
+  }
+
+  private async onFederatedClientMismatch(
+    messageData: ProtobufOTR.QualifiedNewOtrMessage,
+    messageSendingStatus: MessageSendingStatus,
+    plainTextArray: Uint8Array,
+  ): Promise<ProtobufOTR.QualifiedNewOtrMessage> {
+    // walk through deleted domain/user map
+    for (const [deletedUserDomain, deletedUserIdClients] of Object.entries(messageSendingStatus.deleted)) {
+      if (!messageData.recipients.find(recipient => recipient.domain === deletedUserDomain)) {
+        // no user from this domain was deleted
+        continue;
+      }
+      // walk through deleted user ids
+      for (const [deletedUserId] of Object.entries(deletedUserIdClients)) {
+        // walk through message recipients
+        for (const recipientIndex in messageData.recipients) {
+          // check if message recipients' domain is the same as the deleted user's domain
+          if (messageData.recipients[recipientIndex].domain === deletedUserDomain) {
+            // check if message recipients' id is the same as the deleted user's id
+            for (const entriesIndex in messageData.recipients[recipientIndex].entries || []) {
+              const uuid = messageData.recipients[recipientIndex].entries![entriesIndex].user?.uuid;
+              if (!!uuid && bytesToUUID(uuid) === deletedUserId) {
+                // delete this user from the message recipients
+                delete messageData.recipients[recipientIndex].entries![entriesIndex];
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const missingUserIds = Object.entries(messageSendingStatus.missing);
+    if (missingUserIds.length) {
+      const missingPreKeyBundles = await this.apiClient.user.api.postQualifiedMultiPreKeyBundles(
+        messageSendingStatus.missing,
+      );
+      const reEncryptedPayloads = await this.cryptographyService.encryptQualified(plainTextArray, missingPreKeyBundles);
+
+      // walk through missing domain/user map
+      for (const [missingUserDomain, missingUserIdClients] of missingUserIds) {
+        if (!messageData.recipients.find(recipient => recipient.domain === missingUserDomain)) {
+          // no user from this domain is missing
+          continue;
+        }
+
+        // walk through missing user ids
+        for (const [missingUserId, missingClientIds] of Object.entries(missingUserIdClients)) {
+          // walk through message recipients
+          for (const recipientIndex in messageData.recipients) {
+            // check if message recipients' domain is the same as the missing user's domain
+            if (messageData.recipients[recipientIndex].domain === missingUserDomain) {
+              // check if there is a recipient with same user id as the missing user's id
+              let userIndex = messageData.recipients[recipientIndex].entries?.findIndex(
+                ({user}) => bytesToUUID(user.uuid) === missingUserId,
+              );
+
+              if (userIndex === -1) {
+                // no recipient found, let's create it
+                userIndex = messageData.recipients[recipientIndex].entries!.push({
+                  user: {
+                    uuid: uuidToBytes(missingUserId),
+                  },
+                });
+              }
+
+              const missingUserUUID = messageData.recipients[recipientIndex].entries![userIndex!].user.uuid;
+
+              if (bytesToUUID(missingUserUUID) === missingUserId) {
+                for (const missingClientId of missingClientIds) {
+                  messageData.recipients[recipientIndex].entries![userIndex!].clients ||= [];
+                  messageData.recipients[recipientIndex].entries![userIndex!].clients?.push({
+                    client: {
+                      client: Long.fromString(missingClientId, 16),
+                    },
+                    text: reEncryptedPayloads[missingUserDomain][missingUserId][missingClientId],
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return messageData;
   }
 }

@@ -67,11 +67,11 @@ const login: LoginData = {
       referenceMessageId,
     };
     const buttonActionConfirmationMessage =
-      account.service!.conversation.messageBuilder.createButtonActionConfirmationMessage(
-        conversation,
-        buttonActionConfirmationContent,
-      );
-    await account.service!.conversation.send(buttonActionConfirmationMessage, [from]);
+      account.service!.conversation.messageBuilder.createButtonActionConfirmationMessage({
+        conversationId: conversation,
+        content: buttonActionConfirmationContent,
+      });
+    await account.service!.conversation.send({payloadBundle: buttonActionConfirmationMessage, userIds: [from]});
 
     console.info(
       `Confirmed button click on "${buttonId}" for poll "${referenceMessageId}" by user "${from}" in conversation "${conversation}".`,
@@ -81,13 +81,13 @@ const login: LoginData = {
   if (account.service) {
     // Send poll
     const pollMessage = account.service.conversation.messageBuilder
-      .createComposite(conversationId)
+      .createComposite({conversationId})
       .addText(Text.create({content: 'Are you a robot?'}))
       .addButton('Yes')
       .addButton('No')
       .build();
 
-    await account.service.conversation.send(pollMessage);
+    await account.service.conversation.send({payloadBundle: pollMessage});
 
     // Send button action
     const buttonItems = pollMessage.content.items!.filter(item => typeof item.button === 'object');
@@ -96,10 +96,10 @@ const login: LoginData = {
       buttonId: lastButton!.id,
       referenceMessageId: pollMessage.id,
     };
-    const buttonActionMessage = account.service.conversation.messageBuilder.createButtonActionMessage(
+    const buttonActionMessage = account.service.conversation.messageBuilder.createButtonActionMessage({
       conversationId,
-      buttonActionContent,
-    );
-    await account.service.conversation.send(buttonActionMessage);
+      content: buttonActionContent,
+    });
+    await account.service.conversation.send({payloadBundle: buttonActionMessage});
   }
 })().catch(error => console.error('Error', error.message));

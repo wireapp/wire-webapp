@@ -89,7 +89,7 @@ const {
     const payload = account
       .service!.conversation.messageBuilder.createText({conversationId: WIRE_CONVERSATION_ID, text: message})
       .build();
-    await account.service!.conversation.send(payload, undefined, useProtobuf);
+    await account.service!.conversation.send({payloadBundle: payload, sendAsProtobuf: useProtobuf});
   }
 
   const twoSeconds = TimeUtil.TimeInMillis.SECOND * 2;

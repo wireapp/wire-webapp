@@ -24,10 +24,11 @@ import {
   DefaultConversationRoleName,
   MutedStatus,
   NewConversation,
+  QualifiedUserClients,
 } from '@wireapp/api-client/src/conversation/';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import type {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event/';
-import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {
   Asset,
   ButtonAction,
@@ -60,7 +61,7 @@ import {
 import type {AssetContent, ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
 import type {CryptographyService, EncryptedAsset} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
-import {isStringArray, isQualifiedIdArray} from '../util/TypePredicateUtil';
+import {isStringArray, isQualifiedIdArray, isQualifiedUserClients} from '../util/TypePredicateUtil';
 import {MessageBuilder} from './message/MessageBuilder';
 import {MessageService} from './message/MessageService';
 import {MessageToProtoMapper} from './message/MessageToProtoMapper';
@@ -89,6 +90,7 @@ import type {
 
 /** A map of the format `{ UserId: [clientId, ...] }` */
 export type UserClientsMap = {[userId: string]: string[]};
+export type QualifiedUserClientsMap = {[domain: string]: UserClientsMap};
 
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
@@ -121,44 +123,43 @@ export class ConversationService {
 
   private async getPreKeyBundle(
     conversationId: string,
-    userIds?: string[] | UserClientsMap,
-  ): Promise<UserPreKeyBundleMap> {
-    const conversation = await this.apiClient.conversation.api.getConversation(conversationId);
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    conversationDomain?: string,
+  ): Promise<QualifiedUserPreKeyBundleMap> {
+    const conversation = await this.apiClient.conversation.api.getConversation(conversationId, conversationDomain);
 
-    let members: string[];
+    let members: QualifiedId[];
 
     if (userIds && Array.isArray(userIds) && userIds.length) {
-      members = userIds;
-    } else if (userIds) {
-      members = Object.keys(userIds);
+      members = userIds.map(userId => ({domain: 'none', id: userId}));
+    } else if (userIds && typeof Object.values(userIds)[0] === 'string') {
+      members = Object.keys(userIds).map(userId => ({domain: 'none', id: userId}));
+    } else if (userIds && typeof Object.values(userIds)[0] === 'object') {
+      members = Object.entries(userIds).map(([domain, userId]) => ({domain, id: userId}));
     } else {
       /*
        * If you are sending a message to a conversation, you have to include
        * yourself in the list of users if you want to sync a message also to your
        * other clients.
        */
-      members = conversation.members.others.map(member => member.id).concat(conversation.members.self.id);
+      members = conversation.members.others
+        .map(member => member.qualified_id || {domain: 'none', id: member.id})
+        .concat({domain: conversationDomain || 'none', id: conversation.members.self.id});
     }
+    const preKeys = await Promise.all(
+      members.map(async qualifiedUserId => {
+        const prekeyBundle = await this.apiClient.user.api.getUserPreKeys(
+          qualifiedUserId.domain === 'none' ? qualifiedUserId.id : qualifiedUserId,
+        );
+        return {user: qualifiedUserId, clients: prekeyBundle.clients};
+      }),
+    );
 
-    let preKeys = await Promise.all(members.map(member => this.apiClient.user.api.getUserPreKeys(member)));
-
-    if (userIds && !Array.isArray(userIds)) {
-      preKeys = preKeys.map(preKey => {
-        const userId = typeof preKey.user == 'string' ? preKey.user : preKey.user.id;
-        if (userId in userIds) {
-          preKey.clients = preKey.clients.filter(client => {
-            userIds[userId].includes(client.client);
-          });
-        }
-        return preKey;
-      });
-    }
-
-    return preKeys.reduce((bundleMap: UserPreKeyBundleMap, bundle) => {
-      const userId = typeof bundle.user == 'string' ? bundle.user : bundle.user.id;
-      bundleMap[userId] = {};
-      for (const client of bundle.clients) {
-        bundleMap[userId][client.client] = client.prekey;
+    return preKeys.reduce<QualifiedUserPreKeyBundleMap>((bundleMap, qualifiedPrekey) => {
+      bundleMap[qualifiedPrekey.user.domain] ||= {};
+      for (const client of qualifiedPrekey.clients) {
+        bundleMap[qualifiedPrekey.user.domain][qualifiedPrekey.user.id] ||= {};
+        bundleMap[qualifiedPrekey.user.domain][qualifiedPrekey.user.id][client.client] = client.prekey;
       }
       return bundleMap;
     }, {});
@@ -173,51 +174,91 @@ export class ConversationService {
     sendingClientId: string,
     conversationId: string,
     asset: EncryptedAsset,
-    preKeyBundles: UserPreKeyBundleMap,
+    preKeyBundles: QualifiedUserPreKeyBundleMap,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<void> {
-    const {cipherText, keyBytes, sha256} = asset;
-    const messageId = MessageBuilder.createId();
+    if (preKeyBundles.none) {
+      const {cipherText, keyBytes, sha256} = asset;
+      const messageId = MessageBuilder.createId();
 
-    const externalMessage = {
-      otrKey: new Uint8Array(keyBytes),
-      sha256: new Uint8Array(sha256),
-    };
+      const externalMessage = {
+        otrKey: new Uint8Array(keyBytes),
+        sha256: new Uint8Array(sha256),
+      };
 
-    const base64CipherText = Encoder.toBase64(cipherText).asString;
+      const base64CipherText = Encoder.toBase64(cipherText).asString;
 
-    const genericMessage = GenericMessage.create({
-      [GenericMessageType.EXTERNAL]: externalMessage,
-      messageId,
-    });
+      const genericMessage = GenericMessage.create({
+        [GenericMessageType.EXTERNAL]: externalMessage,
+        messageId,
+      });
 
-    const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
+      const plainTextArray = GenericMessage.encode(genericMessage).finish();
 
-    return sendAsProtobuf
-      ? this.messageService.sendOTRProtobufMessage(
+      const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles.none || {});
+
+      if (sendAsProtobuf) {
+        await this.messageService.sendOTRProtobufMessage(
           sendingClientId,
           recipients,
           conversationId,
           plainTextArray,
           cipherText,
-        )
-      : this.messageService.sendOTRMessage(
+        );
+      } else {
+        await this.messageService.sendOTRMessage(
           sendingClientId,
           recipients,
           conversationId,
           plainTextArray,
           base64CipherText,
         );
+      }
+
+      // todo: add federated sending here
+    }
+  }
+
+  private async sendFederatedGenericMessage(
+    sendingClientId: string,
+    conversationId: string,
+    genericMessage: GenericMessage,
+    conversationDomain: string,
+    userIds?: QualifiedUserClients,
+  ): Promise<void> {
+    const plainTextArray = GenericMessage.encode(genericMessage).finish();
+    const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds, conversationDomain);
+
+    const recipients = await this.cryptographyService.encryptQualified(plainTextArray, preKeyBundles);
+
+    await this.messageService.sendFederatedOTRMessage(
+      sendingClientId,
+      conversationId,
+      conversationDomain,
+      recipients,
+      plainTextArray,
+    );
   }
 
   private async sendGenericMessage(
     sendingClientId: string,
     conversationId: string,
     genericMessage: GenericMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClientsMap,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<void> {
+    if (conversationDomain) {
+      return this.sendFederatedGenericMessage(
+        this.apiClient.validatedClientId,
+        conversationId,
+        genericMessage,
+        conversationDomain,
+        isQualifiedUserClients(userIds) ? userIds : undefined,
+      );
+    }
+
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds);
 
@@ -229,10 +270,11 @@ export class ConversationService {
         encryptedAsset,
         preKeyBundles,
         sendAsProtobuf,
+        conversationDomain,
       );
     }
 
-    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
+    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles.none);
 
     return sendAsProtobuf
       ? this.messageService.sendOTRProtobufMessage(sendingClientId, recipients, conversationId, plainTextArray)
@@ -241,8 +283,9 @@ export class ConversationService {
 
   private async sendButtonAction(
     payloadBundle: ButtonActionMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<ButtonActionMessage> {
     const genericMessage = GenericMessage.create({
       [GenericMessageType.BUTTON_ACTION]: ButtonAction.create(payloadBundle.content),
@@ -255,6 +298,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -266,8 +310,9 @@ export class ConversationService {
 
   private async sendButtonActionConfirmation(
     payloadBundle: ButtonActionConfirmationMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<ButtonActionConfirmationMessage> {
     const genericMessage = GenericMessage.create({
       [GenericMessageType.BUTTON_ACTION_CONFIRMATION]: ButtonActionConfirmation.create(payloadBundle.content),
@@ -280,6 +325,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -291,8 +337,9 @@ export class ConversationService {
 
   private async sendComposite(
     payloadBundle: CompositeMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<CompositeMessage> {
     const genericMessage = GenericMessage.create({
       [GenericMessageType.COMPOSITE]: Composite.create(payloadBundle.content),
@@ -305,6 +352,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -316,8 +364,9 @@ export class ConversationService {
 
   private async sendConfirmation(
     payloadBundle: ConfirmationMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<ConfirmationMessage> {
     const content = Confirmation.create(payloadBundle.content);
 
@@ -332,6 +381,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -343,8 +393,9 @@ export class ConversationService {
 
   private async sendEditedText(
     payloadBundle: EditedTextMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<EditedTextMessage> {
     const editedMessage = MessageEdit.create({
       replacingMessageId: payloadBundle.content.originalMessageId,
@@ -362,6 +413,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -373,8 +425,9 @@ export class ConversationService {
 
   private async sendFileData(
     payloadBundle: FileAssetMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<FileAssetMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileData provided.');
@@ -413,6 +466,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -424,8 +478,9 @@ export class ConversationService {
 
   private async sendFileMetaData(
     payloadBundle: FileAssetMetaDataMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<FileAssetMetaDataMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileMetaData provided.');
@@ -463,6 +518,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -474,8 +530,9 @@ export class ConversationService {
 
   private async sendFileAbort(
     payloadBundle: FileAssetAbortMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<FileAssetAbortMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileAbort provided.');
@@ -507,6 +564,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -518,8 +576,9 @@ export class ConversationService {
 
   private async sendImage(
     payloadBundle: ImageAssetMessageOutgoing,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<ImageAssetMessage> {
     if (!payloadBundle.content) {
       throw new Error('No content for sendImage provided.');
@@ -571,6 +630,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -583,8 +643,9 @@ export class ConversationService {
 
   private async sendLocation(
     payloadBundle: LocationMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<LocationMessage> {
     const {expectsReadConfirmation, latitude, legalHoldStatus, longitude, name, zoom} = payloadBundle.content;
 
@@ -613,6 +674,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -624,8 +686,9 @@ export class ConversationService {
 
   private async sendKnock(
     payloadBundle: PingMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<PingMessage> {
     const content = Knock.create(payloadBundle.content);
 
@@ -645,6 +708,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -657,8 +721,9 @@ export class ConversationService {
 
   private async sendReaction(
     payloadBundle: ReactionMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<ReactionMessage> {
     const {legalHoldStatus, originalMessageId, type} = payloadBundle.content;
 
@@ -679,6 +744,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -690,8 +756,9 @@ export class ConversationService {
 
   private async sendSessionReset(
     payloadBundle: ResetSessionMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<ResetSessionMessage> {
     const genericMessage = GenericMessage.create({
       [GenericMessageType.CLIENT_ACTION]: ClientAction.RESET_SESSION,
@@ -704,6 +771,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -715,8 +783,9 @@ export class ConversationService {
 
   private async sendCall(
     payloadBundle: CallMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<CallMessage> {
     const callMessage = Calling.create({
       content: payloadBundle.content,
@@ -733,6 +802,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -744,8 +814,9 @@ export class ConversationService {
 
   private async sendText(
     payloadBundle: TextMessage,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<TextMessage> {
     let genericMessage = GenericMessage.create({
       messageId: payloadBundle.id,
@@ -763,6 +834,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -777,6 +849,7 @@ export class ConversationService {
     timestamp: number | Date = new Date(),
     messageId: string = MessageBuilder.createId(),
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<ClearConversationMessage> {
     if (timestamp instanceof Date) {
       timestamp = timestamp.getTime();
@@ -802,6 +875,7 @@ export class ConversationService {
       genericMessage,
       undefined,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -821,6 +895,7 @@ export class ConversationService {
     conversationId: string,
     messageIdToHide: string,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<HideMessage> {
     const messageId = MessageBuilder.createId();
 
@@ -842,6 +917,7 @@ export class ConversationService {
       genericMessage,
       undefined,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -860,8 +936,9 @@ export class ConversationService {
   public async deleteMessageEveryone(
     conversationId: string,
     messageIdToDelete: string,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClientsMap | QualifiedUserClients,
     sendAsProtobuf?: boolean,
+    conversationDomain?: string,
   ): Promise<DeleteMessage> {
     const messageId = MessageBuilder.createId();
 
@@ -880,6 +957,7 @@ export class ConversationService {
       genericMessage,
       userIds,
       sendAsProtobuf,
+      conversationDomain,
     );
 
     return {
@@ -895,7 +973,7 @@ export class ConversationService {
     };
   }
 
-  private shouldSendAsExternal(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): boolean {
+  private shouldSendAsExternal(plainText: Uint8Array, preKeyBundles: QualifiedUserPreKeyBundleMap): boolean {
     const EXTERNAL_MESSAGE_THRESHOLD_BYTES = 200 * 1024;
 
     let clientCount = 0;
@@ -987,44 +1065,54 @@ export class ConversationService {
    * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
    * @returns Sent message
    */
-  public async send(payloadBundle: OtrMessage, userIds?: string[] | UserClientsMap, sendAsProtobuf?: boolean) {
+  public async send({
+    payloadBundle,
+    userIds,
+    sendAsProtobuf,
+    conversationDomain,
+  }: {
+    payloadBundle: OtrMessage;
+    userIds?: string[] | UserClientsMap | QualifiedUserClients;
+    sendAsProtobuf?: boolean;
+    conversationDomain?: string;
+  }) {
     switch (payloadBundle.type) {
       case PayloadBundleType.ASSET:
-        return this.sendFileData(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendFileData(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.ASSET_ABORT:
-        return this.sendFileAbort(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendFileAbort(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.ASSET_META:
-        return this.sendFileMetaData(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendFileMetaData(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.ASSET_IMAGE:
-        return this.sendImage(payloadBundle as ImageAssetMessageOutgoing, userIds, sendAsProtobuf);
+        return this.sendImage(payloadBundle as ImageAssetMessageOutgoing, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.BUTTON_ACTION:
-        return this.sendButtonAction(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendButtonAction(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.BUTTON_ACTION_CONFIRMATION:
-        return this.sendButtonActionConfirmation(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendButtonActionConfirmation(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.CALL:
-        return this.sendCall(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendCall(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.CLIENT_ACTION: {
         if (payloadBundle.content.clientAction === ClientAction.RESET_SESSION) {
-          return this.sendSessionReset(payloadBundle, userIds, sendAsProtobuf);
+          return this.sendSessionReset(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
         }
         throw new Error(
           `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`,
         );
       }
       case PayloadBundleType.COMPOSITE:
-        return this.sendComposite(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendComposite(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.CONFIRMATION:
-        return this.sendConfirmation(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendConfirmation(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.LOCATION:
-        return this.sendLocation(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendLocation(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.MESSAGE_EDIT:
-        return this.sendEditedText(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendEditedText(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.PING:
-        return this.sendKnock(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendKnock(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.REACTION:
-        return this.sendReaction(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendReaction(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.TEXT:
-        return this.sendText(payloadBundle, userIds, sendAsProtobuf);
+        return this.sendText(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       default:
         throw new Error(`No send method implemented for "${payloadBundle['type']}".`);
     }
