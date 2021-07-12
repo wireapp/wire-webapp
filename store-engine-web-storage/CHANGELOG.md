@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.5.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.5.3...@wireapp/store-engine-web-storage@1.5.4) (2021-07-12)
+
+**Note:** Version bump only for package @wireapp/store-engine-web-storage
+
+
+
+
+
 ## [1.5.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-web-storage/compare/@wireapp/store-engine-web-storage@1.5.2...@wireapp/store-engine-web-storage@1.5.3) (2021-07-06)
 
 **Note:** Version bump only for package @wireapp/store-engine-web-storage

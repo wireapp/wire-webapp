@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.16.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.15.26...@wireapp/bot-api@7.16.0) (2021-07-12)
+
+
+### Features
+
+* **api-client,core:** Send OTR messages to federated users (SQCORE-789) ([#3979](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/3979)) ([2915e87](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/2915e8718657054b5d619d3d2300eccb0202c05d))
+
+
+
+
+
 ## [7.15.26](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.15.25...@wireapp/bot-api@7.15.26) (2021-07-06)
 
 **Note:** Version bump only for package @wireapp/bot-api

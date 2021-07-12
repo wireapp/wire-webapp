@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [4.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/compare/@wireapp/changelog-bot@4.4.27...@wireapp/changelog-bot@4.5.0) (2021-07-12)
+
+
+### Features
+
+* **api-client,core:** Send OTR messages to federated users (SQCORE-789) ([#3979](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/issues/3979)) ([2915e87](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/commit/2915e8718657054b5d619d3d2300eccb0202c05d))
+
+
+
+
+
 ## [4.4.27](https://github.com/wireapp/wire-web-packages/tree/main/packages/changelog-bot/compare/@wireapp/changelog-bot@4.4.26...@wireapp/changelog-bot@4.4.27) (2021-07-06)
 
 **Note:** Version bump only for package @wireapp/changelog-bot

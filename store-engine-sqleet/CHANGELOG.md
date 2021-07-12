@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.7.6...@wireapp/store-engine-sqleet@1.7.7) (2021-07-12)
+
+**Note:** Version bump only for package @wireapp/store-engine-sqleet
+
+
+
+
+
 ## [1.7.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-sqleet/compare/@wireapp/store-engine-sqleet@1.7.5...@wireapp/store-engine-sqleet@1.7.6) (2021-07-06)
 
 **Note:** Version bump only for package @wireapp/store-engine-sqleet

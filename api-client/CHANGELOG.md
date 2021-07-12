@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.28.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.27.0...@wireapp/api-client@12.28.0) (2021-07-12)
+
+
+### Features
+
+* **api-client,core:** Send OTR messages to federated users (SQCORE-789) ([#3979](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/3979)) ([2915e87](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/2915e8718657054b5d619d3d2300eccb0202c05d))
+
+
+
+
+
 # [12.27.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.26.0...@wireapp/api-client@12.27.0) (2021-07-06)
 
 

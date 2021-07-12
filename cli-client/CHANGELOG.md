@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client/compare/@wireapp/cli-client@8.2.27...@wireapp/cli-client@8.3.0) (2021-07-12)
+
+
+### Features
+
+* **api-client,core:** Send OTR messages to federated users (SQCORE-789) ([#3979](https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client/issues/3979)) ([2915e87](https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client/commit/2915e8718657054b5d619d3d2300eccb0202c05d))
+
+
+
+
+
 ## [8.2.27](https://github.com/wireapp/wire-web-packages/tree/main/packages/cli-client/compare/@wireapp/cli-client@8.2.26...@wireapp/cli-client@8.2.27) (2021-07-06)
 
 **Note:** Version bump only for package @wireapp/cli-client
