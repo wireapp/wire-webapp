@@ -1208,17 +1208,13 @@ export class ConversationRepository {
     offline = false,
     updateGuests = false,
   ): Promise<Conversation> {
-    try {
-      let userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
-      const qualifiedUserEntities = await this.userRepository.getUsersById(
-        conversationEntity.participatingQualifiedUserIds(),
-        offline,
-      );
-      userEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
-      conversationEntity.participating_user_ets(userEntities);
-    } catch (error) {
-      console.error('debug: error', error);
-    }
+    let userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
+    const qualifiedUserEntities = await this.userRepository.getUsersById(
+      conversationEntity.participatingQualifiedUserIds(),
+      offline,
+    );
+    userEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
+    conversationEntity.participating_user_ets(userEntities);
 
     if (updateGuests) {
       conversationEntity.updateGuests();
