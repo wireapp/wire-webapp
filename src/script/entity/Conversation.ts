@@ -91,7 +91,7 @@ export class Conversation {
   public readonly connection: ko.Observable<ConnectionEntity>;
   public creator: string;
   public readonly display_name: ko.PureComputed<string>;
-  public domain?: string;
+  public domain?: string = undefined;
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly globalMessageTimer: ko.Observable<number>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;

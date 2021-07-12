@@ -679,13 +679,14 @@ class App {
     }
 
     const router = new Router({
-      '/conversation/:conversationId': conversationId => mainView.content.showConversation(conversationId),
+      '/conversation/:conversationId(/:domain)': (conversationId: string, domain?: string) =>
+        mainView.content.showConversation(conversationId, {}, domain),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      // TODO: Make it work with qualified IDs
+      // TODO Federation fix: Make it work with qualified IDs
       '/user/:userId': userId => {
         mainView.content.userModal.showUser(userId, () => router.navigate('/'));
       },

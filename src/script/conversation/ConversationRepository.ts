@@ -766,19 +766,19 @@ export class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    */
-  async getConversationById(conversation_id: string): Promise<Conversation> {
+  async getConversationById(conversation_id: string, domain?: string): Promise<Conversation> {
     if (typeof conversation_id !== 'string') {
       throw new ConversationError(
         ConversationError.TYPE.NO_CONVERSATION_ID,
         ConversationError.MESSAGE.NO_CONVERSATION_ID,
       );
     }
-    const conversationEntity = this.conversationState.findConversation(conversation_id);
+    const conversationEntity = this.conversationState.findConversation(conversation_id, domain);
     if (conversationEntity) {
       return conversationEntity;
     }
     try {
-      return await this.fetchConversationById(conversation_id);
+      return await this.fetchConversationById(conversation_id, domain);
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
