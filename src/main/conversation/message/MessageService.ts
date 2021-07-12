@@ -103,7 +103,7 @@ export class MessageService {
         ...messageSendingStatus.redundant,
       };
 
-      for (const [domainFailed, userClientsFailed] of Object.entries(allFailed) || {}) {
+      for (const [domainFailed, userClientsFailed] of Object.entries(allFailed)) {
         for (const userIdMissing of Object.keys(userClientsFailed)) {
           const userIsIgnored = messageData.ignoreOnly.userIds.find(({domain: domainIgnore, id: userIdIgnore}) => {
             return userIdIgnore === userIdMissing && domainIgnore === domainFailed;
