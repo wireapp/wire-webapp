@@ -105,7 +105,7 @@ export class ConversationService {
    * @param conversation_id ID of conversation to get
    * @returns Resolves with the server response
    */
-  getConversationById(conversationId: string, domain?: string): Promise<BackendConversation> {
+  getConversationById(conversationId: string, domain: string): Promise<BackendConversation> {
     return this.apiClient.conversation.api.getConversation(conversationId, domain);
   }
 
