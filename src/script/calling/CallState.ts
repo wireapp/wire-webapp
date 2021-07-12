@@ -22,6 +22,7 @@ import ko from 'knockout';
 import {Call} from './Call';
 import {STATE as CALL_STATE} from '@wireapp/avs';
 import {VideoSpeakersTab} from '../view_model/CallingViewModel';
+import {Config} from '../Config';
 
 @singleton()
 export class CallState {
@@ -44,7 +45,7 @@ export class CallState {
       const activeCallIds = activeCalls.map(call => call.conversationId);
       this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
-    this.cbrEncoding = ko.observable(0);
+    this.cbrEncoding = ko.observable(Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0);
     this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTab.ALL);
   }
 }
