@@ -81,7 +81,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
         !!this.selectedParticipant() &&
         !this.selectedParticipant().isMe &&
         !this.selectedParticipant().isTemporaryGuest() &&
-        !this.activeConversation().isFederated()
+        !this.activeConversation()?.isFederated()
       );
     });
 
