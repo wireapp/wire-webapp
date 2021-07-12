@@ -112,6 +112,7 @@ export class CallingRepository {
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
+  onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
     return {
@@ -166,6 +167,8 @@ export class CallingRepository {
     };
 
     this.subscribeToEvents();
+
+    this.onChooseScreen = (deviceId: string) => {};
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
