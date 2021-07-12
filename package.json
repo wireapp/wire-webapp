@@ -17,7 +17,7 @@
     "reconnecting-websocket": "4.4.0",
     "spark-md5": "3.0.1",
     "tough-cookie": "4.0.0",
-    "ws": "7.5.2"
+    "ws": "7.5.3"
   },
   "devDependencies": {
     "@babel/core": "7.14.6",
@@ -59,7 +59,7 @@
     "webpack": "4.46.0",
     "webpack-cli": "4.7.2",
     "webpack-dev-server": "3.11.2",
-    "ws": "7.5.2"
+    "ws": "7.5.3"
   },
   "description": "Wire API Client to send and receive data.",
   "files": [
