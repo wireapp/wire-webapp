@@ -619,9 +619,10 @@ export class UserRepository {
   /**
    * Update a local user from the backend by ID.
    */
-  updateUserById = async (userId: string | QualifiedId): Promise<void> => {
-    const localUserEntity = this.findUserById(userId);
-    const updatedUserData = await this.userService.getUser(userId);
+  updateUserById = async (userId: string, domain?: string): Promise<void> => {
+    const fullyQualifiedUser = domain ? {domain, id: userId} : userId;
+    const localUserEntity = this.findUserById(fullyQualifiedUser);
+    const updatedUserData = await this.userService.getUser(fullyQualifiedUser);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);
