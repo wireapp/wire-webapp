@@ -150,3 +150,17 @@ export const utf8ToUtf16BE = (str = ''): number[] => {
 
   return bytes;
 };
+
+export function uuidToBytes(uuid: string) {
+  return new Uint8Array(
+    uuid
+      .replace(/-/g, '')
+      .match(/.{1,2}/g)
+      .map(byte => parseInt(byte, 16)),
+  );
+}
+
+export function bytesToUUID(uuid: Uint8Array): string {
+  const str = [...uuid].map(byte => byte.toString(16).padStart(2, '0')).join('');
+  return `${str.slice(0, 8)}-${str.slice(8, 12)}-${str.slice(12, 16)}-${str.slice(16, 20)}-${str.slice(20)}`;
+}

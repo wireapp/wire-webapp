@@ -23,9 +23,11 @@ import type {
   ClientMismatch,
   Conversation as BackendConversation,
   ConversationCode,
+  MessageSendingStatus,
   NewConversation,
   NewOTRMessage,
 } from '@wireapp/api-client/src/conversation';
+import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import type {
   ConversationMemberUpdateData,
   ConversationOtherMemberUpdateData,
@@ -343,6 +345,14 @@ export class ConversationService {
     }
 
     return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, ignoreMissing);
+  }
+
+  postEncryptedFederatedMessage(
+    conversationId: string,
+    domain: string,
+    messageData: ProtobufOTR.QualifiedNewOtrMessage,
+  ): Promise<MessageSendingStatus> {
+    return this.apiClient.conversation.api.postOTRMessageV2(conversationId, domain, messageData);
   }
 
   /**

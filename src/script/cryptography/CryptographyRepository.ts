@@ -22,9 +22,18 @@ import type {AxiosError} from 'axios';
 import {amplify} from 'amplify';
 import {error as StoreEngineError} from '@wireapp/store-engine';
 import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
-import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
+import type {
+  MessageSendingStatus,
+  NewOTRMessage,
+  OTRRecipients,
+  QualifiedUserClients,
+  QualifiedOTRRecipients,
+  UserClients,
+} from '@wireapp/api-client/src/conversation/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
+import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
+import Long from 'long';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
@@ -42,6 +51,7 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {bytesToUUID, uuidToBytes} from '../util/StringUtil';
 
 export interface SignalingKeys {
   enckey: string;
@@ -52,8 +62,6 @@ interface EncryptedPayload {
   cipherText?: string;
   sessionId: string;
 }
-
-export type Recipients = Record<string, string[]>;
 
 export interface ClientKeys {
   lastResortKey: BackendPreKey;
@@ -245,7 +253,7 @@ export class CryptographyRepository {
    * @returns Resolves with the encrypted payload
    */
   async encryptGenericMessage(
-    recipients: Recipients,
+    recipients: UserClients,
     genericMessage: GenericMessage,
     payload: NewOTRMessage<string> = this.constructPayload(this.currentClient().id),
   ) {
@@ -275,6 +283,138 @@ export class CryptographyRepository {
     }
 
     return messagePayload;
+  }
+
+  async onFederatedClientMismatch(
+    messageData: ProtobufOTR.QualifiedNewOtrMessage,
+    messageSendingStatus: MessageSendingStatus,
+    genericMessage: GenericMessage,
+  ): Promise<ProtobufOTR.QualifiedNewOtrMessage> {
+    // walk through deleted domain/user map
+    for (const [deletedUserDomain, deletedUserIdClients] of Object.entries(messageSendingStatus.deleted)) {
+      if (!messageData.recipients.find(recipient => recipient.domain === deletedUserDomain)) {
+        // no user from this domain was deleted
+        continue;
+      }
+      // walk through deleted user ids
+      for (const [deletedUserId] of Object.entries(deletedUserIdClients)) {
+        // walk through message recipients
+        for (const recipientIndex in messageData.recipients) {
+          // check if message recipients' domain is the same as the deleted user's domain
+          if (messageData.recipients[recipientIndex].domain === deletedUserDomain) {
+            // check if message recipients' id is the same as the deleted user's id
+            for (const entriesIndex in messageData.recipients[recipientIndex].entries || []) {
+              const uuid = messageData.recipients[recipientIndex].entries![entriesIndex].user?.uuid;
+              if (!!uuid && bytesToUUID(uuid) === deletedUserId) {
+                // delete this user from the message recipients
+                delete messageData.recipients[recipientIndex].entries![entriesIndex];
+              }
+            }
+          }
+        }
+      }
+    }
+
+    const missingUserIds = Object.entries(messageSendingStatus.missing);
+    if (missingUserIds.length) {
+      const reEncryptedPayloads = await this.encryptFederatedGenericMessage(
+        messageSendingStatus.missing,
+        genericMessage,
+      );
+
+      // walk through missing domain/user map
+      for (const [missingUserDomain, missingUserIdClients] of missingUserIds) {
+        if (!messageData.recipients.find(recipient => recipient.domain === missingUserDomain)) {
+          // no user from this domain is missing
+          continue;
+        }
+
+        // walk through missing user ids
+        for (const [missingUserId, missingClientIds] of Object.entries(missingUserIdClients)) {
+          // walk through message recipients
+          for (const recipientIndex in messageData.recipients) {
+            // check if message recipients' domain is the same as the missing user's domain
+            if (messageData.recipients[recipientIndex].domain === missingUserDomain) {
+              // check if there is a recipient with same user id as the missing user's id
+              let userIndex = messageData.recipients[recipientIndex].entries?.findIndex(
+                ({user}) => bytesToUUID(user.uuid) === missingUserId,
+              );
+
+              if (userIndex === -1) {
+                // no recipient found, let's create it
+                userIndex = messageData.recipients[recipientIndex].entries!.push({
+                  user: {
+                    uuid: uuidToBytes(missingUserId),
+                  },
+                });
+              }
+
+              const missingUserUUID = messageData.recipients[recipientIndex].entries![userIndex!].user.uuid;
+
+              if (bytesToUUID(missingUserUUID) === missingUserId) {
+                for (const missingClientId of missingClientIds) {
+                  messageData.recipients[recipientIndex].entries![userIndex!].clients ||= [];
+                  messageData.recipients[recipientIndex].entries![userIndex!].clients?.push({
+                    client: {
+                      client: Long.fromString(missingClientId, 16),
+                    },
+                    text: reEncryptedPayloads[missingUserDomain][missingUserId][missingClientId],
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return messageData;
+  }
+
+  async encryptFederatedGenericMessage(
+    recipients: QualifiedUserClients,
+    genericMessage: GenericMessage,
+  ): Promise<QualifiedOTRRecipients> {
+    const qualifiedOTRRecipients: QualifiedOTRRecipients = {};
+
+    const preKeyBundles = await this.cryptographyService.getQualifiedUsersPreKeys(recipients);
+
+    for (const [domain, preKeyBundleMap] of Object.entries(preKeyBundles)) {
+      qualifiedOTRRecipients[domain] = await this.encrypt(genericMessage, preKeyBundleMap);
+    }
+
+    return qualifiedOTRRecipients;
+  }
+
+  public async encrypt(
+    genericMessage: GenericMessage,
+    preKeyBundles: UserPreKeyBundleMap,
+  ): Promise<OTRRecipients<Uint8Array>> {
+    const recipients: OTRRecipients<Uint8Array> = {};
+    const bundles: Promise<EncryptedPayload>[] = [];
+
+    for (const userId in preKeyBundles) {
+      recipients[userId] = {};
+
+      for (const clientId in preKeyBundles[userId]) {
+        const sessionId = this.constructSessionId(userId, clientId);
+        bundles.push(this.encryptPayloadForSession(sessionId, genericMessage));
+      }
+    }
+
+    const payloads = await Promise.all(bundles);
+
+    payloads.forEach(payload => {
+      const {cipherText, sessionId} = payload;
+      const [userId, clientId] = this.dismantleSessionId(sessionId);
+      recipients[userId][clientId] = base64ToArray(cipherText);
+    });
+
+    return recipients;
+  }
+
+  private dismantleSessionId(sessionId: string): string[] {
+    return sessionId.split('@');
   }
 
   /**
@@ -347,10 +487,10 @@ export class CryptographyRepository {
   }
 
   private async buildPayload(
-    recipients: Recipients,
+    recipients: UserClients,
     genericMessage: GenericMessage,
     messagePayload: NewOTRMessage<string>,
-  ): Promise<{messagePayload: NewOTRMessage<string>; missingRecipients: Recipients}> {
+  ): Promise<{messagePayload: NewOTRMessage<string>; missingRecipients: UserClients}> {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
@@ -372,7 +512,7 @@ export class CryptographyRepository {
   }
 
   private async encryptGenericMessageForMissingRecipients(
-    missingRecipients: Recipients,
+    missingRecipients: UserClients,
     genericMessage: GenericMessage,
     messagePayload: NewOTRMessage<string>,
   ) {
@@ -403,8 +543,8 @@ export class CryptographyRepository {
   private mapCipherTextToPayload(
     messagePayload: NewOTRMessage<string>,
     cipherPayload: EncryptedPayload[],
-  ): {messagePayload: NewOTRMessage<string>; missingRecipients: Recipients} {
-    const missingRecipients: Recipients = {};
+  ): {messagePayload: NewOTRMessage<string>; missingRecipients: UserClients} {
+    const missingRecipients: UserClients = {};
 
     cipherPayload.forEach(({cipherText, sessionId}) => {
       const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);

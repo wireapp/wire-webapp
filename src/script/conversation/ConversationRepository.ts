@@ -757,8 +757,8 @@ export class ConversationRepository {
     this.conversation_service.deleteConversationFromDb(conversationId);
   };
 
-  public async getAllUsersInConversation(conversation_id: string): Promise<User[]> {
-    const conversationEntity = await this.getConversationById(conversation_id);
+  public async getAllUsersInConversation(conversation_id: string, domain?: string): Promise<User[]> {
+    const conversationEntity = await this.getConversationById(conversation_id, domain);
     const users = [this.userState.self()].concat(conversationEntity.participating_user_ets());
     return users;
   }
