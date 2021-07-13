@@ -28,6 +28,7 @@ import type {
   FeatureDigitalSignature,
   FeatureLegalhold,
   FeatureSSO,
+  FeatureFileSharing,
 } from './Feature';
 import type {FeatureList} from './FeatureList';
 
@@ -39,6 +40,7 @@ export class FeatureAPI {
     DIGITAL_SIGNATURES: 'digitalSignatures',
     CALLING_CONFERENCE: 'conferenceCalling',
     CALLING_VIDEO: 'videoCalling',
+    FILE_SHARING: 'fileSharing',
     LEGAL_HOLD: 'legalhold',
     FEATURES: 'features',
     SSO: 'sso',
@@ -110,6 +112,30 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureVideoCalling>(config);
+    return response.data;
+  }
+
+  public async getFileSharingFeature(teamId: string): Promise<FeatureFileSharing> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.FILE_SHARING}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureFileSharing>(config);
+    return response.data;
+  }
+
+  public async putFileSharingFeature(
+    teamId: string,
+    fileSharingFeature: FeatureFileSharing,
+  ): Promise<FeatureFileSharing> {
+    const config: AxiosRequestConfig = {
+      data: fileSharingFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.FILE_SHARING}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureFileSharing>(config);
     return response.data;
   }
 
