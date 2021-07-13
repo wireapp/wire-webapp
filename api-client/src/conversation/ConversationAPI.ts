@@ -74,9 +74,10 @@ export class ConversationAPI {
     CODE_CHECK: '/code-check',
     CONVERSATIONS: '/conversations',
     JOIN: '/join',
+    LIST_CONVERSATIONS: '/list-conversations',
     MEMBERS: 'members',
-    MESSAGES: 'messages',
     MESSAGE_TIMER: 'message-timer',
+    MESSAGES: 'messages',
     NAME: 'name',
     OTR: 'otr',
     PROTEUS: 'proteus',
@@ -233,6 +234,21 @@ export class ConversationAPI {
     limit = ConversationAPI.MAX_CHUNK_SIZE,
   ): Promise<Conversations> {
     return this._getConversations(startConversationId, undefined, limit);
+  }
+
+  /**
+   * Get all remote conversations from a federated backend.
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_list_conversations
+   */
+  public async getRemoteConversations(ownDomain: string): Promise<Conversation[]> {
+    const config: AxiosRequestConfig = {
+      data: {},
+      method: 'post',
+      url: ConversationAPI.URL.LIST_CONVERSATIONS,
+    };
+
+    const {data} = await this.client.sendJSON<Conversations>(config);
+    return data.conversations.filter(conversation => conversation.qualified_id.domain !== ownDomain);
   }
 
   /**
