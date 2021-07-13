@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.31.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.30.0...@wireapp/api-client@12.31.0) (2021-07-13)
+
+
+### Features
+
+* **api-client:** Add file sharing feature config endpoints ([#4051](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4051)) ([52c899a](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/52c899a3c40a21f3908763be672ed660dc07c8e5))
+
+
+
+
+
 # [12.30.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.29.0...@wireapp/api-client@12.30.0) (2021-07-13)
 
 
