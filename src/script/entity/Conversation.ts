@@ -91,7 +91,6 @@ export class Conversation {
   public readonly connection: ko.Observable<ConnectionEntity>;
   public creator: string;
   public readonly display_name: ko.PureComputed<string>;
-  public domain?: string = undefined;
   public readonly firstUserEntity: ko.PureComputed<User>;
   public readonly globalMessageTimer: ko.Observable<number>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
@@ -463,7 +462,8 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        if (!this.hasUsers()) {
+        const hasUserIds = this.participating_user_ids().length + this.participatingQualifiedUserIds().length > 0;
+        if (!hasUserIds) {
           return t('conversationsEmptyConversation');
         }
       }
@@ -925,16 +925,8 @@ export class Conversation {
     return this.getLastMessage()?.timestamp() ? this.getLastMessage().timestamp() >= this.last_event_timestamp() : true;
   };
 
-  get isRemoteConversation(): boolean {
-    if (!Config.getConfig().FEATURE.ENABLE_FEDERATION || typeof this.domain === 'undefined') {
-      return false;
-    }
-
-    return this.domain !== Config.getConfig().FEATURE.FEDERATION_DOMAIN;
-  }
-
   serialize(): ConversationRecord {
-    const record: ConversationRecord = {
+    return {
       accessModes: this.accessModes,
       accessRole: this.accessRole,
       archived_state: this.archivedState(),
@@ -962,14 +954,5 @@ export class Conversation {
       type: this.type(),
       verification_state: this.verification_state(),
     };
-
-    if (this.domain) {
-      record.qualified_id = {
-        domain: this.domain,
-        id: this.id,
-      };
-    }
-
-    return record;
   }
 }

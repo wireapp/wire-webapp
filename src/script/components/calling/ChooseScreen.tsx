@@ -19,6 +19,7 @@
 
 import React, {Fragment, useEffect} from 'react';
 
+import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface Screen {
@@ -76,3 +77,8 @@ const ChooseScreen: React.FC<ChooseScreenProps> = ({cancel, choose, screens = []
 };
 
 export default ChooseScreen;
+
+registerReactComponent('choose-screen', {
+  component: ChooseScreen,
+  template: '<div data-bind="react: {cancel, choose, screens: ko.unwrap(screens), windows: ko.unwrap(windows)}"></div>',
+});

@@ -17,9 +17,4 @@
  *
  */
 
-export const generateConversationUrl = (conversationId: string, domain?: string): string => {
-  if (domain) {
-    return `/conversation/${conversationId}/${domain}`;
-  }
-  return `/conversation/${conversationId}`;
-};
+export const generateConversationUrl = (conversationId: string): string => `/conversation/${conversationId}`;

@@ -22,7 +22,6 @@ import ko from 'knockout';
 import {Call} from './Call';
 import {STATE as CALL_STATE} from '@wireapp/avs';
 import {VideoSpeakersTab} from '../view_model/CallingViewModel';
-import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
 
 @singleton()
 export class CallState {
@@ -32,9 +31,6 @@ export class CallState {
   public readonly acceptedVersionWarnings: ko.ObservableArray<string>;
   public readonly cbrEncoding: ko.Observable<number>;
   public readonly videoSpeakersActiveTab: ko.Observable<string>;
-  readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
-  readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
-  readonly isChoosingScreen: ko.PureComputed<boolean>;
 
   constructor() {
     this.activeCalls = ko.observableArray();
@@ -43,17 +39,12 @@ export class CallState {
       return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
     });
     this.acceptedVersionWarnings = ko.observableArray<string>();
+
     this.activeCalls.subscribe(activeCalls => {
       const activeCallIds = activeCalls.map(call => call.conversationId);
       this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
     this.cbrEncoding = ko.observable(0);
     this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTab.ALL);
-
-    this.selectableScreens = ko.observable([]);
-    this.selectableWindows = ko.observable([]);
-    this.isChoosingScreen = ko.pureComputed(
-      () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
-    );
   }
 }

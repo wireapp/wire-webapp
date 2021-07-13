@@ -76,8 +76,13 @@ declare global {
 }
 
 export class CallingViewModel {
+  private onChooseScreen: (deviceId: string) => void;
+
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
+  readonly isChoosingScreen: ko.PureComputed<boolean>;
+  readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
+  readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
   readonly videoSpeakersActiveTab: ko.Observable<string>;
 
@@ -104,6 +109,12 @@ export class CallingViewModel {
         return call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
       }),
     );
+    this.selectableScreens = ko.observable([]);
+    this.selectableWindows = ko.observable([]);
+    this.isChoosingScreen = ko.pureComputed(
+      () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
+    );
+    this.onChooseScreen = () => {};
 
     const ring = (call: Call): void => {
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {
@@ -202,18 +213,18 @@ export class CallingViewModel {
         }
         const showScreenSelection = (): Promise<void> => {
           return new Promise(resolve => {
-            this.callingRepository.onChooseScreen = (deviceId: string): void => {
+            this.onChooseScreen = (deviceId: string): void => {
               this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
-              this.callState.selectableScreens([]);
-              this.callState.selectableWindows([]);
+              this.selectableScreens([]);
+              this.selectableWindows([]);
               resolve();
             };
             this.mediaDevicesHandler.getScreenSources().then((sources: ElectronDesktopCapturerSource[]) => {
               if (sources.length === 1) {
-                return this.callingRepository.onChooseScreen(sources[0].id);
+                return this.onChooseScreen(sources[0].id);
               }
-              this.callState.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
-              this.callState.selectableWindows(sources.filter(source => source.id.startsWith('window')));
+              this.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
+              this.selectableWindows(sources.filter(source => source.id.startsWith('window')));
             });
           });
         };
@@ -259,7 +270,7 @@ export class CallingViewModel {
   }
 
   readonly onCancelScreenSelection = () => {
-    this.callState.selectableScreens([]);
-    this.callState.selectableWindows([]);
+    this.selectableScreens([]);
+    this.selectableWindows([]);
   };
 }

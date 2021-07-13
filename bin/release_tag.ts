@@ -142,7 +142,7 @@ const sendRandomGif = async (account: Account, conversationId: string, query: st
       text: `${query} • via giphy.com`,
     })
     .build();
-  await account.service.conversation.send({payloadBundle: payload});
+  await account.service.conversation.send(payload);
 
   const fileMetaDataPayload = account.service.conversation.messageBuilder.createFileMetadata({
     conversationId,
@@ -152,7 +152,7 @@ const sendRandomGif = async (account: Account, conversationId: string, query: st
       type: 'image/gif',
     },
   });
-  await account.service.conversation.send({payloadBundle: fileMetaDataPayload});
+  await account.service.conversation.send(fileMetaDataPayload);
 
   try {
     const filePayload = await account.service.conversation.messageBuilder.createImage({
@@ -160,7 +160,7 @@ const sendRandomGif = async (account: Account, conversationId: string, query: st
       image: {data: fileBuffer, height: Number(imageHeight), type: 'image/gif', width: Number(imageWidth)},
       messageId: fileMetaDataPayload.id,
     });
-    await account.service.conversation.send({payloadBundle: filePayload});
+    await account.service.conversation.send(filePayload);
   } catch (error) {
     logger.warn(`Error while sending asset: "${error.stack}"`);
     const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort({
@@ -168,7 +168,7 @@ const sendRandomGif = async (account: Account, conversationId: string, query: st
       originalMessageId: fileMetaDataPayload.id,
       reason: 0,
     });
-    await account.service.conversation.send({payloadBundle: fileAbortPayload});
+    await account.service.conversation.send(fileAbortPayload);
   }
 };
 
@@ -196,7 +196,7 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
         })
         .build();
       await sendRandomGif(account, WIRE_CONVERSATION, 'in the oven');
-      await account.service.conversation.send({payloadBundle: payload});
+      await account.service.conversation.send(payload);
     } else if (stage === DeploymentStage.PRODUCTION && WIRE_RELEASE_NOTES_CONVERSATION_ID) {
       // Production Release
       const message = `The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version`;
@@ -206,7 +206,7 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
           text: message,
         })
         .build();
-      await account.service.conversation.send({payloadBundle: payload});
+      await account.service.conversation.send(payload);
     }
     logger.info(`Sent "${stage}" announcement.`);
   } else {
