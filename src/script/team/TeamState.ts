@@ -34,6 +34,7 @@ export class TeamState {
   public readonly memberInviters: ko.Observable<any>;
   public readonly memberRoles: ko.Observable<any>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
+  public readonly isVideoCallingEnabled: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList>;
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
@@ -67,6 +68,7 @@ export class TeamState {
     });
 
     this.supportsLegalHold = ko.observable(false);
+    this.isVideoCallingEnabled = ko.observable(false);
 
     this.userState.isTeam = this.isTeam;
     this.userState.teamMembers = this.teamMembers;
