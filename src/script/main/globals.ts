@@ -107,6 +107,7 @@ declare global {
           ENABLE_MEDIA_EMBEDS: boolean;
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
+          ENFORCE_CONSTANT_BITRATE: boolean;
           FEDERATION_DOMAIN: string;
           PERSIST_TEMPORARY_CLIENTS: boolean;
           SHOW_LOADING_INFORMATION: boolean;

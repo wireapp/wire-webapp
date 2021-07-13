@@ -172,7 +172,9 @@ export class CallingRepository {
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
-    this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
+    if (!Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
+      this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
+    }
   };
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -1271,7 +1273,7 @@ export class CallingRepository {
 
   private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
     const activeCall = this.callState.activeCalls()[0];
-    if (activeCall) {
+    if (activeCall && !Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
       activeCall.isCbrEnabled(!!enabled);
     }
   };
