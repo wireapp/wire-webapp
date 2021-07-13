@@ -18,8 +18,8 @@
  */
 
 import type {ClientPreKey, PreKey} from '@wireapp/api-client/src/auth/';
-import type {UserClients} from '@wireapp/api-client/src/conversation/';
-import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation/';
+import type {UserPreKeyBundleMap, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
@@ -48,6 +48,10 @@ export class CryptographyService {
    */
   getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
     return this.apiClient.user.api.postMultiPreKeyBundles(recipients);
+  }
+
+  getQualifiedUsersPreKeys(recipients: QualifiedUserClients): Promise<QualifiedUserPreKeyBundleMap> {
+    return this.apiClient.user.api.postQualifiedMultiPreKeyBundles(recipients);
   }
 
   /**

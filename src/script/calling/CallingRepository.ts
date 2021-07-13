@@ -70,7 +70,6 @@ import * as trackingHelpers from '../tracking/Helpers';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
@@ -851,8 +850,8 @@ export class CallingRepository {
     }
   }
 
-  private mapTargets(targets: SendMessageTarget): Recipients {
-    const recipients: Recipients = {};
+  private mapTargets(targets: SendMessageTarget): UserClients {
+    const recipients: UserClients = {};
 
     for (const target of targets.clients) {
       const {userid, clientid} = target;

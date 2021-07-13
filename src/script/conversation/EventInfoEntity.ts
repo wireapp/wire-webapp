@@ -18,9 +18,9 @@
  */
 
 import type {GenericMessage, IGenericMessage} from '@wireapp/protocol-messaging';
+import type {UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation/';
 
 import type {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {Recipients} from '../cryptography/CryptographyRepository';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -34,7 +34,7 @@ export interface MessageSendingOptions {
    *  * `true`: force sending
    */
   precondition?: string[] | boolean;
-  recipients: Recipients;
+  recipients: UserClients | QualifiedUserClients;
 }
 
 export class EventInfoEntity {
@@ -43,15 +43,13 @@ export class EventInfoEntity {
   private type?: GENERIC_MESSAGE_TYPE;
   public readonly conversationId: string;
   public timestamp?: number;
+  public conversationDomain?: string;
 
   constructor(genericMessage: GenericMessage, conversationId: string = '', options?: MessageSendingOptions) {
     this.conversationId = conversationId;
     this.genericMessage = genericMessage;
 
     this.options = {nativePush: true, precondition: false, ...options};
-
-    this.timestamp = undefined;
-    this.type = undefined;
   }
 
   forceSending(): void {

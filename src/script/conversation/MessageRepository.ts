@@ -39,10 +39,19 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
+import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
+import Long from 'long';
 import {ReactionType} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation/';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
+import {
+  NewOTRMessage,
+  ClientMismatch,
+  UserClients,
+  QualifiedUserClients,
+  MessageSendingStatus,
+  QualifiedOTRRecipients,
+} from '@wireapp/api-client/src/conversation/';
+import {RequestCancellationError, User as APIClientUser, QualifiedId} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
 import {container} from 'tsyringe';
@@ -53,7 +62,7 @@ import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {getDifference} from 'Util/ArrayUtil';
 import {arrayToBase64, createRandomUuid, loadUrlBlob} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {capitalizeFirstChar} from 'Util/StringUtil';
+import {capitalizeFirstChar, uuidToBytes} from 'Util/StringUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
 import {encryptAesAsset} from '../assets/AssetCrypto';
@@ -85,7 +94,7 @@ import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
-import {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {UserRepository} from '../user/UserRepository';
@@ -742,6 +751,7 @@ export class MessageRepository {
     const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
     eventInfoEntity.setTimestamp(injectedEvent.time);
+    eventInfoEntity.conversationDomain = conversationEntity.domain;
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
     this.trackContributed(conversationEntity, genericMessage);
     const backendIsoDate = syncTimestamp ? sentPayload.time : '';
@@ -1111,8 +1121,23 @@ export class MessageRepository {
 
   private sendGenericMessageToConversation(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
     return this.messageSender.queueMessage(async () => {
-      const recipients = await this.createRecipients(eventInfoEntity.conversationId);
+      const recipients = await this.createRecipients(
+        eventInfoEntity.conversationId,
+        undefined,
+        undefined,
+        eventInfoEntity.conversationDomain,
+      );
       eventInfoEntity.updateOptions({recipients});
+
+      if (eventInfoEntity.conversationDomain) {
+        await this.sendFederatedGenericMessage(eventInfoEntity);
+        return {
+          deleted: {},
+          missing: {},
+          redundant: {},
+          time: new Date().toISOString(),
+        };
+      }
       return this.sendGenericMessage(eventInfoEntity, true);
     });
   }
@@ -1172,27 +1197,61 @@ export class MessageRepository {
   /**
    * Create a user client map for a given conversation.
    *
-   * @param conversation_id Conversation ID
-   * @param skip_own_clients `true`, if other own clients should be skipped (to not sync messages on own clients)
-   * @param user_ids Optionally the intended recipient users
+   * @param conversationId Conversation ID
+   * @param skipOwnClients `true`, if other own clients should be skipped (to not sync messages on own clients)
+   * @param userIds Optionally the intended recipient users
    * @returns Resolves with a user client map
    */
   async createRecipients(
-    conversation_id: string,
-    skip_own_clients = false,
-    user_ids: string[] = null,
-  ): Promise<Recipients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id);
-    const recipients: Recipients = {};
+    conversationId: string,
+    skipOwnClients?: boolean,
+    userIds?: string[] | null,
+  ): Promise<UserClients>;
+  async createRecipients(
+    conversationId: string,
+    skipOwnClients?: boolean,
+    userIds?: string[] | null,
+    conversationDomain?: string,
+  ): Promise<QualifiedUserClients>;
+  async createRecipients(
+    conversationId: string,
+    skipOwnClients = false,
+    userIds: string[] = null,
+    conversationDomain?: string,
+  ): Promise<UserClients | QualifiedUserClients> {
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(
+      conversationId,
+      conversationDomain,
+    );
+    if (conversationDomain) {
+      const recipients: QualifiedUserClients = {};
+
+      for (const userEntity of userEntities) {
+        if (!(skipOwnClients && userEntity.isMe)) {
+          if (userIds && !userIds.includes(userEntity.id)) {
+            continue;
+          }
+
+          recipients[userEntity.domain] ||= {};
+          recipients[userEntity.domain][userEntity.id] = userEntity.devices().map(clientEntity => clientEntity.id);
+        }
+      }
+
+      return recipients;
+    }
+
+    const recipients: UserClients = {};
+
     for (const userEntity of userEntities) {
-      if (!(skip_own_clients && userEntity.isMe)) {
-        if (user_ids && !user_ids.includes(userEntity.id)) {
+      if (!(skipOwnClients && userEntity.isMe)) {
+        if (userIds && !userIds.includes(userEntity.id)) {
           continue;
         }
 
-        recipients[userEntity.id] = userEntity.devices().map(client_et => client_et.id);
+        recipients[userEntity.id] = userEntity.devices().map(clientEntity => clientEntity.id);
       }
     }
+
     return recipients;
   }
 
@@ -1205,7 +1264,10 @@ export class MessageRepository {
       }
 
       const {genericMessage, options} = eventInfoEntity;
-      const payload = await this.cryptography_repository.encryptGenericMessage(options.recipients, genericMessage);
+      const payload = await this.cryptography_repository.encryptGenericMessage(
+        options.recipients as UserClients,
+        genericMessage,
+      );
       payload.native_push = options.nativePush;
       return await this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
@@ -1213,6 +1275,42 @@ export class MessageRepository {
 
       if (isRequestTooLarge) {
         return this.sendExternalGenericMessage(eventInfoEntity);
+      }
+
+      throw error;
+    }
+  }
+
+  private async sendFederatedGenericMessage(eventInfoEntity: EventInfoEntity): Promise<void> {
+    try {
+      await this.grantOutgoingMessage(eventInfoEntity, undefined, false);
+      const sendAsExternal = await this.shouldSendAsExternal(eventInfoEntity);
+      if (sendAsExternal) {
+        // TODO
+        // return await this.sendExternalFederatedGenericMessage(eventInfoEntity);
+        return;
+      }
+
+      const {genericMessage, options} = eventInfoEntity;
+      const payload = await this.cryptography_repository.encryptFederatedGenericMessage(
+        options.recipients as QualifiedUserClients,
+        genericMessage,
+      );
+      const sendingClientId = this.clientState.currentClient().id;
+      await this.sendFederatedOTRMessage(
+        sendingClientId,
+        eventInfoEntity.conversationId,
+        eventInfoEntity.conversationDomain,
+        payload,
+        genericMessage,
+      );
+    } catch (error) {
+      const isRequestTooLarge = isBackendError(error) && error.code === HTTP_STATUS.REQUEST_TOO_LONG;
+
+      if (isRequestTooLarge) {
+        // TODO
+        // return await this.sendExternalFederatedGenericMessage(eventInfoEntity);
+        return;
       }
 
       throw error;
@@ -1313,7 +1411,7 @@ export class MessageRepository {
 
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
-    userIds: string[],
+    userIds: QualifiedId[],
     checkLegalHold: boolean,
   ): Promise<void> {
     const messageType = eventInfoEntity.getType();
@@ -1349,11 +1447,12 @@ export class MessageRepository {
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
     consentType: string,
-    userIds: string[],
+    userIds: QualifiedId[],
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
       eventInfoEntity.conversationId,
+      eventInfoEntity.conversationDomain,
     );
     const legalHoldMessageTypes: string[] = [
       GENERIC_MESSAGE_TYPE.ASSET,
@@ -1378,7 +1477,9 @@ export class MessageRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
+      userIds = conversationEntity
+        .getUsersWithUnverifiedClients()
+        .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
 
       return this.userRepository
         .getUsersById(userIds)
@@ -1479,7 +1580,7 @@ export class MessageRepository {
     } catch (axiosError) {
       const error = axiosError.response?.data || axiosError;
       if (error.missing) {
-        const remoteUserClients = error.missing as Recipients;
+        const remoteUserClients = error.missing as UserClients;
         const localUserClients = await this.createRecipients(conversationEntity.id);
         const selfId = this.userState.self().id;
 
@@ -1492,7 +1593,7 @@ export class MessageRepository {
             deleted[userId] = deletedClients;
           }
           return deleted;
-        }, {} as Recipients);
+        }, {} as UserClients);
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
@@ -1643,7 +1744,7 @@ export class MessageRepository {
       });
 
       const payload = await this.cryptography_repository.encryptGenericMessage(
-        options.recipients,
+        options.recipients as UserClients,
         genericMessageExternal,
       );
       payload.data = arrayToBase64(encryptedAsset.cipherText);
@@ -1653,6 +1754,132 @@ export class MessageRepository {
       this.logger.info('Failed sending external message', error);
       throw error;
     }
+  }
+
+  public async sendFederatedOTRMessage(
+    sendingClientId: string,
+    conversationId: string,
+    conversationDomain: string,
+    recipients: QualifiedOTRRecipients,
+    genericMessage: GenericMessage,
+    assetData?: Uint8Array,
+  ): Promise<void> {
+    const qualifiedUserEntries = Object.entries(recipients).map<ProtobufOTR.IQualifiedUserEntry>(
+      ([domain, otrRecipients]) => {
+        const userEntries = Object.entries(otrRecipients).map<ProtobufOTR.IUserEntry>(([userId, otrClientMap]) => {
+          const clientEntries = Object.entries(otrClientMap).map<ProtobufOTR.IClientEntry>(([clientId, payload]) => {
+            return {
+              client: {
+                client: Long.fromString(clientId, 16),
+              },
+              text: payload,
+            };
+          });
+
+          return {
+            clients: clientEntries,
+            user: {
+              uuid: uuidToBytes(userId),
+            },
+          };
+        });
+
+        return {domain, entries: userEntries};
+      },
+    );
+
+    const protoMessage = ProtobufOTR.QualifiedNewOtrMessage.create({
+      recipients: qualifiedUserEntries,
+      sender: {
+        client: Long.fromString(sendingClientId, 16),
+      },
+    });
+
+    if (assetData) {
+      protoMessage.blob = assetData;
+    }
+
+    /*
+     * When creating the PreKey bundles we already found out to which users we want to send a message, so we can ignore
+     * missing clients. We have to ignore missing clients because there can be the case that there are clients that
+     * don't provide PreKeys (clients from the Pre-E2EE era).
+     */
+    protoMessage.ignoreAll = {};
+
+    const messageSendingStatus = await this.conversation_service.postEncryptedFederatedMessage(
+      conversationId,
+      conversationDomain,
+      protoMessage,
+    );
+
+    const federatedClientsMismatch = this.checkFederatedClientsMismatch(protoMessage, messageSendingStatus);
+
+    if (federatedClientsMismatch) {
+      const reEncryptedMessage = await this.cryptography_repository.onFederatedClientMismatch(
+        protoMessage,
+        federatedClientsMismatch,
+        genericMessage,
+      );
+      await this.conversation_service.postEncryptedFederatedMessage(
+        conversationId,
+        conversationDomain,
+        reEncryptedMessage,
+      );
+    }
+  }
+
+  private checkFederatedClientsMismatch(
+    messageData: ProtobufOTR.QualifiedNewOtrMessage,
+    messageSendingStatus: MessageSendingStatus,
+  ): MessageSendingStatus | null {
+    const updatedMessageSendingStatus = {...messageSendingStatus};
+    const sendingStatusKeys: (keyof Omit<typeof updatedMessageSendingStatus, 'time'>)[] = [
+      'deleted',
+      'failed_to_send',
+      'missing',
+      'redundant',
+    ];
+
+    if (messageData.ignoreOnly?.userIds?.length) {
+      const allFailed: QualifiedUserClients = {
+        ...messageSendingStatus.deleted,
+        ...messageSendingStatus.failed_to_send,
+        ...messageSendingStatus.missing,
+        ...messageSendingStatus.redundant,
+      };
+
+      for (const [domainFailed, userClientsFailed] of Object.entries(allFailed)) {
+        for (const userIdMissing of Object.keys(userClientsFailed)) {
+          const userIsIgnored = messageData.ignoreOnly.userIds.find(({domain: domainIgnore, id: userIdIgnore}) => {
+            return userIdIgnore === userIdMissing && domainIgnore === domainFailed;
+          });
+          if (userIsIgnored) {
+            for (const sendingStatusKey of sendingStatusKeys) {
+              delete updatedMessageSendingStatus[sendingStatusKey][domainFailed][userIdMissing];
+            }
+          }
+        }
+      }
+    } else if (messageData.reportOnly?.userIds?.length) {
+      for (const [reportDomain, reportUserId] of Object.entries(messageData.reportOnly.userIds)) {
+        for (const sendingStatusKey of sendingStatusKeys) {
+          for (const [domainDeleted, userClientsDeleted] of Object.entries(
+            updatedMessageSendingStatus[sendingStatusKey],
+          )) {
+            for (const userIdDeleted of Object.keys(userClientsDeleted)) {
+              if (userIdDeleted !== reportUserId.id && domainDeleted !== reportDomain) {
+                delete updatedMessageSendingStatus[sendingStatusKey][domainDeleted][userIdDeleted];
+              }
+            }
+          }
+        }
+      }
+    } else if (!!messageData.ignoreAll) {
+      // report nothing
+      return null;
+    }
+
+    return updatedMessageSendingStatus;
   }
 
   /**
@@ -1747,7 +1974,7 @@ export class MessageRepository {
         payload,
       );
 
-      const missedUserIds = Object.keys(error.missing);
+      const missedUserIds = Object.keys(error.missing).map(id => ({domain: undefined, id}));
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
