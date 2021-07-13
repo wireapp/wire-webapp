@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {APIClient} from '../service/APIClientSingleton';
 
 export class CryptographyService {
-  constructor(private readonly apiClient = container.resolve(APIClient)) {}
+  constructor(public readonly apiClient = container.resolve(APIClient)) {}
 
   /**
    * Gets a pre-key for a client of a user.

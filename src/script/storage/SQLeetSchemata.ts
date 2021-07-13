@@ -61,6 +61,8 @@ export class SQLeetSchemata {
             muted_timestamp: SQLiteType.INTEGER,
             name: SQLiteType.TEXT,
             others: SQLiteType.JSON,
+            qualified_id: SQLiteType.JSON,
+            qualified_users: SQLiteType.JSON,
             receipt_mode: SQLiteType.INTEGER,
             status: SQLiteType.INTEGER,
             team_id: SQLiteType.TEXT,

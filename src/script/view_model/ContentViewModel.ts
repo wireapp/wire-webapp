@@ -272,7 +272,11 @@ export class ContentViewModel {
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
    */
-  readonly showConversation = (conversation: Conversation | string, options: ShowConversationOptions = {}) => {
+  readonly showConversation = (
+    conversation: Conversation | string,
+    options: ShowConversationOptions = {},
+    domain?: string,
+  ) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
@@ -291,7 +295,7 @@ export class ContentViewModel {
 
     const conversationPromise = isConversation
       ? Promise.resolve(conversation as Conversation)
-      : this.conversationRepository.getConversationById(conversation as string);
+      : this.conversationRepository.getConversationById(conversation as string, domain);
 
     conversationPromise
       .then(conversationEntity => {

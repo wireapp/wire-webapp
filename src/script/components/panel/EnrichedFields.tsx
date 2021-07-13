@@ -28,6 +28,7 @@ import {noop} from 'Util/util';
 
 import type {User} from '../../entity/User';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
+import {Config} from '../../Config';
 
 export interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;
@@ -41,11 +42,20 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
   user,
 }) => {
   const [fields, setFields] = useState<RichInfoField[]>([]);
-  const email: string = useKoSubscribable(user?.email || ko.observable());
+  const email: string = useKoSubscribable(user.email || ko.observable());
 
   useEffect(() => {
     let cancel = false;
     const returnFields: RichInfoField[] = email ? [{type: t('userProfileEmail'), value: email}] : [];
+
+    if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
+      if (!!user.domain) {
+        returnFields.push({
+          type: t('userProfileDomain'),
+          value: user.domain,
+        });
+      }
+    }
 
     const loadRichFields = async () => {
       try {

@@ -185,7 +185,6 @@ export class MessageListViewModel {
     }
 
     // Update new conversation
-    this.logger.info('conversationEntity', conversationEntity);
     this.conversation(conversationEntity);
 
     // Keep last read timestamp to render unread when entering conversation
