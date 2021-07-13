@@ -49,7 +49,7 @@ export interface Conversation {
   members: ConversationMembers;
   message_timer: number | null;
   name: string;
-  qualified_id: QualifiedId;
+  qualified_id?: QualifiedId;
   team: string | null;
   type: CONVERSATION_TYPE;
 }
