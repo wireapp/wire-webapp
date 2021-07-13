@@ -18,6 +18,7 @@
  */
 
 import type {ConversationMembers} from './';
+import {QualifiedId} from '../user';
 
 export enum CONVERSATION_TYPE {
   REGULAR = 0,
@@ -48,6 +49,7 @@ export interface Conversation {
   members: ConversationMembers;
   message_timer: number | null;
   name: string;
+  qualified_id: QualifiedId;
   team: string | null;
   type: CONVERSATION_TYPE;
 }
