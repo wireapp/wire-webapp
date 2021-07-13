@@ -42,6 +42,7 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {Account} from '@wireapp/core';
 
 export interface SignalingKeys {
   enckey: string;
@@ -88,6 +89,20 @@ export class CryptographyRepository {
 
     this.currentClient = undefined;
     this.cryptobox = undefined;
+  }
+
+  async sendFederatedMessage(text: string = 'Hello, World!', conversationId: string, domain?: string): Promise<void> {
+    const crudEngine = this.storageRepository.storageService.engine;
+    const storeEngineProvider = () => Promise.resolve(crudEngine);
+    const apiClient = this.cryptographyService.apiClient;
+
+    const account = new Account(apiClient, storeEngineProvider);
+    await account.initServices(crudEngine);
+
+    const textPayload = account.service!.conversation.messageBuilder.createText({conversationId, text}).build();
+    await account.service!.conversation.send({
+      payloadBundle: textPayload,
+    });
   }
 
   /**
