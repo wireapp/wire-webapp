@@ -2977,10 +2977,10 @@
   dependencies:
     "@types/node" "~14"
 
-"@wireapp/webapp-events@0.11.1":
-  version "0.11.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.11.1.tgz#ed4d92b426d2f93abace4e3e813162eff97b0052"
-  integrity sha512-N+18Id1eNabMgbLqKnbzmQQ9x2whnY3o/a60bJTBzbNyWpkruO7u4KLcrp52JGRvO7rEJRn6uDKunSHaVjCaVA==
+"@wireapp/webapp-events@0.11.2":
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/webapp-events/-/webapp-events-0.11.2.tgz#c36abd8e9108647eb0e9a04eef5c29e5dcc8ae19"
+  integrity sha512-poCnbQ7QMQWG2aMnuslw3FQFwJtzGZ+imjnJ7c7vCYM/k6ureEe7TsBmSCKMsemzxxW4Cby64Wq3uvYXtnfgtQ==
 
 "@wireapp/websql@0.0.17":
   version "0.0.17"
