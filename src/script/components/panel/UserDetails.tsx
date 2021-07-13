@@ -49,7 +49,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
   ]);
 
   useEffect(() => {
-    amplify.publish(WebAppEvents.USER.UPDATE, participant.id, participant.domain);
+    amplify.publish(WebAppEvents.USER.UPDATE, participant.id);
   }, [participant]);
 
   return (

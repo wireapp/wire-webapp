@@ -39,13 +39,13 @@ const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, gr
   const is1to1 = useKoSubscribable(group.is1to1);
   return (
     <div
-      key={`${group.id}@${group.domain}`}
+      key={group.id}
       data-uie-name="item-group"
       className="search-list-item"
       data-uie-uid={`${group.id}`}
       onClick={() => {
         click(group);
-        router.navigate(generateConversationUrl(group.id, group.domain));
+        router.navigate(generateConversationUrl(group.id));
       }}
       data-uie-value={displayName}
     >

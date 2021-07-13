@@ -54,7 +54,6 @@ import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
-import {Config} from '../Config';
 
 export class ConversationService {
   private readonly eventService: EventService;
@@ -94,17 +93,8 @@ export class ConversationService {
    * Retrieves all the conversations of a user.
    * @returns Resolves with the conversation information
    */
-  async getAllConversations(): Promise<BackendConversation[]> {
-    const conversations = await this.apiClient.conversation.api.getAllConversations();
-
-    if (Config.getConfig().FEATURE.ENABLE_FEDERATION === true && Config.getConfig().FEATURE.FEDERATION_DOMAIN) {
-      const remoteConversations = await this.apiClient.conversation.api.getRemoteConversations(
-        Config.getConfig().FEATURE.FEDERATION_DOMAIN,
-      );
-      conversations.push(...remoteConversations);
-    }
-
-    return conversations;
+  getAllConversations(): Promise<BackendConversation[]> {
+    return this.apiClient.conversation.api.getAllConversations();
   }
 
   /**
@@ -115,8 +105,8 @@ export class ConversationService {
    * @param conversation_id ID of conversation to get
    * @returns Resolves with the server response
    */
-  getConversationById(conversationId: string, domain: string): Promise<BackendConversation> {
-    return this.apiClient.conversation.api.getConversation(conversationId, domain);
+  getConversationById(conversationId: string): Promise<BackendConversation> {
+    return this.apiClient.conversation.api.getConversation(conversationId);
   }
 
   /**

@@ -53,7 +53,7 @@ export class StorageService {
   public db?: DexieDatabase;
   private readonly hasHookSupport: boolean;
   private readonly dbListeners: DatabaseListener[];
-  public readonly engine: CRUDEngine;
+  private readonly engine: CRUDEngine;
   public readonly isTemporaryAndNonPersistent: boolean;
   private readonly logger: Logger;
   private userId?: string;

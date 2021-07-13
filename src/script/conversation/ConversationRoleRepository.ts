@@ -93,10 +93,7 @@ export class ConversationRoleRepository {
   };
 
   updateConversationRoles = async (conversation: Conversation): Promise<void> => {
-    const remoteConversationData = await this.conversationService.getConversationById(
-      conversation.id,
-      conversation.domain,
-    );
+    const remoteConversationData = await this.conversationService.getConversationById(conversation.id);
     const roleUpdates: Record<string, string> = {};
 
     // Add role for self participant

@@ -368,7 +368,7 @@ export class ConversationRepository {
   /**
    * Get a conversation from the backend.
    */
-  private async fetchConversationById(conversationId: string, domain?: string): Promise<Conversation> {
+  private async fetchConversationById(conversationId: string): Promise<Conversation> {
     const fetching_conversations: Record<string, FetchPromise[]> = {};
     if (fetching_conversations.hasOwnProperty(conversationId)) {
       return new Promise((resolve, reject) => {
@@ -378,7 +378,7 @@ export class ConversationRepository {
 
     fetching_conversations[conversationId] = [];
     try {
-      const response = await this.conversation_service.getConversationById(conversationId, domain);
+      const response = await this.conversation_service.getConversationById(conversationId);
       const conversationEntity = this.mapConversations(response);
 
       this.logger.info(`Fetched conversation '${conversationId}' from backend`);
@@ -685,10 +685,7 @@ export class ConversationRepository {
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
-    const conversationData = await this.conversation_service.getConversationById(
-      conversationEntity.id,
-      conversationEntity.domain,
-    );
+    const conversationData = await this.conversation_service.getConversationById(conversationEntity.id);
     const {name, message_timer} = conversationData;
     this.conversationMapper.updateProperties(conversationEntity, {name} as any);
     this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
@@ -766,19 +763,19 @@ export class ConversationRepository {
   /**
    * Check for conversation locally and fetch it from the server otherwise.
    */
-  async getConversationById(conversation_id: string, domain?: string): Promise<Conversation> {
+  async getConversationById(conversation_id: string): Promise<Conversation> {
     if (typeof conversation_id !== 'string') {
       throw new ConversationError(
         ConversationError.TYPE.NO_CONVERSATION_ID,
         ConversationError.MESSAGE.NO_CONVERSATION_ID,
       );
     }
-    const conversationEntity = this.conversationState.findConversation(conversation_id, domain);
+    const conversationEntity = this.conversationState.findConversation(conversation_id);
     if (conversationEntity) {
       return conversationEntity;
     }
     try {
-      return await this.fetchConversationById(conversation_id, domain);
+      return await this.fetchConversationById(conversation_id);
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
@@ -1085,7 +1082,7 @@ export class ConversationRepository {
     return Promise.all(
       this.conversationState.conversations().map(async conversation => {
         try {
-          await this.conversation_service.getConversationById(conversation.id, conversation.domain);
+          await this.conversation_service.getConversationById(conversation.id);
         } catch ({code}) {
           if (code === HTTP_STATUS.NOT_FOUND) {
             this.deleteConversationLocally(conversation.id, true);
@@ -1211,17 +1208,17 @@ export class ConversationRepository {
     offline = false,
     updateGuests = false,
   ): Promise<Conversation> {
-    let userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
-    const qualifiedUserEntities = await this.userRepository.getUsersById(
-      conversationEntity.participatingQualifiedUserIds(),
-      offline,
-    );
-    userEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
-    // TODO Federation fix: Filter duplicated users
-    userEntities = userEntities.filter(
-      (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
-    );
-    conversationEntity.participating_user_ets(userEntities);
+    try {
+      let userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
+      const qualifiedUserEntities = await this.userRepository.getUsersById(
+        conversationEntity.participatingQualifiedUserIds(),
+        offline,
+      );
+      userEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
+      conversationEntity.participating_user_ets(userEntities);
+    } catch (error) {
+      console.error('debug: error', error);
+    }
 
     if (updateGuests) {
       conversationEntity.updateGuests();
@@ -2184,7 +2181,7 @@ export class ConversationRepository {
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
 
-    const data = await this.conversation_service.getConversationById(conversationEntity.id, conversationEntity.domain);
+    const data = await this.conversation_service.getConversationById(conversationEntity.id);
     const allMembers = [...data.members.others, data.members.self];
     const conversationRoles = allMembers.reduce((roles, member) => {
       roles[member.id] = member.conversation_role;
