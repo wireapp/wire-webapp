@@ -37,6 +37,9 @@ updates:
       - dependency-name: 'tsyringe'
         versions:
           - '> 4.3.0'
+      - dependency-name: '@wireapp/avs'
+        versions:
+          - '> 7.1.6'
   - package-ecosystem: npm
     directory: '/server'
     schedule:
