@@ -248,7 +248,7 @@ export class ConversationAPI {
     };
 
     const {data} = await this.client.sendJSON<Conversations>(config);
-    return data.conversations.filter(conversation => conversation.qualified_id.domain !== ownDomain);
+    return data.conversations.filter(conversation => conversation.qualified_id?.domain !== ownDomain);
   }
 
   /**
