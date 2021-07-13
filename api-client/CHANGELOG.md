@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.30.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.29.0...@wireapp/api-client@12.30.0) (2021-07-13)
+
+
+### Features
+
+* **api-client:** Get remote conversations ([2f92337](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/2f92337b1f67014aa7772d66a8d6cd9f16115e4c))
+* **api-client:** Get remote conversations ([0e9f3ae](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/0e9f3ae20f4441d35f990d2059a4c89ac410ca7a))
+* **api-client:** Get remote conversations ([#4050](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4050)) ([e7b7da8](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/e7b7da8c0ea4ede16c7a4021c2078316b0059200))
+
+
+
+
+
 # [12.29.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.28.0...@wireapp/api-client@12.29.0) (2021-07-12)
 
 
