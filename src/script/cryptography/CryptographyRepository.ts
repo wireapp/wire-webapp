@@ -42,7 +42,6 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
-import {Account} from '@wireapp/core';
 
 export interface SignalingKeys {
   enckey: string;
@@ -91,20 +90,6 @@ export class CryptographyRepository {
     this.cryptobox = undefined;
   }
 
-  async sendFederatedMessage(text: string = 'Hello, World!', conversationId: string, domain?: string): Promise<void> {
-    const crudEngine = this.storageRepository.storageService.engine;
-    const storeEngineProvider = () => Promise.resolve(crudEngine);
-    const apiClient = this.cryptographyService.apiClient;
-
-    const account = new Account(apiClient, storeEngineProvider);
-    await account.initServices(crudEngine);
-
-    const textPayload = account.service!.conversation.messageBuilder.createText({conversationId, text}).build();
-    await account.service!.conversation.send({
-      payloadBundle: textPayload,
-    });
-  }
-
   /**
    * Initializes the repository by creating a new Cryptobox.
    * @returns Resolves with an array of PreKeys
@@ -151,7 +136,7 @@ export class CryptographyRepository {
    * @returns Fingerprint of local identity public key
    */
   getLocalFingerprint() {
-    return this.formatFingerprint(this.cryptobox.getIdentity().public_key.fingerprint());
+    return this.formatFingerprint(this.cryptobox.identity.public_key.fingerprint());
   }
 
   /**
@@ -505,15 +490,11 @@ export class CryptographyRepository {
       : CryptographyRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
 
     const {data: eventData, from: remoteUserId, time: formattedTime} = event;
-    // TODO Federation fix: Skip decryption errors
-    const isFederationError =
-      Config.getConfig().FEATURE.ENABLE_FEDERATION === true &&
-      (event as any).qualified_conversation &&
-      (event as any).qualified_conversation.domain !== Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+
     const isDuplicateMessage = error instanceof ProteusErrors.DecryptError.DuplicateMessage;
     const isOutdatedMessage = error instanceof ProteusErrors.DecryptError.OutdatedMessage;
     // We don't need to show these message errors to the user
-    if (isDuplicateMessage || isOutdatedMessage || isFederationError) {
+    if (isDuplicateMessage || isOutdatedMessage) {
       const message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is outdated or a duplicate.`;
       throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }

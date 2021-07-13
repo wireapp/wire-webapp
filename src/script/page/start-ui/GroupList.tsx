@@ -27,7 +27,7 @@ import GroupListItem from './groupList/GroupListItem';
 
 export interface GroupListProps {
   assetRepository?: AssetRepository;
-  click: (conversation: Conversation) => void;
+  click: (group: Conversation) => void;
   groups: Conversation[];
   router?: Router;
 }
@@ -40,14 +40,8 @@ const GroupList: React.FC<GroupListProps> = ({
 }) => {
   return (
     <div className="search-list search-list-lg">
-      {groups.map(conversation => (
-        <GroupListItem
-          assetRepository={assetRepository}
-          click={click}
-          group={conversation}
-          key={`${conversation.id}@${conversation.domain}`}
-          router={router}
-        />
+      {groups.map(group => (
+        <GroupListItem assetRepository={assetRepository} click={click} group={group} key={group.id} router={router} />
       ))}
     </div>
   );

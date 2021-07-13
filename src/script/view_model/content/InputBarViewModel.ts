@@ -329,7 +329,7 @@ export class InputBarViewModel {
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
 
-    this.disableControls = ko.pureComputed(() => this.conversationEntity()?.isFederated());
+    this.disableControls = ko.pureComputed(() => this.conversationEntity().isFederated());
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {
