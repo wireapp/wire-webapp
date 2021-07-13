@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
-import {FeatureList} from '@wireapp/api-client/src/team/feature/';
+import {FeatureList, FeatureStatus} from '@wireapp/api-client/src/team/feature/';
 
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -36,6 +36,8 @@ export class TeamState {
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList>;
+  public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
+  public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnforced: ko.PureComputed<boolean>;
   public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
@@ -72,20 +74,17 @@ export class TeamState {
     this.userState.teamMembers = this.teamMembers;
     this.userState.teamUsers = this.teamUsers;
 
-    this.isAppLockEnabled = ko.pureComputed(() => {
-      const appLock = this.teamFeatures()?.['appLock'];
-      return appLock?.status === 'enabled';
-    });
-
-    this.isAppLockEnforced = ko.pureComputed(() => {
-      const appLock = this.teamFeatures()?.['appLock'];
-      return appLock?.config?.enforceAppLock;
-    });
-
-    this.appLockInactivityTimeoutSecs = ko.pureComputed(() => {
-      const appLock = this.teamFeatures()?.['appLock'];
-      return appLock?.config?.inactivityTimeoutSecs;
-    });
+    this.isVideoCallingEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
+    );
+    this.isConferenceCallingEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
+    );
+    this.isAppLockEnabled = ko.pureComputed(() => this.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED);
+    this.isAppLockEnforced = ko.pureComputed(() => this.teamFeatures()?.appLock?.config?.enforceAppLock);
+    this.appLockInactivityTimeoutSecs = ko.pureComputed(
+      () => this.teamFeatures()?.appLock?.config?.inactivityTimeoutSecs,
+    );
   }
 
   readonly isExternal = (userId: string): boolean => {
