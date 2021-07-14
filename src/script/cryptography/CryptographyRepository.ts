@@ -22,7 +22,7 @@ import type {AxiosError} from 'axios';
 import {amplify} from 'amplify';
 import {error as StoreEngineError} from '@wireapp/store-engine';
 import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
-import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
+import type {UserClients, NewOTRMessage, QualifiedUserClients} from '@wireapp/api-client/src/conversation/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -94,7 +94,7 @@ export class CryptographyRepository {
   async sendCoreMessage(
     text: string = 'Hello, World!',
     conversationId: string,
-    userIds: string[],
+    userIds: string[] | QualifiedUserClients,
     conversationDomain?: string,
   ): Promise<void> {
     const crudEngine = this.storageRepository.storageService.engine;
