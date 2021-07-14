@@ -24,6 +24,7 @@ import {
   DefaultConversationRoleName,
   MutedStatus,
   NewConversation,
+  UserClients,
   QualifiedUserClients,
 } from '@wireapp/api-client/src/conversation/';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data/';
@@ -88,10 +89,6 @@ import type {
   TextMessage,
 } from './message/OtrMessage';
 
-/** A map of the format `{ UserId: [clientId, ...] }` */
-export type UserClientsMap = {[userId: string]: string[]};
-export type QualifiedUserClientsMap = {[domain: string]: UserClientsMap};
-
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
   public readonly messageBuilder: MessageBuilder;
@@ -123,7 +120,7 @@ export class ConversationService {
 
   private async getPreKeyBundle(
     conversationId: string,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     conversationDomain?: string,
   ): Promise<QualifiedUserPreKeyBundleMap> {
     const conversation = await this.apiClient.conversation.api.getConversation(conversationId, conversationDomain);
@@ -245,7 +242,7 @@ export class ConversationService {
     sendingClientId: string,
     conversationId: string,
     genericMessage: GenericMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClientsMap,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<void> {
@@ -283,7 +280,7 @@ export class ConversationService {
 
   private async sendButtonAction(
     payloadBundle: ButtonActionMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ButtonActionMessage> {
@@ -310,7 +307,7 @@ export class ConversationService {
 
   private async sendButtonActionConfirmation(
     payloadBundle: ButtonActionConfirmationMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ButtonActionConfirmationMessage> {
@@ -337,7 +334,7 @@ export class ConversationService {
 
   private async sendComposite(
     payloadBundle: CompositeMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<CompositeMessage> {
@@ -364,7 +361,7 @@ export class ConversationService {
 
   private async sendConfirmation(
     payloadBundle: ConfirmationMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ConfirmationMessage> {
@@ -393,7 +390,7 @@ export class ConversationService {
 
   private async sendEditedText(
     payloadBundle: EditedTextMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<EditedTextMessage> {
@@ -425,7 +422,7 @@ export class ConversationService {
 
   private async sendFileData(
     payloadBundle: FileAssetMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<FileAssetMessage> {
@@ -478,7 +475,7 @@ export class ConversationService {
 
   private async sendFileMetaData(
     payloadBundle: FileAssetMetaDataMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<FileAssetMetaDataMessage> {
@@ -530,7 +527,7 @@ export class ConversationService {
 
   private async sendFileAbort(
     payloadBundle: FileAssetAbortMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<FileAssetAbortMessage> {
@@ -576,7 +573,7 @@ export class ConversationService {
 
   private async sendImage(
     payloadBundle: ImageAssetMessageOutgoing,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ImageAssetMessage> {
@@ -643,7 +640,7 @@ export class ConversationService {
 
   private async sendLocation(
     payloadBundle: LocationMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<LocationMessage> {
@@ -686,7 +683,7 @@ export class ConversationService {
 
   private async sendKnock(
     payloadBundle: PingMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<PingMessage> {
@@ -721,7 +718,7 @@ export class ConversationService {
 
   private async sendReaction(
     payloadBundle: ReactionMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ReactionMessage> {
@@ -756,7 +753,7 @@ export class ConversationService {
 
   private async sendSessionReset(
     payloadBundle: ResetSessionMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ResetSessionMessage> {
@@ -783,7 +780,7 @@ export class ConversationService {
 
   private async sendCall(
     payloadBundle: CallMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<CallMessage> {
@@ -814,7 +811,7 @@ export class ConversationService {
 
   private async sendText(
     payloadBundle: TextMessage,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<TextMessage> {
@@ -936,7 +933,7 @@ export class ConversationService {
   public async deleteMessageEveryone(
     conversationId: string,
     messageIdToDelete: string,
-    userIds?: string[] | UserClientsMap | QualifiedUserClients,
+    userIds?: string[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<DeleteMessage> {
@@ -1072,7 +1069,7 @@ export class ConversationService {
     conversationDomain,
   }: {
     payloadBundle: OtrMessage;
-    userIds?: string[] | UserClientsMap | QualifiedUserClients;
+    userIds?: string[] | UserClients | QualifiedUserClients;
     sendAsProtobuf?: boolean;
     conversationDomain?: string;
   }) {
