@@ -49,7 +49,7 @@ export class SelfService {
   }
 
   putSelfEmail(email: string): Promise<void> {
-    return this.apiClient.self.api.putEmail({email});
+    return this.apiClient.auth.api.putEmail({email});
   }
 
   putSelfHandle(handle: string): Promise<void> {
