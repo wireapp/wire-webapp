@@ -17,12 +17,12 @@
  *
  */
 
-import type {Conversation} from '@wireapp/api-client/src/conversation';
+import type {Conversation, UserClients} from '@wireapp/api-client/src/conversation';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data';
 import type {ConversationEvent, TeamEvent, UserEvent} from '@wireapp/api-client/src/event';
 import type {User} from '@wireapp/api-client/src/user/';
 import type {Account} from '@wireapp/core';
-import type {PayloadBundle, ReactionType, UserClientsMap} from '@wireapp/core/src/main/conversation/';
+import type {PayloadBundle, ReactionType} from '@wireapp/core/src/main/conversation/';
 import type {
   ButtonActionConfirmationContent,
   CallingContent,
@@ -121,7 +121,7 @@ export abstract class MessageHandler {
   /**
    * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
    */
-  async sendCall(conversationId: string, content: CallingContent, userIds?: string[] | UserClientsMap): Promise<void> {
+  async sendCall(conversationId: string, content: CallingContent, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
       const callPayload = this.account.service.conversation.messageBuilder.createCall({conversationId, content});
       await this.account.service.conversation.send({payloadBundle: callPayload, userIds});
@@ -135,7 +135,7 @@ export abstract class MessageHandler {
     conversationId: string,
     text: string,
     buttons: string[],
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
       const message = this.account.service.conversation.messageBuilder
@@ -152,7 +152,7 @@ export abstract class MessageHandler {
   async sendConfirmation(
     conversationId: string,
     firstMessageId: string,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
       const confirmationPayload = this.account.service.conversation.messageBuilder.createConfirmation({
@@ -189,7 +189,7 @@ export abstract class MessageHandler {
     newMessageText: string,
     newMentions?: MentionContent[],
     newLinkPreview?: LinkPreviewContent,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
       const editedPayload = this.account.service.conversation.messageBuilder
@@ -214,7 +214,7 @@ export abstract class MessageHandler {
     }
   }
 
-  async sendFileByPath(conversationId: string, filePath: string, userIds?: string[] | UserClientsMap): Promise<void> {
+  async sendFileByPath(conversationId: string, filePath: string, userIds?: string[] | UserClients): Promise<void> {
     const data = await promisify(fs.readFile)(filePath);
     const fileType = await FileType.fromBuffer(data);
     const metadata: FileMetaDataContent = {
@@ -239,7 +239,7 @@ export abstract class MessageHandler {
     conversationId: string,
     file: FileContent,
     metadata: FileMetaDataContent,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
       const metadataPayload = this.account.service.conversation.messageBuilder.createFileMetadata({
@@ -269,7 +269,7 @@ export abstract class MessageHandler {
   /**
    * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
    */
-  async sendImage(conversationId: string, image: ImageContent, userIds?: string[] | UserClientsMap): Promise<void> {
+  async sendImage(conversationId: string, image: ImageContent, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
       const imagePayload = await this.account.service.conversation.messageBuilder.createImage({conversationId, image});
       await this.account.service.conversation.send({payloadBundle: imagePayload, userIds});
@@ -282,7 +282,7 @@ export abstract class MessageHandler {
   async sendLocation(
     conversationId: string,
     location: LocationContent,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
       const locationPayload = this.account.service.conversation.messageBuilder.createLocation({
@@ -296,7 +296,7 @@ export abstract class MessageHandler {
   /**
    * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
    */
-  async sendPing(conversationId: string, userIds?: string[] | UserClientsMap): Promise<void> {
+  async sendPing(conversationId: string, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
       const pingPayload = this.account.service.conversation.messageBuilder.createPing({conversationId});
       await this.account.service.conversation.send({payloadBundle: pingPayload, userIds});
@@ -310,7 +310,7 @@ export abstract class MessageHandler {
     conversationId: string,
     originalMessageId: string,
     type: ReactionType,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
       const reactionPayload = this.account.service.conversation.messageBuilder.createReaction({
@@ -328,7 +328,7 @@ export abstract class MessageHandler {
     conversationId: string,
     quotedMessage: QuotableMessage,
     text: string,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
       const replyPayload = this.account.service.conversation.messageBuilder
@@ -346,7 +346,7 @@ export abstract class MessageHandler {
     conversationId: string,
     quotedMessage: QuotableMessage,
     text: string,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClients,
   ): Promise<void> {
     return this.sendQuote(conversationId, quotedMessage, text, userIds);
   }
@@ -359,7 +359,7 @@ export abstract class MessageHandler {
     text: string,
     mentions?: MentionContent[],
     linkPreview?: LinkPreviewContent,
-    userIds?: string[] | UserClientsMap,
+    userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
       const payload = this.account.service.conversation.messageBuilder
