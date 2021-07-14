@@ -113,7 +113,7 @@ export class TitleBarViewModel {
       }
 
       const isSupportedConversation = this.conversationEntity().isGroup() || this.conversationEntity().is1to1();
-      const hasParticipants = !!this.conversationEntity().hasUsers();
+      const hasParticipants = !!this.conversationEntity().participating_user_ids().length;
       const isActiveConversation = hasParticipants && !this.conversationEntity().removed_from_conversation();
       return !this.hasCall() && isSupportedConversation && isActiveConversation;
     });
