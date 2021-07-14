@@ -35,11 +35,13 @@ export class AuthAPI {
   public static readonly URL = {
     ACCESS: '/access',
     COOKIES: '/cookies',
+    EMAIL: 'email',
     INITIATE_BIND: '/sso-initiate-bind',
     INITIATE_LOGIN: 'initiate-login',
     LOGIN: '/login',
     LOGOUT: 'logout',
     REGISTER: '/register',
+    SELF: 'self',
     SEND: 'send',
     SSO: '/sso',
   };
@@ -149,6 +151,17 @@ export class AuthAPI {
 
     const response = await this.client.sendJSON<User>(config);
     return retrieveCookie(response);
+  }
+
+  public async putEmail(emailData: {email: string}): Promise<void> {
+    const config: AxiosRequestConfig = {
+      data: emailData,
+      method: 'put',
+      url: `${AuthAPI.URL.ACCESS}/${AuthAPI.URL.SELF}/${AuthAPI.URL.EMAIL}`,
+      withCredentials: true,
+    };
+
+    await this.client.sendJSON(config);
   }
 
   public async headInitiateLogin(ssoCode: string): Promise<void> {
