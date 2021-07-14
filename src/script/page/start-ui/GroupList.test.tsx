@@ -38,7 +38,7 @@ describe('GroupList', () => {
   const createGroupConversation = (name: string, id = createRandomUuid()) => {
     const conversation = new Conversation(id);
     const userIds = [createRandomUuid(), createRandomUuid()];
-    const users = userIds.map(id => new User(id, null));
+    const users = userIds.map(id => new User(id));
     conversation.participating_user_ids.push(...userIds);
     conversation.participating_user_ets.push(...users);
     return conversation;

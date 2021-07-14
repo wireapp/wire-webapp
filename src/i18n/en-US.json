@@ -1028,7 +1028,6 @@
   "userProfileButtonIgnore": "Ignore",
   "userProfileButtonUnblock": "Unblock",
   "userProfileEmail": "Email",
-  "userProfileDomain": "Domain",
   "userRemainingTimeHours": "{{time}}h left",
   "userRemainingTimeMinutes": "Less than {{time}}m left",
   "verify.changeEmail": "Change email",

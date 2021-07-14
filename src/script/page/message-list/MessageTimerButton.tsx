@@ -36,9 +36,7 @@ export interface MessageTimerButtonProps {
 export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversation}) => {
   const messageTimer = useKoSubscribable(conversation.messageTimer);
   const hasMessageTimer = !!messageTimer;
-  const isFederated = useKoSubscribable(conversation.isFederated);
-  const hasGlobalMessageTimer = useKoSubscribable(conversation.hasGlobalMessageTimer);
-  const isTimerDisabled = hasGlobalMessageTimer || isFederated;
+  const isTimerDisabled = useKoSubscribable(conversation.hasGlobalMessageTimer);
   const duration = hasMessageTimer ? formatDuration(messageTimer) : ({} as DurationUnit);
 
   // Click on ephemeral button
@@ -89,7 +87,7 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversat
           </div>
         )
       ) : (
-        <div className={cx('button-icon-large', {disabled: isTimerDisabled})}>
+        <div className="button-icon-large">
           <Icon.Timer data-uie-name="message-timer-icon" />
         </div>
       )}

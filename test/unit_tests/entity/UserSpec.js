@@ -24,35 +24,35 @@ import {ClientEntity} from 'src/script/client/ClientEntity';
 describe('User', () => {
   describe('Initials', () => {
     it('returns correct initials for user with first name and last name', () => {
-      const user_et = new User(undefined, null);
+      const user_et = new User();
       user_et.name('John Doe');
 
       expect(user_et.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with just a first name', () => {
-      const user_et = new User(undefined, null);
+      const user_et = new User();
       user_et.name('John');
 
       expect(user_et.initials()).toBe('JO');
     });
 
     it('returns correct initials for user with middle name', () => {
-      const user_et = new User(undefined, null);
+      const user_et = new User();
       user_et.name('John Peter Doe');
 
       expect(user_et.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with one character as name', () => {
-      const user_et = new User(undefined, null);
+      const user_et = new User();
       user_et.name('J');
 
       expect(user_et.initials()).toBe('J');
     });
 
     it('returns correct initials for user with an emoji as name', () => {
-      const user_et = new User(undefined, null);
+      const user_et = new User();
       user_et.name('🐒');
 
       expect(user_et.initials()).toBe('🐒');
@@ -67,7 +67,7 @@ describe('User', () => {
       const second_client = new ClientEntity();
       second_client.id = '575b7a890cdb7635';
 
-      const user_et = new User(undefined, null);
+      const user_et = new User();
       user_et.addClient(first_client);
       user_et.addClient(second_client);
       user_et.addClient(second_client);
@@ -78,7 +78,7 @@ describe('User', () => {
 
   describe('accent_color', () => {
     it('can change the accent color', () => {
-      const userEntity = new User(undefined, null);
+      const userEntity = new User();
       userEntity.accent_id(ACCENT_ID.BLUE);
 
       expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[ACCENT_ID.BLUE]);
