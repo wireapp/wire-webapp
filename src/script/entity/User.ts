@@ -113,7 +113,7 @@ export class User {
     };
   }
 
-  constructor(id: string = '', domain: string | null) {
+  constructor(id: string = '') {
     this.id = id;
     this.isMe = false;
     this.isService = false;
@@ -121,7 +121,6 @@ export class User {
     this.isDeleted = false;
     this.providerId = undefined;
     this.serviceId = undefined;
-    this.domain = domain;
     this.providerName = ko.observable(undefined);
 
     this.joaatHash = -1;
@@ -211,7 +210,7 @@ export class User {
   }
 
   /**
-   * Returns the fully qualified user handle.
+   * Returns the fully qualified user ID.
    * @example "@handle@wire.com"
    */
   get handle(): string {

@@ -58,7 +58,7 @@ describe('InputBarViewModel', () => {
       const mentionCandidate = viewModel.getMentionCandidate(selectionStart, selectionEnd, inputValue);
       viewModel.editedMention(mentionCandidate);
 
-      const userEntity = new User(createRandomUuid(), null);
+      const userEntity = new User(createRandomUuid());
       userEntity.name(userName);
 
       const mentionEntity = viewModel._createMentionEntity(userEntity);

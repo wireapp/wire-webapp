@@ -90,7 +90,7 @@ describe('WindowTitleViewModel', () => {
       conversationEntity.addMessage(message);
       conversationEntity.name('Birthday Bash');
       conversationEntity.type(CONVERSATION_TYPE.REGULAR);
-      conversationEntity.selfUser(new User(createRandomUuid(), null));
+      conversationEntity.selfUser(new User(createRandomUuid()));
 
       title_view_model.conversationState.conversations_unarchived.push(conversationEntity);
       title_view_model.conversationState.activeConversation(conversationEntity);
@@ -102,7 +102,7 @@ describe('WindowTitleViewModel', () => {
     });
 
     it('does not change the title if muted conversations receive messages', () => {
-      const selfUserEntity = new User(createRandomUuid(), null);
+      const selfUserEntity = new User(createRandomUuid());
       selfUserEntity.inTeam(true);
 
       const selected_conversation = new Conversation(createRandomUuid());
@@ -217,9 +217,9 @@ describe('WindowTitleViewModel', () => {
       title_view_model.contentState(ContentViewModel.STATE.CONNECTION_REQUESTS);
       title_view_model.userState.connectRequests = ko.observableArray([]);
 
-      const firstConnectedUser = new User(createRandomUuid(), null);
-      const secondConnectedUser = new User(createRandomUuid(), null);
-      const thirdConnectedUser = new User(createRandomUuid(), null);
+      const firstConnectedUser = new User(createRandomUuid());
+      const secondConnectedUser = new User(createRandomUuid());
+      const thirdConnectedUser = new User(createRandomUuid());
 
       const tests = [
         {
@@ -255,7 +255,7 @@ describe('WindowTitleViewModel', () => {
       conversationEntity.addMessage(contentMessage);
       conversationEntity.name('Birthday Bash');
       conversationEntity.type(CONVERSATION_TYPE.REGULAR);
-      conversationEntity.selfUser(new User(createRandomUuid(), null));
+      conversationEntity.selfUser(new User(createRandomUuid()));
 
       amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, badgeCount => {
         expect(badgeCount).toBe(1);
