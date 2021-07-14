@@ -25,6 +25,8 @@ import type {
   FeatureConferenceCalling,
   FeatureVideoCalling,
   FeatureFileSharing,
+  FeatureVideoMessage,
+  FeatureAudioMessage,
 } from './Feature';
 
 export enum FEATURE_KEY {
@@ -32,6 +34,8 @@ export enum FEATURE_KEY {
   DIGITAL_SIGNATURES = 'digitalSignatures',
   CONFERENCE_CALLING = 'conferenceCalling',
   VIDEO_CALLING = 'videoCalling',
+  VIDEO_MESSAGE = 'videoMessage',
+  AUDIO_MESSAGE = 'audioMessage',
   FILE_SHARING = 'fileSharing',
   LEGALHOLD = 'legalhold',
   SEARCH_VISIBILITY = 'searchVisibility',
@@ -44,6 +48,8 @@ export type FeatureList = {
   [FEATURE_KEY.DIGITAL_SIGNATURES]?: FeatureDigitalSignature;
   [FEATURE_KEY.CONFERENCE_CALLING]?: FeatureConferenceCalling;
   [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
+  [FEATURE_KEY.VIDEO_MESSAGE]?: FeatureVideoMessage;
+  [FEATURE_KEY.AUDIO_MESSAGE]?: FeatureAudioMessage;
   [FEATURE_KEY.FILE_SHARING]?: FeatureFileSharing;
   [FEATURE_KEY.LEGALHOLD]?: FeatureLegalhold;
   [FEATURE_KEY.SEARCH_VISIBILITY]?: FeatureWithoutConfig;

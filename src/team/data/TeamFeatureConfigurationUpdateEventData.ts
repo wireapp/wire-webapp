@@ -26,6 +26,8 @@ import {
   FeatureWithoutConfig,
   FEATURE_KEY,
   FeatureFileSharing,
+  FeatureVideoMessage,
+  FeatureAudioMessage,
 } from '../feature';
 
 export type TeamFeatureConfigurationUpdateEventData =
@@ -33,6 +35,8 @@ export type TeamFeatureConfigurationUpdateEventData =
   | (FeatureDigitalSignature & {name: FEATURE_KEY.DIGITAL_SIGNATURES})
   | (FeatureConferenceCalling & {name: FEATURE_KEY.CONFERENCE_CALLING})
   | (FeatureVideoCalling & {name: FEATURE_KEY.VIDEO_CALLING})
+  | (FeatureVideoMessage & {name: FEATURE_KEY.VIDEO_MESSAGE})
+  | (FeatureAudioMessage & {name: FEATURE_KEY.AUDIO_MESSAGE})
   | (FeatureFileSharing & {name: FEATURE_KEY.FILE_SHARING})
   | (FeatureLegalhold & {name: FEATURE_KEY.LEGALHOLD})
   | (FeatureWithoutConfig & {name: FEATURE_KEY.SEARCH_VISIBILITY | FEATURE_KEY.SSO | FEATURE_KEY.VALIDATE_SAML_EMAILS});
