@@ -19,7 +19,6 @@
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
@@ -78,18 +77,13 @@ export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType};
 export type DegradedMessageEvent = ConversationEvent<{type: VerificationMessageType; userIds: string[]}>;
 export type DeleteEvent = ConversationEvent<{deleted_time: number}>;
-export type GroupCreationEvent = ConversationEvent<{
-  allTeamMembers: boolean;
-  name: string;
-  qualifiedUserIds: QualifiedId[];
-  userIds: string[];
-}>;
+export type GroupCreationEvent = ConversationEvent<{allTeamMembers: boolean; name: string; userIds: string[]}>;
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}>;
 export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {status: StatusType};
 export type MissedEvent = BaseEvent & {id: string; type: string};
-export type OneToOneCreationEvent = ConversationEvent<{qualifiedUserIds: QualifiedId[]; userIds: string[]}>;
+export type OneToOneCreationEvent = ConversationEvent<{userIds: string[]}>;
 export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}>;
 export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; reason: AVS_REASON}> & {
   protocol_version: number;
@@ -105,7 +99,6 @@ export const EventBuilder = {
     return {
       conversation: id,
       data: {
-        qualifiedUserIds: conversationEntity.participatingQualifiedUserIds(),
         userIds: conversationEntity.participating_user_ids(),
       },
       from: creatorId,
@@ -234,7 +227,6 @@ export const EventBuilder = {
     const isoDate = new Date(timestamp || 0).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
-    const qualifiedUserIds = conversationEntity.participatingQualifiedUserIds().slice();
     const createdBySelf = creatorId === selfUserId || isTemporaryGuest;
     if (!createdBySelf) {
       userIds.push(selfUserId);
@@ -245,7 +237,6 @@ export const EventBuilder = {
       data: {
         allTeamMembers: conversationEntity.withAllTeamMembers(),
         name: conversationEntity.name(),
-        qualifiedUserIds,
         userIds,
       },
       from: isTemporaryGuest ? selfUserId : creatorId,

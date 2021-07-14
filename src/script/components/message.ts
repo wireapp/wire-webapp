@@ -203,15 +203,7 @@ class Message {
       const entries: ContextMenuEntry[] = [];
 
       const canDelete =
-        messageEntity.user().isMe &&
-        !this.conversation().removed_from_conversation() &&
-        messageEntity.isDeletable() &&
-        !this.conversation().isFederated();
-
-      const canEdit =
-        messageEntity.isEditable() &&
-        !this.conversation().removed_from_conversation() &&
-        !this.conversation().isFederated();
+        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
 
       const hasDetails =
         !this.conversation().is1to1() &&
@@ -234,7 +226,7 @@ class Message {
         });
       }
 
-      if (canEdit) {
+      if (messageEntity.isEditable() && !this.conversation().removed_from_conversation()) {
         entries.push({
           click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
           label: t('conversationContextMenuEdit'),

@@ -169,7 +169,7 @@ describe('MessageRepository', () => {
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
-        conversation.selfUser(new User(createRandomUuid(), null));
+        conversation.selfUser(new User(createRandomUuid()));
         const messageText = 'hello there';
         return testFactory.message_repository.sendTextWithLinkPreview(conversation, messageText, []);
       });
@@ -239,7 +239,7 @@ describe('MessageRepository', () => {
     });
 
     it('should not delete other users messages', async () => {
-      const user_et = new User(undefined, null);
+      const user_et = new User();
       user_et.isMe = false;
       const message_to_delete_et = new Message(createRandomUuid());
       message_to_delete_et.user(user_et);
@@ -254,7 +254,7 @@ describe('MessageRepository', () => {
 
     it('should send delete and deletes message for own messages', () => {
       spyOn(testFactory.event_service, 'deleteEvent');
-      const userEntity = new User(undefined, null);
+      const userEntity = new User();
       userEntity.isMe = true;
       const messageEntityToDelete = new Message();
       messageEntityToDelete.id = createRandomUuid();

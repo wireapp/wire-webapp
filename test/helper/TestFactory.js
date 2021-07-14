@@ -152,7 +152,7 @@ export class TestFactory {
     clientEntity.class = ClientClassification.DESKTOP;
     clientEntity.id = '60aee26b7f55a99f';
 
-    const user = new User(entities.user.john_doe.id, null);
+    const user = new User(entities.user.john_doe.id);
     user.devices.push(clientEntity);
     user.email(entities.user.john_doe.email);
     user.isMe = true;
