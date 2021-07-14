@@ -247,6 +247,13 @@ export class MessageRepository {
     return undefined;
   }
 
+  async sendFederatedMessage(): Promise<void> {
+    const userIds = this.conversationState.activeConversation().allUserEntities.map(user => user.id);
+    const conversationId = this.conversationState.activeConversation().id;
+
+    await this.cryptography_repository.sendCoreMessage('Hello from Core!', conversationId, userIds);
+  }
+
   /**
    * Send text message with link preview in specified conversation.
    *

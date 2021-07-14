@@ -91,17 +91,25 @@ export class CryptographyRepository {
     this.cryptobox = undefined;
   }
 
-  async sendFederatedMessage(text: string = 'Hello, World!', conversationId: string, domain?: string): Promise<void> {
+  async sendCoreMessage(
+    text: string = 'Hello, World!',
+    conversationId: string,
+    userIds: string[],
+    conversationDomain?: string,
+  ): Promise<void> {
     const crudEngine = this.storageRepository.storageService.engine;
     const storeEngineProvider = () => Promise.resolve(crudEngine);
     const apiClient = this.cryptographyService.apiClient;
 
     const account = new Account(apiClient, storeEngineProvider);
     await account.initServices(crudEngine);
+    await account.service.client['cryptographyService'].initCryptobox();
 
     const textPayload = account.service!.conversation.messageBuilder.createText({conversationId, text}).build();
     await account.service!.conversation.send({
+      conversationDomain,
       payloadBundle: textPayload,
+      userIds,
     });
   }
 
