@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.32.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.31.0...@wireapp/api-client@12.32.0) (2021-07-14)
+
+
+### Features
+
+* **api-client:** New endpoint for changing email address ([#4052](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4052)) ([61b9022](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/61b90220d7d4ab74cd78c9c816c711c446ec214d))
+
+
+
+
+
 # [12.31.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.30.0...@wireapp/api-client@12.31.0) (2021-07-13)
 
 
