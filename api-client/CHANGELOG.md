@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.33.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.32.0...@wireapp/api-client@12.33.0) (2021-07-14)
+
+
+### Features
+
+* **api-client:** AV message feature config endpoints ([#4054](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4054)) ([bdff279](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/bdff279a2c9acdd04f76ac336ac7d796e169cceb))
+
+
+
+
+
 # [12.32.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.31.0...@wireapp/api-client@12.32.0) (2021-07-14)
 
 
