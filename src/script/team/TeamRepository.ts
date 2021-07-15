@@ -62,6 +62,7 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 
+// TODO: Remove after core update
 type TemporaryFeatureList = FeatureList & {audioMessage?: FeatureWithoutConfig} & {videoMessage?: FeatureWithoutConfig};
 
 export interface AccountInfo {
@@ -408,7 +409,6 @@ export class TeamRepository {
 
     if (previousConfig) {
       this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
-      this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
     }
 
     this.saveFeatureConfig(featureConfigList);
@@ -464,23 +464,6 @@ export class TeamRepository {
           title: t('featureConfigChangeModalAudioVideoHeadline'),
         },
       });
-    }
-  };
-
-  private readonly handleConferenceCallingFeatureChange = (
-    previousConfig: TemporaryFeatureList,
-    newConfig: TemporaryFeatureList,
-  ) => {
-    if (previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
-      const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
-      if (hasChangedToEnabled) {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          text: {
-            message: /* TODO */ hasChangedToEnabled ? 'activated' : 'deactivated',
-            title: /* TODO */ 'Conference calling',
-          },
-        });
-      }
     }
   };
 
