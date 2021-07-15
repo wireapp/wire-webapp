@@ -23,7 +23,7 @@ import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/C
 import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
-import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
+import type {FeatureList, FeatureWithoutConfig} from '@wireapp/api-client/src/team/feature/';
 import {FeatureStatus} from '@wireapp/api-client/src/team/feature/';
 import type {
   TeamConversationDeleteEvent,
@@ -61,6 +61,8 @@ import {TeamState} from './TeamState';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+
+type TemporaryFeatureList = FeatureList & {audioMessage?: FeatureWithoutConfig} & {videoMessage?: FeatureWithoutConfig};
 
 export interface AccountInfo {
   accentID: number;
@@ -401,7 +403,7 @@ export class TeamRepository {
     }
   };
 
-  private readonly handleConfigUpdate = (featureConfigList: FeatureList) => {
+  private readonly handleConfigUpdate = (featureConfigList: TemporaryFeatureList) => {
     const previousConfig = this.loadPreviousFeatureConfig();
 
     if (previousConfig) {
@@ -412,7 +414,10 @@ export class TeamRepository {
     this.saveFeatureConfig(featureConfigList);
   };
 
-  private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+  private readonly handleAudioVideoFeatureChange = (
+    previousConfig: TemporaryFeatureList,
+    newConfig: TemporaryFeatureList,
+  ) => {
     const changeList = [];
 
     const hasVideoCallingChanged = previousConfig?.videoCalling?.status !== newConfig?.videoCalling?.status;
@@ -427,10 +432,31 @@ export class TeamRepository {
       );
     }
 
-    // TODO video message
-    // TODO audio message
+    const hasVideoMessageChanged = previousConfig?.videoMessage?.status !== newConfig?.videoMessage?.status;
+    if (hasVideoMessageChanged) {
+      const hasChangedToEnabled = newConfig?.videoMessage?.status === FeatureStatus.ENABLED;
+      changeList.push(
+        `<li>${
+          hasChangedToEnabled
+            ? t('featureConfigChangeModalAudioVideoDescriptionItemVideoMessageEnabled')
+            : t('featureConfigChangeModalAudioVideoDescriptionItemVideoMessageDisabled')
+        }</li>`,
+      );
+    }
 
-    if (hasVideoCallingChanged) {
+    const hasAudioMessageChanged = previousConfig?.audioMessage?.status !== newConfig?.audioMessage?.status;
+    if (hasAudioMessageChanged) {
+      const hasChangedToEnabled = newConfig?.audioMessage?.status === FeatureStatus.ENABLED;
+      changeList.push(
+        `<li>${
+          hasChangedToEnabled
+            ? t('featureConfigChangeModalAudioVideoDescriptionItemAudioMessageEnabled')
+            : t('featureConfigChangeModalAudioVideoDescriptionItemAudioMessageDisabled')
+        }</li>`,
+      );
+    }
+
+    if (hasVideoCallingChanged || hasVideoMessageChanged || hasAudioMessageChanged) {
       const message = `${t('featureConfigChangeModalAudioVideoDescription')} <ul>${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
@@ -441,7 +467,10 @@ export class TeamRepository {
     }
   };
 
-  private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+  private readonly handleConferenceCallingFeatureChange = (
+    previousConfig: TemporaryFeatureList,
+    newConfig: TemporaryFeatureList,
+  ) => {
     if (previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
       const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
       if (hasChangedToEnabled) {
@@ -455,10 +484,10 @@ export class TeamRepository {
     }
   };
 
-  private readonly loadPreviousFeatureConfig = (): FeatureList =>
+  private readonly loadPreviousFeatureConfig = (): TemporaryFeatureList =>
     JSON.parse(window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY));
 
-  private readonly saveFeatureConfig = (featureConfigList: FeatureList): void =>
+  private readonly saveFeatureConfig = (featureConfigList: TemporaryFeatureList): void =>
     window.localStorage.setItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY, JSON.stringify(featureConfigList));
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
