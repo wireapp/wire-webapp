@@ -388,6 +388,7 @@ export class TeamRepository {
 
     if (shouldFetchConfig && teamId) {
       const featureConfigList = await this.teamService.getAllTeamFeatures(teamId);
+      this.teamState.teamFeatures(featureConfigList);
       this.handleConfigUpdate(featureConfigList);
     }
   };
@@ -400,6 +401,7 @@ export class TeamRepository {
     const teamId = this.userState.self().teamId;
     if (teamId) {
       const featureConfigList = await this.teamService.getAllTeamFeatures(teamId);
+      this.teamState.teamFeatures(featureConfigList);
       this.handleConfigUpdate(featureConfigList);
     }
   };

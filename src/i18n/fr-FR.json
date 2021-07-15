@@ -507,6 +507,8 @@
   "legalHoldDescriptionOthers": "La conservation à des fins juridiques a été activée pour au moins un contact dans cette conversation.<br />Tous les messages vont être enregistrés pour un accès futur, y compris les messages supprimés, modifiés et éphémères.",
   "legalHoldDescriptionSelf": "La conservation à des fins juridiques a été activée pour votre compte.<br />Tous vos messages seront enregistrés pour un accès futur, y compris les messages supprimés, modifiés et éphémères.<br />Vos contacts seront informés de l’enregistrement.",
   "legalHoldHeadline": "Conservation à des fins juridiques",
+  "legalHoldMessageSendingMissingConsentMessage": "You cannot send this message because you have at least one outdated device that does not support legal hold. Please update all your devices or remove them from the app settings. [link]Learn more[/link]",
+  "legalHoldMessageSendingMissingConsentTitle": "Message cannot be sent",
   "legalHoldModalPrimaryAction": "Accepter",
   "legalHoldModalSecondaryAction": "Pas maintenant",
   "legalHoldModalText": "Tous les futurs messages seront enregistrés par l’appareil avec l'empreinte numérique suivante: [br][fingerprint][br]Ceci inclut les messages supprimés, modifiés et éphémères dans toutes les conversations.",

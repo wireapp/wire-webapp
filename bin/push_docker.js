@@ -21,24 +21,16 @@
 
 const child = require('child_process');
 const appConfigPkg = require('../app-config/package.json');
-const {execSync} = require('child_process');
 
 require('dotenv').config();
 
-let currentBranch = '';
-
-try {
-  currentBranch = execSync('git rev-parse HEAD').toString().trim();
-} catch (error) {}
-
 const distributionParam = process.argv[2] || '';
 const stageParam = process.argv[3] || '';
-const releaseParam = process.argv[4] || '';
+const versionParam = process.argv[4] || '';
 const commitSha = process.env.GITHUB_SHA || 'COMMIT_ID';
-const commitShaLength = 7;
-const commitShortSha = commitSha.substring(0, commitShaLength - 1);
+const commitShortSha = commitSha.substring(0, 7);
 const configurationEntry = `wire-web-config-default-${
-  distributionParam ? distributionParam : currentBranch === 'master' ? 'master' : 'staging'
+  distributionParam || stageParam === 'production' ? 'master' : 'staging'
 }`;
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
@@ -48,8 +40,8 @@ const tags = [];
 if (stageParam) {
   tags.push(`${repository}:${stageParam}`);
 }
-if (releaseParam) {
-  tags.push(`${repository}:${releaseParam}-${configVersion}-${commitShortSha}`);
+if (stageParam === 'production') {
+  tags.push(`${repository}:${versionParam}-${configVersion}-${commitShortSha}`);
 }
 
 const dockerCommands = [

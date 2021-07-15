@@ -507,6 +507,8 @@
   "legalHoldDescriptionOthers": "Legal Hold has been activated for at least one person in this conversation.<br />All messages will be preserved for future access, including deleted, edited, and timed messages.",
   "legalHoldDescriptionSelf": "Legal Hold has been activated for your account.<br />All messages will be preserved for future access, including deleted, edited, and timed messages.<br />Your conversation partners will be aware of the recording.",
   "legalHoldHeadline": "Legal Hold",
+  "legalHoldMessageSendingMissingConsentMessage": "You cannot send this message because you have at least one outdated device that does not support legal hold. Please update all your devices or remove them from the app settings. [link]Learn more[/link]",
+  "legalHoldMessageSendingMissingConsentTitle": "Message cannot be sent",
   "legalHoldModalPrimaryAction": "Accept",
   "legalHoldModalSecondaryAction": "Ne dabar",
   "legalHoldModalText": "All future messages will be recorded by the device with fingerprint:[br][fingerprint][br]This includes deleted, edited, and timed messages in all conversations.",
