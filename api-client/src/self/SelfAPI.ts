@@ -137,6 +137,21 @@ export class SelfAPI {
   }
 
   /**
+   * Change your email address.
+   * @param emailData The new email address
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changeEmail
+   */
+  public async putEmail(emailData: {email: string}): Promise<void> {
+    const config: AxiosRequestConfig = {
+      data: emailData,
+      method: 'put',
+      url: `${SelfAPI.URL.SELF}/${SelfAPI.URL.EMAIL}`,
+    };
+
+    await this.client.sendJSON(config);
+  }
+
+  /**
    * Change your handle.
    * @param handleData The new handle
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/changeHandle
