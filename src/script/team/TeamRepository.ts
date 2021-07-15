@@ -405,24 +405,39 @@ export class TeamRepository {
     const previousConfig = this.loadPreviousFeatureConfig();
 
     if (previousConfig) {
-      this.handleVideoCallingFeatureChange(previousConfig, featureConfigList);
+      this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
     }
 
     this.saveFeatureConfig(featureConfigList);
   };
 
-  private readonly handleVideoCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    if (previousConfig?.videoCalling?.status !== newConfig?.videoCalling?.status) {
+  private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    const changeList = [];
+
+    const hasVideoCallingChanged = previousConfig?.videoCalling?.status !== newConfig?.videoCalling?.status;
+    if (hasVideoCallingChanged) {
       const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
-      if (hasChangedToEnabled) {
-        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-          text: {
-            message: /* TODO */ hasChangedToEnabled ? 'activated' : 'deactivated',
-            title: /* TODO */ 'Camera use',
-          },
-        });
-      }
+      changeList.push(
+        `<li>${
+          hasChangedToEnabled
+            ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
+            : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled')
+        }</li>`,
+      );
+    }
+
+    // TODO video message
+    // TODO audio message
+
+    if (hasVideoCallingChanged) {
+      const message = `${t('featureConfigChangeModalAudioVideoDescription')} <ul>${changeList}</ul>`;
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: message,
+          title: t('featureConfigChangeModalAudioVideoHeadline'),
+        },
+      });
     }
   };
 

@@ -1067,5 +1067,9 @@
   "wireWindows": "{{brandName}} for Windows",
   "wire_for_web": "{{brandName}} for Web",
   "legalHoldMessageSendingMissingConsentTitle": "Message cannot be sent",
-  "legalHoldMessageSendingMissingConsentMessage": "You cannot send this message because you have at least one outdated device that does not support legal hold. Please update all your devices or remove them from the app settings. [link]Learn more[/link]"
+  "legalHoldMessageSendingMissingConsentMessage": "You cannot send this message because you have at least one outdated device that does not support legal hold. Please update all your devices or remove them from the app settings. [link]Learn more[/link]",
+  "featureConfigChangeModalAudioVideoHeadline": "Audio/Video restrictions",
+  "featureConfigChangeModalAudioVideoDescription": "The team admin changed the following features:",
+  "featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled": "Camera in calls is enabled",
+  "featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled": "Camera in calls is disabled"
 }
