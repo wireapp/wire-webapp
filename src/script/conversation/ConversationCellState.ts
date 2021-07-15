@@ -360,7 +360,7 @@ const _getStateUserName = {
     return hasHandle ? userEntity.handle : '';
   },
   icon: (conversationEntity: Conversation): ConversationStatusIcon.PENDING_CONNECTION | void => {
-    if (conversationEntity.isRequest()) {
+    if (conversationEntity.connection().isOutgoingRequest()) {
       return ConversationStatusIcon.PENDING_CONNECTION;
     }
   },
