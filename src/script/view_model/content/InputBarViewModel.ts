@@ -57,6 +57,7 @@ import {StorageRepository} from '../../storage';
 import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 interface DraftMessage {
   mentions: MentionEntity[];
@@ -99,6 +100,7 @@ export class InputBarViewModel {
   readonly richTextInput: ko.PureComputed<string>;
   readonly inputPlaceholder: ko.PureComputed<string>;
   readonly showGiphyButton: ko.PureComputed<boolean>;
+  readonly isFileSharingEnabled: ko.PureComputed<boolean>;
   readonly pingTooltip: string;
   readonly hasLocalEphemeralTimer: ko.PureComputed<boolean>;
   readonly renderMessage: typeof renderMessage;
@@ -128,6 +130,7 @@ export class InputBarViewModel {
     private readonly messageRepository: MessageRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.shadowInput = null;
     this.textarea = null;
@@ -144,6 +147,8 @@ export class InputBarViewModel {
 
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
+
+    this.isFileSharingEnabled = this.teamState.isFileSharingEnabled;
 
     const handleRepliedMessageDeleted = (messageId: string) => {
       if (this.replyMessageEntity()?.id === messageId) {
@@ -548,6 +553,10 @@ export class InputBarViewModel {
     const images: File[] = [];
     const files: File[] = [];
 
+    if (!this.isFileSharingEnabled()) {
+      return;
+    }
+
     const tooManyConcurrentUploads = this._isHittingUploadLimit(droppedFiles);
     if (tooManyConcurrentUploads) {
       return;
@@ -568,6 +577,9 @@ export class InputBarViewModel {
   };
 
   readonly onPasteFiles = (pastedFiles: File[]): void => {
+    if (!this.isFileSharingEnabled()) {
+      return;
+    }
     const [pastedFile] = pastedFiles;
     this.pastedFile(pastedFile);
   };
