@@ -490,15 +490,11 @@ export class CryptographyRepository {
       : CryptographyRepository.CONFIG.UNKNOWN_DECRYPTION_ERROR_CODE;
 
     const {data: eventData, from: remoteUserId, time: formattedTime} = event;
-    // TODO Federation fix: Skip decryption errors
-    const isFederationError =
-      Config.getConfig().FEATURE.ENABLE_FEDERATION === true &&
-      (event as any).qualified_conversation &&
-      (event as any).qualified_conversation.domain !== Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+
     const isDuplicateMessage = error instanceof ProteusErrors.DecryptError.DuplicateMessage;
     const isOutdatedMessage = error instanceof ProteusErrors.DecryptError.OutdatedMessage;
     // We don't need to show these message errors to the user
-    if (isDuplicateMessage || isOutdatedMessage || isFederationError) {
+    if (isDuplicateMessage || isOutdatedMessage) {
       const message = `Message from user ID "${remoteUserId}" at "${formattedTime}" will not be handled because it is outdated or a duplicate.`;
       throw new CryptographyError(CryptographyError.TYPE.UNHANDLED_TYPE, message);
     }

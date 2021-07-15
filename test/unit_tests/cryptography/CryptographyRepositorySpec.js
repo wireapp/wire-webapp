@@ -161,7 +161,7 @@ describe('CryptographyRepository', () => {
         .spyOn(testFactory.cryptography_repository.cryptographyService, 'putClientPreKeys')
         .mockReturnValue(Promise.resolve());
       const preKeys = await testFactory.cryptography_repository.initCryptobox();
-      const alice = testFactory.cryptography_repository.cryptobox.getIdentity();
+      const alice = testFactory.cryptography_repository.cryptobox.identity;
 
       expect(alice).toBeDefined();
 

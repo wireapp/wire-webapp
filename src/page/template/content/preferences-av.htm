@@ -114,7 +114,9 @@
       <header class="preferences-header" data-bind="text: t('preferencesOptionsCall')"></header>
       <div class="preferences-option">
         <div class="preferences-option-icon checkbox accent-text" data-bind="attr: {'data-uie-value': optionVbrEncoding}" data-uie-name="status-preference-vbr-encoding">
-          <input type="checkbox" id="vbr-encoding-checkbox" data-bind="checked: optionVbrEncoding">
+          <input type="checkbox" id="vbr-encoding-checkbox" data-bind="
+              attr: {'disabled': isCbrEncodingEnforced},
+              checked: optionVbrEncoding">
           <label class="preferences-options-checkbox-label" for="vbr-encoding-checkbox" data-bind="text: t('preferencesOptionsEnableVbrCheckbox')"></label>
         </div>
       </div>

@@ -42,11 +42,11 @@ export class UserMapper {
   }
 
   mapUserFromJson(userData: APIClientUser | APIClientSelf): User {
-    return this.updateUserFromObject(undefined, userData);
+    return this.updateUserFromObject(new User(), userData);
   }
 
   mapSelfUserFromJson(userData: APIClientSelf | APIClientUser): User {
-    const userEntity = this.updateUserFromObject(undefined, userData);
+    const userEntity = this.updateUserFromObject(new User(), userData);
     userEntity.isMe = true;
 
     const dataFromBackend = userData as APIClientSelf;
@@ -78,10 +78,7 @@ export class UserMapper {
    * @param userData Updated user data from backend
    * @todo Pass in "serverTimeHandler", so that it can be removed from the "UserMapper" constructor
    */
-  updateUserFromObject(
-    userEntity: User = new User(undefined, null),
-    userData: Partial<APIClientUser | APIClientSelf>,
-  ): User | undefined {
+  updateUserFromObject(userEntity: User, userData: Partial<APIClientUser | APIClientSelf>): User | undefined {
     if (!userData) {
       return undefined;
     }

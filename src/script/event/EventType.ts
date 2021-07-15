@@ -20,6 +20,7 @@
 export enum EVENT_TYPE {
   CALL = 'call',
   CONVERSATION = 'conversation',
+  FEATURE_CONFIG = 'feature-config',
   TEAM = 'team',
   USER = 'user',
 }

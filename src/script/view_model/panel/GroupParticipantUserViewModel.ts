@@ -29,33 +29,33 @@ import {Actions} from 'Components/panel/UserActions';
 import 'Components/panel/EnrichedFields';
 import 'Components/panel/UserDetails';
 
-import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
-import {ClientEvent} from '../../event/Client';
-import {PanelViewModel} from '../PanelViewModel';
-import {TeamState} from '../../team/TeamState';
-import {UserState} from '../../user/UserState';
-import type {ActionsViewModel} from '../ActionsViewModel';
-import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {ConversationRoleRepository} from '../../conversation/ConversationRoleRepository';
-import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
-import type {PanelParams} from '../PanelViewModel';
+import {BasePanelViewModel, PanelViewModelProps} from './BasePanelViewModel';
+import type {ActionsViewModel} from '../ActionsViewModel';
 import type {TeamRepository} from '../../team/TeamRepository';
+import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {User} from '../../entity/User';
+import {PanelViewModel} from '../PanelViewModel';
+import type {PanelParams} from '../PanelViewModel';
+import {ClientEvent} from '../../event/Client';
+import type {MemberLeaveEvent} from '../../conversation/EventBuilder';
+import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 export class GroupParticipantUserViewModel extends BasePanelViewModel {
-  private readonly conversationRoleRepository: ConversationRoleRepository;
-  private readonly isAdmin: ko.PureComputed<boolean>;
-  private readonly selectedParticipant: ko.Observable<User>;
-  private readonly teamRepository: TeamRepository;
-  private readonly teamState: TeamState;
   private readonly userState: UserState;
-  readonly actionsViewModel: ActionsViewModel;
-  readonly canChangeRole: ko.PureComputed<boolean>;
-  readonly conversationRepository: ConversationRepository;
-  readonly isActivatedAccount: ko.PureComputed<boolean>;
-  readonly isSelfVerified: ko.PureComputed<boolean>;
-  readonly logger: Logger;
+  private readonly teamState: TeamState;
 
+  actionsViewModel: ActionsViewModel;
+  teamRepository: TeamRepository;
+  conversationRepository: ConversationRepository;
+  conversationRoleRepository: ConversationRoleRepository;
+  logger: Logger;
+  isActivatedAccount: ko.PureComputed<boolean>;
+  selectedParticipant: ko.Observable<User>;
+  isSelfVerified: ko.PureComputed<boolean>;
+  canChangeRole: ko.PureComputed<boolean>;
+  isAdmin: ko.PureComputed<boolean>;
   constructor(params: PanelViewModelProps) {
     super(params);
 
@@ -75,23 +75,19 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
     this.selectedParticipant = ko.observable(undefined);
     this.isSelfVerified = ko.pureComputed(() => this.userState.self()?.is_verified());
 
-    this.canChangeRole = ko.pureComputed(() => {
-      return (
+    this.canChangeRole = ko.pureComputed(
+      () =>
         this.conversationRoleRepository.canChangeParticipantRoles(this.activeConversation()) &&
         !!this.selectedParticipant() &&
         !this.selectedParticipant().isMe &&
-        !this.selectedParticipant().isTemporaryGuest() &&
-        !this.activeConversation()?.isFederated()
-      );
-    });
+        !this.selectedParticipant().isTemporaryGuest(),
+    );
 
-    this.isAdmin = ko.pureComputed(() => {
-      return (
+    this.isAdmin = ko.pureComputed(
+      () =>
         this.activeConversation().isGroup() &&
-        this.conversationRoleRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant())
-      );
-    });
-
+        this.conversationRoleRepository.isUserGroupAdmin(this.activeConversation(), this.selectedParticipant()),
+    );
     amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.checkMemberLeave);
   }
 
