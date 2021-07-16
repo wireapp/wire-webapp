@@ -40,6 +40,7 @@ import type {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {AssetRepository} from '../assets/AssetRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {TeamState} from '../team/TeamState';
 
 import './asset/audioAsset';
 import './asset/FileAssetComponent';
@@ -86,6 +87,7 @@ interface MessageParams {
   selfId: ko.Observable<string>;
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
+  teamState?: TeamState;
 }
 
 class Message {
@@ -119,6 +121,7 @@ class Message {
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
   StatusType: typeof StatusType;
+  teamState: TeamState;
 
   constructor(
     {
@@ -146,6 +149,7 @@ class Message {
       conversationRepository,
       messageRepository,
       actionsViewModel,
+      teamState = container.resolve(TeamState),
     }: MessageParams,
     componentInfo: {element: HTMLElement},
   ) {
@@ -210,7 +214,7 @@ class Message {
         !messageEntity.isEphemeral() &&
         !this.conversation().removed_from_conversation();
 
-      if (messageEntity.isDownloadable()) {
+      if (messageEntity.isDownloadable() && teamState.isFileSharingReceivingEnabled()) {
         entries.push({
           click: () => messageEntity.download(container.resolve(AssetRepository)),
           label: t('conversationContextMenuDownload'),
@@ -240,7 +244,7 @@ class Message {
         });
       }
 
-      if (messageEntity.isCopyable()) {
+      if (messageEntity.isCopyable() && teamState.isFileSharingReceivingEnabled()) {
         entries.push({
           click: () => messageEntity.copy(),
           label: t('conversationContextMenuCopy'),

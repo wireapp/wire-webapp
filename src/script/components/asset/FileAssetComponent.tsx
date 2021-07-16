@@ -30,14 +30,16 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {TeamState} from '../../team/TeamState';
 
 export interface FileAssetProps {
   header?: boolean;
   message: ContentMessage;
+  teamState?: TeamState;
 }
 
-const FileAssetComponent: React.FC<FileAssetProps> = ({message, header}) => {
+const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamState = container.resolve(TeamState)}) => {
   const asset = message.getFirstAsset() as FileAsset;
   const plainAssetStatus = useKoSubscribable(asset.status);
   const fileName = trimFileExtension(asset.file_name);
@@ -48,6 +50,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header}) => {
   const assetRepository = container.resolve(AssetRepository);
   const uploadProgress = useKoSubscribable(assetRepository.getUploadProgress(message.id));
   const downloadProgress = useKoSubscribable(asset.downloadProgress);
+  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
   // This is a hack since we don't have a FileAsset available before it's
   // uploaded completely we have to check if there is upload progress to
@@ -75,61 +78,65 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header}) => {
   const isDownloading = assetStatus === AssetTransferState.DOWNLOADING;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
-  return (
-    !message.isObfuscated() && (
-      <>
-        {hasHeader && <AssetHeader message={message} />}
-        <div
-          className={cx('file', {
-            'cursor-pointer': isUploaded,
-          })}
-          data-uie-name="file"
-          data-uie-value={asset.file_name}
-          onClick={() => {
-            if (isUploaded) {
-              downloadAsset();
-            }
-          }}
-        >
-          {isPendingUpload && <div className="asset-placeholder loading-dots"></div>}
-          {isNotUploading && (
-            <>
-              {isUploaded && (
-                <div
-                  className="file-icon icon-file"
-                  onClick={event => {
-                    event.stopPropagation();
-                    downloadAsset();
-                  }}
-                  data-uie-name="file-icon"
-                >
-                  <span className="file-icon-ext icon-view"></span>
+  return !isFileSharingReceivingEnabled ? (
+    <>{'Unable to receive this type of message'}</>
+  ) : (
+    <>
+      {!message.isObfuscated() && (
+        <>
+          {hasHeader && <AssetHeader message={message} />}
+          <div
+            className={cx('file', {
+              'cursor-pointer': isUploaded,
+            })}
+            data-uie-name="file"
+            data-uie-value={asset.file_name}
+            onClick={() => {
+              if (isUploaded) {
+                downloadAsset();
+              }
+            }}
+          >
+            {isPendingUpload && <div className="asset-placeholder loading-dots"></div>}
+            {isNotUploading && (
+              <>
+                {isUploaded && (
+                  <div
+                    className="file-icon icon-file"
+                    onClick={event => {
+                      event.stopPropagation();
+                      downloadAsset();
+                    }}
+                    data-uie-name="file-icon"
+                  >
+                    <span className="file-icon-ext icon-view"></span>
+                  </div>
+                )}
+
+                {isDownloading && <AssetLoader loadProgress={downloadProgress} onCancel={asset.cancelDownload} />}
+
+                {isUploading && <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />}
+
+                {isFailedUpload && <div className="media-button media-button-error"></div>}
+
+                <div className="file-desc">
+                  <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                    {fileName}
+                  </div>
+                  <ul className="file-desc-meta label-xs text-foreground">
+                    <li data-uie-name="file-size">{formattedFileSize}</li>
+                    {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
+                    {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
+                    {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
+                    {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
+                  </ul>
                 </div>
-              )}
-
-              {isDownloading && <AssetLoader loadProgress={downloadProgress} onCancel={asset.cancelDownload} />}
-
-              {isUploading && <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />}
-
-              {isFailedUpload && <div className="media-button media-button-error"></div>}
-
-              <div className="file-desc">
-                <div className="label-bold-xs ellipsis" data-uie-name="file-name">
-                  {fileName}
-                </div>
-                <ul className="file-desc-meta label-xs text-foreground">
-                  <li data-uie-name="file-size">{formattedFileSize}</li>
-                  {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
-                  {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
-                  {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
-                  {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
-                </ul>
-              </div>
-            </>
-          )}
-        </div>
-      </>
-    )
+              </>
+            )}
+          </div>
+        </>
+      )}
+    </>
   );
 };
 
