@@ -408,9 +408,36 @@ export class TeamRepository {
 
     if (previousConfig) {
       this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
+      this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
     }
 
     this.saveFeatureConfig(featureConfigList);
+  };
+
+  private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    const changeList = [];
+
+    const hasFileSharingChanged = previousConfig?.fileSharing?.status !== newConfig?.fileSharing?.status;
+    if (hasFileSharingChanged) {
+      const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
+      changeList.push(
+        `<li>${
+          hasChangedToEnabled
+            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
+            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled')
+        }</li>`,
+      );
+    }
+
+    if (hasFileSharingChanged) {
+      const message = `${t('featureConfigChangeModalDescription')} <ul>${changeList}</ul>`;
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: message,
+          title: t('featureConfigChangeModalFileSharingHeadline'),
+        },
+      });
+    }
   };
 
   private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
@@ -453,7 +480,7 @@ export class TeamRepository {
     }
 
     if (hasVideoCallingChanged || hasVideoMessageChanged || hasAudioMessageChanged) {
-      const message = `${t('featureConfigChangeModalAudioVideoDescription')} <ul>${changeList}</ul>`;
+      const message = `${t('featureConfigChangeModalDescription')} <ul>${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           htmlMessage: message,
