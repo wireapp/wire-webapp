@@ -37,6 +37,8 @@ export class TeamState {
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
+  public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
+  public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnforced: ko.PureComputed<boolean>;
@@ -73,6 +75,13 @@ export class TeamState {
     this.userState.isTeam = this.isTeam;
     this.userState.teamMembers = this.teamMembers;
     this.userState.teamUsers = this.teamUsers;
+
+    this.isFileSharingSendingEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
+    );
+    this.isFileSharingReceivingEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
+    );
 
     this.isVideoCallingEnabled = ko.pureComputed(
       () => this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
