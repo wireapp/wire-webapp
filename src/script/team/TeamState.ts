@@ -77,10 +77,10 @@ export class TeamState {
     this.userState.teamUsers = this.teamUsers;
 
     this.isFileSharingSendingEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
+      () => true || this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
     );
     this.isFileSharingReceivingEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
+      () => true || this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
     );
 
     this.isVideoCallingEnabled = ko.pureComputed(
