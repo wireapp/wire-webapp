@@ -71,7 +71,9 @@ export class TeamState {
 
     this.supportsLegalHold = ko.observable(false);
 
-    this.isFileSharingReceivingEnabled = ko.pureComputed(() => false);
+    this.isFileSharingReceivingEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
+    );
 
     this.userState.isTeam = this.isTeam;
     this.userState.teamMembers = this.teamMembers;
