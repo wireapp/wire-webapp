@@ -34,10 +34,12 @@ export class TeamState {
   public readonly memberInviters: ko.Observable<any>;
   public readonly memberRoles: ko.Observable<any>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
-  public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
+  public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
+  public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
+  public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnforced: ko.PureComputed<boolean>;
   public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
@@ -73,6 +75,13 @@ export class TeamState {
     this.userState.isTeam = this.isTeam;
     this.userState.teamMembers = this.teamMembers;
     this.userState.teamUsers = this.teamUsers;
+
+    this.isFileSharingSendingEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
+    );
+    this.isFileSharingReceivingEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
+    );
 
     this.isVideoCallingEnabled = ko.pureComputed(
       // TODO connect to video calling feature config
