@@ -408,6 +408,7 @@ export class TeamRepository {
 
     if (previousConfig) {
       this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
+      this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
     }
 
     this.saveFeatureConfig(featureConfigList);
@@ -460,6 +461,20 @@ export class TeamRepository {
           title: t('featureConfigChangeModalAudioVideoHeadline'),
         },
       });
+    }
+  };
+
+  private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    if (previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
+      const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
+      if (hasChangedToEnabled) {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: /* TODO */ hasChangedToEnabled ? 'activated' : 'deactivated',
+            title: /* TODO */ 'Conference calling',
+          },
+        });
+      }
     }
   };
 
