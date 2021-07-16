@@ -37,6 +37,7 @@ import {Conversation} from '../../entity/Conversation';
 import {UserState} from '../../user/UserState';
 import {ConversationState} from '../../conversation/ConversationState';
 import {CallState} from '../../calling/CallState';
+import {TeamState} from '../../team/TeamState';
 
 // Parent: ContentViewModel
 export class TitleBarViewModel {
@@ -48,6 +49,7 @@ export class TitleBarViewModel {
   readonly badgeLabelCopy: ko.PureComputed<string>;
   readonly showCallControls: ko.PureComputed<boolean>;
   readonly supportsVideoCall: ko.PureComputed<boolean>;
+  readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   readonly peopleTooltip: string;
 
   constructor(
@@ -58,6 +60,7 @@ export class TitleBarViewModel {
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.contentViewModel = contentViewModel;
 
@@ -121,6 +124,7 @@ export class TitleBarViewModel {
     this.supportsVideoCall = ko.pureComputed(() =>
       this.conversationEntity()?.supportsVideoCall(callingRepository.supportsConferenceCalling),
     );
+    this.isVideoCallingEnabled = ko.pureComputed(() => this.teamState.isVideoCallingEnabled());
 
     const shortcut = Shortcut.getShortcutTooltip(ShortcutType.PEOPLE);
     this.peopleTooltip = t('tooltipConversationPeople', shortcut);
