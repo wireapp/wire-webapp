@@ -99,7 +99,7 @@
             <!-- ko ifnot: input().length -->
               <message-timer-button params="conversation: conversationEntity"></message-timer-button>
 
-              <!-- ko if: isFileSharingEnabled -->
+              <!-- ko if: isFileSharingSendingEnabled -->
                 <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large">
                   <image-icon></image-icon>
                   <input data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>

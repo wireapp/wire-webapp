@@ -100,7 +100,7 @@ export class InputBarViewModel {
   readonly richTextInput: ko.PureComputed<string>;
   readonly inputPlaceholder: ko.PureComputed<string>;
   readonly showGiphyButton: ko.PureComputed<boolean>;
-  readonly isFileSharingEnabled: ko.PureComputed<boolean>;
+  readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   readonly pingTooltip: string;
   readonly hasLocalEphemeralTimer: ko.PureComputed<boolean>;
   readonly renderMessage: typeof renderMessage;
@@ -148,7 +148,7 @@ export class InputBarViewModel {
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
 
-    this.isFileSharingEnabled = this.teamState.isFileSharingEnabled;
+    this.isFileSharingSendingEnabled = this.teamState.isFileSharingSendingEnabled;
 
     const handleRepliedMessageDeleted = (messageId: string) => {
       if (this.replyMessageEntity()?.id === messageId) {
@@ -553,7 +553,7 @@ export class InputBarViewModel {
     const images: File[] = [];
     const files: File[] = [];
 
-    if (!this.isFileSharingEnabled()) {
+    if (!this.isFileSharingSendingEnabled()) {
       return;
     }
 
@@ -577,7 +577,7 @@ export class InputBarViewModel {
   };
 
   readonly onPasteFiles = (pastedFiles: File[]): void => {
-    if (!this.isFileSharingEnabled()) {
+    if (!this.isFileSharingSendingEnabled()) {
       return;
     }
     const [pastedFile] = pastedFiles;
