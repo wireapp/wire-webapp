@@ -463,11 +463,20 @@ export class TeamRepository {
     }
   };
 
-  private readonly loadPreviousFeatureConfig = (): FeatureList =>
-    JSON.parse(window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY));
+  private readonly loadPreviousFeatureConfig = (): FeatureList | void => {
+    const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
+      window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY),
+    );
+    if (featureConfigs && featureConfigs[this.userState.self().id]) {
+      return featureConfigs[this.userState.self().id];
+    }
+  };
 
   private readonly saveFeatureConfig = (featureConfigList: FeatureList): void =>
-    window.localStorage.setItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY, JSON.stringify(featureConfigList));
+    window.localStorage.setItem(
+      TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY,
+      JSON.stringify({[this.userState.self().id]: featureConfigList}),
+    );
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {
