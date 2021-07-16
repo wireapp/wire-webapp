@@ -134,6 +134,8 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const [callDuration, setCallDuration] = useState('');
 
+  const isAllowedCall = !isGroup || teamState.isConferenceCallingEnabled();
+
   useEffect(() => {
     let intervalId: number;
     if (isOngoing && startedAt) {
@@ -151,9 +153,13 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     <>
       {showJoinButton && (
         <div
-          className="call-ui__button call-ui__button--green call-ui__button--join"
+          className={cx('call-ui__button call-ui__button--join', {
+            'call-ui__button--disabled': !isAllowedCall,
+            'call-ui__button--green': isAllowedCall,
+          })}
+          title={!isAllowedCall ? 'NOT ALLOWED' : undefined}
           style={{margin: '40px 16px 0px 16px'}}
-          onClick={() => callActions.answer(call)}
+          onClick={() => (isAllowedCall ? callActions.answer(call) : undefined)}
           data-uie-name="do-call-controls-call-join"
         >
           {t('callJoin')}
@@ -316,8 +322,12 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   )}
                   {isIncoming && (
                     <div
-                      className="call-ui__button call-ui__button--green call-ui__button--large"
-                      onClick={() => callActions.answer(call)}
+                      className={cx('call-ui__button call-ui__button--large', {
+                        'call-ui__button--disabled': !isAllowedCall,
+                        'call-ui__button--green': isAllowedCall,
+                      })}
+                      title={!isAllowedCall ? 'NOT ALLOWED' : undefined}
+                      onClick={() => (isAllowedCall ? callActions.answer(call) : undefined)}
                       data-uie-name="do-call-controls-call-accept"
                     >
                       <Icon.Pickup className="small-icon" />

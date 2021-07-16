@@ -31,6 +31,8 @@ import {viewportObserver} from '../../ui/viewportObserver';
 
 import 'Components/AvailabilityState';
 import type {User} from '../../entity/User';
+import {container} from 'tsyringe';
+import {TeamState} from '../../team/TeamState';
 
 interface ConversationListCellProps {
   conversation: Conversation;
@@ -41,11 +43,13 @@ interface ConversationListCellProps {
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: () => void;
   showJoinButton: boolean;
+  teamState?: TeamState;
 }
 
 class ConversationListCell {
   conversation: Conversation;
   isSelected: ko.Computed<boolean>;
+  isAllowedCall: ko.Computed<boolean>;
   rightClick: () => void;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   showJoinButton: boolean;
@@ -69,9 +73,13 @@ class ConversationListCell {
       index = ko.observable(0),
       isVisibleFunc = () => false,
       offsetTop = ko.observable(0),
+      teamState = container.resolve(TeamState),
     }: ConversationListCellProps,
     element: HTMLElement,
   ) {
+    this.isAllowedCall = ko.pureComputed(() => {
+      return !conversation.isGroup() || teamState.isConferenceCallingEnabled();
+    });
     this.conversation = conversation;
     this.isSelected = ko.computed(() => is_selected(conversation));
     this.rightClick = rightClick;
@@ -182,7 +190,12 @@ ko.components.register('conversation-list-cell', {
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko if: showJoinButton -->
-          <div class="call-ui__button call-ui__button--green call-ui__button--join" data-bind="click: onClickJoinCall, text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
+          <!-- ko if: isAllowedCall -->
+            <div class="call-ui__button call-ui__button--green call-ui__button--join" data-bind="click: onClickJoinCall, text: t('callJoin')" data-uie-name="do-call-controls-call-join"></div>
+          <!-- /ko -->
+          <!-- ko ifnot: isAllowedCall -->
+            <div class="call-ui__button call-ui__button--join call-ui__button--disabled" data-bind="text: t('callJoin'), attr: {title: 'NOT ALLOWED'}" data-uie-name="do-call-controls-call-join"></div>
+          <!-- /ko -->
         <!-- /ko -->
       </div>
       <!-- /ko -->
