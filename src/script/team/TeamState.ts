@@ -75,10 +75,12 @@ export class TeamState {
     this.userState.teamUsers = this.teamUsers;
 
     this.isVideoCallingEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
+      // TODO connect to video calling feature config
+      () => true || this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
     );
     this.isConferenceCallingEnabled = ko.pureComputed(
-      () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
+      // TODO connect to conference calling feature config
+      () => true || this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
     );
     this.isAppLockEnabled = ko.pureComputed(() => this.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED);
     this.isAppLockEnforced = ko.pureComputed(() => this.teamFeatures()?.appLock?.config?.enforceAppLock);
