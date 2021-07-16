@@ -38,11 +38,11 @@ import type {Conversation} from '../entity/Conversation';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
-import type {TeamRepository} from '../team/TeamRepository';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
+import {TeamState} from '../team/TeamState';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -78,6 +78,10 @@ declare global {
 export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
+  readonly isChoosingScreen: ko.PureComputed<boolean>;
+  readonly isAllowedCall: ko.PureComputed<boolean>;
+  readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
+  readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
   readonly videoSpeakersActiveTab: ko.Observable<string>;
 
@@ -87,12 +91,16 @@ export class CallingViewModel {
     readonly mediaDevicesHandler: MediaDevicesHandler,
     readonly mediaStreamHandler: MediaStreamHandler,
     readonly permissionRepository: PermissionRepository,
-    readonly teamRepository: TeamRepository,
     private readonly selfUser: ko.Observable<User>,
     readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
+    readonly teamState = container.resolve(TeamState),
     readonly callState = container.resolve(CallState),
   ) {
+    this.isAllowedCall = ko.pureComputed(() => {
+      const conversation = this.conversationState.activeConversation();
+      return !conversation.isGroup() || teamState.isConferenceCallingEnabled();
+    });
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.activeCalls().filter(call => {
