@@ -88,7 +88,7 @@
     "@types/sdp-transform": "2.4.5",
     "@types/simplebar": "5.3.3",
     "@types/sinon": "10.0.2",
-    "@types/speakingurl": "13.0.2",
+    "@types/speakingurl": "13.0.3",
     "@types/uint32": "0.2.0",
     "@types/underscore": "1.11.3",
     "@types/webpack-env": "1.16.2",
