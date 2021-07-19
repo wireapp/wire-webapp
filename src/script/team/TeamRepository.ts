@@ -430,10 +430,10 @@ export class TeamRepository {
     }
 
     if (hasFileSharingChanged) {
-      const message = `${t('featureConfigChangeModalDescription')} <ul>${changeList}</ul>`;
+      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          message: message,
+          htmlMessage: message,
           title: t('featureConfigChangeModalFileSharingHeadline'),
         },
       });
@@ -480,7 +480,7 @@ export class TeamRepository {
     }
 
     if (hasVideoCallingChanged || hasVideoMessageChanged || hasAudioMessageChanged) {
-      const message = `${t('featureConfigChangeModalDescription')} <ul>${changeList}</ul>`;
+      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           htmlMessage: message,
