@@ -25,11 +25,14 @@ import {viewportObserver} from '../../ui/viewportObserver';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
 import './AssetLoader';
 import {Config} from '../../Config';
+import {TeamState} from '../../team/TeamState';
+import {container} from 'tsyringe';
 
 interface Params {
   asset: MediumImage;
   message: ContentMessage;
   onClick: (message: ContentMessage, event: MouseEvent) => void;
+  teamState?: TeamState;
 }
 
 class ImageAssetComponent extends AbstractAssetTransferStateTracker {
@@ -42,7 +45,7 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
   isIdle: () => boolean;
   container: HTMLElement;
 
-  constructor({asset, message, onClick}: Params, element: HTMLElement) {
+  constructor({asset, message, onClick, teamState = container.resolve(TeamState)}: Params, element: HTMLElement) {
     super(message);
     this.asset = asset;
     this.message = message;
@@ -58,7 +61,7 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
 
     ko.computed(
       () => {
-        if (this.isVisible() && asset.resource()) {
+        if (this.isVisible() && asset.resource() && teamState.isFileSharingReceivingEnabled()) {
           this.assetRepository
             .load(asset.resource())
             .then((blob: Blob) => {

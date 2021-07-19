@@ -206,6 +206,9 @@ class Message {
       const messageEntity = this.message;
       const entries: ContextMenuEntry[] = [];
 
+      const isRestrictedFileShare =
+        !teamState.isFileSharingReceivingEnabled() && (messageEntity.hasAssetFile() || messageEntity.hasAssetImage());
+
       const canDelete =
         messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
 
@@ -214,7 +217,7 @@ class Message {
         !messageEntity.isEphemeral() &&
         !this.conversation().removed_from_conversation();
 
-      if (messageEntity.isDownloadable() && teamState.isFileSharingReceivingEnabled()) {
+      if (messageEntity.isDownloadable() && !isRestrictedFileShare) {
         entries.push({
           click: () => messageEntity.download(container.resolve(AssetRepository)),
           label: t('conversationContextMenuDownload'),
@@ -244,7 +247,7 @@ class Message {
         });
       }
 
-      if (messageEntity.isCopyable() && teamState.isFileSharingReceivingEnabled()) {
+      if (messageEntity.isCopyable() && !isRestrictedFileShare) {
         entries.push({
           click: () => messageEntity.copy(),
           label: t('conversationContextMenuCopy'),
