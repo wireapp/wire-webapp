@@ -45,3 +45,5 @@ export type FeatureAudioMessage = FeatureWithoutConfig;
 export type FeatureDigitalSignature = FeatureWithoutConfig;
 export type FeatureLegalhold = FeatureWithoutConfig;
 export type FeatureSSO = FeatureWithoutConfig;
+export type FeatureSearchVisibility = FeatureWithoutConfig;
+export type FeatureValidateSAMLEmails = FeatureWithoutConfig;

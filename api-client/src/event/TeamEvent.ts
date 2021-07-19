@@ -17,6 +17,7 @@
  *
  */
 
+import {FEATURE_KEY} from '../team';
 import type {
   TeamFeatureConfigurationUpdateEventData,
   TeamConversationCreateData,
@@ -108,5 +109,6 @@ export interface TeamUpdateEvent extends BaseTeamEvent {
 
 export interface TeamFeatureConfigurationUpdateEvent extends BaseTeamEvent {
   data: TeamFeatureConfigurationUpdateEventData;
+  name: FEATURE_KEY;
   type: TEAM_EVENT.FEATURE_CONFIG_UPDATE;
 }

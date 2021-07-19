@@ -23,20 +23,23 @@ import {
   FeatureConferenceCalling,
   FeatureVideoCalling,
   FeatureLegalhold,
-  FeatureWithoutConfig,
-  FEATURE_KEY,
   FeatureFileSharing,
   FeatureVideoMessage,
   FeatureAudioMessage,
+  FeatureSSO,
+  FeatureSearchVisibility,
+  FeatureValidateSAMLEmails,
 } from '../feature';
 
 export type TeamFeatureConfigurationUpdateEventData =
-  | (FeatureAppLock & {name: FEATURE_KEY.APPLOCK})
-  | (FeatureDigitalSignature & {name: FEATURE_KEY.DIGITAL_SIGNATURES})
-  | (FeatureConferenceCalling & {name: FEATURE_KEY.CONFERENCE_CALLING})
-  | (FeatureVideoCalling & {name: FEATURE_KEY.VIDEO_CALLING})
-  | (FeatureVideoMessage & {name: FEATURE_KEY.VIDEO_MESSAGE})
-  | (FeatureAudioMessage & {name: FEATURE_KEY.AUDIO_MESSAGE})
-  | (FeatureFileSharing & {name: FEATURE_KEY.FILE_SHARING})
-  | (FeatureLegalhold & {name: FEATURE_KEY.LEGALHOLD})
-  | (FeatureWithoutConfig & {name: FEATURE_KEY.SEARCH_VISIBILITY | FEATURE_KEY.SSO | FEATURE_KEY.VALIDATE_SAML_EMAILS});
+  | FeatureAppLock
+  | FeatureDigitalSignature
+  | FeatureConferenceCalling
+  | FeatureVideoCalling
+  | FeatureVideoMessage
+  | FeatureAudioMessage
+  | FeatureFileSharing
+  | FeatureLegalhold
+  | FeatureSSO
+  | FeatureSearchVisibility
+  | FeatureValidateSAMLEmails;
