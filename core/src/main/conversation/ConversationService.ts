@@ -24,12 +24,12 @@ import {
   DefaultConversationRoleName,
   MutedStatus,
   NewConversation,
-  UserClients,
   QualifiedUserClients,
+  UserClients,
 } from '@wireapp/api-client/src/conversation/';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import type {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event/';
-import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {
   Asset,
   ButtonAction,
@@ -62,7 +62,7 @@ import {
 import type {AssetContent, ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
 import type {CryptographyService, EncryptedAsset} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
-import {isStringArray, isQualifiedIdArray, isQualifiedUserClients} from '../util/TypePredicateUtil';
+import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../util/TypePredicateUtil';
 import {MessageBuilder} from './message/MessageBuilder';
 import {MessageService} from './message/MessageService';
 import {MessageToProtoMapper} from './message/MessageToProtoMapper';
@@ -118,22 +118,29 @@ export class ConversationService {
     return genericMessage;
   }
 
-  private async getPreKeyBundle(
+  private async getQualifiedPreKeyBundle(
     conversationId: string,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: QualifiedId[] | QualifiedUserClients,
     conversationDomain?: string,
   ): Promise<QualifiedUserPreKeyBundleMap> {
-    const conversation = await this.apiClient.conversation.api.getConversation(conversationId, conversationDomain);
+    let members: QualifiedId[] = [];
 
-    let members: QualifiedId[];
+    if (userIds) {
+      if (isQualifiedIdArray(userIds)) {
+        // userIds is of type `QualifiedId[]`
+        members = userIds;
+      } else if (isUserClients(userIds)) {
+        members = Object.keys(userIds).map(userId => ({domain: 'none', id: userId}));
+      } else if (isQualifiedUserClients(userIds)) {
+        members = Object.entries(userIds).reduce<QualifiedId[]>((accumulator, [domain, userClients]) => {
+          accumulator.push(...Object.keys(userClients).map(userId => ({domain, id: userId})));
+          return accumulator;
+        }, []);
+      }
+    }
 
-    if (userIds && Array.isArray(userIds) && userIds.length) {
-      members = userIds.map(userId => ({domain: 'none', id: userId}));
-    } else if (userIds && typeof Object.values(userIds)[0] === 'string') {
-      members = Object.keys(userIds).map(userId => ({domain: 'none', id: userId}));
-    } else if (userIds && typeof Object.values(userIds)[0] === 'object') {
-      members = Object.entries(userIds).map(([domain, userId]) => ({domain, id: userId}));
-    } else {
+    if (!members.length) {
+      const conversation = await this.apiClient.conversation.api.getConversation(conversationId, conversationDomain);
       /*
        * If you are sending a message to a conversation, you have to include
        * yourself in the list of users if you want to sync a message also to your
@@ -143,6 +150,7 @@ export class ConversationService {
         .map(member => member.qualified_id || {domain: 'none', id: member.id})
         .concat({domain: conversationDomain || 'none', id: conversation.members.self.id});
     }
+
     const preKeys = await Promise.all(
       members.map(async qualifiedUserId => {
         const prekeyBundle = await this.apiClient.user.api.getUserPreKeys(
@@ -162,6 +170,42 @@ export class ConversationService {
     }, {});
   }
 
+  private async getPreKeyBundle(
+    conversationId: string,
+    userIds?: string[] | UserClients,
+  ): Promise<UserPreKeyBundleMap> {
+    let members: string[] = [];
+
+    if (userIds) {
+      if (isStringArray(userIds)) {
+        members = userIds;
+      } else if (isUserClients(userIds)) {
+        members = Object.keys(userIds);
+      }
+    }
+
+    if (!members.length) {
+      const conversation = await this.apiClient.conversation.api.getConversation(conversationId);
+      /*
+       * If you are sending a message to a conversation, you have to include
+       * yourself in the list of users if you want to sync a message also to your
+       * other clients.
+       */
+      members = conversation.members.others.map(member => member.id).concat(conversation.members.self.id);
+    }
+
+    const preKeys = await Promise.all(members.map(member => this.apiClient.user.api.getUserPreKeys(member)));
+
+    return preKeys.reduce((bundleMap: UserPreKeyBundleMap, bundle) => {
+      const userId = bundle.user;
+      bundleMap[userId] ||= {};
+      for (const client of bundle.clients) {
+        bundleMap[userId][client.client] = client.prekey;
+      }
+      return bundleMap;
+    }, {});
+  }
+
   private getSelfConversation(): Promise<Conversation> {
     const {userId} = this.apiClient.context!;
     return this.apiClient.conversation.api.getConversation(userId);
@@ -171,9 +215,8 @@ export class ConversationService {
     sendingClientId: string,
     conversationId: string,
     asset: EncryptedAsset,
-    preKeyBundles: QualifiedUserPreKeyBundleMap,
+    preKeyBundles: UserPreKeyBundleMap,
     sendAsProtobuf?: boolean,
-    conversationDomain?: string,
   ): Promise<void> {
     if (preKeyBundles.none) {
       const {cipherText, keyBytes, sha256} = asset;
@@ -193,7 +236,7 @@ export class ConversationService {
 
       const plainTextArray = GenericMessage.encode(genericMessage).finish();
 
-      const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles.none || {});
+      const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
       if (sendAsProtobuf) {
         await this.messageService.sendOTRProtobufMessage(
@@ -222,10 +265,10 @@ export class ConversationService {
     conversationId: string,
     genericMessage: GenericMessage,
     conversationDomain: string,
-    userIds?: QualifiedUserClients,
+    userIds?: QualifiedId[] | QualifiedUserClients,
   ): Promise<void> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds, conversationDomain);
+    const preKeyBundles = await this.getQualifiedPreKeyBundle(conversationId, userIds, conversationDomain);
 
     const recipients = await this.cryptographyService.encryptQualified(plainTextArray, preKeyBundles);
 
@@ -242,18 +285,26 @@ export class ConversationService {
     sendingClientId: string,
     conversationId: string,
     genericMessage: GenericMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<void> {
     if (conversationDomain) {
+      if (isStringArray(userIds) || isUserClients(userIds)) {
+        throw new Error('Invalid userIds option for sending');
+      }
+
       return this.sendFederatedGenericMessage(
         this.apiClient.validatedClientId,
         conversationId,
         genericMessage,
         conversationDomain,
-        isQualifiedUserClients(userIds) ? userIds : undefined,
+        userIds,
       );
+    }
+
+    if (isQualifiedIdArray(userIds) || isQualifiedUserClients(userIds)) {
+      throw new Error('Invalid userIds option for sending');
     }
 
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
@@ -267,11 +318,10 @@ export class ConversationService {
         encryptedAsset,
         preKeyBundles,
         sendAsProtobuf,
-        conversationDomain,
       );
     }
 
-    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles.none);
+    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
     return sendAsProtobuf
       ? this.messageService.sendOTRProtobufMessage(sendingClientId, recipients, conversationId, plainTextArray)
@@ -280,7 +330,7 @@ export class ConversationService {
 
   private async sendButtonAction(
     payloadBundle: ButtonActionMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ButtonActionMessage> {
@@ -307,7 +357,7 @@ export class ConversationService {
 
   private async sendButtonActionConfirmation(
     payloadBundle: ButtonActionConfirmationMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ButtonActionConfirmationMessage> {
@@ -334,7 +384,7 @@ export class ConversationService {
 
   private async sendComposite(
     payloadBundle: CompositeMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<CompositeMessage> {
@@ -361,7 +411,7 @@ export class ConversationService {
 
   private async sendConfirmation(
     payloadBundle: ConfirmationMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ConfirmationMessage> {
@@ -390,7 +440,7 @@ export class ConversationService {
 
   private async sendEditedText(
     payloadBundle: EditedTextMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<EditedTextMessage> {
@@ -422,7 +472,7 @@ export class ConversationService {
 
   private async sendFileData(
     payloadBundle: FileAssetMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<FileAssetMessage> {
@@ -475,7 +525,7 @@ export class ConversationService {
 
   private async sendFileMetaData(
     payloadBundle: FileAssetMetaDataMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<FileAssetMetaDataMessage> {
@@ -527,7 +577,7 @@ export class ConversationService {
 
   private async sendFileAbort(
     payloadBundle: FileAssetAbortMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<FileAssetAbortMessage> {
@@ -573,7 +623,7 @@ export class ConversationService {
 
   private async sendImage(
     payloadBundle: ImageAssetMessageOutgoing,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ImageAssetMessage> {
@@ -640,7 +690,7 @@ export class ConversationService {
 
   private async sendLocation(
     payloadBundle: LocationMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<LocationMessage> {
@@ -683,7 +733,7 @@ export class ConversationService {
 
   private async sendKnock(
     payloadBundle: PingMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<PingMessage> {
@@ -718,7 +768,7 @@ export class ConversationService {
 
   private async sendReaction(
     payloadBundle: ReactionMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ReactionMessage> {
@@ -753,7 +803,7 @@ export class ConversationService {
 
   private async sendSessionReset(
     payloadBundle: ResetSessionMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<ResetSessionMessage> {
@@ -780,7 +830,7 @@ export class ConversationService {
 
   private async sendCall(
     payloadBundle: CallMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<CallMessage> {
@@ -811,7 +861,7 @@ export class ConversationService {
 
   private async sendText(
     payloadBundle: TextMessage,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<TextMessage> {
@@ -933,7 +983,7 @@ export class ConversationService {
   public async deleteMessageEveryone(
     conversationId: string,
     messageIdToDelete: string,
-    userIds?: string[] | UserClients | QualifiedUserClients,
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
   ): Promise<DeleteMessage> {
@@ -970,7 +1020,7 @@ export class ConversationService {
     };
   }
 
-  private shouldSendAsExternal(plainText: Uint8Array, preKeyBundles: QualifiedUserPreKeyBundleMap): boolean {
+  private shouldSendAsExternal(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): boolean {
     const EXTERNAL_MESSAGE_THRESHOLD_BYTES = 200 * 1024;
 
     let clientCount = 0;
@@ -1069,7 +1119,7 @@ export class ConversationService {
     conversationDomain,
   }: {
     payloadBundle: OtrMessage;
-    userIds?: string[] | UserClients | QualifiedUserClients;
+    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
     sendAsProtobuf?: boolean;
     conversationDomain?: string;
   }) {
