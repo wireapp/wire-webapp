@@ -2383,10 +2383,10 @@
   resolved "https://registry.yarnpkg.com/@types/scheduler/-/scheduler-0.16.1.tgz#18845205e86ff0038517aab7a18a62a6b9f71275"
   integrity sha512-EaCxbanVeyxDRTQBkdLb3Bvl/HK7PBK6UJjsSixB0iHKoWxE5uu2Q/DgtpOhPIojN0Zl1whvOd7PoHs2P0s5eA==
 
-"@types/sdp-transform@2.4.4":
-  version "2.4.4"
-  resolved "https://registry.yarnpkg.com/@types/sdp-transform/-/sdp-transform-2.4.4.tgz#e7d3b4323d1ae9fab8199508effa1620279bbf1a"
-  integrity sha512-cTpXVbNaN1YL++3mYArwlaujujeVe8ty66rbZPdFWx94fxM7jFjs5X621esca40yRe45htNdXROMIr2cgI+xGg==
+"@types/sdp-transform@2.4.5":
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/@types/sdp-transform/-/sdp-transform-2.4.5.tgz#3167961e0a1a5265545e278627aa37c606003f53"
+  integrity sha512-GVO0gnmbyO3Oxm2HdPsYUNcyihZE3GyCY8ysMYHuQGfLhGZq89Nm4lSzULWTzZoyHtg+VO/IdrnxZHPnPSGnAg==
 
 "@types/simplebar@5.3.3":
   version "5.3.3"
