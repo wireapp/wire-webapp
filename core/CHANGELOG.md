@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.10.10](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.10.9...@wireapp/core@17.10.10) (2021-07-19)
+
+
+### Bug Fixes
+
+* **core:** Split up prekey fetching for federation ([#4055](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4055)) ([e542ebb](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/e542ebb7618de715402dca4b06286677f0484e2d))
+
+
+
+
+
 ## [17.10.9](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.10.8...@wireapp/core@17.10.9) (2021-07-19)
 
 **Note:** Version bump only for package @wireapp/core
