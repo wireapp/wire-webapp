@@ -18,7 +18,7 @@
  */
 
 import ReactDOM from 'react-dom';
-import React, {Fragment, useEffect, useMemo} from 'react';
+import React, {Fragment, useEffect} from 'react';
 import {container} from 'tsyringe';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
@@ -81,10 +81,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
   }, [currentCallState]);
 
-  const videoGrid = useMemo(
-    () => joinedCall && getGrid(joinedCall),
-    [joinedCall, participants, pages, currentPage, participants?.map(p => p.hasActiveVideo())],
-  );
+  const videoGrid = joinedCall && getGrid(joinedCall);
 
   const onCancelScreenSelection = () => {
     callState.selectableScreens([]);

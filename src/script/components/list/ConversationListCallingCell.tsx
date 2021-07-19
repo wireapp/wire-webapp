@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -109,10 +109,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showVideoButton = call.initialType === CALL_TYPE.VIDEO || isOngoing;
   const showParticipantsButton = isOngoing && isGroup;
 
-  const videoGrid = useMemo(
-    () => call && getGrid(call),
-    [call, participants, pages, currentPage, participants?.map(p => p.hasActiveVideo())],
-  );
+  const videoGrid = call && getGrid(call);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
   const conversationUrl = generateConversationUrl(conversation.id);
