@@ -408,9 +408,36 @@ export class TeamRepository {
 
     if (previousConfig) {
       this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
+      this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
     }
 
     this.saveFeatureConfig(featureConfigList);
+  };
+
+  private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    const changeList = [];
+
+    const hasFileSharingChanged = previousConfig?.fileSharing?.status !== newConfig?.fileSharing?.status;
+    if (hasFileSharingChanged) {
+      const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
+      changeList.push(
+        `<li>${
+          hasChangedToEnabled
+            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
+            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled')
+        }</li>`,
+      );
+    }
+
+    if (hasFileSharingChanged) {
+      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: message,
+          title: t('featureConfigChangeModalFileSharingHeadline'),
+        },
+      });
+    }
   };
 
   private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
@@ -453,7 +480,7 @@ export class TeamRepository {
     }
 
     if (hasVideoCallingChanged || hasVideoMessageChanged || hasAudioMessageChanged) {
-      const message = `${t('featureConfigChangeModalAudioVideoDescription')} <ul>${changeList}</ul>`;
+      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           htmlMessage: message,
@@ -463,11 +490,20 @@ export class TeamRepository {
     }
   };
 
-  private readonly loadPreviousFeatureConfig = (): FeatureList =>
-    JSON.parse(window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY));
+  private readonly loadPreviousFeatureConfig = (): FeatureList | void => {
+    const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
+      window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY),
+    );
+    if (featureConfigs && featureConfigs[this.userState.self().id]) {
+      return featureConfigs[this.userState.self().id];
+    }
+  };
 
   private readonly saveFeatureConfig = (featureConfigList: FeatureList): void =>
-    window.localStorage.setItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY, JSON.stringify(featureConfigList));
+    window.localStorage.setItem(
+      TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY,
+      JSON.stringify({[this.userState.self().id]: featureConfigList}),
+    );
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {
