@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -75,17 +75,14 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, pages, currentPage} =
-    useKoSubscribableChildren(call, [
-      'reason',
-      'state',
-      'isCbrEnabled',
-      'startedAt',
-      'participants',
-      'maximizedParticipant',
-      'pages',
-      'currentPage',
-    ]);
+  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant} = useKoSubscribableChildren(call, [
+    'reason',
+    'state',
+    'isCbrEnabled',
+    'startedAt',
+    'participants',
+    'maximizedParticipant',
+  ]);
   const {
     isGroup,
     participating_user_ets: userEts,
@@ -109,10 +106,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showVideoButton = call.initialType === CALL_TYPE.VIDEO || isOngoing;
   const showParticipantsButton = isOngoing && isGroup;
 
-  const videoGrid = useMemo(
-    () => call && getGrid(call),
-    [call, participants, pages, currentPage, participants?.map(p => p.hasActiveVideo())],
-  );
+  const videoGrid = call && getGrid(call);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
   const conversationUrl = generateConversationUrl(conversation.id);

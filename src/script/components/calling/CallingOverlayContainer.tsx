@@ -18,7 +18,7 @@
  */
 
 import ReactDOM from 'react-dom';
-import React, {Fragment, useEffect, useMemo} from 'react';
+import React, {Fragment, useEffect} from 'react';
 import {container} from 'tsyringe';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
@@ -64,13 +64,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
       'selectableWindows',
       'isChoosingScreen',
     ]);
-  const {
-    maximizedParticipant,
-    pages,
-    currentPage,
-    participants,
-    state: currentCallState,
-  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'pages', 'currentPage', 'participants', 'state']);
+  const {maximizedParticipant, state: currentCallState} = useKoSubscribableChildren(joinedCall, [
+    'maximizedParticipant',
+    'state',
+  ]);
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
@@ -81,10 +78,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
   }, [currentCallState]);
 
-  const videoGrid = useMemo(
-    () => joinedCall && getGrid(joinedCall),
-    [joinedCall, participants, pages, currentPage, participants?.map(p => p.hasActiveVideo())],
-  );
+  const videoGrid = joinedCall && getGrid(joinedCall);
 
   const onCancelScreenSelection = () => {
     callState.selectableScreens([]);
