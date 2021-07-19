@@ -2074,10 +2074,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/generate-changelog@1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@types/generate-changelog/-/generate-changelog-1.8.0.tgz#ed9d3f0b3255ab64c3ab022ec65792d7a5bf8c6f"
-  integrity sha512-JEpf0zZOuJHrHAiTOL8s9fP6uyvooJkxDoCUJFquWN9N9WyjU+14F1j0aDcn1Zc3PkdPwnQSUYlljv1UHgz8pQ==
+"@types/generate-changelog@1.8.1":
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/@types/generate-changelog/-/generate-changelog-1.8.1.tgz#267372d8d8a5de2667b61b49dee77ee5f4c07b24"
+  integrity sha512-MYZW/SOfJluNdw+lkbC/MNmdBO7QFuY/WFziHW6nMo+NbJ5MgNy78qaLCC4Pz5DiHZRiahUoDoZSr6EBmlRreA==
 
 "@types/geolite2@2.0.0":
   version "2.0.0"
