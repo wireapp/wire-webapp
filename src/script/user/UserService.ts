@@ -17,7 +17,7 @@
  *
  */
 
-import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user/';
+import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp/api-client/src/user/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -26,6 +26,7 @@ import type {User} from '../entity/User';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 import {APIClient} from '../service/APIClientSingleton';
+import {isQualifiedIdArray} from 'Util/TypePredicateUtil';
 
 export class UserService {
   private readonly logger: Logger;
@@ -108,7 +109,10 @@ export class UserService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/users
    * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    */
-  getUsers(userIds: string[]): Promise<APIClientUser[]> {
+  getUsers(userIds: string[] | QualifiedId[]): Promise<APIClientUser[]> {
+    if (isQualifiedIdArray(userIds)) {
+      return this.apiClient.user.api.postListUsers({qualified_ids: userIds});
+    }
     return this.apiClient.user.api.getUsers({ids: userIds});
   }
 

@@ -113,8 +113,9 @@ export class User {
     };
   }
 
-  constructor(id: string = '') {
+  constructor(id: string = '', domain?: string) {
     this.id = id;
+    this.domain = domain;
     this.isMe = false;
     this.isService = false;
     this.isSingleSignOn = false;

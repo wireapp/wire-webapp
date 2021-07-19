@@ -78,13 +78,13 @@ export class UserModalViewModel {
     this.hide();
   };
 
-  showUser(userId: string, onModalClosed: () => void = noop): void {
+  showUser(userId: string, domain?: string, onModalClosed: () => void = noop): void {
     this.onClosedCallback = onModalClosed;
     this.user(null);
     this.userNotFound(false);
     if (userId) {
       this.userRepository
-        .getUserById(userId)
+        .getUserById(userId, domain)
         .then(user => {
           if (user.isDeleted) {
             return this.userNotFound(true);
