@@ -17,8 +17,8 @@
  *
  */
 
-import type {QualifiedUserClients} from '@wireapp/api-client/src/conversation/QualifiedUserClients';
-import type {QualifiedId} from '@wireapp/api-client/src/user/QualifiedId';
+import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/src/conversation/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
 export function isStringArray(obj: any): obj is string[] {
   return Array.isArray(obj) && typeof obj[0] === 'string';
@@ -37,6 +37,17 @@ export function isQualifiedUserClients(obj: any): obj is QualifiedUserClients {
         const firstClientId = firstClientIdArray[0];
         return typeof firstClientId === 'string';
       }
+    }
+  }
+  return false;
+}
+
+export function isUserClients(obj: any): obj is UserClients {
+  if (typeof obj === 'object') {
+    const firstUserClientArray = Object.values(obj)?.[0];
+    if (Array.isArray(firstUserClientArray)) {
+      const firstClientId = firstUserClientArray[0];
+      return typeof firstClientId === 'string';
     }
   }
   return false;
