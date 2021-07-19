@@ -47,7 +47,7 @@ import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {TeamState} from '../../team/TeamState';
 import {Context, ContextMenuEntry} from '../../ui/ContextMenu';
-import type {Participant} from '../../calling/Participant';
+import type {ClientId, Participant, UserId} from '../../calling/Participant';
 
 export interface CallingCellProps {
   call: Call;
@@ -141,11 +141,26 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     event.preventDefault();
     const entries: ContextMenuEntry[] = [
       {
-        click: () => callingRepository.sendModeratorMute(conversation.id, participant.user.id, participant.clientId),
+        click: () =>
+          callingRepository.sendModeratorMute(conversation.id, {[participant.user.id]: [participant.clientId]}),
         icon: 'mic-off-icon',
         isDisabled:
           participant.isMuted() || conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
         label: 'Mute',
+      },
+      {
+        click: () => {
+          const recipients = participants.reduce((acc, {user, clientId}) => {
+            acc[user.id] = [...(acc[user.id] || []), clientId];
+            return acc;
+          }, {} as Record<UserId, ClientId[]>);
+          callingRepository.sendModeratorMute(conversation.id, recipients);
+        },
+        icon: 'mic-off-icon',
+        isDisabled:
+          participants.every(p => p.isMuted()) ||
+          conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
+        label: 'Mute all',
       },
     ];
     Context.from(event.nativeEvent, entries, 'participant-moderator-menu');
