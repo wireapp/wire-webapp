@@ -78,65 +78,79 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamStat
   const isDownloading = assetStatus === AssetTransferState.DOWNLOADING;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
-  return !isFileSharingReceivingEnabled ? (
-    <>{'Unable to receive this type of message'}</>
-  ) : (
-    <>
-      {!message.isObfuscated() && (
-        <>
-          {hasHeader && <AssetHeader message={message} />}
-          <div
-            className={cx('file', {
-              'cursor-pointer': isUploaded,
-            })}
-            data-uie-name="file"
-            data-uie-value={asset.file_name}
-            onClick={() => {
-              if (isUploaded) {
-                downloadAsset();
-              }
-            }}
-          >
-            {isPendingUpload && <div className="asset-placeholder loading-dots"></div>}
-            {isNotUploading && (
-              <>
-                {isUploaded && (
-                  <div
-                    className="file-icon icon-file"
-                    onClick={event => {
-                      event.stopPropagation();
-                      downloadAsset();
-                    }}
-                    data-uie-name="file-icon"
-                  >
-                    <span className="file-icon-ext icon-view"></span>
-                  </div>
-                )}
-
-                {isDownloading && <AssetLoader loadProgress={downloadProgress} onCancel={asset.cancelDownload} />}
-
-                {isUploading && <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />}
-
-                {isFailedUpload && <div className="media-button media-button-error"></div>}
-
-                <div className="file-desc">
-                  <div className="label-bold-xs ellipsis" data-uie-name="file-name">
-                    {fileName}
-                  </div>
-                  <ul className="file-desc-meta label-xs text-foreground">
-                    <li data-uie-name="file-size">{formattedFileSize}</li>
-                    {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
-                    {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
-                    {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
-                    {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
-                  </ul>
-                </div>
-              </>
-            )}
+  return (
+    !message.isObfuscated() && (
+      <>
+        {!isFileSharingReceivingEnabled ? (
+          <div className="file">
+            <div className="file-icon icon-file" data-uie-name="file-icon">
+              <span className="file-icon-ext icon-view"></span>
+            </div>
+            <div className="file-desc">
+              <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                {fileName}
+              </div>
+              <ul className="file-desc-meta label-nocase-xs text-foreground">
+                <li data-uie-name="file-restrictions">{t('conversationAssetRestricted')}</li>
+              </ul>
+            </div>
           </div>
-        </>
-      )}
-    </>
+        ) : (
+          <>
+            {hasHeader && <AssetHeader message={message} />}
+            <div
+              className={cx('file', {
+                'cursor-pointer': isUploaded,
+              })}
+              data-uie-name="file"
+              data-uie-value={asset.file_name}
+              onClick={() => {
+                if (isUploaded) {
+                  downloadAsset();
+                }
+              }}
+            >
+              {isPendingUpload && <div className="asset-placeholder loading-dots"></div>}
+              {isNotUploading && (
+                <>
+                  {isUploaded && (
+                    <div
+                      className="file-icon icon-file"
+                      onClick={event => {
+                        event.stopPropagation();
+                        downloadAsset();
+                      }}
+                      data-uie-name="file-icon"
+                    >
+                      <span className="file-icon-ext icon-view"></span>
+                    </div>
+                  )}
+
+                  {isDownloading && <AssetLoader loadProgress={downloadProgress} onCancel={asset.cancelDownload} />}
+
+                  {isUploading && <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />}
+
+                  {isFailedUpload && <div className="media-button media-button-error"></div>}
+
+                  <div className="file-desc">
+                    <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                      {fileName}
+                    </div>
+                    <ul className="file-desc-meta label-xs text-foreground">
+                      <li data-uie-name="file-size">{formattedFileSize}</li>
+                      {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
+                      {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
+                      {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
+                      {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
+                    </ul>
+                  </div>
+                </>
+              )}
+            </div>
+          </>
+        )}
+      </>
+    )
   );
 };
 
