@@ -64,13 +64,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
       'selectableWindows',
       'isChoosingScreen',
     ]);
-  const {
-    maximizedParticipant,
-    pages,
-    currentPage,
-    participants,
-    state: currentCallState,
-  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'pages', 'currentPage', 'participants', 'state']);
+  const {maximizedParticipant, state: currentCallState} = useKoSubscribableChildren(joinedCall, [
+    'maximizedParticipant',
+    'state',
+  ]);
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {

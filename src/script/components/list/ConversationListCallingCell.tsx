@@ -75,17 +75,14 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, pages, currentPage} =
-    useKoSubscribableChildren(call, [
-      'reason',
-      'state',
-      'isCbrEnabled',
-      'startedAt',
-      'participants',
-      'maximizedParticipant',
-      'pages',
-      'currentPage',
-    ]);
+  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant} = useKoSubscribableChildren(call, [
+    'reason',
+    'state',
+    'isCbrEnabled',
+    'startedAt',
+    'participants',
+    'maximizedParticipant',
+  ]);
   const {
     isGroup,
     participating_user_ets: userEts,
