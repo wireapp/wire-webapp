@@ -91,6 +91,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   } = useKoSubscribableChildren(conversation, ['isGroup', 'participating_user_ets', 'selfUser', 'display_name']);
 
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
+  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const {isMuted, videoSpeakersActiveTab} = useKoSubscribableChildren(callState, ['isMuted', 'videoSpeakersActiveTab']);
 
@@ -103,7 +104,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const isOngoing = state === CALL_STATE.MEDIA_ESTAB;
 
   const showNoCameraPreview = !hasAccessToCamera && call.initialType === CALL_TYPE.VIDEO && !isOngoing;
-  const showVideoButton = call.initialType === CALL_TYPE.VIDEO || isOngoing;
+  const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
 
   const videoGrid = call && getGrid(call);
