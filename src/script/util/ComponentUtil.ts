@@ -86,7 +86,10 @@ type UnwrappedValues<T, S = Subscribables<T>> = {
   [Key in keyof S]: Unwrapped<S[Key]>;
 };
 
-export const useKoSubscribableChildren = <C extends keyof Subscribables<P>, P extends Record<C, ko.Subscribable>>(
+export const useKoSubscribableChildren = <
+  C extends keyof Subscribables<P>,
+  P extends Partial<Record<C, ko.Subscribable>>,
+>(
   parent: P,
   children: C[],
 ): UnwrappedValues<P> => {

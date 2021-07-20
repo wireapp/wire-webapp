@@ -22,7 +22,7 @@ import cx from 'classnames';
 
 import {noop} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
 
@@ -58,10 +58,27 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   isVisibleFunc = () => false,
   offsetTop = 0,
 }) => {
-  const isGroup = conversation.isGroup();
-  const is1To1 = conversation.is1to1();
-  const isInTeam = conversation.selfUser().inTeam();
-  const users = conversation.participating_user_ets;
+  const {
+    isGroup,
+    is1to1,
+    selfUser,
+    participating_user_ets: users,
+    display_name: displayName,
+    removed_from_conversation: removedFromConversation,
+    availabilityOfUser,
+    unreadState,
+  } = useKoSubscribableChildren(conversation, [
+    'isGroup',
+    'is1to1',
+    'selfUser',
+    'participating_user_ets',
+    'display_name',
+    'removed_from_conversation',
+    'availabilityOfUser',
+    'unreadState',
+  ]);
+
+  const isInTeam = selfUser.inTeam();
 
   const isSelected = is_selected(conversation);
   const cellHeight = 56;
@@ -78,44 +95,39 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     onJoinCall(conversation, MediaType.AUDIO);
   };
 
-  console.info('showJoinButton', showJoinButton);
-
   return (
     <div
       ref={viewportElementRef}
       data-uie-uid={conversation.id}
-      data-uie-value={conversation.display_name()}
+      data-uie-value={displayName}
       className={cx('conversation-list-cell', {'conversation-list-cell-active': isSelected})}
     >
       {isInViewport && (
         <>
           <div
             className={cx('conversation-list-cell-left', {
-              'conversation-list-cell-left-opaque':
-                conversation.removed_from_conversation() || conversation.participating_user_ids().length === 0,
+              'conversation-list-cell-left-opaque': removedFromConversation || users.length === 0,
             })}
           >
-            {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users()} />}
-            {!isGroup && users().length && (
+            {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
+            {!isGroup && users.length && (
               <div className="avatar-halo">
-                <Avatar participant={users()[0]} avatarSize={AVATAR_SIZE.SMALL} />
+                <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
               </div>
             )}
           </div>
           <div className="conversation-list-cell-center">
-            {is1To1 && isInTeam && (
+            {is1to1 && isInTeam && (
               <AvailabilityState
                 className="conversation-list-cell-availability"
-                availability={conversation.availabilityOfUser()}
-                label={conversation.display_name()}
+                availability={availabilityOfUser}
+                label={displayName}
                 theme={isSelected}
                 dataUieName="status-availability-item"
               />
             )}
-            {!(is1To1 && isInTeam) && (
-              <span className={cx('conversation-list-cell-name', {'accent-text': isSelected})}>
-                {conversation.display_name()}
-              </span>
+            {!(is1to1 && isInTeam) && (
+              <span className={cx('conversation-list-cell-name', {'accent-text': isSelected})}>{displayName}</span>
             )}
             <span className="conversation-list-cell-description" data-uie-name="secondary-line">
               {cellState.description}
@@ -162,12 +174,11 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                     <Icon.Mute className="svg-icon" />
                   </span>
                 )}
-                {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES &&
-                  conversation.unreadState().allMessages.length > 0 && (
-                    <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-unread">
-                      {conversation.unreadState().allMessages.length}
-                    </span>
-                  )}
+                {cellState.icon === ConversationStatusIcon.UNREAD_MESSAGES && unreadState.allMessages.length > 0 && (
+                  <span className="conversation-list-cell-badge cell-badge-light" data-uie-name="status-unread">
+                    {unreadState.allMessages.length}
+                  </span>
+                )}
               </>
             )}
             {showJoinButton && (
