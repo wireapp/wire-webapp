@@ -95,11 +95,13 @@ export const viewportObserver = {
   trackElement,
 };
 
-export const useViewPortObserver = (): [isInViewport: boolean, ref: (node: Element) => void] => {
+export const useViewPortObserver = (
+  defaultIsVisible: boolean = false,
+): [isInViewport: boolean, ref: (node: Element) => void] => {
   const [elementRef, setElementRef] = useState(null);
   const ref = useCallback(node => setElementRef(node), []);
 
-  const [isInViewport, setIsInViewport] = useState(false);
+  const [isInViewport, setIsInViewport] = useState(defaultIsVisible);
   useEffect(() => {
     viewportObserver.trackElement(
       elementRef,
