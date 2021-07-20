@@ -78,8 +78,6 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     'unreadState',
   ]);
 
-  const isInTeam = selfUser.inTeam();
-
   const isSelected = is_selected(conversation);
   const cellHeight = 56;
   const cellTop = index * cellHeight + offsetTop;
@@ -117,7 +115,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             )}
           </div>
           <div className="conversation-list-cell-center">
-            {is1to1 && isInTeam && (
+            {is1to1 && selfUser.inTeam() ? (
               <AvailabilityState
                 className="conversation-list-cell-availability"
                 availability={availabilityOfUser}
@@ -125,8 +123,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
                 theme={isSelected}
                 dataUieName="status-availability-item"
               />
-            )}
-            {!(is1to1 && isInTeam) && (
+            ) : (
               <span className={cx('conversation-list-cell-name', {'accent-text': isSelected})}>{displayName}</span>
             )}
             <span className="conversation-list-cell-description" data-uie-name="secondary-line">
