@@ -66,6 +66,9 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     ]);
   const {maximizedParticipant, state: currentCallState} = useKoSubscribableChildren(joinedCall, [
     'maximizedParticipant',
+    'pages',
+    'currentPage',
+    'participants',
     'state',
   ]);
 

@@ -82,6 +82,8 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     'startedAt',
     'participants',
     'maximizedParticipant',
+    'pages',
+    'currentPage',
   ]);
   const {
     isGroup,
@@ -216,7 +218,10 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             </div>
           </div>
           {(isOngoing || selfParticipant?.hasActiveVideo()) && isMinimized && videoGrid?.grid.length && (
-            <div className="group-video__minimized-wrapper" onClick={() => multitasking.isMinimized(false)}>
+            <div
+              className="group-video__minimized-wrapper"
+              onClick={isOngoing ? () => multitasking.isMinimized(false) : undefined}
+            >
               <GroupVideoGrid
                 grid={
                   videoSpeakersActiveTab === VideoSpeakersTab.ALL
@@ -227,9 +232,11 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 maximizedParticipant={maximizedParticipant}
                 selfParticipant={selfParticipant}
               />
-              <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-                <Icon.Fullscreen />
-              </div>
+              {isOngoing && (
+                <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
+                  <Icon.Fullscreen />
+                </div>
+              )}
             </div>
           )}
 
