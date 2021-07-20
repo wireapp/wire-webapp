@@ -82,19 +82,22 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamStat
     !message.isObfuscated() && (
       <>
         {!asset.isVideo() && !isFileSharingReceivingEnabled ? (
-          <div className="file">
-            <div className="file-icon icon-file" data-uie-name="file-icon">
-              <span className="file-icon-ext icon-block"></span>
-            </div>
-            <div className="file-desc">
-              <div className="label-bold-xs ellipsis" data-uie-name="file-name">
-                {fileName}
+          <>
+            {hasHeader && <AssetHeader message={message} />}
+            <div className="file">
+              <div className="file-icon icon-file" data-uie-name="file-icon">
+                <span className="file-icon-ext icon-block"></span>
               </div>
-              <ul className="file-desc-meta label-nocase-xs text-foreground">
-                <li data-uie-name="file-restrictions">{t('conversationAssetRestricted')}</li>
-              </ul>
+              <div className="file-desc">
+                <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                  {fileName}
+                </div>
+                <ul className="file-desc-meta label-nocase-xs text-foreground">
+                  <li data-uie-name="file-restrictions">{t('conversationAssetRestricted')}</li>
+                </ul>
+              </div>
             </div>
-          </div>
+          </>
         ) : (
           <>
             {hasHeader && <AssetHeader message={message} />}
