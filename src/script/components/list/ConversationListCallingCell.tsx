@@ -162,6 +162,13 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
           conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
         label: 'Mute all',
       },
+      {
+        click: () =>
+          callingRepository.sendModeratorKick(conversation.id, {[participant.user.id]: [participant.clientId]}),
+        icon: 'leave-icon',
+        isDisabled: conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
+        label: 'Kick from call',
+      },
     ];
     Context.from(event.nativeEvent, entries, 'participant-moderator-menu');
   };
