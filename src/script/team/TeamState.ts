@@ -80,12 +80,14 @@ export class TeamState {
     this.userState.teamMembers = this.teamMembers;
     this.userState.teamUsers = this.teamUsers;
 
-    this.isFileSharingSendingEnabled = ko.pureComputed(
-      () => true || this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
-    );
-    this.isFileSharingReceivingEnabled = ko.pureComputed(
-      () => true || this.teamFeatures()?.fileSharing?.status === FeatureStatus.ENABLED,
-    );
+    this.isFileSharingSendingEnabled = ko.pureComputed(() => {
+      const status = this.teamFeatures()?.fileSharing?.status;
+      return status ? status === FeatureStatus.ENABLED : true;
+    });
+    this.isFileSharingReceivingEnabled = ko.pureComputed(() => {
+      const status = this.teamFeatures()?.fileSharing?.status;
+      return status ? status === FeatureStatus.ENABLED : true;
+    });
 
     this.isVideoCallingEnabled = ko.pureComputed(
       // TODO connect to video calling feature config

@@ -81,9 +81,11 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamStat
   return (
     !message.isObfuscated() && (
       <>
-        {!isFileSharingReceivingEnabled ? (
+        {!asset.isVideo() && !isFileSharingReceivingEnabled ? (
           <div className="file">
-            <div className="file-icon icon-file" data-uie-name="file-icon" />
+            <div className="file-icon icon-file" data-uie-name="file-icon">
+              <span className="file-icon-ext icon-block"></span>
+            </div>
             <div className="file-desc">
               <div className="label-bold-xs ellipsis" data-uie-name="file-name">
                 {fileName}
