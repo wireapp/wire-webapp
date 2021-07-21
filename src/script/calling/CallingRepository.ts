@@ -570,6 +570,10 @@ export class CallingRepository {
         }
         break;
       }
+      case CALL_MESSAGE_TYPE.REMOTE_KICK: {
+        this.leaveCall(conversationId);
+        break;
+      }
     }
 
     await validatedPromise.catch(() => this.abortCall(conversationId));
@@ -965,14 +969,26 @@ export class CallingRepository {
     return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
   };
 
-  readonly sendModeratorMute = (conversationId: ConversationId, userId: UserId, clientId: ClientId) => {
+  readonly sendModeratorMute = (conversationId: ConversationId, recipients: Record<UserId, ClientId[]>) => {
     this.sendCallingMessage(
       conversationId,
       {type: CALL_MESSAGE_TYPE.REMOTE_MUTE},
       {
         nativePush: true,
         precondition: true,
-        recipients: {[userId]: [clientId]},
+        recipients,
+      },
+    );
+  };
+
+  readonly sendModeratorKick = (conversationId: ConversationId, recipients: Record<UserId, ClientId[]>) => {
+    this.sendCallingMessage(
+      conversationId,
+      {type: CALL_MESSAGE_TYPE.REMOTE_KICK},
+      {
+        nativePush: true,
+        precondition: true,
+        recipients,
       },
     );
   };
