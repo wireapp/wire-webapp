@@ -17,12 +17,13 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo} from 'react';
 import cx from 'classnames';
 
 import {noop} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import useEffectRef from 'Util/useEffectRef';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
 
@@ -43,6 +44,7 @@ export interface ConversationListCellProps {
   is_selected: (conversation: Conversation) => boolean;
   isVisibleFunc: (top: number, bottom: number) => boolean;
   offsetTop: number;
+  onClick: () => void;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: (conversation: Conversation, event: MouseEvent) => void;
   showJoinButton: boolean;
@@ -52,6 +54,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   showJoinButton,
   conversation,
   onJoinCall,
+  onClick = noop,
   is_selected = () => false,
   rightClick = noop,
   index = 0,
@@ -86,7 +89,20 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const cellBottom = cellTop + cellHeight;
 
   const isInitiallyVisible = isVisibleFunc(cellTop, cellBottom);
-  const [isInViewport, viewportElementRef] = useViewPortObserver(isInitiallyVisible);
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const isInViewport = useViewPortObserver(viewportElementRef, isInitiallyVisible);
+
+  useEffect(() => {
+    const handleRightClick = (event: MouseEvent) => {
+      event.stopPropagation();
+      event.preventDefault();
+      rightClick(conversation, event);
+    };
+    viewportElementRef?.addEventListener('contextmenu', handleRightClick);
+    return () => {
+      viewportElementRef?.removeEventListener('contextmenu', handleRightClick);
+    };
+  }, [viewportElementRef]);
 
   const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState]);
 
@@ -97,10 +113,11 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
 
   return (
     <div
-      ref={viewportElementRef}
+      ref={setViewportElementRef}
       data-uie-uid={conversation.id}
       data-uie-value={displayName}
       className={cx('conversation-list-cell', {'conversation-list-cell-active': isSelected})}
+      onClick={onClick}
     >
       {isInViewport && (
         <>
@@ -136,7 +153,10 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             <span
               className="conversation-list-cell-context-menu"
               data-uie-name="go-options"
-              onClick={event => rightClick(conversation, event.nativeEvent)}
+              onClick={event => {
+                event.stopPropagation();
+                rightClick(conversation, event.nativeEvent);
+              }}
             ></span>
             {!showJoinButton && (
               <>
@@ -200,6 +220,6 @@ export default ConversationListCell;
 
 registerReactComponent('conversation-list-cell', {
   bindings:
-    'offsetTop: ko.unwrap(offsetTop), index: ko.unwrap(index), showJoinButton: ko.unwrap(showJoinButton), conversation, is_selected, isVisibleFunc, onJoinCall, rightClick',
+    'offsetTop: ko.unwrap(offsetTop), index: ko.unwrap(index), showJoinButton: ko.unwrap(showJoinButton), conversation, is_selected, isVisibleFunc, onJoinCall, rightClick, onClick',
   component: ConversationListCell,
 });
