@@ -21,15 +21,18 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
 import {useViewPortObserver} from '../ui/viewportObserver';
+import {TeamState} from '../team/TeamState';
+import {t} from 'Util/LocalizerUtil';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   asset: AssetRemoteData;
   assetRepository?: AssetRepository;
   click?: (asset: AssetRemoteData) => void;
+  teamState?: TeamState;
 }
 
 const Image: React.FC<ImageProps> = ({
@@ -37,11 +40,14 @@ const Image: React.FC<ImageProps> = ({
   click,
   className,
   assetRepository = container.resolve(AssetRepository),
+  teamState = container.resolve(TeamState),
   ...props
 }) => {
   const [isInViewport, viewportElementRef] = useViewPortObserver();
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();
+
+  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
   const onClick = () => {
     if (!assetIsLoading && typeof click === 'function') {
@@ -50,7 +56,7 @@ const Image: React.FC<ImageProps> = ({
   };
 
   useEffect(() => {
-    if (isInViewport === true) {
+    if (isInViewport === true && isFileSharingReceivingEnabled) {
       setAssetIsLoading(true);
       assetRepository.load(asset).then(blob => {
         if (blob) {
@@ -66,7 +72,18 @@ const Image: React.FC<ImageProps> = ({
     };
   }, [isInViewport]);
 
-  return (
+  return !isFileSharingReceivingEnabled ? (
+    <div className={cx('image-restricted', className)}>
+      <div className="image-restricted--container">
+        <div className="flex-center file-icon icon-file" data-uie-name="file-icon">
+          <span className="file-icon-ext icon-block"></span>
+        </div>
+        <div>
+          <div className="label-nocase-xs text-foreground text-center">{t('conversationAssetRestricted')}</div>
+        </div>
+      </div>
+    </div>
+  ) : (
     <div ref={viewportElementRef} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img onClick={onClick} src={assetSrc} />

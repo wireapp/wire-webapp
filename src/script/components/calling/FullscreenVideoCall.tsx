@@ -23,6 +23,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import Icon from 'Components/Icon';
 import React, {useEffect, useMemo, useState} from 'react';
+import {TeamState} from '../../team/TeamState';
+import {container} from 'tsyringe';
 import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {Call} from '../../calling/Call';
@@ -54,6 +56,7 @@ export interface FullscreenVideoCallProps {
   setMaximizedParticipant: (call: Call, participant: Participant) => void;
   setVideoSpeakersActiveTab: (tab: string) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
+  teamState?: TeamState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
@@ -119,6 +122,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   toggleScreenshare,
   leave,
   changePage,
+  teamState = container.resolve(TeamState),
 }) => {
   const selfParticipant = call.getSelfParticipant();
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
@@ -134,13 +138,16 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     participants,
   } = useKoSubscribableChildren(call, ['activeSpeakers', 'currentPage', 'pages', 'startedAt', 'participants']);
   const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
+  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
+
   const currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput();
   const switchCameraSource = (call: Call, deviceId: string) => switchCameraInput(call, deviceId);
   const minimize = () => multitasking.isMinimized(true);
   const videoInput = useKoSubscribable(mediaDevicesHandler.availableDevices.videoInput);
   const showToggleVideo =
-    call.initialType === CALL_TYPE.VIDEO ||
-    conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE);
+    isVideoCallingEnabled &&
+    (call.initialType === CALL_TYPE.VIDEO ||
+      conversation.supportsVideoCall(call.conversationType === CONV_TYPE.CONFERENCE));
   const availableCameras = useMemo(
     () =>
       videoInput.map(device => (device as MediaDeviceInfo).deviceId || (device as ElectronDesktopCapturerSource).id),

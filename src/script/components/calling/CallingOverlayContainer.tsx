@@ -18,7 +18,7 @@
  */
 
 import ReactDOM from 'react-dom';
-import React, {Fragment, useEffect, useMemo, useState} from 'react';
+import React, {Fragment, useEffect} from 'react';
 import {container} from 'tsyringe';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
@@ -54,24 +54,23 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   callState = container.resolve(CallState),
   conversationState = container.resolve(ConversationState),
 }) => {
-  let onChooseScreen = (deviceId: string) => {};
-  const [selectableScreens, setSelectableScreens] = useState<ElectronDesktopCapturerSource[]>([]);
-  const [selectableWindows, setSelectableWindows] = useState<ElectronDesktopCapturerSource[]>([]);
-  const isChoosingScreen = selectableScreens.length > 0 || selectableWindows.length > 0;
-
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
-  const {isMuted, videoSpeakersActiveTab, joinedCall} = useKoSubscribableChildren(callState, [
-    'isMuted',
-    'videoSpeakersActiveTab',
-    'joinedCall',
+  const {isMuted, videoSpeakersActiveTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
+    useKoSubscribableChildren(callState, [
+      'isMuted',
+      'videoSpeakersActiveTab',
+      'joinedCall',
+      'selectableScreens',
+      'selectableWindows',
+      'isChoosingScreen',
+    ]);
+  const {maximizedParticipant, state: currentCallState} = useKoSubscribableChildren(joinedCall, [
+    'maximizedParticipant',
+    'pages',
+    'currentPage',
+    'participants',
+    'state',
   ]);
-  const {
-    maximizedParticipant,
-    pages,
-    currentPage,
-    participants,
-    state: currentCallState,
-  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'pages', 'currentPage', 'participants', 'state']);
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
@@ -82,14 +81,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
   }, [currentCallState]);
 
-  const videoGrid = useMemo(
-    () => joinedCall && getGrid(joinedCall),
-    [joinedCall, participants, pages, currentPage, participants?.map(p => p.hasActiveVideo())],
-  );
+  const videoGrid = joinedCall && getGrid(joinedCall);
 
   const onCancelScreenSelection = () => {
-    setSelectableScreens([]);
-    setSelectableWindows([]);
+    callState.selectableScreens([]);
+    callState.selectableWindows([]);
   };
 
   const getConversationById = (conversationId: string): Conversation => {
@@ -132,18 +128,18 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
     const showScreenSelection = (): Promise<void> => {
       return new Promise(resolve => {
-        onChooseScreen = (deviceId: string): void => {
+        callingRepository.onChooseScreen = (deviceId: string): void => {
           mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
-          setSelectableScreens([]);
-          setSelectableWindows([]);
+          callState.selectableScreens([]);
+          callState.selectableWindows([]);
           resolve();
         };
         mediaDevicesHandler.getScreenSources().then((sources: ElectronDesktopCapturerSource[]) => {
           if (sources.length === 1) {
-            return onChooseScreen(sources[0].id);
+            return callingRepository.onChooseScreen(sources[0].id);
           }
-          setSelectableScreens(sources.filter(source => source.id.startsWith('screen')));
-          setSelectableWindows(sources.filter(source => source.id.startsWith('window')));
+          callState.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
+          callState.selectableWindows(sources.filter(source => source.id.startsWith('window')));
         });
       });
     };
@@ -192,7 +188,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
       {isChoosingScreen && (
         <ChooseScreen
           cancel={onCancelScreenSelection}
-          choose={onChooseScreen}
+          choose={callingRepository.onChooseScreen}
           screens={selectableScreens as unknown as Screen[]}
           windows={selectableWindows as unknown as Screen[]}
         />

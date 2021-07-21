@@ -81,6 +81,7 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
+import {TeamState} from '../team/TeamState';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -113,6 +114,7 @@ export class CallingRepository {
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
+  onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
     return {
@@ -131,6 +133,7 @@ export class CallingRepository {
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
@@ -167,10 +170,14 @@ export class CallingRepository {
     };
 
     this.subscribeToEvents();
+
+    this.onChooseScreen = (deviceId: string) => {};
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
-    this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
+    if (!Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
+      this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
+    }
   };
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -397,6 +404,7 @@ export class CallingRepository {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     try {
+      camera = this.teamState.isVideoCallingEnabled() ? camera : false;
       const mediaStream = await this.getMediaStream({audio, camera}, isGroup);
       if (call.state() !== CALL_STATE.NONE) {
         call.getSelfParticipant().updateMediaStream(mediaStream);
@@ -1304,7 +1312,7 @@ export class CallingRepository {
 
   private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
     const activeCall = this.callState.activeCalls()[0];
-    if (activeCall) {
+    if (activeCall && !Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
       activeCall.isCbrEnabled(!!enabled);
     }
   };

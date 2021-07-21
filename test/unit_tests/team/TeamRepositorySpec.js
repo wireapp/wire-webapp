@@ -17,19 +17,11 @@
  *
  */
 
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-
-import {Config} from 'src/script/Config';
 import {TeamRepository} from 'src/script/team/TeamRepository';
 import {TeamState} from 'src/script/team/TeamState';
 import {UserState} from 'src/script/user/UserState';
-import {TestFactory} from '../../helper/TestFactory';
-
-jest.deepUnmock('axios');
 
 describe('TeamRepository', () => {
-  const testFactory = new TestFactory();
-
   /* eslint sort-keys-fix/sort-keys-fix: "off" */
   const teams_data = {
     teams: [
@@ -60,61 +52,41 @@ describe('TeamRepository', () => {
   };
   /* eslint sort-keys-fix/sort-keys-fix: "off" */
 
-  let server = undefined;
-  let team_repository = undefined;
-
-  beforeEach(async () => {
-    team_repository = await testFactory.exposeTeamActors();
-
-    server = sinon.fakeServer.create();
-    server.autoRespond = true;
-
-    server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/teams`, [
-      HTTP_STATUS.OK,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(teams_data),
-    ]);
-
-    server.respondWith('GET', `${Config.getConfig().BACKEND_REST}/teams/${team_metadata.id}/members`, [
-      HTTP_STATUS.OK,
-      {'Content-Type': 'application/json'},
-      JSON.stringify(team_members),
-    ]);
-
-    server.respondWith(
-      'POST',
-      `${Config.getConfig().BACKEND_REST}/teams/${team_metadata.id}/get-members-by-ids-using-post`,
-      [HTTP_STATUS.OK, {'Content-Type': 'application/json'}, JSON.stringify(team_members)],
-    );
-
-    server.respondWith(
-      'GET',
-      `${Config.getConfig().BACKEND_REST}/users?ids=${team_members.members.map(member => member.user).join(',')}`,
-      [HTTP_STATUS.OK, {'Content-Type': 'application/json'}, ''],
-    );
-  });
-
-  afterEach(() => server.restore());
-
   describe('getTeam()', () => {
-    it('returns the binding team entity', () => {
-      spyOn(team_repository.userState, 'self').and.returnValue({id: 'self-id'});
-      return team_repository.getTeam().then(team_et => {
-        const [team_data] = teams_data.teams;
+    it('returns the binding team entity', async () => {
+      const userState = new UserState();
+      userState.self({id: 'self-id'});
+      const teamService = {
+        getTeams: jest.fn(() => Promise.resolve(teams_data)),
+      };
+      const teamRepo = new TeamRepository(
+        teamService,
+        {
+          mapGuestStatus: jest.fn(),
+        },
+        {},
+        userState,
+        new TeamState(userState),
+      );
+      const team_et = await teamRepo.getTeam();
+      const [team_data] = teams_data.teams;
 
-        expect(team_et.creator).toEqual(team_data.creator);
-        expect(team_et.id).toEqual(team_data.id);
-      });
+      expect(team_et.creator).toEqual(team_data.creator);
+      expect(team_et.id).toEqual(team_data.id);
     });
   });
 
   describe('getAllTeamMembers()', () => {
-    it('returns team member entities', () => {
-      return team_repository.getAllTeamMembers(team_metadata.id).then(entities => {
-        expect(entities.length).toEqual(team_members.members.length);
-        expect(entities[0].userId).toEqual(team_members.members[0].user);
-        expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
-      });
+    it('returns team member entities', async () => {
+      const userState = new UserState();
+      const teamService = {
+        getAllTeamMembers: jest.fn(() => Promise.resolve(team_members)),
+      };
+      const teamRepo = new TeamRepository(teamService, {}, {}, userState, new TeamState(userState));
+      const entities = await teamRepo.getAllTeamMembers(team_metadata.id);
+      expect(entities.length).toEqual(team_members.members.length);
+      expect(entities[0].userId).toEqual(team_members.members[0].user);
+      expect(entities[0].permissions).toEqual(team_members.members[0].permissions);
     });
   });
 
