@@ -22,6 +22,7 @@ import cx from 'classnames';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import Icon from 'Components/Icon';
 
 export interface RestrictedImageProps extends React.HTMLProps<HTMLDivElement> {
   isSmall?: boolean;
@@ -32,8 +33,8 @@ const RestrictedImage: React.FC<RestrictedImageProps> = ({showMessage = true, is
   return (
     <div className={cx('image-restricted', className, {'image-restricted--small': isSmall})}>
       <div className="image-restricted--container">
-        <div className="flex-center file-icon icon-file" data-uie-name="file-icon">
-          <span className="file-icon-ext icon-block"></span>
+        <div className="flex-center" data-uie-name="file-icon">
+          <Icon.Image />
         </div>
         {showMessage && <div className="image-restricted--message">{t('conversationAssetRestricted')}</div>}
       </div>
