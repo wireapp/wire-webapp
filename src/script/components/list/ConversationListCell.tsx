@@ -88,7 +88,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const isInitiallyVisible = isVisibleFunc(cellTop, cellBottom);
   const [isInViewport, viewportElementRef] = useViewPortObserver(isInitiallyVisible);
 
-  const cellState = useMemo(() => generateCellState(conversation), [conversation, unreadState, mutedState]);
+  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState]);
 
   const onClickJoinCall = (event: React.MouseEvent) => {
     event.preventDefault();
