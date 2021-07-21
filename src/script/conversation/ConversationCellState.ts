@@ -84,8 +84,8 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
       }
 
       return conversationEntity.isGroup()
-        ? `${messageEntity.unsafeSenderName()}: ${(messageEntity.getFirstAsset() as Text).text}`
-        : (messageEntity.getFirstAsset() as Text).text;
+        ? `${messageEntity.unsafeSenderName()}: ${(messageEntity.getFirstAsset() as Text)?.text}`
+        : (messageEntity.getFirstAsset() as Text)?.text;
     }
   }
 
