@@ -19,8 +19,8 @@
             <!-- /ko -->
 
             <!-- ko if: replyAsset().isImage()-->
-              <div class="input-bar__reply__message input-bar__reply__message__image" data-bind="background_image: replyAsset().resource()" data-uie-name="media-picture-reply-box">
-                <img/>
+              <div data-uie-name="media-picture-reply-box">
+                <image-component params="className: 'input-bar__reply__message input-bar__reply__message__image', asset: replyAsset().resource(), isQuote: true"></image-component>
               </div>
             <!-- /ko -->
 
