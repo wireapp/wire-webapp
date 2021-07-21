@@ -117,7 +117,7 @@ ko.components.register('audio-asset', {
       <!-- /ko -->
 
       <!-- ko ifnot: isFileSharingReceivingEnabled() -->
-        <audio-restricted params=""></audio-restricted>
+        <audio-restricted></audio-restricted>
       <!-- /ko -->
 
       <!-- ko if: isFileSharingReceivingEnabled() -->
