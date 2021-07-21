@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 const observedElements = new Map();
 const tolerance = 0.8;
@@ -95,12 +95,7 @@ export const viewportObserver = {
   trackElement,
 };
 
-export const useViewPortObserver = (
-  defaultIsVisible: boolean = false,
-): [isInViewport: boolean, ref: (node: Element) => void] => {
-  const [elementRef, setElementRef] = useState(null);
-  const ref = useCallback(node => setElementRef(node), []);
-
+export const useViewPortObserver = (elementRef: HTMLElement, defaultIsVisible: boolean = false): boolean => {
   const [isInViewport, setIsInViewport] = useState(defaultIsVisible);
   useEffect(() => {
     viewportObserver.trackElement(
@@ -119,5 +114,5 @@ export const useViewPortObserver = (
     };
   }, [elementRef]);
 
-  return [isInViewport, ref];
+  return isInViewport;
 };
