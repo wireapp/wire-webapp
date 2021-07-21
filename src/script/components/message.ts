@@ -48,6 +48,7 @@ import './asset/imageAsset';
 import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
 import './asset/videoAsset';
+import './asset/RestrictedFile';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
@@ -206,8 +207,7 @@ class Message {
       const messageEntity = this.message;
       const entries: ContextMenuEntry[] = [];
 
-      const isRestrictedFileShare =
-        !teamState.isFileSharingReceivingEnabled() && (messageEntity.hasAssetFile() || messageEntity.hasAssetImage());
+      const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
 
       const canDelete =
         messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();

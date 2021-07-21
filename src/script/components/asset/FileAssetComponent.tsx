@@ -21,6 +21,7 @@ import {ContentMessage} from '../../entity/message/ContentMessage';
 import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import AssetHeader from 'Components/asset/AssetHeader';
+import RestrictedFile from 'Components/asset/RestrictedFile';
 import {FileAsset} from '../../entity/message/FileAsset';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {container} from 'tsyringe';
@@ -81,22 +82,10 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamStat
   return (
     !message.isObfuscated() && (
       <>
-        {!asset.isVideo() && !isFileSharingReceivingEnabled ? (
+        {!isFileSharingReceivingEnabled ? (
           <>
             {hasHeader && <AssetHeader message={message} />}
-            <div className="file">
-              <div className="file-icon icon-file" data-uie-name="file-icon">
-                <span className="file-icon-ext icon-block"></span>
-              </div>
-              <div className="file-desc">
-                <div className="label-bold-xs ellipsis" data-uie-name="file-name">
-                  {fileName}
-                </div>
-                <ul className="file-desc-meta label-nocase-xs text-foreground">
-                  <li data-uie-name="file-restrictions">{t('conversationAssetRestricted')}</li>
-                </ul>
-              </div>
-            </div>
+            <RestrictedFile asset={asset} />
           </>
         ) : (
           <>
