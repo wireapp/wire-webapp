@@ -27,6 +27,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {useViewPortObserver} from '../ui/viewportObserver';
 import {TeamState} from '../team/TeamState';
 import {t} from 'Util/LocalizerUtil';
+import useEffectRef from 'Util/useEffectRef';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   asset: AssetRemoteData;
@@ -43,7 +44,9 @@ const Image: React.FC<ImageProps> = ({
   teamState = container.resolve(TeamState),
   ...props
 }) => {
-  const [isInViewport, viewportElementRef] = useViewPortObserver();
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const isInViewport = useViewPortObserver(viewportElementRef);
+
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();
 
@@ -84,7 +87,7 @@ const Image: React.FC<ImageProps> = ({
       </div>
     </div>
   ) : (
-    <div ref={viewportElementRef} className={cx('image-wrapper', className)} {...props}>
+    <div ref={setViewportElementRef} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img onClick={onClick} src={assetSrc} />
       ) : (
