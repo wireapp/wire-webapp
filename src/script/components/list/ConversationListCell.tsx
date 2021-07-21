@@ -67,6 +67,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     removed_from_conversation: removedFromConversation,
     availabilityOfUser,
     unreadState,
+    mutedState,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
@@ -76,6 +77,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     'removed_from_conversation',
     'availabilityOfUser',
     'unreadState',
+    'mutedState',
   ]);
 
   const isSelected = is_selected(conversation);
@@ -86,7 +88,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   const isInitiallyVisible = isVisibleFunc(cellTop, cellBottom);
   const [isInViewport, viewportElementRef] = useViewPortObserver(isInitiallyVisible);
 
-  const cellState = useMemo(() => generateCellState(conversation), [conversation]);
+  const cellState = useMemo(() => generateCellState(conversation), [conversation, unreadState, mutedState]);
 
   const onClickJoinCall = (event: React.MouseEvent) => {
     event.preventDefault();
