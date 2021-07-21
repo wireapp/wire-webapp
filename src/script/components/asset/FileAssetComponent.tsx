@@ -92,7 +92,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamStat
                 <div className="label-bold-xs ellipsis" data-uie-name="file-name">
                   {fileName}
                 </div>
-                <ul className="file-desc-meta label-nocase-xs text-foreground">
+                <ul className="file-desc-meta label-xs text-foreground">
                   <li data-uie-name="file-restrictions">{t('conversationAssetRestricted')}</li>
                 </ul>
               </div>
