@@ -51,6 +51,8 @@ export class Message {
   public category?: MessageCategory;
   public conversation_id: string;
   public from: string;
+  // TODO(Federation): Map domain to Message entity
+  public fromDomain?: string;
   public fromClientId: string;
   public id: string;
   public primary_key?: string;

@@ -821,7 +821,12 @@ export class EventMapper {
     return encodedMentions
       .map(encodedMention => {
         const protoMention = Mention.decode(encodedMention);
-        return new MentionEntity(protoMention.start, protoMention.length, protoMention.userId);
+        return new MentionEntity(
+          protoMention.start,
+          protoMention.length,
+          protoMention.userId,
+          protoMention.qualifiedUserId?.domain,
+        );
       })
       .filter((mentionEntity, _, allMentions): boolean | void => {
         if (mentionEntity) {

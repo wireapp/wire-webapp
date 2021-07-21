@@ -49,7 +49,7 @@ export class UserService {
    * @todo There might be more keys which are returned by this function
    * @returns Resolves with all the stored user states
    */
-  loadUserFromDb(): Promise<{availability: number; id: string}[]> {
+  loadUserFromDb(): Promise<{availability: number; domain: string; id: string}[]> {
     return this.storageService.getAll(this.USER_STORE_NAME);
   }
 

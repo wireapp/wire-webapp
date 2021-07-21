@@ -162,7 +162,7 @@ export class UserRepository {
 
         await Promise.all(
           users.map(async user => {
-            const userEntity = await this.getUserById(user.id);
+            const userEntity = await this.getUserById(user.id, user.domain);
             userEntity.availability(user.availability);
           }),
         );
@@ -224,13 +224,17 @@ export class UserRepository {
   /**
    * Event to update availability of a user.
    */
-  private onUserAvailability(event: {data: {availability: Availability.Type}; from: string}): void {
+  private onUserAvailability(event: {
+    data: {availability: Availability.Type};
+    from: string;
+    fromDomain: string | null;
+  }): void {
     if (this.userState.isTeam()) {
       const {
         from: userId,
         data: {availability},
       } = event;
-      this.getUserById(userId).then(userEntity => userEntity.availability(availability));
+      this.getUserById(userId, event.fromDomain).then(userEntity => userEntity.availability(availability));
     }
   }
 
@@ -239,7 +243,7 @@ export class UserRepository {
    */
   private async userUpdate({user}: {user: Partial<APIClientUser>}): Promise<User> {
     const isSelfUser = user.id === this.userState.self().id;
-    const userEntity = isSelfUser ? this.userState.self() : await this.getUserById(user.id);
+    const userEntity = isSelfUser ? this.userState.self() : await this.getUserById(user.id, user.qualified_id.domain);
     this.userMapper.updateUserFromObject(userEntity, user);
     if (isSelfUser) {
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
@@ -289,8 +293,9 @@ export class UserRepository {
     userId: string,
     clientPayload: PublicClient,
     publishClient: boolean = false,
+    domain: string | null,
   ): Promise<boolean> => {
-    const userEntity = await this.getUserById(userId);
+    const userEntity = await this.getUserById(userId, domain);
     const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.isMe);
     const wasClientAdded = userEntity.addClient(clientEntity);
     if (wasClientAdded) {
@@ -310,10 +315,12 @@ export class UserRepository {
 
   /**
    * Removes a stored client and the session connected with it.
+   * @deprecated
+   * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
-  removeClientFromUser = async (userId: string, clientId: string): Promise<void> => {
+  removeClientFromUser = async (userId: string, clientId: string, domain: string | null): Promise<void> => {
     await this.clientRepository.removeClient(userId, clientId);
-    const userEntity = await this.getUserById(userId);
+    const userEntity = await this.getUserById(userId, domain);
     userEntity.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
   };
@@ -321,8 +328,12 @@ export class UserRepository {
   /**
    * Update clients for given user.
    */
-  private readonly updateClientsFromUser = (userId: string, clientEntities: ClientEntity[]): void => {
-    this.getUserById(userId).then(userEntity => {
+  private readonly updateClientsFromUser = (
+    userId: string,
+    clientEntities: ClientEntity[],
+    domain: string | null,
+  ): void => {
+    this.getUserById(userId, domain).then(userEntity => {
       userEntity.devices(clientEntities);
       amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId, clientEntities);
     });
@@ -511,7 +522,7 @@ export class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  async getUserById(userId: string, domain?: string): Promise<User> {
+  async getUserById(userId: string, domain: string | null): Promise<User> {
     const qualifier = domain
       ? {
           domain,
