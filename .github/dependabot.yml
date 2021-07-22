@@ -8,7 +8,7 @@ updates:
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - 'type: chore \U0001F9F9'
+      - 'type: chore 🧹'
   - package-ecosystem: npm
     directory: '/'
     schedule:
@@ -18,7 +18,7 @@ updates:
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - 'type: chore \U0001F9F9'
+      - 'type: chore 🧹'
     ignore:
       - dependency-name: core-js
         versions:
@@ -45,7 +45,7 @@ updates:
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - 'type: chore \U0001F9F9'
+      - 'type: chore 🧹'
     ignore:
       - dependency-name: geolite2
         versions:
@@ -62,7 +62,7 @@ updates:
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - 'type: chore \U0001F9F9'
+      - 'type: chore 🧹'
     ignore:
       - dependency-name: electron
         versions:
