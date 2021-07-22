@@ -18,6 +18,8 @@
  */
 
 import ko from 'knockout';
+import {TeamState} from '../../team/TeamState';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -32,27 +34,30 @@ interface Params {
   header: boolean;
 
   message: ContentMessage;
+  teamState?: TeamState;
 }
 
 class AudioAssetComponent extends AbstractAssetTransferStateTracker {
   logger: Logger;
   message: ContentMessage;
   asset: FileAsset;
-  header: boolean;
+  hasHeader: boolean;
   audioSrc: ko.Observable<string>;
   audioElement: HTMLAudioElement;
   audioTime: ko.Observable<number>;
   audioIsLoaded: ko.Observable<boolean>;
   showLoudnessPreview: ko.PureComputed<boolean>;
   formatSeconds: (duration: number) => string;
+  isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
 
-  constructor({message, header = false}: Params, element: HTMLElement) {
+  constructor({message, header = false, teamState = container.resolve(TeamState)}: Params, element: HTMLElement) {
     super(ko.unwrap(message));
     this.logger = getLogger('AudioAssetComponent');
 
     this.message = ko.unwrap(message);
     this.asset = this.message.getFirstAsset() as FileAsset;
-    this.header = header;
+    this.hasHeader = header;
+    this.isFileSharingReceivingEnabled = teamState.isFileSharingReceivingEnabled;
 
     this.audioSrc = ko.observable();
     this.audioElement = element.querySelector('audio');
@@ -105,40 +110,49 @@ ko.components.register('audio-asset', {
   template: `
     <audio data-bind="attr: {src: audioSrc}, event: {timeupdate: onTimeupdate}"></audio>
     <!-- ko ifnot: message.isObfuscated() -->
-      <!-- ko if: header -->
-        <asset-header params="message: message"></asset-header>
-      <!-- /ko -->
-      <!-- ko if: transferState() === AssetTransferState.UPLOAD_PENDING -->
-        <div class="asset-placeholder loading-dots">
+      <!-- ko if: hasHeader -->
+        <div style="width: 100%">
+          <asset-header params="message: message"></asset-header>
         </div>
       <!-- /ko -->
-      <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
-        <div class="audio-controls">
-          <media-button params="src: audioElement,
-                                large: false,
-                                asset: asset,
-                                play: onPlayButtonClicked,
-                                pause: onPauseButtonClicked,
-                                cancel: () => cancelUpload(message),
-                                transferState: transferState,
-                                uploadProgress: uploadProgress
-                                ">
-          </media-button>
-          <!-- ko if: transferState() !== AssetTransferState.UPLOADING -->
-            <span class="audio-controls-time label-xs"
-                  data-uie-name="status-audio-time"
-                  data-bind="text: formatSeconds(audioTime())">
-            </span>
-            <!-- ko if: showLoudnessPreview -->
-              <audio-seek-bar data-uie-name="status-audio-seekbar"
-                              params="src: audioElement, asset: asset, disabled: !audioSrc()"></audio-seek-bar>
+
+      <!-- ko ifnot: isFileSharingReceivingEnabled() -->
+        <audio-restricted></audio-restricted>
+      <!-- /ko -->
+
+      <!-- ko if: isFileSharingReceivingEnabled() -->
+        <!-- ko if: transferState() === AssetTransferState.UPLOAD_PENDING -->
+          <div class="asset-placeholder loading-dots">
+          </div>
+        <!-- /ko -->
+        <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
+          <div class="audio-controls">
+            <media-button params="src: audioElement,
+                                  large: false,
+                                  asset: asset,
+                                  play: onPlayButtonClicked,
+                                  pause: onPauseButtonClicked,
+                                  cancel: () => cancelUpload(message),
+                                  transferState: transferState,
+                                  uploadProgress: uploadProgress
+                                  ">
+            </media-button>
+            <!-- ko if: transferState() !== AssetTransferState.UPLOADING -->
+              <span class="audio-controls-time label-xs"
+                    data-uie-name="status-audio-time"
+                    data-bind="text: formatSeconds(audioTime())">
+              </span>
+              <!-- ko if: showLoudnessPreview -->
+                <audio-seek-bar data-uie-name="status-audio-seekbar"
+                                params="src: audioElement, asset: asset, disabled: !audioSrc()"></audio-seek-bar>
+              <!-- /ko -->
+              <!-- ko ifnot: showLoudnessPreview -->
+                <seek-bar data-uie-name="status-audio-seekbar"
+                          params="src: audioElement, dark: true, disabled: !audioSrc()"></seek-bar>
+              <!-- /ko -->
             <!-- /ko -->
-            <!-- ko ifnot: showLoudnessPreview -->
-              <seek-bar data-uie-name="status-audio-seekbar"
-                        params="src: audioElement, dark: true, disabled: !audioSrc()"></seek-bar>
-            <!-- /ko -->
-          <!-- /ko -->
-        </div>
+          </div>
+        <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if:  message.isObfuscated() -->

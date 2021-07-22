@@ -43,6 +43,7 @@ import type {MessageRepository} from '../conversation/MessageRepository';
 import {TeamState} from '../team/TeamState';
 
 import './asset/audioAsset';
+import './asset/RestrictedAudio';
 import './asset/FileAssetComponent';
 import './asset/imageAsset';
 import './asset/RestrictedImage';
