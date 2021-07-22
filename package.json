@@ -191,7 +191,7 @@
     "*.{js,ts,tsx}": [
       "eslint --fix"
     ],
-    "*.{json,md}": [
+    "*.{json,md,yml}": [
       "prettier --write"
     ]
   },
@@ -223,7 +223,7 @@
     "lint:code": "eslint -c .eslintrc.json --ext .js,.ts,.tsx .",
     "lint:spelling": "cspell -c .cspell.json 'src/script/**/*.{js,ts,tsx,md}' src/i18n/en-US.json",
     "postinstall": "yarn configure && cd server && yarn && cd ../electron && yarn",
-    "prettier": "prettier --ignore-path .prettierignore \"**/*.{json,md}\"",
+    "prettier": "prettier --ignore-path .prettierignore \"**/*.{json,md,yml}\"",
     "release:staging": "git checkout dev && git pull && ts-node ./bin/release_tag.ts staging",
     "release:production": "git checkout master && git pull && ts-node ./bin/release_tag.ts production",
     "start": "yarn build:server && grunt build && concurrently \"yarn watch:server\" \"grunt watch\"",
