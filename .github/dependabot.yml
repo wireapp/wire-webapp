@@ -8,7 +8,7 @@ updates:
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - "type: chore \U0001F9F9"
+      - 'type: chore \U0001F9F9'
   - package-ecosystem: npm
     directory: '/'
     schedule:
@@ -18,16 +18,14 @@ updates:
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - "type: chore \U0001F9F9"
+      - 'type: chore \U0001F9F9'
     ignore:
       - dependency-name: core-js
         versions:
           - '>= 3.a'
-          - '< 4'
       - dependency-name: webrtc-adapter
         versions:
           - '>= 7.a'
-          - '< 8'
       - dependency-name: 'less'
         versions:
           - '>= 4'
@@ -47,12 +45,11 @@ updates:
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - "type: chore \U0001F9F9"
+      - 'type: chore \U0001F9F9'
     ignore:
       - dependency-name: geolite2
         versions:
-          - '>= 3.a'
-          - '< 4'
+          - '>= 2.a'
       - dependency-name: '@types/node'
         versions:
           - '>= 13.a'
@@ -65,7 +62,7 @@ updates:
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - "type: chore \U0001F9F9"
+      - 'type: chore \U0001F9F9'
     ignore:
       - dependency-name: electron
         versions:

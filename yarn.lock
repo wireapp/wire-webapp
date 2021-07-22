@@ -2090,11 +2090,6 @@
   resolved "https://registry.yarnpkg.com/@types/generate-changelog/-/generate-changelog-1.8.1.tgz#267372d8d8a5de2667b61b49dee77ee5f4c07b24"
   integrity sha512-MYZW/SOfJluNdw+lkbC/MNmdBO7QFuY/WFziHW6nMo+NbJ5MgNy78qaLCC4Pz5DiHZRiahUoDoZSr6EBmlRreA==
 
-"@types/geolite2@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@types/geolite2/-/geolite2-2.0.0.tgz#4b0f7af0d5460b0d67ff981df6f12c72f105c092"
-  integrity sha512-/ADzCQbkeiuu1FGPvh02pxdVhTzMjNOqM8hnOaga+m9nO2BB9puC+qGuGqmFedEmyPSl1pq1pQfgkgxFIE28cg==
-
 "@types/graceful-fs@^4.1.2":
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/@types/graceful-fs/-/graceful-fs-4.1.4.tgz#4ff9f641a7c6d1a3508ff88bc3141b152772e753"

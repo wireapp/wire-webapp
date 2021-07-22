@@ -68,7 +68,6 @@
     "@types/enzyme": "3.10.9",
     "@types/faker": "5.5.7",
     "@types/generate-changelog": "1.8.1",
-    "@types/geolite2": "2.0.0",
     "@types/highlight.js": "10.1.0",
     "@types/js-cookie": "2.2.7",
     "@types/jsdom": "16.2.13",
