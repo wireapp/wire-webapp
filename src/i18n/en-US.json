@@ -1076,5 +1076,7 @@
   "featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled": "Sharing and receiving files of any type is enabled",
   "featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled": "Sharing and receiving files of any type is disabled",
   "conversationAssetRestricted": "File sharing restricted",
-  "conversationAssetRestrictedAudioMessageHeadline": "Audio message"
+  "conversationAssetRestrictedAudioMessageHeadline": "Audio message",
+  "conversationModalRestrictedFileSharingHeadline": "File sharing restrictions",
+  "conversationModalRestrictedFileSharingDescription": "This file could not be shared due to your file sharing restrictions."
 }
