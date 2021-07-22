@@ -95,14 +95,7 @@ class ImageAssetComponent extends AbstractAssetTransferStateTracker {
 ko.components.register('image-asset', {
   template: `
     <!-- ko ifnot: isFileSharingReceivingEnabled() -->
-      <div class="image-restricted">
-        <div class="image-restricted--container">
-          <div class="flex-center file-icon icon-file" data-uie-name="file-icon">
-            <span class="file-icon-ext icon-block"></span>
-          </div>
-          <div class="label-nocase-xs text-foreground text-center" data-bind="text: t('conversationAssetRestricted')"></div>
-        </div>
-      </div>
+      <image-restricted></image-restricted>
     <!-- /ko -->
     <!-- ko if: isFileSharingReceivingEnabled() -->
       <div class="image-asset" data-bind="

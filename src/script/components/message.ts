@@ -46,6 +46,7 @@ import './asset/audioAsset';
 import './asset/RestrictedAudio';
 import './asset/FileAssetComponent';
 import './asset/imageAsset';
+import './asset/RestrictedImage';
 import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
 import './asset/videoAsset';
