@@ -47,7 +47,7 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
       {pages.map(page => (
         <div
           data-uie-name="pagination-item"
-          data-uie-active={currentPage === page ? 'active' : 'inactive'}
+          data-uie-status={currentPage === page ? 'active' : 'inactive'}
           key={page}
           onClick={() => onChangePage(page)}
           css={{
