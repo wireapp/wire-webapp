@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.52.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.52.6...@wireapp/react-ui-kit@7.52.7) (2021-07-23)
+
+
+### Bug Fixes
+
+* **react-ui-kit:** Accept data-uie attribute on Switch component ([#4077](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4077)) ([0987f67](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/0987f6726b966996ab345135044a479341e5808f))
+
+
+
+
+
 ## [7.52.6](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.52.5...@wireapp/react-ui-kit@7.52.6) (2021-07-12)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
