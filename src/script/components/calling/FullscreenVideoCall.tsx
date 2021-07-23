@@ -308,6 +308,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           </div>
           {currentPage !== totalPages - 1 && (
             <div
+              data-uie-name="pagination-next"
               onClick={() => changePage(currentPage + 1, call)}
               className="hide-controls-hidden"
               css={{
@@ -322,6 +323,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           )}
           {currentPage !== 0 && (
             <div
+              data-uie-name="pagination-previous"
               onClick={() => changePage(currentPage - 1, call)}
               className="hide-controls-hidden"
               css={{
