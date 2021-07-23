@@ -41,7 +41,9 @@ const readFileAsync = promisify(fs.readFile);
 
 commander.option('-c, --conversationId <conversationId>').parse(process.argv);
 
-require('dotenv').config({path: path.join(__dirname, 'sender.env')});
+require(`dotenv-defaults`).config({
+  path: path.join(__dirname, 'sender.env'),
+});
 
 const logger = logdown('@wireapp/core/src/demo/sender.ts', {
   logger: console,

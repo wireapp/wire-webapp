@@ -26,7 +26,7 @@ import {Account} from '../main/Account';
 import {PayloadBundleType} from '../main/conversation';
 import type {ButtonActionContent, ButtonActionConfirmationContent} from '../main/conversation/content';
 
-require('dotenv').config();
+import 'dotenv-defaults/config';
 
 const args = process.argv.slice(2);
 const conversationId = args[0] || process.env.WIRE_CONVERSATION;
