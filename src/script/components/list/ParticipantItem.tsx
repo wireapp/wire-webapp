@@ -176,30 +176,6 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 )}
               </div>
             </div>
-            {callParticipant && (
-              <Fragment>
-                {callParticipantSharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
-                {callParticipantSharesScreen && (
-                  <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />
-                )}
-
-                {!callParticipantIsMuted && (
-                  <ParticipantMicOnIcon
-                    className="participant-mic-on-icon"
-                    isActive={callParticipantIsActivelySpeaking}
-                    data-uie-name={callParticipantIsActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
-                  />
-                )}
-
-                {callParticipantIsMuted && (
-                  <Icon.MicOff
-                    className="mic-off-icon"
-                    data-uie-name="status-audio-off"
-                    style={{height: 12, width: 12}}
-                  />
-                )}
-              </Fragment>
-            )}
 
             {isUser && !isOthersMode && isGuest && (
               <span
@@ -224,6 +200,32 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 
             {isUser && isSelfVerified && isVerified && (
               <Icon.Verified className="verified-icon" data-uie-name="status-verified" />
+            )}
+
+            {callParticipant && (
+              <>
+                {callParticipantSharesScreen && (
+                  <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />
+                )}
+
+                {callParticipantSharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
+
+                {!callParticipantIsMuted && (
+                  <ParticipantMicOnIcon
+                    className="participant-mic-on-icon"
+                    isActive={callParticipantIsActivelySpeaking}
+                    data-uie-name={callParticipantIsActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
+                  />
+                )}
+
+                {callParticipantIsMuted && (
+                  <Icon.MicOff
+                    className="mic-off-icon"
+                    data-uie-name="status-audio-off"
+                    style={{height: 12, width: 12}}
+                  />
+                )}
+              </>
             )}
 
             {canSelect && (
