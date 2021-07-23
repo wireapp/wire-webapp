@@ -39,6 +39,7 @@ import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
 import {Availability} from '@wireapp/protocol-messaging';
 import {Config} from '../../Config';
+import useEffectRef from 'Util/useEffectRef';
 
 export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
   badge?: boolean;
@@ -76,7 +77,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   showArrow = false,
   onContextMenu = noop,
 }) => {
-  const [isInViewport, viewportElementRef] = useViewPortObserver();
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const isInViewport = useViewPortObserver(viewportElementRef);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
   const isSelf = !!(participant as User).isMe;
@@ -130,7 +132,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         className="participant-item"
         data-uie-name={isUser ? 'item-user' : 'item-service'}
         data-uie-value={participantName}
-        ref={viewportElementRef}
+        ref={setViewportElementRef}
       >
         {isInViewport && (
           <>

@@ -26,12 +26,14 @@ import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
 import {useViewPortObserver} from '../ui/viewportObserver';
 import {TeamState} from '../team/TeamState';
-import {t} from 'Util/LocalizerUtil';
+import RestrictedImage from './asset/RestrictedImage';
+import useEffectRef from 'Util/useEffectRef';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   asset: AssetRemoteData;
   assetRepository?: AssetRepository;
   click?: (asset: AssetRemoteData) => void;
+  isQuote?: boolean;
   teamState?: TeamState;
 }
 
@@ -39,11 +41,14 @@ const Image: React.FC<ImageProps> = ({
   asset,
   click,
   className,
+  isQuote = false,
   assetRepository = container.resolve(AssetRepository),
   teamState = container.resolve(TeamState),
   ...props
 }) => {
-  const [isInViewport, viewportElementRef] = useViewPortObserver();
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const isInViewport = useViewPortObserver(viewportElementRef);
+
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();
 
@@ -56,7 +61,7 @@ const Image: React.FC<ImageProps> = ({
   };
 
   useEffect(() => {
-    if (isInViewport === true && isFileSharingReceivingEnabled) {
+    if (isInViewport && isFileSharingReceivingEnabled) {
       setAssetIsLoading(true);
       assetRepository.load(asset).then(blob => {
         if (blob) {
@@ -73,18 +78,9 @@ const Image: React.FC<ImageProps> = ({
   }, [isInViewport]);
 
   return !isFileSharingReceivingEnabled ? (
-    <div className={cx('image-restricted', className)}>
-      <div className="image-restricted--container">
-        <div className="flex-center file-icon icon-file" data-uie-name="file-icon">
-          <span className="file-icon-ext icon-block"></span>
-        </div>
-        <div>
-          <div className="label-nocase-xs text-foreground text-center">{t('conversationAssetRestricted')}</div>
-        </div>
-      </div>
-    </div>
+    <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
   ) : (
-    <div ref={viewportElementRef} className={cx('image-wrapper', className)} {...props}>
+    <div ref={setViewportElementRef} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img onClick={onClick} src={assetSrc} />
       ) : (
@@ -98,5 +94,5 @@ export default Image;
 
 registerReactComponent<ImageProps>('image-component', {
   component: Image,
-  template: '<span data-bind="react: {className, asset: ko.unwrap(asset), assetRepository, click}"></span>',
+  template: '<span data-bind="react: {className, asset: ko.unwrap(asset), assetRepository, click, isQuote}"></span>',
 });

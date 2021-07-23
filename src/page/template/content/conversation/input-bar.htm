@@ -19,8 +19,8 @@
             <!-- /ko -->
 
             <!-- ko if: replyAsset().isImage()-->
-              <div class="input-bar__reply__message input-bar__reply__message__image" data-bind="background_image: replyAsset().resource()" data-uie-name="media-picture-reply-box">
-                <img/>
+              <div data-uie-name="media-picture-reply-box">
+                <image-component params="className: 'input-bar__reply__message input-bar__reply__message__image', asset: replyAsset().resource(), isQuote: true"></image-component>
               </div>
             <!-- /ko -->
 
@@ -90,10 +90,12 @@
         <div class="controls-right">
           <!-- ko ifnot: isEditing() -->
             <!-- ko if: showGiphyButton() -->
-              <gif-icon class="controls-right-button button-icon-large"
-                    data-bind="click: clickToShowGiphy, attr: {title: t('extensionsBubbleButtonGif')}"
-                    data-uie-name="do-giphy-popover">
-              </gif-icon>
+              <!-- ko if: isFileSharingSendingEnabled() -->
+                <gif-icon class="controls-right-button button-icon-large"
+                      data-bind="click: clickToShowGiphy, attr: {title: t('extensionsBubbleButtonGif')}"
+                      data-uie-name="do-giphy-popover">
+                </gif-icon>
+              <!-- /ko -->
             <!-- /ko -->
 
             <!-- ko ifnot: input().length -->

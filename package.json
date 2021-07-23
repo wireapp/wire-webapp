@@ -2,7 +2,7 @@
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "7.2.3",
-    "@wireapp/core": "17.10.8",
+    "@wireapp/core": "17.10.10",
     "@wireapp/react-ui-kit": "7.52.6",
     "@wireapp/store-engine-dexie": "1.6.5",
     "@wireapp/store-engine-sqleet": "1.7.8",
@@ -49,13 +49,13 @@
     "webrtc-adapter": "6.4.8"
   },
   "devDependencies": {
-    "@babel/core": "7.14.6",
+    "@babel/core": "7.14.8",
     "@babel/plugin-proposal-class-properties": "7.14.5",
     "@babel/plugin-proposal-decorators": "7.14.5",
     "@babel/plugin-proposal-nullish-coalescing-operator": "7.14.5",
     "@babel/plugin-proposal-optional-chaining": "7.14.5",
     "@babel/plugin-syntax-dynamic-import": "7.8.3",
-    "@babel/preset-env": "7.14.7",
+    "@babel/preset-env": "7.14.8",
     "@babel/preset-react": "7.14.5",
     "@babel/preset-typescript": "7.14.5",
     "@emotion/babel-preset-css-prop": "10.2.1",
@@ -68,7 +68,6 @@
     "@types/enzyme": "3.10.9",
     "@types/faker": "5.5.7",
     "@types/generate-changelog": "1.8.1",
-    "@types/geolite2": "2.0.0",
     "@types/highlight.js": "10.1.0",
     "@types/js-cookie": "2.2.7",
     "@types/jsdom": "16.2.13",
@@ -92,8 +91,8 @@
     "@types/uint32": "0.2.0",
     "@types/underscore": "1.11.3",
     "@types/webpack-env": "1.16.2",
-    "@typescript-eslint/eslint-plugin": "4.28.3",
-    "@typescript-eslint/parser": "4.28.3",
+    "@typescript-eslint/eslint-plugin": "4.28.4",
+    "@typescript-eslint/parser": "4.28.4",
     "@wireapp/copy-config": "1.2.6",
     "@wireapp/eslint-config": "1.10.0",
     "@wireapp/prettier-config": "0.3.2",
@@ -113,8 +112,8 @@
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-babel": "5.3.1",
     "eslint-plugin-import": "2.23.4",
-    "eslint-plugin-jest": "24.3.6",
-    "eslint-plugin-jsdoc": "35.4.5",
+    "eslint-plugin-jest": "24.4.0",
+    "eslint-plugin-jsdoc": "35.5.1",
     "eslint-plugin-no-unsanitized": "3.1.5",
     "eslint-plugin-prettier": "3.4.0",
     "eslint-plugin-react": "7.24.0",
@@ -143,7 +142,7 @@
     "jest": "26.6.3",
     "jsdom-worker": "0.2.1",
     "less": "3.13.1",
-    "lint-staged": "11.0.1",
+    "lint-staged": "11.1.0",
     "load-grunt-tasks": "5.1.0",
     "node-fetch": "2.6.1",
     "node-sass": "6.0.1",
@@ -173,7 +172,7 @@
     "tsc-watch": "4.4.0",
     "typescript": "4.3.5",
     "wait-for-expect": "3.0.2",
-    "webpack": "5.45.1",
+    "webpack": "5.46.0",
     "webpack-cli": "4.7.2",
     "webpack-dev-middleware": "5.0.0",
     "webpack-hot-middleware": "2.25.0",
@@ -192,7 +191,7 @@
     "*.{js,ts,tsx}": [
       "eslint --fix"
     ],
-    "*.{json,md}": [
+    "*.{json,md,yml}": [
       "prettier --write"
     ]
   },
@@ -224,7 +223,7 @@
     "lint:code": "eslint -c .eslintrc.json --ext .js,.ts,.tsx .",
     "lint:spelling": "cspell -c .cspell.json 'src/script/**/*.{js,ts,tsx,md}' src/i18n/en-US.json",
     "postinstall": "yarn configure && cd server && yarn && cd ../electron && yarn",
-    "prettier": "prettier --ignore-path .prettierignore \"**/*.{json,md}\"",
+    "prettier": "prettier --ignore-path .prettierignore \"**/*.{json,md,yml}\"",
     "release:staging": "git checkout dev && git pull && ts-node ./bin/release_tag.ts staging",
     "release:production": "git checkout master && git pull && ts-node ./bin/release_tag.ts production",
     "start": "yarn build:server && grunt build && concurrently \"yarn watch:server\" \"grunt watch\"",

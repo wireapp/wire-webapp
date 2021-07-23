@@ -458,31 +458,7 @@ export class TeamRepository {
       );
     }
 
-    const hasVideoMessageChanged = previousConfig?.videoMessage?.status !== newConfig?.videoMessage?.status;
-    if (hasVideoMessageChanged) {
-      const hasChangedToEnabled = newConfig?.videoMessage?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemVideoMessageEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemVideoMessageDisabled')
-        }</li>`,
-      );
-    }
-
-    const hasAudioMessageChanged = previousConfig?.audioMessage?.status !== newConfig?.audioMessage?.status;
-    if (hasAudioMessageChanged) {
-      const hasChangedToEnabled = newConfig?.audioMessage?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemAudioMessageEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemAudioMessageDisabled')
-        }</li>`,
-      );
-    }
-
-    if (hasVideoCallingChanged || hasVideoMessageChanged || hasAudioMessageChanged) {
+    if (hasVideoCallingChanged) {
       const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
