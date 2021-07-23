@@ -31,7 +31,7 @@ export class BroadcastService {
     this.messageService = new MessageService(this.apiClient, this.cryptographyService);
   }
 
-  private async getPreKeyBundle(teamId: string, skipOwnClients = false): Promise<UserPreKeyBundleMap> {
+  public async getPreKeyBundlesFromTeam(teamId: string, skipOwnClients = false): Promise<UserPreKeyBundleMap> {
     const {members: teamMembers} = await this.apiClient.teams.member.api.getAllMembers(teamId);
 
     let members = teamMembers.map(member => ({id: member.user}));
@@ -53,13 +53,12 @@ export class BroadcastService {
   }
 
   public async broadcastGenericMessage(
-    teamId: string,
     genericMessage: GenericMessage,
+    preKeyBundles: UserPreKeyBundleMap,
     sendAsProtobuf?: boolean,
   ): Promise<void> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const preKeyBundle = await this.getPreKeyBundle(teamId);
-    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundle);
+    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
     return sendAsProtobuf
       ? this.messageService.sendOTRProtobufMessage(this.apiClient.validatedClientId, recipients, null, plainTextArray)

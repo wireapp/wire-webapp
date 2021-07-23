@@ -23,6 +23,10 @@ import {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection/'
 export class ConnectionService {
   constructor(private readonly apiClient: APIClient) {}
 
+  public getConnections(): Promise<Connection[]> {
+    return this.apiClient.connection.api.getAllConnections();
+  }
+
   public acceptConnection(userId: string): Promise<Connection> {
     return this.apiClient.connection.api.putConnection(userId, {
       status: ConnectionStatus.ACCEPTED,
