@@ -293,7 +293,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
               <div className="conversation-list-calling-cell-controls">
                 <div className="conversation-list-calling-cell-controls-left">
                   <button
-                    className={cx('call-ui__button', {'call-ui__button--active': isMuted})}
+                    className={cx('call-ui__button', {'call-ui__button--active': !isMuted})}
                     onClick={() => callActions.toggleMute(call, !isMuted)}
                     data-uie-name="do-toggle-mute"
                     data-uie-value={isMuted ? 'active' : 'inactive'}

@@ -230,7 +230,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               className="video-controls__button"
               data-uie-value={!isMuted ? 'inactive' : 'active'}
               onClick={() => toggleMute(call, !isMuted)}
-              css={isMuted ? videoControlActiveStyles : undefined}
+              css={!isMuted ? videoControlActiveStyles : undefined}
               data-uie-name="do-call-controls-video-call-mute"
             >
               <div className="video-controls__button__label">{t('videoCallOverlayMicrophone')}</div>
