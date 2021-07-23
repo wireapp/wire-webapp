@@ -36,6 +36,7 @@ export interface SwitchProps<T = HTMLInputElement> extends InputProps<T> {
   name?: string;
   onToggle: (isChecked: boolean) => void;
   showLoading?: boolean;
+  dataUieName?: string;
 }
 
 export const Switch = ({
@@ -48,6 +49,7 @@ export const Switch = ({
   activatedColor = COLOR.BLUE,
   deactivatedColor = '#d2d2d2',
   name,
+  dataUieName,
 }: SwitchProps) => (
   <div
     css={{
@@ -68,6 +70,7 @@ export const Switch = ({
         onChange={event => onToggle(event.target.checked)}
         type="checkbox"
         css={{display: 'none'}}
+        data-uie-name={dataUieName}
       />
       <label
         htmlFor={id}
