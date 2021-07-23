@@ -34,7 +34,7 @@ import RestrictedImage from './RestrictedImage';
 import {useViewPortObserver} from '../../ui/viewportObserver';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 
-interface ImageAssetProps {
+export interface ImageAssetProps {
   asset: MediumImage;
   message: ContentMessage;
   onClick: (message: ContentMessage, event: MouseEvent) => void;
@@ -96,7 +96,11 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
       {isUploading && <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />}
 
       {isObfuscated && <Icon.Image className="flex-center full-screen" />}
-      <img className={cx('image-element', {'image-ephemeral': isObfuscated})} src={imageUrl || dummyImageUrl} />
+      <img
+        data-uie-name="image-asset-img"
+        className={cx('image-element', {'image-ephemeral': isObfuscated})}
+        src={imageUrl || dummyImageUrl}
+      />
     </div>
   ) : (
     <RestrictedImage />
