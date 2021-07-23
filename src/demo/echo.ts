@@ -19,7 +19,6 @@
 
 import * as path from 'path';
 import * as logdown from 'logdown';
-import * as dotenv from 'dotenv';
 import {Account} from '@wireapp/core';
 import {PayloadBundleType} from '@wireapp/core/src/main/conversation/';
 import {APIClient} from '@wireapp/api-client';
@@ -43,7 +42,9 @@ process.on('unhandledRejection', (reason, promise) =>
   logger.error('Unhandled Rejection at:', promise, 'reason:', reason),
 );
 
-dotenv.config({path: path.join(__dirname, 'echo.env')});
+require(`dotenv-defaults`).config({
+  path: path.join(__dirname, 'echo.env'),
+});
 
 const assetOriginalCache = {};
 const messageIdCache = {};
