@@ -245,7 +245,7 @@ export class ConversationListViewModel {
   };
 
   readonly clickOnAvailability = (viewModel: unknown, event: MouseEvent): void => {
-    AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
+    AvailabilityContextMenu.show(event, 'left-list-availability-menu');
   };
 
   readonly clickOnConnectRequests = (): void => {
