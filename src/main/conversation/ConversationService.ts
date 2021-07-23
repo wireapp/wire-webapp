@@ -170,10 +170,7 @@ export class ConversationService {
     }, {});
   }
 
-  private async getPreKeyBundle(
-    conversationId: string,
-    userIds?: string[] | UserClients,
-  ): Promise<UserPreKeyBundleMap> {
+  async getPreKeyBundleMap(conversationId: string, userIds?: string[] | UserClients): Promise<UserPreKeyBundleMap> {
     let members: string[] = [];
 
     if (userIds) {
@@ -239,22 +236,21 @@ export class ConversationService {
       const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
       if (sendAsProtobuf) {
-        await this.messageService.sendOTRProtobufMessage(
+        return this.messageService.sendOTRProtobufMessage(
           sendingClientId,
           recipients,
           conversationId,
           plainTextArray,
           cipherText,
         );
-      } else {
-        await this.messageService.sendOTRMessage(
-          sendingClientId,
-          recipients,
-          conversationId,
-          plainTextArray,
-          base64CipherText,
-        );
       }
+      return this.messageService.sendOTRMessage(
+        sendingClientId,
+        recipients,
+        conversationId,
+        plainTextArray,
+        base64CipherText,
+      );
 
       // todo: add federated sending here
     }
@@ -308,7 +304,7 @@ export class ConversationService {
     }
 
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const preKeyBundles = await this.getPreKeyBundle(conversationId, userIds);
+    const preKeyBundles = await this.getPreKeyBundleMap(conversationId, userIds);
 
     if (this.shouldSendAsExternal(plainTextArray, preKeyBundles)) {
       const encryptedAsset = await AssetCryptography.encryptAsset({plainText: plainTextArray});
