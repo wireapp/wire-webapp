@@ -399,37 +399,33 @@
   width: @conversation-message-sender-width;
 }
 
-image-asset {
+.image-asset {
+  position: relative;
   display: flex;
   margin-top: 16px;
   margin-bottom: 24px;
+  cursor: pointer;
 
-  .image-asset {
-    position: relative;
-    cursor: pointer;
-
-    &--no-image {
-      background-color: var(--foreground-fade-8);
-      cursor: default;
-    }
-
-    image-icon svg {
-      fill: white;
-    }
-
-    .image-element {
-      position: relative;
-      max-width: 100%;
-      max-height: 80vh;
-
-      &.image-ephemeral {
-        cursor: default;
-        opacity: 0;
-      }
-    }
+  &--no-image {
+    background-color: var(--foreground-fade-8);
+    cursor: default;
   }
 
-  asset-loader {
+  .image-icon svg {
+    fill: white;
+  }
+
+  .image-element {
+    position: relative;
+    max-width: 100%;
+    max-height: 80vh;
+
+    &.image-ephemeral {
+      cursor: default;
+      opacity: 0;
+    }
+  }
+  .asset-loader {
     position: absolute;
     z-index: 1;
     display: flex;

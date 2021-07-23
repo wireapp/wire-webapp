@@ -84,7 +84,7 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
     <div
       className={cx('image-asset', {
         'bg-color-ephemeral': isObfuscated,
-        'image-asset--no-image': !imageUrl,
+        'image-asset--no-image': !isObfuscated && !imageUrl,
         'loading-dots': !isUploading && !resource && !isObfuscated,
       })}
       data-uie-visible={visible && !isObfuscated}
@@ -93,9 +93,17 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
       data-uie-name="go-image-detail"
       ref={setViewportElementRef}
     >
-      {isUploading && <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />}
+      {isUploading && (
+        <div className="asset-loader">
+          <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />
+        </div>
+      )}
 
-      {isObfuscated && <Icon.Image className="flex-center full-screen" />}
+      {isObfuscated && (
+        <div className="image-icon flex-center full-screen">
+          <Icon.Image />
+        </div>
+      )}
       <img
         data-uie-name="image-asset-img"
         className={cx('image-element', {'image-ephemeral': isObfuscated})}
