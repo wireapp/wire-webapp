@@ -1379,12 +1379,12 @@
   resolved "https://registry.yarnpkg.com/@emotion/weak-memoize/-/weak-memoize-0.2.5.tgz#8eed982e2ee6f7f4e44c253e12962980791efd46"
   integrity sha512-6U71C2Wp7r5XtFtQzYrW5iKFT67OixrSxjI4MptCHzdSVlgabczzqLe0ZSgnub/5Kp4hSbpDB1tMytZY9pwxxA==
 
-"@es-joy/jsdoccomment@0.9.0-alpha.1":
-  version "0.9.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/@es-joy/jsdoccomment/-/jsdoccomment-0.9.0-alpha.1.tgz#f48bd162e185ec7f9f222273a282d10e52fe52f7"
-  integrity sha512-Clxxc0PwpISoYYBibA+1L2qFJ7gvFVhI2Hos87S06K+Q0cXdOhZQJNKWuaQGPAeHjZEuUB/YoWOfwjuF2wirqA==
+"@es-joy/jsdoccomment@0.9.0-alpha.6":
+  version "0.9.0-alpha.6"
+  resolved "https://registry.yarnpkg.com/@es-joy/jsdoccomment/-/jsdoccomment-0.9.0-alpha.6.tgz#f5737c907038692ad5dd25c091523bb5ad93f6c3"
+  integrity sha512-/eTjMezCcNne3VvKGle3kgz14PeOb7sQAX/OsV6a4jCmjzWgrAlQuISLcqgqUlI97BFWCNz7E0U9YyRm3ucyOA==
   dependencies:
-    comment-parser "1.1.6-beta.0"
+    comment-parser "1.1.6-beta.3"
     esquery "^1.4.0"
     jsdoc-type-pratt-parser "1.0.4"
 
@@ -4408,10 +4408,10 @@ comment-json@^4.1.0:
     has-own-prop "^2.0.0"
     repeat-string "^1.6.1"
 
-comment-parser@1.1.6-beta.0:
-  version "1.1.6-beta.0"
-  resolved "https://registry.yarnpkg.com/comment-parser/-/comment-parser-1.1.6-beta.0.tgz#57e503b18d0a5bd008632dcc54b1f95c2fffe8f6"
-  integrity sha512-q3cA8TSMyqW7wcPSYWzbO/rMahnXgzs4SLG/UIWXdEsnXTFPZkEkWAdNgPiHig2OzxgpPLOh4WwsmClDxndwHw==
+comment-parser@1.1.6-beta.3:
+  version "1.1.6-beta.3"
+  resolved "https://registry.yarnpkg.com/comment-parser/-/comment-parser-1.1.6-beta.3.tgz#66df48fa6e8a10d9e31016613491b78075fe3065"
+  integrity sha512-LkPpVUx533rkxrkgphwWo0u6A3Vn9/fa8biHo2mrL6NUKPL6ubnF1P7NTm/M9i/rUvQ/mDxVqOVlmqy5uNUmVw==
 
 common-tags@^1.8.0:
   version "1.8.0"
@@ -5628,13 +5628,13 @@ eslint-plugin-jest@24.4.0:
   dependencies:
     "@typescript-eslint/experimental-utils" "^4.0.1"
 
-eslint-plugin-jsdoc@35.5.1:
-  version "35.5.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-35.5.1.tgz#45932ee22669bbe06c97b82b936d56361efad370"
-  integrity sha512-pPYPWtsykwVEue1tYEyoppBj4dgF7XicF67tLLLraY6RQYBq7qMKjUHji19+hfiTtYKKBD0YfeK8hgjPAE5viw==
+eslint-plugin-jsdoc@36.0.2:
+  version "36.0.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-36.0.2.tgz#6348b0bca5f5c8baebdad31ad40e435d8cfad45d"
+  integrity sha512-cpb8IVYSrBqanUVeIO3Gfk5KD6PwM/7muZBgklCJP8q7ry1HuT4kriB+0EENkUFnVq0OCFmoo9F+edAnvTQvSw==
   dependencies:
-    "@es-joy/jsdoccomment" "0.9.0-alpha.1"
-    comment-parser "1.1.6-beta.0"
+    "@es-joy/jsdoccomment" "0.9.0-alpha.6"
+    comment-parser "1.1.6-beta.3"
     debug "^4.3.2"
     esquery "^1.4.0"
     jsdoc-type-pratt-parser "^1.0.4"
