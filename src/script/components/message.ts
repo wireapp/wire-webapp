@@ -45,7 +45,7 @@ import {TeamState} from '../team/TeamState';
 import './asset/audioAsset';
 import './asset/RestrictedAudio';
 import './asset/FileAssetComponent';
-import './asset/imageAsset';
+import './asset/ImageAsset';
 import './asset/RestrictedImage';
 import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
