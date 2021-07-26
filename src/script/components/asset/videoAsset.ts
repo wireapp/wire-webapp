@@ -18,6 +18,7 @@
  */
 
 import ko from 'knockout';
+import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -26,10 +27,12 @@ import {AssetTransferState} from '../../assets/AssetTransferState';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {FileAsset} from '../../entity/message/FileAsset';
 import {AbstractAssetTransferStateTracker} from './AbstractAssetTransferStateTracker';
+import {TeamState} from '../../team/TeamState';
 
 interface Params {
   isQuote: boolean;
   message: ContentMessage;
+  teamState?: TeamState;
 }
 
 class VideoAssetComponent extends AbstractAssetTransferStateTracker {
@@ -42,16 +45,18 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
   videoPlaybackError: ko.Observable<boolean>;
   showBottomControls: ko.Observable<boolean>;
   videoTimeRest: ko.PureComputed<number>;
+  isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
   preview: ko.Observable<string>;
   displaySmall: ko.Observable<boolean>;
   formatSeconds: (duration: number) => string;
 
-  constructor({message, isQuote}: Params, element: HTMLElement) {
+  constructor({message, isQuote, teamState = container.resolve(TeamState)}: Params, element: HTMLElement) {
     super(ko.unwrap(message));
     this.logger = getLogger('VideoAssetComponent');
 
     this.message = ko.unwrap(message);
     this.asset = this.message.getFirstAsset() as FileAsset;
+    this.isFileSharingReceivingEnabled = teamState.isFileSharingReceivingEnabled;
 
     this.videoElement = element.querySelector('video');
     this.videoSrc = ko.observable();
@@ -66,7 +71,7 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
 
     ko.computed(
       () => {
-        if (this.asset.preview_resource()) {
+        if (this.asset.preview_resource() && this.isFileSharingReceivingEnabled()) {
           this.assetRepository
             .load(this.asset.preview_resource())
             .then(blob => this.preview(window.URL.createObjectURL(blob)));
@@ -129,62 +134,69 @@ class VideoAssetComponent extends AbstractAssetTransferStateTracker {
 ko.components.register('video-asset', {
   template: `
     <!-- ko ifnot: message.isObfuscated() -->
-      <div class="video-asset-container"
-        data-bind="hide_controls: 2000,
-                   attr: {'data-uie-value': asset.file_name},
-                   css: {'video-asset-container--small': displaySmall()}"
-        data-uie-name="video-asset">
-        <video playsinline
-               data-bind="attr: {src: videoSrc, poster: preview},
-                          css: {hidden: transferState() === AssetTransferState.UPLOADING},
-                          style: {backgroundColor: preview() ? '#000': ''},
-                          event: {loadedmetadata: onLoadedmetadata,
-                                  timeupdate: onTimeupdate,
-                                  error: onError,
-                                  playing: onVideoPlaying}">
-        </video>
-        <!-- ko if: videoPlaybackError -->
-          <div class="video-playback-error label-xs" data-bind="text: t('conversationPlaybackError')"></div>
-        <!-- /ko -->
-        <!-- ko ifnot: videoPlaybackError -->
-          <!-- ko if: transferState() === AssetTransferState.UPLOAD_PENDING -->
-            <div class="asset-placeholder loading-dots">
-            </div>
+      <!-- ko ifnot: isFileSharingReceivingEnabled() -->
+        <div class="video-asset-restricted">
+          <file-restricted params="asset: asset"></file-restricted>
+        </div>
+      <!-- /ko -->
+      <!-- ko if: isFileSharingReceivingEnabled() -->
+        <div class="video-asset-container"
+          data-bind="hide_controls: 2000,
+                    attr: {'data-uie-value': asset.file_name},
+                    css: {'video-asset-container--small': displaySmall()}"
+          data-uie-name="video-asset">
+          <video playsinline
+                data-bind="attr: {src: videoSrc, poster: preview},
+                            css: {hidden: transferState() === AssetTransferState.UPLOADING},
+                            style: {backgroundColor: preview() ? '#000': ''},
+                            event: {loadedmetadata: onLoadedmetadata,
+                                    timeupdate: onTimeupdate,
+                                    error: onError,
+                                    playing: onVideoPlaying}">
+          </video>
+          <!-- ko if: videoPlaybackError -->
+            <div class="video-playback-error label-xs" data-bind="text: t('conversationPlaybackError')"></div>
           <!-- /ko -->
+          <!-- ko ifnot: videoPlaybackError -->
+            <!-- ko if: transferState() === AssetTransferState.UPLOAD_PENDING -->
+              <div class="asset-placeholder loading-dots">
+              </div>
+            <!-- /ko -->
 
-          <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
-            <div class="video-controls-center">
-              <!-- ko if: displaySmall() -->
-                <media-button params="src: videoElement,
-                                      large: false,
-                                      asset: asset,
-                                      play: onPlayButtonClicked,
-                                      transferState: transferState,
-                                      uploadProgress: uploadProgress
-                                      ">
-                </media-button>
-              <!-- /ko -->
-              <!-- ko ifnot: displaySmall() -->
-                <media-button params="src: videoElement,
-                                      large: true,
-                                      asset: asset,
-                                      play: onPlayButtonClicked,
-                                      pause: onPauseButtonClicked,
-                                      cancel: () => transferState() === AssetTransferState.UPLOADING ? cancelUpload(message) : asset.cancelDownload(),
-                                      transferState: transferState,
-                                      uploadProgress: uploadProgress
-                                      ">
-                </media-button>
-              <!-- /ko -->
-            </div>
-            <div class='video-controls-bottom' data-bind='visible: showBottomControls()'>
-              <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: videoElement"></seek-bar>
-              <span class="video-controls-time label-xs" data-bind="text: formatSeconds(videoTimeRest())" data-uie-name="status-video-time"></span>
-            </div>
+            <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
+              <div class="video-controls-center">
+                <!-- ko if: displaySmall() -->
+                  <media-button params="src: videoElement,
+                                        large: false,
+                                        asset: asset,
+                                        play: onPlayButtonClicked,
+                                        transferState: transferState,
+                                        uploadProgress: uploadProgress
+                                        ">
+                  </media-button>
+                <!-- /ko -->
+                <!-- ko ifnot: displaySmall() -->
+                  <media-button params="src: videoElement,
+                                        large: true,
+                                        asset: asset,
+                                        play: onPlayButtonClicked,
+                                        pause: onPauseButtonClicked,
+                                        cancel: () => transferState() === AssetTransferState.UPLOADING ? cancelUpload(message) : asset.cancelDownload(),
+                                        transferState: transferState,
+                                        uploadProgress: uploadProgress
+                                        ">
+                  </media-button>
+                <!-- /ko -->
+              </div>
+              <div class='video-controls-bottom' data-bind='visible: showBottomControls()'>
+                <seek-bar data-ui-name="status-video-seekbar" class="video-controls-seekbar" params="src: videoElement"></seek-bar>
+                <span class="video-controls-time label-xs" data-bind="text: formatSeconds(videoTimeRest())" data-uie-name="status-video-time"></span>
+              </div>
+            <!-- /ko -->
           <!-- /ko -->
-        <!-- /ko -->
-      </div>
-      <div class="video-asset-container__sizer"></div>
+        </div>
+        <div class="video-asset-container__sizer"></div>
+      <!-- /ko -->
     <!-- /ko -->
   `,
   viewModel: {

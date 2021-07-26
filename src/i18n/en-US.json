@@ -1072,11 +1072,11 @@
   "featureConfigChangeModalAudioVideoHeadline": "Audio/Video restrictions",
   "featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled": "Camera in calls is enabled",
   "featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled": "Camera in calls is disabled",
-  "featureConfigChangeModalAudioVideoDescriptionItemVideoMessageEnabled": "Sending and receiving of video messages is enabled",
-  "featureConfigChangeModalAudioVideoDescriptionItemVideoMessageDisabled": "Sending and receiving of video messages is disabled",
-  "featureConfigChangeModalAudioVideoDescriptionItemAudioMessageEnabled": "Sending and receiving of audio messages is enabled",
-  "featureConfigChangeModalAudioVideoDescriptionItemAudioMessageDisabled": "Sending and receiving of audio messages is disabled",
   "featureConfigChangeModalFileSharingHeadline": "File sharing restrictions",
   "featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled": "Sharing and receiving files of any type is enabled",
-  "featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled": "Sharing and receiving files of any type is disabled"
+  "featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled": "Sharing and receiving files of any type is disabled",
+  "conversationAssetRestricted": "File sharing restricted",
+  "conversationAssetRestrictedAudioMessageHeadline": "Audio message",
+  "conversationModalRestrictedFileSharingHeadline": "File sharing restrictions",
+  "conversationModalRestrictedFileSharingDescription": "This file could not be shared due to your file sharing restrictions."
 }

@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import Icon from '../Icon';
@@ -39,23 +39,21 @@ const AssetLoader: React.FC<AssetLoaderProps> = ({large, loadProgress, onCancel}
   };
 
   return (
-    <Fragment>
-      <div className="media-button" onClick={onClick} data-uie-name="status-loading-media">
-        <svg viewBox={viewBox} data-uie-name="asset-loader-svg">
-          <circle
-            className="accent-stroke"
-            style={{strokeDasharray: progress}}
-            r="50%"
-            cx="50%"
-            cy="50%"
-            data-uie-name="asset-loader-circle"
-          />
-        </svg>
-        <div className="media-button__icon">
-          <Icon.Close />
-        </div>
+    <div className="media-button" onClick={onClick} data-uie-name="status-loading-media">
+      <svg viewBox={viewBox} data-uie-name="asset-loader-svg">
+        <circle
+          className="accent-stroke"
+          style={{strokeDasharray: progress}}
+          r="50%"
+          cx="50%"
+          cy="50%"
+          data-uie-name="asset-loader-circle"
+        />
+      </svg>
+      <div className="media-button__icon">
+        <Icon.Close />
       </div>
-    </Fragment>
+    </div>
   );
 };
 
@@ -63,6 +61,5 @@ export default AssetLoader;
 
 registerReactComponent('asset-loader', {
   component: AssetLoader,
-  template:
-    '<div class="asset-loader" data-bind="react: {large, loadProgress: ko.unwrap(loadProgress), onCancel}"></div>',
+  template: '<div data-bind="react: {large, loadProgress: ko.unwrap(loadProgress), onCancel}"></div>',
 });

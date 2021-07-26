@@ -24,7 +24,7 @@ import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
-import {FeatureStatus} from '@wireapp/api-client/src/team/feature/';
+import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/src/team/feature/';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -392,13 +392,16 @@ export class TeamRepository {
     }
   };
 
-  private readonly onFeatureConfigUpdate = async (eventJson: TeamEvent, source: EventSource): Promise<void> => {
+  private readonly onFeatureConfigUpdate = async (
+    eventJson: TeamEvent & {name: FEATURE_KEY},
+    source: EventSource,
+  ): Promise<void> => {
     if (source !== EventSource.WEB_SOCKET) {
       // Ignore notification stream events
       return;
     }
     const teamId = this.userState.self().teamId;
-    if (teamId) {
+    if (teamId && eventJson.name === FEATURE_KEY.FILE_SHARING) {
       const featureConfigList = await this.teamService.getAllTeamFeatures(teamId);
       this.teamState.teamFeatures(featureConfigList);
       this.handleConfigUpdate(featureConfigList);
@@ -457,31 +460,7 @@ export class TeamRepository {
       );
     }
 
-    const hasVideoMessageChanged = previousConfig?.videoMessage?.status !== newConfig?.videoMessage?.status;
-    if (hasVideoMessageChanged) {
-      const hasChangedToEnabled = newConfig?.videoMessage?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemVideoMessageEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemVideoMessageDisabled')
-        }</li>`,
-      );
-    }
-
-    const hasAudioMessageChanged = previousConfig?.audioMessage?.status !== newConfig?.audioMessage?.status;
-    if (hasAudioMessageChanged) {
-      const hasChangedToEnabled = newConfig?.audioMessage?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemAudioMessageEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemAudioMessageDisabled')
-        }</li>`,
-      );
-    }
-
-    if (hasVideoCallingChanged || hasVideoMessageChanged || hasAudioMessageChanged) {
+    if (hasVideoCallingChanged) {
       const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {

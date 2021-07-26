@@ -339,7 +339,7 @@ export class UserRepository {
     });
   };
 
-  private readonly setAvailability = (availability: Availability.Type, method: string): void => {
+  private readonly setAvailability = (availability: Availability.Type): void => {
     const hasAvailabilityChanged = availability !== this.userState.self().availability();
     const newAvailabilityValue = valueFromType(availability);
     if (hasAvailabilityChanged) {

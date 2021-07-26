@@ -17,11 +17,13 @@
  *
  */
 
+import ko from 'knockout';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import TestPage from 'Util/test/TestPage';
 import FileAssetComponent, {FileAssetProps} from './FileAssetComponent';
 import {FileAsset} from 'src/script/entity/message/FileAsset';
 import {StatusType} from '../../message/StatusType';
+import {TeamState} from 'src/script/team/TeamState';
 
 class FileAssetComponentTestPage extends TestPage<FileAssetProps> {
   constructor(props?: FileAssetProps) {
@@ -46,8 +48,13 @@ describe('FileAssetComponent', () => {
   }
 
   it('renders file uploads', () => {
+    const teamState = {
+      isFileSharingReceivingEnabled: ko.pureComputed(() => true),
+    } as TeamState;
+
     const testPage = new FileAssetComponentTestPage({
       message: mockContentMessage(),
+      teamState,
     });
 
     const fileUploadMessage = testPage.getFile();
@@ -55,12 +62,17 @@ describe('FileAssetComponent', () => {
   });
 
   it('does not render file uploads from timed-out / obfuscated messages', () => {
+    const teamState = {
+      isFileSharingReceivingEnabled: ko.pureComputed(() => true),
+    } as TeamState;
+
     const message = mockContentMessage();
     message.ephemeral_expires(true);
     message.status(StatusType.SENT);
 
     const testPage = new FileAssetComponentTestPage({
       message,
+      teamState,
     });
 
     const fileUploadMessage = testPage.getFile();
@@ -68,8 +80,13 @@ describe('FileAssetComponent', () => {
   });
 
   it('shows the file size in MB', () => {
+    const teamState = {
+      isFileSharingReceivingEnabled: ko.pureComputed(() => true),
+    } as TeamState;
+
     const testPage = new FileAssetComponentTestPage({
       message: mockContentMessage(),
+      teamState,
     });
 
     const fileSize = testPage.getFileSize();

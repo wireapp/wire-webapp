@@ -677,8 +677,8 @@ export class ConversationRepository {
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
     const conversationData = await this.conversation_service.getConversationById(conversationEntity.id);
-    const {name, message_timer} = conversationData;
-    this.conversationMapper.updateProperties(conversationEntity, {name} as any);
+    const {name, message_timer, type} = conversationData;
+    this.conversationMapper.updateProperties(conversationEntity, {name, type} as any);
     this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
   }
 
@@ -2222,7 +2222,10 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
+    const updateSequence =
+      selfUserRejoins || connectionEntity?.isConnected()
+        ? this.updateConversationFromBackend(conversationEntity)
+        : Promise.resolve();
 
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))

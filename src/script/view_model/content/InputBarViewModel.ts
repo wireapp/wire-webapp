@@ -554,6 +554,7 @@ export class InputBarViewModel {
     const files: File[] = [];
 
     if (!this.isFileSharingSendingEnabled()) {
+      this.showRestrictedFileSharingModal();
       return;
     }
 
@@ -578,10 +579,20 @@ export class InputBarViewModel {
 
   readonly onPasteFiles = (pastedFiles: File[]): void => {
     if (!this.isFileSharingSendingEnabled()) {
+      this.showRestrictedFileSharingModal();
       return;
     }
     const [pastedFile] = pastedFiles;
     this.pastedFile(pastedFile);
+  };
+
+  private readonly showRestrictedFileSharingModal = (): void => {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: t('conversationModalRestrictedFileSharingDescription'),
+        title: t('conversationModalRestrictedFileSharingHeadline'),
+      },
+    });
   };
 
   readonly onWindowClick = (event: Event): void => {
