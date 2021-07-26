@@ -23,7 +23,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {t} from 'Util/LocalizerUtil';
 
-import {Context, ContextMenuEntry} from './ContextMenu';
+import {showContextMenu, ContextMenuEntry} from './ContextMenu';
 
 export const AvailabilityContextMenu = {
   show: (event: MouseEvent, elementName: string): void => {
@@ -46,6 +46,6 @@ export const AvailabilityContextMenu = {
       },
     ];
 
-    Context.from(event, entries, elementName);
+    showContextMenu(event, entries, elementName);
   },
 };
