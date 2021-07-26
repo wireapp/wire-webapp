@@ -43,13 +43,13 @@ describe('MediaButton', () => {
       asset: {downloadProgress: ko.pureComputed(() => 0)} as FileAsset,
       cancel: () => {},
       large: false,
+      mediaElement: videoElement,
       pause: () => {
         videoElement.dispatchEvent(new Event('pause'));
       },
       play: () => {
         videoElement.dispatchEvent(new Event('playing'));
       },
-      src: videoElement,
       transferState: AssetTransferState.UPLOAD_PENDING,
       uploadProgress: 0,
     };
