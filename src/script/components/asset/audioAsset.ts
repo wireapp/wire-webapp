@@ -127,7 +127,7 @@ ko.components.register('audio-asset', {
         <!-- /ko -->
         <!-- ko if: transferState() !== AssetTransferState.UPLOAD_PENDING -->
           <div class="audio-controls">
-            <media-button params="src: audioElement,
+            <media-button params="mediaElement: audioElement,
                                   large: false,
                                   asset: asset,
                                   play: onPlayButtonClicked,

@@ -22,17 +22,23 @@ import React, {CSSProperties, useEffect, useState} from 'react';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {clamp} from 'Util/NumberUtil';
 
-export interface SeekBarProps {
+export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   dark?: boolean;
   disabled?: boolean;
-  src: HTMLMediaElement;
+  mediaElement: HTMLMediaElement;
 }
 
 export interface SeekBarCSS extends CSSProperties {
   '--seek-bar-progress': string;
 }
 
-const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaElement}: SeekBarProps) => {
+const SeekBar: React.FC<SeekBarProps> = ({
+  dark: darkMode,
+  disabled,
+  mediaElement,
+  className,
+  ...props
+}: SeekBarProps) => {
   const [isSeekBarMouseOver, setIsSeekBarMouseOver] = useState<boolean>(false);
   const [isSeekBarThumbDragged, setIsSeekBarThumbDragged] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
@@ -60,7 +66,7 @@ const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaEl
   }, [mediaElement]);
 
   return (
-    <div className="seek-bar">
+    <div className={cx('seek-bar', className)} {...props}>
       <input
         data-uie-name="asset-control-media-seek-bar"
         className={cx({
@@ -99,5 +105,5 @@ export default SeekBar;
 
 registerReactComponent('seek-bar', {
   component: SeekBar,
-  template: '<div data-bind="react: {dark, disabled: ko.unwrap(disabled), src}"></div>',
+  template: '<div data-bind="react: {dark, disabled: ko.unwrap(disabled), mediaElement: src}"></div>',
 });
