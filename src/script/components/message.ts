@@ -49,7 +49,7 @@ import './asset/imageAsset';
 import './asset/RestrictedImage';
 import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
-import './asset/videoAsset';
+import './asset/VideoAsset';
 import './asset/RestrictedFile';
 import './asset/MessageButton';
 import './message/VerificationMessage';

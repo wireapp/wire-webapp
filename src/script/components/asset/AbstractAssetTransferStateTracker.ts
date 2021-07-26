@@ -27,6 +27,10 @@ import {AssetRepository} from '../../assets/AssetRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {FileAsset} from '../../entity/message/FileAsset';
 
+import {useMemo} from 'react';
+import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
+
 export abstract class AbstractAssetTransferStateTracker {
   AssetTransferState: typeof AssetTransferState;
   public readonly assetRepository: AssetRepository;
@@ -62,3 +66,23 @@ export abstract class AbstractAssetTransferStateTracker {
     amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
   }
 }
+
+export const useAssetTransfer = (message: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
+  const asset = useMemo(() => message?.getFirstAsset() as FileAsset, [message]);
+  const uploadProgressComputed = useMemo(() => assetRepository.getUploadProgress(message?.id), [message]);
+  const uploadProgress = useKoSubscribable(uploadProgressComputed);
+  const {status} = useKoSubscribableChildren(asset, ['status']);
+  const transferState = uploadProgress > -1 ? AssetTransferState.UPLOADING : status;
+  return {
+    cancelUpload: () => {
+      assetRepository.cancelUpload(message.id);
+      amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
+    },
+    isDownloading: transferState === AssetTransferState.DOWNLOADING,
+    isUploaded: transferState === AssetTransferState.UPLOADED,
+    isUploading: transferState === AssetTransferState.UPLOADING,
+    loadAsset: (resource: AssetRemoteData) => assetRepository.load(resource),
+    transferState,
+    uploadProgress,
+  };
+};
