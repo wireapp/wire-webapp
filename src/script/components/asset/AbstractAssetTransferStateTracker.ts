@@ -26,6 +26,9 @@ import {AssetTransferState} from '../../assets/AssetTransferState';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {ContentMessage} from '../../entity/message/ContentMessage';
 import {FileAsset} from '../../entity/message/FileAsset';
+import {useMemo} from 'react';
+import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 
 import {useMemo} from 'react';
 import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
