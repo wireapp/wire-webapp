@@ -39,19 +39,33 @@ export class FeatureAPI {
 
   public static readonly URL = {
     APPLOCK: 'appLock',
-    DIGITAL_SIGNATURES: 'digitalSignatures',
+    AUDIO_MESSAGE: 'audioMessage',
     CALLING_CONFERENCE: 'conferenceCalling',
     CALLING_VIDEO: 'videoCalling',
-    VIDEO_MESSAGE: 'videoMessage',
-    AUDIO_MESSAGE: 'audioMessage',
+    DIGITAL_SIGNATURES: 'digitalSignatures',
+    FEATURE_CONFIGS: '/feature-configs',
+    FEATURES: 'features',
     FILE_SHARING: 'fileSharing',
     LEGAL_HOLD: 'legalhold',
-    FEATURES: 'features',
     SSO: 'sso',
     TEAMS: '/teams',
+    VIDEO_MESSAGE: 'videoMessage',
   };
 
-  public async getAllFeatures(teamId: string): Promise<FeatureList> {
+  public async getAllFeatures(): Promise<FeatureList> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: FeatureAPI.URL.FEATURE_CONFIGS,
+    };
+
+    const response = await this.client.sendJSON<FeatureList>(config);
+    return response.data;
+  }
+
+  /**
+   * @deprecated Use `getAllFeatures()` instead.
+   */
+  public async getAllTeamFeatures(teamId: string): Promise<FeatureList> {
     const config: AxiosRequestConfig = {
       method: 'get',
       url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}`,
