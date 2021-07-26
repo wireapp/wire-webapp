@@ -124,8 +124,8 @@ export class TeamRepository {
     const team = await this.getTeam();
     if (this.userState.self().teamId) {
       await this.updateTeamMembers(team);
-      this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures(team.id));
     }
+    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
     this.scheduleFetchTeamInfo();
   };
 
@@ -381,10 +381,9 @@ export class TeamRepository {
     handlingNotifications: NOTIFICATION_HANDLING_STATE,
   ): Promise<void> => {
     const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
-    const teamId = this.userState.self().teamId;
 
-    if (shouldFetchConfig && teamId) {
-      const featureConfigList = await this.teamService.getAllTeamFeatures(teamId);
+    if (shouldFetchConfig) {
+      const featureConfigList = await this.teamService.getAllTeamFeatures();
       this.teamState.teamFeatures(featureConfigList);
       this.handleConfigUpdate(featureConfigList);
     }
@@ -398,9 +397,8 @@ export class TeamRepository {
       // Ignore notification stream events
       return;
     }
-    const teamId = this.userState.self().teamId;
-    if (teamId && eventJson.name === FEATURE_KEY.FILE_SHARING) {
-      const featureConfigList = await this.teamService.getAllTeamFeatures(teamId);
+    if (eventJson.name === FEATURE_KEY.FILE_SHARING) {
+      const featureConfigList = await this.teamService.getAllTeamFeatures();
       this.teamState.teamFeatures(featureConfigList);
       this.handleConfigUpdate(featureConfigList);
     }
