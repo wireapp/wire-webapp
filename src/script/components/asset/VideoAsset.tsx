@@ -26,7 +26,7 @@ import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {FileAsset} from '../../entity/message/FileAsset';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 import {TeamState} from '../../team/TeamState';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import SeekBar from './controls/SeekBar';
 import MediaButton from './controls/MediaButton';
 import RestrictedFile from './RestrictedFile';
@@ -50,14 +50,14 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   assetRepository = container.resolve(AssetRepository),
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
-  const assetPreviewResource = useKoSubscribable(asset.preview_resource);
+  const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);
   const [videoPlaybackError, setVideoPlaybackError] = useState(null);
   const [videoTimeRest, setVideoTimeRest] = useState<number>();
   const [videoPreview, setVideoPreview] = useState<string>(null);
   const [videoSrc, setVideoSrc] = useState<string>(null);
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const isFileSharingReceivingEnabled = useKoSubscribable(teamState.isFileSharingReceivingEnabled);
+  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const [displaySmall, setDisplaySmall] = useState(!!isQuote);
   const {transferState, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
 
