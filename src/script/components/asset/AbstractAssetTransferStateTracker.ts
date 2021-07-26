@@ -30,10 +30,6 @@ import {useMemo} from 'react';
 import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
 
-import {useMemo} from 'react';
-import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
-
 export abstract class AbstractAssetTransferStateTracker {
   AssetTransferState: typeof AssetTransferState;
   public readonly assetRepository: AssetRepository;
