@@ -32,7 +32,6 @@ const RestrictedVideo: React.FC<RestrictedVideoProps> = ({showMessage = true, cl
     <div className={cx('video-asset__restricted', className)}>
       <div className="video-asset__restricted--container">
         <div className="flex-center" data-uie-name="file-icon">
-          {/* <Icon.Play /> */}
           <div className="video-asset__restricted__play-button icon-play" />
         </div>
         {showMessage && <div className="video-asset__restricted--message">{t('conversationAssetRestricted')}</div>}
