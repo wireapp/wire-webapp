@@ -24,7 +24,7 @@ import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
-import {FeatureStatus} from '@wireapp/api-client/src/team/feature/';
+import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/src/team/feature/';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -38,7 +38,7 @@ import {Runtime} from '@wireapp/commons';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
@@ -61,6 +61,7 @@ import {TeamState} from './TeamState';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {Config} from '../Config';
 
 export interface AccountInfo {
   accentID: number;
@@ -390,13 +391,16 @@ export class TeamRepository {
     }
   };
 
-  private readonly onFeatureConfigUpdate = async (eventJson: TeamEvent, source: EventSource): Promise<void> => {
+  private readonly onFeatureConfigUpdate = async (
+    eventJson: TeamEvent & {name: FEATURE_KEY},
+    source: EventSource,
+  ): Promise<void> => {
     if (source !== EventSource.WEB_SOCKET) {
       // Ignore notification stream events
       return;
     }
     const teamId = this.userState.self().teamId;
-    if (teamId) {
+    if (teamId && eventJson.name === FEATURE_KEY.FILE_SHARING) {
       const featureConfigList = await this.teamService.getAllTeamFeatures(teamId);
       this.teamState.teamFeatures(featureConfigList);
       this.handleConfigUpdate(featureConfigList);
@@ -408,10 +412,37 @@ export class TeamRepository {
 
     if (previousConfig) {
       this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
+      this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
     }
 
     this.saveFeatureConfig(featureConfigList);
+  };
+
+  private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    const changeList = [];
+
+    const hasFileSharingChanged = previousConfig?.fileSharing?.status !== newConfig?.fileSharing?.status;
+    if (hasFileSharingChanged) {
+      const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
+      changeList.push(
+        `<li>${
+          hasChangedToEnabled
+            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
+            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled')
+        }</li>`,
+      );
+    }
+
+    if (hasFileSharingChanged) {
+      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: message,
+          title: t('featureConfigChangeModalFileSharingHeadline'),
+        },
+      });
+    }
   };
 
   private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
@@ -429,32 +460,8 @@ export class TeamRepository {
       );
     }
 
-    const hasVideoMessageChanged = previousConfig?.videoMessage?.status !== newConfig?.videoMessage?.status;
-    if (hasVideoMessageChanged) {
-      const hasChangedToEnabled = newConfig?.videoMessage?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemVideoMessageEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemVideoMessageDisabled')
-        }</li>`,
-      );
-    }
-
-    const hasAudioMessageChanged = previousConfig?.audioMessage?.status !== newConfig?.audioMessage?.status;
-    if (hasAudioMessageChanged) {
-      const hasChangedToEnabled = newConfig?.audioMessage?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemAudioMessageEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemAudioMessageDisabled')
-        }</li>`,
-      );
-    }
-
-    if (hasVideoCallingChanged || hasVideoMessageChanged || hasAudioMessageChanged) {
-      const message = `${t('featureConfigChangeModalAudioVideoDescription')} <ul>${changeList}</ul>`;
+    if (hasVideoCallingChanged) {
+      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           htmlMessage: message,
@@ -465,24 +472,42 @@ export class TeamRepository {
   };
 
   private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    if (previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
+    if (true || previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
       const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
-      if (hasChangedToEnabled) {
+      if (true || hasChangedToEnabled) {
+        const replaceEnterprise = replaceLink(
+          Config.getConfig().URL.PRICING,
+          'modal__text__read-more',
+          'read-more-pricing',
+        );
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
           text: {
-            message: /* TODO */ hasChangedToEnabled ? 'activated' : 'deactivated',
-            title: /* TODO */ 'Conference calling',
+            htmlMessage: t(
+              'featureConfigChangeModalConferenceCallingEnabled',
+              {brandName: Config.getConfig().BRAND_NAME},
+              replaceEnterprise,
+            ),
+            title: t('featureConfigChangeModalConferenceCallingTitle', {brandName: Config.getConfig().BRAND_NAME}),
           },
         });
       }
     }
   };
 
-  private readonly loadPreviousFeatureConfig = (): FeatureList =>
-    JSON.parse(window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY));
+  private readonly loadPreviousFeatureConfig = (): FeatureList | void => {
+    const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
+      window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY),
+    );
+    if (featureConfigs && featureConfigs[this.userState.self().id]) {
+      return featureConfigs[this.userState.self().id];
+    }
+  };
 
   private readonly saveFeatureConfig = (featureConfigList: FeatureList): void =>
-    window.localStorage.setItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY, JSON.stringify(featureConfigList));
+    window.localStorage.setItem(
+      TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY,
+      JSON.stringify({[this.userState.self().id]: featureConfigList}),
+    );
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {

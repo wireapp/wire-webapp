@@ -80,7 +80,10 @@ export class TeamMapper {
   mapRole(userEntity: User, permissions?: PermissionsData): void {
     if (permissions) {
       const teamRole = roleFromTeamPermissions(permissions);
-      this.logger.info(`Identified user '${userEntity.id}' as '${teamRole}'`, permissions);
+      this.logger.info(
+        `Identified user '${userEntity.id}' of team '${userEntity.teamId}' as '${teamRole}'`,
+        permissions,
+      );
       userEntity.teamRole(teamRole);
     }
   }

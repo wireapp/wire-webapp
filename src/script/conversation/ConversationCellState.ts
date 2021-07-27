@@ -84,8 +84,8 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
       }
 
       return conversationEntity.isGroup()
-        ? `${messageEntity.unsafeSenderName()}: ${(messageEntity.getFirstAsset() as Text).text}`
-        : (messageEntity.getFirstAsset() as Text).text;
+        ? `${messageEntity.unsafeSenderName()}: ${(messageEntity.getFirstAsset() as Text)?.text}`
+        : (messageEntity.getFirstAsset() as Text)?.text;
     }
   }
 
@@ -185,7 +185,7 @@ const _getStateDefault = {
 };
 
 const _getStateGroupActivity = {
-  description: (conversationEntity: Conversation): string | void => {
+  description: (conversationEntity: Conversation): string => {
     const lastMessageEntity = conversationEntity.getLastMessage();
 
     if (lastMessageEntity.isMember()) {
@@ -242,6 +242,8 @@ const _getStateGroupActivity = {
     if (isConversationRename) {
       return t('conversationsSecondaryLineRenamed', lastMessageEntity.user().name());
     }
+
+    return '';
   },
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
     const lastMessageEntity = conversationEntity.getLastMessage();
@@ -305,7 +307,7 @@ const _getStateRemoved = {
 };
 
 const _getStateUnreadMessage = {
-  description: (conversationEntity: Conversation): string | void => {
+  description: (conversationEntity: Conversation): string => {
     const unreadMessages = conversationEntity.unreadState().allMessages;
 
     for (const messageEntity of unreadMessages) {
@@ -348,6 +350,7 @@ const _getStateUnreadMessage = {
         return conversationEntity.isGroup() ? `${messageEntity.unsafeSenderName()}: ${stateText}` : stateText;
       }
     }
+    return '';
   },
   icon: () => ConversationStatusIcon.UNREAD_MESSAGES,
   match: (conversationEntity: Conversation) => conversationEntity.unreadState().allMessages.length > 0,
@@ -360,7 +363,7 @@ const _getStateUserName = {
     return hasHandle ? userEntity.handle : '';
   },
   icon: (conversationEntity: Conversation): ConversationStatusIcon.PENDING_CONNECTION | void => {
-    if (conversationEntity.isRequest()) {
+    if (conversationEntity.connection().isOutgoingRequest()) {
       return ConversationStatusIcon.PENDING_CONNECTION;
     }
   },
@@ -376,7 +379,7 @@ const _getStateUserName = {
 
 export const generateCellState = (
   conversationEntity: Conversation,
-): {description: string | void; icon: ConversationStatusIcon | void} => {
+): {description: string; icon: ConversationStatusIcon | void} => {
   const states = [
     _getStateRemoved,
     _getStateMuted,

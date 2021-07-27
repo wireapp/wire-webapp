@@ -31,3 +31,30 @@
     object-fit: cover;
   }
 }
+
+.image-restricted {
+  display: flex;
+  width: 160px;
+  height: 90px;
+  background-color: var(--foreground-fade-8);
+  border-radius: 4px;
+
+  &--small {
+    width: 64px;
+    height: 36px;
+  }
+
+  &--container {
+    padding: 8px;
+    margin: auto;
+  }
+
+  &--message {
+    .label-xs;
+    .text-foreground;
+    .text-center;
+
+    margin-top: 8px;
+    line-height: 1.3em;
+  }
+}
