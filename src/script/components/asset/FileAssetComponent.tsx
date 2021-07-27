@@ -86,7 +86,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamStat
               <>
                 {isUploaded && (
                   <div className="file__icon icon-file" data-uie-name="file-icon">
-                    <span className="file__icon__ext icon-view"></span>
+                    <span className="file__icon__ext icon-view" />
                   </div>
                 )}
 
