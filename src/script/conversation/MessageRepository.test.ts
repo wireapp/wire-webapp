@@ -22,8 +22,6 @@ import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '
 import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {PublicClient, ClientClassification} from '@wireapp/api-client/src/client/';
 import * as sinon from 'sinon';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {createRandomUuid} from 'Util/util';
 
@@ -37,7 +35,6 @@ import {ConversationVerificationState} from 'src/script/conversation/Conversatio
 import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {NOTIFICATION_HANDLING_STATE} from 'src/script/event/NotificationHandlingState';
 import {ClientEvent} from 'src/script/event/Client';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
@@ -48,6 +45,22 @@ import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {AssetAddEvent} from 'src/script/conversation/EventBuilder';
+import {ClientRepository} from '../client/ClientRepository';
+import {ConversationRepository} from './ConversationRepository';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
+import {EventRepository} from '../event/EventRepository';
+import {MessageSender} from '../message/MessageSender';
+import {PropertiesRepository} from '../properties/PropertiesRepository';
+import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {UserRepository} from '../user/UserRepository';
+import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
+import {AssetRepository} from '../assets/AssetRepository';
+import {UserState} from '../user/UserState';
+import {TeamState} from '../team/TeamState';
+import {ClientState} from '../client/ClientState';
+import {ConversationState} from './ConversationState';
+import {ConversationService} from './ConversationService';
+import {EventService} from '../event/EventService';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
@@ -74,9 +87,7 @@ describe('MessageRepository', () => {
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
-    return testFactory.exposeConversationActors().then(conversation_repository => {
-      amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-    });
+    return testFactory.exposeConversationActors();
   });
 
   afterEach(() => {
@@ -84,28 +95,16 @@ describe('MessageRepository', () => {
   });
 
   describe('asset upload', () => {
-    let messageEntity: ContentMessage;
-    let conversationEntity: Conversation;
+    it('should update original asset when asset upload is complete', async () => {
+      const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
 
-    beforeEach(() => {
-      conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
+      const fileAssetEntity = new FileAsset();
+      fileAssetEntity.status(AssetTransferState.UPLOADING);
 
-      return testFactory.conversation_repository['saveConversation'](conversationEntity).then(() => {
-        const file_et = new FileAsset();
-        file_et.status(AssetTransferState.UPLOADING);
-        messageEntity = new ContentMessage(createRandomUuid());
-        messageEntity.assets.push(file_et);
-        conversationEntity.addMessage(messageEntity);
+      const messageEntity = new ContentMessage(createRandomUuid());
+      messageEntity.assets.push(fileAssetEntity);
+      conversationEntity.addMessage(messageEntity);
 
-        spyOn(testFactory.event_service, 'updateEventAsUploadSucceeded');
-        spyOn(testFactory.event_service, 'updateEventAsUploadFailed');
-        spyOn(testFactory.event_service, 'deleteEvent');
-      });
-    });
-
-    afterEach(() => conversationEntity.removeMessages());
-
-    it('should update original asset when asset upload is complete', () => {
       const event: Partial<AssetAddEvent> = {
         conversation: conversationEntity.id,
         data: {
@@ -119,17 +118,44 @@ describe('MessageRepository', () => {
         type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 
-      return testFactory.message_repository['onAssetUploadComplete'](conversationEntity, event as AssetAddEvent).then(
-        () => {
-          expect(testFactory.event_service.updateEventAsUploadSucceeded).toHaveBeenCalled();
+      const userState = new UserState();
+      const teamState = new TeamState(userState);
+      const conversationState = new ConversationState(userState, teamState);
+      const clientState = new ClientState();
 
-          const firstAsset = messageEntity.assets()[0] as FileAsset;
+      const eventService = {
+        updateEventAsUploadSucceeded: jest.fn(),
+      };
 
-          expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
-          expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
-          expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
-        },
+      const messageRepository = new MessageRepository(
+        {} as ClientRepository,
+        () => ({} as ConversationRepository),
+        {} as CryptographyRepository,
+        {
+          eventService: eventService as unknown as EventService,
+        } as EventRepository,
+        {} as MessageSender,
+        {} as PropertiesRepository,
+        {} as ServerTimeHandler,
+        {} as UserRepository,
+        {} as ConversationService,
+        {} as LinkPreviewRepository,
+        {} as AssetRepository,
+        userState,
+        teamState,
+        conversationState,
+        clientState,
       );
+
+      await messageRepository['onAssetUploadComplete'](conversationEntity, event as AssetAddEvent);
+
+      expect(eventService.updateEventAsUploadSucceeded).toHaveBeenCalled();
+
+      const firstAsset = messageEntity.assets()[0] as FileAsset;
+
+      expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
+      expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
+      expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
     });
   });
 
@@ -179,7 +205,7 @@ describe('MessageRepository', () => {
   });
 
   describe('shouldSendAsExternal', () => {
-    it('should return true for big payload', () => {
+    it('should return true for big payload', async () => {
       const largeConversationEntity = generateConversation();
       largeConversationEntity.participating_user_ids(
         Array(128)
@@ -187,90 +213,195 @@ describe('MessageRepository', () => {
           .map((x, i) => i.toString()),
       );
 
-      return testFactory.conversation_repository['saveConversation'](largeConversationEntity)
-        .then(() => {
-          const text = new Text({
-            content:
-              'massive external message massive external message massive external message massive external message ' +
-              'massive external message massive external message massive external message massive external message ' +
-              'massive external message massive external message massive external message massive external message ' +
-              'massive external message massive external message massive external message massive external message ' +
-              'massive external message massive external message massive external message massive external message ' +
-              'massive external message massive external message massive external message massive external message ' +
-              'massive external message massive external message massive external message massive external message ' +
-              'massive external message massive external message massive external message massive external message ' +
-              'massive external message massive external message massive external message massive external message',
-          });
-          const genericMessage = new GenericMessage({[GENERIC_MESSAGE_TYPE.TEXT]: text, messageId: createRandomUuid()});
+      const text = new Text({
+        content:
+          'massive external message massive external message massive external message massive external message ' +
+          'massive external message massive external message massive external message massive external message ' +
+          'massive external message massive external message massive external message massive external message ' +
+          'massive external message massive external message massive external message massive external message ' +
+          'massive external message massive external message massive external message massive external message ' +
+          'massive external message massive external message massive external message massive external message ' +
+          'massive external message massive external message massive external message massive external message ' +
+          'massive external message massive external message massive external message massive external message ' +
+          'massive external message massive external message massive external message massive external message',
+      });
+      const genericMessage = new GenericMessage({[GENERIC_MESSAGE_TYPE.TEXT]: text, messageId: createRandomUuid()});
+      const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
 
-          const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
-          return testFactory.message_repository['shouldSendAsExternal'](eventInfoEntity);
-        })
-        .then((shouldSendAsExternal: boolean) => {
-          expect(shouldSendAsExternal).toBeTruthy();
-        });
+      const userState = new UserState();
+      const teamState = new TeamState(userState);
+      const conversationState = new ConversationState(userState, teamState);
+      const clientState = new ClientState();
+
+      const conversationRepository = {
+        getConversationById: jest.fn().mockImplementation(() => largeConversationEntity),
+      };
+
+      const messageRepository = new MessageRepository(
+        {} as ClientRepository,
+        () => conversationRepository as unknown as ConversationRepository,
+        {} as CryptographyRepository,
+        {} as EventRepository,
+        {} as MessageSender,
+        {} as PropertiesRepository,
+        {} as ServerTimeHandler,
+        {} as UserRepository,
+        {} as ConversationService,
+        {} as LinkPreviewRepository,
+        {} as AssetRepository,
+        userState,
+        teamState,
+        conversationState,
+        clientState,
+      );
+
+      const shouldSendAsExternal = await messageRepository['shouldSendAsExternal'](eventInfoEntity);
+      expect(conversationRepository.getConversationById).toHaveBeenCalled();
+      expect(shouldSendAsExternal).toBeTruthy();
     });
 
-    it('should return false for small payload', () => {
+    it('should return false for small payload', async () => {
       const smallConversationEntity = generateConversation();
       smallConversationEntity.participating_user_ids(['0', '1']);
 
-      return testFactory.conversation_repository['saveConversation'](smallConversationEntity)
-        .then(() => {
-          const genericMessage = new GenericMessage({
-            [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
-            messageId: createRandomUuid(),
-          });
+      const genericMessage = new GenericMessage({
+        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
+        messageId: createRandomUuid(),
+      });
+      const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
 
-          const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
-          return testFactory.message_repository['shouldSendAsExternal'](eventInfoEntity);
-        })
-        .then((shouldSendAsExternal: boolean) => {
-          expect(shouldSendAsExternal).toBeFalsy();
-        });
+      const userState = new UserState();
+      const teamState = new TeamState(userState);
+      const conversationState = new ConversationState(userState, teamState);
+      const clientState = new ClientState();
+
+      const conversationRepository = {
+        getConversationById: jest.fn().mockImplementation(async () => smallConversationEntity),
+      };
+
+      const messageRepository = new MessageRepository(
+        {} as ClientRepository,
+        () => conversationRepository as unknown as ConversationRepository,
+        {} as CryptographyRepository,
+        {} as EventRepository,
+        {} as MessageSender,
+        {} as PropertiesRepository,
+        {} as ServerTimeHandler,
+        {} as UserRepository,
+        {} as ConversationService,
+        {} as LinkPreviewRepository,
+        {} as AssetRepository,
+        userState,
+        teamState,
+        conversationState,
+        clientState,
+      );
+
+      const shouldSendAsExternal = await messageRepository['shouldSendAsExternal'](eventInfoEntity);
+      expect(conversationRepository.getConversationById).toHaveBeenCalled();
+      expect(shouldSendAsExternal).toBeFalsy();
     });
   });
 
   describe('deleteMessageForEveryone', () => {
-    let conversationEntity: Conversation;
-    beforeEach(() => {
-      conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
-      spyOn<any>(testFactory.message_repository, 'sendGenericMessage').and.returnValue(Promise.resolve());
-    });
-
     it('should not delete other users messages', async () => {
+      const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
+
       const user_et = new User();
       user_et.isMe = false;
+
       const message_to_delete_et = new Message(createRandomUuid());
       message_to_delete_et.user(user_et);
+
       conversationEntity.addMessage(message_to_delete_et);
 
+      const userState = new UserState();
+      const teamState = new TeamState(userState);
+      const conversationState = new ConversationState(userState, teamState);
+      const clientState = new ClientState();
+
+      const messageRepository = new MessageRepository(
+        {} as ClientRepository,
+        () => ({} as ConversationRepository),
+        {} as CryptographyRepository,
+        {} as EventRepository,
+        {} as MessageSender,
+        {} as PropertiesRepository,
+        {} as ServerTimeHandler,
+        {} as UserRepository,
+        {} as ConversationService,
+        {} as LinkPreviewRepository,
+        {} as AssetRepository,
+        userState,
+        teamState,
+        conversationState,
+        clientState,
+      );
+
+      spyOn<any>(messageRepository, 'sendGenericMessage').and.returnValue(Promise.resolve());
+
       await expect(
-        testFactory.message_repository.deleteMessageForEveryone(conversationEntity, message_to_delete_et),
+        messageRepository.deleteMessageForEveryone(conversationEntity, message_to_delete_et),
       ).rejects.toMatchObject({
         type: ConversationError.TYPE.WRONG_USER,
       });
+      expect(messageRepository['sendGenericMessage']).not.toHaveBeenCalled();
     });
 
-    it('should send delete and deletes message for own messages', () => {
-      spyOn(testFactory.event_service, 'deleteEvent');
+    it('should send delete and deletes message for own messages', async () => {
+      const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
+
       const userEntity = new User();
       userEntity.isMe = true;
+
       const messageEntityToDelete = new Message();
       messageEntityToDelete.id = createRandomUuid();
       messageEntityToDelete.user(userEntity);
+
       conversationEntity.addMessage(messageEntityToDelete);
 
-      spyOn(testFactory.user_repository['userState'], 'self').and.returnValue(userEntity);
-      spyOn(testFactory.conversation_repository, 'getConversationById').and.returnValue(
-        Promise.resolve(conversationEntity),
+      const userState = new UserState();
+      const teamState = new TeamState(userState);
+      const conversationState = new ConversationState(userState, teamState);
+      const clientState = new ClientState();
+
+      const conversationRepository = {
+        getConversationById: jest.fn().mockImplementation(async () => conversationEntity),
+      };
+
+      const eventService = {
+        deleteEvent: jest.fn(),
+      };
+
+      const messageSender = new MessageSender();
+      messageSender.pauseQueue(false);
+
+      const messageRepository = new MessageRepository(
+        {} as ClientRepository,
+        () => conversationRepository as unknown as ConversationRepository,
+        {} as CryptographyRepository,
+        {eventService: eventService as unknown as EventService} as EventRepository,
+        messageSender,
+        {} as PropertiesRepository,
+        {} as ServerTimeHandler,
+        {} as UserRepository,
+        {} as ConversationService,
+        {} as LinkPreviewRepository,
+        {} as AssetRepository,
+        userState,
+        teamState,
+        conversationState,
+        clientState,
       );
 
-      return testFactory.message_repository
-        .deleteMessageForEveryone(conversationEntity, messageEntityToDelete)
-        .then(() => {
-          expect(testFactory.event_service.deleteEvent).toHaveBeenCalledTimes(1);
-        });
+      spyOn<any>(messageRepository, 'sendGenericMessage').and.returnValue(Promise.resolve());
+      spyOn(messageRepository, 'createRecipients').and.returnValue(Promise.resolve());
+      spyOn(userState, 'self').and.returnValue(userEntity);
+
+      await messageRepository.deleteMessageForEveryone(conversationEntity, messageEntityToDelete);
+      expect(messageRepository['sendGenericMessage']).toHaveBeenCalled();
+      expect(messageRepository.createRecipients).toHaveBeenCalled();
+      expect(eventService.deleteEvent).toHaveBeenCalledTimes(1);
     });
   });
 
