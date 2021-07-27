@@ -131,8 +131,6 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const [callDuration, setCallDuration] = useState('');
 
-  const isAllowedCall = !isGroup || teamState.isConferenceCallingEnabled();
-
   useEffect(() => {
     let intervalId: number;
     if (isOngoing && startedAt) {
@@ -150,13 +148,9 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     <>
       {showJoinButton && (
         <div
-          className={cx('call-ui__button call-ui__button--join', {
-            'call-ui__button--disabled': !isAllowedCall,
-            'call-ui__button--green': isAllowedCall,
-          })}
-          title={!isAllowedCall ? 'NOT ALLOWED' : undefined}
+          className={cx('call-ui__button call-ui__button--join call-ui__button--green')}
           style={{margin: '40px 16px 0px 16px'}}
-          onClick={() => (isAllowedCall ? callActions.answer(call) : undefined)}
+          onClick={() => callActions.answer(call)}
           data-uie-name="do-call-controls-call-join"
         >
           {t('callJoin')}
@@ -324,12 +318,8 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   )}
                   {isIncoming && (
                     <div
-                      className={cx('call-ui__button call-ui__button--large', {
-                        'call-ui__button--disabled': !isAllowedCall,
-                        'call-ui__button--green': isAllowedCall,
-                      })}
-                      title={!isAllowedCall ? 'NOT ALLOWED' : undefined}
-                      onClick={() => (isAllowedCall ? callActions.answer(call) : undefined)}
+                      className={cx('call-ui__button call-ui__button--large call-ui__button--green')}
+                      onClick={() => callActions.answer(call)}
                       data-uie-name="do-call-controls-call-accept"
                     >
                       <Icon.Pickup className="small-icon" />
@@ -375,12 +365,12 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 registerReactComponent('conversation-list-calling-cell', {
   component: ConversationListCallingCell,
   template: `<div data-bind="react: {
-    call, 
-    callActions, 
-    callingRepository, 
-    conversation: ko.unwrap(conversation), 
-    hasAccessToCamera: ko.unwrap(hasAccessToCamera), 
-    isSelfVerified: ko.unwrap(isSelfVerified), 
+    call,
+    callActions,
+    callingRepository,
+    conversation: ko.unwrap(conversation),
+    hasAccessToCamera: ko.unwrap(hasAccessToCamera),
+    isSelfVerified: ko.unwrap(isSelfVerified),
     multitasking,
     temporaryUserStyle,
   }"></div>
