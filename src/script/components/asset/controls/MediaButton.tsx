@@ -91,5 +91,5 @@ export default MediaButton;
 registerReactComponent<MediaButtonProps>('media-button', {
   component: MediaButton,
   template:
-    '<div data-bind="react: {asset, cancel, large, pause, play, src, transferState: ko.unwrap(transferState), uploadProgress: ko.unwrap(uploadProgress)}"></div>',
+    '<div data-bind="react: {asset, cancel, large, pause, play, mediaElement, transferState: ko.unwrap(transferState), uploadProgress: ko.unwrap(uploadProgress)}"></div>',
 });
