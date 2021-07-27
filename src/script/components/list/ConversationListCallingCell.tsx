@@ -46,7 +46,7 @@ import {createNavigate} from '../../router/routerBindings';
 import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {TeamState} from '../../team/TeamState';
-import {Context, ContextMenuEntry} from '../../ui/ContextMenu';
+import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
 import type {ClientId, Participant, UserId} from '../../calling/Participant';
 
 export interface CallingCellProps {
@@ -167,7 +167,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
         label: 'Kick from call',
       },
     ];
-    Context.from(event.nativeEvent, entries, 'participant-moderator-menu');
+    showContextMenu(event.nativeEvent, entries, 'participant-moderator-menu');
   };
 
   useEffect(() => {
