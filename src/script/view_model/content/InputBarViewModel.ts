@@ -596,7 +596,10 @@ export class InputBarViewModel {
   };
 
   readonly onWindowClick = (event: Event): void => {
-    if ($(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
+    const ignoredParent = (event.target as HTMLElement).closest(
+      '.conversation-input-bar, .conversation-input-bar-mention-suggestion, .ctx-menu',
+    );
+    if (ignoredParent) {
       return;
     }
     this.cancelMessageEditing();
