@@ -34,6 +34,7 @@ export interface ServerConfig {
     URL: {
       ACCOUNT_BASE: string;
       MOBILE_BASE: string;
+      PRICING: string;
       PRIVACY_POLICY: string;
       SUPPORT: {
         BUG_REPORT: string;

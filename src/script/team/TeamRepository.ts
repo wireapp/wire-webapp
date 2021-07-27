@@ -38,7 +38,7 @@ import {Runtime} from '@wireapp/commons';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
@@ -61,6 +61,7 @@ import {TeamState} from './TeamState';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {Config} from '../Config';
 
 export interface AccountInfo {
   accentID: number;
@@ -412,6 +413,7 @@ export class TeamRepository {
     if (previousConfig) {
       this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
       this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
+      this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
     }
 
     this.saveFeatureConfig(featureConfigList);
@@ -466,6 +468,29 @@ export class TeamRepository {
           title: t('featureConfigChangeModalAudioVideoHeadline'),
         },
       });
+    }
+  };
+
+  private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    if (previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
+      const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
+      if (hasChangedToEnabled) {
+        const replaceEnterprise = replaceLink(
+          Config.getConfig().URL.PRICING,
+          'modal__text__read-more',
+          'read-more-pricing',
+        );
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            htmlMessage: t(
+              'featureConfigChangeModalConferenceCallingEnabled',
+              {brandName: Config.getConfig().BRAND_NAME},
+              replaceEnterprise,
+            ),
+            title: t('featureConfigChangeModalConferenceCallingTitle', {brandName: Config.getConfig().BRAND_NAME}),
+          },
+        });
+      }
     }
   };
 

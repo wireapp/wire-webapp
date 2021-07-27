@@ -1075,6 +1075,8 @@
   "featureConfigChangeModalFileSharingHeadline": "File sharing restrictions",
   "featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled": "Sharing and receiving files of any type is enabled",
   "featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled": "Sharing and receiving files of any type is disabled",
+  "featureConfigChangeModalConferenceCallingTitle": "{{brandName}} Enterprise",
+  "featureConfigChangeModalConferenceCallingEnabled": "Your team was upgraded to {{brandName}} Enterprise, which gives you access to features such as conference calls and more. [link]Learn more about {{brandName}} Enterprise[/link]",
   "conversationAssetRestricted": "File sharing restricted",
   "conversationAssetRestrictedAudioMessageHeadline": "Audio message",
   "conversationModalRestrictedFileSharingHeadline": "File sharing restrictions",
