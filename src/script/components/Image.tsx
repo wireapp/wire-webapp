@@ -32,7 +32,7 @@ import useEffectRef from 'Util/useEffectRef';
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   asset: AssetRemoteData;
   assetRepository?: AssetRepository;
-  click?: (asset: AssetRemoteData) => void;
+  click?: (asset: AssetRemoteData, event: React.MouseEvent) => void;
   isQuote?: boolean;
   teamState?: TeamState;
 }
@@ -54,9 +54,9 @@ const Image: React.FC<ImageProps> = ({
 
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
 
-  const onClick = () => {
+  const onClick = (event: React.MouseEvent) => {
     if (!assetIsLoading && typeof click === 'function') {
-      click(asset);
+      click(asset, event);
     }
   };
 

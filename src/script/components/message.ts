@@ -27,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
-import {Context, ContextMenuEntry} from '../ui/ContextMenu';
+import {showContextMenu as showContext, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import {StatusType} from '../message/StatusType';
@@ -45,11 +45,11 @@ import {TeamState} from '../team/TeamState';
 import './asset/audioAsset';
 import './asset/RestrictedAudio';
 import './asset/FileAssetComponent';
-import './asset/imageAsset';
+import './asset/ImageAsset';
 import './asset/RestrictedImage';
 import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
-import './asset/videoAsset';
+import './asset/VideoAsset';
 import './asset/RestrictedFile';
 import './asset/MessageButton';
 import './message/VerificationMessage';
@@ -297,7 +297,7 @@ class Message {
 
   showContextMenu(event: MouseEvent) {
     const entries = this.contextMenuEntries();
-    Context.from(event, entries, 'message-options-menu');
+    showContext(event, entries, 'message-options-menu');
   }
 }
 

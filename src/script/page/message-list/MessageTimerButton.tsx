@@ -26,7 +26,7 @@ import Icon from 'Components/Icon';
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
-import {Context} from '../../ui/ContextMenu';
+import {showContextMenu} from '../../ui/ContextMenu';
 import type {Conversation} from '../../entity/Conversation';
 
 export interface MessageTimerButtonProps {
@@ -57,7 +57,7 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversat
       }),
     );
 
-    Context.from(event, entries, 'message-timer-menu');
+    showContextMenu(event, entries, 'message-timer-menu');
   };
 
   return (

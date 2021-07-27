@@ -157,8 +157,8 @@ export const loadUrlBlob = (url: string): Promise<Blob> => {
 };
 
 export const getFileExtension = (filename: string): string => {
-  const extensionMatch = filename.match(/\.(tar\.gz|[^.]*)$/i);
-  const foundExtension = extensionMatch && extensionMatch[1];
+  const extensionMatch = filename?.match(/\.(tar\.gz|[^.]*)$/i);
+  const foundExtension = extensionMatch?.[1];
   return foundExtension || '';
 };
 
