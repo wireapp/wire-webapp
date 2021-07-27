@@ -17,7 +17,7 @@
  *
  */
 
-file-asset {
+.file-asset {
   .asset-container-style;
 
   flex-wrap: wrap;
@@ -29,43 +29,43 @@ file-asset {
   display: flex;
   width: 100%;
   align-items: center;
-}
 
-.file-icon {
-  position: relative;
-  font-size: @font-size-xl;
-}
+  &__desc {
+    min-width: 0;
+    flex: 1 1 auto;
+    margin-left: 12px;
+    line-height: @line-height-sm;
 
-.file-icon-ext {
-  position: absolute;
-  right: 0;
-  bottom: 4px;
-  left: 0;
-  color: #fff;
-  font-family: @font-family-base;
-  font-size: @font-size-xs;
-  text-align: center;
-}
+    &__meta {
+      display: flex;
+      padding: 0;
+      margin: 0;
+      list-style: none;
 
-.file-desc {
-  min-width: 0;
-  flex: 1 1 auto;
-  margin-left: 12px;
-  line-height: @line-height-sm;
-}
+      & > li:not(:first-child)::before {
+        padding-right: 4px;
+        content: '\b7'; // middot
+      }
 
-.file-desc-meta {
-  display: flex;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-
-  & > li:not(:first-child)::before {
-    padding-right: 4px;
-    content: '\b7'; // middot
+      & > li:not(:last-child) {
+        margin-right: 4px;
+      }
+    }
   }
 
-  & > li:not(:last-child) {
-    margin-right: 4px;
+  &__icon {
+    position: relative;
+    font-size: @font-size-xl;
+
+    &__ext {
+      position: absolute;
+      right: 0;
+      bottom: 4px;
+      left: 0;
+      color: #fff;
+      font-family: @font-family-base;
+      font-size: @font-size-xs;
+      text-align: center;
+    }
   }
 }
