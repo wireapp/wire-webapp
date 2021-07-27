@@ -77,6 +77,7 @@ export const useAssetTransfer = (message: ContentMessage, assetRepository = cont
       assetRepository.cancelUpload(message.id);
       amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
     },
+    downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
     isDownloading: transferState === AssetTransferState.DOWNLOADING,
     isUploaded: transferState === AssetTransferState.UPLOADED,
     isUploading: transferState === AssetTransferState.UPLOADING,
