@@ -148,7 +148,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     <>
       {showJoinButton && (
         <div
-          className={cx('call-ui__button call-ui__button--join call-ui__button--green')}
+          className="call-ui__button call-ui__button--green call-ui__button--join"
           style={{margin: '40px 16px 0px 16px'}}
           onClick={() => callActions.answer(call)}
           data-uie-name="do-call-controls-call-join"
@@ -318,7 +318,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   )}
                   {isIncoming && (
                     <div
-                      className={cx('call-ui__button call-ui__button--large call-ui__button--green')}
+                      className="call-ui__button call-ui__button--green call-ui__button--large"
                       onClick={() => callActions.answer(call)}
                       data-uie-name="do-call-controls-call-accept"
                     >
