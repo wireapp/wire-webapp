@@ -75,20 +75,20 @@ export class FeatureAPI {
     return response.data;
   }
 
-  public async getLegalholdFeature(teamId: string): Promise<FeatureLegalhold> {
+  public async getLegalholdFeature(): Promise<FeatureLegalhold> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.LEGAL_HOLD}`,
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.LEGAL_HOLD}`,
     };
 
     const response = await this.client.sendJSON<FeatureLegalhold>(config);
     return response.data;
   }
 
-  public async getConferenceCallingFeature(teamId: string): Promise<FeatureConferenceCalling> {
+  public async getConferenceCallingFeature(): Promise<FeatureConferenceCalling> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_CONFERENCE}`,
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.CALLING_CONFERENCE}`,
     };
 
     const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
@@ -109,10 +109,10 @@ export class FeatureAPI {
     return response.data;
   }
 
-  public async getVideoCallingFeature(teamId: string): Promise<FeatureVideoCalling> {
+  public async getVideoCallingFeature(): Promise<FeatureVideoCalling> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_VIDEO}`,
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.CALLING_VIDEO}`,
     };
 
     const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
@@ -133,10 +133,10 @@ export class FeatureAPI {
     return response.data;
   }
 
-  public async getFileSharingFeature(teamId: string): Promise<FeatureFileSharing> {
+  public async getFileSharingFeature(): Promise<FeatureFileSharing> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.FILE_SHARING}`,
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.FILE_SHARING}`,
     };
 
     const response = await this.client.sendJSON<FeatureFileSharing>(config);
@@ -157,10 +157,10 @@ export class FeatureAPI {
     return response.data;
   }
 
-  public async getVideoMessageFeature(teamId: string): Promise<FeatureVideoMessage> {
+  public async getVideoMessageFeature(): Promise<FeatureVideoMessage> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.VIDEO_MESSAGE}`,
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.VIDEO_MESSAGE}`,
     };
 
     const response = await this.client.sendJSON<FeatureVideoMessage>(config);
@@ -181,10 +181,10 @@ export class FeatureAPI {
     return response.data;
   }
 
-  public async getAudioMessageFeature(teamId: string): Promise<FeatureAudioMessage> {
+  public async getAudioMessageFeature(): Promise<FeatureAudioMessage> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.AUDIO_MESSAGE}`,
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.AUDIO_MESSAGE}`,
     };
 
     const response = await this.client.sendJSON<FeatureAudioMessage>(config);
@@ -205,10 +205,10 @@ export class FeatureAPI {
     return response.data;
   }
 
-  public async getSSOFeature(teamId: string): Promise<FeatureSSO> {
+  public async getSSOFeature(): Promise<FeatureSSO> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.SSO}`,
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.SSO}`,
     };
 
     const response = await this.client.sendJSON<FeatureSSO>(config);
@@ -225,10 +225,10 @@ export class FeatureAPI {
     return response.data;
   }
 
-  public async getAppLockFeature(teamId: string): Promise<FeatureAppLock> {
+  public async getAppLockFeature(): Promise<FeatureAppLock> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.APPLOCK}`,
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.APPLOCK}`,
     };
 
     const response = await this.client.sendJSON<FeatureAppLock>(config);
