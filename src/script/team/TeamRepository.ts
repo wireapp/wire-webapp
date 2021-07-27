@@ -472,9 +472,9 @@ export class TeamRepository {
   };
 
   private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    if (true || previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
+    if (previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
       const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
-      if (true || hasChangedToEnabled) {
+      if (hasChangedToEnabled) {
         const replaceEnterprise = replaceLink(
           Config.getConfig().URL.PRICING,
           'modal__text__read-more',
