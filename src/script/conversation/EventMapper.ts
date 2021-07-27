@@ -824,7 +824,7 @@ export class EventMapper {
         return new MentionEntity(
           protoMention.start,
           protoMention.length,
-          protoMention.userId,
+          protoMention.qualifiedUserId?.id || protoMention.userId,
           protoMention.qualifiedUserId?.domain,
         );
       })
