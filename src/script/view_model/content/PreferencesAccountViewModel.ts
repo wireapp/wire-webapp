@@ -357,7 +357,7 @@ export class PreferencesAccountViewModel {
   };
 
   readonly clickOnAvailability = (viewModel: unknown, event: MouseEvent) => {
-    AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
+    AvailabilityContextMenu.show(event, 'preferences-account-availability-menu');
   };
 
   readonly clickOnBackupExport = (): void => {

@@ -191,7 +191,6 @@ export class ConversationLabelRepository {
     this.saveLabels();
   };
 
-  // TODO: Write test cases!
   readonly getConversationLabelIds = (conversation: Conversation): string[] => {
     const ids: string[] = [];
 

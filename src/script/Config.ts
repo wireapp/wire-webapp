@@ -48,6 +48,7 @@ export class Configuration {
   readonly URL = {
     ACCOUNT_BASE: 'https://account.wire.com',
     MOBILE_BASE: '',
+    PRICING: '#',
     PRIVACY_POLICY: 'https://wire-website-staging.zinfra.io/security',
     SUPPORT: {
       BUG_REPORT: 'https://support.wire.com/new?ticket_form_id=101615',

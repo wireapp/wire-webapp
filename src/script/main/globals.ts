@@ -43,7 +43,7 @@ import 'Components/toggle/InfoToggle';
 import '../page/preferences/InputLevel';
 import 'Components/calling/FullscreenVideoCall';
 import 'Components/list/ConversationListCallingCell';
-import 'Components/list/conversationListCell';
+import 'Components/list/ConversationListCell';
 import 'Components/avatar/GroupAvatar';
 import 'Components/message';
 import 'Components/message/messageQuote';
@@ -118,6 +118,7 @@ declare global {
         URL: {
           ACCOUNT_BASE: string;
           MOBILE_BASE: string;
+          PRICING: string;
           PRIVACY_POLICY: string;
           SUPPORT: {
             BUG_REPORT: string;

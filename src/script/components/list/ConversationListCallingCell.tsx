@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -75,17 +75,16 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant, pages, currentPage} =
-    useKoSubscribableChildren(call, [
-      'reason',
-      'state',
-      'isCbrEnabled',
-      'startedAt',
-      'participants',
-      'maximizedParticipant',
-      'pages',
-      'currentPage',
-    ]);
+  const {reason, state, isCbrEnabled, startedAt, participants, maximizedParticipant} = useKoSubscribableChildren(call, [
+    'reason',
+    'state',
+    'isCbrEnabled',
+    'startedAt',
+    'participants',
+    'maximizedParticipant',
+    'pages',
+    'currentPage',
+  ]);
   const {
     isGroup,
     participating_user_ets: userEts,
@@ -94,6 +93,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   } = useKoSubscribableChildren(conversation, ['isGroup', 'participating_user_ets', 'selfUser', 'display_name']);
 
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
+  const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
   const {isMuted, videoSpeakersActiveTab} = useKoSubscribableChildren(callState, ['isMuted', 'videoSpeakersActiveTab']);
 
@@ -106,13 +106,10 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const isOngoing = state === CALL_STATE.MEDIA_ESTAB;
 
   const showNoCameraPreview = !hasAccessToCamera && call.initialType === CALL_TYPE.VIDEO && !isOngoing;
-  const showVideoButton = call.initialType === CALL_TYPE.VIDEO || isOngoing;
+  const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
 
-  const videoGrid = useMemo(
-    () => call && getGrid(call),
-    [call, participants, pages, currentPage, participants?.map(p => p.hasActiveVideo())],
-  );
+  const videoGrid = call && getGrid(call);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
   const conversationUrl = generateConversationUrl(conversation.id);
@@ -227,7 +224,10 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             </div>
           </div>
           {(isOngoing || selfParticipant?.hasActiveVideo()) && isMinimized && videoGrid?.grid.length && (
-            <div className="group-video__minimized-wrapper" onClick={() => multitasking.isMinimized(false)}>
+            <div
+              className="group-video__minimized-wrapper"
+              onClick={isOngoing ? () => multitasking.isMinimized(false) : undefined}
+            >
               <GroupVideoGrid
                 grid={
                   videoSpeakersActiveTab === VideoSpeakersTab.ALL
@@ -238,9 +238,11 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 maximizedParticipant={maximizedParticipant}
                 selfParticipant={selfParticipant}
               />
-              <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
-                <Icon.Fullscreen />
-              </div>
+              {isOngoing && (
+                <div className="group-video__minimized-wrapper__overlay" data-uie-name="do-maximize-call">
+                  <Icon.Fullscreen />
+                </div>
+              )}
             </div>
           )}
 

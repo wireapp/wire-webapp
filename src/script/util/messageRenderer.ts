@@ -27,6 +27,7 @@ import {replaceInRange} from './StringUtil';
 import type {MentionEntity} from '../message/MentionEntity';
 
 interface MentionText {
+  domain: string | null;
   isSelfMentioned: boolean;
   text: string;
   userId: string;
@@ -97,9 +98,12 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
   const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = (mentionData: MentionText) => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
-    const elementAttributes = mentionData.isSelfMentioned
+    let elementAttributes = mentionData.isSelfMentioned
       ? ' data-uie-name="label-self-mention"'
       : ` data-uie-name="label-other-mention" data-user-id="${mentionData.userId}"`;
+    if (!mentionData.isSelfMentioned && mentionData.domain) {
+      elementAttributes += ` data-user-domain="${mentionData.domain}"`;
+    }
 
     const mentionText = mentionData.text.replace(/^@/, '');
     const content = `<span class="mention-at-sign">@</span>${escape(mentionText)}`;
@@ -116,6 +120,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
       const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
       const mentionKey = createMentionHash(mention);
       mentionTexts[mentionKey] = {
+        domain: mention.domain,
         isSelfMentioned: mention.targetsUser(selfId),
         text: mentionText,
         userId: mention.userId,

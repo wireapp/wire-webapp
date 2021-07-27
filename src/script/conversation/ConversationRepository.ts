@@ -95,6 +95,7 @@ import {TeamState} from '../team/TeamState';
 import {TeamRepository} from '../team/TeamRepository';
 import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {UserFilter} from '../user/UserFilter';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -676,8 +677,8 @@ export class ConversationRepository {
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
     const conversationData = await this.conversation_service.getConversationById(conversationEntity.id);
-    const {name, message_timer} = conversationData;
-    this.conversationMapper.updateProperties(conversationEntity, {name} as any);
+    const {name, message_timer, type} = conversationData;
+    this.conversationMapper.updateProperties(conversationEntity, {name, type} as any);
     this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
   }
 
@@ -1437,14 +1438,15 @@ export class ConversationRepository {
   readonly teamMemberLeave = async (
     teamId: string,
     userId: string,
+    domain: string | null,
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
-    const userEntity = await this.userRepository.getUserById(userId);
+    const userEntity = await this.userRepository.getUserById(userId, domain);
     this.conversationState
       .conversations()
       .filter(conversationEntity => {
         const conversationInTeam = conversationEntity.team_id === teamId;
-        const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
+        const userIsParticipant = UserFilter.isParticipant(conversationEntity, userId, domain);
         return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
       })
       .forEach(conversationEntity => {
@@ -1628,18 +1630,16 @@ export class ConversationRepository {
     this.showModal(messageText, titleText);
   }
 
-  private handleUsersNotConnected(userIds: string[] = []) {
-    const [userID] = userIds;
-    const userPromise = userIds.length === 1 ? this.userRepository.getUserById(userID) : Promise.resolve(null);
+  private async handleUsersNotConnected(userIds: string[] = []): Promise<void> {
+    const titleText = t('modalConversationNotConnectedHeadline');
 
-    userPromise.then((userEntity: User) => {
-      const username = userEntity?.name();
-      const messageText = username
-        ? t('modalConversationNotConnectedMessageOne', username)
-        : t('modalConversationNotConnectedMessageMany');
-      const titleText = t('modalConversationNotConnectedHeadline');
-      this.showModal(messageText, titleText);
-    });
+    if (userIds.length > 1) {
+      this.showModal(t('modalConversationNotConnectedMessageMany'), titleText);
+    } else {
+      // TODO(Federation): Update code once connections are implemented on the backend
+      const userEntity = await this.userRepository.getUserById(userIds[0], null);
+      this.showModal(t('modalConversationNotConnectedMessageOne', userEntity.name()), titleText);
+    }
   }
 
   private showModal(messageText: string, titleText: string) {
@@ -2222,7 +2222,10 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
+    const updateSequence =
+      selfUserRejoins || connectionEntity?.isConnected()
+        ? this.updateConversationFromBackend(conversationEntity)
+        : Promise.resolve();
 
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
@@ -2371,7 +2374,8 @@ export class ConversationRepository {
       const fileName = event.data.info.name;
       const contentType = event.data.content_type;
       if (!isAllowedFile(fileName, contentType)) {
-        const user = await this.userRepository.getUserById(event.from);
+        // TODO(Federation): Update code once sending assets is implemented on the backend
+        const user = await this.userRepository.getUserById(event.from, null);
         return this.injectFileTypeRestrictedMessage(
           conversationEntity,
           user,
@@ -2669,7 +2673,7 @@ export class ConversationRepository {
 
     const messageFromSelf = messageEntity.from === this.userState.self().id;
     if (messageFromSelf && event_data.reaction) {
-      const userEntity = await this.userRepository.getUserById(from);
+      const userEntity = await this.userRepository.getUserById(from, messageEntity.fromDomain);
       const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);
       reactionMessageEntity.user(userEntity);
       reactionMessageEntity.reaction = event_data.reaction;
@@ -2690,7 +2694,7 @@ export class ConversationRepository {
    * @returns Resolves when users have been update
    */
   private async updateMessageUserEntities(messageEntity: Message) {
-    const userEntity = await this.userRepository.getUserById(messageEntity.from);
+    const userEntity = await this.userRepository.getUserById(messageEntity.from, messageEntity.fromDomain);
     messageEntity.user(userEntity);
     const isMemberMessage = messageEntity.isMember();
     if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {

@@ -22,7 +22,7 @@ import TestPage from 'Util/test/TestPage';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import MessageTimerButton, {MessageTimerButtonProps} from './MessageTimerButton';
 import type {Conversation} from '../../entity/Conversation';
-import {Context} from '../../ui/ContextMenu';
+import * as Context from '../../ui/ContextMenu';
 
 class MessageTimerButtonPage extends TestPage<MessageTimerButtonProps> {
   constructor(props?: MessageTimerButtonProps) {
@@ -53,7 +53,7 @@ describe('MessageTimerButton', () => {
   });
 
   it('activates the context menu', () => {
-    jest.spyOn(Context, 'from').mockClear();
+    jest.spyOn(Context, 'showContextMenu').mockClear();
 
     const conversation: Partial<Conversation> = {
       hasGlobalMessageTimer: ko.pureComputed(() => false),
@@ -66,9 +66,9 @@ describe('MessageTimerButton', () => {
 
     expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('enabled');
 
-    expect(Context.from).toHaveBeenCalledTimes(0);
+    expect(Context.showContextMenu).toHaveBeenCalledTimes(0);
     messageTimerButtonPage.clickMessageTimerElement();
-    expect(Context.from).toHaveBeenCalledTimes(1);
+    expect(Context.showContextMenu).toHaveBeenCalledTimes(1);
   });
 
   it('shows the active message timer button', () => {
@@ -112,7 +112,7 @@ describe('MessageTimerButton', () => {
   });
 
   it(`doesn't activate the context menu on a disabled message timer button`, () => {
-    jest.spyOn(Context, 'from').mockClear();
+    jest.spyOn(Context, 'showContextMenu').mockClear();
     const minutes = 10;
     const duration = TIME_IN_MILLIS.MINUTE * minutes;
 
@@ -127,8 +127,8 @@ describe('MessageTimerButton', () => {
 
     expect(messageTimerButtonPage.getMessageTimerElement().prop('data-uie-value')).toBe('disabled');
 
-    expect(Context.from).toHaveBeenCalledTimes(0);
+    expect(Context.showContextMenu).toHaveBeenCalledTimes(0);
     messageTimerButtonPage.clickMessageTimerElement();
-    expect(Context.from).toHaveBeenCalledTimes(0);
+    expect(Context.showContextMenu).toHaveBeenCalledTimes(0);
   });
 });
