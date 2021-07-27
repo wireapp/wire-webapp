@@ -685,8 +685,8 @@ class App {
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId': userId => {
-        mainView.content.userModal.showUser(userId, () => router.navigate('/'));
+      '/user/:userId(/:domain)': (userId: string, domain?: string) => {
+        mainView.content.userModal.showUser(userId, domain, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);

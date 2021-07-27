@@ -373,7 +373,9 @@ export class TeamRepository {
     const isOtherUser = this.userState.self().id !== userId;
 
     if (isLocalTeam && isOtherUser) {
-      this.userRepository.getUserById(userId).then(userEntity => this.addUserToTeam(userEntity));
+      this.userRepository
+        .getUserById(userId, this.userState.self().domain)
+        .then(userEntity => this.addUserToTeam(userEntity));
       this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), member));
     }
   }

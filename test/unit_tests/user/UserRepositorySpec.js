@@ -148,20 +148,6 @@ describe('UserRepository', () => {
   });
 
   describe('User handling', () => {
-    describe('fetchUsersById', () => {
-      it('should handle malformed input', () => {
-        return testFactory.user_repository
-          .fetchUsersById()
-          .then(response => {
-            expect(response.length).toBe(0);
-            return testFactory.user_repository.fetchUsersById([undefined, undefined, undefined]);
-          })
-          .then(response => {
-            expect(response.length).toBe(0);
-          });
-      });
-    });
-
     describe('findUserById', () => {
       let user = null;
 

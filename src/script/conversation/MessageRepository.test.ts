@@ -461,6 +461,7 @@ describe('MessageRepository', () => {
           conversationPartner.id,
           clientPayload,
           false,
+          conversationPartner.domain,
         );
 
         expect(wasClientAdded).toBe(true);

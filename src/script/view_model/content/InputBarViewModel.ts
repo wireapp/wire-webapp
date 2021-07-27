@@ -423,7 +423,7 @@ export class InputBarViewModel {
     const draftMessage: DraftMessage = {...(storageValue as DraftMessage)};
 
     draftMessage.mentions = draftMessage.mentions.map(mention => {
-      return new MentionEntity(mention.startIndex, mention.length, mention.userId);
+      return new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain);
     });
 
     const replyMessageId = draftMessage.reply
@@ -449,7 +449,7 @@ export class InputBarViewModel {
 
   private readonly _createMentionEntity = (userEntity: User): MentionEntity => {
     const mentionLength = userEntity.name().length + 1;
-    return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+    return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id, userEntity.domain);
   };
 
   readonly addMention = (userEntity: User, inputElement: HTMLInputElement): void => {

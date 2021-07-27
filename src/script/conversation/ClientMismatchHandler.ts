@@ -74,6 +74,8 @@ export class ClientMismatchHandler {
 
   /**
    * Fetches missing clients from participants. Triggers conversation verification state updates. Re-encrypts message to include encrypted payload for missed clients.
+   * @deprecated
+   * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
   private async handleMissing(
     recipients: UserClients,
@@ -106,7 +108,7 @@ export class ClientMismatchHandler {
     await Promise.all(
       Object.values(qualifiedUsersMap).map(userClientMap =>
         Object.entries(userClientMap).map(([userId, clients]) => {
-          return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+          return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)));
         }),
       ),
     );
@@ -122,6 +124,8 @@ export class ClientMismatchHandler {
 
   /**
    * Modifies payload in-place and removes entries for redundant or deleted clients. It also triggers the removal of clients from the local database if clients have been detected as deleted on backend. On top of that it "amplifies" that users have left the conversation (when there are no more clients for a user).
+   * @deprecated
+   * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
   async removeClientsFromPayload(
     recipients: UserClients,
@@ -150,7 +154,7 @@ export class ClientMismatchHandler {
         delete payload.recipients[userId][clientId];
       }
       if (removeLocallyStoredClient) {
-        await this.userRepository.removeClientFromUser(userId, clientId);
+        await this.userRepository.removeClientFromUser(userId, clientId, null);
       }
     };
 

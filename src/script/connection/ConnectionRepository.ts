@@ -260,7 +260,8 @@ export class ConnectionRepository {
    */
   private async updateConnection(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
     this.addConnectionEntity(connectionEntity);
-    const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
+    // TODO(Federation): Update code once connections are implemented on the backend
+    const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
     return userEntity.connection(connectionEntity);
   }
 
@@ -320,7 +321,8 @@ export class ConnectionRepository {
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
-      const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
+      // TODO(Federation): Update code once connections are implemented on the backend
+      const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
       const messageEntity = new MemberMessage();
       messageEntity.user(userEntity);
 

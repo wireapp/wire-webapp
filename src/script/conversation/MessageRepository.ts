@@ -1250,7 +1250,7 @@ export class MessageRepository {
     if (ensureUser) {
       return messagePromise.then(message => {
         if (message.from && !message.user().id) {
-          return this.userRepository.getUserById(message.from).then(userEntity => {
+          return this.userRepository.getUserById(message.from, message.user().domain).then(userEntity => {
             message.user(userEntity);
             return message as ContentMessage;
           });
@@ -1279,7 +1279,11 @@ export class MessageRepository {
       // Since this is a bare API client user we use `.deleted`
       const isDeleted = user.deleted === true;
       if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, user.id);
+        await this.conversationRepositoryProvider().teamMemberLeave(
+          this.teamState.team().id,
+          user.id,
+          this.userState.self().domain,
+        );
       }
     }
   }
@@ -1496,7 +1500,9 @@ export class MessageRepository {
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId))),
+            Promise.all(
+              clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId, null)),
+            ),
           ),
         );
 
@@ -1519,7 +1525,9 @@ export class MessageRepository {
         await Promise.all(
           Object.values(qualifiedUsersMap).map(userClientMap =>
             Object.entries(userClientMap).map(([userId, clients]) => {
-              return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+              return Promise.all(
+                clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)),
+              );
             }),
           ),
         );
