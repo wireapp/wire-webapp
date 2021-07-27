@@ -247,18 +247,13 @@ export class MessageRepository {
     return undefined;
   }
 
-  async sendFederatedMessage(): Promise<void> {
+  async sendFederatedMessage(message: string): Promise<void> {
     const conversation = this.conversationState.activeConversation();
     const userIds: string[] | QualifiedId[] = conversation.domain
       ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
       : conversation.allUserEntities.map(user => user.id);
 
-    await this.cryptography_repository.sendCoreMessage(
-      'Hello from Core!',
-      conversation.id,
-      userIds,
-      conversation.domain,
-    );
+    await this.cryptography_repository.sendCoreMessage(message, conversation.id, userIds, conversation.domain);
   }
 
   /**
