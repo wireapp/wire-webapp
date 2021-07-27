@@ -21,7 +21,8 @@ import ko from 'knockout';
 import type {AxiosError} from 'axios';
 import {amplify} from 'amplify';
 import {error as StoreEngineError} from '@wireapp/store-engine';
-import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import {Account} from '@wireapp/core';
 import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
@@ -114,6 +115,28 @@ export class CryptographyRepository {
     });
 
     return this.cryptobox.load();
+  }
+
+  async sendCoreMessage(
+    text: string = 'Hello, World!',
+    conversationId: string,
+    userIds: string[] | QualifiedId[],
+    conversationDomain?: string,
+  ): Promise<void> {
+    const crudEngine = this.storageRepository.storageService['engine'];
+    const storeEngineProvider = () => Promise.resolve(crudEngine);
+    const apiClient = this.cryptographyService['apiClient'];
+
+    const account = new Account(apiClient, storeEngineProvider);
+    await account.initServices(crudEngine);
+    await account.service.client['cryptographyService'].initCryptobox();
+
+    const textPayload = account.service!.conversation.messageBuilder.createText({conversationId, text}).build();
+    await account.service!.conversation.send({
+      conversationDomain,
+      payloadBundle: textPayload,
+      userIds,
+    });
   }
 
   /**
