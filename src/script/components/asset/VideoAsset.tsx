@@ -29,12 +29,12 @@ import {TeamState} from '../../team/TeamState';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import SeekBar from './controls/SeekBar';
 import MediaButton from './controls/MediaButton';
-import RestrictedFile from './RestrictedFile';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import useEffectRef from 'Util/useEffectRef';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {useTimeout} from '@wireapp/react-ui-kit';
+import RestrictedVideo from './RestrictedVideo';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;
@@ -107,9 +107,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
     !message.isObfuscated() && (
       <div className="video-asset">
         {!isFileSharingReceivingEnabled ? (
-          <div className="video-asset__restricted">
-            <RestrictedFile asset={asset} />
-          </div>
+          <RestrictedVideo />
         ) : (
           <>
             <div

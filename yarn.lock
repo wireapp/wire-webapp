@@ -2804,10 +2804,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@12.33.4":
-  version "12.33.4"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.33.4.tgz#06ce98d807b640956c02d0fe95fa8ad10cd81a35"
-  integrity sha512-R/JnO1kLxiJwP64PhakrtGZA9k9dMP7xnsXTmgu4FUf6mC3zKScD1YYJg8KvXJjMzKIa1cXvi63cnutrZa9tnQ==
+"@wireapp/api-client@12.34.0":
+  version "12.34.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.34.0.tgz#cea7ed545dcdd4700f6d732863d4238d10eaac12"
+  integrity sha512-1+3OL494tksGiG5cFpxH/BQxLzH1u5YNvJHOBNnPT55oSnmtbT66kDQWgWRGny5j2JPxIQZZjsfX6x8fN+v7Vg==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2861,14 +2861,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.11.0":
-  version "17.11.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.11.0.tgz#b38c2a4c7a0fe2e8c3a9a12b61759cbda41b703a"
-  integrity sha512-8GBLOtJxbQeNRHh+Ru/D0UBqvy2mxMlQvJ/hZP8kQunDDnKmaJRSjXuzOTmlf/DoLabTDP2NmpBAUSXjkUpIPg==
+"@wireapp/core@17.11.1":
+  version "17.11.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.11.1.tgz#311a55c3bd1548f2c399f1de11b622a374f3b2e6"
+  integrity sha512-0M7zUKpaS0jMxPiH6HXCDyJkI1kgmZtIWq4FlOMXmL9Zhe+snXuHrDDAgFmT5JZZZKbAn40bJp8pansXT5XvUw==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "12.33.4"
+    "@wireapp/api-client" "12.34.0"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.9.5"
     hash.js "1.1.7"
@@ -2936,10 +2936,10 @@
   dependencies:
     protobufjs "6.10.2"
 
-"@wireapp/react-ui-kit@7.52.6":
-  version "7.52.6"
-  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.52.6.tgz#bb74275e0645a5b2267979ea6e9c527e50637197"
-  integrity sha512-po59VObfp73XcBzSDLHFWZtUer/TfxaGGXHScCgfcWXByRaQsw+YXtQrJVkGQmOvSrru05xalseYValSXBT/2w==
+"@wireapp/react-ui-kit@7.52.8":
+  version "7.52.8"
+  resolved "https://registry.yarnpkg.com/@wireapp/react-ui-kit/-/react-ui-kit-7.52.8.tgz#bc3dbf12cc213f3e970b2fb43d25eff7eb5e6ab8"
+  integrity sha512-fbMocK3tyRlwKcN/2UOcIBY6g9o0MeLLors4LWQ/SbR0jySEelEIb4m3icAdx8ZjSPnr+BKhbMtIopdXXjmqfA==
   dependencies:
     "@emotion/core" "10.1.1"
     "@types/color" "3.0.2"
