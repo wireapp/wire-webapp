@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import 'Components/calling/ChooseScreen';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
@@ -43,6 +43,9 @@ import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
+import {TeamState} from '../team/TeamState';
+import {Config} from '../Config';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -92,6 +95,7 @@ export class CallingViewModel {
     readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
@@ -179,10 +183,18 @@ export class CallingViewModel {
         callState.videoSpeakersActiveTab(tab);
       },
       startAudio: (conversationEntity: Conversation): void => {
-        startCall(conversationEntity, CALL_TYPE.NORMAL);
+        if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
+          this.showRestrictedConferenceCallingModal();
+        } else {
+          startCall(conversationEntity, CALL_TYPE.NORMAL);
+        }
       },
       startVideo(conversationEntity: Conversation): void {
-        startCall(conversationEntity, CALL_TYPE.VIDEO);
+        if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
+          this.showRestrictedConferenceCallingModal();
+        } else {
+          startCall(conversationEntity, CALL_TYPE.VIDEO);
+        }
       },
       switchCameraInput: (call: Call, deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
@@ -228,6 +240,30 @@ export class CallingViewModel {
         });
       },
     };
+  }
+
+  private showRestrictedConferenceCallingModal() {
+    const replaceEnterprise = replaceLink(
+      Config.getConfig().URL.PRICING,
+      'modal__text__read-more',
+      'read-more-pricing',
+    );
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      primaryAction: {
+        action: () => {
+          safeWindowOpen(Config.getConfig().URL.PRICING);
+        },
+        text: t('callingRestrictedConferenceCallModalUpgradeButton'),
+      },
+      text: {
+        htmlMessage: t(
+          'callingRestrictedConferenceCallModalDescription',
+          {brandName: Config.getConfig().BRAND_NAME},
+          replaceEnterprise,
+        ),
+        title: t('callingRestrictedConferenceCallModalTitle'),
+      },
+    });
   }
 
   isIdle(call: Call): boolean {
