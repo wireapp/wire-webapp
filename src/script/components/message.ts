@@ -51,6 +51,7 @@ import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
 import './asset/VideoAsset';
 import './asset/RestrictedFile';
+import './asset/RestrictedVideo';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
