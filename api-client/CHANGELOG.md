@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.35.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.34.0...@wireapp/api-client@12.35.0) (2021-07-27)
+
+
+### Features
+
+* **api-client:** Use team-agnostic feature config GET endpoints ([#4089](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4089)) ([9a5b15e](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/9a5b15e15b5bd231fc7ddcb6680d012a6f01b8da))
+
+
+
+
+
 # [12.34.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.33.4...@wireapp/api-client@12.34.0) (2021-07-26)
 
 
