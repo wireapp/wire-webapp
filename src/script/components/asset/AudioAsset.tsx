@@ -38,13 +38,11 @@ import MediaButton from './controls/MediaButton';
 import Icon from 'Components/Icon';
 import useEffectRef from 'Util/useEffectRef';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import {AssetRepository} from '../../assets/AssetRepository';
 import {registerReactComponent} from 'Util/ComponentUtil';
 
 const logger = getLogger('AudioAssetComponent');
 
 export interface AudioAssetProps {
-  assetRepository?: AssetRepository;
   className?: string;
   header: boolean;
   /* Does the asset have a visible header? */
@@ -57,12 +55,11 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   message,
   className,
   teamState = container.resolve(TeamState),
-  assetRepository = container.resolve(AssetRepository),
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
   const [audioElement, setAudioElement] = useEffectRef<HTMLAudioElement>();
   const isFileSharingReceivingEnabled = teamState.isFileSharingReceivingEnabled();
-  const {transferState, uploadProgress, cancelUpload} = useAssetTransfer(message);
+  const {transferState, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
   const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration || 0);
   const [audioSrc, setAudioSrc] = useState<string>();
   const onTimeupdate = () => setAudioTime(audioElement.currentTime);
@@ -75,7 +72,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
     } else {
       asset.status(AssetTransferState.DOWNLOADING);
       try {
-        const blob = await assetRepository.load(asset.original_resource());
+        const blob = await loadAsset(asset.original_resource());
         setAudioSrc(window.URL.createObjectURL(blob));
         audioElement?.play();
       } catch (error) {
@@ -158,6 +155,6 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 export default AudioAsset;
 
 registerReactComponent<AudioAssetProps>('audio-asset', {
-  bindings: 'header, className, message, teamState, assetRepository',
+  bindings: 'header, className, message, teamState',
   component: AudioAsset,
 });
