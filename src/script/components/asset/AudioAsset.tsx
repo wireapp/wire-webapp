@@ -38,7 +38,7 @@ import MediaButton from './controls/MediaButton';
 import Icon from 'Components/Icon';
 import useEffectRef from 'Util/useEffectRef';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 const logger = getLogger('AudioAssetComponent');
 
@@ -58,7 +58,8 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
   const [audioElement, setAudioElement] = useEffectRef<HTMLAudioElement>();
-  const isFileSharingReceivingEnabled = teamState.isFileSharingReceivingEnabled();
+  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
+  const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {transferState, uploadProgress, cancelUpload, loadAsset} = useAssetTransfer(message);
   const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration || 0);
   const [audioSrc, setAudioSrc] = useState<string>();
@@ -91,7 +92,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   return (
     <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>
       <audio ref={setAudioElement} src={audioSrc} onTimeUpdate={onTimeupdate} />
-      {!message.isObfuscated() && (
+      {!isObfuscated ? (
         <>
           {header && (
             <div style={{width: '100%'}}>
@@ -145,8 +146,9 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
             <RestrictedAudio />
           )}
         </>
+      ) : (
+        <Icon.MicOn />
       )}
-      {message.isObfuscated() && <Icon.MicOn />}
     </div>
   );
 };
