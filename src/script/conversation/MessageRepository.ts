@@ -42,7 +42,7 @@ import {
 import {ReactionType} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation/';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
+import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
 import {container} from 'tsyringe';
@@ -245,6 +245,15 @@ export class MessageRepository {
       }
     }
     return undefined;
+  }
+
+  async sendFederatedMessage(message: string): Promise<void> {
+    const conversation = this.conversationState.activeConversation();
+    const userIds: string[] | QualifiedId[] = conversation.domain
+      ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
+      : conversation.allUserEntities.map(user => user.id);
+
+    await this.cryptography_repository.sendCoreMessage(message, conversation.id, userIds, conversation.domain);
   }
 
   /**

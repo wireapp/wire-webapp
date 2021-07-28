@@ -118,6 +118,6 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
 export default ImageAsset;
 
 registerReactComponent('image-asset', {
-  bindings: 'asset, message, onClick',
   component: ImageAsset,
+  template: '<div data-bind="react: {asset, message, onClick}"></div>',
 });
