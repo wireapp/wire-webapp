@@ -22,7 +22,6 @@ import cx from 'classnames';
 
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
-import {registerReactComponent} from 'Util/ComponentUtil';
 
 import {FileAsset} from '../../../entity/message/FileAsset';
 import {createRandomUuid} from 'Util/util';
@@ -120,8 +119,3 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
 };
 
 export default AudioSeekBar;
-
-registerReactComponent('audio-seek-bar', {
-  bindings: 'asset, disabled: ko.unwrap(disabled), audioElement: src',
-  component: AudioSeekBar,
-});

@@ -42,7 +42,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {TeamState} from '../team/TeamState';
 
-import './asset/audioAsset';
+import './asset/AudioAsset';
 import './asset/RestrictedAudio';
 import './asset/FileAssetComponent';
 import './asset/ImageAsset';

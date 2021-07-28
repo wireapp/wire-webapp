@@ -19,7 +19,6 @@
 
 import cx from 'classnames';
 import React, {CSSProperties, useEffect, useState} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {clamp} from 'Util/NumberUtil';
 
 export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
@@ -102,8 +101,3 @@ const SeekBar: React.FC<SeekBarProps> = ({
 };
 
 export default SeekBar;
-
-registerReactComponent('seek-bar', {
-  component: SeekBar,
-  template: '<div data-bind="react: {dark, disabled: ko.unwrap(disabled), mediaElement: src}"></div>',
-});
