@@ -125,5 +125,5 @@ export default FileAssetComponent;
 
 registerReactComponent('file-asset', {
   component: FileAssetComponent,
-  template: '<div data-bind"react: {header, message: ko.unwrap(message)}"></div>',
+  template: '<div data-bind="react: {header, message: ko.unwrap(message)}"></div>',
 });
