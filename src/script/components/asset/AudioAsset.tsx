@@ -45,15 +45,15 @@ const logger = getLogger('AudioAssetComponent');
 export interface AudioAssetProps {
   className?: string;
   /* Does the asset have a visible header? */
-  header: boolean;
+  hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
 }
 
 const AudioAsset: React.FC<AudioAssetProps> = ({
-  header,
   message,
   className,
+  hasHeader = false,
   teamState = container.resolve(TeamState),
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
@@ -94,7 +94,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
       <audio ref={setAudioElement} src={audioSrc} onTimeUpdate={onTimeupdate} />
       {!isObfuscated ? (
         <>
-          {header && (
+          {hasHeader && (
             <div style={{width: '100%'}}>
               <AssetHeader message={message} />
             </div>
@@ -108,7 +108,6 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
                 <div className="audio-controls">
                   <MediaButton
                     mediaElement={audioElement}
-                    large={false}
                     asset={asset}
                     play={onPlayButtonClicked}
                     pause={onPauseButtonClicked}
@@ -156,6 +155,6 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 export default AudioAsset;
 
 registerReactComponent<AudioAssetProps>('audio-asset', {
-  bindings: 'header, className, message, teamState',
+  bindings: 'hasHeader: header, className, message',
   component: AudioAsset,
 });
