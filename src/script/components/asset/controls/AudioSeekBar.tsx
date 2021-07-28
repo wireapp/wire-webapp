@@ -52,11 +52,11 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   }, [asset]);
 
   useEffect(() => {
-    audioElement.addEventListener('ended', onAudioEnded);
-    audioElement.addEventListener('timeupdate', onTimeUpdate);
+    audioElement?.addEventListener('ended', onAudioEnded);
+    audioElement?.addEventListener('timeupdate', onTimeUpdate);
     return () => {
-      audioElement.removeEventListener('ended', onAudioEnded);
-      audioElement.removeEventListener('timeupdate', onTimeUpdate);
+      audioElement?.removeEventListener('ended', onAudioEnded);
+      audioElement?.removeEventListener('timeupdate', onTimeUpdate);
     };
   }, [audioElement]);
 
