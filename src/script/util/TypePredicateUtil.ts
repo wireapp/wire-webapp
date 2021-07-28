@@ -35,9 +35,9 @@ export function isUser(userCandidate: any): userCandidate is User {
 }
 
 export function isQualifiedIdArray(ids: string[] | QualifiedId[]): ids is QualifiedId[] {
-  return ids.length && isQualifiedId(ids[0]);
+  return !!ids.length && isQualifiedId(ids[0]);
 }
 
 export function isQualifiedId(userId: string | QualifiedId): userId is QualifiedId {
-  return typeof userId === 'object';
+  return typeof userId === 'object' && 'domain' in userId && typeof userId.domain === 'string';
 }
