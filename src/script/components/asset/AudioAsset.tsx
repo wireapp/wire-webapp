@@ -44,8 +44,8 @@ const logger = getLogger('AudioAssetComponent');
 
 export interface AudioAssetProps {
   className?: string;
-  header: boolean;
   /* Does the asset have a visible header? */
+  header: boolean;
   message: ContentMessage;
   teamState?: TeamState;
 }
