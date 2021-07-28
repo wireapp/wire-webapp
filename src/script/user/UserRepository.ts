@@ -243,7 +243,9 @@ export class UserRepository {
    */
   private async userUpdate({user}: {user: Partial<APIClientUser>}): Promise<User> {
     const isSelfUser = user.id === this.userState.self().id;
-    const userEntity = isSelfUser ? this.userState.self() : await this.getUserById(user.id, user.qualified_id.domain);
+    const userEntity = isSelfUser
+      ? this.userState.self()
+      : await this.getUserById(user.id, user.qualified_id?.domain || null);
     this.userMapper.updateUserFromObject(userEntity, user);
     if (isSelfUser) {
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
