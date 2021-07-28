@@ -697,7 +697,7 @@ export class CallingRepository {
     if (call.state() === CALL_STATE.INCOMING) {
       selfParticipant.videoState(newState);
       if (newState === VIDEO_STATE.STOPPED) {
-        selfParticipant.releaseVideoStream();
+        selfParticipant.releaseVideoStream(true);
       } else {
         this.warmupMediaStreams(call, false, true);
       }

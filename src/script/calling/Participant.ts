@@ -90,13 +90,13 @@ export class Participant {
     return new MediaStream(audioTracks.concat(videoTracks));
   }
 
-  releaseVideoStream(): void {
-    this.releaseStream(this.videoStream());
+  releaseVideoStream(stopTracks?: boolean): void {
+    this.releaseStream(this.videoStream(), stopTracks);
     this.videoStream(undefined);
   }
 
   releaseAudioStream(): void {
-    this.releaseStream(this.audioStream());
+    this.releaseStream(this.audioStream(), true);
     this.audioStream(undefined);
   }
 
@@ -105,13 +105,15 @@ export class Participant {
     this.releaseAudioStream();
   }
 
-  private releaseStream(mediaStream?: MediaStream): void {
+  private releaseStream(mediaStream?: MediaStream, stopTracks?: boolean): void {
     if (!mediaStream) {
       return;
     }
 
     mediaStream.getTracks().forEach(track => {
-      track.stop();
+      if (stopTracks) {
+        track.stop();
+      }
       mediaStream.removeTrack(track);
     });
   }
