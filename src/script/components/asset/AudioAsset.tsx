@@ -98,9 +98,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
               <AssetHeader message={message} />
             </div>
           )}
-          {!isFileSharingReceivingEnabled && <RestrictedAudio />}
-
-          {isFileSharingReceivingEnabled && (
+          {isFileSharingReceivingEnabled ? (
             <>
               {transferState === AssetTransferState.UPLOAD_PENDING && (
                 <div className="asset-placeholder loading-dots" />
@@ -123,15 +121,14 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
                       <span className="audio-controls-time label-xs" data-uie-name="status-audio-time">
                         {formatSeconds(audioTime)}
                       </span>
-                      {showLoudnessPreview && (
+                      {showLoudnessPreview ? (
                         <AudioSeekBar
                           data-uie-name="status-audio-seekbar"
                           audioElement={audioElement}
                           asset={asset}
                           disabled={!audioSrc}
                         />
-                      )}
-                      {!showLoudnessPreview && (
+                      ) : (
                         <SeekBar
                           dark
                           data-uie-name="status-audio-seekbar"
@@ -144,6 +141,8 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
                 </div>
               )}
             </>
+          ) : (
+            <RestrictedAudio />
           )}
         </>
       )}
