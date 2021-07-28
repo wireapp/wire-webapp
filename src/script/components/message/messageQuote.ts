@@ -197,7 +197,7 @@ ko.components.register('message-quote', {
           <!-- /ko -->
 
           <!-- ko if: asset.isAudio() -->
-            <audio-asset class="message-quote__audio" params="message: $parent.quotedMessage" data-uie-name="media-audio-quote"></audio-asset>
+            <audio-asset params="message: $parent.quotedMessage, className: 'message-quote__audio'" data-uie-name="media-audio-quote"></audio-asset>
           <!-- /ko -->
 
           <!-- ko if: asset.isFile() -->

@@ -21,7 +21,6 @@ import React from 'react';
 import cx from 'classnames';
 
 import {formatDayMonthNumeral, formatTimeShort} from 'Util/TimeUtil';
-import {registerReactComponent} from 'Util/ComponentUtil';
 
 import type {Message} from '../../entity/message/Message';
 
@@ -46,8 +45,3 @@ const AssetHeader: React.FC<AssetHeaderProps> = ({message}) => {
 };
 
 export default AssetHeader;
-
-registerReactComponent('asset-header', {
-  component: AssetHeader,
-  template: '<div data-bind="react: {message}"></div>',
-});

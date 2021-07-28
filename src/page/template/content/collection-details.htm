@@ -26,7 +26,7 @@
             <file-asset class="collection-file" params="message: messageEntity, header: true"></file-asset>
           <!-- /ko -->
           <!-- ko if: messageEntity.getFirstAsset().isAudio() -->
-            <audio-asset class="collection-file" params="message: messageEntity, header: true"></audio-asset>
+            <audio-asset params="message: messageEntity, header: true, className: 'collection-file'"></audio-asset>
           <!-- /ko -->
           <!-- ko if: messageEntity.getFirstAsset().isVideo() -->
             <file-asset class="collection-file" params="message: messageEntity, header: true"></file-asset>
