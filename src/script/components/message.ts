@@ -370,7 +370,7 @@ const normalTemplate: string = `
         <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.isAudio() -->
-        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></audio-asset>
+        <audio-asset data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message, className: 'message-asset'"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.isFile() -->
         <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>

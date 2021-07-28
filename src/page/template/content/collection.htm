@@ -56,7 +56,7 @@
                 <!-- /ko -->
               </header>
               <div class="collection-images" data-bind="foreach: {data: audio.slice(0, 4), as: 'messageEntity'}">
-                <audio-asset class="collection-file" params="message: messageEntity, header: true"></audio-asset>
+                <audio-asset params="message: messageEntity, header: true, className: 'collection-file'"></audio-asset>
               </div>
             </section>
           <!-- /ko -->

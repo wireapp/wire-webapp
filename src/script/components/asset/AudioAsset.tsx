@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 import {TeamState} from '../../team/TeamState';
 import {container} from 'tsyringe';
+import cx from 'classnames';
 
 import {getLogger} from 'Util/Logger';
 import {formatSeconds} from 'Util/TimeUtil';
@@ -44,6 +45,7 @@ const logger = getLogger('AudioAssetComponent');
 
 export interface AudioAssetProps {
   assetRepository?: AssetRepository;
+  className?: string;
   header: boolean;
   // Does the asset have a visible header?
   message: ContentMessage;
@@ -53,6 +55,7 @@ export interface AudioAssetProps {
 const AudioAsset: React.FC<AudioAssetProps> = ({
   header,
   message,
+  className,
   teamState = container.resolve(TeamState),
   assetRepository = container.resolve(AssetRepository),
 }) => {
@@ -89,7 +92,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
   }, []);
 
   return (
-    <div data-uie-name="audio-asset" data-uie-value={asset.file_name}>
+    <div className={cx('audio-asset', className)} data-uie-name="audio-asset" data-uie-value={asset.file_name}>
       <audio ref={setAudioElement} src={audioSrc} onTimeUpdate={onTimeupdate} />
       {!message.isObfuscated() && (
         <>
@@ -155,6 +158,6 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 export default AudioAsset;
 
 registerReactComponent<AudioAssetProps>('audio-asset', {
-  bindings: 'header, message, teamState, assetRepository',
+  bindings: 'header, className, message, teamState, assetRepository',
   component: AudioAsset,
 });
