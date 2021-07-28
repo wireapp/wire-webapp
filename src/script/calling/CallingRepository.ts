@@ -388,7 +388,7 @@ export class CallingRepository {
 
   private removeCall(call: Call): void {
     const index = this.callState.activeCalls().indexOf(call);
-    call.getSelfParticipant().releaseMediaStream();
+    call.getSelfParticipant().releaseMediaStream(true);
     call.participants.removeAll();
     call.removeAllAudio();
     if (index !== -1) {
@@ -743,7 +743,7 @@ export class CallingRepository {
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
       if (!isVideoCall) {
-        call.getSelfParticipant().releaseVideoStream();
+        call.getSelfParticipant().releaseVideoStream(true);
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
       await this.pushClients(call.conversationId);
@@ -837,7 +837,7 @@ export class CallingRepository {
       case MediaType.VIDEO: {
         // Don't stop video input (coming from A/V preferences) when screensharing is activated
         if (!selfParticipant.sharesScreen()) {
-          selfParticipant.releaseVideoStream();
+          selfParticipant.releaseVideoStream(true);
         }
         break;
       }
@@ -1085,7 +1085,7 @@ export class CallingRepository {
       this.removeCall(call);
       return;
     }
-    selfParticipant.releaseMediaStream();
+    selfParticipant.releaseMediaStream(true);
     call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
@@ -1355,7 +1355,7 @@ export class CallingRepository {
     // user has stopped sharing their screen
     if (participant.videoState() === VIDEO_STATE.SCREENSHARE && state !== VIDEO_STATE.SCREENSHARE) {
       if (isSameUser) {
-        selfParticipant.releaseVideoStream();
+        selfParticipant.releaseVideoStream(true);
       }
       this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
         [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING,
@@ -1372,7 +1372,7 @@ export class CallingRepository {
     }
 
     if (call.state() === CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
-      selfParticipant.releaseVideoStream();
+      selfParticipant.releaseVideoStream(true);
     }
 
     call

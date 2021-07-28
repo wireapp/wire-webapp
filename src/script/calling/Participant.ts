@@ -100,8 +100,8 @@ export class Participant {
     this.audioStream(undefined);
   }
 
-  releaseMediaStream(): void {
-    this.releaseVideoStream();
+  releaseMediaStream(stopTracks?: boolean): void {
+    this.releaseVideoStream(stopTracks);
     this.releaseAudioStream();
   }
 
