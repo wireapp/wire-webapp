@@ -124,6 +124,6 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamStat
 export default FileAssetComponent;
 
 registerReactComponent('file-asset', {
-  bindings: 'header, message: ko.unwrap(message)',
   component: FileAssetComponent,
+  template: '<div data-bind="react: {header, message: ko.unwrap(message)}"></div>',
 });
