@@ -189,7 +189,7 @@ export class CallingViewModel {
           startCall(conversationEntity, CALL_TYPE.NORMAL);
         }
       },
-      startVideo(conversationEntity: Conversation): void {
+      startVideo: (conversationEntity: Conversation): void => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
           this.showRestrictedConferenceCallingModal();
         } else {
