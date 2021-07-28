@@ -50,6 +50,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   assetRepository = container.resolve(AssetRepository),
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
+  const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);
   const [videoPlaybackError, setVideoPlaybackError] = useState(null);
   const [videoTimeRest, setVideoTimeRest] = useState<number>();
@@ -104,7 +105,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   };
 
   return (
-    !message.isObfuscated() && (
+    !isObfuscated && (
       <div className="video-asset">
         {!isFileSharingReceivingEnabled ? (
           <RestrictedVideo />

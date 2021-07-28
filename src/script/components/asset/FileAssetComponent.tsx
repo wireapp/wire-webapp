@@ -35,12 +35,16 @@ import {TeamState} from '../../team/TeamState';
 import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 
 export interface FileAssetProps {
-  header?: boolean;
+  hasHeader?: boolean;
   message: ContentMessage;
   teamState?: TeamState;
 }
 
-const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamState = container.resolve(TeamState)}) => {
+const FileAssetComponent: React.FC<FileAssetProps> = ({
+  message,
+  hasHeader = false,
+  teamState = container.resolve(TeamState),
+}) => {
   const asset = message.getFirstAsset() as FileAsset;
 
   const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
@@ -66,7 +70,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({message, header, teamStat
   return (
     !isObfuscated && (
       <div className="file-asset">
-        {header && <AssetHeader message={message} />}
+        {hasHeader && <AssetHeader message={message} />}
         {isFileSharingReceivingEnabled ? (
           <div
             className={cx('file', {
@@ -125,5 +129,5 @@ export default FileAssetComponent;
 
 registerReactComponent('file-asset', {
   component: FileAssetComponent,
-  template: '<div data-bind="react: {header, message: ko.unwrap(message)}"></div>',
+  template: '<div data-bind="react: {hasHeader: header, message: ko.unwrap(message)}"></div>',
 });
