@@ -24,12 +24,17 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface RestrictedVideoProps extends React.HTMLProps<HTMLDivElement> {
+  isSmall?: boolean;
   showMessage?: boolean;
 }
 
-const RestrictedVideo: React.FC<RestrictedVideoProps> = ({showMessage = true, className}) => {
+const RestrictedVideo: React.FC<RestrictedVideoProps> = ({showMessage = true, isSmall = false, className}) => {
   return (
-    <div className={cx('video-asset__restricted', className)}>
+    <div
+      className={cx('video-asset__restricted', className, {
+        'video-asset__restricted--small': isSmall,
+      })}
+    >
       <div className="video-asset__restricted--container">
         <div className="flex-center" data-uie-name="file-icon">
           <div className="video-asset__restricted__play-button icon-play" />
@@ -44,5 +49,5 @@ export default RestrictedVideo;
 
 registerReactComponent<RestrictedVideoProps>('video-restricted', {
   component: RestrictedVideo,
-  template: '<div data-bind="react: {className, showMessage}"></div>',
+  template: '<div data-bind="react: {className, showMessage, isSmall}"></div>',
 });
