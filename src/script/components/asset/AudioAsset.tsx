@@ -47,7 +47,7 @@ export interface AudioAssetProps {
   assetRepository?: AssetRepository;
   className?: string;
   header: boolean;
-  // Does the asset have a visible header?
+  /* Does the asset have a visible header? */
   message: ContentMessage;
   teamState?: TeamState;
 }
