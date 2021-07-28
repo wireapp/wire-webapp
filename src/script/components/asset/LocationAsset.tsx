@@ -17,7 +17,7 @@
  *
  */
 
-import React, {Fragment} from 'react';
+import React from 'react';
 
 import {getMapsUrl} from 'Util/LocationUtil';
 import {registerReactComponent} from 'Util/ComponentUtil';
@@ -34,7 +34,7 @@ const LocationAsset: React.FC<LocationAssetProps> = ({asset}) => {
   const mapsUrl = getMapsUrl(parseFloat(latitude), parseFloat(longitude), name, zoom);
 
   return (
-    <Fragment>
+    <>
       <div className="location-asset-icon icon-location" />
       <div className="location-asset-title" data-uie-name="location-name">
         {asset.name}
@@ -48,7 +48,7 @@ const LocationAsset: React.FC<LocationAssetProps> = ({asset}) => {
       >
         {t('conversationLocationLink')}
       </a>
-    </Fragment>
+    </>
   );
 };
 
