@@ -25,9 +25,8 @@
             <!-- /ko -->
 
             <!-- ko if: replyAsset().isVideo() -->
-              <div class="input-bar__reply__message input-bar__reply__message__image input-bar__reply__video" data-bind="background_image: replyAsset().preview_resource()" data-uie-name="media-video-reply-box">
-                <img/>
-                <camera-icon></camera-icon>
+              <div data-uie-name="media-video-reply-box">
+                <video-restricted params="className: 'input-bar__reply__message', showMessage: false, isSmall: true"></video-restricted>
               </div>
             <!-- /ko -->
 
