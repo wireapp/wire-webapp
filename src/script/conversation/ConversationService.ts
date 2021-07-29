@@ -99,14 +99,10 @@ export class ConversationService {
 
   /**
    * Get a conversation by ID.
-   *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
-   *
-   * @param conversation_id ID of conversation to get
-   * @returns Resolves with the server response
    */
-  getConversationById(conversationId: string): Promise<BackendConversation> {
-    return this.apiClient.conversation.api.getConversation(conversationId);
+  getConversationById(conversationId: string, domain: string | null): Promise<BackendConversation> {
+    return this.apiClient.conversation.api.getConversation(conversationId, domain);
   }
 
   /**
