@@ -90,6 +90,6 @@ describe('FileAssetComponent', () => {
     });
 
     const fileSize = testPage.getFileSize();
-    expect(fileSize).toBe('10MB');
+    expect(fileSize).toBe('10 MB');
   });
 });
