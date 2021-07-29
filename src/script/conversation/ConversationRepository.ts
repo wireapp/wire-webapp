@@ -678,7 +678,7 @@ export class ConversationRepository {
   private async updateConversationFromBackend(conversationEntity: Conversation) {
     const conversationData = await this.conversation_service.getConversationById(conversationEntity.id);
     const {name, message_timer, type} = conversationData;
-    this.conversationMapper.updateProperties(conversationEntity, {name, type} as any);
+    this.conversationMapper.updateProperties(conversationEntity, {name, type});
     this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
   }
 

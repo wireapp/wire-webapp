@@ -274,7 +274,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     eventJson: ConversationMessageTimerUpdateEvent,
   ): Promise<Conversation> {
     const updates = {globalMessageTimer: ConversationEphemeralHandler.validateTimer(eventJson.data.message_timer)};
-    this.conversationMapper.updateProperties(conversationEntity, updates as any);
+    this.conversationMapper.updateProperties(conversationEntity, updates);
     return Promise.resolve(conversationEntity);
   }
 
