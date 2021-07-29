@@ -99,14 +99,10 @@ export class ConversationService {
 
   /**
    * Get a conversation by ID.
-   *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
-   *
-   * @param conversation_id ID of conversation to get
-   * @returns Resolves with the server response
    */
-  getConversationById(conversationId: string): Promise<BackendConversation> {
-    return this.apiClient.conversation.api.getConversation(conversationId);
+  getConversationById(conversationId: string, domain: string | null): Promise<BackendConversation> {
+    return this.apiClient.conversation.api.getConversation(conversationId, domain);
   }
 
   /**
@@ -354,14 +350,12 @@ export class ConversationService {
 
   /**
    * Deletes a conversation entity from the local database.
-   * @param conversation_id ID of conversation to be deleted
    * @returns Resolves when the entity was deleted
    */
-  deleteConversationFromDb(conversation_id: string): Promise<string> {
-    return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_id).then(primary_key => {
-      this.logger.info(`State of conversation '${primary_key}' was deleted`);
-      return primary_key;
-    });
+  async deleteConversationFromDb(conversationId: string, domain: string | null): Promise<string> {
+    const id = domain ? `${conversationId}@${domain}` : conversationId;
+    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, id);
+    return primaryKey;
   }
 
   loadConversation<T>(conversationId: string): Promise<T> {
