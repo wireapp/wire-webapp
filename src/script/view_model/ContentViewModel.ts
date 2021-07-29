@@ -227,7 +227,7 @@ export class ContentViewModel {
     this.userState.connectRequests.subscribe(requests => {
       const isStateRequests = this.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
       if (isStateRequests && !requests.length) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation());
+        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
       }
     });
 
@@ -236,7 +236,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation()?.connection().status() ===
         ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
       ) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation());
+        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
       }
     });
 
@@ -272,7 +272,11 @@ export class ContentViewModel {
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
    */
-  readonly showConversation = (conversation: Conversation | string, options: ShowConversationOptions = {}) => {
+  readonly showConversation = (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string,
+  ) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
@@ -383,7 +387,7 @@ export class ContentViewModel {
       const repoHasConversation = this.conversationState.conversations().some(({id}) => id === previousId);
 
       if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
-        return this.showConversation(this.previousConversation);
+        return this.showConversation(this.previousConversation, {});
       }
 
       return this.switchContent(ContentViewModel.STATE.WATERMARK);
