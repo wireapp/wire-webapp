@@ -217,7 +217,7 @@ export class LegalHoldModalViewModel {
     this.isLoading(true);
     this.isVisible(true);
     await this.messageRepository.updateAllClients(conversation, false);
-    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation.id);
+    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation.id, conversation.domain);
     const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
     if (!legalHoldUsers.length) {
       this.isVisible(false);

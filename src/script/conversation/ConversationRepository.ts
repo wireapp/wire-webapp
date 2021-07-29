@@ -269,8 +269,8 @@ export class ConversationRepository {
         conversationEntity.is_cleared() &&
         conversationEntity.removed_from_conversation()
       ) {
-        this.conversation_service.deleteConversationFromDb(conversationEntity.id);
-        this.deleteConversationFromRepository(conversationEntity.id);
+        this.conversation_service.deleteConversationFromDb(conversationEntity.id, conversationEntity.domain);
+        this.deleteConversationFromRepository(conversationEntity.id, conversationEntity.domain);
       }
     });
   }
@@ -705,10 +705,14 @@ export class ConversationRepository {
 
   /**
    * Deletes a conversation from the repository.
-   * @param conversation_id ID of conversation to be deleted from the repository
    */
-  private deleteConversationFromRepository(conversation_id: string) {
-    this.conversationState.conversations.remove(conversationEntity => conversationEntity.id === conversation_id);
+  private deleteConversationFromRepository(conversationId: string, domain: string | null) {
+    this.conversationState.conversations.remove(conversation => {
+      if (domain) {
+        return conversation.id === conversationId && conversation.domain === domain;
+      }
+      return conversation.id === conversationId;
+    });
   }
 
   public deleteConversation(conversationEntity: Conversation) {
@@ -729,10 +733,10 @@ export class ConversationRepository {
 
   private readonly deleteConversationLocally = (
     conversationId: string,
-    skipNotification = false,
+    skipNotification: boolean,
     domain: string | null,
   ) => {
-    const conversationEntity = this.conversationState.findConversation(conversationId);
+    const conversationEntity = this.conversationState.findConversation(conversationId, domain);
     if (!conversationEntity) {
       return;
     }
@@ -748,12 +752,12 @@ export class ConversationRepository {
       this.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
       this.conversationLabelRepository.saveLabels();
     }
-    this.deleteConversationFromRepository(conversationId);
-    this.conversation_service.deleteConversationFromDb(conversationId);
+    this.deleteConversationFromRepository(conversationId, domain);
+    this.conversation_service.deleteConversationFromDb(conversationId, domain);
   };
 
-  public async getAllUsersInConversation(conversation_id: string): Promise<User[]> {
-    const conversationEntity = await this.getConversationById(conversation_id);
+  public async getAllUsersInConversation(conversationId: string, domain: string | null): Promise<User[]> {
+    const conversationEntity = await this.getConversationById(conversationId, domain);
     const users = [this.userState.self()].concat(conversationEntity.participating_user_ets());
     return users;
   }
@@ -1606,8 +1610,8 @@ export class ConversationRepository {
     this.deleteMessages(conversationEntity, timestamp);
 
     if (conversationEntity.removed_from_conversation()) {
-      this.conversation_service.deleteConversationFromDb(conversationEntity.id);
-      this.deleteConversationFromRepository(conversationEntity.id);
+      this.conversation_service.deleteConversationFromDb(conversationEntity.id, conversationEntity.domain);
+      this.deleteConversationFromRepository(conversationEntity.id, conversationEntity.domain);
     }
   }
 
