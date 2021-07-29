@@ -1180,14 +1180,18 @@ export class MessageRepository {
 
   /**
    * Create a user client map for a given conversation.
-   * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
+   *
+   * @param conversation_id Conversation ID
+   * @param skip_own_clients `true`, if other own clients should be skipped (to not sync messages on own clients)
+   * @param user_ids Optionally the intended recipient users
+   * @returns Resolves with a user client map
    */
   async createRecipients(
     conversation_id: string,
     skip_own_clients = false,
     user_ids: string[] = null,
   ): Promise<Recipients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id, null);
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id);
     const recipients: Recipients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
