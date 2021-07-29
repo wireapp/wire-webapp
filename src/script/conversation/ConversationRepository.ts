@@ -269,8 +269,9 @@ export class ConversationRepository {
         conversationEntity.is_cleared() &&
         conversationEntity.removed_from_conversation()
       ) {
-        this.conversation_service.deleteConversationFromDb(conversationEntity.id, conversationEntity.domain);
-        this.deleteConversationFromRepository(conversationEntity.id, conversationEntity.domain);
+        const {id, domain} = conversationEntity;
+        this.conversation_service.deleteConversationFromDb(id, domain);
+        this.deleteConversationFromRepository(id, domain);
       }
     });
   }

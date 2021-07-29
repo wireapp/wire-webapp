@@ -293,12 +293,6 @@ export class ContentViewModel {
       return this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
-    const isConversation = isConversationEntity(conversation);
-    const isConversationId = typeof conversation === 'string';
-    if (!isConversation && !isConversationId) {
-      throw new Error(`Wrong input for conversation: ${typeof conversation}`);
-    }
-
     try {
       const conversationEntity = isConversationEntity(conversation)
         ? conversation
