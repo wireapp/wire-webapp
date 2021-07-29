@@ -634,7 +634,7 @@ export class UserRepository {
    * Update a local user from the backend by ID.
    */
   updateUserById = async (userId: string | QualifiedId): Promise<void> => {
-    const localUserEntity = this.findUserById(userId) || new User();
+    const localUserEntity = this.findUserById(userId) || new User('', null);
     const updatedUserData =
       typeof userId === 'string' ? await this.userService.getUser(userId) : await this.userService.getUser(userId.id);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
