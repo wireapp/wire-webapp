@@ -55,12 +55,12 @@ const SeekBar: React.FC<SeekBarProps> = ({
       setProgress(100);
     };
 
-    mediaElement.addEventListener('timeupdate', onTimeUpdate);
-    mediaElement.addEventListener('ended', onEnded);
+    mediaElement?.addEventListener('timeupdate', onTimeUpdate);
+    mediaElement?.addEventListener('ended', onEnded);
 
     return () => {
-      mediaElement.removeEventListener('timeupdate', onTimeUpdate);
-      mediaElement.removeEventListener('ended', onEnded);
+      mediaElement?.removeEventListener('timeupdate', onTimeUpdate);
+      mediaElement?.removeEventListener('ended', onEnded);
     };
   }, [mediaElement]);
 
