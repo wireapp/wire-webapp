@@ -176,7 +176,7 @@ export const trimFileExtension = (filename: string): string => {
 
 export const formatBytes = (bytes: number, decimals: number = 1): string => {
   if (bytes === 0) {
-    return '0B';
+    return '0 B';
   }
 
   const kilobytes = 1024;
