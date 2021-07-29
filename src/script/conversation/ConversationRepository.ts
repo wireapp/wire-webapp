@@ -682,7 +682,7 @@ export class ConversationRepository {
       conversationEntity.domain,
     );
     const {name, message_timer, type} = conversationData;
-    this.conversationMapper.updateProperties(conversationEntity, {name, type} as any);
+    this.conversationMapper.updateProperties(conversationEntity, {name, type});
     this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
   }
 
