@@ -155,6 +155,6 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
 export default AudioAsset;
 
 registerReactComponent<AudioAssetProps>('audio-asset', {
-  bindings: 'hasHeader: header, className, message',
+  bindings: 'hasHeader: header, className, message: ko.unwrap(message)',
   component: AudioAsset,
 });
