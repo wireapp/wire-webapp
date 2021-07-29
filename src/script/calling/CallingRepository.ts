@@ -1344,6 +1344,10 @@ export class CallingRepository {
       return;
     }
     const participant = call.getParticipant(userId, clientId);
+    if (!participant) {
+      return;
+    }
+
     const selfParticipant = call.getSelfParticipant();
     const isSameUser = selfParticipant.doesMatchIds(userId, clientId);
 
