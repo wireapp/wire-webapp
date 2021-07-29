@@ -1114,8 +1114,8 @@ describe('ConversationRepository', () => {
     });
 
     it('should know all users participating in a conversation (including the self user)', () => {
-      const [, users] = testFactory.conversation_repository.conversationState.conversations();
-      return testFactory.conversation_repository.getAllUsersInConversation(users.id, null).then(user_ets => {
+      const [, dudes] = testFactory.conversation_repository.conversationState.conversations();
+      return testFactory.conversation_repository.getAllUsersInConversation(dudes.id).then(user_ets => {
         expect(user_ets.length).toBe(3);
         expect(testFactory.conversation_repository.conversationState.conversations().length).toBe(4);
       });

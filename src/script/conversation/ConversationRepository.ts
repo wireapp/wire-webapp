@@ -269,9 +269,8 @@ export class ConversationRepository {
         conversationEntity.is_cleared() &&
         conversationEntity.removed_from_conversation()
       ) {
-        const {id, domain} = conversationEntity;
-        this.conversation_service.deleteConversationFromDb(id, domain);
-        this.deleteConversationFromRepository(id, domain);
+        this.conversation_service.deleteConversationFromDb(conversationEntity.id);
+        this.deleteConversationFromRepository(conversationEntity.id);
       }
     });
   }
@@ -360,7 +359,7 @@ export class ConversationRepository {
   /**
    * Get a conversation from the backend.
    */
-  private async fetchConversationById(conversationId: string, domain: string | null): Promise<Conversation> {
+  private async fetchConversationById(conversationId: string): Promise<Conversation> {
     const fetching_conversations: Record<string, FetchPromise[]> = {};
     if (fetching_conversations.hasOwnProperty(conversationId)) {
       return new Promise((resolve, reject) => {
@@ -370,7 +369,7 @@ export class ConversationRepository {
 
     fetching_conversations[conversationId] = [];
     try {
-      const response = await this.conversation_service.getConversationById(conversationId, domain);
+      const response = await this.conversation_service.getConversationById(conversationId);
       const conversationEntity = this.mapConversations(response) as Conversation;
 
       this.logger.info(`Fetched conversation '${conversationId}' from backend`);
@@ -382,7 +381,7 @@ export class ConversationRepository {
       return conversationEntity;
     } catch (originalError) {
       if (originalError.code === HTTP_STATUS.NOT_FOUND) {
-        this.deleteConversationLocally(conversationId, false, domain);
+        this.deleteConversationLocally(conversationId);
       }
       const error = new ConversationError(
         ConversationError.TYPE.CONVERSATION_NOT_FOUND,
@@ -677,10 +676,7 @@ export class ConversationRepository {
   }
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
-    const conversationData = await this.conversation_service.getConversationById(
-      conversationEntity.id,
-      conversationEntity.domain,
-    );
+    const conversationData = await this.conversation_service.getConversationById(conversationEntity.id);
     const {name, message_timer, type} = conversationData;
     this.conversationMapper.updateProperties(conversationEntity, {name, type});
     this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
@@ -706,21 +702,17 @@ export class ConversationRepository {
 
   /**
    * Deletes a conversation from the repository.
+   * @param conversation_id ID of conversation to be deleted from the repository
    */
-  private deleteConversationFromRepository(conversationId: string, domain: string | null) {
-    this.conversationState.conversations.remove(conversation => {
-      if (domain) {
-        return conversation.id === conversationId && conversation.domain === domain;
-      }
-      return conversation.id === conversationId;
-    });
+  private deleteConversationFromRepository(conversation_id: string) {
+    this.conversationState.conversations.remove(conversationEntity => conversationEntity.id === conversation_id);
   }
 
   public deleteConversation(conversationEntity: Conversation) {
     this.conversation_service
       .deleteConversation(this.teamState.team().id, conversationEntity.id)
       .then(() => {
-        this.deleteConversationLocally(conversationEntity.id, true, conversationEntity.domain);
+        this.deleteConversationLocally(conversationEntity.id, true);
       })
       .catch(() => {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
@@ -732,12 +724,8 @@ export class ConversationRepository {
       });
   }
 
-  private readonly deleteConversationLocally = (
-    conversationId: string,
-    skipNotification: boolean,
-    domain: string | null,
-  ) => {
-    const conversationEntity = this.conversationState.findConversation(conversationId, domain);
+  private readonly deleteConversationLocally = (conversationId: string, skipNotification = false) => {
+    const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;
     }
@@ -753,33 +741,32 @@ export class ConversationRepository {
       this.conversationLabelRepository.removeConversationFromAllLabels(conversationEntity, true);
       this.conversationLabelRepository.saveLabels();
     }
-    this.deleteConversationFromRepository(conversationId, domain);
-    this.conversation_service.deleteConversationFromDb(conversationId, domain);
+    this.deleteConversationFromRepository(conversationId);
+    this.conversation_service.deleteConversationFromDb(conversationId);
   };
 
-  public async getAllUsersInConversation(conversationId: string, domain: string | null): Promise<User[]> {
-    const conversationEntity = await this.getConversationById(conversationId, domain);
+  public async getAllUsersInConversation(conversation_id: string): Promise<User[]> {
+    const conversationEntity = await this.getConversationById(conversation_id);
     const users = [this.userState.self()].concat(conversationEntity.participating_user_ets());
     return users;
   }
 
   /**
    * Check for conversation locally and fetch it from the server otherwise.
-   * TODO(Federation): Remove "optional" from "domain"
    */
-  async getConversationById(conversation_id: string, domain?: string | null): Promise<Conversation> {
+  async getConversationById(conversation_id: string): Promise<Conversation> {
     if (typeof conversation_id !== 'string') {
       throw new ConversationError(
         ConversationError.TYPE.NO_CONVERSATION_ID,
         ConversationError.MESSAGE.NO_CONVERSATION_ID,
       );
     }
-    const conversationEntity = this.conversationState.findConversation(conversation_id, domain);
+    const conversationEntity = this.conversationState.findConversation(conversation_id);
     if (conversationEntity) {
       return conversationEntity;
     }
     try {
-      return await this.fetchConversationById(conversation_id, domain);
+      return await this.fetchConversationById(conversation_id);
     } catch (error) {
       const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
@@ -1059,8 +1046,7 @@ export class ConversationRepository {
       .then(conversationEntity => {
         if (!conversationEntity) {
           if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
-            // TODO(Federation): Federated 1:1 connections are not yet implemented by the backend.
-            return this.fetchConversationById(connectionEntity.conversationId, null);
+            return this.fetchConversationById(connectionEntity.conversationId);
           }
         }
         return conversationEntity;
@@ -1096,10 +1082,10 @@ export class ConversationRepository {
     return Promise.all(
       this.conversationState.conversations().map(async conversation => {
         try {
-          await this.conversation_service.getConversationById(conversation.id, conversation.domain);
+          await this.conversation_service.getConversationById(conversation.id);
         } catch ({code}) {
           if (code === HTTP_STATUS.NOT_FOUND) {
-            this.deleteConversationLocally(conversation.id, true, conversation.domain);
+            this.deleteConversationLocally(conversation.id, true);
           }
         }
       }),
@@ -1611,8 +1597,8 @@ export class ConversationRepository {
     this.deleteMessages(conversationEntity, timestamp);
 
     if (conversationEntity.removed_from_conversation()) {
-      this.conversation_service.deleteConversationFromDb(conversationEntity.id, conversationEntity.domain);
-      this.deleteConversationFromRepository(conversationEntity.id, conversationEntity.domain);
+      this.conversation_service.deleteConversationFromDb(conversationEntity.id);
+      this.deleteConversationFromRepository(conversationEntity.id);
     }
   }
 
@@ -1932,7 +1918,7 @@ export class ConversationRepository {
         return this.onCreate(eventJson, eventSource);
 
       case CONVERSATION_EVENT.DELETE:
-        return this.deleteConversationLocally(eventJson.conversation, false, conversationEntity.domain);
+        return this.deleteConversationLocally(eventJson.conversation);
 
       case CONVERSATION_EVENT.MEMBER_JOIN:
         return this.onMemberJoin(conversationEntity, eventJson);
@@ -2184,7 +2170,7 @@ export class ConversationRepository {
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
 
-    const data = await this.conversation_service.getConversationById(conversationEntity.id, conversationEntity.domain);
+    const data = await this.conversation_service.getConversationById(conversationEntity.id);
     const allMembers = [...data.members.others, data.members.self];
     const conversationRoles = allMembers.reduce((roles, member) => {
       roles[member.id] = member.conversation_role;
