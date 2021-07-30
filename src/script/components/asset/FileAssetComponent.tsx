@@ -69,7 +69,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
 
   return (
     !isObfuscated && (
-      <div className="file-asset">
+      <div className="file-asset" data-uie-name="file-asset">
         {hasHeader && <AssetHeader message={message} />}
         {isFileSharingReceivingEnabled ? (
           <div
