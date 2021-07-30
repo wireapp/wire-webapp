@@ -45,7 +45,7 @@ const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, format
         <div className="full-search__item__content__text ellipsis" data-uie-name="full-search-item-text">
           {parts.map((part, index) =>
             index % 2 ? (
-              <mark className="full-search__marked" data-uie-name="full-search-item-mark">
+              <mark key={index} className="full-search__marked" data-uie-name="full-search-item-mark">
                 {part}
               </mark>
             ) : (
