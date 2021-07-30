@@ -176,7 +176,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                         <div className="video-asset__controls__bottom">
                           <SeekBar
                             className="video-asset__controls__bottom__seekbar"
-                            data-ui-name="status-video-seekbar"
+                            data-uie-name="status-video-seekbar"
                             mediaElement={videoElement}
                           />
                           <span
