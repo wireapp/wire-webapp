@@ -1059,6 +1059,8 @@ export class ConversationRepository {
 
         if (connectionEntity.isConnected()) {
           conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
+        } else {
+          conversationEntity.type(CONVERSATION_TYPE.REGULAR);
         }
 
         return this.updateParticipatingUserEntities(conversationEntity);
