@@ -299,6 +299,8 @@ export class Conversation {
       () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
     );
 
+    this.isFederated = ko.pureComputed(() => !!this.domain);
+
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
     });
