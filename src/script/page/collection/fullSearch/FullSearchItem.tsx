@@ -62,7 +62,7 @@ const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, format
       </div>
       {matches > 1 && (
         <div className="badge" data-uie-name="full-search-item-badge">
-          {matches.toString(10)}
+          {matches.toString()}
         </div>
       )}
     </div>
