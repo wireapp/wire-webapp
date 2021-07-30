@@ -23,6 +23,7 @@ import {clamp} from 'Util/NumberUtil';
 
 export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   dark?: boolean;
+  ['data-uie-name']?: string;
   disabled?: boolean;
   mediaElement: HTMLMediaElement;
 }
@@ -31,7 +32,13 @@ export interface SeekBarCSS extends CSSProperties {
   '--seek-bar-progress': string;
 }
 
-const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, mediaElement, className}: SeekBarProps) => {
+const SeekBar: React.FC<SeekBarProps> = ({
+  dark: darkMode,
+  disabled,
+  mediaElement,
+  className,
+  'data-uie-name': dataUieName,
+}: SeekBarProps) => {
   const [isSeekBarMouseOver, setIsSeekBarMouseOver] = useState<boolean>(false);
   const [isSeekBarThumbDragged, setIsSeekBarThumbDragged] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
@@ -59,7 +66,7 @@ const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, mediaElement
   }, [mediaElement]);
 
   return (
-    <div className={cx('seek-bar', className)} data-uie-name="status-audio-seekbar">
+    <div className={cx('seek-bar', className)} data-uie-name={dataUieName}>
       <input
         data-uie-name="asset-control-media-seek-bar"
         className={cx({
