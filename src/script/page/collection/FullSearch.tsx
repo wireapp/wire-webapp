@@ -18,64 +18,24 @@
  */
 
 import React, {useEffect, useMemo, useState} from 'react';
-import {escape} from 'underscore';
 
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 import {isScrolledBottom} from 'Util/scroll-helpers';
 import useEffectRef from 'Util/useEffectRef';
-import {formatDateShort} from 'Util/TimeUtil';
 
-import type {Text} from '../../entity/message/Text';
 import type {Message} from '../../entity/message/Message';
 import useDebounce from '../../hooks/useDebounce';
 import {getSearchRegex} from '../../search/FullTextSearch';
 import {ContentMessage} from '../../entity/message/ContentMessage';
+import FullSearchItem from './fullSearch/FullSearchItem';
 
 export interface FullSearchProps {
   change?: (query: string) => void;
   click?: (messageEntity: Message) => void;
   searchProvider: (query: string) => Promise<{messageEntities: Message[]; query: string}>;
 }
-
-interface FullSearchItemProps {
-  formatText: (text: string) => {formatedText: string; matches: number};
-  message: ContentMessage;
-  onClick: () => void;
-}
-
-const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, formatText}) => {
-  const {user, timestamp} = useKoSubscribableChildren(message, ['user', 'timestamp']);
-  const {name} = useKoSubscribableChildren(user, ['name']);
-  const {formatedText, matches} = formatText(escape((message.getFirstAsset() as Text).text));
-  return (
-    <div className="full-search__item" onClick={onClick} data-uie-name="full-search-item">
-      <div className="full-search__item__avatar">
-        <Avatar participant={user} avatarSize={AVATAR_SIZE.X_SMALL} />
-      </div>
-      <div className="full-search__item__content">
-        <div
-          className="full-search__item__content__text ellipsis"
-          data-uie-name="full-search-item-text"
-          dangerouslySetInnerHTML={{__html: formatedText}}
-        ></div>
-        <div className="full-search__item__content__info">
-          <span className="font-weight-bold" data-uie-name="full-search-item-sender">
-            {name}
-          </span>
-          <span data-uie-name="full-search-item-timestamp">{formatDateShort(timestamp)}</span>
-        </div>
-      </div>
-      {matches > 1 && (
-        <div className="badge" data-uie-name="full-search-item-badge">
-          {matches.toString(10)}
-        </div>
-      )}
-    </div>
-  );
-};
 
 const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, change = noop}) => {
   const MAX_VISIBLE_MESSAGES = 30;
@@ -122,40 +82,31 @@ const FullSearch: React.FC<FullSearchProps> = ({searchProvider, click = noop, ch
     return () => {
       parent?.removeEventListener('scroll', onScroll);
     };
-  }, [element]);
+  }, [element, messages]);
 
   const formatSearchResult = useMemo(() => {
-    const replaceRegex = getSearchRegex(escape(input));
+    const regex = getSearchRegex(input);
 
     return (text: string) => {
-      let matches = 0;
-      text = escape(text);
-      let formatedText = text.replace(replaceRegex, (match: string): string => {
-        matches += 1;
-        return `<mark class='full-search__marked' data-uie-name='full-search-item-mark'>${match}</mark>`;
-      });
-
-      const markOffset = formatedText.indexOf('<mark') - 1;
-      let sliceOffset = markOffset;
-
-      for (const index of [...Array(Math.max(markOffset, 0)).keys()].reverse()) {
-        if (index < markOffset - PRE_MARKED_OFFSET) {
-          break;
-        }
-
-        const char = formatedText[index];
-        if (char === ' ') {
-          sliceOffset = index + 1;
-        }
+      const matches = [...text.matchAll(regex)];
+      const firstIndex = matches[0]?.index;
+      let firstPart = text.substring(0, firstIndex ?? text.length);
+      if (firstIndex > MAX_OFFSET_INDEX && text.length > MAX_TEXT_LENGTH) {
+        let splitOffset = firstIndex - 1;
+        const firstSpace = firstPart.indexOf(' ', splitOffset - PRE_MARKED_OFFSET);
+        splitOffset = firstSpace > -1 ? firstSpace : splitOffset;
+        firstPart = `…${firstPart.substring(splitOffset)}`;
       }
+      const parts = matches.reduce(
+        (acc, match, i) => [
+          ...acc,
+          match[0],
+          text.substring(match.index + match[0].length, matches[i + 1]?.index ?? text.length),
+        ],
+        [firstPart],
+      );
 
-      const textTooLong = text.length > MAX_TEXT_LENGTH;
-      const offsetTooBig = markOffset > MAX_OFFSET_INDEX;
-      if (textTooLong && offsetTooBig) {
-        formatedText = `…${formatedText.slice(sliceOffset)}`;
-      }
-
-      return {formatedText, matches};
+      return {matches: matches.length, parts};
     };
   }, [input]);
 
