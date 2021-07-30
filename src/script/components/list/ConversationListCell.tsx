@@ -44,7 +44,7 @@ export interface ConversationListCellProps {
   is_selected: (conversation: Conversation) => boolean;
   isVisibleFunc: (top: number, bottom: number) => boolean;
   offsetTop: number;
-  onClick: () => void;
+  onClick: React.MouseEventHandler<Element>;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: (conversation: Conversation, event: MouseEvent) => void;
   showJoinButton: boolean;
