@@ -25,10 +25,8 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import {container} from 'tsyringe';
-
 import {getLogger, Logger} from 'Util/Logger';
 import {replaceLink, t} from 'Util/LocalizerUtil';
-
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import type {User} from '../entity/User';
@@ -47,7 +45,6 @@ export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
-  private readonly connectionMapper: ConnectionMapper;
 
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
@@ -64,8 +61,6 @@ export class ConnectionRepository {
     this.userRepository = userRepository;
 
     this.logger = getLogger('ConnectionRepository');
-
-    this.connectionMapper = new ConnectionMapper();
 
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
@@ -105,9 +100,9 @@ export class ConnectionRepository {
 
     if (connectionEntity) {
       previousStatus = connectionEntity.status();
-      this.connectionMapper.updateConnectionFromJson(connectionEntity, connectionData);
+      ConnectionMapper.updateConnectionFromJson(connectionEntity, connectionData);
     } else {
-      connectionEntity = this.connectionMapper.mapConnectionFromJson(connectionData);
+      connectionEntity = ConnectionMapper.mapConnectionFromJson(connectionData);
     }
 
     await this.updateConnection(connectionEntity);
@@ -221,7 +216,7 @@ export class ConnectionRepository {
   async getConnections(): Promise<ConnectionEntity[]> {
     try {
       const connectionData = await this.connectionService.getConnections();
-      const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
+      const newConnectionEntities = ConnectionMapper.mapConnectionsFromJson(connectionData);
       return newConnectionEntities.length
         ? await this.updateConnections(newConnectionEntities)
         : Object.values(this.connectionState.connectionEntities());

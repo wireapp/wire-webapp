@@ -131,7 +131,7 @@ export class Message {
     this.primary_key = undefined;
     this.status = ko.observable(StatusType.UNSPECIFIED);
     this.type = '';
-    this.user = ko.observable(new User());
+    this.user = ko.observable(new User('', null));
     this.version = 1;
     this.visible = ko.observable(true);
 

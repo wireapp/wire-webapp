@@ -124,7 +124,12 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
                       {showLoudnessPreview ? (
                         <AudioSeekBar audioElement={audioElement} asset={asset} disabled={!audioSrc} />
                       ) : (
-                        <SeekBar dark mediaElement={audioElement} disabled={!audioSrc} />
+                        <SeekBar
+                          dark
+                          mediaElement={audioElement}
+                          disabled={!audioSrc}
+                          data-ui-name="status-audio-seekbar"
+                        />
                       )}
                     </>
                   )}

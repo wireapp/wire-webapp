@@ -174,9 +174,7 @@ describe('MessageRepository', () => {
         Promise.resolve(new Message()),
       );
       spyOn(testFactory.conversation_service, 'postEncryptedMessage').and.returnValue(Promise.resolve({}));
-      spyOn(testFactory.conversation_repository['conversationMapper'], 'mapConversations').and.returnValue(
-        Promise.resolve(conversation),
-      );
+      spyOn(ConversationMapper, 'mapConversations').and.returnValue(Promise.resolve(conversation));
       spyOn<any>(testFactory.conversation_repository, 'fetchConversationById').and.returnValue(
         Promise.resolve(conversation),
       );
@@ -195,7 +193,7 @@ describe('MessageRepository', () => {
 
       const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
         conversation.localMessageTimer(expiration);
-        conversation.selfUser(new User(createRandomUuid()));
+        conversation.selfUser(new User(createRandomUuid(), null));
         const messageText = 'hello there';
         return testFactory.message_repository.sendTextWithLinkPreview(conversation, messageText, []);
       });
@@ -307,7 +305,7 @@ describe('MessageRepository', () => {
     it('should not delete other users messages', async () => {
       const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
 
-      const user_et = new User();
+      const user_et = new User('', null);
       user_et.isMe = false;
 
       const message_to_delete_et = new Message(createRandomUuid());
@@ -351,7 +349,7 @@ describe('MessageRepository', () => {
     it('should send delete and deletes message for own messages', async () => {
       const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
 
-      const userEntity = new User();
+      const userEntity = new User('', null);
       userEntity.isMe = true;
 
       const messageEntityToDelete = new Message();
@@ -467,7 +465,7 @@ describe('MessageRepository', () => {
         expect(wasClientAdded).toBe(true);
       }
 
-      const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromDb])[0];
+      const conversationEntity = ConversationMapper.mapConversations([conversationJsonFromDb])[0];
       conversationEntity.participating_user_ets.push(conversationPartner);
       conversationEntity.selfUser(selfUser);
 
