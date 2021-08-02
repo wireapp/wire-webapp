@@ -20,21 +20,21 @@
 import React from 'react';
 import cx from 'classnames';
 
+import {registerReactComponent} from 'Util/ComponentUtil';
+
 import type {ConversationLabel} from '../../conversation/ConversationLabelRepository';
 import Icon from '../Icon';
 
 export interface GroupedConversationHeaderProps {
   conversationLabel: ConversationLabel;
   isOpen: boolean;
-  onClick?: () => void;
 }
 
-const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({onClick, conversationLabel, isOpen}) => {
+const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({conversationLabel, isOpen}) => {
   const badge = conversationLabel.conversations().filter(conversation => conversation.hasUnread()).length;
 
   return (
     <div
-      onClick={onClick}
       className={cx('conversation-folder__head', {'conversation-folder__head--open': isOpen})}
       data-uie-name="conversation-folder-head"
     >
@@ -52,3 +52,8 @@ const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({on
 };
 
 export default GroupedConversationHeader;
+
+registerReactComponent('grouped-conversation-header', {
+  component: GroupedConversationHeader,
+  template: '<div data-bind="react: {conversationLabel, isOpen: ko.unwrap(isOpen)}"></div>',
+});
