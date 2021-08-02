@@ -54,6 +54,7 @@ import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 import {TestFactory} from '../../helper/TestFactory';
@@ -80,9 +81,8 @@ describe('NotificationRepository', () => {
       amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
       // Create entities
-      const conversationMapper = testFactory.conversation_repository.conversationMapper;
       user_et = testFactory.user_repository.userMapper.mapUserFromJson(payload.users.get.one[0]);
-      [conversation_et] = conversationMapper.mapConversations([entities.conversation]);
+      [conversation_et] = ConversationMapper.mapConversations([entities.conversation]);
       conversation_et.team_id = undefined;
       const selfUserEntity = new User(createRandomUuid());
       selfUserEntity.isMe = true;
