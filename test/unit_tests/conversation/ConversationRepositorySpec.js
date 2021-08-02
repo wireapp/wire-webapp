@@ -41,6 +41,7 @@ import {MessageCategory} from 'src/script/message/MessageCategory';
 import {UserGenerator} from '../../helper/UserGenerator';
 import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
+import {entities, payload} from '../../api/payloads';
 import {ConversationError} from 'src/script/error/ConversationError';
 
 jest.deepUnmock('axios');

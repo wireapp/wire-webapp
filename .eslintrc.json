@@ -7,11 +7,8 @@
   "globals": {
     "$": true,
     "amplify": true,
-    "entities": true,
     "jQuery": true,
     "ko": true,
-    "lorem_ipsum": true,
-    "payload": true,
     "sinon": true,
     "wire": true,
     "z": true,
