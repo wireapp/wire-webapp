@@ -28,6 +28,7 @@ import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';
 import {QualifiedPublicUserMap} from 'src/script/client/ClientService';
 import {TestFactory} from '../../../test/helper/TestFactory';
+import {entities} from '../../../test/api/payloads';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();

@@ -28,6 +28,7 @@ import {ClientMismatchHandler} from 'src/script/conversation/ClientMismatchHandl
 import type {ConversationRepository} from './ConversationRepository';
 import type {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
 import type {UserRepository} from '../user/UserRepository';
+import {entities} from '../../../test/api/payloads';
 
 describe('ClientMismatchHandler', () => {
   describe('onClientMismatch', () => {

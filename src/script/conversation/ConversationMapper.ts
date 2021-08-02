@@ -82,7 +82,10 @@ export class ConversationMapper {
     });
   }
 
-  static updateProperties(conversationEntity: Conversation, conversationData: Record<string, any>): Conversation {
+  static updateProperties(
+    conversationEntity: Conversation,
+    conversationData: Partial<Record<keyof Conversation, any>>,
+  ): Conversation {
     Object.entries(conversationData).forEach(([key, value]: [keyof Conversation, string]) => {
       if (key !== 'id') {
         if (value !== undefined && conversationEntity.hasOwnProperty(key)) {
@@ -254,7 +257,7 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
-  static getMutedState(mutedState: boolean, notificationState: number): boolean | number {
+  static getMutedState(mutedState: boolean, notificationState?: number): boolean | number {
     const validNotificationStates = Object.values(NOTIFICATION_STATE);
     if (validNotificationStates.includes(notificationState)) {
       // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
@@ -281,7 +284,7 @@ export class ConversationMapper {
           remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
-        const updates: Record<string, any> = {
+        const updates: Partial<ConversationDatabaseData> = {
           accessModes: access,
           accessRole: access_role,
           creator,

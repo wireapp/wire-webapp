@@ -23,6 +23,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {NotificationPreference} from '@wireapp/api-client/src/user/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {Runtime} from '@wireapp/commons';
 
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
@@ -58,7 +59,7 @@ import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 import {TestFactory} from '../../helper/TestFactory';
-import {Runtime} from '@wireapp/commons';
+import {entities, payload} from '../../api/payloads';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};
@@ -672,8 +673,7 @@ describe('NotificationRepository', () => {
     beforeEach(() => {
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
-      const connectionMapper = new ConnectionMapper();
-      connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
+      connectionEntity = ConnectionMapper.mapConnectionFromJson(entities.connection);
       message_et = new MemberMessage();
       message_et.user(user_et);
     });

@@ -18,10 +18,10 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 
 import 'src/script/localization/Localizer';
 import {createRandomUuid} from 'Util/util';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 
 import {Conversation} from 'src/script/entity/Conversation';
 import {ContentMessage} from 'src/script/entity/message/ContentMessage';
@@ -41,12 +41,13 @@ import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {MentionEntity} from 'src/script/message/MentionEntity';
+import {entities} from '../../api/payloads';
 
 describe('Conversation', () => {
   let conversation_et = null;
   let other_user = null;
 
-  const self_user = new User(window.entities.user.john_doe.id);
+  const self_user = new User(entities.user.john_doe.id);
   self_user.isMe = true;
 
   const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
@@ -54,7 +55,7 @@ describe('Conversation', () => {
 
   beforeEach(() => {
     conversation_et = new Conversation();
-    other_user = new User(window.entities.user.jane_roe.id);
+    other_user = new User(entities.user.jane_roe.id);
   });
 
   describe('type checks', () => {
@@ -465,7 +466,7 @@ describe('Conversation', () => {
 
   describe('display_name', () => {
     it('displays a name if the conversation is a 1:1 conversation or a connection request', () => {
-      other_user.name(window.entities.user.jane_roe.name);
+      other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
@@ -489,7 +490,7 @@ describe('Conversation', () => {
     it('displays a group conversation name with names from the participants', () => {
       const third_user = new User(createRandomUuid());
       third_user.name('Brad Delson');
-      other_user.name(window.entities.user.jane_roe.name);
+      other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
       conversation_et.participating_user_ets.push(third_user);
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
@@ -1082,8 +1083,7 @@ describe('Conversation', () => {
         type: 3,
       };
 
-      const connectionMapper = new ConnectionMapper();
-      const connectionEntity = connectionMapper.mapConnectionFromJson(payload_connection);
+      const connectionEntity = ConnectionMapper.mapConnectionFromJson(payload_connection);
 
       const [new_conversation] = ConversationMapper.mapConversations([payload_conversation]);
       new_conversation.connection(connectionEntity);
