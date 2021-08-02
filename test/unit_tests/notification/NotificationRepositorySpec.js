@@ -672,8 +672,7 @@ describe('NotificationRepository', () => {
     beforeEach(() => {
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
-      const connectionMapper = new ConnectionMapper();
-      connectionEntity = connectionMapper.mapConnectionFromJson(entities.connection);
+      connectionEntity = ConnectionMapper.mapConnectionFromJson(entities.connection);
       message_et = new MemberMessage();
       message_et.user(user_et);
     });

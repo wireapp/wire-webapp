@@ -1082,8 +1082,7 @@ describe('Conversation', () => {
         type: 3,
       };
 
-      const connectionMapper = new ConnectionMapper();
-      const connectionEntity = connectionMapper.mapConnectionFromJson(payload_connection);
+      const connectionEntity = ConnectionMapper.mapConnectionFromJson(payload_connection);
 
       const [new_conversation] = ConversationMapper.mapConversations([payload_conversation]);
       new_conversation.connection(connectionEntity);
