@@ -95,21 +95,30 @@ export class ConnectionRepository {
   private async onUserConnection(eventJson: UserConnectionData, source: EventSource): Promise<void> {
     const connectionData = eventJson.connection;
 
+    // Try to find existing connection
     let connectionEntity = this.getConnectionByUserId(connectionData.to);
-    let previousStatus: ConnectionStatus = null;
+    const previousStatus = connectionEntity?.status();
 
+    // Update connection status
     if (connectionEntity) {
-      previousStatus = connectionEntity.status();
       ConnectionMapper.updateConnectionFromJson(connectionEntity, connectionData);
     } else {
+      // Create new connection if there was no connection before
       connectionEntity = ConnectionMapper.mapConnectionFromJson(connectionData);
     }
 
-    await this.updateConnection(connectionEntity);
+    // Attach connection to user
+    await this.attachConnectionToUser(connectionEntity);
+
+    // Update info about user when connection gets accepted
     const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
     if (shouldUpdateUser) {
       await this.userRepository.updateUserById(connectionEntity.userId);
+      // Get conversation related to connection and set its type to 1:1
+      // This case is important when the 'user.connection' event arrives after the 'conversation.member-join' event: https://wearezeta.atlassian.net/browse/SQCORE-348
+      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity);
     }
+
     await this.sendNotification(connectionEntity, source, previousStatus);
   }
 
@@ -250,10 +259,10 @@ export class ConnectionRepository {
   }
 
   /**
-   * Update user matching a given connection.
-   * @returns Promise that resolves when the connection have been updated
+   * Attach a connection to a user and cache that information in the connection state.
+   * @returns Promise that resolves when the connection has been updated
    */
-  private async updateConnection(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
+  private async attachConnectionToUser(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
     this.addConnectionEntity(connectionEntity);
     // TODO(Federation): Update code once connections are implemented on the backend
     const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
