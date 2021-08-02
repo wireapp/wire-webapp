@@ -22,7 +22,6 @@ import {StorageSchemata} from 'src/script/storage/StorageSchemata';
 import {TestFactory} from '../../helper/TestFactory';
 
 describe('ConversationService', () => {
-  let conversation_mapper = null;
   let conversation_service = null;
   let server = null;
   let storage_service = null;
@@ -32,7 +31,6 @@ describe('ConversationService', () => {
   beforeAll(() => {
     return testFactory.exposeConversationActors().then(() => {
       conversation_service = testFactory.conversation_service;
-      conversation_mapper = new ConversationMapper();
       storage_service = testFactory.storage_service;
       server = sinon.fakeServer.create();
     });
@@ -74,7 +72,7 @@ describe('ConversationService', () => {
         name: 'Michael',
         type: 2,
       };
-      const [conversation_et] = conversation_mapper.mapConversations([conversation_payload]);
+      const [conversation_et] = ConversationMapper.mapConversations([conversation_payload]);
 
       return conversation_service.saveConversationStateInDb(conversation_et).then(conversation_record => {
         expect(conversation_record.name()).toBe(conversation_payload.name);

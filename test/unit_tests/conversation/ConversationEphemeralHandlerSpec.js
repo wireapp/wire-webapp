@@ -18,14 +18,12 @@
  */
 
 import {Conversation} from 'src/script/entity/Conversation';
-import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationEphemeralHandler} from 'src/script/conversation/ConversationEphemeralHandler';
 import {EventService} from 'src/script/event/EventService';
 
 const buildConversationEphemeralHandler = () => {
-  const conversationMapper = new ConversationMapper();
   const eventService = new EventService(null, null);
-  return new ConversationEphemeralHandler(conversationMapper, eventService, () => {});
+  return new ConversationEphemeralHandler(eventService, () => {});
 };
 
 describe('ConversationEphemeralHandler', () => {

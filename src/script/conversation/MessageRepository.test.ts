@@ -174,9 +174,7 @@ describe('MessageRepository', () => {
         Promise.resolve(new Message()),
       );
       spyOn(testFactory.conversation_service, 'postEncryptedMessage').and.returnValue(Promise.resolve({}));
-      spyOn(testFactory.conversation_repository['conversationMapper'], 'mapConversations').and.returnValue(
-        Promise.resolve(conversation),
-      );
+      spyOn(ConversationMapper, 'mapConversations').and.returnValue(Promise.resolve(conversation));
       spyOn<any>(testFactory.conversation_repository, 'fetchConversationById').and.returnValue(
         Promise.resolve(conversation),
       );
@@ -467,7 +465,7 @@ describe('MessageRepository', () => {
         expect(wasClientAdded).toBe(true);
       }
 
-      const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromDb])[0];
+      const conversationEntity = ConversationMapper.mapConversations([conversationJsonFromDb])[0];
       conversationEntity.participating_user_ets.push(conversationPartner);
       conversationEntity.selfUser(selfUser);
 

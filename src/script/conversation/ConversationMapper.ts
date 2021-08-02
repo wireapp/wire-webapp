@@ -70,7 +70,7 @@ export type ConversationDatabaseData = ConversationRecord &
   };
 
 export class ConversationMapper {
-  mapConversations(conversationsData: ConversationDatabaseData[], timestamp: number = 1): Conversation[] {
+  static mapConversations(conversationsData: ConversationDatabaseData[], timestamp: number = 1): Conversation[] {
     if (conversationsData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
@@ -78,11 +78,11 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
     return conversationsData.map((conversationData: ConversationDatabaseData, index: number) => {
-      return this._createConversationEntity(conversationData, timestamp + index);
+      return ConversationMapper.createConversationEntity(conversationData, timestamp + index);
     });
   }
 
-  updateProperties(conversationEntity: Conversation, conversationData: Record<string, any>): Conversation {
+  static updateProperties(conversationEntity: Conversation, conversationData: Record<string, any>): Conversation {
     Object.entries(conversationData).forEach(([key, value]: [keyof Conversation, string]) => {
       if (key !== 'id') {
         if (value !== undefined && conversationEntity.hasOwnProperty(key)) {
@@ -98,7 +98,7 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
-  updateSelfStatus(
+  static updateSelfStatus(
     conversationEntity: Conversation,
     selfState: Partial<SelfStatusUpdateDatabaseData>,
     disablePersistence: boolean = false,
@@ -186,7 +186,7 @@ export class ConversationMapper {
       const mutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
       conversationEntity.setTimestamp(mutedTimestamp, Conversation.TIMESTAMP_TYPE.MUTED);
 
-      const mutedState = this.getMutedState(otr_muted, selfState.otr_muted_status);
+      const mutedState = ConversationMapper.getMutedState(otr_muted, selfState.otr_muted_status);
       if (typeof mutedState === 'boolean') {
         conversationEntity.mutedState(mutedState === true ? NOTIFICATION_STATE.NOTHING : NOTIFICATION_STATE.EVERYTHING);
       } else {
@@ -201,7 +201,10 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
-  _createConversationEntity(conversationData: ConversationDatabaseData, initialTimestamp?: number): Conversation {
+  private static createConversationEntity(
+    conversationData: ConversationDatabaseData,
+    initialTimestamp?: number,
+  ): Conversation {
     if (conversationData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
     }
@@ -218,7 +221,7 @@ export class ConversationMapper {
     conversationEntity.name(name || '');
 
     const selfState = members ? members.self : conversationData;
-    conversationEntity = this.updateSelfStatus(conversationEntity, selfState as any);
+    conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
     if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
       conversationEntity.last_event_timestamp(initialTimestamp);
@@ -243,7 +246,7 @@ export class ConversationMapper {
     const accessModes = conversationData.accessModes || conversationData.access;
     const accessRole = conversationData.accessRole || conversationData.access_role;
     if (accessModes && accessRole) {
-      this.mapAccessState(conversationEntity, accessModes, accessRole);
+      ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
     }
 
     conversationEntity.receiptMode(conversationData.receipt_mode);
@@ -251,7 +254,7 @@ export class ConversationMapper {
     return conversationEntity;
   }
 
-  getMutedState(mutedState: boolean, notificationState: number): boolean | number {
+  static getMutedState(mutedState: boolean, notificationState: number): boolean | number {
     const validNotificationStates = Object.values(NOTIFICATION_STATE);
     if (validNotificationStates.includes(notificationState)) {
       // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
@@ -261,7 +264,7 @@ export class ConversationMapper {
     return typeof mutedState === 'boolean' ? mutedState : NOTIFICATION_STATE.EVERYTHING;
   }
 
-  mergeConversation(
+  static mergeConversation(
     localConversations: ConversationDatabaseData[],
     remoteConversations: ConversationBackendData[],
   ): ConversationDatabaseData[] {
@@ -348,7 +351,7 @@ export class ConversationMapper {
         const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(mutedTimestamp, remoteMutedTimestamp);
 
         if (isRemoteMutedTimestampNewer || mutedState === undefined) {
-          const remoteMutedState = this.getMutedState(selfState.otr_muted, selfState.otr_muted_status);
+          const remoteMutedState = ConversationMapper.getMutedState(selfState.otr_muted, selfState.otr_muted_status);
           mergedConversation.muted_state = remoteMutedState;
           mergedConversation.muted_timestamp = remoteMutedTimestamp;
         }
@@ -358,7 +361,7 @@ export class ConversationMapper {
     );
   }
 
-  mapAccessCode(conversationEntity: Conversation, accessCode: ConversationCode): void {
+  static mapAccessCode(conversationEntity: Conversation, accessCode: ConversationCode): void {
     const isTeamConversation = conversationEntity && conversationEntity.team_id;
 
     if (accessCode.uri && isTeamConversation) {
@@ -367,7 +370,7 @@ export class ConversationMapper {
     }
   }
 
-  mapAccessState(
+  static mapAccessState(
     conversationEntity: Conversation,
     accessModes: CONVERSATION_ACCESS[],
     accessRole: CONVERSATION_ACCESS_ROLE,

@@ -139,7 +139,7 @@ describe('ConversationRepository', () => {
         type: CONVERSATION_TYPE.REGULAR,
       };
 
-      const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromBackend])[0];
+      const conversationEntity = ConversationMapper.mapConversations([conversationJsonFromBackend])[0];
       conversationEntity.participating_user_ets.push(conversationPartner);
       conversationEntity.selfUser(selfUser);
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
@@ -321,8 +321,7 @@ describe('ConversationRepository', () => {
         type: 0,
       };
 
-      const conversationMapper = testFactory.conversation_repository.conversationMapper;
-      const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation]);
+      const [newConversationEntity] = ConversationMapper.mapConversations([team1to1Conversation]);
       testFactory.conversation_repository.conversationState.conversations.push(newConversationEntity);
 
       const teamId = team1to1Conversation.team;
