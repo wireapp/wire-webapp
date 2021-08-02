@@ -96,6 +96,7 @@ import {TeamRepository} from '../team/TeamRepository';
 import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {UserFilter} from '../user/UserFilter';
+import {ConversationFilter} from './ConversationFilter';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -877,7 +878,7 @@ export class ConversationRepository {
           return false;
         }
 
-        const inTeam = userEntity.teamId === conversationEntity.team_id;
+        const inTeam = ConversationFilter.isInTeam(conversationEntity, userEntity);
         if (!inTeam) {
           // Disregard conversations that are not in the team
           return false;
@@ -889,8 +890,7 @@ export class ConversationRepository {
           return false;
         }
 
-        const [userId] = conversationEntity.participating_user_ids();
-        return userEntity.id === userId;
+        return ConversationFilter.is1To1WithUser(conversationEntity, userEntity);
       });
 
       if (matchingConversationEntity) {
