@@ -17,21 +17,13 @@
  *
  */
 
-import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-
-import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
+import {ConnectionStatus, Connection} from '@wireapp/api-client/src/connection/';
+import {ConnectionMapper} from './ConnectionMapper';
 
 describe('ConnectionMapper', () => {
-  /** @type {ConnectionMapper} */
-  let connectionMapper = undefined;
-
-  beforeAll(() => {
-    connectionMapper = new ConnectionMapper();
-  });
-
   describe('mapConnectionFromJson', () => {
     it('escapes all properties of an object', () => {
-      const payload = {
+      const payload: Connection = {
         conversation: '4a559f61-8466-45a7-b366-9e1662f02370',
         from: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
         last_update: '2017-02-14T12:43:31.460Z',
@@ -40,7 +32,7 @@ describe('ConnectionMapper', () => {
         to: '39b7f597-dfd1-4dff-86f5-fe1b79cb70a0',
       };
 
-      const connectionEntity = connectionMapper.mapConnectionFromJson(payload);
+      const connectionEntity = ConnectionMapper.mapConnectionFromJson(payload);
 
       expect(connectionEntity.conversationId).toBe(payload.conversation);
       expect(connectionEntity.from).toBe(payload.from);
