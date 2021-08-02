@@ -80,38 +80,42 @@ const ImageAsset: React.FC<ImageAssetProps> = ({asset, message, onClick, teamSta
 
   const dummyImageUrl = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1' width='${asset.width}' height='${asset.height}'></svg>`;
 
-  return isFileSharingReceivingEnabled ? (
-    <div
-      className={cx('image-asset', {
-        'bg-color-ephemeral': isObfuscated,
-        'image-asset--no-image': !isObfuscated && !imageUrl,
-        'loading-dots': !isUploading && !resource && !isObfuscated,
-      })}
-      data-uie-visible={visible && !isObfuscated}
-      data-uie-status={imageUrl ? 'loaded' : 'loading'}
-      onClick={event => onClick(message, event.nativeEvent)}
-      data-uie-name="go-image-detail"
-      ref={setViewportElementRef}
-    >
-      {isUploading && (
-        <div className="asset-loader">
-          <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />
-        </div>
-      )}
+  return (
+    <div data-uie-name="image-asset">
+      {isFileSharingReceivingEnabled ? (
+        <div
+          className={cx('image-asset', {
+            'bg-color-ephemeral': isObfuscated,
+            'image-asset--no-image': !isObfuscated && !imageUrl,
+            'loading-dots': !isUploading && !resource && !isObfuscated,
+          })}
+          data-uie-visible={visible && !isObfuscated}
+          data-uie-status={imageUrl ? 'loaded' : 'loading'}
+          onClick={event => onClick(message, event.nativeEvent)}
+          data-uie-name="go-image-detail"
+          ref={setViewportElementRef}
+        >
+          {isUploading && (
+            <div className="asset-loader">
+              <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />
+            </div>
+          )}
 
-      {isObfuscated && (
-        <div className="image-icon flex-center full-screen">
-          <Icon.Image />
+          {isObfuscated && (
+            <div className="image-icon flex-center full-screen">
+              <Icon.Image />
+            </div>
+          )}
+          <img
+            data-uie-name="image-asset-img"
+            className={cx('image-element', {'image-ephemeral': isObfuscated})}
+            src={imageUrl || dummyImageUrl}
+          />
         </div>
+      ) : (
+        <RestrictedImage />
       )}
-      <img
-        data-uie-name="image-asset-img"
-        className={cx('image-element', {'image-ephemeral': isObfuscated})}
-        src={imageUrl || dummyImageUrl}
-      />
     </div>
-  ) : (
-    <RestrictedImage />
   );
 };
 

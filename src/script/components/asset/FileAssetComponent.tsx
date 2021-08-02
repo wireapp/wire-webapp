@@ -69,7 +69,7 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
 
   return (
     !isObfuscated && (
-      <div className="file-asset">
+      <div className="file-asset" data-uie-name="file-asset">
         {hasHeader && <AssetHeader message={message} />}
         {isFileSharingReceivingEnabled ? (
           <div
@@ -107,7 +107,9 @@ const FileAssetComponent: React.FC<FileAssetProps> = ({
                     {fileName}
                   </div>
                   <ul className="file__desc__meta label-xs text-foreground">
-                    <li data-uie-name="file-size">{formattedFileSize}</li>
+                    <li className="label-nocase-xs" data-uie-name="file-size">
+                      {formattedFileSize}
+                    </li>
                     {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
                     {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
                     {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}

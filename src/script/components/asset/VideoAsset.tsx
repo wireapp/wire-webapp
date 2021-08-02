@@ -106,7 +106,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
 
   return (
     !isObfuscated && (
-      <div className="video-asset">
+      <div className="video-asset" data-uie-name="video-asset" data-uie-value={asset.file_name}>
         {!isFileSharingReceivingEnabled ? (
           <RestrictedVideo />
         ) : (
@@ -118,8 +118,6 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                 removeTimeout();
                 setHideControls(false);
               }}
-              data-uie-name="video-asset"
-              data-uie-value={asset.file_name}
             >
               <video
                 ref={setVideoElement}
@@ -178,7 +176,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                         <div className="video-asset__controls__bottom">
                           <SeekBar
                             className="video-asset__controls__bottom__seekbar"
-                            data-ui-name="status-video-seekbar"
+                            data-uie-name="status-video-seekbar"
                             mediaElement={videoElement}
                           />
                           <span

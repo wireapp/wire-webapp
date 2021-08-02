@@ -108,6 +108,7 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
       preserveAspectRatio="none"
       ref={svgNode}
       onClick={onLevelClick}
+      data-uie-name="status-audio-seekbar"
     >
       <clipPath id={clipId}>
         <rect x={0} y={0} height={1} width={position} />

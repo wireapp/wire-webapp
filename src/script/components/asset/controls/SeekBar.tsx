@@ -23,6 +23,7 @@ import {clamp} from 'Util/NumberUtil';
 
 export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   dark?: boolean;
+  ['data-uie-name']?: string;
   disabled?: boolean;
   mediaElement: HTMLMediaElement;
 }
@@ -36,7 +37,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
   disabled,
   mediaElement,
   className,
-  ...props
+  'data-uie-name': dataUieName,
 }: SeekBarProps) => {
   const [isSeekBarMouseOver, setIsSeekBarMouseOver] = useState<boolean>(false);
   const [isSeekBarThumbDragged, setIsSeekBarThumbDragged] = useState<boolean>(false);
@@ -65,7 +66,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
   }, [mediaElement]);
 
   return (
-    <div className={cx('seek-bar', className)} {...props}>
+    <div className={cx('seek-bar', className)} data-uie-name={dataUieName}>
       <input
         data-uie-name="asset-control-media-seek-bar"
         className={cx({

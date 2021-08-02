@@ -82,17 +82,14 @@ export class ConversationMapper {
     });
   }
 
-  updateProperties(
-    conversationEntity: Conversation & {[index: string]: Function},
-    conversationData: ConversationBackendData,
-  ): Conversation {
-    Object.entries(conversationData).forEach(([key, value]) => {
+  updateProperties(conversationEntity: Conversation, conversationData: Record<string, any>): Conversation {
+    Object.entries(conversationData).forEach(([key, value]: [keyof Conversation, string]) => {
       if (key !== 'id') {
         if (value !== undefined && conversationEntity.hasOwnProperty(key)) {
           if (ko.isObservable(conversationEntity[key])) {
-            conversationEntity[key](value);
+            (conversationEntity[key] as ko.Observable)(value);
           } else {
-            conversationEntity[key] = value;
+            (conversationEntity[key] as any) = value;
           }
         }
       }

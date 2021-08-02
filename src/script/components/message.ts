@@ -213,7 +213,15 @@ class Message {
       const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
 
       const canDelete =
-        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
+        messageEntity.user().isMe &&
+        !this.conversation().removed_from_conversation() &&
+        messageEntity.isDeletable() &&
+        !this.conversation().isFederated();
+
+      const canEdit =
+        messageEntity.isEditable() &&
+        !this.conversation().removed_from_conversation() &&
+        !this.conversation().isFederated();
 
       const hasDetails =
         !this.conversation().is1to1() &&
@@ -236,7 +244,7 @@ class Message {
         });
       }
 
-      if (messageEntity.isEditable() && !this.conversation().removed_from_conversation()) {
+      if (canEdit) {
         entries.push({
           click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
           label: t('conversationContextMenuEdit'),
