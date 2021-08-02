@@ -101,7 +101,7 @@ import {ConversationFilter} from './ConversationFilter';
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
 type EventJson = any;
-type EntityObject = {conversationEntity: Conversation; messageEntity: ContentMessage};
+type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
 
 export class ConversationRepository {
   private init_handled: number;
@@ -2195,7 +2195,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-join' event
    * @returns Resolves when the event was handled
    */
-  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();

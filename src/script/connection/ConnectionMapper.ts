@@ -39,7 +39,7 @@ export class ConnectionMapper {
   }
 
   /**
-   * Maps JSON connection into a blank connection entity or updates an existing one.
+   * Updates a connection entity in-place.
    */
   static updateConnectionFromJson(
     connectionEntity: ConnectionEntity,
