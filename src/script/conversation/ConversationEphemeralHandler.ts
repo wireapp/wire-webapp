@@ -32,7 +32,7 @@ import {StatusType} from '../message/StatusType';
 import {Text} from '../entity/message/Text';
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 import type {EventService} from '../event/EventService';
-import type {ConversationMapper} from './ConversationMapper';
+import {ConversationMapper} from './ConversationMapper';
 import type {Message} from '../entity/message/Message';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {Conversation} from '../entity/Conversation';
@@ -41,7 +41,6 @@ import type {EventRecord} from '../storage';
 export class ConversationEphemeralHandler extends AbstractConversationEventHandler {
   eventListeners: Record<string, (...args: any[]) => void>;
   eventService: EventService;
-  conversationMapper: ConversationMapper;
   logger: Logger;
   timedMessages: ko.ObservableArray<ContentMessage>;
   timedMessagesSubscription: ko.Subscription;
@@ -62,11 +61,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     return isTimerReset ? messageTimer : clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
   }
 
-  constructor(
-    conversationMapper: ConversationMapper,
-    eventService: EventService,
-    eventListeners: Record<string, (...args: any[]) => void>,
-  ) {
+  constructor(eventService: EventService, eventListeners: Record<string, (...args: any[]) => void>) {
     super();
 
     const defaultEventListeners = {onMessageTimeout: noop};
@@ -77,7 +72,6 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       [CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE]: this._updateEphemeralTimer.bind(this),
     });
 
-    this.conversationMapper = conversationMapper;
     this.logger = getLogger('ConversationEphemeralHandler');
 
     this.timedMessages = ko.observableArray([]);
@@ -274,7 +268,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     eventJson: ConversationMessageTimerUpdateEvent,
   ): Promise<Conversation> {
     const updates = {globalMessageTimer: ConversationEphemeralHandler.validateTimer(eventJson.data.message_timer)};
-    this.conversationMapper.updateProperties(conversationEntity, updates as any);
+    ConversationMapper.updateProperties(conversationEntity, updates);
     return Promise.resolve(conversationEntity);
   }
 

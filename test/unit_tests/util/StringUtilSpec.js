@@ -30,6 +30,7 @@ import {
   utf8ToUtf16BE,
   obfuscate,
 } from 'Util/StringUtil';
+import {lorem_ipsum} from '../../api/payloads';
 
 describe('StringUtil', () => {
   describe('compareTransliteration', () => {

@@ -35,7 +35,7 @@ import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
 import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
 
-import {Context} from '../ui/ContextMenu';
+import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
@@ -516,7 +516,7 @@ export class ListViewModel {
       });
     }
 
-    Context.from(event, entries, 'conversation-list-options-menu');
+    showContextMenu(event, entries, 'conversation-list-options-menu');
   };
 
   readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {

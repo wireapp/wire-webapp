@@ -39,7 +39,7 @@ describe('UserInput', () => {
       enter: () => {},
       input: '',
       placeholder: '',
-      selectedUsers: [new User('1'), new User('2'), new User('3'), new User('4')],
+      selectedUsers: [new User('1', null), new User('2', null), new User('3', null), new User('4', null)],
       setInput: ko.observable(''),
       setSelectedUsers: ko.observableArray([]),
     });
@@ -48,7 +48,12 @@ describe('UserInput', () => {
   });
 
   it('allows to deselect a user when pressing "backspace"', () => {
-    const selectedUsers = ko.observableArray([new User('1'), new User('2'), new User('3'), new User('4')]);
+    const selectedUsers = ko.observableArray([
+      new User('1', null),
+      new User('2', null),
+      new User('3', null),
+      new User('4', null),
+    ]);
 
     const props = {
       enter: () => {},

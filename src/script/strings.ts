@@ -379,11 +379,11 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.existentAccountSubhead',
   },
   fullConversationHeadline: {
-    defaultMessage: 'This {brandName} conversation is full.',
+    defaultMessage: 'Unable to join conversation',
     id: 'conversationJoin.fullConversationHeadline',
   },
   fullConversationSubhead: {
-    defaultMessage: 'Talk to the person who invited you.',
+    defaultMessage: 'The maximum number of participants in this conversation has been reached.',
     id: 'conversationJoin.fullConversationSubhead',
   },
   hasAccount: {

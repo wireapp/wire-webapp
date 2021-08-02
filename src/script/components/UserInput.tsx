@@ -78,6 +78,7 @@ const UserInput: React.FC<UserInputProps> = ({
               if (isRemovalAction(event.keyCode) && emptyInput) {
                 setSelectedUsers(selectedUsers.slice(0, -1));
               } else if (isEnterKey(event.nativeEvent)) {
+                event.preventDefault();
                 onEnter?.();
               }
               return true;

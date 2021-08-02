@@ -23,21 +23,21 @@ import React, {useEffect, useState} from 'react';
 import type {FileAsset} from '../../../entity/message/FileAsset';
 import {AssetTransferState} from '../../../assets/AssetTransferState';
 import {noop} from 'Util/util';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export interface MediaButtonProps {
   asset: FileAsset;
   cancel?: () => void;
-  large: boolean;
+  large?: boolean;
+  mediaElement?: HTMLMediaElement;
   pause?: () => void;
   play: () => void;
-  src: HTMLMediaElement;
   transferState: AssetTransferState;
   uploadProgress: number;
 }
 
 const MediaButton: React.FC<MediaButtonProps> = ({
-  src,
+  mediaElement,
   large,
   asset,
   uploadProgress,
@@ -51,15 +51,16 @@ const MediaButton: React.FC<MediaButtonProps> = ({
   const onPause = () => setIsPlaying(false);
   const unwrappedAsset = useKoSubscribableChildren(asset, ['downloadProgress']);
 
-  const mediaElement = src;
-
   useEffect(() => {
-    mediaElement.addEventListener('playing', onPlay);
-    mediaElement.addEventListener('pause', onPause);
-
+    if (mediaElement) {
+      mediaElement.addEventListener('playing', onPlay);
+      mediaElement.addEventListener('pause', onPause);
+    }
     return () => {
-      mediaElement.removeEventListener('playing', onPlay);
-      mediaElement.removeEventListener('pause', onPause);
+      if (mediaElement) {
+        mediaElement.removeEventListener('playing', onPlay);
+        mediaElement.removeEventListener('pause', onPause);
+      }
     };
   }, [mediaElement]);
 
@@ -73,7 +74,7 @@ const MediaButton: React.FC<MediaButtonProps> = ({
         'media-button-lg': large,
       })}
     >
-      {isUploaded && !isPlaying && (
+      {isUploaded && !isPlaying && mediaElement && (
         <div className="media-button media-button-play icon-play" onClick={play} data-uie-name="do-play-media" />
       )}
       {isUploaded && isPlaying && (
@@ -86,9 +87,3 @@ const MediaButton: React.FC<MediaButtonProps> = ({
 };
 
 export default MediaButton;
-
-registerReactComponent<MediaButtonProps>('media-button', {
-  component: MediaButton,
-  template:
-    '<div data-bind="react: {asset, cancel, large, pause, play, src, transferState: ko.unwrap(transferState), uploadProgress: ko.unwrap(uploadProgress)}"></div>',
-});

@@ -57,6 +57,7 @@ import {StorageRepository} from '../../storage';
 import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
+import {TeamState} from '../../team/TeamState';
 
 interface DraftMessage {
   mentions: MentionEntity[];
@@ -99,6 +100,7 @@ export class InputBarViewModel {
   readonly richTextInput: ko.PureComputed<string>;
   readonly inputPlaceholder: ko.PureComputed<string>;
   readonly showGiphyButton: ko.PureComputed<boolean>;
+  readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   readonly pingTooltip: string;
   readonly hasLocalEphemeralTimer: ko.PureComputed<boolean>;
   readonly renderMessage: typeof renderMessage;
@@ -107,6 +109,7 @@ export class InputBarViewModel {
   /** MIME types and file extensions are accepted */
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
+  readonly disableControls: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -128,6 +131,7 @@ export class InputBarViewModel {
     private readonly messageRepository: MessageRepository,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.shadowInput = null;
     this.textarea = null;
@@ -144,6 +148,8 @@ export class InputBarViewModel {
 
     this.editMessageEntity = ko.observable();
     this.replyMessageEntity = ko.observable();
+
+    this.isFileSharingSendingEnabled = this.teamState.isFileSharingSendingEnabled;
 
     const handleRepliedMessageDeleted = (messageId: string) => {
       if (this.replyMessageEntity()?.id === messageId) {
@@ -328,6 +334,8 @@ export class InputBarViewModel {
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
 
+    this.disableControls = ko.pureComputed(() => this.conversationEntity().isFederated());
+
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {
       if (this.conversationEntity()) {
@@ -418,7 +426,7 @@ export class InputBarViewModel {
     const draftMessage: DraftMessage = {...(storageValue as DraftMessage)};
 
     draftMessage.mentions = draftMessage.mentions.map(mention => {
-      return new MentionEntity(mention.startIndex, mention.length, mention.userId);
+      return new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain);
     });
 
     const replyMessageId = draftMessage.reply
@@ -444,7 +452,7 @@ export class InputBarViewModel {
 
   private readonly _createMentionEntity = (userEntity: User): MentionEntity => {
     const mentionLength = userEntity.name().length + 1;
-    return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+    return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id, userEntity.domain);
   };
 
   readonly addMention = (userEntity: User, inputElement: HTMLInputElement): void => {
@@ -548,6 +556,11 @@ export class InputBarViewModel {
     const images: File[] = [];
     const files: File[] = [];
 
+    if (!this.isFileSharingSendingEnabled()) {
+      this.showRestrictedFileSharingModal();
+      return;
+    }
+
     const tooManyConcurrentUploads = this._isHittingUploadLimit(droppedFiles);
     if (tooManyConcurrentUploads) {
       return;
@@ -568,12 +581,28 @@ export class InputBarViewModel {
   };
 
   readonly onPasteFiles = (pastedFiles: File[]): void => {
+    if (!this.isFileSharingSendingEnabled()) {
+      this.showRestrictedFileSharingModal();
+      return;
+    }
     const [pastedFile] = pastedFiles;
     this.pastedFile(pastedFile);
   };
 
+  private readonly showRestrictedFileSharingModal = (): void => {
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+      text: {
+        message: t('conversationModalRestrictedFileSharingDescription'),
+        title: t('conversationModalRestrictedFileSharingHeadline'),
+      },
+    });
+  };
+
   readonly onWindowClick = (event: Event): void => {
-    if ($(event.target).closest('.conversation-input-bar, .conversation-input-bar-mention-suggestion').length) {
+    const ignoredParent = (event.target as HTMLElement).closest(
+      '.conversation-input-bar, .conversation-input-bar-mention-suggestion, .ctx-menu',
+    );
+    if (ignoredParent) {
       return;
     }
     this.cancelMessageEditing();
@@ -621,7 +650,9 @@ export class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
+            if (!this.conversationEntity().isFederated()) {
+              this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
+            }
             this.updateMentions(data, keyboardEvent);
           }
           break;

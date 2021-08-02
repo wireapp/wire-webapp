@@ -26,7 +26,7 @@ import Icon from 'Components/Icon';
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
-import {Context} from '../../ui/ContextMenu';
+import {showContextMenu} from '../../ui/ContextMenu';
 import type {Conversation} from '../../entity/Conversation';
 
 export interface MessageTimerButtonProps {
@@ -36,7 +36,9 @@ export interface MessageTimerButtonProps {
 export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversation}) => {
   const messageTimer = useKoSubscribable(conversation.messageTimer);
   const hasMessageTimer = !!messageTimer;
-  const isTimerDisabled = useKoSubscribable(conversation.hasGlobalMessageTimer);
+  const isFederated = useKoSubscribable(conversation.isFederated);
+  const hasGlobalMessageTimer = useKoSubscribable(conversation.hasGlobalMessageTimer);
+  const isTimerDisabled = hasGlobalMessageTimer || isFederated;
   const duration = hasMessageTimer ? formatDuration(messageTimer) : ({} as DurationUnit);
 
   // Click on ephemeral button
@@ -57,7 +59,7 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversat
       }),
     );
 
-    Context.from(event, entries, 'message-timer-menu');
+    showContextMenu(event, entries, 'message-timer-menu');
   };
 
   return (
@@ -87,7 +89,7 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversat
           </div>
         )
       ) : (
-        <div className="button-icon-large">
+        <div className={cx('button-icon-large', {disabled: isTimerDisabled})}>
           <Icon.Timer data-uie-name="message-timer-icon" />
         </div>
       )}

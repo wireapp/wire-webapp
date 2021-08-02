@@ -24,10 +24,11 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import ko from 'knockout';
 import type {Availability} from '@wireapp/protocol-messaging';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {MouseEventHandler} from 'react';
 
 import 'Components/AvailabilityState';
 import 'Components/LegalHoldDot';
-import 'Components/list/groupedConversations';
+import 'Components/list/GroupedConversations';
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -52,6 +53,7 @@ import type {MainViewModel} from '../MainViewModel';
 import type {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import type {PropertiesRepository} from '../../properties/PropertiesRepository';
 import type {User} from '../../entity/User';
+import {createNavigate} from '../../router/routerBindings';
 
 export class ConversationListViewModel {
   readonly startTooltip: string;
@@ -70,7 +72,7 @@ export class ConversationListViewModel {
   readonly hasPendingLegalHold: ko.PureComputed<boolean>;
   readonly showConnectRequests: ko.PureComputed<boolean>;
   readonly selfAvailability: ko.PureComputed<Availability.Type>;
-  readonly getConversationUrl: (conversationId: string) => string;
+  readonly makeOnClick: (conversationId: string) => MouseEventHandler<Element>;
   readonly participantAvatarSize: typeof AVATAR_SIZE.SMALL;
   readonly getIsVisibleFunc: () => (() => boolean) | ((top: number, bottom: number) => boolean);
   private readonly logger: Logger;
@@ -116,7 +118,7 @@ export class ConversationListViewModel {
     this.hasPendingLegalHold = ko.pureComputed(() => this.selfUser().hasPendingLegalHold());
     this.isTeam = this.teamState.isTeam;
     this.isActivatedAccount = this.userState.isActivatedAccount;
-    this.getConversationUrl = generateConversationUrl;
+    this.makeOnClick = (conversationId: string) => createNavigate(generateConversationUrl(conversationId));
 
     this.selfUser = ko.pureComputed(() => this.userState.self && this.userState.self());
     this.selfAvailability = ko.pureComputed(() => this.selfUser() && this.selfUser().availability());
@@ -243,7 +245,7 @@ export class ConversationListViewModel {
   };
 
   readonly clickOnAvailability = (viewModel: unknown, event: MouseEvent): void => {
-    AvailabilityContextMenu.show(event, 'list_header', 'left-list-availability-menu');
+    AvailabilityContextMenu.show(event, 'left-list-availability-menu');
   };
 
   readonly clickOnConnectRequests = (): void => {

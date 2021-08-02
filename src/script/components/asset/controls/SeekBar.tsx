@@ -19,20 +19,26 @@
 
 import cx from 'classnames';
 import React, {CSSProperties, useEffect, useState} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {clamp} from 'Util/NumberUtil';
 
-export interface SeekBarProps {
+export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   dark?: boolean;
+  ['data-uie-name']?: string;
   disabled?: boolean;
-  src: HTMLMediaElement;
+  mediaElement: HTMLMediaElement;
 }
 
 export interface SeekBarCSS extends CSSProperties {
   '--seek-bar-progress': string;
 }
 
-const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaElement}: SeekBarProps) => {
+const SeekBar: React.FC<SeekBarProps> = ({
+  dark: darkMode,
+  disabled,
+  mediaElement,
+  className,
+  'data-uie-name': dataUieName,
+}: SeekBarProps) => {
   const [isSeekBarMouseOver, setIsSeekBarMouseOver] = useState<boolean>(false);
   const [isSeekBarThumbDragged, setIsSeekBarThumbDragged] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
@@ -50,17 +56,17 @@ const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaEl
       setProgress(100);
     };
 
-    mediaElement.addEventListener('timeupdate', onTimeUpdate);
-    mediaElement.addEventListener('ended', onEnded);
+    mediaElement?.addEventListener('timeupdate', onTimeUpdate);
+    mediaElement?.addEventListener('ended', onEnded);
 
     return () => {
-      mediaElement.removeEventListener('timeupdate', onTimeUpdate);
-      mediaElement.removeEventListener('ended', onEnded);
+      mediaElement?.removeEventListener('timeupdate', onTimeUpdate);
+      mediaElement?.removeEventListener('ended', onEnded);
     };
   }, [mediaElement]);
 
   return (
-    <div className="seek-bar">
+    <div className={cx('seek-bar', className)} data-uie-name={dataUieName}>
       <input
         data-uie-name="asset-control-media-seek-bar"
         className={cx({
@@ -96,8 +102,3 @@ const SeekBar: React.FC<SeekBarProps> = ({dark: darkMode, disabled, src: mediaEl
 };
 
 export default SeekBar;
-
-registerReactComponent('seek-bar', {
-  component: SeekBar,
-  template: '<div data-bind="react: {dark, disabled: ko.unwrap(disabled), src}"></div>',
-});
