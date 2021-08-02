@@ -38,6 +38,7 @@ import {UserState} from '../../user/UserState';
 import {ConversationState} from '../../conversation/ConversationState';
 import {CallState} from '../../calling/CallState';
 import {TeamState} from '../../team/TeamState';
+import {ConversationFilter} from '../../conversation/ConversationFilter';
 
 // Parent: ContentViewModel
 export class TitleBarViewModel {
@@ -114,11 +115,7 @@ export class TitleBarViewModel {
       if (!this.conversationEntity()) {
         return false;
       }
-
-      const isSupportedConversation = this.conversationEntity().isGroup() || this.conversationEntity().is1to1();
-      const hasParticipants = !!this.conversationEntity().participating_user_ids().length;
-      const isActiveConversation = hasParticipants && !this.conversationEntity().removed_from_conversation();
-      return !this.hasCall() && isSupportedConversation && isActiveConversation;
+      return ConversationFilter.showCallControls(this.conversationEntity(), this.hasCall());
     });
 
     this.supportsVideoCall = ko.pureComputed(() =>
