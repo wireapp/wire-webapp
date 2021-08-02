@@ -127,7 +127,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             })}
           >
             {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
-            {!isGroup && users.length && (
+            {!isGroup && !!users.length && (
               <div className="avatar-halo">
                 <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
               </div>
