@@ -22,7 +22,7 @@ import {ConnectionMapper} from './ConnectionMapper';
 
 describe('ConnectionMapper', () => {
   describe('mapConnectionFromJson', () => {
-    it('escapes all properties of an object', () => {
+    it('maps accepted connection requests', () => {
       const payload: Connection = {
         conversation: '4a559f61-8466-45a7-b366-9e1662f02370',
         from: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
@@ -40,6 +40,10 @@ describe('ConnectionMapper', () => {
       expect(connectionEntity.message).toBe(payload.message);
       expect(connectionEntity.status()).toBe(payload.status);
       expect(connectionEntity.userId).toBe(payload.to);
+
+      expect(connectionEntity.isConnected()).toBeTruthy();
+      expect(connectionEntity.isIncomingRequest()).toBeFalsy();
+      expect(connectionEntity.isOutgoingRequest()).toBeFalsy();
     });
   });
 });
