@@ -179,7 +179,8 @@ describe('ConversationMapper', () => {
       ConversationMapper.updateProperties(conversationEntity, updates);
 
       expect(conversationEntity.name()).toBe(updatedName);
-      expect((conversationEntity as any).newProperty).toBeUndefined();
+      //@ts-expect-error
+      expect(conversationEntity.newProperty).toBeUndefined();
     });
   });
 

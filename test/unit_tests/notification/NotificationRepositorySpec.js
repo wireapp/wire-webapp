@@ -23,6 +23,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {NotificationPreference} from '@wireapp/api-client/src/user/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {Runtime} from '@wireapp/commons';
 
 import {t} from 'Util/LocalizerUtil';
 import {createRandomUuid} from 'Util/util';
@@ -58,7 +59,7 @@ import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 import {TestFactory} from '../../helper/TestFactory';
-import {Runtime} from '@wireapp/commons';
+import {entities, payload} from '../../api/payloads';
 
 window.wire = window.wire || {};
 window.wire.app = window.wire.app || {};

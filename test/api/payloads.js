@@ -291,8 +291,4 @@ const payload = {
   },
 };
 
-window.lorem_ipsum = lorem_ipsum;
-window.entities = entities;
-window.payload = payload;
-
 export {lorem_ipsum, entities, payload};
