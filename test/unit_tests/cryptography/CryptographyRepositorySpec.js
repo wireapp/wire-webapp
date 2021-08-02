@@ -28,6 +28,7 @@ import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 import {TestFactory} from '../../helper/TestFactory';
 import {CryptographyError} from 'src/script/error/CryptographyError';
+import {entities} from '../../api/payloads';
 
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
