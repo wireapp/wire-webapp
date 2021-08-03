@@ -194,7 +194,7 @@ export class GroupCreationViewModel {
         );
         this.isShown(false);
 
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
       } catch (error) {
         this.isCreatingConversation = false;
         throw error;

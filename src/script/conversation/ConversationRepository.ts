@@ -742,7 +742,7 @@ export class ConversationRepository {
     }
     if (this.conversationState.isActiveConversation(conversationEntity)) {
       const nextConversation = this.getNextConversation(conversationEntity);
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation, {});
     }
     if (!skipNotification) {
       const deletionMessage = new DeleteConversationMessage(conversationEntity);
@@ -994,7 +994,7 @@ export class ConversationRepository {
       );
       const knownConversation = this.conversationState.findConversation(conversationId);
       if (knownConversation && knownConversation.status() === ConversationStatus.CURRENT_MEMBER) {
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation);
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
@@ -1006,7 +1006,7 @@ export class ConversationRepository {
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }
-              amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+              amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
             } catch (error) {
               switch (error.label) {
                 case BackendErrorLabel.NO_CONVERSATION:
@@ -1342,7 +1342,7 @@ export class ConversationRepository {
     }
 
     if (isActiveConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
 
@@ -2337,7 +2337,7 @@ export class ConversationRepository {
     }
 
     const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
-    const nextConversationEt = isActiveConversation ? this.getNextConversation(conversationEntity) : undefined;
+    const nextConversationEntity = isActiveConversation ? this.getNextConversation(conversationEntity) : undefined;
     const previouslyArchived = conversationEntity.is_archived();
 
     ConversationMapper.updateSelfStatus(conversationEntity, eventData);
@@ -2352,7 +2352,7 @@ export class ConversationRepository {
     }
 
     if (isActiveConversation && (conversationEntity.is_archived() || conversationEntity.is_cleared())) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEt);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
 
