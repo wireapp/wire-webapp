@@ -501,6 +501,14 @@ export class Conversation {
     return [this.selfUser()].concat(this.participating_user_ets());
   }
 
+  get isRemoteConversation(): boolean {
+    if (!Config.getConfig().FEATURE.ENABLE_FEDERATION || typeof this.domain === 'undefined') {
+      return false;
+    }
+
+    return this.domain !== Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+  }
+
   readonly persistState = (): void => {
     if (this.shouldPersistStateChanges) {
       this.publishPersistState();

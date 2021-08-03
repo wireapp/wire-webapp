@@ -635,7 +635,7 @@ export class InputBarViewModel {
 
     if (this.isEditing()) {
       this.sendMessageEdit(messageText, this.editMessageEntity());
-    } else if (this.conversationEntity().isFederated()) {
+    } else if (this.conversationEntity().isRemoteConversation) {
       this.sendFederatedMessage(messageText);
     } else {
       this.sendMessage(messageText, this.replyMessageEntity());
