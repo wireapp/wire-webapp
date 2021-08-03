@@ -295,11 +295,17 @@ export class ConversationRepository {
     accessState?: string,
     options = {},
   ): Promise<Conversation | undefined> {
-    const userIds = userEntities.map(userEntity => userEntity.id);
+    const sameFederatedDomainUserIds = userEntities
+      .filter(userEntity => userEntity.isOnSameFederatedDomain())
+      .map(userEntity => userEntity.id);
+    const otherFederatedDomainUserIds = userEntities
+      .filter(userEntity => !userEntity.isOnSameFederatedDomain())
+      .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      users: userIds,
+      qualified_users: otherFederatedDomainUserIds,
+      users: sameFederatedDomainUserIds,
       ...options,
     };
 
@@ -343,7 +349,7 @@ export class ConversationRepository {
       });
       return conversationEntity as Conversation;
     } catch (error) {
-      this.handleConversationCreateError(error, userIds);
+      this.handleConversationCreateError(error, sameFederatedDomainUserIds);
       return undefined;
     }
   }
@@ -910,6 +916,10 @@ export class ConversationRepository {
         return matchingConversationEntity;
       }
       return this.createGroupConversation([userEntity]);
+    }
+
+    if (!userEntity.isOnSameFederatedDomain()) {
+      return this.createGroupConversation([userEntity], `${userEntity.name()} & ${this.userState.self().name()}`);
     }
 
     const conversationId = userEntity.connection().conversationId;
