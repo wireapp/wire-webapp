@@ -748,7 +748,7 @@ export class ConversationRepository {
     }
     if (this.conversationState.isActiveConversation(conversationEntity)) {
       const nextConversation = this.getNextConversation(conversationEntity);
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation, {});
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation, {}, nextConversation.domain);
     }
     if (!skipNotification) {
       const deletionMessage = new DeleteConversationMessage(conversationEntity);

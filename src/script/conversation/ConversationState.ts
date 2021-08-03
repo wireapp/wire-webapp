@@ -109,6 +109,11 @@ export class ConversationState {
    */
   isActiveConversation(conversationEntity: Conversation): boolean {
     const activeConversation = this.activeConversation();
-    return !!activeConversation && !!conversationEntity && activeConversation.id === conversationEntity.id;
+    return (
+      !!activeConversation &&
+      !!conversationEntity &&
+      activeConversation.id === conversationEntity.id &&
+      activeConversation.domain === conversationEntity.domain
+    );
   }
 }

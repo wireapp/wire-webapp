@@ -216,16 +216,12 @@ export class ConversationMapper {
     }
 
     const {creator, id, members, name, others, type} = conversationData;
-    let conversationEntity = new Conversation(id);
+    let conversationEntity = new Conversation(id, conversationData.domain || conversationData.qualified_id?.domain);
     conversationEntity.roles(conversationData.roles || {});
 
     conversationEntity.creator = creator;
     conversationEntity.type(type);
     conversationEntity.name(name || '');
-
-    if (conversationData.qualified_id) {
-      conversationEntity.domain = conversationData.qualified_id.domain;
-    }
 
     const selfState = members ? members.self : conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);

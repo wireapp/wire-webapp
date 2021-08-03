@@ -112,7 +112,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const videoGrid = call && getGrid(call);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
-  const conversationUrl = generateConversationUrl(conversation.id);
+  const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);
   const selfParticipant = call?.getSelfParticipant();
 
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [

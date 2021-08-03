@@ -85,7 +85,7 @@
         <!-- ko foreach: {data: unarchivedConversations, as: 'conversation', noChildContext: true} -->
         <conversation-list-cell
           data-uie-name="item-conversation"
-          params="onClick: makeOnClick(conversation.id), rightClick: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall, index: $index, isVisibleFunc: isVisibleFunc"
+          params="onClick: makeOnClick(conversation.id, conversation.domain), rightClick: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall, index: $index, isVisibleFunc: isVisibleFunc"
         >
         </conversation-list-cell>
         <!-- /ko -->
