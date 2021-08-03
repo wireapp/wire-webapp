@@ -27,6 +27,7 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 import {TestFactory} from '../../helper/TestFactory';
+import {entities} from '../../api/payloads';
 
 describe('UserRepository', () => {
   let server = null;

@@ -34,7 +34,6 @@ import 'Components/asset/controls/MediaButton';
 import 'Components/asset/controls/SeekBar';
 import 'Components/CopyToClipboard';
 import 'Components/message/EphemeralTimer';
-import '../page/collection/fullSearch';
 import '../page/start-ui/GroupList';
 import 'Components/toggle/GuestModeToggle';
 import 'Components/icons';

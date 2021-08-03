@@ -72,6 +72,7 @@ import {ClientState} from 'src/script/client/ClientState';
 import {TeamState} from 'src/script/team/TeamState';
 import {ConversationState} from 'src/script/conversation/ConversationState';
 import {AssetService} from 'src/script/assets/AssetService';
+import {entities} from '../api/payloads';
 
 export class TestFactory {
   constructor() {
