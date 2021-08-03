@@ -57,7 +57,7 @@ const FullSearchItem: React.FC<FullSearchItemProps> = ({message, onClick, format
           <span className="font-weight-bold" data-uie-name="full-search-item-sender">
             {name}
           </span>
-          <span data-uie-name="full-search-item-timestamp">{formatDateShort(timestamp)}</span>
+          <span data-uie-name="full-search-item-timestamp">{` ${formatDateShort(timestamp)}`}</span>
         </div>
       </div>
       {matches > 1 && (
