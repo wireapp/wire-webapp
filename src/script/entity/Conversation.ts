@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -67,7 +67,6 @@ enum TIMESTAMP_TYPE {
 }
 
 export class Conversation {
-  [key: string]: any;
   public readonly archivedState: ko.Observable<boolean>;
   private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
   private readonly isManaged: boolean;
@@ -98,7 +97,7 @@ export class Conversation {
   public readonly hasLegalHold: ko.Computed<boolean>;
   public readonly hasService: ko.PureComputed<boolean>;
   public readonly hasUnread: ko.PureComputed<boolean>;
-  public readonly id: string;
+  public id: string;
   public readonly inTeam: ko.PureComputed<boolean>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
@@ -143,6 +142,11 @@ export class Conversation {
   public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
   public readonly withAllTeamMembers: ko.Observable<boolean>;
+  public readonly hasExternal: ko.PureComputed<boolean>;
+  public accessModes?: CONVERSATION_ACCESS[];
+  public accessRole?: CONVERSATION_ACCESS_ROLE;
+  public readonly domain?: string;
+  isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
@@ -294,6 +298,8 @@ export class Conversation {
     this.isCreatedBySelf = ko.pureComputed(
       () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
     );
+
+    this.isFederated = ko.pureComputed(() => !!this.domain);
 
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;

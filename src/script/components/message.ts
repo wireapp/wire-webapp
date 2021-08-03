@@ -27,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
-import {Context, ContextMenuEntry} from '../ui/ContextMenu';
+import {showContextMenu as showContext, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import {StatusType} from '../message/StatusType';
@@ -40,13 +40,18 @@ import type {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {AssetRepository} from '../assets/AssetRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {TeamState} from '../team/TeamState';
 
-import './asset/audioAsset';
+import './asset/AudioAsset';
+import './asset/RestrictedAudio';
 import './asset/FileAssetComponent';
-import './asset/imageAsset';
+import './asset/ImageAsset';
+import './asset/RestrictedImage';
 import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
-import './asset/videoAsset';
+import './asset/VideoAsset';
+import './asset/RestrictedFile';
+import './asset/RestrictedVideo';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
@@ -59,6 +64,7 @@ import './message/LegalHoldMessage';
 import './message/SystemMessage';
 import './message/MemberMessage';
 import './message/ReadReceiptStatus';
+import './message/PingMessage';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -85,6 +91,7 @@ interface MessageParams {
   selfId: ko.Observable<string>;
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
+  teamState?: TeamState;
 }
 
 class Message {
@@ -118,6 +125,7 @@ class Message {
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
   StatusType: typeof StatusType;
+  teamState: TeamState;
 
   constructor(
     {
@@ -145,6 +153,7 @@ class Message {
       conversationRepository,
       messageRepository,
       actionsViewModel,
+      teamState = container.resolve(TeamState),
     }: MessageParams,
     componentInfo: {element: HTMLElement},
   ) {
@@ -201,15 +210,25 @@ class Message {
       const messageEntity = this.message;
       const entries: ContextMenuEntry[] = [];
 
+      const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
+
       const canDelete =
-        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
+        messageEntity.user().isMe &&
+        !this.conversation().removed_from_conversation() &&
+        messageEntity.isDeletable() &&
+        !this.conversation().isFederated();
+
+      const canEdit =
+        messageEntity.isEditable() &&
+        !this.conversation().removed_from_conversation() &&
+        !this.conversation().isFederated();
 
       const hasDetails =
         !this.conversation().is1to1() &&
         !messageEntity.isEphemeral() &&
         !this.conversation().removed_from_conversation();
 
-      if (messageEntity.isDownloadable()) {
+      if (messageEntity.isDownloadable() && !isRestrictedFileShare) {
         entries.push({
           click: () => messageEntity.download(container.resolve(AssetRepository)),
           label: t('conversationContextMenuDownload'),
@@ -225,7 +244,7 @@ class Message {
         });
       }
 
-      if (messageEntity.isEditable() && !this.conversation().removed_from_conversation()) {
+      if (canEdit) {
         entries.push({
           click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
           label: t('conversationContextMenuEdit'),
@@ -239,7 +258,7 @@ class Message {
         });
       }
 
-      if (messageEntity.isCopyable()) {
+      if (messageEntity.isCopyable() && !isRestrictedFileShare) {
         entries.push({
           click: () => messageEntity.copy(),
           label: t('conversationContextMenuCopy'),
@@ -287,14 +306,19 @@ class Message {
 
   showContextMenu(event: MouseEvent) {
     const entries = this.contextMenuEntries();
-    Context.from(event, entries, 'message-options-menu');
+    showContext(event, entries, 'message-options-menu');
   }
 }
 
 // If this is not explicitly defined as string,
 // TS will define this as the string's content.
 const receiptStatusTemplate: string = `
-  <read-receipt-status params="message: message, is1to1Conversation: conversation().is1to1, isLastDeliveredMessage: isLastDeliveredMessage, onClickReceipts: onClickReceipts">
+  <read-receipt-status params="
+    message: message,
+    is1to1Conversation: conversation().is1to1,
+    isLastDeliveredMessage: isLastDeliveredMessage,
+    onClickReceipts: onClickReceipts,
+  "></read-receipt-status>
 `;
 
 const normalTemplate: string = `
@@ -354,7 +378,7 @@ const normalTemplate: string = `
         <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.isAudio() -->
-        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></audio-asset>
+        <audio-asset data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message, className: 'message-asset'"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.isFile() -->
         <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>
@@ -405,24 +429,6 @@ const normalTemplate: string = `
   <!-- /ko -->
   `;
 
-const pingTemplate: string = `
-  <div class="message-header">
-    <div class="message-header-icon">
-      <div class="icon-ping" data-bind="css: message.get_icon_classes"></div>
-    </div>
-    <div class="message-header-label" data-bind="attr: {title: message.ephemeral_caption()}, css: {'ephemeral-message-obfuscated': message.isObfuscated()}">
-      <span class="message-header-label__multiline">
-        <span class="message-header-sender-name" data-bind='text: message.unsafeSenderName()'></span>
-        <span class="ellipsis" data-bind="text: message.caption"></span>
-      </span>
-    </div>
-    <div class="message-body-actions">
-      <time class="time with-tooltip with-tooltip--top with-tooltip--time" data-bind="text: message.displayTimestampShort(), attr: {'data-timestamp': message.timestamp, 'data-tooltip': message.displayTimestampLong()}, showAllTimestamps"></time>
-      ${receiptStatusTemplate}
-    </div>
-  </div>
-  `;
-
 ko.components.register('message', {
   template: `
     <!-- ko if: message.super_type === 'normal' -->
@@ -461,7 +467,12 @@ ko.components.register('message', {
       "></member-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'ping' -->
-      ${pingTemplate}
+      <ping-message params="
+        message: message,
+        is1to1Conversation: conversation().is1to1,
+        isLastDeliveredMessage: isLastDeliveredMessage,
+        onClickReceipts: onClickReceipts,
+      "></ping-message>
     <!-- /ko -->
     <!-- ko if: message.super_type === 'file-type-restricted' -->
       <filetype-restricted-message params="message: message"></filetype-restricted-message>

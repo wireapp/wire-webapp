@@ -95,18 +95,19 @@ import {TeamState} from '../team/TeamState';
 import {TeamRepository} from '../team/TeamRepository';
 import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {UserFilter} from '../user/UserFilter';
+import {ConversationFilter} from './ConversationFilter';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
 type EventJson = any;
-type EntityObject = {conversationEntity: Conversation; messageEntity: ContentMessage};
+type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
 
 export class ConversationRepository {
   private init_handled: number;
   private init_promise?: {rejectFn: (reason?: any) => void; resolveFn: (value?: unknown) => void};
   private init_total: number;
   private isBlockingNotificationHandling: boolean;
-  private readonly conversationMapper: ConversationMapper;
   private readonly conversationsWithNewEvents: Map<any, any>;
   private readonly ephemeralHandler: ConversationEphemeralHandler;
   public readonly conversationLabelRepository: ConversationLabelRepository;
@@ -155,7 +156,6 @@ export class ConversationRepository {
 
     this.logger = getLogger('ConversationRepository');
 
-    this.conversationMapper = new ConversationMapper();
     this.event_mapper = new EventMapper();
     this.verificationStateHandler = new ConversationVerificationStateHandler(
       this.eventRepository,
@@ -175,8 +175,8 @@ export class ConversationRepository {
 
     this.initSubscriptions();
 
-    this.stateHandler = new ConversationStateHandler(this.conversation_service, this.conversationMapper);
-    this.ephemeralHandler = new ConversationEphemeralHandler(this.conversationMapper, this.eventService, {
+    this.stateHandler = new ConversationStateHandler(this.conversation_service);
+    this.ephemeralHandler = new ConversationEphemeralHandler(this.eventService, {
       onMessageTimeout: this.handleMessageExpiration,
     });
 
@@ -231,6 +231,8 @@ export class ConversationRepository {
 
     this.eventService.addEventUpdatedListener(this.updateLocalMessageEntity);
     this.eventService.addEventDeletedListener(this.deleteLocalMessageEntity);
+
+    window.addEventListener<any>(WebAppEvents.CONVERSATION.JOIN, this.onConversationJoin);
   }
 
   private readonly updateLocalMessageEntity = async ({
@@ -406,7 +408,7 @@ export class ConversationRepository {
     if (!remoteConversations.length) {
       conversationsData = localConversations;
     } else {
-      const data = this.conversationMapper.mergeConversation(localConversations, remoteConversations);
+      const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
       conversationsData = (await this.conversation_service.saveConversationsInDb(data)) as any[];
     }
     const conversationEntities = this.mapConversations(conversationsData) as Conversation[];
@@ -422,7 +424,7 @@ export class ConversationRepository {
       const localEntity = this.conversationState.conversations().find(({id}) => id === conversationData.id);
 
       if (localEntity) {
-        const entity = this.conversationMapper.updateSelfStatus(localEntity, conversationData as any, true);
+        const entity = ConversationMapper.updateSelfStatus(localEntity, conversationData as any, true);
         handledConversationEntities.push(entity);
         return;
       }
@@ -674,9 +676,9 @@ export class ConversationRepository {
 
   private async updateConversationFromBackend(conversationEntity: Conversation) {
     const conversationData = await this.conversation_service.getConversationById(conversationEntity.id);
-    const {name, message_timer} = conversationData;
-    this.conversationMapper.updateProperties(conversationEntity, {name} as any);
-    this.conversationMapper.updateSelfStatus(conversationEntity, {message_timer});
+    const {name, message_timer, type} = conversationData;
+    ConversationMapper.updateProperties(conversationEntity, {name, type});
+    ConversationMapper.updateSelfStatus(conversationEntity, {message_timer});
   }
 
   /**
@@ -876,7 +878,7 @@ export class ConversationRepository {
           return false;
         }
 
-        const inTeam = userEntity.teamId === conversationEntity.team_id;
+        const inTeam = ConversationFilter.isInTeam(conversationEntity, userEntity);
         if (!inTeam) {
           // Disregard conversations that are not in the team
           return false;
@@ -888,8 +890,7 @@ export class ConversationRepository {
           return false;
         }
 
-        const [userId] = conversationEntity.participating_user_ids();
-        return userEntity.id === userId;
+        return ConversationFilter.is1To1WithUser(conversationEntity, userEntity);
       });
 
       if (matchingConversationEntity) {
@@ -953,13 +954,84 @@ export class ConversationRepository {
     return undefined;
   }
 
-  async joinConversationWithCode(key: string, code: string): Promise<{conversationEntity: Conversation} | undefined> {
-    const response = await this.conversation_service.postConversationJoin(key, code);
-    if (response) {
-      return this.onCreate(response as any);
+  /**
+   * Starts the join public conversation flow.
+   * Opens conversation directly when it is already known.
+   *
+   * @param event Custom event containing join key/code
+   */
+  private readonly onConversationJoin = async (event: {detail: {code: string; key: string}}) => {
+    const {key, code} = event.detail;
+
+    const showNoConversationModal = () => {
+      const titleText = t('modalConversationJoinNotFoundHeadline');
+      const messageText = t('modalConversationJoinNotFoundMessage');
+      this.showModal(messageText, titleText);
+    };
+    const showTooManyMembersModal = () => {
+      const titleText = t('modalConversationJoinFullHeadline');
+      const messageText = t('modalConversationJoinFullMessage');
+      this.showModal(messageText, titleText);
+    };
+
+    try {
+      const {id: conversationId, name: conversationName} = await this.conversation_service.getConversationJoin(
+        key,
+        code,
+      );
+      const knownConversation = this.conversationState.findConversation(conversationId);
+      if (knownConversation && knownConversation.status() === ConversationStatus.CURRENT_MEMBER) {
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation);
+        return;
+      }
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        primaryAction: {
+          action: async () => {
+            try {
+              const response = await this.conversation_service.postConversationJoin(key, code);
+              const conversationEntity = await this.getConversationById(conversationId);
+              if (response) {
+                await this.onMemberJoin(conversationEntity, response);
+              }
+              amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+            } catch (error) {
+              switch (error.label) {
+                case BackendErrorLabel.NO_CONVERSATION:
+                case BackendErrorLabel.NO_CONVERSATION_CODE: {
+                  showNoConversationModal();
+                  break;
+                }
+                case BackendErrorLabel.TOO_MANY_MEMBERS: {
+                  showTooManyMembersModal();
+                  break;
+                }
+
+                default: {
+                  throw error;
+                }
+              }
+            }
+          },
+          text: t('modalConversationJoinConfirm'),
+        },
+        text: {
+          message: t('modalConversationJoinMessage', {conversationName}),
+          title: t('modalConversationJoinHeadline'),
+        },
+      });
+    } catch (error) {
+      switch (error.label) {
+        case BackendErrorLabel.NO_CONVERSATION:
+        case BackendErrorLabel.NO_CONVERSATION_CODE: {
+          showNoConversationModal();
+          break;
+        }
+        default: {
+          throw error;
+        }
+      }
     }
-    return undefined;
-  }
+  };
 
   /**
    * Maps user connection to the corresponding conversation.
@@ -1039,7 +1111,7 @@ export class ConversationRepository {
     initialTimestamp = this.getLatestEventTimestamp(),
   ) {
     const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
-    const entities = this.conversationMapper.mapConversations(
+    const entities = ConversationMapper.mapConversations(
       conversationsData as ConversationDatabaseData[],
       initialTimestamp,
     );
@@ -1364,14 +1436,15 @@ export class ConversationRepository {
   readonly teamMemberLeave = async (
     teamId: string,
     userId: string,
+    domain: string | null,
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
-    const userEntity = await this.userRepository.getUserById(userId);
+    const userEntity = await this.userRepository.getUserById(userId, domain);
     this.conversationState
       .conversations()
       .filter(conversationEntity => {
         const conversationInTeam = conversationEntity.team_id === teamId;
-        const userIsParticipant = conversationEntity.participating_user_ids().includes(userId);
+        const userIsParticipant = UserFilter.isParticipant(conversationEntity, userId, domain);
         return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
       })
       .forEach(conversationEntity => {
@@ -1555,18 +1628,16 @@ export class ConversationRepository {
     this.showModal(messageText, titleText);
   }
 
-  private handleUsersNotConnected(userIds: string[] = []) {
-    const [userID] = userIds;
-    const userPromise = userIds.length === 1 ? this.userRepository.getUserById(userID) : Promise.resolve(null);
+  private async handleUsersNotConnected(userIds: string[] = []): Promise<void> {
+    const titleText = t('modalConversationNotConnectedHeadline');
 
-    userPromise.then((userEntity: User) => {
-      const username = userEntity?.name();
-      const messageText = username
-        ? t('modalConversationNotConnectedMessageOne', username)
-        : t('modalConversationNotConnectedMessageMany');
-      const titleText = t('modalConversationNotConnectedHeadline');
-      this.showModal(messageText, titleText);
-    });
+    if (userIds.length > 1) {
+      this.showModal(t('modalConversationNotConnectedMessageMany'), titleText);
+    } else {
+      // TODO(Federation): Update code once connections are implemented on the backend
+      const userEntity = await this.userRepository.getUserById(userIds[0], null);
+      this.showModal(t('modalConversationNotConnectedMessageOne', userEntity.name()), titleText);
+    }
   }
 
   private showModal(messageText: string, titleText: string) {
@@ -2124,7 +2195,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-join' event
    * @returns Resolves when the event was handled
    */
-  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
@@ -2149,7 +2220,10 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
+    const updateSequence =
+      selfUserRejoins || connectionEntity?.isConnected()
+        ? this.updateConversationFromBackend(conversationEntity)
+        : Promise.resolve();
 
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
@@ -2252,7 +2326,7 @@ export class ConversationRepository {
     const nextConversationEt = isActiveConversation ? this.getNextConversation(conversationEntity) : undefined;
     const previouslyArchived = conversationEntity.is_archived();
 
-    this.conversationMapper.updateSelfStatus(conversationEntity, eventData);
+    ConversationMapper.updateSelfStatus(conversationEntity, eventData);
 
     const wasUnarchived = previouslyArchived && !conversationEntity.is_archived();
     if (wasUnarchived) {
@@ -2298,7 +2372,8 @@ export class ConversationRepository {
       const fileName = event.data.info.name;
       const contentType = event.data.content_type;
       if (!isAllowedFile(fileName, contentType)) {
-        const user = await this.userRepository.getUserById(event.from);
+        // TODO(Federation): Update code once sending assets is implemented on the backend
+        const user = await this.userRepository.getUserById(event.from, null);
         return this.injectFileTypeRestrictedMessage(
           conversationEntity,
           user,
@@ -2470,7 +2545,7 @@ export class ConversationRepository {
    */
   private async onRename(conversationEntity: Conversation, eventJson: EventJson) {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
-    this.conversationMapper.updateProperties(conversationEntity, eventJson.data);
+    ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
   }
 
@@ -2483,7 +2558,7 @@ export class ConversationRepository {
    */
   private async onReceiptModeChanged(conversationEntity: Conversation, eventJson: EventJson) {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
-    this.conversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data.receipt_mode});
+    ConversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data.receipt_mode});
     return {conversationEntity, messageEntity};
   }
 
@@ -2596,7 +2671,7 @@ export class ConversationRepository {
 
     const messageFromSelf = messageEntity.from === this.userState.self().id;
     if (messageFromSelf && event_data.reaction) {
-      const userEntity = await this.userRepository.getUserById(from);
+      const userEntity = await this.userRepository.getUserById(from, messageEntity.fromDomain);
       const reactionMessageEntity = new Message(messageEntity.id, SuperType.REACTION);
       reactionMessageEntity.user(userEntity);
       reactionMessageEntity.reaction = event_data.reaction;
@@ -2617,7 +2692,7 @@ export class ConversationRepository {
    * @returns Resolves when users have been update
    */
   private async updateMessageUserEntities(messageEntity: Message) {
-    const userEntity = await this.userRepository.getUserById(messageEntity.from);
+    const userEntity = await this.userRepository.getUserById(messageEntity.from, messageEntity.fromDomain);
     messageEntity.user(userEntity);
     const isMemberMessage = messageEntity.isMember();
     if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {

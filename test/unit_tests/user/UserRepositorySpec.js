@@ -27,6 +27,7 @@ import {EventRepository} from 'src/script/event/EventRepository';
 import {UserRepository} from 'src/script/user/UserRepository';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 import {TestFactory} from '../../helper/TestFactory';
+import {entities} from '../../api/payloads';
 
 describe('UserRepository', () => {
   let server = null;
@@ -148,20 +149,6 @@ describe('UserRepository', () => {
   });
 
   describe('User handling', () => {
-    describe('fetchUsersById', () => {
-      it('should handle malformed input', () => {
-        return testFactory.user_repository
-          .fetchUsersById()
-          .then(response => {
-            expect(response.length).toBe(0);
-            return testFactory.user_repository.fetchUsersById([undefined, undefined, undefined]);
-          })
-          .then(response => {
-            expect(response.length).toBe(0);
-          });
-      });
-    });
-
     describe('findUserById', () => {
       let user = null;
 

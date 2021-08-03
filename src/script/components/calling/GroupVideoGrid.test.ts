@@ -38,18 +38,16 @@ class GroupVideoGridPage extends TestPage<GroupVideoGripProps> {
 
 describe('GroupVideoGrid', () => {
   it('renders video grids', async () => {
-    const user = new User('id');
+    const user = new User('id', null);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [participant, participant],
-        hasRemoteVideo: false,
         thumbnail: null,
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: false,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
@@ -59,8 +57,8 @@ describe('GroupVideoGrid', () => {
   });
 
   it('maximizes a grid on double click', async () => {
-    const userOne = new User('idOne');
-    const userTwo = new User('idTwo');
+    const userOne = new User('idOne', null);
+    const userTwo = new User('idTwo', null);
     userOne.name('Testing User One');
     userOne.name('Testing User Two');
     const participantOne = new Participant(userOne, 'exampleOne');
@@ -69,12 +67,10 @@ describe('GroupVideoGrid', () => {
     const props: GroupVideoGripProps = {
       grid: {
         grid: [participantOne, participantTwo],
-        hasRemoteVideo: false,
         thumbnail: null,
       },
       maximizedParticipant,
       minimized: false,
-      muted: false,
       selfParticipant: participantOne,
       setMaximizedParticipant: () => {
         maximizedParticipant = participantTwo;
@@ -88,19 +84,17 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders a grid with paused video', async () => {
-    const user = new User('id');
+    const user = new User('id', null);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     participant.videoState(VIDEO_STATE.PAUSED);
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [participant],
-        hasRemoteVideo: false,
         thumbnail: null,
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: false,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
@@ -109,7 +103,7 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders thumbnail', async () => {
-    const user = new User('id');
+    const user = new User('id', null);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     participant.setVideoStream(new MediaStream());
@@ -117,12 +111,10 @@ describe('GroupVideoGrid', () => {
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [],
-        hasRemoteVideo: false,
         thumbnail: participant,
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: true,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });
@@ -132,7 +124,7 @@ describe('GroupVideoGrid', () => {
   });
 
   it('renders muted thumbnail', async () => {
-    const user = new User('id');
+    const user = new User('id', null);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
     participant.setVideoStream(new MediaStream());
@@ -140,12 +132,10 @@ describe('GroupVideoGrid', () => {
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
         grid: [],
-        hasRemoteVideo: false,
         thumbnail: participant,
       },
       maximizedParticipant: null,
       minimized: false,
-      muted: true,
       selfParticipant: participant,
       setMaximizedParticipant: () => undefined,
     });

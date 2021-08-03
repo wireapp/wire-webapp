@@ -7,9 +7,8 @@
     <ul class="left-list-items" data-bind="antiscroll: shouldUpdateScrollbar, bordered_list: archivedConversations, foreach: {data: archivedConversations, as: 'conversation', noChildContext: true}">
       <li>
         <conversation-list-cell
-          data-bind="click: () => clickOnConversation(conversation), event: {'contextmenu': (_, event) => listViewModel.onContextMenu(conversation, event)}"
           data-uie-name="item-conversation-archived"
-          params="rightClick: listViewModel.onContextMenu, conversation: conversation, onJoinCall: onJoinCall">
+          params="onClick: () => clickOnConversation(conversation), rightClick: listViewModel.onContextMenu, conversation: conversation, onJoinCall: onJoinCall">
         </conversation-list-cell>
       </li>
     </ul>

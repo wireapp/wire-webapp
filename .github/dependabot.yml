@@ -8,25 +8,24 @@ updates:
       timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - "type: chore \U0001F9F9"
+      - 'type: chore 🧹'
   - package-ecosystem: npm
     directory: '/'
     schedule:
       interval: weekly
       day: sunday
-      time: '01:00'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - "type: chore \U0001F9F9"
+      - 'type: chore 🧹'
     ignore:
       - dependency-name: core-js
         versions:
           - '>= 3.a'
-          - '< 4'
       - dependency-name: webrtc-adapter
         versions:
           - '>= 7.a'
-          - '< 8'
       - dependency-name: 'less'
         versions:
           - '>= 4'
@@ -36,20 +35,21 @@ updates:
       - dependency-name: 'tsyringe'
         versions:
           - '> 4.3.0'
+      - dependency-name: '@wireapp/avs'
   - package-ecosystem: npm
     directory: '/server'
     schedule:
       interval: weekly
       day: sunday
-      time: '01:00'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - "type: chore \U0001F9F9"
+      - 'type: chore 🧹'
     ignore:
       - dependency-name: geolite2
         versions:
-          - '>= 3.a'
-          - '< 4'
+          - '>= 2.a'
       - dependency-name: '@types/node'
         versions:
           - '>= 13.a'
@@ -58,10 +58,11 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: '01:00'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
     open-pull-requests-limit: 99
     labels:
-      - "type: chore \U0001F9F9"
+      - 'type: chore 🧹'
     ignore:
       - dependency-name: electron
         versions:

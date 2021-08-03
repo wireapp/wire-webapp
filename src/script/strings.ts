@@ -347,7 +347,7 @@ export const unsupportedStrings = defineMessages({
 
 export const unsupportedJoinStrings = defineMessages({
   unsupportedJoinHeadline: {
-    defaultMessage: 'You have been invited {newline}to join a <strong>{brandName} guest room.</strong>',
+    defaultMessage: 'You have been invited to join a conversation in {brandName}',
     id: 'conversationJoin.unsupportedJoinHeadline',
   },
   unsupportedJoinMobileSubhead: {
@@ -358,7 +358,7 @@ export const unsupportedJoinStrings = defineMessages({
 
 export const conversationJoinStrings = defineMessages({
   existentAccountHeadline: {
-    defaultMessage: '{name}, you have been invited {newline}to join a <strong>{brandName} guest room.</strong>',
+    defaultMessage: '{name}, you have been invited to join a conversation in {brandName}',
     id: 'conversationJoin.existentAccountHeadline',
   },
   existentAccountJoinWithoutLink: {
@@ -366,7 +366,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.existentAccountJoinWithoutLink',
   },
   existentAccountJoinWithoutText: {
-    defaultMessage: 'without an account.',
+    defaultMessage: '{existentAccountJoinWithoutLink} without an account',
     id: 'conversationJoin.existentAccountJoinWithoutText',
   },
   existentAccountOpenButton: {
@@ -374,15 +374,16 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.buttonExistentAccountOpen',
   },
   existentAccountSubhead: {
-    defaultMessage: 'Guest rooms let you have conversations with people who are not on your team.',
-    id: 'conversationJoin.subheadExistentAccount',
+    defaultMessage:
+      'Audio and video conferencing, text messaging, file sharing, and screen sharing, all end-to-end-encrypted.',
+    id: 'conversationJoin.existentAccountSubhead',
   },
   fullConversationHeadline: {
-    defaultMessage: 'This <strong>{brandName} guest room</strong>{newline}is full.',
+    defaultMessage: 'Unable to join conversation',
     id: 'conversationJoin.fullConversationHeadline',
   },
   fullConversationSubhead: {
-    defaultMessage: 'Talk to the person who invited you.',
+    defaultMessage: 'The maximum number of participants in this conversation has been reached.',
     id: 'conversationJoin.fullConversationSubhead',
   },
   hasAccount: {
@@ -390,7 +391,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.hasAccount',
   },
   headline: {
-    defaultMessage: 'You have been invited {newline}to join a <strong>{brandName} guest room.</strong>',
+    defaultMessage: 'You have been invited to join a conversation in {brandName}',
     id: 'conversationJoin.headline',
   },
   invalidCreateAccountLink: {
@@ -402,11 +403,11 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.invalidCreateAccountText',
   },
   invalidHeadline: {
-    defaultMessage: 'This <strong>{brandName} guest room</strong>{newline}is now closed.',
+    defaultMessage: 'Conversation not found',
     id: 'conversationJoin.invalidHeadline',
   },
   invalidSubhead: {
-    defaultMessage: 'Ask the person who invited you how to join.',
+    defaultMessage: 'The link to this group conversation expired or the conversation was set to private.',
     id: 'conversationJoin.invalidSubhead',
   },
   loginLink: {
@@ -418,7 +419,7 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.namePlaceholder',
   },
   subhead: {
-    defaultMessage: 'Encrypted group messaging and conference calls. {newline}No account necessary.',
+    defaultMessage: 'Join conversation as temporary guest (access expires after 24 hours)',
     id: 'conversationJoin.subhead',
   },
 });

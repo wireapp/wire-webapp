@@ -33,6 +33,8 @@ import {ConversationState} from '../../conversation/ConversationState';
 import {MessageCategory} from '../../message/MessageCategory';
 import {Message} from '../../entity/message/Message';
 
+import '../../page/collection/FullSearch';
+
 export class CollectionViewModel {
   collectionDetails: CollectionDetailsViewModel;
   conversationEntity: ko.Observable<Conversation>;

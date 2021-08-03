@@ -34,15 +34,15 @@ import 'Components/asset/controls/MediaButton';
 import 'Components/asset/controls/SeekBar';
 import 'Components/CopyToClipboard';
 import 'Components/message/EphemeralTimer';
-import '../page/collection/fullSearch';
 import '../page/start-ui/GroupList';
 import 'Components/toggle/GuestModeToggle';
 import 'Components/icons';
 import 'Components/Image';
 import 'Components/toggle/InfoToggle';
 import '../page/preferences/InputLevel';
-import 'Components/list/conversationListCallingCell';
-import 'Components/list/conversationListCell';
+import 'Components/calling/FullscreenVideoCall';
+import 'Components/list/ConversationListCallingCell';
+import 'Components/list/ConversationListCell';
 import 'Components/avatar/GroupAvatar';
 import 'Components/message';
 import 'Components/message/messageQuote';
@@ -103,8 +103,10 @@ declare global {
           ENABLE_DEBUG: boolean;
           ENABLE_DOMAIN_DISCOVERY: boolean;
           ENABLE_FEDERATION: boolean;
+          ENABLE_MEDIA_EMBEDS: boolean;
           ENABLE_PHONE_LOGIN: boolean;
           ENABLE_SSO: boolean;
+          ENFORCE_CONSTANT_BITRATE: boolean;
           FEDERATION_DOMAIN: string;
           PERSIST_TEMPORARY_CLIENTS: boolean;
           SHOW_LOADING_INFORMATION: boolean;
@@ -115,6 +117,7 @@ declare global {
         URL: {
           ACCOUNT_BASE: string;
           MOBILE_BASE: string;
+          PRICING: string;
           PRIVACY_POLICY: string;
           SUPPORT: {
             BUG_REPORT: string;

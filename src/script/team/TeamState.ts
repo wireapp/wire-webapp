@@ -19,13 +19,14 @@
 
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
-import {FeatureList} from '@wireapp/api-client/src/team/feature/';
+import {FeatureList, FeatureStatus} from '@wireapp/api-client/src/team/feature/';
 
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {User} from '../entity/User';
 import {UserState} from '../user/UserState';
 import {TeamEntity} from './TeamEntity';
+import {ROLE} from '../user/UserPermission';
 
 @singleton()
 export class TeamState {
@@ -35,6 +36,10 @@ export class TeamState {
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList>;
+  public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
+  public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
+  public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
+  public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnforced: ko.PureComputed<boolean>;
   public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
@@ -71,19 +76,31 @@ export class TeamState {
     this.userState.teamMembers = this.teamMembers;
     this.userState.teamUsers = this.teamUsers;
 
-    this.isAppLockEnabled = ko.pureComputed(() => {
-      const appLock = this.teamFeatures()?.['appLock'];
-      return appLock?.status === 'enabled';
+    this.isFileSharingSendingEnabled = ko.pureComputed(() => {
+      const status = this.teamFeatures()?.fileSharing?.status;
+      return status ? status === FeatureStatus.ENABLED : true;
+    });
+    this.isFileSharingReceivingEnabled = ko.pureComputed(() => {
+      const status = this.teamFeatures()?.fileSharing?.status;
+      return status ? status === FeatureStatus.ENABLED : true;
     });
 
-    this.isAppLockEnforced = ko.pureComputed(() => {
-      const appLock = this.teamFeatures()?.['appLock'];
-      return appLock?.config?.enforceAppLock;
-    });
-
-    this.appLockInactivityTimeoutSecs = ko.pureComputed(() => {
-      const appLock = this.teamFeatures()?.['appLock'];
-      return appLock?.config?.inactivityTimeoutSecs;
-    });
+    this.isVideoCallingEnabled = ko.pureComputed(
+      // TODO connect to video calling feature config
+      () => true || this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
+    );
+    this.isConferenceCallingEnabled = ko.pureComputed(
+      // TODO connect to conference calling feature config
+      () => true || this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
+    );
+    this.isAppLockEnabled = ko.pureComputed(() => this.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED);
+    this.isAppLockEnforced = ko.pureComputed(() => this.teamFeatures()?.appLock?.config?.enforceAppLock);
+    this.appLockInactivityTimeoutSecs = ko.pureComputed(
+      () => this.teamFeatures()?.appLock?.config?.inactivityTimeoutSecs,
+    );
   }
+
+  readonly isExternal = (userId: string): boolean => {
+    return this.memberRoles()[userId] === ROLE.PARTNER;
+  };
 }

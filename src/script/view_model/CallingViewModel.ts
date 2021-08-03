@@ -25,12 +25,11 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import 'Components/calling/ChooseScreen';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 
 import {AudioType} from '../audio/AudioType';
 import type {Call} from '../calling/Call';
 import type {CallingRepository} from '../calling/CallingRepository';
-import {getGrid, Grid} from '../calling/videoGridHandler';
 import type {User} from '../entity/User';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
@@ -40,16 +39,19 @@ import type {PermissionRepository} from '../permission/PermissionRepository';
 import {PermissionStatusState} from '../permission/PermissionStatusState';
 import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
-import type {Participant} from '../calling/Participant';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
+import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
+import {TeamState} from '../team/TeamState';
+import {Config} from '../Config';
+import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 export interface CallActions {
   answer: (call: Call) => void;
+  changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
-  setMaximizedTileVideoParticipant: (participant: Participant) => void;
   setVideoSpeakersActiveTab: (tab: string) => void;
   startAudio: (conversationEntity: Conversation) => void;
   startVideo: (conversationEntity: Conversation) => void;
@@ -60,12 +62,15 @@ export interface CallActions {
   toggleScreenshare: (call: Call) => void;
 }
 
-export const VideoSpeakersTabs = {
-  speakers: 'speakers',
-  // explicitly disabled.
-  // eslint-disable-next-line sort-keys-fix/sort-keys-fix
-  all: 'all',
-};
+export enum VideoSpeakersTab {
+  ALL = 'all',
+  SPEAKERS = 'speakers',
+}
+
+export const VideoSpeakersTabs: ButtonGroupTab[] = [
+  {getText: () => t('videoSpeakersTabSpeakers'), value: VideoSpeakersTab.SPEAKERS},
+  {getText: substitute => t('videoSpeakersTabAll', substitute), value: VideoSpeakersTab.ALL},
+];
 
 declare global {
   interface HTMLAudioElement {
@@ -74,16 +79,10 @@ declare global {
 }
 
 export class CallingViewModel {
-  private onChooseScreen: (deviceId: string) => void;
-
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
-  readonly isChoosingScreen: ko.PureComputed<boolean>;
-  readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
-  readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isSelfVerified: ko.Computed<boolean>;
   readonly videoSpeakersActiveTab: ko.Observable<string>;
-  readonly maximizedTileVideoParticipant: ko.Observable<Participant | null>;
 
   constructor(
     readonly callingRepository: CallingRepository,
@@ -96,6 +95,7 @@ export class CallingViewModel {
     readonly multitasking: Multitasking,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
@@ -108,14 +108,6 @@ export class CallingViewModel {
         return call.reason() !== CALL_REASON.ANSWERED_ELSEWHERE;
       }),
     );
-    this.selectableScreens = ko.observable([]);
-    this.selectableWindows = ko.observable([]);
-    this.isChoosingScreen = ko.pureComputed(
-      () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
-    );
-    this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTabs.all);
-    this.maximizedTileVideoParticipant = ko.observable(null);
-    this.onChooseScreen = () => {};
 
     const ring = (call: Call): void => {
       const sounds: Partial<Record<CALL_STATE, AudioType>> = {
@@ -177,25 +169,32 @@ export class CallingViewModel {
           this.callingRepository.answerCall(call);
         }
       },
+      changePage: (newPage, call) => {
+        this.callingRepository.changeCallPage(newPage, call);
+      },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
-        this.videoSpeakersActiveTab(VideoSpeakersTabs.all);
-        this.maximizedTileVideoParticipant(null);
+        callState.videoSpeakersActiveTab(VideoSpeakersTab.ALL);
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
       },
-      setMaximizedTileVideoParticipant: (participant: Participant) => {
-        this.maximizedTileVideoParticipant(participant);
-      },
       setVideoSpeakersActiveTab: (tab: string) => {
-        this.videoSpeakersActiveTab(tab);
+        callState.videoSpeakersActiveTab(tab);
       },
       startAudio: (conversationEntity: Conversation): void => {
-        startCall(conversationEntity, CALL_TYPE.NORMAL);
+        if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
+          this.showRestrictedConferenceCallingModal();
+        } else {
+          startCall(conversationEntity, CALL_TYPE.NORMAL);
+        }
       },
-      startVideo(conversationEntity: Conversation): void {
-        startCall(conversationEntity, CALL_TYPE.VIDEO);
+      startVideo: (conversationEntity: Conversation): void => {
+        if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
+          this.showRestrictedConferenceCallingModal();
+        } else {
+          startCall(conversationEntity, CALL_TYPE.VIDEO);
+        }
       },
       switchCameraInput: (call: Call, deviceId: string) => {
         this.mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
@@ -215,18 +214,18 @@ export class CallingViewModel {
         }
         const showScreenSelection = (): Promise<void> => {
           return new Promise(resolve => {
-            this.onChooseScreen = (deviceId: string): void => {
+            this.callingRepository.onChooseScreen = (deviceId: string): void => {
               this.mediaDevicesHandler.currentDeviceId.screenInput(deviceId);
-              this.selectableScreens([]);
-              this.selectableWindows([]);
+              this.callState.selectableScreens([]);
+              this.callState.selectableWindows([]);
               resolve();
             };
             this.mediaDevicesHandler.getScreenSources().then((sources: ElectronDesktopCapturerSource[]) => {
               if (sources.length === 1) {
-                return this.onChooseScreen(sources[0].id);
+                return this.callingRepository.onChooseScreen(sources[0].id);
               }
-              this.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
-              this.selectableWindows(sources.filter(source => source.id.startsWith('window')));
+              this.callState.selectableScreens(sources.filter(source => source.id.startsWith('screen')));
+              this.callState.selectableWindows(sources.filter(source => source.id.startsWith('window')));
             });
           });
         };
@@ -243,12 +242,28 @@ export class CallingViewModel {
     };
   }
 
-  getVideoGrid(call: Call): ko.PureComputed<Grid> {
-    return getGrid(call);
-  }
-
-  hasVideos(call: Call): boolean {
-    return !!call.participants().find(participant => participant.hasActiveVideo());
+  private showRestrictedConferenceCallingModal() {
+    const replaceEnterprise = replaceLink(
+      Config.getConfig().URL.PRICING,
+      'modal__text__read-more',
+      'read-more-pricing',
+    );
+    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+      primaryAction: {
+        action: () => {
+          safeWindowOpen(Config.getConfig().URL.PRICING);
+        },
+        text: t('callingRestrictedConferenceCallModalUpgradeButton'),
+      },
+      text: {
+        htmlMessage: t(
+          'callingRestrictedConferenceCallModalDescription',
+          {brandName: Config.getConfig().BRAND_NAME},
+          replaceEnterprise,
+        ),
+        title: t('callingRestrictedConferenceCallModalTitle'),
+      },
+    });
   }
 
   isIdle(call: Call): boolean {
@@ -280,7 +295,7 @@ export class CallingViewModel {
   }
 
   readonly onCancelScreenSelection = () => {
-    this.selectableScreens([]);
-    this.selectableWindows([]);
+    this.callState.selectableScreens([]);
+    this.callState.selectableWindows([]);
   };
 }

@@ -23,6 +23,8 @@ import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/C
 import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
+import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
+import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/src/team/feature/';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -36,7 +38,7 @@ import {Runtime} from '@wireapp/commons';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/LocalizerUtil';
 import {loadDataUrl} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Environment} from 'Util/Environment';
@@ -51,12 +53,15 @@ import {User} from '../entity/User';
 import {TeamService} from './TeamService';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {UserRepository} from '../user/UserRepository';
-import {EventRepository} from '../event/EventRepository';
 import {TeamMemberEntity} from './TeamMemberEntity';
 import {ServiceEntity} from '../integration/ServiceEntity';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
 import {TeamState} from './TeamState';
+import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
+import {EventSource} from '../event/EventSource';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {Config} from '../Config';
 
 export interface AccountInfo {
   accentID: number;
@@ -69,6 +74,7 @@ export interface AccountInfo {
 }
 
 export class TeamRepository {
+  private static readonly LOCAL_STORAGE_FEATURE_CONFIG_KEY = 'FEATURE_CONFIG_KEY';
   private readonly logger: Logger;
   readonly teamService: TeamService;
   private readonly teamMapper: TeamMapper;
@@ -100,15 +106,12 @@ export class TeamRepository {
     };
 
     amplify.subscribe(WebAppEvents.TEAM.EVENT_FROM_BACKEND, this.onTeamEvent);
+    amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.onNotificationHandlingStateChange);
     amplify.subscribe(WebAppEvents.TEAM.UPDATE_INFO, this.sendAccountInfo.bind(this));
   }
 
   readonly getRoleBadge = (userId: string): string => {
-    return this.isExternal(userId) ? t('rolePartner') : '';
-  };
-
-  readonly isExternal = (userId: string): boolean => {
-    return this.teamState.memberRoles()[userId] === ROLE.PARTNER;
+    return this.teamState.isExternal(userId) ? t('rolePartner') : '';
   };
 
   readonly isSelfConnectedTo = (userId: string): boolean => {
@@ -122,8 +125,8 @@ export class TeamRepository {
     const team = await this.getTeam();
     if (this.userState.self().teamId) {
       await this.updateTeamMembers(team);
-      this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures(team.id));
     }
+    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
     this.scheduleFetchTeamInfo();
   };
 
@@ -202,7 +205,7 @@ export class TeamRepository {
     return IntegrationMapper.mapServicesFromArray(servicesData);
   }
 
-  readonly onTeamEvent = (eventJson: any, source: typeof EventRepository.SOURCE): void => {
+  readonly onTeamEvent = (eventJson: any, source: EventSource): void => {
     const type = eventJson.type;
 
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
@@ -231,6 +234,10 @@ export class TeamRepository {
       }
       case TEAM_EVENT.UPDATE: {
         this.onUpdate(eventJson);
+        break;
+      }
+      case TEAM_EVENT.FEATURE_CONFIG_UPDATE: {
+        this.onFeatureConfigUpdate(eventJson, source);
         break;
       }
       case TEAM_EVENT.CONVERSATION_CREATE:
@@ -366,10 +373,141 @@ export class TeamRepository {
     const isOtherUser = this.userState.self().id !== userId;
 
     if (isLocalTeam && isOtherUser) {
-      this.userRepository.getUserById(userId).then(userEntity => this.addUserToTeam(userEntity));
+      this.userRepository
+        .getUserById(userId, this.userState.self().domain)
+        .then(userEntity => this.addUserToTeam(userEntity));
       this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), member));
     }
   }
+
+  private readonly onNotificationHandlingStateChange = async (
+    handlingNotifications: NOTIFICATION_HANDLING_STATE,
+  ): Promise<void> => {
+    const shouldFetchConfig = handlingNotifications === NOTIFICATION_HANDLING_STATE.WEB_SOCKET;
+
+    if (shouldFetchConfig) {
+      const featureConfigList = await this.teamService.getAllTeamFeatures();
+      this.teamState.teamFeatures(featureConfigList);
+      this.handleConfigUpdate(featureConfigList);
+    }
+  };
+
+  private readonly onFeatureConfigUpdate = async (
+    eventJson: TeamEvent & {name: FEATURE_KEY},
+    source: EventSource,
+  ): Promise<void> => {
+    if (source !== EventSource.WEB_SOCKET) {
+      // Ignore notification stream events
+      return;
+    }
+    if (eventJson.name === FEATURE_KEY.FILE_SHARING) {
+      const featureConfigList = await this.teamService.getAllTeamFeatures();
+      this.teamState.teamFeatures(featureConfigList);
+      this.handleConfigUpdate(featureConfigList);
+    }
+  };
+
+  private readonly handleConfigUpdate = (featureConfigList: FeatureList) => {
+    const previousConfig = this.loadPreviousFeatureConfig();
+
+    if (previousConfig) {
+      this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
+      this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
+      this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
+    }
+
+    this.saveFeatureConfig(featureConfigList);
+  };
+
+  private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    const changeList = [];
+
+    const hasFileSharingChanged = previousConfig?.fileSharing?.status !== newConfig?.fileSharing?.status;
+    if (hasFileSharingChanged) {
+      const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
+      changeList.push(
+        `<li>${
+          hasChangedToEnabled
+            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
+            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled')
+        }</li>`,
+      );
+    }
+
+    if (hasFileSharingChanged) {
+      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: message,
+          title: t('featureConfigChangeModalFileSharingHeadline'),
+        },
+      });
+    }
+  };
+
+  private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    const changeList = [];
+
+    const hasVideoCallingChanged = previousConfig?.videoCalling?.status !== newConfig?.videoCalling?.status;
+    if (hasVideoCallingChanged) {
+      const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
+      changeList.push(
+        `<li>${
+          hasChangedToEnabled
+            ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
+            : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled')
+        }</li>`,
+      );
+    }
+
+    if (hasVideoCallingChanged) {
+      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: message,
+          title: t('featureConfigChangeModalAudioVideoHeadline'),
+        },
+      });
+    }
+  };
+
+  private readonly handleConferenceCallingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    if (previousConfig?.conferenceCalling?.status !== newConfig?.conferenceCalling?.status) {
+      const hasChangedToEnabled = newConfig?.conferenceCalling?.status === FeatureStatus.ENABLED;
+      if (hasChangedToEnabled) {
+        const replaceEnterprise = replaceLink(
+          Config.getConfig().URL.PRICING,
+          'modal__text__read-more',
+          'read-more-pricing',
+        );
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            htmlMessage: t(
+              'featureConfigChangeModalConferenceCallingEnabled',
+              {brandName: Config.getConfig().BRAND_NAME},
+              replaceEnterprise,
+            ),
+            title: t('featureConfigChangeModalConferenceCallingTitle', {brandName: Config.getConfig().BRAND_NAME}),
+          },
+        });
+      }
+    }
+  };
+
+  private readonly loadPreviousFeatureConfig = (): FeatureList | void => {
+    const featureConfigs: {[selfId: string]: FeatureList} = JSON.parse(
+      window.localStorage.getItem(TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY),
+    );
+    if (featureConfigs && featureConfigs[this.userState.self().id]) {
+      return featureConfigs[this.userState.self().id];
+    }
+  };
+
+  private readonly saveFeatureConfig = (featureConfigList: FeatureList): void =>
+    window.localStorage.setItem(
+      TeamRepository.LOCAL_STORAGE_FEATURE_CONFIG_KEY,
+      JSON.stringify({[this.userState.self().id]: featureConfigList}),
+    );
 
   private onMemberLeave(eventJson: TeamMemberLeaveEvent): void {
     const {
@@ -386,7 +524,13 @@ export class TeamRepository {
       }
 
       this.teamState.team().members.remove(member => member.id === userId);
-      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, userId, new Date(time).toISOString());
+      amplify.publish(
+        WebAppEvents.TEAM.MEMBER_LEAVE,
+        teamId,
+        userId,
+        this.userState.self().domain,
+        new Date(time).toISOString(),
+      );
     }
   }
 

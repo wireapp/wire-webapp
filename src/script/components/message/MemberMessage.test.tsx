@@ -54,7 +54,7 @@ describe('MemberMessage', () => {
       hasReadReceiptsTurnedOn: false,
       isSelfTemporaryGuest: false,
       message: createMemberMessage({
-        otherUser: ko.pureComputed(() => new User('id')),
+        otherUser: ko.pureComputed(() => new User('id', null)),
         showLargeAvatar: () => true,
       }),
       onClickCancelRequest: () => {},

@@ -20,9 +20,8 @@
 import {getGrid} from 'src/script/calling/videoGridHandler';
 import {Participant} from 'src/script/calling/Participant';
 import {Call} from 'src/script/calling/Call';
-import {CONV_TYPE, CALL_TYPE} from '@wireapp/avs';
+import {CONV_TYPE, CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 import {User} from 'src/script/entity/User';
-
 describe('videoGridHandler', () => {
   let participants;
 
@@ -66,21 +65,25 @@ describe('videoGridHandler', () => {
         ];
 
         const participantsObs = ko.observable([]);
-        const selfUser = new User();
+        const selfUser = new User('self_id');
         selfUser.isMe = true;
         const selfParticipant = new Participant(selfUser, 'selfdevice');
+        selfParticipant.videoState(VIDEO_STATE.STARTED);
+        selfParticipant.videoStream({});
         const call = new Call('', '', undefined, selfParticipant, CALL_TYPE.NORMAL, {
           currentAvailableDeviceId: {
             audioOutput: ko.pureComputed(() => 'test'),
           },
         });
         call.participants = participantsObs;
-        const grid = getGrid(call);
         tests.forEach(({oldParticipants, newParticipants, expected, scenario}) => {
           participantsObs([selfParticipant, ...oldParticipants]);
           participantsObs([selfParticipant, ...newParticipants]);
-
-          expect(grid().grid.map(toParticipantId)).toEqual(expected.map(toParticipantId), scenario);
+          let result = expected.map(toParticipantId);
+          if (expected.length > 1) {
+            result = [selfParticipant.user.id, ...expected.map(toParticipantId)];
+          }
+          expect(getGrid(call).grid.map(toParticipantId)).toEqual(result, scenario);
         });
       });
     });
@@ -96,9 +99,9 @@ describe('videoGridHandler', () => {
         call.addParticipant(participants[0]);
         const grid = getGrid(call);
 
-        expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
+        expect(grid.grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
 
-        expect(grid().thumbnail).toBe(selfParticipant);
+        expect(grid.thumbnail).toBe(selfParticipant);
       });
 
       it('places the self user in the grid for any call type with just one other participant', () => {
@@ -111,9 +114,9 @@ describe('videoGridHandler', () => {
         call.addParticipant(participants[0]);
         const grid = getGrid(call);
 
-        expect(grid().grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
+        expect(grid.grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
 
-        expect(grid().thumbnail).toBe(selfParticipant);
+        expect(grid.thumbnail).toBe(selfParticipant);
       });
 
       it('places the self user in the grid if there are no other video participants', () => {
@@ -125,9 +128,9 @@ describe('videoGridHandler', () => {
         });
         const grid = getGrid(call);
 
-        expect(grid().grid.map(toParticipantId)).toEqual([selfParticipant].map(toParticipantId));
+        expect(grid.grid.map(toParticipantId)).toEqual([selfParticipant].map(toParticipantId));
 
-        expect(grid().thumbnail).toBe(null);
+        expect(grid.thumbnail).toBe(null);
       });
 
       it('places the self user in the grid if there are more than 1 other participant', () => {
@@ -141,11 +144,11 @@ describe('videoGridHandler', () => {
         call.addParticipant(participants[1]);
         const grid = getGrid(call);
 
-        expect(grid().grid.map(toParticipantId)).toEqual(
+        expect(grid.grid.map(toParticipantId)).toEqual(
           [selfParticipant, participants[0], participants[1]].map(toParticipantId),
         );
 
-        expect(grid().thumbnail).toBe(null);
+        expect(grid.thumbnail).toBe(null);
       });
     });
   });

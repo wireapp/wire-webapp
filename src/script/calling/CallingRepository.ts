@@ -80,6 +80,7 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
+import {TeamState} from '../team/TeamState';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -112,6 +113,7 @@ export class CallingRepository {
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
+  onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
     return {
@@ -130,6 +132,7 @@ export class CallingRepository {
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
@@ -166,10 +169,14 @@ export class CallingRepository {
     };
 
     this.subscribeToEvents();
+
+    this.onChooseScreen = (deviceId: string) => {};
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
-    this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
+    if (!Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
+      this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
+    }
   };
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -396,6 +403,7 @@ export class CallingRepository {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     try {
+      camera = this.teamState.isVideoCallingEnabled() ? camera : false;
       const mediaStream = await this.getMediaStream({audio, camera}, isGroup);
       if (call.state() !== CALL_STATE.NONE) {
         call.getSelfParticipant().updateMediaStream(mediaStream);
@@ -745,6 +753,8 @@ export class CallingRepository {
   rejectCall(conversationId: ConversationId): void {
     this.wCall.reject(this.wUser, conversationId);
   }
+
+  changeCallPage(newPage: number, call: Call): void {}
 
   readonly leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
@@ -1117,6 +1127,9 @@ export class CallingRepository {
     if (call.participants().length > call.analyticsMaximumParticipants) {
       call.analyticsMaximumParticipants = call.participants().length;
     }
+
+    call.updatePages();
+    this.changeCallPage(call.currentPage(), call);
   }
 
   private readonly handleCallParticipantChanges = (conversationId: ConversationId, membersJson: string) => {
@@ -1239,18 +1252,19 @@ export class CallingRepository {
 
   private readonly updateParticipantVideoStream = (
     conversationId: ConversationId,
-    userId: UserId,
-    clientId: ClientId,
-    streams: MediaStream[],
+    remoteUserId: UserId,
+    remoteClientId: ClientId,
+    streams: readonly MediaStream[] | null,
   ): void => {
-    let participant = this.findParticipant(conversationId, userId, clientId);
+    let participant = this.findParticipant(conversationId, remoteUserId, remoteClientId);
     if (!participant) {
-      participant = new Participant(this.userRepository.findUserById(userId), clientId);
+      participant = new Participant(this.userRepository.findUserById(remoteUserId), remoteClientId);
       const call = this.findCall(conversationId);
       call.addParticipant(participant);
     }
 
-    if (streams.length === 0) {
+    if (streams === null || streams.length === 0) {
+      participant.releaseVideoStream();
       return;
     }
 
@@ -1262,7 +1276,7 @@ export class CallingRepository {
 
   private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
     const activeCall = this.callState.activeCalls()[0];
-    if (activeCall) {
+    if (activeCall && !Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
       activeCall.isCbrEnabled(!!enabled);
     }
   };

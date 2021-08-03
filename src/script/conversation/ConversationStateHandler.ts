@@ -31,15 +31,14 @@ import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import type {Conversation} from '../entity/Conversation';
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_STATE} from './AccessState';
-import type {ConversationMapper} from './ConversationMapper';
+import {ConversationMapper} from './ConversationMapper';
 import type {ConversationService} from './ConversationService';
 import {ConversationEvent} from './EventBuilder';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
-  private readonly conversationMapper: ConversationMapper;
   private readonly conversationService: ConversationService;
 
-  constructor(conversationService: ConversationService, conversationMapper: ConversationMapper) {
+  constructor(conversationService: ConversationService) {
     super();
     const eventHandlingConfig: EventHandlingConfig = {
       [CONVERSATION_EVENT.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),
@@ -47,7 +46,6 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       [CONVERSATION_EVENT.CODE_UPDATE]: this._updateConversationAccessCode.bind(this),
     };
     this.setEventHandlingConfig(eventHandlingConfig);
-    this.conversationMapper = conversationMapper;
     this.conversationService = conversationService;
   }
 
@@ -96,7 +94,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
   async getAccessCode(conversationEntity: Conversation): Promise<void> {
     try {
       const response = await this.conversationService.getConversationCode(conversationEntity.id);
-      return this.conversationMapper.mapAccessCode(conversationEntity, response);
+      return ConversationMapper.mapAccessCode(conversationEntity, response);
     } catch (error) {
       const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (!isNotFound) {
@@ -110,7 +108,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       const response = await this.conversationService.postConversationCode(conversationEntity.id);
       const accessCode = response && response.data;
       if (accessCode) {
-        this.conversationMapper.mapAccessCode(conversationEntity, accessCode);
+        ConversationMapper.mapAccessCode(conversationEntity, accessCode);
       }
     } catch (e) {
       return this._showModal(t('modalConversationGuestOptionsRequestCodeMessage'));
@@ -131,7 +129,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     eventJson: ConversationEvent<ConversationAccessUpdateData>,
   ): void {
     const {access: accessModes, access_role: accessRole} = eventJson.data;
-    this.conversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
+    ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
   }
 
   private _resetConversationAccessCode(conversationEntity: Conversation): void {
@@ -142,7 +140,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     conversationEntity: Conversation,
     eventJson: ConversationEvent<ConversationCode>,
   ): void {
-    this.conversationMapper.mapAccessCode(conversationEntity, eventJson.data);
+    ConversationMapper.mapAccessCode(conversationEntity, eventJson.data);
   }
 
   private _showModal(message: string): void {

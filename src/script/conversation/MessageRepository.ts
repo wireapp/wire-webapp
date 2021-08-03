@@ -42,14 +42,14 @@ import {
 import {ReactionType} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation/';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
+import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {getDifference} from 'Util/ArrayUtil';
 import {arrayToBase64, createRandomUuid, loadUrlBlob} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -106,6 +106,8 @@ import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
 import {isBackendError} from 'Util/TypePredicateUtil';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http';
+import {Config} from '../Config';
 
 type ConversationEvent = {conversation: string; id: string};
 type EventJson = any;
@@ -243,6 +245,15 @@ export class MessageRepository {
       }
     }
     return undefined;
+  }
+
+  async sendFederatedMessage(message: string): Promise<void> {
+    const conversation = this.conversationState.activeConversation();
+    const userIds: string[] | QualifiedId[] = conversation.domain
+      ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
+      : conversation.allUserEntities.map(user => user.id);
+
+    await this.cryptography_repository.sendCoreMessage(message, conversation.id, userIds, conversation.domain);
   }
 
   /**
@@ -1248,7 +1259,7 @@ export class MessageRepository {
     if (ensureUser) {
       return messagePromise.then(message => {
         if (message.from && !message.user().id) {
-          return this.userRepository.getUserById(message.from).then(userEntity => {
+          return this.userRepository.getUserById(message.from, message.user().domain).then(userEntity => {
             message.user(userEntity);
             return message as ContentMessage;
           });
@@ -1277,7 +1288,11 @@ export class MessageRepository {
       // Since this is a bare API client user we use `.deleted`
       const isDeleted = user.deleted === true;
       if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, user.id);
+        await this.conversationRepositoryProvider().teamMemberLeave(
+          this.teamState.team().id,
+          user.id,
+          this.userState.self().domain,
+        );
       }
     }
   }
@@ -1494,7 +1509,9 @@ export class MessageRepository {
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId))),
+            Promise.all(
+              clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId, null)),
+            ),
           ),
         );
 
@@ -1517,7 +1534,9 @@ export class MessageRepository {
         await Promise.all(
           Object.values(qualifiedUsersMap).map(userClientMap =>
             Object.entries(userClientMap).map(([userId, clients]) => {
-              return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+              return Promise.all(
+                clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)),
+              );
             }),
           ),
         );
@@ -1701,6 +1720,34 @@ export class MessageRepository {
       return response;
     } catch (axiosError) {
       const error = axiosError.response?.data;
+
+      const hasNoLegalholdConsent = error?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
+      const ignoredMessageTypes = [GENERIC_MESSAGE_TYPE.CONFIRMATION];
+      if (hasNoLegalholdConsent && !ignoredMessageTypes.includes(messageType as GENERIC_MESSAGE_TYPE)) {
+        const replaceLinkLegalHold = replaceLink(
+          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
+          '',
+          'read-more-legal-hold',
+        );
+        await new Promise<void>(resolve => {
+          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+            primaryAction: {
+              action: () => {
+                resolve();
+              },
+            },
+            text: {
+              htmlMessage: t('legalHoldMessageSendingMissingConsentMessage', {}, replaceLinkLegalHold),
+              title: t('legalHoldMessageSendingMissingConsentTitle'),
+            },
+          });
+        });
+        throw new ConversationError(
+          ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+          ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+        );
+      }
+
       const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
       if (isUnknownClient) {
         this.clientRepository.removeLocalClient();

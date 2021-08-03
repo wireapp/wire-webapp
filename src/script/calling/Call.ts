@@ -20,12 +20,16 @@
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
+import {chunk} from 'Util/ArrayUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {Config} from '../Config';
 
 export type ConversationId = string;
+
+const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = Infinity;
 
 interface ActiveSpeaker {
   audio_level: number;
@@ -45,10 +49,16 @@ export class Call {
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
-  public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(false);
+  public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(
+    Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE,
+  );
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
   public blockMessages: boolean = false;
   public type?: CALL_MESSAGE_TYPE;
+  public currentPage: ko.Observable<number> = ko.observable(0);
+  public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
+  readonly maximizedParticipant: ko.Observable<Participant | null>;
+
   private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
   /**
    * set to `true` if anyone has enabled their video during a call (used for analytics)
@@ -80,6 +90,7 @@ export class Call {
       this.activeAudioOutput = newActiveAudioOutput;
       this.updateAudioStreamsSink();
     });
+    this.maximizedParticipant = ko.observable(null);
   }
 
   get hasWorkingAudioInput(): boolean {
@@ -157,8 +168,6 @@ export class Call {
     const activeSpeakers = uniqueAudioLevels
       // Get the participants.
       .map(({userid, clientid}) => this.getParticipant(userid, clientid))
-      // Make sure there was a participant found.
-      .filter(participant => participant?.hasActiveVideo())
       // Limit them to 4.
       .slice(0, 4)
       // Sort them by name
@@ -168,13 +177,11 @@ export class Call {
     this.activeSpeakers(activeSpeakers);
   }
 
-  getActiveVideoSpeakers = () =>
-    this.activeSpeakers()
-      .filter(p => p.hasActiveVideo())
-      .slice(0, 4);
+  getActiveSpeakers = () => this.activeSpeakers();
 
   addParticipant(participant: Participant): void {
     this.participants.push(participant);
+    this.updatePages();
   }
 
   getParticipant(userId: UserId, clientId: ClientId): Participant | undefined {
@@ -187,5 +194,20 @@ export class Call {
 
   removeParticipant(participant: Participant): void {
     this.participants.remove(participant);
+    this.updatePages();
+  }
+
+  updatePages() {
+    const selfParticipant = this.getSelfParticipant();
+    const remoteParticipants = this.getRemoteParticipants()
+      .sort((p1, p2) => sortUsersByPriority(p1.user, p2.user))
+      .sort((p1, p2) => (p1.hasActiveVideo() === p2.hasActiveVideo() ? 0 : p1.hasActiveVideo() ? -1 : 1));
+
+    const newPages = chunk<Participant>([selfParticipant, ...remoteParticipants], NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE);
+
+    if (newPages.length < this.pages().length) {
+      this.currentPage(newPages.length - 1);
+    }
+    this.pages(newPages);
   }
 }

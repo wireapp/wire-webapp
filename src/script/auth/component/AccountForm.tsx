@@ -23,6 +23,7 @@ import React from 'react';
 import {FormattedMessage, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {AnyAction, Dispatch} from 'redux';
+import {KEY} from 'Util/KeyboardUtil';
 import {Config} from '../../Config';
 import {accountFormStrings} from '../../strings';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
@@ -152,7 +153,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
             autoComplete="section-create-team username"
             placeholder={_(accountFormStrings.namePlaceholder)}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-              if (event.key === 'Enter') {
+              if (event.key === KEY.ENTER) {
                 inputs.email.current.focus();
               }
             }}
@@ -180,7 +181,7 @@ const AccountForm = ({account, ...props}: Props & ConnectedProps & DispatchProps
                 : accountFormStrings.emailTeamPlaceholder,
             )}
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-              if (event.key === 'Enter') {
+              if (event.key === KEY.ENTER) {
                 inputs.password.current.focus();
               }
             }}

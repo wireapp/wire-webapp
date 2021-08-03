@@ -20,7 +20,7 @@
 import React, {useState, useEffect, CSSProperties} from 'react';
 import {css} from '@emotion/core';
 
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 import type {Grid} from '../../calling/videoGridHandler';
@@ -28,14 +28,14 @@ import Video from './Video';
 import type {Participant} from '../../calling/Participant';
 import GroupVideoGridTile from './GroupVideoGridTile';
 import ParticipantMicOnIcon from './ParticipantMicOnIcon';
+import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 
 export interface GroupVideoGripProps {
   grid: Grid;
   maximizedParticipant: Participant;
   minimized?: boolean;
-  muted?: boolean;
   selfParticipant: Participant;
-  setMaximizedParticipant: (participant: Participant) => void;
+  setMaximizedParticipant?: (participant: Participant) => void;
 }
 
 interface RowsAndColumns extends CSSProperties {
@@ -44,15 +44,35 @@ interface RowsAndColumns extends CSSProperties {
 }
 
 const calculateRowsAndColumns = (totalCount: number): RowsAndColumns => {
-  const columns = Math.ceil(Math.sqrt(totalCount));
-  const rows = Math.ceil(totalCount / columns);
+  const columns = totalCount ? Math.ceil(Math.sqrt(totalCount)) : 1;
+  const rows = totalCount ? Math.ceil(totalCount / columns) : 1;
   return {'--columns': columns, '--rows': rows};
 };
+
+const GroupVideoThumbnailWrapper: React.FC<{minimized: boolean}> = ({minimized, children}) => (
+  <div
+    className="group-video__thumbnail"
+    css={
+      minimized
+        ? css`
+            top: unset;
+            right: 8px;
+            bottom: 8px;
+            width: 80px;
+            height: 60px;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
+          `
+        : undefined
+    }
+    data-uie-name="self-video-thumbnail-wrapper"
+  >
+    {children}
+  </div>
+);
 
 const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   minimized = false,
   grid,
-  muted = false,
   selfParticipant,
   maximizedParticipant,
   setMaximizedParticipant,
@@ -75,9 +95,12 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     };
   }, [grid]);
 
-  const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid.grid.length));
+  const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid?.grid.length));
 
   const doubleClickedOnVideo = (userId: string, clientId: string) => {
+    if (typeof setMaximizedParticipant !== 'function') {
+      return;
+    }
     if (maximizedParticipant !== null) {
       setMaximizedParticipant(null);
       return;
@@ -89,21 +112,23 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
     setMaximizedParticipant(participant);
   };
 
-  const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(p => !!p);
+  const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(Boolean);
 
   useEffect(() => {
     setRowsAndColumns(calculateRowsAndColumns(participants.length));
   }, [participants.length]);
 
-  const selfName = useKoSubscribable(selfParticipant.user.name);
-  const selfIsMuted = useKoSubscribable(selfParticipant.isMuted);
-  const selfIsActivelySpeaking = useKoSubscribable(selfParticipant.isActivelySpeaking);
+  const {isMuted: selfIsMuted, isActivelySpeaking: selfIsActivelySpeaking} = useKoSubscribableChildren(
+    selfParticipant,
+    ['isMuted', 'isActivelySpeaking'],
+  );
+  const {name: selfName} = useKoSubscribableChildren(selfParticipant?.user, ['name']);
 
   return (
     <div className="group-video">
       <div
         className="group-video-grid"
-        css={{backgroundColor: '#323739'}}
+        css={{backgroundColor: '#000'}}
         style={rowsAndColumns}
         data-uie-name="grids-wrapper"
       >
@@ -138,27 +163,13 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             key={participant.clientId}
             selfParticipant={selfParticipant}
             participantCount={participants.length}
-            maximizedParticipant={maximizedParticipant}
+            isMaximized={!!maximizedParticipant}
             onParticipantDoubleClick={doubleClickedOnVideo}
           />
         ))}
       </div>
       {thumbnailVideoStream && !maximizedParticipant && (
-        <div
-          className="group-video__thumbnail"
-          css={
-            minimized
-              ? css`
-                  top: unset;
-                  right: 8px;
-                  bottom: 8px;
-                  width: 80px;
-                  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16);
-                `
-              : undefined
-          }
-          data-uie-name="self-video-thumbnail-wrapper"
-        >
+        <GroupVideoThumbnailWrapper minimized={minimized}>
           <Video
             className="group-video__thumbnail-video"
             autoPlay
@@ -195,16 +206,28 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               {selfName}
             </span>
           </div>
-        </div>
+        </GroupVideoThumbnailWrapper>
+      )}
+      {!!grid.thumbnail && !thumbnailHasActiveVideo && !!selfParticipant && (
+        <GroupVideoThumbnailWrapper minimized={minimized}>
+          <div
+            css={{
+              alignItems: 'center',
+              display: 'flex',
+              height: '100%',
+              justifyContent: 'center',
+              width: '100%',
+            }}
+          >
+            <Avatar
+              avatarSize={minimized ? AVATAR_SIZE.SMALL : AVATAR_SIZE.MEDIUM}
+              participant={selfParticipant.user}
+            />
+          </div>
+        </GroupVideoThumbnailWrapper>
       )}
     </div>
   );
 };
 
 export default GroupVideoGrid;
-
-registerReactComponent('group-video-grid', {
-  component: GroupVideoGrid,
-  template:
-    '<div class="group-video-wrapper" data-bind="react: {grid: ko.unwrap(grid), selfParticipant: ko.unwrap(selfParticipant), maximizedParticipant: ko.unwrap(maximizedParticipant), minimized, muted: ko.unwrap(muted)}"></div>',
-});

@@ -17,118 +17,112 @@
  *
  */
 
-import {ContentMessage} from '../../entity/message/ContentMessage';
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import cx from 'classnames';
-import AssetHeader from 'Components/asset/AssetHeader';
-import {FileAsset} from '../../entity/message/FileAsset';
-import {AssetRepository} from '../../assets/AssetRepository';
 import {container} from 'tsyringe';
-import {AssetTransferState} from '../../assets/AssetTransferState';
+
+import AssetHeader from 'Components/asset/AssetHeader';
+import RestrictedFile from 'Components/asset/RestrictedFile';
 import AssetLoader from 'Components/asset/AssetLoader';
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 import {t} from 'Util/LocalizerUtil';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import type {FileAsset} from '../../entity/message/FileAsset';
+import type {ContentMessage} from '../../entity/message/ContentMessage';
+import {AssetTransferState} from '../../assets/AssetTransferState';
+import {TeamState} from '../../team/TeamState';
+import {useAssetTransfer} from './AbstractAssetTransferStateTracker';
 
 export interface FileAssetProps {
-  header?: boolean;
+  hasHeader?: boolean;
   message: ContentMessage;
+  teamState?: TeamState;
 }
 
-const FileAssetComponent: React.FC<FileAssetProps> = ({message, header}) => {
+const FileAssetComponent: React.FC<FileAssetProps> = ({
+  message,
+  hasHeader = false,
+  teamState = container.resolve(TeamState),
+}) => {
   const asset = message.getFirstAsset() as FileAsset;
-  const plainAssetStatus = useKoSubscribable(asset.status);
-  const fileName = trimFileExtension(asset.file_name);
-  const formattedFileSize = formatBytes(parseInt(asset.file_size, 10));
-  const fileExtension = getFileExtension(asset.file_name);
 
-  const [assetStatus, setAssetStatus] = useState(plainAssetStatus);
-  const assetRepository = container.resolve(AssetRepository);
-  const uploadProgress = useKoSubscribable(assetRepository.getUploadProgress(message.id));
-  const downloadProgress = useKoSubscribable(asset.downloadProgress);
+  const {transferState, downloadAsset, uploadProgress, cancelUpload} = useAssetTransfer(message);
+  const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
+  const {downloadProgress} = useKoSubscribableChildren(asset, ['downloadProgress']);
+  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
+
+  const fileName = trimFileExtension(asset.file_name);
+  const fileExtension = getFileExtension(asset.file_name);
+  const formattedFileSize = formatBytes(parseInt(asset.file_size, 10));
 
   // This is a hack since we don't have a FileAsset available before it's
   // uploaded completely we have to check if there is upload progress to
   // transition into the `AssetTransferState.UPLOADING` state.
-  useEffect(() => {
-    if (uploadProgress > 0 && uploadProgress < 100) {
-      setAssetStatus(AssetTransferState.UPLOADING);
-    } else {
-      setAssetStatus(plainAssetStatus);
-    }
-  }, [uploadProgress, plainAssetStatus]);
+  const assetStatus = uploadProgress > 0 && uploadProgress < 100 ? AssetTransferState.UPLOADING : transferState;
 
-  const downloadAsset = () => assetRepository.downloadFile(asset);
-
-  const cancelUpload = () => {
-    assetRepository.cancelUpload(message.id);
-    amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
-  };
-
-  const hasHeader = !!header;
   const isPendingUpload = assetStatus === AssetTransferState.UPLOAD_PENDING;
-  const isNotUploading = !isPendingUpload;
   const isFailedUpload = assetStatus === AssetTransferState.UPLOAD_FAILED;
   const isUploaded = assetStatus === AssetTransferState.UPLOADED;
   const isDownloading = assetStatus === AssetTransferState.DOWNLOADING;
   const isUploading = assetStatus === AssetTransferState.UPLOADING;
 
   return (
-    !message.isObfuscated() && (
-      <>
+    !isObfuscated && (
+      <div className="file-asset" data-uie-name="file-asset">
         {hasHeader && <AssetHeader message={message} />}
-        <div
-          className={cx('file', {
-            'cursor-pointer': isUploaded,
-          })}
-          data-uie-name="file"
-          data-uie-value={asset.file_name}
-          onClick={() => {
-            if (isUploaded) {
-              downloadAsset();
-            }
-          }}
-        >
-          {isPendingUpload && <div className="asset-placeholder loading-dots"></div>}
-          {isNotUploading && (
-            <>
-              {isUploaded && (
-                <div
-                  className="file-icon icon-file"
-                  onClick={event => {
-                    event.stopPropagation();
-                    downloadAsset();
-                  }}
-                  data-uie-name="file-icon"
-                >
-                  <span className="file-icon-ext icon-view"></span>
+        {isFileSharingReceivingEnabled ? (
+          <div
+            className={cx('file', {
+              'cursor-pointer': isUploaded,
+            })}
+            data-uie-name="file"
+            data-uie-value={asset.file_name}
+            onClick={() => {
+              if (isUploaded) {
+                downloadAsset(asset);
+              }
+            }}
+          >
+            {isPendingUpload ? (
+              <div className="asset-placeholder loading-dots"></div>
+            ) : (
+              <>
+                {isUploaded && (
+                  <div className="file__icon icon-file" data-uie-name="file-icon">
+                    <span className="file__icon__ext icon-view" />
+                  </div>
+                )}
+
+                {isDownloading && (
+                  <AssetLoader loadProgress={downloadProgress} onCancel={() => asset.cancelDownload()} />
+                )}
+
+                {isUploading && <AssetLoader loadProgress={uploadProgress} onCancel={() => cancelUpload()} />}
+
+                {isFailedUpload && <div className="media-button media-button-error" />}
+
+                <div className="file__desc">
+                  <div className="label-bold-xs ellipsis" data-uie-name="file-name">
+                    {fileName}
+                  </div>
+                  <ul className="file__desc__meta label-xs text-foreground">
+                    <li className="label-nocase-xs" data-uie-name="file-size">
+                      {formattedFileSize}
+                    </li>
+                    {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
+                    {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
+                    {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
+                    {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
+                  </ul>
                 </div>
-              )}
-
-              {isDownloading && <AssetLoader loadProgress={downloadProgress} onCancel={asset.cancelDownload} />}
-
-              {isUploading && <AssetLoader loadProgress={uploadProgress} onCancel={cancelUpload} />}
-
-              {isFailedUpload && <div className="media-button media-button-error"></div>}
-
-              <div className="file-desc">
-                <div className="label-bold-xs ellipsis" data-uie-name="file-name">
-                  {fileName}
-                </div>
-                <ul className="file-desc-meta label-xs text-foreground">
-                  <li data-uie-name="file-size">{formattedFileSize}</li>
-                  {fileExtension && <li data-uie-name="file-type">{fileExtension}</li>}
-                  {isUploading && <li data-uie-name="file-status">{t('conversationAssetUploading')}</li>}
-                  {isFailedUpload && <li data-uie-name="file-status">{t('conversationAssetUploadFailed')}</li>}
-                  {isDownloading && <li data-uie-name="file-status">{t('conversationAssetDownloading')}</li>}
-                </ul>
-              </div>
-            </>
-          )}
-        </div>
-      </>
+              </>
+            )}
+          </div>
+        ) : (
+          <RestrictedFile asset={asset} />
+        )}
+      </div>
     )
   );
 };
@@ -137,6 +131,5 @@ export default FileAssetComponent;
 
 registerReactComponent('file-asset', {
   component: FileAssetComponent,
-  template:
-    '<div data-bind="react: {header, message: ko.unwrap(message)}" style="width: 100%; align-self: center"></div>',
+  template: '<div data-bind="react: {hasHeader: header, message: ko.unwrap(message)}"></div>',
 });

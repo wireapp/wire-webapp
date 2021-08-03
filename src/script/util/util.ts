@@ -157,8 +157,8 @@ export const loadUrlBlob = (url: string): Promise<Blob> => {
 };
 
 export const getFileExtension = (filename: string): string => {
-  const extensionMatch = filename.match(/\.(tar\.gz|[^.]*)$/i);
-  const foundExtension = extensionMatch && extensionMatch[1];
+  const extensionMatch = filename?.match(/\.(tar\.gz|[^.]*)$/i);
+  const foundExtension = extensionMatch?.[1];
   return foundExtension || '';
 };
 
@@ -176,14 +176,14 @@ export const trimFileExtension = (filename: string): string => {
 
 export const formatBytes = (bytes: number, decimals: number = 1): string => {
   if (bytes === 0) {
-    return '0B';
+    return '0 B';
   }
 
   const kilobytes = 1024;
   decimals += 1;
-  const unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const unit = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const index = Math.floor(Math.log(bytes) / Math.log(kilobytes));
-  return parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals)) + unit[index];
+  return `${parseFloat((bytes / Math.pow(kilobytes, index)).toFixed(decimals))} ${unit[index]}`;
 };
 
 export const getContentTypeFromDataUrl = (dataUrl: string): string => {
