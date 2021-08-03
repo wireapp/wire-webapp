@@ -53,7 +53,7 @@ ko.components.register('grouped-conversations', {
           <!-- ko foreach: {data: folder.conversations, as: 'conversation', noChildContext: true} -->
             <conversation-list-cell
               data-uie-name="item-conversation"
-              params="onClick: makeOnClick(conversation.id), rightClick: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall,offsetTop: getOffsetTop(folder, conversation), index: $index, isVisibleFunc: isVisibleFunc">
+              params="onClick: makeOnClick(conversation.id, conversation.domain), rightClick: (_, event) => listViewModel.onContextMenu(conversation, event), conversation: conversation, showJoinButton: hasJoinableCall(conversation.id), is_selected: isSelectedConversation, onJoinCall: onJoinCall,offsetTop: getOffsetTop(folder, conversation), index: $index, isVisibleFunc: isVisibleFunc">
             </conversation-list-cell>
           <!-- /ko -->
         </div>
@@ -75,7 +75,8 @@ ko.components.register('grouped-conversations', {
     this.onJoinCall = onJoinCall;
     this.isSelectedConversation = isSelectedConversation;
     this.getConversationUrl = generateConversationUrl;
-    this.makeOnClick = (conversationId: string) => createNavigate(generateConversationUrl(conversationId));
+    this.makeOnClick = (conversationId: string, domain: string | null) =>
+      createNavigate(generateConversationUrl(conversationId, domain));
     this.isVisibleFunc = isVisibleFunc;
     this.countUnread = (conversations: ko.Observable<Conversation[]>) =>
       conversations().reduce((sum, conversation) => (conversation.hasUnread() ? sum + 1 : sum), 0);

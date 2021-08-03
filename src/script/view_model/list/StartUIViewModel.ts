@@ -274,7 +274,7 @@ export class StartUIViewModel {
 
   readonly clickOnCreateGuestRoom = (): void => {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
     });
   };
 
@@ -292,13 +292,14 @@ export class StartUIViewModel {
   };
 
   readonly clickOnOther = (participantEntity: User | ServiceEntity): Promise<void> | void => {
-    if (isUser(participantEntity) && participantEntity.isOutgoingRequest()) {
-      return this.clickOnContact(participantEntity as User);
-    }
     if (isUser(participantEntity)) {
+      if (participantEntity.isOutgoingRequest() || !participantEntity.isOnSameFederatedDomain()) {
+        return this.clickOnContact(participantEntity);
+      }
       return this.mainViewModel.content.userModal.showUser(participantEntity.id, participantEntity.domain);
     }
-    return this.mainViewModel.content.serviceModal.showService(participantEntity as ServiceEntity);
+
+    return this.mainViewModel.content.serviceModal.showService(participantEntity);
   };
 
   readonly clickOnShowPeople = (): void => {

@@ -118,7 +118,7 @@ export class CryptographyRepository {
   }
 
   async sendCoreMessage(
-    text: string = 'Hello, World!',
+    text: string,
     conversationId: string,
     userIds: string[] | QualifiedId[],
     conversationDomain?: string,
