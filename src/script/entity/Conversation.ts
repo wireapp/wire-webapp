@@ -145,7 +145,7 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE;
-  public readonly domain?: string;
+  public domain?: string;
   isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {

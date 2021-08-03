@@ -293,7 +293,7 @@ export class ConversationRepository {
     userEntities: User[],
     groupName?: string,
     accessState?: string,
-    options = {},
+    options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
     const sameFederatedDomainUserIds = userEntities
       .filter(userEntity => userEntity.isOnSameFederatedDomain())
@@ -2153,7 +2153,11 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onCreate(
-    eventJson: EventJson,
+    eventJson: {
+      conversation: string;
+      data: ConversationCreateData;
+      time?: string | number;
+    },
     eventSource?: EventSource,
   ): Promise<{conversationEntity: Conversation} | undefined> {
     const {conversation: conversationId, data: eventData, time} = eventJson;

@@ -223,6 +223,10 @@ export class ConversationMapper {
     conversationEntity.type(type);
     conversationEntity.name(name || '');
 
+    if (conversationData.qualified_id) {
+      conversationEntity.domain = conversationData.qualified_id.domain;
+    }
+
     const selfState = members ? members.self : conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 

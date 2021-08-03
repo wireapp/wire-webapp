@@ -293,10 +293,7 @@ export class StartUIViewModel {
 
   readonly clickOnOther = (participantEntity: User | ServiceEntity): Promise<void> | void => {
     if (isUser(participantEntity)) {
-      if (participantEntity.isOutgoingRequest()) {
-        return this.clickOnContact(participantEntity);
-      }
-      if (!participantEntity.isOnSameFederatedDomain()) {
+      if (participantEntity.isOutgoingRequest() || !participantEntity.isOnSameFederatedDomain()) {
         return this.clickOnContact(participantEntity);
       }
       return this.mainViewModel.content.userModal.showUser(participantEntity.id, participantEntity.domain);
