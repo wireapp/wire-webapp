@@ -128,7 +128,7 @@ const AudioAsset: React.FC<AudioAssetProps> = ({
                           dark
                           mediaElement={audioElement}
                           disabled={!audioSrc}
-                          data-ui-name="status-audio-seekbar"
+                          data-uie-name="status-audio-seekbar"
                         />
                       )}
                     </>
