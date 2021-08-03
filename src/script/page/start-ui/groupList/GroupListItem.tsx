@@ -45,7 +45,7 @@ const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, gr
       data-uie-uid={`${group.id}`}
       onClick={() => {
         click(group);
-        router.navigate(generateConversationUrl(group.id));
+        router.navigate(generateConversationUrl(group.id, group.domain));
       }}
       data-uie-value={displayName}
     >
