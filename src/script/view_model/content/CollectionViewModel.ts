@@ -63,7 +63,7 @@ export class CollectionViewModel {
 
   onKeyDownCollection = (keyboardEvent: KeyboardEvent): void => {
     if (isEscapeKey(keyboardEvent)) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity(), {});
     }
   };
 
@@ -151,7 +151,7 @@ export class CollectionViewModel {
   };
 
   clickOnBackButton(): void {
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity());
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, this.conversationEntity(), {});
   }
 
   clickOnSection(category: string, items: ContentMessage[]): void {
