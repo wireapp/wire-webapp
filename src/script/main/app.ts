@@ -673,7 +673,7 @@ class App {
     } else if (this.repository.user.shouldChangeUsername()) {
       mainView.list.showTakeover();
     } else if (conversationEntity) {
-      mainView.content.showConversation(conversationEntity);
+      mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
