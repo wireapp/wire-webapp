@@ -42,9 +42,12 @@ const Pagination: React.FC<PaginationProps> = ({totalPages, currentPage, onChang
         justifyContent: 'center',
         ...wrapperStyles,
       }}
+      data-uie-name="pagination-wrapper"
     >
       {pages.map(page => (
         <div
+          data-uie-name="pagination-item"
+          data-uie-status={currentPage === page ? 'active' : 'inactive'}
           key={page}
           onClick={() => onChangePage(page)}
           css={{

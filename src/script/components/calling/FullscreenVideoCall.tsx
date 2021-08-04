@@ -75,6 +75,13 @@ const videoControlActiveStyles = css`
   }
 `;
 
+const videoControlInActiveStyles = css`
+  svg > path,
+  svg > g > path {
+    fill: #fff;
+  }
+`;
+
 const videoControlDisabledStyles = css`
   ${videoControlActiveStyles};
   cursor: default;
@@ -223,11 +230,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               className="video-controls__button"
               data-uie-value={!isMuted ? 'inactive' : 'active'}
               onClick={() => toggleMute(call, !isMuted)}
-              css={isMuted ? videoControlActiveStyles : undefined}
+              css={!isMuted ? videoControlActiveStyles : undefined}
               data-uie-name="do-call-controls-video-call-mute"
             >
-              <div className="video-controls__button__label">{t('videoCallOverlayMute')}</div>
-              <Icon.MicOff />
+              <div className="video-controls__button__label">{t('videoCallOverlayMicrophone')}</div>
+              {isMuted ? <Icon.MicOff width={16} height={16} /> : <Icon.MicOn width={16} height={16} />}
             </div>
 
             {showToggleVideo && (
@@ -235,10 +242,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                 className="video-controls__button"
                 data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                 onClick={() => toggleCamera(call)}
-                css={selfSharesCamera ? videoControlActiveStyles : undefined}
+                css={selfSharesCamera ? videoControlActiveStyles : videoControlInActiveStyles}
                 data-uie-name="do-call-controls-toggle-video"
               >
-                <Icon.Camera />
+                {selfSharesCamera ? <Icon.Camera width={16} height={16} /> : <Icon.CameraOff width={16} height={16} />}
                 {showSwitchCamera ? (
                   <DeviceToggleButton
                     styles={css`
@@ -252,7 +259,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     onChooseDevice={deviceId => switchCameraSource(call, deviceId)}
                   />
                 ) : (
-                  <div className="video-controls__button__label">{t('videoCallOverlayVideo')}</div>
+                  <div className="video-controls__button__label">{t('videoCallOverlayCamera')}</div>
                 )}
               </div>
             )}
@@ -268,7 +275,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               data-uie-enabled={canShareScreen ? 'true' : 'false'}
               data-uie-name="do-toggle-screen"
             >
-              <Icon.Screenshare />
+              {selfSharesScreen ? (
+                <Icon.Screenshare width={16} height={16} />
+              ) : (
+                <Icon.ScreenshareOff width={16} height={16} />
+              )}
               <div className="video-controls__button__label">{t('videoCallOverlayShareScreen')}</div>
             </div>
 
@@ -297,6 +308,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           </div>
           {currentPage !== totalPages - 1 && (
             <div
+              data-uie-name="pagination-next"
               onClick={() => changePage(currentPage + 1, call)}
               className="hide-controls-hidden"
               css={{
@@ -311,6 +323,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           )}
           {currentPage !== 0 && (
             <div
+              data-uie-name="pagination-previous"
               onClick={() => changePage(currentPage - 1, call)}
               className="hide-controls-hidden"
               css={{
