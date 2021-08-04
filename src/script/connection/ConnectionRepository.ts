@@ -146,7 +146,7 @@ export class ConnectionRepository {
   ): Promise<void> {
     await this.updateStatus(userEntity, ConnectionStatus.BLOCKED);
     if (hideConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
 
@@ -165,7 +165,7 @@ export class ConnectionRepository {
   ): Promise<void> {
     await this.updateStatus(userEntity, ConnectionStatus.CANCELLED);
     if (hideConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
 

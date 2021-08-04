@@ -70,7 +70,7 @@ interface ShowConversationOptions {
 }
 
 interface ShowConversationOverload {
-  (conversation: Conversation, options?: ShowConversationOptions): Promise<void>;
+  (conversation: Conversation, options: ShowConversationOptions): Promise<void>;
   (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
 }
 
@@ -233,7 +233,7 @@ export class ContentViewModel {
     this.userState.connectRequests.subscribe(requests => {
       const isStateRequests = this.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
       if (isStateRequests && !requests.length) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation());
+        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
       }
     });
 
@@ -242,7 +242,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation()?.connection().status() ===
         ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
       ) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation());
+        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
       }
     });
 
@@ -280,7 +280,7 @@ export class ContentViewModel {
    */
   readonly showConversation: ShowConversationOverload = async (
     conversation: Conversation | string,
-    options: ShowConversationOptions = {},
+    options: ShowConversationOptions,
     domain?: string | null,
   ) => {
     const {
@@ -380,7 +380,7 @@ export class ContentViewModel {
       const repoHasConversation = this.conversationState.conversations().some(({id}) => id === previousId);
 
       if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
-        void this.showConversation(this.previousConversation);
+        void this.showConversation(this.previousConversation, {});
         return;
       }
 
