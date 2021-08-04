@@ -138,8 +138,8 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
                 .conversations()
                 .map((conversation, index) => (
                   <ConversationListCell
+                    dataUieName="item-conversation"
                     key={conversation.id}
-                    data-uie-name="item-conversation"
                     onClick={makeOnClick(conversation.id, conversation.domain)}
                     rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
                     conversation={conversation}
