@@ -265,7 +265,7 @@ export class ListViewModel {
     }
 
     if (nextItem) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem, {});
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem);
     }
   };
 
@@ -406,7 +406,7 @@ export class ListViewModel {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
     this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   };
 
   readonly onContextMenu = (conversationEntity: Conversation, event: MouseEvent): void => {

@@ -333,7 +333,7 @@ export class ActionsViewModel {
       conversationEntity.cleared_timestamp(0);
     }
 
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
   };
 
   removeFromConversation = async (conversationEntity: Conversation, userEntity: User): Promise<void> => {
