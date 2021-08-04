@@ -24,8 +24,6 @@ import {
   FeatureVideoCalling,
   FeatureLegalhold,
   FeatureFileSharing,
-  FeatureVideoMessage,
-  FeatureAudioMessage,
   FeatureSSO,
   FeatureSearchVisibility,
   FeatureValidateSAMLEmails,
@@ -36,8 +34,6 @@ export type TeamFeatureConfigurationUpdateEventData =
   | FeatureDigitalSignature
   | FeatureConferenceCalling
   | FeatureVideoCalling
-  | FeatureVideoMessage
-  | FeatureAudioMessage
   | FeatureFileSharing
   | FeatureLegalhold
   | FeatureSSO

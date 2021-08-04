@@ -29,8 +29,6 @@ import type {
   FeatureLegalhold,
   FeatureSSO,
   FeatureFileSharing,
-  FeatureVideoMessage,
-  FeatureAudioMessage,
 } from './Feature';
 import type {FeatureList} from './FeatureList';
 
@@ -39,7 +37,6 @@ export class FeatureAPI {
 
   public static readonly URL = {
     APPLOCK: 'appLock',
-    AUDIO_MESSAGE: 'audioMessage',
     CALLING_CONFERENCE: 'conferenceCalling',
     CALLING_VIDEO: 'videoCalling',
     DIGITAL_SIGNATURES: 'digitalSignatures',
@@ -49,7 +46,6 @@ export class FeatureAPI {
     LEGAL_HOLD: 'legalhold',
     SSO: 'sso',
     TEAMS: '/teams',
-    VIDEO_MESSAGE: 'videoMessage',
   };
 
   public async getAllFeatures(): Promise<FeatureList> {
@@ -154,54 +150,6 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureFileSharing>(config);
-    return response.data;
-  }
-
-  public async getVideoMessageFeature(): Promise<FeatureVideoMessage> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.VIDEO_MESSAGE}`,
-    };
-
-    const response = await this.client.sendJSON<FeatureVideoMessage>(config);
-    return response.data;
-  }
-
-  public async putVideoMessageFeature(
-    teamId: string,
-    videoMessageFeature: FeatureVideoMessage,
-  ): Promise<FeatureVideoMessage> {
-    const config: AxiosRequestConfig = {
-      data: videoMessageFeature,
-      method: 'put',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.VIDEO_MESSAGE}`,
-    };
-
-    const response = await this.client.sendJSON<FeatureVideoMessage>(config);
-    return response.data;
-  }
-
-  public async getAudioMessageFeature(): Promise<FeatureAudioMessage> {
-    const config: AxiosRequestConfig = {
-      method: 'get',
-      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.AUDIO_MESSAGE}`,
-    };
-
-    const response = await this.client.sendJSON<FeatureAudioMessage>(config);
-    return response.data;
-  }
-
-  public async putAudioMessageFeature(
-    teamId: string,
-    audioMessageFeature: FeatureAudioMessage,
-  ): Promise<FeatureAudioMessage> {
-    const config: AxiosRequestConfig = {
-      data: audioMessageFeature,
-      method: 'put',
-      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.AUDIO_MESSAGE}`,
-    };
-
-    const response = await this.client.sendJSON<FeatureAudioMessage>(config);
     return response.data;
   }
 
