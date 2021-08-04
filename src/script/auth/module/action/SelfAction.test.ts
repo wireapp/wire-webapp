@@ -147,7 +147,7 @@ describe('SelfAction', () => {
   it('can set the self email', async () => {
     const email = 'myemail@mail.com';
     const mockedApiClient = {
-      self: {api: {putEmail: () => Promise.resolve()}},
+      auth: {api: {putEmail: () => Promise.resolve()}},
     };
 
     const store = mockStoreFactory({
@@ -165,7 +165,7 @@ describe('SelfAction', () => {
     const email = 'myemail@mail.com';
     const error = new Error('test error');
     const mockedApiClient = {
-      self: {api: {putEmail: () => Promise.reject(error)}},
+      auth: {api: {putEmail: () => Promise.reject(error)}},
     };
 
     const store = mockStoreFactory({
