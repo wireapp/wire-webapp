@@ -35,6 +35,7 @@ import {MainViewModel} from '../MainViewModel';
 import {PreferencesDeviceDetailsViewModel} from './PreferencesDeviceDetailsViewModel';
 import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
+import {splitFingerprint} from 'Util/StringUtil';
 
 export class PreferencesDevicesViewModel {
   private readonly actionsViewModel: ActionsViewModel;
@@ -57,7 +58,7 @@ export class PreferencesDevicesViewModel {
     this.actionsViewModel = mainViewModel.actions;
     this.preferencesDeviceDetails = contentViewModel.preferencesDeviceDetails;
     this.currentClient = this.clientState.currentClient;
-    this.displayClientId = ko.pureComputed(() => (this.currentClient() ? this.currentClient().formatId() : []));
+    this.displayClientId = ko.pureComputed(() => this.currentClient()?.formatId() ?? []);
 
     this.activationDate = ko.observable();
     // all clients except the current client
@@ -84,7 +85,7 @@ export class PreferencesDevicesViewModel {
     if (this.currentClient() && !this.localFingerprint().length) {
       const date = formatTimestamp(this.currentClient().time);
       this.activationDate(t('preferencesDevicesActivatedOn', {date}));
-      this.localFingerprint(this.cryptographyRepository.getLocalFingerprint());
+      this.localFingerprint(splitFingerprint(this.cryptographyRepository.getLocalFingerprint()));
     }
   };
 }

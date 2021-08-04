@@ -61,11 +61,17 @@ import type {Message} from '../entity/message/Message';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
+import {isConversationEntity} from 'Util/TypePredicateUtil';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
   openFirstSelfMention?: boolean;
   openNotificationSettings?: boolean;
+}
+
+interface ShowConversationOverload {
+  (conversation: Conversation, options: ShowConversationOptions): Promise<void>;
+  (conversationId: string, options: ShowConversationOptions, domain: string | null): Promise<void>;
 }
 
 export class ContentViewModel {
@@ -227,7 +233,7 @@ export class ContentViewModel {
     this.userState.connectRequests.subscribe(requests => {
       const isStateRequests = this.state() === ContentViewModel.STATE.CONNECTION_REQUESTS;
       if (isStateRequests && !requests.length) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation());
+        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
       }
     });
 
@@ -236,7 +242,7 @@ export class ContentViewModel {
         this.conversationState.activeConversation()?.connection().status() ===
         ConnectionStatus.MISSING_LEGAL_HOLD_CONSENT
       ) {
-        this.showConversation(this.conversationRepository.getMostRecentConversation());
+        this.showConversation(this.conversationRepository.getMostRecentConversation(), {});
       }
     });
 
@@ -272,7 +278,11 @@ export class ContentViewModel {
    * @param conversation Conversation entity or conversation ID
    * @param options State to open conversation in
    */
-  readonly showConversation = (conversation: Conversation | string, options: ShowConversationOptions = {}) => {
+  readonly showConversation: ShowConversationOverload = async (
+    conversation: Conversation | string,
+    options: ShowConversationOptions,
+    domain?: string | null,
+  ) => {
     const {
       exposeMessage: exposeMessageEntity,
       openFirstSelfMention = false,
@@ -283,85 +293,72 @@ export class ContentViewModel {
       return this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
-    const isConversation = typeof conversation === 'object' && conversation.id;
-    const isConversationId = typeof conversation === 'string';
-    if (!isConversation && !isConversationId) {
-      throw new Error(`Wrong input for conversation: ${typeof conversation}`);
-    }
+    try {
+      const conversationEntity = isConversationEntity(conversation)
+        ? conversation
+        : await this.conversationRepository.getConversationById(conversation, domain);
+      if (!conversationEntity) {
+        throw new ConversationError(
+          ConversationError.TYPE.CONVERSATION_NOT_FOUND,
+          ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
+        );
+      }
+      const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
+      const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
+      const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
 
-    const conversationPromise = isConversation
-      ? Promise.resolve(conversation as Conversation)
-      : this.conversationRepository.getConversationById(conversation as string);
-
-    conversationPromise
-      .then(conversationEntity => {
-        if (!conversationEntity) {
-          throw new ConversationError(
-            ConversationError.TYPE.CONVERSATION_NOT_FOUND,
-            ConversationError.MESSAGE.CONVERSATION_NOT_FOUND,
-          );
+      if (isOpenedConversation) {
+        if (openNotificationSettings) {
+          this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: conversationEntity});
         }
-        const isActiveConversation = this.conversationState.isActiveConversation(conversationEntity);
-        const isConversationState = this.state() === ContentViewModel.STATE.CONVERSATION;
-        const isOpenedConversation = conversationEntity && isActiveConversation && isConversationState;
+        return;
+      }
 
-        if (isOpenedConversation) {
-          if (openNotificationSettings) {
-            this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {entity: conversationEntity});
-          }
-          return;
-        }
+      this.releaseContent(this.state());
 
-        this.releaseContent(this.state());
+      this.state(ContentViewModel.STATE.CONVERSATION);
+      this.mainViewModel.list.openConversations();
 
-        this.state(ContentViewModel.STATE.CONVERSATION);
-        this.mainViewModel.list.openConversations();
+      if (!isActiveConversation) {
+        this.conversationState.activeConversation(conversationEntity);
+      }
 
-        if (!isActiveConversation) {
-          this.conversationState.activeConversation(conversationEntity);
-        }
+      const messageEntity = openFirstSelfMention ? conversationEntity.getFirstUnreadSelfMention() : exposeMessageEntity;
 
-        const messageEntity = openFirstSelfMention
-          ? conversationEntity.getFirstUnreadSelfMention()
-          : exposeMessageEntity;
+      if (conversationEntity.is_cleared()) {
+        conversationEntity.cleared_timestamp(0);
+      }
 
-        if (conversationEntity.is_cleared()) {
-          conversationEntity.cleared_timestamp(0);
-        }
+      if (conversationEntity.is_archived()) {
+        await this.conversationRepository.unarchiveConversation(conversationEntity);
+      }
 
-        const unarchivePromise = conversationEntity.is_archived()
-          ? this.conversationRepository.unarchiveConversation(conversationEntity)
-          : Promise.resolve();
+      await this.messageList.changeConversation(conversationEntity, messageEntity);
 
-        unarchivePromise.then(() => {
-          this.messageList.changeConversation(conversationEntity, messageEntity).then(() => {
-            this.showContent(ContentViewModel.STATE.CONVERSATION);
-            this.previousConversation = this.conversationState.activeConversation();
-            if (openNotificationSettings) {
-              this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {
-                entity: this.conversationState.activeConversation(),
-              });
-            }
-          });
+      this.showContent(ContentViewModel.STATE.CONVERSATION);
+      this.previousConversation = this.conversationState.activeConversation();
+      if (openNotificationSettings) {
+        this.mainViewModel.panel.togglePanel(PanelViewModel.STATE.NOTIFICATIONS, {
+          entity: this.conversationState.activeConversation(),
         });
-      })
-      .catch(error => {
-        const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
-        if (isConversationNotFound) {
-          this.mainViewModel.modals.showModal(
-            ModalsViewModel.TYPE.ACKNOWLEDGE,
-            {
-              text: {
-                message: t('conversationNotFoundMessage'),
-                title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
-              },
+      }
+    } catch (error) {
+      const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+      if (isConversationNotFound) {
+        this.mainViewModel.modals.showModal(
+          ModalsViewModel.TYPE.ACKNOWLEDGE,
+          {
+            text: {
+              message: t('conversationNotFoundMessage'),
+              title: t('conversationNotFoundTitle', Config.getConfig().BRAND_NAME),
             },
-            undefined,
-          );
-        } else {
-          throw error;
-        }
-      });
+          },
+          undefined,
+        );
+      } else {
+        throw error;
+      }
+    }
   };
 
   readonly switchContent = (newContentState: string): void => {
@@ -383,7 +380,8 @@ export class ContentViewModel {
       const repoHasConversation = this.conversationState.conversations().some(({id}) => id === previousId);
 
       if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
-        return this.showConversation(this.previousConversation);
+        void this.showConversation(this.previousConversation, {});
+        return;
       }
 
       return this.switchContent(ContentViewModel.STATE.WATERMARK);

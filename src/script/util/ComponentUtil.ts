@@ -45,7 +45,7 @@ export function registerReactComponent<Props>(
     ko.components.register(name, {
       template: template ?? `<!-- ko react: {${bindings}} --><!-- /ko -->`,
       viewModel: function (knockoutParams: Props) {
-        const bindingsString = bindings ?? /react: ?{(.*)}/.exec(template)[1];
+        const bindingsString = bindings ?? /react: ?{([^]*)}/.exec(template)[1];
         const pairs = bindingsString?.split(',');
         const neededParams = pairs?.map(pair => {
           const [name, value = name] = pair.split(':');

@@ -63,7 +63,7 @@ export class TakeoverViewModel {
       await this.userRepository.changeUsername(this.username());
       const conversationEntity = this.conversationRepository.getMostRecentConversation();
       if (conversationEntity) {
-        return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+        return amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
       }
 
       if (this.userState.connectRequests().length) {

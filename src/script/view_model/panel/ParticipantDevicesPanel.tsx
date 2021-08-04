@@ -20,11 +20,13 @@
 import React from 'react';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
+import useEffectRef from 'Util/useEffectRef';
 import UserDevices, {UserDevicesState, useUserDevicesHistory} from 'Components/UserDevices';
 
 import type {User} from '../../entity/User';
 import {ViewModelRepositories} from '../MainViewModel';
 import PanelHeader from './PanelHeader';
+import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 
 interface ParticipantDevicesPanelProps {
   onClose: () => void;
@@ -34,6 +36,8 @@ interface ParticipantDevicesPanelProps {
 }
 
 const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({repositories, onClose, onGoBack, user}) => {
+  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  useFadingScrollbar(scrollbarRef);
   const history = useUserDevicesHistory();
   return (
     <>
@@ -49,14 +53,14 @@ const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({reposi
         goBackUie="go-back-participant-devices"
       />
 
-      <div className="panel__content" data-bind="fadingscrollbar">
+      <div className="panel__content" ref={setScrollbarRef}>
         <UserDevices
           clientRepository={repositories.client}
           cryptographyRepository={repositories.cryptography}
           messageRepository={repositories.message}
           current={history.current}
           goTo={history.goTo}
-          userEntity={user}
+          user={user}
         />
       </div>
     </>
@@ -66,6 +70,6 @@ const ParticipantDevicesPanel: React.FC<ParticipantDevicesPanelProps> = ({reposi
 export default ParticipantDevicesPanel;
 
 registerReactComponent('participant-devices-panel', {
-  bindings: 'onClose, onGoBack, repositories, user: ko.unwrap(user)',
+  bindings: 'onClose, onGoBack, repositories, user',
   component: ParticipantDevicesPanel,
 });

@@ -673,13 +673,14 @@ class App {
     } else if (this.repository.user.shouldChangeUsername()) {
       mainView.list.showTakeover();
     } else if (conversationEntity) {
-      mainView.content.showConversation(conversationEntity);
+      mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     const router = new Router({
-      '/conversation/:conversationId': conversationId => mainView.content.showConversation(conversationId),
+      '/conversation/:conversationId(/:domain)': (conversationId: string, domain?: string) =>
+        mainView.content.showConversation(conversationId, {}, domain),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),

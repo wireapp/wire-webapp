@@ -32,7 +32,7 @@ import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
+import {arrayToBase64, base64ToArray} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
@@ -118,7 +118,7 @@ export class CryptographyRepository {
   }
 
   async sendCoreMessage(
-    text: string = 'Hello, World!',
+    text: string,
     conversationId: string,
     userIds: string[] | QualifiedId[],
     conversationDomain?: string,
@@ -158,8 +158,8 @@ export class CryptographyRepository {
    * Get the fingerprint of the local identity.
    * @returns Fingerprint of local identity public key
    */
-  getLocalFingerprint() {
-    return this.formatFingerprint(this.cryptobox.getIdentity().public_key.fingerprint());
+  getLocalFingerprint(): string {
+    return this.cryptobox.getIdentity().public_key.fingerprint();
   }
 
   /**
@@ -169,15 +169,11 @@ export class CryptographyRepository {
    * @param preKey PreKey to initialize a session from
    * @returns Resolves with the remote fingerprint
    */
-  async getRemoteFingerprint(userId: string, clientId: string, preKey?: BackendPreKey): Promise<RegExpMatchArray> {
+  async getRemoteFingerprint(userId: string, clientId: string, preKey?: BackendPreKey): Promise<string> {
     const cryptoboxSession = preKey
       ? await this.createSessionFromPreKey(preKey, userId, clientId)
       : await this.loadSession(userId, clientId);
-    return cryptoboxSession ? this.formatFingerprint(cryptoboxSession.fingerprint_remote()) : [];
-  }
-
-  private formatFingerprint(fingerprint: string): RegExpMatchArray {
-    return zeroPadding(fingerprint, 16).match(/.{1,2}/g) || [];
+    return cryptoboxSession ? cryptoboxSession.fingerprint_remote() : undefined;
   }
 
   /**

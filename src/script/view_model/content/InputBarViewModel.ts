@@ -635,6 +635,8 @@ export class InputBarViewModel {
 
     if (this.isEditing()) {
       this.sendMessageEdit(messageText, this.editMessageEntity());
+    } else if (this.conversationEntity().isRemoteConversation) {
+      this.sendFederatedMessage(messageText);
     } else {
       this.sendMessage(messageText, this.replyMessageEntity());
     }
@@ -832,6 +834,15 @@ export class InputBarViewModel {
               userId: replyMessageEntity.from,
             });
           });
+  };
+
+  readonly sendFederatedMessage = (messageText: string): void => {
+    if (!messageText.length) {
+      return;
+    }
+
+    this.messageRepository.sendFederatedMessage(messageText);
+    this.cancelMessageReply();
   };
 
   readonly sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {
