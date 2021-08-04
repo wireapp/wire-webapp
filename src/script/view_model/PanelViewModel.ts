@@ -29,7 +29,6 @@ import {GroupParticipantServiceViewModel} from './panel/GroupParticipantServiceV
 import {GroupParticipantUserViewModel} from './panel/GroupParticipantUserViewModel';
 import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
 import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
-import {NotificationsViewModel} from './panel/NotificationsViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
@@ -43,6 +42,7 @@ import {container} from 'tsyringe';
 
 import './panel/TimedMessagesPanel';
 import './panel/ParticipantDevicesPanel';
+import './panel/NotificationsPanel';
 
 export const OPEN_CONVERSATION_DETAILS = 'PanelViewModel.OPEN_CONVERSATION_DETAILS';
 
@@ -106,7 +106,6 @@ export class PanelViewModel {
       [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: GroupParticipantUserViewModel,
       [PanelViewModel.STATE.GUEST_OPTIONS]: GuestsAndServicesViewModel,
       [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
-      [PanelViewModel.STATE.NOTIFICATIONS]: NotificationsViewModel,
     };
 
     return Object.entries(viewModels).reduce((subViews, [state, viewModel]) => {
