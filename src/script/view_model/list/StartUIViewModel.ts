@@ -274,7 +274,7 @@ export class StartUIViewModel {
 
   readonly clickOnCreateGuestRoom = (): void => {
     this.conversationRepository.createGuestRoom().then(conversationEntity => {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
     });
   };
 
