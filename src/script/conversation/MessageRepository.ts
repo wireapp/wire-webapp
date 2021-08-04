@@ -42,7 +42,7 @@ import {
 import {ReactionType} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation/';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
+import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
 import {container} from 'tsyringe';
@@ -245,6 +245,15 @@ export class MessageRepository {
       }
     }
     return undefined;
+  }
+
+  async sendFederatedMessage(message: string): Promise<void> {
+    const conversation = this.conversationState.activeConversation();
+    const userIds: string[] | QualifiedId[] = conversation.domain
+      ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
+      : conversation.allUserEntities.map(user => user.id);
+
+    await this.cryptography_repository.sendCoreMessage(message, conversation.id, userIds, conversation.domain);
   }
 
   /**
@@ -1171,18 +1180,14 @@ export class MessageRepository {
 
   /**
    * Create a user client map for a given conversation.
-   *
-   * @param conversation_id Conversation ID
-   * @param skip_own_clients `true`, if other own clients should be skipped (to not sync messages on own clients)
-   * @param user_ids Optionally the intended recipient users
-   * @returns Resolves with a user client map
+   * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
   async createRecipients(
     conversation_id: string,
     skip_own_clients = false,
     user_ids: string[] = null,
   ): Promise<Recipients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id);
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id, null);
     const recipients: Recipients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
@@ -1250,7 +1255,7 @@ export class MessageRepository {
     if (ensureUser) {
       return messagePromise.then(message => {
         if (message.from && !message.user().id) {
-          return this.userRepository.getUserById(message.from).then(userEntity => {
+          return this.userRepository.getUserById(message.from, message.user().domain).then(userEntity => {
             message.user(userEntity);
             return message as ContentMessage;
           });
@@ -1279,7 +1284,11 @@ export class MessageRepository {
       // Since this is a bare API client user we use `.deleted`
       const isDeleted = user.deleted === true;
       if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, user.id);
+        await this.conversationRepositoryProvider().teamMemberLeave(
+          this.teamState.team().id,
+          user.id,
+          this.userState.self().domain,
+        );
       }
     }
   }
@@ -1496,7 +1505,9 @@ export class MessageRepository {
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId))),
+            Promise.all(
+              clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId, null)),
+            ),
           ),
         );
 
@@ -1519,7 +1530,9 @@ export class MessageRepository {
         await Promise.all(
           Object.values(qualifiedUsersMap).map(userClientMap =>
             Object.entries(userClientMap).map(([userId, clients]) => {
-              return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+              return Promise.all(
+                clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)),
+              );
             }),
           ),
         );

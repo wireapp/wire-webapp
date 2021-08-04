@@ -72,7 +72,7 @@ export class ConversationListViewModel {
   readonly hasPendingLegalHold: ko.PureComputed<boolean>;
   readonly showConnectRequests: ko.PureComputed<boolean>;
   readonly selfAvailability: ko.PureComputed<Availability.Type>;
-  readonly makeOnClick: (conversationId: string) => MouseEventHandler<Element>;
+  readonly makeOnClick: (conversationId: string, domain: string | null) => MouseEventHandler<Element>;
   readonly participantAvatarSize: typeof AVATAR_SIZE.SMALL;
   readonly getIsVisibleFunc: () => (() => boolean) | ((top: number, bottom: number) => boolean);
   private readonly logger: Logger;
@@ -118,7 +118,8 @@ export class ConversationListViewModel {
     this.hasPendingLegalHold = ko.pureComputed(() => this.selfUser().hasPendingLegalHold());
     this.isTeam = this.teamState.isTeam;
     this.isActivatedAccount = this.userState.isActivatedAccount;
-    this.makeOnClick = (conversationId: string) => createNavigate(generateConversationUrl(conversationId));
+    this.makeOnClick = (conversationId: string, domain: string | null) =>
+      createNavigate(generateConversationUrl(conversationId, domain));
 
     this.selfUser = ko.pureComputed(() => this.userState.self && this.userState.self());
     this.selfAvailability = ko.pureComputed(() => this.selfUser() && this.selfUser().availability());

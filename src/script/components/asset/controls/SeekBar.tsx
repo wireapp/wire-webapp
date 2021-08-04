@@ -19,11 +19,11 @@
 
 import cx from 'classnames';
 import React, {CSSProperties, useEffect, useState} from 'react';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {clamp} from 'Util/NumberUtil';
 
 export interface SeekBarProps extends React.HTMLProps<HTMLDivElement> {
   dark?: boolean;
+  ['data-uie-name']?: string;
   disabled?: boolean;
   mediaElement: HTMLMediaElement;
 }
@@ -37,7 +37,7 @@ const SeekBar: React.FC<SeekBarProps> = ({
   disabled,
   mediaElement,
   className,
-  ...props
+  'data-uie-name': dataUieName,
 }: SeekBarProps) => {
   const [isSeekBarMouseOver, setIsSeekBarMouseOver] = useState<boolean>(false);
   const [isSeekBarThumbDragged, setIsSeekBarThumbDragged] = useState<boolean>(false);
@@ -56,17 +56,17 @@ const SeekBar: React.FC<SeekBarProps> = ({
       setProgress(100);
     };
 
-    mediaElement.addEventListener('timeupdate', onTimeUpdate);
-    mediaElement.addEventListener('ended', onEnded);
+    mediaElement?.addEventListener('timeupdate', onTimeUpdate);
+    mediaElement?.addEventListener('ended', onEnded);
 
     return () => {
-      mediaElement.removeEventListener('timeupdate', onTimeUpdate);
-      mediaElement.removeEventListener('ended', onEnded);
+      mediaElement?.removeEventListener('timeupdate', onTimeUpdate);
+      mediaElement?.removeEventListener('ended', onEnded);
     };
   }, [mediaElement]);
 
   return (
-    <div className={cx('seek-bar', className)} {...props}>
+    <div className={cx('seek-bar', className)} data-uie-name={dataUieName}>
       <input
         data-uie-name="asset-control-media-seek-bar"
         className={cx({
@@ -102,8 +102,3 @@ const SeekBar: React.FC<SeekBarProps> = ({
 };
 
 export default SeekBar;
-
-registerReactComponent('seek-bar', {
-  component: SeekBar,
-  template: '<div data-bind="react: {dark, disabled: ko.unwrap(disabled), mediaElement: src}"></div>',
-});

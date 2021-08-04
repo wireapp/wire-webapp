@@ -28,6 +28,7 @@ import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';
 import {QualifiedPublicUserMap} from 'src/script/client/ClientService';
 import {TestFactory} from '../../../test/helper/TestFactory';
+import {entities} from '../../../test/api/payloads';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();
@@ -240,7 +241,7 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity();
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
-      testFactory.client_repository.selfUser(new User(userId));
+      testFactory.client_repository.selfUser(new User(userId, null));
       const result = testFactory.client_repository['isCurrentClient'](userId, clientId);
 
       expect(result).toBeTruthy();

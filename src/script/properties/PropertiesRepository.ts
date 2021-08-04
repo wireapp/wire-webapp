@@ -178,7 +178,11 @@ export class PropertiesRepository {
       })
       .catch(() => {
         this.logger.warn(
-          `Property "${PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS}" doesn't exist for this account. Continuing with the default value of "${this.properties.settings}".`,
+          `Property "${
+            PropertiesRepository.CONFIG.WEBAPP_ACCOUNT_SETTINGS
+          }" doesn't exist for this account. Continuing with default values: ${JSON.stringify(
+            this.properties.settings,
+          )}`,
         );
       });
   }

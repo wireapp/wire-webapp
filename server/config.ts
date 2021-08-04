@@ -160,6 +160,7 @@ const config: ServerConfig = {
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
       MOBILE_BASE: process.env.URL_MOBILE_BASE,
+      PRICING: process.env.URL_PRICING,
       PRIVACY_POLICY: process.env.URL_PRIVACY_POLICY,
       SUPPORT: {
         BUG_REPORT: process.env.URL_SUPPORT_BUG_REPORT,

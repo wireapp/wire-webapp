@@ -25,9 +25,8 @@
             <!-- /ko -->
 
             <!-- ko if: replyAsset().isVideo() -->
-              <div class="input-bar__reply__message input-bar__reply__message__image input-bar__reply__video" data-bind="background_image: replyAsset().preview_resource()" data-uie-name="media-video-reply-box">
-                <img/>
-                <camera-icon></camera-icon>
+              <div data-uie-name="media-video-reply-box">
+                <video-restricted params="className: 'input-bar__reply__message', showMessage: false, isSmall: true"></video-restricted>
               </div>
             <!-- /ko -->
 
@@ -89,32 +88,30 @@
 
         <div class="controls-right">
           <!-- ko ifnot: isEditing() -->
-            <!-- ko if: showGiphyButton() -->
-              <!-- ko if: isFileSharingSendingEnabled() -->
-                <gif-icon class="controls-right-button button-icon-large"
-                      data-bind="click: clickToShowGiphy, attr: {title: t('extensionsBubbleButtonGif')}"
-                      data-uie-name="do-giphy-popover">
-                </gif-icon>
-              <!-- /ko -->
+            <!-- ko if: showGiphyButton() && isFileSharingSendingEnabled() -->
+              <gif-icon class="controls-right-button button-icon-large"
+                  data-bind="click: clickToShowGiphy, disabled: disableControls, attr: {title: t('extensionsBubbleButtonGif')}, css: {'disabled': disableControls}"
+                  data-uie-name="do-giphy-popover">
+              </gif-icon>
             <!-- /ko -->
 
             <!-- ko ifnot: input().length -->
-              <message-timer-button params="conversation: conversationEntity"></message-timer-button>
+              <message-timer-button params="conversation: conversationEntity, disabled: disableControls" data-bind="css: {'disabled': disableControls}"></message-timer-button>
 
-              <!-- ko if: isFileSharingSendingEnabled() -->
-                <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large">
-                  <image-icon></image-icon>
-                  <input data-bind="attr: {accept: acceptedImageTypes}, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
-                </label>
+            <!-- ko if: isFileSharingSendingEnabled() -->
+              <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large" data-bind="css: {'disabled': disableControls}">
+                <image-icon></image-icon>
+                <input data-bind="attr: {accept: acceptedImageTypes}, disabled: disableControls, file_select: uploadImages" type="file" multiple="multiple" data-uie-name="do-share-image"/>
+              </label>
 
-                <label id="conversation-input-bar-files" class="controls-right-button button-icon-large" data-bind="attr: {title: t('tooltipConversationFile')}">
-                  <attachment-icon></attachment-icon>
-                  <input data-bind="attr: {accept: allowedFileTypes}, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
-                </label>
+              <label id="conversation-input-bar-files" class="controls-right-button button-icon-large" data-bind="attr: {title: t('tooltipConversationFile')}, css: {'disabled': disableControls}">
+                <attachment-icon></attachment-icon>
+                <input data-bind="disabled: disableControls, attr: {accept: allowedFileTypes}, file_select: uploadFiles" type="file" multiple="multiple" data-uie-name="do-share-file"/>
+              </label>
               <!-- /ko -->
 
               <span class="controls-right-button button-icon-large"
-                    data-bind="click: clickToPing, attr: {'title': pingTooltip}, css:{'disabled': pingDisabled}"
+                    data-bind="click: clickToPing, disabled: disableControls, attr: {'title': pingTooltip}, css: {'disabled': pingDisabled() || disableControls()}"
                     data-uie-name="do-ping">
                 <ping-icon></ping-icon>
               </span>
@@ -123,7 +120,7 @@
 
           <!-- ko if: isEditing() -->
             <span class="controls-right-button button-icon-large"
-                  data-bind="click: cancelMessageEditing"
+                  data-bind="click: cancelMessageEditing, css: {'disabled': disableControls}"
                   data-uie-name="do-cancel-edit">
               <close-icon></close-icon>
             </span>

@@ -90,14 +90,18 @@ export class ConversationState {
 
   /**
    * Find a local conversation by ID.
-   * @param conversationId ID of conversation to get
    * @returns Conversation is locally available
    */
-  findConversation(conversationId: string) {
+  findConversation(conversationId: string, domain?: string): Conversation {
     // we prevent access to local conversation if the team is deleted
     return this.teamState.isTeamDeleted()
       ? undefined
-      : this.conversations().find(conversation => conversation.id === conversationId);
+      : this.conversations().find(conversation => {
+          if (domain) {
+            return conversation.id === conversationId && conversation.domain === domain;
+          }
+          return conversation.id === conversationId;
+        });
   }
 
   /**
@@ -105,6 +109,11 @@ export class ConversationState {
    */
   isActiveConversation(conversationEntity: Conversation): boolean {
     const activeConversation = this.activeConversation();
-    return !!activeConversation && !!conversationEntity && activeConversation.id === conversationEntity.id;
+    return (
+      !!activeConversation &&
+      !!conversationEntity &&
+      activeConversation.id === conversationEntity.id &&
+      activeConversation.domain === conversationEntity.domain
+    );
   }
 }

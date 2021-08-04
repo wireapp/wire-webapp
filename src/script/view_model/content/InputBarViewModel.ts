@@ -109,6 +109,7 @@ export class InputBarViewModel {
   /** MIME types and file extensions are accepted */
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
+  readonly disableControls: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -333,6 +334,8 @@ export class InputBarViewModel {
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
 
+    this.disableControls = ko.pureComputed(() => this.conversationEntity().isFederated());
+
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {
       if (this.conversationEntity()) {
@@ -423,7 +426,7 @@ export class InputBarViewModel {
     const draftMessage: DraftMessage = {...(storageValue as DraftMessage)};
 
     draftMessage.mentions = draftMessage.mentions.map(mention => {
-      return new MentionEntity(mention.startIndex, mention.length, mention.userId);
+      return new MentionEntity(mention.startIndex, mention.length, mention.userId, mention.domain);
     });
 
     const replyMessageId = draftMessage.reply
@@ -449,7 +452,7 @@ export class InputBarViewModel {
 
   private readonly _createMentionEntity = (userEntity: User): MentionEntity => {
     const mentionLength = userEntity.name().length + 1;
-    return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id);
+    return new MentionEntity(this.editedMention().startIndex, mentionLength, userEntity.id, userEntity.domain);
   };
 
   readonly addMention = (userEntity: User, inputElement: HTMLInputElement): void => {
@@ -632,6 +635,8 @@ export class InputBarViewModel {
 
     if (this.isEditing()) {
       this.sendMessageEdit(messageText, this.editMessageEntity());
+    } else if (this.conversationEntity().isRemoteConversation) {
+      this.sendFederatedMessage(messageText);
     } else {
       this.sendMessage(messageText, this.replyMessageEntity());
     }
@@ -647,7 +652,9 @@ export class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
+            if (!this.conversationEntity().isFederated()) {
+              this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
+            }
             this.updateMentions(data, keyboardEvent);
           }
           break;
@@ -827,6 +834,15 @@ export class InputBarViewModel {
               userId: replyMessageEntity.from,
             });
           });
+  };
+
+  readonly sendFederatedMessage = (messageText: string): void => {
+    if (!messageText.length) {
+      return;
+    }
+
+    this.messageRepository.sendFederatedMessage(messageText);
+    this.cancelMessageReply();
   };
 
   readonly sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {

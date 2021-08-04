@@ -113,8 +113,9 @@ export class User {
     };
   }
 
-  constructor(id: string = '') {
+  constructor(id: string = '', domain: string | null) {
     this.id = id;
+    this.domain = domain;
     this.isMe = false;
     this.isService = false;
     this.isSingleSignOn = false;
@@ -254,6 +255,7 @@ export class User {
   serialize() {
     return {
       availability: this.availability(),
+      domain: this.domain,
       id: this.id,
     };
   }

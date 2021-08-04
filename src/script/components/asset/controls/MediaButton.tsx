@@ -23,7 +23,7 @@ import React, {useEffect, useState} from 'react';
 import type {FileAsset} from '../../../entity/message/FileAsset';
 import {AssetTransferState} from '../../../assets/AssetTransferState';
 import {noop} from 'Util/util';
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export interface MediaButtonProps {
   asset: FileAsset;
@@ -87,9 +87,3 @@ const MediaButton: React.FC<MediaButtonProps> = ({
 };
 
 export default MediaButton;
-
-registerReactComponent<MediaButtonProps>('media-button', {
-  component: MediaButton,
-  template:
-    '<div data-bind="react: {asset, cancel, large, pause, play, mediaElement, transferState: ko.unwrap(transferState), uploadProgress: ko.unwrap(uploadProgress)}"></div>',
-});

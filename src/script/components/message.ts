@@ -42,7 +42,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {TeamState} from '../team/TeamState';
 
-import './asset/audioAsset';
+import './asset/AudioAsset';
 import './asset/RestrictedAudio';
 import './asset/FileAssetComponent';
 import './asset/ImageAsset';
@@ -51,6 +51,7 @@ import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
 import './asset/VideoAsset';
 import './asset/RestrictedFile';
+import './asset/RestrictedVideo';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
@@ -212,7 +213,15 @@ class Message {
       const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
 
       const canDelete =
-        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
+        messageEntity.user().isMe &&
+        !this.conversation().removed_from_conversation() &&
+        messageEntity.isDeletable() &&
+        !this.conversation().isFederated();
+
+      const canEdit =
+        messageEntity.isEditable() &&
+        !this.conversation().removed_from_conversation() &&
+        !this.conversation().isFederated();
 
       const hasDetails =
         !this.conversation().is1to1() &&
@@ -235,7 +244,7 @@ class Message {
         });
       }
 
-      if (messageEntity.isEditable() && !this.conversation().removed_from_conversation()) {
+      if (canEdit) {
         entries.push({
           click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
           label: t('conversationContextMenuEdit'),
@@ -369,7 +378,7 @@ const normalTemplate: string = `
         <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.isAudio() -->
-        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></audio-asset>
+        <audio-asset data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message, className: 'message-asset'"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.isFile() -->
         <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>

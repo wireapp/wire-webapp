@@ -29,12 +29,12 @@ import {TeamState} from '../../team/TeamState';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import SeekBar from './controls/SeekBar';
 import MediaButton from './controls/MediaButton';
-import RestrictedFile from './RestrictedFile';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import useEffectRef from 'Util/useEffectRef';
 import {AssetRepository} from '../../assets/AssetRepository';
 import {useTimeout} from '@wireapp/react-ui-kit';
+import RestrictedVideo from './RestrictedVideo';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;
@@ -50,6 +50,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   assetRepository = container.resolve(AssetRepository),
 }) => {
   const asset = message.getFirstAsset() as FileAsset;
+  const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {preview_resource: assetPreviewResource} = useKoSubscribableChildren(asset, ['preview_resource']);
   const [videoPlaybackError, setVideoPlaybackError] = useState(null);
   const [videoTimeRest, setVideoTimeRest] = useState<number>();
@@ -104,12 +105,10 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
   };
 
   return (
-    !message.isObfuscated() && (
-      <div className="video-asset">
+    !isObfuscated && (
+      <div className="video-asset" data-uie-name="video-asset" data-uie-value={asset.file_name}>
         {!isFileSharingReceivingEnabled ? (
-          <div className="video-asset__restricted">
-            <RestrictedFile asset={asset} />
-          </div>
+          <RestrictedVideo />
         ) : (
           <>
             <div
@@ -119,8 +118,6 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                 removeTimeout();
                 setHideControls(false);
               }}
-              data-uie-name="video-asset"
-              data-uie-value={asset.file_name}
             >
               <video
                 ref={setVideoElement}
@@ -179,7 +176,7 @@ const VideoAsset: React.FC<VideoAssetProps> = ({
                         <div className="video-asset__controls__bottom">
                           <SeekBar
                             className="video-asset__controls__bottom__seekbar"
-                            data-ui-name="status-video-seekbar"
+                            data-uie-name="status-video-seekbar"
                             mediaElement={videoElement}
                           />
                           <span

@@ -71,6 +71,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     availabilityOfUser,
     unreadState,
     mutedState,
+    isRequest,
   } = useKoSubscribableChildren(conversation, [
     'isGroup',
     'is1to1',
@@ -81,6 +82,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     'availabilityOfUser',
     'unreadState',
     'mutedState',
+    'isRequest',
   ]);
 
   const isSelected = is_selected(conversation);
@@ -104,7 +106,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
     };
   }, [viewportElementRef]);
 
-  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState]);
+  const cellState = useMemo(() => generateCellState(conversation), [unreadState, mutedState, isRequest]);
 
   const onClickJoinCall = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -127,7 +129,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
             })}
           >
             {isGroup && <GroupAvatar className="conversation-list-cell-avatar-arrow" users={users} />}
-            {!isGroup && users.length && (
+            {!isGroup && !!users.length && (
               <div className="avatar-halo">
                 <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />
               </div>

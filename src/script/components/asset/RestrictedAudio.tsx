@@ -19,7 +19,6 @@
 
 import React from 'react';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 
@@ -42,8 +41,3 @@ const RestrictedAudio: React.FC<RestrictedAudioProps> = ({}) => {
 };
 
 export default RestrictedAudio;
-
-registerReactComponent<RestrictedAudioProps>('audio-restricted', {
-  bindings: '',
-  component: RestrictedAudio,
-});

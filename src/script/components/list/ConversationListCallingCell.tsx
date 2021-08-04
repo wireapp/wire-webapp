@@ -115,7 +115,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const videoGrid = call && getGrid(call);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
-  const conversationUrl = generateConversationUrl(conversation.id);
+  const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);
   const selfParticipant = call?.getSelfParticipant();
 
   const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
@@ -201,7 +201,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             {!temporaryUserStyle && (
               <div className="conversation-list-cell-left" onClick={createNavigate(conversationUrl)}>
                 {isGroup && <GroupAvatar users={conversationParticipants} isLight={true} />}
-                {!isGroup && conversationParticipants.length && (
+                {!isGroup && !!conversationParticipants.length && (
                   <Avatar participant={conversationParticipants[0]} avatarSize={AVATAR_SIZE.SMALL} />
                 )}
               </div>
@@ -256,7 +256,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 ))}
             </div>
           </div>
-          {(isOngoing || selfParticipant?.hasActiveVideo()) && isMinimized && videoGrid?.grid.length && (
+          {(isOngoing || selfParticipant?.hasActiveVideo()) && isMinimized && !!videoGrid?.grid.length && (
             <div
               className="group-video__minimized-wrapper"
               onClick={isOngoing ? () => multitasking.isMinimized(false) : undefined}
@@ -413,12 +413,12 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 registerReactComponent('conversation-list-calling-cell', {
   component: ConversationListCallingCell,
   template: `<div data-bind="react: {
-    call, 
-    callActions, 
-    callingRepository, 
-    conversation: ko.unwrap(conversation), 
-    hasAccessToCamera: ko.unwrap(hasAccessToCamera), 
-    isSelfVerified: ko.unwrap(isSelfVerified), 
+    call,
+    callActions,
+    callingRepository,
+    conversation: ko.unwrap(conversation),
+    hasAccessToCamera: ko.unwrap(hasAccessToCamera),
+    isSelfVerified: ko.unwrap(isSelfVerified),
     multitasking,
     temporaryUserStyle,
   }"></div>

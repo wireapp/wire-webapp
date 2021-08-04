@@ -32,16 +32,16 @@ const RestrictedFile: React.FC<RestrictedFileProps> = ({asset}) => {
   const fileName = trimFileExtension(asset?.file_name);
   return (
     <div className="file">
-      <div className="file-icon icon-file" data-uie-name="file-icon">
-        <span className="file-icon-ext icon-block"></span>
+      <div className="file__icon icon-file" data-uie-name="file-icon">
+        <span className="file__icon__ext icon-block"></span>
       </div>
-      <div className="file-desc">
+      <div className="file__desc">
         {fileName && (
           <div className="label-bold-xs ellipsis" data-uie-name="file-name">
             {fileName}
           </div>
         )}
-        <ul className="file-desc-meta label-nocase-xs text-foreground">
+        <ul className="file__desc__meta label-xs text-foreground">
           <li data-uie-name="file-restrictions">{t('conversationAssetRestricted')}</li>
         </ul>
       </div>

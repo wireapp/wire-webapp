@@ -161,7 +161,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   return (
     <Fragment>
-      {!isMinimized && videoGrid?.grid.length && (
+      {!isMinimized && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
           key={joinedCall.conversationId}
           videoGrid={videoGrid}

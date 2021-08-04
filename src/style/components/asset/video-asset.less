@@ -17,6 +17,8 @@
  *
  */
 
+@play-button-size: 32px;
+
 @keyframes loading {
   to {
     transform: rotate(360deg);
@@ -25,12 +27,11 @@
 
 // Video asset component
 .video-asset {
-  .asset-container-style;
-
   position: relative;
   display: block;
 
   &__container {
+    .asset-container-style;
     .full-screen;
 
     video {
@@ -59,11 +60,6 @@
     &--small + &__sizer {
       padding-bottom: 88px;
     }
-  }
-
-  &__restricted {
-    width: 100%;
-    margin: 16px 12px;
   }
 
   &__placeholder {
@@ -127,6 +123,46 @@
     &--hidden {
       opacity: 0;
       transition: opacity @animation-timing-fast ease-in-out;
+    }
+  }
+
+  &__restricted {
+    display: flex;
+    width: 200px;
+    height: 113px;
+    background-color: var(--foreground-fade-8);
+    border-radius: 4px;
+
+    &--small {
+      width: 100px;
+      height: 56px;
+    }
+
+    &--container {
+      padding: 8px;
+      margin: auto;
+    }
+
+    &__play-button {
+      .circle(@play-button-size);
+      .text-foreground;
+
+      position: relative;
+      flex: 0 0 auto;
+      margin: auto;
+      background-color: white;
+      font-size: @font-size-sm;
+      line-height: @play-button-size;
+      text-align: center;
+    }
+
+    &--message {
+      .label-xs;
+      .text-foreground;
+      .text-center;
+
+      margin-top: 8px;
+      line-height: 1.3em;
     }
   }
 }

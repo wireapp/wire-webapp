@@ -54,6 +54,7 @@ import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {Config} from '../Config';
 
 export class ConversationService {
   private readonly eventService: EventService;
@@ -93,20 +94,25 @@ export class ConversationService {
    * Retrieves all the conversations of a user.
    * @returns Resolves with the conversation information
    */
-  getAllConversations(): Promise<BackendConversation[]> {
-    return this.apiClient.conversation.api.getAllConversations();
+  async getAllConversations(): Promise<BackendConversation[]> {
+    const conversations = await this.apiClient.conversation.api.getAllConversations();
+
+    if (Config.getConfig().FEATURE.ENABLE_FEDERATION === true && Config.getConfig().FEATURE.FEDERATION_DOMAIN) {
+      const remoteConversations = await this.apiClient.conversation.api.getRemoteConversations(
+        Config.getConfig().FEATURE.FEDERATION_DOMAIN,
+      );
+      conversations.push(...remoteConversations);
+    }
+
+    return conversations;
   }
 
   /**
    * Get a conversation by ID.
-   *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
-   *
-   * @param conversation_id ID of conversation to get
-   * @returns Resolves with the server response
    */
-  getConversationById(conversationId: string): Promise<BackendConversation> {
-    return this.apiClient.conversation.api.getConversation(conversationId);
+  getConversationById(conversationId: string, domain: string | null): Promise<BackendConversation> {
+    return this.apiClient.conversation.api.getConversation(conversationId, domain);
   }
 
   /**
@@ -354,14 +360,12 @@ export class ConversationService {
 
   /**
    * Deletes a conversation entity from the local database.
-   * @param conversation_id ID of conversation to be deleted
    * @returns Resolves when the entity was deleted
    */
-  deleteConversationFromDb(conversation_id: string): Promise<string> {
-    return this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, conversation_id).then(primary_key => {
-      this.logger.info(`State of conversation '${primary_key}' was deleted`);
-      return primary_key;
-    });
+  async deleteConversationFromDb(conversationId: string, domain: string | null): Promise<string> {
+    const id = domain ? `${conversationId}@${domain}` : conversationId;
+    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, id);
+    return primaryKey;
   }
 
   loadConversation<T>(conversationId: string): Promise<T> {

@@ -19,6 +19,9 @@
 
 import type {BackendError} from '@wireapp/api-client/src/http/';
 import {AxiosError} from 'axios';
+import {User} from '../entity/User';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {Conversation} from '../entity/Conversation';
 
 export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError {
   return errorCandidate && errorCandidate.isAxiosError === true;
@@ -26,4 +29,20 @@ export function isAxiosError(errorCandidate: any): errorCandidate is AxiosError 
 
 export function isBackendError(errorCandidate: any): errorCandidate is BackendError {
   return errorCandidate && typeof errorCandidate.label === 'string' && typeof errorCandidate.message === 'string';
+}
+
+export function isUser(userCandidate: any): userCandidate is User {
+  return userCandidate instanceof User;
+}
+
+export function isQualifiedIdArray(ids: string[] | QualifiedId[]): ids is QualifiedId[] {
+  return !!ids.length && isQualifiedId(ids[0]);
+}
+
+export function isQualifiedId(userId: string | QualifiedId): userId is QualifiedId {
+  return typeof userId === 'object' && 'domain' in userId && typeof userId.domain === 'string';
+}
+
+export function isConversationEntity(conversation: any): conversation is Conversation {
+  return conversation instanceof Conversation;
 }
