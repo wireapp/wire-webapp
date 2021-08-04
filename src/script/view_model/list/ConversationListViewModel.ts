@@ -28,7 +28,7 @@ import type {MouseEventHandler} from 'react';
 
 import 'Components/AvailabilityState';
 import 'Components/LegalHoldDot';
-import 'Components/list/groupedConversations';
+import 'Components/list/GroupedConversations';
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
