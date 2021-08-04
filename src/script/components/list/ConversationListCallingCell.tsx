@@ -21,7 +21,6 @@ import React, {useEffect, useState} from 'react';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {container} from 'tsyringe';
-import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
@@ -46,8 +45,6 @@ import {createNavigate} from '../../router/routerBindings';
 import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {TeamState} from '../../team/TeamState';
-import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
-import type {ClientId, Participant, UserId} from '../../calling/Participant';
 
 export interface CallingCellProps {
   call: Call;
@@ -133,42 +130,6 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const [showParticipants, setShowParticipants] = useState(false);
 
   const [callDuration, setCallDuration] = useState('');
-
-  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
-    event.preventDefault();
-    const entries: ContextMenuEntry[] = [
-      {
-        click: () =>
-          callingRepository.sendModeratorMute(conversation.id, {[participant.user.id]: [participant.clientId]}),
-        icon: 'mic-off-icon',
-        isDisabled:
-          participant.isMuted() || conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
-        label: 'Mute',
-      },
-      {
-        click: () => {
-          const recipients = participants.reduce((acc, {user, clientId}) => {
-            acc[user.id] = [...(acc[user.id] || []), clientId];
-            return acc;
-          }, {} as Record<UserId, ClientId[]>);
-          callingRepository.sendModeratorMute(conversation.id, recipients);
-        },
-        icon: 'mic-off-icon',
-        isDisabled:
-          participants.every(p => p.isMuted()) ||
-          conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
-        label: 'Mute all',
-      },
-      {
-        click: () =>
-          callingRepository.sendModeratorKick(conversation.id, {[participant.user.id]: [participant.clientId]}),
-        icon: 'leave-icon',
-        isDisabled: conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
-        label: 'Kick from call',
-      },
-    ];
-    showContextMenu(event.nativeEvent, entries, 'participant-moderator-menu');
-  };
 
   useEffect(() => {
     let intervalId: number;
@@ -397,7 +358,6 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         selfInTeam={selfUser?.inTeam()}
                         isSelfVerified={isSelfVerified}
                         external={teamState.isExternal(participant.user.id)}
-                        onContextMenu={event => getParticipantContext(event, participant)}
                       />
                     ))}
                 </div>
