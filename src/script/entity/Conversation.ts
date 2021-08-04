@@ -482,9 +482,9 @@ export class Conversation {
 
   private hasInitializedUsers() {
     const hasMappedUsers =
-      this.participating_user_ets().length ||
-      this.participating_user_ids().length + this.participatingQualifiedUserIds().length > 0;
-    return Boolean(this.selfUser() && hasMappedUsers);
+      this.participating_user_ets().length > 0 ||
+      this.participating_user_ids().length + this.participatingQualifiedUserIds().length === 0;
+    return !!this.selfUser() && hasMappedUsers;
   }
 
   private _initSubscriptions() {
