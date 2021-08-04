@@ -1130,10 +1130,12 @@ export class ConversationRepository {
    * @param initialTimestamp Initial server and event timestamp
    * @returns Mapped conversation/s
    */
+  mapConversations(payload: BackendConversation, initialTimestamp?: number): Conversation;
+  mapConversations(payload: BackendConversation[], initialTimestamp?: number): Conversation[];
   mapConversations(
     payload: BackendConversation[] | BackendConversation,
     initialTimestamp = this.getLatestEventTimestamp(),
-  ) {
+  ): Conversation | Conversation[] {
     const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
     const entities = ConversationMapper.mapConversations(
       conversationsData as ConversationDatabaseData[],
@@ -1228,8 +1230,16 @@ export class ConversationRepository {
     offline = false,
     updateGuests = false,
   ): Promise<Conversation> {
-    const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
-    userEntities.sort(sortUsersByPriority);
+    let userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
+    const qualifiedUserEntities = await this.userRepository.getUsersById(
+      conversationEntity.participatingQualifiedUserIds(),
+      offline,
+    );
+    userEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
+    // TODO Federation fix: Filter duplicated users
+    userEntities = userEntities.filter(
+      (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
+    );
     conversationEntity.participating_user_ets(userEntities);
 
     if (updateGuests) {
@@ -2169,9 +2179,13 @@ export class ConversationRepository {
         throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
 
-      const conversationEntity = this.mapConversations(eventData, initialTimestamp) as Conversation;
+      const conversationEntity = this.mapConversations(eventData, initialTimestamp);
       if (conversationEntity) {
-        if (conversationEntity.participating_user_ids().length) {
+        if (
+          conversationEntity.participating_user_ids().length +
+            conversationEntity.participatingQualifiedUserIds().length >
+          0
+        ) {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
@@ -2223,7 +2237,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-join' event
    * @returns Resolves when the event was handled
    */
-  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson): Promise<void | EntityObject> {
+  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson) {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
@@ -2248,10 +2262,7 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    const updateSequence =
-      selfUserRejoins || connectionEntity?.isConnected()
-        ? this.updateConversationFromBackend(conversationEntity)
-        : Promise.resolve();
+    const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
 
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
@@ -2293,6 +2304,7 @@ export class ConversationRepository {
         .filter((userEntity: User) => !userEntity.isMe)
         .forEach((userEntity: User) => {
           conversationEntity.participating_user_ids.remove(userEntity.id);
+          conversationEntity.participatingQualifiedUserIds.remove({domain: userEntity.domain, id: userEntity.id});
 
           if (userEntity.isTemporaryGuest()) {
             userEntity.clearExpirationTimeout();

@@ -215,7 +215,7 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, type} = conversationData;
+    const {creator, id, members, name, qualified_users, others, type} = conversationData;
     let conversationEntity = new Conversation(id, conversationData.domain || conversationData.qualified_id?.domain);
     conversationEntity.roles(conversationData.roles || {});
 
@@ -232,8 +232,16 @@ export class ConversationMapper {
     }
 
     // Active participants from database or backend payload
-    const participatingUserIds = others || members.others.map(other => other.id);
+    const participatingUserIds =
+      others || members?.others.filter(other => !other.qualified_id).map(other => other.id) || [];
+    const participatingQualifiedUserIds =
+      qualified_users ||
+      members?.others
+        .filter(other => !!other.qualified_id)
+        .map(other => ({domain: other.qualified_id.domain, id: other.qualified_id.id})) ||
+      [];
     conversationEntity.participating_user_ids(participatingUserIds);
+    conversationEntity.participatingQualifiedUserIds(participatingQualifiedUserIds);
 
     // Team ID from database or backend payload
     const teamId = conversationData.team_id || conversationData.team;
@@ -319,8 +327,17 @@ export class ConversationMapper {
         const noOthers = !mergedConversation.others || !mergedConversation.others.length;
         if (isGroup || noOthers) {
           mergedConversation.others = othersStates
-            .filter(otherState => (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number))
+            .filter(
+              otherState =>
+                Number(otherState.status) === Number(ConversationStatus.CURRENT_MEMBER) && !otherState.qualified_id,
+            )
             .map(otherState => otherState.id);
+          mergedConversation.qualified_users = othersStates
+            .filter(
+              otherState =>
+                Number(otherState.status) === Number(ConversationStatus.CURRENT_MEMBER) && !!otherState.qualified_id,
+            )
+            .map(otherState => ({domain: otherState.qualified_id.domain, id: otherState.qualified_id.id}));
         }
 
         // This should ensure a proper order

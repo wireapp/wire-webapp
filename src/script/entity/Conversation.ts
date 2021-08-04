@@ -23,6 +23,7 @@ import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-mes
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -126,8 +127,12 @@ export class Conversation {
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
+  /** Does not include self user */
   public readonly participating_user_ets: ko.ObservableArray<User>;
+  /** Does not include self user */
   public readonly participating_user_ids: ko.ObservableArray<string>;
+  /** Does not include self user */
+  public readonly participatingQualifiedUserIds: ko.ObservableArray<QualifiedId>;
   public readonly receiptMode: ko.Observable<Confirmation.Type>;
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
@@ -145,8 +150,8 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE;
-  public domain?: string;
-  isFederated: ko.PureComputed<boolean>;
+  public readonly domain?: string;
+  public readonly isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
@@ -169,8 +174,9 @@ export class Conversation {
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
 
-    this.participating_user_ets = ko.observableArray([]); // Does not include self user
-    this.participating_user_ids = ko.observableArray([]); // Does not include self user
+    this.participating_user_ets = ko.observableArray([]);
+    this.participating_user_ids = ko.observableArray([]);
+    this.participatingQualifiedUserIds = ko.observableArray([]);
     this.selfUser = ko.observable();
     this.roles = ko.observable({});
 
@@ -189,7 +195,8 @@ export class Conversation {
 
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
-      const hasOneParticipant = this.participating_user_ids().length === 1;
+      const hasOneParticipant =
+        this.participating_user_ids().length + this.participatingQualifiedUserIds().length === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
@@ -301,7 +308,9 @@ export class Conversation {
       () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
     );
 
-    this.isFederated = ko.pureComputed(() => !!this.domain);
+    this.isFederated = ko.pureComputed(() =>
+      this.participatingQualifiedUserIds().some(userId => userId.domain !== this.selfUser().domain),
+    );
 
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
@@ -454,7 +463,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        const hasUserIds = !!this.participating_user_ids().length;
+        const hasUserIds = this.participating_user_ids().length + this.participatingQualifiedUserIds().length > 0;
         if (!hasUserIds) {
           return t('conversationsEmptyConversation');
         }
@@ -472,7 +481,9 @@ export class Conversation {
   }
 
   private hasInitializedUsers() {
-    const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
+    const hasMappedUsers =
+      this.participating_user_ets().length ||
+      this.participating_user_ids().length + this.participatingQualifiedUserIds().length > 0;
     return Boolean(this.selfUser() && hasMappedUsers);
   }
 
@@ -671,11 +682,18 @@ export class Conversation {
     const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
     const adjustCountForServices = countServices ? 0 : this.getNumberOfServices();
 
-    return this.participating_user_ids().length + adjustCountForSelf - adjustCountForServices;
+    return (
+      this.participating_user_ids().length +
+      this.participatingQualifiedUserIds().length +
+      adjustCountForSelf -
+      adjustCountForServices
+    );
   }
 
   getNumberOfClients(): number {
-    const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
+    const participantsMapped =
+      this.participating_user_ids().length + this.participatingQualifiedUserIds().length ===
+      this.participating_user_ets().length;
     if (participantsMapped) {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
         return userEntity.devices().length
@@ -938,6 +956,7 @@ export class Conversation {
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
       others: this.participating_user_ids(),
+      qualified_users: this.participatingQualifiedUserIds(),
       receipt_mode: this.receiptMode(),
       roles: this.roles(),
       status: this.status(),
