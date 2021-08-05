@@ -65,6 +65,8 @@ import './message/SystemMessage';
 import './message/MemberMessage';
 import './message/ReadReceiptStatus';
 import './message/PingMessage';
+import './message/MessageFooterLike';
+import './message/MessageLike';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -392,12 +394,7 @@ const normalTemplate: string = `
     <!-- /ko -->
 
     <!-- ko if: !message.other_likes().length && message.isReactable() -->
-      <div class="message-body-like">
-        <span class="message-body-like-icon like-button message-show-on-hover" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: () => onLike(message)">
-          <span class="icon-like-small"></span>
-          <span class="icon-liked-small"></span>
-        </span>
-      </div>
+        <message-like class="message-body-like" params="className: 'message-body-like-icon like-button message-show-on-hover', message: message, onLike: onLike"></message-like>
     <!-- /ko -->
 
     <div class="message-body-actions">
@@ -415,17 +412,7 @@ const normalTemplate: string = `
 
   </div>
   <!-- ko if: message.other_likes().length -->
-    <div class="message-footer">
-      <div class="message-footer-icon">
-        <span class="like-button" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: () => onLike(message)">
-          <span class="icon-like-small"></span>
-          <span class="icon-liked-small"></span>
-        </span>
-      </div>
-      <div class="message-footer-label " data-bind="css: {'cursor-pointer': !conversation().is1to1()}, click: !conversation().is1to1() ? onClickLikes : null ">
-        <span class="font-size-xs text-foreground" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
-      </div>
-    </div>
+    <message-footer-like params="message: message, is1to1Conversation: conversation().is1to1(), onLike: onLike, onClickLikes: onClickLikes"></message-footer-like>
   <!-- /ko -->
   `;
 
