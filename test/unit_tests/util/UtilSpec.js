@@ -57,8 +57,8 @@ describe('formatBytes', () => {
     expect(formatBytes(0)).toEqual('0 B');
   });
 
-  it('renders 1 kB', () => {
-    expect(formatBytes(1024)).toEqual('1 kB');
+  it('renders 1 KB', () => {
+    expect(formatBytes(1024)).toEqual('1 KB');
   });
 
   it('renders 25 MB', () => {
