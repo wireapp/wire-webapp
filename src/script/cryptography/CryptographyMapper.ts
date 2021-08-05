@@ -61,7 +61,13 @@ import {CryptographyError} from '../error/CryptographyError';
 import {EventRecord} from '../storage';
 
 export interface MappedText {
-  data: {content: string; mentions: string[]; previews: string[]; quote?: string; replacing_message_id?: string};
+  data: {
+    content: string;
+    mentions: string[];
+    previews: string[];
+    quote?: string;
+    replacing_message_id?: string;
+  };
   type: CONVERSATION;
 }
 

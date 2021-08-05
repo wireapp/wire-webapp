@@ -1236,7 +1236,7 @@ export class ConversationRepository {
       offline,
     );
     userEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
-    // TODO Federation fix: Filter duplicated users
+    // TODO(Federation) fix: Filter duplicated users
     userEntities = userEntities.filter(
       (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
     );
@@ -2737,25 +2737,22 @@ export class ConversationRepository {
    * @returns Resolves when users have been update
    */
   private async updateMessageUserEntities(messageEntity: Message) {
+    // TODO(Federation): implement `fromDomain` for message entities
     const userEntity = await this.userRepository.getUserById(messageEntity.from, messageEntity.fromDomain);
     messageEntity.user(userEntity);
     const isMemberMessage = messageEntity.isMember();
     if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
-      return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
-        userEntities.sort(sortUsersByPriority);
-        (messageEntity as MemberMessage).userEntities(userEntities);
-        return messageEntity;
-      });
+      const userEntities = await this.userRepository.getUsersById((messageEntity as MemberMessage).userIds());
+      userEntities.sort(sortUsersByPriority);
+      (messageEntity as MemberMessage).userEntities(userEntities);
     }
     if (messageEntity.isContent()) {
       const userIds = Object.keys(messageEntity.reactions());
 
       messageEntity.reactions_user_ets.removeAll();
       if (userIds.length) {
-        return this.userRepository.getUsersById(userIds).then(userEntities_1 => {
-          messageEntity.reactions_user_ets(userEntities_1);
-          return messageEntity;
-        });
+        const userEntities = await this.userRepository.getUsersById(userIds);
+        messageEntity.reactions_user_ets(userEntities);
       }
     }
     return messageEntity;

@@ -464,7 +464,7 @@ export class EventMapper {
    * @returns Member message entity
    */
   private _mapEventMemberJoin(event: EventRecord, conversationEntity: Conversation) {
-    const {data: eventData, from: sender} = event;
+    const {data: eventData, from: senderId} = event;
     const {has_service: hasService, user_ids: userIds} = eventData;
 
     const messageEntity = new MemberMessage();
@@ -473,8 +473,8 @@ export class EventMapper {
     messageEntity.visible(!isSingleModeConversation);
 
     if (conversationEntity.isGroup()) {
-      const messageFromCreator = sender === conversationEntity.creator;
-      const creatorIndex = userIds.indexOf(sender);
+      const messageFromCreator = senderId === conversationEntity.creator;
+      const creatorIndex = userIds.indexOf(senderId);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
       if (creatorIsJoiningMember) {

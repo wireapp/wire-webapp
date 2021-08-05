@@ -574,7 +574,7 @@ export class UserRepository {
     let knownUserEntities = partitionedUsers[0];
 
     const unknownUserIds = partitionedUsers[1];
-    // TODO Federation fix: Filter duplicated users
+    // TODO(Federation) fix: Filter duplicated users
     knownUserEntities = knownUserEntities.filter(
       (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
     );
