@@ -305,7 +305,10 @@ export class Conversation {
     });
 
     this.isCreatedBySelf = ko.pureComputed(
-      () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
+      () =>
+        this.selfUser().id === this.creator &&
+        this.selfUser().domain === this.domain &&
+        !this.removed_from_conversation(),
     );
 
     this.isFederated = ko.pureComputed(() =>

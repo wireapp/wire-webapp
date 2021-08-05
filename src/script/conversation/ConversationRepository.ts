@@ -2205,17 +2205,22 @@ export class ConversationRepository {
   private async onGroupCreation(conversationEntity: Conversation, eventJson: EventRecord) {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     const creatorId = conversationEntity.creator;
-    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
+    const conversationDomain = conversationEntity.domain;
+    const createdByParticipant =
+      !!conversationEntity.participating_user_ids().find(userId => userId === creatorId) ||
+      conversationEntity
+        .participatingQualifiedUserIds()
+        .find(user => user.id === creatorId && user.domain === conversationDomain);
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
 
     const data = await this.conversation_service.getConversationById(conversationEntity.id, conversationEntity.domain);
     const allMembers = [...data.members.others, data.members.self];
-    const conversationRoles = allMembers.reduce((roles, member) => {
+    const conversationRoles = allMembers.reduce<Record<string, string>>((roles, member) => {
       roles[member.id] = member.conversation_role;
       return roles;
-    }, {} as Record<string, string>);
+    }, {});
     conversationEntity.roles(conversationRoles);
 
     if (!creatorIsParticipant) {
