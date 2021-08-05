@@ -22,7 +22,7 @@ import React from 'react';
 import DragableClickWrapper from 'Components/DragableClickWrapper';
 import Icon from 'Components/Icon';
 
-interface PanelHeaderProps {
+export interface PanelHeaderProps {
   closeUie?: string;
   goBackUie?: string;
   onClose: () => void;

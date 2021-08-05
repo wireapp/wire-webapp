@@ -30,7 +30,7 @@ import {ViewModelRepositories} from '../MainViewModel';
 import PanelHeader from './PanelHeader';
 import {ConversationState} from '../../conversation/ConversationState';
 
-interface NotificationsPanelProps {
+export interface NotificationsPanelProps {
   conversationState?: ConversationState;
   onClose: () => void;
   onGoBack: () => void;
