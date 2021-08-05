@@ -33,6 +33,7 @@ import {
   REASON,
   STATE as CALL_STATE,
   VIDEO_STATE,
+  VSTREAMS,
   Wcall,
   WcallClient,
   WcallMember,
@@ -387,7 +388,7 @@ export class CallingRepository {
 
   private removeCall(call: Call): void {
     const index = this.callState.activeCalls().indexOf(call);
-    call.getSelfParticipant().releaseMediaStream();
+    call.getSelfParticipant().releaseMediaStream(true);
     call.participants.removeAll();
     call.removeAllAudio();
     if (index !== -1) {
@@ -685,7 +686,7 @@ export class CallingRepository {
     if (call.state() === CALL_STATE.INCOMING) {
       selfParticipant.videoState(newState);
       if (newState === VIDEO_STATE.STOPPED) {
-        selfParticipant.releaseVideoStream();
+        selfParticipant.releaseVideoStream(true);
       } else {
         this.warmupMediaStreams(call, false, true);
       }
@@ -731,7 +732,7 @@ export class CallingRepository {
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
       if (!isVideoCall) {
-        call.getSelfParticipant().releaseVideoStream();
+        call.getSelfParticipant().releaseVideoStream(true);
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
       await this.pushClients(call.conversationId);
@@ -754,7 +755,15 @@ export class CallingRepository {
     this.wCall.reject(this.wUser, conversationId);
   }
 
-  changeCallPage(newPage: number, call: Call): void {}
+  changeCallPage(newPage: number, call: Call): void {
+    const nextPageParticipants = call.pages()[newPage];
+    const payload = {
+      clients: nextPageParticipants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      convid: call.conversationId,
+    };
+    this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
+    call.currentPage(newPage);
+  }
 
   readonly leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
@@ -817,7 +826,7 @@ export class CallingRepository {
       case MediaType.VIDEO: {
         // Don't stop video input (coming from A/V preferences) when screensharing is activated
         if (!selfParticipant.sharesScreen()) {
-          selfParticipant.releaseVideoStream();
+          selfParticipant.releaseVideoStream(true);
         }
         break;
       }
@@ -905,11 +914,6 @@ export class CallingRepository {
     _unused: null,
     payload: string,
   ): number => {
-    const protoCalling = new Calling({content: payload});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-      messageId: createRandomUuid(),
-    });
     const call = this.findCall(conversationId);
     if (call?.blockMessages) {
       return 0;
@@ -933,12 +937,25 @@ export class CallingRepository {
           };
         }
 
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-        return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
+        return this.sendCallingMessage(conversationId, payload, options);
       })
       .catch(() => this.abortCall(conversationId));
 
     return 0;
+  };
+
+  private readonly sendCallingMessage = (
+    conversationId: ConversationId,
+    payload: string | Object,
+    options?: MessageSendingOptions,
+  ): Promise<ClientMismatch> => {
+    const protoCalling = new Calling({content: typeof payload === 'string' ? payload : JSON.stringify(payload)});
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+      messageId: createRandomUuid(),
+    });
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
+    return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
   };
 
   private readonly sendSFTRequest = (
@@ -1033,7 +1050,7 @@ export class CallingRepository {
       this.removeCall(call);
       return;
     }
-    selfParticipant.releaseMediaStream();
+    selfParticipant.releaseMediaStream(true);
     call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
@@ -1292,6 +1309,10 @@ export class CallingRepository {
       return;
     }
     const participant = call.getParticipant(userId, clientId);
+    if (!participant) {
+      return;
+    }
+
     const selfParticipant = call.getSelfParticipant();
     const isSameUser = selfParticipant.doesMatchIds(userId, clientId);
 
@@ -1303,7 +1324,7 @@ export class CallingRepository {
     // user has stopped sharing their screen
     if (participant.videoState() === VIDEO_STATE.SCREENSHARE && state !== VIDEO_STATE.SCREENSHARE) {
       if (isSameUser) {
-        selfParticipant.releaseVideoStream();
+        selfParticipant.releaseVideoStream(true);
       }
       this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
         [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING,
@@ -1320,7 +1341,7 @@ export class CallingRepository {
     }
 
     if (call.state() === CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
-      selfParticipant.releaseVideoStream();
+      selfParticipant.releaseVideoStream(true);
     }
 
     call
