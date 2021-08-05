@@ -48,7 +48,7 @@ const MessageFooterLike: React.FC<MessageFooterLikeProps> = ({message, is1to1Con
         className={cx('message-footer-label', {
           'cursor-pointer': !is1to1Conversation,
         })}
-        onClick={!is1to1Conversation ? () => onClickLikes({message}) : null}
+        onClick={is1to1Conversation ? null : () => onClickLikes({message})}
       >
         <span
           className="font-size-xs text-foreground"

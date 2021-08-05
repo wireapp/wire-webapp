@@ -79,7 +79,7 @@ describe('MessageFooterLike', () => {
     expect(spyOnOpenConversationDetails).toHaveBeenCalled();
   });
 
-  it('does not open conversation details in 1:1 conversation when clicking on like name', async () => {
+  it('does not open conversation details in 1:1 conversation when clicking on like names', async () => {
     const spyOnOpenConversationDetails = jest.fn();
     const messageFooterLikePage = new MessageFooterLikePage({
       is1to1Conversation: true,
