@@ -146,7 +146,7 @@ export class Conversation {
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE;
   public domain?: string;
-  isFederated: ko.PureComputed<boolean>;
+  public isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
