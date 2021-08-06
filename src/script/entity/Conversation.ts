@@ -311,9 +311,7 @@ export class Conversation {
         !this.removed_from_conversation(),
     );
 
-    this.isFederated = ko.pureComputed(() =>
-      this.participatingQualifiedUserIds().some(userId => userId.domain !== this.selfUser().domain),
-    );
+    this.isFederated = ko.pureComputed(() => Config.getConfig().FEATURE.ENABLE_FEDERATION && !!this.domain);
 
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
