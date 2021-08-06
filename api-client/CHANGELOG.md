@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.36.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.35.2...@wireapp/api-client@12.36.0) (2021-08-06)
+
+
+### Features
+
+* **api-client:** Restructured BillingAPI ([#4111](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4111)) ([45b8bca](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/45b8bca6076eea5c34f781c6bc6d3a3e840ec65a))
+
+
+
+
+
 ## [12.35.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.35.1...@wireapp/api-client@12.35.2) (2021-08-04)
 
 **Note:** Version bump only for package @wireapp/api-client
