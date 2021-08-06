@@ -25,6 +25,7 @@ export {PaymentAPI, PaymentData} from './payment/';
 export {ServiceAPI, Service, ServiceWhitelistData} from './service/';
 export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError, ServiceNotFoundError} from './TeamError';
 
+export * from './billing/';
 export * from './identityprovider/';
 export * from './scim/';
 export * from './feature/';

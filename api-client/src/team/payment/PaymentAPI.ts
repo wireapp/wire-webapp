@@ -45,6 +45,9 @@ export class PaymentAPI {
     TEAMS: '/teams',
   };
 
+  /**
+   * @deprecated Use BillingAPI
+   */
   public async putPaymentData(teamId: string, paymentData: PaymentDataUpdate): Promise<PaymentData> {
     const config: AxiosRequestConfig = {
       data: paymentData,
@@ -56,6 +59,9 @@ export class PaymentAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated Use BillingAPI
+   */
   public async getPaymentData(teamId: string): Promise<PaymentData> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -66,6 +72,9 @@ export class PaymentAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated Use BillingAPI
+   */
   public async deletePaymentData(teamId: string, paymentData: Partial<PaymentDataUpdate>): Promise<PaymentData> {
     const config: AxiosRequestConfig = {
       data: paymentData,
@@ -77,6 +86,9 @@ export class PaymentAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated Use BillingAPI
+   */
   public async putPaymentBilling(teamId: string, billingInfo: PaymentBillingData): Promise<PaymentBillingData> {
     const config: AxiosRequestConfig = {
       data: billingInfo,
@@ -88,6 +100,9 @@ export class PaymentAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated Use BillingAPI
+   */
   public async getPaymentBilling(teamId: string): Promise<PaymentBillingData> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -98,6 +113,9 @@ export class PaymentAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated Use BillingAPI
+   */
   public async putPaymentPlan(teamId: string, plan: PaymentPlan): Promise<void> {
     const config: AxiosRequestConfig = {
       data: plan,
@@ -108,6 +126,9 @@ export class PaymentAPI {
     await this.client.sendJSON(config);
   }
 
+  /**
+   * @deprecated Use BillingAPI
+   */
   public async getPlans(teamId: string): Promise<PaymentStripePlan[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -118,6 +139,9 @@ export class PaymentAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated
+   */
   public async getCharges(teamId: string): Promise<PaymentStripeCharge[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -128,6 +152,9 @@ export class PaymentAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated Use BillingAPI
+   */
   public async getInvoices(
     teamId: string,
     limit: number = PaymentAPI.DEFAULT_INVOICES_CHUNK_SIZE,
@@ -146,6 +173,9 @@ export class PaymentAPI {
     return response.data;
   }
 
+  /**
+   * @deprecated Use BillingAPI
+   */
   public async getSupportedCurrencies(teamId: string): Promise<string[]> {
     const config: AxiosRequestConfig = {
       method: 'get',
