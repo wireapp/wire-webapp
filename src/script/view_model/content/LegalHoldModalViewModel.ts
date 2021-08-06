@@ -101,7 +101,7 @@ export class LegalHoldModalViewModel {
       this.isLoading(false);
     };
     this.disableSubmit = ko.pureComputed(() => this.requiresPassword() && this.passwordValue().length < 1);
-    amplify.subscribe(LegalHoldModalViewModel.SHOW_REQUEST, (fingerprint?: string[]) =>
+    amplify.subscribe(LegalHoldModalViewModel.SHOW_REQUEST, (fingerprint?: string) =>
       this.showRequestModal(false, fingerprint),
     );
     amplify.subscribe(LegalHoldModalViewModel.HIDE_REQUEST, this.hideModal);
@@ -109,7 +109,7 @@ export class LegalHoldModalViewModel {
     amplify.subscribe(LegalHoldModalViewModel.HIDE_DETAILS, this.hideLegalHoldModal);
   }
 
-  showRequestModal = async (showLoading?: boolean, fingerprint?: string[]) => {
+  showRequestModal = async (showLoading?: boolean, fingerprint?: string) => {
     this.showRequest(true);
     const setModalParams = (value: boolean) => {
       this.isVisible(value);
@@ -129,12 +129,11 @@ export class LegalHoldModalViewModel {
     if (!fingerprint) {
       const response = await this.teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
       if (response.status === LegalHoldMemberStatus.PENDING) {
-        const fingerprintString = await this.cryptographyRepository.getRemoteFingerprint(
+        fingerprint = await this.cryptographyRepository.getRemoteFingerprint(
           selfUser.id,
           response.client.id,
           response.last_prekey,
         );
-        fingerprint = splitFingerprint(fingerprintString);
         selfUser.hasPendingLegalHold(true);
       } else {
         setModalParams(false);
@@ -143,7 +142,9 @@ export class LegalHoldModalViewModel {
     }
     this.isVisible(true);
     this.isLoading(false);
-    const formattedFingerprint = fingerprint.map(part => `<span>${part} </span>`).join('');
+    const formattedFingerprint = splitFingerprint(fingerprint)
+      .map(part => `<span>${part} </span>`)
+      .join('');
     this.requestFingerprint(
       `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formattedFingerprint}</span>`,
     );
