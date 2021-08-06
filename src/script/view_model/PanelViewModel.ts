@@ -266,7 +266,7 @@ export class PanelViewModel {
   };
 
   private readonly _hidePanel = (state: string, forceInvisible = false): void => {
-    if (!this.subViews[state]) {
+    if (!this.elementIds[state]) {
       return;
     }
     this.exitingState(undefined);
