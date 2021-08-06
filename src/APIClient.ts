@@ -53,6 +53,7 @@ import {
   LegalHoldAPI,
   MemberAPI,
   PaymentAPI,
+  BillingAPI,
   ServiceAPI,
   TeamAPI,
   TeamConversationAPI,
@@ -109,6 +110,7 @@ export class APIClient extends EventEmitter {
     legalhold: {api: LegalHoldAPI};
     member: {api: MemberAPI};
     payment: {api: PaymentAPI};
+    billing: {api: BillingAPI};
     scim: {api: ScimAPI};
     search: {api: TeamSearchAPI};
     service: {api: ServiceAPI};
@@ -219,6 +221,9 @@ export class APIClient extends EventEmitter {
       },
       payment: {
         api: new PaymentAPI(this.transport.http),
+      },
+      billing: {
+        api: new BillingAPI(this.transport.http),
       },
       scim: {
         api: new ScimAPI(this.transport.http),
