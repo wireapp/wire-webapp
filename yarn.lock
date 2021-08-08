@@ -2353,11 +2353,6 @@
   resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.4.tgz#0d3a4254863afaa89d6f02d73c2806271d13415d"
   integrity sha512-U0o4K+GNiK0PNxoDwd8xRnvLVe4kzei6opn3/FCjAriqaP+rfrDdSl1kP/hLL6Y3/Y3hhGnBwD4dCkkAqs1W/Q==
 
-"@types/platform@1.3.4":
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.4.tgz#0d3a4254863afaa89d6f02d73c2806271d13415d"
-  integrity sha512-U0o4K+GNiK0PNxoDwd8xRnvLVe4kzei6opn3/FCjAriqaP+rfrDdSl1kP/hLL6Y3/Y3hhGnBwD4dCkkAqs1W/Q==
-
 "@types/prettier@^2.0.0":
   version "2.1.6"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.1.6.tgz#f4b1efa784e8db479cdb8b14403e2144b1e9ff03"
@@ -2482,11 +2477,6 @@
   integrity sha512-RJJrrySY7A8havqpGObOB4W92QXKJo63/jFLLgpvOtsGUqbQZ9Sbgl35KMm1DjC6j7AvmmU2bIno+3IyEaemaw==
 
 "@types/tough-cookie@*", "@types/tough-cookie@4.0.1":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.1.tgz#8f80dd965ad81f3e1bc26d6f5c727e132721ff40"
-  integrity sha512-Y0K95ThC3esLEYD6ZuqNek29lNX2EM1qxV8y2FTLUB0ff5wWrk7az+mLrnNFUnaXcgKye22+sFBRXOgpPILZNg==
-
-"@types/tough-cookie@4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.1.tgz#8f80dd965ad81f3e1bc26d6f5c727e132721ff40"
   integrity sha512-Y0K95ThC3esLEYD6ZuqNek29lNX2EM1qxV8y2FTLUB0ff5wWrk7az+mLrnNFUnaXcgKye22+sFBRXOgpPILZNg==
@@ -2819,10 +2809,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@12.35.0":
-  version "12.35.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.35.0.tgz#bfcf69ee80ab127b3e09711890baea2601110c18"
-  integrity sha512-rgIk9xc59BNdOIXAFUAxLa7Da4hh4ThaHjesqLEtaSuWmSyevy4H2hh3MkEUhaEZAEUPHi8R8ij19jmWCr2V6w==
+"@wireapp/api-client@12.36.0":
+  version "12.36.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.36.0.tgz#3005e749f9ae36fdc40fadd070a8edab9be74472"
+  integrity sha512-Dke6aaCmh8ZalHznvsWw4EgKZpBtr5/QM+cDAjbaEMbP4QkbxpEy8V6EI5a4dgDEDPEcUYNHqqgrEjoCnNDBOw==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2876,14 +2866,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.11.2":
-  version "17.11.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.11.2.tgz#325718e4cd5bd846a5875d82c466de06bbda4cc5"
-  integrity sha512-byUbLLlvj8Uer9Fva5cKyCRkc2ifzt3LoI9yKa618CMr2T1OxbGHbSnFDrVz9zlKZQwlaPHq81WmN2UhFcNyJA==
+"@wireapp/core@17.11.5":
+  version "17.11.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.11.5.tgz#bd313aedcb15a99a3d9e039950551a8e42db8c63"
+  integrity sha512-R+UNeI0nZE5wkOQ/bgPGxot7SZ7PKcb9xOO8UgQWMTL1Ji5CESshR6T5D0igdGxOl0OKspITuF5sWT0ZAr6SgA==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "12.35.0"
+    "@wireapp/api-client" "12.36.0"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.9.5"
     hash.js "1.1.7"
