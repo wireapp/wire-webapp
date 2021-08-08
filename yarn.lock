@@ -2353,11 +2353,6 @@
   resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.4.tgz#0d3a4254863afaa89d6f02d73c2806271d13415d"
   integrity sha512-U0o4K+GNiK0PNxoDwd8xRnvLVe4kzei6opn3/FCjAriqaP+rfrDdSl1kP/hLL6Y3/Y3hhGnBwD4dCkkAqs1W/Q==
 
-"@types/platform@1.3.4":
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/@types/platform/-/platform-1.3.4.tgz#0d3a4254863afaa89d6f02d73c2806271d13415d"
-  integrity sha512-U0o4K+GNiK0PNxoDwd8xRnvLVe4kzei6opn3/FCjAriqaP+rfrDdSl1kP/hLL6Y3/Y3hhGnBwD4dCkkAqs1W/Q==
-
 "@types/prettier@^2.0.0":
   version "2.1.6"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.1.6.tgz#f4b1efa784e8db479cdb8b14403e2144b1e9ff03"
@@ -2482,11 +2477,6 @@
   integrity sha512-RJJrrySY7A8havqpGObOB4W92QXKJo63/jFLLgpvOtsGUqbQZ9Sbgl35KMm1DjC6j7AvmmU2bIno+3IyEaemaw==
 
 "@types/tough-cookie@*", "@types/tough-cookie@4.0.1":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.1.tgz#8f80dd965ad81f3e1bc26d6f5c727e132721ff40"
-  integrity sha512-Y0K95ThC3esLEYD6ZuqNek29lNX2EM1qxV8y2FTLUB0ff5wWrk7az+mLrnNFUnaXcgKye22+sFBRXOgpPILZNg==
-
-"@types/tough-cookie@4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-4.0.1.tgz#8f80dd965ad81f3e1bc26d6f5c727e132721ff40"
   integrity sha512-Y0K95ThC3esLEYD6ZuqNek29lNX2EM1qxV8y2FTLUB0ff5wWrk7az+mLrnNFUnaXcgKye22+sFBRXOgpPILZNg==
@@ -11579,10 +11569,10 @@ redux-thunk@2.3.0:
   resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.3.0.tgz#51c2c19a185ed5187aaa9a2d08b666d0d6467622"
   integrity sha512-km6dclyFnmcvxhAcrQV2AkZmPQjzPDjgVlQtR0EQjxZPyJ0BnMf3in1ryuR8A2qU0HldVRfxYXbFSKlI3N7Slw==
 
-redux@4.1.0, redux@^4.0.0, redux@^4.0.5:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/redux/-/redux-4.1.0.tgz#eb049679f2f523c379f1aff345c8612f294c88d4"
-  integrity sha512-uI2dQN43zqLWCt6B/BMGRMY6db7TTY4qeHHfGeKb3EOhmOKjU3KdWvNLJyqaHRksv/ErdNH7cFZWg9jXtewy4g==
+redux@4.1.1, redux@^4.0.0, redux@^4.0.5:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/redux/-/redux-4.1.1.tgz#76f1c439bb42043f985fbd9bf21990e60bd67f47"
+  integrity sha512-hZQZdDEM25UY2P493kPYuKqviVwZ58lEmGQNeQ+gXa+U0gYPUBf7NKYazbe3m+bs/DzM/ahN12DbF+NG8i0CWw==
   dependencies:
     "@babel/runtime" "^7.9.2"
 
