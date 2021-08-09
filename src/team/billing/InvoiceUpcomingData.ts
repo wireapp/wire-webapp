@@ -19,7 +19,7 @@
 
 import type {SupportedCurrency} from './SupportedCurrency';
 
-interface Coupon {
+export interface Coupon {
   amountOff: number;
   name: string;
   percentOff: number;

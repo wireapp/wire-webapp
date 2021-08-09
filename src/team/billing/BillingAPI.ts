@@ -23,7 +23,7 @@ import {BillingData} from './BillingInfo';
 import {BillingTeamData} from './BillingTeamData';
 import {CardData} from './CardData';
 import {InvoiceListData} from './InvoiceListData';
-import {InvoiceUpcomingData} from './InvoiceUpcomingData';
+import {Coupon, InvoiceUpcomingData} from './InvoiceUpcomingData';
 import {PlanData, PlanInterval} from './PlanData';
 import {SupportedCurrency} from './SupportedCurrency';
 
@@ -36,6 +36,7 @@ export class BillingAPI {
     CURRENCIES: 'currencies',
     INFO: 'info',
     CARD: 'card',
+    COUPON: 'coupon',
     INVOICES: 'invoices',
     PLAN: 'plan',
     LIST: 'list',
@@ -98,6 +99,31 @@ export class BillingAPI {
     return response.data;
   }
 
+  public async postCoupon(teamId: string, coupon: string): Promise<Coupon> {
+    const config: AxiosRequestConfig = {
+      data: {
+        coupon,
+      },
+      method: 'post',
+      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.COUPON}`,
+    };
+
+    const response = await this.client.sendJSON<Coupon>(config);
+    return response.data;
+  }
+
+  public async deleteCoupon(teamId: string, coupon: string): Promise<void> {
+    const config: AxiosRequestConfig = {
+      data: {
+        coupon,
+      },
+      method: 'delete',
+      url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.COUPON}`,
+    };
+
+    await this.client.sendJSON(config);
+  }
+
   public async getCurrentPlan(teamId: string): Promise<PlanData> {
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -108,14 +134,15 @@ export class BillingAPI {
     return response.data;
   }
 
-  public async putPlan(teamId: string, planId: string): Promise<void> {
+  public async putPlan(teamId: string, planId: string): Promise<PlanData> {
     const config: AxiosRequestConfig = {
       data: {planId},
       method: 'put',
       url: `${BillingAPI.URL.TEAMS}/${teamId}/${BillingAPI.URL.BILLING}/${BillingAPI.URL.PLAN}`,
     };
 
-    await this.client.sendJSON(config);
+    const response = await this.client.sendJSON<PlanData>(config);
+    return response.data;
   }
 
   public async getAvailablePlans(
