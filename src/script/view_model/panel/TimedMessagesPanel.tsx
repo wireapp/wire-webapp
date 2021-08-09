@@ -17,8 +17,6 @@
  *
  */
 
-import DragableClickWrapper from 'Components/DragableClickWrapper';
-import Icon from 'Components/Icon';
 import React, {useEffect, useState} from 'react';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {container} from 'tsyringe';
@@ -30,6 +28,7 @@ import useEffectRef from 'Util/useEffectRef';
 import {ConversationState} from '../../conversation/ConversationState';
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
 import {ViewModelRepositories} from '../MainViewModel';
+import PanelHeader from './PanelHeader';
 
 interface TimedMessagesPanelProps {
   onClose: () => void;
@@ -87,19 +86,12 @@ const TimedMessagesPanel: React.FC<TimedMessagesPanelProps> = ({onClose, onGoBac
   };
   return (
     <>
-      <div className="panel__header">
-        <DragableClickWrapper onClick={onGoBack}>
-          <div className="icon-button" data-uie-name="go-back-timed-messages-options">
-            <Icon.ArrowLeft />
-          </div>
-        </DragableClickWrapper>
-        <div className="panel__header__title">{t('timedMessagesTitle')}</div>
-        <DragableClickWrapper onClick={onClose}>
-          <div className="icon-button" data-uie-name="do-close">
-            <Icon.Close className="right-panel-close" />
-          </div>
-        </DragableClickWrapper>
-      </div>
+      <PanelHeader
+        onGoBack={onGoBack}
+        onClose={onClose}
+        title={t('timedMessagesTitle')}
+        goBackUie="go-back-timed-messages-options"
+      />
       <div ref={setScrollbarRef} className="panel__content">
         {messageTimes.map(({text, isCustom, value}) => (
           <label

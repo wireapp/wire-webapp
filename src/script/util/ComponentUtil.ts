@@ -41,25 +41,27 @@ export function registerReactComponent<Props>(
     component,
   }: RegisterReactComponentWithBindings<Props> | RegisterReactComponentWithTemplate<Props>,
 ) {
-  ko.components.register(name, {
-    template: template ?? `<!-- ko react: {${bindings}} --><!-- /ko -->`,
-    viewModel: function (knockoutParams: Props) {
-      const bindingsString = bindings ?? /react: ?{([^]*)}/.exec(template)[1];
-      const pairs = bindingsString?.split(',');
-      const neededParams = pairs?.map(pair => {
-        const [name, value = name] = pair.split(':');
-        return value.replace(/ko\.unwrap\(|\)/g, '').trim();
-      }) as (keyof Props)[];
+  if (!ko.components.isRegistered(name)) {
+    ko.components.register(name, {
+      template: template ?? `<!-- ko react: {${bindings}} --><!-- /ko -->`,
+      viewModel: function (knockoutParams: Props) {
+        const bindingsString = bindings ?? /react: ?{([^]*)}/.exec(template)[1];
+        const pairs = bindingsString?.split(',');
+        const neededParams = pairs?.map(pair => {
+          const [name, value = name] = pair.split(':');
+          return value.replace(/ko\.unwrap\(|\)/g, '').trim();
+        }) as (keyof Props)[];
 
-      neededParams.forEach(param => {
-        if (!knockoutParams.hasOwnProperty(param)) {
-          knockoutParams[param] = undefined;
-        }
-      });
-      Object.assign(this, knockoutParams);
-      this.reactComponent = component;
-    },
-  });
+        neededParams.forEach(param => {
+          if (!knockoutParams.hasOwnProperty(param)) {
+            knockoutParams[param] = undefined;
+          }
+        });
+        Object.assign(this, knockoutParams);
+        this.reactComponent = component;
+      },
+    });
+  }
 }
 
 export const useKoSubscribableCallback = <T = any>(
