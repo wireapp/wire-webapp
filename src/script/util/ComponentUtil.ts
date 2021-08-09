@@ -19,6 +19,7 @@
 
 import ko, {Unwrapped} from 'knockout';
 import {useEffect, useState} from 'react';
+import Root from '../auth/page/Root';
 interface RegisterReactComponent<Props> {
   component: React.ComponentType<Props>;
 }
@@ -112,6 +113,30 @@ export const useKoSubscribableChildren = <
     });
     return () => subscriptions.forEach(subscription => subscription?.dispose());
   }, [parent]);
+
+  return state;
+};
+
+export const useKoSubscribableMap = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
+  parents: P[],
+  child: C,
+): UnwrappedValues<P>[] => {
+  const getValues = (roots: P[]): UnwrappedValues<P>[] => roots?.map(root => root?.[child]?.());
+  const [state, setState] = useState<UnwrappedValues<P>[]>(getValues(parents) ?? []);
+  useEffect(() => {
+    console.log('### useKoSubscribableMap', parents);
+    setState(getValues(parents) ?? []);
+    const subscriptions = parents?.map(parent => {
+      const subscribable = parent?.[child];
+      console.log('### subscribable', subscribable);
+      return subscribable?.subscribe(() => {
+       console.log('### inner parents', parents);
+        setState(getValues(parents) ?? []);
+      });
+    });
+
+    return () => subscriptions?.forEach(subscription => subscription?.dispose());
+  }, [parents]);
 
   return state;
 };

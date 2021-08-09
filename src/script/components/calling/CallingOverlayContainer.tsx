@@ -18,14 +18,14 @@
  */
 
 import ReactDOM from 'react-dom';
-import React, {Fragment, useEffect} from 'react';
+import React, {Fragment, useEffect, useMemo} from 'react';
 import {container} from 'tsyringe';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
 import FullscreenVideoCall from './FullscreenVideoCall';
 import ChooseScreen, {Screen} from './ChooseScreen';
 import {ConversationState} from '../../conversation/ConversationState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren, useKoSubscribableMap} from 'Util/ComponentUtil';
 import {Call} from '../../calling/Call';
 import {Multitasking} from '../../notification/NotificationRepository';
 import {getGrid} from '../../calling/videoGridHandler';
@@ -64,13 +64,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
       'selectableWindows',
       'isChoosingScreen',
     ]);
-  const {maximizedParticipant, state: currentCallState} = useKoSubscribableChildren(joinedCall, [
-    'maximizedParticipant',
-    'pages',
-    'currentPage',
-    'participants',
-    'state',
-  ]);
+  const {
+    maximizedParticipant,
+    state: currentCallState,
+    participants,
+  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'pages', 'currentPage', 'participants', 'state']);
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
@@ -81,6 +79,14 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
   }, [currentCallState]);
 
+  //const users = participants?.map(({user}) => user);
+  //const names = useKoSubscribableMap(users, 'name');
+
+  //const videoGrid = useMemo(() => joinedCall && getGrid(joinedCall), [joinedCall, names]);
+
+  const users = useMemo(() => participants?.map(({user}) => user), [participants]);
+  const {} = useKoSubscribableMap(users, 'name');
+  console.log('### render fulls screen call');
   const videoGrid = joinedCall && getGrid(joinedCall);
 
   const onCancelScreenSelection = () => {

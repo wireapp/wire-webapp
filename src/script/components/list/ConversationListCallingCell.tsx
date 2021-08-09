@@ -17,12 +17,12 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren, useKoSubscribableMap} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import useEffectRef from 'Util/useEffectRef';
@@ -108,6 +108,9 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showNoCameraPreview = !hasAccessToCamera && call.initialType === CALL_TYPE.VIDEO && !isOngoing;
   const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
+
+  const users = useMemo(() => participants?.map(({user}) => user), [participants]);
+  useKoSubscribableMap(users, 'name');
 
   const videoGrid = call && getGrid(call);
 
