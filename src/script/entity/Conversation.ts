@@ -131,7 +131,7 @@ export class Conversation {
   public readonly participating_user_ets: ko.ObservableArray<User>;
   /** Does not include self user */
   public readonly participating_user_ids: ko.ObservableArray<string>;
-  /** Does not include self user */
+  /** Contains only IDs from users with domains. Does not include self user. */
   public readonly participatingQualifiedUserIds: ko.ObservableArray<QualifiedId>;
   public readonly receiptMode: ko.Observable<Confirmation.Type>;
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
