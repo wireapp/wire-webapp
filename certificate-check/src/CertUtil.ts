@@ -70,23 +70,23 @@ export function hostnameShouldBePinned(hostname: string): boolean {
   return KNOWN_PINS.some(pin => pin.url.test(hostname.toLowerCase().trim()));
 }
 
-export function verifyPinning(hostname: string, certificate?: ElectronCertificate): PinningResult {
-  if (!certificate) {
+export function verifyPinning(hostname: string, remoteCertificate?: ElectronCertificate): PinningResult {
+  if (!remoteCertificate) {
     return {
       errorMessage: 'No certificate provided by Electron.',
     };
   }
 
-  if (!certificate.issuerCert) {
+  if (!remoteCertificate.issuerCert) {
     return {
       errorMessage: 'No issuer certificate in certificate.',
     };
   }
 
-  const {data: certData, issuerCert} = certificate;
+  const {data: certData, issuerCert} = remoteCertificate;
 
-  function getRemoteIssuerCertData(certificate: ElectronCertificate = issuerCert): ElectronCertificate {
-    return certificate.issuerCert ? getRemoteIssuerCertData(certificate.issuerCert) : certificate;
+  function getRemoteIssuerCertData(remoteIssuerCert: ElectronCertificate = issuerCert): ElectronCertificate {
+    return remoteIssuerCert.issuerCert ? getRemoteIssuerCertData(remoteIssuerCert.issuerCert) : remoteIssuerCert;
   }
 
   let remoteIssuerCertHex: string;
@@ -111,7 +111,7 @@ export function verifyPinning(hostname: string, certificate?: ElectronCertificat
   const result: PinningResult = {};
 
   for (const knownPin of KNOWN_PINS) {
-    const {url, publicKeyInfo = [], issuerRootCerts: knownIssuerRootCerts = []} = knownPin;
+    const {url, publicKeyInfo: localPublicKeyInfo = [], issuerRootCerts: knownIssuerRootCerts = []} = knownPin;
 
     if (url.test(hostname.toLowerCase().trim())) {
       if (knownIssuerRootCerts.length > 0) {
@@ -127,35 +127,35 @@ export function verifyPinning(hostname: string, certificate?: ElectronCertificat
         }
       }
 
-      result.verifiedPublicKeyInfo = publicKeyInfo
-        .reduce((arr: boolean[], pubkey) => {
+      result.verifiedPublicKeyInfo = localPublicKeyInfo
+        .reduce((arr: boolean[], localPubKey) => {
           const {
-            algorithmID: knownAlgorithmID,
-            algorithmParam: knownAlgorithmParam,
-            fingerprints: knownFingerprints,
-          } = pubkey;
+            algorithmID: localAlgorithmID,
+            algorithmParam: localAlgorithmParam,
+            fingerprints: localFingerprints,
+          } = localPubKey;
 
           const fingerprintCheck =
-            knownFingerprints.length > 0 &&
-            knownFingerprints.some(knownFingerprint => knownFingerprint === remotePublicKeyFingerprint);
-          const algorithmIDCheck = knownAlgorithmID === remotePublicKey.algoid;
-          const algorithmParamCheck = knownAlgorithmParam === remotePublicKey.algparam;
+            localFingerprints.length > 0 &&
+            localFingerprints.some(knownFingerprint => knownFingerprint === remotePublicKeyFingerprint);
+          const algorithmIDCheck = localAlgorithmID === remotePublicKey.algoid;
+          const algorithmParamCheck = localAlgorithmParam === remotePublicKey.algparam;
 
           if (!fingerprintCheck) {
-            const fingerprintsCombined = knownFingerprints.join(', ');
+            const fingerprintsCombined = localFingerprints.join(', ');
             const errorMessage = `Public key fingerprints: "${remotePublicKeyFingerprint}" could not be verified with any of the known fingerprints "${fingerprintsCombined}".`;
             errorMessages.push(errorMessage);
           }
 
           if (!algorithmIDCheck) {
             const algorithmID = remotePublicKey.algoid;
-            const errorMessage = `Algorithm ID: "${algorithmID}" could not be verified with the known ID "${knownAlgorithmID}".`;
+            const errorMessage = `Algorithm ID: "${algorithmID}" could not be verified with the known ID "${localAlgorithmID}".`;
             errorMessages.push(errorMessage);
           }
 
           if (!algorithmParamCheck) {
             const algorithmParam = remotePublicKey.algparam;
-            const errorMessage = `Algorithm parameter: "${algorithmParam}" could not be verified with the known parameter "${knownAlgorithmParam}".`;
+            const errorMessage = `Algorithm parameter: "${algorithmParam}" could not be verified with the known parameter "${localAlgorithmParam}".`;
             errorMessages.push(errorMessage);
           }
 
@@ -171,7 +171,7 @@ export function verifyPinning(hostname: string, certificate?: ElectronCertificat
 
   if (errorMessages.length > 0) {
     result.errorMessage = errorMessages.join('\n');
-    result.certificate = certificate;
+    result.certificate = remoteCertificate;
   }
 
   return result;
