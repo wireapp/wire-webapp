@@ -39,7 +39,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isQualifiedId, isUser} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -476,9 +476,9 @@ export class UserRepository {
    */
   findUserById(userId: string | QualifiedId): User | undefined {
     return this.userState.users().find(userEntity => {
-      return typeof userId === 'string'
-        ? userEntity.id === userId
-        : userEntity.id === userId.id && userEntity.domain === userId.domain;
+      return isQualifiedId(userId)
+        ? userEntity.id === userId.id && userEntity.domain === userId.domain
+        : userEntity.id === userId;
     });
   }
 
@@ -563,18 +563,21 @@ export class UserRepository {
    * @param userIds List of user ID
    * @param offline Should we only look for cached contacts
    */
-  async getUsersById(userIds: string[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: string[] | QualifiedId[], offline: boolean = false): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
 
-    const findUsers = userIds.map(userId => this.findUserById(userId) || userId);
+    const findUsers = await Promise.all(userIds.map(userId => this.findUserById(userId) || userId));
+    const partitionedUsers = partition(findUsers, item => isUser(item)) as [User[], string[] | QualifiedId[]];
 
-    const resolveArray = await Promise.all(findUsers);
-    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => typeof item !== 'string') as [
-      User[],
-      string[],
-    ];
+    let knownUserEntities = partitionedUsers[0];
+
+    const unknownUserIds = partitionedUsers[1];
+    // TODO(Federation) fix: Filter duplicated users
+    knownUserEntities = knownUserEntities.filter(
+      (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
+    );
 
     if (offline || !unknownUserIds.length) {
       return knownUserEntities;
@@ -584,11 +587,11 @@ export class UserRepository {
     return knownUserEntities.concat(userEntities);
   }
 
-  getUserFromBackend(userId: string): Promise<APIClientUser> {
+  getUserFromBackend(userId: string | QualifiedId): Promise<APIClientUser> {
     return this.userService.getUser(userId);
   }
 
-  getUserListFromBackend(userIds: string[]): Promise<APIClientUser[]> {
+  getUserListFromBackend(userIds: string[] | QualifiedId[]): Promise<APIClientUser[]> {
     return this.userService.getUsers(userIds);
   }
 
@@ -634,9 +637,8 @@ export class UserRepository {
    * Update a local user from the backend by ID.
    */
   updateUserById = async (userId: string | QualifiedId): Promise<void> => {
-    const localUserEntity = this.findUserById(userId) || new User('', null);
-    const updatedUserData =
-      typeof userId === 'string' ? await this.userService.getUser(userId) : await this.userService.getUser(userId.id);
+    const localUserEntity = this.findUserById(userId);
+    const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);

@@ -370,11 +370,12 @@ export class EventMapper {
    * @returns Member message entity
    */
   private _mapEvent1to1Creation({data: eventData}: EventRecord) {
-    const {has_service: hasService, userIds} = eventData;
+    const {has_service: hasService, qualifiedUserIds, userIds} = eventData;
 
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
+    messageEntity.qualifiedUserIds(qualifiedUserIds || []);
 
     if (hasService) {
       messageEntity.showServicesWarning = true;
@@ -421,6 +422,7 @@ export class EventMapper {
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
     messageEntity.userIds(eventData.userIds);
+    messageEntity.qualifiedUserIds(eventData.qualifiedUserIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
   }
@@ -462,7 +464,7 @@ export class EventMapper {
    * @returns Member message entity
    */
   private _mapEventMemberJoin(event: EventRecord, conversationEntity: Conversation) {
-    const {data: eventData, from: sender} = event;
+    const {data: eventData, from: senderId} = event;
     const {has_service: hasService, user_ids: userIds} = eventData;
 
     const messageEntity = new MemberMessage();
@@ -471,8 +473,8 @@ export class EventMapper {
     messageEntity.visible(!isSingleModeConversation);
 
     if (conversationEntity.isGroup()) {
-      const messageFromCreator = sender === conversationEntity.creator;
-      const creatorIndex = userIds.indexOf(sender);
+      const messageFromCreator = senderId === conversationEntity.creator;
+      const creatorIndex = userIds.indexOf(senderId);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
       if (creatorIsJoiningMember) {
