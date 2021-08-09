@@ -129,7 +129,7 @@ export class Conversation {
   public readonly notificationState: ko.PureComputed<number>;
   /** Does not include self user */
   public readonly participating_user_ets: ko.ObservableArray<User>;
-  /** Does not include self user */
+  /** Contains only IDs from users without a domain. Does not include self user. */
   public readonly participating_user_ids: ko.ObservableArray<string>;
   /** Contains only IDs from users with domains. Does not include self user. */
   public readonly participatingQualifiedUserIds: ko.ObservableArray<QualifiedId>;
