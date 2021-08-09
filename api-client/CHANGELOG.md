@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.37.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.36.0...@wireapp/api-client@12.37.0) (2021-08-09)
+
+
+### Features
+
+* **api-client:** Billing coupon endpoints ([#4112](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4112)) ([f54b1ac](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/f54b1acc4c34a1cb972dbcaabe9e2added3e0559))
+
+
+
+
+
 # [12.36.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.35.2...@wireapp/api-client@12.36.0) (2021-08-06)
 
 
