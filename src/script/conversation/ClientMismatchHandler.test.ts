@@ -19,14 +19,14 @@
 
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {ClientClassification} from '@wireapp/api-client/src/client/';
-import type {ClientMismatch, NewOTRMessage} from '@wireapp/api-client/src/conversation';
+import type {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation';
 import {createRandomUuid} from 'Util/util';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {Conversation} from 'src/script/entity/Conversation';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {ClientMismatchHandler} from 'src/script/conversation/ClientMismatchHandler';
 import type {ConversationRepository} from './ConversationRepository';
-import type {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {UserRepository} from '../user/UserRepository';
 import {entities} from '../../../test/api/payloads';
 
@@ -176,7 +176,7 @@ describe('ClientMismatchHandler', () => {
       eventInfoEntity.setTimestamp(clientMismatch.time);
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
 
-      const expectedReceipients: Recipients = {
+      const expectedReceipients: UserClients = {
         [johnDoe.user_id]: [johnDoe.client_id],
       };
       expect(cryptographyRepositorySpy.encryptGenericMessage).toHaveBeenCalledWith(
