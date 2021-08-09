@@ -195,8 +195,7 @@ export class Conversation {
 
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
-      const hasOneParticipant =
-        this.participating_user_ids().length + this.participatingQualifiedUserIds().length === 1;
+      const hasOneParticipant = this.amountOfUserIds === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
@@ -464,7 +463,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        if (!this.hasUserIds) {
+        if (this.amountOfUserIds === 0) {
           return t('conversationsEmptyConversation');
         }
       }
@@ -481,9 +480,7 @@ export class Conversation {
   }
 
   private hasInitializedUsers() {
-    const hasMappedUsers =
-      this.participating_user_ets().length > 0 ||
-      this.participating_user_ids().length + this.participatingQualifiedUserIds().length === 0;
+    const hasMappedUsers = this.participating_user_ets().length > 0 || this.amountOfUserIds === 0;
     return !!this.selfUser() && hasMappedUsers;
   }
 
@@ -508,8 +505,8 @@ export class Conversation {
     ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
   }
 
-  get hasUserIds() {
-    return this.participating_user_ids().length + this.participatingQualifiedUserIds().length > 0;
+  get amountOfUserIds() {
+    return this.participating_user_ids().length + this.participatingQualifiedUserIds().length;
   }
 
   get allUserEntities() {
@@ -686,18 +683,11 @@ export class Conversation {
     const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
     const adjustCountForServices = countServices ? 0 : this.getNumberOfServices();
 
-    return (
-      this.participating_user_ids().length +
-      this.participatingQualifiedUserIds().length +
-      adjustCountForSelf -
-      adjustCountForServices
-    );
+    return this.amountOfUserIds + adjustCountForSelf - adjustCountForServices;
   }
 
   getNumberOfClients(): number {
-    const participantsMapped =
-      this.participating_user_ids().length + this.participatingQualifiedUserIds().length ===
-      this.participating_user_ets().length;
+    const participantsMapped = this.amountOfUserIds === this.participating_user_ets().length;
     if (participantsMapped) {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
         return userEntity.devices().length
