@@ -464,8 +464,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        const hasUserIds = this.participating_user_ids().length + this.participatingQualifiedUserIds().length > 0;
-        if (!hasUserIds) {
+        if (!this.hasUserIds) {
           return t('conversationsEmptyConversation');
         }
       }
@@ -507,6 +506,10 @@ export class Conversation {
       this.type,
       this.verification_state,
     ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
+  }
+
+  get hasUserIds() {
+    return this.participating_user_ids().length + this.participatingQualifiedUserIds().length > 0;
   }
 
   get allUserEntities() {
