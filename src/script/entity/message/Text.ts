@@ -53,7 +53,7 @@ export class Text extends Asset {
   }
 
   // Process text before rendering it
-  render(selfId: string, themeColor: string): string {
+  render(selfId: string, themeColor?: string): string {
     const message = renderMessage(this.text, selfId, this.mentions());
     return !this.previews().length ? mediaParser.renderMediaEmbeds(message, themeColor) : message;
   }
