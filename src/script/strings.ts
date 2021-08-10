@@ -766,6 +766,10 @@ export const logoutReasonStrings = defineMessages({
     defaultMessage: 'You were signed out because your device was deleted.',
     id: 'LOGOUT_REASON.CLIENT_REMOVED',
   },
+  [LOGOUT_REASON.NO_APP_CONFIG]: {
+    defaultMessage: 'You were signed out because the initial configuration could not be loaded.',
+    id: 'LOGOUT_REASON.NO_APP_CONFIG',
+  },
   [LOGOUT_REASON.SESSION_EXPIRED]: {
     defaultMessage: 'You were signed out because your session expired.{newline}Please log in again.',
     id: 'LOGOUT_REASON.SESSION_EXPIRED',

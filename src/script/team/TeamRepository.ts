@@ -62,6 +62,7 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
+import {TeamError} from '../error/TeamError';
 
 export interface AccountInfo {
   accentID: number;
@@ -126,7 +127,11 @@ export class TeamRepository {
     if (this.userState.self().teamId) {
       await this.updateTeamMembers(team);
     }
-    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
+    try {
+      this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
+    } catch (error) {
+      throw new TeamError(TeamError.TYPE.NO_APP_CONFIG, TeamError.MESSAGE.NO_APP_CONFIG);
+    }
     this.scheduleFetchTeamInfo();
   };
 
