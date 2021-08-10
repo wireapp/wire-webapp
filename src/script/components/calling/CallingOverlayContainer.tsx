@@ -28,7 +28,7 @@ import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
 import {CallState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
-import {useGrid} from '../../calling/videoGridHandler';
+import {useVideoGrid} from '../../calling/videoGridHandler';
 import {ConversationState} from '../../conversation/ConversationState';
 import {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
@@ -79,7 +79,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
   }, [currentCallState]);
 
-  const videoGrid = useGrid(joinedCall);
+  const videoGrid = useVideoGrid(joinedCall);
 
   const onCancelScreenSelection = () => {
     callState.selectableScreens([]);

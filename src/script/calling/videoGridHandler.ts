@@ -58,7 +58,7 @@ function getGrid(call: Call) {
   };
 }
 
-export const useGrid = (call: Call): Grid => {
+export const useVideoGrid = (call: Call): Grid => {
   const [grid, setGrid] = useState<Grid>();
   const {participants, currentPage, pages} = useKoSubscribableChildren(call, ['participants', 'currentPage', 'pages']);
 
