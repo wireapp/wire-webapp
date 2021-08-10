@@ -29,7 +29,7 @@ export interface Grid {
   thumbnail: Participant | null;
 }
 
-function getGrid(call: Call) {
+export function getGrid(call: Call) {
   if (call.pages().length > 1) {
     return {
       grid: call.pages()[call.currentPage()],
