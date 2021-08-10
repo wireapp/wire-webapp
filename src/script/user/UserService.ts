@@ -93,6 +93,7 @@ export class UserService {
   /**
    * Get a set of users for the given usernames.
    *
+   * @example ['0bb84213-8cc2-4bb1-9e0b-b8dd522396d5', '15ede065-72b3-433a-9917-252f076ed031']
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/checkUserHandles
    */
   checkUserHandles(usernames: string[], amount: number = 1): Promise<string[]> {
@@ -120,7 +121,7 @@ export class UserService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
-  getUser(userId: string | QualifiedId): Promise<APIClientUser> {
+  getUser(userId: string): Promise<APIClientUser> {
     return this.apiClient.user.api.getUser(userId);
   }
 }

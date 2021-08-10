@@ -18,7 +18,6 @@
  */
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
 
 import ko from 'knockout';
@@ -53,7 +52,6 @@ export class MemberMessage extends SystemMessage {
   public readonly userEntities: ko.ObservableArray<User>;
   public readonly userIds: ko.ObservableArray<string>;
   public memberMessageType: SystemMessageType;
-  public qualifiedUserIds: ko.ObservableArray<QualifiedId>;
   public reason: MemberLeaveReason;
 
   static get CONFIG() {
@@ -72,7 +70,6 @@ export class MemberMessage extends SystemMessage {
 
     this.userEntities = ko.observableArray();
     this.userIds = ko.observableArray();
-    this.qualifiedUserIds = ko.observableArray([]);
     this.name = ko.observable('');
 
     this.exceedsMaxVisibleUsers = ko.pureComputed(() => {
@@ -118,7 +115,7 @@ export class MemberMessage extends SystemMessage {
 
     this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length > 0);
 
-    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User(undefined, null)));
+    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User('', null)));
 
     this.htmlCaption = ko.pureComputed(() => {
       if (!this.hasUsers()) {

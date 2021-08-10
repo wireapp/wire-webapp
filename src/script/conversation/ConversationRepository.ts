@@ -1130,12 +1130,10 @@ export class ConversationRepository {
    * @param initialTimestamp Initial server and event timestamp
    * @returns Mapped conversation/s
    */
-  mapConversations(payload: BackendConversation, initialTimestamp?: number): Conversation;
-  mapConversations(payload: BackendConversation[], initialTimestamp?: number): Conversation[];
   mapConversations(
     payload: BackendConversation[] | BackendConversation,
     initialTimestamp = this.getLatestEventTimestamp(),
-  ): Conversation | Conversation[] {
+  ) {
     const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
     const entities = ConversationMapper.mapConversations(
       conversationsData as ConversationDatabaseData[],
@@ -1230,16 +1228,8 @@ export class ConversationRepository {
     offline = false,
     updateGuests = false,
   ): Promise<Conversation> {
-    let userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
-    const qualifiedUserEntities = await this.userRepository.getUsersById(
-      conversationEntity.participatingQualifiedUserIds(),
-      offline,
-    );
-    userEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
-    // TODO(Federation) fix: Filter duplicated users
-    userEntities = userEntities.filter(
-      (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
-    );
+    const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
+    userEntities.sort(sortUsersByPriority);
     conversationEntity.participating_user_ets(userEntities);
 
     if (updateGuests) {
@@ -2179,13 +2169,9 @@ export class ConversationRepository {
         throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
 
-      const conversationEntity = this.mapConversations(eventData, initialTimestamp);
+      const conversationEntity = this.mapConversations(eventData, initialTimestamp) as Conversation;
       if (conversationEntity) {
-        if (
-          conversationEntity.participating_user_ids().length +
-            conversationEntity.participatingQualifiedUserIds().length >
-          0
-        ) {
+        if (conversationEntity.participating_user_ids().length) {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
@@ -2205,12 +2191,7 @@ export class ConversationRepository {
   private async onGroupCreation(conversationEntity: Conversation, eventJson: EventRecord) {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     const creatorId = conversationEntity.creator;
-    const conversationDomain = conversationEntity.domain;
-    const createdByParticipant =
-      !!conversationEntity.participating_user_ids().find(userId => userId === creatorId) ||
-      conversationEntity
-        .participatingQualifiedUserIds()
-        .find(user => user.id === creatorId && user.domain === conversationDomain);
+    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
@@ -2242,7 +2223,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-join' event
    * @returns Resolves when the event was handled
    */
-  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
@@ -2267,7 +2248,10 @@ export class ConversationRepository {
       await this.conversationRoleRepository.updateConversationRoles(conversationEntity);
     }
 
-    const updateSequence = selfUserRejoins ? this.updateConversationFromBackend(conversationEntity) : Promise.resolve();
+    const updateSequence =
+      selfUserRejoins || connectionEntity?.isConnected()
+        ? this.updateConversationFromBackend(conversationEntity)
+        : Promise.resolve();
 
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
@@ -2309,7 +2293,6 @@ export class ConversationRepository {
         .filter((userEntity: User) => !userEntity.isMe)
         .forEach((userEntity: User) => {
           conversationEntity.participating_user_ids.remove(userEntity.id);
-          conversationEntity.participatingQualifiedUserIds.remove({domain: userEntity.domain, id: userEntity.id});
 
           if (userEntity.isTemporaryGuest()) {
             userEntity.clearExpirationTimeout();
@@ -2737,22 +2720,25 @@ export class ConversationRepository {
    * @returns Resolves when users have been update
    */
   private async updateMessageUserEntities(messageEntity: Message) {
-    // TODO(Federation): implement `fromDomain` for message entities
     const userEntity = await this.userRepository.getUserById(messageEntity.from, messageEntity.fromDomain);
     messageEntity.user(userEntity);
     const isMemberMessage = messageEntity.isMember();
     if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
-      const userEntities = await this.userRepository.getUsersById((messageEntity as MemberMessage).userIds());
-      userEntities.sort(sortUsersByPriority);
-      (messageEntity as MemberMessage).userEntities(userEntities);
+      return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
+        userEntities.sort(sortUsersByPriority);
+        (messageEntity as MemberMessage).userEntities(userEntities);
+        return messageEntity;
+      });
     }
     if (messageEntity.isContent()) {
       const userIds = Object.keys(messageEntity.reactions());
 
       messageEntity.reactions_user_ets.removeAll();
       if (userIds.length) {
-        const userEntities = await this.userRepository.getUsersById(userIds);
-        messageEntity.reactions_user_ets(userEntities);
+        return this.userRepository.getUsersById(userIds).then(userEntities_1 => {
+          messageEntity.reactions_user_ets(userEntities_1);
+          return messageEntity;
+        });
       }
     }
     return messageEntity;
