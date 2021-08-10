@@ -34,13 +34,13 @@ import useEffectRef from 'Util/useEffectRef';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import {CallState} from '../../calling/CallState';
-import {getGrid, Grid} from '../../calling/videoGridHandler';
+import {Grid, useVideoGrid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
+import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import CallDuration from './conversationListCallingCell/CallDuration';
@@ -108,7 +108,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
 
-  const videoGrid = call && getGrid(call);
+  const videoGrid = useVideoGrid(call);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
   const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);
