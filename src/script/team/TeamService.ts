@@ -67,6 +67,7 @@ export class TeamService {
   }
 
   getAllTeamFeatures(): Promise<FeatureList> {
+    throw new Error('kaputt');
     return this.apiClient.teams.feature.api.getAllFeatures();
   }
 }
