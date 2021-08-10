@@ -260,8 +260,8 @@ export class UserRepository {
     const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
-      const connectionEntity_1 = connectionEntities.find(({userId}) => userId === userEntity.id);
-      userEntity.connection(connectionEntity_1);
+      const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
+      userEntity.connection(connectionEntity);
     });
     return this.assignAllClients();
   }
