@@ -108,7 +108,7 @@ export class PanelViewModel {
       [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
     };
 
-    return Object.entries(viewModels).reduce((subViews, [state, viewModel]) => {
+    return Object.entries(viewModels).reduce<Record<string, any>>((subViews, [state, viewModel]) => {
       subViews[state] = new viewModel({
         isVisible: ko.pureComputed(this._isStateVisible.bind(this, state)),
         mainViewModel: this.mainViewModel,
@@ -119,7 +119,7 @@ export class PanelViewModel {
         repositories: this.repositories,
       });
       return subViews;
-    }, {} as Record<string, any>);
+    }, {});
   }
 
   /**

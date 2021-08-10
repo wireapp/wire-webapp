@@ -400,7 +400,7 @@ describe('EventRepository', () => {
       const fakeProp: any = undefined;
       const eventRepo = new EventRepository(eventServiceSpy, fakeProp, fakeProp, fakeProp, fakeProp, fakeProp);
       eventRepo.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
-      jest.spyOn(eventRepo as any, 'distributeEvent').mockImplementation(() => {});
+      jest.spyOn<any, any>(eventRepo, 'distributeEvent').mockImplementation(() => {});
 
       const event = {
         conversation: '64dcb45f-bf8d-4eac-a263-649a60d69305',

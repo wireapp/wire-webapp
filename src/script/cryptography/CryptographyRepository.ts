@@ -54,8 +54,6 @@ interface EncryptedPayload {
   sessionId: string;
 }
 
-export type Recipients = Record<string, string[]>;
-
 export interface ClientKeys {
   lastResortKey: BackendPreKey;
   preKeys: BackendPreKey[];
@@ -264,7 +262,7 @@ export class CryptographyRepository {
    * @returns Resolves with the encrypted payload
    */
   async encryptGenericMessage(
-    recipients: Recipients,
+    recipients: UserClients,
     genericMessage: GenericMessage,
     payload: NewOTRMessage<string> = this.constructPayload(this.currentClient().id),
   ) {
@@ -366,10 +364,10 @@ export class CryptographyRepository {
   }
 
   private async buildPayload(
-    recipients: Recipients,
+    recipients: UserClients,
     genericMessage: GenericMessage,
     messagePayload: NewOTRMessage<string>,
-  ): Promise<{messagePayload: NewOTRMessage<string>; missingRecipients: Recipients}> {
+  ): Promise<{messagePayload: NewOTRMessage<string>; missingRecipients: UserClients}> {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
@@ -391,7 +389,7 @@ export class CryptographyRepository {
   }
 
   private async encryptGenericMessageForMissingRecipients(
-    missingRecipients: Recipients,
+    missingRecipients: UserClients,
     genericMessage: GenericMessage,
     messagePayload: NewOTRMessage<string>,
   ) {
@@ -422,8 +420,8 @@ export class CryptographyRepository {
   private mapCipherTextToPayload(
     messagePayload: NewOTRMessage<string>,
     cipherPayload: EncryptedPayload[],
-  ): {messagePayload: NewOTRMessage<string>; missingRecipients: Recipients} {
-    const missingRecipients: Recipients = {};
+  ): {messagePayload: NewOTRMessage<string>; missingRecipients: UserClients} {
+    const missingRecipients: UserClients = {};
 
     cipherPayload.forEach(({cipherText, sessionId}) => {
       const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);

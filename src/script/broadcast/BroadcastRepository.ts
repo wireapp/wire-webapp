@@ -20,7 +20,7 @@
 import type {GenericMessage} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation/';
+import type {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
 
 import {Logger, getLogger} from 'Util/Logger';
 
@@ -29,7 +29,7 @@ import {EventInfoEntity} from '../conversation/EventInfoEntity';
 import type {BroadcastService} from './BroadcastService';
 import type {ClientMismatchHandler} from '../conversation/ClientMismatchHandler';
 import type {ClientRepository} from '../client/ClientRepository';
-import type {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
+import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import type {MessageSender} from '../message/MessageSender';
 import type {User} from '../entity/User';
@@ -107,8 +107,8 @@ export class BroadcastRepository {
    * @param userEntities Recipients of the message
    * @returns Resolves with a user client map
    */
-  private createBroadcastRecipients(userEntities: User[]): Recipients {
-    return userEntities.reduce<Recipients>((recipientsIndex, userEntity) => {
+  private createBroadcastRecipients(userEntities: User[]): UserClients {
+    return userEntities.reduce<UserClients>((recipientsIndex, userEntity) => {
       recipientsIndex[userEntity.id] = userEntity.devices().map(clientEntity => clientEntity.id);
       return recipientsIndex;
     }, {});

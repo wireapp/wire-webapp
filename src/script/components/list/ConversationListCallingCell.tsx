@@ -37,7 +37,7 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import {getGrid, Grid} from '../../calling/videoGridHandler';
+import {Grid, useVideoGrid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
@@ -109,7 +109,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
 
-  const videoGrid = call && getGrid(call);
+  const videoGrid = useVideoGrid(call);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
   const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);

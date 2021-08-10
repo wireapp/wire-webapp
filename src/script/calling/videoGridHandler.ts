@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import type {Participant} from '../calling/Participant';
@@ -55,3 +57,23 @@ export function getGrid(call: Call) {
     thumbnail: thumbnailParticipant,
   };
 }
+
+export const useVideoGrid = (call: Call): Grid => {
+  const [grid, setGrid] = useState<Grid>();
+  const {participants, currentPage, pages} = useKoSubscribableChildren(call, ['participants', 'currentPage', 'pages']);
+
+  useEffect(() => {
+    if (!call) {
+      return setGrid(undefined);
+    }
+    setGrid(getGrid(call));
+    const subscriptions = participants?.map(({user}) =>
+      user.name.subscribe(() => {
+        setGrid(getGrid(call));
+      }),
+    );
+    return () => subscriptions?.forEach(s => s.dispose());
+  }, [participants?.length, call, currentPage, pages?.length]);
+
+  return grid;
+};

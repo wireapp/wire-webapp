@@ -41,7 +41,7 @@ import {
 } from '@wireapp/protocol-messaging';
 import {ReactionType} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation/';
+import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
@@ -85,7 +85,7 @@ import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
-import {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {UserRepository} from '../user/UserRepository';
@@ -1186,9 +1186,9 @@ export class MessageRepository {
     conversation_id: string,
     skip_own_clients = false,
     user_ids: string[] = null,
-  ): Promise<Recipients> {
+  ): Promise<UserClients> {
     const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id, null);
-    const recipients: Recipients = {};
+    const recipients: UserClients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
         if (user_ids && !user_ids.includes(userEntity.id)) {
@@ -1488,20 +1488,23 @@ export class MessageRepository {
     } catch (axiosError) {
       const error = axiosError.response?.data || axiosError;
       if (error.missing) {
-        const remoteUserClients = error.missing as Recipients;
+        const remoteUserClients = error.missing as UserClients;
         const localUserClients = await this.createRecipients(conversationEntity.id);
         const selfId = this.userState.self().id;
 
-        const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
-          if (userId === selfId) {
+        const deletedUserClients = Object.entries(localUserClients).reduce<UserClients>(
+          (deleted, [userId, clients]) => {
+            if (userId === selfId) {
+              return deleted;
+            }
+            const deletedClients = getDifference(remoteUserClients[userId], clients);
+            if (deletedClients.length) {
+              deleted[userId] = deletedClients;
+            }
             return deleted;
-          }
-          const deletedClients = getDifference(remoteUserClients[userId], clients);
-          if (deletedClients.length) {
-            deleted[userId] = deletedClients;
-          }
-          return deleted;
-        }, {} as Recipients);
+          },
+          {},
+        );
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
@@ -1511,7 +1514,7 @@ export class MessageRepository {
           ),
         );
 
-        const missingUserIds = Object.entries(remoteUserClients).reduce((missing, [userId, clients]) => {
+        const missingUserIds = Object.entries(remoteUserClients).reduce<string[]>((missing, [userId, clients]) => {
           if (userId === selfId) {
             return missing;
           }
