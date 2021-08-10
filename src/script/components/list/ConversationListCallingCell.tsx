@@ -17,12 +17,12 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren, useKoSubscribableMap} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import useEffectRef from 'Util/useEffectRef';
@@ -37,7 +37,7 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import {getGrid, Grid} from '../../calling/videoGridHandler';
+import {Grid, useGrid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
@@ -109,10 +109,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
 
-  const users = useMemo(() => participants?.map(({user}) => user), [participants]);
-  useKoSubscribableMap(users, 'name');
-
-  const videoGrid = call && getGrid(call);
+  const videoGrid = useGrid(call);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
   const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);

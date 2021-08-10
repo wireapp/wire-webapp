@@ -17,25 +17,26 @@
  *
  */
 
-import ReactDOM from 'react-dom';
-import React, {Fragment, useEffect, useMemo} from 'react';
-import {container} from 'tsyringe';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
+import React, {Fragment, useEffect} from 'react';
+import ReactDOM from 'react-dom';
+import {container} from 'tsyringe';
 
-import FullscreenVideoCall from './FullscreenVideoCall';
-import ChooseScreen, {Screen} from './ChooseScreen';
-import {ConversationState} from '../../conversation/ConversationState';
-import {useKoSubscribableChildren, useKoSubscribableMap} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
 import {Call} from '../../calling/Call';
-import {Multitasking} from '../../notification/NotificationRepository';
-import {getGrid} from '../../calling/videoGridHandler';
-import {Conversation} from '../../entity/Conversation';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {MediaDevicesHandler, ElectronDesktopCapturerSource} from '../../media/MediaDevicesHandler';
-import {Participant} from '../../calling/Participant';
-import {VideoSpeakersTab} from '../../view_model/CallingViewModel';
-import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {CallState} from '../../calling/CallState';
+import {Participant} from '../../calling/Participant';
+import {useGrid} from '../../calling/videoGridHandler';
+import {ConversationState} from '../../conversation/ConversationState';
+import {Conversation} from '../../entity/Conversation';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {MediaStreamHandler} from '../../media/MediaStreamHandler';
+import {Multitasking} from '../../notification/NotificationRepository';
+import {VideoSpeakersTab} from '../../view_model/CallingViewModel';
+import ChooseScreen, {Screen} from './ChooseScreen';
+import FullscreenVideoCall from './FullscreenVideoCall';
 
 export interface CallingContainerProps {
   readonly callingRepository: CallingRepository;
@@ -64,11 +65,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
       'selectableWindows',
       'isChoosingScreen',
     ]);
-  const {
-    maximizedParticipant,
-    state: currentCallState,
-    participants,
-  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'pages', 'currentPage', 'participants', 'state']);
+  const {maximizedParticipant, state: currentCallState} = useKoSubscribableChildren(joinedCall, [
+    'maximizedParticipant',
+    'state',
+  ]);
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {
@@ -79,15 +79,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     }
   }, [currentCallState]);
 
-  //const users = participants?.map(({user}) => user);
-  //const names = useKoSubscribableMap(users, 'name');
-
-  //const videoGrid = useMemo(() => joinedCall && getGrid(joinedCall), [joinedCall, names]);
-
-  const users = useMemo(() => participants?.map(({user}) => user), [participants]);
-  const {} = useKoSubscribableMap(users, 'name');
-  console.log('### render fulls screen call');
-  const videoGrid = joinedCall && getGrid(joinedCall);
+  const videoGrid = useGrid(joinedCall);
 
   const onCancelScreenSelection = () => {
     callState.selectableScreens([]);
