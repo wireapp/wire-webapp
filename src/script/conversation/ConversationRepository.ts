@@ -918,7 +918,7 @@ export class ConversationRepository {
       return this.createGroupConversation([userEntity]);
     }
 
-    if (!userEntity.isOnSameFederatedDomain()) {
+    if (!userEntity.isOnSameFederatedDomain(this.userState.self().domain)) {
       return this.createGroupConversation([userEntity], `${userEntity.name()} & ${this.userState.self().name()}`);
     }
 
