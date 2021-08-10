@@ -64,18 +64,15 @@ export const useVideoGrid = (call: Call): Grid => {
 
   useEffect(() => {
     if (!call) {
-      setGrid(undefined);
-      return undefined;
+      return setGrid(undefined);
     }
     setGrid(getGrid(call));
-    const subscriptions = participants?.map(p => {
-      return p.user.name.subscribe(() => {
+    const subscriptions = participants?.map(({user}) =>
+      user.name.subscribe(() => {
         setGrid(getGrid(call));
-      });
-    });
-    return () => {
-      subscriptions?.forEach(s => s.dispose());
-    };
+      }),
+    );
+    return () => subscriptions?.forEach(s => s.dispose());
   }, [participants?.length, call, currentPage, pages?.length]);
 
   return grid;
