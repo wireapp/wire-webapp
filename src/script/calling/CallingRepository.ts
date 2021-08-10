@@ -71,7 +71,6 @@ import * as trackingHelpers from '../tracking/Helpers';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
@@ -92,6 +91,8 @@ interface MediaStreamQuery {
 interface SendMessageTarget {
   clients: WcallClient[];
 }
+
+type Clients = {clientid: string; userid: string}[];
 
 type ClientListEntry = [user: string, client: string];
 
@@ -263,7 +264,7 @@ export class CallingRepository {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients: UserClients = await this.messageRepository.createRecipients(conversationId);
+      const localClients = await this.messageRepository.createRecipients(conversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -302,9 +303,7 @@ export class CallingRepository {
       eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
       await this.messageRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
 
-      type Clients = {clientid: string; userid: string}[];
-
-      const clients: Clients[] = Object.entries(mismatch.missing).map(([userid, clientids]: [string, string[]]) =>
+      const clients: Clients[] = Object.entries(mismatch.missing).map(([userid, clientids]) =>
         clientids.map(clientid => ({clientid, userid})),
       );
 
@@ -865,8 +864,8 @@ export class CallingRepository {
     }
   }
 
-  private mapTargets(targets: SendMessageTarget): Recipients {
-    const recipients: Recipients = {};
+  private mapTargets(targets: SendMessageTarget): UserClients {
+    const recipients: UserClients = {};
 
     for (const target of targets.clients) {
       const {userid, clientid} = target;
