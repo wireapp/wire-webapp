@@ -1,32 +1,12 @@
-/*
- * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see http://www.gnu.org/licenses/.
- *
- */
-
-import type {
+import {ConversationStatus} from '../../conversation/ConversationStatus';
+import {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {
   DefaultConversationRoleName,
   CONVERSATION_ACCESS,
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/src/conversation';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
-import type {Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
-import type {ConversationStatus} from '../../conversation/ConversationStatus';
-import type {ConversationVerificationState} from '../../conversation/ConversationVerificationState';
+import {Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 export interface ConversationRecord {
   accessModes: CONVERSATION_ACCESS[];
@@ -49,7 +29,6 @@ export interface ConversationRecord {
   muted_timestamp: number;
   name: string;
   others: string[];
-  qualified_users?: QualifiedId[];
   receipt_mode?: Confirmation.Type;
   roles: {[userId: string]: DefaultConversationRoleName | string};
   status: ConversationStatus;
