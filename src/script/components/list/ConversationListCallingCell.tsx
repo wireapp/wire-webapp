@@ -174,7 +174,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   {t('callStateConnecting')}
                 </span>
               )}
-              <CallDuration isCbrEnabled={isCbrEnabled} startedAt={startedAt} isOngoing={isOngoing} />
+              <CallDuration {...{isCbrEnabled, isOngoing, startedAt}} />
             </div>
             <div className="conversation-list-cell-right">
               {isConnecting ||

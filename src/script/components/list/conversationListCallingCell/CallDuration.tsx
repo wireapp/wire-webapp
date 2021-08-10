@@ -17,9 +17,9 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {t} from 'Util/LocalizerUtil';
-import {formatSeconds} from 'Util/TimeUtil';
+import Duration from 'Components/calling/Duration';
 
 interface CallDurationProps {
   isCbrEnabled: boolean;
@@ -28,35 +28,18 @@ interface CallDurationProps {
 }
 
 const CallDuration: React.FC<CallDurationProps> = ({isOngoing, startedAt, isCbrEnabled}) => {
-  const [callDuration, setCallDuration] = useState('');
-
-  useEffect(() => {
-    let intervalId: number;
-    if (isOngoing && startedAt) {
-      const updateTimer = () => {
-        const time = Math.floor((Date.now() - startedAt) / 1000);
-        setCallDuration(formatSeconds(time));
-      };
-      updateTimer();
-      intervalId = window.setInterval(updateTimer, 1000);
-    }
-    return () => clearInterval(intervalId);
-  }, [startedAt, isOngoing]);
-
-  return (
-    callDuration && (
-      <div className="conversation-list-info-wrapper">
-        <span className="conversation-list-cell-description" data-uie-name="call-duration">
-          {callDuration}
+  return isOngoing && startedAt ? (
+    <div className="conversation-list-info-wrapper">
+      <span className="conversation-list-cell-description" data-uie-name="call-duration">
+        <Duration {...{startedAt}} />
+      </span>
+      {isCbrEnabled && (
+        <span className="conversation-list-cell-description" data-uie-name="call-cbr">
+          {t('callStateCbr')}
         </span>
-        {isCbrEnabled && (
-          <span className="conversation-list-cell-description" data-uie-name="call-cbr">
-            {t('callStateCbr')}
-          </span>
-        )}
-      </div>
-    )
-  );
+      )}
+    </div>
+  ) : null;
 };
 
 export default CallDuration;
