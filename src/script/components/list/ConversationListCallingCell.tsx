@@ -17,34 +17,33 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
+import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
-import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatSeconds} from 'Util/TimeUtil';
-import useEffectRef from 'Util/useEffectRef';
-import {sortUsersByPriority} from 'Util/StringUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
-import Icon from 'Components/Icon';
 import GroupVideoGrid from 'Components/calling/GroupVideoGrid';
+import Icon from 'Components/Icon';
 import ParticipantItem from 'Components/list/ParticipantItem';
-
-import {generateConversationUrl} from '../../router/routeGenerator';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {sortUsersByPriority} from 'Util/StringUtil';
+import useEffectRef from 'Util/useEffectRef';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
+import {CallState} from '../../calling/CallState';
 import {getGrid, Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
-import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate} from '../../router/routerBindings';
-import {CallState} from '../../calling/CallState';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {TeamState} from '../../team/TeamState';
+import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
+import CallDuration from './conversationListCallingCell/CallDuration';
 
 export interface CallingCellProps {
   call: Call;
@@ -60,7 +59,7 @@ export interface CallingCellProps {
   videoGrid: Grid;
 }
 
-export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
+const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   conversation,
   temporaryUserStyle,
   call,
@@ -129,21 +128,6 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showJoinButton = conversation && isStillOngoing && temporaryUserStyle;
   const [showParticipants, setShowParticipants] = useState(false);
 
-  const [callDuration, setCallDuration] = useState('');
-
-  useEffect(() => {
-    let intervalId: number;
-    if (isOngoing && startedAt) {
-      const updateTimer = () => {
-        const time = Math.floor((Date.now() - startedAt) / 1000);
-        setCallDuration(formatSeconds(time));
-      };
-      updateTimer();
-      intervalId = window.setInterval(updateTimer, 1000);
-    }
-    return () => clearInterval(intervalId);
-  }, [startedAt, isOngoing]);
-
   return (
     <>
       {showJoinButton && (
@@ -190,18 +174,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   {t('callStateConnecting')}
                 </span>
               )}
-              {callDuration && (
-                <div className="conversation-list-info-wrapper">
-                  <span className="conversation-list-cell-description" data-uie-name="call-duration">
-                    {callDuration}
-                  </span>
-                  {isCbrEnabled && (
-                    <span className="conversation-list-cell-description" data-uie-name="call-cbr">
-                      {t('callStateCbr')}
-                    </span>
-                  )}
-                </div>
-              )}
+              <CallDuration isCbrEnabled={isCbrEnabled} startedAt={startedAt} isOngoing={isOngoing} />
             </div>
             <div className="conversation-list-cell-right">
               {isConnecting ||
@@ -369,6 +342,8 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     </>
   );
 };
+
+export default ConversationListCallingCell;
 
 registerReactComponent('conversation-list-calling-cell', {
   component: ConversationListCallingCell,
