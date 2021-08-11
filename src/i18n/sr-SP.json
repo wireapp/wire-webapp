@@ -48,6 +48,7 @@
   "BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND": "Ова е-пошта се не може употребити за компанијску пријаву. Унесите ССО код за наставак.",
   "LOGOUT_REASON.ACCOUNT_REMOVED": "Одјавили сте се јер је ваш рачун избрисан.",
   "LOGOUT_REASON.CLIENT_REMOVED": "Одјавили сте се јер је ваш уређај избрисан.",
+  "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Одјавили сте се јер је ваша сесија истекла. {newline}Молимо пријавите се поново.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Немате довољно простора на диску",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Унесите исправну е-маил адресу",

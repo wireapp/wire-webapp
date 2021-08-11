@@ -48,6 +48,7 @@
   "BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND": "Этот email не может быть использован при авторизации организации. Пожалуйста, введите код SSO для продолжения.",
   "LOGOUT_REASON.ACCOUNT_REMOVED": "Вы деавторизованы, так как ваша учетная запись была удалена.",
   "LOGOUT_REASON.CLIENT_REMOVED": "Вы деавторизованы, так как ваше устройство было удалено.",
+  "LOGOUT_REASON.NO_APP_CONFIG": "Вы были деавторизованы, поскольку не удалось загрузить первоначальную конфигурацию.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Вы были деавторизованы из-за истечения продолжительности вашей сессии.{newline}Пожалуйста, войдите снова.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Недостаточно места на диске",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Пожалуйста, введите правильный email",
