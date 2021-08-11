@@ -20,6 +20,7 @@
 import {BaseError} from './BaseError';
 
 enum TEAM_ERROR_TYPE {
+  NO_APP_CONFIG = 'NO_APP_CONFIG',
   NO_PERMISSIONS = 'NO_PERMISSIONS',
 }
 
@@ -30,12 +31,14 @@ export class TeamError extends BaseError {
 
   static get MESSAGE(): Record<TEAM_ERROR_TYPE, string> {
     return {
+      NO_APP_CONFIG: 'Unable to receive application configuration',
       NO_PERMISSIONS: 'No permissions provided',
     };
   }
 
   static get TYPE(): Record<TEAM_ERROR_TYPE, TEAM_ERROR_TYPE> {
     return {
+      NO_APP_CONFIG: TEAM_ERROR_TYPE.NO_APP_CONFIG,
       NO_PERMISSIONS: TEAM_ERROR_TYPE.NO_PERMISSIONS,
     };
   }
