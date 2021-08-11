@@ -374,7 +374,7 @@ export class EventMapper {
 
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
-    messageEntity.userIds(userIds);
+    messageEntity.userIds(userIds || []);
     messageEntity.qualifiedUserIds(qualifiedUserIds || []);
 
     if (hasService) {
@@ -465,7 +465,7 @@ export class EventMapper {
    */
   private _mapEventMemberJoin(event: EventRecord, conversationEntity: Conversation) {
     const {data: eventData, from: senderId} = event;
-    const {has_service: hasService, user_ids: userIds} = eventData;
+    const {has_service: hasService, user_ids: userIds, qualifiedUserIds} = eventData;
 
     const messageEntity = new MemberMessage();
 
@@ -486,7 +486,8 @@ export class EventMapper {
         messageEntity.showServicesWarning = true;
       }
 
-      messageEntity.userIds(userIds);
+      messageEntity.userIds(userIds || []);
+      messageEntity.qualifiedUserIds(qualifiedUserIds || []);
     }
 
     return messageEntity;
@@ -500,7 +501,8 @@ export class EventMapper {
    */
   private _mapEventMemberLeave({data: eventData}: EventRecord) {
     const messageEntity = new MemberMessage();
-    messageEntity.userIds(eventData.user_ids);
+    messageEntity.userIds(eventData.user_ids || []);
+    messageEntity.qualifiedUserIds(eventData.qualifiedUserIds || []);
     messageEntity.reason = eventData.reason;
     return messageEntity;
   }
@@ -634,7 +636,8 @@ export class EventMapper {
     const messageEntity = new VerificationMessage();
 
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
-    messageEntity.userIds(eventData.userIds || eventData.user_ids);
+    messageEntity.userIds(eventData.userIds || eventData.user_ids || []);
+    messageEntity.qualifiedUserIds(eventData.qualifiedUserIds || eventData.qualified_user_ids || []);
     messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
