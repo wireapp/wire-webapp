@@ -86,7 +86,7 @@ import {User} from '../entity/User';
 import {EventService} from '../event/EventService';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {EventSource} from '../event/EventSource';
-import {MemberMessage} from '../entity/message/MemberMessage';
+import type {MemberMessage} from '../entity/message/MemberMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import type {EventRecord} from '../storage';
 import {MessageRepository} from './MessageRepository';
@@ -97,6 +97,7 @@ import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
+import type {VerificationMessage} from '../entity/message/VerificationMessage';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -2745,12 +2746,14 @@ export class ConversationRepository {
     messageEntity.user(userEntity);
     const isMemberMessage = messageEntity.isMember();
     if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
-      const userEntities = await this.userRepository.getUsersById((messageEntity as MemberMessage).userIds());
+      const userEntities = await this.userRepository.getUsersById(
+        (messageEntity as MemberMessage | VerificationMessage).userIds(),
+      );
       const qualifiedUserEntities = await this.userRepository.getUsersById(
-        (messageEntity as MemberMessage).qualifiedUserIds(),
+        (messageEntity as MemberMessage | VerificationMessage).qualifiedUserIds(),
       );
       const allUserEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
-      (messageEntity as MemberMessage).userEntities(allUserEntities);
+      (messageEntity as MemberMessage | VerificationMessage).userEntities(allUserEntities);
     }
     if (messageEntity.isContent()) {
       const userIds = Object.keys(messageEntity.reactions());
