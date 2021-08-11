@@ -37,12 +37,10 @@ const Duration: React.FC<DurationProps> = ({startedAt}) => {
       updateTimer();
       durationUpdateInterval = window.setInterval(updateTimer, 1000);
     }
-    return () => {
-      window.clearInterval(durationUpdateInterval);
-    };
+    return () => window.clearInterval(durationUpdateInterval);
   }, [startedAt]);
 
-  return <React.Fragment>{duration}</React.Fragment>;
+  return <>{duration}</>;
 };
 
 export default Duration;
