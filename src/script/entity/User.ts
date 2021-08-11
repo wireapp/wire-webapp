@@ -207,6 +207,10 @@ export class User {
   }
 
   isOnSameFederatedDomain(otherDomain: string = Config.getConfig().FEATURE.FEDERATION_DOMAIN): boolean {
+    if (!Config.getConfig().FEATURE.ENABLE_FEDERATION) {
+      return true;
+    }
+
     return this.domain === otherDomain;
   }
 
