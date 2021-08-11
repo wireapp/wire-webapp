@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [12.37.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.37.0...@wireapp/api-client@12.37.1) (2021-08-11)
+
+
+### Bug Fixes
+
+* **api-client:** Remove currency from BillingInfo type ([#4116](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4116)) ([0c6bf59](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/0c6bf5963546afb4a646bad4c0152ecbb46ec52f))
+
+
+
+
+
 # [12.37.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.36.0...@wireapp/api-client@12.37.0) (2021-08-09)
 
 
