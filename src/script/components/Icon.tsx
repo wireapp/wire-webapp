@@ -33,7 +33,7 @@ const normalizeIconName = (name: string) =>
   name
     .replace(/-icon$/, '')
     .replace(/\b\w/g, found => found.toUpperCase())
-    .replace(/-/g, '');
+    .replaceAll('-', '');
 
 const createSvgComponent = (svg: HTMLElement, displayName: string): React.FC<IconProps> => {
   const SVGComponent: React.FC<IconProps> = oProps => {

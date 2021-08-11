@@ -95,7 +95,7 @@ function modifyMarkdownLinks(markdown: string): string {
 markdownit.normalizeLinkText = text => text;
 
 export const renderMessage = (message: string, selfId: string, mentionEntities: MentionEntity[] = []) => {
-  const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
+  const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replaceAll('=', '')}`;
   const renderMention = (mentionData: MentionText) => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
     let elementAttributes = mentionData.isSelfMentioned
@@ -220,7 +220,7 @@ export const renderMessage = (message: string, selfId: string, mentionEntities: 
 
 export const getRenderedTextContent = (text: string): string => {
   const renderedMessage = renderMessage(text, '');
-  const messageWithLinebreaks = renderedMessage.replace(/<br>/g, '\n');
+  const messageWithLinebreaks = renderedMessage.replaceAll('<br>', '\n');
   const strippedMessage = messageWithLinebreaks.replace(/<.+?>/g, '');
   return markdownit.utils.unescapeAll(strippedMessage);
 };

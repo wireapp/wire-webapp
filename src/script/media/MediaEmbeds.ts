@@ -79,8 +79,8 @@ const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
  * @returns Message content
  */
 const _appendIFrame = (link: HTMLAnchorElement, message: string, iFrame: string): string => {
-  const linkString = link.outerHTML.replace(/&amp;/g, '&');
-  return message.replace(/&amp;/g, '&').replace(linkString, `${linkString}${iFrame}`);
+  const linkString = link.outerHTML.replaceAll('&amp;', '&');
+  return message.replaceAll('&amp;', '&').replace(linkString, `${linkString}${iFrame}`);
 };
 
 /**
@@ -233,8 +233,8 @@ export const MediaEmbeds = {
 
       // convert spotify uri: album/23... -> album:23... -> album%3A23...
       let embed = '';
-      linkSrc.replace(MediaEmbeds.regex.spotify, (match, group1) => {
-        const replaceSlashes = group1.replace(/\//g, ':');
+      linkSrc.replace(MediaEmbeds.regex.spotify, (_match, group1) => {
+        const replaceSlashes = group1.replaceAll('/', ':');
         const encodedParams = encodeURIComponent(`:${replaceSlashes}`);
         return (embed = iFrame.replace('$1', encodedParams));
       });

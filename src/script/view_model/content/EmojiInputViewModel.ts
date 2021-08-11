@@ -170,7 +170,7 @@ export class EmojiInputViewModel {
       const alphaCodes = [details.name, ...details.aliases];
       alphaCodes.forEach(alphaCode => {
         if (alphaCode) {
-          const name = alphaCode.slice(1, -1).replace(/_/g, ' ').toLowerCase();
+          const name = alphaCode.slice(1, -1).replaceAll('_', ' ').toLowerCase();
           this.emojiList.push({icon, name});
           this.emojiDict[name] = icon;
         }
