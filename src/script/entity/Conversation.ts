@@ -23,6 +23,7 @@ import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-mes
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -126,8 +127,12 @@ export class Conversation {
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
+  /** Includes all participating users (with & without domain) except the self user. */
   public readonly participating_user_ets: ko.ObservableArray<User>;
+  /** Contains only IDs from users without a domain. Does not include self user. */
   public readonly participating_user_ids: ko.ObservableArray<string>;
+  /** Contains only IDs from users with domains. Does not include self user. */
+  public readonly participatingQualifiedUserIds: ko.ObservableArray<QualifiedId>;
   public readonly receiptMode: ko.Observable<Confirmation.Type>;
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
@@ -145,8 +150,8 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE;
-  public domain?: string;
-  public isFederated: ko.PureComputed<boolean>;
+  public readonly domain?: string;
+  public readonly isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
@@ -169,8 +174,9 @@ export class Conversation {
     this.is_loaded = ko.observable(false);
     this.is_pending = ko.observable(false);
 
-    this.participating_user_ets = ko.observableArray([]); // Does not include self user
-    this.participating_user_ids = ko.observableArray([]); // Does not include self user
+    this.participating_user_ets = ko.observableArray([]);
+    this.participating_user_ids = ko.observableArray([]);
+    this.participatingQualifiedUserIds = ko.observableArray([]);
     this.selfUser = ko.observable();
     this.roles = ko.observable({});
 
@@ -189,7 +195,7 @@ export class Conversation {
 
     this.isTeam1to1 = ko.pureComputed(() => {
       const isGroupConversation = this.type() === CONVERSATION_TYPE.REGULAR;
-      const hasOneParticipant = this.participating_user_ids().length === 1;
+      const hasOneParticipant = this.amountOfUserIds === 1;
       return isGroupConversation && hasOneParticipant && this.team_id && !this.name();
     });
     this.isGroup = ko.pureComputed(() => {
@@ -298,7 +304,10 @@ export class Conversation {
     });
 
     this.isCreatedBySelf = ko.pureComputed(
-      () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
+      () =>
+        this.selfUser().id === this.creator &&
+        this.selfUser().domain === this.domain &&
+        !this.removed_from_conversation(),
     );
 
     this.isFederated = ko.pureComputed(() => Config.getConfig().FEATURE.ENABLE_FEDERATION && !!this.domain);
@@ -454,8 +463,7 @@ export class Conversation {
           return truncate(joinedNames, maxLength, false);
         }
 
-        const hasUserIds = !!this.participating_user_ids().length;
-        if (!hasUserIds) {
+        if (this.amountOfUserIds === 0) {
           return t('conversationsEmptyConversation');
         }
       }
@@ -472,8 +480,8 @@ export class Conversation {
   }
 
   private hasInitializedUsers() {
-    const hasMappedUsers = this.participating_user_ets().length || !this.participating_user_ids().length;
-    return Boolean(this.selfUser() && hasMappedUsers);
+    const hasMappedUsers = this.participating_user_ets().length > 0 || this.amountOfUserIds === 0;
+    return !!this.selfUser() && hasMappedUsers;
   }
 
   private _initSubscriptions() {
@@ -495,6 +503,10 @@ export class Conversation {
       this.type,
       this.verification_state,
     ].forEach(property => (property as ko.Observable).subscribe(this.persistState));
+  }
+
+  get amountOfUserIds() {
+    return this.participating_user_ids().length + this.participatingQualifiedUserIds().length;
   }
 
   get allUserEntities() {
@@ -671,11 +683,11 @@ export class Conversation {
     const adjustCountForSelf = countSelf && !this.removed_from_conversation() ? 1 : 0;
     const adjustCountForServices = countServices ? 0 : this.getNumberOfServices();
 
-    return this.participating_user_ids().length + adjustCountForSelf - adjustCountForServices;
+    return this.amountOfUserIds + adjustCountForSelf - adjustCountForServices;
   }
 
   getNumberOfClients(): number {
-    const participantsMapped = this.participating_user_ids().length === this.participating_user_ets().length;
+    const participantsMapped = this.amountOfUserIds === this.participating_user_ets().length;
     if (participantsMapped) {
       return this.participating_user_ets().reduce((accumulator, userEntity) => {
         return userEntity.devices().length
@@ -938,6 +950,7 @@ export class Conversation {
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
       others: this.participating_user_ids(),
+      qualified_users: this.participatingQualifiedUserIds(),
       receipt_mode: this.receiptMode(),
       roles: this.roles(),
       status: this.status(),

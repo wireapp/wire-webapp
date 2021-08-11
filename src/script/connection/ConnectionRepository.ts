@@ -266,7 +266,8 @@ export class ConnectionRepository {
     this.addConnectionEntity(connectionEntity);
     // TODO(Federation): Update code once connections are implemented on the backend
     const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
-    return userEntity.connection(connectionEntity);
+    userEntity.connection(connectionEntity);
+    return connectionEntity;
   }
 
   /**
