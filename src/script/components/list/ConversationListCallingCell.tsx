@@ -27,6 +27,7 @@ import GroupAvatar from 'Components/avatar/GroupAvatar';
 import GroupVideoGrid from 'Components/calling/GroupVideoGrid';
 import Icon from 'Components/Icon';
 import ParticipantItem from 'Components/list/ParticipantItem';
+import Duration from 'Components/calling/Duration';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
@@ -43,7 +44,6 @@ import {TeamState} from '../../team/TeamState';
 import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
-import CallDuration from './conversationListCallingCell/CallDuration';
 
 export interface CallingCellProps {
   call: Call;
@@ -174,7 +174,18 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   {t('callStateConnecting')}
                 </span>
               )}
-              <CallDuration {...{isCbrEnabled, isOngoing, startedAt}} />
+              {isOngoing && startedAt && (
+                <div className="conversation-list-info-wrapper">
+                  <span className="conversation-list-cell-description" data-uie-name="call-duration">
+                    <Duration {...{startedAt}} />
+                  </span>
+                  {isCbrEnabled && (
+                    <span className="conversation-list-cell-description" data-uie-name="call-cbr">
+                      {t('callStateCbr')}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
             <div className="conversation-list-cell-right">
               {isConnecting ||
