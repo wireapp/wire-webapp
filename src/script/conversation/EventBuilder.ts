@@ -73,7 +73,7 @@ export interface VoiceChannelActivateEvent extends BaseEvent {
   type: string;
 }
 
-export type AllVerifiedEvent = ConversationEvent<{type: VerificationMessageType}>;
+export type AllVerifiedEvent = ConversationEvent<{type: VerificationMessageType; userIds: string[]}>;
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType};
 export type DegradedMessageEvent = ConversationEvent<{type: VerificationMessageType; userIds: string[]}>;
@@ -120,6 +120,7 @@ export const EventBuilder = {
       conversation: conversationEntity.id,
       data: {
         type: VerificationMessageType.VERIFIED,
+        userIds: conversationEntity.participating_user_ids(),
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
