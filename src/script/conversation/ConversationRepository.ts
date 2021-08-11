@@ -2746,8 +2746,11 @@ export class ConversationRepository {
     const isMemberMessage = messageEntity.isMember();
     if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
       const userEntities = await this.userRepository.getUsersById((messageEntity as MemberMessage).userIds());
-      userEntities.sort(sortUsersByPriority);
-      (messageEntity as MemberMessage).userEntities(userEntities);
+      const qualifiedUserEntities = await this.userRepository.getUsersById(
+        (messageEntity as MemberMessage).qualifiedUserIds(),
+      );
+      const allUserEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
+      (messageEntity as MemberMessage).userEntities(allUserEntities);
     }
     if (messageEntity.isContent()) {
       const userIds = Object.keys(messageEntity.reactions());

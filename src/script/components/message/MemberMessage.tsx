@@ -111,7 +111,7 @@ const MemberMessage: React.FC<MemberMessageProps> = ({
           )}
 
           {hasUsers && (
-            <div className="message-header">
+            <div className="message-header" data-uie-name="label-group-creation-participants">
               <div className="message-header-icon message-header-icon--svg text-foreground">
                 {isGroupCreation && <Icon.Message />}
                 {isMemberRemoval && <span className="icon-minus" />}
