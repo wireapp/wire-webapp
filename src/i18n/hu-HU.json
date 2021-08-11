@@ -48,6 +48,7 @@
   "BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND": "Ez az e-mail nem használható vállalati bejelentkezéshez. Kérlek, írd be az SSO kódot a folytatáshoz.",
   "LOGOUT_REASON.ACCOUNT_REMOVED": "Ki lettél jelentkeztetve, mert a felhasználói fiókodat törölték.",
   "LOGOUT_REASON.CLIENT_REMOVED": "Ki lettél jelentkeztetve, mert az eszközödet törölték.",
+  "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "A munkamenet lejárt, ezért ki lettél jelentkeztetve.{newline}Kérjük, jelentkezz be újra.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Nincs elég tárhely",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Kérjük, érvényes e-mail címet adj meg",

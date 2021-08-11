@@ -525,7 +525,7 @@ export class UserRepository {
    * Check for user locally and fetch it from the server otherwise.
    */
   async getUserById(userId: string, domain: string | null): Promise<User> {
-    const qualifier = domain
+    const qualifier: string | QualifiedId = domain
       ? {
           domain,
           id: userId,

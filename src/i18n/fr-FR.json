@@ -48,6 +48,7 @@
   "BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND": "Cette adresse e-mail ne peut pas être utilisée pour cette connexion entreprise. Veuillez saisir le code SSO pour continuer.",
   "LOGOUT_REASON.ACCOUNT_REMOVED": "Vous avez été déconnecté car votre compte a été supprimé.",
   "LOGOUT_REASON.CLIENT_REMOVED": "Vous avez été déconnecté car votre appareil a été supprimé.",
+  "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Vous avez été déconnecté car votre session a expirée.{newline}Veuillez vous reconnecter.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Espace disque insuffisant",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Veuillez saisir une adresse e-mail valide",
