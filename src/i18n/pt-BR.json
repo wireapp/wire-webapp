@@ -48,6 +48,7 @@
   "BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND": "Este e-mail não pode ser usado para login corporativo. Por favor, insira o código SSO para continuar.",
   "LOGOUT_REASON.ACCOUNT_REMOVED": "Você foi desconectado pois sua conta foi excluída.",
   "LOGOUT_REASON.CLIENT_REMOVED": "Você foi desconectado pois seu dispositivo foi excluído.",
+  "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Você foi desconectado porque sua sessão expirou. {Newline}Por favor, inicie sessão novamente.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Espaço em disco insuficiente",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Por favor, insira um endereço de e-mail válido",

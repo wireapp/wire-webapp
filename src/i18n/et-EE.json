@@ -48,6 +48,7 @@
   "BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND": "This email cannot be used for enterprise login. Please enter the SSO code to proceed.",
   "LOGOUT_REASON.ACCOUNT_REMOVED": "Sind logiti välja, kuna sinu konto kustutati.",
   "LOGOUT_REASON.CLIENT_REMOVED": "Sind logiti välja, kuna sinu seade kustutati.",
+  "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Sind logiti välja, kuna su seanss aegus.{newline}Palun logi uuesti sisse.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Puudub piisav salvestusruum",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Palun sisesta kehtiv e-posti aadress",

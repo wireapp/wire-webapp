@@ -48,6 +48,7 @@
   "BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND": "This email cannot be used for enterprise login. Please enter the SSO code to proceed.",
   "LOGOUT_REASON.ACCOUNT_REMOVED": "Byli jste odhlášeni, protože váš účet byl smazán.",
   "LOGOUT_REASON.CLIENT_REMOVED": "Byli jste odhlášeni, protože vaše zařízení bylo smazáno.",
+  "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Byli jste odhlášeni, protože platnost relace vypršela.{newline}Prosím, přihlaste se znovu.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Nedostatek volného místa na disku",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Zadejte prosím platnou emailovou adresu",

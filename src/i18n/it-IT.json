@@ -48,6 +48,7 @@
   "BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND": "Questa email non può essere utilizzata per l'accesso aziendale. Inserisci il codice SSO per procedere.",
   "LOGOUT_REASON.ACCOUNT_REMOVED": "Sei stato disconnesso perché il tuo account è stato eliminato.",
   "LOGOUT_REASON.CLIENT_REMOVED": "Sei stato disconnesso perché il tuo dispositivo è stato eliminato.",
+  "LOGOUT_REASON.NO_APP_CONFIG": "You were signed out because the initial configuration could not be loaded.",
   "LOGOUT_REASON.SESSION_EXPIRED": "Sei stato disconnesso perché la tua sessione è scaduta.{newline}Effettua nuovamente il login.",
   "LabeledError.GENERAL_ERRORS.LOW_DISK_SPACE": "Spazio su disco insufficiente",
   "ValidationError.FIELD.EMAIL.TYPE_MISMATCH": "Please enter a valid email address",
