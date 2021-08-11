@@ -17,13 +17,10 @@
  *
  */
 
-import type {SupportedCurrency} from './SupportedCurrency';
-
 export interface BillingData {
   city: string;
   company: string;
   country: string;
-  currency?: SupportedCurrency;
   firstname: string;
   lastname: string;
   state?: string;
