@@ -18,9 +18,9 @@
  */
 
 import type {GenericMessage, IGenericMessage} from '@wireapp/protocol-messaging';
+import type {UserClients} from '@wireapp/api-client/src/conversation/';
 
 import type {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {Recipients} from '../cryptography/CryptographyRepository';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -34,7 +34,7 @@ export interface MessageSendingOptions {
    *  * `true`: force sending
    */
   precondition?: string[] | boolean;
-  recipients: Recipients;
+  recipients: UserClients;
 }
 
 export class EventInfoEntity {

@@ -47,6 +47,7 @@ export const FORWARDED_QUERY_KEYS = [
 export const LOGOUT_REASON = {
   ACCOUNT_REMOVED: 'deleted',
   CLIENT_REMOVED: 'client_removed',
+  NO_APP_CONFIG: 'no_app_config',
   SESSION_EXPIRED: 'expired',
 };
 

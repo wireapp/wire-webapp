@@ -17,34 +17,33 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
+import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
-import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatSeconds} from 'Util/TimeUtil';
-import useEffectRef from 'Util/useEffectRef';
-import {sortUsersByPriority} from 'Util/StringUtil';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
-import Icon from 'Components/Icon';
 import GroupVideoGrid from 'Components/calling/GroupVideoGrid';
+import Icon from 'Components/Icon';
 import ParticipantItem from 'Components/list/ParticipantItem';
-
-import {generateConversationUrl} from '../../router/routeGenerator';
+import Duration from 'Components/calling/Duration';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {t} from 'Util/LocalizerUtil';
+import {sortUsersByPriority} from 'Util/StringUtil';
+import useEffectRef from 'Util/useEffectRef';
 
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
-import {getGrid, Grid} from '../../calling/videoGridHandler';
+import {Grid, useVideoGrid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
-import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import type {Multitasking} from '../../notification/NotificationRepository';
+import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate} from '../../router/routerBindings';
+import {TeamState} from '../../team/TeamState';
 import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
-import {TeamState} from '../../team/TeamState';
+import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 
 export interface CallingCellProps {
   call: Call;
@@ -60,7 +59,7 @@ export interface CallingCellProps {
   videoGrid: Grid;
 }
 
-export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
+const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   conversation,
   temporaryUserStyle,
   call,
@@ -109,7 +108,7 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const showVideoButton = isVideoCallingEnabled && (call.initialType === CALL_TYPE.VIDEO || isOngoing);
   const showParticipantsButton = isOngoing && isGroup;
 
-  const videoGrid = call && getGrid(call);
+  const videoGrid = useVideoGrid(call);
 
   const conversationParticipants = conversation && userEts.concat([selfUser]);
   const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);
@@ -128,21 +127,6 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const showJoinButton = conversation && isStillOngoing && temporaryUserStyle;
   const [showParticipants, setShowParticipants] = useState(false);
-
-  const [callDuration, setCallDuration] = useState('');
-
-  useEffect(() => {
-    let intervalId: number;
-    if (isOngoing && startedAt) {
-      const updateTimer = () => {
-        const time = Math.floor((Date.now() - startedAt) / 1000);
-        setCallDuration(formatSeconds(time));
-      };
-      updateTimer();
-      intervalId = window.setInterval(updateTimer, 1000);
-    }
-    return () => clearInterval(intervalId);
-  }, [startedAt, isOngoing]);
 
   return (
     <>
@@ -190,10 +174,10 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                   {t('callStateConnecting')}
                 </span>
               )}
-              {callDuration && (
+              {isOngoing && startedAt && (
                 <div className="conversation-list-info-wrapper">
                   <span className="conversation-list-cell-description" data-uie-name="call-duration">
-                    {callDuration}
+                    <Duration {...{startedAt}} />
                   </span>
                   {isCbrEnabled && (
                     <span className="conversation-list-cell-description" data-uie-name="call-cbr">
@@ -254,13 +238,13 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
               <div className="conversation-list-calling-cell-controls">
                 <div className="conversation-list-calling-cell-controls-left">
                   <button
-                    className={cx('call-ui__button', {'call-ui__button--active': isMuted})}
+                    className={cx('call-ui__button', {'call-ui__button--active': !isMuted})}
                     onClick={() => callActions.toggleMute(call, !isMuted)}
                     data-uie-name="do-toggle-mute"
                     data-uie-value={isMuted ? 'active' : 'inactive'}
-                    title={t('videoCallOverlayMute')}
+                    title={t('videoCallOverlayMicrophone')}
                   >
-                    <Icon.MicOff className="small-icon" />
+                    {isMuted ? <Icon.MicOff className="small-icon" /> : <Icon.MicOn className="small-icon" />}
                   </button>
                   {showVideoButton && (
                     <button
@@ -268,10 +252,14 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       onClick={() => callActions.toggleCamera(call)}
                       disabled={disableVideoButton}
                       data-uie-name="do-toggle-video"
-                      title={t('videoCallOverlayVideo')}
+                      title={t('videoCallOverlayCamera')}
                       data-uie-value={selfSharesCamera ? 'active' : 'inactive'}
                     >
-                      <Icon.Camera className="small-icon" />
+                      {selfSharesCamera ? (
+                        <Icon.Camera className="small-icon" />
+                      ) : (
+                        <Icon.CameraOff className="small-icon" />
+                      )}
                     </button>
                   )}
                   {isOngoing && (
@@ -288,7 +276,11 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                       data-uie-enabled={disableScreenButton ? 'false' : 'true'}
                       title={t('videoCallOverlayShareScreen')}
                     >
-                      <Icon.Screenshare className="small-icon" />
+                      {selfSharesScreen ? (
+                        <Icon.Screenshare className="small-icon" />
+                      ) : (
+                        <Icon.ScreenshareOff className="small-icon" />
+                      )}
                     </div>
                   )}
                 </div>
@@ -361,6 +353,8 @@ export const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     </>
   );
 };
+
+export default ConversationListCallingCell;
 
 registerReactComponent('conversation-list-calling-cell', {
   component: ConversationListCallingCell,

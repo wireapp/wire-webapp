@@ -127,6 +127,7 @@ import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
 import CallingContainer from 'Components/calling/CallingOverlayContainer';
+import {TeamError} from '../error/TeamError';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -164,7 +165,12 @@ class App {
       },
       NOTIFICATION_CHECK: TIME_IN_MILLIS.SECOND * 10,
       SIGN_OUT_REASONS: {
-        IMMEDIATE: [SIGN_OUT_REASON.ACCOUNT_DELETED, SIGN_OUT_REASON.CLIENT_REMOVED, SIGN_OUT_REASON.SESSION_EXPIRED],
+        IMMEDIATE: [
+          SIGN_OUT_REASON.NO_APP_CONFIG,
+          SIGN_OUT_REASON.ACCOUNT_DELETED,
+          SIGN_OUT_REASON.CLIENT_REMOVED,
+          SIGN_OUT_REASON.SESSION_EXPIRED,
+        ],
         TEMPORARY_GUEST: [
           SIGN_OUT_REASON.MULTIPLE_TABS,
           SIGN_OUT_REASON.SESSION_EXPIRED,
@@ -541,6 +547,10 @@ class App {
         case AccessTokenError.TYPE.REQUEST_FORBIDDEN: {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
           return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
+        }
+        case TeamError.TYPE.NO_APP_CONFIG: {
+          this.logger.warn(`Logging out user: ${error.message}`, error);
+          return this._redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
         }
 
         default: {

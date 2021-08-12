@@ -2198,10 +2198,10 @@ export class ConversationRepository {
 
     const data = await this.conversation_service.getConversationById(conversationEntity.id, conversationEntity.domain);
     const allMembers = [...data.members.others, data.members.self];
-    const conversationRoles = allMembers.reduce((roles, member) => {
+    const conversationRoles = allMembers.reduce<Record<string, string>>((roles, member) => {
       roles[member.id] = member.conversation_role;
       return roles;
-    }, {} as Record<string, string>);
+    }, {});
     conversationEntity.roles(conversationRoles);
 
     if (!creatorIsParticipant) {

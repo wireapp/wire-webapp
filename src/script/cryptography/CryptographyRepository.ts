@@ -32,7 +32,7 @@ import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {arrayToBase64, base64ToArray, zeroPadding} from 'Util/util';
+import {arrayToBase64, base64ToArray} from 'Util/util';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
@@ -53,8 +53,6 @@ interface EncryptedPayload {
   cipherText?: string;
   sessionId: string;
 }
-
-export type Recipients = Record<string, string[]>;
 
 export interface ClientKeys {
   lastResortKey: BackendPreKey;
@@ -158,8 +156,8 @@ export class CryptographyRepository {
    * Get the fingerprint of the local identity.
    * @returns Fingerprint of local identity public key
    */
-  getLocalFingerprint() {
-    return this.formatFingerprint(this.cryptobox.getIdentity().public_key.fingerprint());
+  getLocalFingerprint(): string {
+    return this.cryptobox.getIdentity().public_key.fingerprint();
   }
 
   /**
@@ -169,15 +167,11 @@ export class CryptographyRepository {
    * @param preKey PreKey to initialize a session from
    * @returns Resolves with the remote fingerprint
    */
-  async getRemoteFingerprint(userId: string, clientId: string, preKey?: BackendPreKey): Promise<RegExpMatchArray> {
+  async getRemoteFingerprint(userId: string, clientId: string, preKey?: BackendPreKey): Promise<string> {
     const cryptoboxSession = preKey
       ? await this.createSessionFromPreKey(preKey, userId, clientId)
       : await this.loadSession(userId, clientId);
-    return cryptoboxSession ? this.formatFingerprint(cryptoboxSession.fingerprint_remote()) : [];
-  }
-
-  private formatFingerprint(fingerprint: string): RegExpMatchArray {
-    return zeroPadding(fingerprint, 16).match(/.{1,2}/g) || [];
+    return cryptoboxSession ? cryptoboxSession.fingerprint_remote() : undefined;
   }
 
   /**
@@ -268,7 +262,7 @@ export class CryptographyRepository {
    * @returns Resolves with the encrypted payload
    */
   async encryptGenericMessage(
-    recipients: Recipients,
+    recipients: UserClients,
     genericMessage: GenericMessage,
     payload: NewOTRMessage<string> = this.constructPayload(this.currentClient().id),
   ) {
@@ -370,10 +364,10 @@ export class CryptographyRepository {
   }
 
   private async buildPayload(
-    recipients: Recipients,
+    recipients: UserClients,
     genericMessage: GenericMessage,
     messagePayload: NewOTRMessage<string>,
-  ): Promise<{messagePayload: NewOTRMessage<string>; missingRecipients: Recipients}> {
+  ): Promise<{messagePayload: NewOTRMessage<string>; missingRecipients: UserClients}> {
     const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
       (accumulator, [userId, clientIds]) => {
         if (clientIds && clientIds.length) {
@@ -395,7 +389,7 @@ export class CryptographyRepository {
   }
 
   private async encryptGenericMessageForMissingRecipients(
-    missingRecipients: Recipients,
+    missingRecipients: UserClients,
     genericMessage: GenericMessage,
     messagePayload: NewOTRMessage<string>,
   ) {
@@ -426,8 +420,8 @@ export class CryptographyRepository {
   private mapCipherTextToPayload(
     messagePayload: NewOTRMessage<string>,
     cipherPayload: EncryptedPayload[],
-  ): {messagePayload: NewOTRMessage<string>; missingRecipients: Recipients} {
-    const missingRecipients: Recipients = {};
+  ): {messagePayload: NewOTRMessage<string>; missingRecipients: UserClients} {
+    const missingRecipients: UserClients = {};
 
     cipherPayload.forEach(({cipherText, sessionId}) => {
       const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);

@@ -39,10 +39,20 @@ const isProduction = (): boolean => {
   return window.wire.env.ENVIRONMENT === BackendEnvironment.PRODUCTION;
 };
 
-export const Environment = {
+interface Environment {
   backend: {
-    current: undefined as any,
-  },
+    current?: string;
+  };
+  electronVersion: typeof getElectronVersion;
+  frontend: {
+    isLocalhost: typeof isLocalhost;
+    isProduction: typeof isProduction;
+  };
+  version: (showWrapperVersion?: boolean) => string;
+}
+
+export const Environment: Environment = {
+  backend: {},
   electronVersion: getElectronVersion,
   frontend: {
     isLocalhost,

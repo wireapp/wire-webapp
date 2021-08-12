@@ -126,7 +126,7 @@ export class UserMapper {
     if (hasAsset) {
       mappedAssets = mapProfileAssets(userEntity.id, userData.assets);
     } else if (hasPicture) {
-      mappedAssets = mapProfileAssetsV1(userEntity.id, (userData as any).picture);
+      mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
     }
     updateUserEntityAssets(userEntity, mappedAssets);
 

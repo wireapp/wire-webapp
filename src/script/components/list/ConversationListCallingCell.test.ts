@@ -27,7 +27,7 @@ import TestPage from 'Util/test/TestPage';
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
-import {CallingCellProps, ConversationListCallingCell} from './ConversationListCallingCell';
+import ConversationListCallingCell, {CallingCellProps} from './ConversationListCallingCell';
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 import {CallActions} from 'src/script/view_model/CallingViewModel';

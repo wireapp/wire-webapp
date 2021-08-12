@@ -23,6 +23,7 @@ export enum SIGN_OUT_REASON {
   CLIENT_REMOVED = 'client_removed',
   INDEXED_DB = 'indexedDb',
   MULTIPLE_TABS = 'multiple_tabs',
+  NO_APP_CONFIG = 'no_app_config',
   NOT_SIGNED_IN = 'not_signed_in',
   SESSION_EXPIRED = 'expired',
   USER_REQUESTED = 'user_requested',

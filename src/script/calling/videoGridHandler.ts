@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect, useState} from 'react';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import type {Participant} from '../calling/Participant';
@@ -41,9 +43,8 @@ export function getGrid(call: Call) {
   const remoteParticipants = call
     .getRemoteParticipants()
     .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
-  const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
 
-  if (remoteParticipants.length === 1 && remoteVideoParticipants.length === 1) {
+  if (remoteParticipants.length === 1) {
     inGridParticipants = remoteParticipants;
     thumbnailParticipant = selfParticipant;
   } else {
@@ -52,7 +53,27 @@ export function getGrid(call: Call) {
   }
 
   return {
-    grid: inGridParticipants.filter(p => p?.hasActiveVideo()),
-    thumbnail: thumbnailParticipant?.hasActiveVideo() ? thumbnailParticipant : null,
+    grid: inGridParticipants,
+    thumbnail: thumbnailParticipant,
   };
 }
+
+export const useVideoGrid = (call: Call): Grid => {
+  const [grid, setGrid] = useState<Grid>();
+  const {participants, currentPage, pages} = useKoSubscribableChildren(call, ['participants', 'currentPage', 'pages']);
+
+  useEffect(() => {
+    if (!call) {
+      return setGrid(undefined);
+    }
+    setGrid(getGrid(call));
+    const subscriptions = participants?.map(({user}) =>
+      user.name.subscribe(() => {
+        setGrid(getGrid(call));
+      }),
+    );
+    return () => subscriptions?.forEach(s => s.dispose());
+  }, [participants?.length, call, currentPage, pages?.length]);
+
+  return grid;
+};
