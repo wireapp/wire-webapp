@@ -18,7 +18,6 @@
  */
 
 import ko from 'knockout';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
 import {SuperType} from '../../message/SuperType';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
@@ -30,7 +29,6 @@ export class VerificationMessage extends Message {
   public userIds: ko.ObservableArray<string>;
   public verificationMessageType: ko.Observable<VerificationMessageType>;
   public readonly isSelfClient: ko.PureComputed<boolean>;
-  public qualifiedUserIds: ko.ObservableArray<QualifiedId>;
 
   constructor() {
     super();
@@ -40,7 +38,6 @@ export class VerificationMessage extends Message {
 
     this.verificationMessageType = ko.observable();
     this.userIds = ko.observableArray();
-    this.qualifiedUserIds = ko.observableArray([]);
 
     this.userEntities = ko.observableArray();
 

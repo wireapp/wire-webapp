@@ -86,7 +86,7 @@ import {User} from '../entity/User';
 import {EventService} from '../event/EventService';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import {EventSource} from '../event/EventSource';
-import type {MemberMessage} from '../entity/message/MemberMessage';
+import {MemberMessage} from '../entity/message/MemberMessage';
 import {FileAsset} from '../entity/message/FileAsset';
 import type {EventRecord} from '../storage';
 import {MessageRepository} from './MessageRepository';
@@ -97,7 +97,6 @@ import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
-import type {VerificationMessage} from '../entity/message/VerificationMessage';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -1131,12 +1130,10 @@ export class ConversationRepository {
    * @param initialTimestamp Initial server and event timestamp
    * @returns Mapped conversation/s
    */
-  mapConversations(payload: BackendConversation, initialTimestamp?: number): Conversation;
-  mapConversations(payload: BackendConversation[], initialTimestamp?: number): Conversation[];
   mapConversations(
     payload: BackendConversation[] | BackendConversation,
     initialTimestamp = this.getLatestEventTimestamp(),
-  ): Conversation | Conversation[] {
+  ) {
     const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
     const entities = ConversationMapper.mapConversations(
       conversationsData as ConversationDatabaseData[],
@@ -1231,16 +1228,8 @@ export class ConversationRepository {
     offline = false,
     updateGuests = false,
   ): Promise<Conversation> {
-    let userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
-    const qualifiedUserEntities = await this.userRepository.getUsersById(
-      conversationEntity.participatingQualifiedUserIds(),
-      offline,
-    );
-    userEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
-    // TODO(Federation) fix: Filter duplicated users
-    userEntities = userEntities.filter(
-      (user, index, users) => users.findIndex(anotherUser => anotherUser.id === user.id) === index,
-    );
+    const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), offline);
+    userEntities.sort(sortUsersByPriority);
     conversationEntity.participating_user_ets(userEntities);
 
     if (updateGuests) {
@@ -2180,13 +2169,9 @@ export class ConversationRepository {
         throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
 
-      const conversationEntity = this.mapConversations(eventData, initialTimestamp);
+      const conversationEntity = this.mapConversations(eventData, initialTimestamp) as Conversation;
       if (conversationEntity) {
-        if (
-          conversationEntity.participating_user_ids().length +
-            conversationEntity.participatingQualifiedUserIds().length >
-          0
-        ) {
+        if (conversationEntity.participating_user_ids().length) {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
         }
         await this.updateParticipatingUserEntities(conversationEntity);
@@ -2206,12 +2191,7 @@ export class ConversationRepository {
   private async onGroupCreation(conversationEntity: Conversation, eventJson: EventRecord) {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     const creatorId = conversationEntity.creator;
-    const conversationDomain = conversationEntity.domain;
-    const createdByParticipant =
-      !!conversationEntity.participating_user_ids().find(userId => userId === creatorId) ||
-      conversationEntity
-        .participatingQualifiedUserIds()
-        .find(user => user.id === creatorId && user.domain === conversationDomain);
+    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
@@ -2313,7 +2293,6 @@ export class ConversationRepository {
         .filter((userEntity: User) => !userEntity.isMe)
         .forEach((userEntity: User) => {
           conversationEntity.participating_user_ids.remove(userEntity.id);
-          conversationEntity.participatingQualifiedUserIds.remove({domain: userEntity.domain, id: userEntity.id});
 
           if (userEntity.isTemporaryGuest()) {
             userEntity.clearExpirationTimeout();
@@ -2741,27 +2720,25 @@ export class ConversationRepository {
    * @returns Resolves when users have been update
    */
   private async updateMessageUserEntities(messageEntity: Message) {
-    // TODO(Federation): implement `fromDomain` for message entities
     const userEntity = await this.userRepository.getUserById(messageEntity.from, messageEntity.fromDomain);
     messageEntity.user(userEntity);
     const isMemberMessage = messageEntity.isMember();
     if (isMemberMessage || messageEntity.hasOwnProperty('userEntities')) {
-      const userEntities = await this.userRepository.getUsersById(
-        (messageEntity as MemberMessage | VerificationMessage).userIds(),
-      );
-      const qualifiedUserEntities = await this.userRepository.getUsersById(
-        (messageEntity as MemberMessage | VerificationMessage).qualifiedUserIds(),
-      );
-      const allUserEntities = userEntities.concat(qualifiedUserEntities).sort(sortUsersByPriority);
-      (messageEntity as MemberMessage | VerificationMessage).userEntities(allUserEntities);
+      return this.userRepository.getUsersById((messageEntity as MemberMessage).userIds()).then(userEntities => {
+        userEntities.sort(sortUsersByPriority);
+        (messageEntity as MemberMessage).userEntities(userEntities);
+        return messageEntity;
+      });
     }
     if (messageEntity.isContent()) {
       const userIds = Object.keys(messageEntity.reactions());
 
       messageEntity.reactions_user_ets.removeAll();
       if (userIds.length) {
-        const userEntities = await this.userRepository.getUsersById(userIds);
-        messageEntity.reactions_user_ets(userEntities);
+        return this.userRepository.getUsersById(userIds).then(userEntities_1 => {
+          messageEntity.reactions_user_ets(userEntities_1);
+          return messageEntity;
+        });
       }
     }
     return messageEntity;
