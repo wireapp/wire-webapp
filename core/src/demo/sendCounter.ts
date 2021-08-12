@@ -84,6 +84,7 @@ const {
   logger.log('Name', name);
   logger.log('User ID', account['apiClient'].context!.userId);
   logger.log('Client ID', account['apiClient'].context!.clientId);
+  logger.log('Domain', account['apiClient'].context!.domain);
 
   async function sendText(message: string): Promise<void> {
     const payload = account
