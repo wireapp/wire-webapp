@@ -74,27 +74,26 @@ export const useFadingScrollbar = (element: HTMLElement): void => {
         return setAnimationState('idle');
       }
       currentColor[3] += delta;
-      const [r, g, b, a] = currentColor;
-      element.style.setProperty('--scrollbar-color', ` rgba(${r}, ${g}, ${b}, ${a})`);
+      element.style.setProperty('--scrollbar-color', `rgba(${currentColor})`);
     };
     const fadeIn = () => setAnimationState('fadein');
     const fadeOut = () => setAnimationState('fadeout');
     const debouncedFadeOut = debounce(fadeOut, 1000);
-
-    element.addEventListener('mouseenter', fadeIn);
-    element.addEventListener('mouseleave', fadeOut);
-    element.addEventListener('mousemove', fadeIn);
-    element.addEventListener('mousemove', debouncedFadeOut);
-    element.addEventListener('scroll', fadeIn);
-    element.addEventListener('scroll', debouncedFadeOut);
-
-    return () => {
-      element.removeEventListener('mouseenter', fadeIn);
-      element.removeEventListener('mouseleave', fadeOut);
-      element.removeEventListener('mousemove', fadeIn);
-      element.removeEventListener('mousemove', debouncedFadeOut);
-      element.removeEventListener('scroll', fadeIn);
-      element.removeEventListener('scroll', debouncedFadeOut);
+    const fadeInIdle = () => {
+      fadeIn();
+      debouncedFadeOut();
     };
+
+    const events = {
+      mouseenter: fadeIn,
+      mouseleave: fadeOut,
+      mousemove: fadeInIdle,
+      scroll: fadeInIdle,
+    };
+
+    Object.entries(events).forEach(([eventName, handler]) => element.addEventListener(eventName, handler));
+
+    return () =>
+      Object.entries(events).forEach(([eventName, handler]) => element.removeEventListener(eventName, handler));
   }, [element]);
 };
