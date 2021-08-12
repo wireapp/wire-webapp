@@ -25,7 +25,7 @@ export const useFadingScrollbar = (element: HTMLElement): void => {
     if (!element) {
       return undefined;
     }
-    const animationSpeed = 12;
+    const animationSpeed = 0.05;
 
     function parseColor(color: string) {
       const el = document.body.appendChild(document.createElement('thiselementdoesnotexist'));
@@ -75,7 +75,7 @@ export const useFadingScrollbar = (element: HTMLElement): void => {
       }
       currentColor[3] += delta;
       const [r, g, b, a] = currentColor;
-      element.style.setProperty('--scrollbar-color', ` rgba(${r}, ${g}, ${b}, ${a / 255})`);
+      element.style.setProperty('--scrollbar-color', ` rgba(${r}, ${g}, ${b}, ${a})`);
     };
     const fadeIn = () => setAnimationState('fadein');
     const fadeOut = () => setAnimationState('fadeout');
