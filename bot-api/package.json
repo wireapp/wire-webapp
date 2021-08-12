@@ -6,7 +6,7 @@
     "uuidjs": "4.2.8"
   },
   "devDependencies": {
-    "@types/jasmine": "3.8.1",
+    "@types/jasmine": "3.8.2",
     "cross-env": "7.0.3",
     "dotenv-defaults": "2.0.2",
     "jasmine": "3.8.0",
