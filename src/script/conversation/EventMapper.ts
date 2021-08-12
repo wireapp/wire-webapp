@@ -370,12 +370,11 @@ export class EventMapper {
    * @returns Member message entity
    */
   private _mapEvent1to1Creation({data: eventData}: EventRecord) {
-    const {has_service: hasService, qualifiedUserIds, userIds} = eventData;
+    const {has_service: hasService, userIds} = eventData;
 
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
-    messageEntity.userIds(userIds || []);
-    messageEntity.qualifiedUserIds(qualifiedUserIds || []);
+    messageEntity.userIds(userIds);
 
     if (hasService) {
       messageEntity.showServicesWarning = true;
@@ -422,7 +421,6 @@ export class EventMapper {
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
     messageEntity.userIds(eventData.userIds);
-    messageEntity.qualifiedUserIds(eventData.qualifiedUserIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
   }
@@ -464,8 +462,8 @@ export class EventMapper {
    * @returns Member message entity
    */
   private _mapEventMemberJoin(event: EventRecord, conversationEntity: Conversation) {
-    const {data: eventData, from: senderId} = event;
-    const {has_service: hasService, user_ids: userIds, qualifiedUserIds} = eventData;
+    const {data: eventData, from: sender} = event;
+    const {has_service: hasService, user_ids: userIds} = eventData;
 
     const messageEntity = new MemberMessage();
 
@@ -473,8 +471,8 @@ export class EventMapper {
     messageEntity.visible(!isSingleModeConversation);
 
     if (conversationEntity.isGroup()) {
-      const messageFromCreator = senderId === conversationEntity.creator;
-      const creatorIndex = userIds.indexOf(senderId);
+      const messageFromCreator = sender === conversationEntity.creator;
+      const creatorIndex = userIds.indexOf(sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
       if (creatorIsJoiningMember) {
@@ -486,8 +484,7 @@ export class EventMapper {
         messageEntity.showServicesWarning = true;
       }
 
-      messageEntity.userIds(userIds || []);
-      messageEntity.qualifiedUserIds(qualifiedUserIds || []);
+      messageEntity.userIds(userIds);
     }
 
     return messageEntity;
@@ -501,8 +498,7 @@ export class EventMapper {
    */
   private _mapEventMemberLeave({data: eventData}: EventRecord) {
     const messageEntity = new MemberMessage();
-    messageEntity.userIds(eventData.user_ids || []);
-    messageEntity.qualifiedUserIds(eventData.qualifiedUserIds || []);
+    messageEntity.userIds(eventData.user_ids);
     messageEntity.reason = eventData.reason;
     return messageEntity;
   }
@@ -636,8 +632,7 @@ export class EventMapper {
     const messageEntity = new VerificationMessage();
 
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
-    messageEntity.userIds(eventData.userIds || eventData.user_ids || []);
-    messageEntity.qualifiedUserIds(eventData.qualifiedUserIds || eventData.qualified_user_ids || []);
+    messageEntity.userIds(eventData.userIds || eventData.user_ids);
     messageEntity.verificationMessageType(eventData.type);
 
     return messageEntity;
