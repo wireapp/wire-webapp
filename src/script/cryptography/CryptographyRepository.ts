@@ -129,7 +129,6 @@ export class CryptographyRepository {
     await account.initServices(crudEngine);
     await account.service.client['cryptographyService'].initCryptobox();
     const textPayload = account.service!.conversation.messageBuilder.createText({conversationId, text}).build();
-    userIds.pop();
     await account.service!.conversation.send({
       conversationDomain,
       payloadBundle: textPayload,
