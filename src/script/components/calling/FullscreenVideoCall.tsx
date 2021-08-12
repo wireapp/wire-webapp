@@ -294,7 +294,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           </div>
         </div>
       )}
-      {videoSpeakersActiveTab === VideoSpeakersTab.ALL && totalPages > 1 && (
+      {!maximizedParticipant && videoSpeakersActiveTab === VideoSpeakersTab.ALL && totalPages > 1 && (
         <>
           <div
             className="hide-controls-hidden"
