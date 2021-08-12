@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [12.38.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.37.1...@wireapp/api-client@12.38.0) (2021-08-12)
+
+
+### Features
+
+* **core:** Add domain to context ([#4117](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4117)) ([106190f](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/106190f6ac45274b3bf286299f4df48eff458d93))
+
+
+
+
+
 ## [12.37.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.37.0...@wireapp/api-client@12.37.1) (2021-08-11)
 
 

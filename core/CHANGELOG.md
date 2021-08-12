@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.11.7...@wireapp/core@17.12.0) (2021-08-12)
+
+
+### Features
+
+* **core:** Add domain to context ([#4117](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4117)) ([106190f](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/106190f6ac45274b3bf286299f4df48eff458d93))
+
+
+
+
+
 ## [17.11.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.11.6...@wireapp/core@17.11.7) (2021-08-11)
 
 **Note:** Version bump only for package @wireapp/core
