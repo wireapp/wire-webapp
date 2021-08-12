@@ -201,7 +201,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 ))}
             </div>
           </div>
-          {(isOngoing || selfParticipant?.hasActiveVideo()) && isMinimized && !!videoGrid?.grid?.length && (
+          {(isOngoing || selfParticipant?.hasActiveVideo()) && isMinimized && !!videoGrid?.grid?.length ? (
             <div
               className="group-video__minimized-wrapper"
               onClick={isOngoing ? () => multitasking.isMinimized(false) : undefined}
@@ -222,15 +222,15 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 </div>
               )}
             </div>
-          )}
-
-          {showNoCameraPreview && (
-            <div
-              className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
-              data-uie-name="label-no-camera-access-preview"
-            >
-              {t('callNoCameraAccess')}
-            </div>
+          ) : (
+            showNoCameraPreview && (
+              <div
+                className="group-video__minimized-wrapper group-video__minimized-wrapper--no-camera-access"
+                data-uie-name="label-no-camera-access-preview"
+              >
+                {t('callNoCameraAccess')}
+              </div>
+            )
           )}
 
           {!isDeclined && (
