@@ -334,6 +334,7 @@ export class InputBarViewModel {
       return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
     });
 
+    // TODO(Federation): For Federation playground builds we disable every other activity than sending plain text messages
     this.disableControls = ko.pureComputed(() => this.conversationEntity().isFederated());
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
@@ -635,7 +636,7 @@ export class InputBarViewModel {
 
     if (this.isEditing()) {
       this.sendMessageEdit(messageText, this.editMessageEntity());
-    } else if (this.conversationEntity().isRemoteConversation) {
+    } else if (this.disableControls()) {
       this.sendFederatedMessage(messageText);
     } else {
       this.sendMessage(messageText, this.replyMessageEntity());
