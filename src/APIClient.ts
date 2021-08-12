@@ -334,6 +334,10 @@ export class APIClient extends EventEmitter {
     return this.context?.userId || undefined;
   }
 
+  public get domain(): string | undefined {
+    return this.context?.domain || undefined;
+  }
+
   /** Should be used in cases where the user ID is MANDATORY. */
   public get validatedUserId(): string {
     if (this.userId) {
