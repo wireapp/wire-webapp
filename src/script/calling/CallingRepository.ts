@@ -562,6 +562,17 @@ export class CallingRepository {
         }
         break;
       }
+      case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
+        const call = this.findCall(conversationId);
+        if (call) {
+          this.muteCall(call, true);
+        }
+        break;
+      }
+      case CALL_MESSAGE_TYPE.REMOTE_KICK: {
+        this.leaveCall(conversationId);
+        break;
+      }
     }
 
     await validatedPromise.catch(() => this.abortCall(conversationId));
@@ -955,6 +966,30 @@ export class CallingRepository {
     });
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
     return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
+  };
+
+  readonly sendModeratorMute = (conversationId: ConversationId, recipients: Record<UserId, ClientId[]>) => {
+    this.sendCallingMessage(
+      conversationId,
+      {type: CALL_MESSAGE_TYPE.REMOTE_MUTE},
+      {
+        nativePush: true,
+        precondition: true,
+        recipients,
+      },
+    );
+  };
+
+  readonly sendModeratorKick = (conversationId: ConversationId, recipients: Record<UserId, ClientId[]>) => {
+    this.sendCallingMessage(
+      conversationId,
+      {type: CALL_MESSAGE_TYPE.REMOTE_KICK},
+      {
+        nativePush: true,
+        precondition: true,
+        recipients,
+      },
+    );
   };
 
   private readonly sendSFTRequest = (
