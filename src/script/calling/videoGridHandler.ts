@@ -50,6 +50,7 @@ export const useVideoGrid = (call: Call): Grid => {
     if (!call) {
       return setGrid(undefined);
     }
+    call.updatePages();
     setGrid(getGrid(call));
     const subscriptions = participants?.map(({user}) =>
       user.name.subscribe(() => {

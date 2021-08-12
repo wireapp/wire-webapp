@@ -77,23 +77,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
   maximizedParticipant,
   setMaximizedParticipant,
 }) => {
-  const [thumbnailHasActiveVideo, setThumbnailHasActiveVideo] = useState(false);
-  const [thumbnailSharesScreen, setThumbnailSharesScreen] = useState(false);
-  const [thumbnailVideoStream, setThumbnailVideoStream] = useState<MediaStream>(null);
-
-  useEffect(() => {
-    setThumbnailHasActiveVideo(grid.thumbnail?.hasActiveVideo() ?? false);
-    setThumbnailSharesScreen(grid.thumbnail?.sharesScreen() ?? false);
-    setThumbnailVideoStream(grid.thumbnail?.videoStream() ?? null);
-    const activeVideoSub = grid.thumbnail?.hasActiveVideo.subscribe(val => setThumbnailHasActiveVideo(val));
-    const sharesScreenSub = grid.thumbnail?.sharesScreen.subscribe(val => setThumbnailSharesScreen(val));
-    const videoStreamSub = grid.thumbnail?.videoStream.subscribe(val => setThumbnailVideoStream(val));
-    return () => {
-      activeVideoSub?.dispose();
-      sharesScreenSub?.dispose();
-      videoStreamSub?.dispose();
-    };
-  }, [grid]);
+  const thumbnail = useKoSubscribableChildren(grid.thumbnail, ['hasActiveVideo', 'sharesScreen', 'videoStream']);
 
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid?.grid.length));
 
@@ -168,7 +152,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
           />
         ))}
       </div>
-      {thumbnailVideoStream && !maximizedParticipant && (
+      {thumbnail.videoStream && !maximizedParticipant && (
         <GroupVideoThumbnailWrapper minimized={minimized}>
           <Video
             className="group-video__thumbnail-video"
@@ -176,9 +160,9 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
             playsInline
             data-uie-name="self-video-thumbnail"
             css={{
-              transform: thumbnailHasActiveVideo && !thumbnailSharesScreen ? 'rotateY(180deg)' : 'initial',
+              transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
             }}
-            srcObject={thumbnailVideoStream}
+            srcObject={thumbnail.videoStream}
           />
           <div className="group-video-grid__element__label" css={{padding: 4}}>
             {selfIsMuted ? (
@@ -208,7 +192,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
           </div>
         </GroupVideoThumbnailWrapper>
       )}
-      {!!grid.thumbnail && !thumbnailHasActiveVideo && !!selfParticipant && (
+      {!!grid.thumbnail && !thumbnail.hasActiveVideo && !!selfParticipant && (
         <GroupVideoThumbnailWrapper minimized={minimized}>
           <div
             css={{
