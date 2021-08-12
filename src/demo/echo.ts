@@ -510,5 +510,6 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
   logger.log('Name', name);
   logger.log('User ID', account['apiClient'].context.userId);
   logger.log('Client ID', account['apiClient'].context.clientId);
+  logger.log('Domain', account['apiClient'].context.domain);
   logger.log('Listening for messages ...');
 })().catch(error => logger.error(error));

@@ -39,12 +39,14 @@ export class SelfService {
     return name;
   }
 
-  public getSelf(): Promise<Self> {
-    return this.apiClient.self.api.getSelf();
+  public async getSelf(): Promise<Self> {
+    const selfData = await this.apiClient.self.api.getSelf();
+    this.apiClient.context!.domain = selfData.qualified_id?.domain;
+    return selfData;
   }
 
   public async getUsername(): Promise<string | undefined> {
-    const {handle} = await this.apiClient.self.api.getSelf();
+    const {handle} = await this.getSelf();
     return handle;
   }
 
