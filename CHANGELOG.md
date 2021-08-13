@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.38.0...@wireapp/api-client@13.0.0) (2021-08-13)
+
+
+### Bug Fixes
+
+* **api-client:** Remove legacy resource to change email addresses ([#4118](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4118)) ([7487287](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/7487287b536a4bf77da4edceeb036b380480c444))
+
+
+### BREAKING CHANGES
+
+* **api-client:** Removed `self.api.putEmail`, use `auth.api.putEmail` instead
+
+
+
+
+
 # [12.38.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.37.1...@wireapp/api-client@12.38.0) (2021-08-12)
 
 
