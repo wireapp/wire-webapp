@@ -2851,10 +2851,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@12.36.0":
-  version "12.36.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.36.0.tgz#3005e749f9ae36fdc40fadd070a8edab9be74472"
-  integrity sha512-Dke6aaCmh8ZalHznvsWw4EgKZpBtr5/QM+cDAjbaEMbP4QkbxpEy8V6EI5a4dgDEDPEcUYNHqqgrEjoCnNDBOw==
+"@wireapp/api-client@12.38.0":
+  version "12.38.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-12.38.0.tgz#2eecbaff038a45af977f4c2f6f2dd44792455024"
+  integrity sha512-htXbgdMuG+Okeq9+5Tbesn/TM2mBhAG4nISvtPUPy6DGY296U1b9z+Iff1ixyTQMcK0kGTHdmei4f6FEzvGDXg==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2908,16 +2908,16 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.11.5":
-  version "17.11.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.11.5.tgz#bd313aedcb15a99a3d9e039950551a8e42db8c63"
-  integrity sha512-R+UNeI0nZE5wkOQ/bgPGxot7SZ7PKcb9xOO8UgQWMTL1Ji5CESshR6T5D0igdGxOl0OKspITuF5sWT0ZAr6SgA==
+"@wireapp/core@17.12.0":
+  version "17.12.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.12.0.tgz#d658c8a1e0ab78ae0a19ebee211fff2ce17aa8cc"
+  integrity sha512-WepoyVXKvSuyc8WUCizX0A5/kB5yqpNxXJXDSJ/Sw8638utibRj55oD/asTUXeBLA32UgjyzWmOnGxDaScro3A==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "12.36.0"
+    "@wireapp/api-client" "12.38.0"
     "@wireapp/cryptobox" "12.7.1"
-    bazinga64 "5.9.5"
+    bazinga64 "5.9.6"
     hash.js "1.1.7"
     http-status-codes "2.1.4"
     logdown "3.3.1"
@@ -3840,6 +3840,11 @@ bazinga64@5.9.5:
   version "5.9.5"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.9.5.tgz#87208b64a9aa0c6e8617a7928a85daa0117ed500"
   integrity sha512-l4jPBlcfbqt1haiW4GZhKlvMde8lO+CYviTvt1JQnYNZ43MkVjYNKdTZdPMTCHpklxl/wwPCL6LplAnD/bvMkQ==
+
+bazinga64@5.9.6:
+  version "5.9.6"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.9.6.tgz#ab425f83687b6ae82a3bcd041ee075d27eb290ba"
+  integrity sha512-tImi45HPqL4mkoUx/ESmfoZeYSsmaBGIyFEIhVqGEWNHU/B2nkvJY2UeIblyCXAnyKA2AiR8ejpsR8zhYbW+uA==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
@@ -10241,9 +10246,9 @@ path-key@^3.0.0, path-key@^3.1.0:
   integrity sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==
 
 path-parse@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.6.tgz#d62dbb5679405d72c4737ec58600e9ddcf06d24c"
-  integrity sha512-GSmOT2EbHrINBf9SR7CDELwlJ8AENk3Qn7OikK4nFYAu3Ote2+JYNVvkpAEQm3/TLNEJFD/xZJjzyxg3KBWOzw==
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.7.tgz#fbc114b60ca42b30d9daf5858e4bd68bbedb6735"
+  integrity sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==
 
 path-root-regex@^0.1.0:
   version "0.1.2"

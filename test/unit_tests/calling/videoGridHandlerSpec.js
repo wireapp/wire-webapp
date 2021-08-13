@@ -83,6 +83,7 @@ describe('videoGridHandler', () => {
           if (expected.length > 1) {
             result = [selfParticipant.user.id, ...expected.map(toParticipantId)];
           }
+          call.updatePages();
           expect(getGrid(call).grid.map(toParticipantId)).toEqual(result, scenario);
         });
       });
@@ -97,6 +98,7 @@ describe('videoGridHandler', () => {
           },
         });
         call.addParticipant(participants[0]);
+        call.updatePages();
         const grid = getGrid(call);
 
         expect(grid.grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
@@ -112,6 +114,7 @@ describe('videoGridHandler', () => {
           },
         });
         call.addParticipant(participants[0]);
+        call.updatePages();
         const grid = getGrid(call);
 
         expect(grid.grid.map(toParticipantId)).toEqual([participants[0]].map(toParticipantId));
@@ -126,6 +129,7 @@ describe('videoGridHandler', () => {
             audioOutput: ko.pureComputed(() => 'test'),
           },
         });
+        call.updatePages();
         const grid = getGrid(call);
 
         expect(grid.grid.map(toParticipantId)).toEqual([selfParticipant].map(toParticipantId));
@@ -142,6 +146,7 @@ describe('videoGridHandler', () => {
         });
         call.addParticipant(participants[0]);
         call.addParticipant(participants[1]);
+        call.updatePages();
         const grid = getGrid(call);
 
         expect(grid.grid.map(toParticipantId)).toEqual(

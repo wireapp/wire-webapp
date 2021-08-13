@@ -1307,9 +1307,14 @@ export class CallingRepository {
     remoteClientId: ClientId,
     streams: readonly MediaStream[] | null,
   ): void => {
-    const participant = this.findParticipant(conversationId, remoteUserId, remoteClientId);
+    let participant = this.findParticipant(conversationId, remoteUserId, remoteClientId);
     if (!participant) {
-      return;
+      const call = this.findCall(conversationId);
+      if (call?.conversationType !== CONV_TYPE.ONEONONE) {
+        return;
+      }
+      participant = new Participant(this.userRepository.findUserById(remoteUserId), remoteClientId);
+      call.addParticipant(participant);
     }
 
     if (streams === null || streams.length === 0) {
