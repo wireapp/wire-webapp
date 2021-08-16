@@ -50,15 +50,17 @@ export const useVideoGrid = (call: Call): Grid => {
     if (!call) {
       return setGrid(undefined);
     }
-    call.updatePages();
-    setGrid(getGrid(call));
-    const subscriptions = participants?.map(({user}) =>
-      user.name.subscribe(() => {
-        call.updatePages();
-        setGrid(getGrid(call));
-      }),
-    );
-    return () => subscriptions?.forEach(s => s.dispose());
+    const updateGrid = () => {
+      call.updatePages();
+      setGrid(getGrid(call));
+    };
+    updateGrid();
+    const nameSubscriptions = participants?.map(p => p.user.name.subscribe(updateGrid));
+    const videoSubscriptions = participants?.map(p => p.hasActiveVideo.subscribe(updateGrid));
+    return () => {
+      nameSubscriptions?.forEach(s => s.dispose());
+      videoSubscriptions?.forEach(s => s.dispose());
+    };
   }, [participants?.length, call, currentPage, pages?.length]);
 
   return grid;
