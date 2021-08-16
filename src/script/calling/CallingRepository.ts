@@ -767,6 +767,8 @@ export class CallingRepository {
   readonly leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
     this.wCall.end(this.wUser, conversationId);
+    this.callState.selectableScreens([]);
+    this.callState.selectableWindows([]);
   };
 
   muteCall(call: Call, shouldMute: boolean): void {
