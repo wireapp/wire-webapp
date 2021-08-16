@@ -17,7 +17,7 @@
  *
  */
 
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {Conversation} from '../../entity/Conversation';
@@ -34,7 +34,7 @@ import {createNavigate} from '../../router/routerBindings';
 import GroupedConversationHeader from './GroupedConversationHeader';
 import ConversationListCell from './ConversationListCell';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 export interface GroupedConversationsProps {
   conversationRepository: ConversationRepository;
@@ -61,7 +61,9 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   const makeOnClick = (conversationId: string, domain: string | null) =>
     createNavigate(generateConversationUrl(conversationId, domain));
 
-  const folders = (() => {
+  const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
+
+  const folders = useMemo(() => {
     const folders: ConversationLabel[] = [];
 
     const favorites = conversationLabelRepository.getFavorites();
@@ -86,7 +88,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     folders.push(...custom);
 
     return folders;
-  })();
+  }, [labels.map(label => label.name).join('')]);
 
   const isExpanded = (folderId: string): boolean => expandedFolders.includes(folderId);
   const toggle = (folderId: string): void => {
