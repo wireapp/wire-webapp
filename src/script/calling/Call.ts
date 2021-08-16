@@ -29,7 +29,7 @@ import {Config} from '../Config';
 
 export type ConversationId = string;
 
-const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 9;
+const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = Infinity;
 
 interface ActiveSpeaker {
   audio_level: number;
@@ -213,7 +213,7 @@ export class Call {
     const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.hasActiveVideo());
 
     const newPages = chunk<Participant>(
-      [selfParticipant, ...withVideo, ...withoutVideo],
+      [selfParticipant, ...withVideo, ...withoutVideo].filter(Boolean),
       NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE,
     );
 
