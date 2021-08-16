@@ -31,7 +31,6 @@ import {
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate} from '../../router/routerBindings';
 
-import './GroupedConversationHeader';
 import GroupedConversationHeader from './GroupedConversationHeader';
 import ConversationListCell from './ConversationListCell';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
