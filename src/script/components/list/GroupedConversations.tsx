@@ -91,9 +91,9 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   const isExpanded = (folderId: string): boolean => expandedFolders.includes(folderId);
   const toggle = (folderId: string): void => {
     if (isExpanded(folderId)) {
-      setExpandedFolders(expanded => expanded.filter(folder => folder !== folderId));
+      setExpandedFolders(expandedFolders.filter(folder => folder !== folderId));
     } else {
-      setExpandedFolders(expanded => [...expanded, folderId]);
+      setExpandedFolders([...expandedFolders, folderId]);
     }
   };
   /*
