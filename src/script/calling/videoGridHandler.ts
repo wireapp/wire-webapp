@@ -30,17 +30,17 @@ export interface Grid {
 }
 
 export function getGrid(call: Call) {
-  const videoParticipants = call.pages()[call.currentPage()].filter(p => p.hasActiveVideo());
+  const videoParticipants = call.pages()[call.currentPage()]?.filter(p => p.hasActiveVideo());
   const selfParticipant = call.getSelfParticipant();
 
-  if (selfParticipant?.hasActiveVideo() && videoParticipants.length === 2) {
+  if (selfParticipant?.hasActiveVideo() && videoParticipants?.length === 2) {
     return {
       grid: videoParticipants.slice(1),
       thumbnail: selfParticipant,
     };
   }
   return {
-    grid: videoParticipants,
+    grid: videoParticipants ?? [],
     thumbnail: null,
   };
 }
