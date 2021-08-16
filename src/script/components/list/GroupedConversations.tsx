@@ -88,7 +88,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     folders.push(...custom);
 
     return folders;
-  }, [labels.map(label => label.name).join('')]);
+  }, [labels.map(label => label.name + label.conversations().length).join('')]);
 
   const isExpanded = (folderId: string): boolean => expandedFolders.includes(folderId);
   const toggle = (folderId: string): void => {
@@ -162,7 +162,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
 export default GroupedConversations;
 
 registerReactComponent<GroupedConversationsProps>('grouped-conversations', {
-  bindings:
-    'expandedFolders: ko.unwrap(expandedFolders), setExpandedFolders: expandedFolders, conversationRepository, hasJoinableCall, isSelectedConversation, isVisibleFunc, listViewModel, onJoinCall',
   component: GroupedConversations,
+  template:
+    '<div data-bind="react: {expandedFolders: ko.unwrap(expandedFolders), setExpandedFolders: expandedFolders, conversationRepository, hasJoinableCall, isSelectedConversation, isVisibleFunc, listViewModel, onJoinCall}"></div>',
 });
