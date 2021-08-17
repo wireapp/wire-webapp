@@ -17,12 +17,13 @@
  *
  */
 
-import React, {useMemo} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {Conversation} from '../../entity/Conversation';
 import {
   ConversationLabel,
+  ConversationLabelRepository,
   createLabel,
   createLabelFavorites,
   createLabelGroups,
@@ -35,6 +36,27 @@ import GroupedConversationHeader from './GroupedConversationHeader';
 import ConversationListCell from './ConversationListCell';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {
+  const {labels: conversationLables} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
+  const [labels, setLabels] = useState<ConversationLabel[]>(conversationLables);
+
+  useEffect(() => {
+    if (!conversationLables) {
+      return setLabels([]);
+    }
+    const updateLabels = () => {
+      setLabels(() => [...conversationLabelRepository.labels()]);
+    };
+    updateLabels();
+    const labelsSubscriptions = labels?.map(l => l.conversations.subscribe(updateLabels));
+    return () => {
+      labelsSubscriptions?.forEach(l => l.dispose());
+    };
+  }, [labels?.length]);
+
+  return labels;
+};
 
 export interface GroupedConversationsProps {
   conversationRepository: ConversationRepository;
@@ -61,7 +83,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   const makeOnClick = (conversationId: string, domain: string | null) =>
     createNavigate(generateConversationUrl(conversationId, domain));
 
-  const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
+  const labels = useLabels(conversationLabelRepository);
 
   const folders = useMemo(() => {
     const folders: ConversationLabel[] = [];
