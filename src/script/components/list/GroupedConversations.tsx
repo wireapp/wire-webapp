@@ -46,7 +46,7 @@ const useLabels = (conversationLabelRepository: ConversationLabelRepository) => 
       return setLabels([]);
     }
     const updateLabels = () => {
-      setLabels([...conversationLabelRepository.labels()]);
+      setLabels([...conversationLabels]);
     };
     updateLabels();
     const labelsSubscriptions = labels?.map(l => l.conversations.subscribe(updateLabels));
