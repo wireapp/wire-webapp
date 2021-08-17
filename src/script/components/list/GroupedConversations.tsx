@@ -38,11 +38,11 @@ import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {
-  const {labels: conversationLables} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
-  const [labels, setLabels] = useState<ConversationLabel[]>(conversationLables);
+  const {labels: conversationLabels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
+  const [labels, setLabels] = useState<ConversationLabel[]>(conversationLabels);
 
   useEffect(() => {
-    if (!conversationLables) {
+    if (!conversationLabels) {
       return setLabels([]);
     }
     const updateLabels = () => {
@@ -53,7 +53,7 @@ const useLabels = (conversationLabelRepository: ConversationLabelRepository) => 
     return () => {
       labelsSubscriptions?.forEach(l => l.dispose());
     };
-  }, [conversationLables?.length]);
+  }, [conversationLabels?.length]);
 
   return labels;
 };
