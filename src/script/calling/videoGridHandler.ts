@@ -30,14 +30,17 @@ export interface Grid {
 }
 
 export function getGrid(call: Call) {
-  if (call.participants().length === 2) {
+  const videoParticipants = call.pages()[call.currentPage()]?.filter(p => p.hasActiveVideo());
+  const selfParticipant = call.getSelfParticipant();
+
+  if (selfParticipant?.hasActiveVideo() && videoParticipants?.length === 2) {
     return {
-      grid: call.getRemoteParticipants(),
-      thumbnail: call.getSelfParticipant(),
+      grid: videoParticipants.slice(1),
+      thumbnail: selfParticipant,
     };
   }
   return {
-    grid: call.pages()[call.currentPage()],
+    grid: videoParticipants ?? [],
     thumbnail: null,
   };
 }
@@ -50,15 +53,17 @@ export const useVideoGrid = (call: Call): Grid => {
     if (!call) {
       return setGrid(undefined);
     }
-    call.updatePages();
-    setGrid(getGrid(call));
-    const subscriptions = participants?.map(({user}) =>
-      user.name.subscribe(() => {
-        call.updatePages();
-        setGrid(getGrid(call));
-      }),
-    );
-    return () => subscriptions?.forEach(s => s.dispose());
+    const updateGrid = () => {
+      call.updatePages();
+      setGrid(getGrid(call));
+    };
+    updateGrid();
+    const nameSubscriptions = participants?.map(p => p.user.name.subscribe(updateGrid));
+    const videoSubscriptions = participants?.map(p => p.hasActiveVideo.subscribe(updateGrid));
+    return () => {
+      nameSubscriptions?.forEach(s => s.dispose());
+      videoSubscriptions?.forEach(s => s.dispose());
+    };
   }, [participants?.length, call, currentPage, pages?.length]);
 
   return grid;
