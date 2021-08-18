@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.0.0...@wireapp/api-client@13.1.0) (2021-08-18)
+
+
+### Features
+
+* **api-client:** Add classified domains to feature config ([#4119](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4119)) ([3b73c52](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/3b73c524ff511fc86cf1f66007214f0c86e0bba0))
+
+
+
+
+
 # [13.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@12.38.0...@wireapp/api-client@13.0.0) (2021-08-13)
 
 
