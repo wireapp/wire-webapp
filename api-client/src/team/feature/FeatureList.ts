@@ -19,34 +19,37 @@
 
 import type {
   FeatureAppLock,
-  FeatureDigitalSignature,
-  FeatureWithoutConfig,
-  FeatureLegalhold,
+  FeatureClassifiedDomains,
   FeatureConferenceCalling,
-  FeatureVideoCalling,
+  FeatureDigitalSignature,
   FeatureFileSharing,
+  FeatureLegalhold,
+  FeatureVideoCalling,
+  FeatureWithoutConfig,
 } from './Feature';
 
 export enum FEATURE_KEY {
   APPLOCK = 'appLock',
-  DIGITAL_SIGNATURES = 'digitalSignatures',
+  CLASSIFIED_DOMAINS = 'classifiedDomains',
   CONFERENCE_CALLING = 'conferenceCalling',
-  VIDEO_CALLING = 'videoCalling',
+  DIGITAL_SIGNATURES = 'digitalSignatures',
   FILE_SHARING = 'fileSharing',
   LEGALHOLD = 'legalhold',
   SEARCH_VISIBILITY = 'searchVisibility',
   SSO = 'sso',
   VALIDATE_SAML_EMAILS = 'validateSAMLemails',
+  VIDEO_CALLING = 'videoCalling',
 }
 
 export type FeatureList = {
   [FEATURE_KEY.APPLOCK]?: FeatureAppLock;
-  [FEATURE_KEY.DIGITAL_SIGNATURES]?: FeatureDigitalSignature;
+  [FEATURE_KEY.CLASSIFIED_DOMAINS]?: FeatureClassifiedDomains;
   [FEATURE_KEY.CONFERENCE_CALLING]?: FeatureConferenceCalling;
-  [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
+  [FEATURE_KEY.DIGITAL_SIGNATURES]?: FeatureDigitalSignature;
   [FEATURE_KEY.FILE_SHARING]?: FeatureFileSharing;
   [FEATURE_KEY.LEGALHOLD]?: FeatureLegalhold;
   [FEATURE_KEY.SEARCH_VISIBILITY]?: FeatureWithoutConfig;
   [FEATURE_KEY.SSO]?: FeatureWithoutConfig;
   [FEATURE_KEY.VALIDATE_SAML_EMAILS]?: FeatureWithoutConfig;
+  [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
 };

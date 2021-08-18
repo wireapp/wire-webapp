@@ -31,12 +31,18 @@ export interface Feature<T extends FeatureConfig> {
 }
 
 export interface FeatureConfig {}
+
 export interface FeatureAppLockConfig extends FeatureConfig {
   enforceAppLock: boolean;
   inactivityTimeoutSecs: number;
 }
 
+export interface FeatureClassifiedDomainsConfig extends FeatureConfig {
+  domains: string[];
+}
+
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
+export type FeatureClassifiedDomains = Feature<FeatureClassifiedDomainsConfig>;
 export type FeatureConferenceCalling = FeatureWithoutConfig;
 export type FeatureVideoCalling = FeatureWithoutConfig;
 export type FeatureFileSharing = FeatureWithoutConfig;
