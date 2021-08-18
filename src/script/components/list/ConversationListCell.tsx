@@ -40,11 +40,12 @@ import Icon from 'Components/Icon';
 
 export interface ConversationListCellProps {
   conversation: Conversation;
+  dataUieName?: string;
   index: number;
   is_selected: (conversation: Conversation) => boolean;
   isVisibleFunc: (top: number, bottom: number) => boolean;
   offsetTop: number;
-  onClick: () => void;
+  onClick: React.MouseEventHandler<Element>;
   onJoinCall: (conversation: Conversation, mediaType: MediaType) => void;
   rightClick: (conversation: Conversation, event: MouseEvent) => void;
   showJoinButton: boolean;
@@ -60,6 +61,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   index = 0,
   isVisibleFunc = () => false,
   offsetTop = 0,
+  dataUieName,
 }) => {
   const {
     isGroup,
@@ -116,6 +118,7 @@ const ConversationListCell: React.FC<ConversationListCellProps> = ({
   return (
     <div
       ref={setViewportElementRef}
+      data-uie-name={dataUieName}
       data-uie-uid={conversation.id}
       data-uie-value={displayName}
       className={cx('conversation-list-cell', {'conversation-list-cell-active': isSelected})}
