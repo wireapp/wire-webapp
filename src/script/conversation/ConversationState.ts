@@ -32,7 +32,7 @@ import {UserState} from '../user/UserState';
 export class ConversationState {
   public readonly conversations_cleared: ko.ObservableArray<Conversation>;
   public readonly sorted_conversations: ko.PureComputed<Conversation[]>;
-  public readonly activeConversation: ko.Observable<Conversation>;
+  public readonly activeConversation: ko.Observable<Conversation | null>;
   public readonly connectedUsers: ko.PureComputed<User[]>;
   public readonly conversations_archived: ko.ObservableArray<Conversation>;
   public readonly conversations_unarchived: ko.ObservableArray<Conversation>;
@@ -44,12 +44,11 @@ export class ConversationState {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    this.activeConversation = ko.observable();
+    this.activeConversation = ko.observable(null);
     this.conversations = ko.observableArray([]);
     this.conversations_archived = ko.observableArray([]);
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
-
     this.sorted_conversations = ko.pureComputed(() => this.filtered_conversations().sort(sortGroupsByLastEvent));
     this.self_conversation = ko.pureComputed(() => this.findConversation(this.userState.self()?.id));
 
