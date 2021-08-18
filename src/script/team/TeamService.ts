@@ -78,26 +78,32 @@ export class TeamService {
           },
           status: FeatureStatus.ENABLED,
         },
+        [FEATURE_KEY.CLASSIFIED_DOMAINS]: {
+          config: {
+            domains: [],
+          },
+          status: FeatureStatus.DISABLED,
+        },
         [FEATURE_KEY.CONFERENCE_CALLING]: {
           status: FeatureStatus.ENABLED,
         },
         [FEATURE_KEY.DIGITAL_SIGNATURES]: {
-          status: FeatureStatus.DISABLED,
+          status: FeatureStatus.ENABLED,
         },
         [FEATURE_KEY.FILE_SHARING]: {
           status: FeatureStatus.ENABLED,
         },
         [FEATURE_KEY.LEGALHOLD]: {
-          status: FeatureStatus.DISABLED,
+          status: FeatureStatus.ENABLED,
         },
         [FEATURE_KEY.SEARCH_VISIBILITY]: {
-          status: FeatureStatus.DISABLED,
+          status: FeatureStatus.ENABLED,
         },
         [FEATURE_KEY.SSO]: {
           status: FeatureStatus.ENABLED,
         },
         [FEATURE_KEY.VALIDATE_SAML_EMAILS]: {
-          status: FeatureStatus.DISABLED,
+          status: FeatureStatus.ENABLED,
         },
         [FEATURE_KEY.VIDEO_CALLING]: {
           status: FeatureStatus.ENABLED,
