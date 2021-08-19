@@ -64,17 +64,17 @@ export class Participant {
   readonly doesMatchIds = (userId: UserId, clientId: ClientId): boolean =>
     userId === this.user.id && clientId === this.clientId;
 
-  setAudioStream(audioStream: MediaStream, stopTracks?: boolean): void {
+  setAudioStream(audioStream: MediaStream, stopTracks: boolean): void {
     this.releaseStream(this.audioStream(), stopTracks);
     this.audioStream(audioStream);
   }
 
-  setVideoStream(videoStream?: MediaStream, stopTracks?: boolean): void {
+  setVideoStream(videoStream: MediaStream, stopTracks: boolean): void {
     this.releaseStream(this.videoStream(), stopTracks);
     this.videoStream(videoStream);
   }
 
-  updateMediaStream(newStream: MediaStream, stopTracks?: boolean): MediaStream {
+  updateMediaStream(newStream: MediaStream, stopTracks: boolean): MediaStream {
     if (newStream.getVideoTracks().length) {
       this.setVideoStream(new MediaStream(newStream.getVideoTracks()), stopTracks);
     }
@@ -90,7 +90,7 @@ export class Participant {
     return new MediaStream(audioTracks.concat(videoTracks));
   }
 
-  releaseVideoStream(stopTracks?: boolean): void {
+  releaseVideoStream(stopTracks: boolean): void {
     this.releaseStream(this.videoStream(), stopTracks);
     this.videoStream(undefined);
   }
@@ -100,12 +100,12 @@ export class Participant {
     this.audioStream(undefined);
   }
 
-  releaseMediaStream(stopTracks?: boolean): void {
+  releaseMediaStream(stopTracks: boolean): void {
     this.releaseVideoStream(stopTracks);
     this.releaseAudioStream();
   }
 
-  private releaseStream(mediaStream?: MediaStream, stopTracks?: boolean): void {
+  private releaseStream(mediaStream: MediaStream, stopTracks: boolean): void {
     if (!mediaStream) {
       return;
     }
