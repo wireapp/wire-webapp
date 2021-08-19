@@ -85,20 +85,21 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
 
   const labels = useLabels(conversationLabelRepository);
 
+  const favorites = conversationLabelRepository.getFavorites();
+  const groups = conversationLabelRepository.getGroupsWithoutLabel();
+  const contacts = conversationLabelRepository.getContactsWithoutLabel();
+
   const folders = useMemo(() => {
     const folders: ConversationLabel[] = [];
 
-    const favorites = conversationLabelRepository.getFavorites();
     if (favorites.length) {
       folders.push(createLabelFavorites(favorites));
     }
 
-    const groups = conversationLabelRepository.getGroupsWithoutLabel();
     if (groups.length) {
       folders.push(createLabelGroups(groups));
     }
 
-    const contacts = conversationLabelRepository.getContactsWithoutLabel();
     if (contacts.length) {
       folders.push(createLabelPeople(contacts));
     }
@@ -110,7 +111,12 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     folders.push(...custom);
 
     return folders;
-  }, [labels.map(label => label.name + label.conversations().length).join('')]);
+  }, [
+    labels.map(label => label.name + label.conversations().length).join(''),
+    favorites.length,
+    groups.length,
+    contacts.length,
+  ]);
 
   const isExpanded = (folderId: string): boolean => expandedFolders.includes(folderId);
   const toggle = (folderId: string): void => {
