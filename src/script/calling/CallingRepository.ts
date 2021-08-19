@@ -716,7 +716,7 @@ export class CallingRepository {
       };
       const selfParticipant = call.getSelfParticipant();
       selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
-      selfParticipant.updateMediaStream(mediaStream);
+      selfParticipant.updateMediaStream(mediaStream, true);
       this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.SCREENSHARE);
       selfParticipant.startedScreenSharingAt(Date.now());
     } catch (error) {
