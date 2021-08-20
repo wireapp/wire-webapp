@@ -17,7 +17,8 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import {container} from 'tsyringe';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {Conversation} from '../../entity/Conversation';
@@ -29,13 +30,11 @@ import {
   createLabelGroups,
   createLabelPeople,
 } from '../../conversation/ConversationLabelRepository';
-import {generateConversationUrl} from '../../router/routeGenerator';
-import {createNavigate} from '../../router/routerBindings';
 
-import GroupedConversationHeader from './GroupedConversationHeader';
-import ConversationListCell from './ConversationListCell';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
+import {ConversationState} from '../../conversation/ConversationState';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import GroupedConversationsFolder from './GroupedConversationsFolder';
 
 const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {
   const {labels: conversationLabels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
@@ -60,6 +59,7 @@ const useLabels = (conversationLabelRepository: ConversationLabelRepository) => 
 
 export interface GroupedConversationsProps {
   conversationRepository: ConversationRepository;
+  conversationState: ConversationState;
   expandedFolders: string[];
   hasJoinableCall: (conversationId: string) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
@@ -67,6 +67,7 @@ export interface GroupedConversationsProps {
   listViewModel: ListViewModel;
   onJoinCall: (conversationEntity: Conversation) => void;
   setExpandedFolders: (folders: string[]) => void;
+  toggle: (folderId: string) => void;
 }
 
 const GroupedConversations: React.FC<GroupedConversationsProps> = ({
@@ -75,19 +76,20 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   hasJoinableCall,
   isSelectedConversation,
   isVisibleFunc,
-  listViewModel,
   onJoinCall,
   setExpandedFolders,
+  listViewModel,
+  conversationState = container.resolve(ConversationState),
 }) => {
   const {conversationLabelRepository} = conversationRepository;
-  const makeOnClick = (conversationId: string, domain: string | null) =>
-    createNavigate(generateConversationUrl(conversationId, domain));
+  const {conversations_unarchived: conversations} = useKoSubscribableChildren(conversationState, [
+    'conversations_unarchived',
+  ]);
 
   const labels = useLabels(conversationLabelRepository);
-
-  const favorites = conversationLabelRepository.getFavorites();
-  const groups = conversationLabelRepository.getGroupsWithoutLabel();
-  const contacts = conversationLabelRepository.getContactsWithoutLabel();
+  const favorites = conversationLabelRepository.getFavorites(conversations);
+  const groups = conversationLabelRepository.getGroupsWithoutLabel(conversations);
+  const contacts = conversationLabelRepository.getContactsWithoutLabel(conversations);
 
   const folders = useMemo(() => {
     const folders: ConversationLabel[] = [];
@@ -116,16 +118,21 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     favorites.length,
     groups.length,
     contacts.length,
+    expandedFolders,
   ]);
 
-  const isExpanded = (folderId: string): boolean => expandedFolders.includes(folderId);
-  const toggle = (folderId: string): void => {
-    if (isExpanded(folderId)) {
-      setExpandedFolders(expandedFolders.filter(folder => folder !== folderId));
-    } else {
-      setExpandedFolders([...expandedFolders, folderId]);
-    }
-  };
+  const isExpanded = useCallback((folderId: string): boolean => expandedFolders.includes(folderId), [expandedFolders]);
+  const toggle = useCallback(
+    (folderId: string): void => {
+      if (isExpanded(folderId)) {
+        setExpandedFolders(expandedFolders.filter(folder => folder !== folderId));
+      } else {
+        setExpandedFolders([...expandedFolders, folderId]);
+      }
+    },
+    [expandedFolders],
+  );
+
   /*
    *  We need to calculate the offset from the top for the isVisibleFunc as we can't rely
    *  on the index of the conversation alone. We need to account for the folder headers and
@@ -150,38 +157,18 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   return (
     <>
       {folders.map(folder => (
-        <div
+        <GroupedConversationsFolder
           key={folder.id}
-          className="conversation-folder"
-          data-uie-name="conversation-folder"
-          data-uie-value={folder.name}
-        >
-          <GroupedConversationHeader
-            onClick={() => toggle(folder.id)}
-            conversationLabel={folder}
-            isOpen={isExpanded(folder.id)}
-          />
-          <div>
-            {isExpanded(folder.id) &&
-              folder
-                .conversations()
-                .map((conversation, index) => (
-                  <ConversationListCell
-                    dataUieName="item-conversation"
-                    key={conversation.id}
-                    onClick={makeOnClick(conversation.id, conversation.domain)}
-                    rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
-                    conversation={conversation}
-                    showJoinButton={hasJoinableCall(conversation.id)}
-                    is_selected={isSelectedConversation}
-                    onJoinCall={onJoinCall}
-                    offsetTop={getOffsetTop(folder, conversation)}
-                    index={index}
-                    isVisibleFunc={isVisibleFunc}
-                  />
-                ))}
-          </div>
-        </div>
+          folder={folder}
+          toggle={toggle}
+          onJoinCall={onJoinCall}
+          getOffsetTop={getOffsetTop}
+          isVisibleFunc={isVisibleFunc}
+          listViewModel={listViewModel}
+          expandedFolders={expandedFolders}
+          hasJoinableCall={hasJoinableCall}
+          isSelectedConversation={isSelectedConversation}
+        />
       ))}
     </>
   );
