@@ -29,6 +29,7 @@ import {Message} from './Message';
 export class DecryptErrorMessage extends Message {
   public client_id: string;
   public error_code: string;
+  public domain?: string;
   private readonly is_remote_identity_changed: ko.PureComputed<boolean>;
   public readonly htmlCaption: ko.PureComputed<string>;
   public readonly is_recoverable: ko.PureComputed<boolean>;

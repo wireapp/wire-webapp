@@ -166,10 +166,15 @@ export class CryptographyRepository {
    * @param preKey PreKey to initialize a session from
    * @returns Resolves with the remote fingerprint
    */
-  async getRemoteFingerprint(userId: string, clientId: string, preKey?: BackendPreKey): Promise<string> {
+  async getRemoteFingerprint(
+    userId: string,
+    clientId: string,
+    preKey?: BackendPreKey,
+    domain?: string,
+  ): Promise<string> {
     const cryptoboxSession = preKey
-      ? await this.createSessionFromPreKey(preKey, userId, clientId)
-      : await this.loadSession(userId, clientId);
+      ? await this.createSessionFromPreKey(preKey, userId, clientId, domain)
+      : await this.loadSession(userId, clientId, domain);
     return cryptoboxSession ? cryptoboxSession.fingerprint_remote() : undefined;
   }
 
@@ -180,9 +185,9 @@ export class CryptographyRepository {
    * @param clientId Client ID
    * @returns Resolves with a map of pre-keys for the requested clients
    */
-  getUserPreKeyByIds(userId: string, clientId: string): Promise<BackendPreKey> {
+  getUserPreKeyByIds(userId: string, clientId: string, domain: string | null): Promise<BackendPreKey> {
     return this.cryptographyService
-      .getUserPreKeyByIds(userId, clientId)
+      .getUserPreKeyByIds(userId, clientId, domain)
       .then(response => response.prekey)
       .catch(error => {
         const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
@@ -212,12 +217,12 @@ export class CryptographyRepository {
     });
   }
 
-  private loadSession(userId: string, clientId: string): Promise<CryptoboxSession | void> {
-    const sessionId = this.constructSessionId(userId, clientId);
+  private loadSession(userId: string, clientId: string, domain: string | null): Promise<CryptoboxSession | void> {
+    const sessionId = this.constructSessionId(userId, clientId, domain);
 
     return this.cryptobox.session_load(sessionId).catch(() => {
-      return this.getUserPreKeyByIds(userId, clientId).then(preKey => {
-        return this.createSessionFromPreKey(preKey, userId, clientId);
+      return this.getUserPreKeyByIds(userId, clientId, domain).then(preKey => {
+        return this.createSessionFromPreKey(preKey, userId, clientId, domain);
       });
     });
   }
@@ -236,19 +241,26 @@ export class CryptographyRepository {
   }
 
   /**
-   * Construct a session ID.
+   * Construct a session ID which will be used to persist Cryptobox sessions.
    *
-   * @todo Make public
    * @param userId User ID for the remote participant
    * @param clientId Client ID of the remote participant
+   * @param [domain] Domain of the remote participant (only available in federation-aware webapps)
    * @returns Session ID
    */
-  private constructSessionId(userId: string, clientId: string): string {
+  private constructSessionId(userId: string, clientId: string, domain: string | null): string {
+    /**
+     * For backward compatibility: We store sessions with participants from our own domain without a domain  in the session ID (legacy session ID format).
+     * All other sessions (with users from a different domain/remote backends) will be saved with a domain in their session ID.
+     */
+    if (Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN !== domain) {
+      return domain ? `${domain}@${userId}@${clientId}` : `${userId}@${clientId}`;
+    }
     return `${userId}@${clientId}`;
   }
 
-  deleteSession(userId: string, clientId: string): Promise<string> {
-    const sessionId = this.constructSessionId(userId, clientId);
+  deleteSession(userId: string, clientId: string, domain: string | null): Promise<string> {
+    const sessionId = this.constructSessionId(userId, clientId, domain);
     return this.cryptobox.session_delete(sessionId);
   }
 
@@ -346,13 +358,19 @@ export class CryptographyRepository {
     preKey: BackendPreKey,
     userId: string,
     clientId: string,
+    domain: string | null,
   ): Promise<CryptoboxSession | void> {
     try {
+      const domainText = domain ? ` on domain \'${domain}\'` : ' without domain';
       if (!preKey) {
-        this.logger.warn(`No pre-key for user '${userId}' ('${clientId}') found. The client might have been deleted.`);
+        this.logger.warn(
+          `No pre-key for user '${userId}' ('${clientId}'${domainText}) found. The client might have been deleted.`,
+        );
       } else {
-        this.logger.log(`Initializing session with user '${userId}' (${clientId}) with pre-key ID '${preKey.id}'.`);
-        const sessionId = this.constructSessionId(userId, clientId);
+        this.logger.log(
+          `Initializing session with user '${userId}' (${clientId}${domainText}) with pre-key ID '${preKey.id}'.`,
+        );
+        const sessionId = this.constructSessionId(userId, clientId, domain);
         const preKeyArray = base64ToArray(preKey.key);
         return await this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
@@ -362,6 +380,9 @@ export class CryptographyRepository {
     }
   }
 
+  /**
+   * @deprecated Method will become obsolete with federation, use `CryptographyRepository.sendCoreMessage` instead.
+   */
   private async buildPayload(
     recipients: UserClients,
     genericMessage: GenericMessage,
@@ -372,7 +393,8 @@ export class CryptographyRepository {
         if (clientIds && clientIds.length) {
           messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
-            const sessionId = this.constructSessionId(userId, clientId);
+            // TODO(Federation): Update code once federated messages are sent with '@wireapp/core'
+            const sessionId = this.constructSessionId(userId, clientId, null);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
 
             accumulator.push(encryptionPromise);
@@ -387,6 +409,9 @@ export class CryptographyRepository {
     return this.mapCipherTextToPayload(messagePayload, cipherPayload);
   }
 
+  /**
+   * @deprecated Method will become obsolete with federation, use `CryptographyRepository.sendCoreMessage` instead.
+   */
   private async encryptGenericMessageForMissingRecipients(
     missingRecipients: UserClients,
     genericMessage: GenericMessage,
@@ -400,7 +425,8 @@ export class CryptographyRepository {
       if (clientPreKeyMap && Object.keys(clientPreKeyMap).length) {
         for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
           if (preKeyPayload) {
-            const sessionId = this.constructSessionId(userId, clientId);
+            // TODO(Federation): Update code once connections are implemented on the backend
+            const sessionId = this.constructSessionId(userId, clientId, null);
             const encryptionPromise = this.encryptPayloadForSession(
               sessionId,
               genericMessage,
@@ -460,7 +486,8 @@ export class CryptographyRepository {
     const {data: eventData, from: userId} = event;
     const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
-    const sessionId = this.constructSessionId(userId, eventData.sender);
+    // TODO(Federation): Update code once messages from remote backends are received
+    const sessionId = this.constructSessionId(userId, eventData.sender, null);
 
     const plaintext = await this.cryptobox.decrypt(sessionId, cipherText);
     return GenericMessage.decode(plaintext);

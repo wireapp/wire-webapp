@@ -341,8 +341,8 @@ export class ClientRepository {
    * @param clientId ID of client to be deleted
    * @returns Resolves when a client and its session have been deleted
    */
-  async removeClient(userId: string, clientId: string): Promise<string> {
-    await this.cryptographyRepository.deleteSession(userId, clientId);
+  async removeClient(userId: string, clientId: string, domain: string | null): Promise<string> {
+    await this.cryptographyRepository.deleteSession(userId, clientId, domain);
     return this.deleteClientFromDb(userId, clientId);
   }
 
@@ -371,7 +371,7 @@ export class ClientRepository {
               if (!clientEntityMap[domain]) {
                 clientEntityMap[domain] = {};
               }
-              clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients);
+              clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients, true, domain);
             }),
           ),
         ),
@@ -419,7 +419,7 @@ export class ClientRepository {
    */
   async updateClientsForSelf(): Promise<ClientEntity[]> {
     const clientsData = await this.clientService.getClients();
-    return this.updateClientsOfUserById(this.selfUser().id, clientsData, false);
+    return this.updateClientsOfUserById(this.selfUser().id, clientsData, false, this.selfUser().domain);
   }
 
   /**
@@ -436,6 +436,7 @@ export class ClientRepository {
     userId: string,
     clientsData: RegisteredClient[] | PublicClient[],
     publish: boolean = true,
+    domain: string | null,
   ): Promise<ClientEntity[]> {
     const clientsFromBackend: Record<string, RegisteredClient | PublicClient> = {};
     const clientsStoredInDb: ClientRecord[] = [];
@@ -461,7 +462,7 @@ export class ClientRepository {
 
             if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
               this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
-              this.removeClient(userId, clientId);
+              this.removeClient(userId, clientId, domain);
             }
 
             // Locally known client changed on backend
@@ -478,7 +479,7 @@ export class ClientRepository {
 
           // Locally known client deleted on backend
           this.logger.warn(`Removing client '${clientId}' of user '${userId}' locally`);
-          this.removeClient(userId, clientId);
+          this.removeClient(userId, clientId, domain);
         }
 
         for (const clientId in clientsFromBackend) {
