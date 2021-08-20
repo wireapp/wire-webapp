@@ -17,8 +17,10 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {ConversationLabel} from '../../conversation/ConversationLabelRepository';
 import Icon from '../Icon';
@@ -30,7 +32,14 @@ export interface GroupedConversationHeaderProps {
 }
 
 const GroupedConversationHeader: React.FC<GroupedConversationHeaderProps> = ({onClick, conversationLabel, isOpen}) => {
-  const badge = conversationLabel.conversations().filter(conversation => conversation.hasUnread()).length;
+  const {conversations} = useKoSubscribableChildren(conversationLabel, ['conversations']);
+  const [badge, setBadge] = useState(0);
+  useEffect(() => {
+    const updateBadge = () => setBadge(conversations.filter(conversation => conversation.hasUnread()).length);
+    const unreadSubscriptions = conversations?.map(c => c.hasUnread.subscribe(updateBadge));
+    updateBadge();
+    return () => unreadSubscriptions?.forEach(s => s.dispose());
+  }, [conversations?.length]);
 
   return (
     <div
