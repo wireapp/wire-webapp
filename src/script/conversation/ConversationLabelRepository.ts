@@ -148,14 +148,14 @@ export class ConversationLabelRepository {
     }
   };
 
-  readonly getGroupsWithoutLabel = () => {
-    return this.conversations().filter(
+  readonly getGroupsWithoutLabel = (conversations = this.conversations()) => {
+    return conversations.filter(
       conversation => conversation.isGroup() && !this.allLabeledConversations().includes(conversation),
     );
   };
 
-  readonly getContactsWithoutLabel = () => {
-    return this.conversations().filter(
+  readonly getContactsWithoutLabel = (conversations = this.conversations()) => {
+    return conversations.filter(
       conversation => !conversation.isGroup() && !this.allLabeledConversations().includes(conversation),
     );
   };
@@ -163,10 +163,11 @@ export class ConversationLabelRepository {
   readonly getFavoriteLabel = (): ConversationLabel => this.labels().find(({type}) => type === LabelType.Favorite);
   readonly getLabelById = (labelId: string): ConversationLabel => this.labels().find(({id}) => id === labelId);
 
-  readonly getFavorites = (): Conversation[] => this.getLabelConversations(this.getFavoriteLabel());
+  readonly getFavorites = (conversations = this.conversations()): Conversation[] =>
+    this.getLabelConversations(this.getFavoriteLabel(), conversations);
 
-  readonly getLabelConversations = (label: ConversationLabel): Conversation[] =>
-    label ? this.conversations().filter(conversation => label.conversations().includes(conversation)) : [];
+  readonly getLabelConversations = (label: ConversationLabel, conversations = this.conversations()): Conversation[] =>
+    label ? conversations.filter(conversation => label.conversations().includes(conversation)) : [];
 
   readonly isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
 
