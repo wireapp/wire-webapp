@@ -78,7 +78,7 @@ export class InputBarViewModel {
   private readonly selectionStart: ko.Observable<number>;
   private readonly selectionEnd: ko.Observable<number>;
   readonly participantAvatarSize = AVATAR_SIZE.X_SMALL;
-  readonly conversationEntity: ko.Observable<Conversation>;
+  readonly conversationEntity: ko.Observable<Conversation | null>;
   readonly selfUser: ko.Observable<User>;
   private readonly conversationHasFocus: ko.Observable<boolean>;
   private readonly editMessageEntity: ko.Observable<ContentMessage>;
@@ -335,7 +335,7 @@ export class InputBarViewModel {
     });
 
     // TODO(Federation): For Federation playground builds we disable every other activity than sending plain text messages
-    this.disableControls = ko.pureComputed(() => this.conversationEntity().isFederated());
+    this.disableControls = ko.pureComputed(() => this.conversationEntity()?.isFederated());
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {
@@ -534,7 +534,7 @@ export class InputBarViewModel {
       const newMentions = (messageEntity.getFirstAsset() as Text).mentions().slice();
       this.currentMentions(newMentions);
 
-      if (messageEntity.quote()) {
+      if (messageEntity.quote() && this.conversationEntity()) {
         this.messageRepository
           .getMessageInConversationById(this.conversationEntity(), messageEntity.quote().messageId)
           .then(quotedMessage => this.replyMessageEntity(quotedMessage));
@@ -653,7 +653,7 @@ export class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            if (!this.conversationEntity().isFederated()) {
+            if (!this.conversationEntity()?.isFederated()) {
               this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
             }
             this.updateMentions(data, keyboardEvent);

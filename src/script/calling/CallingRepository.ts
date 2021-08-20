@@ -406,7 +406,7 @@ export class CallingRepository {
       camera = this.teamState.isVideoCallingEnabled() ? camera : false;
       const mediaStream = await this.getMediaStream({audio, camera}, isGroup);
       if (call.state() !== CALL_STATE.NONE) {
-        call.getSelfParticipant().updateMediaStream(mediaStream);
+        call.getSelfParticipant().updateMediaStream(mediaStream, true);
         if (camera) {
           call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
         }
@@ -727,7 +727,7 @@ export class CallingRepository {
       };
       const selfParticipant = call.getSelfParticipant();
       selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
-      selfParticipant.updateMediaStream(mediaStream);
+      selfParticipant.updateMediaStream(mediaStream, true);
       this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.SCREENSHARE);
       selfParticipant.startedScreenSharingAt(Date.now());
     } catch (error) {
@@ -860,7 +860,7 @@ export class CallingRepository {
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
       if (audioTracks.length > 0) {
-        selfParticipant.setAudioStream(new MediaStream(audioTracks));
+        selfParticipant.setAudioStream(new MediaStream(audioTracks), true);
         this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
       }
     }
@@ -869,7 +869,7 @@ export class CallingRepository {
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
       if (videoTracks.length > 0) {
-        selfParticipant.setVideoStream(new MediaStream(videoTracks));
+        selfParticipant.setVideoStream(new MediaStream(videoTracks), true);
         this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
       }
     }
@@ -1257,7 +1257,7 @@ export class CallingRepository {
         }
         const mediaStream = await this.getMediaStream(missingStreams, isGroup);
         this.mediaStreamQuery = undefined;
-        const newStream = selfParticipant.updateMediaStream(mediaStream);
+        const newStream = selfParticipant.updateMediaStream(mediaStream, true);
         return newStream;
       } catch (error) {
         this.mediaStreamQuery = undefined;
@@ -1318,7 +1318,7 @@ export class CallingRepository {
     }
 
     if (streams === null || streams.length === 0) {
-      participant.releaseVideoStream();
+      participant.releaseVideoStream(false);
       return;
     }
 

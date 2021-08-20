@@ -106,7 +106,7 @@ describe('GroupVideoGrid', () => {
     const user = new User('id', null);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
-    participant.setVideoStream(new MediaStream());
+    participant.setVideoStream(new MediaStream(), false);
     participant.isMuted(true);
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {
@@ -127,7 +127,7 @@ describe('GroupVideoGrid', () => {
     const user = new User('id', null);
     user.name('Anton Bertha');
     const participant = new Participant(user, 'example');
-    participant.setVideoStream(new MediaStream());
+    participant.setVideoStream(new MediaStream(), false);
     participant.isMuted(true);
     const groupVideoGrid = new GroupVideoGridPage({
       grid: {

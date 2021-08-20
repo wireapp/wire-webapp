@@ -23,6 +23,7 @@ import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
 import type {Services} from '@wireapp/api-client/src/team/service/';
 import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
 import type {TeamChunkData, TeamData} from '@wireapp/api-client/src/team/team/';
+import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/src/team/feature/';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
@@ -67,6 +68,48 @@ export class TeamService {
   }
 
   getAllTeamFeatures(): Promise<FeatureList> {
-    return this.apiClient.teams.feature.api.getAllFeatures();
+    return this.apiClient.teams.feature.api.getAllFeatures().catch(() => {
+      // The following code enables all default features to ensure that modern webapps work with legacy backends (backends that don't provide a "feature-configs" endpoint)
+      const defaultFeatures: FeatureList = {
+        [FEATURE_KEY.APPLOCK]: {
+          config: {
+            enforceAppLock: false,
+            inactivityTimeoutSecs: 60,
+          },
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.CLASSIFIED_DOMAINS]: {
+          config: {
+            domains: [],
+          },
+          status: FeatureStatus.DISABLED,
+        },
+        [FEATURE_KEY.CONFERENCE_CALLING]: {
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.DIGITAL_SIGNATURES]: {
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.FILE_SHARING]: {
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.LEGALHOLD]: {
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.SEARCH_VISIBILITY]: {
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.SSO]: {
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.VALIDATE_SAML_EMAILS]: {
+          status: FeatureStatus.ENABLED,
+        },
+        [FEATURE_KEY.VIDEO_CALLING]: {
+          status: FeatureStatus.ENABLED,
+        },
+      };
+      return defaultFeatures;
+    });
   }
 }

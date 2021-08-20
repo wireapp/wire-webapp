@@ -1054,6 +1054,7 @@
   "videoCallOverlayCamera": "Camera",
   "videoCallOverlayConversations": "Conversations",
   "videoCallOverlayFitVideoLabel": "double-click to maximize any participant",
+  "videoCallOverlayFitVideoLabelGoBack": "double-click to go back to all participants",
   "videoCallOverlayHangUp": "Hang Up",
   "videoCallOverlayMicrophone": "Microphone",
   "videoCallOverlayShareScreen": "Share Screen",
