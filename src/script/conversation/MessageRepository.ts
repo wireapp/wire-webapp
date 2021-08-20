@@ -247,6 +247,11 @@ export class MessageRepository {
     return undefined;
   }
 
+  /**
+   * @see https://wearezeta.atlassian.net/wiki/spaces/CORE/pages/300351887/Using+federation+environments
+   * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
+   * @see https://docs.wire.com/understand/federation/index.html
+   */
   async sendFederatedMessage(message: string): Promise<void> {
     const conversation = this.conversationState.activeConversation();
     const userIds: string[] | QualifiedId[] = conversation.domain
@@ -773,11 +778,16 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(user_id: string, client_id: string, conversation_id: string): Promise<ClientMismatch> {
+  async resetSession(
+    user_id: string,
+    client_id: string,
+    conversation_id: string,
+    domain: string | null,
+  ): Promise<ClientMismatch> {
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 
     try {
-      const session_id = await this.cryptography_repository.deleteSession(user_id, client_id);
+      const session_id = await this.cryptography_repository.deleteSession(user_id, client_id, domain);
       if (session_id) {
         this.logger.info(`Deleted session with client '${client_id}' of user '${user_id}'.`);
       } else {
