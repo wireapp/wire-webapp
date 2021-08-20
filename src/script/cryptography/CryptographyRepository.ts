@@ -245,12 +245,12 @@ export class CryptographyRepository {
    *
    * @param userId User ID for the remote participant
    * @param clientId Client ID of the remote participant
-   * @param [domain] Domain of the remote participant (only available in federation-aware webapps)
+   * @param domain Domain of the remote participant (only available in federation-aware webapps)
    * @returns Session ID
    */
   private constructSessionId(userId: string, clientId: string, domain: string | null): string {
     /**
-     * For backward compatibility: We store sessions with participants from our own domain without a domain  in the session ID (legacy session ID format).
+     * For backward compatibility: We store sessions with participants from our own domain without a domain in the session ID (legacy session ID format).
      * All other sessions (with users from a different domain/remote backends) will be saved with a domain in their session ID.
      */
     if (Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN !== domain) {

@@ -156,20 +156,20 @@ describe('ClientRepository', () => {
 
   describe('constructPrimaryKey', () => {
     it('returns a proper primary key for a client', () => {
-      const actualPrimaryKey = testFactory.client_repository['constructPrimaryKey'](userId, clientId);
+      const actualPrimaryKey = testFactory.client_repository['constructPrimaryKey'](userId, clientId, null);
       const expectedPrimaryKey = `${userId}@${clientId}`;
 
       expect(actualPrimaryKey).toEqual(expectedPrimaryKey);
     });
 
     it('throws an error if missing user ID', () => {
-      const functionCall = () => testFactory.client_repository['constructPrimaryKey'](undefined, clientId);
+      const functionCall = () => testFactory.client_repository['constructPrimaryKey'](undefined, clientId, null);
 
       expect(functionCall).toThrowError(ClientError);
     });
 
     it('throws an error if missing client ID', () => {
-      const functionCall = () => testFactory.client_repository['constructPrimaryKey'](userId, undefined);
+      const functionCall = () => testFactory.client_repository['constructPrimaryKey'](userId, undefined, null);
 
       expect(functionCall).toThrowError(ClientError);
     });
