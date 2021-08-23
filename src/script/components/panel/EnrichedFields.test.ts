@@ -83,7 +83,7 @@ describe('EnrichedFields', () => {
     expect(enrichedFields.getEntries().length).toEqual(3);
   });
 
-  it('displays the domain of a user if the federation feature flag is turned on', async () => {
+  it('displays the domain of a user when the federation feature flag is turned on', async () => {
     spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
       FEATURE: {
         ENABLE_FEDERATION: true,
@@ -103,7 +103,7 @@ describe('EnrichedFields', () => {
     expect(enrichedFields.findByValue(domain).length).toBe(1);
   });
 
-  it('does NOT display the domain of a user if the federation feature flag is turned off', async () => {
+  it('does NOT display the domain of a user when the federation feature flag is turned off', async () => {
     spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
       FEATURE: {
         ENABLE_FEDERATION: false,
