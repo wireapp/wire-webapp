@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
@@ -35,6 +35,7 @@ import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {ConversationState} from '../../conversation/ConversationState';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import GroupedConversationsFolder from './GroupedConversationsFolder';
+import {CallState} from '../../calling/CallState';
 
 const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {
   const {labels: conversationLabels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
@@ -58,6 +59,7 @@ const useLabels = (conversationLabelRepository: ConversationLabelRepository) => 
 };
 
 export interface GroupedConversationsProps {
+  callState: CallState;
   conversationRepository: ConversationRepository;
   conversationState: ConversationState;
   expandedFolders: string[];
@@ -80,41 +82,30 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   setExpandedFolders,
   listViewModel,
   conversationState = container.resolve(ConversationState),
+  callState = container.resolve(CallState),
 }) => {
   const {conversationLabelRepository} = conversationRepository;
   const {conversations_unarchived: conversations} = useKoSubscribableChildren(conversationState, [
     'conversations_unarchived',
   ]);
+  useKoSubscribableChildren(callState, ['activeCalls']);
 
-  const labels = useLabels(conversationLabelRepository);
+  useLabels(conversationLabelRepository);
 
-  const folders = useMemo(() => {
-    const folders: ConversationLabel[] = [];
+  const favorites = conversationLabelRepository.getFavorites(conversations);
+  const groups = conversationLabelRepository.getGroupsWithoutLabel(conversations);
+  const contacts = conversationLabelRepository.getContactsWithoutLabel(conversations);
+  const custom = conversationLabelRepository
+    .getLabels()
+    .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
+    .filter(({conversations}) => !!conversations().length);
 
-    const favorites = conversationLabelRepository.getFavorites(conversations);
-    const groups = conversationLabelRepository.getGroupsWithoutLabel(conversations);
-    const contacts = conversationLabelRepository.getContactsWithoutLabel(conversations);
-
-    if (favorites.length) {
-      folders.push(createLabelFavorites(favorites));
-    }
-
-    if (groups.length) {
-      folders.push(createLabelGroups(groups));
-    }
-
-    if (contacts.length) {
-      folders.push(createLabelPeople(contacts));
-    }
-
-    const custom = conversationLabelRepository
-      .getLabels()
-      .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
-      .filter(({conversations}) => !!conversations().length);
-    folders.push(...custom);
-
-    return folders;
-  }, [labels.map(label => label.name + label.conversations().length).join(''), expandedFolders, conversations]);
+  const folders = [
+    favorites.length && createLabelFavorites(favorites),
+    groups.length && createLabelGroups(groups),
+    contacts.length && createLabelPeople(contacts),
+    ...custom,
+  ].filter(Boolean);
 
   const isExpanded = useCallback((folderId: string): boolean => expandedFolders.includes(folderId), [expandedFolders]);
   const toggle = useCallback(
@@ -153,7 +144,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     <>
       {folders.map(folder => (
         <GroupedConversationsFolder
-          key={folder.id}
+          key={folder.id + folder.conversations.length}
           folder={folder}
           toggle={toggle}
           onJoinCall={onJoinCall}
