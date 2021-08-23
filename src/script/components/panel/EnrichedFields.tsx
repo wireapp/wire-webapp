@@ -84,7 +84,7 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
             <div className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
               {type}
             </div>
-            <div className="enriched-fields__entry__value" data-uie-name="item-enriched-value">
+            <div className="enriched-fields__entry__value" data-uie-name="item-enriched-value" data-uie-value={value}>
               {value}
             </div>
           </div>
