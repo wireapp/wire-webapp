@@ -115,3 +115,25 @@ export const useKoSubscribableChildren = <
 
   return state;
 };
+
+export const useKoSubscribableMap = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
+  parents: P[],
+  child: C,
+): Unwrapped<P[C]>[] => {
+  const getValues = (roots: P[]): Unwrapped<P[C]>[] =>
+    roots.reduce((acc, root) => [...acc, root?.[child]?.()], [] as Unwrapped<P[C]>[]);
+
+  const [state, setState] = useState<Unwrapped<P[C]>[]>();
+
+  useEffect(() => {
+    setState(getValues(parents));
+    const subscriptions = parents.map(parent => {
+      return parent?.[child]?.subscribe(() => {
+        setState(getValues(parents));
+      });
+    });
+
+    return () => subscriptions.forEach(subscription => subscription?.dispose());
+  }, [parents]);
+  return state;
+};
