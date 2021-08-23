@@ -87,12 +87,13 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   ]);
 
   const labels = useLabels(conversationLabelRepository);
-  const favorites = conversationLabelRepository.getFavorites(conversations);
-  const groups = conversationLabelRepository.getGroupsWithoutLabel(conversations);
-  const contacts = conversationLabelRepository.getContactsWithoutLabel(conversations);
 
   const folders = useMemo(() => {
     const folders: ConversationLabel[] = [];
+
+    const favorites = conversationLabelRepository.getFavorites(conversations);
+    const groups = conversationLabelRepository.getGroupsWithoutLabel(conversations);
+    const contacts = conversationLabelRepository.getContactsWithoutLabel(conversations);
 
     if (favorites.length) {
       folders.push(createLabelFavorites(favorites));
@@ -113,13 +114,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     folders.push(...custom);
 
     return folders;
-  }, [
-    labels.map(label => label.name + label.conversations().length).join(''),
-    favorites.length,
-    groups.length,
-    contacts.length,
-    expandedFolders,
-  ]);
+  }, [labels.map(label => label.name + label.conversations().length).join(''), expandedFolders, conversations]);
 
   const isExpanded = useCallback((folderId: string): boolean => expandedFolders.includes(folderId), [expandedFolders]);
   const toggle = useCallback(
