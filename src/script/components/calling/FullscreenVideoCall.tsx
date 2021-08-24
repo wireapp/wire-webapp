@@ -208,9 +208,11 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               textSubstitute={participants.length.toString()}
             />
           )}
-          <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
-            {maximizedParticipant ? t('videoCallOverlayFitVideoLabelGoBack') : t('videoCallOverlayFitVideoLabel')}
-          </div>
+          {(videoGrid.grid.length > 1 || maximizedParticipant) && (
+            <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
+              {maximizedParticipant ? t('videoCallOverlayFitVideoLabelGoBack') : t('videoCallOverlayFitVideoLabel')}
+            </div>
+          )}
           <div className="video-controls__wrapper">
             <div className="video-controls__button" onClick={minimize} data-uie-name="do-call-controls-video-minimize">
               {hasUnreadMessages ? (
