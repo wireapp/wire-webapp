@@ -208,7 +208,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
               textSubstitute={participants.length.toString()}
             />
           )}
-          {(participants.length > 2 || maximizedParticipant) && (
+          {(videoGrid.grid.length > 1 || maximizedParticipant) && (
             <div className="video-controls__fit-info" data-uie-name="label-fit-fill-info">
               {maximizedParticipant ? t('videoCallOverlayFitVideoLabelGoBack') : t('videoCallOverlayFitVideoLabel')}
             </div>
