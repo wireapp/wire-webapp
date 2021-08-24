@@ -144,7 +144,7 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
     <>
       {folders.map(folder => (
         <GroupedConversationsFolder
-          key={folder.id + folder.conversations.length}
+          key={`${folder.id}-${folder.conversations().length}`}
           folder={folder}
           toggle={toggle}
           onJoinCall={onJoinCall}
