@@ -49,11 +49,13 @@ const useLabels = (conversationLabelRepository: ConversationLabelRepository) => 
       setLabels([...conversationLabels]);
     };
     updateLabels();
-    const labelsSubscriptions = conversationLabels?.map(l => l.conversations.subscribe(updateLabels));
+    const labelsSubscriptions = conversationLabels?.map(l => {
+      return l.conversations.subscribe(updateLabels);
+    });
     return () => {
       labelsSubscriptions?.forEach(l => l.dispose());
     };
-  }, [conversationLabels?.length]);
+  }, [conversationLabels?.length + conversationLabels?.map(cl => cl.conversations().length).join('')]);
 
   return labels;
 };
