@@ -42,15 +42,11 @@ const useLabels = (conversationLabelRepository: ConversationLabelRepository) => 
   const [labels, setLabels] = useState<ConversationLabel[]>(conversationLabels);
 
   useEffect(() => {
-    const updateLabels = () => {
-      setLabels([...(conversationLabels ?? [])]);
-    };
+    const updateLabels = () => setLabels([...(conversationLabels ?? [])]);
     updateLabels();
     const labelsSubscriptions = conversationLabels?.map(l => l.conversations.subscribe(updateLabels));
 
-    return () => {
-      labelsSubscriptions?.forEach(l => l.dispose());
-    };
+    return () => labelsSubscriptions?.forEach(l => l.dispose());
   }, [conversationLabels, conversationLabels?.length]);
 
   return labels;
