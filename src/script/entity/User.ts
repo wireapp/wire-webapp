@@ -202,7 +202,7 @@ export class User {
     this.isExpired = ko.observable(false);
   }
 
-  get isFederatedUser(): boolean {
+  get hasDomain(): boolean {
     return !!this.domain;
   }
 

@@ -51,7 +51,7 @@ import {compareTransliteration, sortByPriority, startsWith, sortUsersByPriority}
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {EventBuilder} from '../conversation/EventBuilder';
+import {EventBuilder, GroupCreationEvent} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
@@ -2154,7 +2154,7 @@ export class ConversationRepository {
   private async onCreate(
     eventJson: ConversationCreateEvent,
     eventSource?: EventSource,
-  ): Promise<{conversationEntity: Conversation} | undefined> {
+  ): Promise<{conversationEntity: Conversation}> {
     const {conversation: conversationId, data: eventData, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
@@ -2186,8 +2186,8 @@ export class ConversationRepository {
     return undefined;
   }
 
-  private async onGroupCreation(conversationEntity: Conversation, eventJson: EventRecord) {
-    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+  private async onGroupCreation(conversationEntity: Conversation, eventJson: GroupCreationEvent) {
+    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson as EventRecord, conversationEntity);
     const creatorId = conversationEntity.creator;
     const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
