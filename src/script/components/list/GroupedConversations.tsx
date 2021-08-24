@@ -53,7 +53,7 @@ const useLabels = (conversationLabelRepository: ConversationLabelRepository) => 
     return () => {
       labelsSubscriptions?.forEach(l => l.dispose());
     };
-  }, [conversationLabels?.length]);
+  }, [conversationLabels?.map(l => l.conversations().length).join()]);
 
   return labels;
 };
