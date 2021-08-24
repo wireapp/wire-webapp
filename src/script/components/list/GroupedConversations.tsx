@@ -42,20 +42,12 @@ const useLabels = (conversationLabelRepository: ConversationLabelRepository) => 
   const [labels, setLabels] = useState<ConversationLabel[]>(conversationLabels);
 
   useEffect(() => {
-    if (!conversationLabels) {
-      return setLabels([]);
-    }
-    const updateLabels = () => {
-      setLabels([...conversationLabels]);
-    };
+    const updateLabels = () => setLabels([...(conversationLabels ?? [])]);
     updateLabels();
-    const labelsSubscriptions = conversationLabels?.map(l => {
-      return l.conversations.subscribe(updateLabels);
-    });
-    return () => {
-      labelsSubscriptions?.forEach(l => l.dispose());
-    };
-  }, [conversationLabels?.length + conversationLabels?.map(cl => cl.conversations().length).join('')]);
+    const labelsSubscriptions = conversationLabels?.map(l => l.conversations.subscribe(updateLabels));
+
+    return () => labelsSubscriptions?.forEach(l => l.dispose());
+  }, [conversationLabels, conversationLabels?.length]);
 
   return labels;
 };
