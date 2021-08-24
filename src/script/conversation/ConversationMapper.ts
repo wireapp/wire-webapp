@@ -215,7 +215,7 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, type} = conversationData;
+    const {creator, id, members, name, others, qualified_others, type} = conversationData;
     let conversationEntity = new Conversation(id, conversationData.domain || conversationData.qualified_id?.domain);
     conversationEntity.roles(conversationData.roles || {});
 
@@ -232,7 +232,7 @@ export class ConversationMapper {
     }
 
     // Active participants from database or backend payload
-    const participatingUserIds = others || members.others.map(other => other.id);
+    const participatingUserIds = qualified_others || (others ? others.map(userId => ({id: userId, domain: null})) : members.others.map(other => ({id: other.id, domain: other.qualified_id?.domain || null})));
     conversationEntity.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload

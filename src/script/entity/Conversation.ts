@@ -46,6 +46,7 @@ import {Config} from '../Config';
 import type {Call} from '../calling/Call';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import type {QualifiedIdOptional} from '../conversation/EventBuilder';
 
 interface UnreadState {
   allEvents: Message[];
@@ -127,7 +128,7 @@ export class Conversation {
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
-  public readonly participating_user_ids: ko.ObservableArray<string>;
+  public readonly participating_user_ids: ko.ObservableArray<QualifiedIdOptional>;
   public readonly receiptMode: ko.Observable<Confirmation.Type>;
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
@@ -217,8 +218,9 @@ export class Conversation {
     this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
-      if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {
-        this.participating_user_ids.push(connectedUserId);
+      // TODO(Federation): Check for domain once backend supports federated connections
+      if (connectedUserId && !this.participating_user_ids().find(user => user.id === connectedUserId)) {
+        this.participating_user_ids.push({id: connectedUserId, domain: null});
       }
     });
 
@@ -937,7 +939,8 @@ export class Conversation {
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
-      others: this.participating_user_ids(),
+      others: this.participating_user_ids().map(user => user.id),
+      qualified_others: this.participating_user_ids(),
       receipt_mode: this.receiptMode(),
       roles: this.roles(),
       status: this.status(),

@@ -32,6 +32,11 @@ import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {AssetRecord, EventRecord} from '../storage';
 
+export interface QualifiedIdOptional {
+  domain: string | null;
+  id: string;
+}
+
 export interface BaseEvent {
   conversation: string;
   from: string;
@@ -77,13 +82,13 @@ export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType};
 export type DegradedMessageEvent = ConversationEvent<{type: VerificationMessageType; userIds: string[]}>;
 export type DeleteEvent = ConversationEvent<{deleted_time: number}>;
-export type GroupCreationEvent = ConversationEvent<{allTeamMembers: boolean; name: string; userIds: string[]}>;
+export type GroupCreationEvent = ConversationEvent<{allTeamMembers: boolean; name: string; userIds: QualifiedIdOptional[]}>;
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}>;
 export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {status: StatusType};
 export type MissedEvent = BaseEvent & {id: string; type: string};
-export type OneToOneCreationEvent = ConversationEvent<{userIds: string[]}>;
+export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedIdOptional[]}>;
 export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}>;
 export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; reason: AVS_REASON}> & {
   protocol_version: number;
@@ -224,12 +229,13 @@ export const EventBuilder = {
   ): GroupCreationEvent {
     const {creator: creatorId, id} = conversationEntity;
     const selfUserId = conversationEntity.selfUser().id;
+    const selfUserDomain = conversationEntity.selfUser().domain;
     const isoDate = new Date(timestamp || 0).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUserId || isTemporaryGuest;
     if (!createdBySelf) {
-      userIds.push(selfUserId);
+      userIds.push({id: selfUserId, domain: selfUserDomain});
     }
 
     return {

@@ -28,6 +28,7 @@ import {
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
   ConversationCreateEvent,
+  ConversationMemberJoinEvent,
 } from '@wireapp/api-client/src/event/';
 import {
   DefaultConversationRoleName as DefaultRole,
@@ -528,7 +529,7 @@ export class ConversationRepository {
       const allTeamMembersParticipate = this.teamState.teamMembers().length
         ? this.teamState
             .teamMembers()
-            .every(teamMember => conversationEntity.participating_user_ids().includes(teamMember.id))
+            .every(teamMember => !!conversationEntity.participating_user_ids().find(user => user.id === teamMember.id && user.domain == teamMember.domain))
         : false;
 
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
@@ -1851,7 +1852,7 @@ export class ConversationRepository {
     const {from: sender, id, type, time} = eventJson;
 
     if (sender) {
-      const allParticipantIds = conversationEntity.participating_user_ids().concat(this.userState.self().id);
+      const allParticipantIds = conversationEntity.participating_user_ids().concat({id: this.userState.self().id, domain: this.userState.self().domain});
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
       if (isFromUnknownUser) {
@@ -2189,7 +2190,8 @@ export class ConversationRepository {
   private async onGroupCreation(conversationEntity: Conversation, eventJson: GroupCreationEvent) {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson as EventRecord, conversationEntity);
     const creatorId = conversationEntity.creator;
-    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
+    const creatorDomain = conversationEntity.domain;
+    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId.id === creatorId && userId.domain === creatorDomain);
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
@@ -2221,7 +2223,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-join' event
    * @returns Resolves when the event was handled
    */
-  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson): Promise<void | EntityObject> {
+  private async onMemberJoin(conversationEntity: Conversation, eventJson: ConversationMemberJoinEvent): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
@@ -2231,13 +2233,23 @@ export class ConversationRepository {
 
     const eventData = eventJson.data;
 
-    eventData.user_ids.forEach((userId: string) => {
-      const isSelfUser = userId === this.userState.self().id;
-      const isParticipatingUser = conversationEntity.participating_user_ids().includes(userId);
-      if (!isSelfUser && !isParticipatingUser) {
-        conversationEntity.participating_user_ids.push(userId);
-      }
-    });
+    if (eventData.users) {
+      eventData.users.forEach(user => {
+        const isSelfUser = user.id === this.userState.self().id && user.domain === this.userState.self().domain;
+        const isParticipatingUser = !!conversationEntity.participating_user_ids().find(participatingUser => participatingUser.id === user.id && participatingUser.domain == user.domain);
+        if (!isSelfUser && !isParticipatingUser) {
+          conversationEntity.participating_user_ids.push({id: user.id, domain: user.domain});
+        }
+      });
+    } else {
+      eventData.user_ids.forEach(userId => {
+        const isSelfUser = userId === this.userState.self().id;
+        const isParticipatingUser = !!conversationEntity.participating_user_ids().find(user => user.id === userId);
+        if (!isSelfUser && !isParticipatingUser) {
+          conversationEntity.participating_user_ids.push({id: userId, domain: null});
+        }
+      });
+    }
 
     // Self user joins again
     const selfUserRejoins = eventData.user_ids.includes(this.userState.self().id);
