@@ -38,7 +38,7 @@ import {
   Conversation as BackendConversation,
 } from '@wireapp/api-client/src/conversation/';
 import {container} from 'tsyringe';
-import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
+import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -344,7 +344,12 @@ export class ConversationRepository {
       const response = await this.conversation_service.postConversations(payload);
       const {conversationEntity} = await this.onCreate({
         conversation: response.id,
-        data: response as ConversationCreateData,
+        data: {
+          ...response,
+          last_event: '0.0',
+          last_event_time: '1970-01-01T00:00:00.000Z',
+          receipt_mode: null,
+        },
         from: this.userState.self().id,
         qualified_conversation: response.qualified_id,
         time: new Date().toISOString(),
