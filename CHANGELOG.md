@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.1.0...@wireapp/api-client@13.2.0) (2021-08-24)
+
+
+### Features
+
+* **api-client:** Add federated users to ConversationMemberJoinData ([38326e5](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/38326e5dc05ec4b5cae9f67ff0b777c1909907a7))
+
+
+
+
+
 # [13.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.0.0...@wireapp/api-client@13.1.0) (2021-08-18)
 
 
