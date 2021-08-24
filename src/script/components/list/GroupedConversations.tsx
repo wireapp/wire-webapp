@@ -17,7 +17,8 @@
  *
  */
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
+import {container} from 'tsyringe';
 
 import type {ConversationRepository} from '../../conversation/ConversationRepository';
 import type {Conversation} from '../../entity/Conversation';
@@ -29,37 +30,32 @@ import {
   createLabelGroups,
   createLabelPeople,
 } from '../../conversation/ConversationLabelRepository';
-import {generateConversationUrl} from '../../router/routeGenerator';
-import {createNavigate} from '../../router/routerBindings';
 
-import GroupedConversationHeader from './GroupedConversationHeader';
-import ConversationListCell from './ConversationListCell';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
+import {ConversationState} from '../../conversation/ConversationState';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import GroupedConversationsFolder from './GroupedConversationsFolder';
+import {CallState} from '../../calling/CallState';
 
 const useLabels = (conversationLabelRepository: ConversationLabelRepository) => {
   const {labels: conversationLabels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
   const [labels, setLabels] = useState<ConversationLabel[]>(conversationLabels);
 
   useEffect(() => {
-    if (!conversationLabels) {
-      return setLabels([]);
-    }
-    const updateLabels = () => {
-      setLabels([...conversationLabels]);
-    };
+    const updateLabels = () => setLabels([...(conversationLabels ?? [])]);
     updateLabels();
-    const labelsSubscriptions = labels?.map(l => l.conversations.subscribe(updateLabels));
-    return () => {
-      labelsSubscriptions?.forEach(l => l.dispose());
-    };
-  }, [conversationLabels?.length]);
+    const labelsSubscriptions = conversationLabels?.map(l => l.conversations.subscribe(updateLabels));
+
+    return () => labelsSubscriptions?.forEach(l => l.dispose());
+  }, [conversationLabels, conversationLabels?.length]);
 
   return labels;
 };
 
 export interface GroupedConversationsProps {
+  callState: CallState;
   conversationRepository: ConversationRepository;
+  conversationState: ConversationState;
   expandedFolders: string[];
   hasJoinableCall: (conversationId: string) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
@@ -67,6 +63,7 @@ export interface GroupedConversationsProps {
   listViewModel: ListViewModel;
   onJoinCall: (conversationEntity: Conversation) => void;
   setExpandedFolders: (folders: string[]) => void;
+  toggle: (folderId: string) => void;
 }
 
 const GroupedConversations: React.FC<GroupedConversationsProps> = ({
@@ -75,57 +72,47 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   hasJoinableCall,
   isSelectedConversation,
   isVisibleFunc,
-  listViewModel,
   onJoinCall,
   setExpandedFolders,
+  listViewModel,
+  conversationState = container.resolve(ConversationState),
+  callState = container.resolve(CallState),
 }) => {
   const {conversationLabelRepository} = conversationRepository;
-  const makeOnClick = (conversationId: string, domain: string | null) =>
-    createNavigate(generateConversationUrl(conversationId, domain));
-
-  const labels = useLabels(conversationLabelRepository);
-
-  const favorites = conversationLabelRepository.getFavorites();
-  const groups = conversationLabelRepository.getGroupsWithoutLabel();
-  const contacts = conversationLabelRepository.getContactsWithoutLabel();
-
-  const folders = useMemo(() => {
-    const folders: ConversationLabel[] = [];
-
-    if (favorites.length) {
-      folders.push(createLabelFavorites(favorites));
-    }
-
-    if (groups.length) {
-      folders.push(createLabelGroups(groups));
-    }
-
-    if (contacts.length) {
-      folders.push(createLabelPeople(contacts));
-    }
-
-    const custom = conversationLabelRepository
-      .getLabels()
-      .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
-      .filter(({conversations}) => !!conversations().length);
-    folders.push(...custom);
-
-    return folders;
-  }, [
-    labels.map(label => label.name + label.conversations().length).join(''),
-    favorites.length,
-    groups.length,
-    contacts.length,
+  const {conversations_unarchived: conversations} = useKoSubscribableChildren(conversationState, [
+    'conversations_unarchived',
   ]);
+  useKoSubscribableChildren(callState, ['activeCalls']);
 
-  const isExpanded = (folderId: string): boolean => expandedFolders.includes(folderId);
-  const toggle = (folderId: string): void => {
-    if (isExpanded(folderId)) {
-      setExpandedFolders(expandedFolders.filter(folder => folder !== folderId));
-    } else {
-      setExpandedFolders([...expandedFolders, folderId]);
-    }
-  };
+  useLabels(conversationLabelRepository);
+
+  const favorites = conversationLabelRepository.getFavorites(conversations);
+  const groups = conversationLabelRepository.getGroupsWithoutLabel(conversations);
+  const contacts = conversationLabelRepository.getContactsWithoutLabel(conversations);
+  const custom = conversationLabelRepository
+    .getLabels()
+    .map(label => createLabel(label.name, conversationLabelRepository.getLabelConversations(label), label.id))
+    .filter(({conversations}) => !!conversations().length);
+
+  const folders = [
+    favorites.length && createLabelFavorites(favorites),
+    groups.length && createLabelGroups(groups),
+    contacts.length && createLabelPeople(contacts),
+    ...custom,
+  ].filter(Boolean);
+
+  const isExpanded = useCallback((folderId: string): boolean => expandedFolders.includes(folderId), [expandedFolders]);
+  const toggle = useCallback(
+    (folderId: string): void => {
+      if (isExpanded(folderId)) {
+        setExpandedFolders(expandedFolders.filter(folder => folder !== folderId));
+      } else {
+        setExpandedFolders([...expandedFolders, folderId]);
+      }
+    },
+    [expandedFolders],
+  );
+
   /*
    *  We need to calculate the offset from the top for the isVisibleFunc as we can't rely
    *  on the index of the conversation alone. We need to account for the folder headers and
@@ -150,38 +137,18 @@ const GroupedConversations: React.FC<GroupedConversationsProps> = ({
   return (
     <>
       {folders.map(folder => (
-        <div
-          key={folder.id}
-          className="conversation-folder"
-          data-uie-name="conversation-folder"
-          data-uie-value={folder.name}
-        >
-          <GroupedConversationHeader
-            onClick={() => toggle(folder.id)}
-            conversationLabel={folder}
-            isOpen={isExpanded(folder.id)}
-          />
-          <div>
-            {isExpanded(folder.id) &&
-              folder
-                .conversations()
-                .map((conversation, index) => (
-                  <ConversationListCell
-                    dataUieName="item-conversation"
-                    key={conversation.id}
-                    onClick={makeOnClick(conversation.id, conversation.domain)}
-                    rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
-                    conversation={conversation}
-                    showJoinButton={hasJoinableCall(conversation.id)}
-                    is_selected={isSelectedConversation}
-                    onJoinCall={onJoinCall}
-                    offsetTop={getOffsetTop(folder, conversation)}
-                    index={index}
-                    isVisibleFunc={isVisibleFunc}
-                  />
-                ))}
-          </div>
-        </div>
+        <GroupedConversationsFolder
+          key={`${folder.id}-${folder.conversations().length}`}
+          folder={folder}
+          toggle={toggle}
+          onJoinCall={onJoinCall}
+          getOffsetTop={getOffsetTop}
+          isVisibleFunc={isVisibleFunc}
+          listViewModel={listViewModel}
+          expandedFolders={expandedFolders}
+          hasJoinableCall={hasJoinableCall}
+          isSelectedConversation={isSelectedConversation}
+        />
       ))}
     </>
   );

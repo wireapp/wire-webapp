@@ -32,10 +32,14 @@ export class ClientEntity {
   address?: string;
   class: ClientClassification | '?';
   cookie?: string;
+  domain?: string;
   id: string;
   isSelfClient: boolean;
   label?: string;
-  location?: object;
+  location?: {
+    lat?: number;
+    lon?: number;
+  };
   meta: {
     isVerified?: ko.Observable<boolean>;
     primaryKey?: string;

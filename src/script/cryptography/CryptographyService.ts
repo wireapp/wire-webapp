@@ -35,8 +35,8 @@ export class CryptographyService {
    * @param clientId Client ID
    * @returns Resolves with a pre-key for given the client of the user
    */
-  getUserPreKeyByIds(userId: string, clientId: string): Promise<ClientPreKey> {
-    return this.apiClient.user.api.getClientPreKey(userId, clientId);
+  getUserPreKeyByIds(userId: string, clientId: string, domain: string | null): Promise<ClientPreKey> {
+    return this.apiClient.user.api.getClientPreKey(userId, clientId, domain);
   }
 
   /**
