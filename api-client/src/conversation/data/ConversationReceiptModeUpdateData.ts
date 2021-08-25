@@ -17,6 +17,10 @@
  *
  */
 
+/**
+ * In 1:1 team conversations the value is `null` (no read receipts) by default.
+ * When creating a group conversation, then the user can actively decide if read receipts should be turned on or off.
+ */
 export enum RECEIPT_MODE {
   OFF = 0,
   ON = 1,
