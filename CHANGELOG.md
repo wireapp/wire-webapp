@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.3.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.3.0...@wireapp/api-client@13.3.1) (2021-08-25)
+
+
+### Bug Fixes
+
+* **api-client:** Fix receipt mode typing for new conversations ([79e9c2c](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/79e9c2c530c421378b11b10d02393598cc56cc6f))
+
+
+
+
+
 # [13.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.2.0...@wireapp/api-client@13.3.0) (2021-08-25)
 
 
