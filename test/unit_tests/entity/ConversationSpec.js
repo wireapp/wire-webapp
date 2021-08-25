@@ -17,6 +17,9 @@
  *
  */
 
+//@ts-check
+
+import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 
@@ -44,10 +47,12 @@ import {MentionEntity} from 'src/script/message/MentionEntity';
 import {entities} from '../../api/payloads';
 
 describe('Conversation', () => {
+  /** @type {Conversation} */
   let conversation_et = null;
+  /** @type {User} */
   let other_user = null;
 
-  const self_user = new User(entities.user.john_doe.id);
+  const self_user = new User(entities.user.john_doe.id, null);
   self_user.isMe = true;
 
   const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
@@ -55,7 +60,7 @@ describe('Conversation', () => {
 
   beforeEach(() => {
     conversation_et = new Conversation();
-    other_user = new User(entities.user.jane_roe.id);
+    other_user = new User(entities.user.jane_roe.id, null);
   });
 
   describe('type checks', () => {
@@ -141,6 +146,7 @@ describe('Conversation', () => {
   });
 
   describe('add message', () => {
+    /** @type {Message} */
     let initial_message_et = undefined;
 
     beforeEach(() => {
@@ -162,7 +168,7 @@ describe('Conversation', () => {
       const newMessageEntity = new Message(createRandomUuid());
       newMessageEntity.id = initial_message_et.id;
 
-      conversation_et.addMessage(newMessageEntity, true);
+      conversation_et.addMessage(newMessageEntity);
 
       expect(conversation_et.messages().length).toBe(initialLength);
       expect(conversation_et.messages().some(message => message == newMessageEntity)).toBe(false);
@@ -211,6 +217,7 @@ describe('Conversation', () => {
       it('and adding a message should not update it if affect_order is false', () => {
         const message_et = new Message(createRandomUuid());
         message_et.timestamp(second_timestamp);
+        //@ts-ignore
         message_et.affect_order(false);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -287,6 +294,7 @@ describe('Conversation', () => {
     message2.timestamp(reference_timestamp - 5000);
 
     it('adds multiple messages', () => {
+      /** @type {any[]} */
       const message_ets = [message1, message2];
       conversation_et.addMessages(message_ets);
 
@@ -300,8 +308,8 @@ describe('Conversation', () => {
     });
 
     it('returns last delivered message', () => {
-      const remoteUserEntity = new User(createRandomUuid());
-      const selfUserEntity = new User(createRandomUuid());
+      const remoteUserEntity = new User(createRandomUuid(), null);
+      const selfUserEntity = new User(createRandomUuid(), null);
       selfUserEntity.isMe = true;
 
       const sentMessageEntity = new ContentMessage(createRandomUuid());
@@ -342,10 +350,11 @@ describe('Conversation', () => {
   });
 
   describe('getLastEditableMessage', () => {
+    /** @type {User} */
     let self_user_et = undefined;
 
     beforeEach(() => {
-      self_user_et = new User();
+      self_user_et = new User('', null);
       self_user_et.isMe = true;
     });
 
@@ -358,7 +367,7 @@ describe('Conversation', () => {
     it('returns undefined if last message is not text and not added by self user', () => {
       const message_et = new PingMessage();
       message_et.id = createRandomUuid();
-      message_et.user(new User());
+      message_et.user(new User('', null));
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
@@ -377,7 +386,7 @@ describe('Conversation', () => {
       const message_et = new ContentMessage();
       message_et.addAsset(new Text());
       message_et.id = createRandomUuid();
-      message_et.user(new User());
+      message_et.user(new User('', null));
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
@@ -402,7 +411,7 @@ describe('Conversation', () => {
 
       const ping_message_et = new PingMessage();
       ping_message_et.id = createRandomUuid();
-      ping_message_et.user(new User());
+      ping_message_et.user(new User('', null));
       conversation_et.addMessage(ping_message_et);
 
       expect(conversation_et.getLastEditableMessage()).toBeDefined();
@@ -451,6 +460,7 @@ describe('Conversation', () => {
       const reference_iso_date = new Date(referenceTimestamp).toISOString();
 
       expect(conversation_et.getNextIsoDate(referenceTimestamp)).toBe(reference_iso_date);
+      //@ts-expect-error
       expect(new Date(conversation_et.getNextIsoDate('foo')).getTime()).toBeGreaterThan(
         new Date(reference_iso_date).getTime(),
       );
@@ -460,6 +470,7 @@ describe('Conversation', () => {
       const expected_iso_date = new Date(last_server_timestamp + 1).toISOString();
 
       expect(conversation_et.getNextIsoDate(referenceTimestamp)).toEqual(expected_iso_date);
+      //@ts-expect-error
       expect(conversation_et.getNextIsoDate('foo')).toEqual(expected_iso_date);
     });
   });
@@ -488,7 +499,7 @@ describe('Conversation', () => {
     });
 
     it('displays a group conversation name with names from the participants', () => {
-      const third_user = new User(createRandomUuid());
+      const third_user = new User(createRandomUuid(), null);
       third_user.name('Brad Delson');
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
@@ -504,11 +515,11 @@ describe('Conversation', () => {
     it('displays "Empty Conversation" if no other participants are in the conversation', () => {
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
-      expect(conversation_et.display_name()).toBe(z.string.conversationsEmptyConversation);
+      expect(conversation_et.display_name()).toBe(window.z.string.conversationsEmptyConversation);
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
-      const user = new User(createRandomUuid());
+      const user = new User(createRandomUuid(), null);
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
       conversation_et.participating_user_ids.push({domain: null, id: other_user.id});
       conversation_et.participating_user_ids.push({domain: null, id: user.id});
@@ -539,11 +550,11 @@ describe('Conversation', () => {
       const third_client = new ClientEntity();
       third_client.id = '6c0daa855d6b8b6e';
 
-      const user_et = new User();
+      const user_et = new User('', null);
       user_et.devices.push(first_client);
       user_et.devices.push(second_client);
 
-      const second_user_et = new User();
+      const second_user_et = new User('', null);
       second_user_et.devices.push(third_client);
 
       conversation_et.participating_user_ets.push(user_et);
@@ -562,11 +573,11 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User(createRandomUuid());
+      const self_user_et = new User(createRandomUuid(), null);
       self_user_et.isMe = true;
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User();
+      const user_et = new User('', null);
       user_et.devices.push(verified_client_et);
       conversation_et.participating_user_ets.push(user_et);
 
@@ -578,16 +589,16 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User();
+      const self_user_et = new User('', null);
       self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User();
+      const user_et = new User('', null);
       user_et.devices.push(unverified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new User();
+      const user_et_two = new User('', null);
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
@@ -599,16 +610,16 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity();
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User();
+      const self_user_et = new User('', null);
       self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User();
+      const user_et = new User('', null);
       user_et.devices.push(verified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new User();
+      const user_et_two = new User('', null);
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
@@ -620,13 +631,13 @@ describe('Conversation', () => {
   describe('hasGuest', () => {
     it('detects conversations with guest', () => {
       conversation_et = new Conversation(createRandomUuid());
-      const selfUserEntity = new User(createRandomUuid());
+      const selfUserEntity = new User(createRandomUuid(), null);
       selfUserEntity.isMe = true;
       selfUserEntity.inTeam(true);
       conversation_et.selfUser(selfUserEntity);
 
       // Is false for conversations not containing a guest
-      const userEntity = new User(createRandomUuid());
+      const userEntity = new User(createRandomUuid(), null);
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -638,7 +649,7 @@ describe('Conversation', () => {
       expect(conversation_et.hasGuest()).toBe(false);
 
       // Is true for group conversations containing a guest
-      const secondUserEntity = new User(createRandomUuid());
+      const secondUserEntity = new User(createRandomUuid(), null);
       secondUserEntity.isGuest(true);
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -664,7 +675,7 @@ describe('Conversation', () => {
 
   describe('hasService', () => {
     it('detects conversations with services', () => {
-      const userEntity = new User(createRandomUuid());
+      const userEntity = new User(createRandomUuid(), null);
 
       conversation_et = new Conversation(createRandomUuid());
       conversation_et.participating_user_ets.push(userEntity);
@@ -677,7 +688,7 @@ describe('Conversation', () => {
 
       expect(conversation_et.hasService()).toBe(false);
 
-      const secondUserEntity = new User(createRandomUuid());
+      const secondUserEntity = new User(createRandomUuid(), null);
       secondUserEntity.isService = true;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -758,6 +769,7 @@ describe('Conversation', () => {
   });
 
   describe('removeMessageById', () => {
+    /** @type {string} */
     let message_id = undefined;
 
     beforeEach(() => {
@@ -816,6 +828,7 @@ describe('Conversation', () => {
 
     it('should remove all messages for invalid input timestamp', () => {
       expect(conversation_et.messages().length).toBe(2);
+      //@ts-expect-error
       conversation_et.removeMessages('foo');
 
       expect(conversation_et.messages().length).toBe(0);
@@ -866,16 +879,21 @@ describe('Conversation', () => {
   });
 
   describe('shouldUnarchive', () => {
+    /** @type {number} */
     let timestamp = undefined;
+    /** @type {ContentMessage} */
     let contentMessage = undefined;
+    /** @type {PingMessage} */
     let mutedTimestampMessage = undefined;
+    /** @type {PingMessage} */
     let outdatedMessage = undefined;
+    /** @type {PingMessage} */
     let pingMessage = undefined;
+    /** @type {ContentMessage} */
     let selfMentionMessage = undefined;
-
     const conversationEntity = new Conversation(createRandomUuid());
 
-    const selfUserEntity = new User(createRandomUuid());
+    const selfUserEntity = new User(createRandomUuid(), null);
     selfUserEntity.isMe = true;
     selfUserEntity.inTeam(true);
     conversationEntity.selfUser(selfUserEntity);
@@ -899,7 +917,7 @@ describe('Conversation', () => {
       pingMessage.timestamp(timestamp + 200);
 
       selfMentionMessage = new ContentMessage();
-      const mentionEntity = new MentionEntity(0, 7, selfUserEntity.id);
+      const mentionEntity = new MentionEntity(0, 7, selfUserEntity.id, selfUserEntity.domain);
       const textAsset = new Text('id', '@Gregor, Hello there');
       textAsset.mentions.push(mentionEntity);
       selfMentionMessage.assets([textAsset]);
@@ -993,8 +1011,7 @@ describe('Conversation', () => {
 
       expect(conversationEntity.shouldUnarchive()).toBe(false);
 
-      const callMessage = new CallMessage();
-      callMessage.call_message_type = CALL_MESSAGE_TYPE.ACTIVATED;
+      const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED);
       callMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(callMessage);
 
@@ -1011,7 +1028,7 @@ describe('Conversation', () => {
       expect(conversationEntity.shouldUnarchive()).toBe(false);
       const selfJoinMessage = new MemberMessage();
       selfJoinMessage.type = CONVERSATION_EVENT.MEMBER_JOIN;
-      selfJoinMessage.userIds.push(selfUserEntity.id);
+      selfJoinMessage.userIds.push({domain: selfUserEntity.domain, id: selfUserEntity.id});
       selfJoinMessage.timestamp(timestamp + 200);
       conversationEntity.messages_unordered.push(selfJoinMessage);
 
@@ -1021,8 +1038,11 @@ describe('Conversation', () => {
 
   describe('_incrementTimeOnly', () => {
     it('should update only to newer timestamps', () => {
+      //@ts-ignore
       expect(conversation_et._incrementTimeOnly(first_timestamp, second_timestamp)).toBe(second_timestamp);
+      //@ts-ignore
       expect(conversation_et._incrementTimeOnly(second_timestamp, first_timestamp)).toBeFalsy();
+      //@ts-ignore
       expect(conversation_et._incrementTimeOnly(first_timestamp, first_timestamp)).toBeFalsy();
     });
   });
@@ -1044,14 +1064,16 @@ describe('Conversation', () => {
     it('updates the participating user IDs with the user ID of the other party', () => {
       const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
 
+      /** @type {ConnectionData} */
       const payload_connection = {
         conversation: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
         from: '616cbbeb-1360-4e17-b333-e000662257bd',
         last_update: '2017-05-10T11:34:18.396Z',
         message: ' ',
-        status: 'sent',
+        status: ConnectionStatus.SENT,
         to: `${connector_user_id}`,
       };
+      /** @type {any} */
       const payload_conversation = {
         access: ['private'],
         creator: '616cbbeb-1360-4e17-b333-e000662257bd',
@@ -1097,19 +1119,22 @@ describe('Conversation', () => {
     it('returns expected values', () => {
       const NOTIFICATION_STATES = NOTIFICATION_STATE;
       const conversationEntity = new Conversation(createRandomUuid());
-      const selfUserEntity = new User(createRandomUuid());
+      const selfUserEntity = new User(createRandomUuid(), null);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
       conversationEntity.selfUser(selfUserEntity);
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+      //@ts-expect-error
       conversationEntity.mutedState('true');
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+      //@ts-expect-error
       conversationEntity.mutedState(true);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
+      //@ts-expect-error
       conversationEntity.mutedState(false);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
@@ -1126,12 +1151,15 @@ describe('Conversation', () => {
       conversationEntity.mutedState(undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+      //@ts-expect-error
       conversationEntity.mutedState('true');
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);
+      //@ts-expect-error
       conversationEntity.mutedState(true);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.MENTIONS_AND_REPLIES);
+      //@ts-expect-error
       conversationEntity.mutedState(false);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.EVERYTHING);

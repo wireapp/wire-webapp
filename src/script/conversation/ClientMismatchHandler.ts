@@ -119,7 +119,7 @@ export class ClientMismatchHandler {
     );
 
     this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(
-      missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: id})),
+      missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id})),
     );
 
     if (payload) {
