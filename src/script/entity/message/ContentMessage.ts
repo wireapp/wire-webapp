@@ -22,7 +22,6 @@ import ko from 'knockout';
 import {copyText} from 'Util/ClipboardUtil';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
-
 import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
 import type {User} from '../User';
@@ -41,10 +40,12 @@ export class ContentMessage extends Message {
   public readonly like_caption: ko.PureComputed<string>;
   public readonly other_likes: ko.PureComputed<User[]>;
   public readonly quote: ko.Observable<QuoteEntity>;
+  // TODO: Rename to `reactionsUsers`
   public readonly reactions_user_ids: ko.PureComputed<string>;
   public readonly was_edited: ko.PureComputed<boolean>;
   public replacing_message_id: null | string;
   readonly edited_timestamp: ko.Observable<number>;
+  // TODO(Federation): Make reactions federation-aware.
   readonly reactions: ko.Observable<{[userId: string]: string}>;
 
   constructor(id?: string) {

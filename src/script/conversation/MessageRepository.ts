@@ -62,7 +62,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {AssetAddEvent, EventBuilder, QualifiedIdOptional} from '../conversation/EventBuilder';
+import {AssetAddEvent, EventBuilder} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';

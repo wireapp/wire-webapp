@@ -101,9 +101,10 @@ export class ClientRepository {
    * Load all known clients from the database.
    * @returns Resolves with all the clients found in the local database
    */
-  getAllClientsFromDb(): Promise<Record<string, ClientEntity[]>> {
+  getAllClientsFromDb(): Promise<{[userId: string]: ClientEntity[]}> {
     return this.clientService.loadAllClientsFromDb().then(clients => {
-      const recipients: Record<string, ClientEntity[]> = {};
+      // TODO(Federation): Add domain to identifier
+      const recipients: {[userId: string]: ClientEntity[]} = {};
       const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const client of clients) {

@@ -287,7 +287,8 @@ export const EventBuilder = {
 
   buildMemberJoin(
     conversationEntity: Conversation,
-    sender: string,
+    sender: QualifiedIdOptional,
+    // TODO(Federation): Needs to be replaced with QualifiedIds
     joiningUserIds: string[],
     timestamp?: number,
   ): MemberJoinEvent {
@@ -301,7 +302,7 @@ export const EventBuilder = {
       data: {
         user_ids: joiningUserIds,
       },
-      from: sender,
+      from: sender.id,
       time: isoDate,
       type: CONVERSATION_EVENT.MEMBER_JOIN,
     };

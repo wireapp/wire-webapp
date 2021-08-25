@@ -73,11 +73,14 @@ export class ClientEntity {
   }
 
   /**
-   * Splits an ID into user ID & client ID.
+   * Splits an ID into user ID, client ID & domain (if any).
    */
-  static dismantleUserClientId(id: string): {clientId: string; userId: string} {
-    const [userId, clientId] = typeof id === 'string' ? id.split('@') : ([] as string[]);
-    return {clientId, userId};
+  static dismantleUserClientId(id: string): {clientId: string; userId: string, domain?: string} {
+    // see https://regex101.com/r/c8FtCw/1
+    const regex = /((?<domain>.+)@)?(?<userId>.+)@(?<clientId>.+)$/g;
+    const match = regex.exec(id);
+    const {domain, userId, clientId} = match?.groups || {};
+    return {clientId, domain, userId};
   }
 
   /**

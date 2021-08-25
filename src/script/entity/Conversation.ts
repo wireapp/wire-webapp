@@ -746,7 +746,7 @@ export class Conversation {
 
       const isCallActivation = messageEntity.isCall() && messageEntity.isActivation();
       const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
-      const wasSelfUserAdded = isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().id);
+      const wasSelfUserAdded = isMemberJoin && (messageEntity as MemberMessage).isUserAffected(({id: this.selfUser().id, domain: this.selfUser().domain}));
 
       return isCallActivation || wasSelfUserAdded;
     });

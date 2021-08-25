@@ -27,6 +27,7 @@ import type {ConversationRepository} from '../../conversation/ConversationReposi
 import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
+import {Config} from '../../Config';
 
 export class ServiceMiddleware {
   private readonly userRepository: UserRepository;
@@ -80,7 +81,7 @@ export class ServiceMiddleware {
   }
 
   private async _containsService(userIds: string[]) {
-    const userEntities = await this.userRepository.getUsersById(userIds);
+    const userEntities = await this.userRepository.getUsersById(userIds.map(userId => ({id: userId, domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN})));
     return userEntities.some(userEntity => userEntity.isService);
   }
 

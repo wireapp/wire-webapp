@@ -1263,8 +1263,10 @@ export class ConversationRepository {
     }
   }
 
-  addMissingMember(conversationEntity: Conversation, userIds: QualifiedIdOptional[], timestamp: number) {
-    const [sender] = userIds;
+  // TODO(Federation): This code needs to get adjusted to take care of domains.
+  addMissingMember(conversationEntity: Conversation, users: QualifiedIdOptional[], timestamp: number) {
+    const [sender] = users;
+    const userIds = users.map(user => user.id)
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
     return this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.INJECTED);
   }
@@ -2300,9 +2302,11 @@ export class ConversationRepository {
       const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
       (messageEntity as MemberMessage)
         .userEntities()
-        .filter((userEntity: User) => !userEntity.isMe)
-        .forEach((userEntity: User) => {
-          conversationEntity.participating_user_ids.remove(userEntity.id);
+        .filter((userEntity) => !userEntity.isMe)
+        .forEach((userEntity) => {
+          conversationEntity.participating_user_ids.remove((userId) => {
+            return userId.id === userEntity.id && userId.domain == userEntity.domain;
+          });
 
           if (userEntity.isTemporaryGuest()) {
             userEntity.clearExpirationTimeout();
@@ -2745,8 +2749,9 @@ export class ConversationRepository {
 
       messageEntity.reactions_user_ets.removeAll();
       if (userIds.length) {
-        return this.userRepository.getUsersById(userIds).then(userEntities_1 => {
-          messageEntity.reactions_user_ets(userEntities_1);
+        // TODO(Federation): Make code federation-aware.
+        return this.userRepository.getUsersById(userIds.map(userId =>({id: userId, domain: null}))).then(userEntities => {
+          messageEntity.reactions_user_ets(userEntities);
           return messageEntity;
         });
       }

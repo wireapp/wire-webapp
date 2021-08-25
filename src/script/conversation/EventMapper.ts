@@ -872,6 +872,7 @@ export class EventMapper {
   }
 }
 
+// TODO: Method is probably being used for data from backend & database. If yes, it should be split up (Single-responsibility principle).
 function addMetadata<T extends Message>(entity: T, event: EventRecord): T {
   const {data: eventData, read_receipts} = event;
   if (eventData) {

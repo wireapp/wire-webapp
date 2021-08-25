@@ -68,7 +68,7 @@ import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 import {QualifiedPublicUserMap} from '../client/ClientService';
-import {QualifiedIdOptional} from "../conversation/EventBuilder";
+import {QualifiedIdOptional} from '../conversation/EventBuilder';
 
 export class UserRepository {
   private readonly logger: Logger;
@@ -258,11 +258,12 @@ export class UserRepository {
    * Update users matching the given connections.
    */
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
-    const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
+    // TODO(Federation): Include domain as soon as connections to federated backends are supported.
+    const userIds = connectionEntities.map(connectionEntity => ({id: connectionEntity.userId, domain: null}));
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
-      const connectionEntity_1 = connectionEntities.find(({userId}) => userId === userEntity.id);
-      userEntity.connection(connectionEntity_1);
+      const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
+      userEntity.connection(connectionEntity);
     });
     return this.assignAllClients();
   }
@@ -273,7 +274,13 @@ export class UserRepository {
    */
   private async assignAllClients(): Promise<User[]> {
     const recipients = await this.clientRepository.getAllClientsFromDb();
-    const userIds = Object.keys(recipients);
+    const userIds: QualifiedIdOptional[] = Object.entries(recipients).map(([userId, clientEntities]) => {
+      return {
+        id: userId,
+        domain: clientEntities[0].domain,
+      };
+    });
+
     this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
@@ -570,9 +577,9 @@ export class UserRepository {
     const findUsers = userIds.map(userId => this.findUserById(userId) || userId);
 
     const resolveArray = await Promise.all(findUsers);
-    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => typeof item !== 'string') as [
+    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => item instanceof User) as [
       User[],
-      string[],
+      QualifiedIdOptional[],
     ];
 
     if (offline || !unknownUserIds.length) {
