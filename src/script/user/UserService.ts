@@ -111,7 +111,10 @@ export class UserService {
    */
   getUsers(userIds: string[] | QualifiedId[]): Promise<APIClientUser[]> {
     if (isQualifiedIdArray(userIds)) {
-      return this.apiClient.user.api.postListUsers({qualified_ids: userIds});
+      if (!!userIds[0].domain) {
+        return this.apiClient.user.api.postListUsers({qualified_ids: userIds});
+      }
+      return this.apiClient.user.api.getUsers({ids: userIds.map(userId => userId.id)});
     }
     return this.apiClient.user.api.getUsers({ids: userIds});
   }

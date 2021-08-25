@@ -40,7 +40,7 @@ export function isQualifiedIdArray(ids: string[] | QualifiedId[]): ids is Qualif
 }
 
 export function isQualifiedId(userId: string | QualifiedId): userId is QualifiedId {
-  return typeof userId === 'object' && 'domain' in userId && typeof userId.domain === 'string';
+  return typeof userId === 'object' && 'domain' in userId;
 }
 
 export function isConversationEntity(conversation: any): conversation is Conversation {
