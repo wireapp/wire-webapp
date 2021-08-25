@@ -133,37 +133,35 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
-    const entries: ContextMenuEntry[] = [
-      {
-        click: () =>
-          callingRepository.sendModeratorMute(conversation.id, {[participant.user.id]: [participant.clientId]}),
-        icon: 'mic-off-icon',
-        isDisabled:
-          participant.isMuted() || conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
-        label: 'Mute',
-      },
-      {
-        click: () => {
-          const recipients = participants.reduce((acc, {user, clientId}) => {
+
+    const isNotModerator = conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN;
+    if (isNotModerator) {
+      return;
+    }
+
+    const muteParticipant = {
+      click: () =>
+        callingRepository.sendModeratorMute(conversation.id, {[participant.user.id]: [participant.clientId]}),
+      icon: 'mic-off-icon',
+      isDisabled: participant.isMuted(),
+      label: t('moderatorMenuEntryMute'),
+    };
+
+    const muteOthers = {
+      click: () => {
+        const recipients = participants
+          .filter(p => p !== participant)
+          .reduce((acc, {user, clientId}) => {
             acc[user.id] = [...(acc[user.id] || []), clientId];
             return acc;
           }, {} as Record<UserId, ClientId[]>);
-          callingRepository.sendModeratorMute(conversation.id, recipients);
-        },
-        icon: 'mic-off-icon',
-        isDisabled:
-          participants.every(p => p.isMuted()) ||
-          conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
-        label: 'Mute all',
+        callingRepository.sendModeratorMute(conversation.id, recipients);
       },
-      {
-        click: () =>
-          callingRepository.sendModeratorKick(conversation.id, {[participant.user.id]: [participant.clientId]}),
-        icon: 'leave-icon',
-        isDisabled: conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN,
-        label: 'Kick from call',
-      },
-    ];
+      icon: 'mic-off-icon',
+      label: t('moderatorMenuEntryMuteAllOthers'),
+    };
+
+    const entries: ContextMenuEntry[] = [!participant.user.isMe && muteParticipant, muteOthers].filter(Boolean);
     showContextMenu(event.nativeEvent, entries, 'participant-moderator-menu');
   };
 
