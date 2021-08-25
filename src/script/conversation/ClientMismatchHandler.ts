@@ -95,15 +95,15 @@ export class ClientMismatchHandler {
     const {genericMessage, timestamp} = eventInfoEntity;
 
     if (conversationEntity !== undefined) {
-      const knownUserIds = conversationEntity.participating_user_ids();
+      const knownUsers = conversationEntity.participating_user_ids();
       // TODO(Federation): This code does not consider federated environments / conversations as this function is deprecated
-      const unknownUserIds = getDifference(
-        knownUserIds,
-        missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: id})),
-      );
+      const unknownUsers = getDifference(
+        knownUsers.map(user => user.id),
+        missingUserIds,
+      ).map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id}));
 
-      if (unknownUserIds.length > 0) {
-        this.conversationRepositoryProvider().addMissingMember(conversationEntity, unknownUserIds, timestamp - 1);
+      if (unknownUsers.length > 0) {
+        this.conversationRepositoryProvider().addMissingMember(conversationEntity, unknownUsers, timestamp - 1);
       }
     }
 

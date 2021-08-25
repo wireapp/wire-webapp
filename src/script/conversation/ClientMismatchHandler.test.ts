@@ -40,7 +40,7 @@ describe('ClientMismatchHandler', () => {
       client_id: 'edc943ba4d6ef6b1',
       user_id: entities.user.jane_roe.id,
     };
-    const payload = {
+    const payload: NewOTRMessage<string> = {
       recipients: {
         [janeRoe.user_id]: {
           [janeRoe.client_id]: '💣',
@@ -53,7 +53,7 @@ describe('ClientMismatchHandler', () => {
       const knownUserId = johnDoe.user_id;
       const unknownUserId = janeRoe.user_id;
       const conversation = new Conversation(createRandomUuid());
-      conversation.participating_user_ids([knownUserId]);
+      conversation.participating_user_ids([{domain: null, id: knownUserId}]);
 
       const userRepositorySpy: Partial<UserRepository> = {
         addClientToUser: jest.fn(),
@@ -77,7 +77,7 @@ describe('ClientMismatchHandler', () => {
         addMissingMember: jest.fn(),
         getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
         verificationStateHandler: {
-          onClientsAdded: jest.fn(), // params `missingUserIds`
+          onClientsAdded: jest.fn(),
         } as any,
       };
       const cryptographyRepositorySpy: Partial<CryptographyRepository> = {
@@ -107,7 +107,7 @@ describe('ClientMismatchHandler', () => {
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
       expect(conversationRepositorySpy.addMissingMember).toHaveBeenCalledWith(
         conversation,
-        [unknownUserId],
+        [{domain: undefined, id: unknownUserId}],
         timestamp - 1,
       );
     });
