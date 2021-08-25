@@ -55,7 +55,7 @@ export class ArchiveViewModel {
   readonly clickOnConversation = (conversationEntity: Conversation): void => {
     this.conversationRepository.unarchiveConversation(conversationEntity, true, 'opened conversation from archive');
     this.listViewModel.switchList(ListViewModel.STATE.CONVERSATIONS);
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
 
   readonly clickOnClose = (): void => {

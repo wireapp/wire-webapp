@@ -64,22 +64,22 @@ export class Participant {
   readonly doesMatchIds = (userId: UserId, clientId: ClientId): boolean =>
     userId === this.user.id && clientId === this.clientId;
 
-  setAudioStream(audioStream: MediaStream): void {
-    this.releaseStream(this.audioStream());
+  setAudioStream(audioStream: MediaStream, stopTracks: boolean): void {
+    this.releaseStream(this.audioStream(), stopTracks);
     this.audioStream(audioStream);
   }
 
-  setVideoStream(videoStream?: MediaStream): void {
-    this.releaseStream(this.videoStream());
+  setVideoStream(videoStream: MediaStream, stopTracks: boolean): void {
+    this.releaseStream(this.videoStream(), stopTracks);
     this.videoStream(videoStream);
   }
 
-  updateMediaStream(newStream: MediaStream): MediaStream {
+  updateMediaStream(newStream: MediaStream, stopTracks: boolean): MediaStream {
     if (newStream.getVideoTracks().length) {
-      this.setVideoStream(new MediaStream(newStream.getVideoTracks()));
+      this.setVideoStream(new MediaStream(newStream.getVideoTracks()), stopTracks);
     }
     if (newStream.getAudioTracks().length) {
-      this.setAudioStream(new MediaStream(newStream.getAudioTracks()));
+      this.setAudioStream(new MediaStream(newStream.getAudioTracks()), stopTracks);
     }
     return this.getMediaStream();
   }
@@ -90,28 +90,30 @@ export class Participant {
     return new MediaStream(audioTracks.concat(videoTracks));
   }
 
-  releaseVideoStream(): void {
-    this.releaseStream(this.videoStream());
+  releaseVideoStream(stopTracks: boolean): void {
+    this.releaseStream(this.videoStream(), stopTracks);
     this.videoStream(undefined);
   }
 
   releaseAudioStream(): void {
-    this.releaseStream(this.audioStream());
+    this.releaseStream(this.audioStream(), true);
     this.audioStream(undefined);
   }
 
-  releaseMediaStream(): void {
-    this.releaseVideoStream();
+  releaseMediaStream(stopTracks: boolean): void {
+    this.releaseVideoStream(stopTracks);
     this.releaseAudioStream();
   }
 
-  private releaseStream(mediaStream?: MediaStream): void {
+  private releaseStream(mediaStream: MediaStream, stopTracks: boolean): void {
     if (!mediaStream) {
       return;
     }
 
     mediaStream.getTracks().forEach(track => {
-      track.stop();
+      if (stopTracks) {
+        track.stop();
+      }
       mediaStream.removeTrack(track);
     });
   }

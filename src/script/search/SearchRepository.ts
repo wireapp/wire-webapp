@@ -94,10 +94,8 @@ export class SearchRepository {
       const values = properties
         .slice()
         .reverse()
-        .map(property =>
-          typeof (userEntity as any)[property] === 'function'
-            ? (userEntity as any)[property]()
-            : (userEntity as any)[property],
+        .map((property: keyof User) =>
+          typeof userEntity[property] === 'function' ? (userEntity[property] as Function)() : userEntity[property],
         );
 
       const uniqueValues = Array.from(new Set(values));

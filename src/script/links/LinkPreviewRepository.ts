@@ -152,7 +152,7 @@ export class LinkPreviewRepository {
     try {
       const data = await window.openGraphAsync(link);
       if (data) {
-        return Object.entries(data).reduce<OpenGraphResult>((result, [key, value]) => {
+        return Object.entries(data).reduce((result, [key, value]) => {
           result[key] = Array.isArray(value) ? value[0] : value;
           return result;
         }, {} as OpenGraphResult);

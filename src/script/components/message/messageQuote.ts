@@ -173,9 +173,9 @@ ko.components.register('message-quote', {
         </div>
         <!-- ko foreach: {data: quotedMessage().assets, as: 'asset', afterRender: updateCanShowMore} -->
           <!-- ko if: asset.isImage() -->
-              <div class="message-quote__image" data-bind="background_image: asset.resource(), click: (data, event) => $parent.showDetail($parent.quotedMessage(), event)" data-uie-name="media-picture-quote">
-                <img data-bind="attr: {src: asset.dummy_url}"/>
-              </div>
+            <div data-uie-name="media-picture-quote">
+              <image-component params="click: (data, event) => $parent.showDetail($parent.quotedMessage(), event), className: 'message-quote__image', asset: asset.resource()"></image-component>
+            </div>
           <!-- /ko -->
 
           <!-- ko if: asset.isText() -->
@@ -197,7 +197,7 @@ ko.components.register('message-quote', {
           <!-- /ko -->
 
           <!-- ko if: asset.isAudio() -->
-            <audio-asset class="message-quote__audio" params="message: $parent.quotedMessage" data-uie-name="media-audio-quote"></audio-asset>
+            <audio-asset params="message: $parent.quotedMessage, className: 'message-quote__audio'" data-uie-name="media-audio-quote"></audio-asset>
           <!-- /ko -->
 
           <!-- ko if: asset.isFile() -->

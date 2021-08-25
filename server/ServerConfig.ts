@@ -20,8 +20,10 @@ export interface ServerConfig {
       ENABLE_DEBUG: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
       ENABLE_FEDERATION: boolean;
+      ENABLE_MEDIA_EMBEDS: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
+      ENFORCE_CONSTANT_BITRATE: boolean;
       FEDERATION_DOMAIN: string;
       PERSIST_TEMPORARY_CLIENTS: boolean;
       SHOW_LOADING_INFORMATION: boolean;
@@ -32,6 +34,7 @@ export interface ServerConfig {
     URL: {
       ACCOUNT_BASE: string;
       MOBILE_BASE: string;
+      PRICING: string;
       PRIVACY_POLICY: string;
       SUPPORT: {
         BUG_REPORT: string;

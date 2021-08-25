@@ -17,8 +17,8 @@
  *
  */
 
-import {Confirmation} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data/ConversationReceiptModeUpdateData';
 import ko from 'knockout';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -182,7 +182,7 @@ export class GroupCreationViewModel {
 
       const accessState = this.isTeam() ? this.accessState() : undefined;
       const options = {
-        receipt_mode: this.enableReadReceipts() ? Confirmation.Type.READ : Confirmation.Type.DELIVERED,
+        receipt_mode: this.enableReadReceipts() ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
       };
 
       try {
@@ -194,7 +194,7 @@ export class GroupCreationViewModel {
         );
         this.isShown(false);
 
-        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+        amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
       } catch (error) {
         this.isCreatingConversation = false;
         throw error;

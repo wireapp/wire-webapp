@@ -24,15 +24,17 @@ import {CSS_SQUARE, CSS_FLEX_CENTER} from 'Util/CSSMixin';
 import type {User} from '../../entity/User';
 
 export interface GroupAvatarProps {
+  className?: string;
   isLight?: boolean;
   users: User[];
 }
 
-const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false}) => {
+const GroupAvatar: React.FC<GroupAvatarProps> = ({users, isLight = false, className}) => {
   const slicedUsers = users.slice(0, 4);
 
   return (
     <div
+      className={className}
       css={{
         ...CSS_SQUARE(32),
         border: isLight ? '1px solid var(--background-fade-8)' : '1px solid hsla(0, 0%, 100%, 0.12)',

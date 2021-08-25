@@ -27,7 +27,7 @@ import TestPage from 'Util/test/TestPage';
 import {Call} from 'src/script/calling/Call';
 import {Participant} from 'src/script/calling/Participant';
 import {Conversation} from 'src/script/entity/Conversation';
-import {CallingCellProps, ConversationListCallingCell} from './ConversationListCallingCell';
+import ConversationListCallingCell, {CallingCellProps} from './ConversationListCallingCell';
 import {User} from 'src/script/entity/User';
 import {MediaDevicesHandler} from 'src/script/media/MediaDevicesHandler';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
@@ -46,7 +46,11 @@ class ConversationListCallingCellPage extends TestPage<CallingCellProps> {
   getCallDuration = () => this.get('[data-uie-name="call-duration"]');
 }
 
-const createCall = (state: CALL_STATE, selfUser = new User(createRandomUuid()), selfClientId = createRandomUuid()) => {
+const createCall = (
+  state: CALL_STATE,
+  selfUser = new User(createRandomUuid(), null),
+  selfClientId = createRandomUuid(),
+) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call('', '', 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {
@@ -67,7 +71,7 @@ const createProps = async () => {
   };
 
   const conversation = new Conversation();
-  conversation.participating_user_ets([new User('id')]);
+  conversation.participating_user_ets([new User('id', null)]);
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,

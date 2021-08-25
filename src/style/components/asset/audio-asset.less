@@ -17,11 +17,38 @@
  *
  */
 
-audio-asset {
+.audio-asset {
   .asset-container-style;
 
   flex-wrap: wrap;
   padding: 12px;
+}
+
+.audio-restricted {
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+
+  &__icon {
+    margin-left: 4px;
+  }
+
+  &__description {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 16px;
+    line-height: 1em;
+
+    &__headline {
+      .label-bold-xs;
+    }
+
+    &__message {
+      .label-xs;
+      .text-foreground;
+    }
+  }
 }
 
 .audio-controls {

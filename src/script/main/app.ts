@@ -127,6 +127,7 @@ import type {BaseError} from '../error/BaseError';
 import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
 import CallingContainer from 'Components/calling/CallingOverlayContainer';
+import {TeamError} from '../error/TeamError';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -164,7 +165,12 @@ class App {
       },
       NOTIFICATION_CHECK: TIME_IN_MILLIS.SECOND * 10,
       SIGN_OUT_REASONS: {
-        IMMEDIATE: [SIGN_OUT_REASON.ACCOUNT_DELETED, SIGN_OUT_REASON.CLIENT_REMOVED, SIGN_OUT_REASON.SESSION_EXPIRED],
+        IMMEDIATE: [
+          SIGN_OUT_REASON.NO_APP_CONFIG,
+          SIGN_OUT_REASON.ACCOUNT_DELETED,
+          SIGN_OUT_REASON.CLIENT_REMOVED,
+          SIGN_OUT_REASON.SESSION_EXPIRED,
+        ],
         TEMPORARY_GUEST: [
           SIGN_OUT_REASON.MULTIPLE_TABS,
           SIGN_OUT_REASON.SESSION_EXPIRED,
@@ -542,6 +548,10 @@ class App {
           this.logger.warn(`Redirecting to login: ${error.message}`, error);
           return this._redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
         }
+        case TeamError.TYPE.NO_APP_CONFIG: {
+          this.logger.warn(`Logging out user: ${error.message}`, error);
+          return this._redirectToLogin(SIGN_OUT_REASON.NO_APP_CONFIG);
+        }
 
         default: {
           this.logger.error(`Caused by: ${(error ? error.message : undefined) || error}`, error);
@@ -673,20 +683,21 @@ class App {
     } else if (this.repository.user.shouldChangeUsername()) {
       mainView.list.showTakeover();
     } else if (conversationEntity) {
-      mainView.content.showConversation(conversationEntity);
+      mainView.content.showConversation(conversationEntity, {});
     } else if (this.repository.user['userState'].connectRequests().length) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.CONNECTION_REQUESTS);
     }
 
     const router = new Router({
-      '/conversation/:conversationId': conversationId => mainView.content.showConversation(conversationId),
+      '/conversation/:conversationId(/:domain)': (conversationId: string, domain?: string) =>
+        mainView.content.showConversation(conversationId, {}, domain),
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/user/:userId': userId => {
-        mainView.content.userModal.showUser(userId, () => router.navigate('/'));
+      '/user/:userId(/:domain)': (userId: string, domain?: string) => {
+        mainView.content.userModal.showUser(userId, domain, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);

@@ -201,7 +201,7 @@ export class PreferencesAccountViewModel {
     this.userRepository.changeAccentColor(id);
   };
 
-  changeName = async (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+  changeName = async (_viewModel: unknown, event: ChangeEvent<HTMLInputElement>): Promise<void> => {
     const newName = event.target.value.trim();
 
     const isUnchanged = newName === this.selfUser().name();
@@ -356,8 +356,8 @@ export class PreferencesAccountViewModel {
     });
   };
 
-  readonly clickOnAvailability = (viewModel: unknown, event: MouseEvent) => {
-    AvailabilityContextMenu.show(event, 'settings', 'preferences-account-availability-menu');
+  readonly clickOnAvailability = (_viewModel: unknown, event: MouseEvent) => {
+    AvailabilityContextMenu.show(event, 'preferences-account-availability-menu');
   };
 
   readonly clickOnBackupExport = (): void => {
@@ -365,7 +365,7 @@ export class PreferencesAccountViewModel {
     amplify.publish(WebAppEvents.BACKUP.EXPORT.START);
   };
 
-  readonly onImportFileChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): void => {
+  readonly onImportFileChange = (_viewModel: unknown, event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files[0];
     if (file) {
       amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.HISTORY_IMPORT);
@@ -492,7 +492,7 @@ export class PreferencesAccountViewModel {
 
   readonly shouldFocusUsername = (): boolean => this.userRepository.shouldSetUsername;
 
-  readonly verifyUsername = (username: string, event: ChangeEvent<HTMLInputElement>): void => {
+  readonly verifyUsername = (_username: string, event: ChangeEvent<HTMLInputElement>): void => {
     const enteredUsername = event.target.value.toLowerCase();
 
     const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
@@ -535,20 +535,20 @@ export class PreferencesAccountViewModel {
     this.submittedUsername(null);
   };
 
-  readonly onReadReceiptsChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
+  readonly onReadReceiptsChange = (_viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
     const mode = isChecked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key, mode);
     return true;
   };
 
-  readonly onChangeAppLockEnabled = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
+  readonly onChangeAppLockEnabled = (_viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
     this.appLockRepository.setEnabled(isChecked);
     return true;
   };
 
-  readonly onMarketingConsentChange = (viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
+  readonly onMarketingConsentChange = (_viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
     const mode = isChecked ? ConsentValue.GIVEN : ConsentValue.NOT_GIVEN;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_MARKETING_CONSENT.key, mode);

@@ -27,7 +27,7 @@ import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
-import {Context, ContextMenuEntry} from '../ui/ContextMenu';
+import {showContextMenu as showContext, ContextMenuEntry} from '../ui/ContextMenu';
 import type {ContentMessage} from '../entity/message/ContentMessage';
 import type {CompositeMessage} from '../entity/message/CompositeMessage';
 import {StatusType} from '../message/StatusType';
@@ -40,13 +40,18 @@ import type {DecryptErrorMessage} from '../entity/message/DecryptErrorMessage';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
 import {AssetRepository} from '../assets/AssetRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
+import {TeamState} from '../team/TeamState';
 
-import './asset/audioAsset';
+import './asset/AudioAsset';
+import './asset/RestrictedAudio';
 import './asset/FileAssetComponent';
-import './asset/imageAsset';
+import './asset/ImageAsset';
+import './asset/RestrictedImage';
 import './asset/LinkPreviewAssetComponent';
 import './asset/LocationAsset';
-import './asset/videoAsset';
+import './asset/VideoAsset';
+import './asset/RestrictedFile';
+import './asset/RestrictedVideo';
 import './asset/MessageButton';
 import './message/VerificationMessage';
 import './message/CallMessage';
@@ -60,6 +65,8 @@ import './message/SystemMessage';
 import './message/MemberMessage';
 import './message/ReadReceiptStatus';
 import './message/PingMessage';
+import './message/MessageFooterLike';
+import './message/MessageLike';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -86,6 +93,7 @@ interface MessageParams {
   selfId: ko.Observable<string>;
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
+  teamState?: TeamState;
 }
 
 class Message {
@@ -119,6 +127,7 @@ class Message {
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
   StatusType: typeof StatusType;
+  teamState: TeamState;
 
   constructor(
     {
@@ -146,6 +155,7 @@ class Message {
       conversationRepository,
       messageRepository,
       actionsViewModel,
+      teamState = container.resolve(TeamState),
     }: MessageParams,
     componentInfo: {element: HTMLElement},
   ) {
@@ -202,15 +212,25 @@ class Message {
       const messageEntity = this.message;
       const entries: ContextMenuEntry[] = [];
 
+      const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
+
       const canDelete =
-        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
+        messageEntity.user().isMe &&
+        !this.conversation().removed_from_conversation() &&
+        messageEntity.isDeletable() &&
+        !this.conversation().isFederated();
+
+      const canEdit =
+        messageEntity.isEditable() &&
+        !this.conversation().removed_from_conversation() &&
+        !this.conversation().isFederated();
 
       const hasDetails =
         !this.conversation().is1to1() &&
         !messageEntity.isEphemeral() &&
         !this.conversation().removed_from_conversation();
 
-      if (messageEntity.isDownloadable()) {
+      if (messageEntity.isDownloadable() && !isRestrictedFileShare) {
         entries.push({
           click: () => messageEntity.download(container.resolve(AssetRepository)),
           label: t('conversationContextMenuDownload'),
@@ -226,7 +246,7 @@ class Message {
         });
       }
 
-      if (messageEntity.isEditable() && !this.conversation().removed_from_conversation()) {
+      if (canEdit) {
         entries.push({
           click: () => amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.EDIT, messageEntity),
           label: t('conversationContextMenuEdit'),
@@ -240,7 +260,7 @@ class Message {
         });
       }
 
-      if (messageEntity.isCopyable()) {
+      if (messageEntity.isCopyable() && !isRestrictedFileShare) {
         entries.push({
           click: () => messageEntity.copy(),
           label: t('conversationContextMenuCopy'),
@@ -288,7 +308,7 @@ class Message {
 
   showContextMenu(event: MouseEvent) {
     const entries = this.contextMenuEntries();
-    Context.from(event, entries, 'message-options-menu');
+    showContext(event, entries, 'message-options-menu');
   }
 }
 
@@ -360,7 +380,7 @@ const normalTemplate: string = `
         <video-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-movie': message.isObfuscated()}" params="message: message"></video-asset>
       <!-- /ko -->
       <!-- ko if: asset.isAudio() -->
-        <audio-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message"></audio-asset>
+        <audio-asset data-bind="css: {'ephemeral-asset-expired': message.isObfuscated()}" params="message: message, className: 'message-asset'"></audio-asset>
       <!-- /ko -->
       <!-- ko if: asset.isFile() -->
         <file-asset class="message-asset" data-bind="css: {'ephemeral-asset-expired icon-file': message.isObfuscated()}" params="message: message"></file-asset>
@@ -374,12 +394,7 @@ const normalTemplate: string = `
     <!-- /ko -->
 
     <!-- ko if: !message.other_likes().length && message.isReactable() -->
-      <div class="message-body-like">
-        <span class="message-body-like-icon like-button message-show-on-hover" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: () => onLike(message)">
-          <span class="icon-like-small"></span>
-          <span class="icon-liked-small"></span>
-        </span>
-      </div>
+        <message-like class="message-body-like" params="className: 'message-body-like-icon like-button message-show-on-hover', message: message, onLike: onLike"></message-like>
     <!-- /ko -->
 
     <div class="message-body-actions">
@@ -397,17 +412,7 @@ const normalTemplate: string = `
 
   </div>
   <!-- ko if: message.other_likes().length -->
-    <div class="message-footer">
-      <div class="message-footer-icon">
-        <span class="like-button" data-bind="attr: {'data-ui-value': message.is_liked()}, css: {'like-button-liked': message.is_liked()}, style: {opacity: message.is_liked() ? 1 : ''}, click: () => onLike(message)">
-          <span class="icon-like-small"></span>
-          <span class="icon-liked-small"></span>
-        </span>
-      </div>
-      <div class="message-footer-label " data-bind="css: {'cursor-pointer': !conversation().is1to1()}, click: !conversation().is1to1() ? onClickLikes : null ">
-        <span class="font-size-xs text-foreground" data-bind="text: message.like_caption(), attr: {'data-uie-value': message.reactions_user_ids()}"  data-uie-name="message-liked-names"></span>
-      </div>
-    </div>
+    <message-footer-like params="message: message, is1to1Conversation: conversation().is1to1(), onLike: onLike, onClickLikes: onClickLikes"></message-footer-like>
   <!-- /ko -->
   `;
 

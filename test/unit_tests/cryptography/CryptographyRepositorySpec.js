@@ -28,6 +28,7 @@ import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {ClientEvent} from 'src/script/event/Client';
 import {TestFactory} from '../../helper/TestFactory';
 import {CryptographyError} from 'src/script/error/CryptographyError';
+import {entities} from '../../api/payloads';
 
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
@@ -114,40 +115,7 @@ describe('CryptographyRepository', () => {
       const fingerprint = await testFactory.cryptography_repository.getRemoteFingerprint(userId, clientId, preKey);
 
       // eslint-disable-next-line
-      expect(fingerprint).toEqual([
-        'c1',
-        '09',
-        '9e',
-        '49',
-        '5b',
-        '7c',
-        '51',
-        '6f',
-        '9c',
-        '50',
-        'b8',
-        'd6',
-        'b9',
-        'a3',
-        '0c',
-        'ca',
-        'b1',
-        'e8',
-        'bd',
-        '28',
-        '55',
-        '7e',
-        '51',
-        '31',
-        'a6',
-        'f7',
-        'b8',
-        '6c',
-        '01',
-        '81',
-        'b9',
-        '1a',
-      ]);
+      expect(fingerprint).toEqual('c1099e495b7c516f9c50b8d6b9a30ccab1e8bd28557e5131a6f7b86c0181b91a');
     });
   });
 

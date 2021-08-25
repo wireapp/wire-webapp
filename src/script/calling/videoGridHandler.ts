@@ -17,7 +17,9 @@
  *
  */
 
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {useEffect, useState} from 'react';
+
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import type {Participant} from '../calling/Participant';
 import {Call} from './Call';
@@ -28,31 +30,41 @@ export interface Grid {
 }
 
 export function getGrid(call: Call) {
-  if (call.pages().length > 1) {
+  const videoParticipants = call.pages()[call.currentPage()]?.filter(p => p.hasActiveVideo());
+  const selfParticipant = call.getSelfParticipant();
+
+  if (selfParticipant?.hasActiveVideo() && videoParticipants?.length === 2) {
     return {
-      grid: call.pages()[call.currentPage()],
-      thumbnail: null,
+      grid: videoParticipants.slice(1),
+      thumbnail: selfParticipant,
     };
   }
-
-  let inGridParticipants: Participant[];
-  let thumbnailParticipant: Participant | null;
-  const selfParticipant = call.getSelfParticipant();
-  const remoteParticipants = call
-    .getRemoteParticipants()
-    .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
-  const remoteVideoParticipants = remoteParticipants.filter(participant => participant.hasActiveVideo());
-
-  if (remoteParticipants.length === 1 && remoteVideoParticipants.length === 1) {
-    inGridParticipants = remoteParticipants;
-    thumbnailParticipant = selfParticipant;
-  } else {
-    inGridParticipants = [selfParticipant, ...remoteParticipants];
-    thumbnailParticipant = null;
-  }
-
   return {
-    grid: inGridParticipants.filter(p => p?.hasActiveVideo()),
-    thumbnail: thumbnailParticipant?.hasActiveVideo() ? thumbnailParticipant : null,
+    grid: videoParticipants ?? [],
+    thumbnail: null,
   };
 }
+
+export const useVideoGrid = (call: Call): Grid => {
+  const [grid, setGrid] = useState<Grid>();
+  const {participants, currentPage, pages} = useKoSubscribableChildren(call, ['participants', 'currentPage', 'pages']);
+
+  useEffect(() => {
+    if (!call) {
+      return setGrid(undefined);
+    }
+    const updateGrid = () => {
+      call.updatePages();
+      setGrid(getGrid(call));
+    };
+    updateGrid();
+    const nameSubscriptions = participants?.map(p => p.user.name.subscribe(updateGrid));
+    const videoSubscriptions = participants?.map(p => p.hasActiveVideo.subscribe(updateGrid));
+    return () => {
+      nameSubscriptions?.forEach(s => s.dispose());
+      videoSubscriptions?.forEach(s => s.dispose());
+    };
+  }, [participants, participants?.length, call, currentPage, pages?.length]);
+
+  return grid;
+};

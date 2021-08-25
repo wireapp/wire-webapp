@@ -33,6 +33,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import React, {useEffect, useState} from 'react';
 import {useIntl} from 'react-intl';
+import {splitFingerprint} from 'Util/StringUtil';
 import {clientItemStrings} from '../../strings';
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
@@ -75,10 +76,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     }
   }, [selected]);
 
-  const formatId = (id = '?', outputLength = 16) => {
-    const paddedId = id.padStart(outputLength, '0');
-    return paddedId.toUpperCase().replace(/(..)/g, '$1 ');
-  };
+  const formatId = (id = '?') => splitFingerprint(id).join(' ');
 
   const executeAnimateIn = (): void => {
     setAnimationStep(step => {

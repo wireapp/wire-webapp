@@ -43,6 +43,7 @@ import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
 import {ClientState} from './ClientState';
+import {Config} from '../Config';
 
 export type QualifiedUserClientMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
 
@@ -84,8 +85,8 @@ export class ClientRepository {
   // Service interactions
   //##############################################################################
 
-  private deleteClientFromDb(userId: string, clientId: string): Promise<string> {
-    return this.clientService.deleteClientFromDb(this.constructPrimaryKey(userId, clientId));
+  private deleteClientFromDb(userId: string, clientId: string, domain: string | null): Promise<string> {
+    return this.clientService.deleteClientFromDb(this.constructPrimaryKey(userId, clientId, domain));
   }
 
   /**
@@ -162,15 +163,17 @@ export class ClientRepository {
    *
    * @param userId User ID from the owner of the client
    * @param clientId ID of the client
-   * @returns Primary key
+   * @param domain Domain of the remote participant (only available in federation-aware webapps)
    */
-  private constructPrimaryKey(userId: string, clientId: string): string {
-    if (!userId) {
-      throw new ClientError(ClientError.TYPE.NO_USER_ID, ClientError.MESSAGE.NO_USER_ID);
+  private constructPrimaryKey(userId: string, clientId: string, domain: string | null): string {
+    /**
+     * For backward compatibility: We store clients with participants from our own domain without a domain in the session ID (legacy session ID format).
+     * All other clients (from users on a different domain/remote backends) will be saved with a domain in their primary key.
+     */
+    if (Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN !== domain) {
+      return domain ? `${domain}@${userId}@${clientId}` : `${userId}@${clientId}`;
     }
-    if (!clientId) {
-      throw new ClientError(ClientError.TYPE.NO_CLIENT_ID, ClientError.MESSAGE.NO_CLIENT_ID);
-    }
+
     return `${userId}@${clientId}`;
   }
 
@@ -182,7 +185,7 @@ export class ClientRepository {
    * @returns Resolves with the record stored in database
    */
   saveClientInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
-    const primaryKey = this.constructPrimaryKey(userId, clientPayload.id);
+    const primaryKey = this.constructPrimaryKey(userId, clientPayload.id, clientPayload.domain);
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
@@ -193,10 +196,16 @@ export class ClientRepository {
    * @param userId User ID of the client owner
    * @param clientId Client ID which needs to get updated
    * @param changes New values which should be updated on the client
+   * @param domain Domain of the remote participant (only available in federation-aware webapps)
    * @returns Number of updated records
    */
-  private updateClientInDb(userId: string, clientId: string, changes: Partial<ClientRecord>): Promise<number> {
-    const primaryKey = this.constructPrimaryKey(userId, clientId);
+  private updateClientInDb(
+    userId: string,
+    clientId: string,
+    changes: Partial<ClientRecord>,
+    domain: string | null,
+  ): Promise<number> {
+    const primaryKey = this.constructPrimaryKey(userId, clientId, domain);
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
     return this.clientService.updateClientInDb(primaryKey, changes);
@@ -211,7 +220,7 @@ export class ClientRepository {
    * @returns Resolves when the verification state has been updated
    */
   async verifyClient(userId: string, clientEntity: ClientEntity, isVerified: boolean): Promise<void> {
-    await this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}});
+    await this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}}, clientEntity.domain);
     clientEntity.meta.isVerified(isVerified);
     amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
   }
@@ -226,7 +235,7 @@ export class ClientRepository {
   private updateClientSchemaInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
     clientPayload.meta = {
       is_verified: false,
-      primary_key: this.constructPrimaryKey(userId, clientPayload.id),
+      primary_key: this.constructPrimaryKey(userId, clientPayload.id, clientPayload.domain),
     };
     return this.saveClientInDb(userId, clientPayload);
   }
@@ -298,7 +307,7 @@ export class ClientRepository {
    */
   async deleteClient(clientId: string, password: string): Promise<ClientEntity[]> {
     await this.clientService.deleteClient(clientId, password);
-    await this.deleteClientFromDb(this.selfUser().id, clientId);
+    await this.deleteClientFromDb(this.selfUser().id, clientId, this.selfUser().domain);
     this.selfUser().removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
     return this.clientState.clients();
@@ -341,9 +350,9 @@ export class ClientRepository {
    * @param clientId ID of client to be deleted
    * @returns Resolves when a client and its session have been deleted
    */
-  async removeClient(userId: string, clientId: string): Promise<string> {
-    await this.cryptographyRepository.deleteSession(userId, clientId);
-    return this.deleteClientFromDb(userId, clientId);
+  async removeClient(userId: string, clientId: string, domain: string | null): Promise<string> {
+    await this.cryptographyRepository.deleteSession(userId, clientId, domain);
+    return this.deleteClientFromDb(userId, clientId, domain);
   }
 
   /**
@@ -371,7 +380,7 @@ export class ClientRepository {
               if (!clientEntityMap[domain]) {
                 clientEntityMap[domain] = {};
               }
-              clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients);
+              clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients, true, domain);
             }),
           ),
         ),
@@ -419,7 +428,7 @@ export class ClientRepository {
    */
   async updateClientsForSelf(): Promise<ClientEntity[]> {
     const clientsData = await this.clientService.getClients();
-    return this.updateClientsOfUserById(this.selfUser().id, clientsData, false);
+    return this.updateClientsOfUserById(this.selfUser().id, clientsData, false, this.selfUser().domain);
   }
 
   /**
@@ -436,6 +445,7 @@ export class ClientRepository {
     userId: string,
     clientsData: RegisteredClient[] | PublicClient[],
     publish: boolean = true,
+    domain: string | null,
   ): Promise<ClientEntity[]> {
     const clientsFromBackend: Record<string, RegisteredClient | PublicClient> = {};
     const clientsStoredInDb: ClientRecord[] = [];
@@ -461,7 +471,7 @@ export class ClientRepository {
 
             if (this.clientState.currentClient() && this.isCurrentClient(userId, clientId)) {
               this.logger.warn(`Removing duplicate self client '${clientId}' locally`);
-              this.removeClient(userId, clientId);
+              this.removeClient(userId, clientId, domain);
             }
 
             // Locally known client changed on backend
@@ -478,7 +488,7 @@ export class ClientRepository {
 
           // Locally known client deleted on backend
           this.logger.warn(`Removing client '${clientId}' of user '${userId}' locally`);
-          this.removeClient(userId, clientId);
+          this.removeClient(userId, clientId, domain);
         }
 
         for (const clientId in clientsFromBackend) {

@@ -22,7 +22,6 @@ import cx from 'classnames';
 
 import {interpolate} from 'Util/ArrayUtil';
 import {clamp} from 'Util/NumberUtil';
-import {registerReactComponent} from 'Util/ComponentUtil';
 
 import {FileAsset} from '../../../entity/message/FileAsset';
 import {createRandomUuid} from 'Util/util';
@@ -53,11 +52,11 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
   }, [asset]);
 
   useEffect(() => {
-    audioElement.addEventListener('ended', onAudioEnded);
-    audioElement.addEventListener('timeupdate', onTimeUpdate);
+    audioElement?.addEventListener('ended', onAudioEnded);
+    audioElement?.addEventListener('timeupdate', onTimeUpdate);
     return () => {
-      audioElement.removeEventListener('ended', onAudioEnded);
-      audioElement.removeEventListener('timeupdate', onTimeUpdate);
+      audioElement?.removeEventListener('ended', onAudioEnded);
+      audioElement?.removeEventListener('timeupdate', onTimeUpdate);
     };
   }, [audioElement]);
 
@@ -102,13 +101,14 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
 
   return (
     <svg
-      className={cx({'element-disabled': disabled})}
+      className={cx('audio-seek-bar', {'element-disabled': disabled})}
       width="100%"
       height="100%"
       viewBox="0 0 1 1"
       preserveAspectRatio="none"
       ref={svgNode}
       onClick={onLevelClick}
+      data-uie-name="status-audio-seekbar"
     >
       <clipPath id={clipId}>
         <rect x={0} y={0} height={1} width={position} />
@@ -120,8 +120,3 @@ const AudioSeekBar: React.FC<AudioSeekBarProps> = ({asset, audioElement, disable
 };
 
 export default AudioSeekBar;
-
-registerReactComponent('audio-seek-bar', {
-  bindings: 'asset, disabled: ko.unwrap(disabled), audioElement: src',
-  component: AudioSeekBar,
-});

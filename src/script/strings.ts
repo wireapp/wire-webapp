@@ -379,11 +379,11 @@ export const conversationJoinStrings = defineMessages({
     id: 'conversationJoin.existentAccountSubhead',
   },
   fullConversationHeadline: {
-    defaultMessage: 'This {brandName} conversation is full.',
+    defaultMessage: 'Unable to join conversation',
     id: 'conversationJoin.fullConversationHeadline',
   },
   fullConversationSubhead: {
-    defaultMessage: 'Talk to the person who invited you.',
+    defaultMessage: 'The maximum number of participants in this conversation has been reached.',
     id: 'conversationJoin.fullConversationSubhead',
   },
   hasAccount: {
@@ -765,6 +765,10 @@ export const logoutReasonStrings = defineMessages({
   [LOGOUT_REASON.CLIENT_REMOVED]: {
     defaultMessage: 'You were signed out because your device was deleted.',
     id: 'LOGOUT_REASON.CLIENT_REMOVED',
+  },
+  [LOGOUT_REASON.NO_APP_CONFIG]: {
+    defaultMessage: 'You were signed out because the initial configuration could not be loaded.',
+    id: 'LOGOUT_REASON.NO_APP_CONFIG',
   },
   [LOGOUT_REASON.SESSION_EXPIRED]: {
     defaultMessage: 'You were signed out because your session expired.{newline}Please log in again.',

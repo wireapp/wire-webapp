@@ -20,11 +20,12 @@
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
-import {chunk} from 'Util/ArrayUtil';
+import {chunk, partition} from 'Util/ArrayUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
+import {Config} from '../Config';
 
 export type ConversationId = string;
 
@@ -48,7 +49,9 @@ export class Call {
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
-  public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(false);
+  public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(
+    Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE,
+  );
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
   public blockMessages: boolean = false;
   public type?: CALL_MESSAGE_TYPE;
@@ -104,6 +107,11 @@ export class Call {
 
   removeAudio(audioId: string) {
     this.releaseStream(this.audios[audioId]?.stream);
+    const audioElement = this.audios[audioId]?.audioElement;
+    if (audioElement) {
+      audioElement.remove();
+      audioElement.srcObject = null;
+    }
     delete this.audios[audioId];
   }
 
@@ -128,6 +136,10 @@ export class Call {
     Object.values(this.audios).forEach(audio => {
       if ((audio.audioElement?.srcObject as MediaStream)?.active) {
         return;
+      }
+      if (audio.audioElement?.srcObject) {
+        audio.audioElement.remove();
+        audio.audioElement.srcObject = null;
       }
       const audioElement = new Audio();
       audioElement.srcObject = audio.stream;
@@ -196,15 +208,16 @@ export class Call {
 
   updatePages() {
     const selfParticipant = this.getSelfParticipant();
-    const remoteParticipants = this.getRemoteParticipants()
-      .sort((p1, p2) => sortUsersByPriority(p1.user, p2.user))
-      .sort((p1, p2) => (p1.hasActiveVideo() === p2.hasActiveVideo() ? 0 : p1.hasActiveVideo() ? -1 : 1));
+    const remoteParticipants = this.getRemoteParticipants().sort((p1, p2) => sortUsersByPriority(p1.user, p2.user));
 
-    const newPages = chunk<Participant>([selfParticipant, ...remoteParticipants], NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE);
+    const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.hasActiveVideo());
 
-    if (newPages.length < this.pages().length) {
-      this.currentPage(newPages.length - 1);
-    }
+    const newPages = chunk<Participant>(
+      [selfParticipant, ...withVideo, ...withoutVideo].filter(Boolean),
+      NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE,
+    );
+
+    this.currentPage(Math.min(this.currentPage(), newPages.length - 1));
     this.pages(newPages);
   }
 }

@@ -505,6 +505,7 @@ export class EventRepository {
       case EVENT_TYPE.CONVERSATION:
         amplify.publish(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, event, source);
         break;
+      case EVENT_TYPE.FEATURE_CONFIG:
       case EVENT_TYPE.TEAM:
         amplify.publish(WebAppEvents.TEAM.EVENT_FROM_BACKEND, event, source);
         break;

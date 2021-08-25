@@ -22,7 +22,7 @@ import ko from 'knockout';
 import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -67,7 +67,6 @@ enum TIMESTAMP_TYPE {
 }
 
 export class Conversation {
-  [key: string]: any;
   public readonly archivedState: ko.Observable<boolean>;
   private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
   private readonly isManaged: boolean;
@@ -98,7 +97,7 @@ export class Conversation {
   public readonly hasLegalHold: ko.Computed<boolean>;
   public readonly hasService: ko.PureComputed<boolean>;
   public readonly hasUnread: ko.PureComputed<boolean>;
-  public readonly id: string;
+  public id: string;
   public readonly inTeam: ko.PureComputed<boolean>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
@@ -143,13 +142,20 @@ export class Conversation {
   public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
   public readonly withAllTeamMembers: ko.Observable<boolean>;
+  public readonly hasExternal: ko.PureComputed<boolean>;
+  public accessModes?: CONVERSATION_ACCESS[];
+  public accessRole?: CONVERSATION_ACCESS_ROLE;
+  public domain?: string;
+  public isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
   }
 
-  constructor(conversation_id: string = '') {
+  constructor(conversation_id: string = '', domain?: string) {
     this.id = conversation_id;
+
+    this.domain = domain;
 
     this.logger = getLogger(`Conversation (${this.id})`);
 
@@ -294,6 +300,8 @@ export class Conversation {
     this.isCreatedBySelf = ko.pureComputed(
       () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
     );
+
+    this.isFederated = ko.pureComputed(() => Config.getConfig().FEATURE.ENABLE_FEDERATION && !!this.domain);
 
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
@@ -491,6 +499,14 @@ export class Conversation {
 
   get allUserEntities() {
     return [this.selfUser()].concat(this.participating_user_ets());
+  }
+
+  get isRemoteConversation(): boolean {
+    if (!Config.getConfig().FEATURE.ENABLE_FEDERATION || typeof this.domain === 'undefined') {
+      return false;
+    }
+
+    return this.domain !== Config.getConfig().FEATURE.FEDERATION_DOMAIN;
   }
 
   readonly persistState = (): void => {
@@ -908,6 +924,7 @@ export class Conversation {
       archived_timestamp: this.archivedTimestamp(),
       cleared_timestamp: this.cleared_timestamp(),
       creator: this.creator,
+      domain: this.domain,
       ephemeral_timer: this.localMessageTimer(),
       global_message_timer: this.globalMessageTimer(),
       id: this.id,
