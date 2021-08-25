@@ -61,7 +61,7 @@ export const useVideoGrid = (call: Call): Grid => {
       nameSubscriptions?.forEach(s => s.dispose());
       videoSubscriptions?.forEach(s => s.dispose());
     };
-  }, [participants?.length, call, currentPage, pages?.length]);
+  }, [participants, participants?.length, call, currentPage, pages?.length]);
 
   return grid;
 };
