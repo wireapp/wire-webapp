@@ -27,7 +27,6 @@ import {
   CONVERSATION_EVENT,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
-  ConversationCreateEvent,
 } from '@wireapp/api-client/src/event/';
 import {
   DefaultConversationRoleName as DefaultRole,
@@ -38,8 +37,9 @@ import {
   Conversation as BackendConversation,
 } from '@wireapp/api-client/src/conversation/';
 import {container} from 'tsyringe';
-import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
+import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
+
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
@@ -48,6 +48,7 @@ import {getNextItem} from 'Util/ArrayUtil';
 import {createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {compareTransliteration, sortByPriority, startsWith, sortUsersByPriority} from 'Util/StringUtil';
+
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
@@ -344,16 +345,7 @@ export class ConversationRepository {
       const response = await this.conversation_service.postConversations(payload);
       const {conversationEntity} = await this.onCreate({
         conversation: response.id,
-        data: {
-          ...response,
-          last_event: '0.0',
-          last_event_time: '1970-01-01T00:00:00.000Z',
-          receipt_mode: null,
-        },
-        from: this.userState.self().id,
-        qualified_conversation: response.qualified_id,
-        time: new Date().toISOString(),
-        type: CONVERSATION_EVENT.CREATE,
+        data: response as ConversationCreateData,
       });
       return conversationEntity as Conversation;
     } catch (error) {
@@ -384,7 +376,7 @@ export class ConversationRepository {
     fetching_conversations[conversationId] = [];
     try {
       const response = await this.conversation_service.getConversationById(conversationId, domain);
-      const [conversationEntity] = this.mapConversations([response]);
+      const conversationEntity = this.mapConversations(response) as Conversation;
 
       this.logger.info(`Fetched conversation '${conversationId}' from backend`);
       this.saveConversation(conversationEntity);
@@ -426,7 +418,7 @@ export class ConversationRepository {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
       conversationsData = (await this.conversation_service.saveConversationsInDb(data)) as any[];
     }
-    const conversationEntities = this.mapConversations(conversationsData);
+    const conversationEntities = this.mapConversations(conversationsData) as Conversation[];
     this.saveConversations(conversationEntities);
     return this.conversationState.conversations();
   }
@@ -450,7 +442,9 @@ export class ConversationRepository {
     let conversationEntities: Conversation[] = [];
 
     if (unknownConversations.length) {
-      conversationEntities = conversationEntities.concat(this.mapConversations(unknownConversations as any[]));
+      conversationEntities = conversationEntities.concat(
+        this.mapConversations(unknownConversations as any[]) as Conversation[],
+      );
       this.saveConversations(conversationEntities);
     }
 
@@ -1136,15 +1130,22 @@ export class ConversationRepository {
    * @param initialTimestamp Initial server and event timestamp
    * @returns Mapped conversation/s
    */
-  mapConversations(payload: BackendConversation[], initialTimestamp = this.getLatestEventTimestamp()): Conversation[] {
-    const entities = ConversationMapper.mapConversations(payload as ConversationDatabaseData[], initialTimestamp);
+  mapConversations(
+    payload: BackendConversation[] | BackendConversation,
+    initialTimestamp = this.getLatestEventTimestamp(),
+  ) {
+    const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
+    const entities = ConversationMapper.mapConversations(
+      conversationsData as ConversationDatabaseData[],
+      initialTimestamp,
+    );
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());
       conversationEntity.setStateChangePersistence(true);
     });
 
-    return entities;
+    return Array.isArray(payload) ? entities : entities[0];
   }
 
   private mapGuestStatusSelf() {
@@ -2152,22 +2153,23 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onCreate(
-    eventJson: ConversationCreateEvent,
+    eventJson: {
+      conversation: string;
+      data: ConversationCreateData;
+      time?: string | number;
+    },
     eventSource?: EventSource,
   ): Promise<{conversationEntity: Conversation} | undefined> {
     const {conversation: conversationId, data: eventData, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
     try {
-      const existingConversationEntity = this.conversationState.findConversation(
-        conversationId,
-        eventJson.qualified_conversation?.domain,
-      );
+      const existingConversationEntity = this.conversationState.findConversation(conversationId);
       if (existingConversationEntity) {
         throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
 
-      const [conversationEntity] = this.mapConversations([eventData], initialTimestamp);
+      const conversationEntity = this.mapConversations(eventData, initialTimestamp) as Conversation;
       if (conversationEntity) {
         if (conversationEntity.participating_user_ids().length) {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
