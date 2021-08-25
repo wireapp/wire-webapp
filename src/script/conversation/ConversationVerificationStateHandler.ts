@@ -65,7 +65,7 @@ export class ConversationVerificationStateHandler {
    * Self user or other participant added clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  readonly onClientAdded = (userId: string, _clientEntity?: ClientEntity): void => {
+  readonly onClientAdded = (userId: QualifiedIdOptional, _clientEntity?: ClientEntity): void => {
     this.onClientsAdded([userId]);
   };
 
@@ -73,7 +73,7 @@ export class ConversationVerificationStateHandler {
    * Multiple participants added clients.
    * @param userIds Multiple user IDs (can include self user ID)
    */
-  onClientsAdded(userIds: string[]): void {
+  onClientsAdded(userIds: QualifiedIdOptional[]): void {
     this.getActiveConversationsWithUsers(userIds).forEach(({conversationEntity, userIds: matchingUserIds}) => {
       this.checkChangeToDegraded(conversationEntity, matchingUserIds, VerificationMessageType.NEW_DEVICE);
     });
@@ -114,7 +114,7 @@ export class ConversationVerificationStateHandler {
    * @param conversationEntity Changed conversation entity
    * @param userIds IDs of added members
    */
-  onMemberJoined(conversationEntity: Conversation, userIds: string[]): void {
+  onMemberJoined(conversationEntity: Conversation, userIds: QualifiedIdOptional[]): void {
     this.checkChangeToDegraded(conversationEntity, userIds, VerificationMessageType.NEW_MEMBER);
   }
 
@@ -160,7 +160,7 @@ export class ConversationVerificationStateHandler {
    */
   private checkChangeToDegraded(
     conversationEntity: Conversation,
-    userIds: string[],
+    userIds: QualifiedIdOptional[],
     type: VerificationMessageType,
   ): boolean {
     const shouldShowDegradationWarning = type !== VerificationMessageType.UNVERIFIED;
@@ -197,13 +197,15 @@ export class ConversationVerificationStateHandler {
    * @param userIds Multiple user IDs (can include self user ID)
    * @returns Array of objects containing the conversation entities and matching user IDs
    */
-  private getActiveConversationsWithUsers(userIds: QualifiedIdOptional[]): {conversationEntity: Conversation; userIds: string[]}[] {
+  private getActiveConversationsWithUsers(
+    userIds: QualifiedIdOptional[],
+  ): {conversationEntity: Conversation; userIds: QualifiedIdOptional[]}[] {
     return this.conversationState
       .filtered_conversations()
       .map((conversationEntity: Conversation) => {
         if (!conversationEntity.removed_from_conversation()) {
-          const selfUserId = this.userState.self().id;
-          const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUserId);
+          const selfUser = {domain: this.userState.self().domain, id: this.userState.self().id};
+          const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUser);
           const matchingUserIds = intersection(userIdsInConversation, userIds);
 
           if (!!matchingUserIds.length) {

@@ -29,7 +29,7 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {UserRepository} from '../user/UserRepository';
 import type {EventInfoEntity} from './EventInfoEntity';
 import type {Conversation} from '../entity/Conversation';
-import {Config} from "../Config";
+import {Config} from '../Config';
 
 export class ClientMismatchHandler {
   private readonly logger: Logger;
@@ -97,7 +97,10 @@ export class ClientMismatchHandler {
     if (conversationEntity !== undefined) {
       const knownUserIds = conversationEntity.participating_user_ids();
       // TODO(Federation): This code does not consider federated environments / conversations as this function is deprecated
-      const unknownUserIds = getDifference(knownUserIds, missingUserIds.map(id => ({id: id, domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN})));
+      const unknownUserIds = getDifference(
+        knownUserIds,
+        missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: id})),
+      );
 
       if (unknownUserIds.length > 0) {
         this.conversationRepositoryProvider().addMissingMember(conversationEntity, unknownUserIds, timestamp - 1);
@@ -115,7 +118,9 @@ export class ClientMismatchHandler {
       ),
     );
 
-    this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(missingUserIds);
+    this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(
+      missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: id})),
+    );
 
     if (payload) {
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);

@@ -529,7 +529,12 @@ export class ConversationRepository {
       const allTeamMembersParticipate = this.teamState.teamMembers().length
         ? this.teamState
             .teamMembers()
-            .every(teamMember => !!conversationEntity.participating_user_ids().find(user => user.id === teamMember.id && user.domain == teamMember.domain))
+            .every(
+              teamMember =>
+                !!conversationEntity
+                  .participating_user_ids()
+                  .find(user => user.id === teamMember.id && user.domain == teamMember.domain),
+            )
         : false;
 
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
@@ -1266,7 +1271,7 @@ export class ConversationRepository {
   // TODO(Federation): This code needs to get adjusted to take care of domains.
   addMissingMember(conversationEntity: Conversation, users: QualifiedIdOptional[], timestamp: number) {
     const [sender] = users;
-    const userIds = users.map(user => user.id)
+    const userIds = users.map(user => user.id);
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
     return this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.INJECTED);
   }
@@ -1854,7 +1859,9 @@ export class ConversationRepository {
     const {from: sender, id, type, time} = eventJson;
 
     if (sender) {
-      const allParticipantIds = conversationEntity.participating_user_ids().concat({id: this.userState.self().id, domain: this.userState.self().domain});
+      const allParticipantIds = conversationEntity
+        .participating_user_ids()
+        .concat({domain: this.userState.self().domain, id: this.userState.self().id});
       const isFromUnknownUser = !allParticipantIds.includes(sender);
 
       if (isFromUnknownUser) {
@@ -2193,7 +2200,9 @@ export class ConversationRepository {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson as EventRecord, conversationEntity);
     const creatorId = conversationEntity.creator;
     const creatorDomain = conversationEntity.domain;
-    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId.id === creatorId && userId.domain == creatorDomain);
+    const createdByParticipant = !!conversationEntity
+      .participating_user_ids()
+      .find(userId => userId.id === creatorId && userId.domain == creatorDomain);
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
@@ -2225,7 +2234,10 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-join' event
    * @returns Resolves when the event was handled
    */
-  private async onMemberJoin(conversationEntity: Conversation, eventJson: ConversationMemberJoinEvent): Promise<void | EntityObject> {
+  private async onMemberJoin(
+    conversationEntity: Conversation,
+    eventJson: ConversationMemberJoinEvent,
+  ): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
@@ -2237,10 +2249,20 @@ export class ConversationRepository {
 
     if (eventData.users) {
       eventData.users.forEach(otherMember => {
-        const isSelfUser = otherMember.id === this.userState.self().id && otherMember.qualified_id?.domain == this.userState.self().domain;
-        const isParticipatingUser = !!conversationEntity.participating_user_ids().find(participatingUser => participatingUser.id === otherMember.id && participatingUser.domain == otherMember.qualified_id?.domain);
+        const isSelfUser =
+          otherMember.id === this.userState.self().id &&
+          otherMember.qualified_id?.domain == this.userState.self().domain;
+        const isParticipatingUser = !!conversationEntity
+          .participating_user_ids()
+          .find(
+            participatingUser =>
+              participatingUser.id === otherMember.id && participatingUser.domain == otherMember.qualified_id?.domain,
+          );
         if (!isSelfUser && !isParticipatingUser) {
-          conversationEntity.participating_user_ids.push({id: otherMember.id, domain: otherMember.qualified_id?.domain});
+          conversationEntity.participating_user_ids.push({
+            domain: otherMember.qualified_id?.domain,
+            id: otherMember.id,
+          });
         }
       });
     } else {
@@ -2248,7 +2270,7 @@ export class ConversationRepository {
         const isSelfUser = userId === this.userState.self().id;
         const isParticipatingUser = !!conversationEntity.participating_user_ids().find(user => user.id === userId);
         if (!isSelfUser && !isParticipatingUser) {
-          conversationEntity.participating_user_ids.push({id: userId, domain: null});
+          conversationEntity.participating_user_ids.push({domain: null, id: userId});
         }
       });
     }
@@ -2265,11 +2287,14 @@ export class ConversationRepository {
         ? this.updateConversationFromBackend(conversationEntity)
         : Promise.resolve();
 
+    const qualifiedUserIds =
+      eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: null, id: userId}));
+
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this.addEventToConversation(conversationEntity, eventJson))
       .then(({messageEntity}) => {
-        this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
+        this.verificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
         return {conversationEntity, messageEntity};
       });
   }
@@ -2302,9 +2327,9 @@ export class ConversationRepository {
       const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
       (messageEntity as MemberMessage)
         .userEntities()
-        .filter((userEntity) => !userEntity.isMe)
-        .forEach((userEntity) => {
-          conversationEntity.participating_user_ids.remove((userId) => {
+        .filter(userEntity => !userEntity.isMe)
+        .forEach(userEntity => {
+          conversationEntity.participating_user_ids.remove(userId => {
             return userId.id === userEntity.id && userId.domain == userEntity.domain;
           });
 
@@ -2750,10 +2775,12 @@ export class ConversationRepository {
       messageEntity.reactions_user_ets.removeAll();
       if (userIds.length) {
         // TODO(Federation): Make code federation-aware.
-        return this.userRepository.getUsersById(userIds.map(userId =>({id: userId, domain: null}))).then(userEntities => {
-          messageEntity.reactions_user_ets(userEntities);
-          return messageEntity;
-        });
+        return this.userRepository
+          .getUsersById(userIds.map(userId => ({domain: null, id: userId})))
+          .then(userEntities => {
+            messageEntity.reactions_user_ets(userEntities);
+            return messageEntity;
+          });
       }
     }
     return messageEntity;

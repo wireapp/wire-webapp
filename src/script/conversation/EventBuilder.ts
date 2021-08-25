@@ -82,7 +82,11 @@ export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType};
 export type DegradedMessageEvent = ConversationEvent<{type: VerificationMessageType; userIds: string[]}>;
 export type DeleteEvent = ConversationEvent<{deleted_time: number}>;
-export type GroupCreationEvent = ConversationEvent<{allTeamMembers: boolean; name: string; userIds: QualifiedIdOptional[]}>;
+export type GroupCreationEvent = ConversationEvent<{
+  allTeamMembers: boolean;
+  name: string;
+  userIds: QualifiedIdOptional[];
+}>;
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}>;
 export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;
@@ -171,7 +175,7 @@ export const EventBuilder = {
 
   buildDegraded(
     conversationEntity: Conversation,
-    userIds: string[],
+    userIds: QualifiedIdOptional[],
     type: VerificationMessageType,
     currentTimestamp: number,
   ): DegradedMessageEvent {
@@ -179,7 +183,7 @@ export const EventBuilder = {
       conversation: conversationEntity.id,
       data: {
         type,
-        userIds,
+        userIds: userIds.map(({id}) => id),
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
@@ -235,7 +239,7 @@ export const EventBuilder = {
     const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUserId || isTemporaryGuest;
     if (!createdBySelf) {
-      userIds.push({id: selfUserId, domain: selfUserDomain});
+      userIds.push({domain: selfUserDomain, id: selfUserId});
     }
 
     return {
