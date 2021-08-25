@@ -1047,6 +1047,7 @@ export class ConversationService {
 
     const newConversation: NewConversation = {
       name,
+      receipt_mode: null,
       users: ids,
     };
 
