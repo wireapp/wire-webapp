@@ -1086,5 +1086,7 @@
   "wireLinux": "{{brandName}} for Linux",
   "wireMacos": "{{brandName}} for macOS",
   "wireWindows": "{{brandName}} for Windows",
-  "wire_for_web": "{{brandName}} for Web"
+  "wire_for_web": "{{brandName}} for Web",
+  "moderatorMenuEntryMute": "Mute",
+  "moderatorMenuEntryMuteAllOthers": "Mute everyone else"
 }
