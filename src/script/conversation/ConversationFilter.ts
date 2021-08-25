@@ -23,7 +23,7 @@ import type {User} from '../entity/User';
 export class ConversationFilter {
   static is1To1WithUser(conversationEntity: Conversation, userEntity: User): boolean {
     const [userId] = conversationEntity.participating_user_ids();
-    return userEntity.id === userId;
+    return userEntity.id === userId.id && userEntity.domain == userId.domain;
   }
 
   static isInTeam(conversationEntity: Conversation, userEntity: User): boolean {

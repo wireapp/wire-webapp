@@ -62,7 +62,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {AssetAddEvent, EventBuilder} from '../conversation/EventBuilder';
+import {AssetAddEvent, EventBuilder, QualifiedIdOptional} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
@@ -1078,7 +1078,8 @@ export class MessageRepository {
     }
 
     const senderId = messageEntity.from;
-    const conversationHasUser = conversationEntity.participating_user_ids().includes(senderId);
+    // TODO(Federation): Add check for domain with "qualified_from" in message entity
+    const conversationHasUser = conversationEntity.participating_user_ids().find(userId => senderId === userId.id);
 
     if (!conversationHasUser) {
       messageEntity.setButtonError(buttonId, t('buttonActionError'));
@@ -1366,6 +1367,9 @@ export class MessageRepository {
     return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
   }
 
+  /**
+   * @deprecated Will not work with federation. Please use `sendFederatedMessage`.
+   */
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
     consentType: string,
@@ -1400,8 +1404,12 @@ export class MessageRepository {
 
       userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
 
+      // TODO(Federation): Consider using `Config.getConfig().FEATURE.FEDERATION_DOMAIN`.
       return this.userRepository
-        .getUsersById(userIds)
+        .getUsersById(userIds.map(userId => ({
+          id: userId,
+          domain: null
+        })))
         .then(userEntities => {
           let actionString;
           let messageString;
@@ -1692,6 +1700,7 @@ export class MessageRepository {
    *
    * @param eventInfoEntity Info about message to be sent
    * @param payload Payload
+   * @deprecated Please use `sendFederatedMessage`
    * @returns Promise that resolves after sending the encrypted message
    */
   private async sendEncryptedMessage(

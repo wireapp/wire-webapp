@@ -52,7 +52,7 @@ import {compareTransliteration, sortByPriority, startsWith, sortUsersByPriority}
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {EventBuilder, GroupCreationEvent} from '../conversation/EventBuilder';
+import {EventBuilder, GroupCreationEvent, QualifiedIdOptional} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
@@ -706,8 +706,8 @@ export class ConversationRepository {
    */
   public async updateConversations(conversationEntities: Conversation[]): Promise<void> {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
+    // TODO(Federation): Check if this flatten code behaves well with new user id schema
     const userIds = flatten(mapOfUserIds);
-
     await this.userRepository.getUsersById(userIds);
     conversationEntities.forEach(conversationEntity => this.fetchUsersAndEvents(conversationEntity));
   }
@@ -722,7 +722,7 @@ export class ConversationRepository {
   private deleteConversationFromRepository(conversationId: string, domain: string | null) {
     this.conversationState.conversations.remove(conversation => {
       if (domain) {
-        return conversation.id === conversationId && conversation.domain === domain;
+        return conversation.id === conversationId && conversation.domain == domain;
       }
       return conversation.id === conversationId;
     });
@@ -1263,7 +1263,7 @@ export class ConversationRepository {
     }
   }
 
-  addMissingMember(conversationEntity: Conversation, userIds: string[], timestamp: number) {
+  addMissingMember(conversationEntity: Conversation, userIds: QualifiedIdOptional[], timestamp: number) {
     const [sender] = userIds;
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
     return this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.INJECTED);
@@ -2191,7 +2191,7 @@ export class ConversationRepository {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson as EventRecord, conversationEntity);
     const creatorId = conversationEntity.creator;
     const creatorDomain = conversationEntity.domain;
-    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId.id === creatorId && userId.domain === creatorDomain);
+    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId.id === creatorId && userId.domain == creatorDomain);
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
@@ -2234,11 +2234,11 @@ export class ConversationRepository {
     const eventData = eventJson.data;
 
     if (eventData.users) {
-      eventData.users.forEach(user => {
-        const isSelfUser = user.id === this.userState.self().id && user.domain === this.userState.self().domain;
-        const isParticipatingUser = !!conversationEntity.participating_user_ids().find(participatingUser => participatingUser.id === user.id && participatingUser.domain == user.domain);
+      eventData.users.forEach(otherMember => {
+        const isSelfUser = otherMember.id === this.userState.self().id && otherMember.qualified_id?.domain == this.userState.self().domain;
+        const isParticipatingUser = !!conversationEntity.participating_user_ids().find(participatingUser => participatingUser.id === otherMember.id && participatingUser.domain == otherMember.qualified_id?.domain);
         if (!isSelfUser && !isParticipatingUser) {
-          conversationEntity.participating_user_ids.push({id: user.id, domain: user.domain});
+          conversationEntity.participating_user_ids.push({id: otherMember.id, domain: otherMember.qualified_id?.domain});
         }
       });
     } else {

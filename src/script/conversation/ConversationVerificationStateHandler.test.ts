@@ -72,12 +72,21 @@ describe('ConversationVerificationStateHandler', () => {
       userB.devices.push(clientB);
 
       conversationAB.selfUser(selfUserEntity);
-      conversationAB.participating_user_ids.push(userA.id, userB.id);
+      conversationAB.participating_user_ids.push({
+        id: userA.id,
+        domain: userA.domain
+      }, {
+        id: userB.id,
+        domain: userB.domain
+      });
       conversationAB.participating_user_ets.push(userA, userB);
       conversationAB.verification_state(ConversationVerificationState.VERIFIED);
 
       conversationB.selfUser(selfUserEntity);
-      conversationB.participating_user_ids.push(userB.id);
+      conversationB.participating_user_ids.push({
+        id: userB.id,
+        domain: userB.domain
+      });
       conversationB.verification_state(ConversationVerificationState.VERIFIED);
       conversationB.participating_user_ets.push(userB);
 
@@ -213,7 +222,10 @@ describe('ConversationVerificationStateHandler', () => {
       new_client_b.meta.isVerified(false);
       new_user.devices.push(new_client_b);
 
-      conversationAB.participating_user_ids.push(new_user.id);
+      conversationAB.participating_user_ids.push({
+        id: new_user.id,
+        domain: new_user.domain
+      });
       conversationAB.participating_user_ets.push(new_user);
 
       stateHandler.onMemberJoined(conversationAB, [new_user.id]);
@@ -232,7 +244,10 @@ describe('ConversationVerificationStateHandler', () => {
       new_client_b.meta.isVerified(true);
       new_user.devices.push(new_client_b);
 
-      conversationAB.participating_user_ids.push(new_user.id);
+      conversationAB.participating_user_ids.push({
+        id: new_user.id,
+        domain: new_user.domain
+      });
       conversationAB.participating_user_ets.push(new_user);
 
       stateHandler.onMemberJoined(conversationAB, [new_user.id]);

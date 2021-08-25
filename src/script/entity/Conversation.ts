@@ -508,7 +508,7 @@ export class Conversation {
       return false;
     }
 
-    return this.domain !== Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    return this.domain != Config.getConfig().FEATURE.FEDERATION_DOMAIN;
   }
 
   readonly persistState = (): void => {

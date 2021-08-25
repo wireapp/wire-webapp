@@ -19,19 +19,17 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
-
 import ko from 'knockout';
-
 import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {getUserName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
-
 import {ClientEvent} from '../../event/Client';
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {User} from '../User';
 import {SystemMessage} from './SystemMessage';
 import {Config} from '../../Config';
+import {QualifiedIdOptional} from "../../conversation/EventBuilder";
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
@@ -50,7 +48,7 @@ export class MemberMessage extends SystemMessage {
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
   public showServicesWarning: boolean;
   public readonly userEntities: ko.ObservableArray<User>;
-  public readonly userIds: ko.ObservableArray<string>;
+  public readonly userIds: ko.ObservableArray<QualifiedIdOptional>;
   public memberMessageType: SystemMessageType;
   public reason: MemberLeaveReason;
 
@@ -341,8 +339,8 @@ export class MemberMessage extends SystemMessage {
     return this.isMemberLeave() || this.isTeamMemberLeave();
   }
 
-  isUserAffected(userId: string): boolean {
-    return this.userIds().includes(userId);
+  isUserAffected(userId: QualifiedIdOptional): boolean {
+    return !!this.userIds().find(user => user.id === userId.id && user.domain == userId.domain);
   }
 
   guestCount(): number {

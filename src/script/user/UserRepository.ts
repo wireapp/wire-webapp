@@ -68,6 +68,7 @@ import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 import {QualifiedPublicUserMap} from '../client/ClientService';
+import {QualifiedIdOptional} from "../conversation/EventBuilder";
 
 export class UserRepository {
   private readonly logger: Logger;
@@ -478,7 +479,7 @@ export class UserRepository {
     return this.userState.users().find(userEntity => {
       return typeof userId === 'string'
         ? userEntity.id === userId
-        : userEntity.id === userId.id && userEntity.domain === userId.domain;
+        : userEntity.id === userId.id && userEntity.domain == userId.domain;
     });
   }
 
@@ -560,10 +561,8 @@ export class UserRepository {
 
   /**
    * Check for users locally and fetch them from the server otherwise.
-   * @param userIds List of user ID
-   * @param offline Should we only look for cached contacts
    */
-  async getUsersById(userIds: string[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: QualifiedIdOptional[] = [], offline: boolean = false): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
@@ -649,7 +648,7 @@ export class UserRepository {
   static findMatchingUser(userId: string | QualifiedId, userEntities: User[]): User | undefined {
     if (isQualifiedId(userId)) {
       return userEntities.find(userEntity => {
-        return userEntity.domain === userId.domain && userEntity.id === userId.id;
+        return userEntity.domain == userId.domain && userEntity.id === userId.id;
       });
     }
     return userEntities.find(userEntity => userEntity.id === userId);

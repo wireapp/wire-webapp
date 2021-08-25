@@ -181,7 +181,7 @@ export class SearchRepository {
       const apiUser = await this.userRepository.getUserByHandle({domain, handle: name});
       if (apiUser) {
         const knownUser = userEntities.find(
-          user => user.id === apiUser.id && user.domain === apiUser.qualified_id?.domain,
+          user => user.id === apiUser.id && user.domain == apiUser.qualified_id?.domain,
         );
         if (!knownUser) {
           const matchedUser = this.userRepository.userMapper.mapUserFromJson(apiUser);

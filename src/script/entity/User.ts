@@ -211,7 +211,7 @@ export class User {
       return true;
     }
 
-    return this.domain === otherDomain;
+    return this.domain == otherDomain;
   }
 
   /**

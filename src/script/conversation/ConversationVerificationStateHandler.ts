@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {EventBuilder} from '../conversation/EventBuilder';
+import {EventBuilder, QualifiedIdOptional} from '../conversation/EventBuilder';
 import {EventRecord} from '../storage';
 import {VerificationMessageType} from '../message/VerificationMessageType';
 import type {ClientEntity} from '../client/ClientEntity';
@@ -197,7 +197,7 @@ export class ConversationVerificationStateHandler {
    * @param userIds Multiple user IDs (can include self user ID)
    * @returns Array of objects containing the conversation entities and matching user IDs
    */
-  private getActiveConversationsWithUsers(userIds: string[]): {conversationEntity: Conversation; userIds: string[]}[] {
+  private getActiveConversationsWithUsers(userIds: QualifiedIdOptional[]): {conversationEntity: Conversation; userIds: string[]}[] {
     return this.conversationState
       .filtered_conversations()
       .map((conversationEntity: Conversation) => {
