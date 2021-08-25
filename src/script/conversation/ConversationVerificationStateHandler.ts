@@ -52,7 +52,7 @@ export class ConversationVerificationStateHandler {
     amplify.subscribe(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, this.onClientVerificationChanged);
   }
 
-  readonly onClientVerificationChanged = (userId: string): void => {
+  readonly onClientVerificationChanged = (userId: QualifiedIdOptional): void => {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this.checkChangeToVerified(conversationEntity);
       if (!isStateChange) {
@@ -83,7 +83,7 @@ export class ConversationVerificationStateHandler {
    * Self user removed a client or other participants deleted clients.
    * @param userId ID of user that added client (can be self user ID)
    */
-  readonly onClientRemoved = (userId: string, _clientId?: string): void => {
+  readonly onClientRemoved = (userId: QualifiedIdOptional, _clientId?: string): void => {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity}) => {
       this.checkChangeToVerified(conversationEntity);
     });
@@ -100,7 +100,7 @@ export class ConversationVerificationStateHandler {
   /**
    * Clients of a user were updated.
    */
-  readonly onClientsUpdated = (userId: string): void => {
+  readonly onClientsUpdated = (userId: QualifiedIdOptional): void => {
     this.getActiveConversationsWithUsers([userId]).forEach(({conversationEntity, userIds}) => {
       const isStateChange = this.checkChangeToVerified(conversationEntity);
       if (!isStateChange) {

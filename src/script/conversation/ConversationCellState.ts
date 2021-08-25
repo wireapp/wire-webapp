@@ -291,10 +291,11 @@ const _getStateRemoved = {
   description: (conversationEntity: Conversation) => {
     const lastMessageEntity = conversationEntity.getLastMessage();
     const selfUserId = conversationEntity.selfUser().id;
+    const selfUserDomain = conversationEntity.selfUser().domain;
 
     const isMemberRemoval =
-      lastMessageEntity && lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberRemoval();
-    const wasSelfRemoved = isMemberRemoval && (lastMessageEntity as MemberMessage).userIds().includes(selfUserId);
+      lastMessageEntity && lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
+    const wasSelfRemoved = isMemberRemoval && !!(lastMessageEntity as MemberMessage).userIds().find(userId => userId.id === selfUserId && userId.domain == selfUserDomain);
     if (wasSelfRemoved) {
       const selfLeft = lastMessageEntity.user().id === selfUserId;
       return selfLeft ? t('conversationsSecondaryLineYouLeft') : t('conversationsSecondaryLineYouWereRemoved');
