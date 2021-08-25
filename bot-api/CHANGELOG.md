@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [7.16.25](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.16.24...@wireapp/bot-api@7.16.25) (2021-08-25)
+
+**Note:** Version bump only for package @wireapp/bot-api
+
+
+
+
+
 ## [7.16.24](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.16.23...@wireapp/bot-api@7.16.24) (2021-08-24)
 
 **Note:** Version bump only for package @wireapp/bot-api
