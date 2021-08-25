@@ -18,7 +18,6 @@
  */
 
 import {amplify} from 'amplify';
-import {intersection} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
@@ -206,7 +205,11 @@ export class ConversationVerificationStateHandler {
         if (!conversationEntity.removed_from_conversation()) {
           const selfUser = {domain: this.userState.self().domain, id: this.userState.self().id};
           const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUser);
-          const matchingUserIds = intersection(userIdsInConversation, userIds);
+          const matchingUserIds = userIdsInConversation.filter(userIdInConversation =>
+            userIds.find(
+              userId => userId.id === userIdInConversation.id && userId.domain == userIdInConversation.domain,
+            ),
+          );
 
           if (!!matchingUserIds.length) {
             return {conversationEntity, userIds: matchingUserIds};
