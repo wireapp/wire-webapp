@@ -29,7 +29,7 @@ import {SystemMessageType} from '../../message/SystemMessageType';
 import {User} from '../User';
 import {SystemMessage} from './SystemMessage';
 import {Config} from '../../Config';
-import {QualifiedIdOptional} from "../../conversation/EventBuilder";
+import {QualifiedIdOptional} from '../../conversation/EventBuilder';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];

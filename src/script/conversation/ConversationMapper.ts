@@ -232,7 +232,11 @@ export class ConversationMapper {
     }
 
     // Active participants from database or backend payload
-    const participatingUserIds = qualified_others || (others ? others.map(userId => ({id: userId, domain: null})) : members.others.map(other => ({id: other.id, domain: other.qualified_id?.domain || null})));
+    const participatingUserIds =
+      qualified_others ||
+      (others
+        ? others.map(userId => ({domain: null, id: userId}))
+        : members.others.map(other => ({domain: other.qualified_id?.domain || null, id: other.id})));
     conversationEntity.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload

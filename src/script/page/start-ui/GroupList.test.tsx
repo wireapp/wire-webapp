@@ -25,7 +25,7 @@ import {AssetRepository} from '../../assets/AssetRepository';
 import {Conversation} from '../../entity/Conversation';
 import {User} from '../../entity/User';
 import {Router} from '../../router/Router';
-import {QualifiedIdOptional} from "../../conversation/EventBuilder";
+import {QualifiedIdOptional} from '../../conversation/EventBuilder';
 
 class GroupListPage extends TestPage<GroupListProps> {
   constructor(props?: GroupListProps) {
@@ -38,13 +38,16 @@ class GroupListPage extends TestPage<GroupListProps> {
 describe('GroupList', () => {
   const createGroupConversation = (name: string, id = createRandomUuid()) => {
     const conversation = new Conversation(id);
-    const userIds: QualifiedIdOptional[] = [{
-      id: createRandomUuid(),
-      domain: null
-    }, {
-      id: createRandomUuid(),
-      domain: null
-    }];
+    const userIds: QualifiedIdOptional[] = [
+      {
+        domain: null,
+        id: createRandomUuid(),
+      },
+      {
+        domain: null,
+        id: createRandomUuid(),
+      },
+    ];
     const users = userIds.map(userId => new User(userId.id, userId.domain));
     conversation.participating_user_ids.push(...userIds);
     conversation.participating_user_ets.push(...users);

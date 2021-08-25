@@ -220,7 +220,7 @@ export class Conversation {
       const connectedUserId = connectionEntity?.userId;
       // TODO(Federation): Check for domain once backend supports federated connections
       if (connectedUserId && !this.participating_user_ids().find(user => user.id === connectedUserId)) {
-        this.participating_user_ids.push({id: connectedUserId, domain: null});
+        this.participating_user_ids.push({domain: null, id: connectedUserId});
       }
     });
 
@@ -746,7 +746,9 @@ export class Conversation {
 
       const isCallActivation = messageEntity.isCall() && messageEntity.isActivation();
       const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
-      const wasSelfUserAdded = isMemberJoin && (messageEntity as MemberMessage).isUserAffected(({id: this.selfUser().id, domain: this.selfUser().domain}));
+      const wasSelfUserAdded =
+        isMemberJoin &&
+        (messageEntity as MemberMessage).isUserAffected({domain: this.selfUser().domain, id: this.selfUser().id});
 
       return isCallActivation || wasSelfUserAdded;
     });

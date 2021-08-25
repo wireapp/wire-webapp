@@ -81,7 +81,9 @@ export class ServiceMiddleware {
   }
 
   private async _containsService(userIds: string[]) {
-    const userEntities = await this.userRepository.getUsersById(userIds.map(userId => ({id: userId, domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN})));
+    const userEntities = await this.userRepository.getUsersById(
+      userIds.map(userId => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: userId})),
+    );
     return userEntities.some(userEntity => userEntity.isService);
   }
 

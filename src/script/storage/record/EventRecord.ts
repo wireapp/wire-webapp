@@ -20,9 +20,9 @@
 import {StatusType} from '../../message/StatusType';
 
 export interface ReadReceipt {
+  domain?: string;
   time: string;
   userId: string;
-  domain?: string;
 }
 
 export interface AssetRecord {

@@ -38,6 +38,7 @@ import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
 import {BaseError} from 'src/script/error/BaseError';
 import {entities, payload} from '../../../test/api/payloads';
+import {QualifiedIdOptional} from './EventBuilder';
 
 describe('ConversationMapper', () => {
   describe('mapConversations', () => {
@@ -71,12 +72,12 @@ describe('ConversationMapper', () => {
       const initialTimestamp = Date.now();
       const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp);
 
-      const expectedParticipantIds: string[] = [
+      const expectedParticipantIds: QualifiedIdOptional[] = [
         conversation.members.others[0].id,
         conversation.members.others[1].id,
         conversation.members.others[2].id,
         conversation.members.others[3].id,
-      ];
+      ].map(id => ({domain: null, id}));
 
       expect(conversationEntity.participating_user_ids()).toEqual(expectedParticipantIds);
       expect(conversationEntity.id).toBe(conversation.id);

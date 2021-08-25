@@ -55,8 +55,8 @@ describe('EventBuilder', () => {
   });
 
   it('buildDegraded', () => {
-    const user_ids = [createRandomUuid()];
-    const event = EventBuilder.buildDegraded(conversation_et, user_ids, VerificationMessageType.NEW_DEVICE, 0);
+    const users = [{domain: null, id: createRandomUuid()}];
+    const event = EventBuilder.buildDegraded(conversation_et, users, VerificationMessageType.NEW_DEVICE, 0);
 
     return event_mapper.mapJsonEvent(event, conversation_et).then(messageEntity => {
       expect(messageEntity).toBeDefined();
@@ -64,7 +64,7 @@ describe('EventBuilder', () => {
       expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.NEW_DEVICE);
       expect(messageEntity.from).toBe(conversation_et.selfUser().id);
       expect(messageEntity.conversation_id).toBe(conversation_et.id);
-      expect(messageEntity.userIds()).toEqual(user_ids);
+      expect(messageEntity.userIds()).toEqual(users.map(user => user.id));
     });
   });
 

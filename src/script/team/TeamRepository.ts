@@ -297,7 +297,9 @@ export class TeamRepository {
       this.teamState.memberRoles({});
       this.teamState.memberInviters({});
     }
-    const userEntities = await this.userRepository.getUsersById(memberIds.map(memberId => ({id: memberId, domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN})));
+    const userEntities = await this.userRepository.getUsersById(
+      memberIds.map(memberId => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: memberId})),
+    );
 
     if (append) {
       const knownUserIds = teamEntity.members().map(({id}) => id);
@@ -317,7 +319,7 @@ export class TeamRepository {
 
       const memberIds = teamMembers
         .filter(({userId}) => userId !== this.userState.self().id)
-        .map(memberEntity => ({id: memberEntity.userId, domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN}));
+        .map(memberEntity => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: memberEntity.userId}));
 
       const userEntities = await this.userRepository.getUsersById(memberIds);
       teamEntity.members(userEntities);

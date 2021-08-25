@@ -1406,10 +1406,12 @@ export class MessageRepository {
 
       // TODO(Federation): Consider using `Config.getConfig().FEATURE.FEDERATION_DOMAIN`.
       return this.userRepository
-        .getUsersById(userIds.map(userId => ({
-          id: userId,
-          domain: null
-        })))
+        .getUsersById(
+          userIds.map(userId => ({
+            domain: null,
+            id: userId,
+          })),
+        )
         .then(userEntities => {
           let actionString;
           let messageString;

@@ -75,7 +75,7 @@ export class ClientEntity {
   /**
    * Splits an ID into user ID, client ID & domain (if any).
    */
-  static dismantleUserClientId(id: string): {clientId: string; userId: string, domain?: string} {
+  static dismantleUserClientId(id: string): {clientId: string; domain?: string; userId: string} {
     // see https://regex101.com/r/c8FtCw/1
     const regex = /((?<domain>.+)@)?(?<userId>.+)@(?<clientId>.+)$/g;
     const match = regex.exec(id);

@@ -259,7 +259,7 @@ export class UserRepository {
    */
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     // TODO(Federation): Include domain as soon as connections to federated backends are supported.
-    const userIds = connectionEntities.map(connectionEntity => ({id: connectionEntity.userId, domain: null}));
+    const userIds = connectionEntities.map(connectionEntity => ({domain: null, id: connectionEntity.userId}));
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
       const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
@@ -276,8 +276,8 @@ export class UserRepository {
     const recipients = await this.clientRepository.getAllClientsFromDb();
     const userIds: QualifiedIdOptional[] = Object.entries(recipients).map(([userId, clientEntities]) => {
       return {
-        id: userId,
         domain: clientEntities[0].domain,
+        id: userId,
       };
     });
 

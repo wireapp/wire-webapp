@@ -30,7 +30,7 @@ export interface ConversationRecord {
   muted_timestamp: number;
   name: string;
   others: string[];
-  qualified_others: QualifiedIdOptional[],
+  qualified_others: QualifiedIdOptional[];
   receipt_mode?: Confirmation.Type;
   roles: {[userId: string]: DefaultConversationRoleName | string};
   status: ConversationStatus;

@@ -209,8 +209,8 @@ describe('MessageRepository', () => {
         Array(128)
           .fill(undefined)
           .map((x, i) => ({
+            domain: null,
             id: i.toString(),
-            domain: null
           })),
       );
 
@@ -263,13 +263,16 @@ describe('MessageRepository', () => {
 
     it('should return false for small payload', async () => {
       const smallConversationEntity = generateConversation();
-      smallConversationEntity.participating_user_ids([{
-        id: '0',
-        domain: null
-      }, {
-        id: '1',
-        domain: null
-      }]);
+      smallConversationEntity.participating_user_ids([
+        {
+          domain: null,
+          id: '0',
+        },
+        {
+          domain: null,
+          id: '1',
+        },
+      ]);
 
       const genericMessage = new GenericMessage({
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
