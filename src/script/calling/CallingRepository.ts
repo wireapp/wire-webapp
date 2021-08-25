@@ -63,7 +63,7 @@ import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoE
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
 import {Call, ConversationId} from './Call';
-import {CallState} from './CallState';
+import {CallState, MuteState} from './CallState';
 import {ClientId, Participant, UserId} from './Participant';
 import {EventName} from '../tracking/EventName';
 import {Segmentation} from '../tracking/Segmentation';
@@ -250,7 +250,7 @@ export class CallingRepository {
     /* cspell:enable */
     const tenSeconds = 10;
     wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
-    wCall.setMuteHandler(wUser, this.callState.isMuted);
+    wCall.setMuteHandler(wUser, this.updateMuteState);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
     wCall.setReqClientsHandler(wUser, this.requestClients);
@@ -258,6 +258,13 @@ export class CallingRepository {
 
     return wUser;
   }
+
+  private readonly updateMuteState = (isMuted: number) => {
+    this.callState.isMuted(!!isMuted);
+    if (!isMuted) {
+      this.callState.updateMuteState(MuteState.NOT_MUTED);
+    }
+  };
 
   private async pushClients(conversationId: ConversationId): Promise<void> {
     try {

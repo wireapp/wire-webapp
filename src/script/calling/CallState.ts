@@ -25,10 +25,18 @@ import {VideoSpeakersTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
 
+export enum MuteState {
+  NOT_MUTED,
+  SELF_MUTED,
+  REMOTE_MUTED,
+  REMOTE_FORCE_MUTED,
+}
+
 @singleton()
 export class CallState {
   public readonly activeCalls: ko.ObservableArray<Call>;
   public readonly isMuted: ko.Observable<boolean>;
+  public muteState: MuteState = MuteState.NOT_MUTED;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
   public readonly acceptedVersionWarnings: ko.ObservableArray<string>;
   public readonly cbrEncoding: ko.Observable<number>;
@@ -57,4 +65,6 @@ export class CallState {
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
   }
+
+  updateMuteState = (newState: MuteState) => (this.muteState = newState);
 }
