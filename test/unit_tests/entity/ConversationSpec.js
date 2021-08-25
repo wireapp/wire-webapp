@@ -1064,7 +1064,7 @@ describe('Conversation', () => {
     it('updates the participating user IDs with the user ID of the other party', () => {
       const connector_user_id = 'b43b376d-7b5a-4d77-89be-81a02892db8c';
 
-      /** @type {ConnectionData} */
+      /** @type {import('@wireapp/api-client/src/connection/').Connection} */
       const payload_connection = {
         conversation: '15a7f358-8eba-4b8e-bcf2-61a08eb53349',
         from: '616cbbeb-1360-4e17-b333-e000662257bd',
