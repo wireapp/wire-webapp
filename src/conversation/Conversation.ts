@@ -51,10 +51,6 @@ export interface Conversation {
   message_timer: number | null;
   name: string;
   qualified_id?: QualifiedId;
-  /**
-   * In 1:1 team conversations the value is `null` (no read receipts).
-   * When creating a group conversation, then the user can actively decide if read receipts should be turned on or off.
-   */
   receipt_mode: RECEIPT_MODE | null;
   team: string | null;
   type: CONVERSATION_TYPE;
