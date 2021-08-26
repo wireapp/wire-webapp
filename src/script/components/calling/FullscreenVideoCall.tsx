@@ -31,6 +31,7 @@ import type {Call} from '../../calling/Call';
 import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
+import {MuteState} from '../../calling/CallState';
 import useHideElement from '../../hooks/useHideElement';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
@@ -53,6 +54,7 @@ export interface FullscreenVideoCallProps {
   maximizedParticipant: Participant;
   mediaDevicesHandler: MediaDevicesHandler;
   multitasking: Multitasking;
+  muteState: MuteState;
   setMaximizedParticipant: (call: Call, participant: Participant) => void;
   setVideoSpeakersActiveTab: (tab: string) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
@@ -109,6 +111,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   conversation,
   isChoosingScreen,
   isMuted,
+  muteState,
   mediaDevicesHandler,
   multitasking,
   videoGrid,
@@ -160,9 +163,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
   useEffect(() => {
     amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-    return () => {
-      amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-    };
+    return () => amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
   }, []);
 
   const totalPages = callPages.length;
@@ -188,6 +189,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
       {!isChoosingScreen && <div className="video-element-overlay hide-controls-hidden"></div>}
 
       <div id="video-title" className="video-title hide-controls-hidden">
+        {muteState === MuteState.REMOTE_MUTED && (
+          <div className="video-title__info-bar">{t('muteStateRemoteMute')}</div>
+        )}
         <div className="video-remote-name">{conversationName}</div>
         <div data-uie-name="video-timer" className="video-timer label-xs">
           <Duration startedAt={startedAt} />

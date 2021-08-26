@@ -63,7 +63,7 @@ import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoE
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
 import {Call, ConversationId} from './Call';
-import {CallState} from './CallState';
+import {CallState, MuteState} from './CallState';
 import {ClientId, Participant, UserId} from './Participant';
 import {EventName} from '../tracking/EventName';
 import {Segmentation} from '../tracking/Segmentation';
@@ -115,6 +115,7 @@ export class CallingRepository {
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
+  private nextMuteState: MuteState;
   onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
@@ -250,7 +251,7 @@ export class CallingRepository {
     /* cspell:enable */
     const tenSeconds = 10;
     wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
-    wCall.setMuteHandler(wUser, this.callState.isMuted);
+    wCall.setMuteHandler(wUser, this.updateMuteState);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
     wCall.setReqClientsHandler(wUser, this.requestClients);
@@ -258,6 +259,10 @@ export class CallingRepository {
 
     return wUser;
   }
+
+  private readonly updateMuteState = (isMuted: number) => {
+    this.callState.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
+  };
 
   private async pushClients(conversationId: ConversationId): Promise<void> {
     try {
@@ -565,7 +570,7 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
         const call = this.findCall(conversationId);
         if (call) {
-          this.muteCall(call, true);
+          this.muteCall(call, true, MuteState.REMOTE_MUTED);
         }
         break;
       }
@@ -748,7 +753,7 @@ export class CallingRepository {
       await this.pushClients(call.conversationId);
 
       if (Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && call.conversationType === CONV_TYPE.CONFERENCE) {
-        this.wCall.setMute(this.wUser, 1);
+        this.setMute(true);
       }
 
       this.wCall.answer(this.wUser, call.conversationId, callType, this.callState.cbrEncoding());
@@ -780,11 +785,16 @@ export class CallingRepository {
     this.wCall.end(this.wUser, conversationId);
   };
 
-  muteCall(call: Call, shouldMute: boolean): void {
+  muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
     if (call.hasWorkingAudioInput === false && this.callState.isMuted()) {
       this.showNoAudioInputModal();
       return;
     }
+    this.setMute(shouldMute, reason);
+  }
+
+  setMute(shouldMute: boolean, reason: MuteState = MuteState.SELF_MUTED): void {
+    this.nextMuteState = reason;
     this.wCall.setMute(this.wUser, shouldMute ? 1 : 0);
   }
 
