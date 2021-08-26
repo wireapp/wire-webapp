@@ -42,7 +42,7 @@ import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
-import {CallState} from '../../calling/CallState';
+import {CallState, MuteState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
 import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
@@ -97,7 +97,11 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
-  const {isMuted, videoSpeakersActiveTab} = useKoSubscribableChildren(callState, ['isMuted', 'videoSpeakersActiveTab']);
+  const {isMuted, muteState, videoSpeakersActiveTab} = useKoSubscribableChildren(callState, [
+    'isMuted',
+    'muteState',
+    'videoSpeakersActiveTab',
+  ]);
 
   const isStillOngoing = reason === CALL_REASON.STILL_ONGOING;
   const isDeclined = [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
@@ -179,6 +183,9 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
       )}
       {conversation && !isDeclined && (
         <div className="conversation-list-calling-cell-background">
+          {muteState === MuteState.REMOTE_MUTED && (
+            <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
+          )}
           <div className="conversation-list-calling-cell conversation-list-cell">
             {!temporaryUserStyle && (
               <div className="conversation-list-cell-left" onClick={createNavigate(conversationUrl)}>
