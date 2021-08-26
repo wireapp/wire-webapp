@@ -1088,5 +1088,6 @@
   "wireWindows": "{{brandName}} for Windows",
   "wire_for_web": "{{brandName}} for Web",
   "moderatorMenuEntryMute": "Mute",
-  "moderatorMenuEntryMuteAllOthers": "Mute everyone else"
+  "moderatorMenuEntryMuteAllOthers": "Mute everyone else",
+  "muteStateRemoteMute": "You have been muted"
 }
