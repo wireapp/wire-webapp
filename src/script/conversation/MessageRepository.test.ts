@@ -19,15 +19,13 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-import {Confirmation, GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {PublicClient, ClientClassification} from '@wireapp/api-client/src/client/';
 import * as sinon from 'sinon';
-
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {createRandomUuid} from 'Util/util';
-
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {UserGenerator} from '../../../test/helper/UserGenerator';
-
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
@@ -432,7 +430,7 @@ describe('MessageRepository', () => {
         muted_timestamp: 0,
         name: 'Test Group',
         others: [conversationPartner.id],
-        receipt_mode: Confirmation.Type.READ,
+        receipt_mode: RECEIPT_MODE.ON,
         status: ConversationStatus.CURRENT_MEMBER,
         team_id: createRandomUuid(),
         type: CONVERSATION_TYPE.REGULAR,

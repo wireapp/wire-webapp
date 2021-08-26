@@ -2814,10 +2814,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@13.1.0":
-  version "13.1.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-13.1.0.tgz#568686320e675213457df1c9868d8dc45dfdf642"
-  integrity sha512-N7nvsUReFz5txFfmZX8F25tYzMgQ58u6gT7+vdkZOcCt0qeWQ7j126x5iFYBHG3IYiW2R+1qUujx4uCfjZ25uQ==
+"@wireapp/api-client@13.3.1":
+  version "13.3.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-13.3.1.tgz#fa68df2f08b2baab2f218e7d39925dad5eed6883"
+  integrity sha512-tRZimrJ063Kv4YySG14XSxqP1LL639ecAPqX90Xds85nV50HwmXxcMwNUsIl8OoL9EM/c3sCeud8/jl68p5sDA==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2871,14 +2871,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.12.2":
-  version "17.12.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.12.2.tgz#45350b2fc98853ed6cc94a4a25234c383dfaa729"
-  integrity sha512-H2gUWtSHbL3vQCZxWMYWc+vhpx+Bl53U3t7MxZejTqGJCz8eBxVoPPT3gLuwao2g7POso3OTJDoJ5pufiIJRWA==
+"@wireapp/core@17.12.5":
+  version "17.12.5"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.12.5.tgz#cd77dc978277f00b6e205be261023518fc97ca2d"
+  integrity sha512-bRv7SXgzdn4yZYifqC6xsfygxUQB7rxQeoLqGZUWD4Gt/upvVmOmVoKwUc56ydJrLFFoEU/UxWoytcbSwl/buA==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "13.1.0"
+    "@wireapp/api-client" "13.3.1"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.9.6"
     hash.js "1.1.7"
