@@ -237,6 +237,7 @@ export class ConversationMapper {
       (others
         ? others.map(userId => ({domain: null, id: userId}))
         : members.others.map(other => ({domain: other.qualified_id?.domain || null, id: other.id})));
+
     conversationEntity.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload

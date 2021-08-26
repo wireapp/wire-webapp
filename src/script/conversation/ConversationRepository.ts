@@ -705,7 +705,6 @@ export class ConversationRepository {
    */
   public async updateConversations(conversationEntities: Conversation[]): Promise<void> {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
-    // TODO(Federation): Check if this flatten code behaves well with new user id schema
     const userIds = flatten(mapOfUserIds);
     await this.userRepository.getUsersById(userIds);
     conversationEntities.forEach(conversationEntity => this.fetchUsersAndEvents(conversationEntity));
@@ -1857,13 +1856,13 @@ export class ConversationRepository {
       return conversationEntity;
     }
 
-    const {from: sender, id, type, time} = eventJson;
+    const {from: senderId, id, type, time} = eventJson;
 
-    if (sender) {
+    if (senderId) {
       const allParticipantIds = conversationEntity
         .participating_user_ids()
         .concat({domain: this.userState.self().domain, id: this.userState.self().id});
-      const isFromUnknownUser = !allParticipantIds.includes(sender);
+      const isFromUnknownUser = !allParticipantIds.includes(senderId);
 
       if (isFromUnknownUser) {
         const membersUpdateMessages = [
@@ -1873,18 +1872,20 @@ export class ConversationRepository {
         ];
         const isMembersUpdateEvent = membersUpdateMessages.includes(eventJson.type);
         if (isMembersUpdateEvent) {
-          const isFromUpdatedMember = eventJson.data.user_ids.includes(sender);
+          const isFromUpdatedMember = eventJson.data.user_ids.includes(senderId);
           if (isFromUpdatedMember) {
             // we ignore leave/join events that are sent by the user actually leaving or joining
             return conversationEntity;
           }
         }
 
-        const message = `Received '${type}' event '${id}' from user '${sender}' unknown in '${conversationEntity.id}'`;
+        const message = `Received '${type}' event '${id}' from user '${senderId}' unknown in '${conversationEntity.id}'`;
         this.logger.warn(message, eventJson);
 
+        const qualifiedSender: QualifiedIdOptional = {domain: null, id: senderId};
+
         const timestamp = new Date(time).getTime() - 1;
-        return this.addMissingMember(conversationEntity, [sender], timestamp).then(() => conversationEntity);
+        return this.addMissingMember(conversationEntity, [qualifiedSender], timestamp).then(() => conversationEntity);
       }
     }
 
@@ -2262,7 +2263,7 @@ export class ConversationRepository {
           );
         if (!isSelfUser && !isParticipatingUser) {
           conversationEntity.participating_user_ids.push({
-            domain: otherMember.qualified_id?.domain,
+            domain: otherMember.qualified_id?.domain || null,
             id: otherMember.id,
           });
         }
@@ -2270,7 +2271,7 @@ export class ConversationRepository {
     } else {
       eventData.user_ids.forEach(userId => {
         const isSelfUser = userId === this.userState.self().id;
-        const isParticipatingUser = !!conversationEntity.participating_user_ids().find(user => user.id === userId);
+        const isParticipatingUser = conversationEntity.participating_user_ids().some(user => user.id === userId);
         if (!isSelfUser && !isParticipatingUser) {
           conversationEntity.participating_user_ids.push({domain: null, id: userId});
         }

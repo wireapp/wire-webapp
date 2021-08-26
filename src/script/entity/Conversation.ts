@@ -219,7 +219,7 @@ export class Conversation {
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
       // TODO(Federation): Check for domain once backend supports federated connections
-      if (connectedUserId && !this.participating_user_ids().find(user => user.id === connectedUserId)) {
+      if (connectedUserId && this.participating_user_ids().every(user => user.id !== connectedUserId)) {
         this.participating_user_ids.push({domain: null, id: connectedUserId});
       }
     });

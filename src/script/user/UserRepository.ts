@@ -574,10 +574,8 @@ export class UserRepository {
       return [];
     }
 
-    const findUsers = userIds.map(userId => this.findUserById(userId) || userId);
-
-    const resolveArray = await Promise.all(findUsers);
-    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => item instanceof User) as [
+    const allUsers = await Promise.all(userIds.map(userId => this.findUserById(userId) || userId));
+    const [knownUserEntities, unknownUserIds] = partition(allUsers, item => item instanceof User) as [
       User[],
       QualifiedIdOptional[],
     ];
