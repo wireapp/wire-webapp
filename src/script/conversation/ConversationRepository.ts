@@ -304,6 +304,7 @@ export class ConversationRepository {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
       qualified_users: otherFederatedDomainUserIds,
+      receipt_mode: null,
       users: sameFederatedDomainUserIds,
       ...options,
     };
@@ -345,10 +346,10 @@ export class ConversationRepository {
       const {conversationEntity} = await this.onCreate({
         conversation: response.id,
         data: {
-          ...response,
           last_event: '0.0',
           last_event_time: '1970-01-01T00:00:00.000Z',
           receipt_mode: null,
+          ...response,
         },
         from: this.userState.self().id,
         qualified_conversation: response.qualified_id,
@@ -2154,7 +2155,7 @@ export class ConversationRepository {
   private async onCreate(
     eventJson: ConversationCreateEvent,
     eventSource?: EventSource,
-  ): Promise<{conversationEntity: Conversation} | undefined> {
+  ): Promise<{conversationEntity: Conversation}> {
     const {conversation: conversationId, data: eventData, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
