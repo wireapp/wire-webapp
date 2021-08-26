@@ -25,7 +25,7 @@ const appConfigPkg = require('../app-config/package.json');
 require('dotenv').config();
 
 /**
- * This script create a Docker image of "wire-webapp" and uploads it to:
+ * This script creates a Docker image of "wire-webapp" and uploads it to:
  * https://quay.io/repository/wire/webapp?tab=tags
  *
  * To run this script, you need to have Docker installed (i.e. "Docker Desktop for Mac"). The docker deamon (or Docker for Desktop app) has to be started before running this script.
