@@ -163,9 +163,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const updateUnreadCount = (unreadCount: number) => setHasUnreadMessages(unreadCount > 0);
   useEffect(() => {
     amplify.subscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-    return () => {
-      amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
-    };
+    return () => amplify.unsubscribe(WebAppEvents.LIFECYCLE.UNREAD_COUNT, updateUnreadCount);
   }, []);
 
   const totalPages = callPages.length;
