@@ -36,7 +36,7 @@ require('dotenv').config();
  * yarn docker '' staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
  */
 
-/** Either empty (for our own cloud releases) or a suffix (i.e. "-ey") for custom deployments */
+/** Either empty (for our own cloud releases) or a suffix (i.e. "ey") for custom deployments */
 const distributionParam = process.argv[2] || '';
 /** Either "staging" (for internal releases / staging bumps) or "production" (for cloud releases) */
 const stageParam = process.argv[3] || '';
