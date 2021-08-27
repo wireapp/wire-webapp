@@ -28,7 +28,7 @@ require('dotenv').config();
  * This script creates a Docker image of "wire-webapp" and uploads it to:
  * https://quay.io/repository/wire/webapp?tab=tags
  *
- * To run this script, you need to have Docker installed (i.e. "Docker Desktop for Mac"). The docker deamon (or Docker for Desktop app) has to be started before running this script. Make sure to set "DOCKER_USERNAME" and "DOCKER_PASSWORD" in your local ".env" file or system environment variables.
+ * To run this script, you need to have Docker installed (i.e. "Docker Desktop for Mac"). The docker daemon (or Docker for Desktop app) has to be started before running this script. Make sure to set "DOCKER_USERNAME" and "DOCKER_PASSWORD" in your local ".env" file or system environment variables.
  *
  * Note: You must run "yarn build:prod" before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
  *
