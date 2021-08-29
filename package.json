@@ -31,7 +31,7 @@
     "react-intl": "5.20.10",
     "react-intl-po": "2.2.2",
     "react-redux": "7.2.4",
-    "react-router": "5.2.0",
+    "react-router": "5.2.1",
     "react-router-dom": "5.2.0",
     "react-transition-group": "4.4.2",
     "redux": "4.1.1",
