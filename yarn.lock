@@ -13726,6 +13726,11 @@ uuidjs@4.2.8:
   resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.8.tgz#cd42ba57b13c3369f3c3800b4786635da8916e0b"
   integrity sha512-ric9GPq5dSYq50Cu9PemXiKlRztZLzsdB0NrGTbE8cLSM9PxzObmM/Fghq7g/sfuz3dVF1cwQ1AMt6FeXMaGJw==
 
+uuidjs@4.2.9:
+  version "4.2.9"
+  resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.9.tgz#f1225bd51f9e8aee3c56ec3be0683c14dd9e05ed"
+  integrity sha512-ie/yQOFIBnswUUTPQRwMphF/OeE3Pg9y0jorjOPPFtGaeVp9JSdGN5rA9odsXDFH1UfwtpriJXKTro1JTNaIXg==
+
 v8-compile-cache@^2.0.3, v8-compile-cache@^2.2.0, v8-compile-cache@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.3.0.tgz#2de19618c66dc247dcfb6f99338035d8245a2cee"
