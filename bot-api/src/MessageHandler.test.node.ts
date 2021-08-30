@@ -41,7 +41,7 @@ describe('MessageHandler', () => {
     mainHandler = new MainHandler();
     mainHandler.account = new Account();
     await mainHandler.account!.initServices(new MemoryEngine());
-    mainHandler.account!['apiClient']['createContext']('user-id', ClientType.NONE);
+    await mainHandler.account!['apiClient']['createContext']('user-id', ClientType.NONE);
 
     spyOn(mainHandler.account!.service!.conversation, 'send').and.returnValue(Promise.resolve({} as TextMessage));
   });

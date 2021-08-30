@@ -19,12 +19,13 @@
 
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {APIClient} from '@wireapp/api-client';
-import {AuthAPI, Context} from '@wireapp/api-client/src/auth';
-import {ClientAPI, ClientType} from '@wireapp/api-client/src/client';
+import {AuthAPI} from '@wireapp/api-client/src/auth';
+import {ClientAPI, ClientType, RegisteredClient} from '@wireapp/api-client/src/client';
+import {Self, SelfAPI} from '@wireapp/api-client/src/self';
 import {ConversationAPI} from '@wireapp/api-client/src/conversation';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Notification, NotificationAPI} from '@wireapp/api-client/src/notification';
-import {ValidationUtil} from '@wireapp/commons';
+import {AccentColor, ValidationUtil} from '@wireapp/commons';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import * as Proteus from '@wireapp/proteus';
 import {MemoryEngine} from '@wireapp/store-engine';
@@ -108,7 +109,24 @@ describe('Account', () => {
 
     nock(MOCK_BACKEND.rest)
       .get(ClientAPI.URL.CLIENTS)
-      .reply(HTTP_STATUS.OK, [{id: CLIENT_ID}]);
+      .reply(HTTP_STATUS.OK, [{id: CLIENT_ID}] as RegisteredClient[]);
+
+    nock(MOCK_BACKEND.rest)
+      .get(SelfAPI.URL.SELF)
+      .reply(HTTP_STATUS.OK, {
+        email: 'email@example.com',
+        handle: 'exampleuser',
+        locale: 'en',
+        qualified_id: {
+          domain: 'example.com',
+          id: '024174ec-c098-4104-9424-3849804acb78',
+        },
+        accent_id: AccentColor.AccentColorID.BRIGHT_ORANGE,
+        picture: [],
+        name: 'Example User',
+        id: '024174ec-c098-4104-9424-3849804acb78',
+        assets: [],
+      } as Self);
   });
 
   describe('"createText"', () => {
@@ -154,11 +172,11 @@ describe('Account', () => {
       const account = new Account(apiClient);
 
       await account.initServices(new MemoryEngine());
-      const {clientId, clientType, userId} = (await account.login({
+      const {clientId, clientType, userId} = await account.login({
         clientType: ClientType.TEMPORARY,
         email: 'hello@example.com',
         password: 'my-secret',
-      })) as Context;
+      });
 
       expect(clientId).toBe(CLIENT_ID);
       expect(ValidationUtil.isUUIDv4(userId)).toBe(true);
