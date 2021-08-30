@@ -247,7 +247,7 @@ export class APIClient extends EventEmitter {
     CookieStore.setCookie(cookie);
 
     const initialAccessToken = await this.transport.http.refreshAccessToken();
-    const context = this.createContext(initialAccessToken.user, clientType);
+    const context = await this.createContext(initialAccessToken.user, clientType);
 
     await this.accessTokenStore.updateToken(initialAccessToken);
 
@@ -271,7 +271,7 @@ export class APIClient extends EventEmitter {
     return this.createContext(accessToken.user, loginData.clientType);
   }
 
-  public async loginWithToken(accessTokenString: string, clientType: ClientType = ClientType.NONE) {
+  public async loginWithToken(accessTokenString: string, clientType: ClientType = ClientType.NONE): Promise<Context> {
     const {userId} = parseAccessToken(accessTokenString);
 
     const accessTokenData: AccessTokenData = {
@@ -293,7 +293,7 @@ export class APIClient extends EventEmitter {
 
     const user = await this.auth.api.postRegister(userAccount);
 
-    this.createContext(user.id, clientType);
+    await this.createContext(user.id, clientType);
 
     return this.init(clientType, CookieStore.getCookie());
   }
@@ -317,8 +317,19 @@ export class APIClient extends EventEmitter {
     return this.transport.ws.connect(this.context?.clientId, onConnect);
   }
 
-  private createContext(userId: string, clientType: ClientType): Context {
-    this.context = this.context ? {...this.context, clientType} : {clientType, userId};
+  private async createContext(userId: string, clientType: ClientType): Promise<Context> {
+    let selfDomain = undefined;
+    try {
+      const self = await this.self.api.getSelf();
+      selfDomain = self.qualified_id?.domain;
+      this.logger.info(`Got self domain "${selfDomain}"`);
+    } catch (error) {
+      this.logger.warn('Could not get self user:', error.message);
+    }
+
+    this.context = this.context
+      ? {...this.context, clientType, domain: selfDomain}
+      : {clientType, userId, domain: selfDomain};
     return this.context;
   }
 

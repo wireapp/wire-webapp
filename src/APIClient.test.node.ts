@@ -20,11 +20,13 @@
 /* eslint-disable no-magic-numbers, dot-notation */
 
 import nock from 'nock';
+import {AccentColor} from '@wireapp/commons/src/main';
 
 import {APIClient} from './APIClient';
 import {AuthAPI} from './auth/AuthAPI';
 import {ClientType} from './client';
 import {BackendErrorLabel, StatusCode} from './http';
+import {Self, SelfAPI} from './self';
 import {UserAPI} from './user/UserAPI';
 
 describe('APIClient', () => {
@@ -39,6 +41,25 @@ describe('APIClient', () => {
     token_type: 'Bearer',
     user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
   };
+
+  beforeEach(() => {
+    nock(baseUrl)
+      .get(SelfAPI.URL.SELF)
+      .reply(StatusCode.OK, {
+        email: 'email@example.com',
+        handle: 'exampleuser',
+        locale: 'en',
+        qualified_id: {
+          domain: 'example.com',
+          id: '024174ec-c098-4104-9424-3849804acb78',
+        },
+        accent_id: AccentColor.AccentColorID.BRIGHT_ORANGE,
+        picture: [],
+        name: 'Example User',
+        id: '024174ec-c098-4104-9424-3849804acb78',
+        assets: [],
+      } as Self);
+  });
 
   describe('constructor', () => {
     it('constructs a client with production backend and StoreEngine by default', () => {
@@ -178,7 +199,7 @@ describe('APIClient', () => {
     it('can logout a user', async () => {
       const client = new APIClient();
 
-      client.context = client['createContext']('3721e5d3-558d-45ac-b476-b4a64a8f74c1', ClientType.TEMPORARY);
+      client.context = await client['createContext']('3721e5d3-558d-45ac-b476-b4a64a8f74c1', ClientType.TEMPORARY);
 
       await client.logout();
     });
