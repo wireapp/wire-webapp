@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.3.1...@wireapp/api-client@13.4.0) (2021-08-30)
+
+
+### Bug Fixes
+
+* **api-client:** Add missing typing ([7b40578](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/7b40578ec76e840e678c5ea504c395dc3d2a59f9))
+
+
+### Features
+
+* **api-client:** Get self domain when creating context ([#4121](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4121)) ([16d0a8c](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/16d0a8c75c6cefd03ba520542dd7da18d6541540))
+
+
+
+
+
 ## [13.3.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.3.0...@wireapp/api-client@13.3.1) (2021-08-25)
 
 
