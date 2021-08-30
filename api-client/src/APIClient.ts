@@ -40,7 +40,7 @@ import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
 import {CookieStore} from './auth/CookieStore';
 import {GiphyAPI} from './giphy/';
-import {HttpClient} from './http/';
+import {BackendError, HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
 import {ObfuscationUtil} from './obfuscation/';
 import {OnConnect, WebSocketClient} from './tcp/';
@@ -324,7 +324,7 @@ export class APIClient extends EventEmitter {
       selfDomain = self.qualified_id?.domain;
       this.logger.info(`Got self domain "${selfDomain}"`);
     } catch (error) {
-      this.logger.warn('Could not get self user:', error.message);
+      this.logger.warn('Could not get self user:', (error as BackendError).message);
     }
 
     this.context = this.context
