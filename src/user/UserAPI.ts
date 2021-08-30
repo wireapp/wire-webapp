@@ -20,7 +20,7 @@
 import Axios, {AxiosRequestConfig} from 'axios';
 import {ArrayUtil} from '@wireapp/commons';
 
-import {HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
+import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';
 import type {
   Activate,
   ActivationResponse,
@@ -252,7 +252,7 @@ export class UserAPI {
         const response = await this.client.sendJSON<SearchResult>(config);
         return response.data;
       } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Search request got cancelled');
         }
         throw error;

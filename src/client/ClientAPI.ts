@@ -22,7 +22,7 @@ import type {AxiosRequestConfig} from 'axios';
 import type {PreKeyBundle} from '../auth/';
 import type {NewClient, RegisteredClient, UpdatedClient} from '../client/';
 import {ClientCapabilityRemovedError} from './ClientError';
-import {BackendErrorLabel, HttpClient} from '../http/';
+import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {ClientCapabilityData} from './ClientCapabilityData';
 
 export class ClientAPI {
@@ -54,9 +54,9 @@ export class ClientAPI {
     try {
       await this.client.sendJSON(config);
     } catch (error) {
-      switch (error.label) {
+      switch ((error as BackendError).label) {
         case BackendErrorLabel.CLIENT_CAPABILITY_REMOVED: {
-          throw new ClientCapabilityRemovedError(error.message);
+          throw new ClientCapabilityRemovedError((error as BackendError).message);
         }
       }
       throw error;

@@ -21,7 +21,7 @@ import nock from 'nock';
 
 import {HttpClient} from './HttpClient';
 import {BackendErrorLabel} from './BackendErrorLabel';
-import {StatusCode} from '.';
+import {BackendError, StatusCode} from '.';
 import {AccessTokenStore, AuthAPI} from '../auth';
 
 describe('HttpClient', () => {
@@ -72,7 +72,7 @@ describe('HttpClient', () => {
         await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
         fail();
       } catch (error) {
-        expect(error.message).toBe('Authentication failed because the token is invalid.');
+        expect((error as BackendError).message).toBe('Authentication failed because the token is invalid.');
       }
     });
   });
@@ -94,7 +94,7 @@ describe('HttpClient', () => {
       await client._sendRequest({method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS});
       fail();
     } catch (error) {
-      expect(error.message).toBe('Authentication failed because the cookie is missing.');
+      expect((error as BackendError).message).toBe('Authentication failed because the cookie is missing.');
     }
   });
 });

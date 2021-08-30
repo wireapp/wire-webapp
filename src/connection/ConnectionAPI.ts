@@ -20,7 +20,7 @@
 import type {AxiosRequestConfig} from 'axios';
 
 import type {Connection, ConnectionRequest, ConnectionUpdate, UserConnectionList} from '../connection/';
-import {BackendErrorLabel, HttpClient} from '../http/';
+import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import {ConnectionLegalholdMissingConsentError} from './ConnectionError';
 
 export class ConnectionAPI {
@@ -109,9 +109,9 @@ export class ConnectionAPI {
       const response = await this.client.sendJSON<Connection>(config);
       return response.data;
     } catch (error) {
-      switch (error.label) {
+      switch ((error as BackendError).label) {
         case BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT: {
-          throw new ConnectionLegalholdMissingConsentError(error.message);
+          throw new ConnectionLegalholdMissingConsentError((error as BackendError).message);
         }
       }
       throw error;

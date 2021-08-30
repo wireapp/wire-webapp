@@ -21,7 +21,14 @@ import axios, {AxiosRequestConfig} from 'axios';
 import {ArrayUtil} from '@wireapp/commons';
 
 import {TeamAPI} from '../team/TeamAPI';
-import {handleProgressEvent, HttpClient, ProgressCallback, RequestCancelable, SyntheticErrorLabel} from '../../http/';
+import {
+  BackendError,
+  handleProgressEvent,
+  HttpClient,
+  ProgressCallback,
+  RequestCancelable,
+  SyntheticErrorLabel,
+} from '../../http/';
 import type {MemberData, Members} from '../member/';
 import {RequestCancellationError} from '../../user';
 import {MemberCSVResponse} from './MemberCSVResponse';
@@ -152,7 +159,7 @@ export class MemberAPI {
           mimeType: response.headers['content-type'],
         };
       } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Member CSV download got cancelled.');
         }
         throw error;

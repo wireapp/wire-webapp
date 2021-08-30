@@ -18,7 +18,7 @@
  */
 
 import Axios, {AxiosRequestConfig} from 'axios';
-import {HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http';
+import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http';
 import {RequestCancellationError} from '../../user';
 import {TeamAPI} from '../team';
 import {TeamSearchOptions} from './TeamSearchOptions';
@@ -58,7 +58,7 @@ export class TeamSearchAPI {
         const response = await this.client.sendJSON<TeamSearchResult>(config);
         return response.data;
       } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Search request got cancelled');
         }
         throw error;

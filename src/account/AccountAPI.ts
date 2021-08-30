@@ -20,7 +20,7 @@
 import type {AxiosRequestConfig} from 'axios';
 
 import {CustomBackendNotFoundError} from './AccountError';
-import {HttpClient, BackendErrorLabel} from '../http';
+import {HttpClient, BackendErrorLabel, BackendError} from '../http';
 import type {BackendConfigData} from './BackendConfigData';
 import type {CallConfigData} from './CallConfigData';
 import type {DomainData} from './DomainData';
@@ -173,9 +173,10 @@ export class AccountAPI {
       const response = await this.client.sendJSON<DomainData>(config);
       return response.data;
     } catch (error) {
-      switch (error.label) {
+      const backendError = error as BackendError;
+      switch (backendError.label) {
         case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
-          throw new CustomBackendNotFoundError(error.message);
+          throw new CustomBackendNotFoundError(backendError.message);
         }
       }
       throw error;
