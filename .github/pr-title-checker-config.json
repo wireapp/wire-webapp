@@ -1,0 +1,11 @@
+{
+  "LABEL": {
+    "name": "Title needs formatting",
+    "color": "FF0000"
+  },
+  "CHECKS": {
+    "prefixes": ["chore: ", "docs: ", "feat: ", "fix: ", "refactor: ", "style: ", "tes: "],
+    "regexp": "docs\\(v[0-9]\\): ",
+    "ignoreLabels": ["runfix"]
+  }
+}

@@ -1,0 +1,12 @@
+name: 'PR Title Check'
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: thehanimo/pr-title-checker@v1.2
+        with:
+          GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
