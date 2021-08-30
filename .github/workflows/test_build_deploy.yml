@@ -297,7 +297,8 @@ jobs:
         with:
           tag_name: ${{env.TAG}}
           name: ${{env.TAG}}
-          draft: true
+          body_path: ./CHANGELOG.md
+          draft: false
           prerelease: true
 
       - name: Notify staging bump
