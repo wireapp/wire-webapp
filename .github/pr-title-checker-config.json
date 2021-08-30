@@ -1,6 +1,6 @@
 {
   "LABEL": {
-    "name": "do-not-merge",
+    "name": "blocked: fix-pr-title",
     "color": "b60205"
   },
   "CHECKS": {
