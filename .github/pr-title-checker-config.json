@@ -1,7 +1,7 @@
 {
   "LABEL": {
-    "name": "Title needs formatting",
-    "color": "FF0000"
+    "name": "do-not-merge",
+    "color": "b60205"
   },
   "CHECKS": {
     "prefixes": ["docs: ", "feat: ", "fix: ", "refactor: ", "style: ", "test: "],
