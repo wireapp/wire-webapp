@@ -271,7 +271,7 @@ jobs:
             yarn docker "$DISTRIBUTION" production "$TAG"
           fi
 
-      - name: Generate changelog
+      - name: Generate changelog for production release
         if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         run: yarn changelog:ci
 
@@ -288,7 +288,11 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Create GitHub staging release draft
+      - name: Generate changelog for staging release
+        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        run: yarn changelog:dev
+
+      - name: Create GitHub staging release
         id: create_release_staging
         if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: softprops/action-gh-release@v1
@@ -297,7 +301,8 @@ jobs:
         with:
           tag_name: ${{env.TAG}}
           name: ${{env.TAG}}
-          draft: true
+          body_path: ./CHANGELOG.md
+          draft: false
           prerelease: true
 
       - name: Notify staging bump
