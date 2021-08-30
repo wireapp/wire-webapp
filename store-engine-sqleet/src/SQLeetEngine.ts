@@ -69,7 +69,7 @@ export class SQLeetEngine implements CRUDEngine {
         allowWebWorkerFallback: true,
       });
     } catch (error) {
-      throw new Error(`An error happened while initializing the engine: ${error.message}`);
+      throw new Error(`An error happened while initializing the engine: ${(error as Error).message}`);
     }
   }
 
@@ -198,7 +198,7 @@ export class SQLeetEngine implements CRUDEngine {
         '@primaryKey': primaryKey,
       });
     } catch (error) {
-      if (error.message.startsWith(`UNIQUE constraint failed: `)) {
+      if ((error as Error).message.startsWith(`UNIQUE constraint failed: `)) {
         const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
         throw new StoreEngineError.RecordAlreadyExistsError(message);
       } else {
@@ -303,7 +303,7 @@ export class SQLeetEngine implements CRUDEngine {
     } catch (error) {
       const isRecordNotFound =
         error instanceof StoreEngineError.RecordNotFoundError ||
-        error.constructor.name === StoreEngineError.RecordNotFoundError.name;
+        (error as Error).constructor.name === StoreEngineError.RecordNotFoundError.name;
       if (isRecordNotFound) {
         return this.create(tableName, primaryKey, changes);
       }

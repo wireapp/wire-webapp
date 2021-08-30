@@ -19,7 +19,7 @@
 
 import type {AxiosRequestConfig} from 'axios';
 
-import {BackendErrorLabel, HttpClient} from '../../http';
+import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
 import {InvalidAppLockTimeoutError} from './FeatureError';
 import type {
   FeatureAppLock,
@@ -194,9 +194,9 @@ export class FeatureAPI {
       const response = await this.client.sendJSON<FeatureAppLock>(config);
       return response.data;
     } catch (error) {
-      switch (error.label) {
+      switch ((error as BackendError).label) {
         case BackendErrorLabel.APP_LOCK_INVALID_TIMEOUT: {
-          throw new InvalidAppLockTimeoutError(error.message);
+          throw new InvalidAppLockTimeoutError((error as BackendError).message);
         }
       }
       throw error;

@@ -104,7 +104,7 @@ export function verifyPinning(hostname: string, remoteCertificate?: ElectronCert
   } catch (error) {
     return {
       decoding: false,
-      errorMessage: error,
+      errorMessage: (error as Error).message,
     };
   }
 

@@ -29,7 +29,10 @@ export class AutoConnectHandler extends MessageHandler {
         try {
           await this.sendConnectionResponse(content.to, true);
         } catch (error) {
-          console.warn(`Failed to accept connection request from "${payload.from}": ${error.message}`, error);
+          console.warn(
+            `Failed to accept connection request from "${payload.from}": ${(error as Error).message}`,
+            error,
+          );
         }
         break;
     }

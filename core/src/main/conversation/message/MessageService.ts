@@ -71,7 +71,7 @@ export class MessageService {
       }
     } catch (error) {
       const reEncryptedMessage = await this.onClientMismatch(
-        error,
+        error as AxiosError,
         {...message, data: base64CipherText ? Decoder.fromBase64(base64CipherText).asBytes : undefined, recipients},
         plainTextArray,
       );
@@ -260,7 +260,7 @@ export class MessageService {
         );
       }
     } catch (error) {
-      const reEncryptedMessage = await this.onClientProtobufMismatch(error, protoMessage, plainTextArray);
+      const reEncryptedMessage = await this.onClientProtobufMismatch(error as AxiosError, protoMessage, plainTextArray);
       if (conversationId === null) {
         await this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, reEncryptedMessage);
       } else {

@@ -21,7 +21,14 @@ import axios, {AxiosRequestConfig} from 'axios';
 
 import {AssetRetentionPolicy} from './AssetRetentionPolicy';
 import {base64MD5FromBuffer, concatToBuffer} from '../shims/node/buffer';
-import {handleProgressEvent, HttpClient, ProgressCallback, RequestCancelable, SyntheticErrorLabel} from '../http/';
+import {
+  BackendError,
+  handleProgressEvent,
+  HttpClient,
+  ProgressCallback,
+  RequestCancelable,
+  SyntheticErrorLabel,
+} from '../http/';
 import {isValidToken, isValidUUID} from './AssetUtil';
 import {RequestCancellationError} from '../user';
 import {unsafeAlphanumeric} from '../shims/node/random';
@@ -90,7 +97,7 @@ export class AssetAPI {
           mimeType: response.headers['content-type'],
         };
       } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Asset download got cancelled.');
         }
         throw error;
@@ -149,7 +156,7 @@ export class AssetAPI {
         const response = await this.client.sendRequest<AssetUploadData>(config);
         return response.data;
       } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Asset upload got cancelled.');
         }
         throw error;
@@ -202,7 +209,7 @@ export class AssetAPI {
           mimeType: response.headers['content-type'],
         };
       } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Asset download got cancelled.');
         }
         throw error;
@@ -253,7 +260,7 @@ export class AssetAPI {
           mimeType: response.headers['content-type'],
         };
       } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Asset download got cancelled.');
         }
         throw error;

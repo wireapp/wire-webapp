@@ -17,6 +17,7 @@
  *
  */
 
+import type {AxiosError} from 'axios';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {APIClient} from '@wireapp/api-client';
 import type {RegisterData} from '@wireapp/api-client/src/auth';
@@ -135,7 +136,7 @@ export class Account extends EventEmitter {
         try {
           await this.persistCookie(this.storeEngine, cookie);
         } catch (error) {
-          this.logger.error(`Failed to save cookie: ${error.message}`, error);
+          this.logger.error(`Failed to save cookie: ${(error as Error).message}`, error);
         }
       }
     });
@@ -255,10 +256,10 @@ export class Account extends EventEmitter {
       // There was no client so we need to "create" and "register" a client
       const notFoundInDatabase =
         error instanceof cryptobox.error.CryptoboxError ||
-        error.constructor.name === 'CryptoboxError' ||
+        (error as Error).constructor.name === 'CryptoboxError' ||
         error instanceof StoreEngineError.RecordNotFoundError ||
-        error.constructor.name === StoreEngineError.RecordNotFoundError.name;
-      const notFoundOnBackend = error.response?.status === HTTP_STATUS.NOT_FOUND;
+        (error as Error).constructor.name === StoreEngineError.RecordNotFoundError.name;
+      const notFoundOnBackend = (error as AxiosError).response?.status === HTTP_STATUS.NOT_FOUND;
 
       if (notFoundInDatabase) {
         this.logger.log(`Could not find valid client in database "${this.storeEngine?.storeName}".`);

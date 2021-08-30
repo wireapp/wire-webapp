@@ -20,7 +20,7 @@
 import Axios from 'axios';
 import type {AxiosRequestConfig} from 'axios';
 import type {NewTeamData, TeamChunkData, TeamData} from '../';
-import {HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http/';
+import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http/';
 import {RequestCancellationError} from '../../user';
 import type {TeamSizeData} from './TeamSizeData';
 import type {UpdateTeamData} from './UpdateTeamData';
@@ -99,7 +99,7 @@ export class TeamAPI {
         const response = await this.client.sendJSON<TeamSizeData>(config);
         return response.data;
       } catch (error) {
-        if (error.message === SyntheticErrorLabel.REQUEST_CANCELLED) {
+        if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
           throw new RequestCancellationError('Team size request got cancelled');
         }
         throw error;

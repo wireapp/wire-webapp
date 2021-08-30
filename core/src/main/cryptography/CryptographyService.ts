@@ -163,7 +163,7 @@ export class CryptographyService {
       const payloadAsArrayBuffer = await this.cryptobox.encrypt(sessionId, plainText, decodedPreKeyBundle.buffer);
       encryptedPayload = new Uint8Array(payloadAsArrayBuffer);
     } catch (error) {
-      this.logger.error(`Could not encrypt payload: ${error.message}`);
+      this.logger.error(`Could not encrypt payload: ${(error as Error).message}`);
       encryptedPayload = new Uint8Array(Buffer.from('💣', 'utf-8'));
     }
 

@@ -139,7 +139,7 @@ export class IndexedDBEngine implements CRUDEngine {
         const newPrimaryKey = await this.db.table<EntityType, PrimaryKey>(tableName).add(entity, primaryKey);
         return newPrimaryKey;
       } catch (error) {
-        throw this.mapDatabaseError(error, tableName, primaryKey);
+        throw this.mapDatabaseError(error as DexieError, tableName, primaryKey);
       }
     }
     const message = `Record "${primaryKey}" cannot be saved in "${tableName}" because it's "undefined" or "null".`;

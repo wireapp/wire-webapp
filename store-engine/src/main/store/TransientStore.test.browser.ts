@@ -64,7 +64,7 @@ describe('store.TransientStore', () => {
         fail();
       } catch (error) {
         expect(error).toEqual(jasmine.any(RecordAlreadyExistsError));
-        expect(error.code).toBe(1);
+        expect((error as RecordAlreadyExistsError).code).toBe(1);
       }
     });
   });

@@ -125,7 +125,7 @@ export class NotificationService extends EventEmitter {
     } catch (error) {
       if (
         error instanceof StoreEngineError.RecordNotFoundError ||
-        error.constructor.name === StoreEngineError.RecordNotFoundError.name
+        (error as Error).constructor.name === StoreEngineError.RecordNotFoundError.name
       ) {
         return this.database.createLastEventDate(eventDate);
       }
@@ -166,8 +166,15 @@ export class NotificationService extends EventEmitter {
           await this.setLastNotificationId(notification);
         }
       } catch (error) {
-        this.logger.error(`There was an error with notification ID "${notification.id}": ${error.message}`, error);
-        const notificationError: NotificationError = {error, notification, type: CoreError.NOTIFICATION_ERROR};
+        this.logger.error(
+          `There was an error with notification ID "${notification.id}": ${(error as Error).message}`,
+          error,
+        );
+        const notificationError: NotificationError = {
+          error: error as Error,
+          notification,
+          type: CoreError.NOTIFICATION_ERROR,
+        };
         this.emit(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError);
         continue;
       }

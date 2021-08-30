@@ -21,6 +21,8 @@ import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import fs from 'fs-extra';
 import path from 'path';
 
+type FSError = Error & {code: string};
+
 export interface FileEngineOptions {
   fileExtension: string;
 }
@@ -112,10 +114,10 @@ export class FileEngine implements CRUDEngine {
         await fs.writeFile(filePath, newEntity, {flag: 'wx'});
         return primaryKey;
       } catch (error) {
-        if (error.code === 'ENOENT') {
+        if ((error as FSError).code === 'ENOENT') {
           await fs.outputFile(filePath, newEntity);
           return primaryKey;
-        } else if (error.code === 'EEXIST') {
+        } else if ((error as FSError).code === 'EEXIST') {
           const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
           throw new StoreEngineError.RecordAlreadyExistsError(message);
         }
@@ -154,7 +156,7 @@ export class FileEngine implements CRUDEngine {
     try {
       data = await fs.readFile(file, {encoding: 'utf8', flag: 'r'});
     } catch (error) {
-      if (error.code === 'ENOENT') {
+      if ((error as FSError).code === 'ENOENT') {
         const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
         throw new StoreEngineError.RecordNotFoundError(message);
       }
@@ -185,7 +187,7 @@ export class FileEngine implements CRUDEngine {
     try {
       files = await fs.readdir(directory);
     } catch (error) {
-      if (error.code === 'ENOENT') {
+      if ((error as FSError).code === 'ENOENT') {
         return [];
       }
       throw error;
@@ -219,7 +221,7 @@ export class FileEngine implements CRUDEngine {
       await this.update(tableName, primaryKey, changes);
     } catch (error) {
       const doesNotExist = error instanceof StoreEngineError.RecordNotFoundError;
-      const doesNotExistAndHasNoPrimaryKey = error.code === 'EISDIR' && primaryKey === undefined;
+      const doesNotExistAndHasNoPrimaryKey = (error as FSError).code === 'EISDIR' && primaryKey === undefined;
 
       if (doesNotExist || doesNotExistAndHasNoPrimaryKey) {
         return this.create(tableName, primaryKey, changes);
