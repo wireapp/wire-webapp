@@ -84,7 +84,7 @@ describe('Account', () => {
       spyOn(account.service.cryptography, 'initCryptobox').and.returnValue(Promise.resolve());
       spyOn(account.service.client, 'getLocalClient').and.returnValue(Promise.resolve({id: clientId}));
       spyOn(account.apiClient.client.api, 'getClient').and.returnValue(Promise.resolve({id: clientId}));
-      account.apiClient.createContext('userId', 'clientType', 'clientId');
+      await account.apiClient.createContext('userId', 'clientType', 'clientId');
 
       await account.loadAndValidateLocalClient();
 
@@ -104,7 +104,7 @@ describe('Account', () => {
       spyOn(account.service.client, 'register').and.returnValue(Promise.resolve({id: clientId}));
       spyOn(account.service.client, 'synchronizeClients').and.returnValue(Promise.resolve());
       spyOn(account.service.notification, 'initializeNotificationStream').and.returnValue(Promise.resolve());
-      account.apiClient.createContext('userId', 'clientType', 'clientId');
+      await account.apiClient.createContext('userId', 'clientType', 'clientId');
 
       await account.registerClient();
 

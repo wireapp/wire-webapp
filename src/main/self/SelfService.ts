@@ -41,7 +41,6 @@ export class SelfService {
 
   public async getSelf(): Promise<Self> {
     const selfData = await this.apiClient.self.api.getSelf();
-    this.apiClient.context!.domain = selfData.qualified_id?.domain;
     return selfData;
   }
 
