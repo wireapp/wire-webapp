@@ -4,8 +4,8 @@
     "color": "FF0000"
   },
   "CHECKS": {
-    "prefixes": ["chore: ", "docs: ", "feat: ", "fix: ", "refactor: ", "style: ", "test: "],
+    "prefixes": ["docs: ", "feat: ", "fix: ", "refactor: ", "style: ", "test: "],
     "regexp": "docs\\(v[0-9]\\): ",
-    "ignoreLabels": ["runfix"]
+    "ignoreLabels": ["chore: ", "runfix: "]
   }
 }
