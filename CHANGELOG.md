@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.12.5...@wireapp/core@17.13.0) (2021-08-30)
+
+
+### Features
+
+* **api-client:** Get self domain when creating context ([#4121](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4121)) ([16d0a8c](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/16d0a8c75c6cefd03ba520542dd7da18d6541540))
+
+
+
+
+
 ## [17.12.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.12.4...@wireapp/core@17.12.5) (2021-08-25)
 
 
