@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/generate-changelog": "1.8.1",
     "@types/node": "~14",
-    "@wireapp/core": "17.12.5",
+    "@wireapp/core": "17.13.0",
     "commander": "8.0.0",
     "generate-changelog": "1.8.0"
   },
@@ -31,5 +31,5 @@
     "test": "exit 0",
     "test:project": "yarn dist && yarn test"
   },
-  "version": "4.5.26"
+  "version": "4.5.27"
 }

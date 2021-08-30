@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.17.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.16.26...@wireapp/bot-api@7.17.0) (2021-08-30)
+
+
+### Features
+
+* **api-client:** Get self domain when creating context ([#4121](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/4121)) ([16d0a8c](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/16d0a8c75c6cefd03ba520542dd7da18d6541540))
+
+
+
+
+
 ## [7.16.26](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.16.25...@wireapp/bot-api@7.16.26) (2021-08-25)
 
 **Note:** Version bump only for package @wireapp/bot-api
