@@ -5,6 +5,6 @@
   },
   "CHECKS": {
     "regexp": "(docs|feat|fix|refactor|style|test)\\((services|call|core)\\): ",
-    "ignoreLabels": ["chore: ", "runfix: "]
+    "ignoreLabels": ["chore(", "runfix("]
   }
 }
