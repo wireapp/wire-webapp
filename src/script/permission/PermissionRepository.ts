@@ -61,7 +61,7 @@ export class PermissionRepository {
         this.permissionState[permissionType](permissionState);
 
       return navigator.permissions
-        .query({name: permissionType})
+        .query({name: permissionType as any})
         .then(permissionStatus => {
           this.logger.log(`Permission state for '${permissionType}' is '${permissionStatus.state}'`);
           setPermissionState(permissionStatus.state as PermissionStatusState);

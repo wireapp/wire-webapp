@@ -35,12 +35,6 @@ import {MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 
-declare global {
-  interface MediaDevices {
-    getDisplayMedia: any;
-  }
-}
-
 export class MediaStreamHandler {
   static get CONFIG() {
     return {PERMISSION_HINT_DELAY: 200};
