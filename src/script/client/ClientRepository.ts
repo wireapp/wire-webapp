@@ -50,6 +50,7 @@ import {ClientState} from './ClientState';
 
 export type QualifiedUserClientMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
 export type UserPublicClientMap = {[userId: string]: PublicClient[]};
+export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 
 export class ClientRepository {
   private readonly logger: Logger;
@@ -375,7 +376,7 @@ export class ClientRepository {
   }
 
   async getClientsByUserIds(userIds: string[], updateClients: false): Promise<UserPublicClientMap>;
-  async getClientsByUserIds(userIds: string[], updateClients: true): Promise<Record<string, ClientEntity[]>>;
+  async getClientsByUserIds(userIds: string[], updateClients: true): Promise<UserClientEntityMap>;
   async getClientsByUserIds(
     userIds: string[],
     updateClients: boolean = true,
@@ -474,7 +475,7 @@ export class ClientRepository {
           const backendClient = clientsFromBackend[clientId];
 
           if (backendClient) {
-            const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, backendClient);
+            const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {...backendClient, domain});
 
             delete clientsFromBackend[clientId];
 

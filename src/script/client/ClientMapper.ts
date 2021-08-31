@@ -53,6 +53,10 @@ export class ClientMapper {
       clientEntity.meta.userId = userId;
     }
 
+    if (clientPayload.domain) {
+      clientEntity.domain = clientPayload.domain;
+    }
+
     return clientEntity;
   }
 
