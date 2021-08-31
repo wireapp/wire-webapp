@@ -429,7 +429,9 @@ export class ConversationRepository {
     const unknownConversations: ConversationRecord[] = [];
 
     conversationsDataArray.forEach(conversationData => {
-      const localEntity = this.conversationState.conversations().find(({id}) => id === conversationData.id);
+      const localEntity = this.conversationState
+        .conversations()
+        .find(({id, domain}) => id === conversationData.id && domain == conversationData.domain);
 
       if (localEntity) {
         const entity = ConversationMapper.updateSelfStatus(localEntity, conversationData as any, true);

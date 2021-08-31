@@ -281,11 +281,13 @@ export class ConversationMapper {
     return remoteConversations.map(
       (remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
         const conversationId = remoteConversationData.id;
+        const conversationDomain = remoteConversationData.qualified_id?.domain;
         const newLocalConversation = {id: conversationId} as ConversationDatabaseData;
         const localConversationData: ConversationDatabaseData =
-          localConversations.find(({id}) => id === conversationId) || newLocalConversation;
+          localConversations.find(({domain, id}) => id === conversationId && domain == conversationDomain) ||
+          newLocalConversation;
 
-        const {access, access_role, creator, members, message_timer, receipt_mode, name, team, type} =
+        const {access, access_role, creator, members, message_timer, qualified_id, receipt_mode, name, team, type} =
           remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
@@ -293,6 +295,7 @@ export class ConversationMapper {
           accessModes: access,
           accessRole: access_role,
           creator,
+          domain: qualified_id?.domain,
           message_timer,
           name,
           receipt_mode,
