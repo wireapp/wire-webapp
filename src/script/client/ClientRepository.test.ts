@@ -22,11 +22,10 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Runtime} from '@wireapp/commons';
 
 import {User} from 'src/script/entity/User';
-import {ClientRepository} from 'src/script/client/ClientRepository';
+import {ClientRepository, UserPublicClientMap} from 'src/script/client/ClientRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';
-import {QualifiedPublicUserMap} from 'src/script/client/ClientService';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {entities} from '../../../test/api/payloads';
 
@@ -56,12 +55,10 @@ describe('ClientRepository', () => {
         {class: ClientClassification.TABLET, id: 'c411f97b139c818b'},
         {class: ClientClassification.DESKTOP, id: 'cbf3ea49214702d8'},
       ];
-      const userClientMap: QualifiedPublicUserMap = {
-        none: {
-          [entities.user.john_doe.id]: allClients,
-        },
+      const userClientMap: UserPublicClientMap = {
+        [entities.user.john_doe.id]: allClients,
       };
-      spyOn(testFactory.client_repository.clientService, 'getClientsByUserIds').and.callFake(() =>
+      spyOn(testFactory.client_repository.clientService, 'getClientsByUserId').and.callFake(() =>
         Promise.resolve(userClientMap),
       );
 
@@ -69,7 +66,7 @@ describe('ClientRepository', () => {
         [entities.user.john_doe.id],
         false,
       );
-      expect(clientEntities.none[entities.user.john_doe.id].length).toBe(allClients.length);
+      expect(clientEntities[entities.user.john_doe.id].length).toBe(allClients.length);
     });
   });
 
@@ -151,14 +148,6 @@ describe('ClientRepository', () => {
       await expect(testFactory.client_repository.getValidLocalClient()).rejects.toMatchObject({
         type: ClientError.TYPE.DATABASE_FAILURE,
       });
-    });
-  });
-
-  describe('constructPrimaryKey', () => {
-    it('returns a proper primary key for a client', () => {
-      const actualPrimaryKey = testFactory.client_repository['constructPrimaryKey'](userId, clientId, null);
-      const expectedPrimaryKey = `${userId}@${clientId}`;
-      expect(actualPrimaryKey).toEqual(expectedPrimaryKey);
     });
   });
 
