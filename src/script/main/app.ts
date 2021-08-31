@@ -463,7 +463,7 @@ class App {
 
       userRepository['userState'].self().devices(clientEntities);
       this.logger.info('App pre-loading completed');
-      await this._handleUrlParams();
+      this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 

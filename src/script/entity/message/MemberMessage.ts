@@ -85,7 +85,9 @@ export class MemberMessage extends SystemMessage {
 
     // Users joined the conversation without sender
     this.joinedUserEntities = ko.pureComputed(() => {
-      return this.userEntities().filter(userEntity => !this.user() || this.user().id !== userEntity.id);
+      return this.userEntities().filter(
+        userEntity => !this.user() || (this.user().id !== userEntity.id && this.user().domain !== userEntity.domain),
+      );
     });
 
     this.joinedUserEntities.subscribe(joinedUserEntities => {
@@ -187,7 +189,7 @@ export class MemberMessage extends SystemMessage {
 
       switch (this.type) {
         case CONVERSATION_EVENT.MEMBER_JOIN: {
-          const senderJoined = this.otherUser().id === this.user().id;
+          const senderJoined = this.otherUser().id === this.user().id && this.otherUser().domain == this.user().domain;
           if (senderJoined) {
             return this.user().isMe
               ? t('conversationMemberJoinedSelfYou')
@@ -217,7 +219,7 @@ export class MemberMessage extends SystemMessage {
             return t('temporaryGuestLeaveMessage');
           }
 
-          const senderLeft = this.otherUser().id === this.user().id;
+          const senderLeft = this.otherUser().id === this.user().id && this.otherUser().domain == this.user().domain;
           if (senderLeft) {
             return this.user().isMe ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name);
           }

@@ -27,6 +27,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {StorageService} from '../storage/StorageService';
 import {APIClient} from '../service/APIClientSingleton';
 import {isQualifiedIdArray} from 'Util/TypePredicateUtil';
+import {constructUserPrimaryKey} from '../util/StorageUtil';
 
 export class UserService {
   private readonly logger: Logger;
@@ -60,7 +61,9 @@ export class UserService {
   saveUserInDb(userEntity: User): Promise<User> {
     const userData = userEntity.serialize();
 
-    return this.storageService.save(this.USER_STORE_NAME, userEntity.id, userData).then(primaryKey => {
+    const primaryKey = constructUserPrimaryKey(userEntity.domain, userEntity.id);
+
+    return this.storageService.save(this.USER_STORE_NAME, primaryKey, userData).then(primaryKey => {
       this.logger.info(`State of user '${primaryKey}' was stored`, userData);
       return userEntity;
     });

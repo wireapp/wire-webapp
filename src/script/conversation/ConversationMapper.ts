@@ -223,7 +223,7 @@ export class ConversationMapper {
     conversationEntity.type(type);
     conversationEntity.name(name || '');
 
-    const selfState = members ? members.self : conversationData;
+    const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
     if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
@@ -234,9 +234,9 @@ export class ConversationMapper {
     // Active participants from database or backend payload
     const participatingUserIds =
       qualified_others ||
-      (others
-        ? others.map(userId => ({domain: null, id: userId}))
-        : members.others.map(other => ({domain: other.qualified_id?.domain || null, id: other.id})));
+      (members?.others
+        ? members.others.map(other => ({domain: other.qualified_id?.domain || null, id: other.id}))
+        : others.map(userId => ({domain: null, id: userId})));
 
     conversationEntity.participating_user_ids(participatingUserIds);
 
@@ -304,6 +304,14 @@ export class ConversationMapper {
           team_id: team,
           type,
         };
+
+        const qualified_others = othersStates
+          ?.filter(other => !!other.qualified_id)
+          .map(({qualified_id}) => qualified_id);
+
+        if (qualified_others.length) {
+          updates.qualified_others = qualified_others;
+        }
 
         // Add roles for self
         if (selfState.conversation_role && !(selfState.id in updates.roles)) {

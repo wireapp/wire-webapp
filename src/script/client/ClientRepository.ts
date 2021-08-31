@@ -27,11 +27,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import murmurhash from 'murmurhash';
-
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
-
+import {constructClientPrimaryKey, loadValue} from 'Util/StorageUtil';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -43,7 +41,6 @@ import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
 import {ClientState} from './ClientState';
-import {Config} from '../Config';
 
 export type QualifiedUserClientMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
 
@@ -86,7 +83,7 @@ export class ClientRepository {
   //##############################################################################
 
   private deleteClientFromDb(userId: string, clientId: string, domain: string | null): Promise<string> {
-    return this.clientService.deleteClientFromDb(this.constructPrimaryKey(userId, clientId, domain));
+    return this.clientService.deleteClientFromDb(constructClientPrimaryKey(domain, userId, clientId));
   }
 
   /**
@@ -160,25 +157,6 @@ export class ClientRepository {
   }
 
   /**
-   * Construct the primary key to store clients in database.
-   *
-   * @param userId User ID from the owner of the client
-   * @param clientId ID of the client
-   * @param domain Domain of the remote participant (only available in federation-aware webapps)
-   */
-  private constructPrimaryKey(userId: string, clientId: string, domain: string | null): string {
-    /**
-     * For backward compatibility: We store clients with participants from our own domain without a domain in the session ID (legacy session ID format).
-     * All other clients (from users on a different domain/remote backends) will be saved with a domain in their primary key.
-     */
-    if (Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN !== domain) {
-      return domain ? `${domain}@${userId}@${clientId}` : `${userId}@${clientId}`;
-    }
-
-    return `${userId}@${clientId}`;
-  }
-
-  /**
    * Save a client into the database.
    *
    * @param userId ID of user client to be stored belongs to
@@ -186,7 +164,7 @@ export class ClientRepository {
    * @returns Resolves with the record stored in database
    */
   saveClientInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
-    const primaryKey = this.constructPrimaryKey(userId, clientPayload.id, clientPayload.domain);
+    const primaryKey = constructClientPrimaryKey(clientPayload.domain, userId, clientPayload.id);
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
@@ -206,7 +184,7 @@ export class ClientRepository {
     changes: Partial<ClientRecord>,
     domain: string | null,
   ): Promise<number> {
-    const primaryKey = this.constructPrimaryKey(userId, clientId, domain);
+    const primaryKey = constructClientPrimaryKey(domain, userId, clientId);
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
     return this.clientService.updateClientInDb(primaryKey, changes);
@@ -236,7 +214,7 @@ export class ClientRepository {
   private updateClientSchemaInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
     clientPayload.meta = {
       is_verified: false,
-      primary_key: this.constructPrimaryKey(userId, clientPayload.id, clientPayload.domain),
+      primary_key: constructClientPrimaryKey(clientPayload.domain, userId, clientPayload.id),
     };
     return this.saveClientInDb(userId, clientPayload);
   }

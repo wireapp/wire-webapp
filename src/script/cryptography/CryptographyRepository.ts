@@ -33,6 +33,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {arrayToBase64, base64ToArray} from 'Util/util';
+import {constructClientPrimaryKey} from 'Util/StorageUtil';
 
 import {CryptographyMapper} from './CryptographyMapper';
 import {Config} from '../Config';
@@ -218,7 +219,7 @@ export class CryptographyRepository {
   }
 
   private loadSession(userId: string, clientId: string, domain: string | null): Promise<CryptoboxSession | void> {
-    const sessionId = this.constructSessionId(userId, clientId, domain);
+    const sessionId = constructClientPrimaryKey(domain, userId, clientId);
 
     return this.cryptobox.session_load(sessionId).catch(() => {
       return this.getUserPreKeyByIds(userId, clientId, domain).then(preKey => {
@@ -240,27 +241,8 @@ export class CryptographyRepository {
     };
   }
 
-  /**
-   * Construct a session ID which will be used to persist Cryptobox sessions.
-   *
-   * @param userId User ID for the remote participant
-   * @param clientId Client ID of the remote participant
-   * @param domain Domain of the remote participant (only available in federation-aware webapps)
-   * @returns Session ID
-   */
-  private constructSessionId(userId: string, clientId: string, domain: string | null): string {
-    /**
-     * For backward compatibility: We store sessions with participants from our own domain without a domain in the session ID (legacy session ID format).
-     * All other sessions (with users from a different domain/remote backends) will be saved with a domain in their session ID.
-     */
-    if (Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN !== domain) {
-      return domain ? `${domain}@${userId}@${clientId}` : `${userId}@${clientId}`;
-    }
-    return `${userId}@${clientId}`;
-  }
-
   deleteSession(userId: string, clientId: string, domain: string | null): Promise<string> {
-    const sessionId = this.constructSessionId(userId, clientId, domain);
+    const sessionId = constructClientPrimaryKey(domain, userId, clientId);
     return this.cryptobox.session_delete(sessionId);
   }
 
@@ -370,7 +352,7 @@ export class CryptographyRepository {
         this.logger.log(
           `Initializing session with user '${userId}' (${clientId}${domainText}) with pre-key ID '${preKey.id}'.`,
         );
-        const sessionId = this.constructSessionId(userId, clientId, domain);
+        const sessionId = constructClientPrimaryKey(domain, userId, clientId);
         const preKeyArray = base64ToArray(preKey.key);
         return await this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
       }
@@ -394,7 +376,7 @@ export class CryptographyRepository {
           messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
             // TODO(Federation): Update code once federated messages are sent with '@wireapp/core'
-            const sessionId = this.constructSessionId(userId, clientId, null);
+            const sessionId = constructClientPrimaryKey(null, userId, clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
 
             accumulator.push(encryptionPromise);
@@ -426,7 +408,7 @@ export class CryptographyRepository {
         for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
           if (preKeyPayload) {
             // TODO(Federation): Update code once connections are implemented on the backend
-            const sessionId = this.constructSessionId(userId, clientId, null);
+            const sessionId = constructClientPrimaryKey(null, userId, clientId);
             const encryptionPromise = this.encryptPayloadForSession(
               sessionId,
               genericMessage,
@@ -487,7 +469,7 @@ export class CryptographyRepository {
     const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
     // TODO(Federation): Update code once messages from remote backends are received
-    const sessionId = this.constructSessionId(userId, eventData.sender, null);
+    const sessionId = constructClientPrimaryKey(null, userId, eventData.sender);
 
     const plaintext = await this.cryptobox.decrypt(sessionId, cipherText);
     return GenericMessage.decode(plaintext);
