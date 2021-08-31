@@ -17,7 +17,6 @@
  *
  */
 
-import {Confirmation} from '@wireapp/protocol-messaging';
 import {
   CONVERSATION_TYPE,
   CONVERSATION_ACCESS,
@@ -27,7 +26,7 @@ import {
   OtherMember as OtherMemberBackendData,
 } from '@wireapp/api-client/src/conversation/';
 import {createRandomUuid} from 'Util/util';
-
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {Conversation} from 'src/script/entity/Conversation';
 import {
   ConversationDatabaseData,
@@ -306,8 +305,8 @@ describe('ConversationMapper', () => {
 
   describe('mergeConversation', () => {
     function getDataWithReadReceiptMode(
-      localReceiptMode: Confirmation.Type,
-      remoteReceiptMode: Confirmation.Type,
+      localReceiptMode: RECEIPT_MODE,
+      remoteReceiptMode: RECEIPT_MODE,
     ): Partial<ConversationDatabaseData>[] {
       const conversationCreatorId = createRandomUuid();
       const conversationId = createRandomUuid();

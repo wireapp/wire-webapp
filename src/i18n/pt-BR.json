@@ -1044,7 +1044,7 @@
   "userProfileButtonConnect": "Conectar",
   "userProfileButtonIgnore": "Ignorar",
   "userProfileButtonUnblock": "Desbloquear",
-  "userProfileDomain": "Domain",
+  "userProfileDomain": "Domínio",
   "userProfileEmail": "E-mail",
   "userRemainingTimeHours": "{{time}}h restantes",
   "userRemainingTimeMinutes": "Menos de {{time}}m restantes",

@@ -996,6 +996,11 @@ export class CallingRepository {
       return;
     }
 
+    if (reason === REASON.NORMAL) {
+      this.callState.selectableScreens([]);
+      this.callState.selectableWindows([]);
+    }
+
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
       const conversationEntity = this.conversationState.findConversation(conversationId);
       const callingEvent = EventBuilder.buildCallingTimeoutEvent(

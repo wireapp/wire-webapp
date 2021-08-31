@@ -19,15 +19,13 @@
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
-
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationStatus} from '../conversation/ConversationStatus';
@@ -44,6 +42,7 @@ import type {Message} from './message/Message';
 import type {SystemMessage} from './message/SystemMessage';
 import {Config} from '../Config';
 import type {Call} from '../calling/Call';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import type {QualifiedIdOptional} from '../conversation/EventBuilder';
@@ -129,7 +128,7 @@ export class Conversation {
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
   public readonly participating_user_ids: ko.ObservableArray<QualifiedIdOptional>;
-  public readonly receiptMode: ko.Observable<Confirmation.Type>;
+  public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
   public readonly selfUser: ko.Observable<User>;
@@ -328,7 +327,7 @@ export class Conversation {
     this.localMessageTimer = ko.observable(null);
     this.globalMessageTimer = ko.observable(null);
 
-    this.receiptMode = ko.observable(Confirmation.Type.DELIVERED);
+    this.receiptMode = ko.observable(RECEIPT_MODE.OFF);
 
     this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
