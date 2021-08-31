@@ -29,6 +29,7 @@ import {
   UserAssetType as APIClientUserAssetType,
   QualifiedId,
 } from '@wireapp/api-client/src/user';
+import type {QualifiedUserMap} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
@@ -60,14 +61,13 @@ import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {UserMapper} from './UserMapper';
 import {UserState} from './UserState';
-import type {ClientRepository, QualifiedUserClientMap} from '../client/ClientRepository';
+import type {ClientRepository, QualifiedUserClientMap, UserPublicClientMap} from '../client/ClientRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
-import {QualifiedPublicUserMap} from '../client/ClientService';
 import {QualifiedIdOptional} from '../conversation/EventBuilder';
 
 export class UserRepository {
@@ -176,28 +176,28 @@ export class UserRepository {
   /**
    * Retrieves meta information about all the clients of a given user.
    */
-  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
-  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicUserMap>;
-  getClientsByUserIds(
-    userIds: (QualifiedId | string)[],
+  getClientsByQualifiedUserIds(
+    userIds: QualifiedId[],
     updateClients: boolean,
-  ): Promise<QualifiedUserClientMap | QualifiedPublicUserMap> {
-    return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
+  ): Promise<QualifiedUserClientMap | QualifiedUserMap> {
+    return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients as any);
   }
 
   /**
    * Retrieves meta information about all the clients of a given user.
    */
   getClientsByUsers(userEntities: User[], updateClients: true): Promise<QualifiedUserClientMap>;
-  getClientsByUsers(userEntities: User[], updateClients: false): Promise<QualifiedPublicUserMap>;
+  getClientsByUsers(userEntities: User[], updateClients: false): Promise<UserPublicClientMap>;
   getClientsByUsers(
     userEntities: User[],
     updateClients: boolean,
-  ): Promise<QualifiedUserClientMap | QualifiedPublicUserMap> {
-    const userIds: (QualifiedId | string)[] = userEntities.map(userEntity => {
-      return userEntity.domain ? {domain: userEntity.domain, id: userEntity.id} : userEntity.id;
-    });
+  ): Promise<QualifiedUserClientMap | UserPublicClientMap> {
+    if (!!userEntities[0]?.domain) {
+      const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+      return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients as any);
+    }
 
+    const userIds = userEntities.map(userEntity => userEntity.id);
     return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
   }
 
@@ -639,8 +639,7 @@ export class UserRepository {
    */
   updateUserById = async (userId: string | QualifiedId): Promise<void> => {
     const localUserEntity = this.findUserById(userId) || new User('', null);
-    const updatedUserData =
-      typeof userId === 'string' ? await this.userService.getUser(userId) : await this.userService.getUser(userId.id);
+    const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);

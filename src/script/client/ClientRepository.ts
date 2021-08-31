@@ -18,7 +18,13 @@
  */
 
 import ko from 'knockout';
-import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/src/client/';
+import {
+  ClientType,
+  PublicClient,
+  RegisteredClient,
+  ClientCapability,
+  QualifiedUserMap,
+} from '@wireapp/api-client/src/client/';
 import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/src/event';
 import {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Runtime} from '@wireapp/commons';
@@ -35,7 +41,7 @@ import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
-import type {ClientService, QualifiedPublicUserMap} from './ClientService';
+import type {ClientService} from './ClientService';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
@@ -43,6 +49,7 @@ import {ClientRecord} from '../storage';
 import {ClientState} from './ClientState';
 
 export type QualifiedUserClientMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
+export type UserPublicClientMap = {[userId: string]: PublicClient[]};
 
 export class ClientRepository {
   private readonly logger: Logger;
@@ -342,23 +349,20 @@ export class ClientRepository {
    * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
-  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
-  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicUserMap>;
-  async getClientsByUserIds(
-    userIds: (QualifiedId | string)[],
-    updateClients: boolean,
-  ): Promise<QualifiedPublicUserMap | QualifiedUserClientMap> {
-    const userClientsMap = await this.clientService.getClientsByUserIds(userIds);
-
+  async getClientsByQualifiedUserIds(userIds: QualifiedId[], updateClients: true): Promise<QualifiedUserClientMap>;
+  async getClientsByQualifiedUserIds(userIds: QualifiedId[], updateClients: false): Promise<QualifiedUserMap>;
+  async getClientsByQualifiedUserIds(
+    userIds: QualifiedId[],
+    updateClients?: boolean,
+  ): Promise<QualifiedUserMap | QualifiedUserClientMap> {
+    const userClientsMap = await this.clientService.getClientsByQualifiedUserIds(userIds);
     if (updateClients) {
       const clientEntityMap: QualifiedUserClientMap = {};
       await Promise.all(
         Object.entries(userClientsMap).map(([domain, userClientMap]) =>
           Promise.all(
             Object.entries(userClientMap).map(async ([userId, clients]) => {
-              if (!clientEntityMap[domain]) {
-                clientEntityMap[domain] = {};
-              }
+              clientEntityMap[domain] ||= {};
               clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients, true, domain);
             }),
           ),
@@ -368,6 +372,32 @@ export class ClientRepository {
     }
 
     return userClientsMap;
+  }
+
+  async getClientsByUserIds(userIds: string[], updateClients: false): Promise<UserPublicClientMap>;
+  async getClientsByUserIds(userIds: string[], updateClients: true): Promise<Record<string, ClientEntity[]>>;
+  async getClientsByUserIds(
+    userIds: string[],
+    updateClients: boolean = true,
+  ): Promise<Record<string, ClientEntity[]> | Record<string, PublicClient[]>> {
+    if (updateClients) {
+      const clientEntityMap: Record<string, ClientEntity[]> = {};
+      await Promise.all(
+        userIds.map(async userId => {
+          const clients = await this.clientService.getClientsByUserId(userId);
+          clientEntityMap[userId] = await this.updateClientsOfUserById(userId, clients, true, null);
+        }),
+      );
+      return clientEntityMap;
+    }
+
+    const publicClientMap: Record<string, PublicClient[]> = {};
+    await Promise.all(
+      userIds.map(async userId => {
+        publicClientMap[userId] = await this.clientService.getClientsByUserId(userId);
+      }),
+    );
+    return publicClientMap;
   }
 
   private async getClientByUserIdFromDb(requestedUserId: string): Promise<ClientRecord[]> {

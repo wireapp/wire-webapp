@@ -127,7 +127,7 @@ export class UserService {
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/user
    */
-  getUser(userId: string): Promise<APIClientUser> {
+  getUser(userId: string | QualifiedId): Promise<APIClientUser> {
     return this.apiClient.user.api.getUser(userId);
   }
 }

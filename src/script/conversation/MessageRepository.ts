@@ -1552,13 +1552,9 @@ export class MessageRepository {
 
         const qualifiedUsersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
         await Promise.all(
-          Object.values(qualifiedUsersMap).map(userClientMap =>
-            Object.entries(userClientMap).map(([userId, clients]) => {
-              return Promise.all(
-                clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)),
-              );
-            }),
-          ),
+          Object.entries(qualifiedUsersMap).map(([userId, clients]) => {
+            return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)));
+          }),
         );
       }
     }
