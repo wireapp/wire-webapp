@@ -22,7 +22,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Runtime} from '@wireapp/commons';
 
 import {User} from 'src/script/entity/User';
-import {ClientRepository, UserPublicClientMap} from 'src/script/client/ClientRepository';
+import {ClientRepository} from 'src/script/client/ClientRepository';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';
@@ -55,11 +55,9 @@ describe('ClientRepository', () => {
         {class: ClientClassification.TABLET, id: 'c411f97b139c818b'},
         {class: ClientClassification.DESKTOP, id: 'cbf3ea49214702d8'},
       ];
-      const userClientMap: UserPublicClientMap = {
-        [entities.user.john_doe.id]: allClients,
-      };
+
       spyOn(testFactory.client_repository.clientService, 'getClientsByUserId').and.callFake(() =>
-        Promise.resolve(userClientMap),
+        Promise.resolve(allClients),
       );
 
       const clientEntities = await testFactory.client_repository.getClientsByUserIds(

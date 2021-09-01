@@ -380,9 +380,9 @@ export class ClientRepository {
   async getClientsByUserIds(
     userIds: string[],
     updateClients: boolean = true,
-  ): Promise<Record<string, ClientEntity[]> | Record<string, PublicClient[]>> {
+  ): Promise<UserClientEntityMap | UserPublicClientMap> {
     if (updateClients) {
-      const clientEntityMap: Record<string, ClientEntity[]> = {};
+      const clientEntityMap: UserClientEntityMap = {};
       await Promise.all(
         userIds.map(async userId => {
           const clients = await this.clientService.getClientsByUserId(userId);
@@ -392,7 +392,7 @@ export class ClientRepository {
       return clientEntityMap;
     }
 
-    const publicClientMap: Record<string, PublicClient[]> = {};
+    const publicClientMap: UserPublicClientMap = {};
     await Promise.all(
       userIds.map(async userId => {
         publicClientMap[userId] = await this.clientService.getClientsByUserId(userId);
