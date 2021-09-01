@@ -544,7 +544,12 @@ describe('ConversationRepository', () => {
       return testFactory.conversation_repository.handleConversationEvent(event).then(() => {
         expect(testFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
           conversationEntity,
-          [event.from],
+          [
+            {
+              domain: null,
+              id: event.from,
+            },
+          ],
           new Date(event.time).getTime() - 1,
         );
       });

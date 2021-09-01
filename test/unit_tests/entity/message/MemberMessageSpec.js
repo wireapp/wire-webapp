@@ -70,11 +70,11 @@ describe('Member Message', () => {
       user_sender.name('Sender');
       message_et.user(user_sender);
 
-      const user_a = new User(createRandomUuid());
+      const user_a = new User(createRandomUuid(), null);
       user_a.name('John');
-      const user_b = new User(createRandomUuid());
+      const user_b = new User(createRandomUuid(), null);
       user_b.name('Jim');
-      const user_c = new User(createRandomUuid());
+      const user_c = new User(createRandomUuid(), null);
       user_c.name('Jill');
       message_et.userEntities.push(user_sender, user_a, user_b, user_c);
 
