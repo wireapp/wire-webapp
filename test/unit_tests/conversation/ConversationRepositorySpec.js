@@ -179,9 +179,9 @@ describe('ConversationRepository', () => {
         return Promise.reject(missingClientsError);
       });
 
-      spyOn(testFactory.client_service, 'getClientsByUserIds').and.returnValue(
-        Promise.resolve({
-          none: {
+      spyOn(testFactory.client_service, 'getClientsByUserId').and.returnValue(
+        Promise.resolve([
+          {
             [eventJson.id]: [
               {
                 class: ClientClassification.DESKTOP,
@@ -197,7 +197,7 @@ describe('ConversationRepository', () => {
               },
             ],
           },
-        }),
+        ]),
       );
 
       const injectLegalHoldMessageSpy = spyOn(testFactory.conversation_repository, 'injectLegalHoldMessage');
