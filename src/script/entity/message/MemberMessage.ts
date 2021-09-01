@@ -85,9 +85,11 @@ export class MemberMessage extends SystemMessage {
 
     // Users joined the conversation without sender
     this.joinedUserEntities = ko.pureComputed(() => {
-      return this.userEntities().filter(
-        userEntity => !this.user() || (this.user().id !== userEntity.id && this.user().domain !== userEntity.domain),
-      );
+      return this.userEntities().filter(userEntity => {
+        const userHasDifferentId = this.user().id !== userEntity.id;
+        const userIsFromDifferentDomain = this.user().domain !== userEntity.domain;
+        return userHasDifferentId || userIsFromDifferentDomain;
+      });
     });
 
     this.joinedUserEntities.subscribe(joinedUserEntities => {
