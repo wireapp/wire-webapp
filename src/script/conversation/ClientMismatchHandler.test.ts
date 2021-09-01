@@ -64,12 +64,10 @@ describe('ClientMismatchHandler', () => {
         }),
         getClientsByUsers: jest.fn().mockImplementation(() =>
           Promise.resolve({
-            none: {
-              [johnDoe.user_id]: [
-                {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
-                {class: ClientClassification.PHONE, id: '809fd276d6709474'},
-              ],
-            },
+            [johnDoe.user_id]: [
+              {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
+              {class: ClientClassification.PHONE, id: '809fd276d6709474'},
+            ],
           }),
         ),
       };
@@ -123,12 +121,10 @@ describe('ClientMismatchHandler', () => {
         }),
         getClientsByUsers: jest.fn().mockImplementation(() =>
           Promise.resolve({
-            none: {
-              [johnDoe.user_id]: [
-                {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
-                {class: ClientClassification.PHONE, id: '809fd276d6709474'},
-              ],
-            },
+            [johnDoe.user_id]: [
+              {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
+              {class: ClientClassification.PHONE, id: '809fd276d6709474'},
+            ],
           }),
         ),
       };
