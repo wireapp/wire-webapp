@@ -192,7 +192,8 @@ export class UserRepository {
     userEntities: User[],
     updateClients: boolean,
   ): Promise<QualifiedUserClientMap | UserPublicClientMap> {
-    if (!!userEntities[0]?.domain) {
+    // TODO(Federation): When detection a domain we actually should not need to check for the federation-feature because the system must be federation-aware. However, during the transition period it's safer to check for the config too.
+    if (!!userEntities[0]?.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
       const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
       return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients as any);
     }

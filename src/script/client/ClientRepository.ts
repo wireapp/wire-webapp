@@ -350,6 +350,7 @@ export class ClientRepository {
    * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
+  // TODO(Federation): A function that receives "QualifiedId" objects should always return a qualified client map
   async getClientsByQualifiedUserIds(userIds: QualifiedId[], updateClients: true): Promise<QualifiedUserClientMap>;
   async getClientsByQualifiedUserIds(userIds: QualifiedId[], updateClients: false): Promise<QualifiedUserMap>;
   async getClientsByQualifiedUserIds(
