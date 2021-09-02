@@ -483,10 +483,11 @@ export class UserRepository {
    * Find a local user.
    */
   findUserById(userId: string | QualifiedId): User | undefined {
-    return this.userState.users().find(userEntity => {
+    return this.userState.users().find(knownUser => {
       return typeof userId === 'string'
-        ? userEntity.id === userId
-        : userEntity.id === userId.id && userEntity.domain == userId.domain;
+        ? knownUser.id === userId
+        : // Don't check for the domain when the user query has no domain
+          knownUser.id === userId.id && (!userId.domain || knownUser.domain == userId.domain);
     });
   }
 
