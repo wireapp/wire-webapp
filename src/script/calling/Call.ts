@@ -25,7 +25,6 @@ import {sortUsersByPriority} from 'Util/StringUtil';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
-import {Config} from '../Config';
 
 export type ConversationId = string;
 
@@ -49,9 +48,7 @@ export class Call {
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
-  public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(
-    Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE,
-  );
+  public readonly isCbrEnabled: ko.Observable<boolean> = ko.observable(false);
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
   public blockMessages: boolean = false;
   public type?: CALL_MESSAGE_TYPE;

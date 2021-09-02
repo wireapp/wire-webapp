@@ -67,6 +67,7 @@ import './message/ReadReceiptStatus';
 import './message/PingMessage';
 import './message/MessageFooterLike';
 import './message/MessageLike';
+import './message/MessageQuote';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
