@@ -41,8 +41,8 @@ import {
 } from '@wireapp/protocol-messaging';
 import {ReactionType} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {NewOTRMessage, ClientMismatch} from '@wireapp/api-client/src/conversation/';
-import {RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
+import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
+import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
 import {container} from 'tsyringe';
@@ -85,7 +85,7 @@ import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
-import {CryptographyRepository, Recipients} from '../cryptography/CryptographyRepository';
+import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {UserRepository} from '../user/UserRepository';
@@ -245,6 +245,20 @@ export class MessageRepository {
       }
     }
     return undefined;
+  }
+
+  /**
+   * @see https://wearezeta.atlassian.net/wiki/spaces/CORE/pages/300351887/Using+federation+environments
+   * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
+   * @see https://docs.wire.com/understand/federation/index.html
+   */
+  async sendFederatedMessage(message: string): Promise<void> {
+    const conversation = this.conversationState.activeConversation();
+    const userIds: string[] | QualifiedId[] = conversation.domain
+      ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
+      : conversation.allUserEntities.map(user => user.id);
+
+    await this.cryptography_repository.sendCoreMessage(message, conversation.id, userIds, conversation.domain);
   }
 
   /**
@@ -764,11 +778,16 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(user_id: string, client_id: string, conversation_id: string): Promise<ClientMismatch> {
+  async resetSession(
+    user_id: string,
+    client_id: string,
+    conversation_id: string,
+    domain: string | null,
+  ): Promise<ClientMismatch> {
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 
     try {
-      const session_id = await this.cryptography_repository.deleteSession(user_id, client_id);
+      const session_id = await this.cryptography_repository.deleteSession(user_id, client_id, domain);
       if (session_id) {
         this.logger.info(`Deleted session with client '${client_id}' of user '${user_id}'.`);
       } else {
@@ -865,6 +884,7 @@ export class MessageRepository {
     });
 
     this.messageSender.queueMessage(() => {
+      // TODO(Federation): Apply logic for 'sendFederatedMessage'. The 'createRecipients' logic will be done inside of '@wireapp/core'.
       return this.createRecipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
         const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
@@ -1171,19 +1191,15 @@ export class MessageRepository {
 
   /**
    * Create a user client map for a given conversation.
-   *
-   * @param conversation_id Conversation ID
-   * @param skip_own_clients `true`, if other own clients should be skipped (to not sync messages on own clients)
-   * @param user_ids Optionally the intended recipient users
-   * @returns Resolves with a user client map
+   * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
   async createRecipients(
     conversation_id: string,
     skip_own_clients = false,
     user_ids: string[] = null,
-  ): Promise<Recipients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id);
-    const recipients: Recipients = {};
+  ): Promise<UserClients> {
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id, null);
+    const recipients: UserClients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
         if (user_ids && !user_ids.includes(userEntity.id)) {
@@ -1250,7 +1266,7 @@ export class MessageRepository {
     if (ensureUser) {
       return messagePromise.then(message => {
         if (message.from && !message.user().id) {
-          return this.userRepository.getUserById(message.from).then(userEntity => {
+          return this.userRepository.getUserById(message.from, message.user().domain).then(userEntity => {
             message.user(userEntity);
             return message as ContentMessage;
           });
@@ -1279,7 +1295,11 @@ export class MessageRepository {
       // Since this is a bare API client user we use `.deleted`
       const isDeleted = user.deleted === true;
       if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, user.id);
+        await this.conversationRepositoryProvider().teamMemberLeave(
+          this.teamState.team().id,
+          user.id,
+          this.userState.self().domain,
+        );
       }
     }
   }
@@ -1479,28 +1499,33 @@ export class MessageRepository {
     } catch (axiosError) {
       const error = axiosError.response?.data || axiosError;
       if (error.missing) {
-        const remoteUserClients = error.missing as Recipients;
+        const remoteUserClients = error.missing as UserClients;
         const localUserClients = await this.createRecipients(conversationEntity.id);
         const selfId = this.userState.self().id;
 
-        const deletedUserClients = Object.entries(localUserClients).reduce((deleted, [userId, clients]) => {
-          if (userId === selfId) {
+        const deletedUserClients = Object.entries(localUserClients).reduce<UserClients>(
+          (deleted, [userId, clients]) => {
+            if (userId === selfId) {
+              return deleted;
+            }
+            const deletedClients = getDifference(remoteUserClients[userId], clients);
+            if (deletedClients.length) {
+              deleted[userId] = deletedClients;
+            }
             return deleted;
-          }
-          const deletedClients = getDifference(remoteUserClients[userId], clients);
-          if (deletedClients.length) {
-            deleted[userId] = deletedClients;
-          }
-          return deleted;
-        }, {} as Recipients);
+          },
+          {},
+        );
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId))),
+            Promise.all(
+              clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId, null)),
+            ),
           ),
         );
 
-        const missingUserIds = Object.entries(remoteUserClients).reduce((missing, [userId, clients]) => {
+        const missingUserIds = Object.entries(remoteUserClients).reduce<string[]>((missing, [userId, clients]) => {
           if (userId === selfId) {
             return missing;
           }
@@ -1519,7 +1544,9 @@ export class MessageRepository {
         await Promise.all(
           Object.values(qualifiedUsersMap).map(userClientMap =>
             Object.entries(userClientMap).map(([userId, clients]) => {
-              return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client)));
+              return Promise.all(
+                clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)),
+              );
             }),
           ),
         );

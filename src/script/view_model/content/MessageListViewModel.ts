@@ -389,7 +389,12 @@ export class MessageListViewModel {
 
     messageEntity.is_resetting_session(true);
     try {
-      await this.messageRepository.resetSession(messageEntity.from, messageEntity.client_id, this.conversation().id);
+      await this.messageRepository.resetSession(
+        messageEntity.from,
+        messageEntity.client_id,
+        this.conversation().id,
+        messageEntity.domain,
+      );
       resetProgress();
     } catch (error) {
       this.logger.warn('Error while trying to reset session', error);
@@ -586,11 +591,12 @@ export class MessageListViewModel {
       ? (event.target as HTMLElement).closest<HTMLSpanElement>('.message-mention')
       : undefined;
     const userId = mentionElement?.dataset.userId;
+    const domain = mentionElement?.dataset.domain;
 
     if (userId) {
       (async () => {
         try {
-          const userEntity = await this.userRepository.getUserById(userId);
+          const userEntity = await this.userRepository.getUserById(userId, domain);
           this.showUserDetails(userEntity);
         } catch (error) {
           if (error.type !== UserError.TYPE.USER_NOT_FOUND) {

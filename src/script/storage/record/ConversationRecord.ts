@@ -6,7 +6,8 @@ import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/src/conversation';
-import {Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
 export interface ConversationRecord {
   accessModes: CONVERSATION_ACCESS[];
@@ -15,6 +16,7 @@ export interface ConversationRecord {
   archived_timestamp: number;
   cleared_timestamp: number;
   creator: string;
+  domain?: string;
   ephemeral_timer: number;
   global_message_timer: number;
   id: string;
@@ -28,7 +30,7 @@ export interface ConversationRecord {
   muted_timestamp: number;
   name: string;
   others: string[];
-  receipt_mode?: Confirmation.Type;
+  receipt_mode: RECEIPT_MODE | null;
   roles: {[userId: string]: DefaultConversationRoleName | string};
   status: ConversationStatus;
   team_id: string;

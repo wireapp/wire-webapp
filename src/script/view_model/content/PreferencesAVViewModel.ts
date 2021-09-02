@@ -76,6 +76,7 @@ export class PreferencesAVViewModel {
   videoMediaStream: ko.PureComputed<MediaStream>;
   willChangeMediaSource: WillChangeMediaSource;
   optionVbrEncoding: ko.Observable<boolean>;
+  isCbrEncodingEnforced: boolean;
   supportsConferenceCalling: boolean;
   optionAgcEnabled: ko.Observable<boolean>;
 
@@ -135,9 +136,13 @@ export class PreferencesAVViewModel {
 
     this.brandName = this.Config.BRAND_NAME;
 
-    this.optionVbrEncoding = ko.observable(false);
+    this.isCbrEncodingEnforced = Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE;
+
+    this.optionVbrEncoding = ko.observable(!this.isCbrEncodingEnforced);
     this.optionVbrEncoding.subscribe(vbrEncoding => {
-      this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, vbrEncoding);
+      if (!this.isCbrEncodingEnforced) {
+        this.propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, vbrEncoding);
+      }
     });
 
     this.optionAgcEnabled = ko.observable(this.constraintsHandler.getAgcPreference());
@@ -343,7 +348,7 @@ export class PreferencesAVViewModel {
   }
 */
   readonly updateProperties = ({settings}: WebappProperties): void => {
-    this.optionVbrEncoding(settings.call.enable_vbr_encoding);
+    this.optionVbrEncoding(!this.isCbrEncodingEnforced && settings.call.enable_vbr_encoding);
   };
 
   saveCallLogs(): number | void {

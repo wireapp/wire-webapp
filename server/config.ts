@@ -145,8 +145,10 @@ const config: ServerConfig = {
       ENABLE_DEBUG: process.env.FEATURE_ENABLE_DEBUG == 'true',
       ENABLE_DOMAIN_DISCOVERY: process.env.FEATURE_ENABLE_DOMAIN_DISCOVERY != 'false',
       ENABLE_FEDERATION: process.env.FEATURE_ENABLE_FEDERATION == 'true',
+      ENABLE_MEDIA_EMBEDS: process.env.FEATURE_ENABLE_MEDIA_EMBEDS != 'false',
       ENABLE_PHONE_LOGIN: process.env.FEATURE_ENABLE_PHONE_LOGIN != 'false',
       ENABLE_SSO: process.env.FEATURE_ENABLE_SSO == 'true',
+      ENFORCE_CONSTANT_BITRATE: process.env.FEATURE_ENFORCE_CONSTANT_BITRATE == 'true',
       FEDERATION_DOMAIN: process.env.FEATURE_FEDERATION_DOMAIN,
       PERSIST_TEMPORARY_CLIENTS: process.env.FEATURE_PERSIST_TEMPORARY_CLIENTS != 'false',
       SHOW_LOADING_INFORMATION: process.env.FEATURE_SHOW_LOADING_INFORMATION == 'true',
@@ -158,6 +160,7 @@ const config: ServerConfig = {
     URL: {
       ACCOUNT_BASE: process.env.URL_ACCOUNT_BASE,
       MOBILE_BASE: process.env.URL_MOBILE_BASE,
+      PRICING: process.env.URL_PRICING,
       PRIVACY_POLICY: process.env.URL_PRIVACY_POLICY,
       SUPPORT: {
         BUG_REPORT: process.env.URL_SUPPORT_BUG_REPORT,

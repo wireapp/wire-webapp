@@ -35,7 +35,7 @@ import {StartUIViewModel} from './list/StartUIViewModel';
 import {TakeoverViewModel} from './list/TakeoverViewModel';
 import {TemporaryGuestViewModel} from './list/TemporaryGuestViewModel';
 
-import {Context} from '../ui/ContextMenu';
+import {showContextMenu} from '../ui/ContextMenu';
 import {showLabelContextMenu} from '../ui/LabelContextMenu';
 import {Shortcut} from '../ui/Shortcut';
 import {ShortcutType} from '../ui/ShortcutType';
@@ -265,7 +265,7 @@ export class ListViewModel {
     }
 
     if (nextItem) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem, {});
     }
   };
 
@@ -406,7 +406,7 @@ export class ListViewModel {
     this.switchList(ListViewModel.STATE.TEMPORARY_GUEST);
     this.modal(ListViewModel.MODAL_TYPE.TEMPORARY_GUEST);
     const conversationEntity = this.conversationRepository.getMostRecentConversation();
-    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity);
+    amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
 
   readonly onContextMenu = (conversationEntity: Conversation, event: MouseEvent): void => {
@@ -516,7 +516,7 @@ export class ListViewModel {
       });
     }
 
-    Context.from(event, entries, 'conversation-list-options-menu');
+    showContextMenu(event, entries, 'conversation-list-options-menu');
   };
 
   readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {

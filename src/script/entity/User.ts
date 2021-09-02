@@ -113,8 +113,9 @@ export class User {
     };
   }
 
-  constructor(id: string = '') {
+  constructor(id: string = '', domain: string | null) {
     this.id = id;
+    this.domain = domain;
     this.isMe = false;
     this.isService = false;
     this.isSingleSignOn = false;
@@ -206,6 +207,10 @@ export class User {
   }
 
   isOnSameFederatedDomain(otherDomain: string = Config.getConfig().FEATURE.FEDERATION_DOMAIN): boolean {
+    if (!Config.getConfig().FEATURE.ENABLE_FEDERATION) {
+      return true;
+    }
+
     return this.domain === otherDomain;
   }
 
@@ -254,6 +259,7 @@ export class User {
   serialize() {
     return {
       availability: this.availability(),
+      domain: this.domain,
       id: this.id,
     };
   }

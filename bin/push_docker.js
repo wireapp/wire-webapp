@@ -21,24 +21,32 @@
 
 const child = require('child_process');
 const appConfigPkg = require('../app-config/package.json');
-const {execSync} = require('child_process');
 
 require('dotenv').config();
 
-let currentBranch = '';
+/**
+ * This script creates a Docker image of "wire-webapp" and uploads it to:
+ * https://quay.io/repository/wire/webapp?tab=tags
+ *
+ * To run this script, you need to have Docker installed (i.e. "Docker Desktop for Mac"). The docker daemon (or Docker for Desktop app) has to be started before running this script. Make sure to set "DOCKER_USERNAME" and "DOCKER_PASSWORD" in your local ".env" file or system environment variables.
+ *
+ * Note: You must run "yarn build:prod" before creating the Docker image, otherwise the compiled JavaScript code (and other assets) won't be part of the bundle.
+ *
+ * Demo execution:
+ * yarn docker '' staging '2021-08-25' '1240cfda9e609470cf1154e18f5bc582ca8907ff'
+ */
 
-try {
-  currentBranch = execSync('git rev-parse HEAD').toString().trim();
-} catch (error) {}
-
+/** Either empty (for our own cloud releases) or a suffix (i.e. "ey") for custom deployments */
 const distributionParam = process.argv[2] || '';
+/** Either "staging" (for internal releases / staging bumps) or "production" (for cloud releases) */
 const stageParam = process.argv[3] || '';
-const releaseParam = process.argv[4] || '';
-const commitSha = process.env.GITHUB_SHA || 'COMMIT_ID';
-const commitShaLength = 7;
-const commitShortSha = commitSha.substring(0, commitShaLength - 1);
+/** Version tag of webapp (i.e. "2021-08-25") */
+const versionParam = process.argv[4] || '';
+/** Commit ID of https://github.com/wireapp/wire-webapp (i.e. "1240cfda9e609470cf1154e18f5bc582ca8907ff") */
+const commitSha = process.env.GITHUB_SHA || process.argv[5];
+const commitShortSha = commitSha.substring(0, 7);
 const configurationEntry = `wire-web-config-default-${
-  distributionParam ? distributionParam : currentBranch === 'master' ? 'master' : 'staging'
+  distributionParam || stageParam === 'production' ? 'master' : 'staging'
 }`;
 const configVersion = appConfigPkg.dependencies[configurationEntry].split('#')[1];
 const dockerRegistryDomain = 'quay.io';
@@ -48,8 +56,8 @@ const tags = [];
 if (stageParam) {
   tags.push(`${repository}:${stageParam}`);
 }
-if (releaseParam) {
-  tags.push(`${repository}:${releaseParam}-${configVersion}-${commitShortSha}`);
+if (stageParam === 'production') {
+  tags.push(`${repository}:${versionParam}-${configVersion}-${commitShortSha}`);
 }
 
 const dockerCommands = [

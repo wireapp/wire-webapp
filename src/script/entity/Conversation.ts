@@ -19,15 +19,13 @@
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {Availability, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-
+import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
 import {truncate} from 'Util/StringUtil';
-
 import {ACCESS_STATE} from '../conversation/AccessState';
 import {NOTIFICATION_STATE} from '../conversation/NotificationSetting';
 import {ConversationStatus} from '../conversation/ConversationStatus';
@@ -44,6 +42,7 @@ import type {Message} from './message/Message';
 import type {SystemMessage} from './message/SystemMessage';
 import {Config} from '../Config';
 import type {Call} from '../calling/Call';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 
@@ -67,7 +66,6 @@ enum TIMESTAMP_TYPE {
 }
 
 export class Conversation {
-  [key: string]: any;
   public readonly archivedState: ko.Observable<boolean>;
   private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
   private readonly isManaged: boolean;
@@ -98,7 +96,7 @@ export class Conversation {
   public readonly hasLegalHold: ko.Computed<boolean>;
   public readonly hasService: ko.PureComputed<boolean>;
   public readonly hasUnread: ko.PureComputed<boolean>;
-  public readonly id: string;
+  public id: string;
   public readonly inTeam: ko.PureComputed<boolean>;
   public readonly is_archived: ko.Observable<boolean>;
   public readonly is_cleared: ko.PureComputed<boolean>;
@@ -129,7 +127,7 @@ export class Conversation {
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
   public readonly participating_user_ids: ko.ObservableArray<string>;
-  public readonly receiptMode: ko.Observable<Confirmation.Type>;
+  public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
   public readonly selfUser: ko.Observable<User>;
@@ -143,13 +141,20 @@ export class Conversation {
   public readonly unreadState: ko.PureComputed<UnreadState>;
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
   public readonly withAllTeamMembers: ko.Observable<boolean>;
+  public readonly hasExternal: ko.PureComputed<boolean>;
+  public accessModes?: CONVERSATION_ACCESS[];
+  public accessRole?: CONVERSATION_ACCESS_ROLE;
+  public domain?: string;
+  public isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
   }
 
-  constructor(conversation_id: string = '') {
+  constructor(conversation_id: string = '', domain?: string) {
     this.id = conversation_id;
+
+    this.domain = domain;
 
     this.logger = getLogger(`Conversation (${this.id})`);
 
@@ -295,6 +300,8 @@ export class Conversation {
       () => this.selfUser().id === this.creator && !this.removed_from_conversation(),
     );
 
+    this.isFederated = ko.pureComputed(() => Config.getConfig().FEATURE.ENABLE_FEDERATION && !!this.domain);
+
     this.showNotificationsEverything = ko.pureComputed(() => {
       return this.notificationState() === NOTIFICATION_STATE.EVERYTHING;
     });
@@ -318,7 +325,7 @@ export class Conversation {
     this.localMessageTimer = ko.observable(null);
     this.globalMessageTimer = ko.observable(null);
 
-    this.receiptMode = ko.observable(Confirmation.Type.DELIVERED);
+    this.receiptMode = ko.observable(RECEIPT_MODE.OFF);
 
     this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
@@ -491,6 +498,14 @@ export class Conversation {
 
   get allUserEntities() {
     return [this.selfUser()].concat(this.participating_user_ets());
+  }
+
+  get isRemoteConversation(): boolean {
+    if (!Config.getConfig().FEATURE.ENABLE_FEDERATION || typeof this.domain === 'undefined') {
+      return false;
+    }
+
+    return this.domain !== Config.getConfig().FEATURE.FEDERATION_DOMAIN;
   }
 
   readonly persistState = (): void => {
@@ -908,6 +923,7 @@ export class Conversation {
       archived_timestamp: this.archivedTimestamp(),
       cleared_timestamp: this.cleared_timestamp(),
       creator: this.creator,
+      domain: this.domain,
       ephemeral_timer: this.localMessageTimer(),
       global_message_timer: this.globalMessageTimer(),
       id: this.id,

@@ -25,6 +25,8 @@ import {RichProfileRepository} from 'src/script/user/RichProfileRepository';
 import TestPage from 'Util/test/TestPage';
 import {createRandomUuid} from 'Util/util';
 import EnrichedFields, {EnrichedFieldsProps} from './EnrichedFields';
+import {Config, Configuration} from '../../Config';
+import type {TypeUtil} from '@wireapp/commons';
 
 class EnrichedFieldsPage extends TestPage<EnrichedFieldsProps> {
   constructor(props?: EnrichedFieldsProps) {
@@ -32,6 +34,8 @@ class EnrichedFieldsPage extends TestPage<EnrichedFieldsProps> {
   }
 
   getEntries = () => this.get('[data-uie-name="item-enriched-key"]');
+  findByValue = (expectedValue: string) =>
+    this.get(`[data-uie-name="item-enriched-value"][data-uie-value="${expectedValue}"]`);
 }
 
 const richInfo: Partial<RichInfo> = {
@@ -52,7 +56,7 @@ const createRichProfileRepository = () => {
 describe('EnrichedFields', () => {
   it('displays all the given fields', async () => {
     const richProfileRepository = createRichProfileRepository();
-    const user = new User(createRandomUuid());
+    const user = new User(createRandomUuid(), null);
     const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user});
 
     await act(() =>
@@ -66,7 +70,7 @@ describe('EnrichedFields', () => {
 
   it('displays the email if set on user', async () => {
     const richProfileRepository = createRichProfileRepository();
-    const user = new User(createRandomUuid());
+    const user = new User(createRandomUuid(), null);
     user.email('user@inter.net');
     const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user});
 
@@ -79,9 +83,49 @@ describe('EnrichedFields', () => {
     expect(enrichedFields.getEntries().length).toEqual(3);
   });
 
+  it('displays the domain of a user when the federation feature flag is turned on', async () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_FEDERATION: true,
+      },
+    });
+
+    const richProfileRepository = createRichProfileRepository();
+    const domain = 'wire.com';
+    const user = new User(createRandomUuid(), domain);
+    const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user});
+    await act(() =>
+      waitFor(() => {
+        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
+      }),
+    );
+    enrichedFields.update();
+    expect(enrichedFields.findByValue(domain).length).toBe(1);
+  });
+
+  it('does NOT display the domain of a user when the federation feature flag is turned off', async () => {
+    spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
+      FEATURE: {
+        ENABLE_FEDERATION: false,
+      },
+    });
+
+    const richProfileRepository = createRichProfileRepository();
+    const domain = 'wire.com';
+    const user = new User(createRandomUuid(), domain);
+    const enrichedFields = new EnrichedFieldsPage({richProfileRepository, user});
+    await act(() =>
+      waitFor(() => {
+        expect(richProfileRepository.getUserRichProfile).toHaveBeenCalled();
+      }),
+    );
+    enrichedFields.update();
+    expect(enrichedFields.findByValue(domain).length).toBe(0);
+  });
+
   it('calls the `onFieldsLoaded` function when fields are loaded', async () => {
     const richProfileRepository = createRichProfileRepository();
-    const user = new User(createRandomUuid());
+    const user = new User(createRandomUuid(), null);
     const onFieldsLoaded = jest.fn();
     const enrichedFields = new EnrichedFieldsPage({onFieldsLoaded, richProfileRepository, user});
 

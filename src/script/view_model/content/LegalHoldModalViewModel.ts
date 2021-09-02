@@ -24,7 +24,7 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
-import {UserDevicesHistory, UserDevicesState, makeUserDevicesHistory} from 'Components/userDevices';
+import {UserDevicesState, makeUserDevicesHistory} from 'Components/UserDevices';
 import {t} from 'Util/LocalizerUtil';
 
 import {UserState} from '../../user/UserState';
@@ -35,6 +35,7 @@ import type {CryptographyRepository} from '../../cryptography/CryptographyReposi
 import type {MessageRepository} from '../../conversation/MessageRepository';
 import type {TeamRepository} from '../../team/TeamRepository';
 import type {User} from '../../entity/User';
+import {splitFingerprint} from 'Util/StringUtil';
 import {KEY} from 'Util/KeyboardUtil';
 
 export class LegalHoldModalViewModel {
@@ -49,7 +50,7 @@ export class LegalHoldModalViewModel {
   devicesUser: ko.Observable<User>;
   onBgClick: () => void;
   onClosed: () => void;
-  userDevicesHistory: UserDevicesHistory;
+  userDevicesHistory;
   showDeviceList: () => boolean;
   isLoading: ko.Observable<boolean>;
   showRequest: ko.Observable<boolean>;
@@ -83,7 +84,7 @@ export class LegalHoldModalViewModel {
     this.isLoading = ko.observable(false);
     this.isSendingApprove = ko.observable(false);
     this.skipShowUsers = ko.observable(false);
-    this.showDeviceList = () => this.userDevicesHistory.current() === UserDevicesState.DEVICE_LIST;
+    this.showDeviceList = () => this.userDevicesHistory.current().state === UserDevicesState.DEVICE_LIST;
     this.conversationId = null;
 
     this.onBgClick = () => {
@@ -100,7 +101,7 @@ export class LegalHoldModalViewModel {
       this.isLoading(false);
     };
     this.disableSubmit = ko.pureComputed(() => this.requiresPassword() && this.passwordValue().length < 1);
-    amplify.subscribe(LegalHoldModalViewModel.SHOW_REQUEST, (fingerprint?: string[]) =>
+    amplify.subscribe(LegalHoldModalViewModel.SHOW_REQUEST, (fingerprint?: string) =>
       this.showRequestModal(false, fingerprint),
     );
     amplify.subscribe(LegalHoldModalViewModel.HIDE_REQUEST, this.hideModal);
@@ -108,7 +109,7 @@ export class LegalHoldModalViewModel {
     amplify.subscribe(LegalHoldModalViewModel.HIDE_DETAILS, this.hideLegalHoldModal);
   }
 
-  showRequestModal = async (showLoading?: boolean, fingerprint?: string[]) => {
+  showRequestModal = async (showLoading?: boolean, fingerprint?: string) => {
     this.showRequest(true);
     const setModalParams = (value: boolean) => {
       this.isVisible(value);
@@ -141,7 +142,9 @@ export class LegalHoldModalViewModel {
     }
     this.isVisible(true);
     this.isLoading(false);
-    const formattedFingerprint = fingerprint.map(part => `<span>${part} </span>`).join('');
+    const formattedFingerprint = splitFingerprint(fingerprint)
+      .map(part => `<span>${part} </span>`)
+      .join('');
     this.requestFingerprint(
       `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${formattedFingerprint}</span>`,
     );
@@ -217,7 +220,7 @@ export class LegalHoldModalViewModel {
     this.isLoading(true);
     this.isVisible(true);
     await this.messageRepository.updateAllClients(conversation, false);
-    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation.id);
+    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation.id, conversation.domain);
     const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
     if (!legalHoldUsers.length) {
       this.isVisible(false);

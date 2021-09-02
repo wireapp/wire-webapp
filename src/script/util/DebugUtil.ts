@@ -223,7 +223,7 @@ export class DebugUtil {
     event: ConversationEvent,
   ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
     const conversation = await this.conversationRepository.getConversationById(event.conversation);
-    const user = await this.userRepository.getUserById(event.from);
+    const user = await this.userRepository.getUserById(event.from, event.qualified_from?.domain);
 
     const debugInformation = {
       conversation,

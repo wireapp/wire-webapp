@@ -39,7 +39,7 @@ const createDeleteMessage = (partialDeleteMessage: Partial<DeleteMessageEntity>)
     displayTimestampShort: () => '',
     timestamp: ko.observable(Date.now()),
     unsafeSenderName: ko.pureComputed(() => ''),
-    user: ko.observable(new User('userId')),
+    user: ko.observable(new User('userId', null)),
     ...partialDeleteMessage,
   };
   return DeleteMessage as DeleteMessageEntity;

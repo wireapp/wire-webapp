@@ -21,7 +21,7 @@ import {t} from 'Util/LocalizerUtil';
 
 import type {ConversationLabelRepository} from '../conversation/ConversationLabelRepository';
 import type {Conversation} from '../entity/Conversation';
-import {Context, ContextMenuEntry} from '../ui/ContextMenu';
+import {showContextMenu, ContextMenuEntry} from './ContextMenu';
 
 export const showLabelContextMenu = (
   event: MouseEvent,
@@ -51,5 +51,5 @@ export const showLabelContextMenu = (
     : [noLabels];
 
   const entries: ContextMenuEntry[] = [newLabel, separator, ...namedLabels];
-  Context.from(event, entries, 'conversation-label-context-menu');
+  showContextMenu(event, entries, 'conversation-label-context-menu');
 };

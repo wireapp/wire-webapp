@@ -18,39 +18,33 @@
  */
 
 import type {Connection as ConnectionData} from '@wireapp/api-client/src/connection/';
-
-import {Logger, getLogger} from 'Util/Logger';
-
 import {ConnectionEntity} from './ConnectionEntity';
 
 /**
  * Connection mapper to convert all server side JSON connections into core connection entities.
  */
 export class ConnectionMapper {
-  readonly logger: Logger;
-
-  constructor() {
-    this.logger = getLogger('ConnectionMapper');
-  }
-
-  mapConnectionFromJson(connectionData: ConnectionData): ConnectionEntity {
+  static mapConnectionFromJson(connectionData: ConnectionData): ConnectionEntity {
     const connectionEntity = new ConnectionEntity();
-    return this.updateConnectionFromJson(connectionEntity, connectionData);
+    return ConnectionMapper.updateConnectionFromJson(connectionEntity, connectionData);
   }
 
   /**
    * Convert multiple JSON connections into connection entities.
-   * @param connectionsData Connection data
    */
-  mapConnectionsFromJson(connectionsData: ConnectionData[]): ConnectionEntity[] {
-    return connectionsData.filter(Boolean).map(connectionData => this.mapConnectionFromJson(connectionData));
+  static mapConnectionsFromJson(connectionsData: ConnectionData[]): ConnectionEntity[] {
+    return connectionsData
+      .filter(Boolean)
+      .map(connectionData => ConnectionMapper.mapConnectionFromJson(connectionData));
   }
 
   /**
-   * Maps JSON connection into a blank connection entity or updates an existing one.
-   * @param connectionEntity Connection entity that the info shall be mapped to
+   * Updates a connection entity in-place.
    */
-  updateConnectionFromJson(connectionEntity: ConnectionEntity, connectionData: ConnectionData): ConnectionEntity {
+  static updateConnectionFromJson(
+    connectionEntity: ConnectionEntity,
+    connectionData: ConnectionData,
+  ): ConnectionEntity {
     const {conversation, from, last_update, message, status, to: remoteUserId} = connectionData;
 
     connectionEntity.status(status);

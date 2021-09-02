@@ -21,36 +21,47 @@ import React, {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {registerReactComponent} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {AssetRepository} from '../assets/AssetRepository';
 import {useViewPortObserver} from '../ui/viewportObserver';
+import {TeamState} from '../team/TeamState';
+import RestrictedImage from './asset/RestrictedImage';
+import useEffectRef from 'Util/useEffectRef';
 
 export interface ImageProps extends React.HTMLProps<HTMLDivElement> {
   asset: AssetRemoteData;
   assetRepository?: AssetRepository;
-  click?: (asset: AssetRemoteData) => void;
+  click?: (asset: AssetRemoteData, event: React.MouseEvent) => void;
+  isQuote?: boolean;
+  teamState?: TeamState;
 }
 
 const Image: React.FC<ImageProps> = ({
   asset,
   click,
   className,
+  isQuote = false,
   assetRepository = container.resolve(AssetRepository),
+  teamState = container.resolve(TeamState),
   ...props
 }) => {
-  const [isInViewport, viewportElementRef] = useViewPortObserver();
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const isInViewport = useViewPortObserver(viewportElementRef);
+
   const [assetIsLoading, setAssetIsLoading] = useState<boolean>(false);
   const [assetSrc, setAssetSrc] = useState<string>();
 
-  const onClick = () => {
+  const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
+
+  const onClick = (event: React.MouseEvent) => {
     if (!assetIsLoading && typeof click === 'function') {
-      click(asset);
+      click(asset, event);
     }
   };
 
   useEffect(() => {
-    if (isInViewport === true) {
+    if (isInViewport && isFileSharingReceivingEnabled) {
       setAssetIsLoading(true);
       assetRepository.load(asset).then(blob => {
         if (blob) {
@@ -66,8 +77,10 @@ const Image: React.FC<ImageProps> = ({
     };
   }, [isInViewport]);
 
-  return (
-    <div ref={viewportElementRef} className={cx('image-wrapper', className)} {...props}>
+  return !isFileSharingReceivingEnabled ? (
+    <RestrictedImage className={className} showMessage={!isQuote} isSmall={isQuote} />
+  ) : (
+    <div ref={setViewportElementRef} className={cx('image-wrapper', className)} {...props}>
       {assetSrc ? (
         <img onClick={onClick} src={assetSrc} />
       ) : (
@@ -81,5 +94,5 @@ export default Image;
 
 registerReactComponent<ImageProps>('image-component', {
   component: Image,
-  template: '<span data-bind="react: {className, asset: ko.unwrap(asset), assetRepository, click}"></span>',
+  template: '<span data-bind="react: {className, asset: ko.unwrap(asset), assetRepository, click, isQuote}"></span>',
 });

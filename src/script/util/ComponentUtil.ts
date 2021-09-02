@@ -41,25 +41,27 @@ export function registerReactComponent<Props>(
     component,
   }: RegisterReactComponentWithBindings<Props> | RegisterReactComponentWithTemplate<Props>,
 ) {
-  ko.components.register(name, {
-    template: template ?? `<!-- ko react: {${bindings}} --><!-- /ko -->`,
-    viewModel: function (knockoutParams: Props) {
-      const bindingsString = bindings ?? /react: ?{([^]*)}/.exec(template)[1];
-      const pairs = bindingsString?.split(',');
-      const neededParams = pairs?.map(pair => {
-        const [name, value = name] = pair.split(':');
-        return value.replace(/ko\.unwrap\(|\)/g, '').trim();
-      }) as (keyof Props)[];
+  if (!ko.components.isRegistered(name)) {
+    ko.components.register(name, {
+      template: template ?? `<!-- ko react: {${bindings}} --><!-- /ko -->`,
+      viewModel: function (knockoutParams: Props) {
+        const bindingsString = bindings ?? /react: ?{([^]*)}/.exec(template)[1];
+        const pairs = bindingsString?.split(',');
+        const neededParams = pairs?.map(pair => {
+          const [name, value = name] = pair.split(':');
+          return value.replace(/ko\.unwrap\(|\)/g, '').trim();
+        }) as (keyof Props)[];
 
-      neededParams.forEach(param => {
-        if (!knockoutParams.hasOwnProperty(param)) {
-          knockoutParams[param] = undefined;
-        }
-      });
-      Object.assign(this, knockoutParams);
-      this.reactComponent = component;
-    },
-  });
+        neededParams.forEach(param => {
+          if (!knockoutParams.hasOwnProperty(param)) {
+            knockoutParams[param] = undefined;
+          }
+        });
+        Object.assign(this, knockoutParams);
+        this.reactComponent = component;
+      },
+    });
+  }
 }
 
 export const useKoSubscribableCallback = <T = any>(
@@ -86,7 +88,10 @@ type UnwrappedValues<T, S = Subscribables<T>> = {
   [Key in keyof S]: Unwrapped<S[Key]>;
 };
 
-export const useKoSubscribableChildren = <C extends keyof Subscribables<P>, P extends Record<C, ko.Subscribable>>(
+export const useKoSubscribableChildren = <
+  C extends keyof Subscribables<P>,
+  P extends Partial<Record<C, ko.Subscribable>>,
+>(
   parent: P,
   children: C[],
 ): UnwrappedValues<P> => {
@@ -108,5 +113,27 @@ export const useKoSubscribableChildren = <C extends keyof Subscribables<P>, P ex
     return () => subscriptions.forEach(subscription => subscription?.dispose());
   }, [parent]);
 
+  return state;
+};
+
+export const useKoSubscribableMap = <C extends keyof Subscribables<P>, P extends Partial<Record<C, ko.Subscribable>>>(
+  parents: P[],
+  child: C,
+): Unwrapped<P[C]>[] => {
+  const getValues = (roots: P[]): Unwrapped<P[C]>[] =>
+    roots.reduce((acc, root) => [...acc, root?.[child]?.()], [] as Unwrapped<P[C]>[]);
+
+  const [state, setState] = useState<Unwrapped<P[C]>[]>();
+
+  useEffect(() => {
+    setState(getValues(parents));
+    const subscriptions = parents.map(parent => {
+      return parent?.[child]?.subscribe(() => {
+        setState(getValues(parents));
+      });
+    });
+
+    return () => subscriptions.forEach(subscription => subscription?.dispose());
+  }, [parents]);
   return state;
 };

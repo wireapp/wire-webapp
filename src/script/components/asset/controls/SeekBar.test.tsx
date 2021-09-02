@@ -56,7 +56,7 @@ describe('SeekBar', () => {
     const testPage = new SeekBarPage({
       dark: false,
       disabled: false,
-      src: audioElement,
+      mediaElement: audioElement,
     });
 
     expect(testPage.getProgress()).toEqual('0%');

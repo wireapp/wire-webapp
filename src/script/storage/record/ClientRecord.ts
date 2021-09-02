@@ -23,11 +23,12 @@ export interface ClientRecord {
   address?: string;
   class: ClientClassification | '?';
   cookie?: string;
+  domain?: string;
   id: string;
   label?: string;
   location?: {
-    lat: number;
-    lon: number;
+    lat?: number;
+    lon?: number;
   };
   meta?: {
     is_verified?: boolean;

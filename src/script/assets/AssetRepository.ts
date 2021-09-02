@@ -140,7 +140,7 @@ export class AssetRepository {
             progress => asset.downloadProgress(progress * 100),
           );
           asset.cancelDownload = request.cancel;
-          return request.response;
+          return await request.response;
         }
         case 2: {
           const request = await this.assetService.downloadAssetV2(
@@ -150,7 +150,7 @@ export class AssetRepository {
             progress => asset.downloadProgress(progress),
           );
           asset.cancelDownload = request.cancel;
-          return request.response;
+          return await request.response;
         }
         case 1: {
           const request = await this.assetService.downloadAssetV1(
@@ -160,7 +160,7 @@ export class AssetRepository {
             progress => asset.downloadProgress(progress),
           );
           asset.cancelDownload = request.cancel;
-          return request.response;
+          return await request.response;
         }
         default:
           throw Error('Cannot map URL data.');

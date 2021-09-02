@@ -28,6 +28,7 @@ import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';
 import {QualifiedPublicUserMap} from 'src/script/client/ClientService';
 import {TestFactory} from '../../../test/helper/TestFactory';
+import {entities} from '../../../test/api/payloads';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();
@@ -155,22 +156,9 @@ describe('ClientRepository', () => {
 
   describe('constructPrimaryKey', () => {
     it('returns a proper primary key for a client', () => {
-      const actualPrimaryKey = testFactory.client_repository['constructPrimaryKey'](userId, clientId);
+      const actualPrimaryKey = testFactory.client_repository['constructPrimaryKey'](userId, clientId, null);
       const expectedPrimaryKey = `${userId}@${clientId}`;
-
       expect(actualPrimaryKey).toEqual(expectedPrimaryKey);
-    });
-
-    it('throws an error if missing user ID', () => {
-      const functionCall = () => testFactory.client_repository['constructPrimaryKey'](undefined, clientId);
-
-      expect(functionCall).toThrowError(ClientError);
-    });
-
-    it('throws an error if missing client ID', () => {
-      const functionCall = () => testFactory.client_repository['constructPrimaryKey'](userId, undefined);
-
-      expect(functionCall).toThrowError(ClientError);
     });
   });
 
@@ -240,7 +228,7 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity();
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
-      testFactory.client_repository.selfUser(new User(userId));
+      testFactory.client_repository.selfUser(new User(userId, null));
       const result = testFactory.client_repository['isCurrentClient'](userId, clientId);
 
       expect(result).toBeTruthy();

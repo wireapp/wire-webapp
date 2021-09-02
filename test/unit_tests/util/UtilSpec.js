@@ -54,19 +54,19 @@ describe('createRandomUuid', () => {
 
 describe('formatBytes', () => {
   it('renders 0 bytes', () => {
-    expect(formatBytes(0)).toEqual('0B');
+    expect(formatBytes(0)).toEqual('0 B');
   });
 
-  it('renders 1KB', () => {
-    expect(formatBytes(1024)).toEqual('1KB');
+  it('renders 1 KB', () => {
+    expect(formatBytes(1024)).toEqual('1 KB');
   });
 
-  it('renders 25MB', () => {
-    expect(formatBytes(25 * 1024 * 1024)).toEqual('25MB');
+  it('renders 25 MB', () => {
+    expect(formatBytes(25 * 1024 * 1024)).toEqual('25 MB');
   });
 
-  it('renders 25GB', () => {
-    expect(formatBytes(25 * 1024 * 1024 * 1024)).toEqual('25GB');
+  it('renders 25 GB', () => {
+    expect(formatBytes(25 * 1024 * 1024 * 1024)).toEqual('25 GB');
   });
 });
 

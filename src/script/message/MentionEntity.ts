@@ -41,12 +41,13 @@ export class MentionEntity {
   length: number;
   type: PROTO_MESSAGE_TYPE;
   userId: string;
+  domain: string | null;
 
-  constructor(startIndex: number, length: number, userId: string) {
+  constructor(startIndex: number, length: number, userId: string, domain: string | null) {
     this.startIndex = startIndex;
     this.length = length;
     this.type = PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
-
+    this.domain = domain;
     this.userId = userId;
   }
 

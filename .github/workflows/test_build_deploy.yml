@@ -55,8 +55,6 @@ jobs:
           echo "BUILD_DESKTOP=${{contains(env.TAG, 'staging') || contains(env.TAG, 'production') || contains(env.PR_LAST_COMMIT_MESSAGE, '+Desktop')}}" >> $GITHUB_ENV
 
       - name: Print environment variables
-        env:
-          GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
           echo -e "BRANCH_NAME = ${BRANCH_NAME}"
           echo -e "TAG = ${TAG}"
@@ -65,7 +63,6 @@ jobs:
           echo -e "COMMIT_URL = ${COMMIT_URL}"
           echo -e "COMMITTER = ${COMMITTER}"
           echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
-          echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: Skip CI
         if: |
@@ -274,7 +271,7 @@ jobs:
             yarn docker "$DISTRIBUTION" production "$TAG"
           fi
 
-      - name: Generate changelog
+      - name: Generate changelog for production release
         if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         run: yarn changelog:ci
 
@@ -291,7 +288,11 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Create GitHub staging release draft
+      - name: Generate changelog for staging release
+        if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        run: yarn changelog:dev
+
+      - name: Create GitHub staging release
         id: create_release_staging
         if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         uses: softprops/action-gh-release@v1
@@ -300,7 +301,8 @@ jobs:
         with:
           tag_name: ${{env.TAG}}
           name: ${{env.TAG}}
-          draft: true
+          body_path: ./CHANGELOG.md
+          draft: false
           prerelease: true
 
       - name: Notify staging bump
@@ -434,13 +436,10 @@ jobs:
 
       - name: Print environment variables
         shell: bash
-        env:
-          GITHUB_CONTEXT: ${{toJson(github)}}
         run: |
           echo -e "TAG = ${TAG}"
           echo -e "PR_LAST_COMMIT_MESSAGE = ${PR_LAST_COMMIT_MESSAGE}"
           echo -e "BUILD_DESKTOP = ${BUILD_DESKTOP}"
-          echo -e "GITHUB_CONTEXT = ${GITHUB_CONTEXT}"
 
       - name: Use latest Node.js v12
         if: env.BUILD_DESKTOP == 'true'

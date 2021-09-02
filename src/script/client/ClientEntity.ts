@@ -19,8 +19,7 @@
 
 import {ClientClassification, ClientType} from '@wireapp/api-client/src/client/';
 import ko from 'knockout';
-
-import {zeroPadding} from 'Util/util';
+import {splitFingerprint} from 'Util/StringUtil';
 
 import {ClientRecord} from '../storage';
 import {ClientMapper} from './ClientMapper';
@@ -33,10 +32,14 @@ export class ClientEntity {
   address?: string;
   class: ClientClassification | '?';
   cookie?: string;
+  domain?: string;
   id: string;
   isSelfClient: boolean;
   label?: string;
-  location?: object;
+  location?: {
+    lat?: number;
+    lon?: number;
+  };
   meta: {
     isVerified?: ko.Observable<boolean>;
     primaryKey?: string;
@@ -82,7 +85,7 @@ export class ClientEntity {
    * @returns Client ID in pairs of two as an array
    */
   formatId(): string[] {
-    return zeroPadding(this.id, 16).match(/.{1,2}/g);
+    return splitFingerprint(this.id);
   }
 
   isLegalHold(): boolean {

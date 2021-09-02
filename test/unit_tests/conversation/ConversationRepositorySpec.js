@@ -41,6 +41,7 @@ import {MessageCategory} from 'src/script/message/MessageCategory';
 import {UserGenerator} from '../../helper/UserGenerator';
 import {Config} from 'src/script/Config';
 import {TestFactory} from '../../helper/TestFactory';
+import {entities, payload} from '../../api/payloads';
 import {ConversationError} from 'src/script/error/ConversationError';
 
 jest.deepUnmock('axios');
@@ -139,7 +140,7 @@ describe('ConversationRepository', () => {
         type: CONVERSATION_TYPE.REGULAR,
       };
 
-      const conversationEntity = new ConversationMapper().mapConversations([conversationJsonFromBackend])[0];
+      const [conversationEntity] = ConversationMapper.mapConversations([conversationJsonFromBackend]);
       conversationEntity.participating_user_ets.push(conversationPartner);
       conversationEntity.selfUser(selfUser);
       spyOn(testFactory.conversation_repository.userState, 'self').and.returnValue(selfUser);
@@ -321,8 +322,7 @@ describe('ConversationRepository', () => {
         type: 0,
       };
 
-      const conversationMapper = testFactory.conversation_repository.conversationMapper;
-      const [newConversationEntity] = conversationMapper.mapConversations([team1to1Conversation]);
+      const [newConversationEntity] = ConversationMapper.mapConversations([team1to1Conversation]);
       testFactory.conversation_repository.conversationState.conversations.push(newConversationEntity);
 
       const teamId = team1to1Conversation.team;
@@ -698,20 +698,68 @@ describe('ConversationRepository', () => {
 
       beforeEach(() => {
         spyOn(testFactory.conversation_repository, 'onCreate').and.callThrough();
-        spyOn(testFactory.conversation_repository, 'mapConversations').and.returnValue(
+        spyOn(testFactory.conversation_repository, 'mapConversations').and.returnValue([
           new Conversation(createRandomUuid()),
-        );
+        ]);
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
         spyOn(testFactory.conversation_repository, 'saveConversation').and.returnValue(false);
 
         conversationId = createRandomUuid();
-        createEvent = {conversation: conversationId, data: {}, type: CONVERSATION_EVENT.CREATE};
+        createEvent = {
+          conversation: conversationId,
+          data: {
+            access: ['invite'],
+            access_role: 'activated',
+            creator: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
+            id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
+            last_event: '0.0',
+            last_event_time: '1970-01-01T00:00:00.000Z',
+            members: {
+              others: [
+                {
+                  conversation_role: 'wire_admin',
+                  id: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
+                  qualified_id: {
+                    domain: 'bella.wire.link',
+                    id: 'c472ba79-0bca-4a74-aaa3-a559a16705d3',
+                  },
+                  status: 0,
+                },
+              ],
+              self: {
+                conversation_role: 'wire_member',
+                hidden: false,
+                hidden_ref: null,
+                id: '9dcb21e0-9670-4d05-8590-408f3686c873',
+                otr_archived: false,
+                otr_archived_ref: null,
+                otr_muted: false,
+                otr_muted_ref: null,
+                otr_muted_status: null,
+                service: null,
+                status: 0,
+                status_ref: '0.0',
+                status_time: '1970-01-01T00:00:00.000Z',
+              },
+            },
+            message_timer: null,
+            name: '-, benny_bella',
+            qualified_id: {
+              domain: 'bella.wire.link',
+              id: 'c9405f98-e25a-4b1f-ade7-227ea765dff7',
+            },
+            receipt_mode: null,
+            team: null,
+            type: 0,
+          },
+          type: CONVERSATION_EVENT.CREATE,
+        };
       });
 
       it('should process create event for a new conversation created locally', () => {
         return testFactory.conversation_repository.handleConversationEvent(createEvent).then(() => {
           expect(testFactory.conversation_repository.onCreate).toHaveBeenCalled();
-          expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(createEvent.data, 1);
+          expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith([createEvent.data], 1);
         });
       });
 
@@ -722,7 +770,7 @@ describe('ConversationRepository', () => {
         return testFactory.conversation_repository.handleConversationEvent(createEvent).then(() => {
           expect(testFactory.conversation_repository.onCreate).toHaveBeenCalled();
           expect(testFactory.conversation_repository.mapConversations).toHaveBeenCalledWith(
-            createEvent.data,
+            [createEvent.data],
             time.getTime(),
           );
         });
@@ -1114,8 +1162,8 @@ describe('ConversationRepository', () => {
     });
 
     it('should know all users participating in a conversation (including the self user)', () => {
-      const [, dudes] = testFactory.conversation_repository.conversationState.conversations();
-      return testFactory.conversation_repository.getAllUsersInConversation(dudes.id).then(user_ets => {
+      const [, users] = testFactory.conversation_repository.conversationState.conversations();
+      return testFactory.conversation_repository.getAllUsersInConversation(users.id, null).then(user_ets => {
         expect(user_ets.length).toBe(3);
         expect(testFactory.conversation_repository.conversationState.conversations().length).toBe(4);
       });

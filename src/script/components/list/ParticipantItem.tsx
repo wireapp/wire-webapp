@@ -26,6 +26,7 @@ import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {UserlistMode} from 'Components/UserList';
 import {t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
+import {noop} from 'Util/util';
 
 import {User} from '../../entity/User';
 import {ServiceEntity} from '../../integration/ServiceEntity';
@@ -38,8 +39,9 @@ import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
 import {Availability} from '@wireapp/protocol-messaging';
 import {Config} from '../../Config';
+import useEffectRef from 'Util/useEffectRef';
 
-export interface ParticipantItemProps {
+export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
   badge?: boolean;
   callParticipant?: Participant;
   canSelect?: boolean;
@@ -75,8 +77,10 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   participant,
   selfInTeam,
   showArrow = false,
+  onContextMenu = noop,
 }) => {
-  const [isInViewport, viewportElementRef] = useViewPortObserver();
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const isInViewport = useViewPortObserver(viewportElementRef);
   const isUser = participant instanceof User && !participant.isService;
   const isService = participant instanceof ServiceEntity || participant.isService;
   const isSelf = !!(participant as User).isMe;
@@ -125,12 +129,13 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         'no-underline': noUnderline,
         'show-arrow': showArrow,
       })}
+      onContextMenu={onContextMenu}
     >
       <div
         className="participant-item"
         data-uie-name={isUser ? 'item-user' : 'item-service'}
         data-uie-value={participantName}
-        ref={viewportElementRef}
+        ref={setViewportElementRef}
       >
         {isInViewport && (
           <>
@@ -176,26 +181,6 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 )}
               </div>
             </div>
-            {callParticipant && (
-              <Fragment>
-                {callParticipantSharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
-                {callParticipantSharesScreen && (
-                  <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />
-                )}
-
-                {!callParticipantIsMuted && (
-                  <ParticipantMicOnIcon
-                    className="participant-mic-on-icon"
-                    isActive={callParticipantIsActivelySpeaking}
-                    data-uie-name={callParticipantIsActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
-                  />
-                )}
-
-                {callParticipantIsMuted && (
-                  <Icon.MicOff className="mic-off-icon" data-uie-name="status-audio-off" style={{height: 12}} />
-                )}
-              </Fragment>
-            )}
 
             {isUser && !isOthersMode && isGuest && (
               <span
@@ -220,6 +205,32 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 
             {isUser && isSelfVerified && isVerified && (
               <Icon.Verified className="verified-icon" data-uie-name="status-verified" />
+            )}
+
+            {callParticipant && (
+              <>
+                {callParticipantSharesScreen && (
+                  <Icon.Screenshare className="screenshare-icon" data-uie-name="status-screenshare" />
+                )}
+
+                {callParticipantSharesCamera && <Icon.Camera className="camera-icon" data-uie-name="status-video" />}
+
+                {!callParticipantIsMuted && (
+                  <ParticipantMicOnIcon
+                    className="participant-mic-on-icon"
+                    isActive={callParticipantIsActivelySpeaking}
+                    data-uie-name={callParticipantIsActivelySpeaking ? 'status-active-speaking' : 'status-audio-on'}
+                  />
+                )}
+
+                {callParticipantIsMuted && (
+                  <Icon.MicOff
+                    className="mic-off-icon"
+                    data-uie-name="status-audio-off"
+                    style={{height: 12, width: 12}}
+                  />
+                )}
+              </>
             )}
 
             {canSelect && (

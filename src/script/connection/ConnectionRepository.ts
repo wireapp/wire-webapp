@@ -25,10 +25,8 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
 import {container} from 'tsyringe';
-
 import {getLogger, Logger} from 'Util/Logger';
 import {replaceLink, t} from 'Util/LocalizerUtil';
-
 import type {Conversation} from '../entity/Conversation';
 import {MemberMessage} from '../entity/message/MemberMessage';
 import type {User} from '../entity/User';
@@ -47,7 +45,6 @@ export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
   private readonly userRepository: UserRepository;
   private readonly logger: Logger;
-  private readonly connectionMapper: ConnectionMapper;
 
   static get CONFIG(): Record<string, BackendEventType[]> {
     return {
@@ -64,8 +61,6 @@ export class ConnectionRepository {
     this.userRepository = userRepository;
 
     this.logger = getLogger('ConnectionRepository');
-
-    this.connectionMapper = new ConnectionMapper();
 
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
   }
@@ -100,21 +95,30 @@ export class ConnectionRepository {
   private async onUserConnection(eventJson: UserConnectionData, source: EventSource): Promise<void> {
     const connectionData = eventJson.connection;
 
+    // Try to find existing connection
     let connectionEntity = this.getConnectionByUserId(connectionData.to);
-    let previousStatus: ConnectionStatus = null;
+    const previousStatus = connectionEntity?.status();
 
+    // Update connection status
     if (connectionEntity) {
-      previousStatus = connectionEntity.status();
-      this.connectionMapper.updateConnectionFromJson(connectionEntity, connectionData);
+      ConnectionMapper.updateConnectionFromJson(connectionEntity, connectionData);
     } else {
-      connectionEntity = this.connectionMapper.mapConnectionFromJson(connectionData);
+      // Create new connection if there was no connection before
+      connectionEntity = ConnectionMapper.mapConnectionFromJson(connectionData);
     }
 
-    await this.updateConnection(connectionEntity);
+    // Attach connection to user
+    await this.attachConnectionToUser(connectionEntity);
+
+    // Update info about user when connection gets accepted
     const shouldUpdateUser = previousStatus === ConnectionStatus.SENT && connectionEntity.isConnected();
     if (shouldUpdateUser) {
       await this.userRepository.updateUserById(connectionEntity.userId);
+      // Get conversation related to connection and set its type to 1:1
+      // This case is important when the 'user.connection' event arrives after the 'conversation.member-join' event: https://wearezeta.atlassian.net/browse/SQCORE-348
+      amplify.publish(WebAppEvents.CONVERSATION.MAP_CONNECTION, connectionEntity);
     }
+
     await this.sendNotification(connectionEntity, source, previousStatus);
   }
 
@@ -142,7 +146,7 @@ export class ConnectionRepository {
   ): Promise<void> {
     await this.updateStatus(userEntity, ConnectionStatus.BLOCKED);
     if (hideConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
 
@@ -161,7 +165,7 @@ export class ConnectionRepository {
   ): Promise<void> {
     await this.updateStatus(userEntity, ConnectionStatus.CANCELLED);
     if (hideConversation) {
-      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity);
+      amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversationEntity, {});
     }
   }
 
@@ -221,7 +225,7 @@ export class ConnectionRepository {
   async getConnections(): Promise<ConnectionEntity[]> {
     try {
       const connectionData = await this.connectionService.getConnections();
-      const newConnectionEntities = this.connectionMapper.mapConnectionsFromJson(connectionData);
+      const newConnectionEntities = ConnectionMapper.mapConnectionsFromJson(connectionData);
       return newConnectionEntities.length
         ? await this.updateConnections(newConnectionEntities)
         : Object.values(this.connectionState.connectionEntities());
@@ -255,12 +259,13 @@ export class ConnectionRepository {
   }
 
   /**
-   * Update user matching a given connection.
-   * @returns Promise that resolves when the connection have been updated
+   * Attach a connection to a user and cache that information in the connection state.
+   * @returns Promise that resolves when the connection has been updated
    */
-  private async updateConnection(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
+  private async attachConnectionToUser(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
     this.addConnectionEntity(connectionEntity);
-    const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
+    // TODO(Federation): Update code once connections are implemented on the backend
+    const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
     return userEntity.connection(connectionEntity);
   }
 
@@ -320,7 +325,8 @@ export class ConnectionRepository {
 
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
-      const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
+      // TODO(Federation): Update code once connections are implemented on the backend
+      const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
       const messageEntity = new MemberMessage();
       messageEntity.user(userEntity);
 

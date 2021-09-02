@@ -42,11 +42,11 @@ export class UserMapper {
   }
 
   mapUserFromJson(userData: APIClientUser | APIClientSelf): User {
-    return this.updateUserFromObject(new User(), userData);
+    return this.updateUserFromObject(new User('', null), userData);
   }
 
   mapSelfUserFromJson(userData: APIClientSelf | APIClientUser): User {
-    const userEntity = this.updateUserFromObject(new User(), userData);
+    const userEntity = this.updateUserFromObject(new User('', null), userData);
     userEntity.isMe = true;
 
     const dataFromBackend = userData as APIClientSelf;
@@ -126,7 +126,7 @@ export class UserMapper {
     if (hasAsset) {
       mappedAssets = mapProfileAssets(userEntity.id, userData.assets);
     } else if (hasPicture) {
-      mappedAssets = mapProfileAssetsV1(userEntity.id, (userData as any).picture);
+      mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
     }
     updateUserEntityAssets(userEntity, mappedAssets);
 

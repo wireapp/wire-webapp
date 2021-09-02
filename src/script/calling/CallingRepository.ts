@@ -33,6 +33,7 @@ import {
   REASON,
   STATE as CALL_STATE,
   VIDEO_STATE,
+  VSTREAMS,
   Wcall,
   WcallClient,
   WcallMember,
@@ -70,7 +71,6 @@ import * as trackingHelpers from '../tracking/Helpers';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {Recipients} from '../cryptography/CryptographyRepository';
 import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
@@ -80,6 +80,7 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
+import {TeamState} from '../team/TeamState';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -90,6 +91,8 @@ interface MediaStreamQuery {
 interface SendMessageTarget {
   clients: WcallClient[];
 }
+
+type Clients = {clientid: string; userid: string}[];
 
 type ClientListEntry = [user: string, client: string];
 
@@ -112,6 +115,7 @@ export class CallingRepository {
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
+  onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
     return {
@@ -130,6 +134,7 @@ export class CallingRepository {
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
+    private readonly teamState = container.resolve(TeamState),
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
@@ -166,10 +171,14 @@ export class CallingRepository {
     };
 
     this.subscribeToEvents();
+
+    this.onChooseScreen = (deviceId: string) => {};
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
-    this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
+    if (!Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
+      this.callState.cbrEncoding(vbrEnabled ? 0 : 1);
+    }
   };
 
   getStats(conversationId: ConversationId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
@@ -255,7 +264,7 @@ export class CallingRepository {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients: UserClients = await this.messageRepository.createRecipients(conversationId);
+      const localClients = await this.messageRepository.createRecipients(conversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -294,9 +303,7 @@ export class CallingRepository {
       eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
       await this.messageRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
 
-      type Clients = {clientid: string; userid: string}[];
-
-      const clients: Clients[] = Object.entries(mismatch.missing).map(([userid, clientids]: [string, string[]]) =>
+      const clients: Clients[] = Object.entries(mismatch.missing).map(([userid, clientids]) =>
         clientids.map(clientid => ({clientid, userid})),
       );
 
@@ -380,7 +387,7 @@ export class CallingRepository {
 
   private removeCall(call: Call): void {
     const index = this.callState.activeCalls().indexOf(call);
-    call.getSelfParticipant().releaseMediaStream();
+    call.getSelfParticipant().releaseMediaStream(true);
     call.participants.removeAll();
     call.removeAllAudio();
     if (index !== -1) {
@@ -396,9 +403,10 @@ export class CallingRepository {
     // if it's a video call we query the video user media in order to display the video preview
     const isGroup = [CONV_TYPE.CONFERENCE, CONV_TYPE.GROUP].includes(call.conversationType);
     try {
+      camera = this.teamState.isVideoCallingEnabled() ? camera : false;
       const mediaStream = await this.getMediaStream({audio, camera}, isGroup);
       if (call.state() !== CALL_STATE.NONE) {
-        call.getSelfParticipant().updateMediaStream(mediaStream);
+        call.getSelfParticipant().updateMediaStream(mediaStream, true);
         if (camera) {
           call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
         }
@@ -677,7 +685,7 @@ export class CallingRepository {
     if (call.state() === CALL_STATE.INCOMING) {
       selfParticipant.videoState(newState);
       if (newState === VIDEO_STATE.STOPPED) {
-        selfParticipant.releaseVideoStream();
+        selfParticipant.releaseVideoStream(true);
       } else {
         this.warmupMediaStreams(call, false, true);
       }
@@ -708,7 +716,7 @@ export class CallingRepository {
       };
       const selfParticipant = call.getSelfParticipant();
       selfParticipant.videoState(VIDEO_STATE.SCREENSHARE);
-      selfParticipant.updateMediaStream(mediaStream);
+      selfParticipant.updateMediaStream(mediaStream, true);
       this.wCall.setVideoSendState(this.wUser, call.conversationId, VIDEO_STATE.SCREENSHARE);
       selfParticipant.startedScreenSharingAt(Date.now());
     } catch (error) {
@@ -723,7 +731,7 @@ export class CallingRepository {
 
       const isVideoCall = callType === CALL_TYPE.VIDEO;
       if (!isVideoCall) {
-        call.getSelfParticipant().releaseVideoStream();
+        call.getSelfParticipant().releaseVideoStream(true);
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
       await this.pushClients(call.conversationId);
@@ -746,7 +754,15 @@ export class CallingRepository {
     this.wCall.reject(this.wUser, conversationId);
   }
 
-  changeCallPage(newPage: number, call: Call): void {}
+  changeCallPage(newPage: number, call: Call): void {
+    const nextPageParticipants = call.pages()[newPage];
+    const payload = {
+      clients: nextPageParticipants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      convid: call.conversationId,
+    };
+    this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
+    call.currentPage(newPage);
+  }
 
   readonly leaveCall = (conversationId: ConversationId): void => {
     delete this.poorCallQualityUsers[conversationId];
@@ -809,7 +825,7 @@ export class CallingRepository {
       case MediaType.VIDEO: {
         // Don't stop video input (coming from A/V preferences) when screensharing is activated
         if (!selfParticipant.sharesScreen()) {
-          selfParticipant.releaseVideoStream();
+          selfParticipant.releaseVideoStream(true);
         }
         break;
       }
@@ -833,7 +849,7 @@ export class CallingRepository {
     if (mediaType === MediaType.AUDIO) {
       const audioTracks = mediaStream.getAudioTracks().map(track => track.clone());
       if (audioTracks.length > 0) {
-        selfParticipant.setAudioStream(new MediaStream(audioTracks));
+        selfParticipant.setAudioStream(new MediaStream(audioTracks), true);
         this.wCall.replaceTrack(call.conversationId, audioTracks[0]);
       }
     }
@@ -842,14 +858,14 @@ export class CallingRepository {
     if (mediaType === MediaType.VIDEO && selfParticipant.sharesCamera() && !selfParticipant.sharesScreen()) {
       const videoTracks = mediaStream.getVideoTracks().map(track => track.clone());
       if (videoTracks.length > 0) {
-        selfParticipant.setVideoStream(new MediaStream(videoTracks));
+        selfParticipant.setVideoStream(new MediaStream(videoTracks), true);
         this.wCall.replaceTrack(call.conversationId, videoTracks[0]);
       }
     }
   }
 
-  private mapTargets(targets: SendMessageTarget): Recipients {
-    const recipients: Recipients = {};
+  private mapTargets(targets: SendMessageTarget): UserClients {
+    const recipients: UserClients = {};
 
     for (const target of targets.clients) {
       const {userid, clientid} = target;
@@ -897,11 +913,6 @@ export class CallingRepository {
     _unused: null,
     payload: string,
   ): number => {
-    const protoCalling = new Calling({content: payload});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-      messageId: createRandomUuid(),
-    });
     const call = this.findCall(conversationId);
     if (call?.blockMessages) {
       return 0;
@@ -925,12 +936,25 @@ export class CallingRepository {
           };
         }
 
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-        return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
+        return this.sendCallingMessage(conversationId, payload, options);
       })
       .catch(() => this.abortCall(conversationId));
 
     return 0;
+  };
+
+  private readonly sendCallingMessage = (
+    conversationId: ConversationId,
+    payload: string | Object,
+    options?: MessageSendingOptions,
+  ): Promise<ClientMismatch> => {
+    const protoCalling = new Calling({content: typeof payload === 'string' ? payload : JSON.stringify(payload)});
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
+      messageId: createRandomUuid(),
+    });
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
+    return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
   };
 
   private readonly sendSFTRequest = (
@@ -970,6 +994,11 @@ export class CallingRepository {
     const call = this.findCall(conversationId);
     if (!call) {
       return;
+    }
+
+    if (reason === REASON.NORMAL) {
+      this.callState.selectableScreens([]);
+      this.callState.selectableWindows([]);
     }
 
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
@@ -1025,7 +1054,7 @@ export class CallingRepository {
       this.removeCall(call);
       return;
     }
-    selfParticipant.releaseMediaStream();
+    selfParticipant.releaseMediaStream(true);
     call.removeAllAudio();
     selfParticipant.videoState(VIDEO_STATE.STOPPED);
     call.reason(reason);
@@ -1198,7 +1227,7 @@ export class CallingRepository {
         }
         const mediaStream = await this.getMediaStream(missingStreams, isGroup);
         this.mediaStreamQuery = undefined;
-        const newStream = selfParticipant.updateMediaStream(mediaStream);
+        const newStream = selfParticipant.updateMediaStream(mediaStream, true);
         return newStream;
       } catch (error) {
         this.mediaStreamQuery = undefined;
@@ -1250,13 +1279,16 @@ export class CallingRepository {
   ): void => {
     let participant = this.findParticipant(conversationId, remoteUserId, remoteClientId);
     if (!participant) {
-      participant = new Participant(this.userRepository.findUserById(remoteUserId), remoteClientId);
       const call = this.findCall(conversationId);
+      if (call?.conversationType !== CONV_TYPE.ONEONONE) {
+        return;
+      }
+      participant = new Participant(this.userRepository.findUserById(remoteUserId), remoteClientId);
       call.addParticipant(participant);
     }
 
     if (streams === null || streams.length === 0) {
-      participant.releaseVideoStream();
+      participant.releaseVideoStream(false);
       return;
     }
 
@@ -1284,6 +1316,10 @@ export class CallingRepository {
       return;
     }
     const participant = call.getParticipant(userId, clientId);
+    if (!participant) {
+      return;
+    }
+
     const selfParticipant = call.getSelfParticipant();
     const isSameUser = selfParticipant.doesMatchIds(userId, clientId);
 
@@ -1295,7 +1331,7 @@ export class CallingRepository {
     // user has stopped sharing their screen
     if (participant.videoState() === VIDEO_STATE.SCREENSHARE && state !== VIDEO_STATE.SCREENSHARE) {
       if (isSameUser) {
-        selfParticipant.releaseVideoStream();
+        selfParticipant.releaseVideoStream(true);
       }
       this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
         [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING,
@@ -1312,7 +1348,7 @@ export class CallingRepository {
     }
 
     if (call.state() === CALL_STATE.MEDIA_ESTAB && isSameUser && !selfParticipant.sharesScreen()) {
-      selfParticipant.releaseVideoStream();
+      selfParticipant.releaseVideoStream(true);
     }
 
     call
