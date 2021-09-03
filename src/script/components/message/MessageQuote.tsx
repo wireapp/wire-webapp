@@ -41,6 +41,7 @@ import AudioAsset from 'Components/asset/AudioAsset';
 import FileAssetComponent from 'Components/asset/FileAssetComponent';
 import LocationAsset from 'Components/asset/LocationAsset';
 import useEffectRef from 'Util/useEffectRef';
+import {Text} from 'src/script/entity/message/Text';
 
 export interface QuoteProps {
   conversation: Conversation;
@@ -129,7 +130,7 @@ const Quote: React.FC<QuoteProps> = ({
 
 interface QuotedMessageProps {
   focusMessage: (id: string) => void;
-  handleClickOnMessage: (message: ContentMessage, event: React.MouseEvent) => boolean;
+  handleClickOnMessage: (message: ContentMessage | Text, event: React.MouseEvent) => boolean;
   quotedMessage: ContentMessage;
   selfId: string;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
@@ -210,7 +211,7 @@ const QuotedMessage: React.FC<QuotedMessageProps> = ({
                   'message-quote__text--large': includesOnlyEmojis(asset.text),
                 })}
                 ref={setTextQuoteElement}
-                onClick={event => handleClickOnMessage(quotedMessage, event)}
+                onClick={event => handleClickOnMessage(asset, event)}
                 dangerouslySetInnerHTML={{__html: asset.render(selfId)}}
                 dir="auto"
                 data-uie-name="media-text-quote"
