@@ -37,7 +37,7 @@ export interface UserDetailsProps {
   participant: User;
 }
 
-const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isVerified, isGroupAdmin}) => {
+const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isGroupAdmin}) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
     'isGuest',
@@ -67,7 +67,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
             {user.name}
           </div>
         )}
-        {isSelfVerified && (isVerified ?? user.is_verified) && (
+        {isSelfVerified && user.is_verified && (
           <Icon.Verified
             className="panel-participant__head__verified-icon"
             data-uie-name="status-verified-participant"
