@@ -439,7 +439,7 @@ export class TeamRepository {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           htmlMessage: message,
-          title: t('featureConfigChangeModalFileSharingHeadline'),
+          title: t('featureConfigChangeModalFileSharingHeadline', {brandName: Config.getConfig().BRAND_NAME}),
         },
       });
     }
@@ -465,7 +465,7 @@ export class TeamRepository {
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
           htmlMessage: message,
-          title: t('featureConfigChangeModalAudioVideoHeadline'),
+          title: t('featureConfigChangeModalAudioVideoHeadline', {brandName: Config.getConfig().BRAND_NAME}),
         },
       });
     }

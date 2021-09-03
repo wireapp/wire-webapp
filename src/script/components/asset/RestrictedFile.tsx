@@ -42,7 +42,7 @@ const RestrictedFile: React.FC<RestrictedFileProps> = ({asset}) => {
           </div>
         )}
         <ul className="file__desc__meta label-xs text-foreground">
-          <li data-uie-name="file-restrictions">{t('conversationAssetRestricted')}</li>
+          <li data-uie-name="file-restrictions">{t('conversationFileAssetRestricted')}</li>
         </ul>
       </div>
     </div>
