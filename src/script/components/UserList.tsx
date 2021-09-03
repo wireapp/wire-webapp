@@ -39,6 +39,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
 import ParticipantItem from 'Components/list/ParticipantItem';
 import {TeamState} from '../team/TeamState';
+import useEffectRef from 'Util/useEffectRef';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -201,7 +202,8 @@ const UserList: React.FC<UserListProps> = ({
   const isSelected = (userEntity: User): boolean =>
     isSelectEnabled && selectedUsers.some(user => user.id === userEntity.id);
 
-  const [isInViewport, viewportElementRef] = useViewPortObserver();
+  const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
+  const isInViewport = useViewPortObserver(viewportElementRef);
 
   useEffect(() => {
     if (isInViewport) {
@@ -332,7 +334,7 @@ const UserList: React.FC<UserListProps> = ({
       )}
 
       {foundUserEntities().length > maxShownUsers && (
-        <div ref={viewportElementRef}>
+        <div ref={setViewportElementRef}>
           <div css={{height: 100}}></div>
         </div>
       )}
