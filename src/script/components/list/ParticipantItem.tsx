@@ -41,7 +41,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {Config} from '../../Config';
 import useEffectRef from 'Util/useEffectRef';
 
-export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
+export interface ParticipantItemProps extends Omit<React.HTMLProps<HTMLDivElement>, 'onClick'> {
   badge?: boolean;
   callParticipant?: Participant;
   canSelect?: boolean;
