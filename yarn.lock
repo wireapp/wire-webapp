@@ -2985,16 +2985,16 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@13.3.1":
-  version "13.3.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-13.3.1.tgz#fa68df2f08b2baab2f218e7d39925dad5eed6883"
-  integrity sha512-tRZimrJ063Kv4YySG14XSxqP1LL639ecAPqX90Xds85nV50HwmXxcMwNUsIl8OoL9EM/c3sCeud8/jl68p5sDA==
+"@wireapp/api-client@13.4.0":
+  version "13.4.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-13.4.0.tgz#e17568a568ee016d399e9e65038de213f7f14603"
+  integrity sha512-d3nkSlAtH2d6lZjrHl/idUCz6cZVZqlGjZtuKdwTHxvYE+Ho+oS2inBKZa+n0XX9KwOpkBRXHVri+7Zwk4XWwg==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
     "@types/tough-cookie" "4.0.1"
-    "@wireapp/commons" "4.2.10"
-    "@wireapp/priority-queue" "1.6.36"
+    "@wireapp/commons" "4.2.11"
+    "@wireapp/priority-queue" "1.6.37"
     "@wireapp/protocol-messaging" "1.35.0"
     axios "0.21.1"
     axios-retry "3.1.9"
@@ -3015,10 +3015,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/cbor/-/cbor-4.7.2.tgz#cf890cbd1af6f684fd06c704e96b3186bd0672f3"
   integrity sha512-SfWI1pfwPLpYDC2gkQIOtVFA51x1LFbWoZ5qPp9wit5l3x1CWIpmGK3g1F06XXJn/HeRHJawwp28pzzH58h2iQ==
 
-"@wireapp/commons@4.2.10":
-  version "4.2.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.2.10.tgz#3236b155f12ab770a9cab651474ca036e3a1d57c"
-  integrity sha512-8lJWhmj/f+9AOTGOSBdLW8ziubXMEM17gngXRen+LBln/31iQC5B9sgJp1xDfFPgeSlNhf7S/iRzYk3dn6c9Yw==
+"@wireapp/commons@4.2.11":
+  version "4.2.11"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.2.11.tgz#786605872daf4edb20a997136c2ea8b85411c60e"
+  integrity sha512-boo+x7pV7B3G6zHV5z9BoUhvQzUn/9C72/TehAdfkRhElTJQJ7IJsBC+gMzHavlhVSt+a/63YlvfgK84BTvUtw==
   dependencies:
     "@types/fs-extra" "9.0.12"
     "@types/node" "~14"
@@ -3042,16 +3042,16 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.12.5":
-  version "17.12.5"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.12.5.tgz#cd77dc978277f00b6e205be261023518fc97ca2d"
-  integrity sha512-bRv7SXgzdn4yZYifqC6xsfygxUQB7rxQeoLqGZUWD4Gt/upvVmOmVoKwUc56ydJrLFFoEU/UxWoytcbSwl/buA==
+"@wireapp/core@17.13.0":
+  version "17.13.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.13.0.tgz#a347f9bc026eebc16a053938e1c1db3c9e71a3cd"
+  integrity sha512-nBqqvpVoaOK0tOyavfYmNJ2EOBgqRWHGEavv8Mzxt4IWuVJovSqYXewbWO03rjv+/hUfzHKSRzhSrH9/JKBPDg==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "13.3.1"
+    "@wireapp/api-client" "13.4.0"
     "@wireapp/cryptobox" "12.7.1"
-    bazinga64 "5.9.6"
+    bazinga64 "5.9.7"
     hash.js "1.1.7"
     http-status-codes "2.1.4"
     logdown "3.3.1"
@@ -3093,10 +3093,10 @@
   dependencies:
     "@types/node" "~14"
 
-"@wireapp/priority-queue@1.6.36":
-  version "1.6.36"
-  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.36.tgz#afb182920372a2966a28be0c30d43b477d1a462d"
-  integrity sha512-i2EHKhJ6wVyyuENTIVdD7tRQkJSUlfbIwe6Hq83T0KvcUvBTi0u4vPeJ+e6WP4zx3XwUQB/vGHfCX9v6/UVcEA==
+"@wireapp/priority-queue@1.6.37":
+  version "1.6.37"
+  resolved "https://registry.yarnpkg.com/@wireapp/priority-queue/-/priority-queue-1.6.37.tgz#d5414c3040dfe3763baa5439f299a1299be6ab22"
+  integrity sha512-ASbGZITGY5FgNsjILd5wPpf9aKuPUVdVCYqAABKSAjuK++BxZm5nHjZAqiu/ncqeJ3r4WXNa/2WQME46L62OPg==
   dependencies:
     "@types/node" "~14"
 
@@ -3974,6 +3974,11 @@ bazinga64@5.9.6:
   version "5.9.6"
   resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.9.6.tgz#ab425f83687b6ae82a3bcd041ee075d27eb290ba"
   integrity sha512-tImi45HPqL4mkoUx/ESmfoZeYSsmaBGIyFEIhVqGEWNHU/B2nkvJY2UeIblyCXAnyKA2AiR8ejpsR8zhYbW+uA==
+
+bazinga64@5.9.7:
+  version "5.9.7"
+  resolved "https://registry.yarnpkg.com/bazinga64/-/bazinga64-5.9.7.tgz#2a8fcf68fa7cf8df446df85ed9fd2b54afeeedb0"
+  integrity sha512-OzBRvkvDrDxH+wbQmYfw7QgDQXdxF6H2zJYrpaVs228KGjaLU8frRPi6ucDlMS+8CQwzf7aRcgPeSqgAa4vyjQ==
 
 bcrypt-pbkdf@^1.0.0:
   version "1.0.2"
