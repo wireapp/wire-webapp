@@ -904,7 +904,7 @@
   "preferencesOptionsEnableAgcCheckbox": "Automatic gain control (AGC)",
   "preferencesOptionsEnableAgcDetails": "Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.",
   "preferencesOptionsEnableVbrCheckbox": "Variable Bit Rate Encoding",
-  "preferencesOptionsEnableVbrDetails": "This makes audio calls use less data and work better on slower networks. Turn off to use constant bitrate encoding (CBR). CBR is always used for conference calls with more than two participants regardless of setting here. Variable bitrate encoding (VBR) can only be used in 1:1 calls.",
+  "preferencesOptionsEnableVbrDetails": "This makes audio calls use less data and work better on slower networks. Turn off to use constant bitrate encoding (CBR). This setting only affects 1:1 calls; conference calls always use CBR encoding.",
   "preferencesOptionsNotifications": "Notifications",
   "preferencesOptionsNotificationsNone": "Off",
   "preferencesOptionsNotificationsObfuscate": "Hide details",
