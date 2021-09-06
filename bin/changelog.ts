@@ -18,13 +18,15 @@ void (async () => {
   const from = branchName ? newProductionTag : lastProductionTag;
   const to = branchName ? branchName : newProductionTag;
 
+  console.info(`Generating changelog with commits from "${from}" to "${to}".`);
+
   const changelog = await Changelog.generate({
     exclude: ['chore', 'docs', 'refactor', 'style', 'test'],
     repoUrl: pkg.repository.url.replace('.git', ''),
     tag: `${from}...${to}`,
   });
 
-  console.info(`Generating changelog with commits from "${from}" to "${to}".`);
   fs.outputFileSync(outputPath, changelog, 'utf8');
+
   console.info(`Wrote file to: ${outputPath}`);
 })();
