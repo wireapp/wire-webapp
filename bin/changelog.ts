@@ -20,13 +20,17 @@ void (async () => {
 
   console.info(`Generating changelog with commits from "${from}" to "${to}".`);
 
-  const changelog = await Changelog.generate({
-    exclude: ['chore', 'docs', 'refactor', 'style', 'test'],
-    repoUrl: pkg.repository.url.replace('.git', ''),
-    tag: `${from}...${to}`,
-  });
+  try {
+    const changelog = await Changelog.generate({
+      exclude: ['chore', 'docs', 'refactor', 'style', 'test'],
+      repoUrl: pkg.repository.url.replace('.git', ''),
+      tag: `${from}...${to}`,
+    });
 
-  fs.outputFileSync(outputPath, changelog, 'utf8');
+    fs.outputFileSync(outputPath, changelog, 'utf8');
 
-  console.info(`Wrote file to: ${outputPath}`);
+    console.info(`Wrote file to: ${outputPath}`);
+  } catch (error) {
+    console.warn(`Could not generate changelog from "${from}" to "${to}": ${error.message}`);
+  }
 })();
