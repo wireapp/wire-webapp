@@ -26,11 +26,9 @@ void (async () => {
       repoUrl: pkg.repository.url.replace('.git', ''),
       tag: `${from}...${to}`,
     });
-
     fs.outputFileSync(outputPath, changelog, 'utf8');
-
     console.info(`Wrote file to: ${outputPath}`);
   } catch (error) {
-    console.warn(`Could not generate changelog from "${from}" to "${to}": ${error.message}`);
+    console.warn(`Could not generate changelog from "${from}" to "${to}": ${error.message}`, error);
   }
 })();
