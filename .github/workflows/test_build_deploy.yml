@@ -76,7 +76,7 @@ jobs:
           access_token: ${{github.token}}
 
       - name: Yarn cache
-        uses: c-hive/gha-yarn-cache@v1
+        uses: c-hive/gha-yarn-cache@v2.1.0
 
       - name: Authenticate git clone
         env:
