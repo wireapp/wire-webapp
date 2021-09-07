@@ -222,8 +222,11 @@ export class IntegrationRepository {
    * @param userEntity Service user to be removed from the conversation
    */
   removeService(conversationEntity: Conversation, userEntity: User): Promise<MemberLeaveEvent> {
-    const {id: userId} = userEntity;
-    return this.conversationRepository.removeService(conversationEntity, userId);
+    const {id: userId, domain} = userEntity;
+    return this.conversationRepository.removeService(conversationEntity, {
+      domain,
+      id: userId,
+    });
   }
 
   async searchForServices(query: string, queryObservable: ko.Observable<string>): Promise<void> {

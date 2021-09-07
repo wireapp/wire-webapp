@@ -261,7 +261,10 @@ export class ActionsViewModel {
             if (clearContent) {
               this.conversationRepository.clearConversation(conversationEntity, true);
             } else {
-              this.conversationRepository.removeMember(conversationEntity, this.userState.self().id);
+              this.conversationRepository.removeMember(conversationEntity, {
+                domain: this.userState.self().domain,
+                id: this.userState.self().id,
+              });
             }
             resolve();
           },
@@ -348,7 +351,10 @@ export class ActionsViewModel {
           primaryAction: {
             action: async () => {
               try {
-                await this.conversationRepository.removeMember(conversationEntity, userEntity.id);
+                await this.conversationRepository.removeMember(conversationEntity, {
+                  domain: userEntity.domain,
+                  id: userEntity.id,
+                });
                 resolve();
               } catch (error) {
                 reject(error);
