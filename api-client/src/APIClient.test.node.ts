@@ -42,23 +42,23 @@ describe('APIClient', () => {
     user: 'aaf9a833-ef30-4c22-86a0-9adc8a15b3b4',
   };
 
+  const selfExample: Self = {
+    email: 'email@example.com',
+    handle: 'exampleuser',
+    locale: 'en',
+    qualified_id: {
+      domain: 'example.com',
+      id: '024174ec-c098-4104-9424-3849804acb78',
+    },
+    accent_id: AccentColor.AccentColorID.BRIGHT_ORANGE,
+    picture: [],
+    name: 'Example User',
+    id: '024174ec-c098-4104-9424-3849804acb78',
+    assets: [],
+  };
+
   beforeEach(() => {
-    nock(baseUrl)
-      .get(SelfAPI.URL.SELF)
-      .reply(StatusCode.OK, {
-        email: 'email@example.com',
-        handle: 'exampleuser',
-        locale: 'en',
-        qualified_id: {
-          domain: 'example.com',
-          id: '024174ec-c098-4104-9424-3849804acb78',
-        },
-        accent_id: AccentColor.AccentColorID.BRIGHT_ORANGE,
-        picture: [],
-        name: 'Example User',
-        id: '024174ec-c098-4104-9424-3849804acb78',
-        assets: [],
-      } as Self);
+    nock(baseUrl).get(SelfAPI.URL.SELF).reply(StatusCode.OK, selfExample);
   });
 
   describe('constructor', () => {
@@ -243,8 +243,8 @@ describe('APIClient', () => {
 
     beforeEach(() => {
       nock(baseUrl).post(AuthAPI.URL.REGISTER, registerData).reply(StatusCode.OK, registerData);
-
       nock(baseUrl).post(AuthAPI.URL.ACCESS).reply(StatusCode.OK, accessTokenData);
+      nock(baseUrl).get(SelfAPI.URL.SELF).reply(StatusCode.OK, selfExample);
     });
 
     it('automatically gets an access token after registration', async () => {
