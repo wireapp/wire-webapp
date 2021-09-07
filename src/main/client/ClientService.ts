@@ -26,6 +26,7 @@ import type {CryptographyService} from '../cryptography/';
 import {ClientInfo, ClientBackendRepository, ClientDatabaseRepository} from './';
 
 export interface MetaClient extends RegisteredClient {
+  domain: string | null;
   meta: {
     is_verified?: boolean;
     primary_key: string;
@@ -57,14 +58,18 @@ export class ClientService {
     return this.database.getLocalClient();
   }
 
-  public createLocalClient(client: RegisteredClient): Promise<MetaClient> {
-    return this.database.createLocalClient(client);
+  public createLocalClient(client: RegisteredClient, domain: string | null): Promise<MetaClient> {
+    return this.database.createLocalClient(client, domain);
   }
 
   public async synchronizeClients(): Promise<MetaClient[]> {
     const registeredClients = await this.backend.getClients();
     const filteredClients = registeredClients.filter(client => client.id !== this.apiClient.context!.clientId);
-    return this.database.createClientList(this.apiClient.context!.userId, filteredClients);
+    return this.database.createClientList(
+      this.apiClient.context!.userId,
+      filteredClients,
+      this.apiClient.context!.domain || null,
+    );
   }
 
   // TODO: Split functionality into "create" and "register" client
@@ -103,7 +108,7 @@ export class ClientService {
     };
 
     const client = await this.backend.postClient(newClient);
-    await this.createLocalClient(client);
+    await this.createLocalClient(client, this.apiClient.context.domain || null);
     await this.cryptographyService.initCryptobox();
 
     return client;
