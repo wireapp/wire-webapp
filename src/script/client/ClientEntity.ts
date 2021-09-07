@@ -49,11 +49,12 @@ export class ClientEntity {
   time?: string;
   type?: ClientType.PERMANENT | ClientType.TEMPORARY;
 
-  constructor(isSelfClient = false) {
+  constructor(isSelfClient: boolean, domain: string | null) {
     this.isSelfClient = isSelfClient;
 
     this.class = '?';
     this.id = '';
+    this.domain = domain;
 
     if (this.isSelfClient) {
       this.address = '';

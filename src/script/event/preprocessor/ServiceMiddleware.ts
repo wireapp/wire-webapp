@@ -27,7 +27,7 @@ import type {ConversationRepository} from '../../conversation/ConversationReposi
 import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
-import {Config} from '../../Config';
+import {QualifiedIdOptional} from '../../conversation/EventBuilder';
 
 export class ServiceMiddleware {
   private readonly userRepository: UserRepository;
@@ -61,10 +61,12 @@ export class ServiceMiddleware {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, data: eventData} = event;
-    const selfUserId = this.userState.self().id;
-    const containsSelfUser = eventData.user_ids.includes(selfUserId);
+    const selfUser = this.userState.self();
+    const containsSelfUser = eventData.user_ids.find(
+      (user: QualifiedIdOptional) => selfUser.id === user.id && selfUser.domain == user.domain,
+    );
 
-    const userIds = containsSelfUser
+    const userIds: QualifiedIdOptional[] = containsSelfUser
       ? await this.conversationRepository
           .getConversationById(conversationId)
           .then(conversationEntity => conversationEntity.participating_user_ids())
@@ -80,10 +82,8 @@ export class ServiceMiddleware {
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
-  private async _containsService(userIds: string[]) {
-    const userEntities = await this.userRepository.getUsersById(
-      userIds.map(userId => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: userId})),
-    );
+  private async _containsService(users: QualifiedIdOptional[]) {
+    const userEntities = await this.userRepository.getUsersById(users);
     return userEntities.some(userEntity => userEntity.isService);
   }
 

@@ -20,7 +20,7 @@
 import type {
   NewClient,
   RegisteredClient,
-  QualifiedUserMap,
+  QualifiedUserClientMap,
   ClientCapabilityData,
   PublicClient,
 } from '@wireapp/api-client/src/client';
@@ -115,7 +115,7 @@ export class ClientService {
    * Retrieves meta information about all the clients of a specific user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
    */
-  async getClientsByQualifiedUserIds(userIds: QualifiedId[]): Promise<QualifiedUserMap> {
+  async getClientsByQualifiedUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
     const listedClients = await this.apiClient.user.api.postListClients({qualified_users: userIds});
     return listedClients.qualified_user_map;
   }

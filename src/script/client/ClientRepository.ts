@@ -18,13 +18,7 @@
  */
 
 import ko from 'knockout';
-import {
-  ClientType,
-  PublicClient,
-  RegisteredClient,
-  ClientCapability,
-  QualifiedUserMap,
-} from '@wireapp/api-client/src/client/';
+import {ClientType, PublicClient, RegisteredClient, ClientCapability} from '@wireapp/api-client/src/client/';
 import {USER_EVENT, UserClientAddEvent, UserClientRemoveEvent} from '@wireapp/api-client/src/event';
 import {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Runtime} from '@wireapp/commons';
@@ -48,8 +42,7 @@ import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
 import {ClientState} from './ClientState';
 
-export type QualifiedUserClientMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
-export type UserPublicClientMap = {[userId: string]: PublicClient[]};
+export type QualifiedUserClientEntityMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 
 export class ClientRepository {
@@ -107,16 +100,16 @@ export class ClientRepository {
    * @returns Resolves with all the clients found in the local database
    */
   getAllClientsFromDb(): Promise<{[userId: string]: ClientEntity[]}> {
-    return this.clientService.loadAllClientsFromDb().then(clients => {
+    return this.clientService.loadAllClientsFromDb().then(clientRecords => {
       // TODO(Federation): Add domain to identifier
       const recipients: {[userId: string]: ClientEntity[]} = {};
       const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
-      for (const client of clients) {
-        const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
+      for (const clientRecord of clientRecords) {
+        const {userId} = ClientEntity.dismantleUserClientId(clientRecord.meta.primary_key);
         if (userId && !skippedUserIds.includes(userId)) {
           recipients[userId] ||= [];
-          recipients[userId].push(ClientMapper.mapClient(client, false));
+          recipients[userId].push(ClientMapper.mapClient(clientRecord, false, clientRecord.domain));
         }
       }
       return recipients;
@@ -151,13 +144,13 @@ export class ClientRepository {
       .catch(() => {
         throw new ClientError(ClientError.TYPE.DATABASE_FAILURE, ClientError.MESSAGE.DATABASE_FAILURE);
       })
-      .then(clientPayload => {
-        if (typeof clientPayload === 'string') {
+      .then(clientRecord => {
+        if (typeof clientRecord === 'string') {
           this.logger.info('No local client found in database');
           throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
         }
 
-        const currentClient = ClientMapper.mapClient(clientPayload, true);
+        const currentClient = ClientMapper.mapClient(clientRecord, true, clientRecord.domain);
         this.clientState.currentClient(currentClient);
         this.logger.info(`Loaded local client '${currentClient.id}'`, this.clientState.currentClient());
         return this.clientState.currentClient();
@@ -219,12 +212,20 @@ export class ClientRepository {
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  private updateClientSchemaInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
-    clientPayload.meta = {
-      is_verified: false,
-      primary_key: constructClientPrimaryKey(clientPayload.domain, userId, clientPayload.id),
+  private updateClientSchemaInDb(
+    userId: string,
+    clientPayload: PublicClient,
+    domain: string | null,
+  ): Promise<ClientRecord> {
+    const clientRecord: ClientRecord = {
+      ...clientPayload,
+      domain,
+      meta: {
+        is_verified: false,
+        primary_key: constructClientPrimaryKey(domain, userId, clientPayload.id),
+      },
     };
-    return this.saveClientInDb(userId, clientPayload);
+    return this.saveClientInDb(userId, clientRecord);
   }
 
   //##############################################################################
@@ -351,62 +352,56 @@ export class ClientRepository {
    * @returns Resolves with an array of client entities
    */
   // TODO(Federation): A function that receives "QualifiedId" objects should always return a qualified client map
-  async getClientsByQualifiedUserIds(userIds: QualifiedId[], updateClients: true): Promise<QualifiedUserClientMap>;
-  async getClientsByQualifiedUserIds(userIds: QualifiedId[], updateClients: false): Promise<QualifiedUserMap>;
   async getClientsByQualifiedUserIds(
     userIds: QualifiedId[],
-    updateClients?: boolean,
-  ): Promise<QualifiedUserMap | QualifiedUserClientMap> {
-    const userClientsMap = await this.clientService.getClientsByQualifiedUserIds(userIds);
+    updateClients: boolean,
+  ): Promise<QualifiedUserClientEntityMap> {
+    const clientEntityMap: QualifiedUserClientEntityMap = {};
+    const qualifiedUserClientsMap = await this.clientService.getClientsByQualifiedUserIds(userIds);
+
     if (updateClients) {
-      const clientEntityMap: QualifiedUserClientMap = {};
       await Promise.all(
-        Object.entries(userClientsMap).map(([domain, userClientMap]) =>
+        Object.entries(qualifiedUserClientsMap).map(([domain, userClientMap]) =>
           Promise.all(
             Object.entries(userClientMap).map(async ([userId, clients]) => {
               clientEntityMap[domain] ||= {};
-              clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients, true, domain);
+              clientEntityMap[domain] ||= {};
+              clientEntityMap[domain][userId] = updateClients
+                ? await this.updateClientsOfUserById(userId, clients, true, domain)
+                : // TODO(Federation): Check if `isSelfClient` is needed here
+                  ClientMapper.mapClients(clients, false, domain);
             }),
           ),
         ),
       );
-      return clientEntityMap;
     }
 
-    return userClientsMap;
+    return clientEntityMap;
   }
 
-  async getClientsByUserIds(userIds: string[], updateClients: false): Promise<UserPublicClientMap>;
-  async getClientsByUserIds(userIds: string[], updateClients: true): Promise<UserClientEntityMap>;
-  async getClientsByUserIds(
-    userIds: string[],
-    updateClients: boolean = true,
-  ): Promise<UserClientEntityMap | UserPublicClientMap> {
-    if (updateClients) {
-      const clientEntityMap: UserClientEntityMap = {};
-      await Promise.all(
-        userIds.map(async userId => {
-          const clients = await this.clientService.getClientsByUserId(userId);
-          clientEntityMap[userId] = await this.updateClientsOfUserById(userId, clients, true, null);
-        }),
-      );
-      return clientEntityMap;
-    }
-
-    const publicClientMap: UserPublicClientMap = {};
+  async getClientsByUserIds(userIds: string[], updateClients: boolean): Promise<UserClientEntityMap> {
+    const clientEntityMap: UserClientEntityMap = {};
     await Promise.all(
       userIds.map(async userId => {
-        publicClientMap[userId] = await this.clientService.getClientsByUserId(userId);
+        const clients = await this.clientService.getClientsByUserId(userId);
+        clientEntityMap[userId] = updateClients
+          ? await this.updateClientsOfUserById(userId, clients, true, null)
+          : // TODO(Federation): Check if `isSelfClient` is needed here
+            ClientMapper.mapClients(clients, false, null);
       }),
     );
-    return publicClientMap;
+
+    return clientEntityMap;
   }
 
-  private async getClientByUserIdFromDb(requestedUserId: string): Promise<ClientRecord[]> {
+  private async getClientByUserIdFromDb(
+    requestedUserId: string,
+    requestedDomain: string | null,
+  ): Promise<ClientRecord[]> {
     const clients = await this.clientService.loadAllClientsFromDb();
     return clients.filter(client => {
-      const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
-      return userId === requestedUserId;
+      const {userId, domain} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
+      return userId === requestedUserId && (!domain || domain == requestedDomain);
     });
   }
 
@@ -416,8 +411,8 @@ export class ClientRepository {
    */
   async getClientsForSelf(): Promise<ClientEntity[]> {
     this.logger.info('Retrieving all clients of the self user from database');
-    const clientsData = await this.getClientByUserIdFromDb(this.selfUser().id);
-    const clientEntities = ClientMapper.mapClients(clientsData, true);
+    const clientRecords = await this.getClientByUserIdFromDb(this.selfUser().id, this.selfUser().domain);
+    const clientEntities = ClientMapper.mapClients(clientRecords, true, this.selfUser().domain);
     clientEntities.forEach(clientEntity => this.selfUser().addClient(clientEntity));
     return this.selfUser().devices();
   }
@@ -458,7 +453,7 @@ export class ClientRepository {
     publish: boolean = true,
     domain: string | null,
   ): Promise<ClientEntity[]> {
-    const clientsFromBackend: Record<string, RegisteredClient | PublicClient> = {};
+    const clientsFromBackend: {[clientId: string]: RegisteredClient | PublicClient} = {};
     const clientsStoredInDb: ClientRecord[] = [];
     const isSelfUser = userId === this.selfUser().id;
 
@@ -467,7 +462,7 @@ export class ClientRepository {
     }
 
     // Find clients in database
-    return this.getClientByUserIdFromDb(userId)
+    return this.getClientByUserIdFromDb(userId, domain)
       .then(clientsFromDatabase => {
         const promises = [];
 
@@ -514,12 +509,12 @@ export class ClientRepository {
           if (this.selfUser().id === userId) {
             this.onClientAdd({client: clientPayload as RegisteredClient});
           }
-          promises.push(this.updateClientSchemaInDb(userId, clientPayload));
+          promises.push(this.updateClientSchemaInDb(userId, clientPayload, domain));
         }
 
         return Promise.all(promises);
       })
-      .then(newRecords => ClientMapper.mapClients(clientsStoredInDb.concat(newRecords), isSelfUser))
+      .then(newRecords => ClientMapper.mapClients(clientsStoredInDb.concat(newRecords), isSelfUser, domain))
       .then(clientEntities => {
         if (publish) {
           amplify.publish(WebAppEvents.CLIENT.UPDATE, userId, clientEntities);
@@ -581,7 +576,7 @@ export class ClientRepository {
    */
   private onClientAdd(eventJson: Partial<UserClientAddEvent>): void {
     this.logger.info('Client of self user added', eventJson);
-    amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().id, eventJson.client, true);
+    amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().id, eventJson.client, true, this.selfUser().domain);
   }
 
   /**

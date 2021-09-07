@@ -29,11 +29,11 @@ import {
   UserAssetType as APIClientUserAssetType,
   QualifiedId,
 } from '@wireapp/api-client/src/user';
-import type {QualifiedUserMap} from '@wireapp/api-client/src/client';
+import type {QualifiedUserClientMap} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
-import type {PublicClient} from '@wireapp/api-client/src/client';
+import type {PublicClient, AddedClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
 
 import {chunk, partition} from 'Util/ArrayUtil';
@@ -61,7 +61,7 @@ import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {UserMapper} from './UserMapper';
 import {UserState} from './UserState';
-import type {ClientRepository, QualifiedUserClientMap, UserPublicClientMap} from '../client/ClientRepository';
+import type {ClientRepository, QualifiedUserClientEntityMap, UserClientEntityMap} from '../client/ClientRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
@@ -174,32 +174,31 @@ export class UserRepository {
   }
 
   /**
-   * Retrieves meta information about all the clients of a given user.
+   * Retrieves meta information about all the clients of given qualified users.
    */
   getClientsByQualifiedUserIds(
     userIds: QualifiedId[],
     updateClients: boolean,
-  ): Promise<QualifiedUserClientMap | QualifiedUserMap> {
+  ): Promise<QualifiedUserClientEntityMap | QualifiedUserClientMap> {
     return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients as any);
   }
 
   /**
-   * Retrieves meta information about all the clients of a given user.
+   * Retrieves meta information about all the clients of given users.
    */
-  getClientsByUsers(userEntities: User[], updateClients: true): Promise<QualifiedUserClientMap>;
-  getClientsByUsers(userEntities: User[], updateClients: false): Promise<UserPublicClientMap>;
   getClientsByUsers(
     userEntities: User[],
     updateClients: boolean,
-  ): Promise<QualifiedUserClientMap | UserPublicClientMap> {
-    // TODO(Federation): When detection a domain we actually should not need to check for the federation-feature because the system must be federation-aware. However, during the transition period it's safer to check for the config too.
+  ): Promise<UserClientEntityMap | QualifiedUserClientEntityMap> {
+    // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
+    // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
     if (!!userEntities[0]?.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
       const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
-      return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients as any);
+      return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
     }
 
     const userIds = userEntities.map(userEntity => userEntity.id);
-    return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
+    return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
   /**
@@ -216,7 +215,9 @@ export class UserRepository {
     // @todo Add user deletion cases for other users
     const isSelfUser = id === this.userState.self().id;
     if (isSelfUser) {
-      // Info: Deletion of the user causes a database deletion which may interrupt currently running database operations. That's why we added a timeout, to leave some time for the database to finish running reads/writes before the database connection gets closed and the database gets deleted (WEBAPP-6379).
+      // Info: Deletion of the user causes a database deletion which may interrupt currently running database operations.
+      // That's why we added a timeout, to leave some time for the database to finish running reads/writes before the
+      // database connection gets closed and the database gets deleted (WEBAPP-6379).
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 100);
@@ -296,18 +297,28 @@ export class UserRepository {
   }
 
   /**
-   * Saves a new client for the first time to the database and adds it to a user's entity.
+   * Method does:
+   * - fetch user locally or from backend
+   * - map client payload to client entity
+   * - attach client entity to user entity
+   * - persist client entity to database
+   * - trigger "client added" or "legal hold" system messages
+   *
+   * TODO(SRP): Split up method because it does not follow the single-responsibility principle
    *
    * @returns Resolves with `true` when a client has been added
    */
   addClientToUser = async (
     userId: string,
-    clientPayload: PublicClient,
+    clientPayload: PublicClient | AddedClient | ClientEntity,
     publishClient: boolean = false,
     domain: string | null,
   ): Promise<boolean> => {
     const userEntity = await this.getUserById(userId, domain);
-    const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.isMe);
+    const clientEntity =
+      clientPayload instanceof ClientEntity
+        ? clientPayload
+        : ClientMapper.mapClient(clientPayload, userEntity.isMe, domain);
     const wasClientAdded = userEntity.addClient(clientEntity);
     if (wasClientAdded) {
       await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
@@ -572,6 +583,9 @@ export class UserRepository {
    * Check for users locally and fetch them from the server otherwise.
    */
   async getUsersById(userIds: QualifiedIdOptional[] = [], offline: boolean = false): Promise<User[]> {
+    // if (userIds.find(userId => (typeof (userId as any).id !== 'string'))) {
+    //   throw new Error()
+    // }
     if (!userIds.length) {
       return [];
     }

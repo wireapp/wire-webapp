@@ -41,6 +41,7 @@ import {
 import {container} from 'tsyringe';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
@@ -1270,11 +1271,9 @@ export class ConversationRepository {
     }
   }
 
-  // TODO(Federation): This code needs to get adjusted to take care of domains.
   addMissingMember(conversationEntity: Conversation, users: QualifiedIdOptional[], timestamp: number) {
     const [sender] = users;
-    const userIds = users.map(user => user.id);
-    const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
+    const event = EventBuilder.buildMemberJoin(conversationEntity, sender, users, timestamp);
     return this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.INJECTED);
   }
 
@@ -1357,7 +1356,7 @@ export class ConversationRepository {
     this._clearConversation(conversationEntity);
 
     if (leaveConversation) {
-      this.removeMember(conversationEntity, this.userState.self().id);
+      this.removeMember(conversationEntity, {domain: this.userState.self().domain, id: this.userState.self().id});
     }
 
     if (isActiveConversation) {
@@ -1376,16 +1375,16 @@ export class ConversationRepository {
    * Remove member from conversation.
    *
    * @param conversationEntity Conversation to remove member from
-   * @param userId ID of member to be removed from the conversation
+   * @param user ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, userId: string) {
-    const response = await this.conversation_service.deleteMembers(conversationEntity.id, userId);
+  public async removeMember(conversationEntity: Conversation, user: QualifiedId) {
+    const response = await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
     const roles = conversationEntity.roles();
-    delete roles[userId];
+    delete roles[user.id];
     conversationEntity.roles(roles);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+    const event = response || EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
     this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
   }
@@ -1394,17 +1393,17 @@ export class ConversationRepository {
    * Remove service from conversation.
    *
    * @param conversationEntity Conversation to remove service from
-   * @param userId ID of service user to be removed from the conversation
+   * @param user ID of service user to be removed from the conversation
    * @returns Resolves when service was removed from the conversation
    */
-  public removeService(conversationEntity: Conversation, userId: string) {
-    return this.conversation_service.deleteBots(conversationEntity.id, userId).then((response: any) => {
+  public removeService(conversationEntity: Conversation, user: QualifiedId) {
+    return this.conversation_service.deleteBots(conversationEntity.id, user.id).then((response: any) => {
       // TODO: Can this even have a response? in the API Client it look like it always returns `void`
       const hasResponse = response?.event;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;

@@ -371,7 +371,6 @@ export class EventMapper {
    */
   private _mapEvent1to1Creation({data: eventData}: EventRecord) {
     const {has_service: hasService, userIds} = eventData;
-
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
@@ -420,6 +419,11 @@ export class EventMapper {
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
+    messageEntity.userIds().find((userId: any) => {
+      if (typeof userId.id !== 'string') {
+        throw new Error();
+      }
+    });
     messageEntity.userIds(eventData.userIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
@@ -484,6 +488,11 @@ export class EventMapper {
         messageEntity.showServicesWarning = true;
       }
 
+      userIds.find((userId: any) => {
+        if (typeof userId.id !== 'string') {
+          throw new Error();
+        }
+      });
       messageEntity.userIds(userIds);
     }
 
@@ -630,7 +639,11 @@ export class EventMapper {
    */
   private _mapEventVerification({data: eventData}: EventRecord) {
     const messageEntity = new VerificationMessage();
-
+    eventData.userIds.find((userId: any) => {
+      if (typeof userId.id !== 'string') {
+        throw new Error();
+      }
+    });
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
     messageEntity.verificationMessageType(eventData.type);

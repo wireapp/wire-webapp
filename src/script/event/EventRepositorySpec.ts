@@ -440,7 +440,7 @@ describe('EventRepository', () => {
 
       // Create client for testing
       const ownClientId = 'f180a823bf0d1204';
-      const client = new ClientEntity();
+      const client = new ClientEntity(false, null);
       client.id = ownClientId;
       testFactory.client_repository['clientState'].currentClient(client);
 

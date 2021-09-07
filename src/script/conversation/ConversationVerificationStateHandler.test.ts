@@ -63,11 +63,11 @@ describe('ConversationVerificationStateHandler', () => {
       userA = new User(createRandomUuid(), null);
       userB = new User(createRandomUuid(), null);
 
-      clientA = new ClientEntity();
+      clientA = new ClientEntity(false, null);
       clientA.meta.isVerified(true);
       userA.devices.push(clientA);
 
-      clientB = new ClientEntity();
+      clientB = new ClientEntity(false, null);
       clientB.meta.isVerified(true);
       userB.devices.push(clientB);
 
@@ -114,7 +114,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationAB.is_verified()).toBeTruthy();
 
-      const new_client_b = new ClientEntity();
+      const new_client_b = new ClientEntity(false, null);
       new_client_b.meta.isVerified(false);
       userB.devices.push(new_client_b);
 
@@ -136,7 +136,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(conversationAB.is_verified()).toBeDefined();
       expect(conversationAB.is_verified()).toBeTruthy();
 
-      const new_client_b = new ClientEntity();
+      const new_client_b = new ClientEntity(false, null);
       new_client_b.meta.isVerified(true);
       userB.devices.push(new_client_b);
 
@@ -162,7 +162,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationC.verification_state()).toBe(ConversationVerificationState.VERIFIED);
 
-      const new_client = new ClientEntity();
+      const new_client = new ClientEntity(false, null);
       new_client.meta.isVerified(false);
       selfUserEntity.devices.push(new_client);
 
@@ -192,7 +192,7 @@ describe('ConversationVerificationStateHandler', () => {
       spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
       spyOn(EventBuilder, 'buildAllVerified').and.returnValue(verifiedEvent);
 
-      const new_client = new ClientEntity();
+      const new_client = new ClientEntity(false, null);
       new_client.meta.isVerified(false);
       selfUserEntity.devices.push(new_client);
 
@@ -221,7 +221,7 @@ describe('ConversationVerificationStateHandler', () => {
       spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
 
       const new_user = new User(createRandomUuid(), null);
-      const new_client_b = new ClientEntity();
+      const new_client_b = new ClientEntity(false, null);
       new_client_b.meta.isVerified(false);
       new_user.devices.push(new_client_b);
 
@@ -243,7 +243,7 @@ describe('ConversationVerificationStateHandler', () => {
       spyOn(EventBuilder, 'buildDegraded');
 
       const new_user = new User(createRandomUuid(), null);
-      const new_client_b = new ClientEntity();
+      const new_client_b = new ClientEntity(false, null);
       new_client_b.meta.isVerified(true);
       new_user.devices.push(new_client_b);
 

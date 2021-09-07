@@ -23,6 +23,7 @@ import type {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-clie
 
 import {Logger, getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
+import {isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 
 import type {ConversationRepository} from './ConversationRepository';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -109,12 +110,22 @@ export class ClientMismatchHandler {
 
     const missingUserEntities = missingUserIds.map(missingUserId => this.userRepository.findUserById(missingUserId));
 
-    const qualifiedUsersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
-    await Promise.all(
-      Object.entries(qualifiedUsersMap).map(([userId, clients]) =>
-        Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null))),
-      ),
-    );
+    const usersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
+    if (isQualifiedUserClientEntityMap(usersMap)) {
+      await Promise.all(
+        Object.entries(usersMap).map(([domain, userClientsMap]) =>
+          Object.entries(userClientsMap).map(([userId, clients]) =>
+            Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, domain))),
+          ),
+        ),
+      );
+    } else {
+      await Promise.all(
+        Object.entries(usersMap).map(([userId, clients]) =>
+          Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null))),
+        ),
+      );
+    }
 
     this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(
       missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id})),

@@ -19,6 +19,7 @@
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
@@ -292,8 +293,7 @@ export const EventBuilder = {
   buildMemberJoin(
     conversationEntity: Conversation,
     sender: QualifiedIdOptional,
-    // TODO(Federation): Needs to be replaced with QualifiedIds
-    joiningUserIds: string[],
+    joiningUserIds: QualifiedIdOptional[],
     timestamp?: number,
   ): MemberJoinEvent {
     if (!timestamp) {
@@ -304,7 +304,7 @@ export const EventBuilder = {
     return {
       conversation: conversationEntity.id,
       data: {
-        user_ids: joiningUserIds,
+        user_ids: joiningUserIds.map(({id}) => id),
       },
       from: sender.id,
       time: isoDate,
@@ -314,16 +314,16 @@ export const EventBuilder = {
 
   buildMemberLeave(
     conversationEntity: Conversation,
-    userId: string,
+    userId: QualifiedId,
     removedBySelfUser: boolean,
     currentTimestamp: number,
   ): MemberLeaveEvent {
     return {
       conversation: conversationEntity.id,
       data: {
-        user_ids: [userId],
+        user_ids: [userId.id],
       },
-      from: removedBySelfUser ? conversationEntity.selfUser().id : userId,
+      from: removedBySelfUser ? conversationEntity.selfUser().id : userId.id,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: CONVERSATION_EVENT.MEMBER_LEAVE,
     };

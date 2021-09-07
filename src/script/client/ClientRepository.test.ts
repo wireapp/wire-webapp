@@ -28,6 +28,7 @@ import {ClientMapper} from 'src/script/client/ClientMapper';
 import {ClientError} from 'src/script/error/ClientError';
 import {TestFactory} from '../../../test/helper/TestFactory';
 import {entities} from '../../../test/api/payloads';
+import {ClientRecord} from '../storage/record/ClientRecord';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();
@@ -43,7 +44,7 @@ describe('ClientRepository', () => {
 
   describe('getClientsByUserIds', () => {
     it('maps client entities from client payloads by the backend', async () => {
-      const client = new ClientEntity();
+      const client = new ClientEntity(false, null);
       client.id = clientId;
 
       testFactory.client_repository['clientState'].currentClient(client);
@@ -157,8 +158,13 @@ describe('ClientRepository', () => {
     });
 
     it('returns true on Electron', () => {
-      const clientPayload = {type: ClientType.PERMANENT};
-      const clientEntity = ClientMapper.mapClient(clientPayload, true);
+      const clientPayload: ClientRecord = {
+        class: ClientClassification.DESKTOP,
+        id: clientId,
+        meta: {},
+        type: ClientType.PERMANENT,
+      };
+      const clientEntity = ClientMapper.mapClient(clientPayload, true, null);
       testFactory.client_repository['clientState'].currentClient(clientEntity);
       spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
       const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
@@ -167,8 +173,13 @@ describe('ClientRepository', () => {
     });
 
     it('returns true on Electron even if client is temporary', () => {
-      const clientPayload = {type: ClientType.TEMPORARY};
-      const clientEntity = ClientMapper.mapClient(clientPayload, true);
+      const clientPayload: ClientRecord = {
+        class: ClientClassification.DESKTOP,
+        id: clientId,
+        meta: {},
+        type: ClientType.TEMPORARY,
+      };
+      const clientEntity = ClientMapper.mapClient(clientPayload, true, null);
       testFactory.client_repository['clientState'].currentClient(clientEntity);
       spyOn(Runtime, 'isDesktopApp').and.returnValue(true);
       const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
@@ -184,8 +195,13 @@ describe('ClientRepository', () => {
     });
 
     it('returns true if current client is permanent', () => {
-      const clientPayload = {type: ClientType.PERMANENT};
-      const clientEntity = ClientMapper.mapClient(clientPayload, true);
+      const clientPayload: ClientRecord = {
+        class: ClientClassification.PHONE,
+        id: clientId,
+        meta: {},
+        type: ClientType.PERMANENT,
+      };
+      const clientEntity = ClientMapper.mapClient(clientPayload, true, null);
       testFactory.client_repository['clientState'].currentClient(clientEntity);
       const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
 
@@ -193,8 +209,13 @@ describe('ClientRepository', () => {
     });
 
     it('returns false if current client is temporary', () => {
-      const clientPayload = {type: ClientType.TEMPORARY};
-      const clientEntity = ClientMapper.mapClient(clientPayload, true);
+      const clientPayload: ClientRecord = {
+        class: ClientClassification.PHONE,
+        id: clientId,
+        meta: {},
+        type: ClientType.TEMPORARY,
+      };
+      const clientEntity = ClientMapper.mapClient(clientPayload, true, null);
       testFactory.client_repository['clientState'].currentClient(clientEntity);
       const isPermanent = testFactory.client_repository.isCurrentClientPermanent();
 
@@ -212,7 +233,7 @@ describe('ClientRepository', () => {
     beforeEach(() => testFactory.client_repository['clientState'].currentClient(undefined));
 
     it('returns true if user ID and client ID match', () => {
-      const clientEntity = new ClientEntity();
+      const clientEntity = new ClientEntity(false, null);
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
       testFactory.client_repository.selfUser(new User(userId, null));
@@ -222,7 +243,7 @@ describe('ClientRepository', () => {
     });
 
     it('returns false if only the user ID matches', () => {
-      const clientEntity = new ClientEntity();
+      const clientEntity = new ClientEntity(false, null);
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
       const result = testFactory.client_repository['isCurrentClient'](userId, 'ABCDE');
@@ -231,7 +252,7 @@ describe('ClientRepository', () => {
     });
 
     it('returns false if only the client ID matches', () => {
-      const clientEntity = new ClientEntity();
+      const clientEntity = new ClientEntity(false, null);
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
       const result = testFactory.client_repository['isCurrentClient']('ABCDE', clientId);
@@ -246,14 +267,14 @@ describe('ClientRepository', () => {
     });
 
     it('throws an error if client ID is not specified', () => {
-      testFactory.client_repository['clientState'].currentClient(new ClientEntity());
+      testFactory.client_repository['clientState'].currentClient(new ClientEntity(false, null));
       const functionCall = () => testFactory.client_repository['isCurrentClient'](userId, undefined);
 
       expect(functionCall).toThrowError(ClientError);
     });
 
     it('throws an error if user ID is not specified', () => {
-      testFactory.client_repository['clientState'].currentClient(new ClientEntity());
+      testFactory.client_repository['clientState'].currentClient(new ClientEntity(false, null));
       const functionCall = () => testFactory.client_repository['isCurrentClient'](undefined, clientId);
 
       expect(functionCall).toThrowError(ClientError);

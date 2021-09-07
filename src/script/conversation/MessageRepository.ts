@@ -105,7 +105,7 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 
@@ -1529,19 +1529,16 @@ export class MessageRepository {
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(
-              clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId, null)),
-            ),
+            Promise.all(clients.map(clientId => this.userRepository.removeClientFromUser(userId, clientId, null))),
           ),
         );
 
         const missingUserIds = Object.entries(remoteUserClients).reduce<string[]>((missing, [userId, clients]) => {
-          if (userId === selfId) {
-            return missing;
-          }
-          const missingClients = getDifference(localUserClients[userId] || ([] as string[]), clients);
-          if (missingClients.length) {
-            missing.push(userId);
+          if (userId !== selfId) {
+            const missingClients = getDifference(localUserClients[userId] || ([] as string[]), clients);
+            if (missingClients.length) {
+              missing.push(userId);
+            }
           }
           return missing;
         }, []);
@@ -1550,12 +1547,22 @@ export class MessageRepository {
           this.userRepository.findUserById(missingUserId),
         );
 
-        const qualifiedUsersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
-        await Promise.all(
-          Object.entries(qualifiedUsersMap).map(([userId, clients]) => {
-            return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)));
-          }),
-        );
+        const usersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
+        if (isQualifiedUserClientEntityMap(usersMap)) {
+          await Promise.all(
+            Object.entries(usersMap).map(([domain, userClientsMap]) =>
+              Object.entries(userClientsMap).map(([userId, clients]) =>
+                Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, domain))),
+              ),
+            ),
+          );
+        } else {
+          await Promise.all(
+            Object.entries(usersMap).map(([userId, clients]) =>
+              Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null))),
+            ),
+          );
+        }
       }
     }
     if (blockSystemMessage) {

@@ -61,7 +61,7 @@ describe('UserDetails', () => {
 
   it('shows a verified icon when all clients from the self user are verified and all clients of the other participant are verified', () => {
     const otherParticipant = new User(createRandomUuid(), null);
-    const verifiedClient = new ClientEntity();
+    const verifiedClient = new ClientEntity(false, null);
     verifiedClient.meta.isVerified(true);
     otherParticipant.devices.push(verifiedClient);
     const userDetails = new UserDetailsPage({isGroupAdmin: true, isSelfVerified: true, participant: otherParticipant});
