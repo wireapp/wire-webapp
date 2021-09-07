@@ -301,7 +301,6 @@ jobs:
         with:
           tag_name: ${{env.TAG}}
           name: ${{env.TAG}}
-          body_path: ./CHANGELOG.md
           draft: false
           prerelease: true
 
