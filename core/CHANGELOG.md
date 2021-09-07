@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.14.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.13.0...@wireapp/core@17.14.0) (2021-09-07)
+
+
+### Features
+
+* **core:** Add domain to clients ([#4124](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4124)) ([e769f80](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/e769f80257626dffdb44a07a6dc4b12e775ae41b))
+
+
+
+
+
 # [17.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.12.5...@wireapp/core@17.13.0) (2021-08-30)
 
 

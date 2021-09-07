@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.4.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.4.0...@wireapp/api-client@13.4.1) (2021-09-07)
+
+
+### Bug Fixes
+
+* **api-client:** Rename QualifiedUserMap to QualifiedUserClientMap ([d710335](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/d710335c129dbca09d6f782a925a10b528158d1b))
+
+
+
+
+
 # [13.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.3.1...@wireapp/api-client@13.4.0) (2021-08-30)
 
 
