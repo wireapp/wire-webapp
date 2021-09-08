@@ -34,6 +34,7 @@ import type {
   MessageSendingStatus,
   NewConversation,
   NewOTRMessage,
+  RemoteConversations,
 } from './';
 import type {
   ConversationAccessUpdateEvent,
@@ -73,8 +74,9 @@ export class ConversationAPI {
     CODE: 'code',
     CODE_CHECK: '/code-check',
     CONVERSATIONS: '/conversations',
+    IDS: 'ids',
     JOIN: '/join',
-    LIST_CONVERSATIONS: '/list-conversations',
+    LIST: 'list',
     MEMBERS: 'members',
     MESSAGE_TIMER: 'message-timer',
     MESSAGES: 'messages',
@@ -207,6 +209,7 @@ export class ConversationAPI {
    * @param limit Max. number of IDs to return
    * @param conversationId Conversation ID to start from (exclusive)
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversationIds
+   * @deprecated Use `getListConversations()` instead.
    */
   public async getConversationIds(limit: number, conversationId?: string): Promise<ConversationIds> {
     const config: AxiosRequestConfig = {
@@ -215,7 +218,7 @@ export class ConversationAPI {
         size: limit,
         start: conversationId,
       },
-      url: `${ConversationAPI.URL.CONVERSATIONS}/ids`,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.IDS}`,
     };
 
     const response = await this.client.sendJSON<ConversationIds>(config);
@@ -237,18 +240,25 @@ export class ConversationAPI {
   }
 
   /**
-   * Get all remote conversations from a federated backend.
-   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_list_conversations
+   * Get conversation metadata for a list of conversation ids
+   * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_conversations_list_v2
    */
-  public async getRemoteConversations(ownDomain: string): Promise<Conversation[]> {
+  public async getListConversations(): Promise<RemoteConversations> {
     const config: AxiosRequestConfig = {
-      data: {},
       method: 'post',
-      url: ConversationAPI.URL.LIST_CONVERSATIONS,
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}/${ConversationAPI.URL.V2}`,
     };
 
-    const {data} = await this.client.sendJSON<Conversations>(config);
-    return data.conversations.filter(conversation => conversation.qualified_id?.domain !== ownDomain);
+    const {data} = await this.client.sendJSON<RemoteConversations>(config);
+    return data;
+  }
+
+  /**
+   * Get all remote conversations from a federated backend.
+   */
+  public async getRemoteConversations(ownDomain: string): Promise<Conversation[]> {
+    const data = await this.getListConversations();
+    return data.found?.filter(conversation => conversation.qualified_id?.domain !== ownDomain) || [];
   }
 
   /**
