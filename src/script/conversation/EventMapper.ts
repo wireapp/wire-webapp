@@ -639,11 +639,6 @@ export class EventMapper {
    */
   private _mapEventVerification({data: eventData}: EventRecord) {
     const messageEntity = new VerificationMessage();
-    eventData.userIds.find((userId: any) => {
-      if (typeof userId.id !== 'string') {
-        throw new Error();
-      }
-    });
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
     messageEntity.verificationMessageType(eventData.type);
