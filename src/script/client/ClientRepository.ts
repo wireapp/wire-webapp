@@ -199,10 +199,15 @@ export class ClientRepository {
    * @param isVerified New state to apply
    * @returns Resolves when the verification state has been updated
    */
-  async verifyClient(userId: string, clientEntity: ClientEntity, isVerified: boolean): Promise<void> {
+  async verifyClient(
+    userId: string,
+    clientEntity: ClientEntity,
+    isVerified: boolean,
+    domain: string | null,
+  ): Promise<void> {
     await this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}}, clientEntity.domain);
     clientEntity.meta.isVerified(isVerified);
-    amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
+    amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, {domain, id: userId}, clientEntity, isVerified);
   }
 
   /**
