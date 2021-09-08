@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.4.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.4.2...@wireapp/api-client@13.4.3) (2021-09-08)
+
+
+### Bug Fixes
+
+* **api-client:** Update getRemoteConversations endpoint ([#4114](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4114)) ([4d1e7e3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/4d1e7e3c3ff670ed5f75fbfd96691133cf59570f))
+
+
+
+
+
 ## [13.4.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.4.1...@wireapp/api-client@13.4.2) (2021-09-08)
 
 **Note:** Version bump only for package @wireapp/api-client
