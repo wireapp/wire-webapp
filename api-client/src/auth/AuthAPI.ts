@@ -41,6 +41,7 @@ export class AuthAPI {
     LOGIN: '/login',
     LOGOUT: 'logout',
     REGISTER: '/register',
+    REMOVE: 'remove',
     SELF: 'self',
     SEND: 'send',
     SSO: '/sso',
@@ -68,7 +69,7 @@ export class AuthAPI {
         password,
       },
       method: 'post',
-      url: `${AuthAPI.URL.COOKIES}/remove`,
+      url: `${AuthAPI.URL.COOKIES}/${AuthAPI.URL.REMOVE}`,
       withCredentials: true,
     };
 

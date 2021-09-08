@@ -52,6 +52,7 @@ export class UserAPI {
     BY_HANDLE: 'by-handle',
     CALLS: '/calls',
     CLIENTS: 'clients',
+    CONFIG: 'config',
     CONTACTS: 'contacts',
     DELETE: '/delete',
     HANDLES: 'handles',
@@ -124,7 +125,7 @@ export class UserAPI {
   public async getCallsConfiguration(): Promise<RTCConfiguration> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.CALLS}/config`,
+      url: `${UserAPI.URL.CALLS}/${UserAPI.URL.CONFIG}`,
     };
 
     const response = await this.client.sendJSON<RTCConfiguration>(config);

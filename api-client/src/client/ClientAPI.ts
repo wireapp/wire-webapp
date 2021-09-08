@@ -31,6 +31,7 @@ export class ClientAPI {
   public static readonly URL = {
     CLIENTS: '/clients',
     CAPABILITIES: 'capabilities',
+    PREKEYS: 'prekeys',
   };
 
   public async postClient(newClient: NewClient): Promise<RegisteredClient> {
@@ -108,7 +109,7 @@ export class ClientAPI {
   public async getClientPreKeys(clientId: string): Promise<PreKeyBundle> {
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ClientAPI.URL.CLIENTS}/${clientId}/prekeys`,
+      url: `${ClientAPI.URL.CLIENTS}/${clientId}/${ClientAPI.URL.PREKEYS}`,
     };
 
     const response = await this.client.sendJSON<PreKeyBundle>(config, true);
