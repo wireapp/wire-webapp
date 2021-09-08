@@ -31,6 +31,8 @@ import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 import {AssetRepository} from '../../assets/AssetRepository';
+import {UserReactionMap} from '../../storage';
+import type {ReactionType} from '@wireapp/core/src/main/conversation/ReactionType';
 
 export class ContentMessage extends Message {
   private readonly isLikedProvisional: ko.Observable<boolean>;
@@ -46,7 +48,7 @@ export class ContentMessage extends Message {
   public replacing_message_id: null | string;
   readonly edited_timestamp: ko.Observable<number>;
   // TODO(Federation): Make reactions federation-aware.
-  readonly reactions: ko.Observable<{[userId: string]: string}>;
+  readonly reactions: ko.Observable<UserReactionMap>;
 
   constructor(id?: string) {
     super(id);
@@ -125,9 +127,9 @@ export class ContentMessage extends Message {
     data: event_data,
     from,
   }: {
-    data: {reaction: string};
+    data: {reaction: ReactionType};
     from: string;
-  }): false | {reactions: Record<string, string>; version: number} {
+  }): false | {reactions: UserReactionMap; version: number} {
     const reaction = event_data && event_data.reaction;
     const hasUser = this.reactions()[from];
     const shouldAdd = reaction && !hasUser;

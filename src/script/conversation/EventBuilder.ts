@@ -77,17 +77,19 @@ export interface VoiceChannelActivateEvent extends BaseEvent {
   protocol_version: number;
   type: string;
 }
-
-export type AllVerifiedEvent = ConversationEvent<{type: VerificationMessageType}>;
+export type AllVerifiedEventData = {type: VerificationMessageType};
+export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData>;
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType};
-export type DegradedMessageEvent = ConversationEvent<{type: VerificationMessageType; userIds: string[]}>;
+export type DegradedMessageEventData = {type: VerificationMessageType; userIds: string[]};
+export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData>;
 export type DeleteEvent = ConversationEvent<{deleted_time: number}>;
-export type GroupCreationEvent = ConversationEvent<{
+export type GroupCreationEventData = {
   allTeamMembers: boolean;
   name: string;
   userIds: QualifiedIdOptional[];
-}>;
+};
+export type GroupCreationEvent = ConversationEvent<GroupCreationEventData>;
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}>;
 export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;

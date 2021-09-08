@@ -18,6 +18,7 @@
  */
 
 import {StatusType} from '../../message/StatusType';
+import type {ReactionType} from '@wireapp/core/src/main/conversation/';
 
 export interface ReadReceipt {
   domain?: string;
@@ -32,13 +33,15 @@ export interface AssetRecord {
   token?: string;
 }
 
+export type UserReactionMap = {[userId: string]: ReactionType};
+
 export interface EventRecord<T = any> {
   category: number;
   client?: {time: string};
   connection?: {lastUpdate: string};
   content?: string;
   conversation: string;
-  data: T;
+  data?: T;
   edited_time?: string;
   ephemeral_expires?: boolean | string | number;
   ephemeral_started?: number;
@@ -50,8 +53,9 @@ export interface EventRecord<T = any> {
   mentions?: string[];
   message?: string;
   previews?: string[];
-  primary_key: string;
-  reactions: Record<string, string>;
+  /** Only used with IndexedDB table 'event' */
+  primary_key?: string;
+  reactions?: UserReactionMap;
   read_receipts?: ReadReceipt[];
   selected_button_id?: string;
   server_time?: string;

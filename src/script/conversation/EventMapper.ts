@@ -104,7 +104,7 @@ export class EventMapper {
    * @param conversationEntity Conversation entity the event belong to
    * @returns Resolves with the mapped message entity
    */
-  mapJsonEvent(event: EventRecord, conversationEntity: Conversation) {
+  mapJsonEvent<T>(event: EventRecord<T>, conversationEntity: Conversation) {
     return this._mapJsonEvent(event, conversationEntity).catch(error => {
       const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (isMessageNotFound) {
