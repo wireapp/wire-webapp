@@ -583,9 +583,6 @@ export class UserRepository {
    * Check for users locally and fetch them from the server otherwise.
    */
   async getUsersById(userIds: QualifiedIdOptional[] = [], offline: boolean = false): Promise<User[]> {
-    // if (userIds.find(userId => (typeof (userId as any).id !== 'string'))) {
-    //   throw new Error()
-    // }
     if (!userIds.length) {
       return [];
     }

@@ -419,11 +419,6 @@ export class EventMapper {
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
     messageEntity.name(eventData.name || '');
-    messageEntity.userIds().find((userId: any) => {
-      if (typeof userId.id !== 'string') {
-        throw new Error();
-      }
-    });
     messageEntity.userIds(eventData.userIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
@@ -488,11 +483,6 @@ export class EventMapper {
         messageEntity.showServicesWarning = true;
       }
 
-      userIds.find((userId: any) => {
-        if (typeof userId.id !== 'string') {
-          throw new Error();
-        }
-      });
       messageEntity.userIds(userIds);
     }
 
