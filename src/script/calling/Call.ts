@@ -28,7 +28,7 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 
 export type ConversationId = string;
 
-const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = Infinity;
+const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 9;
 
 interface ActiveSpeaker {
   audio_level: number;
@@ -210,7 +210,7 @@ export class Call {
     const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.hasActiveVideo());
 
     const newPages = chunk<Participant>(
-      [selfParticipant, ...withVideo, ...withoutVideo].filter(Boolean),
+      [selfParticipant, ...withVideo, ...withoutVideo],
       NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE,
     );
 
