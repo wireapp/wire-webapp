@@ -522,7 +522,7 @@ export class ClientRepository {
       .then(newRecords => ClientMapper.mapClients(clientsStoredInDb.concat(newRecords), isSelfUser, domain))
       .then(clientEntities => {
         if (publish) {
-          amplify.publish(WebAppEvents.CLIENT.UPDATE, userId, clientEntities);
+          amplify.publish(WebAppEvents.CLIENT.UPDATE, userId, clientEntities, domain);
         }
         return clientEntities;
       })
@@ -614,6 +614,6 @@ export class ClientRepository {
         'legalHoldDeactivated',
       );
     }
-    amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId);
+    amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId, this.selfUser().domain);
   }
 }

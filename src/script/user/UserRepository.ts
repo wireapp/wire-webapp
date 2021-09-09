@@ -357,7 +357,7 @@ export class UserRepository {
   ): void => {
     this.getUserById(userId, domain).then(userEntity => {
       userEntity.devices(clientEntities);
-      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId, clientEntities);
+      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, {domain, id: userId});
     });
   };
 
