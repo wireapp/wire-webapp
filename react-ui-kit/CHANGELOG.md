@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.53.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.52.11...@wireapp/react-ui-kit@7.53.0) (2021-09-09)
+
+
+### Features
+
+* **react-ui-kit:** Add CheckRound, List & Support icons ([#4125](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4125)) ([a9fe082](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/a9fe082d48be9e7361615cf3d15f31af92a3dc41))
+
+
+
+
+
 ## [7.52.11](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.52.10...@wireapp/react-ui-kit@7.52.11) (2021-08-30)
 
 **Note:** Version bump only for package @wireapp/react-ui-kit
