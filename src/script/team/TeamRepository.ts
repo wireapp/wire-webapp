@@ -402,11 +402,9 @@ export class TeamRepository {
       // Ignore notification stream events
       return;
     }
-    if (eventJson.name === FEATURE_KEY.FILE_SHARING) {
-      const featureConfigList = await this.teamService.getAllTeamFeatures();
-      this.teamState.teamFeatures(featureConfigList);
-      this.handleConfigUpdate(featureConfigList);
-    }
+    const featureConfigList = await this.teamService.getAllTeamFeatures();
+    this.teamState.teamFeatures(featureConfigList);
+    this.handleConfigUpdate(featureConfigList);
   };
 
   private readonly handleConfigUpdate = (featureConfigList: FeatureList) => {
