@@ -145,6 +145,24 @@ export class ConversationAPI {
   }
 
   /**
+   * Remove a qualified member from a qualified conversation.
+   * @param conversation The conversation to remove the user from
+   * @param user The user to remove
+   */
+  public async deleteQualifiedMember(
+    conversation: QualifiedId,
+    user: QualifiedId,
+  ): Promise<ConversationMemberLeaveEvent> {
+    const config: AxiosRequestConfig = {
+      method: 'delete',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${conversation.domain}/${conversation.id}/${ConversationAPI.URL.MEMBERS}/${user.domain}/${user.id}`,
+    };
+
+    const response = await this.client.sendJSON<ConversationMemberLeaveEvent>(config);
+    return response.data;
+  }
+
+  /**
    * Get all conversations.
    */
   public getAllConversations(): Promise<Conversation[]> {
