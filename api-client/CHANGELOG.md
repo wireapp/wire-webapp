@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.4.4...@wireapp/api-client@13.5.0) (2021-09-09)
+
+
+### Features
+
+* **api-client:** Delete qualified member from qualified conversation ([#4126](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4126)) ([bf86d01](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/bf86d01d3d41212ca9a77612793b0251a8cbfa9b))
+
+
+
+
+
 ## [13.4.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.4.3...@wireapp/api-client@13.4.4) (2021-09-09)
 
 **Note:** Version bump only for package @wireapp/api-client
