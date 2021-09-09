@@ -105,7 +105,7 @@ describe('ClientMismatchHandler', () => {
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
       expect(conversationRepositorySpy.addMissingMember).toHaveBeenCalledWith(
         conversation,
-        [{domain: undefined, id: unknownUserId}],
+        [{domain: null, id: unknownUserId}],
         timestamp - 1,
       );
     });
