@@ -329,7 +329,7 @@ export class UserRepository {
           amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
         }
       } else if (publishClient) {
-        amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
+        amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain, id: userId}, clientEntity);
       }
     }
     return wasClientAdded;
@@ -344,7 +344,7 @@ export class UserRepository {
     await this.clientRepository.removeClient(userId, clientId, domain);
     const userEntity = await this.getUserById(userId, domain);
     userEntity.removeClient(clientId);
-    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, {domain, id: userId}, clientId);
   };
 
   /**

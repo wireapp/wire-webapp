@@ -62,7 +62,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {AssetAddEvent, EventBuilder} from '../conversation/EventBuilder';
+import {AssetAddEvent, EventBuilder, QualifiedIdOptional} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
@@ -1334,7 +1334,7 @@ export class MessageRepository {
 
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
-    userIds: string[],
+    userIds: QualifiedIdOptional[],
     checkLegalHold: boolean,
   ): Promise<void> {
     const messageType = eventInfoEntity.getType();
@@ -1373,7 +1373,7 @@ export class MessageRepository {
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
     consentType: string,
-    userIds: string[],
+    userIds: QualifiedIdOptional[],
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
@@ -1402,16 +1402,12 @@ export class MessageRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
+      userIds = conversationEntity
+        .getUsersWithUnverifiedClients()
+        .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
 
-      // TODO(Federation): Consider using `Config.getConfig().FEATURE.FEDERATION_DOMAIN`.
       return this.userRepository
-        .getUsersById(
-          userIds.map(userId => ({
-            domain: null,
-            id: userId,
-          })),
-        )
+        .getUsersById(userIds)
         .then(userEntities => {
           let actionString;
           let messageString;
@@ -1743,9 +1739,9 @@ export class MessageRepository {
       await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
       return response;
     } catch (axiosError) {
-      const error = axiosError.response?.data;
+      const errorData = axiosError.response?.data as ClientMismatch & {label: BackendErrorLabel};
 
-      const hasNoLegalholdConsent = error?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
+      const hasNoLegalholdConsent = errorData?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
       const ignoredMessageTypes = [GENERIC_MESSAGE_TYPE.CONFIRMATION];
       if (hasNoLegalholdConsent && !ignoredMessageTypes.includes(messageType as GENERIC_MESSAGE_TYPE)) {
         const replaceLinkLegalHold = replaceLink(
@@ -1772,23 +1768,26 @@ export class MessageRepository {
         );
       }
 
-      const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
+      const isUnknownClient = errorData?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
       if (isUnknownClient) {
         this.clientRepository.removeLocalClient();
         return undefined;
       }
 
-      if (!error?.missing) {
-        throw error;
+      if (!errorData?.missing) {
+        throw errorData;
       }
 
       const payloadWithMissingClients = await this.clientMismatchHandler.onClientMismatch(
         eventInfoEntity,
-        error,
+        errorData,
         payload,
       );
 
-      const missedUserIds = Object.keys(error.missing);
+      const missedUserIds = Object.keys(errorData.missing).map(userId => ({
+        domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN,
+        id: userId,
+      }));
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,

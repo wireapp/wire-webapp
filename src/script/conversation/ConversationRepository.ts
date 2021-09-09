@@ -1860,10 +1860,10 @@ export class ConversationRepository {
     const {from: senderId, id, type, time} = eventJson;
 
     if (senderId) {
-      const allParticipantIds = conversationEntity
+      const allParticipants = conversationEntity
         .participating_user_ids()
         .concat({domain: this.userState.self().domain, id: this.userState.self().id});
-      const isFromUnknownUser = !allParticipantIds.includes(senderId);
+      const isFromUnknownUser = allParticipants.every(participant => participant.id !== senderId);
 
       if (isFromUnknownUser) {
         const membersUpdateMessages = [
@@ -1873,7 +1873,7 @@ export class ConversationRepository {
         ];
         const isMembersUpdateEvent = membersUpdateMessages.includes(eventJson.type);
         if (isMembersUpdateEvent) {
-          const isFromUpdatedMember = eventJson.data.user_ids.includes(senderId);
+          const isFromUpdatedMember = eventJson.data.user_ids?.includes(senderId);
           if (isFromUpdatedMember) {
             // we ignore leave/join events that are sent by the user actually leaving or joining
             return conversationEntity;

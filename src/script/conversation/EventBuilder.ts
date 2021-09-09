@@ -81,7 +81,7 @@ export type AllVerifiedEventData = {type: VerificationMessageType};
 export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData>;
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType};
-export type DegradedMessageEventData = {type: VerificationMessageType; userIds: string[]};
+export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedIdOptional[]};
 export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData>;
 export type DeleteEvent = ConversationEvent<{deleted_time: number}>;
 export type GroupCreationEventData = {
@@ -186,7 +186,7 @@ export const EventBuilder = {
       conversation: conversationEntity.id,
       data: {
         type,
-        userIds: userIds.map(({id}) => id),
+        userIds,
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
