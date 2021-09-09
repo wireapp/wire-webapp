@@ -210,7 +210,7 @@ export class Call {
     const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.hasActiveVideo());
 
     const newPages = chunk<Participant>(
-      [selfParticipant, ...withVideo, ...withoutVideo],
+      [selfParticipant, ...withVideo, ...withoutVideo].filter(Boolean),
       NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE,
     );
 
