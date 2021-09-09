@@ -17,17 +17,19 @@
  *
  */
 
+import ko from 'knockout';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {USER_EVENT} from '@wireapp/api-client/src/event/';
 
-import {PreferenceNotificationRepository} from 'src/script/notification/PreferenceNotificationRepository';
+import {PreferenceNotificationRepository, Notification} from 'src/script/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {createRandomUuid} from 'Util/util';
+import {User} from '../entity/User';
 
 describe('PreferenceNotificationRepository', () => {
-  const user = {id: createRandomUuid()};
-  const userObservable = () => user;
+  const user = new User(createRandomUuid(), null);
+  const userObservable = ko.observable(user);
 
   beforeEach(() => {
     spyOn(amplify, 'store').and.callFake(() => {});
@@ -64,7 +66,7 @@ describe('PreferenceNotificationRepository', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = {};
 
-    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, user.id, newClientData);
+    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain: user.domain, id: user.id}, newClientData);
 
     expect(preferenceNotificationRepository.notifications().length).toBe(1);
     expect(preferenceNotificationRepository.notifications()[0]).toEqual({
@@ -78,7 +80,7 @@ describe('PreferenceNotificationRepository', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = {};
 
-    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, createRandomUuid(), newClientData);
+    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain: null, id: createRandomUuid()}, newClientData);
 
     expect(preferenceNotificationRepository.notifications().length).toBe(0);
   });
@@ -86,12 +88,12 @@ describe('PreferenceNotificationRepository', () => {
   it('stores in local storage any notification added', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
 
-    const notifications = [
-      {data: 1, type: 'preference-changed'},
-      {data: 2, type: 'device-changed'},
+    const notifications: Notification[] = [
+      {data: true, type: 'preference-changed'},
+      {data: false, type: 'device-changed'},
     ];
 
-    amplify.store.calls.reset();
+    (amplify.store as any).calls.reset();
     notifications.forEach((notification, index) => {
       preferenceNotificationRepository.notifications.push(notification);
 
@@ -100,11 +102,11 @@ describe('PreferenceNotificationRepository', () => {
   });
 
   it('restores saved notifications from local storage', () => {
-    const storedNotifications = [
-      {data: 1, type: 'type-1'},
-      {data: 2, type: 'type-2'},
+    const storedNotifications: Notification[] = [
+      {data: true, type: 'type-1'},
+      {data: false, type: 'type-2'},
     ];
-    amplify.store.and.returnValue(JSON.stringify(storedNotifications));
+    (amplify.store as any).and.returnValue(JSON.stringify(storedNotifications));
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
 
     expect(preferenceNotificationRepository.notifications().length).toBe(storedNotifications.length);
@@ -112,18 +114,18 @@ describe('PreferenceNotificationRepository', () => {
   });
 
   it('returns notifications sorted by priority', () => {
-    const storedNotifications = [
+    const storedNotifications: Notification[] = [
       {
-        data: 2,
+        data: false,
         type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED,
       },
       {
-        data: 1,
+        data: true,
         type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
       },
     ];
 
-    amplify.store.and.returnValue(JSON.stringify(storedNotifications));
+    (amplify.store as any).and.returnValue(JSON.stringify(storedNotifications));
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
 
     const notifications = preferenceNotificationRepository.getNotifications();

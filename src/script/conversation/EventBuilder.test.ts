@@ -80,7 +80,7 @@ describe('EventBuilder', () => {
     expect(messageEntity.verificationMessageType()).toBe(VerificationMessageType.NEW_DEVICE);
     expect(messageEntity.from).toBe(conversation_et.selfUser().id);
     expect(messageEntity.conversation_id).toBe(conversation_et.id);
-    expect(messageEntity.userIds()).toEqual(users.map(user => user.id));
+    expect(messageEntity.userIds()).toEqual(users);
   });
 
   it('buildMissed', async () => {
