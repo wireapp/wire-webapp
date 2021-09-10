@@ -248,9 +248,6 @@ export class UserRepository {
       ? this.userState.self()
       : await this.getUserById(user.id, user.qualified_id?.domain || null);
 
-    // When we receive a user update via Websocket, the name will have been converted to utf-8,
-    // In order to keep Emojis and other unicode characters, we need to run the TextDecoder
-    // over the numeric values of the single characters of the received name.
     if (isWebSocket && user.name) {
       user.name = fixWebsocketString(user.name);
     }
