@@ -47,7 +47,13 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getNextItem} from 'Util/ArrayUtil';
 import {createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
-import {compareTransliteration, sortByPriority, startsWith, sortUsersByPriority} from 'Util/StringUtil';
+import {
+  compareTransliteration,
+  sortByPriority,
+  startsWith,
+  sortUsersByPriority,
+  fixWebsocketString,
+} from 'Util/StringUtil';
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
@@ -1953,7 +1959,7 @@ export class ConversationRepository {
         return this.onMemberUpdate(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.RENAME:
-        return this.onRename(conversationEntity, eventJson);
+        return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
 
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.onAssetAdd(conversationEntity, eventJson);
@@ -2570,7 +2576,10 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.rename' event
    * @returns Resolves when the event was handled
    */
-  private async onRename(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onRename(conversationEntity: Conversation, eventJson: EventJson, isWebSocket = false) {
+    if (isWebSocket && eventJson.data?.name) {
+      eventJson.data.name = fixWebsocketString(eventJson.data.name);
+    }
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};
