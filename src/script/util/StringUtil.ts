@@ -157,7 +157,7 @@ export const splitFingerprint = (fingerprint: string): string[] => fingerprint?.
 // In order to keep Emojis and other unicode characters, we need to run the TextDecoder
 // over the numeric values of the single characters of the received string.
 export const fixWebsocketString = (originalString: string): string => {
-  const nameBuffer = Uint8Array.from([...originalString].map(n => n.charCodeAt(0)));
+  const charArray = Uint8Array.from([...originalString].map(c => c.charCodeAt(0)));
   const decoder = new TextDecoder();
-  return decoder.decode(nameBuffer);
+  return decoder.decode(charArray);
 };
