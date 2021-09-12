@@ -13,7 +13,7 @@
     "globby": "12.0.2",
     "rimraf": "3.0.2",
     "ts-node": "10.2.1",
-    "typescript": "4.4.2"
+    "typescript": "4.4.3"
   },
   "license": "GPL-3.0",
   "main": "dist/main.js",
