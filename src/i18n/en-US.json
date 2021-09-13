@@ -432,7 +432,6 @@
   "featureConfigChangeModalAudioVideoHeadline": "There has been a change in {{brandName}}",
   "featureConfigChangeModalConferenceCallingEnabled": "Your team was upgraded to {{brandName}} Enterprise, which gives you access to features such as conference calls and more. [link]Learn more about {{brandName}} Enterprise[/link]",
   "featureConfigChangeModalConferenceCallingTitle": "{{brandName}} Enterprise",
-  "featureConfigChangeModalDescription": "The team admin changed the following features:",
   "featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled": "Sharing and receiving files of any type is now disabled",
   "featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled": "Sharing and receiving files of any type is now enabled",
   "featureConfigChangeModalFileSharingHeadline": "There has been a change in {{brandName}}",
