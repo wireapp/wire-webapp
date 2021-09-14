@@ -7,6 +7,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: thehanimo/pr-title-checker@v1.2
+      - uses: thehanimo/pr-title-checker@v1.3
         with:
           GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
+          pass_on_octokit_error: true
