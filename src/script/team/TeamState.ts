@@ -90,7 +90,7 @@ export class TeamState {
       () => true || this.teamFeatures()?.videoCalling?.status === FeatureStatus.ENABLED,
     );
     this.isConferenceCallingEnabled = ko.pureComputed(
-      () => false, //this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
+      () => this.teamFeatures()?.conferenceCalling?.status === FeatureStatus.ENABLED,
     );
     this.isAppLockEnabled = ko.pureComputed(() => this.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED);
     this.isAppLockEnforced = ko.pureComputed(() => this.teamFeatures()?.appLock?.config?.enforceAppLock);
