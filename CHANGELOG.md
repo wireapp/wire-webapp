@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.5.0...@wireapp/api-client@13.6.0) (2021-09-15)
+
+
+### Features
+
+* **api-client:** Self-deleting feature config endpoints ([#4127](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4127)) ([7db41f6](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/7db41f620e20fc2bc8cdae0bd719b3fccc9e4586))
+
+
+
+
+
 # [13.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.4.4...@wireapp/api-client@13.5.0) (2021-09-09)
 
 
