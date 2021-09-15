@@ -29,6 +29,7 @@ import type {
   FeatureLegalhold,
   FeatureSSO,
   FeatureFileSharing,
+  FeatureSelfDeletingMessages,
 } from './Feature';
 import type {FeatureList} from './FeatureList';
 
@@ -39,6 +40,7 @@ export class FeatureAPI {
     APPLOCK: 'appLock',
     CALLING_CONFERENCE: 'conferenceCalling',
     CALLING_VIDEO: 'videoCalling',
+    SELF_DELETING_MESSAGES: 'selfDeletingMessages',
     DIGITAL_SIGNATURES: 'digitalSignatures',
     FEATURE_CONFIGS: '/feature-configs',
     FEATURES: 'features',
@@ -126,6 +128,30 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureVideoCalling>(config);
+    return response.data;
+  }
+
+  public async getSelfDeletingMessagesFeature(): Promise<FeatureSelfDeletingMessages> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.SELF_DELETING_MESSAGES}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureSelfDeletingMessages>(config);
+    return response.data;
+  }
+
+  public async putSelfDeletingMessagesFeature(
+    teamId: string,
+    selfDeleteingMessagesFeature: FeatureSelfDeletingMessages,
+  ): Promise<FeatureSelfDeletingMessages> {
+    const config: AxiosRequestConfig = {
+      data: selfDeleteingMessagesFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.SELF_DELETING_MESSAGES}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureSelfDeletingMessages>(config);
     return response.data;
   }
 

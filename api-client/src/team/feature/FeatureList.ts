@@ -24,6 +24,7 @@ import type {
   FeatureDigitalSignature,
   FeatureFileSharing,
   FeatureLegalhold,
+  FeatureSelfDeletingMessages,
   FeatureVideoCalling,
   FeatureWithoutConfig,
 } from './Feature';
@@ -39,6 +40,7 @@ export enum FEATURE_KEY {
   SSO = 'sso',
   VALIDATE_SAML_EMAILS = 'validateSAMLemails',
   VIDEO_CALLING = 'videoCalling',
+  SELF_DELETING_MESSAGES = 'selfDeletingMessages',
 }
 
 export type FeatureList = {
@@ -49,6 +51,7 @@ export type FeatureList = {
   [FEATURE_KEY.FILE_SHARING]?: FeatureFileSharing;
   [FEATURE_KEY.LEGALHOLD]?: FeatureLegalhold;
   [FEATURE_KEY.SEARCH_VISIBILITY]?: FeatureWithoutConfig;
+  [FEATURE_KEY.SELF_DELETING_MESSAGES]?: FeatureSelfDeletingMessages;
   [FEATURE_KEY.SSO]?: FeatureWithoutConfig;
   [FEATURE_KEY.VALIDATE_SAML_EMAILS]?: FeatureWithoutConfig;
   [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
