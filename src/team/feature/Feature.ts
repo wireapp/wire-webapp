@@ -37,6 +37,20 @@ export interface FeatureAppLockConfig extends FeatureConfig {
   inactivityTimeoutSecs: number;
 }
 
+export enum SelfDeletingTimeout {
+  OFF = 0,
+  SECONDS_10 = 10,
+  MINUTES_5 = 300,
+  HOURS_1 = 3_600,
+  DAYS_1 = 86_400,
+  WEEKS_1 = 604_800,
+  WEEKS_4 = 2_419_200,
+}
+
+export interface FeatureSelfDeletingMessagesConfig extends FeatureConfig {
+  enforcedTimeoutSeconds: SelfDeletingTimeout | number;
+}
+
 export interface FeatureClassifiedDomainsConfig extends FeatureConfig {
   domains: string[];
 }
@@ -44,10 +58,11 @@ export interface FeatureClassifiedDomainsConfig extends FeatureConfig {
 export type FeatureAppLock = Feature<FeatureAppLockConfig>;
 export type FeatureClassifiedDomains = Feature<FeatureClassifiedDomainsConfig>;
 export type FeatureConferenceCalling = FeatureWithoutConfig;
-export type FeatureVideoCalling = FeatureWithoutConfig;
-export type FeatureFileSharing = FeatureWithoutConfig;
 export type FeatureDigitalSignature = FeatureWithoutConfig;
+export type FeatureFileSharing = FeatureWithoutConfig;
 export type FeatureLegalhold = FeatureWithoutConfig;
-export type FeatureSSO = FeatureWithoutConfig;
 export type FeatureSearchVisibility = FeatureWithoutConfig;
+export type FeatureSelfDeletingMessages = Feature<FeatureSelfDeletingMessagesConfig>;
+export type FeatureSSO = FeatureWithoutConfig;
 export type FeatureValidateSAMLEmails = FeatureWithoutConfig;
+export type FeatureVideoCalling = FeatureWithoutConfig;

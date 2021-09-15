@@ -27,6 +27,7 @@ import {
   FeatureSSO,
   FeatureSearchVisibility,
   FeatureValidateSAMLEmails,
+  FeatureSelfDeletingMessages,
 } from '../feature';
 
 export type TeamFeatureConfigurationUpdateEventData =
@@ -37,5 +38,6 @@ export type TeamFeatureConfigurationUpdateEventData =
   | FeatureFileSharing
   | FeatureLegalhold
   | FeatureSSO
+  | FeatureSelfDeletingMessages
   | FeatureSearchVisibility
   | FeatureValidateSAMLEmails;
