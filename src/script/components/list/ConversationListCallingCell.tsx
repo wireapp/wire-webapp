@@ -147,11 +147,12 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
       click: () =>
         callingRepository.sendModeratorMute(conversation.id, {[participant.user.id]: [participant.clientId]}),
       icon: 'mic-off-icon',
+      identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
       label: t('moderatorMenuEntryMute'),
     };
 
-    const muteOthers = {
+    const muteOthers: ContextMenuEntry = {
       click: () => {
         const recipients = participants
           .filter(p => p !== participant)
@@ -162,6 +163,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
         callingRepository.sendModeratorMute(conversation.id, recipients);
       },
       icon: 'mic-off-icon',
+      identifier: 'moderator-mute-others',
       label: t('moderatorMenuEntryMuteAllOthers'),
     };
 
