@@ -1178,6 +1178,10 @@ export class CallingRepository {
     members.forEach(member => call.getParticipant(member.userid, member.clientid)?.isMuted(!!member.muted));
   }
 
+  private updateParticipantVideoState(call: Call, members: WcallMember[]): void {
+    members.forEach(member => call.getParticipant(member.userid, member.clientid)?.isSendingVideo(!!member.vrecv));
+  }
+
   private updateParticipantList(call: Call, members: WcallMember[]): void {
     const newMembers = members
       .filter(({userid, clientid}) => !call.getParticipant(userid, clientid))
@@ -1209,6 +1213,7 @@ export class CallingRepository {
 
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
+    this.updateParticipantVideoState(call, members);
   };
 
   private readonly requestClients = (wUser: number, conversationId: ConversationId, _: number) => {
@@ -1345,7 +1350,7 @@ export class CallingRepository {
 
   private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
     const activeCall = this.callState.activeCalls()[0];
-    if (activeCall && !Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
+    if (activeCall) {
       activeCall.isCbrEnabled(!!enabled);
     }
   };

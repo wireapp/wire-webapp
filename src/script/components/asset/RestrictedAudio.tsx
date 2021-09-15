@@ -34,7 +34,7 @@ const RestrictedAudio: React.FC<RestrictedAudioProps> = ({}) => {
         <div className="audio-restricted__description__headline">
           {t('conversationAssetRestrictedAudioMessageHeadline')}
         </div>
-        <div className="audio-restricted__description__message">{t('conversationAssetRestricted')}</div>
+        <div className="audio-restricted__description__message">{t('conversationAudioAssetRestricted')}</div>
       </div>
     </div>
   );

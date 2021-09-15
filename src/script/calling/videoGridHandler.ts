@@ -56,7 +56,7 @@ export const useVideoGrid = (call: Call): Grid => {
     };
     updateGrid();
     const nameSubscriptions = participants?.map(p => p.user.name.subscribe(updateGrid));
-    const videoSubscriptions = participants?.map(p => p.hasActiveVideo.subscribe(updateGrid));
+    const videoSubscriptions = participants?.map(p => p.isSendingVideo.subscribe(updateGrid));
     return () => {
       nameSubscriptions?.forEach(s => s.dispose());
       videoSubscriptions?.forEach(s => s.dispose());
