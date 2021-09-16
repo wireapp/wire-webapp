@@ -207,7 +207,7 @@ export class Call {
     const selfParticipant = this.getSelfParticipant();
     const remoteParticipants = this.getRemoteParticipants().sort((p1, p2) => sortUsersByPriority(p1.user, p2.user));
 
-    const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.hasActiveVideo());
+    const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.isSendingVideo());
 
     const newPages = chunk<Participant>(
       [selfParticipant, ...withVideo, ...withoutVideo].filter(Boolean),

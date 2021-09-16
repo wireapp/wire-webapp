@@ -46,6 +46,7 @@ import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import {TeamState} from '../team/TeamState';
 import {Config} from '../Config';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {ROLE} from '../user/UserPermission';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -243,27 +244,47 @@ export class CallingViewModel {
   }
 
   private showRestrictedConferenceCallingModal() {
-    const replaceEnterprise = replaceLink(
-      Config.getConfig().URL.PRICING,
-      'modal__text__read-more',
-      'read-more-pricing',
-    );
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-      primaryAction: {
-        action: () => {
-          safeWindowOpen(Config.getConfig().URL.PRICING);
+    if (this.selfUser().inTeam()) {
+      if (this.selfUser().teamRole() === ROLE.OWNER) {
+        const replaceEnterprise = replaceLink(
+          Config.getConfig().URL.PRICING,
+          'modal__text__read-more',
+          'read-more-pricing',
+        );
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+          primaryAction: {
+            action: () => {
+              safeWindowOpen(Config.getConfig().URL.PRICING);
+            },
+            text: t('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
+          },
+          text: {
+            htmlMessage: t(
+              'callingRestrictedConferenceCallOwnerModalDescription',
+              {brandName: Config.getConfig().BRAND_NAME},
+              replaceEnterprise,
+            ),
+            title: t('callingRestrictedConferenceCallOwnerModalTitle'),
+          },
+        });
+      } else {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            htmlMessage: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
+            title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
+          },
+        });
+      }
+    } else {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
+            brandName: Config.getConfig().BRAND_NAME,
+          }),
+          title: t('callingRestrictedConferenceCallPersonalModalTitle'),
         },
-        text: t('callingRestrictedConferenceCallModalUpgradeButton'),
-      },
-      text: {
-        htmlMessage: t(
-          'callingRestrictedConferenceCallModalDescription',
-          {brandName: Config.getConfig().BRAND_NAME},
-          replaceEnterprise,
-        ),
-        title: t('callingRestrictedConferenceCallModalTitle'),
-      },
-    });
+      });
+    }
   }
 
   isIdle(call: Call): boolean {
