@@ -35,8 +35,6 @@ export interface Member {
   otr_archived?: boolean;
   /** A reference point for (un)archiving */
   otr_archived_ref: string | null;
-  /** Whether to notify on conversation updates for this user */
-  otr_muted: boolean | null;
   otr_muted_ref: string | null;
   otr_muted_status: MutedStatus | null;
   service: ServiceRef | null;
