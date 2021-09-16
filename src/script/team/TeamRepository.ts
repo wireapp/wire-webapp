@@ -420,25 +420,15 @@ export class TeamRepository {
   };
 
   private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const changeList = [];
-
     const hasFileSharingChanged = previousConfig?.fileSharing?.status !== newConfig?.fileSharing?.status;
-    if (hasFileSharingChanged) {
-      const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
-            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled')
-        }</li>`,
-      );
-    }
+    const hasChangedToEnabled = newConfig?.fileSharing?.status === FeatureStatus.ENABLED;
 
     if (hasFileSharingChanged) {
-      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          htmlMessage: message,
+          htmlMessage: hasChangedToEnabled
+            ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
+            : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled'),
           title: t('featureConfigChangeModalFileSharingHeadline', {brandName: Config.getConfig().BRAND_NAME}),
         },
       });
@@ -446,25 +436,15 @@ export class TeamRepository {
   };
 
   private readonly handleAudioVideoFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
-    const changeList = [];
-
     const hasVideoCallingChanged = previousConfig?.videoCalling?.status !== newConfig?.videoCalling?.status;
-    if (hasVideoCallingChanged) {
-      const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
-      changeList.push(
-        `<li>${
-          hasChangedToEnabled
-            ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
-            : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled')
-        }</li>`,
-      );
-    }
+    const hasChangedToEnabled = newConfig?.videoCalling?.status === FeatureStatus.ENABLED;
 
     if (hasVideoCallingChanged) {
-      const message = `${t('featureConfigChangeModalDescription')} <ul class="modal__list">${changeList}</ul>`;
       amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
         text: {
-          htmlMessage: message,
+          htmlMessage: hasChangedToEnabled
+            ? t('featureConfigChangeModalAudioVideoDescriptionItemCameraEnabled')
+            : t('featureConfigChangeModalAudioVideoDescriptionItemCameraDisabled'),
           title: t('featureConfigChangeModalAudioVideoHeadline', {brandName: Config.getConfig().BRAND_NAME}),
         },
       });

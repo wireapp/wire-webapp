@@ -57,7 +57,7 @@ export class SQLeetSchemata {
             last_event_timestamp: SQLiteType.INTEGER,
             last_server_timestamp: SQLiteType.INTEGER,
             message_timer: SQLiteType.INTEGER,
-            muted_state: SQLiteType.BOOLEAN,
+            muted_state: SQLiteType.INTEGER,
             muted_timestamp: SQLiteType.INTEGER,
             name: SQLiteType.TEXT,
             others: SQLiteType.JSON,
