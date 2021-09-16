@@ -62,7 +62,6 @@ describe('ConversationService', () => {
             muted_time: null,
             otr_archived: false,
             otr_archived_ref: '2016-07-25T11:30:07.883Z',
-            otr_muted: false,
             otr_muted_ref: null,
             status: 0,
             status_ref: '0.0',

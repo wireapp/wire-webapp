@@ -1506,9 +1506,7 @@ export class ConversationRepository {
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const otrMuted = notificationState !== NOTIFICATION_STATE.EVERYTHING;
     const payload = {
-      otr_muted: otrMuted,
       otr_muted_ref: new Date(conversationEntity.getLastKnownTimestamp(currentTimestamp)).toISOString(),
       otr_muted_status: notificationState,
     };
@@ -1518,8 +1516,8 @@ export class ConversationRepository {
       const response = {data: payload, from: this.userState.self().id};
       this.onMemberUpdate(conversationEntity, response);
 
-      const {otr_muted: muted, otr_muted_ref: mutedRef, otr_muted_status: mutedStatus} = payload;
-      const logMessage = `Changed notification state of conversation to '${muted} | ${mutedStatus}' on '${mutedRef}'`;
+      const {otr_muted_ref: mutedRef, otr_muted_status: mutedStatus} = payload;
+      const logMessage = `Changed notification state of conversation to '${mutedStatus}' on '${mutedRef}'`;
       this.logger.info(logMessage);
       return response;
     } catch (error) {

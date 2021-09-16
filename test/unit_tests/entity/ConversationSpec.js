@@ -1071,7 +1071,6 @@ describe('Conversation', () => {
             muted_time: null,
             otr_archived: false,
             otr_archived_ref: null,
-            otr_muted: false,
             otr_muted_ref: null,
             service: null,
             status: 0,
