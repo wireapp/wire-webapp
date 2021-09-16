@@ -132,7 +132,8 @@ describe('EventRepository', () => {
           ? Promise.resolve(last_notification_id)
           : Promise.reject(new EventError(EventError.TYPE.NO_LAST_ID, EventError.MESSAGE.NO_LAST_ID));
       });
-
+      jest.spyOn(testFactory.notification_service, 'getAllNotificationsForClient').mockResolvedValue([]);
+      jest.spyOn(testFactory.notification_service, 'getServerTime').mockResolvedValue(new Date().toISOString());
       jest
         .spyOn(testFactory.notification_service, 'saveLastNotificationIdToDb')
         .mockImplementation(() => Promise.resolve(DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION));
@@ -151,7 +152,7 @@ describe('EventRepository', () => {
       testFactory.event_repository.connectWebSocket();
       await testFactory.event_repository['initializeFromStream'](abortHandler);
 
-      expect(testFactory.notification_service.getLastNotificationIdFromDb).toBeDefined();
+      expect(testFactory.notification_service.getLastNotificationIdFromDb).toHaveBeenCalled();
       expect(testFactory.notification_service.getNotificationsLast).toHaveBeenCalledWith(clientId);
       expect(testFactory.notification_service.getAllNotificationsForClient).toHaveBeenCalledWith(
         clientId,

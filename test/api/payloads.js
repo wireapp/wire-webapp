@@ -76,7 +76,7 @@ const entities = {
         last_read: '1.800122000a4b6e15',
         cleared: '1.800122000a4b6e15',
         otr_muted_ref: '2015-01-13T10:41:55.032Z',
-        otr_muted: false,
+        otr_muted_status: 0,
         status_time: '2015-01-13T10:41:55.032Z',
         status_ref: '0.0',
         id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
