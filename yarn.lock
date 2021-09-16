@@ -2882,10 +2882,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@13.4.0":
-  version "13.4.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-13.4.0.tgz#e17568a568ee016d399e9e65038de213f7f14603"
-  integrity sha512-d3nkSlAtH2d6lZjrHl/idUCz6cZVZqlGjZtuKdwTHxvYE+Ho+oS2inBKZa+n0XX9KwOpkBRXHVri+7Zwk4XWwg==
+"@wireapp/api-client@13.6.1":
+  version "13.6.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-13.6.1.tgz#8992e653edbec99ff98547d4ec9e28c64436e616"
+  integrity sha512-hY+t3aXuoTUkZpZfZGRYc4D677182ecbPr194qYATuXx74Q63j8SyHFS+yjghk+DHf0igbjK/tnkKw3Zzxgdfw==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2893,7 +2893,7 @@
     "@wireapp/commons" "4.2.11"
     "@wireapp/priority-queue" "1.6.37"
     "@wireapp/protocol-messaging" "1.35.0"
-    axios "0.21.1"
+    axios "0.21.4"
     axios-retry "3.1.9"
     http-status-codes "2.1.4"
     logdown "3.3.1"
@@ -2902,10 +2902,10 @@
     tough-cookie "4.0.0"
     ws "7.5.3"
 
-"@wireapp/avs@7.2.86":
-  version "7.2.86"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.2.86.tgz#c38dc0ad7b1f5115d6297c4700c900a7398b355f"
-  integrity sha512-es3rr0yX+jGMoTtkFgg9Zg+xOpm6mzG2hvHl7GQEu5C5Ivgv4//yBGzI6MrFFsriqsLHx4ghYrxRVwyz9GWOHw==
+"@wireapp/avs@7.2.89":
+  version "7.2.89"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.2.89.tgz#f4a1913e1d59b1b5aabefe05efa6bdcefef6ff73"
+  integrity sha512-80t/nDCeYHJxf753oXPWfVvNEAwOqHjMd+VOdUmMl9ungoEjuOjwhlYBmOEuZAh961pbptsdJsxeCWnBENI+cw==
 
 "@wireapp/cbor@4.7.2":
   version "4.7.2"
@@ -2926,12 +2926,12 @@
     platform "1.3.6"
     url-search-params-polyfill "8.1.1"
 
-"@wireapp/copy-config@1.2.8":
-  version "1.2.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.2.8.tgz#21c791134185db056e1472e9f250d3dd26328e72"
-  integrity sha512-FVHxb9N/CvI4THGStYXQiy1nQ6Tvz1TcHm2QE2lUxhUSxvzNuAjlxSHR9YJUxfBb1mWuXD1O8tqZKz2MMCjO6A==
+"@wireapp/copy-config@1.2.9":
+  version "1.2.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/copy-config/-/copy-config-1.2.9.tgz#253dac301cd16f744a5684bbd91a8f091a336b0e"
+  integrity sha512-F8gYIT9pUJlx/Pi2/iaDyE52XiPbTU2vqxqne7k9ITAZwrngYEvtwTu4Z/Q2Og7Jy1xBOFK/u4IUzYtNtNb9YA==
   dependencies:
-    axios "0.21.1"
+    axios "0.21.4"
     copy "0.3.2"
     cosmiconfig "7.0.0"
     fs-extra "10.0.0"
@@ -2939,14 +2939,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.13.0":
-  version "17.13.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.13.0.tgz#a347f9bc026eebc16a053938e1c1db3c9e71a3cd"
-  integrity sha512-nBqqvpVoaOK0tOyavfYmNJ2EOBgqRWHGEavv8Mzxt4IWuVJovSqYXewbWO03rjv+/hUfzHKSRzhSrH9/JKBPDg==
+"@wireapp/core@17.14.6":
+  version "17.14.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.14.6.tgz#c057fe4dd8d75f2b5bdcc7ec1c74cc2fc83aa59d"
+  integrity sha512-iLvjpCu9Supzv8NI76sNWdzWUBi7VMCsRgAcWB7TJbnxqemRCbYG/4no+vZvPhAZle3kxOetyQpZyP9hUMJqAQ==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "13.4.0"
+    "@wireapp/api-client" "13.6.1"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.9.7"
     hash.js "1.1.7"
@@ -3655,12 +3655,12 @@ axios-retry@3.1.9:
   dependencies:
     is-retry-allowed "^1.1.0"
 
-axios@0.21.1:
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
-  integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
+axios@0.21.4:
+  version "0.21.4"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
+  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
   dependencies:
-    follow-redirects "^1.10.0"
+    follow-redirects "^1.14.0"
 
 babel-eslint@10.1.0:
   version "10.1.0"
@@ -5758,10 +5758,10 @@ eslint-plugin-no-unsanitized@3.1.5:
   resolved "https://registry.yarnpkg.com/eslint-plugin-no-unsanitized/-/eslint-plugin-no-unsanitized-3.1.5.tgz#7e1ee74cf41ae59fec48c2ee2e21a7dcb86965fb"
   integrity sha512-s/6w++p1590h/H/dE2Wo660bOkaM/3OEK14Y7xm1UT0bafxkKw1Cq0ksjxkxLdH/WWd014DlsLKuD6CyNrR2Dw==
 
-eslint-plugin-prettier@3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-3.4.1.tgz#e9ddb200efb6f3d05ffe83b1665a716af4a387e5"
-  integrity sha512-htg25EUYUeIhKHXjOinK4BgCcDwtLHjqaxCDsMy5nbnUMkKFvIhMVCp+5GFUXQ4Nr8lBsPqtGAqBenbpFqAA2g==
+eslint-plugin-prettier@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-4.0.0.tgz#8b99d1e4b8b24a762472b4567992023619cb98e0"
+  integrity sha512-98MqmCJ7vJodoQK359bqQWaxOE0CS8paAz/GgjaZLyex4TTk3g9HugoO89EqWCrFiOqn9EVvcoo7gZzONCWVwQ==
   dependencies:
     prettier-linter-helpers "^1.0.0"
 
@@ -6397,10 +6397,10 @@ flush-write-stream@^1.0.2:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
 
-follow-redirects@^1.10.0:
-  version "1.13.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.13.1.tgz#5f69b813376cee4fd0474a3aba835df04ab763b7"
-  integrity sha512-SSG5xmZh1mkPGyKzjZP8zLjltIfpW32Y5QpdNJyjcfGxK3qo3NDDkZOZSFiGn1A6SclQxY9GzEwAHQ3dmYRWpg==
+follow-redirects@^1.14.0:
+  version "1.14.4"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.4.tgz#838fdf48a8bbdd79e52ee51fb1c94e3ed98b9379"
+  integrity sha512-zwGkiSXC1MUJG/qmeIFH2HBJx9u0V46QGUe3YR1fXG8bXQxq7fLj0RjLZQ5nubr9qNJUZrH+xUcwXEoXNpfS+g==
 
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
@@ -11105,10 +11105,10 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@2.3.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.3.0.tgz#b6a5bf1284026ae640f17f7ff5658a7567fc0d18"
-  integrity sha512-kXtO4s0Lz/DW/IJ9QdWhAf7/NmPWQXkFr/r/WkR3vyI+0v8amTDxiaQSLzs8NBlytfLWX/7uQUMIW677yLKl4w==
+prettier@2.4.1:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.4.1.tgz#671e11c89c14a4cfc876ce564106c4a6726c9f5c"
+  integrity sha512-9fbDAXSBcc6Bs1mZrDYb3XKzDLm4EXXL9sC1LqKP5rZkT6KRr/rf9amVUcODVXgguK/isJz0d0hP72WeaKWsvA==
 
 pretty-bytes@^5.3.0, pretty-bytes@^5.4.1:
   version "5.5.0"
