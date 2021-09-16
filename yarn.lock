@@ -2871,10 +2871,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@13.4.1":
-  version "13.4.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-13.4.1.tgz#a7e2540c3b8ddf89d0065967e47db07703353f2f"
-  integrity sha512-oQnKTCGfbl+Dwvzt5ZeTgGe/itxOwrEBs+5G0zazQsCw9gy4e1/XAL7onSftHtZDqcUrUHTJGjSLQfwVmtjCIA==
+"@wireapp/api-client@13.6.1":
+  version "13.6.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-13.6.1.tgz#8992e653edbec99ff98547d4ec9e28c64436e616"
+  integrity sha512-hY+t3aXuoTUkZpZfZGRYc4D677182ecbPr194qYATuXx74Q63j8SyHFS+yjghk+DHf0igbjK/tnkKw3Zzxgdfw==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2882,7 +2882,7 @@
     "@wireapp/commons" "4.2.11"
     "@wireapp/priority-queue" "1.6.37"
     "@wireapp/protocol-messaging" "1.35.0"
-    axios "0.21.1"
+    axios "0.21.4"
     axios-retry "3.1.9"
     http-status-codes "2.1.4"
     logdown "3.3.1"
@@ -2928,14 +2928,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.14.0":
-  version "17.14.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.14.0.tgz#71f6ff00d56aefe07e385c096b89125a39aafd06"
-  integrity sha512-vliCpul7SOuyabgjTKPoQnCIKOtsmP9/dVhbUDJhrDjKIP+tEA6Z1AkBl26TYlmR/yh43LmHCscmdrgeBy187w==
+"@wireapp/core@17.14.6":
+  version "17.14.6"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.14.6.tgz#c057fe4dd8d75f2b5bdcc7ec1c74cc2fc83aa59d"
+  integrity sha512-iLvjpCu9Supzv8NI76sNWdzWUBi7VMCsRgAcWB7TJbnxqemRCbYG/4no+vZvPhAZle3kxOetyQpZyP9hUMJqAQ==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "13.4.1"
+    "@wireapp/api-client" "13.6.1"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.9.7"
     hash.js "1.1.7"
@@ -3650,6 +3650,13 @@ axios@0.21.1:
   integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
   dependencies:
     follow-redirects "^1.10.0"
+
+axios@0.21.4:
+  version "0.21.4"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
+  integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
+  dependencies:
+    follow-redirects "^1.14.0"
 
 babel-eslint@10.1.0:
   version "10.1.0"
@@ -6393,6 +6400,11 @@ follow-redirects@^1.10.0:
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.13.1.tgz#5f69b813376cee4fd0474a3aba835df04ab763b7"
   integrity sha512-SSG5xmZh1mkPGyKzjZP8zLjltIfpW32Y5QpdNJyjcfGxK3qo3NDDkZOZSFiGn1A6SclQxY9GzEwAHQ3dmYRWpg==
+
+follow-redirects@^1.14.0:
+  version "1.14.4"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.14.4.tgz#838fdf48a8bbdd79e52ee51fb1c94e3ed98b9379"
+  integrity sha512-zwGkiSXC1MUJG/qmeIFH2HBJx9u0V46QGUe3YR1fXG8bXQxq7fLj0RjLZQ5nubr9qNJUZrH+xUcwXEoXNpfS+g==
 
 for-in@^1.0.1, for-in@^1.0.2:
   version "1.0.2"
