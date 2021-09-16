@@ -654,7 +654,11 @@ export class ConversationAPI {
     messageData: ProtobufOTR.QualifiedNewOtrMessage,
   ): Promise<MessageSendingStatus> {
     const config: AxiosRequestConfig = {
-      data: ProtobufOTR.QualifiedNewOtrMessage.encode(messageData).finish(),
+      /*
+       * We need to slice the content of what protobuf has generated in order for Axios to send the correct data (see https://github.com/axios/axios/issues/4068)
+       * FIXME: The `slice` can be removed as soon as Axios publishes a version with the dataview issue fixed.
+       */
+      data: ProtobufOTR.QualifiedNewOtrMessage.encode(messageData).finish().slice(),
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${conversationId}/${ConversationAPI.URL.PROTEUS}/${ConversationAPI.URL.MESSAGES}`,
     };
@@ -687,7 +691,11 @@ export class ConversationAPI {
     }
 
     const config: AxiosRequestConfig = {
-      data: ProtobufOTR.NewOtrMessage.encode(messageData).finish(),
+      /*
+       * We need to slice the content of what protobuf has generated in order for Axios to send the correct data (see https://github.com/axios/axios/issues/4068)
+       * FIXME: The `slice` can be removed as soon as Axios publishes a version with the dataview issue fixed.
+       */
+      data: ProtobufOTR.NewOtrMessage.encode(messageData).finish().slice(),
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}/${ConversationAPI.URL.OTR}/${ConversationAPI.URL.MESSAGES}`,
     };
