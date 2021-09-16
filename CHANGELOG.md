@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.6.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.6.0...@wireapp/api-client@13.6.1) (2021-09-16)
+
+
+### Bug Fixes
+
+* **api-client:** Force protobuf arrays to be re-created before sent ([#4130](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4130)) ([95a8edc](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/95a8edcc77990b0d434df5f643f1e65455379041))
+
+
+
+
+
 # [13.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.5.0...@wireapp/api-client@13.6.0) (2021-09-15)
 
 
