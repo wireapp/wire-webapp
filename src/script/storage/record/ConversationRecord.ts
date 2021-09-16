@@ -26,7 +26,7 @@ export interface ConversationRecord {
   last_read_timestamp: number;
   last_server_timestamp: number;
   legal_hold_status: LegalHoldStatus;
-  muted_state: boolean | number;
+  muted_state: number;
   muted_timestamp: number;
   name: string;
   others: string[];

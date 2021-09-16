@@ -30,7 +30,6 @@ import {
 } from '@wireapp/api-client/src/conversation';
 
 import {ACCESS_STATE} from './AccessState';
-import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationStatus} from './ConversationStatus';
 import {Conversation} from '../entity/Conversation';
 import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
@@ -177,7 +176,7 @@ export class ConversationMapper {
     }
 
     // Backend states
-    const {otr_archived, otr_muted} = selfState;
+    const {otr_archived, otr_muted_status: mutedState} = selfState;
 
     if (otr_archived !== undefined) {
       const archivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
@@ -185,16 +184,10 @@ export class ConversationMapper {
       conversationEntity.archivedState(otr_archived);
     }
 
-    if (otr_muted !== undefined) {
+    if (mutedState !== undefined) {
       const mutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
       conversationEntity.setTimestamp(mutedTimestamp, Conversation.TIMESTAMP_TYPE.MUTED);
-
-      const mutedState = ConversationMapper.getMutedState(otr_muted, selfState.otr_muted_status);
-      if (typeof mutedState === 'boolean') {
-        conversationEntity.mutedState(mutedState === true ? NOTIFICATION_STATE.NOTHING : NOTIFICATION_STATE.EVERYTHING);
-      } else {
-        conversationEntity.mutedState(mutedState);
-      }
+      conversationEntity.mutedState(mutedState);
     }
 
     if (disablePersistence) {
@@ -255,16 +248,6 @@ export class ConversationMapper {
     conversationEntity.receiptMode(conversationData.receipt_mode);
 
     return conversationEntity;
-  }
-
-  static getMutedState(mutedState: boolean, notificationState?: number): boolean | number {
-    const validNotificationStates = Object.values(NOTIFICATION_STATE);
-    if (validNotificationStates.includes(notificationState)) {
-      // Ensure bit at offset 0 to be 1 for backwards compatibility of deprecated boolean based state is true
-      return mutedState ? notificationState | 0b1 : NOTIFICATION_STATE.EVERYTHING;
-    }
-
-    return typeof mutedState === 'boolean' ? mutedState : NOTIFICATION_STATE.EVERYTHING;
   }
 
   static mergeConversation(
@@ -354,7 +337,7 @@ export class ConversationMapper {
         const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(mutedTimestamp, remoteMutedTimestamp);
 
         if (isRemoteMutedTimestampNewer || mutedState === undefined) {
-          const remoteMutedState = ConversationMapper.getMutedState(selfState.otr_muted, selfState.otr_muted_status);
+          const remoteMutedState = selfState.otr_muted_status;
           mergedConversation.muted_state = remoteMutedState;
           mergedConversation.muted_timestamp = remoteMutedTimestamp;
         }
