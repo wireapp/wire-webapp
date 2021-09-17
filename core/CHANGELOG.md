@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.15.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.14.7...@wireapp/core@17.15.0) (2021-09-17)
+
+
+### Features
+
+* **core:** Add callbacks for message sending state ([#4133](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4133)) ([892832f](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/892832f0c8f1ba3e62448851b1ee260eaedd96e6))
+
+
+
+
+
 ## [17.14.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.14.6...@wireapp/core@17.14.7) (2021-09-17)
 
 **Note:** Version bump only for package @wireapp/core
