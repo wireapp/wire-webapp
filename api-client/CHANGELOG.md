@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.6.1...@wireapp/api-client@13.7.0) (2021-09-17)
+
+
+### Features
+
+* **api-client:** Add getQualifiedConversationIds ([#4132](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4132)) ([a5d0aa3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/a5d0aa37bc00cd56c366312c885a023faf2ac4e6))
+
+
+
+
+
 ## [13.6.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.6.0...@wireapp/api-client@13.6.1) (2021-09-16)
 
 
