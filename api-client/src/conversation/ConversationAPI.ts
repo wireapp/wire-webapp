@@ -34,6 +34,7 @@ import type {
   MessageSendingStatus,
   NewConversation,
   NewOTRMessage,
+  QualifiedConversationIds,
   RemoteConversations,
 } from './';
 import type {
@@ -77,6 +78,7 @@ export class ConversationAPI {
     IDS: 'ids',
     JOIN: '/join',
     LIST: 'list',
+    LIST_IDS: 'list-ids',
     MEMBERS: 'members',
     MESSAGE_TIMER: 'message-timer',
     MESSAGES: 'messages',
@@ -223,6 +225,42 @@ export class ConversationAPI {
   }
 
   /**
+   * Get all qualified conversation IDs.
+   * @param limit Max. number of qualified IDs to return
+   */
+  public async getQualifiedConversationIds(limit: number = 0): Promise<QualifiedId[]> {
+    const config: AxiosRequestConfig = {
+      data: {},
+      method: 'post',
+      url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST_IDS}`,
+    };
+
+    if (limit > 0) {
+      config.data.size = limit;
+    }
+
+    const allConversations: QualifiedId[] = [];
+
+    const getConversationChunks = async (pagingState?: string): Promise<QualifiedId[]> => {
+      if (pagingState) {
+        config.data.paging_state = pagingState;
+      }
+      const {data} = await this.client.sendJSON<QualifiedConversationIds>(config);
+      const {qualified_conversations, has_more, paging_state} = data;
+
+      allConversations.push(...qualified_conversations);
+
+      if (has_more) {
+        return getConversationChunks(paging_state);
+      }
+
+      return allConversations;
+    };
+
+    return getConversationChunks();
+  }
+
+  /**
    * Get all conversation IDs.
    * @param limit Max. number of IDs to return
    * @param conversationId Conversation ID to start from (exclusive)
@@ -261,8 +299,9 @@ export class ConversationAPI {
    * Get conversation metadata for a list of conversation ids
    * @see https://staging-nginz-https.zinfra.io/api/swagger-ui/#/default/post_conversations_list_v2
    */
-  public async getListConversations(): Promise<RemoteConversations> {
+  public async getListConversations(conversations: QualifiedId[]): Promise<RemoteConversations> {
     const config: AxiosRequestConfig = {
+      data: {qualified_ids: conversations},
       method: 'post',
       url: `${ConversationAPI.URL.CONVERSATIONS}/${ConversationAPI.URL.LIST}/${ConversationAPI.URL.V2}`,
     };
@@ -275,8 +314,9 @@ export class ConversationAPI {
    * Get all remote conversations from a federated backend.
    */
   public async getRemoteConversations(ownDomain: string): Promise<Conversation[]> {
-    const data = await this.getListConversations();
-    return data.found?.filter(conversation => conversation.qualified_id?.domain !== ownDomain) || [];
+    const allConversationIds = await this.getQualifiedConversationIds();
+    const conversations = await this.getListConversations(allConversationIds);
+    return conversations.found?.filter(conversation => conversation.qualified_id?.domain !== ownDomain) || [];
   }
 
   /**
@@ -330,7 +370,7 @@ export class ConversationAPI {
         size: limit,
         start: startConversationId,
       },
-      url: `${ConversationAPI.URL.CONVERSATIONS}`,
+      url: ConversationAPI.URL.CONVERSATIONS,
     };
 
     if (filteredConversationIds) {
