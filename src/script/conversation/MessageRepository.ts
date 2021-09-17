@@ -39,6 +39,7 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
+import {Account} from '@wireapp/core';
 import {ReactionType} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
@@ -252,13 +253,40 @@ export class MessageRepository {
    * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
    * @see https://docs.wire.com/understand/federation/index.html
    */
-  async sendFederatedMessage(message: string): Promise<void> {
-    const conversation = this.conversationState.activeConversation();
+  async sendFederatedMessage(conversation: Conversation, message: string): Promise<void> {
     const userIds: string[] | QualifiedId[] = conversation.domain
       ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
       : conversation.allUserEntities.map(user => user.id);
 
-    await this.cryptography_repository.sendCoreMessage(message, conversation.id, userIds, conversation.domain);
+    const crudEngine = this.cryptography_repository.storageRepository.storageService['engine'];
+    const apiClient = this.cryptography_repository.cryptographyService['apiClient'];
+    apiClient.context!.domain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    const account = new Account(apiClient, () => Promise.resolve(crudEngine));
+    await account.initServices(crudEngine);
+    await account.service.client['cryptographyService'].initCryptobox();
+    const textPayload = account
+      .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
+      .build();
+
+    const injectOptimisticEvent = (genericMessage: GenericMessage) => {
+      const senderId = this.clientState.currentClient().id;
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
+      this.cryptography_repository.cryptographyMapper
+        .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
+        .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
+    };
+
+    const updateOptimisticEvent = (genericMessage: GenericMessage) => {
+      this.updateMessageAsSent(conversation, genericMessage.messageId /* TODO fix date*/);
+    };
+
+    await account.service!.conversation.send({
+      callbacks: {onStart: injectOptimisticEvent, onSuccess: updateOptimisticEvent},
+      conversationDomain: conversation.domain,
+      payloadBundle: textPayload,
+      userIds,
+    });
   }
 
   /**
@@ -759,7 +787,7 @@ export class MessageRepository {
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
     this.trackContributed(conversationEntity, genericMessage);
     const backendIsoDate = syncTimestamp ? sentPayload.time : '';
-    await this.updateMessageAsSent(conversationEntity, injectedEvent, backendIsoDate);
+    await this.updateMessageAsSent(conversationEntity, injectedEvent.id, backendIsoDate);
     return injectedEvent;
   }
 
@@ -1160,11 +1188,11 @@ export class MessageRepository {
    */
   private async updateMessageAsSent(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent,
-    isoDate: string,
+    eventId: string,
+    isoDate?: string,
   ): Promise<Pick<Partial<EventRecord>, 'status' | 'time'> | void> {
     try {
-      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
       const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {
