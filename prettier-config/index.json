@@ -1,11 +1,19 @@
 {
   "$schema": "http://json.schemastore.org/prettierrc",
   "arrowParens": "avoid",
+  "bracketSameLine": false,
   "bracketSpacing": false,
   "endOfLine": "lf",
   "htmlWhitespaceSensitivity": "css",
-  "jsxBracketSameLine": false,
   "jsxSingleQuote": false,
+  "overrides": [
+    {
+      "files": ["*.json"],
+      "options": {
+        "printWidth": 200
+      }
+    }
+  ],
   "printWidth": 120,
   "proseWrap": "never",
   "quoteProps": "as-needed",
@@ -14,13 +22,5 @@
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "all",
-  "useTabs": false,
-  "overrides": [
-    {
-      "files": ["*.json"],
-      "options": {
-        "printWidth": 200
-      }
-    }
-  ]
+  "useTabs": false
 }
