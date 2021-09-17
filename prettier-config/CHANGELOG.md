@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config/compare/@wireapp/prettier-config@0.3.2...@wireapp/prettier-config@0.3.3) (2021-09-17)
+
+
+### Bug Fixes
+
+* **prettier-config:** Use bracketSameLine ([#4131](https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config/issues/4131)) ([f43a104](https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config/commit/f43a104980f81aa2438b8c47e77d4ef8d46da4d3))
+
+
+
+
+
 ## [0.3.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config/compare/@wireapp/prettier-config@0.3.0...@wireapp/prettier-config@0.3.2) (2021-05-12)
 
 **Note:** Version bump only for package @wireapp/prettier-config
