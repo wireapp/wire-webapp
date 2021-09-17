@@ -22,6 +22,7 @@ import {ClientType} from '@wireapp/api-client/src/client';
 import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
 import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
+import {PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '.';
 
 import {Account} from '../Account';
 import * as PayloadHelper from '../test/PayloadHelper';
@@ -81,6 +82,37 @@ describe('ConversationService', () => {
 
       const shouldSendAsExternal = account.service!.conversation['shouldSendAsExternal'](plainText, preKeyBundles);
       expect(shouldSendAsExternal).toBe(false);
+    });
+  });
+
+  describe('"send"', () => {
+    it('calls callbacks when federated message sending is starting and successful', async () => {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
+        userId: PayloadHelper.getUUID(),
+        clientId: PayloadHelper.getUUID(),
+      };
+      const conversationService = account.service!.conversation;
+      spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve(undefined));
+      const callbacks = {onStart: jasmine.createSpy(), onSuccess: jasmine.createSpy()};
+      const promise = conversationService.send({
+        callbacks,
+        payloadBundle: {
+          type: PayloadBundleType.TEXT,
+          conversation: PayloadHelper.getUUID(),
+          from: PayloadHelper.getUUID(),
+          id: PayloadHelper.getUUID(),
+          timestamp: 0,
+          source: PayloadBundleSource.LOCAL,
+          state: PayloadBundleState.OUTGOING_UNSENT,
+          content: {text: 'test'},
+        },
+      });
+
+      expect(callbacks.onStart).toHaveBeenCalled();
+      expect(callbacks.onSuccess).not.toHaveBeenCalled();
+      await promise;
+      expect(callbacks.onSuccess).toHaveBeenCalled();
     });
   });
 

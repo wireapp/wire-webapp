@@ -89,6 +89,11 @@ import type {
   TextMessage,
 } from './message/OtrMessage';
 
+export interface MessageSendingCallbacks {
+  onStart?: (message: GenericMessage) => void;
+  onSuccess?: (message: GenericMessage) => void;
+}
+
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
   public readonly messageBuilder: MessageBuilder;
@@ -857,6 +862,7 @@ export class ConversationService {
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
+    callbacks?: MessageSendingCallbacks,
   ): Promise<TextMessage> {
     let genericMessage = GenericMessage.create({
       messageId: payloadBundle.id,
@@ -867,6 +873,7 @@ export class ConversationService {
     if (expireAfterMillis > 0) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
+    callbacks?.onStart?.(genericMessage);
 
     await this.sendGenericMessage(
       this.apiClient.validatedClientId,
@@ -876,6 +883,7 @@ export class ConversationService {
       sendAsProtobuf,
       conversationDomain,
     );
+    callbacks?.onSuccess?.(genericMessage);
 
     return {
       ...payloadBundle,
@@ -1104,6 +1112,7 @@ export class ConversationService {
   /**
    * @param payloadBundle Outgoing message
    * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
+   * @param [callbacks] Optional callbacks that will be called when the message starts being sent and when it has been succesfully sent. Currently only used for `sendText`.
    * @returns Sent message
    */
   public async send({
@@ -1111,11 +1120,13 @@ export class ConversationService {
     userIds,
     sendAsProtobuf,
     conversationDomain,
+    callbacks,
   }: {
     payloadBundle: OtrMessage;
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
     sendAsProtobuf?: boolean;
     conversationDomain?: string;
+    callbacks?: MessageSendingCallbacks;
   }) {
     switch (payloadBundle.type) {
       case PayloadBundleType.ASSET:
@@ -1153,7 +1164,7 @@ export class ConversationService {
       case PayloadBundleType.REACTION:
         return this.sendReaction(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.TEXT:
-        return this.sendText(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        return this.sendText(payloadBundle, userIds, sendAsProtobuf, conversationDomain, callbacks);
       default:
         throw new Error(`No send method implemented for "${payloadBundle['type']}".`);
     }
