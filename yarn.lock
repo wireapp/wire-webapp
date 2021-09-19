@@ -4715,10 +4715,10 @@ cosmiconfig@^7.0.0, cosmiconfig@^7.0.1:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
-countly-sdk-web@20.11.2:
-  version "20.11.2"
-  resolved "https://registry.yarnpkg.com/countly-sdk-web/-/countly-sdk-web-20.11.2.tgz#26ad9c6fe27f36b6a12c0aaabb0c56bde7cd58ea"
-  integrity sha512-tPSUZabJAGBFI+9V44bv2emL4lvwOd8pJhwtqe8AROg0/mrWKnQHOIYzwhDf+A+TcalxMrdEzW7ctit/d/zl4g==
+countly-sdk-web@20.11.3:
+  version "20.11.3"
+  resolved "https://registry.yarnpkg.com/countly-sdk-web/-/countly-sdk-web-20.11.3.tgz#2f385246ca4e1bef2669504d7d3b3fc7314e9e38"
+  integrity sha512-/blaOEvojWDBqD2wujxiQhnssKeFzRc4WCu0Wexoy9pBwPSQsapNbYP8HLs/MDcJo9ACaRfcxPU2sPN6J4wFSQ==
 
 cpr@3.0.1:
   version "3.0.1"
