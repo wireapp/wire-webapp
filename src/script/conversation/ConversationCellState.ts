@@ -28,6 +28,7 @@ import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {ConversationError} from '../error/ConversationError';
 import type {MemberMessage} from '../entity/message/MemberMessage';
 import type {SystemMessage} from '../entity/message/SystemMessage';
+import {isQualifiedId} from 'Util/TypePredicateUtil';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',
@@ -298,7 +299,9 @@ const _getStateRemoved = {
       isMemberRemoval &&
       !!(lastMessageEntity as MemberMessage)
         .userIds()
-        .find(userId => userId.id === selfUserId && userId.domain == selfUserDomain);
+        .find(userId =>
+          isQualifiedId(userId) ? userId.id === selfUserId && userId.domain === selfUserDomain : userId === selfUserId,
+        );
     if (wasSelfRemoved) {
       const selfLeft = lastMessageEntity.user().id === selfUserId;
       return selfLeft ? t('conversationsSecondaryLineYouLeft') : t('conversationsSecondaryLineYouWereRemoved');
