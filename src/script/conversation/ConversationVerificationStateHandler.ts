@@ -207,7 +207,9 @@ export class ConversationVerificationStateHandler {
           const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUser);
           const matchingUserIds = userIdsInConversation.filter(userIdInConversation =>
             userIds.find(
-              userId => userId.id === userIdInConversation.id && userId.domain == userIdInConversation.domain,
+              userId =>
+                userId.id === userIdInConversation.id &&
+                (!userId.domain || userId.domain === userIdInConversation.domain),
             ),
           );
 
