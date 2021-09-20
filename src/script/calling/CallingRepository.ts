@@ -1242,6 +1242,12 @@ export class CallingRepository {
       }
     })();
 
+    this.mediaStreamQuery.then(() => {
+      const selfParticipant = call.getSelfParticipant();
+      if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
+        selfParticipant.releaseVideoStream(true);
+      }
+    });
     return this.mediaStreamQuery;
   };
 
