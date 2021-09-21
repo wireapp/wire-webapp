@@ -28,6 +28,16 @@ import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
 import {QualifiedIdOptional} from '../../conversation/EventBuilder';
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
+
+interface MemberJoinEvent {
+  user_ids: string[];
+  users: {
+    conversation_role: string;
+    id: string;
+    qualified_id?: QualifiedUserId;
+  }[];
+}
 
 export class ServiceMiddleware {
   private readonly userRepository: UserRepository;
@@ -57,12 +67,13 @@ export class ServiceMiddleware {
     }
   }
 
-  private async _processMemberJoinEvent(event: EventRecord) {
+  private async _processMemberJoinEvent(event: EventRecord<MemberJoinEvent>) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, data: eventData} = event;
+    const userQualifiedIds = this.extractQualifiedUserIds(eventData);
     const selfUser = this.userState.self();
-    const containsSelfUser = eventData.user_ids.find(
+    const containsSelfUser = userQualifiedIds.find(
       (user: QualifiedIdOptional) => selfUser.id === user.id && selfUser.domain == user.domain,
     );
 
@@ -70,15 +81,22 @@ export class ServiceMiddleware {
       ? await this.conversationRepository
           .getConversationById(conversationId)
           .then(conversationEntity => conversationEntity.participating_user_ids())
-      : eventData.user_ids;
+      : userQualifiedIds;
 
     const hasService = await this._containsService(userIds);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
+  private extractQualifiedUserIds(data: MemberJoinEvent): QualifiedIdOptional[] {
+    const userIds = data.users
+      ? data.users.map(user => user.qualified_id || {domain: null, id: user.id})
+      : data.user_ids.map(id => ({domain: null, id}));
+    return userIds;
+  }
+
   private async _process1To1ConversationCreationEvent(event: EventRecord) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
-    const hasService = await this._containsService(event.data.userIds);
+    const hasService = await this._containsService(event.data.users);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
