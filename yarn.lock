@@ -2484,10 +2484,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@17", "@types/react@17.0.21", "@types/react@>=16.9.0":
-  version "17.0.21"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.21.tgz#069c43177cd419afaab5ce26bb4e9056549f7ea6"
-  integrity sha512-GzzXCpOthOjXvrAUFQwU/svyxu658cwu00Q9ugujS4qc1zXgLFaO0kS2SLOaMWLt2Jik781yuHCWB7UcYdGAeQ==
+"@types/react@*", "@types/react@17", "@types/react@17.0.22", "@types/react@>=16.9.0":
+  version "17.0.22"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.22.tgz#c80d1d0e87fe953bae3ab273bef451dea1a6291b"
+  integrity sha512-kq/BMeaAVLJM6Pynh8C2rnr/drCK+/5ksH0ch9asz+8FW3DscYCIEFtCeYTFeIx/ubvOsMXmRfy7qEJ76gM96A==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -2902,10 +2902,10 @@
     tough-cookie "4.0.0"
     ws "7.5.3"
 
-"@wireapp/avs@7.2.89":
-  version "7.2.89"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.2.89.tgz#f4a1913e1d59b1b5aabefe05efa6bdcefef6ff73"
-  integrity sha512-80t/nDCeYHJxf753oXPWfVvNEAwOqHjMd+VOdUmMl9ungoEjuOjwhlYBmOEuZAh961pbptsdJsxeCWnBENI+cw==
+"@wireapp/avs@7.2.91":
+  version "7.2.91"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-7.2.91.tgz#5be89287283fb634c3362b16db63aa1741b3ba1c"
+  integrity sha512-IIZgs55yoqMuSlmkI1KPmFExcXQ9doAQGRWWuSPIcXJVP68p39B7GonAfxbWie2Oi/FOTF5r0H7gJjZw5a8qiQ==
 
 "@wireapp/cbor@4.7.2":
   version "4.7.2"
