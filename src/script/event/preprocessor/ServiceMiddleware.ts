@@ -71,7 +71,7 @@ export class ServiceMiddleware {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, data: eventData} = event;
-    const userQualifiedIds = eventData.users.map(user => user.qualified_id || {domain: selfUser.domain, id: user.id});
+    const userQualifiedIds = this.extractQualifiedUserIds(eventData);
     const selfUser = this.userState.self();
     const containsSelfUser = userQualifiedIds.find(
       (user: QualifiedIdOptional) => selfUser.id === user.id && selfUser.domain == user.domain,
@@ -85,6 +85,13 @@ export class ServiceMiddleware {
 
     const hasService = await this._containsService(userIds);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
+  }
+
+  private extractQualifiedUserIds(data: MemberJoinEvent): QualifiedIdOptional[] {
+    const userIds = data.users
+      ? data.users.map(user => user.qualified_id || {domain: null, id: user.id})
+      : data.user_ids.map(id => ({domain: null, id}));
+    return userIds;
   }
 
   private async _process1To1ConversationCreationEvent(event: EventRecord) {
