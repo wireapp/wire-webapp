@@ -28,6 +28,16 @@ import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
 import {QualifiedIdOptional} from '../../conversation/EventBuilder';
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
+
+interface MemberJoinEvent {
+  user_ids: string[];
+  users: {
+    conversation_role: string;
+    id: string;
+    qualified_id?: QualifiedUserId;
+  }[];
+}
 
 export class ServiceMiddleware {
   private readonly userRepository: UserRepository;
@@ -57,12 +67,13 @@ export class ServiceMiddleware {
     }
   }
 
-  private async _processMemberJoinEvent(event: EventRecord) {
+  private async _processMemberJoinEvent(event: EventRecord<MemberJoinEvent>) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, data: eventData} = event;
+    const userQualifiedIds = eventData.users.map(user => user.qualified_id || {domain: selfUser.domain, id: user.id});
     const selfUser = this.userState.self();
-    const containsSelfUser = eventData.user_ids.find(
+    const containsSelfUser = userQualifiedIds.find(
       (user: QualifiedIdOptional) => selfUser.id === user.id && selfUser.domain == user.domain,
     );
 
@@ -70,7 +81,7 @@ export class ServiceMiddleware {
       ? await this.conversationRepository
           .getConversationById(conversationId)
           .then(conversationEntity => conversationEntity.participating_user_ids())
-      : eventData.user_ids;
+      : userQualifiedIds;
 
     const hasService = await this._containsService(userIds);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
@@ -78,7 +89,7 @@ export class ServiceMiddleware {
 
   private async _process1To1ConversationCreationEvent(event: EventRecord) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
-    const hasService = await this._containsService(event.data.userIds);
+    const hasService = await this._containsService(event.data.users);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
