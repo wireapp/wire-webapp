@@ -561,7 +561,7 @@ export class ConversationRepository {
       ? EventBuilder.buildGroupCreation(conversationEntity, isTemporaryGuest, timestamp)
       : EventBuilder.build1to1Creation(conversationEntity);
 
-    this.eventRepository.injectEvent(creationEvent as EventRecord, eventSource);
+    this.eventRepository.injectEvent(creationEvent, eventSource);
   }
 
   /**
@@ -1494,7 +1494,7 @@ export class ConversationRepository {
       })
       .forEach(conversationEntity => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-        this.eventRepository.injectEvent(leaveEvent as EventRecord);
+        this.eventRepository.injectEvent(leaveEvent);
       });
     userEntity.isDeleted = true;
   };
@@ -1744,7 +1744,7 @@ export class ConversationRepository {
       legalHoldStatus,
       beforeTimestamp,
     );
-    await this.eventRepository.injectEvent(legalHoldUpdateMessage as EventRecord);
+    await this.eventRepository.injectEvent(legalHoldUpdateMessage);
   };
 
   async injectFileTypeRestrictedMessage(
@@ -1755,7 +1755,7 @@ export class ConversationRepository {
     id = createRandomUuid(),
   ) {
     const fileRestrictionMessage = EventBuilder.buildFileTypeRestricted(conversation, user, isIncoming, fileExt, id);
-    await this.eventRepository.injectEvent(fileRestrictionMessage as EventRecord);
+    await this.eventRepository.injectEvent(fileRestrictionMessage);
   }
 
   //##############################################################################
@@ -2152,7 +2152,7 @@ export class ConversationRepository {
       .forEach(conversationEntity => {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const missed_event = EventBuilder.buildMissed(conversationEntity, currentTimestamp);
-        this.eventRepository.injectEvent(missed_event as EventRecord);
+        this.eventRepository.injectEvent(missed_event);
       });
   };
 
@@ -2215,7 +2215,7 @@ export class ConversationRepository {
   }
 
   private async onGroupCreation(conversationEntity: Conversation, eventJson: GroupCreationEvent) {
-    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson as EventRecord, conversationEntity);
+    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     const creatorId = conversationEntity.creator;
     const creatorDomain = conversationEntity.domain;
     const createdByParticipant = !!conversationEntity
@@ -2830,7 +2830,7 @@ export class ConversationRepository {
    */
   public addDeleteMessage(conversationId: string, messageId: string, time: number, messageEntity: Message) {
     const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
-    this.eventRepository.injectEvent(deleteEvent as EventRecord);
+    this.eventRepository.injectEvent(deleteEvent);
   }
 
   //##############################################################################

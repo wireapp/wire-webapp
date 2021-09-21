@@ -41,7 +41,7 @@ export interface QualifiedIdOptional {
 export interface BaseEvent {
   conversation: string;
   from: string;
-  id?: string;
+  id: string;
   time: string;
 }
 
@@ -60,18 +60,22 @@ export interface CallingEvent {
   type: CALL;
 }
 
-export interface BackendEventMessage<T> extends BaseEvent {
+export interface BackendEventMessage<T> extends Omit<BaseEvent, 'id'> {
   data: T;
+  id?: string;
   type: string;
 }
 
 export interface ErrorEvent extends BaseEvent {
   error: string;
   error_code: string;
-  id: string;
   type: CONVERSATION;
 }
 
+export interface VoiceChannelActivateEvent extends BaseEvent {
+  protocol_version: number;
+  type: typeof CONVERSATION.VOICE_CHANNEL_ACTIVATE;
+}
 export type AllVerifiedEventData = {type: VerificationMessageType};
 export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData>;
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
@@ -150,11 +154,6 @@ export interface ErrorEvent extends BaseEvent {
   type: CONVERSATION;
 }
 
-export interface VoiceChannelActivateEvent extends BaseEvent {
-  id: string;
-  protocol_version: number;
-  type: typeof CONVERSATION.VOICE_CHANNEL_ACTIVATE;
-}
 export type ClientConversationEvent =
   | AssetAddEvent
   | CompositeMessageAddEvent
