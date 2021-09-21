@@ -36,7 +36,7 @@ export interface AssetRecord {
 export type UserReactionMap = {[userId: string]: ReactionType};
 
 export interface EventRecord<T = any> {
-  category: number;
+  category?: number;
   client?: {time: string};
   connection?: {lastUpdate: string};
   content?: string;

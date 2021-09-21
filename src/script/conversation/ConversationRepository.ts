@@ -25,11 +25,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   CONVERSATION_EVENT,
+  ConversationEvent,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
   ConversationMemberJoinEvent,
   ConversationCreateEvent,
-} from '@wireapp/api-client/src/event/';
+} from '@wireapp/api-client/src/event';
 import {
   DefaultConversationRoleName as DefaultRole,
   CONVERSATION_ACCESS_ROLE,
@@ -59,7 +60,13 @@ import {
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {EventBuilder, GroupCreationEvent, QualifiedIdOptional} from '../conversation/EventBuilder';
+import {
+  ClientConversationEvent,
+  EventBuilder,
+  GroupCreationEvent,
+  OneToOneCreationEvent,
+  QualifiedIdOptional,
+} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
@@ -1950,7 +1957,11 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when the event has been treated
    */
-  private reactToConversationEvent(conversationEntity: Conversation, eventJson: EventJson, eventSource: EventSource) {
+  private reactToConversationEvent(
+    conversationEntity: Conversation,
+    eventJson: ConversationEvent | ClientConversationEvent,
+    eventSource: EventSource,
+  ) {
     switch (eventJson.type) {
       case CONVERSATION_EVENT.CREATE:
         return this.onCreate(eventJson, eventSource);
@@ -2145,7 +2156,7 @@ export class ConversationRepository {
       });
   };
 
-  private on1to1Creation(conversationEntity: Conversation, eventJson: EventRecord) {
+  private on1to1Creation(conversationEntity: Conversation, eventJson: OneToOneCreationEvent) {
     return this.event_mapper
       .mapJsonEvent(eventJson, conversationEntity)
       .then(messageEntity => this.updateMessageUserEntities(messageEntity))

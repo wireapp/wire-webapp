@@ -42,7 +42,7 @@ export interface BaseEvent {
   conversation: string;
   from: string;
   id?: string;
-  time: string | number;
+  time: string;
 }
 
 export interface ConversationEvent<T> extends BaseEvent {
@@ -72,36 +72,112 @@ export interface ErrorEvent extends BaseEvent {
   type: CONVERSATION;
 }
 
-export interface VoiceChannelActivateEvent extends BaseEvent {
-  id: string;
-  protocol_version: number;
-  type: string;
-}
 export type AllVerifiedEventData = {type: VerificationMessageType};
 export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData>;
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
-  Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType};
+  Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType; type: typeof CONVERSATION.ASSET_ADD};
 export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedIdOptional[]};
 export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData>;
-export type DeleteEvent = ConversationEvent<{deleted_time: number}>;
+export type DeleteEvent = ConversationEvent<{deleted_time: number}> & {type: typeof CONVERSATION.MESSAGE_DELETE};
 export type GroupCreationEventData = {
   allTeamMembers: boolean;
   name: string;
   userIds: QualifiedIdOptional[];
 };
-export type GroupCreationEvent = ConversationEvent<GroupCreationEventData>;
-export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}>;
+export type GroupCreationEvent = ConversationEvent<GroupCreationEventData> & {type: typeof CONVERSATION.GROUP_CREATION};
+export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}> & {
+  type: typeof CONVERSATION.LEGAL_HOLD_UPDATE;
+};
 export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;
-export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {status: StatusType};
-export type MissedEvent = BaseEvent & {id: string; type: string};
-export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedIdOptional[]}>;
-export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}>;
+export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {
+  edited_time?: string;
+  status: StatusType;
+  type: typeof CONVERSATION.MESSAGE_ADD;
+};
+export type MissedEvent = BaseEvent & {id: string; type: typeof CONVERSATION.MISSED_MESSAGES};
+export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedIdOptional[]}> & {
+  type: typeof CONVERSATION.ONE2ONE_CREATION;
+};
+export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}> & {
+  type: typeof CONVERSATION.TEAM_MEMBER_LEAVE;
+};
+export type ReactionEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.REACTION;
+};
+export type MessageHiddenEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.MESSAGE_HIDDEN;
+};
+export type ButtonActionConfirmationEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.BUTTON_ACTION_CONFIRMATION;
+};
+export type DeleteEverywhereEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.DELETE_EVERYWHERE;
+};
+export type CompositeMessageAddEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.COMPOSITE_MESSAGE_ADD;
+};
+export type IncomingMessageTooBigEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.INCOMING_MESSAGE_TOO_BIG;
+};
+export type KnockEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.KNOCK;
+};
+export type LocationEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.LOCATION;
+};
+export type UnableToDecryptEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.UNABLE_TO_DECRYPT;
+};
+export type VerificationEvent = ConversationEvent<{}> & {
+  type: typeof CONVERSATION.VERIFICATION;
+};
 export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; reason: AVS_REASON}> & {
   protocol_version: number;
+  type: typeof CONVERSATION.VOICE_CHANNEL_DEACTIVATE;
 };
-export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isIncoming: boolean; name: string}>;
-export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}>;
+export type FileTypeRestrictedEvent = ConversationEvent<{fileExt: string; isIncoming: boolean; name: string}> & {
+  type: typeof CONVERSATION.FILE_TYPE_RESTRICTED;
+};
+export type CallingTimeoutEvent = ConversationEvent<{reason: AVS_REASON.NOONE_JOINED | AVS_REASON.EVERYONE_LEFT}> & {
+  type: typeof CONVERSATION.CALL_TIME_OUT;
+};
+
+export interface ErrorEvent extends BaseEvent {
+  error: string;
+  error_code: string;
+  id: string;
+  type: CONVERSATION;
+}
+
+export interface VoiceChannelActivateEvent extends BaseEvent {
+  id: string;
+  protocol_version: number;
+  type: typeof CONVERSATION.VOICE_CHANNEL_ACTIVATE;
+}
+export type ClientConversationEvent =
+  | AssetAddEvent
+  | CompositeMessageAddEvent
+  | DeleteEvent
+  | DeleteEverywhereEvent
+  | ButtonActionConfirmationEvent
+  | KnockEvent
+  | IncomingMessageTooBigEvent
+  | GroupCreationEvent
+  | TeamMemberLeaveEvent
+  | ReactionEvent
+  | LegalHoldMessageEvent
+  | MessageAddEvent
+  | MessageHiddenEvent
+  | OneToOneCreationEvent
+  | VoiceChannelDeactivateEvent
+  | FileTypeRestrictedEvent
+  | CallingTimeoutEvent
+  | UnableToDecryptEvent
+  | MissedEvent
+  | LocationEvent
+  | VoiceChannelActivateEvent
+  | VerificationEvent;
 
 export const EventBuilder = {
   build1to1Creation(conversationEntity: Conversation, timestamp: number = 0): OneToOneCreationEvent {
@@ -195,7 +271,12 @@ export const EventBuilder = {
     };
   },
 
-  buildDelete(conversationId: string, messageId: string, time: number, deletedMessageEntity: Message): DeleteEvent {
+  buildDelete(
+    conversationId: string,
+    messageId: string,
+    time: number,
+    deletedMessageEntity: Message,
+  ): DeleteEverywhereEvent {
     return {
       conversation: conversationId,
       data: {
@@ -367,7 +448,7 @@ export const EventBuilder = {
       },
       from: userEntity.id,
       id: createRandomUuid(),
-      time: isoDate,
+      time: new Date(isoDate).toISOString(),
       type: ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE,
     };
   },
