@@ -348,7 +348,7 @@ export class PreferencesAVViewModel {
   }
 */
   readonly updateProperties = ({settings}: WebappProperties): void => {
-    this.optionVbrEncoding(settings.call.enable_vbr_encoding);
+    this.optionVbrEncoding(!this.isCbrEncodingEnforced && settings.call.enable_vbr_encoding);
   };
 
   saveCallLogs(): number | void {

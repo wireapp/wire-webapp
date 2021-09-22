@@ -30,17 +30,14 @@ export interface Grid {
 }
 
 export function getGrid(call: Call) {
-  const videoParticipants = call.pages()[call.currentPage()]?.filter(p => p.hasActiveVideo());
-  const selfParticipant = call.getSelfParticipant();
-
-  if (selfParticipant?.hasActiveVideo() && videoParticipants?.length === 2) {
+  if (call.participants().length === 2) {
     return {
-      grid: videoParticipants.slice(1),
-      thumbnail: selfParticipant,
+      grid: call.getRemoteParticipants(),
+      thumbnail: call.getSelfParticipant(),
     };
   }
   return {
-    grid: videoParticipants ?? [],
+    grid: call.pages()[call.currentPage()],
     thumbnail: null,
   };
 }
@@ -59,7 +56,7 @@ export const useVideoGrid = (call: Call): Grid => {
     };
     updateGrid();
     const nameSubscriptions = participants?.map(p => p.user.name.subscribe(updateGrid));
-    const videoSubscriptions = participants?.map(p => p.hasActiveVideo.subscribe(updateGrid));
+    const videoSubscriptions = participants?.map(p => p.isSendingVideo.subscribe(updateGrid));
     return () => {
       nameSubscriptions?.forEach(s => s.dispose());
       videoSubscriptions?.forEach(s => s.dispose());

@@ -17,8 +17,8 @@
  *
  */
 
-import {Confirmation} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
 import {ConsentValue} from 'src/script/user/ConsentValue';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
@@ -126,7 +126,7 @@ describe('UserRepository', () => {
         const turnOnReceiptMode = {
           key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
           type: 'user.properties-set',
-          value: Confirmation.Type.READ,
+          value: RECEIPT_MODE.ON,
         };
         const turnOffReceiptMode = {
           key: PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
@@ -135,15 +135,15 @@ describe('UserRepository', () => {
         const source = EventRepository.SOURCE.WEB_SOCKET;
         const receiptMode = testFactory.user_repository.propertyRepository.receiptMode;
 
-        expect(receiptMode()).toBe(Confirmation.Type.DELIVERED);
+        expect(receiptMode()).toBe(RECEIPT_MODE.OFF);
 
         testFactory.user_repository.onUserEvent(turnOnReceiptMode, source);
 
-        expect(receiptMode()).toBe(Confirmation.Type.READ);
+        expect(receiptMode()).toBe(RECEIPT_MODE.ON);
 
         testFactory.user_repository.onUserEvent(turnOffReceiptMode, source);
 
-        expect(receiptMode()).toBe(Confirmation.Type.DELIVERED);
+        expect(receiptMode()).toBe(RECEIPT_MODE.OFF);
       });
     });
   });
