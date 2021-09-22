@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.16.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.15.1...@wireapp/core@17.16.0) (2021-09-22)
+
+
+### Features
+
+* **core:** Surface the message sent time to consumer ([#4137](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4137)) ([1b294df](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/1b294df332fa489ae17befc5b2595416d27329e0)), closes [wireapp/wire-webapp#11887](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/11887)
+
+
+
+
+
 ## [17.15.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.15.0...@wireapp/core@17.15.1) (2021-09-22)
 
 **Note:** Version bump only for package @wireapp/core
