@@ -32,6 +32,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {AssetRecord, EventRecord} from '../storage';
+import {ReactionType} from '@wireapp/core/src/main/conversation';
 
 export interface QualifiedIdOptional {
   domain: string | null;
@@ -40,8 +41,10 @@ export interface QualifiedIdOptional {
 
 export interface BaseEvent {
   conversation: string;
+  data?: unknown;
   from: string;
   id: string;
+  server_time?: string;
   time: string;
 }
 
@@ -82,7 +85,9 @@ export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType; type: typeof CONVERSATION.ASSET_ADD};
 export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedIdOptional[]};
 export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData>;
-export type DeleteEvent = ConversationEvent<{deleted_time: number}> & {type: typeof CONVERSATION.MESSAGE_DELETE};
+export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: string; time: string}> & {
+  type: typeof CONVERSATION.MESSAGE_DELETE;
+};
 export type GroupCreationEventData = {
   allTeamMembers: boolean;
   name: string;
@@ -106,13 +111,13 @@ export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedIdOptio
 export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}> & {
   type: typeof CONVERSATION.TEAM_MEMBER_LEAVE;
 };
-export type ReactionEvent = ConversationEvent<{}> & {
+export type ReactionEvent = ConversationEvent<{message_id: string; reaction: ReactionType}> & {
   type: typeof CONVERSATION.REACTION;
 };
-export type MessageHiddenEvent = ConversationEvent<{}> & {
+export type MessageHiddenEvent = ConversationEvent<{conversation_id: string; message_id: string}> & {
   type: typeof CONVERSATION.MESSAGE_HIDDEN;
 };
-export type ButtonActionConfirmationEvent = ConversationEvent<{}> & {
+export type ButtonActionConfirmationEvent = ConversationEvent<{buttonId: string; messageId: string}> & {
   type: typeof CONVERSATION.BUTTON_ACTION_CONFIRMATION;
 };
 export type DeleteEverywhereEvent = ConversationEvent<{}> & {
@@ -273,7 +278,7 @@ export const EventBuilder = {
   buildDelete(
     conversationId: string,
     messageId: string,
-    time: number,
+    time: string,
     deletedMessageEntity: Message,
   ): DeleteEverywhereEvent {
     return {
@@ -356,7 +361,7 @@ export const EventBuilder = {
   buildLegalHoldMessage(
     conversationId: string,
     userId: string,
-    timestamp: number,
+    timestamp: number | string,
     legalHoldStatus: LegalHoldStatus,
     beforeMessage?: boolean,
   ): LegalHoldMessageEvent {

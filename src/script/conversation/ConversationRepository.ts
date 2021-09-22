@@ -25,11 +25,13 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   CONVERSATION_EVENT,
-  ConversationEvent,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
   ConversationMemberJoinEvent,
   ConversationCreateEvent,
+  ConversationEvent,
+  ConversationReceiptModeUpdateEvent,
+  ConversationMemberLeaveEvent,
 } from '@wireapp/api-client/src/event';
 import {
   DefaultConversationRoleName as DefaultRole,
@@ -61,11 +63,17 @@ import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
 import {
+  AssetAddEvent,
+  ButtonActionConfirmationEvent,
   ClientConversationEvent,
+  DeleteEvent,
   EventBuilder,
   GroupCreationEvent,
+  MessageHiddenEvent,
   OneToOneCreationEvent,
   QualifiedIdOptional,
+  ReactionEvent,
+  TeamMemberLeaveEvent,
 } from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
@@ -111,11 +119,12 @@ import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
+import {ConversationMemberUpdateEvent} from '../../../../wire-web-packages/node_modules/@wireapp/api-client/src/event';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
-type EventJson = any;
 type EntityObject = {conversationEntity: Conversation; messageEntity: Message};
+type IncomingEvent = ConversationEvent | ClientConversationEvent;
 
 export class ConversationRepository {
   private init_handled: number;
@@ -1277,7 +1286,7 @@ export class ConversationRepository {
     try {
       const response = await this.conversation_service.postMembers(conversationEntity.id, userIds);
       if (response) {
-        this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
+        this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
     } catch (error) {
       return this.handleAddToConversationError(error, conversationEntity, userIds);
@@ -1287,7 +1296,7 @@ export class ConversationRepository {
   addMissingMember(conversationEntity: Conversation, users: QualifiedIdOptional[], timestamp: number) {
     const [sender] = users;
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, users, timestamp);
-    return this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.INJECTED);
+    return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
   }
 
   /**
@@ -1398,7 +1407,7 @@ export class ConversationRepository {
     conversationEntity.roles(roles);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const event = response || EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
-    this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
+    this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
   }
 
@@ -1436,7 +1445,7 @@ export class ConversationRepository {
   ): Promise<ConversationRenameEvent | undefined> {
     const response = await this.conversation_service.updateConversationName(conversationEntity.id, name);
     if (response) {
-      this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       return response;
     }
     return undefined;
@@ -1456,7 +1465,7 @@ export class ConversationRepository {
       messageTimer,
     );
     if (response) {
-      this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
     return response;
   }
@@ -1467,7 +1476,7 @@ export class ConversationRepository {
   ) {
     const response = await this.conversation_service.updateConversationReceiptMode(conversationEntity.id, receiptMode);
     if (response) {
-      this.eventRepository.injectEvent(response as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
+      this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
     }
     return response;
   }
@@ -1726,7 +1735,7 @@ export class ConversationRepository {
     conversationEntity?: Conversation;
     conversationId: string;
     legalHoldStatus: LegalHoldStatus;
-    timestamp: number;
+    timestamp: string | number;
     userId: string;
   }) => {
     if (typeof legalHoldStatus === 'undefined') {
@@ -1769,7 +1778,7 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when event was handled
    */
-  private readonly onConversationEvent = (eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) => {
+  private readonly onConversationEvent = (eventJson: IncomingEvent, eventSource = EventRepository.SOURCE.STREAM) => {
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
     const logMessage = `Conversation Event: '${eventJson.type}' (Source: ${eventSource})`;
     this.logger.info(logMessage, logObject);
@@ -1777,7 +1786,7 @@ export class ConversationRepository {
     return this.pushToReceivingQueue(eventJson, eventSource);
   };
 
-  private handleConversationEvent(eventJson: EventJson, eventSource = EventRepository.SOURCE.STREAM) {
+  private handleConversationEvent(eventJson: IncomingEvent, eventSource = EventRepository.SOURCE.STREAM) {
     if (!eventJson) {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
@@ -1859,7 +1868,7 @@ export class ConversationRepository {
    */
   private checkConversationParticipants(
     conversationEntity: Conversation,
-    eventJson: EventJson,
+    eventJson: IncomingEvent,
     eventSource: EventSource,
   ) {
     // We ignore injected events
@@ -1868,7 +1877,7 @@ export class ConversationRepository {
       return conversationEntity;
     }
 
-    const {from: senderId, id, type, time} = eventJson;
+    const {from: senderId, type, time} = eventJson;
 
     if (senderId) {
       const allParticipants = conversationEntity
@@ -1891,7 +1900,7 @@ export class ConversationRepository {
           }
         }
 
-        const message = `Received '${type}' event '${id}' from user '${senderId}' unknown in '${conversationEntity.id}'`;
+        const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;
         this.logger.warn(message, eventJson);
 
         const qualifiedSender: QualifiedIdOptional = {domain: null, id: senderId};
@@ -1904,7 +1913,7 @@ export class ConversationRepository {
     return conversationEntity;
   }
 
-  private async checkLegalHoldStatus(conversationEntity: Conversation, eventJson: LegalHoldEvaluator.MappedEvent) {
+  private async checkLegalHoldStatus(conversationEntity: Conversation, eventJson: IncomingEvent) {
     if (!LegalHoldEvaluator.hasMessageLegalHoldFlag(eventJson)) {
       return conversationEntity;
     }
@@ -1959,7 +1968,7 @@ export class ConversationRepository {
    */
   private reactToConversationEvent(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent | ClientConversationEvent,
+    eventJson: IncomingEvent,
     eventSource: EventSource,
   ) {
     switch (eventJson.type) {
@@ -2040,7 +2049,7 @@ export class ConversationRepository {
    * @param eventSource Source of event
    * @returns Resolves when all the handlers have done their job
    */
-  private async triggerFeatureEventHandlers(conversationEntity: Conversation, eventJson: EventJson) {
+  private async triggerFeatureEventHandlers(conversationEntity: Conversation, eventJson: IncomingEvent) {
     const conversationEventHandlers = [this.ephemeralHandler, this.stateHandler];
     const handlePromises = conversationEventHandlers.map(handler =>
       handler.handleConversationEvent(conversationEntity, eventJson),
@@ -2107,7 +2116,7 @@ export class ConversationRepository {
    * @param eventJson JSON data for event
    * @param source Source of event
    */
-  private pushToReceivingQueue(eventJson: EventJson, source: EventSource) {
+  private pushToReceivingQueue(eventJson: IncomingEvent, source: EventSource) {
     this.receiving_queue
       .push(() => this.handleConversationEvent(eventJson, source))
       .then(() => {
@@ -2326,7 +2335,7 @@ export class ConversationRepository {
    */
   private async onMemberLeave(
     conversationEntity: Conversation,
-    eventJson: EventJson,
+    eventJson: ConversationMemberLeaveEvent | TeamMemberLeaveEvent,
   ): Promise<{conversationEntity: Conversation; messageEntity: Message} | undefined> {
     const {data: eventData, from} = eventJson;
     const isFromSelf = from === this.userState.self().id;
@@ -2377,7 +2386,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-update' event
    * @returns Resolves when the event was handled
    */
-  private onMemberUpdate(conversationEntity: Conversation, eventJson: EventJson) {
+  private onMemberUpdate(conversationEntity: Conversation, eventJson: Partial<ConversationMemberUpdateEvent>) {
     const {conversation: conversationId, data: eventData, from} = eventJson;
 
     const isConversationRoleUpdate = !!eventData.conversation_role;
@@ -2434,7 +2443,7 @@ export class ConversationRepository {
    * @param event JSON data of 'conversation.asset-add'
    * @returns Resolves when the event was handled
    */
-  private async onAssetAdd(conversationEntity: Conversation, event: EventJson) {
+  private async onAssetAdd(conversationEntity: Conversation, event: AssetAddEvent) {
     const fromSelf = event.from === this.userState.self().id;
 
     const isRemoteFailure = !fromSelf && event.data.status === AssetTransferState.UPLOAD_FAILED;
@@ -2482,7 +2491,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.message-delete'
    * @returns Resolves when the event was handled
    */
-  private onMessageDeleted(conversationEntity: Conversation, eventJson: EventJson) {
+  private onMessageDeleted(conversationEntity: Conversation, eventJson: DeleteEvent) {
     const {data: eventData, from, id: eventId, time} = eventJson;
 
     return this.messageRepositoryProvider()
@@ -2520,7 +2529,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.message-hidden'
    * @returns Resolves when the event was handled
    */
-  private async onMessageHidden(eventJson: EventJson) {
+  private async onMessageHidden(eventJson: MessageHiddenEvent) {
     const {conversation: conversationId, data: eventData, from} = eventJson;
 
     try {
@@ -2555,7 +2564,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.reaction' event
    * @returns Resolves when the event was handled
    */
-  private async onReaction(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onReaction(conversationEntity: Conversation, eventJson: ReactionEvent) {
     const conversationId = conversationEntity.id;
     const eventData = eventJson.data;
     const messageId = eventData.message_id;
@@ -2592,7 +2601,7 @@ export class ConversationRepository {
     return undefined;
   }
 
-  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
     const {messageId, buttonId} = eventJson.data;
     try {
       const messageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
@@ -2628,7 +2637,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.rename' event
    * @returns Resolves when the event was handled
    */
-  private async onRename(conversationEntity: Conversation, eventJson: EventJson, isWebSocket = false) {
+  private async onRename(conversationEntity: Conversation, eventJson: ConversationRenameEvent, isWebSocket = false) {
     if (isWebSocket && eventJson.data?.name) {
       eventJson.data.name = fixWebsocketString(eventJson.data.name);
     }
@@ -2644,7 +2653,7 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.receipt-mode-update' event
    * @returns Resolves when the event was handled
    */
-  private async onReceiptModeChanged(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onReceiptModeChanged(conversationEntity: Conversation, eventJson: ConversationReceiptModeUpdateEvent) {
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateSelfStatus(conversationEntity, {receipt_mode: eventJson.data.receipt_mode});
     return {conversationEntity, messageEntity};
@@ -2667,7 +2676,7 @@ export class ConversationRepository {
     }
   };
 
-  private async initMessageEntity(conversationEntity: Conversation, eventJson: EventRecord): Promise<Message> {
+  private async initMessageEntity(conversationEntity: Conversation, eventJson: IncomingEvent): Promise<Message> {
     const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
     return this.updateMessageUserEntities(messageEntity);
   }
@@ -2698,7 +2707,7 @@ export class ConversationRepository {
    */
   private async addEventToConversation(
     conversationEntity: Conversation,
-    eventJson: EventJson,
+    eventJson: IncomingEvent,
   ): Promise<{conversationEntity: Conversation; messageEntity: Message}> {
     const messageEntity = (await this.initMessageEntity(conversationEntity, eventJson)) as Message;
     if (conversationEntity && messageEntity) {
@@ -2753,7 +2762,7 @@ export class ConversationRepository {
   private async prepareReactionNotification(
     conversationEntity: Conversation,
     messageEntity: ContentMessage,
-    eventJson: EventJson,
+    eventJson: ReactionEvent,
   ) {
     const {data: event_data, from} = eventJson;
 
@@ -2828,7 +2837,7 @@ export class ConversationRepository {
    * @param time ISO 8601 formatted time string
    * @param messageEntity Message to delete
    */
-  public addDeleteMessage(conversationId: string, messageId: string, time: number, messageEntity: Message) {
+  public addDeleteMessage(conversationId: string, messageId: string, time: string, messageEntity: Message) {
     const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
     this.eventRepository.injectEvent(deleteEvent);
   }

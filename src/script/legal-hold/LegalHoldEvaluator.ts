@@ -17,18 +17,19 @@
  *
  */
 
+import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
-import {CONVERSATION, ClientEvent} from '../event/Client';
+import {CONVERSATION} from '../event/Client';
 
 export type MappedEvent = Record<string, any> & {
   data?: MappedEventData;
-  type: CONVERSATION;
+  type: CONVERSATION_EVENT | CONVERSATION;
 };
 
-type MappedEventData = {
+type MappedEventData = Record<string, any> & {
   expects_read_confirmation?: boolean;
   legal_hold_status?: LegalHoldStatus;
 };
@@ -48,12 +49,15 @@ export const isConversationOnLegalHold = (conversation: Conversation): boolean =
 };
 
 export const hasMessageLegalHoldFlag = (mappedEvent: MappedEvent): boolean => {
-  const supportsLegalHoldFlag = [ClientEvent.CONVERSATION.MESSAGE_ADD].includes(mappedEvent.type);
-  const hasLegalHoldFlag =
+  const supportsLegalHoldFlag = [CONVERSATION.MESSAGE_ADD].includes(mappedEvent.type as CONVERSATION);
+  if (!supportsLegalHoldFlag) {
+    return false;
+  }
+  return (
     mappedEvent.data &&
     typeof mappedEvent.data.legal_hold_status !== 'undefined' &&
-    mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN;
-  return supportsLegalHoldFlag && hasLegalHoldFlag;
+    mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN
+  );
 };
 
 export const renderLegalHoldMessage = (mappedEvent: MappedEvent, localConversationState: LegalHoldStatus): boolean => {
