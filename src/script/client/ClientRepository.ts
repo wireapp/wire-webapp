@@ -371,7 +371,6 @@ export class ClientRepository {
           Promise.all(
             Object.entries(userClientMap).map(async ([userId, clients]) => {
               clientEntityMap[domain] ||= {};
-              clientEntityMap[domain] ||= {};
               clientEntityMap[domain][userId] = updateClients
                 ? await this.updateClientsOfUserById(userId, clients, true, domain)
                 : // TODO(Federation): Check if `isSelfClient` is needed here
