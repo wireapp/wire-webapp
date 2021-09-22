@@ -19,6 +19,7 @@
 
 import type {APIClient} from '@wireapp/api-client';
 import {
+  MessageSendingStatus,
   Conversation,
   CONVERSATION_TYPE,
   DefaultConversationRoleName,
@@ -26,6 +27,7 @@ import {
   NewConversation,
   QualifiedUserClients,
   UserClients,
+  ClientMismatch,
 } from '@wireapp/api-client/src/conversation/';
 import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import type {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event/';
@@ -91,7 +93,7 @@ import type {
 
 export interface MessageSendingCallbacks {
   onStart?: (message: GenericMessage) => void;
-  onSuccess?: (message: GenericMessage) => void;
+  onSuccess?: (message: GenericMessage, sentTime?: string) => void;
 }
 
 export class ConversationService {
@@ -216,7 +218,7 @@ export class ConversationService {
     asset: EncryptedAsset,
     preKeyBundles: UserPreKeyBundleMap,
     sendAsProtobuf?: boolean,
-  ): Promise<void> {
+  ): Promise<ClientMismatch | void> {
     if (preKeyBundles.none) {
       const {cipherText, keyBytes, sha256} = asset;
       const messageId = MessageBuilder.createId();
@@ -264,13 +266,13 @@ export class ConversationService {
     conversationDomain: string,
     genericMessage: GenericMessage,
     userIds?: QualifiedId[] | QualifiedUserClients,
-  ): Promise<void> {
+  ): Promise<MessageSendingStatus> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const preKeyBundles = await this.getQualifiedPreKeyBundle(conversationId, conversationDomain, userIds);
 
     const recipients = await this.cryptographyService.encryptQualified(plainTextArray, preKeyBundles);
 
-    await this.messageService.sendFederatedOTRMessage(
+    return this.messageService.sendFederatedOTRMessage(
       sendingClientId,
       conversationId,
       conversationDomain,
@@ -286,7 +288,7 @@ export class ConversationService {
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
-  ): Promise<void> {
+  ): Promise<ClientMismatch | MessageSendingStatus | void> {
     if (conversationDomain) {
       if (isStringArray(userIds) || isUserClients(userIds)) {
         throw new Error('Invalid userIds option for sending');
@@ -875,7 +877,7 @@ export class ConversationService {
     }
     callbacks?.onStart?.(genericMessage);
 
-    await this.sendGenericMessage(
+    const response = await this.sendGenericMessage(
       this.apiClient.validatedClientId,
       payloadBundle.conversation,
       genericMessage,
@@ -883,7 +885,7 @@ export class ConversationService {
       sendAsProtobuf,
       conversationDomain,
     );
-    callbacks?.onSuccess?.(genericMessage);
+    callbacks?.onSuccess?.(genericMessage, response?.time);
 
     return {
       ...payloadBundle,

@@ -93,7 +93,8 @@ describe('ConversationService', () => {
         clientId: PayloadHelper.getUUID(),
       };
       const conversationService = account.service!.conversation;
-      spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve(undefined));
+      const sentTime = new Date().toISOString();
+      spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: sentTime}));
       const callbacks = {onStart: jasmine.createSpy(), onSuccess: jasmine.createSpy()};
       const promise = conversationService.send({
         callbacks,
@@ -112,7 +113,7 @@ describe('ConversationService', () => {
       expect(callbacks.onStart).toHaveBeenCalled();
       expect(callbacks.onSuccess).not.toHaveBeenCalled();
       await promise;
-      expect(callbacks.onSuccess).toHaveBeenCalled();
+      expect(callbacks.onSuccess).toHaveBeenCalledWith(jasmine.any(Object), sentTime);
     });
   });
 

@@ -24,6 +24,7 @@ import Long from 'long';
 import {bytesToUUID, uuidToBytes} from '@wireapp/commons/src/main/util/StringUtil';
 import {APIClient} from '@wireapp/api-client';
 import {
+  ClientMismatch,
   MessageSendingStatus,
   NewOTRMessage,
   OTRRecipients,
@@ -49,7 +50,7 @@ export class MessageService {
     conversationId: string | null,
     plainTextArray: Uint8Array,
     base64CipherText?: string,
-  ): Promise<void> {
+  ): Promise<ClientMismatch> {
     const message: NewOTRMessage<string> = {
       data: base64CipherText,
       recipients: CryptographyService.convertArrayRecipientsToBase64(recipients),
@@ -65,17 +66,21 @@ export class MessageService {
 
     try {
       if (conversationId === null) {
-        await this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, message, ignoreMissing);
-      } else {
-        await this.apiClient.conversation.api.postOTRMessage(sendingClientId, conversationId, message, ignoreMissing);
+        return await this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, message, ignoreMissing);
       }
+      return await this.apiClient.conversation.api.postOTRMessage(
+        sendingClientId,
+        conversationId,
+        message,
+        ignoreMissing,
+      );
     } catch (error) {
       const reEncryptedMessage = await this.onClientMismatch(
         error as AxiosError,
         {...message, data: base64CipherText ? Decoder.fromBase64(base64CipherText).asBytes : undefined, recipients},
         plainTextArray,
       );
-      await this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, {
+      return await this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, {
         data: reEncryptedMessage.data ? Encoder.toBase64(reEncryptedMessage.data).asString : undefined,
         recipients: CryptographyService.convertArrayRecipientsToBase64(reEncryptedMessage.recipients),
         sender: reEncryptedMessage.sender,
@@ -144,7 +149,7 @@ export class MessageService {
     recipients: QualifiedOTRRecipients,
     plainTextArray: Uint8Array,
     assetData?: Uint8Array,
-  ): Promise<void> {
+  ): Promise<MessageSendingStatus> {
     const qualifiedUserEntries = Object.entries(recipients).map<ProtobufOTR.IQualifiedUserEntry>(
       ([domain, otrRecipients]) => {
         const userEntries = Object.entries(otrRecipients).map<ProtobufOTR.IUserEntry>(([userId, otrClientMap]) => {
@@ -203,6 +208,7 @@ export class MessageService {
       );
       await this.apiClient.conversation.api.postOTRMessageV2(conversationId, conversationDomain, reEncryptedMessage);
     }
+    return messageSendingStatus;
   }
 
   public async sendOTRProtobufMessage(
@@ -211,7 +217,7 @@ export class MessageService {
     conversationId: string | null,
     plainTextArray: Uint8Array,
     assetData?: Uint8Array,
-  ): Promise<void> {
+  ): Promise<ClientMismatch> {
     const userEntries: ProtobufOTR.IUserEntry[] = Object.entries(recipients).map(([userId, otrClientMap]) => {
       const clients: ProtobufOTR.IClientEntry[] = Object.entries(otrClientMap).map(([clientId, payload]) => {
         return {
@@ -250,27 +256,29 @@ export class MessageService {
 
     try {
       if (conversationId === null) {
-        await this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, protoMessage, ignoreMissing);
-      } else {
-        await this.apiClient.conversation.api.postOTRProtobufMessage(
+        return await this.apiClient.broadcast.api.postBroadcastProtobufMessage(
           sendingClientId,
-          conversationId,
           protoMessage,
           ignoreMissing,
         );
       }
+      return await this.apiClient.conversation.api.postOTRProtobufMessage(
+        sendingClientId,
+        conversationId,
+        protoMessage,
+        ignoreMissing,
+      );
     } catch (error) {
       const reEncryptedMessage = await this.onClientProtobufMismatch(error as AxiosError, protoMessage, plainTextArray);
       if (conversationId === null) {
-        await this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, reEncryptedMessage);
-      } else {
-        await this.apiClient.conversation.api.postOTRProtobufMessage(
-          sendingClientId,
-          conversationId,
-          reEncryptedMessage,
-          ignoreMissing,
-        );
+        return await this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, reEncryptedMessage);
       }
+      return await this.apiClient.conversation.api.postOTRProtobufMessage(
+        sendingClientId,
+        conversationId,
+        reEncryptedMessage,
+        ignoreMissing,
+      );
     }
   }
 

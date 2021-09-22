@@ -18,6 +18,7 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
+import {ClientMismatch} from '@wireapp/api-client/src/conversation';
 import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
@@ -56,7 +57,7 @@ export class BroadcastService {
     genericMessage: GenericMessage,
     preKeyBundles: UserPreKeyBundleMap,
     sendAsProtobuf?: boolean,
-  ): Promise<void> {
+  ): Promise<ClientMismatch> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
     const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
