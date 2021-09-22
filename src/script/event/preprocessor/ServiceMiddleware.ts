@@ -39,6 +39,11 @@ interface MemberJoinEvent {
   }[];
 }
 
+interface One2OneCreationEvent {
+  userIds: QualifiedIdOptional[];
+}
+type HandledEvents = MemberJoinEvent | One2OneCreationEvent;
+
 export class ServiceMiddleware {
   private readonly userRepository: UserRepository;
   private readonly conversationRepository: ConversationRepository;
@@ -54,13 +59,13 @@ export class ServiceMiddleware {
     this.logger = getLogger('ServiceMiddleware');
   }
 
-  processEvent(event: EventRecord): Promise<EventRecord> {
+  processEvent(event: EventRecord<HandledEvents>): Promise<EventRecord> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
-        return this._process1To1ConversationCreationEvent(event);
+        return this._process1To1ConversationCreationEvent(event as EventRecord<One2OneCreationEvent>);
 
       case CONVERSATION_EVENT.MEMBER_JOIN:
-        return this._processMemberJoinEvent(event);
+        return this._processMemberJoinEvent(event as EventRecord<MemberJoinEvent>);
 
       default:
         return Promise.resolve(event);
@@ -94,9 +99,9 @@ export class ServiceMiddleware {
     return userIds;
   }
 
-  private async _process1To1ConversationCreationEvent(event: EventRecord) {
+  private async _process1To1ConversationCreationEvent(event: EventRecord<One2OneCreationEvent>) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
-    const hasService = await this._containsService(event.data.users);
+    const hasService = await this._containsService(event.data.userIds);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 

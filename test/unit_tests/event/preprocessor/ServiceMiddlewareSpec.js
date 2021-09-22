@@ -142,6 +142,25 @@ describe('ServiceMiddleware', () => {
           expect(decoratedEvent.data.has_service).not.toBeDefined();
         });
       });
+
+      it('adds meta when services are present in the event with qualified user ids', () => {
+        const event = {
+          data: {
+            userIds: [
+              {domain: null, id: 'not-a-service'},
+              {domain: null, id: 'a-service'},
+            ],
+          },
+          type: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
+        };
+
+        const userEntities = [{}, {isService: true}];
+        spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve(userEntities));
+
+        return serviceMiddleware.processEvent(event).then(decoratedEvent => {
+          expect(decoratedEvent.data.has_service).toBe(true);
+        });
+      });
     });
   });
 });
