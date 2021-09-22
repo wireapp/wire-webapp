@@ -208,7 +208,7 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
 
-    const {creator, id, members, name, others, type} = conversationData;
+    const {creator, id, members, name, others, qualified_others, type} = conversationData;
     let conversationEntity = new Conversation(id, conversationData.domain || conversationData.qualified_id?.domain);
     conversationEntity.roles(conversationData.roles || {});
 
@@ -216,7 +216,7 @@ export class ConversationMapper {
     conversationEntity.type(type);
     conversationEntity.name(name || '');
 
-    const selfState = members ? members.self : conversationData;
+    const selfState = members?.self || conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
     if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
@@ -225,7 +225,12 @@ export class ConversationMapper {
     }
 
     // Active participants from database or backend payload
-    const participatingUserIds = others || members.others.map(other => other.id);
+    const participatingUserIds =
+      qualified_others ||
+      (members?.others
+        ? members.others.map(other => ({domain: other.qualified_id?.domain || null, id: other.id}))
+        : others.map(userId => ({domain: null, id: userId})));
+
     conversationEntity.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload
@@ -259,11 +264,13 @@ export class ConversationMapper {
     return remoteConversations.map(
       (remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
         const conversationId = remoteConversationData.id;
+        const conversationDomain = remoteConversationData.qualified_id?.domain;
         const newLocalConversation = {id: conversationId} as ConversationDatabaseData;
         const localConversationData: ConversationDatabaseData =
-          localConversations.find(({id}) => id === conversationId) || newLocalConversation;
+          localConversations.find(({domain, id}) => id === conversationId && domain == conversationDomain) ||
+          newLocalConversation;
 
-        const {access, access_role, creator, members, message_timer, receipt_mode, name, team, type} =
+        const {access, access_role, creator, members, message_timer, qualified_id, receipt_mode, name, team, type} =
           remoteConversationData;
         const {others: othersStates, self: selfState} = members;
 
@@ -271,6 +278,7 @@ export class ConversationMapper {
           accessModes: access,
           accessRole: access_role,
           creator,
+          domain: qualified_id?.domain,
           message_timer,
           name,
           receipt_mode,
@@ -279,6 +287,14 @@ export class ConversationMapper {
           team_id: team,
           type,
         };
+
+        const qualified_others = othersStates
+          ?.filter(other => !!other.qualified_id)
+          .map(({qualified_id}) => qualified_id);
+
+        if (qualified_others.length) {
+          updates.qualified_others = qualified_others;
+        }
 
         // Add roles for self
         if (selfState.conversation_role && !(selfState.id in updates.roles)) {

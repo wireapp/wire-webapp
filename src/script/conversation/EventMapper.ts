@@ -104,7 +104,7 @@ export class EventMapper {
    * @param conversationEntity Conversation entity the event belong to
    * @returns Resolves with the mapped message entity
    */
-  mapJsonEvent(event: EventRecord, conversationEntity: Conversation) {
+  mapJsonEvent<T>(event: EventRecord<T>, conversationEntity: Conversation) {
     return this._mapJsonEvent(event, conversationEntity).catch(error => {
       const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (isMessageNotFound) {
@@ -371,7 +371,6 @@ export class EventMapper {
    */
   private _mapEvent1to1Creation({data: eventData}: EventRecord) {
     const {has_service: hasService, userIds} = eventData;
-
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
@@ -630,7 +629,6 @@ export class EventMapper {
    */
   private _mapEventVerification({data: eventData}: EventRecord) {
     const messageEntity = new VerificationMessage();
-
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
     messageEntity.verificationMessageType(eventData.type);
@@ -872,6 +870,7 @@ export class EventMapper {
   }
 }
 
+// TODO: Method is probably being used for data from backend & database. If yes, it should be split up (Single-responsibility principle).
 function addMetadata<T extends Message>(entity: T, event: EventRecord): T {
   const {data: eventData, read_receipts} = event;
   if (eventData) {

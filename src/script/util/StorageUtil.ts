@@ -20,6 +20,7 @@
 import {amplify} from 'amplify';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {Config} from '../Config';
 
 export function loadValue<T>(key: string): T | undefined {
   return amplify.store(key);
@@ -32,4 +33,28 @@ export function resetStoreValue(key: string): void {
 export function storeValue(key: string, value: any, secondsToExpire?: number): void {
   const config = secondsToExpire ? {expires: secondsToExpire * TIME_IN_MILLIS.SECOND} : undefined;
   return amplify.store(key, value, config);
+}
+
+/**
+ * Construct the primary key to store clients in database.
+ *
+ * @param userId User ID from the owner of the client
+ * @param clientId ID of the client
+ * @param domain Domain of the remote participant (only available in federation-aware webapps)
+ */
+export function constructClientPrimaryKey(domain: string | null, userId: string, clientId: string): string {
+  const userPrimaryKey = constructUserPrimaryKey(domain, userId);
+  return `${userPrimaryKey}@${clientId}`;
+}
+
+export function constructUserPrimaryKey(domain: string | null, userId: string): string {
+  /**
+   * For backward compatibility: We store clients with participants from our own domain without a domain in the session ID (legacy session ID format).
+   * All other clients (from users on a different domain/remote backends) will be saved with a domain in their primary key.
+   */
+  if (Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN !== domain) {
+    return domain ? `${domain}@${userId}` : userId;
+  }
+
+  return userId;
 }

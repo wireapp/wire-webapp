@@ -179,9 +179,9 @@ describe('ConversationRepository', () => {
         return Promise.reject(missingClientsError);
       });
 
-      spyOn(testFactory.client_service, 'getClientsByUserIds').and.returnValue(
-        Promise.resolve({
-          none: {
+      spyOn(testFactory.client_service, 'getClientsByUserId').and.returnValue(
+        Promise.resolve([
+          {
             [eventJson.id]: [
               {
                 class: ClientClassification.DESKTOP,
@@ -197,7 +197,7 @@ describe('ConversationRepository', () => {
               },
             ],
           },
-        }),
+        ]),
       );
 
       const injectLegalHoldMessageSpy = spyOn(testFactory.conversation_repository, 'injectLegalHoldMessage');
@@ -544,7 +544,12 @@ describe('ConversationRepository', () => {
       return testFactory.conversation_repository.handleConversationEvent(event).then(() => {
         expect(testFactory.conversation_repository.addMissingMember).toHaveBeenCalledWith(
           conversationEntity,
-          [event.from],
+          [
+            {
+              domain: null,
+              id: event.from,
+            },
+          ],
           new Date(event.time).getTime() - 1,
         );
       });
@@ -1116,7 +1121,7 @@ describe('ConversationRepository', () => {
       john = new User(entities.user.john_doe.id);
       john.name('John');
 
-      const johns_computer = new ClientEntity();
+      const johns_computer = new ClientEntity(false, null);
       johns_computer.id = '83ad5d3c31d3c76b';
       johns_computer.class = 'tabconst';
       john.devices.push(johns_computer);
@@ -1124,11 +1129,11 @@ describe('ConversationRepository', () => {
       lara = new User();
       lara.name('Lara');
 
-      const bobs_computer = new ClientEntity();
+      const bobs_computer = new ClientEntity(false, null);
       bobs_computer.id = '74606e4c02b2c7f9';
       bobs_computer.class = 'desktop';
 
-      const bobs_phone = new ClientEntity();
+      const bobs_phone = new ClientEntity(false, null);
       bobs_phone.id = '8f63631e129ed19d';
       bobs_phone.class = 'phone';
 

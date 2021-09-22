@@ -196,7 +196,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const removeUserFromConversation: MenuItem = isNotMe &&
     conversation &&
     !conversation.removed_from_conversation() &&
-    conversation.participating_user_ids().some(id => user.id === id) &&
+    conversation.participating_user_ids().some(userId => user.id === userId.id && user.domain == userId.domain) &&
     conversationRoleRepository.canRemoveParticipants(conversation) && {
       click: async () => {
         await actionsViewModel.removeFromConversation(conversation, user);

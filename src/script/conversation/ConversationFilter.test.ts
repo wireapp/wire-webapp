@@ -33,6 +33,7 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
+        qualified_others: undefined,
         receipt_mode: null,
         roles: {},
         status: 0,
@@ -76,6 +77,7 @@ describe('ConversationFilter', () => {
         muted_timestamp: 0,
         name: 'Florian@Staging11',
         others: ['71e25be1-5433-4647-964d-03a5d9e7c970'],
+        qualified_others: undefined,
         receipt_mode: null,
         roles: {
           '077f0600-4ee6-4b9c-84e6-2795d6cbef0a': 'wire_admin',

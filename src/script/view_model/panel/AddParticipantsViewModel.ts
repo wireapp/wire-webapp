@@ -134,7 +134,9 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
       }
 
       return userEntities.filter(userEntity => {
-        return !activeConversation.participating_user_ids().find(id => userEntity.id === id);
+        return !activeConversation
+          .participating_user_ids()
+          .find(userId => userEntity.id === userId.id && userEntity.domain == userId.domain);
       });
     });
 
