@@ -35,7 +35,7 @@ const filterStyledLabelProps = (props: StyledLabelProps) => filterProps(props, [
 
 const StyledLabel = (props: StyledLabelProps) => {
   const checkSvg =
-    '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>';
+    '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="10" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>';
   return (
     <label
       css={theme => ({
@@ -48,7 +48,7 @@ const StyledLabel = (props: StyledLabelProps) => {
         '&::before': {
           background: COLOR.WHITE,
           border: props.markInvalid ? `1px solid ${COLOR.RED}` : `1px solid ${COLOR.GRAY}`,
-          borderRadius: '4px',
+          borderRadius: '1px',
           boxSizing: 'border-box',
           content: '""',
           display: 'inline-block',

@@ -25,7 +25,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="12" height="10" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
@@ -35,7 +35,7 @@ exports[`"Checkbox" renders (dark theme) 1`] = `
 .emotion-1::before {
   background: #fff;
   border: 1px solid #696c6e;
-  border-radius: 4px;
+  border-radius: 1px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
@@ -221,7 +221,7 @@ exports[`"Checkbox" renders 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="12" height="10" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
@@ -231,7 +231,7 @@ exports[`"Checkbox" renders 1`] = `
 .emotion-1::before {
   background: #fff;
   border: 1px solid #696c6e;
-  border-radius: 4px;
+  border-radius: 1px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
@@ -368,7 +368,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="12" height="10" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
@@ -378,7 +378,7 @@ exports[`"Checkbox" renders as invalid 1`] = `
 .emotion-1::before {
   background: #fff;
   border: 1px solid #e02020;
-  border-radius: 4px;
+  border-radius: 1px;
   box-sizing: border-box;
   content: "";
   display: inline-block;
@@ -515,7 +515,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 }
 
 .wireinput:checked + .emotion-1::before {
-  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="8" height="6" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
+  background: #0772de url('data:image/svg+xml; utf8, <svg xmlns="http://www.w3.org/2000/svg" width="12" height="10" viewBox="0 0 8 6"><path fill="white" d="M2.8 6L8 .7 7.3 0 2.8 4.6.7 2.4l-.7.7z"/></svg>') no-repeat center;
 }
 
 .wireinput:focus + .emotion-1::before {
@@ -525,7 +525,7 @@ exports[`"Checkbox" renders disabled 1`] = `
 .emotion-1::before {
   background: #fff;
   border: 1px solid #696c6e;
-  border-radius: 4px;
+  border-radius: 1px;
   box-sizing: border-box;
   content: "";
   display: inline-block;

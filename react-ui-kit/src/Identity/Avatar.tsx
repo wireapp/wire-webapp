@@ -21,7 +21,6 @@
 import {CSSObject, jsx} from '@emotion/core';
 import {useEffect, useState} from 'react';
 
-import {ArrayUtil} from '@wireapp/commons';
 import {IsInViewport, IsInViewportProps} from '../Misc/';
 import {filterProps} from '../util';
 import {COLOR} from './colors';
@@ -94,7 +93,7 @@ export const Avatar = (props: AvatarProps) => {
   const getInitials = (name: string = '') =>
     name
       .split(' ')
-      .filter(ArrayUtil.filterFalsy)
+      .filter(Boolean)
       .map(([initial]) => initial.toUpperCase())
       .join('')
       .substring(0, isAvatarGridItem ? 1 : 2);
