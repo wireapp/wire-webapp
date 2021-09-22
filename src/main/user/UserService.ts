@@ -93,6 +93,6 @@ export class UserService {
     });
 
     // Broadcast availability status to your team members & external 1:1 connections
-    return this.broadcastService.broadcastGenericMessage(genericMessage, allPreKeyBundles, sendAsProtobuf);
+    await this.broadcastService.broadcastGenericMessage(genericMessage, allPreKeyBundles, sendAsProtobuf);
   }
 }
