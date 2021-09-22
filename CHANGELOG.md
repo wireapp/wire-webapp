@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.54.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.53.0...@wireapp/react-ui-kit@7.54.0) (2021-09-22)
+
+
+### Features
+
+* **react-ui-kit:** Adjust checkbox styling ([#4136](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4136)) ([71694d1](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/71694d1762a52777407b85370ae575d5456edf31))
+
+
+
+
+
 # [7.53.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.52.11...@wireapp/react-ui-kit@7.53.0) (2021-09-09)
 
 
