@@ -1311,7 +1311,7 @@ export class CallingRepository {
 
   private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
     const activeCall = this.callState.activeCalls()[0];
-    if (activeCall) {
+    if (activeCall && !Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
       activeCall.isCbrEnabled(!!enabled);
     }
   };
