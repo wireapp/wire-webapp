@@ -53,7 +53,6 @@ export interface CallActions {
   changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
-  setActiveCallViewTab: (tab: string) => void;
   startAudio: (conversationEntity: Conversation) => void;
   startVideo: (conversationEntity: Conversation) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
