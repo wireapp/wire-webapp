@@ -218,7 +218,7 @@ export class ConversationService {
     asset: EncryptedAsset,
     preKeyBundles: UserPreKeyBundleMap,
     sendAsProtobuf?: boolean,
-  ): Promise<ClientMismatch | void> {
+  ): Promise<ClientMismatch | undefined> {
     if (preKeyBundles.none) {
       const {cipherText, keyBytes, sha256} = asset;
       const messageId = MessageBuilder.createId();
@@ -258,6 +258,7 @@ export class ConversationService {
 
       // todo: add federated sending here
     }
+    return undefined;
   }
 
   private async sendFederatedGenericMessage(
@@ -288,7 +289,7 @@ export class ConversationService {
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
-  ): Promise<ClientMismatch | MessageSendingStatus | void> {
+  ): Promise<ClientMismatch | MessageSendingStatus | undefined> {
     if (conversationDomain) {
       if (isStringArray(userIds) || isUserClients(userIds)) {
         throw new Error('Invalid userIds option for sending');
