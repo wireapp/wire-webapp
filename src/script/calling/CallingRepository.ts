@@ -173,6 +173,17 @@ export class CallingRepository {
     this.subscribeToEvents();
 
     this.onChooseScreen = (deviceId: string) => {};
+
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+      if (!call) {
+        return;
+      }
+      const isSpeakersViewActive = this.callState.isSpeakersViewActive();
+      if (isSpeakersViewActive) {
+        this.requestVideoStreams(call.conversationId, call.activeSpeakers());
+      }
+    });
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
@@ -755,13 +766,25 @@ export class CallingRepository {
   }
 
   changeCallPage(newPage: number, call: Call): void {
-    const nextPageParticipants = call.pages()[newPage];
-    const payload = {
-      clients: nextPageParticipants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
-      convid: call.conversationId,
-    };
-    this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
     call.currentPage(newPage);
+    this.requestCurrentPageVideoStreams();
+  }
+
+  requestCurrentPageVideoStreams(): void {
+    const call = this.callState.joinedCall();
+    if (!call) {
+      return;
+    }
+    const currentPageParticipants = call.pages()[call.currentPage()];
+    this.requestVideoStreams(call.conversationId, currentPageParticipants);
+  }
+
+  requestVideoStreams(conversationId: string, participants: Participant[]) {
+    const payload = {
+      clients: participants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      convid: conversationId,
+    };
+    this.wCall.requestVideoStreams(this.wUser, conversationId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
   readonly leaveCall = (conversationId: ConversationId): void => {
