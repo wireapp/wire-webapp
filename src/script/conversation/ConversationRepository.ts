@@ -120,6 +120,7 @@ import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -2387,23 +2388,25 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private onMemberUpdate(conversationEntity: Conversation, eventJson: Partial<ConversationMemberUpdateEvent>) {
-    const {conversation: conversationId, data: eventData, from} = eventJson;
+    const {qualified_conversation: conversationId, data: eventData, from} = eventJson;
 
     const isConversationRoleUpdate = !!eventData.conversation_role;
     if (isConversationRoleUpdate) {
-      const {target: userId, conversation_role} = eventData;
-      const conversation = this.conversationState.conversations().find(({id}) => id === conversationId);
+      const {qualified_target: userId, conversation_role} = eventData;
+      const conversation = this.conversationState
+        .conversations()
+        .find(conversation => matchQualifiedIds(conversation, conversationId));
       if (conversation) {
         const roles = conversation.roles();
-        roles[userId] = conversation_role;
+        roles[userId.id] = conversation_role;
         conversation.roles(roles);
       }
       return;
     }
 
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
-    const inSelfConversation =
-      !this.conversationState.self_conversation() || conversationId === this.conversationState.self_conversation().id;
+    const selfConversation = this.conversationState.self_conversation();
+    const inSelfConversation = selfConversation && matchQualifiedIds(selfConversation, conversationId);
     if (!inSelfConversation && conversationId && !isBackendEvent) {
       throw new ConversationError(
         ConversationError.TYPE.WRONG_CONVERSATION,
