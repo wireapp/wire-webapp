@@ -17,6 +17,8 @@
  *
  */
 
+import {QualifiedId} from '../../user';
+
 export enum MemberLeaveReason {
   LEGAL_HOLD_POLICY_CONFLICT = 'legalhold-policy-conflict',
 }
@@ -26,6 +28,7 @@ export enum MemberLeaveReason {
  * In case Legalhold is not supported a reason is set.
  */
 export interface ConversationMemberLeaveData {
+  qualified_user_ids: QualifiedId[];
   user_ids: string[];
   reason?: MemberLeaveReason;
 }
