@@ -110,7 +110,7 @@ import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicate
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 
-type ConversationEvent = {conversation: string; id: string};
+type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
