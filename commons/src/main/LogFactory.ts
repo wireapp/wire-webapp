@@ -17,7 +17,7 @@
  *
  */
 
-import ansiRegex = require('ansi-regex');
+import ansiRegex from 'ansi-regex';
 import * as fs from 'fs-extra';
 import logdown from 'logdown';
 import * as os from 'os';

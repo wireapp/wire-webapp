@@ -74,5 +74,18 @@ describe('LogFactory', () => {
       const result = await fs.readFile(logFile, 'utf-8');
       expect(result).toBe(`${logMessage1}${os.EOL}${logMessage2}${os.EOL}`);
     });
+
+    it('strips ANSI escape codes', async () => {
+      const logFile = path.join(logDir, 'test.log');
+
+      const logMessage1 = 'This is a first test';
+      const logMessage2 = 'This is a second test';
+      const logAnsiMessage2 = `\u001B[4m${logMessage2}\u001B[0m`;
+
+      await LogFactory.writeMessage(logMessage1, logFile);
+      await LogFactory.writeMessage(logAnsiMessage2, logFile);
+      const result = await fs.readFile(logFile, 'utf-8');
+      expect(result).toBe(`${logMessage1}${os.EOL}${logMessage2}${os.EOL}`);
+    });
   });
 });
