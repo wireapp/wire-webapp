@@ -119,7 +119,7 @@ import {ConversationState} from './ConversationState';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
-import {ConversationMemberUpdateEvent} from '../../../../wire-web-packages/node_modules/@wireapp/api-client/src/event';
+import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
