@@ -34,7 +34,7 @@ import {Conversation} from '../../entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../../media/MediaStreamHandler';
 import {Multitasking} from '../../notification/NotificationRepository';
-import {VideoSpeakersTab} from '../../view_model/CallingViewModel';
+import {CallViewTab} from '../../view_model/CallingViewModel';
 import ChooseScreen, {Screen} from './ChooseScreen';
 import FullscreenVideoCall from './FullscreenVideoCall';
 
@@ -56,10 +56,10 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
-  const {isMuted, videoSpeakersActiveTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
+  const {isMuted, activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
     useKoSubscribableChildren(callState, [
       'isMuted',
-      'videoSpeakersActiveTab',
+      'activeCallViewTab',
       'joinedCall',
       'selectableScreens',
       'selectableWindows',
@@ -96,7 +96,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const leave = (call: Call) => {
     callingRepository.leaveCall(call.conversationId);
-    callState.videoSpeakersActiveTab(VideoSpeakersTab.ALL);
+    callState.activeCallViewTab(CallViewTab.ALL);
     call.maximizedParticipant(null);
   };
 
@@ -104,8 +104,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     call.maximizedParticipant(participant);
   };
 
-  const setVideoSpeakersActiveTab = (tab: string) => {
-    callState.videoSpeakersActiveTab(tab);
+  const setActiveCallViewTab = (tab: string) => {
+    callState.activeCallViewTab(tab);
+    if (tab === CallViewTab.ALL) {
+      callingRepository.requestCurrentPageVideoStreams();
+    }
   };
 
   const switchCameraInput = (call: Call, deviceId: string) => {
@@ -164,7 +167,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           key={joinedCall.conversationId}
           videoGrid={videoGrid}
           call={joinedCall}
-          videoSpeakersActiveTab={videoSpeakersActiveTab}
+          activeCallViewTab={activeCallViewTab}
           conversation={getConversationById(joinedCall.conversationId)}
           multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
@@ -174,7 +177,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           isChoosingScreen={isChoosingScreen}
           switchCameraInput={switchCameraInput}
           setMaximizedParticipant={setMaximizedParticipant}
-          setVideoSpeakersActiveTab={setVideoSpeakersActiveTab}
+          setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}
           toggleCamera={toggleCamera}
           toggleScreenshare={toggleScreenshare}

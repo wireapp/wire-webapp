@@ -21,7 +21,7 @@ import {singleton} from 'tsyringe';
 import ko from 'knockout';
 import {Call} from './Call';
 import {STATE as CALL_STATE} from '@wireapp/avs';
-import {VideoSpeakersTab} from '../view_model/CallingViewModel';
+import {CallViewTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
 
@@ -32,10 +32,11 @@ export class CallState {
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
   public readonly acceptedVersionWarnings: ko.ObservableArray<string>;
   public readonly cbrEncoding: ko.Observable<number>;
-  public readonly videoSpeakersActiveTab: ko.Observable<string>;
+  public readonly activeCallViewTab: ko.Observable<string>;
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
   readonly isChoosingScreen: ko.PureComputed<boolean>;
+  readonly isSpeakersViewActive: ko.PureComputed<boolean>;
 
   constructor() {
     this.activeCalls = ko.observableArray();
@@ -49,7 +50,8 @@ export class CallState {
       this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
     this.cbrEncoding = ko.observable(Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0);
-    this.videoSpeakersActiveTab = ko.observable(VideoSpeakersTab.ALL);
+    this.activeCallViewTab = ko.observable(CallViewTab.ALL);
+    this.isSpeakersViewActive = ko.pureComputed(() => this.activeCallViewTab() === CallViewTab.SPEAKERS);
 
     this.selectableScreens = ko.observable([]);
     this.selectableWindows = ko.observable([]);

@@ -43,7 +43,7 @@ import {createNavigate} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
 import {CallState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
-import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
+import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 
 export interface CallingCellProps {
   call: Call;
@@ -94,7 +94,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
-  const {isMuted, videoSpeakersActiveTab} = useKoSubscribableChildren(callState, ['isMuted', 'videoSpeakersActiveTab']);
+  const {isMuted, activeCallViewTab} = useKoSubscribableChildren(callState, ['isMuted', 'activeCallViewTab']);
 
   const isStillOngoing = reason === CALL_REASON.STILL_ONGOING;
   const isDeclined = [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
@@ -209,9 +209,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             >
               <GroupVideoGrid
                 grid={
-                  videoSpeakersActiveTab === VideoSpeakersTab.ALL
-                    ? videoGrid
-                    : {grid: call.getActiveSpeakers(), thumbnail: null}
+                  activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: call.getActiveSpeakers(), thumbnail: null}
                 }
                 minimized
                 maximizedParticipant={maximizedParticipant}
