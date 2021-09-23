@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.7.1...@wireapp/api-client@13.8.0) (2021-09-23)
+
+
+### Features
+
+* **api-client:** Improve event types ([#4138](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4138)) ([89fde4c](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/89fde4ca1d4edb5f04f4d1200a7ad6de76009a05))
+
+
+
+
+
 ## [13.7.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.7.0...@wireapp/api-client@13.7.1) (2021-09-22)
 
 **Note:** Version bump only for package @wireapp/api-client
