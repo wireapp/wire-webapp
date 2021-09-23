@@ -35,7 +35,7 @@ import useHideElement from '../../hooks/useHideElement';
 import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {t} from '../../util/LocalizerUtil';
-import {VideoSpeakersTab, VideoSpeakersTabs} from '../../view_model/CallingViewModel';
+import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
 import ButtonGroup from './ButtonGroup';
 import DeviceToggleButton from './DeviceToggleButton';
 import Duration from './Duration';
@@ -43,6 +43,7 @@ import GroupVideoGrid from './GroupVideoGrid';
 import Pagination from './Pagination';
 
 export interface FullscreenVideoCallProps {
+  activeCallViewTab: string;
   call: Call;
   canShareScreen: boolean;
   changePage: (newPage: number, call: Call) => void;
@@ -52,16 +53,15 @@ export interface FullscreenVideoCallProps {
   leave: (call: Call) => void;
   maximizedParticipant: Participant;
   mediaDevicesHandler: MediaDevicesHandler;
-  multitasking: Multitasking;
   setMaximizedParticipant: (call: Call, participant: Participant) => void;
-  setVideoSpeakersActiveTab: (tab: string) => void;
+  setActiveCallViewTab: (tab: string) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
   teamState?: TeamState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
   videoGrid: Grid;
-  videoSpeakersActiveTab: string;
+  multitasking: Multitasking;
 }
 
 const FullscreenVideoCallConfig = {
@@ -113,10 +113,10 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   multitasking,
   videoGrid,
   maximizedParticipant,
-  videoSpeakersActiveTab,
+  activeCallViewTab,
   switchCameraInput,
   setMaximizedParticipant,
-  setVideoSpeakersActiveTab,
+  setActiveCallViewTab,
   toggleMute,
   toggleCamera,
   toggleScreenshare,
@@ -174,7 +174,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           maximizedParticipant={maximizedParticipant}
           selfParticipant={selfParticipant}
           grid={
-            videoSpeakersActiveTab === VideoSpeakersTab.SPEAKERS
+            activeCallViewTab === CallViewTab.SPEAKERS
               ? {
                   grid: activeSpeakers,
                   thumbnail: null,
@@ -198,12 +198,12 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
         <div id="video-controls" className="video-controls hide-controls-hidden">
           {participants.length > 2 && (
             <ButtonGroup
-              items={Object.values(VideoSpeakersTabs)}
+              items={Object.values(CallViewTabs)}
               onChangeItem={item => {
-                setVideoSpeakersActiveTab(item);
+                setActiveCallViewTab(item);
                 setMaximizedParticipant(call, null);
               }}
-              currentItem={videoSpeakersActiveTab}
+              currentItem={activeCallViewTab}
               style={{margin: '0 auto', marginBottom: 32, width: 'fit-content'}}
               textSubstitute={participants.length.toString()}
             />
@@ -296,7 +296,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
           </div>
         </div>
       )}
-      {!maximizedParticipant && videoSpeakersActiveTab === VideoSpeakersTab.ALL && totalPages > 1 && (
+      {!maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1 && (
         <>
           <div
             className="hide-controls-hidden"

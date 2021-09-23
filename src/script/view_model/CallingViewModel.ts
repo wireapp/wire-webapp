@@ -52,7 +52,6 @@ export interface CallActions {
   changePage: (newPage: number, call: Call) => void;
   leave: (call: Call) => void;
   reject: (call: Call) => void;
-  setVideoSpeakersActiveTab: (tab: string) => void;
   startAudio: (conversationEntity: Conversation) => void;
   startVideo: (conversationEntity: Conversation) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
@@ -62,14 +61,14 @@ export interface CallActions {
   toggleScreenshare: (call: Call) => void;
 }
 
-export enum VideoSpeakersTab {
+export enum CallViewTab {
   ALL = 'all',
   SPEAKERS = 'speakers',
 }
 
-export const VideoSpeakersTabs: ButtonGroupTab[] = [
-  {getText: () => t('videoSpeakersTabSpeakers'), value: VideoSpeakersTab.SPEAKERS},
-  {getText: substitute => t('videoSpeakersTabAll', substitute), value: VideoSpeakersTab.ALL},
+export const CallViewTabs: ButtonGroupTab[] = [
+  {getText: () => t('videoSpeakersTabSpeakers'), value: CallViewTab.SPEAKERS},
+  {getText: substitute => t('videoSpeakersTabAll', substitute), value: CallViewTab.ALL},
 ];
 
 declare global {
@@ -82,7 +81,7 @@ export class CallingViewModel {
   readonly activeCalls: ko.PureComputed<Call[]>;
   readonly callActions: CallActions;
   readonly isSelfVerified: ko.Computed<boolean>;
-  readonly videoSpeakersActiveTab: ko.Observable<string>;
+  readonly activeCallViewTab: ko.Observable<string>;
 
   constructor(
     readonly callingRepository: CallingRepository,
@@ -174,13 +173,10 @@ export class CallingViewModel {
       },
       leave: (call: Call) => {
         this.callingRepository.leaveCall(call.conversationId);
-        callState.videoSpeakersActiveTab(VideoSpeakersTab.ALL);
+        callState.activeCallViewTab(CallViewTab.ALL);
       },
       reject: (call: Call) => {
         this.callingRepository.rejectCall(call.conversationId);
-      },
-      setVideoSpeakersActiveTab: (tab: string) => {
-        callState.videoSpeakersActiveTab(tab);
       },
       startAudio: (conversationEntity: Conversation): void => {
         if (conversationEntity.isGroup() && !this.teamState.isConferenceCallingEnabled()) {
