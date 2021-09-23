@@ -87,6 +87,7 @@ export interface BaseConversationEvent {
   qualified_conversation?: QualifiedId;
   qualified_from?: QualifiedId;
   time: string;
+  server_time?: string;
   type: CONVERSATION_EVENT;
 }
 

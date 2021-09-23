@@ -962,7 +962,7 @@ export class ConversationAPI {
    */
   public async putMembershipProperties(
     conversationId: string,
-    memberData: ConversationMemberUpdateData,
+    memberData: Partial<ConversationMemberUpdateData>,
   ): Promise<void> {
     const config: AxiosRequestConfig = {
       data: memberData,

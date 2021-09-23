@@ -19,8 +19,13 @@
 
 import type {MutedStatus} from '../MutedStatus';
 import type {DefaultConversationRoleName} from '../ConversationRole';
+import {QualifiedId} from '../../user';
 
 export interface ConversationMemberUpdateData extends Partial<ConversationOtherMemberUpdateData> {
+  /** The userId concerned by this update */
+  target?: string;
+  qualified_target?: QualifiedId;
+  conversation_role?: string;
   /** Whether the conversation with this user is hidden */
   hidden?: boolean;
   /** A reference point for (un)hiding */
