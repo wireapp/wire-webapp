@@ -1792,12 +1792,12 @@ export class ConversationRepository {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
-    const {conversation, data: eventData, type} = eventJson;
-    const conversationId = eventData?.conversationId || conversation;
+    const {data: eventData, type} = eventJson;
+    const conversationId: QualifiedId = eventData?.qualified_conversation || eventJson.qualified_conversation;
     this.logger.info(`Handling event '${type}' in conversation '${conversationId}' (Source: ${eventSource})`);
 
-    const inSelfConversation =
-      conversationId === this.conversationState.self_conversation() && this.conversationState.self_conversation().id;
+    const selfConversation = this.conversationState.self_conversation();
+    const inSelfConversation = selfConversation && matchQualifiedIds(conversationId, selfConversation);
     if (inSelfConversation) {
       const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
 
@@ -1813,7 +1813,9 @@ export class ConversationRepository {
     }
 
     const isConversationCreate = type === CONVERSATION_EVENT.CREATE;
-    const onEventPromise = isConversationCreate ? Promise.resolve(null) : this.getConversationById(conversationId);
+    const onEventPromise = isConversationCreate
+      ? Promise.resolve(null)
+      : this.getConversationById(conversationId.id, conversationId.domain);
     let previouslyArchived = false;
 
     return onEventPromise
