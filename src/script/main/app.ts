@@ -93,7 +93,6 @@ import {showInitialModal} from '../user/AvailabilityModal';
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
@@ -128,6 +127,7 @@ import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
 import CallingContainer from 'Components/calling/CallingOverlayContainer';
 import {TeamError} from '../error/TeamError';
+import Warnings from '../view_model/WarningsContainer';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -855,7 +855,7 @@ class App {
    * Notify about found update
    */
   readonly update = (): void => {
-    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
+    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.LIFECYCLE_UPDATE);
   };
 
   /**
