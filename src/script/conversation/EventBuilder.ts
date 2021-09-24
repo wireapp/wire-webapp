@@ -19,6 +19,7 @@
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 
 import {createRandomUuid} from 'Util/util';
@@ -31,6 +32,11 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {AssetRecord, EventRecord} from '../storage';
+
+export interface QualifiedIdOptional {
+  domain: string | null;
+  id: string;
+}
 
 export interface BaseEvent {
   conversation: string;
@@ -71,19 +77,25 @@ export interface VoiceChannelActivateEvent extends BaseEvent {
   protocol_version: number;
   type: string;
 }
-
-export type AllVerifiedEvent = ConversationEvent<{type: VerificationMessageType}>;
+export type AllVerifiedEventData = {type: VerificationMessageType};
+export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData>;
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType};
-export type DegradedMessageEvent = ConversationEvent<{type: VerificationMessageType; userIds: string[]}>;
+export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedIdOptional[]};
+export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData>;
 export type DeleteEvent = ConversationEvent<{deleted_time: number}>;
-export type GroupCreationEvent = ConversationEvent<{allTeamMembers: boolean; name: string; userIds: string[]}>;
+export type GroupCreationEventData = {
+  allTeamMembers: boolean;
+  name: string;
+  userIds: QualifiedIdOptional[];
+};
+export type GroupCreationEvent = ConversationEvent<GroupCreationEventData>;
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}>;
 export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;
 export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {status: StatusType};
 export type MissedEvent = BaseEvent & {id: string; type: string};
-export type OneToOneCreationEvent = ConversationEvent<{userIds: string[]}>;
+export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedIdOptional[]}>;
 export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}>;
 export type VoiceChannelDeactivateEvent = ConversationEvent<{duration: number; reason: AVS_REASON}> & {
   protocol_version: number;
@@ -166,7 +178,7 @@ export const EventBuilder = {
 
   buildDegraded(
     conversationEntity: Conversation,
-    userIds: string[],
+    userIds: QualifiedIdOptional[],
     type: VerificationMessageType,
     currentTimestamp: number,
   ): DegradedMessageEvent {
@@ -224,12 +236,13 @@ export const EventBuilder = {
   ): GroupCreationEvent {
     const {creator: creatorId, id} = conversationEntity;
     const selfUserId = conversationEntity.selfUser().id;
+    const selfUserDomain = conversationEntity.selfUser().domain;
     const isoDate = new Date(timestamp || 0).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUserId || isTemporaryGuest;
     if (!createdBySelf) {
-      userIds.push(selfUserId);
+      userIds.push({domain: selfUserDomain, id: selfUserId});
     }
 
     return {
@@ -281,8 +294,8 @@ export const EventBuilder = {
 
   buildMemberJoin(
     conversationEntity: Conversation,
-    sender: string,
-    joiningUserIds: string[],
+    sender: QualifiedIdOptional,
+    joiningUserIds: QualifiedIdOptional[],
     timestamp?: number,
   ): MemberJoinEvent {
     if (!timestamp) {
@@ -293,9 +306,9 @@ export const EventBuilder = {
     return {
       conversation: conversationEntity.id,
       data: {
-        user_ids: joiningUserIds,
+        user_ids: joiningUserIds.map(({id}) => id),
       },
-      from: sender,
+      from: sender.id,
       time: isoDate,
       type: CONVERSATION_EVENT.MEMBER_JOIN,
     };
@@ -303,16 +316,16 @@ export const EventBuilder = {
 
   buildMemberLeave(
     conversationEntity: Conversation,
-    userId: string,
+    userId: QualifiedId,
     removedBySelfUser: boolean,
     currentTimestamp: number,
   ): MemberLeaveEvent {
     return {
       conversation: conversationEntity.id,
       data: {
-        user_ids: [userId],
+        user_ids: [userId.id],
       },
-      from: removedBySelfUser ? conversationEntity.selfUser().id : userId,
+      from: removedBySelfUser ? conversationEntity.selfUser().id : userId.id,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: CONVERSATION_EVENT.MEMBER_LEAVE,
     };

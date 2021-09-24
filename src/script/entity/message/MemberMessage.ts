@@ -19,19 +19,18 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
-
 import ko from 'knockout';
-
 import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
 import {getUserName} from 'Util/SanitizationUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
-
 import {ClientEvent} from '../../event/Client';
 import {SuperType} from '../../message/SuperType';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {User} from '../User';
 import {SystemMessage} from './SystemMessage';
 import {Config} from '../../Config';
+import {QualifiedIdOptional} from '../../conversation/EventBuilder';
+import {isQualifiedId} from 'Util/TypePredicateUtil';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
@@ -50,7 +49,7 @@ export class MemberMessage extends SystemMessage {
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
   public showServicesWarning: boolean;
   public readonly userEntities: ko.ObservableArray<User>;
-  public readonly userIds: ko.ObservableArray<string>;
+  public readonly userIds: ko.ObservableArray<QualifiedIdOptional>;
   public memberMessageType: SystemMessageType;
   public reason: MemberLeaveReason;
 
@@ -87,7 +86,11 @@ export class MemberMessage extends SystemMessage {
 
     // Users joined the conversation without sender
     this.joinedUserEntities = ko.pureComputed(() => {
-      return this.userEntities().filter(userEntity => !this.user() || this.user().id !== userEntity.id);
+      return this.userEntities().filter(userEntity => {
+        const userHasDifferentId = this.user().id !== userEntity.id;
+        const userIsFromDifferentDomain = this.user().domain !== userEntity.domain;
+        return userHasDifferentId || userIsFromDifferentDomain;
+      });
     });
 
     this.joinedUserEntities.subscribe(joinedUserEntities => {
@@ -189,7 +192,7 @@ export class MemberMessage extends SystemMessage {
 
       switch (this.type) {
         case CONVERSATION_EVENT.MEMBER_JOIN: {
-          const senderJoined = this.otherUser().id === this.user().id;
+          const senderJoined = this.otherUser().id === this.user().id && this.otherUser().domain == this.user().domain;
           if (senderJoined) {
             return this.user().isMe
               ? t('conversationMemberJoinedSelfYou')
@@ -219,7 +222,7 @@ export class MemberMessage extends SystemMessage {
             return t('temporaryGuestLeaveMessage');
           }
 
-          const senderLeft = this.otherUser().id === this.user().id;
+          const senderLeft = this.otherUser().id === this.user().id && this.otherUser().domain == this.user().domain;
           if (senderLeft) {
             return this.user().isMe ? t('conversationMemberLeftYou') : t('conversationMemberLeft', name);
           }
@@ -341,8 +344,10 @@ export class MemberMessage extends SystemMessage {
     return this.isMemberLeave() || this.isTeamMemberLeave();
   }
 
-  isUserAffected(userId: string): boolean {
-    return this.userIds().includes(userId);
+  isUserAffected(userId: QualifiedIdOptional): boolean {
+    return !!this.userIds().find(user =>
+      isQualifiedId(user) ? user.id === userId.id && user.domain == userId.domain : userId.id === user,
+    );
   }
 
   guestCount(): number {

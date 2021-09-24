@@ -56,11 +56,11 @@ import {SuperType} from '../message/SuperType';
 import {SystemMessageType} from '../message/SystemMessageType';
 import type {PermissionRepository} from '../permission/PermissionRepository';
 import {ContentViewModel} from '../view_model/ContentViewModel';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
+import Warnings from '../view_model/WarningsContainer';
 
 export interface Multitasking {
   isMinimized: ko.Observable<boolean>;
@@ -748,12 +748,12 @@ export class NotificationRepository {
 
   // Request browser permission for notifications.
   private async requestPermission(): Promise<void> {
-    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.REQUEST_NOTIFICATION);
     // Note: The callback will be only triggered in Chrome.
     // If you ignore a permission request on Firefox, then the callback will not be triggered.
     if (window.Notification.requestPermission) {
       const permissionState = await window.Notification.requestPermission();
-      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.REQUEST_NOTIFICATION);
+      amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.REQUEST_NOTIFICATION);
       this.updatePermissionState(permissionState);
     }
   }

@@ -23,12 +23,14 @@ import type {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-clie
 
 import {Logger, getLogger} from 'Util/Logger';
 import {getDifference} from 'Util/ArrayUtil';
+import {isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 
 import type {ConversationRepository} from './ConversationRepository';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventInfoEntity} from './EventInfoEntity';
 import type {Conversation} from '../entity/Conversation';
+import {Config} from '../Config';
 
 export class ClientMismatchHandler {
   private readonly logger: Logger;
@@ -94,26 +96,40 @@ export class ClientMismatchHandler {
     const {genericMessage, timestamp} = eventInfoEntity;
 
     if (conversationEntity !== undefined) {
-      const knownUserIds = conversationEntity.participating_user_ids();
-      const unknownUserIds = getDifference(knownUserIds, missingUserIds);
+      const knownUsers = conversationEntity.participating_user_ids();
+      // TODO(Federation): This code does not consider federated environments / conversations as this function is deprecated
+      const unknownUsers = getDifference(
+        knownUsers.map(user => user.id),
+        missingUserIds,
+      ).map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || null, id}));
 
-      if (unknownUserIds.length > 0) {
-        this.conversationRepositoryProvider().addMissingMember(conversationEntity, unknownUserIds, timestamp - 1);
+      if (unknownUsers.length > 0) {
+        this.conversationRepositoryProvider().addMissingMember(conversationEntity, unknownUsers, timestamp - 1);
       }
     }
 
     const missingUserEntities = missingUserIds.map(missingUserId => this.userRepository.findUserById(missingUserId));
 
-    const qualifiedUsersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
-    await Promise.all(
-      Object.values(qualifiedUsersMap).map(userClientMap =>
-        Object.entries(userClientMap).map(([userId, clients]) => {
-          return Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)));
-        }),
-      ),
-    );
+    const usersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
+    if (isQualifiedUserClientEntityMap(usersMap)) {
+      await Promise.all(
+        Object.entries(usersMap).map(([domain, userClientsMap]) =>
+          Object.entries(userClientsMap).map(([userId, clients]) =>
+            Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, domain))),
+          ),
+        ),
+      );
+    } else {
+      await Promise.all(
+        Object.entries(usersMap).map(([userId, clients]) =>
+          Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null))),
+        ),
+      );
+    }
 
-    this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(missingUserIds);
+    this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(
+      missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || null, id})),
+    );
 
     if (payload) {
       return this.cryptographyRepository.encryptGenericMessage(recipients, genericMessage, payload);

@@ -6,6 +6,7 @@ import {
   CONVERSATION_ACCESS_ROLE,
   CONVERSATION_TYPE,
 } from '@wireapp/api-client/src/conversation';
+import type {QualifiedIdOptional} from '../../conversation/EventBuilder';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
@@ -30,6 +31,7 @@ export interface ConversationRecord {
   muted_timestamp: number;
   name: string;
   others: string[];
+  qualified_others: QualifiedIdOptional[];
   receipt_mode: RECEIPT_MODE | null;
   roles: {[userId: string]: DefaultConversationRoleName | string};
   status: ConversationStatus;

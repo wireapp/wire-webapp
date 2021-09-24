@@ -842,7 +842,7 @@ export class InputBarViewModel {
       return;
     }
 
-    this.messageRepository.sendFederatedMessage(messageText);
+    this.messageRepository.sendFederatedMessage(this.conversationEntity(), messageText);
     this.cancelMessageReply();
   };
 

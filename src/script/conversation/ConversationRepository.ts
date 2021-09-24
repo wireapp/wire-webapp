@@ -27,6 +27,7 @@ import {
   CONVERSATION_EVENT,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
+  ConversationMemberJoinEvent,
   ConversationCreateEvent,
 } from '@wireapp/api-client/src/event/';
 import {
@@ -40,6 +41,7 @@ import {
 import {container} from 'tsyringe';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
@@ -57,7 +59,7 @@ import {
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {EventBuilder} from '../conversation/EventBuilder';
+import {EventBuilder, GroupCreationEvent, QualifiedIdOptional} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import {ConversationMapper, ConversationDatabaseData} from './ConversationMapper';
@@ -443,7 +445,9 @@ export class ConversationRepository {
     const unknownConversations: ConversationRecord[] = [];
 
     conversationsDataArray.forEach(conversationData => {
-      const localEntity = this.conversationState.conversations().find(({id}) => id === conversationData.id);
+      const localEntity = this.conversationState
+        .conversations()
+        .find(({id, domain}) => id === conversationData.id && domain == conversationData.domain);
 
       if (localEntity) {
         const entity = ConversationMapper.updateSelfStatus(localEntity, conversationData as any, true);
@@ -535,7 +539,12 @@ export class ConversationRepository {
       const allTeamMembersParticipate = this.teamState.teamMembers().length
         ? this.teamState
             .teamMembers()
-            .every(teamMember => conversationEntity.participating_user_ids().includes(teamMember.id))
+            .every(
+              teamMember =>
+                !!conversationEntity
+                  .participating_user_ids()
+                  .find(user => user.id === teamMember.id && user.domain == teamMember.domain),
+            )
         : false;
 
       conversationEntity.withAllTeamMembers(allTeamMembersParticipate);
@@ -713,7 +722,6 @@ export class ConversationRepository {
   public async updateConversations(conversationEntities: Conversation[]): Promise<void> {
     const mapOfUserIds = conversationEntities.map(conversationEntity => conversationEntity.participating_user_ids());
     const userIds = flatten(mapOfUserIds);
-
     await this.userRepository.getUsersById(userIds);
     conversationEntities.forEach(conversationEntity => this.fetchUsersAndEvents(conversationEntity));
   }
@@ -728,7 +736,7 @@ export class ConversationRepository {
   private deleteConversationFromRepository(conversationId: string, domain: string | null) {
     this.conversationState.conversations.remove(conversation => {
       if (domain) {
-        return conversation.id === conversationId && conversation.domain === domain;
+        return conversation.id === conversationId && conversation.domain == domain;
       }
       return conversation.id === conversationId;
     });
@@ -1269,9 +1277,9 @@ export class ConversationRepository {
     }
   }
 
-  addMissingMember(conversationEntity: Conversation, userIds: string[], timestamp: number) {
-    const [sender] = userIds;
-    const event = EventBuilder.buildMemberJoin(conversationEntity, sender, userIds, timestamp);
+  addMissingMember(conversationEntity: Conversation, users: QualifiedIdOptional[], timestamp: number) {
+    const [sender] = users;
+    const event = EventBuilder.buildMemberJoin(conversationEntity, sender, users, timestamp);
     return this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.INJECTED);
   }
 
@@ -1354,7 +1362,7 @@ export class ConversationRepository {
     this._clearConversation(conversationEntity);
 
     if (leaveConversation) {
-      this.removeMember(conversationEntity, this.userState.self().id);
+      this.removeMember(conversationEntity, {domain: this.userState.self().domain, id: this.userState.self().id});
     }
 
     if (isActiveConversation) {
@@ -1373,16 +1381,16 @@ export class ConversationRepository {
    * Remove member from conversation.
    *
    * @param conversationEntity Conversation to remove member from
-   * @param userId ID of member to be removed from the conversation
+   * @param user ID of member to be removed from the conversation
    * @returns Resolves when member was removed from the conversation
    */
-  public async removeMember(conversationEntity: Conversation, userId: string) {
-    const response = await this.conversation_service.deleteMembers(conversationEntity.id, userId);
+  public async removeMember(conversationEntity: Conversation, user: QualifiedId) {
+    const response = await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
     const roles = conversationEntity.roles();
-    delete roles[userId];
+    delete roles[user.id];
     conversationEntity.roles(roles);
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const event = response || EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+    const event = response || EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
     this.eventRepository.injectEvent(event as EventRecord, EventRepository.SOURCE.BACKEND_RESPONSE);
     return event;
   }
@@ -1391,17 +1399,17 @@ export class ConversationRepository {
    * Remove service from conversation.
    *
    * @param conversationEntity Conversation to remove service from
-   * @param userId ID of service user to be removed from the conversation
+   * @param user ID of service user to be removed from the conversation
    * @returns Resolves when service was removed from the conversation
    */
-  public removeService(conversationEntity: Conversation, userId: string) {
-    return this.conversation_service.deleteBots(conversationEntity.id, userId).then((response: any) => {
+  public removeService(conversationEntity: Conversation, user: QualifiedId) {
+    return this.conversation_service.deleteBots(conversationEntity.id, user.id).then((response: any) => {
       // TODO: Can this even have a response? in the API Client it look like it always returns `void`
       const hasResponse = response?.event;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const event = hasResponse
         ? response.event
-        : EventBuilder.buildMemberLeave(conversationEntity, userId, true, currentTimestamp);
+        : EventBuilder.buildMemberLeave(conversationEntity, user, true, currentTimestamp);
 
       this.eventRepository.injectEvent(event, EventRepository.SOURCE.BACKEND_RESPONSE);
       return event;
@@ -1853,11 +1861,13 @@ export class ConversationRepository {
       return conversationEntity;
     }
 
-    const {from: sender, id, type, time} = eventJson;
+    const {from: senderId, id, type, time} = eventJson;
 
-    if (sender) {
-      const allParticipantIds = conversationEntity.participating_user_ids().concat(this.userState.self().id);
-      const isFromUnknownUser = !allParticipantIds.includes(sender);
+    if (senderId) {
+      const allParticipants = conversationEntity
+        .participating_user_ids()
+        .concat({domain: this.userState.self().domain, id: this.userState.self().id});
+      const isFromUnknownUser = allParticipants.every(participant => participant.id !== senderId);
 
       if (isFromUnknownUser) {
         const membersUpdateMessages = [
@@ -1867,18 +1877,20 @@ export class ConversationRepository {
         ];
         const isMembersUpdateEvent = membersUpdateMessages.includes(eventJson.type);
         if (isMembersUpdateEvent) {
-          const isFromUpdatedMember = eventJson.data.user_ids.includes(sender);
+          const isFromUpdatedMember = eventJson.data.user_ids?.includes(senderId);
           if (isFromUpdatedMember) {
             // we ignore leave/join events that are sent by the user actually leaving or joining
             return conversationEntity;
           }
         }
 
-        const message = `Received '${type}' event '${id}' from user '${sender}' unknown in '${conversationEntity.id}'`;
+        const message = `Received '${type}' event '${id}' from user '${senderId}' unknown in '${conversationEntity.id}'`;
         this.logger.warn(message, eventJson);
 
+        const qualifiedSender: QualifiedIdOptional = {domain: null, id: senderId};
+
         const timestamp = new Date(time).getTime() - 1;
-        return this.addMissingMember(conversationEntity, [sender], timestamp).then(() => conversationEntity);
+        return this.addMissingMember(conversationEntity, [qualifiedSender], timestamp).then(() => conversationEntity);
       }
     }
 
@@ -2191,10 +2203,13 @@ export class ConversationRepository {
     return undefined;
   }
 
-  private async onGroupCreation(conversationEntity: Conversation, eventJson: EventRecord) {
-    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson, conversationEntity);
+  private async onGroupCreation(conversationEntity: Conversation, eventJson: GroupCreationEvent) {
+    const messageEntity = await this.event_mapper.mapJsonEvent(eventJson as EventRecord, conversationEntity);
     const creatorId = conversationEntity.creator;
-    const createdByParticipant = !!conversationEntity.participating_user_ids().find(userId => userId === creatorId);
+    const creatorDomain = conversationEntity.domain;
+    const createdByParticipant = !!conversationEntity
+      .participating_user_ids()
+      .find(userId => userId.id === creatorId && userId.domain == creatorDomain);
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
@@ -2226,7 +2241,10 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-join' event
    * @returns Resolves when the event was handled
    */
-  private async onMemberJoin(conversationEntity: Conversation, eventJson: EventJson): Promise<void | EntityObject> {
+  private async onMemberJoin(
+    conversationEntity: Conversation,
+    eventJson: ConversationMemberJoinEvent,
+  ): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
     const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
@@ -2236,13 +2254,33 @@ export class ConversationRepository {
 
     const eventData = eventJson.data;
 
-    eventData.user_ids.forEach((userId: string) => {
-      const isSelfUser = userId === this.userState.self().id;
-      const isParticipatingUser = conversationEntity.participating_user_ids().includes(userId);
-      if (!isSelfUser && !isParticipatingUser) {
-        conversationEntity.participating_user_ids.push(userId);
-      }
-    });
+    if (eventData.users) {
+      eventData.users.forEach(otherMember => {
+        const isSelfUser =
+          otherMember.id === this.userState.self().id &&
+          otherMember.qualified_id?.domain == this.userState.self().domain;
+        const isParticipatingUser = !!conversationEntity
+          .participating_user_ids()
+          .find(
+            participatingUser =>
+              participatingUser.id === otherMember.id && participatingUser.domain == otherMember.qualified_id?.domain,
+          );
+        if (!isSelfUser && !isParticipatingUser) {
+          conversationEntity.participating_user_ids.push({
+            domain: otherMember.qualified_id?.domain || null,
+            id: otherMember.id,
+          });
+        }
+      });
+    } else {
+      eventData.user_ids.forEach(userId => {
+        const isSelfUser = userId === this.userState.self().id;
+        const isParticipatingUser = conversationEntity.participating_user_ids().some(user => user.id === userId);
+        if (!isSelfUser && !isParticipatingUser) {
+          conversationEntity.participating_user_ids.push({domain: null, id: userId});
+        }
+      });
+    }
 
     // Self user joins again
     const selfUserRejoins = eventData.user_ids.includes(this.userState.self().id);
@@ -2256,11 +2294,14 @@ export class ConversationRepository {
         ? this.updateConversationFromBackend(conversationEntity)
         : Promise.resolve();
 
+    const qualifiedUserIds =
+      eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: null, id: userId}));
+
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
       .then(() => this.addEventToConversation(conversationEntity, eventJson))
       .then(({messageEntity}) => {
-        this.verificationStateHandler.onMemberJoined(conversationEntity, eventData.user_ids);
+        this.verificationStateHandler.onMemberJoined(conversationEntity, qualifiedUserIds);
         return {conversationEntity, messageEntity};
       });
   }
@@ -2293,9 +2334,11 @@ export class ConversationRepository {
       const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
       (messageEntity as MemberMessage)
         .userEntities()
-        .filter((userEntity: User) => !userEntity.isMe)
-        .forEach((userEntity: User) => {
-          conversationEntity.participating_user_ids.remove(userEntity.id);
+        .filter(userEntity => !userEntity.isMe)
+        .forEach(userEntity => {
+          conversationEntity.participating_user_ids.remove(userId => {
+            return userId.id === userEntity.id && userId.domain == userEntity.domain;
+          });
 
           if (userEntity.isTemporaryGuest()) {
             userEntity.clearExpirationTimeout();
@@ -2741,10 +2784,13 @@ export class ConversationRepository {
 
       messageEntity.reactions_user_ets.removeAll();
       if (userIds.length) {
-        return this.userRepository.getUsersById(userIds).then(userEntities_1 => {
-          messageEntity.reactions_user_ets(userEntities_1);
-          return messageEntity;
-        });
+        // TODO(Federation): Make code federation-aware.
+        return this.userRepository
+          .getUsersById(userIds.map(userId => ({domain: null, id: userId})))
+          .then(userEntities => {
+            messageEntity.reactions_user_ets(userEntities);
+            return messageEntity;
+          });
       }
     }
     return messageEntity;

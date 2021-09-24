@@ -190,6 +190,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 
             {participant instanceof User &&
               Config.getConfig().FEATURE.ENABLE_FEDERATION &&
+              participant.hasDomain &&
               !participant.isOnSameFederatedDomain() && (
                 <Icon.Federation className="federation-icon" data-uie-name="status-federated-user" />
               )}

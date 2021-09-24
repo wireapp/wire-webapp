@@ -106,21 +106,25 @@ const UserDevices: React.FC<UserDevicesProps> = ({
   const logger = useMemo(() => getLogger('UserDevicesComponent'), []);
 
   useEffect(() => {
-    clientRepository
-      .getClientsByUserIds([user.id], true)
-      .then(qualifiedUsersMap => {
-        for (const userClientMaps of Object.values(qualifiedUsersMap)) {
-          for (const clientEntities of Object.values(userClientMaps)) {
+    (async () => {
+      try {
+        const qualifiedUsersMap = user.domain
+          ? Object.values(
+              await clientRepository.getClientsByQualifiedUserIds([{domain: user.domain, id: user.id}], true),
+            )
+          : [await clientRepository.getClientsByUserIds([user.id], true)];
+        for (const qualifiedUsersMaps of qualifiedUsersMap) {
+          for (const clientEntities of Object.values(qualifiedUsersMaps)) {
             setClients(sortUserDevices(clientEntities));
             const hasDevices = clientEntities.length > 0;
             const deviceMode = hasDevices ? FIND_MODE.FOUND : FIND_MODE.NOT_FOUND;
             setDeviceMode(deviceMode);
           }
         }
-      })
-      .catch(error => {
+      } catch (error) {
         logger.error(`Unable to retrieve clients for user '${user.id}': ${error.message || error}`);
-      });
+      }
+    })();
   }, [user]);
 
   const clickOnDevice = (clientEntity: ClientEntity) => {

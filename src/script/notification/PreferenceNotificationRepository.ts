@@ -22,12 +22,11 @@ import ko from 'knockout';
 import {groupBy} from 'underscore';
 import {USER_EVENT} from '@wireapp/api-client/src/event/';
 import {WebAppEvents} from '@wireapp/webapp-events';
-
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
-
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
+import type {QualifiedIdOptional} from '../conversation/EventBuilder';
 
 export interface Notification {
   data: ClientEntity | boolean;
@@ -68,14 +67,14 @@ export class PreferenceNotificationRepository {
         : resetStoreValue(notificationsStorageKey);
     });
 
-    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (userId: string, clientEntity?: ClientEntity) => {
-      if (userId === selfUserObservable().id) {
-        this.onClientAdd(userId, clientEntity);
+    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedIdOptional, clientEntity?: ClientEntity) => {
+      if (user.id === selfUserObservable().id && user.domain == selfUserObservable().domain) {
+        this.onClientAdd(user.id, clientEntity);
       }
     });
-    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (userId: string, clientId?: string) => {
-      if (userId === selfUserObservable().id) {
-        this.onClientRemove(userId, clientId);
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedIdOptional, clientId?: string) => {
+      if (user.id === selfUserObservable().id && user.domain === selfUserObservable().domain) {
+        this.onClientRemove(user.id, clientId, user.domain);
       }
     });
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
@@ -103,9 +102,12 @@ export class PreferenceNotificationRepository {
     }
   }
 
-  onClientRemove(_userId: string, clientId: string): void {
+  onClientRemove(_userId: string, clientId: string, domain: string | null): void {
     this.notifications.remove(({data: clientEntity}) => {
-      const isExpectedId = typeof clientEntity !== 'boolean' && clientEntity.id === clientId;
+      const isExpectedId =
+        typeof clientEntity !== 'boolean' &&
+        clientEntity.id === clientId &&
+        (!domain || clientEntity.domain === domain);
       return isExpectedId && (clientEntity as ClientEntity).isPermanent();
     });
   }

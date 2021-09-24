@@ -44,7 +44,7 @@ import {createNavigate} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
 import {CallState, MuteState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
-import {CallActions, VideoSpeakersTab} from '../../view_model/CallingViewModel';
+import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
 import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
 import type {ClientId, Participant, UserId} from '../../calling/Participant';
 
@@ -97,10 +97,10 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
-  const {isMuted, muteState, videoSpeakersActiveTab} = useKoSubscribableChildren(callState, [
+  const {isMuted, muteState, activeCallViewTab} = useKoSubscribableChildren(callState, [
     'isMuted',
     'muteState',
-    'videoSpeakersActiveTab',
+    'activeCallViewTab',
   ]);
 
   const isStillOngoing = reason === CALL_REASON.STILL_ONGOING;
@@ -121,10 +121,11 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);
   const selfParticipant = call?.getSelfParticipant();
 
-  const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
-    'sharesScreen',
-    'sharesCamera',
-  ]);
+  const {
+    sharesScreen: selfSharesScreen,
+    sharesCamera: selfSharesCamera,
+    hasActiveVideo: selfHasActiveVideo,
+  } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'hasActiveVideo']);
 
   const isOutgoingVideoCall = isOutgoing && selfSharesCamera;
   const isVideoUnsupported =
@@ -247,16 +248,14 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 ))}
             </div>
           </div>
-          {(isOngoing || selfParticipant?.hasActiveVideo()) && isMinimized && !!videoGrid?.grid?.length ? (
+          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length ? (
             <div
               className="group-video__minimized-wrapper"
               onClick={isOngoing ? () => multitasking.isMinimized(false) : undefined}
             >
               <GroupVideoGrid
                 grid={
-                  videoSpeakersActiveTab === VideoSpeakersTab.ALL
-                    ? videoGrid
-                    : {grid: call.getActiveSpeakers(), thumbnail: null}
+                  activeCallViewTab === CallViewTab.ALL ? videoGrid : {grid: call.getActiveSpeakers(), thumbnail: null}
                 }
                 minimized
                 maximizedParticipant={maximizedParticipant}

@@ -49,13 +49,12 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {flatten} from 'Util/ArrayUtil';
+import {flatten, getDifference} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
 import {Config} from '../Config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
@@ -81,6 +80,7 @@ import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
 import {TeamState} from '../team/TeamState';
+import Warnings from '../view_model/WarningsContainer';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -174,6 +174,17 @@ export class CallingRepository {
     this.subscribeToEvents();
 
     this.onChooseScreen = (deviceId: string) => {};
+
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+      if (!call) {
+        return;
+      }
+      const isSpeakersViewActive = this.callState.isSpeakersViewActive();
+      if (isSpeakersViewActive) {
+        this.requestVideoStreams(call, call.activeSpeakers());
+      }
+    });
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
@@ -336,9 +347,9 @@ export class CallingRepository {
       users = [...users, userId];
     }
     if (users.length === call.participants.length - 1) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+      amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
     }
 
     switch (quality) {
@@ -401,6 +412,9 @@ export class CallingRepository {
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
       conversation.call(null);
+    }
+    if (this.callState.requestedVideoStreams.call === call) {
+      this.callState.requestedVideoStreams = {call: undefined, participants: []};
     }
   }
 
@@ -771,13 +785,35 @@ export class CallingRepository {
   }
 
   changeCallPage(newPage: number, call: Call): void {
-    const nextPageParticipants = call.pages()[newPage];
+    call.currentPage(newPage);
+    this.requestCurrentPageVideoStreams();
+  }
+
+  requestCurrentPageVideoStreams(): void {
+    const call = this.callState.joinedCall();
+    if (!call) {
+      return;
+    }
+    const currentPageParticipants = call.pages()[call.currentPage()];
+    this.requestVideoStreams(call, currentPageParticipants);
+  }
+
+  requestVideoStreams(call: Call, participants: Participant[]) {
+    const callAlreadyRequested = call === this.callState.requestedVideoStreams.call;
+    const requestedParticipants = this.callState.requestedVideoStreams.participants;
+    const participantsAlreadyRequested =
+      participants.length === requestedParticipants.length &&
+      getDifference(participants, requestedParticipants).length === 0;
+
+    if (callAlreadyRequested && participantsAlreadyRequested) {
+      return;
+    }
+
     const payload = {
-      clients: nextPageParticipants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      clients: participants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
       convid: call.conversationId,
     };
     this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
-    call.currentPage(newPage);
   }
 
   readonly leaveCall = (conversationId: ConversationId): void => {
@@ -1035,7 +1071,7 @@ export class CallingRepository {
   };
 
   private readonly callClosed = (reason: REASON, conversationId: ConversationId) => {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+    amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
     const call = this.findCall(conversationId);
     if (!call) {
       return;
@@ -1287,6 +1323,12 @@ export class CallingRepository {
       }
     })();
 
+    this.mediaStreamQuery.then(() => {
+      const selfParticipant = call.getSelfParticipant();
+      if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
+        selfParticipant.releaseVideoStream(true);
+      }
+    });
     return this.mediaStreamQuery;
   };
 
@@ -1350,7 +1392,7 @@ export class CallingRepository {
 
   private readonly audioCbrChanged = (userid: UserId, clientid: ClientId, enabled: number) => {
     const activeCall = this.callState.activeCalls()[0];
-    if (activeCall) {
+    if (activeCall && !Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE) {
       activeCall.isCbrEnabled(!!enabled);
     }
   };

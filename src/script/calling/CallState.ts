@@ -21,9 +21,10 @@ import {singleton} from 'tsyringe';
 import ko from 'knockout';
 import {Call} from './Call';
 import {STATE as CALL_STATE} from '@wireapp/avs';
-import {VideoSpeakersTab} from '../view_model/CallingViewModel';
+import {CallViewTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
+import type {Participant} from './Participant';
 
 export enum MuteState {
   NOT_MUTED,
@@ -40,12 +41,18 @@ export class CallState {
   public readonly cbrEncoding: ko.Observable<number> = ko.observable(
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0,
   );
-  public readonly videoSpeakersActiveTab: ko.Observable<string> = ko.observable(VideoSpeakersTab.ALL);
+  public readonly videoSpeakersActiveTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
   public readonly isMuted: ko.PureComputed<boolean>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
+  public readonly activeCallViewTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly isChoosingScreen: ko.PureComputed<boolean>;
+  readonly isSpeakersViewActive: ko.PureComputed<boolean>;
+  public requestedVideoStreams: {call: Call; participants: Participant[]} = {
+    call: undefined,
+    participants: [],
+  };
 
   constructor() {
     this.isMuted = ko.pureComputed(() => this.muteState() !== MuteState.NOT_MUTED);
@@ -58,6 +65,11 @@ export class CallState {
       const activeCallIds = activeCalls.map(call => call.conversationId);
       this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
+    this.isSpeakersViewActive = ko.pureComputed(() => this.activeCallViewTab() === CallViewTab.SPEAKERS);
+
+    this.isChoosingScreen = ko.pureComputed(
+      () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
+    );
   }
 
   updateMuteState = (newState: MuteState) => this.muteState(newState);

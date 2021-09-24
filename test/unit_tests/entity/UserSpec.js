@@ -61,10 +61,10 @@ describe('User', () => {
 
   describe('addClient', () => {
     it('accepts clients which are no duplicates', () => {
-      const first_client = new ClientEntity();
+      const first_client = new ClientEntity(false, null);
       first_client.id = '5021d77752286cac';
 
-      const second_client = new ClientEntity();
+      const second_client = new ClientEntity(false, null);
       second_client.id = '575b7a890cdb7635';
 
       const user_et = new User();

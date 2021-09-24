@@ -136,6 +136,6 @@ export class PreferencesDeviceDetailsViewModel {
 
   readonly toggleDeviceVerification = (): void => {
     const toggleVerified = !this.device().meta.isVerified();
-    this.clientRepository.verifyClient(this.selfUser().id, this.device(), toggleVerified);
+    this.clientRepository.verifyClient(this.selfUser().id, this.device(), toggleVerified, this.selfUser().domain);
   };
 }

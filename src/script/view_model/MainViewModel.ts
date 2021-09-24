@@ -26,7 +26,6 @@ import {afterRender} from 'Util/util';
 
 import {WindowTitleViewModel} from './WindowTitleViewModel';
 import {modals, ModalsViewModel} from './ModalsViewModel';
-import {WarningsViewModel} from './WarningsViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ActionsViewModel} from './ActionsViewModel';
@@ -62,6 +61,7 @@ import type {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import type {EventTrackingRepository} from '../tracking/EventTrackingRepository';
 import type {MessageRepository} from '../conversation/MessageRepository';
 import {UserState} from '../user/UserState';
+import Warnings from './WarningsContainer';
 
 export interface ViewModelRepositories {
   asset: AssetRepository;
@@ -108,7 +108,6 @@ export class MainViewModel {
   title: WindowTitleViewModel;
   userRepository: UserRepository;
   private readonly userState: UserState;
-  warnings: WarningsViewModel;
 
   static get CONFIG() {
     return {
@@ -190,7 +189,7 @@ export class MainViewModel {
     );
     this.title = new WindowTitleViewModel(this);
     this.favicon = new FaviconViewModel(amplify);
-    this.warnings = new WarningsViewModel();
+    Warnings.init();
 
     this.mainClasses = ko.pureComputed(() => {
       if (this.selfUser()) {
