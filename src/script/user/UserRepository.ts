@@ -68,6 +68,7 @@ import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 import {QualifiedPublicUserMap} from '../client/ClientService';
+import {fixWebsocketString} from 'Util/StringUtil';
 
 export class UserRepository {
   private readonly logger: Logger;
@@ -125,7 +126,7 @@ export class UserRepository {
         this.userDelete(eventJson);
         break;
       case USER_EVENT.UPDATE:
-        this.userUpdate(eventJson);
+        this.userUpdate(eventJson, source === EventRepository.SOURCE.WEB_SOCKET);
         break;
       case ClientEvent.USER.AVAILABILITY:
         this.onUserAvailability(eventJson);
@@ -241,11 +242,16 @@ export class UserRepository {
   /**
    * Event to update the matching user.
    */
-  private async userUpdate({user}: {user: Partial<APIClientUser>}): Promise<User> {
+  private async userUpdate({user}: {user: Partial<APIClientUser>}, isWebSocket = false): Promise<User> {
     const isSelfUser = user.id === this.userState.self().id;
     const userEntity = isSelfUser
       ? this.userState.self()
       : await this.getUserById(user.id, user.qualified_id?.domain || null);
+
+    if (isWebSocket && user.name) {
+      user.name = fixWebsocketString(user.name);
+    }
+
     this.userMapper.updateUserFromObject(userEntity, user);
     if (isSelfUser) {
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);

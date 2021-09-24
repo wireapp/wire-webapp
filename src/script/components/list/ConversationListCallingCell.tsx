@@ -114,10 +114,11 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
   const conversationUrl = generateConversationUrl(conversation.id, conversation.domain);
   const selfParticipant = call?.getSelfParticipant();
 
-  const {sharesScreen: selfSharesScreen, sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, [
-    'sharesScreen',
-    'sharesCamera',
-  ]);
+  const {
+    sharesScreen: selfSharesScreen,
+    sharesCamera: selfSharesCamera,
+    hasActiveVideo: selfHasActiveVideo,
+  } = useKoSubscribableChildren(selfParticipant, ['sharesScreen', 'sharesCamera', 'hasActiveVideo']);
 
   const isOutgoingVideoCall = isOutgoing && selfSharesCamera;
   const isVideoUnsupported =
@@ -201,7 +202,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                 ))}
             </div>
           </div>
-          {(isOngoing || selfParticipant?.hasActiveVideo()) && isMinimized && !!videoGrid?.grid?.length ? (
+          {(isOngoing || selfHasActiveVideo) && isMinimized && !!videoGrid?.grid?.length ? (
             <div
               className="group-video__minimized-wrapper"
               onClick={isOngoing ? () => multitasking.isMinimized(false) : undefined}

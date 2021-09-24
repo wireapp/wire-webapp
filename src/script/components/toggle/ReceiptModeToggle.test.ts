@@ -17,7 +17,7 @@
  *
  */
 
-import {Confirmation} from '@wireapp/protocol-messaging';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 
 import TestPage from 'Util/test/TestPage';
 
@@ -37,7 +37,7 @@ describe('ReceiptModeToggle', () => {
   it('checks the checkbox when receipts are turned on', () => {
     const receiptModeToggle = new ReceiptModeTogglePage({
       onReceiptModeChanged: () => {},
-      receiptMode: Confirmation.Type.DELIVERED,
+      receiptMode: RECEIPT_MODE.OFF,
     });
 
     const checkBox = receiptModeToggle.getCheckbox();
@@ -48,7 +48,7 @@ describe('ReceiptModeToggle', () => {
   it('unchecks the checkbox when receipts are turned off', () => {
     const receiptModeToggle = new ReceiptModeTogglePage({
       onReceiptModeChanged: () => {},
-      receiptMode: Confirmation.Type.READ,
+      receiptMode: RECEIPT_MODE.ON,
     });
 
     const checkBox = receiptModeToggle.getCheckbox();

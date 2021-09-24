@@ -35,6 +35,7 @@ export class Participant {
   public sharesCamera: ko.PureComputed<boolean>;
   public startedScreenSharingAt: ko.Observable<number>;
   public isActivelySpeaking: ko.Observable<boolean>;
+  public isSendingVideo: ko.Observable<boolean>;
 
   // Audio
   public audioStream: ko.Observable<MediaStream | undefined>;
@@ -59,6 +60,7 @@ export class Participant {
     this.isActivelySpeaking = ko.observable(false);
     this.startedScreenSharingAt = ko.observable();
     this.isMuted = ko.observable(false);
+    this.isSendingVideo = ko.observable(false);
   }
 
   readonly doesMatchIds = (userId: UserId, clientId: ClientId): boolean =>

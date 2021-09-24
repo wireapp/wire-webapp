@@ -1032,6 +1032,11 @@ export class CallingRepository {
       return;
     }
 
+    if (reason === REASON.NORMAL) {
+      this.callState.selectableScreens([]);
+      this.callState.selectableWindows([]);
+    }
+
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
       const conversationEntity = this.conversationState.findConversation(conversationId);
       const callingEvent = EventBuilder.buildCallingTimeoutEvent(
@@ -1164,6 +1169,10 @@ export class CallingRepository {
     members.forEach(member => call.getParticipant(member.userid, member.clientid)?.isMuted(!!member.muted));
   }
 
+  private updateParticipantVideoState(call: Call, members: WcallMember[]): void {
+    members.forEach(member => call.getParticipant(member.userid, member.clientid)?.isSendingVideo(!!member.vrecv));
+  }
+
   private updateParticipantList(call: Call, members: WcallMember[]): void {
     const newMembers = members
       .filter(({userid, clientid}) => !call.getParticipant(userid, clientid))
@@ -1195,6 +1204,7 @@ export class CallingRepository {
 
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
+    this.updateParticipantVideoState(call, members);
   };
 
   private readonly requestClients = (wUser: number, conversationId: ConversationId, _: number) => {
@@ -1268,6 +1278,12 @@ export class CallingRepository {
       }
     })();
 
+    this.mediaStreamQuery.then(() => {
+      const selfParticipant = call.getSelfParticipant();
+      if (selfParticipant.videoState() === VIDEO_STATE.STOPPED) {
+        selfParticipant.releaseVideoStream(true);
+      }
+    });
     return this.mediaStreamQuery;
   };
 

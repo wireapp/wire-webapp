@@ -27,6 +27,7 @@ import {
   CONVERSATION_EVENT,
   ConversationMessageTimerUpdateEvent,
   ConversationRenameEvent,
+  ConversationCreateEvent,
 } from '@wireapp/api-client/src/event/';
 import {
   DefaultConversationRoleName as DefaultRole,
@@ -37,9 +38,8 @@ import {
   Conversation as BackendConversation,
 } from '@wireapp/api-client/src/conversation/';
 import {container} from 'tsyringe';
-import {ConversationCreateData, ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
+import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http/';
-
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
@@ -47,8 +47,13 @@ import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getNextItem} from 'Util/ArrayUtil';
 import {createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
-import {compareTransliteration, sortByPriority, startsWith, sortUsersByPriority} from 'Util/StringUtil';
-
+import {
+  compareTransliteration,
+  sortByPriority,
+  startsWith,
+  sortUsersByPriority,
+  fixWebsocketString,
+} from 'Util/StringUtil';
 import {ClientEvent} from '../event/Client';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
@@ -305,6 +310,7 @@ export class ConversationRepository {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
       qualified_users: otherFederatedDomainUserIds,
+      receipt_mode: null,
       users: sameFederatedDomainUserIds,
       ...options,
     };
@@ -345,7 +351,16 @@ export class ConversationRepository {
       const response = await this.conversation_service.postConversations(payload);
       const {conversationEntity} = await this.onCreate({
         conversation: response.id,
-        data: response as ConversationCreateData,
+        data: {
+          last_event: '0.0',
+          last_event_time: '1970-01-01T00:00:00.000Z',
+          receipt_mode: null,
+          ...response,
+        },
+        from: this.userState.self().id,
+        qualified_conversation: response.qualified_id,
+        time: new Date().toISOString(),
+        type: CONVERSATION_EVENT.CREATE,
       });
       return conversationEntity as Conversation;
     } catch (error) {
@@ -376,7 +391,7 @@ export class ConversationRepository {
     fetching_conversations[conversationId] = [];
     try {
       const response = await this.conversation_service.getConversationById(conversationId, domain);
-      const conversationEntity = this.mapConversations(response) as Conversation;
+      const [conversationEntity] = this.mapConversations([response]);
 
       this.logger.info(`Fetched conversation '${conversationId}' from backend`);
       this.saveConversation(conversationEntity);
@@ -418,7 +433,7 @@ export class ConversationRepository {
       const data = ConversationMapper.mergeConversation(localConversations, remoteConversations);
       conversationsData = (await this.conversation_service.saveConversationsInDb(data)) as any[];
     }
-    const conversationEntities = this.mapConversations(conversationsData) as Conversation[];
+    const conversationEntities = this.mapConversations(conversationsData);
     this.saveConversations(conversationEntities);
     return this.conversationState.conversations();
   }
@@ -442,9 +457,7 @@ export class ConversationRepository {
     let conversationEntities: Conversation[] = [];
 
     if (unknownConversations.length) {
-      conversationEntities = conversationEntities.concat(
-        this.mapConversations(unknownConversations as any[]) as Conversation[],
-      );
+      conversationEntities = conversationEntities.concat(this.mapConversations(unknownConversations as any[]));
       this.saveConversations(conversationEntities);
     }
 
@@ -1130,22 +1143,15 @@ export class ConversationRepository {
    * @param initialTimestamp Initial server and event timestamp
    * @returns Mapped conversation/s
    */
-  mapConversations(
-    payload: BackendConversation[] | BackendConversation,
-    initialTimestamp = this.getLatestEventTimestamp(),
-  ) {
-    const conversationsData: BackendConversation[] = Array.isArray(payload) ? payload : [payload];
-    const entities = ConversationMapper.mapConversations(
-      conversationsData as ConversationDatabaseData[],
-      initialTimestamp,
-    );
+  mapConversations(payload: BackendConversation[], initialTimestamp = this.getLatestEventTimestamp()): Conversation[] {
+    const entities = ConversationMapper.mapConversations(payload as ConversationDatabaseData[], initialTimestamp);
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());
       conversationEntity.setStateChangePersistence(true);
     });
 
-    return Array.isArray(payload) ? entities : entities[0];
+    return entities;
   }
 
   private mapGuestStatusSelf() {
@@ -1500,9 +1506,7 @@ export class ConversationRepository {
     }
 
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const otrMuted = notificationState !== NOTIFICATION_STATE.EVERYTHING;
     const payload = {
-      otr_muted: otrMuted,
       otr_muted_ref: new Date(conversationEntity.getLastKnownTimestamp(currentTimestamp)).toISOString(),
       otr_muted_status: notificationState,
     };
@@ -1512,8 +1516,8 @@ export class ConversationRepository {
       const response = {data: payload, from: this.userState.self().id};
       this.onMemberUpdate(conversationEntity, response);
 
-      const {otr_muted: muted, otr_muted_ref: mutedRef, otr_muted_status: mutedStatus} = payload;
-      const logMessage = `Changed notification state of conversation to '${muted} | ${mutedStatus}' on '${mutedRef}'`;
+      const {otr_muted_ref: mutedRef, otr_muted_status: mutedStatus} = payload;
+      const logMessage = `Changed notification state of conversation to '${mutedStatus}' on '${mutedRef}'`;
       this.logger.info(logMessage);
       return response;
     } catch (error) {
@@ -1953,7 +1957,7 @@ export class ConversationRepository {
         return this.onMemberUpdate(conversationEntity, eventJson);
 
       case CONVERSATION_EVENT.RENAME:
-        return this.onRename(conversationEntity, eventJson);
+        return this.onRename(conversationEntity, eventJson, eventSource === EventRepository.SOURCE.WEB_SOCKET);
 
       case ClientEvent.CONVERSATION.ASSET_ADD:
         return this.onAssetAdd(conversationEntity, eventJson);
@@ -2153,23 +2157,22 @@ export class ConversationRepository {
    * @returns Resolves when the event was handled
    */
   private async onCreate(
-    eventJson: {
-      conversation: string;
-      data: ConversationCreateData;
-      time?: string | number;
-    },
+    eventJson: ConversationCreateEvent,
     eventSource?: EventSource,
-  ): Promise<{conversationEntity: Conversation} | undefined> {
+  ): Promise<{conversationEntity: Conversation}> {
     const {conversation: conversationId, data: eventData, time} = eventJson;
     const eventTimestamp = new Date(time).getTime();
     const initialTimestamp = isNaN(eventTimestamp) ? this.getLatestEventTimestamp(true) : eventTimestamp;
     try {
-      const existingConversationEntity = this.conversationState.findConversation(conversationId);
+      const existingConversationEntity = this.conversationState.findConversation(
+        conversationId,
+        eventJson.qualified_conversation?.domain,
+      );
       if (existingConversationEntity) {
         throw new ConversationError(ConversationError.TYPE.NO_CHANGES, ConversationError.MESSAGE.NO_CHANGES);
       }
 
-      const conversationEntity = this.mapConversations(eventData, initialTimestamp) as Conversation;
+      const [conversationEntity] = this.mapConversations([eventData], initialTimestamp);
       if (conversationEntity) {
         if (conversationEntity.participating_user_ids().length) {
           this.addCreationMessage(conversationEntity, false, initialTimestamp, eventSource);
@@ -2571,7 +2574,10 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.rename' event
    * @returns Resolves when the event was handled
    */
-  private async onRename(conversationEntity: Conversation, eventJson: EventJson) {
+  private async onRename(conversationEntity: Conversation, eventJson: EventJson, isWebSocket = false) {
+    if (isWebSocket && eventJson.data?.name) {
+      eventJson.data.name = fixWebsocketString(eventJson.data.name);
+    }
     const {messageEntity} = await this.addEventToConversation(conversationEntity, eventJson);
     ConversationMapper.updateProperties(conversationEntity, eventJson.data);
     return {conversationEntity, messageEntity};

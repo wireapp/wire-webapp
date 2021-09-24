@@ -21,7 +21,8 @@ import {WebappProperties} from '@wireapp/api-client/src/user/data/';
 import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
 import {Logger, Runtime} from '@wireapp/commons';
 import {AccentColorID} from '@wireapp/commons/src/main/util/AccentColor';
-import {Availability, Confirmation} from '@wireapp/protocol-messaging';
+import {Availability} from '@wireapp/protocol-messaging';
+import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import 'Components/AvailabilityState';
@@ -91,7 +92,7 @@ export class PreferencesAccountViewModel {
   teamName: ko.PureComputed<string>;
   optionPrivacy: ko.Observable<boolean>;
   optionTelemetrySharing: ko.Observable<boolean>;
-  optionReadReceipts: ko.Observable<Confirmation.Type>;
+  optionReadReceipts: ko.Observable<RECEIPT_MODE>;
   optionMarketingConsent: ko.Observable<boolean | ConsentValue>;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   isMacOsWrapper: boolean;
@@ -537,7 +538,7 @@ export class PreferencesAccountViewModel {
 
   readonly onReadReceiptsChange = (_viewModel: unknown, event: ChangeEvent<HTMLInputElement>): boolean => {
     const isChecked = event.target.checked;
-    const mode = isChecked ? Confirmation.Type.READ : Confirmation.Type.DELIVERED;
+    const mode = isChecked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF;
     this.propertiesRepository.updateProperty(PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key, mode);
     return true;
   };
