@@ -49,7 +49,7 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {flatten} from 'Util/ArrayUtil';
+import {flatten, getDifference} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
 import {Config} from '../Config';
@@ -181,7 +181,7 @@ export class CallingRepository {
       }
       const isSpeakersViewActive = this.callState.isSpeakersViewActive();
       if (isSpeakersViewActive) {
-        this.requestVideoStreams(call.conversationId, call.activeSpeakers());
+        this.requestVideoStreams(call, call.activeSpeakers());
       }
     });
   }
@@ -407,6 +407,9 @@ export class CallingRepository {
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
       conversation.call(null);
+    }
+    if (this.callState.requestedVideoStreams.call === call) {
+      this.callState.requestedVideoStreams = {call: undefined, participants: []};
     }
   }
 
@@ -776,15 +779,25 @@ export class CallingRepository {
       return;
     }
     const currentPageParticipants = call.pages()[call.currentPage()];
-    this.requestVideoStreams(call.conversationId, currentPageParticipants);
+    this.requestVideoStreams(call, currentPageParticipants);
   }
 
-  requestVideoStreams(conversationId: string, participants: Participant[]) {
+  requestVideoStreams(call: Call, participants: Participant[]) {
+    const callAlreadyRequested = call === this.callState.requestedVideoStreams.call;
+    const requestedParticipants = this.callState.requestedVideoStreams.participants;
+    const participantsAlreadyRequested =
+      participants.length === requestedParticipants.length &&
+      getDifference(participants, requestedParticipants).length === 0;
+
+    if (callAlreadyRequested && participantsAlreadyRequested) {
+      return;
+    }
+
     const payload = {
       clients: participants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
-      convid: conversationId,
+      convid: call.conversationId,
     };
-    this.wCall.requestVideoStreams(this.wUser, conversationId, VSTREAMS.LIST, JSON.stringify(payload));
+    this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
   readonly leaveCall = (conversationId: ConversationId): void => {
