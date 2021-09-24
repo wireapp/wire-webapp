@@ -73,6 +73,7 @@ export class MessageListViewModel {
   private messagesBeforeChangeSubscription: ko.Subscription;
   private messagesContainer: HTMLElement;
   showInvitePeople: ko.PureComputed<boolean>;
+  private readonly isScrollToBottom: ko.Observable<boolean>;
 
   constructor(
     private readonly mainViewModel: MainViewModel,
@@ -136,6 +137,8 @@ export class MessageListViewModel {
         this.conversation().isActiveParticipant() && this.conversation().inTeam() && this.conversation().isGuestRoom()
       );
     });
+
+    this.isScrollToBottom = ko.observable(false);
   }
 
   readonly onMessageContainerInitiated = (messagesContainer: HTMLElement): void => {
@@ -167,6 +170,14 @@ export class MessageListViewModel {
     if (this.shouldStickToBottom()) {
       scrollToBottom(this.getMessagesContainer());
     }
+  };
+
+  readonly clickOnScrollToBottomButton = (): void => {
+    scrollToBottom(this.getMessagesContainer());
+  };
+
+  readonly showScrollToBottom = (): void => {
+    this.isScrollToBottom(true);
   };
 
   private readonly handleInputResize = (inputSizeDiff: number): void => {
@@ -329,6 +340,7 @@ export class MessageListViewModel {
     const lastMessage = this.conversation().getLastMessage();
 
     if (lastMessage) {
+      this.isScrollToBottom(false);
       if (!this.isLastReceivedMessage(lastMessage, this.conversation())) {
         // if the last loaded message is not the last of the conversation, we load the subsequent messages
         this.conversationRepository.getSubsequentMessages(this.conversation(), lastMessage as ContentMessage);

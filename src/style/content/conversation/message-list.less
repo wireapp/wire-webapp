@@ -19,6 +19,7 @@
 
 // MEMBER LIST
 .message-list {
+  position: relative;
   overflow: auto;
   flex: 1 1;
 }
@@ -836,5 +837,18 @@
 
   path {
     fill: #fff;
+  }
+}
+
+.scroll-to-bottom-wrapper {
+  position: absolute;
+  right: 72px;
+  bottom: 64px;
+
+  .scroll-to-bottom-icon {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    color: #fff;
   }
 }

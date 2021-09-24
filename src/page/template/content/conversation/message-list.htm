@@ -1,12 +1,14 @@
- <div id="message-list" class="message-list" data-bind="with: $root.messageList, fadingscrollbar, infinite_scroll: {onHitBottom: () => $root.messageList.loadFollowingMessages(), onHitTop: () => $root.messageList.loadPrecedingMessages(), onInit: $root.messageList.onMessageContainerInitiated}">
-  <div class="messages"
+<div id="message-list" class="message-list"
+    data-bind="with: $root.messageList, fadingscrollbar, infinite_scroll: {onHitBottom: () => $root.messageList.loadFollowingMessages(), onHitTop: () => $root.messageList.loadPrecedingMessages(), onInit: $root.messageList.onMessageContainerInitiated, onScrollTriggered: $root.messageList.showScrollToBottom}"
+    style="position: relative">
+  <div class="messages" 
         data-bind="css: {'flex-center': verticallyCenterMessage},
                    foreach: {data: conversation().messages_visible, as: 'message', noChildContext: true}">
     <div class="message"
-         data-bind="in_viewport: {onVisible: getInViewportCallback(conversation(), message), container: getMessagesContainer()},
+      data-bind="in_viewport: {onVisible: getInViewportCallback(conversation(), message), container: getMessagesContainer()},
                     attr: {'data-uie-uid': message.id, 'data-uie-value': message.super_type, 'data-uie-expired-status': message.ephemeral_expires, 'data-uie-send-status': message.status}"
-         data-uie-name="item-message">
-
+      data-uie-name="item-message">
+      
       <div class="message-header message-timestamp" data-bind="css: getTimestampClass(message)">
         <div class="message-header-icon">
           <span class="message-unread-dot"></span>
@@ -44,5 +46,10 @@
           actionsViewModel: actionsViewModel"
         data-bind="css: {'message-isreplying': message.id && message.id === $root.inputBar.replyMessageId()}"></message>
     </div>
+  </div>
+  <div class="scroll-to-bottom-wrapper">
+    <span class="scroll-to-bottom-icon button-icon-large icon-down"
+      data-bind="visible: isScrollToBottom, clickOrDrag: clickOnScrollToBottomButton, attr: {title: t('tooltipScrollToBottom')}"
+      data-uie-name="scroll-to-bottom"></span>
   </div>
 </div>

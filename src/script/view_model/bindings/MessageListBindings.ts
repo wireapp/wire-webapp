@@ -98,12 +98,18 @@ ko.bindingHandlers.showAllTimestamps = {
 ko.bindingHandlers.infinite_scroll = {
   init(
     scrollingElement: HTMLElement,
-    params: () => {onHitBottom: () => void; onHitTop: () => void; onInit: (element: HTMLElement) => void},
+    params: () => {
+      onHitBottom: () => void;
+      onHitTop: () => void;
+      onInit: (element: HTMLElement) => void;
+      onScrollTriggered: () => void;
+    },
   ) {
-    const {onHitTop, onHitBottom, onInit} = params();
+    const {onHitTop, onHitBottom, onInit, onScrollTriggered} = params();
     onInit(scrollingElement);
 
     const onScroll = ({target: element}: Event & {target: HTMLElement}) => {
+      onScrollTriggered();
       // On some HiDPI screens scrollTop returns a floating point number instead of an integer
       // https://github.com/jquery/api.jquery.com/issues/608
       const scrollPosition = Math.ceil(element.scrollTop);
