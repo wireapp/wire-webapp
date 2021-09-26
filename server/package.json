@@ -29,7 +29,7 @@
     "@types/geolite2": "2.0.0",
     "@types/hbs": "4.0.1",
     "@types/node": "12.20.25",
-    "jest": "26.6.3",
+    "jest": "27.2.2",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-jest": "26.5.6",
