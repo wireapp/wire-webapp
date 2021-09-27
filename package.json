@@ -210,6 +210,7 @@
     "bundle:dev": "webpack --config webpack.config.dev.js --progress",
     "bundle:prod": "webpack --config webpack.config.js",
     "changelog:dev": "ts-node ./bin/changelog.ts dev",
+    "changelog:master": "ts-node ./bin/changelog.ts master",
     "changelog:ci": "ts-node ./bin/changelog.ts",
     "configure": "copy-config",
     "deploy": "yarn && yarn build:prod && eb deploy",
@@ -241,5 +242,5 @@
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts"
   },
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
