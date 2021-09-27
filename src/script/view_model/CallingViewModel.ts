@@ -250,7 +250,7 @@ export class CallingViewModel {
         amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
           primaryAction: {
             action: () => {
-              safeWindowOpen(Config.getConfig().URL.PRICING);
+              safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
             },
             text: t('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
           },
