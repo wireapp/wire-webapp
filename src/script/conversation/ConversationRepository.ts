@@ -1734,7 +1734,7 @@ export class ConversationRepository {
   }: {
     beforeTimestamp?: boolean;
     conversationEntity?: Conversation;
-    conversationId: string;
+    conversationId: QualifiedIdOptional;
     legalHoldStatus: LegalHoldStatus;
     timestamp: string | number;
     userId: string;
@@ -1743,12 +1743,13 @@ export class ConversationRepository {
       return;
     }
     if (!timestamp) {
-      const conversation = conversationEntity || this.conversationState.findConversation(conversationId);
+      // TODO(federation) find with qualified id
+      const conversation = conversationEntity || this.conversationState.findConversation(conversationId.id);
       const servertime = this.serverTimeHandler.toServerTimestamp();
       timestamp = conversation.getLatestTimestamp(servertime);
     }
     const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
-      conversationId || conversationEntity.id,
+      conversationId || conversationEntity,
       userId,
       timestamp,
       legalHoldStatus,
@@ -1793,7 +1794,8 @@ export class ConversationRepository {
     }
 
     const {data: eventData, type} = eventJson;
-    const conversationId: QualifiedId = eventData?.qualified_conversation || eventJson.qualified_conversation;
+    const conversationId: QualifiedId = eventData?.qualified_conversation ||
+      eventJson.qualified_conversation || {domain: null, id: eventJson.conversation};
     this.logger.info(`Handling event '${type}' in conversation '${conversationId}' (Source: ${eventSource})`);
 
     const selfConversation = this.conversationState.self_conversation();
@@ -1931,7 +1933,7 @@ export class ConversationRepository {
     }
 
     const {
-      conversation: conversationId,
+      qualified_conversation: conversationId,
       data: {legal_hold_status: messageLegalHoldStatus},
       from: userId,
       time: isoTimestamp,
@@ -2513,7 +2515,7 @@ export class ConversationRepository {
 
         const isFromSelf = from === this.userState.self().id;
         if (!isFromSelf) {
-          return this.addDeleteMessage(conversationEntity.id, eventId, time, deletedMessageEntity);
+          return this.addDeleteMessage(conversationEntity, eventId, time, deletedMessageEntity);
         }
       })
       .then(() => {
@@ -2842,8 +2844,8 @@ export class ConversationRepository {
    * @param time ISO 8601 formatted time string
    * @param messageEntity Message to delete
    */
-  public addDeleteMessage(conversationId: string, messageId: string, time: string, messageEntity: Message) {
-    const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
+  public addDeleteMessage(conversation: Conversation, messageId: string, time: string, messageEntity: Message) {
+    const deleteEvent = EventBuilder.buildDelete(conversation, messageId, time, messageEntity);
     this.eventRepository.injectEvent(deleteEvent);
   }
 

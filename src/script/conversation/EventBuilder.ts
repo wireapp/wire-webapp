@@ -33,6 +33,7 @@ import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {AssetRecord, EventRecord} from '../storage';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 
 export interface QualifiedIdOptional {
   domain: string | null;
@@ -184,13 +185,23 @@ export type ClientConversationEvent =
   | VoiceChannelActivateEvent
   | VerificationEvent;
 
+function buildQualifiedId(conversation: {domain?: string; id: string}) {
+  return {
+    conversation: conversation.id,
+    qualified_conversation: {
+      domain: conversation.domain,
+      id: conversation.id,
+    },
+  };
+}
+
 export const EventBuilder = {
   build1to1Creation(conversationEntity: Conversation, timestamp: number = 0): OneToOneCreationEvent {
-    const {creator: creatorId, id} = conversationEntity;
+    const {creator: creatorId} = conversationEntity;
     const isoDate = new Date(timestamp).toISOString();
 
     return {
-      conversation: id,
+      ...buildQualifiedId(conversationEntity),
       data: {
         userIds: conversationEntity.participating_user_ids(),
       },
@@ -203,7 +214,7 @@ export const EventBuilder = {
 
   buildAllVerified(conversationEntity: Conversation, currentTimestamp: number): AllVerifiedEvent {
     return {
-      conversation: conversationEntity.id,
+      ...buildQualifiedId(conversationEntity),
       data: {
         type: VerificationMessageType.VERIFIED,
       },
@@ -216,7 +227,7 @@ export const EventBuilder = {
 
   buildAssetAdd(conversationEntity: Conversation, data: AssetRecord, currentTimestamp: number): AssetAddEvent {
     return {
-      conversation: conversationEntity.id,
+      ...buildQualifiedId(conversationEntity),
       data,
       from: conversationEntity.selfUser().id,
       status: StatusType.SENDING,
@@ -246,7 +257,7 @@ export const EventBuilder = {
     userId: string,
   ): CallingTimeoutEvent {
     return {
-      conversation: conversation.id,
+      ...buildQualifiedId(conversation),
       data: {
         reason,
       },
@@ -264,7 +275,7 @@ export const EventBuilder = {
     currentTimestamp: number,
   ): DegradedMessageEvent {
     return {
-      conversation: conversationEntity.id,
+      ...buildQualifiedId(conversationEntity),
       data: {
         type,
         userIds,
@@ -277,13 +288,13 @@ export const EventBuilder = {
   },
 
   buildDelete(
-    conversationId: string,
+    conversation: Conversation,
     messageId: string,
     time: string,
     deletedMessageEntity: Message,
   ): DeleteEverywhereEvent {
     return {
-      conversation: conversationId,
+      ...buildQualifiedId(conversation),
       data: {
         deleted_time: time,
       },
@@ -302,7 +313,7 @@ export const EventBuilder = {
     id: string,
   ): FileTypeRestrictedEvent {
     return {
-      conversation: conversation.id,
+      ...buildQualifiedId(conversation),
       data: {
         fileExt,
         isIncoming,
@@ -320,7 +331,7 @@ export const EventBuilder = {
     isTemporaryGuest: boolean = false,
     timestamp: number,
   ): GroupCreationEvent {
-    const {creator: creatorId, id} = conversationEntity;
+    const {creator: creatorId} = conversationEntity;
     const selfUserId = conversationEntity.selfUser().id;
     const selfUserDomain = conversationEntity.selfUser().domain;
     const isoDate = new Date(timestamp || 0).toISOString();
@@ -332,7 +343,7 @@ export const EventBuilder = {
     }
 
     return {
-      conversation: id,
+      ...buildQualifiedId(conversationEntity),
       data: {
         allTeamMembers: conversationEntity.withAllTeamMembers(),
         name: conversationEntity.name(),
@@ -345,11 +356,15 @@ export const EventBuilder = {
     };
   },
 
-  buildIncomingMessageTooBig(event: EventRecord, messageError: Error, errorCode: number): ErrorEvent {
-    const {conversation: conversationId, data: eventData, from, time} = event;
+  buildIncomingMessageTooBig(
+    event: ConversationOtrMessageAddEvent,
+    messageError: Error,
+    errorCode: number,
+  ): ErrorEvent {
+    const {qualified_conversation: conversationId, data: eventData, from, time} = event;
 
     return {
-      conversation: conversationId,
+      ...buildQualifiedId(conversationId),
       error: `${messageError.message} (${eventData.sender})`,
       error_code: `${errorCode} (${eventData.sender})`,
       from,
@@ -360,14 +375,14 @@ export const EventBuilder = {
   },
 
   buildLegalHoldMessage(
-    conversationId: string,
+    conversationId: QualifiedIdOptional,
     userId: string,
     timestamp: number | string,
     legalHoldStatus: LegalHoldStatus,
     beforeMessage?: boolean,
   ): LegalHoldMessageEvent {
     return {
-      conversation: conversationId,
+      ...buildQualifiedId(conversationId),
       data: {
         legal_hold_status: legalHoldStatus,
       },
@@ -390,7 +405,7 @@ export const EventBuilder = {
     const isoDate = new Date(timestamp).toISOString();
 
     return {
-      conversation: conversationEntity.id,
+      ...buildQualifiedId(conversationEntity),
       data: {
         user_ids: joiningUserIds.map(({id}) => id),
       },
@@ -407,7 +422,7 @@ export const EventBuilder = {
     currentTimestamp: number,
   ): MemberLeaveEvent {
     return {
-      conversation: conversationEntity.id,
+      ...buildQualifiedId(conversationEntity),
       data: {
         user_ids: [userId.id],
       },
@@ -419,7 +434,7 @@ export const EventBuilder = {
 
   buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number, senderId: string): MessageAddEvent {
     return {
-      conversation: conversationEntity.id,
+      ...buildQualifiedId(conversationEntity),
       data: {
         sender: senderId,
       },
@@ -432,7 +447,7 @@ export const EventBuilder = {
 
   buildMissed(conversationEntity: Conversation, currentTimestamp: number): MissedEvent {
     return {
-      conversation: conversationEntity.id,
+      ...buildQualifiedId(conversationEntity),
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
@@ -446,7 +461,7 @@ export const EventBuilder = {
     isoDate: string | number,
   ): TeamMemberLeaveEvent {
     return {
-      conversation: conversationEntity.id,
+      ...buildQualifiedId(conversationEntity),
       data: {
         name: userEntity.name(),
         user_ids: [userEntity.id],
@@ -459,10 +474,10 @@ export const EventBuilder = {
   },
 
   buildUnableToDecrypt(event: EventRecord, decryptionError: Error, errorCode: number): ErrorEvent {
-    const {conversation: conversationId, data: eventData, from, time} = event;
+    const {qualified_conversation: conversationId, data: eventData, from, time} = event;
 
     return {
-      conversation: conversationId,
+      ...buildQualifiedId(conversationId),
       error: `${decryptionError.message} (${eventData.sender})`,
       error_code: `${errorCode} (${eventData.sender})`,
       from,
@@ -473,13 +488,13 @@ export const EventBuilder = {
   },
 
   buildVoiceChannelActivate(
-    conversationId: string,
+    conversation: QualifiedIdOptional,
     userId: string,
     time: string,
     protocolVersion: number,
   ): VoiceChannelActivateEvent {
     return {
-      conversation: conversationId,
+      ...buildQualifiedId(conversation),
       from: userId,
       id: createRandomUuid(),
       protocol_version: protocolVersion,
@@ -489,7 +504,7 @@ export const EventBuilder = {
   },
 
   buildVoiceChannelDeactivate(
-    conversationId: string,
+    conversation: QualifiedIdOptional,
     userId: string,
     duration: number,
     reason: AVS_REASON,
@@ -497,7 +512,7 @@ export const EventBuilder = {
     protocolVersion: number,
   ): VoiceChannelDeactivateEvent {
     return {
-      conversation: conversationId,
+      ...buildQualifiedId(conversation),
       data: {
         duration,
         reason,
