@@ -687,6 +687,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/fs-extra@9.0.13":
+  version "9.0.13"
+  resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-9.0.13.tgz#7594fbae04fe7f1918ce8b3d213f74ff44ac1f45"
+  integrity sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/geolite2@2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/geolite2/-/geolite2-2.0.0.tgz#4b0f7af0d5460b0d67ff981df6f12c72f105c092"
@@ -735,10 +742,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.22.tgz#0d29f382472c4ccf3bd96ff0ce47daf5b7b84b18"
   integrity sha512-g+f/qj/cNcqKkc3tFqlXOYjrmZA+jNBiDzbP3kH+B+otKFqAdPgVTGP1IeKRdMml/aE69as5S4FqtxAbl+LaMw==
 
-"@types/node@12.20.25":
-  version "12.20.25"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.25.tgz#882bea2ca0d2ec22126b92b4dd2dc24b35a07469"
-  integrity sha512-hcTWqk7DR/HrN9Xe7AlJwuCaL13Vcd9/g/T54YrJz4Q3ESM5mr33YCzW2bOfzSIc3aZMeGBvbLGvgN6mIJ0I5Q==
+"@types/node@12.20.27":
+  version "12.20.27"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.20.27.tgz#4141fcad57c332a120591de883e26fe4bb14aaea"
+  integrity sha512-qZdePUDSLAZRXXV234bLBEUM0nAQjoxbcSwp1rqSMUe1rZ47mwU6OjciR/JvF1Oo8mc0ys6GE0ks0HGgqAZoGg==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -790,10 +797,10 @@
   dependencies:
     "@types/yargs-parser" "*"
 
-"@wireapp/commons@4.2.11":
-  version "4.2.11"
-  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.2.11.tgz#786605872daf4edb20a997136c2ea8b85411c60e"
-  integrity sha512-boo+x7pV7B3G6zHV5z9BoUhvQzUn/9C72/TehAdfkRhElTJQJ7IJsBC+gMzHavlhVSt+a/63YlvfgK84BTvUtw==
+"@wireapp/commons@4.2.12":
+  version "4.2.12"
+  resolved "https://registry.yarnpkg.com/@wireapp/commons/-/commons-4.2.12.tgz#2121cd9e40fa6252d18e18830f615d90e80e74c4"
+  integrity sha512-wbSpRUkdTgOs/F8tazPqo3iBjp/5xTA4VY44MOQW7c8hMZuVxJbENrJW6w8ZbipiaJO3jXsYS01cXF2TfIvLdA==
   dependencies:
     "@types/fs-extra" "9.0.12"
     "@types/node" "~14"
@@ -4040,10 +4047,10 @@ pm2-sysmonit@^1.2.8:
     systeminformation "^5.7"
     tx2 "~1.0.4"
 
-pm2@5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/pm2/-/pm2-5.1.1.tgz#cca589a471712bdcac18b8467cef048f7267997a"
-  integrity sha512-2Agpn2IVXOKu8kP+qaxKOvMLNtbZ6lY4bzKcEW2d2tw7O0lpNO7QvDayY4af+8U1+WCn90UjPK4q2wPFVHt/sA==
+pm2@5.1.2:
+  version "5.1.2"
+  resolved "https://registry.yarnpkg.com/pm2/-/pm2-5.1.2.tgz#bffe4e9a84ee013362717eaad1b39b4d73f0fcd0"
+  integrity sha512-2nJQeCWjkN0WnTkWctaoZpqrJTiUN/Icw76IMVHHzPhr/p7yQYlEQgHzlL5IFWxO2N1HdBNXNdZft2p4HUmUcA==
   dependencies:
     "@pm2/agent" "~2.0.0"
     "@pm2/io" "~5.0.0"
@@ -4844,9 +4851,9 @@ tiny-lru@7.0.6:
   integrity sha512-zNYO0Kvgn5rXzWpL0y3RS09sMK67eGaQj9805jlK9G6pSadfriTczzLHFXa/xcW4mIRfmlB9HyQ/+SgL0V1uow==
 
 tmpl@1.0.x:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/tmpl/-/tmpl-1.0.4.tgz#23640dd7b42d00433911140820e5cf440e521dd1"
-  integrity sha1-I2QN17QtAEM5ERQIIOXPRA5SHdE=
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/tmpl/-/tmpl-1.0.5.tgz#8683e0b902bb9c20c4f726e3c0b69f36518c07cc"
+  integrity sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==
 
 to-fast-properties@^2.0.0:
   version "2.0.0"

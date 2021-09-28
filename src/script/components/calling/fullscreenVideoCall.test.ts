@@ -119,7 +119,7 @@ describe('fullscreenVideoCall', () => {
     const setMaximizedSpy = jasmine.createSpy();
     const props = createProps();
     props.setMaximizedParticipant = setMaximizedSpy;
-    props.setVideoSpeakersActiveTab = () => {};
+    props.setActiveCallViewTab = () => {};
     props.call.addParticipant(new Participant(new User('a', null), 'a'));
     props.call.addParticipant(new Participant(new User('b', null), 'b'));
     props.call.addParticipant(new Participant(new User('c', null), 'd'));
