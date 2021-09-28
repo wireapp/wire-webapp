@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.8.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.8.1...@wireapp/api-client@13.8.2) (2021-09-28)
+
+
+### Bug Fixes
+
+* **api-client:** Align ConversationOthMessageData with backend definitions ([#4141](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4141)) ([b25a931](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/b25a931d4982c9827b484754127a1eb0a1b93cd9))
+
+
+
+
+
 ## [13.8.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.8.0...@wireapp/api-client@13.8.1) (2021-09-23)
 
 **Note:** Version bump only for package @wireapp/api-client
