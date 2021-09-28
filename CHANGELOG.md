@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [13.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.8.2...@wireapp/api-client@13.9.0) (2021-09-28)
+
+
+### Features
+
+* **api-client:** Add billing status 'incomplete' ([#4142](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4142)) ([122288d](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/122288df17a5851500d755e75524b02e858efd6f))
+
+
+
+
+
 ## [13.8.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.8.1...@wireapp/api-client@13.8.2) (2021-09-28)
 
 
