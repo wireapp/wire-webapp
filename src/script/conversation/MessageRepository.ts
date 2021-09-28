@@ -1756,12 +1756,16 @@ export class MessageRepository {
       .map(clientId => Object.keys(clientId).length)
       .reduce((totalClients, clients) => totalClients + clients, 0);
 
-    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${conversationId}'`;
+    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${JSON.stringify(
+      qualifiedConversationId,
+    )}'`;
     this.logger.info(logMessage, payload);
 
     if (numberOfUsers > numberOfClients) {
       this.logger.warn(
-        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`,
+        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${JSON.stringify(
+          qualifiedConversationId,
+        )}'`,
       );
     }
 
@@ -1825,13 +1829,15 @@ export class MessageRepository {
       }));
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
-        `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
+        `Updated '${messageType}' message (${messageId}) for conversation '${JSON.stringify(
+          qualifiedConversationId,
+        )}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
       );
       if (payloadWithMissingClients) {
-        return this.conversation_service.postEncryptedMessage(conversationId, payloadWithMissingClients, true);
+        return this.conversation_service.postEncryptedMessage(qualifiedConversationId, payloadWithMissingClients, true);
       }
-      return this.conversation_service.postEncryptedMessage(conversationId, payload, true);
+      return this.conversation_service.postEncryptedMessage(qualifiedConversationId, payload, true);
     }
   }
 
