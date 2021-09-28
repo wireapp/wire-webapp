@@ -1160,7 +1160,7 @@ export class MessageRepository {
 
   private sendGenericMessageToConversation(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
     return this.messageSender.queueMessage(async () => {
-      const recipients = await this.createRecipients(eventInfoEntity.conversationId);
+      const recipients = await this.createRecipients(eventInfoEntity.qualifiedConversationId);
       eventInfoEntity.updateOptions({recipients});
       return this.sendGenericMessage(eventInfoEntity, true);
     });
@@ -1339,7 +1339,7 @@ export class MessageRepository {
   private async shouldShowLegalHoldWarning(eventInfoEntity: EventInfoEntity): Promise<boolean> {
     const messageType = eventInfoEntity.getType();
     const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId.id);
+    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.qualifiedConversationId.id);
     const localLegalHoldStatus = conversationEntity.legalHoldStatus();
     await this.updateAllClients(conversationEntity, !isMessageEdit);
     const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
@@ -1350,10 +1350,10 @@ export class MessageRepository {
     const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
 
     if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
-      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
+      const {qualifiedConversationId, timestamp: numericTimestamp} = eventInfoEntity;
       await this.conversationRepositoryProvider().injectLegalHoldMessage({
         beforeTimestamp: true,
-        conversationId,
+        conversationId: qualifiedConversationId,
         legalHoldStatus: updatedLocalLegalHoldStatus,
         timestamp: numericTimestamp,
         userId: this.userState.self().id,
@@ -1408,8 +1408,8 @@ export class MessageRepository {
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
-      eventInfoEntity.conversationId.id,
-      eventInfoEntity.conversationId.domain,
+      eventInfoEntity.qualifiedConversationId.id,
+      eventInfoEntity.qualifiedConversationId.domain,
     );
     const legalHoldMessageTypes: string[] = [
       GENERIC_MESSAGE_TYPE.ASSET,
@@ -1459,7 +1459,7 @@ export class MessageRepository {
                 ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
                 : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
             } else {
-              const conversationId = eventInfoEntity.conversationId;
+              const conversationId = eventInfoEntity.qualifiedConversationId;
               const type = eventInfoEntity.getType();
 
               const log = `Missing user IDs to grant '${type}' message in '${conversationId}' (${consentType})`;
@@ -1520,7 +1520,7 @@ export class MessageRepository {
             WebAppEvents.WARNING.MODAL,
             ModalsViewModel.TYPE.CONFIRM,
             options,
-            `degraded-${eventInfoEntity.conversationId}`,
+            `degraded-${eventInfoEntity.qualifiedConversationId}`,
           );
         })
         .catch(reject);
@@ -1680,10 +1680,10 @@ export class MessageRepository {
    * @returns Is payload likely to be too big so that we switch to type external?
    */
   private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
-    const {conversationId, genericMessage} = eventInfoEntity;
+    const {qualifiedConversationId, genericMessage} = eventInfoEntity;
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
-      conversationId.id,
-      conversationId.domain,
+      qualifiedConversationId.id,
+      qualifiedConversationId.domain,
     );
     const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
@@ -1743,7 +1743,7 @@ export class MessageRepository {
     eventInfoEntity: EventInfoEntity,
     payload: NewOTRMessage<string>,
   ): Promise<ClientMismatch | undefined> {
-    const {conversationId, genericMessage, options} = eventInfoEntity;
+    const {qualifiedConversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;
     let messageType = eventInfoEntity.getType();
 
@@ -1767,7 +1767,7 @@ export class MessageRepository {
 
     try {
       const response = await this.conversation_service.postEncryptedMessage(
-        conversationId,
+        qualifiedConversationId,
         payload,
         options.precondition,
       );

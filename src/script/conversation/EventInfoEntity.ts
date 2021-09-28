@@ -42,15 +42,15 @@ export class EventInfoEntity {
   options: MessageSendingOptions;
   public readonly genericMessage: GenericMessage;
   private type?: GENERIC_MESSAGE_TYPE;
-  public readonly conversationId: QualifiedIdOptional;
+  public readonly qualifiedConversationId: QualifiedIdOptional;
   public timestamp?: number;
 
   constructor(
     genericMessage: GenericMessage,
-    conversationId: QualifiedIdOptional = {domain: null, id: ''},
+    qualifiedConversationId: QualifiedIdOptional = {domain: null, id: ''},
     options?: MessageSendingOptions,
   ) {
-    this.conversationId = conversationId;
+    this.qualifiedConversationId = qualifiedConversationId;
     this.genericMessage = genericMessage;
 
     this.options = {nativePush: true, precondition: false, ...options};
