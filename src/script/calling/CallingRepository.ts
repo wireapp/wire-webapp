@@ -275,7 +275,10 @@ export class CallingRepository {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients = await this.messageRepository.createRecipients(conversationId);
+      const localClients = await this.messageRepository.createRecipients({
+        domain: null,
+        id: conversationId /*TODO(federation): get conversation domain*/,
+      });
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -310,7 +313,10 @@ export class CallingRepository {
         [GENERIC_MESSAGE_TYPE.CALLING]: new Calling({content: ''}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, {
+        domain: null,
+        id: conversationId /*TODO(federation): get conversation domain*/,
+      });
       eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
       await this.messageRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
 
@@ -508,8 +514,16 @@ export class CallingRepository {
   //##############################################################################
 
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<void> {
-    const recipients = await this.messageRepository.createRecipients(conversationId, false, [userId]);
-    const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
+    const recipients = await this.messageRepository.createRecipients(
+      {domain: null, id: conversationId /*TODO(federation): get conversation domain*/},
+      false,
+      [userId],
+    );
+    const eventInfoEntity = new EventInfoEntity(
+      undefined,
+      {domain: null, id: conversationId /*TODO(federation): get conversation domain*/},
+      {recipients},
+    );
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse
       ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
@@ -906,7 +920,12 @@ export class CallingRepository {
   }
 
   private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
-    const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
+    const event = EventBuilder.buildVoiceChannelActivate(
+      {domain: null, id: conversationId /*TODO(federation): get conversation domain*/},
+      userId,
+      time,
+      this.avsVersion,
+    );
     this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
@@ -919,7 +938,7 @@ export class CallingRepository {
     source: string,
   ): void {
     const event = EventBuilder.buildVoiceChannelDeactivate(
-      conversationId,
+      {domain: null, id: conversationId /*TODO(federation): get conversation domain*/},
       userId,
       duration,
       reason,
@@ -978,8 +997,15 @@ export class CallingRepository {
       [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
       messageId: createRandomUuid(),
     });
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-    return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
+    const eventInfoEntity = new EventInfoEntity(
+      genericMessage,
+      {domain: null, id: conversationId /*TODO(federation): get conversation domain*/},
+      options,
+    );
+    return this.messageRepository.sendCallingMessage(eventInfoEntity, {
+      domain: null,
+      id: conversationId /*TODO(federation): get conversation domain*/,
+    });
   };
 
   private readonly sendSFTRequest = (

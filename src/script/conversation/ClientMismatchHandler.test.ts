@@ -99,7 +99,7 @@ describe('ClientMismatchHandler', () => {
       };
 
       const timestamp = new Date(clientMismatch.time).getTime();
-      const eventInfoEntity = new EventInfoEntity(undefined, conversation.id);
+      const eventInfoEntity = new EventInfoEntity(undefined, {domain: null, id: conversation.id});
       eventInfoEntity.setTimestamp(clientMismatch.time);
 
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
@@ -150,7 +150,7 @@ describe('ClientMismatchHandler', () => {
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(message, conversation.id);
+      const eventInfoEntity = new EventInfoEntity(message, {domain: null, id: conversation.id});
 
       const clientMismatch: ClientMismatch = {
         deleted: {},
@@ -201,7 +201,7 @@ describe('ClientMismatchHandler', () => {
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(message, conversation.id);
+      const eventInfoEntity = new EventInfoEntity(message, {domain: null, id: conversation.id});
 
       const clientMismatch: ClientMismatch = {
         deleted: {
@@ -247,7 +247,7 @@ describe('ClientMismatchHandler', () => {
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(message, conversation.id);
+      const eventInfoEntity = new EventInfoEntity(message, {domain: null, id: conversation.id});
 
       const clientMismatch: ClientMismatch = {
         deleted: {},

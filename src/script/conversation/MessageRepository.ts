@@ -806,12 +806,8 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(
-    user_id: string,
-    client_id: string,
-    conversation_id: QualifiedIdOptional,
-    domain: string | null,
-  ): Promise<ClientMismatch> {
+  async resetSession(user_id: string, client_id: string, conversationId: QualifiedIdOptional): Promise<ClientMismatch> {
+    const {domain} = conversationId;
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 
     try {
@@ -821,7 +817,7 @@ export class MessageRepository {
       } else {
         this.logger.warn('No local session found to delete.');
       }
-      return await this.sendSessionReset(user_id, client_id, conversation_id);
+      return await this.sendSessionReset(user_id, client_id, conversationId);
     } catch (error) {
       const logMessage = `Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`;
       this.logger.warn(logMessage, error);

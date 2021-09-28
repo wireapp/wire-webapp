@@ -92,7 +92,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
       : conversationState.activeConversation().id;
     setIsResettingSession(true);
     messageRepository
-      .resetSession(user.id, selectedClient.id, conversationId, user.domain)
+      .resetSession(user.id, selectedClient.id, {domain: user.domain, id: conversationId})
       .then(_resetProgress)
       .catch(_resetProgress);
   };
