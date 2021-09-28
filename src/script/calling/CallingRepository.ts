@@ -49,7 +49,7 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {flatten, getDifference} from 'Util/ArrayUtil';
+import {flatten} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
 import {Config} from '../Config';
@@ -181,7 +181,7 @@ export class CallingRepository {
       }
       const isSpeakersViewActive = this.callState.isSpeakersViewActive();
       if (isSpeakersViewActive) {
-        this.requestVideoStreams(call, call.activeSpeakers());
+        this.requestVideoStreams(call.conversationId, call.activeSpeakers());
       }
     });
   }
@@ -407,9 +407,6 @@ export class CallingRepository {
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
       conversation.call(null);
-    }
-    if (this.callState.requestedVideoStreams.call === call) {
-      this.callState.requestedVideoStreams = {call: undefined, participants: []};
     }
   }
 
@@ -770,7 +767,9 @@ export class CallingRepository {
 
   changeCallPage(newPage: number, call: Call): void {
     call.currentPage(newPage);
-    this.requestCurrentPageVideoStreams();
+    if (!this.callState.isSpeakersViewActive()) {
+      this.requestCurrentPageVideoStreams();
+    }
   }
 
   requestCurrentPageVideoStreams(): void {
@@ -779,25 +778,15 @@ export class CallingRepository {
       return;
     }
     const currentPageParticipants = call.pages()[call.currentPage()];
-    this.requestVideoStreams(call, currentPageParticipants);
+    this.requestVideoStreams(call.conversationId, currentPageParticipants);
   }
 
-  requestVideoStreams(call: Call, participants: Participant[]) {
-    const callAlreadyRequested = call === this.callState.requestedVideoStreams.call;
-    const requestedParticipants = this.callState.requestedVideoStreams.participants;
-    const participantsAlreadyRequested =
-      participants.length === requestedParticipants.length &&
-      getDifference(participants, requestedParticipants).length === 0;
-
-    if (callAlreadyRequested && participantsAlreadyRequested) {
-      return;
-    }
-
+  requestVideoStreams(conversationId: string, participants: Participant[]) {
     const payload = {
       clients: participants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
-      convid: call.conversationId,
+      convid: conversationId,
     };
-    this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
+    this.wCall.requestVideoStreams(this.wUser, conversationId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
   readonly leaveCall = (conversationId: ConversationId): void => {
@@ -1340,7 +1329,7 @@ export class CallingRepository {
     }
 
     const [stream] = streams;
-    if (stream.getVideoTracks().length > 0) {
+    if (stream.getVideoTracks().length > 0 && participant.videoStream() !== stream) {
       participant.videoStream(stream);
     }
   };
