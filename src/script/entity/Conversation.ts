@@ -786,7 +786,7 @@ export class Conversation {
     return undefined;
   }
 
-  updateTimestampServer(time: number, is_backend_timestamp: boolean = false): void {
+  updateTimestampServer(time: number | string, is_backend_timestamp: boolean = false): void {
     if (is_backend_timestamp) {
       const timestamp = new Date(time).getTime();
 

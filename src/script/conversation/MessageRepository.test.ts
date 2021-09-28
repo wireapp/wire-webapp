@@ -112,7 +112,7 @@ describe('MessageRepository', () => {
         },
         from: createRandomUuid(),
         id: messageEntity.id,
-        time: Date.now(),
+        time: new Date().toISOString(),
         type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 

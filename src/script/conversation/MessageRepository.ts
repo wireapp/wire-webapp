@@ -40,7 +40,7 @@ import {
   DataTransfer,
 } from '@wireapp/protocol-messaging';
 import {Account} from '@wireapp/core';
-import {ReactionType} from '@wireapp/core/src/main/conversation/';
+import {ReactionType, MessageSendingCallbacks} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
@@ -110,7 +110,7 @@ import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicate
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 
-type ConversationEvent = {conversation: string; id: string};
+type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
@@ -268,7 +268,7 @@ export class MessageRepository {
       .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
       .build();
 
-    const injectOptimisticEvent = (genericMessage: GenericMessage) => {
+    const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
       const senderId = this.clientState.currentClient().id;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
@@ -277,8 +277,8 @@ export class MessageRepository {
         .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
     };
 
-    const updateOptimisticEvent = (genericMessage: GenericMessage) => {
-      this.updateMessageAsSent(conversation, genericMessage.messageId /* TODO fix date*/);
+    const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
+      this.updateMessageAsSent(conversation, genericMessage.messageId, sentTime);
     };
 
     await account.service!.conversation.send({
