@@ -1100,7 +1100,7 @@ export class ConversationRepository {
    * @note If there is no conversation it will request it from the backend
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | void> => {
+  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
     return Promise.resolve(this.conversationState.findConversation(connectionEntity.conversationId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -1132,6 +1132,7 @@ export class ConversationRepository {
         if (!isConversationNotFound) {
           throw error;
         }
+        return undefined;
       });
   };
 
@@ -1156,7 +1157,7 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param connectionEntities Connections entities
    */
-  mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation | void>[] {
+  mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation>[] {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
     return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
