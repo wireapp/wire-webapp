@@ -2392,8 +2392,12 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-update' event
    * @returns Resolves when the event was handled
    */
-  private onMemberUpdate(conversationEntity: Conversation, eventJson: Partial<ConversationMemberUpdateEvent>) {
-    const {qualified_conversation: conversationId, data: eventData, from} = eventJson;
+  private onMemberUpdate(
+    conversationEntity: Conversation,
+    eventJson: Pick<ConversationMemberUpdateEvent, 'data' | 'from'>,
+  ) {
+    const {data: eventData, from} = eventJson;
+    const conversationId = {domain: conversationEntity.domain, id: conversationEntity.id};
 
     const isConversationRoleUpdate = !!eventData.conversation_role;
     if (isConversationRoleUpdate) {
