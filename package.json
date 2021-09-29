@@ -113,7 +113,7 @@
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-babel": "5.3.1",
     "eslint-plugin-import": "2.24.2",
-    "eslint-plugin-jest": "24.4.2",
+    "eslint-plugin-jest": "24.5.0",
     "eslint-plugin-jsdoc": "36.1.0",
     "eslint-plugin-no-unsanitized": "3.1.5",
     "eslint-plugin-prettier": "4.0.0",
@@ -242,5 +242,5 @@
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts"
   },
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
