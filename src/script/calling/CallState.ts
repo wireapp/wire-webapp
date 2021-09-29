@@ -24,7 +24,6 @@ import {STATE as CALL_STATE} from '@wireapp/avs';
 import {CallViewTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
-import type {Participant} from './Participant';
 
 @singleton()
 export class CallState {
@@ -59,10 +58,5 @@ export class CallState {
     this.isChoosingScreen = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
-
-    this.requestedVideoStreams = {
-      call: undefined,
-      participants: [],
-    };
   }
 }
