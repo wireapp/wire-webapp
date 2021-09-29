@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [13.9.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.9.0...@wireapp/api-client@13.9.1) (2021-09-29)
+
+
+### Bug Fixes
+
+* **api-client:** Update backend conversation types with latest definitions ([#4143](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4143)) ([610a5b3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/610a5b31a0efcd8c62f4feb80fa1dda67e9cddeb))
+
+
+
+
+
 # [13.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.8.2...@wireapp/api-client@13.9.0) (2021-09-28)
 
 
