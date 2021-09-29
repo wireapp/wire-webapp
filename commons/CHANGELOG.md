@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.2.13](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.12...@wireapp/commons@4.2.13) (2021-09-29)
+
+
+### Bug Fixes
+
+* **commons:** Fix ReDoS in ansi-regex ([0ebfc2c](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/commit/0ebfc2c4a74c11d594dad0faf6b4808a6cda565d))
+
+
+
+
+
 ## [4.2.12](https://github.com/wireapp/wire-web-packages/tree/main/packages/commons/compare/@wireapp/commons@4.2.11...@wireapp/commons@4.2.12) (2021-09-23)
 
 
