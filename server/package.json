@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "dependencies": {
-    "@wireapp/commons": "4.2.11",
+    "@wireapp/commons": "4.2.12",
     "dotenv": "10.0.0",
     "dotenv-extended": "2.9.0",
     "express": "4.17.1",
@@ -19,16 +19,16 @@
     "maxmind": "4.3.2",
     "nocache": "3.0.1",
     "opn": "6.0.0",
-    "pm2": "5.1.1"
+    "pm2": "5.1.2"
   },
   "devDependencies": {
     "@types/express": "4.17.13",
     "@types/express-sitemap-xml": "1.1.1",
     "@types/express-useragent": "1.0.1",
-    "@types/fs-extra": "9.0.12",
+    "@types/fs-extra": "9.0.13",
     "@types/geolite2": "2.0.0",
     "@types/hbs": "4.0.1",
-    "@types/node": "12.20.25",
+    "@types/node": "12.20.27",
     "jest": "26.6.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",

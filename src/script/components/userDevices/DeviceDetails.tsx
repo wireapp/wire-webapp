@@ -81,7 +81,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   const clickToToggleDeviceVerification = () => {
     const toggleVerified = !isVerified;
     clientRepository
-      .verifyClient(user.id, selectedClient, toggleVerified)
+      .verifyClient(user.id, selectedClient, toggleVerified, user.domain)
       .catch((error: DexieError) => logger.warn(`Failed to toggle client verification: ${error.message}`));
   };
 

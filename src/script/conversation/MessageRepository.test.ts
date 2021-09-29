@@ -112,7 +112,7 @@ describe('MessageRepository', () => {
         },
         from: createRandomUuid(),
         id: messageEntity.id,
-        time: Date.now(),
+        time: new Date().toISOString(),
         type: ClientEvent.CONVERSATION.ASSET_ADD,
       };
 
@@ -206,7 +206,10 @@ describe('MessageRepository', () => {
       largeConversationEntity.participating_user_ids(
         Array(128)
           .fill(undefined)
-          .map((x, i) => i.toString()),
+          .map((x, i) => ({
+            domain: null,
+            id: i.toString(),
+          })),
       );
 
       const text = new Text({
@@ -258,7 +261,16 @@ describe('MessageRepository', () => {
 
     it('should return false for small payload', async () => {
       const smallConversationEntity = generateConversation();
-      smallConversationEntity.participating_user_ids(['0', '1']);
+      smallConversationEntity.participating_user_ids([
+        {
+          domain: null,
+          id: '0',
+        },
+        {
+          domain: null,
+          id: '1',
+        },
+      ]);
 
       const genericMessage = new GenericMessage({
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),

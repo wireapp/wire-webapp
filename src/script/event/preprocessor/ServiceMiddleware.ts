@@ -27,6 +27,22 @@ import type {ConversationRepository} from '../../conversation/ConversationReposi
 import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
+import {QualifiedIdOptional} from '../../conversation/EventBuilder';
+import {QualifiedUserId} from '@wireapp/protocol-messaging';
+
+interface MemberJoinEvent {
+  user_ids: string[];
+  users: {
+    conversation_role: string;
+    id: string;
+    qualified_id?: QualifiedUserId;
+  }[];
+}
+
+interface One2OneCreationEvent {
+  userIds: QualifiedIdOptional[];
+}
+type HandledEvents = MemberJoinEvent | One2OneCreationEvent;
 
 export class ServiceMiddleware {
   private readonly userRepository: UserRepository;
@@ -43,44 +59,54 @@ export class ServiceMiddleware {
     this.logger = getLogger('ServiceMiddleware');
   }
 
-  processEvent(event: EventRecord): Promise<EventRecord> {
+  processEvent(event: EventRecord<HandledEvents>): Promise<EventRecord> {
     switch (event.type) {
       case ClientEvent.CONVERSATION.ONE2ONE_CREATION:
-        return this._process1To1ConversationCreationEvent(event);
+        return this._process1To1ConversationCreationEvent(event as EventRecord<One2OneCreationEvent>);
 
       case CONVERSATION_EVENT.MEMBER_JOIN:
-        return this._processMemberJoinEvent(event);
+        return this._processMemberJoinEvent(event as EventRecord<MemberJoinEvent>);
 
       default:
         return Promise.resolve(event);
     }
   }
 
-  private async _processMemberJoinEvent(event: EventRecord) {
+  private async _processMemberJoinEvent(event: EventRecord<MemberJoinEvent>) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
     const {conversation: conversationId, data: eventData} = event;
-    const selfUserId = this.userState.self().id;
-    const containsSelfUser = eventData.user_ids.includes(selfUserId);
+    const userQualifiedIds = this.extractQualifiedUserIds(eventData);
+    const selfUser = this.userState.self();
+    const containsSelfUser = userQualifiedIds.find(
+      (user: QualifiedIdOptional) => selfUser.id === user.id && selfUser.domain == user.domain,
+    );
 
-    const userIds = containsSelfUser
+    const userIds: QualifiedIdOptional[] = containsSelfUser
       ? await this.conversationRepository
           .getConversationById(conversationId)
           .then(conversationEntity => conversationEntity.participating_user_ids())
-      : eventData.user_ids;
+      : userQualifiedIds;
 
     const hasService = await this._containsService(userIds);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
-  private async _process1To1ConversationCreationEvent(event: EventRecord) {
+  private extractQualifiedUserIds(data: MemberJoinEvent): QualifiedIdOptional[] {
+    const userIds = data.users
+      ? data.users.map(user => user.qualified_id || {domain: null, id: user.id})
+      : data.user_ids.map(id => ({domain: null, id}));
+    return userIds;
+  }
+
+  private async _process1To1ConversationCreationEvent(event: EventRecord<One2OneCreationEvent>) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
     const hasService = await this._containsService(event.data.userIds);
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
-  private async _containsService(userIds: string[]) {
-    const userEntities = await this.userRepository.getUsersById(userIds);
+  private async _containsService(users: QualifiedIdOptional[]) {
+    const userEntities = await this.userRepository.getUsersById(users);
     return userEntities.some(userEntity => userEntity.isService);
   }
 

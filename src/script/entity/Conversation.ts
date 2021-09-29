@@ -45,6 +45,7 @@ import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import type {QualifiedIdOptional} from '../conversation/EventBuilder';
 
 interface UnreadState {
   allEvents: Message[];
@@ -86,6 +87,7 @@ export class Conversation {
   public readonly call: ko.Observable<Call>;
   public readonly cleared_timestamp: ko.Observable<number>;
   public readonly connection: ko.Observable<ConnectionEntity>;
+  // TODO(Federation): Currently the 'creator' just refers to a user id but it has to become a qualified id
   public creator: string;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User>;
@@ -126,7 +128,7 @@ export class Conversation {
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
-  public readonly participating_user_ids: ko.ObservableArray<string>;
+  public readonly participating_user_ids: ko.ObservableArray<QualifiedIdOptional>;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
@@ -216,8 +218,9 @@ export class Conversation {
     this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
-      if (connectedUserId && !this.participating_user_ids().includes(connectedUserId)) {
-        this.participating_user_ids.push(connectedUserId);
+      // TODO(Federation): Check for domain once backend supports federated connections
+      if (connectedUserId && this.participating_user_ids().every(user => user.id !== connectedUserId)) {
+        this.participating_user_ids.push({domain: null, id: connectedUserId});
       }
     });
 
@@ -505,7 +508,7 @@ export class Conversation {
       return false;
     }
 
-    return this.domain !== Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    return this.domain != Config.getConfig().FEATURE.FEDERATION_DOMAIN;
   }
 
   readonly persistState = (): void => {
@@ -743,7 +746,9 @@ export class Conversation {
 
       const isCallActivation = messageEntity.isCall() && messageEntity.isActivation();
       const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
-      const wasSelfUserAdded = isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().id);
+      const wasSelfUserAdded =
+        isMemberJoin &&
+        (messageEntity as MemberMessage).isUserAffected({domain: this.selfUser().domain, id: this.selfUser().id});
 
       return isCallActivation || wasSelfUserAdded;
     });
@@ -781,7 +786,7 @@ export class Conversation {
     return undefined;
   }
 
-  updateTimestampServer(time: number, is_backend_timestamp: boolean = false): void {
+  updateTimestampServer(time: number | string, is_backend_timestamp: boolean = false): void {
     if (is_backend_timestamp) {
       const timestamp = new Date(time).getTime();
 
@@ -936,7 +941,8 @@ export class Conversation {
       muted_state: this.mutedState(),
       muted_timestamp: this.mutedTimestamp(),
       name: this.name(),
-      others: this.participating_user_ids(),
+      others: this.participating_user_ids().map(user => user.id),
+      qualified_others: this.participating_user_ids(),
       receipt_mode: this.receiptMode(),
       roles: this.roles(),
       status: this.status(),

@@ -202,7 +202,7 @@ export class User {
     this.isExpired = ko.observable(false);
   }
 
-  get isFederatedUser(): boolean {
+  get hasDomain(): boolean {
     return !!this.domain;
   }
 
@@ -211,7 +211,7 @@ export class User {
       return true;
     }
 
-    return this.domain === otherDomain;
+    return this.domain == otherDomain;
   }
 
   /**
@@ -295,12 +295,15 @@ export class User {
     const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
     if (checkExpiration) {
       if (this.isExpired()) {
-        amplify.publish(WebAppEvents.USER.UPDATE, this.id);
+        amplify.publish(WebAppEvents.USER.UPDATE, {domain: this.domain, id: this.id});
         return;
       }
 
       const timeout = this.expirationRemaining() + User.CONFIG.TEMPORARY_GUEST.EXPIRATION_THRESHOLD;
-      this.expirationTimeoutId = window.setTimeout(() => amplify.publish(WebAppEvents.USER.UPDATE, this.id), timeout);
+      this.expirationTimeoutId = window.setTimeout(
+        () => amplify.publish(WebAppEvents.USER.UPDATE, {domain: this.domain, id: this.id}),
+        timeout,
+      );
     }
   }
 

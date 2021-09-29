@@ -125,7 +125,7 @@ export class TestFactory {
    */
   async exposeCryptographyActors(mockCryptobox = true) {
     const storageRepository = await this.exposeStorageActors();
-    const currentClient = new ClientEntity(true);
+    const currentClient = new ClientEntity(true, null);
     currentClient.id = entities.clients.john_doe.permanent.id;
     this.cryptography_service = new CryptographyService();
 
@@ -148,7 +148,7 @@ export class TestFactory {
    */
   async exposeClientActors() {
     await this.exposeCryptographyActors();
-    const clientEntity = new ClientEntity();
+    const clientEntity = new ClientEntity(false, null);
     clientEntity.address = '192.168.0.1';
     clientEntity.class = ClientClassification.DESKTOP;
     clientEntity.id = '60aee26b7f55a99f';
@@ -165,7 +165,7 @@ export class TestFactory {
     this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, new ClientState());
     this.client_repository.init(user);
 
-    const currentClient = new ClientEntity();
+    const currentClient = new ClientEntity(false, null);
     currentClient.address = '62.96.148.44';
     currentClient.class = ClientClassification.DESKTOP;
     currentClient.cookie = 'webapp@2153234453@temporary@1470926647664';
@@ -294,7 +294,7 @@ export class TestFactory {
       this.user_repository['userState'],
       this.team_repository['teamState'],
     );
-    const clientEntity = new ClientEntity();
+    const clientEntity = new ClientEntity(false, null);
     clientEntity.address = '192.168.0.1';
     clientEntity.class = ClientClassification.DESKTOP;
     clientEntity.id = '60aee26b7f55a99f';

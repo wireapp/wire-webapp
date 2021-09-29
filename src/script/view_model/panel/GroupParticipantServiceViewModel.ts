@@ -59,7 +59,9 @@ export class GroupParticipantServiceViewModel extends BasePanelViewModel {
     this.selectedInConversation = ko.pureComputed(() => {
       if (this.isVisible() && this.activeConversation()) {
         const participatingUserIds = this.activeConversation().participating_user_ids();
-        return participatingUserIds.some(id => this.selectedParticipant().id === id);
+        return participatingUserIds.some(
+          user => this.selectedParticipant().id === user.id && this.selectedParticipant().domain == user.domain,
+        );
       }
       return false;
     });

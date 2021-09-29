@@ -178,6 +178,7 @@ const config: ServerConfig = {
       },
       TEAMS_BASE: process.env.URL_TEAMS_BASE,
       TEAMS_CREATE: process.env.URL_TEAMS_CREATE,
+      TERMS_BILLING: process.env.URL_TERMS_BILLING,
       TERMS_OF_USE_PERSONAL: process.env.URL_TERMS_OF_USE_PERSONAL,
       TERMS_OF_USE_TEAMS: process.env.URL_TERMS_OF_USE_TEAMS,
       WEBSITE_BASE: process.env.URL_WEBSITE_BASE,

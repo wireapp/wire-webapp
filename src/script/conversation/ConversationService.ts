@@ -171,7 +171,7 @@ export class ConversationService {
    * @param payload Updated properties
    * @returns Resolves with the server response
    */
-  updateMemberProperties(conversationId: string, payload: ConversationMemberUpdateData): Promise<void> {
+  updateMemberProperties(conversationId: string, payload: Partial<ConversationMemberUpdateData>): Promise<void> {
     return this.apiClient.conversation.api.putMembershipProperties(conversationId, payload);
   }
 

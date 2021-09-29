@@ -53,15 +53,15 @@ export interface FullscreenVideoCallProps {
   leave: (call: Call) => void;
   maximizedParticipant: Participant;
   mediaDevicesHandler: MediaDevicesHandler;
-  setMaximizedParticipant: (call: Call, participant: Participant) => void;
+  multitasking: Multitasking;
   setActiveCallViewTab: (tab: string) => void;
+  setMaximizedParticipant: (call: Call, participant: Participant) => void;
   switchCameraInput: (call: Call, deviceId: string) => void;
   teamState?: TeamState;
   toggleCamera: (call: Call) => void;
   toggleMute: (call: Call, muteState: boolean) => void;
   toggleScreenshare: (call: Call) => void;
   videoGrid: Grid;
-  multitasking: Multitasking;
 }
 
 const FullscreenVideoCallConfig = {

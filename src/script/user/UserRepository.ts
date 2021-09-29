@@ -29,10 +29,11 @@ import {
   UserAssetType as APIClientUserAssetType,
   QualifiedId,
 } from '@wireapp/api-client/src/user';
+import type {QualifiedUserClientMap} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
-import type {PublicClient} from '@wireapp/api-client/src/client';
+import type {PublicClient, AddedClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
 
 import {chunk, partition} from 'Util/ArrayUtil';
@@ -60,14 +61,14 @@ import {User} from '../entity/User';
 import {UserError} from '../error/UserError';
 import {UserMapper} from './UserMapper';
 import {UserState} from './UserState';
-import type {ClientRepository, QualifiedUserClientMap} from '../client/ClientRepository';
+import type {ClientRepository, QualifiedUserClientEntityMap, UserClientEntityMap} from '../client/ClientRepository';
 import type {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {EventSource} from '../event/EventSource';
 import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
-import {QualifiedPublicUserMap} from '../client/ClientService';
+import {QualifiedIdOptional} from '../conversation/EventBuilder';
 import {fixWebsocketString} from 'Util/StringUtil';
 
 export class UserRepository {
@@ -174,31 +175,31 @@ export class UserRepository {
   }
 
   /**
-   * Retrieves meta information about all the clients of a given user.
+   * Retrieves meta information about all the clients of given qualified users.
    */
-  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
-  getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicUserMap>;
-  getClientsByUserIds(
-    userIds: (QualifiedId | string)[],
+  getClientsByQualifiedUserIds(
+    userIds: QualifiedId[],
     updateClients: boolean,
-  ): Promise<QualifiedUserClientMap | QualifiedPublicUserMap> {
-    return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
+  ): Promise<QualifiedUserClientEntityMap | QualifiedUserClientMap> {
+    return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients as any);
   }
 
   /**
-   * Retrieves meta information about all the clients of a given user.
+   * Retrieves meta information about all the clients of given users.
    */
-  getClientsByUsers(userEntities: User[], updateClients: true): Promise<QualifiedUserClientMap>;
-  getClientsByUsers(userEntities: User[], updateClients: false): Promise<QualifiedPublicUserMap>;
   getClientsByUsers(
     userEntities: User[],
     updateClients: boolean,
-  ): Promise<QualifiedUserClientMap | QualifiedPublicUserMap> {
-    const userIds: (QualifiedId | string)[] = userEntities.map(userEntity => {
-      return userEntity.domain ? {domain: userEntity.domain, id: userEntity.id} : userEntity.id;
-    });
+  ): Promise<UserClientEntityMap | QualifiedUserClientEntityMap> {
+    // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
+    // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
+    if (!!userEntities[0]?.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
+      const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+      return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
+    }
 
-    return this.clientRepository.getClientsByUserIds(userIds, updateClients as any);
+    const userIds = userEntities.map(userEntity => userEntity.id);
+    return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
   /**
@@ -215,7 +216,9 @@ export class UserRepository {
     // @todo Add user deletion cases for other users
     const isSelfUser = id === this.userState.self().id;
     if (isSelfUser) {
-      // Info: Deletion of the user causes a database deletion which may interrupt currently running database operations. That's why we added a timeout, to leave some time for the database to finish running reads/writes before the database connection gets closed and the database gets deleted (WEBAPP-6379).
+      // Info: Deletion of the user causes a database deletion which may interrupt currently running database operations.
+      // That's why we added a timeout, to leave some time for the database to finish running reads/writes before the
+      // database connection gets closed and the database gets deleted (WEBAPP-6379).
       window.setTimeout(() => {
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.ACCOUNT_DELETED, true);
       }, 100);
@@ -263,11 +266,12 @@ export class UserRepository {
    * Update users matching the given connections.
    */
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
-    const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
+    // TODO(Federation): Include domain as soon as connections to federated backends are supported.
+    const userIds = connectionEntities.map(connectionEntity => ({domain: null, id: connectionEntity.userId}));
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
-      const connectionEntity_1 = connectionEntities.find(({userId}) => userId === userEntity.id);
-      userEntity.connection(connectionEntity_1);
+      const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
+      userEntity.connection(connectionEntity);
     });
     return this.assignAllClients();
   }
@@ -278,7 +282,13 @@ export class UserRepository {
    */
   private async assignAllClients(): Promise<User[]> {
     const recipients = await this.clientRepository.getAllClientsFromDb();
-    const userIds = Object.keys(recipients);
+    const userIds: QualifiedIdOptional[] = Object.entries(recipients).map(([userId, clientEntities]) => {
+      return {
+        domain: clientEntities[0].domain,
+        id: userId,
+      };
+    });
+
     this.logger.info(`Found locally stored clients for '${userIds.length}' users`, recipients);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
@@ -293,18 +303,28 @@ export class UserRepository {
   }
 
   /**
-   * Saves a new client for the first time to the database and adds it to a user's entity.
+   * Method does:
+   * - fetch user locally or from backend
+   * - map client payload to client entity
+   * - attach client entity to user entity
+   * - persist client entity to database
+   * - trigger "client added" or "legal hold" system messages
+   *
+   * TODO(SRP): Split up method because it does not follow the single-responsibility principle
    *
    * @returns Resolves with `true` when a client has been added
    */
   addClientToUser = async (
     userId: string,
-    clientPayload: PublicClient,
+    clientPayload: PublicClient | AddedClient | ClientEntity,
     publishClient: boolean = false,
     domain: string | null,
   ): Promise<boolean> => {
     const userEntity = await this.getUserById(userId, domain);
-    const clientEntity = ClientMapper.mapClient(clientPayload, userEntity.isMe);
+    const clientEntity =
+      clientPayload instanceof ClientEntity
+        ? clientPayload
+        : ClientMapper.mapClient(clientPayload, userEntity.isMe, domain);
     const wasClientAdded = userEntity.addClient(clientEntity);
     if (wasClientAdded) {
       await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
@@ -315,7 +335,7 @@ export class UserRepository {
           amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
         }
       } else if (publishClient) {
-        amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
+        amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain, id: userId}, clientEntity);
       }
     }
     return wasClientAdded;
@@ -330,7 +350,7 @@ export class UserRepository {
     await this.clientRepository.removeClient(userId, clientId, domain);
     const userEntity = await this.getUserById(userId, domain);
     userEntity.removeClient(clientId);
-    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, {domain, id: userId}, clientId);
   };
 
   /**
@@ -343,7 +363,7 @@ export class UserRepository {
   ): void => {
     this.getUserById(userId, domain).then(userEntity => {
       userEntity.devices(clientEntities);
-      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId, clientEntities);
+      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, {domain, id: userId});
     });
   };
 
@@ -481,10 +501,11 @@ export class UserRepository {
    * Find a local user.
    */
   findUserById(userId: string | QualifiedId): User | undefined {
-    return this.userState.users().find(userEntity => {
+    return this.userState.users().find(knownUser => {
       return typeof userId === 'string'
-        ? userEntity.id === userId
-        : userEntity.id === userId.id && userEntity.domain === userId.domain;
+        ? knownUser.id === userId
+        : // Don't check for the domain when the user query has no domain
+          knownUser.id === userId.id && (!userId.domain || knownUser.domain == userId.domain);
     });
   }
 
@@ -566,20 +587,16 @@ export class UserRepository {
 
   /**
    * Check for users locally and fetch them from the server otherwise.
-   * @param userIds List of user ID
-   * @param offline Should we only look for cached contacts
    */
-  async getUsersById(userIds: string[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: QualifiedIdOptional[] = [], offline: boolean = false): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
 
-    const findUsers = userIds.map(userId => this.findUserById(userId) || userId);
-
-    const resolveArray = await Promise.all(findUsers);
-    const [knownUserEntities, unknownUserIds] = partition(resolveArray, item => typeof item !== 'string') as [
+    const allUsers = await Promise.all(userIds.map(userId => this.findUserById(userId) || userId));
+    const [knownUserEntities, unknownUserIds] = partition(allUsers, item => item instanceof User) as [
       User[],
-      string[],
+      QualifiedIdOptional[],
     ];
 
     if (offline || !unknownUserIds.length) {
@@ -641,8 +658,7 @@ export class UserRepository {
    */
   updateUserById = async (userId: string | QualifiedId): Promise<void> => {
     const localUserEntity = this.findUserById(userId) || new User('', null);
-    const updatedUserData =
-      typeof userId === 'string' ? await this.userService.getUser(userId) : await this.userService.getUser(userId.id);
+    const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);
@@ -655,7 +671,7 @@ export class UserRepository {
   static findMatchingUser(userId: string | QualifiedId, userEntities: User[]): User | undefined {
     if (isQualifiedId(userId)) {
       return userEntities.find(userEntity => {
-        return userEntity.domain === userId.domain && userEntity.id === userId.id;
+        return userEntity.domain == userId.domain && userEntity.id === userId.id;
       });
     }
     return userEntities.find(userEntity => userEntity.id === userId);

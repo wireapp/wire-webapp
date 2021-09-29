@@ -39,7 +39,8 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {ReactionType} from '@wireapp/core/src/main/conversation/';
+import {Account} from '@wireapp/core';
+import {ReactionType, MessageSendingCallbacks} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
@@ -62,7 +63,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {AssetAddEvent, EventBuilder} from '../conversation/EventBuilder';
+import {AssetAddEvent, EventBuilder, QualifiedIdOptional} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
@@ -105,11 +106,11 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 
-type ConversationEvent = {conversation: string; id: string};
+type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
@@ -252,13 +253,40 @@ export class MessageRepository {
    * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
    * @see https://docs.wire.com/understand/federation/index.html
    */
-  async sendFederatedMessage(message: string): Promise<void> {
-    const conversation = this.conversationState.activeConversation();
+  async sendFederatedMessage(conversation: Conversation, message: string): Promise<void> {
     const userIds: string[] | QualifiedId[] = conversation.domain
       ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
       : conversation.allUserEntities.map(user => user.id);
 
-    await this.cryptography_repository.sendCoreMessage(message, conversation.id, userIds, conversation.domain);
+    const crudEngine = this.cryptography_repository.storageRepository.storageService['engine'];
+    const apiClient = this.cryptography_repository.cryptographyService['apiClient'];
+    apiClient.context!.domain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    const account = new Account(apiClient, () => Promise.resolve(crudEngine));
+    await account.initServices(crudEngine);
+    await account.service.client['cryptographyService'].initCryptobox();
+    const textPayload = account
+      .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
+      .build();
+
+    const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
+      const senderId = this.clientState.currentClient().id;
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
+      this.cryptography_repository.cryptographyMapper
+        .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
+        .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
+    };
+
+    const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
+      this.updateMessageAsSent(conversation, genericMessage.messageId, sentTime);
+    };
+
+    await account.service!.conversation.send({
+      callbacks: {onStart: injectOptimisticEvent, onSuccess: updateOptimisticEvent},
+      conversationDomain: conversation.domain,
+      payloadBundle: textPayload,
+      userIds,
+    });
   }
 
   /**
@@ -759,7 +787,7 @@ export class MessageRepository {
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
     this.trackContributed(conversationEntity, genericMessage);
     const backendIsoDate = syncTimestamp ? sentPayload.time : '';
-    await this.updateMessageAsSent(conversationEntity, injectedEvent, backendIsoDate);
+    await this.updateMessageAsSent(conversationEntity, injectedEvent.id, backendIsoDate);
     return injectedEvent;
   }
 
@@ -1078,7 +1106,8 @@ export class MessageRepository {
     }
 
     const senderId = messageEntity.from;
-    const conversationHasUser = conversationEntity.participating_user_ids().includes(senderId);
+    // TODO(Federation): Add check for domain with "qualified_from" in message entity
+    const conversationHasUser = conversationEntity.participating_user_ids().find(userId => senderId === userId.id);
 
     if (!conversationHasUser) {
       messageEntity.setButtonError(buttonId, t('buttonActionError'));
@@ -1159,11 +1188,11 @@ export class MessageRepository {
    */
   private async updateMessageAsSent(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent,
-    isoDate: string,
+    eventId: string,
+    isoDate?: string,
   ): Promise<Pick<Partial<EventRecord>, 'status' | 'time'> | void> {
     try {
-      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
       const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {
@@ -1333,7 +1362,7 @@ export class MessageRepository {
 
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
-    userIds: string[],
+    userIds: QualifiedIdOptional[],
     checkLegalHold: boolean,
   ): Promise<void> {
     const messageType = eventInfoEntity.getType();
@@ -1366,10 +1395,13 @@ export class MessageRepository {
     return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
   }
 
+  /**
+   * @deprecated Will not work with federation. Please use `sendFederatedMessage`.
+   */
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
     consentType: string,
-    userIds: string[],
+    userIds: QualifiedIdOptional[],
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
@@ -1398,7 +1430,9 @@ export class MessageRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
+      userIds = conversationEntity
+        .getUsersWithUnverifiedClients()
+        .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
 
       return this.userRepository
         .getUsersById(userIds)
@@ -1519,19 +1553,16 @@ export class MessageRepository {
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(
-              clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId, null)),
-            ),
+            Promise.all(clients.map(clientId => this.userRepository.removeClientFromUser(userId, clientId, null))),
           ),
         );
 
         const missingUserIds = Object.entries(remoteUserClients).reduce<string[]>((missing, [userId, clients]) => {
-          if (userId === selfId) {
-            return missing;
-          }
-          const missingClients = getDifference(localUserClients[userId] || ([] as string[]), clients);
-          if (missingClients.length) {
-            missing.push(userId);
+          if (userId !== selfId) {
+            const missingClients = getDifference(localUserClients[userId] || ([] as string[]), clients);
+            if (missingClients.length) {
+              missing.push(userId);
+            }
           }
           return missing;
         }, []);
@@ -1540,16 +1571,22 @@ export class MessageRepository {
           this.userRepository.findUserById(missingUserId),
         );
 
-        const qualifiedUsersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
-        await Promise.all(
-          Object.values(qualifiedUsersMap).map(userClientMap =>
-            Object.entries(userClientMap).map(([userId, clients]) => {
-              return Promise.all(
-                clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)),
-              );
-            }),
-          ),
-        );
+        const usersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
+        if (isQualifiedUserClientEntityMap(usersMap)) {
+          await Promise.all(
+            Object.entries(usersMap).map(([domain, userClientsMap]) =>
+              Object.entries(userClientsMap).map(([userId, clients]) =>
+                Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, domain))),
+              ),
+            ),
+          );
+        } else {
+          await Promise.all(
+            Object.entries(usersMap).map(([userId, clients]) =>
+              Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null))),
+            ),
+          );
+        }
       }
     }
     if (blockSystemMessage) {
@@ -1692,6 +1729,7 @@ export class MessageRepository {
    *
    * @param eventInfoEntity Info about message to be sent
    * @param payload Payload
+   * @deprecated Please use `sendFederatedMessage`
    * @returns Promise that resolves after sending the encrypted message
    */
   private async sendEncryptedMessage(
@@ -1729,9 +1767,9 @@ export class MessageRepository {
       await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
       return response;
     } catch (axiosError) {
-      const error = axiosError.response?.data;
+      const errorData = axiosError.response?.data as ClientMismatch & {label: BackendErrorLabel};
 
-      const hasNoLegalholdConsent = error?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
+      const hasNoLegalholdConsent = errorData?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
       const ignoredMessageTypes = [GENERIC_MESSAGE_TYPE.CONFIRMATION];
       if (hasNoLegalholdConsent && !ignoredMessageTypes.includes(messageType as GENERIC_MESSAGE_TYPE)) {
         const replaceLinkLegalHold = replaceLink(
@@ -1758,23 +1796,26 @@ export class MessageRepository {
         );
       }
 
-      const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
+      const isUnknownClient = errorData?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
       if (isUnknownClient) {
         this.clientRepository.removeLocalClient();
         return undefined;
       }
 
-      if (!error?.missing) {
-        throw error;
+      if (!errorData?.missing) {
+        throw errorData;
       }
 
       const payloadWithMissingClients = await this.clientMismatchHandler.onClientMismatch(
         eventInfoEntity,
-        error,
+        errorData,
         payload,
       );
 
-      const missedUserIds = Object.keys(error.missing);
+      const missedUserIds = Object.keys(errorData.missing).map(userId => ({
+        domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN,
+        id: userId,
+      }));
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,

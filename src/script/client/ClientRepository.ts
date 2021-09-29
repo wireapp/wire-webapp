@@ -27,25 +27,23 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import murmurhash from 'murmurhash';
-
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {loadValue} from 'Util/StorageUtil';
-
+import {constructClientPrimaryKey, loadValue} from 'Util/StorageUtil';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {StorageKey} from '../storage/StorageKey';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {ClientEntity} from './ClientEntity';
 import {ClientMapper} from './ClientMapper';
-import type {ClientService, QualifiedPublicUserMap} from './ClientService';
+import type {ClientService} from './ClientService';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
 import {ClientState} from './ClientState';
-import {Config} from '../Config';
 
-export type QualifiedUserClientMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
+export type QualifiedUserClientEntityMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
+export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 
 export class ClientRepository {
   private readonly logger: Logger;
@@ -86,7 +84,7 @@ export class ClientRepository {
   //##############################################################################
 
   private deleteClientFromDb(userId: string, clientId: string, domain: string | null): Promise<string> {
-    return this.clientService.deleteClientFromDb(this.constructPrimaryKey(userId, clientId, domain));
+    return this.clientService.deleteClientFromDb(constructClientPrimaryKey(domain, userId, clientId));
   }
 
   /**
@@ -101,16 +99,17 @@ export class ClientRepository {
    * Load all known clients from the database.
    * @returns Resolves with all the clients found in the local database
    */
-  getAllClientsFromDb(): Promise<Record<string, ClientEntity[]>> {
-    return this.clientService.loadAllClientsFromDb().then(clients => {
-      const recipients: Record<string, ClientEntity[]> = {};
+  getAllClientsFromDb(): Promise<{[userId: string]: ClientEntity[]}> {
+    return this.clientService.loadAllClientsFromDb().then(clientRecords => {
+      // TODO(Federation): Add domain to identifier
+      const recipients: {[userId: string]: ClientEntity[]} = {};
       const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
-      for (const client of clients) {
-        const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
+      for (const clientRecord of clientRecords) {
+        const {userId} = ClientEntity.dismantleUserClientId(clientRecord.meta.primary_key);
         if (userId && !skippedUserIds.includes(userId)) {
           recipients[userId] ||= [];
-          recipients[userId].push(ClientMapper.mapClient(client, false));
+          recipients[userId].push(ClientMapper.mapClient(clientRecord, false, clientRecord.domain));
         }
       }
       return recipients;
@@ -145,36 +144,17 @@ export class ClientRepository {
       .catch(() => {
         throw new ClientError(ClientError.TYPE.DATABASE_FAILURE, ClientError.MESSAGE.DATABASE_FAILURE);
       })
-      .then(clientPayload => {
-        if (typeof clientPayload === 'string') {
+      .then(clientRecord => {
+        if (typeof clientRecord === 'string') {
           this.logger.info('No local client found in database');
           throw new ClientError(ClientError.TYPE.NO_VALID_CLIENT, ClientError.MESSAGE.NO_VALID_CLIENT);
         }
 
-        const currentClient = ClientMapper.mapClient(clientPayload, true);
+        const currentClient = ClientMapper.mapClient(clientRecord, true, clientRecord.domain);
         this.clientState.currentClient(currentClient);
         this.logger.info(`Loaded local client '${currentClient.id}'`, this.clientState.currentClient());
         return this.clientState.currentClient();
       });
-  }
-
-  /**
-   * Construct the primary key to store clients in database.
-   *
-   * @param userId User ID from the owner of the client
-   * @param clientId ID of the client
-   * @param domain Domain of the remote participant (only available in federation-aware webapps)
-   */
-  private constructPrimaryKey(userId: string, clientId: string, domain: string | null): string {
-    /**
-     * For backward compatibility: We store clients with participants from our own domain without a domain in the session ID (legacy session ID format).
-     * All other clients (from users on a different domain/remote backends) will be saved with a domain in their primary key.
-     */
-    if (Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN !== domain) {
-      return domain ? `${domain}@${userId}@${clientId}` : `${userId}@${clientId}`;
-    }
-
-    return `${userId}@${clientId}`;
   }
 
   /**
@@ -185,7 +165,7 @@ export class ClientRepository {
    * @returns Resolves with the record stored in database
    */
   saveClientInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
-    const primaryKey = this.constructPrimaryKey(userId, clientPayload.id, clientPayload.domain);
+    const primaryKey = constructClientPrimaryKey(clientPayload.domain, userId, clientPayload.id);
     return this.clientService.saveClientInDb(primaryKey, clientPayload);
   }
 
@@ -205,7 +185,7 @@ export class ClientRepository {
     changes: Partial<ClientRecord>,
     domain: string | null,
   ): Promise<number> {
-    const primaryKey = this.constructPrimaryKey(userId, clientId, domain);
+    const primaryKey = constructClientPrimaryKey(domain, userId, clientId);
     // Preserve primary key on update
     changes.meta.primary_key = primaryKey;
     return this.clientService.updateClientInDb(primaryKey, changes);
@@ -219,10 +199,15 @@ export class ClientRepository {
    * @param isVerified New state to apply
    * @returns Resolves when the verification state has been updated
    */
-  async verifyClient(userId: string, clientEntity: ClientEntity, isVerified: boolean): Promise<void> {
+  async verifyClient(
+    userId: string,
+    clientEntity: ClientEntity,
+    isVerified: boolean,
+    domain: string | null,
+  ): Promise<void> {
     await this.updateClientInDb(userId, clientEntity.id, {meta: {is_verified: isVerified}}, clientEntity.domain);
     clientEntity.meta.isVerified(isVerified);
-    amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, userId, clientEntity, isVerified);
+    amplify.publish(WebAppEvents.CLIENT.VERIFICATION_STATE_CHANGED, {domain, id: userId}, clientEntity, isVerified);
   }
 
   /**
@@ -232,12 +217,20 @@ export class ClientRepository {
    * @param clientPayload Client data to be stored in database
    * @returns Resolves with the record stored in database
    */
-  private updateClientSchemaInDb(userId: string, clientPayload: ClientRecord): Promise<ClientRecord> {
-    clientPayload.meta = {
-      is_verified: false,
-      primary_key: this.constructPrimaryKey(userId, clientPayload.id, clientPayload.domain),
+  private updateClientSchemaInDb(
+    userId: string,
+    clientPayload: PublicClient,
+    domain: string | null,
+  ): Promise<ClientRecord> {
+    const clientRecord: ClientRecord = {
+      ...clientPayload,
+      domain,
+      meta: {
+        is_verified: false,
+        primary_key: constructClientPrimaryKey(domain, userId, clientPayload.id),
+      },
     };
-    return this.saveClientInDb(userId, clientPayload);
+    return this.saveClientInDb(userId, clientRecord);
   }
 
   //##############################################################################
@@ -306,10 +299,11 @@ export class ClientRepository {
    * @returns Resolves with the remaining user devices
    */
   async deleteClient(clientId: string, password: string): Promise<ClientEntity[]> {
+    const selfUser = this.selfUser();
     await this.clientService.deleteClient(clientId, password);
-    await this.deleteClientFromDb(this.selfUser().id, clientId, this.selfUser().domain);
-    this.selfUser().removeClient(clientId);
-    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, this.selfUser().id, clientId);
+    await this.deleteClientFromDb(selfUser.id, clientId, selfUser.domain);
+    selfUser.removeClient(clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, {domain: selfUser.domain, id: selfUser.id}, clientId);
     return this.clientState.clients();
   }
 
@@ -363,39 +357,56 @@ export class ClientRepository {
    * @param updateClients Automatically update the clients
    * @returns Resolves with an array of client entities
    */
-  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: true): Promise<QualifiedUserClientMap>;
-  async getClientsByUserIds(userIds: (QualifiedId | string)[], updateClients: false): Promise<QualifiedPublicUserMap>;
-  async getClientsByUserIds(
-    userIds: (QualifiedId | string)[],
+  // TODO(Federation): A function that receives "QualifiedId" objects should always return a qualified client map
+  async getClientsByQualifiedUserIds(
+    userIds: QualifiedId[],
     updateClients: boolean,
-  ): Promise<QualifiedPublicUserMap | QualifiedUserClientMap> {
-    const userClientsMap = await this.clientService.getClientsByUserIds(userIds);
+  ): Promise<QualifiedUserClientEntityMap> {
+    const clientEntityMap: QualifiedUserClientEntityMap = {};
+    const qualifiedUserClientsMap = await this.clientService.getClientsByQualifiedUserIds(userIds);
 
     if (updateClients) {
-      const clientEntityMap: QualifiedUserClientMap = {};
       await Promise.all(
-        Object.entries(userClientsMap).map(([domain, userClientMap]) =>
+        Object.entries(qualifiedUserClientsMap).map(([domain, userClientMap]) =>
           Promise.all(
             Object.entries(userClientMap).map(async ([userId, clients]) => {
-              if (!clientEntityMap[domain]) {
-                clientEntityMap[domain] = {};
-              }
-              clientEntityMap[domain][userId] = await this.updateClientsOfUserById(userId, clients, true, domain);
+              clientEntityMap[domain] ||= {};
+              clientEntityMap[domain][userId] = updateClients
+                ? await this.updateClientsOfUserById(userId, clients, true, domain)
+                : // TODO(Federation): Check if `isSelfClient` is needed here
+                  ClientMapper.mapClients(clients, false, domain);
             }),
           ),
         ),
       );
-      return clientEntityMap;
     }
 
-    return userClientsMap;
+    return clientEntityMap;
   }
 
-  private async getClientByUserIdFromDb(requestedUserId: string): Promise<ClientRecord[]> {
+  async getClientsByUserIds(userIds: string[], updateClients: boolean): Promise<UserClientEntityMap> {
+    const clientEntityMap: UserClientEntityMap = {};
+    await Promise.all(
+      userIds.map(async userId => {
+        const clients = await this.clientService.getClientsByUserId(userId);
+        clientEntityMap[userId] = updateClients
+          ? await this.updateClientsOfUserById(userId, clients, true, null)
+          : // TODO(Federation): Check if `isSelfClient` is needed here
+            ClientMapper.mapClients(clients, false, null);
+      }),
+    );
+
+    return clientEntityMap;
+  }
+
+  private async getClientByUserIdFromDb(
+    requestedUserId: string,
+    requestedDomain: string | null,
+  ): Promise<ClientRecord[]> {
     const clients = await this.clientService.loadAllClientsFromDb();
     return clients.filter(client => {
-      const {userId} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
-      return userId === requestedUserId;
+      const {userId, domain} = ClientEntity.dismantleUserClientId(client.meta.primary_key);
+      return userId === requestedUserId && (!domain || domain == requestedDomain);
     });
   }
 
@@ -405,8 +416,8 @@ export class ClientRepository {
    */
   async getClientsForSelf(): Promise<ClientEntity[]> {
     this.logger.info('Retrieving all clients of the self user from database');
-    const clientsData = await this.getClientByUserIdFromDb(this.selfUser().id);
-    const clientEntities = ClientMapper.mapClients(clientsData, true);
+    const clientRecords = await this.getClientByUserIdFromDb(this.selfUser().id, this.selfUser().domain);
+    const clientEntities = ClientMapper.mapClients(clientRecords, true, this.selfUser().domain);
     clientEntities.forEach(clientEntity => this.selfUser().addClient(clientEntity));
     return this.selfUser().devices();
   }
@@ -447,7 +458,7 @@ export class ClientRepository {
     publish: boolean = true,
     domain: string | null,
   ): Promise<ClientEntity[]> {
-    const clientsFromBackend: Record<string, RegisteredClient | PublicClient> = {};
+    const clientsFromBackend: {[clientId: string]: RegisteredClient | PublicClient} = {};
     const clientsStoredInDb: ClientRecord[] = [];
     const isSelfUser = userId === this.selfUser().id;
 
@@ -456,7 +467,7 @@ export class ClientRepository {
     }
 
     // Find clients in database
-    return this.getClientByUserIdFromDb(userId)
+    return this.getClientByUserIdFromDb(userId, domain)
       .then(clientsFromDatabase => {
         const promises = [];
 
@@ -465,7 +476,7 @@ export class ClientRepository {
           const backendClient = clientsFromBackend[clientId];
 
           if (backendClient) {
-            const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, backendClient);
+            const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {...backendClient, domain});
 
             delete clientsFromBackend[clientId];
 
@@ -503,15 +514,15 @@ export class ClientRepository {
           if (this.selfUser().id === userId) {
             this.onClientAdd({client: clientPayload as RegisteredClient});
           }
-          promises.push(this.updateClientSchemaInDb(userId, clientPayload));
+          promises.push(this.updateClientSchemaInDb(userId, clientPayload, domain));
         }
 
         return Promise.all(promises);
       })
-      .then(newRecords => ClientMapper.mapClients(clientsStoredInDb.concat(newRecords), isSelfUser))
+      .then(newRecords => ClientMapper.mapClients(clientsStoredInDb.concat(newRecords), isSelfUser, domain))
       .then(clientEntities => {
         if (publish) {
-          amplify.publish(WebAppEvents.CLIENT.UPDATE, userId, clientEntities);
+          amplify.publish(WebAppEvents.CLIENT.UPDATE, userId, clientEntities, domain);
         }
         return clientEntities;
       })
@@ -570,7 +581,7 @@ export class ClientRepository {
    */
   private onClientAdd(eventJson: Partial<UserClientAddEvent>): void {
     this.logger.info('Client of self user added', eventJson);
-    amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().id, eventJson.client, true);
+    amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().id, eventJson.client, true, this.selfUser().domain);
   }
 
   /**
@@ -603,6 +614,6 @@ export class ClientRepository {
         'legalHoldDeactivated',
       );
     }
-    amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId);
+    amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId, this.selfUser().domain);
   }
 }

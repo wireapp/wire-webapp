@@ -97,7 +97,7 @@ export class ConversationState {
       ? undefined
       : this.conversations().find(conversation => {
           if (domain) {
-            return conversation.id === conversationId && conversation.domain === domain;
+            return conversation.id === conversationId && conversation.domain == domain;
           }
           return conversation.id === conversationId;
         });
@@ -112,7 +112,7 @@ export class ConversationState {
       !!activeConversation &&
       !!conversationEntity &&
       activeConversation.id === conversationEntity.id &&
-      activeConversation.domain === conversationEntity.domain
+      activeConversation.domain == conversationEntity.domain
     );
   }
 }
