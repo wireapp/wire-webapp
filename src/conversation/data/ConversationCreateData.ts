@@ -18,12 +18,10 @@
  */
 
 import type {Conversation} from '../Conversation';
-import {RECEIPT_MODE} from './ConversationReceiptModeUpdateData';
 
 export interface ConversationCreateData extends Conversation {
   /** @deprecated */
   last_event: string;
   /** @deprecated */
   last_event_time: string;
-  receipt_mode: RECEIPT_MODE | null;
 }
