@@ -173,7 +173,7 @@
     "tsc-watch": "4.5.0",
     "typescript": "4.3.5",
     "wait-for-expect": "3.0.2",
-    "webpack": "5.54.0",
+    "webpack": "5.55.1",
     "webpack-cli": "4.8.0",
     "webpack-dev-middleware": "5.2.1",
     "webpack-hot-middleware": "2.25.1",
@@ -242,5 +242,5 @@
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts"
   },
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
