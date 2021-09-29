@@ -105,13 +105,10 @@ export class PreferencesDeviceDetailsViewModel {
     this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING);
 
     try {
-      const selfConversationId = this.conversationState.self_conversation().id;
-      await this.messageRepository.resetSession(
-        this.selfUser().id,
-        this.device().id,
-        selfConversationId,
-        this.selfUser().domain,
-      );
+      await this.messageRepository.resetSession(this.selfUser().id, this.device().id, {
+        domain: this.selfUser().domain,
+        id: this.conversationState.self_conversation().id,
+      });
       window.setTimeout(() => {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);
       }, MotionDuration.LONG);

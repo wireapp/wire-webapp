@@ -55,6 +55,7 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {Config} from '../Config';
+import {QualifiedIdOptional} from './EventBuilder';
 
 export class ConversationService {
   private readonly eventService: EventService;
@@ -327,7 +328,7 @@ export class ConversationService {
    * @returns Promise that resolves when the message was sent
    */
   postEncryptedMessage(
-    conversationId: string,
+    conversationId: QualifiedIdOptional,
     payload: NewOTRMessage<string>,
     preconditionOption?: boolean | string[],
   ): Promise<ClientMismatch> {
@@ -338,7 +339,8 @@ export class ConversationService {
       payload.report_missing = reportMissing;
     }
 
-    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, ignoreMissing);
+    // TODO(federation): add domain in the postOTRMessage (?)
+    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
   }
 
   /**

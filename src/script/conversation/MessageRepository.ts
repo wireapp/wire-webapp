@@ -513,7 +513,7 @@ export class MessageRepository {
     if (conversationEntity.messageTimer()) {
       genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
     }
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity);
     const payload = await this.sendGenericMessageToConversation(eventInfoEntity);
     const {uploaded: assetData} = conversationEntity.messageTimer()
       ? genericMessage.ephemeral.asset
@@ -782,7 +782,7 @@ export class MessageRepository {
     }
 
     const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity);
     eventInfoEntity.setTimestamp(injectedEvent.time);
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
     this.trackContributed(conversationEntity, genericMessage);
@@ -806,12 +806,8 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(
-    user_id: string,
-    client_id: string,
-    conversation_id: string,
-    domain: string | null,
-  ): Promise<ClientMismatch> {
+  async resetSession(user_id: string, client_id: string, conversationId: QualifiedIdOptional): Promise<ClientMismatch> {
+    const {domain} = conversationId;
     this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
 
     try {
@@ -821,7 +817,7 @@ export class MessageRepository {
       } else {
         this.logger.warn('No local session found to delete.');
       }
-      return await this.sendSessionReset(user_id, client_id, conversation_id);
+      return await this.sendSessionReset(user_id, client_id, conversationId);
     } catch (error) {
       const logMessage = `Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`;
       this.logger.warn(logMessage, error);
@@ -841,7 +837,11 @@ export class MessageRepository {
    * @param conversationId Conversation ID
    * @returns Resolves after sending the session reset
    */
-  private async sendSessionReset(userId: string, clientId: string, conversationId: string): Promise<ClientMismatch> {
+  private async sendSessionReset(
+    userId: string,
+    clientId: string,
+    conversationId: QualifiedIdOptional,
+  ): Promise<ClientMismatch> {
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: createRandomUuid(),
@@ -913,9 +913,9 @@ export class MessageRepository {
 
     this.messageSender.queueMessage(() => {
       // TODO(Federation): Apply logic for 'sendFederatedMessage'. The 'createRecipients' logic will be done inside of '@wireapp/core'.
-      return this.createRecipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
+      return this.createRecipients(conversationEntity, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity, options);
         return this.sendGenericMessage(eventInfoEntity, true);
       });
     });
@@ -1028,9 +1028,9 @@ export class MessageRepository {
       });
       await this.messageSender.queueMessage(() => {
         const userIds = Array.isArray(precondition) ? precondition : undefined;
-        return this.createRecipients(conversationId, false, userIds).then(recipients => {
+        return this.createRecipients(conversationEntity, false, userIds).then(recipients => {
           const options = {precondition, recipients};
-          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
+          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity, options);
           this.sendGenericMessage(eventInfoEntity, true);
         });
       });
@@ -1065,7 +1065,7 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation());
       await this.sendGenericMessageToConversation(eventInfoEntity);
       return await this.deleteMessageById(conversationEntity, messageEntity.id);
     } catch (error) {
@@ -1093,7 +1093,7 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation());
       this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
         this.logger.info(`Cleared conversation '${conversationEntity.id}' on '${new Date(timestamp).toISOString()}'`);
       });
@@ -1125,9 +1125,9 @@ export class MessageRepository {
     });
     this.messageSender.queueMessage(async () => {
       try {
-        const recipients = await this.createRecipients(conversationEntity.id, true, [messageEntity.from]);
+        const recipients = await this.createRecipients(conversationEntity, true, [messageEntity.from]);
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity, options);
         await this.sendGenericMessage(eventInfoEntity, false);
       } catch (error) {
         messageEntity.waitingButtonId(undefined);
@@ -1160,7 +1160,7 @@ export class MessageRepository {
 
   private sendGenericMessageToConversation(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
     return this.messageSender.queueMessage(async () => {
-      const recipients = await this.createRecipients(eventInfoEntity.conversationId);
+      const recipients = await this.createRecipients(eventInfoEntity.qualifiedConversationId);
       eventInfoEntity.updateOptions({recipients});
       return this.sendGenericMessage(eventInfoEntity, true);
     });
@@ -1223,11 +1223,14 @@ export class MessageRepository {
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
   async createRecipients(
-    conversation_id: string,
+    conversationId: QualifiedIdOptional,
     skip_own_clients = false,
     user_ids: string[] = null,
   ): Promise<UserClients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id, null);
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(
+      conversationId.id,
+      conversationId.domain,
+    );
     const recipients: UserClients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
@@ -1336,7 +1339,7 @@ export class MessageRepository {
   private async shouldShowLegalHoldWarning(eventInfoEntity: EventInfoEntity): Promise<boolean> {
     const messageType = eventInfoEntity.getType();
     const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
+    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.qualifiedConversationId.id);
     const localLegalHoldStatus = conversationEntity.legalHoldStatus();
     await this.updateAllClients(conversationEntity, !isMessageEdit);
     const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
@@ -1347,10 +1350,10 @@ export class MessageRepository {
     const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
 
     if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
-      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
+      const {qualifiedConversationId, timestamp: numericTimestamp} = eventInfoEntity;
       await this.conversationRepositoryProvider().injectLegalHoldMessage({
         beforeTimestamp: true,
-        conversationId,
+        conversationId: qualifiedConversationId,
         legalHoldStatus: updatedLocalLegalHoldStatus,
         timestamp: numericTimestamp,
         userId: this.userState.self().id,
@@ -1405,7 +1408,8 @@ export class MessageRepository {
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
-      eventInfoEntity.conversationId,
+      eventInfoEntity.qualifiedConversationId.id,
+      eventInfoEntity.qualifiedConversationId.domain,
     );
     const legalHoldMessageTypes: string[] = [
       GENERIC_MESSAGE_TYPE.ASSET,
@@ -1455,7 +1459,7 @@ export class MessageRepository {
                 ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
                 : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
             } else {
-              const conversationId = eventInfoEntity.conversationId;
+              const conversationId = eventInfoEntity.qualifiedConversationId;
               const type = eventInfoEntity.getType();
 
               const log = `Missing user IDs to grant '${type}' message in '${conversationId}' (${consentType})`;
@@ -1516,7 +1520,7 @@ export class MessageRepository {
             WebAppEvents.WARNING.MODAL,
             ModalsViewModel.TYPE.CONFIRM,
             options,
-            `degraded-${eventInfoEntity.conversationId}`,
+            `degraded-${eventInfoEntity.qualifiedConversationId}`,
           );
         })
         .catch(reject);
@@ -1529,12 +1533,12 @@ export class MessageRepository {
     }
     const sender = this.clientState.currentClient().id;
     try {
-      await this.conversation_service.postEncryptedMessage(conversationEntity.id, {recipients: {}, sender});
+      await this.conversation_service.postEncryptedMessage(conversationEntity, {recipients: {}, sender});
     } catch (axiosError) {
       const error = axiosError.response?.data || axiosError;
       if (error.missing) {
         const remoteUserClients = error.missing as UserClients;
-        const localUserClients = await this.createRecipients(conversationEntity.id);
+        const localUserClients = await this.createRecipients(conversationEntity);
         const selfId = this.userState.self().id;
 
         const deletedUserClients = Object.entries(localUserClients).reduce<UserClients>(
@@ -1612,7 +1616,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation());
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
@@ -1639,7 +1643,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation());
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       this.logger.info(`Sent countly sync message with ID ${countlyId}`);
@@ -1656,7 +1660,7 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: string) {
+  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: QualifiedIdOptional) {
     return this.messageSender.queueMessage(() => {
       const options = eventInfoEntity.options;
       const recipientsPromise = options.recipients
@@ -1676,8 +1680,11 @@ export class MessageRepository {
    * @returns Is payload likely to be too big so that we switch to type external?
    */
   private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
-    const {conversationId, genericMessage} = eventInfoEntity;
-    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(conversationId);
+    const {qualifiedConversationId, genericMessage} = eventInfoEntity;
+    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
+      qualifiedConversationId.id,
+      qualifiedConversationId.domain,
+    );
     const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
     return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
@@ -1736,7 +1743,7 @@ export class MessageRepository {
     eventInfoEntity: EventInfoEntity,
     payload: NewOTRMessage<string>,
   ): Promise<ClientMismatch | undefined> {
-    const {conversationId, genericMessage, options} = eventInfoEntity;
+    const {qualifiedConversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;
     let messageType = eventInfoEntity.getType();
 
@@ -1749,18 +1756,22 @@ export class MessageRepository {
       .map(clientId => Object.keys(clientId).length)
       .reduce((totalClients, clients) => totalClients + clients, 0);
 
-    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${conversationId}'`;
+    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${JSON.stringify(
+      qualifiedConversationId,
+    )}'`;
     this.logger.info(logMessage, payload);
 
     if (numberOfUsers > numberOfClients) {
       this.logger.warn(
-        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`,
+        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${JSON.stringify(
+          qualifiedConversationId,
+        )}'`,
       );
     }
 
     try {
       const response = await this.conversation_service.postEncryptedMessage(
-        conversationId,
+        qualifiedConversationId,
         payload,
         options.precondition,
       );
@@ -1818,13 +1829,15 @@ export class MessageRepository {
       }));
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
-        `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
+        `Updated '${messageType}' message (${messageId}) for conversation '${JSON.stringify(
+          qualifiedConversationId,
+        )}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
       );
       if (payloadWithMissingClients) {
-        return this.conversation_service.postEncryptedMessage(conversationId, payloadWithMissingClients, true);
+        return this.conversation_service.postEncryptedMessage(qualifiedConversationId, payloadWithMissingClients, true);
       }
-      return this.conversation_service.postEncryptedMessage(conversationId, payload, true);
+      return this.conversation_service.postEncryptedMessage(qualifiedConversationId, payload, true);
     }
   }
 
