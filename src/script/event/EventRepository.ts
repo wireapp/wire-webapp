@@ -21,7 +21,7 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, USER_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
 import type {Notification, NotificationList} from '@wireapp/api-client/src/notification/';
 import {AbortHandler} from '@wireapp/api-client/src/tcp/';
 import {container} from 'tsyringe';
@@ -558,7 +558,7 @@ export class EventRepository {
   private async processEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
     const isEncryptedEvent = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     if (isEncryptedEvent) {
-      event = await this.cryptographyRepository.handleEncryptedEvent(event);
+      event = await this.cryptographyRepository.handleEncryptedEvent(event as ConversationOtrMessageAddEvent);
     }
 
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
@@ -567,7 +567,7 @@ export class EventRepository {
 
     const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type as CONVERSATION_EVENT);
     if (shouldSaveEvent) {
-      event = (await this.handleEventSaving(event)) as EventRecord;
+      event = (await this.handleEventSaving(event)) as ConversationOtrMessageAddEvent;
     }
 
     return this.handleEventDistribution(event, source);

@@ -388,12 +388,10 @@ export class MessageListViewModel {
 
     messageEntity.is_resetting_session(true);
     try {
-      await this.messageRepository.resetSession(
-        messageEntity.from,
-        messageEntity.client_id,
-        this.conversation().id,
-        messageEntity.domain,
-      );
+      await this.messageRepository.resetSession(messageEntity.from, messageEntity.client_id, {
+        domain: messageEntity.domain,
+        id: this.conversation().id,
+      });
       resetProgress();
     } catch (error) {
       this.logger.warn('Error while trying to reset session', error);
