@@ -42,16 +42,41 @@ export enum CONVERSATION_ACCESS {
   PRIVATE = 'private',
 }
 
+type UUID = string;
+/**
+ * A conversation object as returned from the server
+ */
 export interface Conversation {
-  access: CONVERSATION_ACCESS[];
-  access_role: CONVERSATION_ACCESS_ROLE;
-  creator: string;
-  id: string;
-  members: ConversationMembers;
-  message_timer: number | null;
-  name: string;
-  qualified_id?: QualifiedId;
-  receipt_mode: RECEIPT_MODE | null;
-  team: string | null;
+  qualified_id: QualifiedId;
+  /** @deprecated Use qualified_id instead */
+  id: UUID;
   type: CONVERSATION_TYPE;
+  creator: UUID;
+  access: CONVERSATION_ACCESS[];
+
+  /** How users can join conversations */
+  access_role: CONVERSATION_ACCESS_ROLE;
+  name?: string;
+  last_event?: string;
+  last_event_time?: string;
+  team?: UUID;
+
+  /**
+   * Per-conversation message timer (can be null)
+   * @format int64
+   * @min -9223372036854776000
+   * @max 9223372036854776000
+   */
+  message_timer?: number;
+
+  /**
+   * Conversation receipt mode
+   * @format int32
+   * @min -2147483648
+   * @max 2147483647
+   */
+  receipt_mode?: RECEIPT_MODE;
+
+  /** Users of a conversation */
+  members: ConversationMembers;
 }
