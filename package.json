@@ -2,7 +2,7 @@
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "7.2.91",
-    "@wireapp/core": "17.16.4",
+    "@wireapp/core": "17.16.6",
     "@wireapp/react-ui-kit": "7.54.0",
     "@wireapp/store-engine-dexie": "1.6.7",
     "@wireapp/store-engine-sqleet": "1.7.11",
@@ -242,5 +242,5 @@
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts"
   },
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
