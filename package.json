@@ -159,7 +159,7 @@
     "react-test-renderer": "16.14.0",
     "redux-devtools-extension": "2.13.9",
     "redux-mock-store": "1.5.4",
-    "simple-git": "2.45.1",
+    "simple-git": "2.46.0",
     "sinon": "11.1.2",
     "snabbdom": "3.1.0",
     "stylelint": "13.13.1",
@@ -242,5 +242,5 @@
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts"
   },
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
