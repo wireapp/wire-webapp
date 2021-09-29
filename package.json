@@ -78,7 +78,7 @@
     "@types/markdown-it": "12.2.1",
     "@types/open-graph": "0.2.2",
     "@types/platform": "1.3.4",
-    "@types/react": "17.0.24",
+    "@types/react": "17.0.25",
     "@types/react-dom": "17.0.9",
     "@types/react-redux": "7.1.18",
     "@types/react-router": "5.1.16",
@@ -242,5 +242,5 @@
     "translate:upload": "yarn translate:merge && ts-node ./bin/translations_upload.ts",
     "translate:download": "ts-node ./bin/translations_download.ts"
   },
-  "version": "0.4.0"
+  "version": "0.5.0"
 }
