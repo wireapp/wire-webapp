@@ -146,7 +146,7 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE;
-  public domain: string | null;
+  public domain?: string;
   public isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
@@ -156,7 +156,7 @@ export class Conversation {
   constructor(conversation_id: string = '', domain?: string) {
     this.id = conversation_id;
 
-    this.domain = domain || null;
+    this.domain = domain;
 
     this.logger = getLogger(`Conversation (${this.id})`);
 

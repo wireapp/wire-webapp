@@ -25,11 +25,10 @@ import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 import {arrayToBase64, createRandomUuid} from 'Util/util';
 
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
-import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
 import {ClientEvent} from 'src/script/event/Client';
-import {TestFactory} from '../../../test/helper/TestFactory';
+import {TestFactory} from '../../helper/TestFactory';
 import {CryptographyError} from 'src/script/error/CryptographyError';
-import {entities} from '../../../test/api/payloads';
+import {entities} from '../../api/payloads';
 
 describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
@@ -40,25 +39,31 @@ describe('CryptographyRepository', () => {
   });
 
   describe('encryptGenericMessage', () => {
-    const jane_roe = {
-      clients: {
-        phone_id: '55cdd1dbe3c2ed74',
-      },
-      id: entities.user.jane_roe.id,
-    };
-    const john_doe = {
-      clients: {
-        desktop_id: 'b29034060fed476e',
-        phone_id: '4b0a0fbf418d264c',
-      },
-      id: entities.user.john_doe.id,
-    };
+    let jane_roe = undefined;
+    let john_doe = undefined;
+
+    beforeAll(() => {
+      john_doe = {
+        clients: {
+          desktop_id: 'b29034060fed476e',
+          phone_id: '4b0a0fbf418d264c',
+        },
+        id: entities.user.john_doe.id,
+      };
+
+      jane_roe = {
+        clients: {
+          phone_id: '55cdd1dbe3c2ed74',
+        },
+        id: entities.user.jane_roe.id,
+      };
+    });
 
     it('encrypts a generic message', () => {
       spyOn(testFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(
-        (recipients: Record<string, string[]>) =>
+        recipients =>
           new Promise(resolve => {
-            const prekey_map: Record<string, any> = {};
+            const prekey_map = {};
 
             for (const user_id in recipients) {
               if (recipients.hasOwnProperty(user_id)) {
@@ -124,7 +129,7 @@ describe('CryptographyRepository', () => {
         .spyOn(testFactory.cryptography_repository.cryptographyService, 'putClientPreKeys')
         .mockReturnValue(Promise.resolve());
       const preKeys = await testFactory.cryptography_repository.initCryptobox();
-      const alice = testFactory.cryptography_repository.cryptobox['identity'];
+      const alice = testFactory.cryptography_repository.cryptobox.identity;
 
       expect(alice).toBeDefined();
 
@@ -150,17 +155,12 @@ describe('CryptographyRepository', () => {
       );
       const encodedCipherText = arrayToBase64(cipherText);
 
-      const mockedEvent: ConversationOtrMessageAddEvent = {
-        conversation: '',
+      const mockedEvent = {
         data: {
-          recipient: '',
-          sender: '',
           text: encodedCipherText,
         },
         from: createRandomUuid(),
-        qualified_conversation: {domain: null, id: '7bc4558b-18ce-446b-8e62-0c442b86ba56'},
-        time: '',
-        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+        id: createRandomUuid(),
       };
 
       const decrypted = await testFactory.cryptography_repository.handleEncryptedEvent(mockedEvent);
@@ -174,13 +174,12 @@ describe('CryptographyRepository', () => {
 
     it('detects a session reset request', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
-      const event: ConversationOtrMessageAddEvent = {
+      const event = {
         conversation: 'f1d2d451-0fcb-4313-b0ba-313b971ab758',
-        qualified_conversation: {id: 'f1d2d451-0fcb-4313-b0ba-313b971ab758', domain: null},
         time: '2017-03-22T11:06:29.232Z',
         data: {text: '💣', sender: 'e35e4ee5b80a1a9d', recipient: '7481c47f2f7336d8'},
         from: 'e3ff8dab-1407-4890-b9d3-e1aab49233e8',
-        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+        type: 'conversation.otr-message-add',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
@@ -193,13 +192,12 @@ describe('CryptographyRepository', () => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const text = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
-      const event: ConversationOtrMessageAddEvent = {
+      const event = {
         conversation: '7bc4558b-18ce-446b-8e62-0c442b86ba56',
-        qualified_conversation: {id: '7bc4558b-18ce-446b-8e62-0c442b86ba56', domain: null},
         time: '2017-06-15T22:18:55.071Z',
         data: {text: text, sender: 'ccc17722a9348793', recipient: '4d7a36b30ef8bc26'},
         from: '8549aada-07cc-4272-9fd4-c2ae040c539d',
-        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+        type: 'conversation.otr-message-add',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 
@@ -212,13 +210,12 @@ describe('CryptographyRepository', () => {
       // Length of this message is 1 320 024 while the maximum is 150% of 12 000 (18 000)
       /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const data = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
-      const event: ConversationOtrMessageAddEvent = {
+      const event = {
         conversation: '7bc4558b-18ce-446b-8e62-0c442b86ba56',
-        qualified_conversation: {id: '7bc4558b-18ce-446b-8e62-0c442b86ba56', domain: null},
         time: '2017-06-15T22:18:55.071Z',
         data: {text: '💣', data: data, sender: 'ccc17722a9348793', recipient: '4d7a36b30ef8bc26'},
         from: '8549aada-07cc-4272-9fd4-c2ae040c539d',
-        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+        type: 'conversation.otr-message-add',
       };
       /* eslint-enable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
 

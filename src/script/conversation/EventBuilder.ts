@@ -33,7 +33,6 @@ import type {Message} from '../entity/message/Message';
 import type {User} from '../entity/User';
 import {AssetRecord, EventRecord} from '../storage';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 
 export interface QualifiedIdOptional {
   domain: string | null;
@@ -45,7 +44,6 @@ export interface BaseEvent {
   data?: unknown;
   from: string;
   id: string;
-  qualified_conversation: QualifiedId;
   server_time?: string;
   time: string;
 }
@@ -185,23 +183,13 @@ export type ClientConversationEvent =
   | VoiceChannelActivateEvent
   | VerificationEvent;
 
-function buildQualifiedId(conversation: {domain?: string; id: string}) {
-  return {
-    conversation: conversation.id,
-    qualified_conversation: {
-      domain: conversation.domain,
-      id: conversation.id,
-    },
-  };
-}
-
 export const EventBuilder = {
   build1to1Creation(conversationEntity: Conversation, timestamp: number = 0): OneToOneCreationEvent {
-    const {creator: creatorId} = conversationEntity;
+    const {creator: creatorId, id} = conversationEntity;
     const isoDate = new Date(timestamp).toISOString();
 
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: id,
       data: {
         userIds: conversationEntity.participating_user_ids(),
       },
@@ -214,7 +202,7 @@ export const EventBuilder = {
 
   buildAllVerified(conversationEntity: Conversation, currentTimestamp: number): AllVerifiedEvent {
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: conversationEntity.id,
       data: {
         type: VerificationMessageType.VERIFIED,
       },
@@ -227,7 +215,7 @@ export const EventBuilder = {
 
   buildAssetAdd(conversationEntity: Conversation, data: AssetRecord, currentTimestamp: number): AssetAddEvent {
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: conversationEntity.id,
       data,
       from: conversationEntity.selfUser().id,
       status: StatusType.SENDING,
@@ -257,7 +245,7 @@ export const EventBuilder = {
     userId: string,
   ): CallingTimeoutEvent {
     return {
-      ...buildQualifiedId(conversation),
+      conversation: conversation.id,
       data: {
         reason,
       },
@@ -275,7 +263,7 @@ export const EventBuilder = {
     currentTimestamp: number,
   ): DegradedMessageEvent {
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: conversationEntity.id,
       data: {
         type,
         userIds,
@@ -288,13 +276,13 @@ export const EventBuilder = {
   },
 
   buildDelete(
-    conversation: Conversation,
+    conversationId: string,
     messageId: string,
     time: string,
     deletedMessageEntity: Message,
   ): DeleteEverywhereEvent {
     return {
-      ...buildQualifiedId(conversation),
+      conversation: conversationId,
       data: {
         deleted_time: time,
       },
@@ -313,7 +301,7 @@ export const EventBuilder = {
     id: string,
   ): FileTypeRestrictedEvent {
     return {
-      ...buildQualifiedId(conversation),
+      conversation: conversation.id,
       data: {
         fileExt,
         isIncoming,
@@ -331,7 +319,7 @@ export const EventBuilder = {
     isTemporaryGuest: boolean = false,
     timestamp: number,
   ): GroupCreationEvent {
-    const {creator: creatorId} = conversationEntity;
+    const {creator: creatorId, id} = conversationEntity;
     const selfUserId = conversationEntity.selfUser().id;
     const selfUserDomain = conversationEntity.selfUser().domain;
     const isoDate = new Date(timestamp || 0).toISOString();
@@ -343,7 +331,7 @@ export const EventBuilder = {
     }
 
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: id,
       data: {
         allTeamMembers: conversationEntity.withAllTeamMembers(),
         name: conversationEntity.name(),
@@ -356,15 +344,11 @@ export const EventBuilder = {
     };
   },
 
-  buildIncomingMessageTooBig(
-    event: ConversationOtrMessageAddEvent,
-    messageError: Error,
-    errorCode: number,
-  ): ErrorEvent {
-    const {qualified_conversation: conversationId, data: eventData, from, time} = event;
+  buildIncomingMessageTooBig(event: EventRecord, messageError: Error, errorCode: number): ErrorEvent {
+    const {conversation: conversationId, data: eventData, from, time} = event;
 
     return {
-      ...buildQualifiedId(conversationId),
+      conversation: conversationId,
       error: `${messageError.message} (${eventData.sender})`,
       error_code: `${errorCode} (${eventData.sender})`,
       from,
@@ -375,14 +359,14 @@ export const EventBuilder = {
   },
 
   buildLegalHoldMessage(
-    conversationId: QualifiedIdOptional,
+    conversationId: string,
     userId: string,
     timestamp: number | string,
     legalHoldStatus: LegalHoldStatus,
     beforeMessage?: boolean,
   ): LegalHoldMessageEvent {
     return {
-      ...buildQualifiedId(conversationId),
+      conversation: conversationId,
       data: {
         legal_hold_status: legalHoldStatus,
       },
@@ -405,7 +389,7 @@ export const EventBuilder = {
     const isoDate = new Date(timestamp).toISOString();
 
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: conversationEntity.id,
       data: {
         user_ids: joiningUserIds.map(({id}) => id),
       },
@@ -422,7 +406,7 @@ export const EventBuilder = {
     currentTimestamp: number,
   ): MemberLeaveEvent {
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: conversationEntity.id,
       data: {
         user_ids: [userId.id],
       },
@@ -434,7 +418,7 @@ export const EventBuilder = {
 
   buildMessageAdd(conversationEntity: Conversation, currentTimestamp: number, senderId: string): MessageAddEvent {
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: conversationEntity.id,
       data: {
         sender: senderId,
       },
@@ -447,7 +431,7 @@ export const EventBuilder = {
 
   buildMissed(conversationEntity: Conversation, currentTimestamp: number): MissedEvent {
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: conversationEntity.id,
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
@@ -461,7 +445,7 @@ export const EventBuilder = {
     isoDate: string | number,
   ): TeamMemberLeaveEvent {
     return {
-      ...buildQualifiedId(conversationEntity),
+      conversation: conversationEntity.id,
       data: {
         name: userEntity.name(),
         user_ids: [userEntity.id],
@@ -474,10 +458,10 @@ export const EventBuilder = {
   },
 
   buildUnableToDecrypt(event: EventRecord, decryptionError: Error, errorCode: number): ErrorEvent {
-    const {qualified_conversation: conversationId, data: eventData, from, time} = event;
+    const {conversation: conversationId, data: eventData, from, time} = event;
 
     return {
-      ...buildQualifiedId(conversationId),
+      conversation: conversationId,
       error: `${decryptionError.message} (${eventData.sender})`,
       error_code: `${errorCode} (${eventData.sender})`,
       from,
@@ -488,13 +472,13 @@ export const EventBuilder = {
   },
 
   buildVoiceChannelActivate(
-    conversation: QualifiedIdOptional,
+    conversationId: string,
     userId: string,
     time: string,
     protocolVersion: number,
   ): VoiceChannelActivateEvent {
     return {
-      ...buildQualifiedId(conversation),
+      conversation: conversationId,
       from: userId,
       id: createRandomUuid(),
       protocol_version: protocolVersion,
@@ -504,7 +488,7 @@ export const EventBuilder = {
   },
 
   buildVoiceChannelDeactivate(
-    conversation: QualifiedIdOptional,
+    conversationId: string,
     userId: string,
     duration: number,
     reason: AVS_REASON,
@@ -512,7 +496,7 @@ export const EventBuilder = {
     protocolVersion: number,
   ): VoiceChannelDeactivateEvent {
     return {
-      ...buildQualifiedId(conversation),
+      conversation: conversationId,
       data: {
         duration,
         reason,

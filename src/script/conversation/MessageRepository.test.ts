@@ -225,7 +225,7 @@ describe('MessageRepository', () => {
           'massive external message massive external message massive external message massive external message',
       });
       const genericMessage = new GenericMessage({[GENERIC_MESSAGE_TYPE.TEXT]: text, messageId: createRandomUuid()});
-      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: null, id: largeConversationEntity.id});
+      const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -276,7 +276,7 @@ describe('MessageRepository', () => {
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: null, id: smallConversationEntity.id});
+      const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -517,15 +517,11 @@ describe('MessageRepository', () => {
       const selfUserId = 'ce1a2792-fb51-4977-a8e5-7a1dd8f2bb0b';
       const otherUserId = '6f88716b-1383-44da-9d57-45b51cc64d90';
 
-      const eventInfoEntity = new EventInfoEntity(
-        genericMessage,
-        {domain: null, id: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b'},
-        {
-          nativePush: true,
-          precondition: false,
-          recipients: {[otherUserId]: [], [selfUserId]: []},
-        },
-      );
+      const eventInfoEntity = new EventInfoEntity(genericMessage, '3da298fd-0ed4-4e51-863c-bfd2f5b9089b', {
+        nativePush: true,
+        precondition: false,
+        recipients: {[otherUserId]: [], [selfUserId]: []},
+      });
 
       const userIdsWithoutClients = MessageRepository.getOtherUsersWithoutClients(eventInfoEntity, selfUserId);
       expect(userIdsWithoutClients.length).toBe(1);

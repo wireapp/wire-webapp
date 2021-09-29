@@ -63,9 +63,9 @@ export class ClientMismatchHandler {
     // Note: Broadcast messages have an empty conversation ID
     let conversationEntity: Conversation | undefined;
 
-    if (eventInfoEntity.qualifiedConversationId.id !== '') {
+    if (eventInfoEntity.conversationId !== '') {
       conversationEntity = await this.conversationRepositoryProvider().getConversationById(
-        eventInfoEntity.qualifiedConversationId.id,
+        eventInfoEntity.conversationId,
       );
     }
 

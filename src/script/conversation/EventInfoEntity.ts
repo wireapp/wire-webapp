@@ -21,7 +21,6 @@ import type {GenericMessage, IGenericMessage} from '@wireapp/protocol-messaging'
 import type {UserClients} from '@wireapp/api-client/src/conversation/';
 
 import type {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
-import {QualifiedIdOptional} from './EventBuilder';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -42,15 +41,11 @@ export class EventInfoEntity {
   options: MessageSendingOptions;
   public readonly genericMessage: GenericMessage;
   private type?: GENERIC_MESSAGE_TYPE;
-  public readonly qualifiedConversationId: QualifiedIdOptional;
+  public readonly conversationId: string;
   public timestamp?: number;
 
-  constructor(
-    genericMessage: GenericMessage,
-    qualifiedConversationId: QualifiedIdOptional = {domain: null, id: ''},
-    options?: MessageSendingOptions,
-  ) {
-    this.qualifiedConversationId = qualifiedConversationId;
+  constructor(genericMessage: GenericMessage, conversationId: string = '', options?: MessageSendingOptions) {
+    this.conversationId = conversationId;
     this.genericMessage = genericMessage;
 
     this.options = {nativePush: true, precondition: false, ...options};

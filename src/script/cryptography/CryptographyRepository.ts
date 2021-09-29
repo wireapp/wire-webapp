@@ -22,7 +22,6 @@ import type {AxiosError} from 'axios';
 import {amplify} from 'amplify';
 import {error as StoreEngineError} from '@wireapp/store-engine';
 import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
@@ -271,7 +270,7 @@ export class CryptographyRepository {
    * @param event Backend event to decrypt
    * @returns Resolves with decrypted and mapped message
    */
-  async handleEncryptedEvent(event: ConversationOtrMessageAddEvent & {id?: string}) {
+  async handleEncryptedEvent(event: EventRecord) {
     const {data: eventData, from: userId, id} = event;
 
     if (!eventData) {

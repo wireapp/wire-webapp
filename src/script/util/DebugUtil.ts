@@ -328,7 +328,7 @@ export class DebugUtil {
   }
 
   async reprocessNotifications(notificationId?: string) {
-    const isEncryptedEvent = (event: any): event is ConversationOtrMessageAddEvent => {
+    const isEncryptedEvent = (event: any): event is EventRecord => {
       return event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     };
 
