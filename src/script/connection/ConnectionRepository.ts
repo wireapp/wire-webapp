@@ -177,7 +177,11 @@ export class ConnectionRepository {
    */
   public async createConnection(userEntity: User): Promise<void> {
     try {
-      const response = await this.connectionService.postConnections(userEntity.id, userEntity.name());
+      const config = Config.getConfig().FEATURE;
+      const isFederatedBackend = config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+      const response = isFederatedBackend
+        ? await this.connectionService.createConnection({domain: userEntity.domain, id: userEntity.id})
+        : await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {

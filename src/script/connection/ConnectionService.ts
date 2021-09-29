@@ -18,6 +18,7 @@
  */
 
 import type {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
@@ -56,6 +57,10 @@ export class ConnectionService {
       name: name,
       user: userId,
     });
+  }
+
+  createConnection(userId: QualifiedId) {
+    return this.apiClient.connection.api.createConnection(userId);
   }
 
   /**
