@@ -33,6 +33,7 @@ import {
   ConversationReceiptModeUpdateEvent,
   ConversationMemberLeaveEvent,
 } from '@wireapp/api-client/src/event';
+
 import {
   DefaultConversationRoleName as DefaultRole,
   CONVERSATION_ACCESS_ROLE,

@@ -49,7 +49,7 @@ import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {flatten} from 'Util/ArrayUtil';
+import {flatten, getDifference} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
 import {Config} from '../Config';
@@ -407,6 +407,9 @@ export class CallingRepository {
     const conversation = this.conversationState.findConversation(call.conversationId);
     if (conversation) {
       conversation.call(null);
+    }
+    if (this.callState.requestedVideoStreams.call === call) {
+      this.callState.requestedVideoStreams = {call: undefined, participants: []};
     }
   }
 

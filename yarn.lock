@@ -1531,8 +1531,7 @@
 "@formatjs/cli@4.3.0":
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.3.0.tgz#1c32876e05bffeb55e9e43360018edb7a232ddce"
-  integrity sha512-Ic5DQoMVB9jX7dtoEulaRJU1FBxVQRYvx3+CqIukySG6l7E02BphfdhxNue0Nh+ZPzsQ69Wi8AKnJdifPf3FaQ==
-  dependencies:
+  integrity sha512-Ic5DQoMVB9jX7dtoEulaRJU1FBxVQRYvx3+CqIukySG6l7E02BphfdhxNue0Nh+ZPzsQ69Wi8AKnJdifPf3FaQ==  dependencies:
     "@formatjs/icu-messageformat-parser" "2.0.11"
     "@formatjs/ts-transformer" "3.4.10"
     "@types/estree" "^0.0.50"
