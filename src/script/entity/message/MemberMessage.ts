@@ -30,7 +30,7 @@ import {User} from '../User';
 import {SystemMessage} from './SystemMessage';
 import {Config} from '../../Config';
 import {QualifiedIdOptional} from '../../conversation/EventBuilder';
-import {isQualifiedId} from 'Util/TypePredicateUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[];
@@ -345,9 +345,7 @@ export class MemberMessage extends SystemMessage {
   }
 
   isUserAffected(userId: QualifiedIdOptional): boolean {
-    return !!this.userIds().find(user =>
-      isQualifiedId(user) ? user.id === userId.id && user.domain == userId.domain : userId.id === user,
-    );
+    return !!this.userIds().find(user => matchQualifiedIds(user, userId));
   }
 
   guestCount(): number {

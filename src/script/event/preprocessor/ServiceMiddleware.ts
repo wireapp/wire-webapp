@@ -29,6 +29,7 @@ import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
 import {QualifiedIdOptional} from '../../conversation/EventBuilder';
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 interface MemberJoinEvent {
   user_ids: string[];
@@ -78,9 +79,7 @@ export class ServiceMiddleware {
     const {conversation: conversationId, data: eventData} = event;
     const userQualifiedIds = this.extractQualifiedUserIds(eventData);
     const selfUser = this.userState.self();
-    const containsSelfUser = userQualifiedIds.find(
-      (user: QualifiedIdOptional) => selfUser.id === user.id && selfUser.domain == user.domain,
-    );
+    const containsSelfUser = userQualifiedIds.find((user: QualifiedIdOptional) => matchQualifiedIds(user, selfUser));
 
     const userIds: QualifiedIdOptional[] = containsSelfUser
       ? await this.conversationRepository

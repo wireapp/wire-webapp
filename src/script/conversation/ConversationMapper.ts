@@ -35,6 +35,7 @@ import {Conversation} from '../entity/Conversation';
 import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {
@@ -263,14 +264,16 @@ export class ConversationMapper {
 
     return remoteConversations.map(
       (remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
-        const conversationId = remoteConversationData.id;
-        const conversationDomain = remoteConversationData.qualified_id?.domain;
-        const newLocalConversation = {id: conversationId} as ConversationDatabaseData;
-        const isSameDomain = (domainA: string, domainB: string): boolean => !domainA || !domainB || domainA === domainB;
-        const localConversationData: ConversationDatabaseData =
-          localConversations.find(
-            ({domain, id}) => id === conversationId && isSameDomain(domain, conversationDomain),
-          ) || newLocalConversation;
+        const remoteConversationId =
+          remoteConversationData.qualified_id ||
+          ({
+            domain: null,
+            id: remoteConversationData.id,
+          } as ConversationDatabaseData);
+        const localConversationData =
+          localConversations.find(conversationId =>
+            matchQualifiedIds(conversationId as QualifiedEntity, remoteConversationId as QualifiedEntity),
+          ) || remoteConversationId;
 
         const {access, access_role, creator, members, message_timer, qualified_id, receipt_mode, name, team, type} =
           remoteConversationData;
