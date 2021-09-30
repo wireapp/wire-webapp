@@ -264,16 +264,13 @@ export class ConversationMapper {
 
     return remoteConversations.map(
       (remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
-        const remoteConversationId =
-          remoteConversationData.qualified_id ||
-          ({
-            domain: null,
-            id: remoteConversationData.id,
-          } as ConversationDatabaseData);
+        const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
+          domain: null,
+          id: remoteConversationData.id,
+        };
         const localConversationData =
-          localConversations.find(conversationId =>
-            matchQualifiedIds(conversationId as QualifiedEntity, remoteConversationId as QualifiedEntity),
-          ) || remoteConversationId;
+          localConversations.find(conversationId => matchQualifiedIds(conversationId, remoteConversationId)) ||
+          (remoteConversationId as ConversationDatabaseData);
 
         const {access, access_role, creator, members, message_timer, qualified_id, receipt_mode, name, team, type} =
           remoteConversationData;
