@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.9.2...@wireapp/api-client@14.0.0) (2021-09-30)
+
+
+### Code Refactoring
+
+* **api-client:** rename and deprecate conversation methods ([#4144](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4144)) ([d3cb178](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/d3cb1784945091c5f82281e7f2f91e2067877f2a))
+
+
+### BREAKING CHANGES
+
+* **api-client:** - `getListConversations` is now renamed `getConversationsByQualifiedIds` 
+- `getRemoteConversations` is now renamed `getConversationList`
+
+
+
+
+
 ## [13.9.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.9.1...@wireapp/api-client@13.9.2) (2021-09-29)
 
 **Note:** Version bump only for package @wireapp/api-client
