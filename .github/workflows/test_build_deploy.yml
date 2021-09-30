@@ -290,7 +290,7 @@ jobs:
 
       - name: Announce production release
         if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: wireapp/github-action-wire-messenger@v2
+        uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
@@ -315,7 +315,7 @@ jobs:
 
       - name: Announce staging release
         if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: wireapp/github-action-wire-messenger@v2
+        uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
@@ -325,7 +325,7 @@ jobs:
 
       - name: Notify CI error
         if: failure() && github.event_name != 'pull_request' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: wireapp/github-action-wire-messenger@v2
+        uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
