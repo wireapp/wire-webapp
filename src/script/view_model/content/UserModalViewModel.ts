@@ -29,6 +29,7 @@ import type {User} from '../../entity/User';
 import type {UserRepository} from '../../user/UserRepository';
 import type {ActionsViewModel} from '../ActionsViewModel';
 import {UserState} from '../../user/UserState';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export class UserModalViewModel {
   userRepository: UserRepository;
@@ -78,13 +79,13 @@ export class UserModalViewModel {
     this.hide();
   };
 
-  showUser(userId: string, domain?: string, onModalClosed: () => void = noop): void {
+  showUser(userId: QualifiedId, onModalClosed: () => void = noop): void {
     this.onClosedCallback = onModalClosed;
     this.user(null);
     this.userNotFound(false);
     if (userId) {
       this.userRepository
-        .getUserById(userId, domain)
+        .getUserById(userId)
         .then(user => {
           if (user.isDeleted) {
             return this.userNotFound(true);

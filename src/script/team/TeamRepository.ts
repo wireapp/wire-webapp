@@ -376,7 +376,7 @@ export class TeamRepository {
 
     if (isLocalTeam && isOtherUser) {
       this.userRepository
-        .getUserById(userId, this.userState.self().domain)
+        .getUserById({domain: this.userState.self().domain, id: userId})
         .then(userEntity => this.addUserToTeam(userEntity));
       this.getTeamMember(teamId, userId).then(member => this.updateMemberRoles(this.teamState.team(), member));
     }

@@ -296,7 +296,7 @@ export class StartUIViewModel {
       if (participantEntity.isOutgoingRequest() || !participantEntity.isOnSameFederatedDomain()) {
         return this.clickOnContact(participantEntity);
       }
-      return this.mainViewModel.content.userModal.showUser(participantEntity.id, participantEntity.domain);
+      return this.mainViewModel.content.userModal.showUser(participantEntity);
     }
 
     return this.mainViewModel.content.serviceModal.showService(participantEntity);

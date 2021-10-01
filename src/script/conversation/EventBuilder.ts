@@ -44,6 +44,8 @@ export interface BaseEvent {
   data?: unknown;
   from: string;
   id: string;
+  qualified_conversation?: QualifiedId;
+  qualified_from?: QualifiedId;
   server_time?: string;
   time: string;
 }
@@ -359,19 +361,21 @@ export const EventBuilder = {
   },
 
   buildLegalHoldMessage(
-    conversationId: string,
-    userId: string,
+    conversationId: QualifiedId,
+    userId: QualifiedId,
     timestamp: number | string,
     legalHoldStatus: LegalHoldStatus,
     beforeMessage?: boolean,
   ): LegalHoldMessageEvent {
     return {
-      conversation: conversationId,
+      conversation: conversationId.id,
       data: {
         legal_hold_status: legalHoldStatus,
       },
-      from: userId,
+      from: userId.id,
       id: createRandomUuid(),
+      qualified_conversation: conversationId,
+      qualified_from: userId,
       time: new Date(new Date(timestamp).getTime() + (beforeMessage ? -1 : 1)).toISOString(),
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };

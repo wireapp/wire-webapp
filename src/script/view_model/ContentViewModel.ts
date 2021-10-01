@@ -296,7 +296,7 @@ export class ContentViewModel {
     try {
       const conversationEntity = isConversationEntity(conversation)
         ? conversation
-        : await this.conversationRepository.getConversationById(conversation, domain);
+        : await this.conversationRepository.getConversationById({domain, id: conversation});
       if (!conversationEntity) {
         throw new ConversationError(
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,

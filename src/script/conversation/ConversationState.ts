@@ -27,6 +27,8 @@ import {Conversation} from '../entity/Conversation';
 import {TeamState} from '../team/TeamState';
 import {User} from '../entity/User';
 import {UserState} from '../user/UserState';
+import {QualifiedId} from '@wireapp/api-client/src/user';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 @singleton()
 export class ConversationState {
@@ -50,7 +52,7 @@ export class ConversationState {
     this.conversations_cleared = ko.observableArray([]);
     this.conversations_unarchived = ko.observableArray([]);
     this.sorted_conversations = ko.pureComputed(() => this.filtered_conversations().sort(sortGroupsByLastEvent));
-    this.self_conversation = ko.pureComputed(() => this.findConversation(this.userState.self()?.id));
+    this.self_conversation = ko.pureComputed(() => this.findConversation(this.userState.self()));
 
     this.filtered_conversations = ko.pureComputed(() => {
       return this.conversations().filter(conversationEntity => {
@@ -91,15 +93,12 @@ export class ConversationState {
    * Find a local conversation by ID.
    * @returns Conversation is locally available
    */
-  findConversation(conversationId: string, domain?: string): Conversation {
+  findConversation(conversationId: QualifiedId): Conversation {
     // we prevent access to local conversation if the team is deleted
     return this.teamState.isTeamDeleted()
       ? undefined
       : this.conversations().find(conversation => {
-          if (domain) {
-            return conversation.id === conversationId && conversation.domain == domain;
-          }
-          return conversation.id === conversationId;
+          return matchQualifiedIds(conversation, conversationId);
         });
   }
 

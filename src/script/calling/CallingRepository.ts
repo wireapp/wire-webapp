@@ -275,7 +275,7 @@ export class CallingRepository {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients = await this.messageRepository.createRecipients(conversationId);
+      const localClients = await this.messageRepository.createRecipients({domain: null, id: conversationId});
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -390,7 +390,7 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.callState.activeCalls.push(call);
-    const conversation = this.conversationState.findConversation(call.conversationId);
+    const conversation = this.conversationState.findConversation({domain: null, id: call.conversationId});
     if (conversation) {
       conversation.call(call);
     }
@@ -404,7 +404,7 @@ export class CallingRepository {
     if (index !== -1) {
       this.callState.activeCalls.splice(index, 1);
     }
-    const conversation = this.conversationState.findConversation(call.conversationId);
+    const conversation = this.conversationState.findConversation({domain: null, id: call.conversationId});
     if (conversation) {
       conversation.call(null);
     }
@@ -508,7 +508,9 @@ export class CallingRepository {
   //##############################################################################
 
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<void> {
-    const recipients = await this.messageRepository.createRecipients(conversationId, false, [userId]);
+    const recipients = await this.messageRepository.createRecipients({domain: null, id: conversationId}, false, [
+      userId,
+    ]);
     const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse
@@ -979,7 +981,7 @@ export class CallingRepository {
       messageId: createRandomUuid(),
     });
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-    return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
+    return this.messageRepository.sendCallingMessage(eventInfoEntity, {domain: null, id: conversationId});
   };
 
   private readonly sendSFTRequest = (
@@ -1027,7 +1029,7 @@ export class CallingRepository {
     }
 
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
-      const conversationEntity = this.conversationState.findConversation(conversationId);
+      const conversationEntity = this.conversationState.findConversation({domain: null, id: conversationId});
       const callingEvent = EventBuilder.buildCallingTimeoutEvent(
         reason,
         conversationEntity,
@@ -1094,7 +1096,7 @@ export class CallingRepository {
     shouldRing: number,
     conversationType: CONV_TYPE,
   ) => {
-    const conversationEntity = this.conversationState.findConversation(conversationId);
+    const conversationEntity = this.conversationState.findConversation({domain: null, id: conversationId});
     if (!conversationEntity) {
       return;
     }
@@ -1398,7 +1400,7 @@ export class CallingRepository {
     call: Call,
     customSegmentations: Record<string, any> = {},
   ) => {
-    const conversationEntity = this.conversationState.findConversation(call.conversationId);
+    const conversationEntity = this.conversationState.findConversation({domain: null, id: call.conversationId});
     const participants = conversationEntity.participating_user_ets();
     const selfUserTeamId = call.getSelfParticipant().user.id;
     const guests = participants.filter(user => user.isGuest()).length;

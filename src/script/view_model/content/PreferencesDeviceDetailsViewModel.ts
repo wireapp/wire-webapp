@@ -89,7 +89,7 @@ export class PreferencesDeviceDetailsViewModel {
   private readonly _updateFingerprint = async (): Promise<void> => {
     this.fingerprint([]);
     try {
-      const fingerprint = await this.cryptographyRepository.getRemoteFingerprint(this.selfUser().id, this.device().id);
+      const fingerprint = await this.cryptographyRepository.getRemoteFingerprint(this.selfUser(), this.device().id);
       this.fingerprint(splitFingerprint(fingerprint));
     } catch (error) {
       this.logger.warn('Error while trying to update fingerprint', error);
@@ -106,12 +106,7 @@ export class PreferencesDeviceDetailsViewModel {
 
     try {
       const selfConversationId = this.conversationState.self_conversation().id;
-      await this.messageRepository.resetSession(
-        this.selfUser().id,
-        this.device().id,
-        selfConversationId,
-        this.selfUser().domain,
-      );
+      await this.messageRepository.resetSession(this.selfUser(), this.device().id, selfConversationId);
       window.setTimeout(() => {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);
       }, MotionDuration.LONG);
@@ -136,6 +131,6 @@ export class PreferencesDeviceDetailsViewModel {
 
   readonly toggleDeviceVerification = (): void => {
     const toggleVerified = !this.device().meta.isVerified();
-    this.clientRepository.verifyClient(this.selfUser().id, this.device(), toggleVerified, this.selfUser().domain);
+    this.clientRepository.verifyClient(this.selfUser(), this.device(), toggleVerified);
   };
 }

@@ -76,14 +76,15 @@ export class ServiceMiddleware {
   private async _processMemberJoinEvent(event: EventRecord<MemberJoinEvent>) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
-    const {conversation: conversationId, data: eventData} = event;
+    const {conversation: conversationId, qualified_conversation, data: eventData} = event;
+    const qualifiedConversation = qualified_conversation || {domain: null, id: conversationId};
     const userQualifiedIds = this.extractQualifiedUserIds(eventData);
     const selfUser = this.userState.self();
     const containsSelfUser = userQualifiedIds.find((user: QualifiedIdOptional) => matchQualifiedIds(user, selfUser));
 
     const userIds: QualifiedIdOptional[] = containsSelfUser
       ? await this.conversationRepository
-          .getConversationById(conversationId)
+          .getConversationById(qualifiedConversation)
           .then(conversationEntity => conversationEntity.participating_user_ids())
       : userQualifiedIds;
 
