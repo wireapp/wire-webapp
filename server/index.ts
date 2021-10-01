@@ -21,7 +21,7 @@ import {config} from './config';
 import {Server} from './Server';
 import {formatDate} from './util/TimeUtil';
 
-const federation = process.argv[2];
+const federation = process.env.FEDERATION;
 
 if (federation) {
   config.SERVER.APP_BASE = `https://local.${federation}.wire.link:8081`;
