@@ -1094,7 +1094,7 @@ export class ConversationRepository {
    * @note If there is no conversation it will request it from the backend
    * @returns Resolves when connection was mapped return value
    */
-  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | void> => {
+  private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
     const qualifiedId: QualifiedId = {domain: null, id: connectionEntity.conversationId};
     return Promise.resolve(this.conversationState.findConversation(qualifiedId))
       .then(conversationEntity => {
@@ -1127,6 +1127,7 @@ export class ConversationRepository {
         if (!isConversationNotFound) {
           throw error;
         }
+        return undefined;
       });
   };
 
@@ -1790,8 +1791,8 @@ export class ConversationRepository {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
-    const {conversation, data: eventData, type} = eventJson;
-    const conversationId = eventData?.conversationId || conversation;
+    const {conversation, qualified_conversation, type} = eventJson;
+    const conversationId = qualified_conversation || {domain: null, id: conversation};
     this.logger.info(`Handling event '${type}' in conversation '${conversationId}' (Source: ${eventSource})`);
 
     const inSelfConversation =
