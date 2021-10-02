@@ -32,7 +32,7 @@ import type {Participant} from '../../calling/Participant';
 import type {Grid} from '../../calling/videoGridHandler';
 import type {Conversation} from '../../entity/Conversation';
 import useHideElement from '../../hooks/useHideElement';
-import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
+import {DeviceTypes, ElectronDesktopCapturerSource, MediaDevicesHandler} from '../../media/MediaDevicesHandler';
 import type {Multitasking} from '../../notification/NotificationRepository';
 import {t} from '../../util/LocalizerUtil';
 import {CallViewTab, CallViewTabs} from '../../view_model/CallingViewModel';
@@ -140,7 +140,9 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const {display_name: conversationName} = useKoSubscribableChildren(conversation, ['display_name']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
-  const currentCameraDevice = mediaDevicesHandler.currentDeviceId.videoInput();
+  const {videoInput: currentCameraDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
+    DeviceTypes.VIDEO_INPUT,
+  ]);
   const switchCameraSource = (call: Call, deviceId: string) => switchCameraInput(call, deviceId);
   const minimize = () => multitasking.isMinimized(true);
   const videoInput = useKoSubscribable(mediaDevicesHandler.availableDevices.videoInput);

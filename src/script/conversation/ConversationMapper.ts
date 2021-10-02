@@ -266,9 +266,11 @@ export class ConversationMapper {
         const conversationId = remoteConversationData.id;
         const conversationDomain = remoteConversationData.qualified_id?.domain;
         const newLocalConversation = {id: conversationId} as ConversationDatabaseData;
+        const isSameDomain = (domainA: string, domainB: string): boolean => !domainA || !domainB || domainA === domainB;
         const localConversationData: ConversationDatabaseData =
-          localConversations.find(({domain, id}) => id === conversationId && domain == conversationDomain) ||
-          newLocalConversation;
+          localConversations.find(
+            ({domain, id}) => id === conversationId && isSameDomain(domain, conversationDomain),
+          ) || newLocalConversation;
 
         const {access, access_role, creator, members, message_timer, qualified_id, receipt_mode, name, team, type} =
           remoteConversationData;

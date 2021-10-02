@@ -288,6 +288,15 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Announce production release
+        if: contains(env.TAG, 'production') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
+        uses: wireapp/github-action-wire-messenger@v2.0.0
+        with:
+          email: ${{secrets.WIRE_BOT_EMAIL}}
+          password: ${{secrets.WIRE_BOT_PASSWORD}}
+          conversation: 1784ed44-7c32-4984-b5e2-0b4d55b034ed
+          send_text: 'The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version'
+
       - name: Generate changelog for staging release
         if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
         run: yarn changelog:dev
@@ -304,32 +313,24 @@ jobs:
           draft: false
           prerelease: true
 
-      - name: Notify staging bump
+      - name: Announce staging release
         if: contains(env.TAG, 'staging') && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: wireapp/github-action-wire-messenger@v1
+        uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: 4223f57f-0c8d-42fe-bf8a-908d680788ab
-          text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
-
-      - name: Notify AVS commit
-        if: env.BRANCH_NAME == 'avs' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: wireapp/github-action-wire-messenger@v1
-        with:
-          email: ${{secrets.WIRE_BOT_EMAIL}}
-          password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: 5496b04a-afd3-410e-8154-855142bcfb03
-          text: 'Deployed commit **${{github.sha}}** ("${{env.TITLE}}") on [wire-webapp-avs](https://wire-webapp-avs.zinfra.io/). 🏁'
+          conversation: '697c93e8-0b13-4204-a35e-59270462366a'
+          send_gif: 'in the oven'
+          send_text: 'Staging bump for commit **${{github.sha}}** ("${{env.TITLE}}") done! 🏁'
 
       - name: Notify CI error
         if: failure() && github.event_name != 'pull_request' && matrix.DISTRIBUTION == 'DISTRIBUTION_0'
-        uses: wireapp/github-action-wire-messenger@v1
+        uses: wireapp/github-action-wire-messenger@v2.0.0
         with:
           email: ${{secrets.WIRE_BOT_EMAIL}}
           password: ${{secrets.WIRE_BOT_PASSWORD}}
-          conversation: b2cc7120-4154-4be4-b0c0-45a8c361c4d1
-          text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
+          conversation: 'b2cc7120-4154-4be4-b0c0-45a8c361c4d1'
+          send_text: '${{env.COMMITTER}} broke the "${{env.BRANCH_NAME}}" branch on "${{github.repository}}" with [${{env.TITLE}}](${{env.COMMIT_URL}}) 🌵'
 
       - name: Build config.js file for desktop
         if: env.BUILD_DESKTOP == 'true'
