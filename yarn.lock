@@ -1531,7 +1531,8 @@
 "@formatjs/cli@4.3.0":
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.3.0.tgz#1c32876e05bffeb55e9e43360018edb7a232ddce"
-  integrity sha512-Ic5DQoMVB9jX7dtoEulaRJU1FBxVQRYvx3+CqIukySG6l7E02BphfdhxNue0Nh+ZPzsQ69Wi8AKnJdifPf3FaQ==  dependencies:
+  integrity sha512-Ic5DQoMVB9jX7dtoEulaRJU1FBxVQRYvx3+CqIukySG6l7E02BphfdhxNue0Nh+ZPzsQ69Wi8AKnJdifPf3FaQ==
+  dependencies:
     "@formatjs/icu-messageformat-parser" "2.0.11"
     "@formatjs/ts-transformer" "3.4.10"
     "@types/estree" "^0.0.50"
@@ -2532,10 +2533,10 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@16 || 17", "@types/react@17.0.24", "@types/react@>=16.9.0":
-  version "17.0.24"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.24.tgz#7e1b3f78d0fc53782543f9bce6d949959a5880bd"
-  integrity sha512-eIpyco99gTH+FTI3J7Oi/OH8MZoFMJuztNRimDOJwH4iGIsKV2qkGnk4M9VzlaVWeEEWLWSQRy0FEA0Kz218cg==
+"@types/react@*", "@types/react@16 || 17", "@types/react@17.0.27", "@types/react@>=16.9.0":
+  version "17.0.27"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.27.tgz#6498ed9b3ad117e818deb5525fa1946c09f2e0e6"
+  integrity sha512-zgiJwtsggVGtr53MndV7jfiUESTqrbxOcBvwfe6KS/9bzaVPCTDieTWnFNecVNx6EAaapg5xsLLWFfHHR437AA==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
