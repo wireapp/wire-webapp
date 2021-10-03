@@ -1531,7 +1531,8 @@
 "@formatjs/cli@4.3.0":
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.3.0.tgz#1c32876e05bffeb55e9e43360018edb7a232ddce"
-  integrity sha512-Ic5DQoMVB9jX7dtoEulaRJU1FBxVQRYvx3+CqIukySG6l7E02BphfdhxNue0Nh+ZPzsQ69Wi8AKnJdifPf3FaQ==  dependencies:
+  integrity sha512-Ic5DQoMVB9jX7dtoEulaRJU1FBxVQRYvx3+CqIukySG6l7E02BphfdhxNue0Nh+ZPzsQ69Wi8AKnJdifPf3FaQ==
+  dependencies:
     "@formatjs/icu-messageformat-parser" "2.0.11"
     "@formatjs/ts-transformer" "3.4.10"
     "@types/estree" "^0.0.50"
@@ -5823,10 +5824,10 @@ eslint-plugin-react-hooks@4.2.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.2.0.tgz#8c229c268d468956334c943bb45fc860280f5556"
   integrity sha512-623WEiZJqxR7VdxFCKLI6d6LLpwJkGPYKODnkH3D7WpOG5KM8yWueBd8TLsNAetEJNF5iJmolaAKO3F8yzyVBQ==
 
-eslint-plugin-react@7.26.0:
-  version "7.26.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.26.0.tgz#3ae019a35d542b98e5af9e2f96b89c232c74b55b"
-  integrity sha512-dceliS5itjk4EZdQYtLMz6GulcsasguIs+VTXuiC7Q5IPIdGTkyfXVdmsQOqEhlD9MciofH4cMcT1bw1WWNxCQ==
+eslint-plugin-react@7.26.1:
+  version "7.26.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.26.1.tgz#41bcfe3e39e6a5ac040971c1af94437c80daa40e"
+  integrity sha512-Lug0+NOFXeOE+ORZ5pbsh6mSKjBKXDXItUD2sQoT+5Yl0eoT82DqnXeTMfUare4QVCn9QwXbfzO/dBLjLXwVjQ==
   dependencies:
     array-includes "^3.1.3"
     array.prototype.flatmap "^1.2.4"
