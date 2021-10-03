@@ -1531,7 +1531,8 @@
 "@formatjs/cli@4.3.0":
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.3.0.tgz#1c32876e05bffeb55e9e43360018edb7a232ddce"
-  integrity sha512-Ic5DQoMVB9jX7dtoEulaRJU1FBxVQRYvx3+CqIukySG6l7E02BphfdhxNue0Nh+ZPzsQ69Wi8AKnJdifPf3FaQ==  dependencies:
+  integrity sha512-Ic5DQoMVB9jX7dtoEulaRJU1FBxVQRYvx3+CqIukySG6l7E02BphfdhxNue0Nh+ZPzsQ69Wi8AKnJdifPf3FaQ==
+  dependencies:
     "@formatjs/icu-messageformat-parser" "2.0.11"
     "@formatjs/ts-transformer" "3.4.10"
     "@types/estree" "^0.0.50"
@@ -8858,10 +8859,10 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
-linkify-it@3.0.2, linkify-it@^3.0.1:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/linkify-it/-/linkify-it-3.0.2.tgz#f55eeb8bc1d3ae754049e124ab3bb56d97797fb8"
-  integrity sha512-gDBO4aHNZS6coiZCKVhSNh43F9ioIL4JwRjLZPkoLIY4yZFwg264Y5lu2x6rb1Js42Gh6Yqm2f6L2AJcnkzinQ==
+linkify-it@3.0.3, linkify-it@^3.0.1:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/linkify-it/-/linkify-it-3.0.3.tgz#a98baf44ce45a550efb4d49c769d07524cc2fa2e"
+  integrity sha512-ynTsyrFSdE5oZ/O9GEf00kPngmOfVwazR5GKDq6EYfhlpFug3J2zybX56a2PRRpc9P+FuSoGNAwjlbDs9jJBPQ==
   dependencies:
     uc.micro "^1.0.1"
 
