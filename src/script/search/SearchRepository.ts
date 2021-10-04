@@ -26,6 +26,7 @@ import type {SearchService} from './SearchService';
 import type {UserRepository} from '../user/UserRepository';
 import type {User} from '../entity/User';
 import type {QualifiedIdOptional} from '../conversation/EventBuilder';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class SearchRepository {
   logger: Logger;
@@ -181,8 +182,8 @@ export class SearchRepository {
     if (validateHandle(name, domain)) {
       const apiUser = await this.userRepository.getUserByHandle({domain, handle: name});
       if (apiUser) {
-        const knownUser = userEntities.find(
-          user => user.id === apiUser.id && user.domain == apiUser.qualified_id?.domain,
+        const knownUser = userEntities.find(user =>
+          matchQualifiedIds(user, apiUser.qualified_id || {domain: null, id: apiUser.id}),
         );
         if (!knownUser) {
           const matchedUser = this.userRepository.userMapper.mapUserFromJson(apiUser);

@@ -130,7 +130,7 @@ export class LegalHoldModalViewModel {
       const response = await this.teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
       if (response.status === LegalHoldMemberStatus.PENDING) {
         fingerprint = await this.cryptographyRepository.getRemoteFingerprint(
-          selfUser.id,
+          selfUser,
           response.client.id,
           response.last_prekey,
         );
@@ -220,7 +220,7 @@ export class LegalHoldModalViewModel {
     this.isLoading(true);
     this.isVisible(true);
     await this.messageRepository.updateAllClients(conversation, false);
-    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation.id, conversation.domain);
+    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation);
     const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
     if (!legalHoldUsers.length) {
       this.isVisible(false);

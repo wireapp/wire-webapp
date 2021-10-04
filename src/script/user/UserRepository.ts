@@ -70,6 +70,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 import {QualifiedIdOptional} from '../conversation/EventBuilder';
 import {fixWebsocketString} from 'Util/StringUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class UserRepository {
   private readonly logger: Logger;
@@ -164,7 +165,7 @@ export class UserRepository {
 
         await Promise.all(
           users.map(async user => {
-            const userEntity = await this.getUserById(user.id, user.domain);
+            const userEntity = await this.getUserById({domain: user.domain, id: user.id});
             userEntity.availability(user.availability);
           }),
         );
@@ -198,7 +199,7 @@ export class UserRepository {
       return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
     }
 
-    const userIds = userEntities.map(userEntity => userEntity.id);
+    const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
     return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
@@ -238,7 +239,9 @@ export class UserRepository {
         from: userId,
         data: {availability},
       } = event;
-      this.getUserById(userId, event.fromDomain).then(userEntity => userEntity.availability(availability));
+      this.getUserById({domain: event.fromDomain, id: userId}).then(userEntity =>
+        userEntity.availability(availability),
+      );
     }
   }
 
@@ -249,7 +252,7 @@ export class UserRepository {
     const isSelfUser = user.id === this.userState.self().id;
     const userEntity = isSelfUser
       ? this.userState.self()
-      : await this.getUserById(user.id, user.qualified_id?.domain || null);
+      : await this.getUserById({domain: user.qualified_id?.domain || null, id: user.id});
 
     if (isWebSocket && user.name) {
       user.name = fixWebsocketString(user.name);
@@ -315,27 +318,26 @@ export class UserRepository {
    * @returns Resolves with `true` when a client has been added
    */
   addClientToUser = async (
-    userId: string,
+    userId: QualifiedId,
     clientPayload: PublicClient | AddedClient | ClientEntity,
     publishClient: boolean = false,
-    domain: string | null,
   ): Promise<boolean> => {
-    const userEntity = await this.getUserById(userId, domain);
+    const userEntity = await this.getUserById(userId);
     const clientEntity =
       clientPayload instanceof ClientEntity
         ? clientPayload
-        : ClientMapper.mapClient(clientPayload, userEntity.isMe, domain);
+        : ClientMapper.mapClient(clientPayload, userEntity.isMe, userId.domain);
     const wasClientAdded = userEntity.addClient(clientEntity);
     if (wasClientAdded) {
       await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
       if (clientEntity.isLegalHold()) {
         amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
-        const isSelfUser = userId === this.userState.self().id;
+        const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
           amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
         }
       } else if (publishClient) {
-        amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain, id: userId}, clientEntity);
+        amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
       }
     }
     return wasClientAdded;
@@ -346,24 +348,20 @@ export class UserRepository {
    * @deprecated
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
-  removeClientFromUser = async (userId: string, clientId: string, domain: string | null): Promise<void> => {
-    await this.clientRepository.removeClient(userId, clientId, domain);
-    const userEntity = await this.getUserById(userId, domain);
+  removeClientFromUser = async (userId: QualifiedId, clientId: string): Promise<void> => {
+    await this.clientRepository.removeClient(userId, clientId);
+    const userEntity = await this.getUserById(userId);
     userEntity.removeClient(clientId);
-    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, {domain, id: userId}, clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
   };
 
   /**
    * Update clients for given user.
    */
-  private readonly updateClientsFromUser = (
-    userId: string,
-    clientEntities: ClientEntity[],
-    domain: string | null,
-  ): void => {
-    this.getUserById(userId, domain).then(userEntity => {
+  private readonly updateClientsFromUser = (userId: QualifiedId, clientEntities: ClientEntity[]): void => {
+    this.getUserById(userId).then(userEntity => {
       userEntity.devices(clientEntities);
-      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, {domain, id: userId});
+      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId);
     });
   };
 
@@ -505,7 +503,7 @@ export class UserRepository {
       return typeof userId === 'string'
         ? knownUser.id === userId
         : // Don't check for the domain when the user query has no domain
-          knownUser.id === userId.id && (!userId.domain || knownUser.domain == userId.domain);
+          matchQualifiedIds(knownUser, userId);
     });
   }
 
@@ -551,21 +549,18 @@ export class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  async getUserById(userId: string, domain: string | null): Promise<User> {
-    const qualifier: string | QualifiedId = domain
-      ? {
-          domain,
-          id: userId,
-        }
-      : userId;
-    let user = this.findUserById(qualifier);
+  async getUserById(userId: QualifiedId): Promise<User> {
+    let user = this.findUserById(userId);
     if (!user) {
       try {
-        user = await this.fetchUserById(qualifier);
+        user = await this.fetchUserById(userId);
       } catch (error) {
         const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
         if (!isNotFound) {
-          this.logger.warn(`Failed to find user with ID '${userId}' and domain '${domain}': ${error.message}`, error);
+          this.logger.warn(
+            `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${error.message}`,
+            error,
+          );
         }
         throw error;
       }
@@ -670,9 +665,7 @@ export class UserRepository {
 
   static findMatchingUser(userId: string | QualifiedId, userEntities: User[]): User | undefined {
     if (isQualifiedId(userId)) {
-      return userEntities.find(userEntity => {
-        return userEntity.domain == userId.domain && userEntity.id === userId.id;
-      });
+      return userEntities.find(userEntity => matchQualifiedIds(userEntity, userId));
     }
     return userEntities.find(userEntity => userEntity.id === userId);
   }

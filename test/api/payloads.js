@@ -161,6 +161,7 @@ entities.user = {
     picture: entities.picture,
     name: 'John Doe',
     id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5',
+    qualified_id: {id: 'd5a39ffb-6ce3-4cc8-9048-0e15d031b4c5', domain: null},
     locale: 'en',
   },
   jane_roe: {
@@ -171,6 +172,7 @@ entities.user = {
     name: 'Jane Roe',
     handle: 'jaro',
     id: '7025598b-ffac-4993-8a81-af3f35b7147f',
+    qualified_id: {id: '7025598b-ffac-4993-8a81-af3f35b7147f', domain: null},
   },
 };
 

@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {amplify} from 'amplify';
 
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -38,23 +39,22 @@ export function storeValue(key: string, value: any, secondsToExpire?: number): v
 /**
  * Construct the primary key to store clients in database.
  *
- * @param userId User ID from the owner of the client
+ * @param userId Qualified User ID from the owner of the client
  * @param clientId ID of the client
- * @param domain Domain of the remote participant (only available in federation-aware webapps)
  */
-export function constructClientPrimaryKey(domain: string | null, userId: string, clientId: string): string {
-  const userPrimaryKey = constructUserPrimaryKey(domain, userId);
+export function constructClientPrimaryKey(userId: QualifiedId, clientId: string): string {
+  const userPrimaryKey = constructUserPrimaryKey(userId);
   return `${userPrimaryKey}@${clientId}`;
 }
 
-export function constructUserPrimaryKey(domain: string | null, userId: string): string {
+export function constructUserPrimaryKey({id, domain}: QualifiedId): string {
   /**
    * For backward compatibility: We store clients with participants from our own domain without a domain in the session ID (legacy session ID format).
    * All other clients (from users on a different domain/remote backends) will be saved with a domain in their primary key.
    */
   if (Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN !== domain) {
-    return domain ? `${domain}@${userId}` : userId;
+    return domain ? `${domain}@${id}` : id;
   }
 
-  return userId;
+  return id;
 }

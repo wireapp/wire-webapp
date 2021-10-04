@@ -697,7 +697,7 @@ class App {
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain?: string) => {
-        mainView.content.userModal.showUser(userId, domain, () => router.navigate('/'));
+        mainView.content.userModal.showUser({domain, id: userId}, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);

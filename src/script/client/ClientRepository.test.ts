@@ -62,7 +62,7 @@ describe('ClientRepository', () => {
       );
 
       const clientEntities = await testFactory.client_repository.getClientsByUserIds(
-        [entities.user.john_doe.id],
+        [entities.user.john_doe.qualified_id],
         false,
       );
       expect(clientEntities[entities.user.john_doe.id].length).toBe(allClients.length);
@@ -238,7 +238,7 @@ describe('ClientRepository', () => {
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
       testFactory.client_repository.selfUser(new User(userId, null));
-      const result = testFactory.client_repository['isCurrentClient'](userId, clientId);
+      const result = testFactory.client_repository['isCurrentClient']({domain: null, id: userId}, clientId);
 
       expect(result).toBeTruthy();
     });
@@ -247,7 +247,7 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity(false, null);
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
-      const result = testFactory.client_repository['isCurrentClient'](userId, 'ABCDE');
+      const result = testFactory.client_repository['isCurrentClient']({domain: null, id: userId}, 'ABCDE');
 
       expect(result).toBeFalsy();
     });
@@ -256,20 +256,21 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity(false, null);
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
-      const result = testFactory.client_repository['isCurrentClient']('ABCDE', clientId);
+      const result = testFactory.client_repository['isCurrentClient']({domain: null, id: 'ABCDE'}, clientId);
 
       expect(result).toBeFalsy();
     });
 
     it('throws an error if current client is not set', () => {
-      const functionCall = () => testFactory.client_repository['isCurrentClient'](userId, clientId);
+      const functionCall = () => testFactory.client_repository['isCurrentClient']({domain: null, id: userId}, clientId);
 
       expect(functionCall).toThrowError(ClientError);
     });
 
     it('throws an error if client ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient(new ClientEntity(false, null));
-      const functionCall = () => testFactory.client_repository['isCurrentClient'](userId, undefined);
+      const functionCall = () =>
+        testFactory.client_repository['isCurrentClient']({domain: null, id: userId}, undefined);
 
       expect(functionCall).toThrowError(ClientError);
     });

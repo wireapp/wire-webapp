@@ -466,10 +466,9 @@ describe('MessageRepository', () => {
 
       for (const clientPayload of clientsPayload) {
         const wasClientAdded = await testFactory.user_repository.addClientToUser(
-          conversationPartner.id,
+          conversationPartner,
           clientPayload,
           false,
-          conversationPartner.domain,
         );
 
         expect(wasClientAdded).toBe(true);
