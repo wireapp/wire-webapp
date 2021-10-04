@@ -18,5 +18,5 @@
  */
 
 export interface UserDeleteData {
-  client: {id: string};
+  id: string;
 }

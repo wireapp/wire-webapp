@@ -26,6 +26,7 @@ import type {
   UserLegalHoldDisableData,
   UserLegalHoldEnableData,
   UserLegalHoldRequestData,
+  UserPropertiesDeleteData,
   UserPropertiesSetData,
   UserPushRemoveData,
   UserUpdateData,
@@ -56,6 +57,7 @@ export type UserEventData =
   | UserConnectionData
   | UserDeleteData
   | UserPropertiesSetData
+  | UserPropertiesDeleteData
   | UserUpdateData
   | UserPushRemoveData
   | null;
@@ -70,6 +72,7 @@ export type UserEvent =
   | UserConnectionEvent
   | UserDeleteEvent
   | UserPropertiesSetEvent
+  | UserPropertiesDeleteEvent
   | UserUpdateEvent
   | UserPushRemoveEvent;
 
@@ -111,6 +114,10 @@ export interface UserDeleteEvent extends BaseUserEvent, UserDeleteData {
 
 export interface UserPropertiesSetEvent extends BaseUserEvent, UserPropertiesSetData {
   type: USER_EVENT.PROPERTIES_SET;
+}
+
+export interface UserPropertiesDeleteEvent extends BaseUserEvent, UserPropertiesDeleteData {
+  type: USER_EVENT.PROPERTIES_DELETE;
 }
 
 export interface UserUpdateEvent extends BaseUserEvent, UserUpdateData {
