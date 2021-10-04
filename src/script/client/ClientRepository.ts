@@ -551,12 +551,12 @@ export class ClientRepository {
 
     const isClientAdd = type === USER_EVENT.CLIENT_ADD;
     if (isClientAdd) {
-      return this.onClientAdd(eventJson as UserClientAddEvent);
+      return this.onClientAdd(eventJson);
     }
 
     const isClientRemove = type === USER_EVENT.CLIENT_REMOVE;
     if (isClientRemove) {
-      this.onClientRemove(eventJson as UserClientRemoveEvent);
+      this.onClientRemove(eventJson);
     }
   };
 
@@ -564,7 +564,7 @@ export class ClientRepository {
    * A client was added by the self user.
    * @param eventJson JSON data of 'user.client-add' event
    */
-  private onClientAdd(eventJson: Partial<UserClientAddEvent>): void {
+  private onClientAdd(eventJson: Pick<UserClientAddEvent, 'client'>): void {
     this.logger.info('Client of self user added', eventJson);
     const qualifiedId = {domain: this.selfUser().domain, id: this.selfUser().id};
     amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, eventJson.client, true);
