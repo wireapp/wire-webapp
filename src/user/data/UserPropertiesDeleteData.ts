@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,6 @@
  *
  */
 
-export * from './UserActivateData';
-export * from './UserClientAddData';
-export * from './UserLegalHoldRequestData';
-export * from './UserClientRemoveData';
-export * from './UserConnectionData';
-export * from './UserDeleteData';
-export * from './UserLegalHoldDisableData';
-export * from './UserLegalHoldEnableData';
-export * from './UserPropertiesSetData';
-export * from './UserPropertiesDeleteData';
-export * from './UserPushRemoveData';
-export * from './UserUpdateData';
+export interface UserPropertiesDeleteData {
+  key: string;
+}
