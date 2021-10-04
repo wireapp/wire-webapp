@@ -62,7 +62,7 @@ describe('ClientRepository', () => {
       );
 
       const clientEntities = await testFactory.client_repository.getClientsByUserIds(
-        [entities.user.john_doe.id],
+        [entities.user.john_doe.qualified_id],
         false,
       );
       expect(clientEntities[entities.user.john_doe.id].length).toBe(allClients.length);
