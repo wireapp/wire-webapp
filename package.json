@@ -2,7 +2,7 @@
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "7.2.91",
-    "@wireapp/core": "17.16.4",
+    "@wireapp/core": "17.16.8",
     "@wireapp/react-ui-kit": "7.54.0",
     "@wireapp/store-engine-dexie": "1.6.7",
     "@wireapp/store-engine-sqleet": "1.7.11",
@@ -113,7 +113,7 @@
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-babel": "5.3.1",
     "eslint-plugin-import": "2.24.2",
-    "eslint-plugin-jest": "24.4.2",
+    "eslint-plugin-jest": "24.5.2",
     "eslint-plugin-jsdoc": "36.1.0",
     "eslint-plugin-no-unsanitized": "3.1.5",
     "eslint-plugin-prettier": "4.0.0",
