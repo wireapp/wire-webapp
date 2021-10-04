@@ -423,7 +423,7 @@ export class UserRepository {
     } = eventJson;
 
     const fingerprint = await this.clientRepository.cryptographyRepository.getRemoteFingerprint(
-      userId,
+      {domain: null, id: userId},
       clientId,
       last_prekey,
     );
