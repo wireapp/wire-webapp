@@ -95,16 +95,11 @@ export class ConversationService {
    * @returns Resolves with the conversation information
    */
   async getAllConversations(): Promise<BackendConversation[]> {
-    const conversations = await this.apiClient.conversation.api.getAllConversations();
+    const domain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    const conversationApi = this.apiClient.conversation.api;
+    const isFederatedBackend = Config.getConfig().FEATURE.ENABLE_FEDERATION === true && domain;
 
-    if (Config.getConfig().FEATURE.ENABLE_FEDERATION === true && Config.getConfig().FEATURE.FEDERATION_DOMAIN) {
-      const remoteConversations = await this.apiClient.conversation.api.getRemoteConversations(
-        Config.getConfig().FEATURE.FEDERATION_DOMAIN,
-      );
-      conversations.push(...remoteConversations);
-    }
-
-    return conversations;
+    return isFederatedBackend ? conversationApi.getConversationList(domain) : conversationApi.getAllConversations();
   }
 
   /**
