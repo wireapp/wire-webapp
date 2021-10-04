@@ -62,6 +62,7 @@ import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -376,11 +377,9 @@ export class ContentViewModel {
       if (isStateRequests) {
         this.switchContent(ContentViewModel.STATE.CONNECTION_REQUESTS);
       }
-      const previousId = this.previousConversation?.id;
-      const previousDomain = this.previousConversation?.domain;
       const repoHasConversation = this.conversationState
         .conversations()
-        .some(({id, domain}) => id === previousId && domain == previousDomain);
+        .some(conversation => matchQualifiedIds(conversation, this.previousConversation));
 
       if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
         void this.showConversation(this.previousConversation, {});

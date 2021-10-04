@@ -70,6 +70,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 import {QualifiedIdOptional} from '../conversation/EventBuilder';
 import {fixWebsocketString} from 'Util/StringUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class UserRepository {
   private readonly logger: Logger;
@@ -502,7 +503,7 @@ export class UserRepository {
       return typeof userId === 'string'
         ? knownUser.id === userId
         : // Don't check for the domain when the user query has no domain
-          knownUser.id === userId.id && (!userId.domain || knownUser.domain == userId.domain);
+          matchQualifiedIds(knownUser, userId);
     });
   }
 
@@ -664,9 +665,7 @@ export class UserRepository {
 
   static findMatchingUser(userId: string | QualifiedId, userEntities: User[]): User | undefined {
     if (isQualifiedId(userId)) {
-      return userEntities.find(userEntity => {
-        return userEntity.domain == userId.domain && userEntity.id === userId.id;
-      });
+      return userEntities.find(userEntity => matchQualifiedIds(userEntity, userId));
     }
     return userEntities.find(userEntity => userEntity.id === userId);
   }

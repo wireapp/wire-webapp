@@ -33,6 +33,7 @@ import type {EventRepository} from '../event/EventRepository';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserState} from '../user/UserState';
 import {ConversationState} from './ConversationState';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class ConversationVerificationStateHandler {
   private readonly logger: Logger;
@@ -206,11 +207,7 @@ export class ConversationVerificationStateHandler {
           const selfUser = {domain: this.userState.self().domain, id: this.userState.self().id};
           const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUser);
           const matchingUserIds = userIdsInConversation.filter(userIdInConversation =>
-            userIds.find(
-              userId =>
-                userId.id === userIdInConversation.id &&
-                (!userId.domain || userId.domain === userIdInConversation.domain),
-            ),
+            userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)),
           );
 
           if (!!matchingUserIds.length) {

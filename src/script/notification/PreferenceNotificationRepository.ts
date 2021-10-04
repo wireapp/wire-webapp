@@ -27,6 +27,7 @@ import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {QualifiedIdOptional} from '../conversation/EventBuilder';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export interface Notification {
   data: ClientEntity | boolean;
@@ -68,12 +69,12 @@ export class PreferenceNotificationRepository {
     });
 
     amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedIdOptional, clientEntity?: ClientEntity) => {
-      if (user.id === selfUserObservable().id && user.domain == selfUserObservable().domain) {
+      if (matchQualifiedIds(user, selfUserObservable())) {
         this.onClientAdd(user.id, clientEntity);
       }
     });
     amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedIdOptional, clientId?: string) => {
-      if (user.id === selfUserObservable().id && user.domain === selfUserObservable().domain) {
+      if (matchQualifiedIds(user, selfUserObservable())) {
         this.onClientRemove(user.id, clientId, user.domain);
       }
     });

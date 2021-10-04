@@ -2233,7 +2233,7 @@ export class ConversationRepository {
     const creatorDomain = conversationEntity.domain;
     const createdByParticipant = !!conversationEntity
       .participating_user_ids()
-      .find(userId => userId.id === creatorId && userId.domain == creatorDomain);
+      .find(userId => matchQualifiedIds(userId, {domain: creatorDomain, id: creatorId}));
     const createdBySelfUser = conversationEntity.isCreatedBySelf();
 
     const creatorIsParticipant = createdByParticipant || createdBySelfUser;
@@ -2284,9 +2284,8 @@ export class ConversationRepository {
         const isSelfUser = matchQualifiedIds(otherId, this.userState.self());
         const isParticipatingUser = !!conversationEntity
           .participating_user_ids()
-          .find(
-            participatingUser =>
-              participatingUser.id === otherMember.id && participatingUser.domain == otherMember.qualified_id?.domain,
+          .find(participatingUser =>
+            matchQualifiedIds(participatingUser, otherMember.qualified_id || {domain: null, id: otherMember.id}),
           );
         if (!isSelfUser && !isParticipatingUser) {
           conversationEntity.participating_user_ids.push({
@@ -2359,9 +2358,7 @@ export class ConversationRepository {
         .userEntities()
         .filter(userEntity => !userEntity.isMe)
         .forEach(userEntity => {
-          conversationEntity.participating_user_ids.remove(userId => {
-            return userId.id === userEntity.id && userId.domain == userEntity.domain;
-          });
+          conversationEntity.participating_user_ids.remove(userId => matchQualifiedIds(userId, userEntity));
 
           if (userEntity.isTemporaryGuest()) {
             userEntity.clearExpirationTimeout();
