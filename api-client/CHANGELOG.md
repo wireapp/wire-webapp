@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.0.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.0.0...@wireapp/api-client@14.0.1) (2021-10-04)
+
+
+### Bug Fixes
+
+* **api-client:** Align user event definitions ([#4145](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4145)) ([556cdf8](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/556cdf890f1acce2bb4e4b0296b54696fae11696))
+
+
+
+
+
 # [14.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@13.9.2...@wireapp/api-client@14.0.0) (2021-09-30)
 
 
