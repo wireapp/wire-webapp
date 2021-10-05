@@ -18,6 +18,7 @@
  */
 
 import {amplify} from 'amplify';
+import emitter from '../app/eventemitter';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ConversationRolesList} from '@wireapp/api-client/src/conversation/ConversationRole';
 import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
@@ -363,7 +364,7 @@ export class TeamRepository {
     const {
       data: {conv: conversationId},
     } = eventJson;
-    amplify.publish(WebAppEvents.CONVERSATION.DELETE, {domain: '', id: conversationId});
+    emitter.emit('conversation.delete', {domain: '', id: conversationId});
   }
 
   private _onMemberJoin(eventJson: TeamMemberJoinEvent): void {

@@ -17,8 +17,6 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
@@ -28,6 +26,7 @@ import {FileAsset} from '../../entity/message/FileAsset';
 import {useMemo} from 'react';
 import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AssetRemoteData} from 'src/script/assets/AssetRemoteData';
+import {emitter} from 'src/script/app/eventemitter';
 
 export const useAssetTransfer = (message: ContentMessage, assetRepository = container.resolve(AssetRepository)) => {
   const asset = useMemo(() => message?.getFirstAsset() as FileAsset, [message]);
@@ -38,7 +37,7 @@ export const useAssetTransfer = (message: ContentMessage, assetRepository = cont
   return {
     cancelUpload: () => {
       assetRepository.cancelUpload(message.id);
-      amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
+      emitter.emit('conversation.asset.cancel', message.id);
     },
     downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
     isDownloading: transferState === AssetTransferState.DOWNLOADING,

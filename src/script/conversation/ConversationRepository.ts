@@ -19,6 +19,7 @@
 
 import ko from 'knockout';
 import {amplify} from 'amplify';
+import {emitter} from '../app/eventemitter';
 import {Confirmation, LegalHoldStatus, Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {flatten} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -244,7 +245,7 @@ export class ConversationRepository {
   }
 
   private initSubscriptions(): void {
-    amplify.subscribe(WebAppEvents.CONVERSATION.DELETE, this.deleteConversationLocally);
+    emitter.on('conversation.delete', this.deleteConversationLocally);
     amplify.subscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, this.onConversationEvent);
     amplify.subscribe(WebAppEvents.CONVERSATION.MAP_CONNECTION, this.mapConnection);
     amplify.subscribe(WebAppEvents.CONVERSATION.MISSED_EVENTS, this.onMissedEvents);
@@ -773,7 +774,7 @@ export class ConversationRepository {
       });
   }
 
-  private readonly deleteConversationLocally = (conversationId: QualifiedId, skipNotification: boolean) => {
+  private readonly deleteConversationLocally = (conversationId: QualifiedId, skipNotification: boolean = false) => {
     const conversationEntity = this.conversationState.findConversation(conversationId);
     if (!conversationEntity) {
       return;

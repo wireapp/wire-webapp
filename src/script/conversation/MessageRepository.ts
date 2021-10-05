@@ -109,6 +109,7 @@ import {UserType} from '../tracking/attribute';
 import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
+import {emitter} from '../app/eventemitter';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -156,7 +157,7 @@ export class MessageRepository {
 
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
-    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancelAssetUpload);
+    emitter.on('conversation.asset.cancel', this.cancelAssetUpload);
   }
 
   /**
