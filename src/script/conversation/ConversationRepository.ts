@@ -2664,7 +2664,7 @@ export class ConversationRepository {
     const shouldDeleteMessage = !messageEntity.user().isMe || messageEntity.isPing();
     if (shouldDeleteMessage) {
       // TODO(federation) map domain
-      this.getConversationById({domain: null, id: messageEntity.conversation_id}).then(conversationEntity => {
+      this.getConversationById({domain: '', id: messageEntity.conversation_id}).then(conversationEntity => {
         const isPingFromSelf = messageEntity.user().isMe && messageEntity.isPing();
         const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
         if (deleteForSelf) {
