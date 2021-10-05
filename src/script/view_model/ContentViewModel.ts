@@ -102,8 +102,8 @@ export class ContentViewModel {
   preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
   preferencesDevices: PreferencesDevicesViewModel;
   preferencesOptions: PreferencesOptionsViewModel;
-  previousConversation: Conversation;
-  previousState: string;
+  previousConversation: Conversation | null = null;
+  previousState: string | null = null;
   serviceModal: ServiceModalViewModel;
   state: ko.Observable<string>;
   State: typeof ContentViewModel.STATE;
@@ -204,9 +204,6 @@ export class ContentViewModel {
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
 
-    this.previousState = undefined;
-    this.previousConversation = undefined;
-
     this.state.subscribe(state => {
       switch (state) {
         case ContentViewModel.STATE.CONVERSATION:
@@ -282,7 +279,7 @@ export class ContentViewModel {
   readonly showConversation: ShowConversationOverload = async (
     conversation: Conversation | string,
     options: ShowConversationOptions,
-    domain?: string | null,
+    domain: string | null = null,
   ) => {
     const {
       exposeMessage: exposeMessageEntity,
@@ -379,7 +376,7 @@ export class ContentViewModel {
       }
       const repoHasConversation = this.conversationState
         .conversations()
-        .some(conversation => matchQualifiedIds(conversation, this.previousConversation));
+        .some(conversation => this.previousConversation && matchQualifiedIds(conversation, this.previousConversation));
 
       if (this.previousConversation && repoHasConversation && !this.previousConversation.is_archived()) {
         void this.showConversation(this.previousConversation, {});
