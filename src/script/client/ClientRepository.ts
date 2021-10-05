@@ -566,7 +566,8 @@ export class ClientRepository {
    */
   private onClientAdd(eventJson: Partial<UserClientAddEvent>): void {
     this.logger.info('Client of self user added', eventJson);
-    amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().id, eventJson.client, true, this.selfUser().domain);
+    const qualifiedId = {domain: this.selfUser().domain, id: this.selfUser().id};
+    amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, eventJson.client, true);
   }
 
   /**
@@ -599,6 +600,6 @@ export class ClientRepository {
         'legalHoldDeactivated',
       );
     }
-    amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().id, clientId, this.selfUser().domain);
+    amplify.publish(WebAppEvents.CLIENT.REMOVE, {domain: this.selfUser().domain, id: this.selfUser().id}, clientId);
   }
 }

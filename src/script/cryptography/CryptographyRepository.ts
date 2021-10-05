@@ -109,7 +109,8 @@ export class CryptographyRepository {
 
     this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
       const {userId, clientId, domain} = ClientEntity.dismantleUserClientId(sessionId);
-      amplify.publish(WebAppEvents.CLIENT.ADD, userId, {id: clientId}, true, domain);
+      const qualifiedId = {domain: domain, id: userId};
+      amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, {id: clientId}, true);
     });
 
     return this.cryptobox.load();
