@@ -23,7 +23,12 @@ import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/'
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {USER_EVENT} from '@wireapp/api-client/src/event';
+import {
+  UserEvent,
+  UserLegalHoldRequestEvent,
+  UserLegalHoldDisableEvent,
+  USER_EVENT,
+} from '@wireapp/api-client/src/event';
 import {
   UserAsset as APIClientUserAsset,
   UserAssetType as APIClientUserAssetType,
@@ -44,7 +49,7 @@ import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUti
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
-import {ClientEvent} from '../event/Client';
+import {USER} from '../event/Client';
 import {ClientMapper} from '../client/ClientMapper';
 import {Config} from '../Config';
 import {ConsentValue} from './ConsentValue';
@@ -72,6 +77,12 @@ import {QualifiedIdOptional} from '../conversation/EventBuilder';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
+interface UserAvailabilityEvent {
+  data: {availability: Availability.Type};
+  from: string;
+  fromDomain: string | null;
+  type: USER.AVAILABILITY;
+}
 export class UserRepository {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
@@ -117,20 +128,18 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    */
-  private readonly onUserEvent = (eventJson: any, source: EventSource): void => {
-    const type = eventJson.type;
-
+  private readonly onUserEvent = (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource): void => {
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
+    this.logger.info(`»» User Event: '${eventJson.type}' (Source: ${source})`, logObject);
 
-    switch (type) {
+    switch (eventJson.type) {
       case USER_EVENT.DELETE:
         this.userDelete(eventJson);
         break;
       case USER_EVENT.UPDATE:
         this.userUpdate(eventJson, source === EventRepository.SOURCE.WEB_SOCKET);
         break;
-      case ClientEvent.USER.AVAILABILITY:
+      case USER.AVAILABILITY:
         this.onUserAvailability(eventJson);
         break;
       case USER_EVENT.LEGAL_HOLD_REQUEST: {
@@ -145,7 +154,7 @@ export class UserRepository {
 
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
     if (source === EventRepository.SOURCE.WEB_SOCKET) {
-      switch (type) {
+      switch (eventJson.type) {
         case USER_EVENT.PROPERTIES_DELETE:
           this.propertyRepository.deleteProperty(eventJson.key);
           break;
@@ -229,19 +238,9 @@ export class UserRepository {
   /**
    * Event to update availability of a user.
    */
-  private onUserAvailability(event: {
-    data: {availability: Availability.Type};
-    from: string;
-    fromDomain: string | null;
-  }): void {
+  private onUserAvailability({from, data, fromDomain}: UserAvailabilityEvent): void {
     if (this.userState.isTeam()) {
-      const {
-        from: userId,
-        data: {availability},
-      } = event;
-      this.getUserById({domain: event.fromDomain, id: userId}).then(userEntity =>
-        userEntity.availability(availability),
-      );
+      this.getUserById({domain: fromDomain, id: from}).then(userEntity => userEntity.availability(data.availability));
     }
   }
 
@@ -396,7 +395,7 @@ export class UserRepository {
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   };
 
-  private onLegalHoldRequestCanceled(eventJson: any): void {
+  private onLegalHoldRequestCanceled(eventJson: UserLegalHoldDisableEvent): void {
     if (this.userState.self().id === eventJson.id) {
       this.userState.self().hasPendingLegalHold(false);
       amplify.publish(LegalHoldModalViewModel.HIDE_REQUEST);
@@ -410,7 +409,7 @@ export class UserRepository {
     }
   }
 
-  private async onLegalHoldRequest(eventJson: any): Promise<void> {
+  private async onLegalHoldRequest(eventJson: UserLegalHoldRequestEvent): Promise<void> {
     if (this.userState.self().id !== eventJson.id) {
       return;
     }
