@@ -2392,14 +2392,13 @@
   resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.1.tgz#459c65fa1867dafe6a8f322c4c51695663cc55e9"
   integrity sha512-5tXH6Bx/kNGd3MgffdmP4dy2Z+G4eaXw0SE81Tq3BNadtnMR5/ySMzX4SLEzHJzSmPNn4HIdpQsBvXMUykr58w==
 
-"@types/markdown-it@12.2.1":
-  version "12.2.1"
-  resolved "https://registry.yarnpkg.com/@types/markdown-it/-/markdown-it-12.2.1.tgz#ca36e1edce6f15a770f3e99e68622d1d2e2f0c65"
-  integrity sha512-iij+ilRX/vxtUPCREjn74xzHo/RorHJDwOsJ6X+TgKw7zSvazhVXnDfwlTnyLOMdiVUjtRYU4CrcUZ7Aci4PmQ==
+"@types/markdown-it@12.2.2":
+  version "12.2.2"
+  resolved "https://registry.yarnpkg.com/@types/markdown-it/-/markdown-it-12.2.2.tgz#b451a2a6645c45138143ac1183351574c3b7ccbd"
+  integrity sha512-mgqTMVcbwAMUs15tS13VtxBCSqP/sXDkMqBhIdGofOywDzzlOj2Y38PFi1pD+PKJDzk5OdN1RJkRx7GPJf+Twg==
   dependencies:
     "@types/linkify-it" "*"
     "@types/mdurl" "*"
-    highlight.js "^10.7.2"
 
 "@types/mdast@^3.0.0":
   version "3.0.3"
@@ -2920,10 +2919,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@14.0.0":
-  version "14.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-14.0.0.tgz#3c9ae880274b61dfd65dfe164697988a7d9f013b"
-  integrity sha512-AY/uRt/Coa+yV+sOflP3QkyhOaGmosl9eFyGWvrY8uRLdjeIENE4IrTkTGsTTZ0h7U8EoIDEVYrgoAPOzEKChQ==
+"@wireapp/api-client@14.0.1":
+  version "14.0.1"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-14.0.1.tgz#3ebff467a2df53f2a989d5277fcdf27b0dcb15ff"
+  integrity sha512-45BS09SLKkIchOTPoeD6mSq3PE2Q4T26iRT8rjMxoaFD2FXFgccVdV1ExYYtlTe4zN/wt9jolJNjFLxBnSApTw==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2977,14 +2976,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.16.8":
-  version "17.16.8"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.16.8.tgz#5f5e610f0ad9bd520fdb234bc67c4533ef955d67"
-  integrity sha512-3mcFDn8W8PpSOV1Ctlh2VwlxD2iyFL8KJbAbV8DN1g4a1eBTfpRXcZKbfPfeWxu03izjR7UclwaJYSVnkgYCrQ==
+"@wireapp/core@17.16.9":
+  version "17.16.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.16.9.tgz#2d5e42f8cf48f9acf3db108ee84139af463d5a3e"
+  integrity sha512-JsfaQHqMx9+teMSM6QJuto2/YM8o1fkd9hy9CirTBvVbxC9po5Z8JsTkRzoEyqzc20GLz2nAlgQa0fSLWv53VQ==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "14.0.0"
+    "@wireapp/api-client" "14.0.1"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.9.7"
     hash.js "1.1.7"
@@ -5793,10 +5792,10 @@ eslint-plugin-import@2.24.2:
     resolve "^1.20.0"
     tsconfig-paths "^3.11.0"
 
-eslint-plugin-jest@24.4.2:
-  version "24.4.2"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-24.4.2.tgz#9e8cf05ee6a0e3025e6149df2f36950abfa8d5bf"
-  integrity sha512-jNMnqwX75z0RXRMXkxwb/+9ylKJYJLJ8nT8nBT0XFM5qx4IQGxP4edMawa0qGkSbHae0BDPBmi8I2QF0/F04XQ==
+eslint-plugin-jest@24.5.2:
+  version "24.5.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-24.5.2.tgz#f71f98f27fd18b50f55246ca090f36d1730e36a6"
+  integrity sha512-lrI3sGAyZi513RRmP08sIW241Ti/zMnn/6wbE4ZBhb3M2pJ9ztaZMnSKSKKBUfotVdwqU8W1KtD8ao2/FR8DIg==
   dependencies:
     "@typescript-eslint/experimental-utils" "^4.0.1"
 
@@ -7238,7 +7237,7 @@ hex-color-regex@^1.1.0:
   resolved "https://registry.yarnpkg.com/hex-color-regex/-/hex-color-regex-1.1.0.tgz#4c06fccb4602fe2602b3c93df82d7e7dbf1a8a8e"
   integrity sha512-l9sfDFsuqtOqKDsQdqrMRk0U85RZc0RtOR9yPI7mRVOa4FsR/BVnZ0shmQRM96Ji99kYZP/7hn1cedc1+ApsTQ==
 
-highlight.js@*, highlight.js@^10.7.2:
+highlight.js@*:
   version "10.7.3"
   resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-10.7.3.tgz#697272e3991356e40c3cac566a74eef681756531"
   integrity sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==
