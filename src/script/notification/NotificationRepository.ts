@@ -18,6 +18,7 @@
  */
 
 import {NotificationPreference, WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Availability} from '@wireapp/protocol-messaging';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -73,7 +74,7 @@ interface ContentViewModelState {
 
 interface NotificationContent {
   /** Notification options */
-  options: {data: {conversationId: string; messageId: string; messageType: string}};
+  options: {data: {conversationId?: QualifiedId; messageId?: string; messageType: string}; tag: string};
   /** Timeout for notification */
   timeout: number;
   /** Notification title */
@@ -92,7 +93,7 @@ export class NotificationRepository {
   private contentViewModelState: ContentViewModelState;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  private readonly notifications: any[];
+  private readonly notifications: Notification[];
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
@@ -270,7 +271,7 @@ export class NotificationRepository {
    * @param permissionState State of browser permission
    * @returns Resolves with `true` if notifications are enabled
    */
-  readonly updatePermissionState = (permissionState: PermissionState | NotificationPermission): boolean => {
+  readonly updatePermissionState = (permissionState: PermissionState | NotificationPermission): boolean | undefined => {
     this.permissionState(permissionState);
     return this.checkPermissionState();
   };
@@ -388,7 +389,7 @@ export class NotificationRepository {
   private createBodyMemberUpdate(messageEntity?: MemberMessage, conversationEntity?: Conversation): string | void {
     const isGroup = conversationEntity && conversationEntity.isGroup();
 
-    switch (messageEntity.memberMessageType) {
+    switch (messageEntity?.memberMessageType) {
       case SystemMessageType.NORMAL:
         if (isGroup) {
           if (messageEntity.isMemberJoin()) {
@@ -498,10 +499,10 @@ export class NotificationRepository {
     messageEntity: ContentMessage,
     connectionEntity: ConnectionEntity,
     conversationEntity: Conversation,
-  ): Promise<any> {
+  ): Promise<NotificationContent | undefined> {
     const body = this.createOptionsBody(messageEntity, conversationEntity);
     if (!body) {
-      return Promise.resolve();
+      return Promise.resolve(undefined);
     }
     const shouldObfuscateSender = this.shouldObfuscateNotificationSender(messageEntity);
     return this.createOptionsIcon(shouldObfuscateSender, messageEntity.user()).then(iconUrl => {
@@ -557,7 +558,7 @@ export class NotificationRepository {
     messageEntity: Message,
     connectionEntity: ConnectionEntity,
     conversationEntity: Conversation,
-  ): {conversationId: string; messageId: string | undefined; messageType: string} {
+  ): NotificationContent['options']['data'] {
     const {id: messageId, type: messageType} = messageEntity;
 
     return {
@@ -597,7 +598,7 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    */
   private createOptionsTag(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
-    return this.getConversationId(connectionEntity, conversationEntity);
+    return this.getConversationId(connectionEntity, conversationEntity)?.id || '';
   }
 
   /**
@@ -665,11 +666,15 @@ export class NotificationRepository {
    * @param conversationEntity Conversation entity
    * @returns ID of conversation
    */
-  private getConversationId(connectionEntity?: ConnectionEntity, conversationEntity?: Conversation): string {
+  private getConversationId(
+    connectionEntity?: ConnectionEntity,
+    conversationEntity?: Conversation,
+  ): QualifiedId | undefined {
     if (connectionEntity) {
-      return connectionEntity.conversationId;
+      // TODO(federation) add domain when connection is implemented on the backend
+      return {domain: '', id: connectionEntity.conversationId};
     }
-    return conversationEntity && conversationEntity.id;
+    return conversationEntity && {domain: conversationEntity.domain, id: conversationEntity.id};
   }
 
   /**
