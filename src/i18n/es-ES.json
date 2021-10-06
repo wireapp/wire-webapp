@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Desbloquear",
   "modalUserUnblockHeadline": "¿Desbloquear?",
   "modalUserUnblockMessage": "{{user}} ahora podrá ponerse en contacto contigo o añadirte a chats de grupo.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Usuario Borrado",
   "notificationAssetAdd": "Compartió una foto",
   "notificationConnectionAccepted": "Aceptó tu solicitud de conexión",

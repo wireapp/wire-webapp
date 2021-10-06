@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Sblocca",
   "modalUserUnblockHeadline": "Sblocca?",
   "modalUserUnblockMessage": "{{user}} sarà in grado di contattarti e aggiungerti alle conversazioni di gruppo di nuovo.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Elimina utente",
   "notificationAssetAdd": "Ha condiviso un’immagine",
   "notificationConnectionAccepted": "Ha accettato la tua richiesta di connessione",

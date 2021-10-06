@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Άρση αποκλεισμού",
   "modalUserUnblockHeadline": "Άρση αποκλεισμού",
   "modalUserUnblockMessage": "{{user}} θα μπορεί να επικοινωνήσει μαζί σας και να σας προσθέσει ξανά σε ομαδικές συνομιλίες.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Διεγραμμένος χρήστης",
   "notificationAssetAdd": "Κοινοποίηση εικόνας",
   "notificationConnectionAccepted": "Η αίτηση σύνδεσης σας έγινε αποδεκτή",

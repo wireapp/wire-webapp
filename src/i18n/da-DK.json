@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Fjern Blokering",
   "modalUserUnblockHeadline": "Fjern Blokering?",
   "modalUserUnblockMessage": "{{user}} vil igen kunne kontakte dig og tilføje dig til gruppesamtaler.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Slet bruger",
   "notificationAssetAdd": "Delte et billede",
   "notificationConnectionAccepted": "Accepterede din anmodning om forbindelse",

@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Odblokiraj",
   "modalUserUnblockHeadline": "Odblokiraj?",
   "modalUserUnblockMessage": "{{user}} vas ne bo mogel kontaktirati ali ponovno dodati v skupinske pogovore.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Izbrisan uporabnik",
   "notificationAssetAdd": "Je delil(-a) sliko",
   "notificationConnectionAccepted": "Je sprejel(-a) vašo zahtevo po povezavi",

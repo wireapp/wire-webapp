@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "خارج کردن از مسدود بودن",
   "modalUserUnblockHeadline": "خارج کردن از مسدود بودن",
   "modalUserUnblockMessage": "{{user}} دوباره قادر به تماس با شما و اضافه کردن شما به مکالمات گروهی خواهد بود.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "کاربر حذف شده",
   "notificationAssetAdd": "یک عکس به‌اشتراک گذاشت",
   "notificationConnectionAccepted": "درخواست ارتباط شما را تایید کرد",

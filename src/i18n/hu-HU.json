@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Tiltás feloldása",
   "modalUserUnblockHeadline": "Feloldod a letiltást?",
   "modalUserUnblockMessage": "{{user}} újra kapcsolatba tud lépni veled és meg tud hívni téged csoportos beszélgetésekbe.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Törölt felhasználó",
   "notificationAssetAdd": "Megosztott egy képet",
   "notificationConnectionAccepted": "Elfogadta a csatlakozási kérelmedet",
