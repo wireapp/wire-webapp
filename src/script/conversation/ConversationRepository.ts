@@ -1793,7 +1793,7 @@ export class ConversationRepository {
 
     const {conversation, qualified_conversation, data: eventData, type} = eventJson;
     // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
-    const conversationId: QualifiedId = eventData.conversationId
+    const conversationId: QualifiedId = eventData?.conversationId
       ? {domain: '', id: eventData.conversationId}
       : qualified_conversation || {domain: '', id: conversation};
     this.logger.info(

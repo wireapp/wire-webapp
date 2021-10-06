@@ -130,7 +130,7 @@ export class Conversation {
   public readonly participating_user_ets: ko.ObservableArray<User>;
   public readonly participating_user_ids: ko.ObservableArray<QualifiedId>;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
-  public readonly removed_from_conversation?: ko.PureComputed<boolean>;
+  public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
   public readonly selfUser: ko.Observable<User>;
   public readonly servicesCount: ko.PureComputed<number>;
