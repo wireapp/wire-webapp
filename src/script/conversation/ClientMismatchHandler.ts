@@ -163,7 +163,7 @@ export class ClientMismatchHandler {
         const isDeleted = backendUser?.deleted === true;
 
         if (isDeleted && conversationEntity.inTeam) {
-          amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, conversationEntity.team_id, userId);
+          amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, conversationEntity.team_id, {domain: '', id: userId});
         }
       }
 

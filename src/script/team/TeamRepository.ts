@@ -363,7 +363,7 @@ export class TeamRepository {
     const {
       data: {conv: conversationId},
     } = eventJson;
-    amplify.publish(WebAppEvents.CONVERSATION.DELETE, conversationId);
+    amplify.publish(WebAppEvents.CONVERSATION.DELETE, {domain: '', id: conversationId});
   }
 
   private _onMemberJoin(eventJson: TeamMemberJoinEvent): void {

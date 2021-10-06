@@ -294,7 +294,7 @@ export class Conversation {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
           conversationEntity: this,
           legalHoldStatus,
-          userId: this.selfUser().id,
+          userId: {domain: this.selfUser().domain, id: this.selfUser().id},
         });
       }
     });
