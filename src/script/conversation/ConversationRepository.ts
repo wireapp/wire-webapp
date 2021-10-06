@@ -1791,9 +1791,14 @@ export class ConversationRepository {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
-    const {conversation, qualified_conversation, type} = eventJson;
-    const conversationId = qualified_conversation || {domain: null, id: conversation};
-    this.logger.info(`Handling event '${type}' in conversation '${conversationId}' (Source: ${eventSource})`);
+    const {conversation, qualified_conversation, data: eventData, type} = eventJson;
+    // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
+    const conversationId: QualifiedId = eventData.conversationId
+      ? {domain: '', id: eventData.conversationId}
+      : qualified_conversation || {domain: null, id: conversation};
+    this.logger.info(
+      `Handling event '${type}' in conversation '${conversationId.id}/${conversationId.domain}' (Source: ${eventSource})`,
+    );
 
     const inSelfConversation =
       conversationId === this.conversationState.self_conversation() && this.conversationState.self_conversation().id;
