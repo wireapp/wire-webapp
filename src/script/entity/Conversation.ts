@@ -45,7 +45,7 @@ import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import type {QualifiedIdOptional} from '../conversation/EventBuilder';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
 interface UnreadState {
   allEvents: Message[];
@@ -128,7 +128,7 @@ export class Conversation {
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
-  public readonly participating_user_ids: ko.ObservableArray<QualifiedIdOptional>;
+  public readonly participating_user_ids: ko.ObservableArray<QualifiedId>;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
   public readonly removed_from_conversation?: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
@@ -220,7 +220,7 @@ export class Conversation {
       const connectedUserId = connectionEntity?.userId;
       // TODO(Federation): Check for domain once backend supports federated connections
       if (connectedUserId && this.participating_user_ids().every(user => user.id !== connectedUserId)) {
-        this.participating_user_ids.push({domain: null, id: connectedUserId});
+        this.participating_user_ids.push({domain: '', id: connectedUserId});
       }
     });
 

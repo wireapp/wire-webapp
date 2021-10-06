@@ -72,7 +72,6 @@ import {
   GroupCreationEvent,
   MessageHiddenEvent,
   OneToOneCreationEvent,
-  QualifiedIdOptional,
   ReactionEvent,
   TeamMemberLeaveEvent,
 } from '../conversation/EventBuilder';
@@ -1290,7 +1289,7 @@ export class ConversationRepository {
     }
   }
 
-  addMissingMember(conversationEntity: Conversation, users: QualifiedIdOptional[], timestamp: number) {
+  addMissingMember(conversationEntity: Conversation, users: QualifiedId[], timestamp: number) {
     const [sender] = users;
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, users, timestamp);
     return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
@@ -1904,7 +1903,7 @@ export class ConversationRepository {
         const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;
         this.logger.warn(message, eventJson);
 
-        const qualifiedSender: QualifiedIdOptional = {domain: '', id: senderId};
+        const qualifiedSender: QualifiedId = {domain: '', id: senderId};
 
         const timestamp = new Date(time).getTime() - 1;
         return this.addMissingMember(conversationEntity, [qualifiedSender], timestamp).then(() => conversationEntity);

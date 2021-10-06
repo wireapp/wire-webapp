@@ -481,7 +481,7 @@ export class EventMapper {
   ) {
     const {data: eventData, from: sender} = event;
     const {has_service: hasService} = eventData;
-    const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: null, id}));
+    const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
 
     const messageEntity = new MemberMessage();
 
@@ -516,7 +516,7 @@ export class EventMapper {
    */
   private _mapEventMemberLeave({data: eventData}: MemberLeaveEvent) {
     const messageEntity = new MemberMessage();
-    const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: null, id}));
+    const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
     messageEntity.userIds(userIds);
     messageEntity.reason = eventData.reason;
     return messageEntity;

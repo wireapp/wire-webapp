@@ -392,7 +392,7 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.callState.activeCalls.push(call);
-    const conversation = this.conversationState.findConversation({domain: null, id: call.conversationId});
+    const conversation = this.conversationState.findConversation({domain: '', id: call.conversationId});
     if (conversation) {
       conversation.call(call);
     }
@@ -406,7 +406,7 @@ export class CallingRepository {
     if (index !== -1) {
       this.callState.activeCalls.splice(index, 1);
     }
-    const conversation = this.conversationState.findConversation({domain: null, id: call.conversationId});
+    const conversation = this.conversationState.findConversation({domain: '', id: call.conversationId});
     if (conversation) {
       conversation.call(null);
     }
@@ -624,7 +624,7 @@ export class CallingRepository {
         const ignoreNotificationStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
         if (!activeCall || !ignoreNotificationStates.includes(activeCall.state())) {
           // we want to ignore call start events that already have an active call (whether it's ringing or connected).
-          this.injectActivateEvent({domain: null, id: conversationId}, userId, time, source);
+          this.injectActivateEvent({domain: '', id: conversationId}, userId, time, source);
         }
         break;
     }
@@ -1037,7 +1037,7 @@ export class CallingRepository {
     }
 
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
-      const conversationEntity = this.conversationState.findConversation({domain: null, id: conversationId});
+      const conversationEntity = this.conversationState.findConversation({domain: '', id: conversationId});
       const callingEvent = EventBuilder.buildCallingTimeoutEvent(
         reason,
         conversationEntity,
@@ -1079,7 +1079,7 @@ export class CallingRepository {
 
     if (!stillActiveState.includes(reason)) {
       this.injectDeactivateEvent(
-        {domain: null /*TODO(federation): get conversation domain*/, id: call.conversationId},
+        {domain: '' /*TODO(federation): get conversation domain*/, id: call.conversationId},
         call.initiator,
         call.startedAt() ? Date.now() - call.startedAt() : 0,
         reason,
@@ -1104,7 +1104,7 @@ export class CallingRepository {
     shouldRing: number,
     conversationType: CONV_TYPE,
   ) => {
-    const conversationEntity = this.conversationState.findConversation({domain: null, id: conversationId});
+    const conversationEntity = this.conversationState.findConversation({domain: '', id: conversationId});
     if (!conversationEntity) {
       return;
     }
@@ -1408,7 +1408,7 @@ export class CallingRepository {
     call: Call,
     customSegmentations: Record<string, any> = {},
   ) => {
-    const conversationEntity = this.conversationState.findConversation({domain: null, id: call.conversationId});
+    const conversationEntity = this.conversationState.findConversation({domain: '', id: call.conversationId});
     const participants = conversationEntity.participating_user_ets();
     const selfUserTeamId = call.getSelfParticipant().user.id;
     const guests = participants.filter(user => user.isGuest()).length;

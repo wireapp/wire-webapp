@@ -158,7 +158,7 @@ describe('CryptographyRepository', () => {
           text: encodedCipherText,
         },
         from: createRandomUuid(),
-        qualified_conversation: {domain: null, id: '7bc4558b-18ce-446b-8e62-0c442b86ba56'},
+        qualified_conversation: {domain: '', id: '7bc4558b-18ce-446b-8e62-0c442b86ba56'},
         time: '',
         type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
       };
@@ -176,7 +176,7 @@ describe('CryptographyRepository', () => {
       /* eslint-disable comma-spacing, key-spacing, sort-keys-fix/sort-keys-fix, quotes */
       const event: ConversationOtrMessageAddEvent = {
         conversation: 'f1d2d451-0fcb-4313-b0ba-313b971ab758',
-        qualified_conversation: {id: 'f1d2d451-0fcb-4313-b0ba-313b971ab758', domain: null},
+        qualified_conversation: {id: 'f1d2d451-0fcb-4313-b0ba-313b971ab758', domain: ''},
         time: '2017-03-22T11:06:29.232Z',
         data: {text: '💣', sender: 'e35e4ee5b80a1a9d', recipient: '7481c47f2f7336d8'},
         from: 'e3ff8dab-1407-4890-b9d3-e1aab49233e8',
@@ -195,7 +195,7 @@ describe('CryptographyRepository', () => {
       const text = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
       const event: ConversationOtrMessageAddEvent = {
         conversation: '7bc4558b-18ce-446b-8e62-0c442b86ba56',
-        qualified_conversation: {id: '7bc4558b-18ce-446b-8e62-0c442b86ba56', domain: null},
+        qualified_conversation: {id: '7bc4558b-18ce-446b-8e62-0c442b86ba56', domain: ''},
         time: '2017-06-15T22:18:55.071Z',
         data: {text: text, sender: 'ccc17722a9348793', recipient: '4d7a36b30ef8bc26'},
         from: '8549aada-07cc-4272-9fd4-c2ae040c539d',
@@ -214,7 +214,7 @@ describe('CryptographyRepository', () => {
       const data = window.btoa(`https://wir${'\u0000\u0001\u0000\u000D\u0000A'.repeat(165000)}e.com/`);
       const event: ConversationOtrMessageAddEvent = {
         conversation: '7bc4558b-18ce-446b-8e62-0c442b86ba56',
-        qualified_conversation: {id: '7bc4558b-18ce-446b-8e62-0c442b86ba56', domain: null},
+        qualified_conversation: {id: '7bc4558b-18ce-446b-8e62-0c442b86ba56', domain: ''},
         time: '2017-06-15T22:18:55.071Z',
         data: {text: '💣', data: data, sender: 'ccc17722a9348793', recipient: '4d7a36b30ef8bc26'},
         from: '8549aada-07cc-4272-9fd4-c2ae040c539d',

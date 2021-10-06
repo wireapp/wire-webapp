@@ -100,7 +100,7 @@ export class CallingViewModel {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.activeCalls().filter(call => {
-        const conversation = this.conversationState.findConversation({domain: null, id: call.conversationId});
+        const conversation = this.conversationState.findConversation({domain: '', id: call.conversationId});
         if (!conversation || conversation.removed_from_conversation()) {
           return false;
         }
@@ -304,7 +304,7 @@ export class CallingViewModel {
   }
 
   getConversationById(conversationId: string): Conversation {
-    return this.conversationState.findConversation({domain: null, id: conversationId});
+    return this.conversationState.findConversation({domain: '', id: conversationId});
   }
 
   hasAccessToCamera(): boolean {

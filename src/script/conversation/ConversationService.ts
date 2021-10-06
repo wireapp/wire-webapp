@@ -403,7 +403,7 @@ export class ConversationService {
 
     return Object.keys(conversations)
       .sort((id_a, id_b) => conversations[id_b] - conversations[id_a])
-      .map(id => ({domain: null, id}));
+      .map(id => ({domain: '', id}));
   }
 
   /**

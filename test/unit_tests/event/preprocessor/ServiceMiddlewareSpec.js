@@ -92,10 +92,7 @@ describe('ServiceMiddleware', () => {
       it('adds meta when services are present in the event with qualified user ids', () => {
         const event = {
           data: {
-            users: [
-              {qualified_id: {domain: null, id: 'not-a-service'}},
-              {qualified_id: {domain: null, id: 'a-service'}},
-            ],
+            users: [{qualified_id: {domain: '', id: 'not-a-service'}}, {qualified_id: {domain: '', id: 'a-service'}}],
           },
           type: CONVERSATION_EVENT.MEMBER_JOIN,
         };
@@ -147,8 +144,8 @@ describe('ServiceMiddleware', () => {
         const event = {
           data: {
             userIds: [
-              {domain: null, id: 'not-a-service'},
-              {domain: null, id: 'a-service'},
+              {domain: '', id: 'not-a-service'},
+              {domain: '', id: 'a-service'},
             ],
           },
           type: ClientEvent.CONVERSATION.ONE2ONE_CREATION,

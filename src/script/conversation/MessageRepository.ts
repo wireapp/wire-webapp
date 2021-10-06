@@ -63,7 +63,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {AssetAddEvent, EventBuilder, QualifiedIdOptional} from '../conversation/EventBuilder';
+import {AssetAddEvent, EventBuilder} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
@@ -1360,7 +1360,7 @@ export class MessageRepository {
 
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
-    userIds: QualifiedIdOptional[],
+    userIds: QualifiedId[],
     checkLegalHold: boolean,
   ): Promise<void> {
     const messageType = eventInfoEntity.getType();
@@ -1399,7 +1399,7 @@ export class MessageRepository {
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
     consentType: string,
-    userIds: QualifiedIdOptional[],
+    userIds: QualifiedId[],
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
@@ -1552,7 +1552,7 @@ export class MessageRepository {
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
             Promise.all(
-              clients.map(clientId => this.userRepository.removeClientFromUser({domain: null, id: userId}, clientId)),
+              clients.map(clientId => this.userRepository.removeClientFromUser({domain: '', id: userId}, clientId)),
             ),
           ),
         );
@@ -1586,7 +1586,7 @@ export class MessageRepository {
           await Promise.all(
             Object.entries(usersMap).map(([userId, clients]) =>
               Promise.all(
-                clients.map(client => this.userRepository.addClientToUser({domain: null, id: userId}, client, false)),
+                clients.map(client => this.userRepository.addClientToUser({domain: '', id: userId}, client, false)),
               ),
             ),
           );

@@ -207,7 +207,7 @@ describe('MessageRepository', () => {
         Array(128)
           .fill(undefined)
           .map((x, i) => ({
-            domain: null,
+            domain: '',
             id: i.toString(),
           })),
       );
@@ -225,7 +225,7 @@ describe('MessageRepository', () => {
           'massive external message massive external message massive external message massive external message',
       });
       const genericMessage = new GenericMessage({[GENERIC_MESSAGE_TYPE.TEXT]: text, messageId: createRandomUuid()});
-      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: null, id: largeConversationEntity.id});
+      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: '', id: largeConversationEntity.id});
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -263,11 +263,11 @@ describe('MessageRepository', () => {
       const smallConversationEntity = generateConversation();
       smallConversationEntity.participating_user_ids([
         {
-          domain: null,
+          domain: '',
           id: '0',
         },
         {
-          domain: null,
+          domain: '',
           id: '1',
         },
       ]);
@@ -276,7 +276,7 @@ describe('MessageRepository', () => {
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: null, id: smallConversationEntity.id});
+      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: '', id: smallConversationEntity.id});
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -518,7 +518,7 @@ describe('MessageRepository', () => {
 
       const eventInfoEntity = new EventInfoEntity(
         genericMessage,
-        {domain: null, id: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b'},
+        {domain: '', id: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b'},
         {
           nativePush: true,
           precondition: false,

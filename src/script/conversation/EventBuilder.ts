@@ -36,11 +36,6 @@ import {AssetRecord, EventRecord} from '../storage';
 import {ReactionType} from '@wireapp/core/src/main/conversation';
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 
-export interface QualifiedIdOptional {
-  domain: string | null;
-  id: string;
-}
-
 export interface BaseEvent {
   conversation: string;
   data?: unknown;
@@ -87,7 +82,7 @@ export type AllVerifiedEventData = {type: VerificationMessageType};
 export type AllVerifiedEvent = ConversationEvent<AllVerifiedEventData>;
 export type AssetAddEvent = Omit<ConversationEvent<any>, 'id'> &
   Partial<Pick<ConversationEvent<any>, 'id'>> & {status: StatusType; type: CONVERSATION.ASSET_ADD};
-export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedIdOptional[]};
+export type DegradedMessageEventData = {type: VerificationMessageType; userIds: QualifiedId[]};
 export type DegradedMessageEvent = ConversationEvent<DegradedMessageEventData>;
 export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: string; time: string}> & {
   type: CONVERSATION.MESSAGE_DELETE;
@@ -95,7 +90,7 @@ export type DeleteEvent = ConversationEvent<{deleted_time: number; message_id: s
 export type GroupCreationEventData = {
   allTeamMembers: boolean;
   name: string;
-  userIds: QualifiedIdOptional[];
+  userIds: QualifiedId[];
 };
 export type GroupCreationEvent = ConversationEvent<GroupCreationEventData> & {type: CONVERSATION.GROUP_CREATION};
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}> & {
@@ -114,7 +109,7 @@ export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {
   type: CONVERSATION.MESSAGE_ADD;
 };
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
-export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedIdOptional[]}> & {
+export type OneToOneCreationEvent = ConversationEvent<{userIds: QualifiedId[]}> & {
   type: CONVERSATION.ONE2ONE_CREATION;
 };
 export type TeamMemberLeaveEvent = ConversationEvent<{name: string; user_ids: string[]}> & {
@@ -192,12 +187,13 @@ export type ClientConversationEvent =
   | VoiceChannelActivateEvent
   | VerificationEvent;
 
-function buildQualifiedId(conversation: {domain?: string; id: string}) {
+function buildQualifiedId(conversation: {domain: string; id: string} | string) {
+  const qualifiedId = typeof conversation === 'string' ? {domain: '', id: conversation} : conversation;
   return {
-    conversation: conversation.id,
+    conversation: qualifiedId.id,
     qualified_conversation: {
-      domain: conversation.domain,
-      id: conversation.id,
+      domain: qualifiedId.domain,
+      id: qualifiedId.id,
     },
   };
 }
@@ -277,7 +273,7 @@ export const EventBuilder = {
 
   buildDegraded(
     conversationEntity: Conversation,
-    userIds: QualifiedIdOptional[],
+    userIds: QualifiedId[],
     type: VerificationMessageType,
     currentTimestamp: number,
   ): DegradedMessageEvent {
@@ -368,10 +364,10 @@ export const EventBuilder = {
     messageError: Error,
     errorCode: number,
   ): ErrorEvent {
-    const {qualified_conversation: conversationId, data: eventData, from, time} = event;
+    const {qualified_conversation: conversationId, conversation, data: eventData, from, time} = event;
 
     return {
-      ...buildQualifiedId(conversationId),
+      ...buildQualifiedId(conversationId || conversation),
       error: `${messageError.message} (${eventData.sender})`,
       error_code: `${errorCode} (${eventData.sender})`,
       from,
@@ -404,8 +400,8 @@ export const EventBuilder = {
 
   buildMemberJoin(
     conversationEntity: Conversation,
-    sender: QualifiedIdOptional,
-    joiningUserIds: QualifiedIdOptional[],
+    sender: QualifiedId,
+    joiningUserIds: QualifiedId[],
     timestamp?: number,
   ): MemberJoinEvent {
     if (!timestamp) {
@@ -484,10 +480,10 @@ export const EventBuilder = {
   },
 
   buildUnableToDecrypt(event: EventRecord, decryptionError: Error, errorCode: number): ErrorEvent {
-    const {qualified_conversation: conversationId, data: eventData, from, time} = event;
+    const {qualified_conversation: conversationId, conversation, data: eventData, from, time} = event;
 
     return {
-      ...buildQualifiedId(conversationId),
+      ...buildQualifiedId(conversationId || conversation),
       error: `${decryptionError.message} (${eventData.sender})`,
       error_code: `${errorCode} (${eventData.sender})`,
       from,
@@ -498,7 +494,7 @@ export const EventBuilder = {
   },
 
   buildVoiceChannelActivate(
-    conversation: QualifiedIdOptional,
+    conversation: QualifiedId,
     userId: string,
     time: string,
     protocolVersion: number,
@@ -514,7 +510,7 @@ export const EventBuilder = {
   },
 
   buildVoiceChannelDeactivate(
-    conversation: QualifiedIdOptional,
+    conversation: QualifiedId,
     userId: string,
     duration: number,
     reason: AVS_REASON,

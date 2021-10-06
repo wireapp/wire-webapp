@@ -84,7 +84,7 @@ export class User {
   public serviceId?: string;
   public teamId?: string;
   /** The federated domain (when the user is on a federated server) */
-  public domain: string | null;
+  public domain: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
 
   static get ACCENT_COLOR() {
@@ -113,7 +113,7 @@ export class User {
     };
   }
 
-  constructor(id: string = '', domain: string | null) {
+  constructor(id: string = '', domain: string = '') {
     this.id = id;
     this.domain = domain;
     this.isMe = false;

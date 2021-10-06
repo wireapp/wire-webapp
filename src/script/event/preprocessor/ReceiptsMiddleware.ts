@@ -51,7 +51,7 @@ export class ReceiptsMiddleware {
       case ClientEvent.CONVERSATION.KNOCK:
       case ClientEvent.CONVERSATION.LOCATION:
       case ClientEvent.CONVERSATION.MESSAGE_ADD: {
-        const qualifiedConversation = event.qualified_conversation || {domain: null, id: event.conversation};
+        const qualifiedConversation = event.qualified_conversation || {domain: '', id: event.conversation};
         return this.conversationRepository.getConversationById(qualifiedConversation).then(conversation => {
           if (conversation && conversation.isGroup()) {
             const expectsReadConfirmation = conversation.receiptMode() === RECEIPT_MODE.ON;

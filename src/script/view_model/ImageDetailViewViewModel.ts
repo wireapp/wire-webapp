@@ -70,7 +70,7 @@ export class ImageDetailViewViewModel {
         const isExpectedId = this.conversationEntity() ? conversationId === this.conversationEntity().id : false;
         if (!isExpectedId) {
           this.conversationRepository
-            .getConversationById({domain: null, id: conversationId})
+            .getConversationById({domain: '', id: conversationId})
             .then(conversationEntity => this.conversationEntity(conversationEntity));
         }
       }
