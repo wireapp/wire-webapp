@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Одблокирај",
   "modalUserUnblockHeadline": "Одблокирати?",
   "modalUserUnblockMessage": "{{user}} моћи ће да вас контактира и поново дода у групне разговоре.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Избрисан корисник",
   "notificationAssetAdd": "подели слику",
   "notificationConnectionAccepted": "прихвати ваш захтев за повезивање",

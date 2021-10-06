@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Eemalda blokeering",
   "modalUserUnblockHeadline": "Eemaldad blokeeringu?",
   "modalUserUnblockMessage": "{{user}} saab sinuga uuesti ühendust võtta ja sind grupivestlustesse lisada.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Kustutatud kasutaja",
   "notificationAssetAdd": "Jagas pilti",
   "notificationConnectionAccepted": "Nõustus sinu ühendamistaotlusega",

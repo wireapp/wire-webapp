@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Atblokuoti",
   "modalUserUnblockHeadline": "Atblokuoti?",
   "modalUserUnblockMessage": "{{user}} galės ir vėl su jumis susisiekti ar pridėti jus į grupės pokalbius.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Ištrintas naudotojas",
   "notificationAssetAdd": "Pasidalino paveikslu",
   "notificationConnectionAccepted": "Priėmė jūsų kontakto užmezgimo užklausą",

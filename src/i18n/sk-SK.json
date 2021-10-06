@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Odblokovať",
   "modalUserUnblockHeadline": "Odblokovať?",
   "modalUserUnblockMessage": "{{user}} Vás bude môcť kontaktovať, alebo Vás pozvať do skupinového rozhovoru.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Odstránený používateľ",
   "notificationAssetAdd": "Zdieľať obrázok",
   "notificationConnectionAccepted": "Prijal Vašu požiadavku na pripojenie",
