@@ -19,7 +19,8 @@
 
 import axios, {AxiosError} from 'axios';
 import {Runtime} from '@wireapp/commons';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
 import type {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation/';
 import {
@@ -57,7 +58,7 @@ import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {ConversationRepository} from '../conversation/ConversationRepository';
-import {CallingEvent, EventBuilder, QualifiedIdOptional} from '../conversation/EventBuilder';
+import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
 import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
@@ -271,7 +272,7 @@ export class CallingRepository {
   }
 
   private async pushClients(conversationId: ConversationId): Promise<void> {
-    const qualifiedConversationId: QualifiedIdOptional = {domain: null, id: conversationId};
+    const qualifiedConversationId: QualifiedId = {domain: '', id: conversationId};
     try {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
@@ -391,7 +392,7 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.callState.activeCalls.push(call);
-    const conversation = this.conversationState.findConversation(call.conversationId);
+    const conversation = this.conversationState.findConversation({domain: null, id: call.conversationId});
     if (conversation) {
       conversation.call(call);
     }
@@ -405,7 +406,7 @@ export class CallingRepository {
     if (index !== -1) {
       this.callState.activeCalls.splice(index, 1);
     }
-    const conversation = this.conversationState.findConversation(call.conversationId);
+    const conversation = this.conversationState.findConversation({domain: null, id: call.conversationId});
     if (conversation) {
       conversation.call(null);
     }
@@ -509,8 +510,8 @@ export class CallingRepository {
   //##############################################################################
 
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<void> {
-    const qualifiedConversationId: QualifiedIdOptional = {
-      domain: null,
+    const qualifiedConversationId: QualifiedId = {
+      domain: '',
       id: conversationId /*TODO(federation): get conversation domain*/,
     };
     const recipients = await this.messageRepository.createRecipients(qualifiedConversationId, false, [userId]);
@@ -910,13 +911,13 @@ export class CallingRepository {
     return recipients;
   }
 
-  private injectActivateEvent(conversationId: QualifiedIdOptional, userId: UserId, time: string, source: string): void {
+  private injectActivateEvent(conversationId: QualifiedId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
     this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private injectDeactivateEvent(
-    conversationId: QualifiedIdOptional,
+    conversationId: QualifiedId,
     userId: UserId,
     duration: number,
     reason: REASON,
@@ -978,8 +979,8 @@ export class CallingRepository {
     payload: string | Object,
     options?: MessageSendingOptions,
   ): Promise<ClientMismatch> => {
-    const qualifiedConversationId: QualifiedIdOptional = {
-      domain: null,
+    const qualifiedConversationId: QualifiedId = {
+      domain: '',
       id: conversationId /*TODO(federation): get conversation domain*/,
     };
     const protoCalling = new Calling({content: typeof payload === 'string' ? payload : JSON.stringify(payload)});
@@ -1036,7 +1037,7 @@ export class CallingRepository {
     }
 
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
-      const conversationEntity = this.conversationState.findConversation(conversationId);
+      const conversationEntity = this.conversationState.findConversation({domain: null, id: conversationId});
       const callingEvent = EventBuilder.buildCallingTimeoutEvent(
         reason,
         conversationEntity,
@@ -1103,7 +1104,7 @@ export class CallingRepository {
     shouldRing: number,
     conversationType: CONV_TYPE,
   ) => {
-    const conversationEntity = this.conversationState.findConversation(conversationId);
+    const conversationEntity = this.conversationState.findConversation({domain: null, id: conversationId});
     if (!conversationEntity) {
       return;
     }
@@ -1407,7 +1408,7 @@ export class CallingRepository {
     call: Call,
     customSegmentations: Record<string, any> = {},
   ) => {
-    const conversationEntity = this.conversationState.findConversation(call.conversationId);
+    const conversationEntity = this.conversationState.findConversation({domain: null, id: call.conversationId});
     const participants = conversationEntity.participating_user_ets();
     const selfUserTeamId = call.getSelfParticipant().user.id;
     const guests = participants.filter(user => user.isGuest()).length;

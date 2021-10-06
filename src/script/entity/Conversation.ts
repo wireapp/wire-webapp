@@ -146,14 +146,14 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE;
-  public domain: string | null;
+  public domain: string;
   public isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
   }
 
-  constructor(conversation_id: string = '', domain?: string) {
+  constructor(conversation_id: string = '', domain: string = '') {
     this.id = conversation_id;
 
     this.domain = domain || null;
@@ -294,7 +294,7 @@ export class Conversation {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
           conversationEntity: this,
           legalHoldStatus,
-          userId: this.selfUser().id,
+          userId: {domain: this.selfUser().domain, id: this.selfUser().id},
         });
       }
     });

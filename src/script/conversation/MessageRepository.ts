@@ -806,20 +806,19 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(user_id: string, client_id: string, conversationId: QualifiedIdOptional): Promise<ClientMismatch> {
-    const {domain} = conversationId;
-    this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
+  async resetSession(userId: QualifiedId, client_id: string, conversationId: QualifiedId): Promise<ClientMismatch> {
+    this.logger.info(`Resetting session with client '${client_id}' of user '${userId.id}'.`);
 
     try {
-      const session_id = await this.cryptography_repository.deleteSession(user_id, client_id, domain);
+      const session_id = await this.cryptography_repository.deleteSession(userId, client_id);
       if (session_id) {
-        this.logger.info(`Deleted session with client '${client_id}' of user '${user_id}'.`);
+        this.logger.info(`Deleted session with client '${client_id}' of user '${userId.id}'.`);
       } else {
         this.logger.warn('No local session found to delete.');
       }
-      return await this.sendSessionReset(user_id, client_id, conversationId);
+      return await this.sendSessionReset(userId, client_id, conversationId);
     } catch (error) {
-      const logMessage = `Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`;
+      const logMessage = `Failed to reset session for client '${client_id}' of user '${userId.id}': ${error.message}`;
       this.logger.warn(logMessage, error);
       throw error;
     }
@@ -838,9 +837,9 @@ export class MessageRepository {
    * @returns Resolves after sending the session reset
    */
   private async sendSessionReset(
-    userId: string,
+    userId: QualifiedId,
     clientId: string,
-    conversationId: QualifiedIdOptional,
+    conversationId: QualifiedId,
   ): Promise<ClientMismatch> {
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
@@ -849,7 +848,7 @@ export class MessageRepository {
 
     const options = {
       precondition: true,
-      recipients: {[userId]: [clientId]},
+      recipients: {[userId.id]: [clientId]},
     };
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
 
@@ -1160,7 +1159,7 @@ export class MessageRepository {
 
   private sendGenericMessageToConversation(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
     return this.messageSender.queueMessage(async () => {
-      const recipients = await this.createRecipients(eventInfoEntity.qualifiedConversationId);
+      const recipients = await this.createRecipients(eventInfoEntity.conversationId);
       eventInfoEntity.updateOptions({recipients});
       return this.sendGenericMessage(eventInfoEntity, true);
     });
@@ -1223,14 +1222,11 @@ export class MessageRepository {
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
   async createRecipients(
-    conversationId: QualifiedIdOptional,
+    conversationId: QualifiedId,
     skip_own_clients = false,
     user_ids: string[] = null,
   ): Promise<UserClients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(
-      conversationId.id,
-      conversationId.domain,
-    );
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversationId);
     const recipients: UserClients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
@@ -1298,7 +1294,7 @@ export class MessageRepository {
     if (ensureUser) {
       return messagePromise.then(message => {
         if (message.from && !message.user().id) {
-          return this.userRepository.getUserById(message.from, message.user().domain).then(userEntity => {
+          return this.userRepository.getUserById({domain: message.user().domain, id: message.from}).then(userEntity => {
             message.user(userEntity);
             return message as ContentMessage;
           });
@@ -1327,11 +1323,10 @@ export class MessageRepository {
       // Since this is a bare API client user we use `.deleted`
       const isDeleted = user.deleted === true;
       if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(
-          this.teamState.team().id,
-          user.id,
-          this.userState.self().domain,
-        );
+        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, {
+          domain: this.userState.self().domain,
+          id: user.id,
+        });
       }
     }
   }
@@ -1339,7 +1334,7 @@ export class MessageRepository {
   private async shouldShowLegalHoldWarning(eventInfoEntity: EventInfoEntity): Promise<boolean> {
     const messageType = eventInfoEntity.getType();
     const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.qualifiedConversationId.id);
+    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
     const localLegalHoldStatus = conversationEntity.legalHoldStatus();
     await this.updateAllClients(conversationEntity, !isMessageEdit);
     const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
@@ -1350,13 +1345,13 @@ export class MessageRepository {
     const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
 
     if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
-      const {qualifiedConversationId, timestamp: numericTimestamp} = eventInfoEntity;
+      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
       await this.conversationRepositoryProvider().injectLegalHoldMessage({
         beforeTimestamp: true,
-        conversationId: qualifiedConversationId,
+        conversationId: conversationId,
         legalHoldStatus: updatedLocalLegalHoldStatus,
         timestamp: numericTimestamp,
-        userId: this.userState.self().id,
+        userId: this.userState.self(),
       });
     }
 
@@ -1408,8 +1403,7 @@ export class MessageRepository {
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
-      eventInfoEntity.qualifiedConversationId.id,
-      eventInfoEntity.qualifiedConversationId.domain,
+      eventInfoEntity.conversationId,
     );
     const legalHoldMessageTypes: string[] = [
       GENERIC_MESSAGE_TYPE.ASSET,
@@ -1459,7 +1453,7 @@ export class MessageRepository {
                 ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
                 : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
             } else {
-              const conversationId = eventInfoEntity.qualifiedConversationId;
+              const conversationId = eventInfoEntity.conversationId;
               const type = eventInfoEntity.getType();
 
               const log = `Missing user IDs to grant '${type}' message in '${conversationId}' (${consentType})`;
@@ -1520,7 +1514,7 @@ export class MessageRepository {
             WebAppEvents.WARNING.MODAL,
             ModalsViewModel.TYPE.CONFIRM,
             options,
-            `degraded-${eventInfoEntity.qualifiedConversationId}`,
+            `degraded-${eventInfoEntity.conversationId}`,
           );
         })
         .catch(reject);
@@ -1557,7 +1551,9 @@ export class MessageRepository {
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(clients.map(clientId => this.userRepository.removeClientFromUser(userId, clientId, null))),
+            Promise.all(
+              clients.map(clientId => this.userRepository.removeClientFromUser({domain: null, id: userId}, clientId)),
+            ),
           ),
         );
 
@@ -1580,14 +1576,18 @@ export class MessageRepository {
           await Promise.all(
             Object.entries(usersMap).map(([domain, userClientsMap]) =>
               Object.entries(userClientsMap).map(([userId, clients]) =>
-                Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, domain))),
+                Promise.all(
+                  clients.map(client => this.userRepository.addClientToUser({domain, id: userId}, client, false)),
+                ),
               ),
             ),
           );
         } else {
           await Promise.all(
             Object.entries(usersMap).map(([userId, clients]) =>
-              Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null))),
+              Promise.all(
+                clients.map(client => this.userRepository.addClientToUser({domain: null, id: userId}, client, false)),
+              ),
             ),
           );
         }
@@ -1660,7 +1660,7 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: QualifiedIdOptional) {
+  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: QualifiedId) {
     return this.messageSender.queueMessage(() => {
       const options = eventInfoEntity.options;
       const recipientsPromise = options.recipients
@@ -1680,11 +1680,8 @@ export class MessageRepository {
    * @returns Is payload likely to be too big so that we switch to type external?
    */
   private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
-    const {qualifiedConversationId, genericMessage} = eventInfoEntity;
-    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
-      qualifiedConversationId.id,
-      qualifiedConversationId.domain,
-    );
+    const {conversationId, genericMessage} = eventInfoEntity;
+    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(conversationId);
     const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
     const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
     return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
@@ -1743,7 +1740,7 @@ export class MessageRepository {
     eventInfoEntity: EventInfoEntity,
     payload: NewOTRMessage<string>,
   ): Promise<ClientMismatch | undefined> {
-    const {qualifiedConversationId, genericMessage, options} = eventInfoEntity;
+    const {conversationId, genericMessage, options} = eventInfoEntity;
     const messageId = genericMessage.messageId;
     let messageType = eventInfoEntity.getType();
 
@@ -1757,21 +1754,21 @@ export class MessageRepository {
       .reduce((totalClients, clients) => totalClients + clients, 0);
 
     const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${JSON.stringify(
-      qualifiedConversationId,
+      conversationId,
     )}'`;
     this.logger.info(logMessage, payload);
 
     if (numberOfUsers > numberOfClients) {
       this.logger.warn(
         `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${JSON.stringify(
-          qualifiedConversationId,
+          conversationId,
         )}'`,
       );
     }
 
     try {
       const response = await this.conversation_service.postEncryptedMessage(
-        qualifiedConversationId,
+        conversationId,
         payload,
         options.precondition,
       );
@@ -1830,14 +1827,14 @@ export class MessageRepository {
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
         `Updated '${messageType}' message (${messageId}) for conversation '${JSON.stringify(
-          qualifiedConversationId,
+          conversationId,
         )}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
       );
       if (payloadWithMissingClients) {
-        return this.conversation_service.postEncryptedMessage(qualifiedConversationId, payloadWithMissingClients, true);
+        return this.conversation_service.postEncryptedMessage(conversationId, payloadWithMissingClients, true);
       }
-      return this.conversation_service.postEncryptedMessage(qualifiedConversationId, payload, true);
+      return this.conversation_service.postEncryptedMessage(conversationId, payload, true);
     }
   }
 

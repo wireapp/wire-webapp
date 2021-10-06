@@ -17,6 +17,7 @@
  *
  */
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import React, {Fragment, useEffect} from 'react';
 import ReactDOM from 'react-dom';
@@ -86,7 +87,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     callState.selectableWindows([]);
   };
 
-  const getConversationById = (conversationId: string): Conversation => {
+  const getConversationById = (conversationId: QualifiedId): Conversation => {
     return conversationState.findConversation(conversationId);
   };
 
@@ -155,7 +156,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     });
   };
 
-  const conversation = conversationState.findConversation(joinedCall?.conversationId);
+  const conversation = conversationState.findConversation({domain: null, id: joinedCall?.conversationId});
   if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
   }
@@ -168,7 +169,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           videoGrid={videoGrid}
           call={joinedCall}
           activeCallViewTab={activeCallViewTab}
-          conversation={getConversationById(joinedCall.conversationId)}
+          conversation={getConversationById({domain: null, id: joinedCall.conversationId})}
           multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
           maximizedParticipant={maximizedParticipant}

@@ -31,6 +31,7 @@ import type {UserRepository} from '../user/UserRepository';
 import type {EventInfoEntity} from './EventInfoEntity';
 import type {Conversation} from '../entity/Conversation';
 import {Config} from '../Config';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export class ClientMismatchHandler {
   private readonly logger: Logger;
@@ -63,9 +64,9 @@ export class ClientMismatchHandler {
     // Note: Broadcast messages have an empty conversation ID
     let conversationEntity: Conversation | undefined;
 
-    if (eventInfoEntity.qualifiedConversationId.id !== '') {
+    if (eventInfoEntity.conversationId.id !== '') {
       conversationEntity = await this.conversationRepositoryProvider().getConversationById(
-        eventInfoEntity.qualifiedConversationId.id,
+        eventInfoEntity.conversationId,
       );
     }
 
@@ -115,14 +116,18 @@ export class ClientMismatchHandler {
       await Promise.all(
         Object.entries(usersMap).map(([domain, userClientsMap]) =>
           Object.entries(userClientsMap).map(([userId, clients]) =>
-            Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, domain))),
+            Promise.all(
+              clients.map(client => this.userRepository.addClientToUser({domain, id: userId}, client, false)),
+            ),
           ),
         ),
       );
     } else {
       await Promise.all(
         Object.entries(usersMap).map(([userId, clients]) =>
-          Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null))),
+          Promise.all(
+            clients.map(client => this.userRepository.addClientToUser({domain: '', id: userId}, client, false)),
+          ),
         ),
       );
     }
@@ -158,25 +163,25 @@ export class ClientMismatchHandler {
         const isDeleted = backendUser?.deleted === true;
 
         if (isDeleted && conversationEntity.inTeam) {
-          amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, conversationEntity.team_id, userId);
+          amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, conversationEntity.team_id, {domain: '', id: userId});
         }
       }
 
       delete payload.recipients[userId];
     };
 
-    const removeDeletedClient = async (userId: string, clientId: string): Promise<void> => {
-      if (payload?.recipients?.[userId]) {
-        delete payload.recipients[userId][clientId];
+    const removeDeletedClient = async (userId: QualifiedId, clientId: string): Promise<void> => {
+      if (payload?.recipients?.[userId.id]) {
+        delete payload.recipients[userId.id][clientId];
       }
       if (removeLocallyStoredClient) {
-        await this.userRepository.removeClientFromUser(userId, clientId, null);
+        await this.userRepository.removeClientFromUser(userId, clientId);
       }
     };
 
     for (const [userId, clientIds = []] of Object.entries(recipients)) {
       for (const clientId of clientIds) {
-        await removeDeletedClient(userId, clientId);
+        await removeDeletedClient({domain: '', id: userId}, clientId);
       }
 
       if (payload?.recipients?.[userId]) {

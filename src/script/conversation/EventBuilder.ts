@@ -18,6 +18,7 @@
  */
 
 import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
@@ -45,7 +46,8 @@ export interface BaseEvent {
   data?: unknown;
   from: string;
   id: string;
-  qualified_conversation: QualifiedId;
+  qualified_conversation?: QualifiedId;
+  qualified_from?: QualifiedId;
   server_time?: string;
   time: string;
 }
@@ -99,8 +101,13 @@ export type GroupCreationEvent = ConversationEvent<GroupCreationEventData> & {ty
 export type LegalHoldMessageEvent = ConversationEvent<{legal_hold_status: LegalHoldStatus}> & {
   type: CONVERSATION.LEGAL_HOLD_UPDATE;
 };
-export type MemberJoinEvent = BackendEventMessage<{user_ids: string[]}>;
-export type MemberLeaveEvent = BackendEventMessage<{user_ids: string[]}>;
+export type MemberJoinEvent = BackendEventMessage<{qualified_user_ids?: QualifiedId[]; user_ids: string[]}>;
+export type MemberLeaveEvent = BackendEventMessage<{
+  name?: string;
+  qualified_user_ids?: QualifiedId[];
+  reason?: MemberLeaveReason;
+  user_ids: string[];
+}>;
 export type MessageAddEvent = Omit<ConversationEvent<{}>, 'id'> & {
   edited_time?: string;
   status: StatusType;
@@ -375,8 +382,8 @@ export const EventBuilder = {
   },
 
   buildLegalHoldMessage(
-    conversationId: QualifiedIdOptional,
-    userId: string,
+    conversationId: QualifiedId,
+    userId: QualifiedId,
     timestamp: number | string,
     legalHoldStatus: LegalHoldStatus,
     beforeMessage?: boolean,
@@ -386,8 +393,10 @@ export const EventBuilder = {
       data: {
         legal_hold_status: legalHoldStatus,
       },
-      from: userId,
+      from: userId.id,
       id: createRandomUuid(),
+      qualified_conversation: conversationId,
+      qualified_from: userId,
       time: new Date(new Date(timestamp).getTime() + (beforeMessage ? -1 : 1)).toISOString(),
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
@@ -424,6 +433,7 @@ export const EventBuilder = {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
+        qualified_user_ids: [userId],
         user_ids: [userId.id],
       },
       from: removedBySelfUser ? conversationEntity.selfUser().id : userId.id,

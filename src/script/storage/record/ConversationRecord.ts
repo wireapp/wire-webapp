@@ -17,7 +17,7 @@ export interface ConversationRecord {
   archived_timestamp: number;
   cleared_timestamp: number;
   creator: string;
-  domain?: string;
+  domain: string | null;
   ephemeral_timer: number;
   global_message_timer: number;
   id: string;
