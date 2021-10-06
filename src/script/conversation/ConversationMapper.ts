@@ -229,7 +229,7 @@ export class ConversationMapper {
     const participatingUserIds =
       qualified_others ||
       (members?.others
-        ? members.others.map(other => ({domain: other.qualified_id?.domain || null, id: other.id}))
+        ? members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}))
         : others.map(userId => ({domain: '', id: userId})));
 
     conversationEntity.participating_user_ids(participatingUserIds);

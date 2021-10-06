@@ -156,7 +156,7 @@ export class Conversation {
   constructor(conversation_id: string = '', domain: string = '') {
     this.id = conversation_id;
 
-    this.domain = domain || null;
+    this.domain = domain;
 
     this.logger = getLogger(`Conversation (${this.id})`);
 
