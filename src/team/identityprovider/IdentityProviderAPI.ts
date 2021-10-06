@@ -52,19 +52,38 @@ export class IdentityProviderAPI {
     return response.data;
   }
 
-  public async deleteIdentityProvider(identityProviderId: string): Promise<void> {
+  public async deleteIdentityProvider(identityProviderId: string, force?: boolean): Promise<void> {
     const config: AxiosRequestConfig = {
       method: 'delete',
       url: `${IdentityProviderAPI.URL.PROVIDER}/${identityProviderId}`,
     };
 
+    if (force) {
+      config.params.params = {force};
+    }
+
     await this.client.sendJSON(config);
   }
 
-  public async postIdentityProvider(identityData: string): Promise<IdentityProvider> {
+  public async postIdentityProvider(identityData: string, replaceProviderId?: string): Promise<IdentityProvider> {
     const config: AxiosRequestConfig = {
       data: identityData,
       method: 'post',
+      url: `${IdentityProviderAPI.URL.PROVIDER}`,
+    };
+
+    if (replaceProviderId) {
+      config.params.params = {replaces: replaceProviderId};
+    }
+
+    const response = await this.client.sendXML<IdentityProvider>(config);
+    return response.data;
+  }
+
+  public async putIdentityProvider(identityData: string): Promise<IdentityProvider> {
+    const config: AxiosRequestConfig = {
+      data: identityData,
+      method: 'put',
       url: `${IdentityProviderAPI.URL.PROVIDER}`,
     };
 
