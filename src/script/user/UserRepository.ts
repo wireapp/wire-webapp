@@ -129,12 +129,10 @@ export class UserRepository {
    * Listener for incoming user events.
    */
   private readonly onUserEvent = (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource): void => {
-    const type = eventJson.type;
-
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
+    this.logger.info(`»» User Event: '${eventJson.type}' (Source: ${source})`, logObject);
 
-    switch (type) {
+    switch (eventJson.type) {
       case USER_EVENT.DELETE:
         this.userDelete(eventJson);
         break;
@@ -156,7 +154,7 @@ export class UserRepository {
 
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
     if (source === EventRepository.SOURCE.WEB_SOCKET) {
-      switch (type) {
+      switch (eventJson.type) {
         case USER_EVENT.PROPERTIES_DELETE:
           this.propertyRepository.deleteProperty(eventJson.key);
           break;

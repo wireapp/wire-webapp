@@ -547,15 +547,11 @@ export class ClientRepository {
    * @param eventJson JSON data for event
    */
   private readonly onUserEvent = (eventJson: UserClientAddEvent | UserClientRemoveEvent): void => {
-    const type = eventJson.type;
-
-    const isClientAdd = type === USER_EVENT.CLIENT_ADD;
-    if (isClientAdd) {
+    if (eventJson.type === USER_EVENT.CLIENT_ADD) {
       return this.onClientAdd(eventJson);
     }
 
-    const isClientRemove = type === USER_EVENT.CLIENT_REMOVE;
-    if (isClientRemove) {
+    if (eventJson.type === USER_EVENT.CLIENT_REMOVE) {
       this.onClientRemove(eventJson);
     }
   };

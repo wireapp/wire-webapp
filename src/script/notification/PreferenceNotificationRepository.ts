@@ -20,7 +20,7 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
-import {USER_EVENT} from '@wireapp/api-client/src/event/';
+import {USER_EVENT, UserEvent} from '@wireapp/api-client/src/event/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 import type {ClientEntity} from '../client/ClientEntity';
@@ -113,7 +113,7 @@ export class PreferenceNotificationRepository {
     });
   }
 
-  readonly onUserEvent = (event: any): void => {
+  readonly onUserEvent = (event: UserEvent & {value?: string}): void => {
     if (event.type === USER_EVENT.PROPERTIES_DELETE || event.type === USER_EVENT.PROPERTIES_SET) {
       if (event.key === PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key) {
         const defaultValue = !!PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.defaultValue;
