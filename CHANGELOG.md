@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.0.1...@wireapp/api-client@14.1.0) (2021-10-06)
+
+
+### Features
+
+* **api-client:** Endpoint for updating identity providers & params for replacing/force deleting identity providers ([#4147](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4147)) ([e83be91](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/e83be91a14167f01becca2e49e162fb894b243d7))
+
+
+
+
+
 ## [14.0.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.0.0...@wireapp/api-client@14.0.1) (2021-10-04)
 
 
