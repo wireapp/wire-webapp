@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Розблокувати",
   "modalUserUnblockHeadline": "Розблокувати?",
   "modalUserUnblockMessage": "{{user}} не буде мати можливості зв’язатися з вами або додати вас до групових розмов.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Видалений користувач",
   "notificationAssetAdd": "Поділився(-лась) картинкою",
   "notificationConnectionAccepted": "Прийняв(-ла) ваш запит на додавання до контактів",

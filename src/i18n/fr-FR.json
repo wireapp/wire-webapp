@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Débloquer",
   "modalUserUnblockHeadline": "Débloquer ?",
   "modalUserUnblockMessage": "{{user}} pourra de nouveau vous parler ou vous ajouter à des conversations de groupe.",
-  "noActiveVideoSpeakers": "Aucun Speaker partageant sa vidéo n'est actif…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Utilisateur supprimé",
   "notificationAssetAdd": "A partagé une image",
   "notificationConnectionAccepted": "A accepté votre demande de connexion",

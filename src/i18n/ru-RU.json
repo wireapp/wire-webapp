@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Разблокировать",
   "modalUserUnblockHeadline": "Разблокировать?",
   "modalUserUnblockMessage": "{{user}} вновь сможет связаться с вами и добавить вас в групповые беседы.",
-  "noActiveVideoSpeakers": "Нет активных видеоспикеров…",
+  "noActiveSpeakers": "Нет активных спикеров…",
   "nonexistentUser": "Удаленный пользователь",
   "notificationAssetAdd": "Поделился(-лась) картинкой",
   "notificationConnectionAccepted": "Принял(-а) ваш запрос на добавление",

@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "解除封鎖",
   "modalUserUnblockHeadline": "解除封鎖？",
   "modalUserUnblockMessage": "{{user}} 將能夠再次與您連繫以及將您添加到對話群組中。",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "已刪除的使用者",
   "notificationAssetAdd": "分享了一張圖片",
   "notificationConnectionAccepted": "接受了您的連線請求",

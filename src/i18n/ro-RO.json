@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Deblochează",
   "modalUserUnblockHeadline": "Deblochează?",
   "modalUserUnblockMessage": "{{user}} te va putea contacta și adăuga din nou la conversații de grup.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Utilizator șters",
   "notificationAssetAdd": "A împărtășit o imagine",
   "notificationConnectionAccepted": "A acceptat cererea de conectare a ta",

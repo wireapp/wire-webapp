@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Odblokuj",
   "modalUserUnblockHeadline": "Odblokować?",
   "modalUserUnblockMessage": "{{user}} będzie mógł się z Tobą skontaktować oraz dodać do rozmowy grupowej.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Użytkownik usunięty",
   "notificationAssetAdd": "Udostępnił obrazek",
   "notificationConnectionAccepted": "Zaakceptowane żądania połączenia",

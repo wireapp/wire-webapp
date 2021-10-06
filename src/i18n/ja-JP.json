@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "ブロック解除",
   "modalUserUnblockHeadline": "ブロック解除？",
   "modalUserUnblockMessage": "{{user}} は、あなたにコンタクトをすることやグループ会話にあなたを追加することができます。",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "削除されたユーザー",
   "notificationAssetAdd": "写真が共有されました",
   "notificationConnectionAccepted": "接続のリクエストが受け入れられました",
