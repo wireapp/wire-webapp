@@ -66,7 +66,7 @@ describe('PreferenceNotificationRepository', () => {
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
     const newClientData = {};
 
-    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain: user.domain, id: user.id}, newClientData);
+    amplify.publish(WebAppEvents.USER.CLIENT_ADDED, user.qualifiedId, newClientData);
 
     expect(preferenceNotificationRepository.notifications().length).toBe(1);
     expect(preferenceNotificationRepository.notifications()[0]).toEqual({

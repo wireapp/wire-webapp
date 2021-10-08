@@ -183,7 +183,7 @@ export class LegalHoldModalViewModel {
       this.skipShowUsers(true);
       selfUser.hasPendingLegalHold(false);
       await this.clientRepository.updateClientsForSelf();
-      amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain: selfUser.domain, id: selfUser.id});
+      amplify.publish(WebAppEvents.USER.CLIENT_ADDED, selfUser.qualifiedId);
     } catch ({code, message}) {
       switch (code) {
         case HTTP_STATUS.BAD_REQUEST: {

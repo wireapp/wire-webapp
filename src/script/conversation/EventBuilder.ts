@@ -329,13 +329,12 @@ export const EventBuilder = {
   ): GroupCreationEvent {
     const {creator: creatorId, id} = conversationEntity;
     const selfUserId = conversationEntity.selfUser().id;
-    const selfUserDomain = conversationEntity.selfUser().domain;
     const isoDate = new Date(timestamp || 0).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUserId || isTemporaryGuest;
     if (!createdBySelf) {
-      userIds.push({domain: selfUserDomain, id: selfUserId});
+      userIds.push(conversationEntity.selfUser().qualifiedId);
     }
 
     return {
