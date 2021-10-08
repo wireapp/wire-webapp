@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.17.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.16.10...@wireapp/core@17.17.0) (2021-10-08)
+
+
+### Features
+
+* **api-client:** Add the connections v2 endpoints ([#4148](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4148)) ([1cc8892](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/1cc8892a55f3fce3a0192bec9a4a90090eb816fa))
+
+
+
+
+
 ## [17.16.10](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.16.9...@wireapp/core@17.16.10) (2021-10-06)
 
 **Note:** Version bump only for package @wireapp/core
