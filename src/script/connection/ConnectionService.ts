@@ -59,8 +59,8 @@ export class ConnectionService {
     });
   }
 
-  createConnection(userId: QualifiedId) {
-    return this.apiClient.connection.api.createConnection(userId);
+  postFederationConnections(userId: QualifiedId) {
+    return this.apiClient.connection.api.postConnection(userId, true);
   }
 
   /**
