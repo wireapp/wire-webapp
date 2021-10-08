@@ -507,7 +507,7 @@ export class TeamRepository {
       amplify.publish(
         WebAppEvents.TEAM.MEMBER_LEAVE,
         teamId,
-        userId,
+        {domain: '', id: userId},
         this.userState.self().domain,
         new Date(time).toISOString(),
       );
