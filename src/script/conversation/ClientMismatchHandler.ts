@@ -102,7 +102,7 @@ export class ClientMismatchHandler {
       const unknownUsers = getDifference(
         knownUsers.map(user => user.id),
         missingUserIds,
-      ).map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || null, id}));
+      ).map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || '', id}));
 
       if (unknownUsers.length > 0) {
         this.conversationRepositoryProvider().addMissingMember(conversationEntity, unknownUsers, timestamp - 1);
@@ -133,7 +133,7 @@ export class ClientMismatchHandler {
     }
 
     this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(
-      missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || null, id})),
+      missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || '', id})),
     );
 
     if (payload) {
