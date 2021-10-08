@@ -1378,7 +1378,7 @@ export class ConversationRepository {
     this._clearConversation(conversationEntity);
 
     if (leaveConversation) {
-      this.removeMember(conversationEntity, {domain: this.userState.self().domain, id: this.userState.self().id});
+      this.removeMember(conversationEntity, this.userState.self().qualifiedId);
     }
 
     if (isActiveConversation) {
@@ -1885,9 +1885,7 @@ export class ConversationRepository {
     const {from: senderId, type, time} = eventJson;
 
     if (senderId) {
-      const allParticipants = conversationEntity
-        .participating_user_ids()
-        .concat({domain: this.userState.self().domain, id: this.userState.self().id});
+      const allParticipants = conversationEntity.participating_user_ids().concat(this.userState.self().qualifiedId);
       const isFromUnknownUser = allParticipants.every(participant => participant.id !== senderId);
 
       if (isFromUnknownUser) {

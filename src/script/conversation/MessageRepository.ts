@@ -513,7 +513,7 @@ export class MessageRepository {
     if (conversationEntity.messageTimer()) {
       genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
     }
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId);
     const payload = await this.sendGenericMessageToConversation(eventInfoEntity);
     const {uploaded: assetData} = conversationEntity.messageTimer()
       ? genericMessage.ephemeral.asset
@@ -782,7 +782,7 @@ export class MessageRepository {
     }
 
     const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId);
     eventInfoEntity.setTimestamp(injectedEvent.time);
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
     this.trackContributed(conversationEntity, genericMessage);
@@ -914,7 +914,7 @@ export class MessageRepository {
       // TODO(Federation): Apply logic for 'sendFederatedMessage'. The 'createRecipients' logic will be done inside of '@wireapp/core'.
       return this.createRecipients(conversationEntity, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity, options);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
         return this.sendGenericMessage(eventInfoEntity, true);
       });
     });
@@ -1029,7 +1029,7 @@ export class MessageRepository {
         const userIds = Array.isArray(precondition) ? precondition : undefined;
         return this.createRecipients(conversationEntity, false, userIds).then(recipients => {
           const options = {precondition, recipients};
-          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity, options);
+          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
           this.sendGenericMessage(eventInfoEntity, true);
         });
       });
@@ -1064,7 +1064,10 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation());
+      const eventInfoEntity = new EventInfoEntity(
+        genericMessage,
+        this.conversationState.self_conversation().qualifiedId,
+      );
       await this.sendGenericMessageToConversation(eventInfoEntity);
       return await this.deleteMessageById(conversationEntity, messageEntity.id);
     } catch (error) {
@@ -1092,7 +1095,10 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation());
+      const eventInfoEntity = new EventInfoEntity(
+        genericMessage,
+        this.conversationState.self_conversation().qualifiedId,
+      );
       this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
         this.logger.info(`Cleared conversation '${conversationEntity.id}' on '${new Date(timestamp).toISOString()}'`);
       });
@@ -1126,7 +1132,7 @@ export class MessageRepository {
       try {
         const recipients = await this.createRecipients(conversationEntity, true, [messageEntity.from]);
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity, options);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
         await this.sendGenericMessage(eventInfoEntity, false);
       } catch (error) {
         messageEntity.waitingButtonId(undefined);
@@ -1351,7 +1357,7 @@ export class MessageRepository {
         conversationId: conversationId,
         legalHoldStatus: updatedLocalLegalHoldStatus,
         timestamp: numericTimestamp,
-        userId: {domain: this.userState.self().domain, id: this.userState.self().id},
+        userId: this.userState.self().qualifiedId,
       });
     }
 
@@ -1614,7 +1620,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation());
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().qualifiedId);
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
@@ -1641,7 +1647,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation());
+    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().qualifiedId);
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       this.logger.info(`Sent countly sync message with ID ${countlyId}`);

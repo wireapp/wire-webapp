@@ -89,8 +89,8 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   const clickToResetSession = () => {
     const _resetProgress = () => window.setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
     const conversationId: QualifiedId = user.isMe
-      ? {domain: conversationState.self_conversation().domain, id: conversationState.self_conversation().id}
-      : {domain: conversationState.activeConversation().domain, id: conversationState.activeConversation().id};
+      ? conversationState.self_conversation().qualifiedId
+      : conversationState.activeConversation()?.qualifiedId;
     setIsResettingSession(true);
     messageRepository
       .resetSession(user.qualifiedId, selectedClient.id, conversationId)

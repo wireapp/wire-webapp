@@ -205,8 +205,9 @@ export class ConversationVerificationStateHandler {
       .filtered_conversations()
       .map((conversationEntity: Conversation) => {
         if (!conversationEntity.removed_from_conversation()) {
-          const selfUser = {domain: this.userState.self().domain, id: this.userState.self().id};
-          const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUser);
+          const userIdsInConversation = conversationEntity
+            .participating_user_ids()
+            .concat(this.userState.self().qualifiedId);
           const matchingUserIds = userIdsInConversation.filter(userIdInConversation =>
             userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)),
           );
@@ -217,7 +218,10 @@ export class ConversationVerificationStateHandler {
         }
         return undefined;
       })
-      .filter(activeConversationInfo => !!activeConversationInfo);
+      .filter(activeConversationInfo => !!activeConversationInfo) as {
+      conversationEntity: Conversation;
+      userIds: QualifiedId[];
+    }[];
   }
 
   /**

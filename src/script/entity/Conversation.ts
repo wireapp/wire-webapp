@@ -294,7 +294,7 @@ export class Conversation {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
           conversationEntity: this,
           legalHoldStatus,
-          userId: {domain: this.selfUser().domain, id: this.selfUser().id},
+          userId: this.selfUser().qualifiedId,
         });
       }
     });
@@ -751,8 +751,7 @@ export class Conversation {
       const isCallActivation = messageEntity.isCall() && messageEntity.isActivation();
       const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
       const wasSelfUserAdded =
-        isMemberJoin &&
-        (messageEntity as MemberMessage).isUserAffected({domain: this.selfUser().domain, id: this.selfUser().id});
+        isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().qualifiedId);
 
       return isCallActivation || wasSelfUserAdded;
     });
