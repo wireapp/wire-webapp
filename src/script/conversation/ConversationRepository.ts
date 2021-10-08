@@ -325,7 +325,7 @@ export class ConversationRepository {
       .map(userEntity => userEntity.id);
     const otherFederatedDomainUserIds = userEntities
       .filter(userEntity => !userEntity.isOnSameFederatedDomain())
-      .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+      .map(userEntity => userEntity.qualifiedId);
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
@@ -1277,7 +1277,7 @@ export class ConversationRepository {
    * @returns Resolves when members were added
    */
   async addMembers(conversationEntity: Conversation, userEntities: User[]) {
-    const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+    const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
       const response = await this.conversation_service.postMembers(conversationEntity.id, userIds);
@@ -1747,7 +1747,7 @@ export class ConversationRepository {
       timestamp = conversation.getLatestTimestamp(servertime);
     }
     const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
-      conversationId || {domain: conversationEntity.domain, id: conversationEntity.id},
+      conversationId || conversationEntity?.qualifiedId,
       userId,
       timestamp,
       legalHoldStatus,

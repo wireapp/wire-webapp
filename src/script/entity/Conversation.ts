@@ -20,6 +20,7 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
@@ -471,6 +472,10 @@ export class Conversation {
     }, 100);
 
     this._initSubscriptions();
+  }
+
+  get qualifiedId(): QualifiedId {
+    return {domain: this.domain, id: this.id};
   }
 
   private hasInitializedUsers() {

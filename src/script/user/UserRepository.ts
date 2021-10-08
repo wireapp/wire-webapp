@@ -203,11 +203,11 @@ export class UserRepository {
     // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
     // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
     if (!!userEntities[0]?.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+      const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
       return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
     }
 
-    const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+    const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
     return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
@@ -623,7 +623,7 @@ export class UserRepository {
    * @param isMe `true` if self user
    */
   private saveUser(userEntity: User, isMe: boolean = false): User {
-    const user = this.findUserById({domain: userEntity.domain, id: userEntity.id});
+    const user = this.findUserById(userEntity.qualifiedId);
     if (!user) {
       if (isMe) {
         userEntity.isMe = true;
@@ -639,9 +639,7 @@ export class UserRepository {
    * @returns Resolves with users passed as parameter
    */
   private saveUsers(userEntities: User[]): User[] {
-    const newUsers = userEntities.filter(
-      userEntity => !this.findUserById({domain: userEntity.domain, id: userEntity.id}),
-    );
+    const newUsers = userEntities.filter(userEntity => !this.findUserById(userEntity.qualifiedId));
     this.userState.users.push(...newUsers);
     return userEntities;
   }

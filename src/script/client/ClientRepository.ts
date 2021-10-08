@@ -287,9 +287,9 @@ export class ClientRepository {
   async deleteClient(clientId: string, password: string): Promise<ClientEntity[]> {
     const selfUser = this.selfUser();
     await this.clientService.deleteClient(clientId, password);
-    await this.deleteClientFromDb(selfUser, clientId);
+    await this.deleteClientFromDb(selfUser.qualifiedId, clientId);
     selfUser.removeClient(clientId);
-    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, {domain: selfUser.domain, id: selfUser.id}, clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
     return this.clientState.clients();
   }
 
@@ -399,8 +399,9 @@ export class ClientRepository {
    */
   async getClientsForSelf(): Promise<ClientEntity[]> {
     this.logger.info('Retrieving all clients of the self user from database');
-    const clientRecords = await this.getClientByUserIdFromDb(this.selfUser());
-    const clientEntities = ClientMapper.mapClients(clientRecords, true, this.selfUser().domain);
+    const {domain, id} = this.selfUser();
+    const clientRecords = await this.getClientByUserIdFromDb({domain, id});
+    const clientEntities = ClientMapper.mapClients(clientRecords, true, domain);
     clientEntities.forEach(clientEntity => this.selfUser().addClient(clientEntity));
     return this.selfUser().devices();
   }
@@ -422,7 +423,8 @@ export class ClientRepository {
    */
   async updateClientsForSelf(): Promise<ClientEntity[]> {
     const clientsData = await this.clientService.getClients();
-    return this.updateClientsOfUserById(this.selfUser(), clientsData, false);
+    const {domain, id} = this.selfUser();
+    return this.updateClientsOfUserById({domain, id}, clientsData, false);
   }
 
   /**
