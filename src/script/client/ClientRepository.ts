@@ -286,11 +286,10 @@ export class ClientRepository {
    */
   async deleteClient(clientId: string, password: string): Promise<ClientEntity[]> {
     const selfUser = this.selfUser();
-    const {id, domain} = selfUser;
     await this.clientService.deleteClient(clientId, password);
-    await this.deleteClientFromDb({domain, id}, clientId);
+    await this.deleteClientFromDb(selfUser.qualifiedId, clientId);
     selfUser.removeClient(clientId);
-    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, {domain, id}, clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
     return this.clientState.clients();
   }
 
