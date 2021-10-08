@@ -648,14 +648,14 @@ export class UserRepository {
    * Update a local user from the backend by ID.
    */
   updateUserById = async (userId: string | QualifiedId): Promise<void> => {
-    const localUserEntity = this.findUserById(userId) || new User('', null);
+    const localUserEntity = this.findUserById(userId) || new User('', '');
     const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);
     }
-    if (updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
-      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.id);
+    if (updatedUserEntity && updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.qualifiedId);
     }
   };
 
