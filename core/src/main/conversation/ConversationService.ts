@@ -144,7 +144,10 @@ export class ConversationService {
     }
 
     if (!members.length) {
-      const conversation = await this.apiClient.conversation.api.getConversation(conversationId, conversationDomain);
+      const conversation = await this.apiClient.conversation.api.getConversation(
+        {id: conversationId, domain: conversationDomain},
+        true,
+      );
       /*
        * If you are sending a message to a conversation, you have to include
        * yourself in the list of users if you want to sync a message also to your
