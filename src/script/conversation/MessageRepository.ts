@@ -1351,7 +1351,7 @@ export class MessageRepository {
         conversationId,
         legalHoldStatus: updatedLocalLegalHoldStatus,
         timestamp: numericTimestamp,
-        userId: this.userState.self(),
+        userId: {domain: this.userState.self().domain, id: this.userState.self().id},
       });
     }
 
