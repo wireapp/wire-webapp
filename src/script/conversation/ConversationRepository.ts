@@ -326,7 +326,7 @@ export class ConversationRepository {
       .map(userEntity => userEntity.id);
     const otherFederatedDomainUserIds = userEntities
       .filter(userEntity => !userEntity.isOnSameFederatedDomain())
-      .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+      .map(userEntity => userEntity.qualifiedId);
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
@@ -1278,7 +1278,7 @@ export class ConversationRepository {
    * @returns Resolves when members were added
    */
   async addMembers(conversationEntity: Conversation, userEntities: User[]) {
-    const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+    const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
       const response = await this.conversation_service.postMembers(conversationEntity.id, userIds);
@@ -1747,7 +1747,7 @@ export class ConversationRepository {
       timestamp = conversation.getLatestTimestamp(servertime);
     }
     const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
-      conversationId || conversationEntity,
+      conversationId || conversationEntity?.qualifiedId,
       userId,
       timestamp,
       legalHoldStatus,
@@ -1793,9 +1793,9 @@ export class ConversationRepository {
 
     const {conversation, qualified_conversation, data: eventData, type} = eventJson;
     // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
-    const conversationId: QualifiedId = eventData.conversationId
+    const conversationId: QualifiedId = eventData?.conversationId
       ? {domain: '', id: eventData.conversationId}
-      : qualified_conversation || {domain: null, id: conversation};
+      : qualified_conversation || {domain: '', id: conversation};
     this.logger.info(
       `Handling event '${type}' in conversation '${conversationId.id}/${conversationId.domain}' (Source: ${eventSource})`,
     );

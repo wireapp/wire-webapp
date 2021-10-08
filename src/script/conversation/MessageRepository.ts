@@ -255,7 +255,7 @@ export class MessageRepository {
    */
   async sendFederatedMessage(conversation: Conversation, message: string): Promise<void> {
     const userIds: string[] | QualifiedId[] = conversation.domain
-      ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
+      ? conversation.allUserEntities.map(user => user.qualifiedId)
       : conversation.allUserEntities.map(user => user.id);
 
     const crudEngine = this.cryptography_repository.storageRepository.storageService['engine'];
@@ -1351,7 +1351,7 @@ export class MessageRepository {
         conversationId,
         legalHoldStatus: updatedLocalLegalHoldStatus,
         timestamp: numericTimestamp,
-        userId: this.userState.self(),
+        userId: {domain: this.userState.self().domain, id: this.userState.self().id},
       });
     }
 
@@ -1428,9 +1428,7 @@ export class MessageRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds = conversationEntity
-        .getUsersWithUnverifiedClients()
-        .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.qualifiedId);
 
       return this.userRepository
         .getUsersById(userIds)

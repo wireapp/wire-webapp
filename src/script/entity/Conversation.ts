@@ -20,6 +20,7 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
@@ -130,7 +131,7 @@ export class Conversation {
   public readonly participating_user_ets: ko.ObservableArray<User>;
   public readonly participating_user_ids: ko.ObservableArray<QualifiedIdOptional>;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
-  public readonly removed_from_conversation?: ko.PureComputed<boolean>;
+  public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
   public readonly selfUser: ko.Observable<User>;
   public readonly servicesCount: ko.PureComputed<number>;
@@ -471,6 +472,10 @@ export class Conversation {
     }, 100);
 
     this._initSubscriptions();
+  }
+
+  get qualifiedId(): QualifiedId {
+    return {domain: this.domain, id: this.id};
   }
 
   private hasInitializedUsers() {
