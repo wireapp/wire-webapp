@@ -107,8 +107,14 @@ export class ConversationService {
    * Get a conversation by ID.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
-  getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
-    return this.apiClient.conversation.api.getConversation(id, domain);
+  getConversationById(convId: QualifiedId): Promise<BackendConversation> {
+    const domain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    const conversationApi = this.apiClient.conversation.api;
+    const isFederatedBackend = Config.getConfig().FEATURE.ENABLE_FEDERATION === true && domain;
+
+    return isFederatedBackend
+      ? conversationApi.getConversation(convId, true)
+      : conversationApi.getConversation(convId.id);
   }
 
   /**
