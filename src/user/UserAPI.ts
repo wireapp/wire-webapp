@@ -148,17 +148,39 @@ export class UserAPI {
     return response.data;
   }
 
+  public async getClientPreKey(userId: string, clientId: string, useFederation?: false): Promise<ClientPreKey>;
+  public async getClientPreKey(userId: QualifiedId, clientId: string, useFederation: true): Promise<ClientPreKey>;
+  public async getClientPreKey(
+    userId: string | QualifiedId,
+    clientId: string,
+    useFederation: boolean = false,
+  ): Promise<ClientPreKey> {
+    if (useFederation) {
+      return this.getClientPreKey_v2(userId as QualifiedId, clientId);
+    }
+    return this.getClientPreKey_v1(userId as string, clientId);
+  }
+
   /**
    * Get a prekey for a specific client of a user.
    * @param userId The user ID
    * @param clientId The client ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
    */
-  public async getClientPreKey(userId: string, clientId: string, domain?: string): Promise<ClientPreKey> {
-    const url = domain
-      ? `${UserAPI.URL.USERS}/${domain}/${userId}/${UserAPI.URL.PRE_KEYS}/${clientId}`
-      : `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
+  async getClientPreKey_v1(userId: string, clientId: string): Promise<ClientPreKey> {
+    const url = `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url,
+    };
 
+    const response = await this.client.sendJSON<ClientPreKey>(config);
+    return response.data;
+  }
+
+  async getClientPreKey_v2(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
+    const {id, domain} = userId;
+    const url = `${UserAPI.URL.USERS}/${domain}/${id}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
     const config: AxiosRequestConfig = {
       method: 'get',
       url,

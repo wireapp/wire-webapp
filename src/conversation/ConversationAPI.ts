@@ -206,16 +206,37 @@ export class ConversationAPI {
     return response.data;
   }
 
+  public async getConversation(conversationId: string, useFederation?: false): Promise<Conversation>;
+  public async getConversation(conversationId: QualifiedId, useFederation: true): Promise<Conversation>;
+  public async getConversation(
+    conversationId: string | QualifiedId,
+    useFederation: boolean = false,
+  ): Promise<Conversation> {
+    if (useFederation) {
+      return this.getConversation_v1(conversationId as string);
+    }
+    return this.getConversation_v2(conversationId as QualifiedId);
+  }
+
   /**
    * Get a conversation by ID.
    * @param conversationId The conversation ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
-  public async getConversation(conversationId: string, domain?: string): Promise<Conversation> {
-    const url = domain
-      ? `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${conversationId}`
-      : `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`;
+  async getConversation_v1(conversationId: string): Promise<Conversation> {
+    const url = `${ConversationAPI.URL.CONVERSATIONS}/${conversationId}`;
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url,
+    };
 
+    const response = await this.client.sendJSON<Conversation>(config);
+    return response.data;
+  }
+
+  async getConversation_v2(conversationId: QualifiedId): Promise<Conversation> {
+    const {id, domain} = conversationId;
+    const url = `${ConversationAPI.URL.CONVERSATIONS}/${domain}/${id}`;
     const config: AxiosRequestConfig = {
       method: 'get',
       url,
