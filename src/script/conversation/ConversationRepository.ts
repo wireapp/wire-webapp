@@ -2398,7 +2398,8 @@ export class ConversationRepository {
 
     const isConversationRoleUpdate = !!eventData.conversation_role;
     if (isConversationRoleUpdate) {
-      const {qualified_target: userId, conversation_role} = eventData;
+      const {target, qualified_target, conversation_role} = eventData;
+      const userId = qualified_target || {domain: '', id: target};
       const conversation = this.conversationState
         .conversations()
         .find(conversation => matchQualifiedIds(conversation, conversationId));
