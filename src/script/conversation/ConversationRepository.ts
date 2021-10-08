@@ -1035,7 +1035,7 @@ export class ConversationRepository {
         code,
       );
       const knownConversation = this.conversationState.findConversation({domain: null, id: conversationId});
-      if (knownConversation && knownConversation.status() === ConversationStatus.CURRENT_MEMBER) {
+      if (knownConversation?.status() === ConversationStatus.CURRENT_MEMBER) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
@@ -1188,7 +1188,7 @@ export class ConversationRepository {
 
   private _mapGuestStatusSelf(conversationEntity: Conversation) {
     const conversationTeamId = conversationEntity.team_id;
-    const selfTeamId = this.teamState.team() && this.teamState.team().id;
+    const selfTeamId = this.teamState.team()?.id;
     const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
     conversationEntity.isGuest(isConversationGuest);
   }
@@ -1801,7 +1801,7 @@ export class ConversationRepository {
     );
 
     const inSelfConversation =
-      conversationId === this.conversationState.self_conversation() && this.conversationState.self_conversation().id;
+      conversationId === this.conversationState.self_conversation()?.qualifiedId;
     if (inSelfConversation) {
       const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
 
@@ -2180,7 +2180,7 @@ export class ConversationRepository {
       .then(messageEntity => this.updateMessageUserEntities(messageEntity))
       .then((messageEntity: MemberMessage) => {
         const userEntity = messageEntity.otherUser();
-        const isOutgoingRequest = userEntity && userEntity.isOutgoingRequest();
+        const isOutgoingRequest = userEntity?.isOutgoingRequest();
         if (isOutgoingRequest) {
           messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
         }
@@ -2276,7 +2276,7 @@ export class ConversationRepository {
   ): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
     const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
-    const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
+    const isPendingConnection = connectionEntity?.isIncomingRequest();
     if (isPendingConnection) {
       return Promise.resolve();
     }

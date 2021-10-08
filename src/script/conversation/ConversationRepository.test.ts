@@ -71,7 +71,7 @@ describe('ConversationRepository', () => {
     conversation_type = CONVERSATION_TYPE.REGULAR,
     connection_status = ConnectionStatus.ACCEPTED,
   ) => {
-    const conversation = new Conversation(createRandomUuid());
+    const conversation = new Conversation(createRandomUuid(), '');
     conversation.type(conversation_type);
 
     const connectionEntity = new ConnectionEntity();
@@ -652,7 +652,9 @@ describe('ConversationRepository', () => {
         const message_id = createRandomUuid();
         const sending_user_id = selfUser.id;
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
-        spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']}});
+        spyOn(Config, 'getConfig').and.returnValue({
+          FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'], ENABLE_FEDERATION: true, FEDERATION_DOMAIN: ''},
+        });
 
         const upload_start: EventRecord = {
           category: 512,
@@ -665,7 +667,7 @@ describe('ConversationRepository', () => {
           from: sending_user_id,
           id: message_id,
           primary_key: '107',
-          qualified_conversation: {domain: null, id: conversation_id},
+          qualified_conversation: {domain: '', id: conversation_id},
           status: 1,
           time: '2017-09-06T09:43:32.278Z',
           type: 'conversation.asset-add',
@@ -675,13 +677,13 @@ describe('ConversationRepository', () => {
           data: {reason: 1, status: 'upload-failed'},
           from: sending_user_id,
           id: message_id,
-          qualified_conversation: {domain: null, id: conversation_id},
+          qualified_conversation: {domain: '', id: conversation_id},
           status: 1,
           time: '2017-09-06T16:14:08.165Z',
           type: 'conversation.asset-add',
         };
 
-        return testFactory.conversation_repository['fetchConversationById']({domain: null, id: conversation_id})
+        return testFactory.conversation_repository['fetchConversationById']({domain: '', id: conversation_id})
           .then(fetched_conversation => {
             expect(fetched_conversation).toBeDefined();
             testFactory.conversation_repository['conversationState'].activeConversation(fetched_conversation);
