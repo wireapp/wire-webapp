@@ -51,8 +51,8 @@ export default class TestPage<T> {
   changeFiles = (element: ReactWrapper, files: File[]) => this.do(() => element.simulate('change', {target: {files}}));
   submit = (element: ReactWrapper) => this.do(() => element.simulate('submit'));
   mouseEnter = (element: ReactWrapper) => this.do(() => element.simulate('mouseenter'));
-  keyCodeUp = (element: ReactWrapper, keyCode: number) => this.do(() => element.simulate('keyup', {keyCode}));
-  keyCodeDown = (element: ReactWrapper, keyCode: number) => this.do(() => element.simulate('keydown', {keyCode}));
+  keyUp = (element: ReactWrapper, key: string) => this.do(() => element.simulate('keyup', {key}));
+  keyDown = (element: ReactWrapper, key: string) => this.do(() => element.simulate('keydown', {key}));
 
   update = () => this.driver.update();
   setProps = (props: T) => this.do(() => this.driver.setProps(props));
