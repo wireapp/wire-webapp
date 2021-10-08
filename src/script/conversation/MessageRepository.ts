@@ -1066,7 +1066,7 @@ export class MessageRepository {
 
       const eventInfoEntity = new EventInfoEntity(
         genericMessage,
-        this.conversationState.self_conversation().qualifiedId,
+        this.conversationState.self_conversation()?.qualifiedId,
       );
       await this.sendGenericMessageToConversation(eventInfoEntity);
       return await this.deleteMessageById(conversationEntity, messageEntity.id);
@@ -1097,7 +1097,7 @@ export class MessageRepository {
 
       const eventInfoEntity = new EventInfoEntity(
         genericMessage,
-        this.conversationState.self_conversation().qualifiedId,
+        this.conversationState.self_conversation()?.qualifiedId,
       );
       this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
         this.logger.info(`Cleared conversation '${conversationEntity.id}' on '${new Date(timestamp).toISOString()}'`);
@@ -1620,7 +1620,10 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().qualifiedId);
+    const eventInfoEntity = new EventInfoEntity(
+      genericMessage,
+      this.conversationState.self_conversation()?.qualifiedId,
+    );
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
@@ -1647,7 +1650,10 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().qualifiedId);
+    const eventInfoEntity = new EventInfoEntity(
+      genericMessage,
+      this.conversationState.self_conversation()?.qualifiedId,
+    );
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       this.logger.info(`Sent countly sync message with ID ${countlyId}`);
