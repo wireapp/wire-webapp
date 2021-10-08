@@ -1747,7 +1747,7 @@ export class ConversationRepository {
       timestamp = conversation.getLatestTimestamp(servertime);
     }
     const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
-      conversationId || conversationEntity,
+      conversationId || {domain: conversationEntity.domain, id: conversationEntity.id},
       userId,
       timestamp,
       legalHoldStatus,
