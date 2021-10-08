@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [14.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.1.0...@wireapp/api-client@14.2.0) (2021-10-08)
+
+
+### Features
+
+* **api-client:** Add the connections v2 endpoints ([#4148](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4148)) ([1cc8892](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/1cc8892a55f3fce3a0192bec9a4a90090eb816fa))
+
+
+
+
+
 # [14.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.0.1...@wireapp/api-client@14.1.0) (2021-10-06)
 
 
