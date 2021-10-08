@@ -187,14 +187,11 @@ export type ClientConversationEvent =
   | VoiceChannelActivateEvent
   | VerificationEvent;
 
-function buildQualifiedId(conversation: {domain: string; id: string} | string) {
+function buildQualifiedId(conversation: QualifiedId | string) {
   const qualifiedId = typeof conversation === 'string' ? {domain: '', id: conversation} : conversation;
   return {
     conversation: qualifiedId.id,
-    qualified_conversation: {
-      domain: qualifiedId.domain,
-      id: qualifiedId.id,
-    },
+    qualified_conversation: {domain: qualifiedId.domain, id: qualifiedId.id},
   };
 }
 

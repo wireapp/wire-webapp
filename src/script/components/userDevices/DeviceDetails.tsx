@@ -74,7 +74,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
     setFingerprintRemote(undefined);
     if (selectedClient) {
       cryptographyRepository
-        .getRemoteFingerprint({domain: user.domain, id: user.id}, selectedClient.id)
+        .getRemoteFingerprint(user.qualifiedId, selectedClient.id)
         .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
     }
   }, [selectedClient]);
@@ -82,7 +82,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
   const clickToToggleDeviceVerification = () => {
     const toggleVerified = !isVerified;
     clientRepository
-      .verifyClient({domain: user.domain, id: user.id}, selectedClient, toggleVerified)
+      .verifyClient(user.qualifiedId, selectedClient, toggleVerified)
       .catch((error: DexieError) => logger.warn(`Failed to toggle client verification: ${error.message}`));
   };
 
@@ -93,7 +93,7 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
       : {domain: conversationState.activeConversation().domain, id: conversationState.activeConversation().id};
     setIsResettingSession(true);
     messageRepository
-      .resetSession({domain: user.domain, id: user.id}, selectedClient.id, conversationId)
+      .resetSession(user.qualifiedId, selectedClient.id, conversationId)
       .then(_resetProgress)
       .catch(_resetProgress);
   };

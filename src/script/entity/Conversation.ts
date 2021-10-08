@@ -46,7 +46,6 @@ import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
 interface UnreadState {
   allEvents: Message[];

@@ -2396,7 +2396,7 @@ export class ConversationRepository {
     eventJson: Pick<ConversationMemberUpdateEvent, 'data' | 'from'>,
   ) {
     const {data: eventData, from} = eventJson;
-    const conversationId = {domain: conversationEntity.domain, id: conversationEntity.id};
+    const conversationId = conversationEntity.qualifiedId;
 
     const isConversationRoleUpdate = !!eventData.conversation_role;
     if (isConversationRoleUpdate) {
