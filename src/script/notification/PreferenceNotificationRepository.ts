@@ -26,7 +26,7 @@ import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
-import type {QualifiedIdOptional} from '../conversation/EventBuilder';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export interface Notification {
@@ -68,12 +68,12 @@ export class PreferenceNotificationRepository {
         : resetStoreValue(notificationsStorageKey);
     });
 
-    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedIdOptional, clientEntity?: ClientEntity) => {
+    amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedId, clientEntity?: ClientEntity) => {
       if (matchQualifiedIds(user, selfUserObservable())) {
         this.onClientAdd(user.id, clientEntity);
       }
     });
-    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedIdOptional, clientId?: string) => {
+    amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedId, clientId: string) => {
       if (matchQualifiedIds(user, selfUserObservable())) {
         this.onClientRemove(user.id, clientId, user.domain);
       }

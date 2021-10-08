@@ -40,7 +40,7 @@ export class ConversationState {
   public readonly conversations_unarchived: ko.ObservableArray<Conversation>;
   public readonly conversations: ko.ObservableArray<Conversation>;
   public readonly filtered_conversations: ko.PureComputed<Conversation[]>;
-  public readonly self_conversation: ko.PureComputed<Conversation>;
+  public readonly self_conversation: ko.PureComputed<Conversation | undefined>;
 
   constructor(
     private readonly userState = container.resolve(UserState),
@@ -93,7 +93,7 @@ export class ConversationState {
    * Find a local conversation by ID.
    * @returns Conversation is locally available
    */
-  findConversation(conversationId: QualifiedId): Conversation {
+  findConversation(conversationId: QualifiedId): Conversation | undefined {
     // we prevent access to local conversation if the team is deleted
     return this.teamState.isTeamDeleted()
       ? undefined

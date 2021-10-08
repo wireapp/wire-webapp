@@ -29,7 +29,7 @@ import {SystemMessageType} from '../../message/SystemMessageType';
 import {User} from '../User';
 import {SystemMessage} from './SystemMessage';
 import {Config} from '../../Config';
-import {QualifiedIdOptional} from '../../conversation/EventBuilder';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class MemberMessage extends SystemMessage {
@@ -49,7 +49,7 @@ export class MemberMessage extends SystemMessage {
   public readonly remoteUserEntities: ko.PureComputed<User[]>;
   public showServicesWarning: boolean;
   public readonly userEntities: ko.ObservableArray<User>;
-  public readonly userIds: ko.ObservableArray<QualifiedIdOptional>;
+  public readonly userIds: ko.ObservableArray<QualifiedId>;
   public memberMessageType: SystemMessageType;
   public reason: MemberLeaveReason;
 
@@ -340,7 +340,7 @@ export class MemberMessage extends SystemMessage {
     return this.isMemberLeave() || this.isTeamMemberLeave();
   }
 
-  isUserAffected(userId: QualifiedIdOptional): boolean {
+  isUserAffected(userId: QualifiedId): boolean {
     return !!this.userIds().find(user => matchQualifiedIds(user, userId));
   }
 

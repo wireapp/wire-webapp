@@ -391,7 +391,7 @@ export class MessageListViewModel {
       await this.messageRepository.resetSession(
         {domain: messageEntity.domain, id: messageEntity.from},
         messageEntity.client_id,
-        this.conversation().id,
+        this.conversation(),
       );
       resetProgress();
     } catch (error) {

@@ -261,10 +261,7 @@ export class ActionsViewModel {
             if (clearContent) {
               this.conversationRepository.clearConversation(conversationEntity, true);
             } else {
-              this.conversationRepository.removeMember(conversationEntity, {
-                domain: this.userState.self().domain,
-                id: this.userState.self().id,
-              });
+              this.conversationRepository.removeMember(conversationEntity, this.userState.self().qualifiedId);
             }
             resolve();
           },

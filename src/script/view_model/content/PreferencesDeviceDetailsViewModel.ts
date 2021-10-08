@@ -105,8 +105,11 @@ export class PreferencesDeviceDetailsViewModel {
     this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.ONGOING);
 
     try {
-      const selfConversationId = this.conversationState.self_conversation().id;
-      await this.messageRepository.resetSession(this.selfUser(), this.device().id, selfConversationId);
+      await this.messageRepository.resetSession(
+        this.selfUser(),
+        this.device().id,
+        this.conversationState.self_conversation(),
+      );
       window.setTimeout(() => {
         this.sessionResetState(PreferencesDeviceDetailsViewModel.SESSION_RESET_STATE.CONFIRMATION);
       }, MotionDuration.LONG);

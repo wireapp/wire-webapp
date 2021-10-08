@@ -19,7 +19,8 @@
 
 import axios, {AxiosError} from 'axios';
 import {Runtime} from '@wireapp/commons';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
 import type {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation/';
 import {
@@ -271,11 +272,12 @@ export class CallingRepository {
   }
 
   private async pushClients(conversationId: ConversationId): Promise<void> {
+    const qualifiedConversationId: QualifiedId = {domain: '', id: conversationId};
     try {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients = await this.messageRepository.createRecipients({domain: null, id: conversationId});
+      const localClients = await this.messageRepository.createRecipients(qualifiedConversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -310,7 +312,7 @@ export class CallingRepository {
         [GENERIC_MESSAGE_TYPE.CALLING]: new Calling({content: ''}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, qualifiedConversationId);
       eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
       await this.messageRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
 
@@ -390,7 +392,7 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.callState.activeCalls.push(call);
-    const conversation = this.conversationState.findConversation({domain: null, id: call.conversationId});
+    const conversation = this.conversationState.findConversation({domain: '', id: call.conversationId});
     if (conversation) {
       conversation.call(call);
     }
@@ -404,7 +406,7 @@ export class CallingRepository {
     if (index !== -1) {
       this.callState.activeCalls.splice(index, 1);
     }
-    const conversation = this.conversationState.findConversation({domain: null, id: call.conversationId});
+    const conversation = this.conversationState.findConversation({domain: '', id: call.conversationId});
     if (conversation) {
       conversation.call(null);
     }
@@ -508,10 +510,12 @@ export class CallingRepository {
   //##############################################################################
 
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<void> {
-    const recipients = await this.messageRepository.createRecipients({domain: null, id: conversationId}, false, [
-      userId,
-    ]);
-    const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
+    const qualifiedConversationId: QualifiedId = {
+      domain: '',
+      id: conversationId /*TODO(federation): get conversation domain*/,
+    };
+    const recipients = await this.messageRepository.createRecipients(qualifiedConversationId, false, [userId]);
+    const eventInfoEntity = new EventInfoEntity(undefined, qualifiedConversationId, {recipients});
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse
       ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
@@ -620,7 +624,7 @@ export class CallingRepository {
         const ignoreNotificationStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
         if (!activeCall || !ignoreNotificationStates.includes(activeCall.state())) {
           // we want to ignore call start events that already have an active call (whether it's ringing or connected).
-          this.injectActivateEvent(conversationId, userId, time, source);
+          this.injectActivateEvent({domain: '', id: conversationId}, userId, time, source);
         }
         break;
     }
@@ -907,13 +911,13 @@ export class CallingRepository {
     return recipients;
   }
 
-  private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
+  private injectActivateEvent(conversationId: QualifiedId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
     this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private injectDeactivateEvent(
-    conversationId: ConversationId,
+    conversationId: QualifiedId,
     userId: UserId,
     duration: number,
     reason: REASON,
@@ -975,13 +979,17 @@ export class CallingRepository {
     payload: string | Object,
     options?: MessageSendingOptions,
   ): Promise<ClientMismatch> => {
+    const qualifiedConversationId: QualifiedId = {
+      domain: '',
+      id: conversationId /*TODO(federation): get conversation domain*/,
+    };
     const protoCalling = new Calling({content: typeof payload === 'string' ? payload : JSON.stringify(payload)});
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
       messageId: createRandomUuid(),
     });
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-    return this.messageRepository.sendCallingMessage(eventInfoEntity, {domain: null, id: conversationId});
+    const eventInfoEntity = new EventInfoEntity(genericMessage, qualifiedConversationId, options);
+    return this.messageRepository.sendCallingMessage(eventInfoEntity, qualifiedConversationId);
   };
 
   private readonly sendSFTRequest = (
@@ -1029,7 +1037,7 @@ export class CallingRepository {
     }
 
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
-      const conversationEntity = this.conversationState.findConversation({domain: null, id: conversationId});
+      const conversationEntity = this.conversationState.findConversation({domain: '', id: conversationId});
       const callingEvent = EventBuilder.buildCallingTimeoutEvent(
         reason,
         conversationEntity,
@@ -1071,7 +1079,7 @@ export class CallingRepository {
 
     if (!stillActiveState.includes(reason)) {
       this.injectDeactivateEvent(
-        call.conversationId,
+        {domain: '' /*TODO(federation): get conversation domain*/, id: call.conversationId},
         call.initiator,
         call.startedAt() ? Date.now() - call.startedAt() : 0,
         reason,
@@ -1096,7 +1104,7 @@ export class CallingRepository {
     shouldRing: number,
     conversationType: CONV_TYPE,
   ) => {
-    const conversationEntity = this.conversationState.findConversation({domain: null, id: conversationId});
+    const conversationEntity = this.conversationState.findConversation({domain: '', id: conversationId});
     if (!conversationEntity) {
       return;
     }
@@ -1400,7 +1408,7 @@ export class CallingRepository {
     call: Call,
     customSegmentations: Record<string, any> = {},
   ) => {
-    const conversationEntity = this.conversationState.findConversation({domain: null, id: call.conversationId});
+    const conversationEntity = this.conversationState.findConversation({domain: '', id: call.conversationId});
     const participants = conversationEntity.participating_user_ets();
     const selfUserTeamId = call.getSelfParticipant().user.id;
     const guests = participants.filter(user => user.isGuest()).length;
