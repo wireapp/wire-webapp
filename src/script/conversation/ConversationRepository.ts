@@ -2391,10 +2391,10 @@ export class ConversationRepository {
    */
   private onMemberUpdate(
     conversationEntity: Conversation,
-    eventJson: Pick<ConversationMemberUpdateEvent, 'data' | 'from'>,
+    eventJson: Pick<ConversationMemberUpdateEvent, 'data' | 'from'> & {conversation?: string},
   ) {
-    const {data: eventData, from} = eventJson;
-    const conversationId = conversationEntity.qualifiedId;
+    const {conversation, data: eventData, from} = eventJson;
+    const conversationId = {domain: '', id: conversation || '' /* TODO(federation) add domain on the sender side */};
 
     const isConversationRoleUpdate = !!eventData.conversation_role;
     if (isConversationRoleUpdate) {
@@ -2414,7 +2414,7 @@ export class ConversationRepository {
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
     const selfConversation = this.conversationState.self_conversation();
     const inSelfConversation = selfConversation && matchQualifiedIds(selfConversation, conversationId);
-    if (!inSelfConversation && conversationId && !isBackendEvent) {
+    if (!inSelfConversation && conversation && !isBackendEvent) {
       throw new ConversationError(
         ConversationError.TYPE.WRONG_CONVERSATION,
         ConversationError.MESSAGE.WRONG_CONVERSATION,
