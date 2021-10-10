@@ -949,13 +949,9 @@ export class ConversationRepository {
       return this.createGroupConversation([userEntity]);
     }
 
-    if (!userEntity.isOnSameFederatedDomain()) {
-      return this.createGroupConversation([userEntity], `${userEntity.name()} & ${this.userState.self().name()}`);
-    }
-
     const conversationId = userEntity.connection().conversationId;
     try {
-      const conversationEntity = await this.getConversationById({domain: '', id: conversationId});
+      const conversationEntity = await this.getConversationById(conversationId);
       conversationEntity.connection(userEntity.connection());
       this.updateParticipatingUserEntities(conversationEntity);
       return conversationEntity;
