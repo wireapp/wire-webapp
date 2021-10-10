@@ -46,6 +46,7 @@ import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 interface UnreadState {
   allEvents: Message[];
@@ -218,9 +219,8 @@ export class Conversation {
     this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
-      // TODO(Federation): Check for domain once backend supports federated connections
-      if (connectedUserId && this.participating_user_ids().every(user => user.id !== connectedUserId)) {
-        this.participating_user_ids.push({domain: '', id: connectedUserId});
+      if (connectedUserId && this.participating_user_ids().every(user => !matchQualifiedIds(user, connectedUserId))) {
+        this.participating_user_ids.push(connectedUserId);
       }
     });
 

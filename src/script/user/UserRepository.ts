@@ -268,10 +268,10 @@ export class UserRepository {
    */
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     // TODO(Federation): Include domain as soon as connections to federated backends are supported.
-    const userIds = connectionEntities.map(connectionEntity => ({domain: '', id: connectionEntity.userId}));
+    const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
-      const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
+      const connectionEntity = connectionEntities.find(({userId}) => matchQualifiedIds(userId, userEntity));
       userEntity.connection(connectionEntity);
     });
     return this.assignAllClients();

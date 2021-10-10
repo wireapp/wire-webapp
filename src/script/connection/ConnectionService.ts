@@ -78,4 +78,14 @@ export class ConnectionService {
       status,
     });
   }
+
+  putFederatedConnections(userId: QualifiedId, status: ConnectionStatus): Promise<Connection> {
+    return this.apiClient.connection.api.putConnection(
+      userId,
+      {
+        status,
+      },
+      true,
+    );
+  }
 }

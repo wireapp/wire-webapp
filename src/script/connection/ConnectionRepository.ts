@@ -40,6 +40,8 @@ import type {ConnectionService} from './ConnectionService';
 import {ConnectionState} from './ConnectionState';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -214,9 +216,11 @@ export class ConnectionRepository {
    * @param conversationId Conversation ID
    * @returns User connection entity
    */
-  getConnectionByConversationId(conversationId: string): ConnectionEntity {
+  getConnectionByConversationId(conversationId: QualifiedId): ConnectionEntity {
     const connectionEntities = Object.values(this.connectionState.connectionEntities());
-    return connectionEntities.find(connectionEntity => connectionEntity.conversationId === conversationId);
+    return connectionEntities.find(connectionEntity =>
+      matchQualifiedIds(connectionEntity.conversationId, conversationId),
+    );
   }
 
   /**
@@ -259,7 +263,7 @@ export class ConnectionRepository {
   }
 
   addConnectionEntity(connectionEntity: ConnectionEntity): void {
-    this.connectionState.connectionEntities()[connectionEntity.userId] = connectionEntity;
+    this.connectionState.connectionEntities()[connectionEntity.userId.id] = connectionEntity;
   }
 
   /**
@@ -269,7 +273,7 @@ export class ConnectionRepository {
   private async attachConnectionToUser(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
     this.addConnectionEntity(connectionEntity);
     // TODO(Federation): Update code once connections are implemented on the backend
-    const userEntity = await this.userRepository.getUserById({domain: '', id: connectionEntity.userId});
+    const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
     return userEntity.connection(connectionEntity);
   }
 
@@ -279,7 +283,7 @@ export class ConnectionRepository {
    */
   private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
     const updatedConnections = connectionEntities.reduce((allConnections, connectionEntity) => {
-      allConnections[connectionEntity.userId] = connectionEntity;
+      allConnections[connectionEntity.userId.id] = connectionEntity;
       return allConnections;
     }, this.connectionState.connectionEntities());
     this.connectionState.connectionEntities(updatedConnections);
@@ -295,8 +299,11 @@ export class ConnectionRepository {
    */
   private async updateStatus(userEntity: User, newStatus: ConnectionStatus): Promise<void> {
     const currentStatus = userEntity.connection().status();
+    const isFederated = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
     try {
-      const response = await this.connectionService.putConnections(userEntity.id, newStatus);
+      const response = isFederated
+        ? await this.connectionService.putFederatedConnections(userEntity.qualifiedId, newStatus)
+        : await this.connectionService.putConnections(userEntity.id, newStatus);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {
@@ -330,7 +337,7 @@ export class ConnectionRepository {
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
       // TODO(Federation): Update code once connections are implemented on the backend
-      const userEntity = await this.userRepository.getUserById({domain: '', id: connectionEntity.userId});
+      const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
       const messageEntity = new MemberMessage();
       messageEntity.user(userEntity);
 

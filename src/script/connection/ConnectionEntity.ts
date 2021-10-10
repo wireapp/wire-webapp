@@ -18,10 +18,11 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import ko from 'knockout';
 
 export class ConnectionEntity {
-  conversationId: string;
+  conversationId: QualifiedId;
   from: string;
   isBlocked: ko.PureComputed<boolean>;
   isCanceled: ko.PureComputed<boolean>;
@@ -35,7 +36,7 @@ export class ConnectionEntity {
   lastUpdate: string;
   message: string;
   status: ko.Observable<ConnectionStatus>;
-  userId: string;
+  userId: QualifiedId;
 
   constructor() {
     this.conversationId = null;

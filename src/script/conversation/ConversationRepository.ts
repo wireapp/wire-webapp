@@ -1094,7 +1094,7 @@ export class ConversationRepository {
    * @returns Resolves when connection was mapped return value
    */
   private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
-    const qualifiedId: QualifiedId = {domain: '', id: connectionEntity.conversationId};
+    const qualifiedId: QualifiedId = connectionEntity.conversationId;
     return Promise.resolve(this.conversationState.findConversation(qualifiedId))
       .then(conversationEntity => {
         if (!conversationEntity) {
