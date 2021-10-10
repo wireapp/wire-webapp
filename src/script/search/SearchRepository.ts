@@ -25,7 +25,7 @@ import {validateHandle} from '../user/UserHandleGenerator';
 import type {SearchService} from './SearchService';
 import type {UserRepository} from '../user/UserRepository';
 import type {User} from '../entity/User';
-import type {QualifiedIdOptional} from '../conversation/EventBuilder';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class SearchRepository {
@@ -169,11 +169,11 @@ export class SearchRepository {
     isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
   ): Promise<User[]> {
-    const matchedUserIdsFromDirectorySearch: QualifiedIdOptional[] = await this.searchService
+    const matchedUserIdsFromDirectorySearch: QualifiedId[] = await this.searchService
       .getContacts(query, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
       .then(({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || null, id: match.id})));
 
-    const userIds: QualifiedIdOptional[] = [...matchedUserIdsFromDirectorySearch];
+    const userIds: QualifiedId[] = [...matchedUserIdsFromDirectorySearch];
     const userEntities = await this.userRepository.getUsersById(userIds);
 
     const domain = query.includes('@') ? query.substr(query.lastIndexOf('@') + 1) : undefined;
@@ -183,7 +183,7 @@ export class SearchRepository {
       const apiUser = await this.userRepository.getUserByHandle({domain, handle: name});
       if (apiUser) {
         const knownUser = userEntities.find(user =>
-          matchQualifiedIds(user, apiUser.qualified_id || {domain: null, id: apiUser.id}),
+          matchQualifiedIds(user, apiUser.qualified_id || {domain: '', id: apiUser.id}),
         );
         if (!knownUser) {
           const matchedUser = this.userRepository.userMapper.mapUserFromJson(apiUser);

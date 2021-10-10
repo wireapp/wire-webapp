@@ -52,11 +52,11 @@ export interface EventRecord<T = any> {
   from_client_id?: string;
   id?: string;
   mentions?: string[];
-  qualified_conversation?: QualifiedId;
   message?: string;
   previews?: string[];
   /** Only used with IndexedDB table 'event' */
   primary_key?: string;
+  qualified_conversation?: QualifiedId;
   reactions?: UserReactionMap;
   read_receipts?: ReadReceipt[];
   selected_button_id?: string;

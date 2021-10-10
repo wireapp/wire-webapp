@@ -21,6 +21,7 @@ import ko from 'knockout';
 import type {AxiosError} from 'axios';
 import {amplify} from 'amplify';
 import {error as StoreEngineError} from '@wireapp/store-engine';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
@@ -266,7 +267,7 @@ export class CryptographyRepository {
    * @param event Backend event to decrypt
    * @returns Resolves with decrypted and mapped message
    */
-  async handleEncryptedEvent(event: EventRecord) {
+  async handleEncryptedEvent(event: ConversationOtrMessageAddEvent & {id?: string}) {
     const {data: eventData, from: userId, id} = event;
 
     if (!eventData) {
@@ -349,7 +350,7 @@ export class CryptographyRepository {
           messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
             // TODO(Federation): Update code once federated messages are sent with '@wireapp/core'
-            const sessionId = constructClientPrimaryKey({domain: null, id: userId}, clientId);
+            const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
 
             accumulator.push(encryptionPromise);
@@ -381,7 +382,7 @@ export class CryptographyRepository {
         for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
           if (preKeyPayload) {
             // TODO(Federation): Update code once connections are implemented on the backend
-            const sessionId = constructClientPrimaryKey({domain: null, id: userId}, clientId);
+            const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
             const encryptionPromise = this.encryptPayloadForSession(
               sessionId,
               genericMessage,
@@ -442,7 +443,7 @@ export class CryptographyRepository {
     const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
     // TODO(Federation): Update code once messages from remote backends are received
-    const sessionId = constructClientPrimaryKey({domain: null, id: userId}, eventData.sender);
+    const sessionId = constructClientPrimaryKey({domain: '', id: userId}, eventData.sender);
 
     const plaintext = await this.cryptobox.decrypt(sessionId, cipherText);
     return GenericMessage.decode(plaintext);

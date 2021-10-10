@@ -41,7 +41,7 @@ interface DatabaseListener {
   type: DEXIE_CRUD_EVENT;
 }
 
-export type DatabaseListenerCallback = (changes: {obj: Object; oldObj: Object}) => void;
+export type DatabaseListenerCallback = (changes: {obj: any; oldObj: any}) => void;
 
 enum DEXIE_CRUD_EVENT {
   DELETING = 'deleting',

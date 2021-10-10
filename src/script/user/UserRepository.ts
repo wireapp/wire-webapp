@@ -73,7 +73,6 @@ import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
-import {QualifiedIdOptional} from '../conversation/EventBuilder';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -269,7 +268,7 @@ export class UserRepository {
    */
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     // TODO(Federation): Include domain as soon as connections to federated backends are supported.
-    const userIds = connectionEntities.map(connectionEntity => ({domain: null, id: connectionEntity.userId}));
+    const userIds = connectionEntities.map(connectionEntity => ({domain: '', id: connectionEntity.userId}));
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
       const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
@@ -284,7 +283,7 @@ export class UserRepository {
    */
   private async assignAllClients(): Promise<User[]> {
     const recipients = await this.clientRepository.getAllClientsFromDb();
-    const userIds: QualifiedIdOptional[] = Object.entries(recipients).map(([userId, clientEntities]) => {
+    const userIds: QualifiedId[] = Object.entries(recipients).map(([userId, clientEntities]) => {
       return {
         domain: clientEntities[0].domain,
         id: userId,
@@ -422,7 +421,7 @@ export class UserRepository {
     } = eventJson;
 
     const fingerprint = await this.clientRepository.cryptographyRepository.getRemoteFingerprint(
-      {domain: null, id: userId},
+      {domain: '', id: userId},
       clientId,
       last_prekey,
     );
@@ -582,7 +581,7 @@ export class UserRepository {
   /**
    * Check for users locally and fetch them from the server otherwise.
    */
-  async getUsersById(userIds: QualifiedIdOptional[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: QualifiedId[] = [], offline: boolean = false): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
@@ -590,7 +589,7 @@ export class UserRepository {
     const allUsers = await Promise.all(userIds.map(userId => this.findUserById(userId) || userId));
     const [knownUserEntities, unknownUserIds] = partition(allUsers, item => item instanceof User) as [
       User[],
-      QualifiedIdOptional[],
+      QualifiedId[],
     ];
 
     if (offline || !unknownUserIds.length) {

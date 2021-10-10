@@ -340,6 +340,7 @@ export class ConversationService {
       payload.report_missing = reportMissing;
     }
 
+    // TODO(federation): add domain in the postOTRMessage (?)
     return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
   }
 
@@ -408,7 +409,7 @@ export class ConversationService {
 
     return Object.keys(conversations)
       .sort((id_a, id_b) => conversations[id_b] - conversations[id_a])
-      .map(id => ({domain: null, id}));
+      .map(id => ({domain: '', id}));
   }
 
   /**

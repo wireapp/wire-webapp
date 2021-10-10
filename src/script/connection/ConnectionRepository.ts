@@ -269,7 +269,7 @@ export class ConnectionRepository {
   private async attachConnectionToUser(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
     this.addConnectionEntity(connectionEntity);
     // TODO(Federation): Update code once connections are implemented on the backend
-    const userEntity = await this.userRepository.getUserById({domain: null, id: connectionEntity.userId});
+    const userEntity = await this.userRepository.getUserById({domain: '', id: connectionEntity.userId});
     return userEntity.connection(connectionEntity);
   }
 
@@ -330,7 +330,7 @@ export class ConnectionRepository {
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
       // TODO(Federation): Update code once connections are implemented on the backend
-      const userEntity = await this.userRepository.getUserById({domain: null, id: connectionEntity.userId});
+      const userEntity = await this.userRepository.getUserById({domain: '', id: connectionEntity.userId});
       const messageEntity = new MemberMessage();
       messageEntity.user(userEntity);
 

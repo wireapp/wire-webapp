@@ -229,8 +229,8 @@ export class ConversationMapper {
     const participatingUserIds =
       qualified_others ||
       (members?.others
-        ? members.others.map(other => ({domain: other.qualified_id?.domain || null, id: other.id}))
-        : others.map(userId => ({domain: null, id: userId})));
+        ? members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}))
+        : others.map(userId => ({domain: '', id: userId})));
 
     conversationEntity.participating_user_ids(participatingUserIds);
 
@@ -265,7 +265,7 @@ export class ConversationMapper {
     return remoteConversations.map(
       (remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
         const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
-          domain: null,
+          domain: '',
           id: remoteConversationData.id,
         };
         const localConversationData =

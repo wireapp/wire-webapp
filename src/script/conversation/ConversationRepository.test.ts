@@ -555,7 +555,7 @@ describe('ConversationRepository', () => {
           conversationEntity,
           [
             {
-              domain: null,
+              domain: '',
               id: event.from,
             },
           ],
@@ -866,7 +866,7 @@ describe('ConversationRepository', () => {
           },
           from: createRandomUuid(),
           id: createRandomUuid(),
-          qualified_conversation: {domain: null, id: conversation_et.id},
+          qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
@@ -895,7 +895,7 @@ describe('ConversationRepository', () => {
           },
           from: selfUser.id,
           id: createRandomUuid(),
-          qualified_conversation: {domain: null, id: conversation_et.id},
+          qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
@@ -924,7 +924,7 @@ describe('ConversationRepository', () => {
           },
           from: other_user_id,
           id: createRandomUuid(),
-          qualified_conversation: {domain: null, id: conversation_et.id},
+          qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
@@ -954,7 +954,7 @@ describe('ConversationRepository', () => {
           },
           from: other_user_id,
           id: createRandomUuid(),
-          qualified_conversation: {domain: null, id: conversation_et.id},
+          qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_DELETE,
         };
@@ -995,7 +995,7 @@ describe('ConversationRepository', () => {
           },
           from: createRandomUuid(),
           id: createRandomUuid(),
-          qualified_conversation: {domain: null, id: conversation_et.id},
+          qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
@@ -1023,7 +1023,7 @@ describe('ConversationRepository', () => {
           },
           from: selfUser.id,
           id: createRandomUuid(),
-          qualified_conversation: {domain: null, id: conversation_et.id},
+          qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
@@ -1048,7 +1048,7 @@ describe('ConversationRepository', () => {
           },
           from: selfUser.id,
           id: createRandomUuid(),
-          qualified_conversation: {domain: null, id: conversation_et.id},
+          qualified_conversation: {domain: '', id: conversation_et.id},
           time: new Date().toISOString(),
           type: ClientEvent.CONVERSATION.MESSAGE_HIDDEN,
         };
@@ -1080,7 +1080,7 @@ describe('ConversationRepository', () => {
         conversationRepository['deleteLocalMessageEntity']({oldObj: deletedMessagePayload} as any);
 
         expect(conversationRepository['conversationState'].findConversation).toHaveBeenCalledWith({
-          domain: null,
+          domain: '',
           id: deletedMessagePayload.conversation,
         });
         expect(conversationEntity.removeMessageById).toHaveBeenCalledWith(deletedMessagePayload.id);
@@ -1106,14 +1106,14 @@ describe('ConversationRepository', () => {
       spyOn(conversationRepository['teamState'], 'isTeamDeleted').and.returnValue(false);
       conversationIds.forEach(conversationId => {
         expect(
-          conversationRepository['conversationState'].findConversation({domain: null, id: conversationId}),
+          conversationRepository['conversationState'].findConversation({domain: '', id: conversationId}),
         ).toBeDefined();
       });
 
       (conversationRepository['teamState'].isTeamDeleted as any).and.returnValue(true);
       conversationIds.forEach(conversationId => {
         expect(
-          conversationRepository['conversationState'].findConversation({domain: null, id: conversationId}),
+          conversationRepository['conversationState'].findConversation({domain: '', id: conversationId}),
         ).not.toBeDefined();
       });
     });
@@ -1121,7 +1121,7 @@ describe('ConversationRepository', () => {
     it('returns the conversation if present in the local conversations', () => {
       conversationIds.forEach(conversationId => {
         expect(
-          conversationRepository['conversationState'].findConversation({domain: null, id: conversationId}),
+          conversationRepository['conversationState'].findConversation({domain: '', id: conversationId}),
         ).toBeDefined();
       });
 
@@ -1131,7 +1131,7 @@ describe('ConversationRepository', () => {
       ];
       inexistentConversationIds.forEach(conversationId => {
         expect(
-          conversationRepository['conversationState'].findConversation({domain: null, id: conversationId}),
+          conversationRepository['conversationState'].findConversation({domain: '', id: conversationId}),
         ).not.toBeDefined();
       });
     });
@@ -1205,7 +1205,7 @@ describe('ConversationRepository', () => {
     it('should know all users participating in a conversation (including the self user)', () => {
       const [, users] = testFactory.conversation_repository['conversationState'].conversations();
       return testFactory.conversation_repository
-        .getAllUsersInConversation({domain: null, id: users.id})
+        .getAllUsersInConversation({domain: '', id: users.id})
         .then(user_ets => {
           expect(user_ets.length).toBe(3);
           expect(testFactory.conversation_repository['conversationState'].conversations().length).toBe(4);
@@ -1216,7 +1216,7 @@ describe('ConversationRepository', () => {
       const [, dudes] = testFactory.conversation_repository['conversationState'].conversations();
       const user_ets = dudes.participating_user_ets();
 
-      return testFactory.message_repository.createRecipients({domain: null, id: dudes.id}).then(recipients => {
+      return testFactory.message_repository.createRecipients({domain: '', id: dudes.id}).then(recipients => {
         expect(Object.keys(recipients).length).toBe(2);
         expect(recipients[bob.id].length).toBe(2);
         expect(recipients[john.id].length).toBe(1);
@@ -1233,7 +1233,7 @@ describe('ConversationRepository', () => {
       spyOn(EventBuilder, 'buildMemberJoin').and.returnValue(event);
 
       return testFactory.conversation_repository
-        .addMissingMember({id: conversationId} as Conversation, [{domain: null, id: 'unknown-user-id'}], 0)
+        .addMissingMember({id: conversationId} as Conversation, [{domain: '', id: 'unknown-user-id'}], 0)
         .then(() => {
           expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(event, EventRepository.SOURCE.INJECTED);
         });
