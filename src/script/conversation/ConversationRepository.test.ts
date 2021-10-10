@@ -653,7 +653,7 @@ describe('ConversationRepository', () => {
         const sending_user_id = selfUser.id;
         spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
         spyOn(Config, 'getConfig').and.returnValue({
-          FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*'], ENABLE_FEDERATION: true, FEDERATION_DOMAIN: ''},
+          FEATURE: {ALLOWED_FILE_UPLOAD_EXTENSIONS: ['*']},
         });
 
         const upload_start: EventRecord = {
