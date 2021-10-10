@@ -213,9 +213,9 @@ export class ConversationAPI {
     useFederation: boolean = false,
   ): Promise<Conversation> {
     if (useFederation) {
-      return this.getConversation_v1(conversationId as string);
+      return this.getConversation_v2(conversationId as QualifiedId);
     }
-    return this.getConversation_v2(conversationId as QualifiedId);
+    return this.getConversation_v1(conversationId as string);
   }
 
   /**
