@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [14.2.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.2.0...@wireapp/api-client@14.2.1) (2021-10-10)
+
+
+### Bug Fixes
+
+* **api-client:** Fix getting conversation in federated env ([#4149](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4149)) ([66c1f7c](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/66c1f7cdbc0e479772b7680b2534fcaf9c904b52))
+
+
+
+
+
 # [14.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.1.0...@wireapp/api-client@14.2.0) (2021-10-08)
 
 
