@@ -2269,7 +2269,7 @@ export class ConversationRepository {
     eventJson: ConversationMemberJoinEvent,
   ): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
-    const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
+    const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.qualifiedId);
     const isPendingConnection = connectionEntity?.isIncomingRequest();
     if (isPendingConnection) {
       return Promise.resolve();

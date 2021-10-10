@@ -75,7 +75,7 @@ describe('ConversationRepository', () => {
     conversation.type(conversation_type);
 
     const connectionEntity = new ConnectionEntity();
-    connectionEntity.conversationId = conversation.id;
+    connectionEntity.conversationId = conversation.qualifiedId;
     connectionEntity.status(connection_status);
     conversation.connection(connectionEntity);
 
@@ -461,7 +461,7 @@ describe('ConversationRepository', () => {
 
     beforeEach(() => {
       connectionEntity = new ConnectionEntity();
-      connectionEntity.conversationId = conversation_et.id;
+      connectionEntity.conversationId = conversation_et.qualifiedId;
 
       const conversation_payload = {
         creator: conversation_et.id,
@@ -825,7 +825,7 @@ describe('ConversationRepository', () => {
         const selfUser = UserGenerator.getRandomUser();
         // conversation has a corresponding pending connection
         const connectionEntity = new ConnectionEntity();
-        connectionEntity.conversationId = conversation_et.id;
+        connectionEntity.conversationId = conversation_et.qualifiedId;
         connectionEntity.status(ConnectionStatus.PENDING);
         testFactory.connection_repository.addConnectionEntity(connectionEntity);
 

@@ -73,7 +73,7 @@ describe('MessageRepository', () => {
     conversation.type(conversation_type);
 
     const connectionEntity = new ConnectionEntity();
-    connectionEntity.conversationId = conversation.id;
+    connectionEntity.conversationId = conversation.qualifiedId;
     connectionEntity.status(connection_status);
     conversation.connection(connectionEntity);
     conversation.legalHoldStatus(LegalHoldStatus.DISABLED);
