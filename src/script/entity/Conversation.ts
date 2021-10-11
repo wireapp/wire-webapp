@@ -82,7 +82,7 @@ export class Conversation {
   public hasCreationMessage: boolean;
   public needsLegalHoldApproval: boolean = false;
   public readonly accessCode: ko.Observable<string>;
-  public readonly accessState: ko.Observable<string>;
+  public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
   public readonly availabilityOfUser: ko.PureComputed<Availability.Type>;
   public readonly call: ko.Observable<Call>;
@@ -161,7 +161,7 @@ export class Conversation {
 
     this.logger = getLogger(`Conversation (${this.id})`);
 
-    this.accessState = ko.observable(ACCESS_STATE.UNKNOWN);
+    this.accessState = ko.observable(ACCESS_STATE.OTHER.UNKNOWN);
     this.accessCode = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();

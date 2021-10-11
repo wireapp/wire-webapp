@@ -297,6 +297,10 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
+  saveConversation = async (conversation: Conversation): Promise<Conversation> => {
+    return this.conversationRepository.saveConversation(conversation);
+  };
+
   getOrCreate1to1Conversation = async (userEntity: User): Promise<Conversation> => {
     const conversationEntity = await this.conversationRepository.get1To1Conversation(userEntity);
     if (conversationEntity) {

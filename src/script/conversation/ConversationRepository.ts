@@ -1189,11 +1189,13 @@ export class ConversationRepository {
   }
 
   /**
-   * Save a conversation in the repository.
+   * Save a conversation in the repository and in the database.
+   * Will resolve with local conversation entity and do nothing if conversation already exists in state
+   *
    * @param conversationEntity Conversation to be saved in the repository
    * @returns Resolves when conversation was saved
    */
-  private saveConversation(conversationEntity: Conversation) {
+  saveConversation(conversationEntity: Conversation) {
     const localEntity = this.conversationState.findConversation(conversationEntity);
     if (!localEntity) {
       this.conversationState.conversations.push(conversationEntity);
