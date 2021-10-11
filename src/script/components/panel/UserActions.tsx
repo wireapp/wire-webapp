@@ -161,9 +161,11 @@ const UserActions: React.FC<UserActionsProps> = ({
     isNotConnectedUser &&
     canConnect && {
       click: async () => {
-        await actionsViewModel.sendConnectionRequest(user);
-        await create1to1Conversation(user, !conversation);
-        onAction(Actions.SEND_REQUEST);
+        const connectionIsSent = await actionsViewModel.sendConnectionRequest(user);
+        if (connectionIsSent) {
+          await create1to1Conversation(user, !conversation);
+          onAction(Actions.SEND_REQUEST);
+        }
       },
       icon: 'plus-icon',
       identifier: ActionIdentifier[Actions.SEND_REQUEST],
