@@ -36,10 +36,16 @@ export class ConnectionAPI {
    * @param userId The ID of the other user
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/connection
    */
-  public async getConnection(userId: string): Promise<Connection> {
+  public async getConnection(userId: QualifiedId, useFederation: true): Promise<Connection>;
+  public async getConnection(userId: string, useFederation?: false): Promise<Connection>;
+  public async getConnection(userId: string | QualifiedId, useFederation: boolean = false): Promise<Connection> {
+    const url =
+      typeof userId !== 'string' && useFederation
+        ? `${ConnectionAPI.URL.CONNECTIONS}/${userId.domain}/${userId}`
+        : `${ConnectionAPI.URL.CONNECTIONS}/${userId}`;
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${ConnectionAPI.URL.CONNECTIONS}/${userId}`,
+      url,
     };
 
     const response = await this.client.sendJSON<Connection>(config);
@@ -112,7 +118,7 @@ export class ConnectionAPI {
    * @param connectionRequestData: The connection request
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/createConnection
    */
-  async postConnection_v1(connectionRequestData: ConnectionRequest): Promise<Connection> {
+  private async postConnection_v1(connectionRequestData: ConnectionRequest): Promise<Connection> {
     const config: AxiosRequestConfig = {
       data: connectionRequestData,
       method: 'post',
@@ -138,7 +144,7 @@ export class ConnectionAPI {
    * @param qualifiedUserId: The qualified id of the user we want to connect to
    * @see https://nginz-https.anta.wire.link/api/swagger-ui/#/default/post_connections__uid_domain___uid
    */
-  async postConnection_v2({id, domain}: QualifiedId): Promise<Connection> {
+  private async postConnection_v2({id, domain}: QualifiedId): Promise<Connection> {
     const config: AxiosRequestConfig = {
       method: 'post',
       url: `${ConnectionAPI.URL.CONNECTIONS}/${domain}/${id}`,
@@ -160,15 +166,31 @@ export class ConnectionAPI {
   /**
    * Update a connection.
    * Note: You can have no more than 1000 connections in accepted or sent state.
-   * @param userId The ID of the other user
+   * @param userId The ID of the other user (qualified or not)
    * @param updatedConnection: The updated connection
+   * @param useFederation: whether the backend supports federation or not (in which case a QualifiedId must be provided)
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/updateConnection
    */
-  public async putConnection(userId: string, updatedConnection: ConnectionUpdate): Promise<Connection> {
+  public async putConnection(userId: string, updatedConnection: ConnectionUpdate): Promise<Connection>;
+  public async putConnection(
+    userId: QualifiedId,
+    updatedConnection: ConnectionUpdate,
+    useFederation: true,
+  ): Promise<Connection>;
+  public async putConnection(
+    userId: string | QualifiedId,
+    updatedConnection: ConnectionUpdate,
+    useFederation: boolean = false,
+  ): Promise<Connection> {
+    const url =
+      useFederation && typeof userId !== 'string'
+        ? `${ConnectionAPI.URL.CONNECTIONS}/${userId.domain}/${userId.id}`
+        : `${ConnectionAPI.URL.CONNECTIONS}/${userId}`;
+
     const config: AxiosRequestConfig = {
       data: updatedConnection,
       method: 'put',
-      url: `${ConnectionAPI.URL.CONNECTIONS}/${userId}`,
+      url,
     };
 
     const response = await this.client.sendJSON<Connection>(config);

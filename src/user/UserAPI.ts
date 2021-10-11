@@ -138,16 +138,34 @@ export class UserAPI {
    * @param clientId The client ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserClient
    */
-  public async getClient(userId: string, clientId: string): Promise<PublicClient> {
+  public async getClient(userId: string, clientId: string, useFederation?: false): Promise<PublicClient>;
+  public async getClient(userId: QualifiedId, clientId: string, useFederation: true): Promise<PublicClient>;
+  public async getClient(
+    userId: string | QualifiedId,
+    clientId: string,
+    useFederation: boolean = false,
+  ): Promise<PublicClient> {
+    const url =
+      useFederation && typeof userId !== 'string'
+        ? `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}/${clientId}`
+        : `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.CLIENTS}/${clientId}`;
+
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.CLIENTS}/${clientId}`,
+      url,
     };
 
     const response = await this.client.sendJSON<PublicClient>(config);
     return response.data;
   }
 
+  /**
+   * Get a prekey for a specific client of a user.
+   * @param userId The user ID
+   * @param clientId The client ID
+   * @param useFederation Whether the backend supports federation (in which case userId must be a QualifiedId)
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
+   */
   public async getClientPreKey(userId: string, clientId: string, useFederation?: false): Promise<ClientPreKey>;
   public async getClientPreKey(userId: QualifiedId, clientId: string, useFederation: true): Promise<ClientPreKey>;
   public async getClientPreKey(
@@ -155,19 +173,13 @@ export class UserAPI {
     clientId: string,
     useFederation: boolean = false,
   ): Promise<ClientPreKey> {
-    if (useFederation) {
-      return this.getClientPreKey_v2(userId as QualifiedId, clientId);
+    if (useFederation && typeof userId !== 'string') {
+      return this.getClientPreKey_v2(userId, clientId);
     }
     return this.getClientPreKey_v1(userId as string, clientId);
   }
 
-  /**
-   * Get a prekey for a specific client of a user.
-   * @param userId The user ID
-   * @param clientId The client ID
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getPrekey
-   */
-  async getClientPreKey_v1(userId: string, clientId: string): Promise<ClientPreKey> {
+  private async getClientPreKey_v1(userId: string, clientId: string): Promise<ClientPreKey> {
     const url = `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
     const config: AxiosRequestConfig = {
       method: 'get',
@@ -178,7 +190,7 @@ export class UserAPI {
     return response.data;
   }
 
-  async getClientPreKey_v2(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
+  private async getClientPreKey_v2(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
     const {id, domain} = userId;
     const url = `${UserAPI.URL.USERS}/${domain}/${id}/${UserAPI.URL.PRE_KEYS}/${clientId}`;
     const config: AxiosRequestConfig = {
@@ -195,10 +207,17 @@ export class UserAPI {
    * @param userId The user ID
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getUserClients
    */
-  public async getClients(userId: string): Promise<PublicClient[]> {
+  public async getClients(userId: string, useFederation?: false): Promise<PublicClient[]>;
+  public async getClients(userId: QualifiedId, useFederation: true): Promise<PublicClient[]>;
+  public async getClients(userId: string | QualifiedId, useFederation: boolean = false): Promise<PublicClient[]> {
+    const url =
+      useFederation && typeof userId !== 'string'
+        ? `${UserAPI.URL.USERS}/${userId.domain}/${userId.id}/${UserAPI.URL.CLIENTS}`
+        : `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.CLIENTS}`;
+
     const config: AxiosRequestConfig = {
       method: 'get',
-      url: `${UserAPI.URL.USERS}/${userId}/${UserAPI.URL.CLIENTS}`,
+      url,
     };
 
     const response = await this.client.sendJSON<PublicClient[]>(config);
