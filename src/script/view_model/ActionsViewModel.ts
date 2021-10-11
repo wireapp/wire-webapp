@@ -369,9 +369,9 @@ export class ActionsViewModel {
 
   /**
    * @param userEntity User to connect to
-   * @returns Resolves when the connection request was successfully created
+   * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  readonly sendConnectionRequest = (userEntity: User): Promise<void> => {
+  readonly sendConnectionRequest = (userEntity: User): Promise<boolean> => {
     return this.connectionRepository.createConnection(userEntity);
   };
 
