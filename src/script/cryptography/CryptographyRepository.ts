@@ -439,11 +439,13 @@ export class CryptographyRepository {
    * @returns Resolves with the decrypted message in ProtocolBuffer format
    */
   private async decryptEvent(event: EventRecord): Promise<GenericMessage> {
-    const {data: eventData, from: userId} = event;
+    const config = Config.getConfig().FEATURE;
+    const isFederatedEnv = config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+    const {data: eventData, from, qualified_from} = event;
+    const userId = isFederatedEnv ? qualified_from : {domain: '', id: from};
     const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
-    // TODO(Federation): Update code once messages from remote backends are received
-    const sessionId = constructClientPrimaryKey({domain: '', id: userId}, eventData.sender);
+    const sessionId = constructClientPrimaryKey(userId, eventData.sender);
 
     const plaintext = await this.cryptobox.decrypt(sessionId, cipherText);
     return GenericMessage.decode(plaintext);

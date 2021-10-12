@@ -57,6 +57,7 @@ export interface EventRecord<T = any> {
   /** Only used with IndexedDB table 'event' */
   primary_key?: string;
   qualified_conversation?: QualifiedId;
+  qualified_from: QualifiedId;
   reactions?: UserReactionMap;
   read_receipts?: ReadReceipt[];
   selected_button_id?: string;
