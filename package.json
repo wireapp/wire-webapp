@@ -2,7 +2,7 @@
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "7.2.91",
-    "@wireapp/core": "17.16.10",
+    "@wireapp/core": "17.17.4",
     "@wireapp/react-ui-kit": "7.54.0",
     "@wireapp/store-engine-dexie": "1.6.7",
     "@wireapp/store-engine-sqleet": "1.7.11",
@@ -78,7 +78,7 @@
     "@types/markdown-it": "12.2.3",
     "@types/open-graph": "0.2.2",
     "@types/platform": "1.3.4",
-    "@types/react": "17.0.27",
+    "@types/react": "17.0.28",
     "@types/react-dom": "17.0.9",
     "@types/react-redux": "7.1.19",
     "@types/react-router": "5.1.17",
