@@ -21,6 +21,7 @@ import type {ClientPreKey, PreKey} from '@wireapp/api-client/src/auth/';
 import type {UserClients} from '@wireapp/api-client/src/conversation/';
 import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {container} from 'tsyringe';
+import {Config} from '../Config';
 
 import {APIClient} from '../service/APIClientSingleton';
 
@@ -36,7 +37,9 @@ export class CryptographyService {
    * @returns Resolves with a pre-key for given the client of the user
    */
   getUserPreKeyByIds(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
-    return this.apiClient.user.api.getClientPreKey(userId.id, clientId, userId.domain);
+    return Config.getConfig().FEATURE.FEDERATION_DOMAIN
+      ? this.apiClient.user.api.getClientPreKey(userId, clientId, true)
+      : this.apiClient.user.api.getClientPreKey(userId.id, clientId);
   }
 
   /**
