@@ -98,7 +98,9 @@ export class ConnectionRepository {
     const connectionData = eventJson.connection;
 
     // Try to find existing connection
-    let connectionEntity = this.getConnectionByUserId(connectionData.to);
+    let connectionEntity = this.getConnectionByUserId(
+      connectionData.qualified_to || {id: connectionData.to, domain: ''},
+    );
     const previousStatus = connectionEntity?.status();
 
     // Update connection status
@@ -209,8 +211,8 @@ export class ConnectionRepository {
   /**
    * Get a connection for a user ID.
    */
-  private getConnectionByUserId(userId: string): ConnectionEntity {
-    return this.connectionState.connectionEntities()[userId];
+  private getConnectionByUserId(userId: QualifiedId): ConnectionEntity {
+    return this.connectionState.connectionEntities()[userId.id];
   }
 
   /**
@@ -218,7 +220,7 @@ export class ConnectionRepository {
    * @param conversationId Conversation ID
    * @returns User connection entity
    */
-  getConnectionByConversationId(conversationId: QualifiedId): ConnectionEntity {
+  getConnectionByConversationId(conversationId: QualifiedId): ConnectionEntity | undefined {
     const connectionEntities = Object.values(this.connectionState.connectionEntities());
     return connectionEntities.find(connectionEntity =>
       matchQualifiedIds(connectionEntity.conversationId, conversationId),

@@ -57,10 +57,10 @@ jest.deepUnmock('axios');
 describe('ConversationRepository', () => {
   const testFactory = new TestFactory();
 
-  let conversation_et: Conversation = null;
-  let self_user_et = null;
-  let server: Sinon.SinonFakeServer = null;
-  let storage_service: StorageService = null;
+  let conversation_et: Conversation;
+  let self_user_et;
+  let server: Sinon.SinonFakeServer;
+  let storage_service: StorageService;
   const messageSenderId = createRandomUuid();
 
   const _findConversation = (conversation: Conversation, conversations: () => Conversation[]) => {
@@ -457,7 +457,7 @@ describe('ConversationRepository', () => {
   });
 
   describe('mapConnection', () => {
-    let connectionEntity: ConnectionEntity = undefined;
+    let connectionEntity: ConnectionEntity;
 
     beforeEach(() => {
       connectionEntity = new ConnectionEntity();
@@ -708,8 +708,8 @@ describe('ConversationRepository', () => {
     });
 
     describe('conversation.create', () => {
-      let conversationId: string = null;
-      let createEvent: ConversationCreateEvent = null;
+      let conversationId: string;
+      let createEvent: ConversationCreateEvent;
 
       beforeEach(() => {
         spyOn(testFactory.conversation_repository as any, 'onCreate').and.callThrough();
@@ -793,7 +793,7 @@ describe('ConversationRepository', () => {
     });
 
     describe('conversation.member-join', () => {
-      let memberJoinEvent: ConversationMemberJoinEvent = null;
+      let memberJoinEvent: ConversationMemberJoinEvent;
 
       beforeEach(() => {
         spyOn(testFactory.conversation_repository as any, 'onMemberJoin').and.callThrough();
@@ -823,23 +823,25 @@ describe('ConversationRepository', () => {
 
       it('should ignore member-join event when joining a 1to1 conversation', () => {
         const selfUser = UserGenerator.getRandomUser();
+        const conversationRepo = testFactory.conversation_repository!;
         // conversation has a corresponding pending connection
         const connectionEntity = new ConnectionEntity();
         connectionEntity.conversationId = conversation_et.qualifiedId;
+        connectionEntity.userId = {domain: '', id: ''};
         connectionEntity.status(ConnectionStatus.PENDING);
-        testFactory.connection_repository.addConnectionEntity(connectionEntity);
+        testFactory.connection_repository!.addConnectionEntity(connectionEntity);
 
-        spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
+        spyOn(conversationRepo!['userState'], 'self').and.returnValue(selfUser);
 
-        return testFactory.conversation_repository['handleConversationEvent'](memberJoinEvent).then(() => {
-          expect(testFactory.conversation_repository['onMemberJoin']).toHaveBeenCalled();
-          expect(testFactory.conversation_repository.updateParticipatingUserEntities).not.toHaveBeenCalled();
+        return conversationRepo['handleConversationEvent'](memberJoinEvent).then(() => {
+          expect(conversationRepo['onMemberJoin']).toHaveBeenCalled();
+          expect(conversationRepo.updateParticipatingUserEntities).not.toHaveBeenCalled();
         });
       });
     });
 
     describe('conversation.message-delete', () => {
-      let message_et: Message = undefined;
+      let message_et: Message;
       const selfUser = UserGenerator.getRandomUser();
 
       beforeEach(() => {
@@ -971,7 +973,7 @@ describe('ConversationRepository', () => {
     });
 
     describe('conversation.message-hidden', () => {
-      let messageId: string = null;
+      let messageId: string;
       const selfUser = UserGenerator.getRandomUser();
 
       beforeEach(() => {
