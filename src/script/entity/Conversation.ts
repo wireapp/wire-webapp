@@ -20,6 +20,7 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {Availability, LegalHoldStatus} from '@wireapp/protocol-messaging';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {Cancelable, debounce} from 'underscore';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
@@ -45,7 +46,6 @@ import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
-import type {QualifiedIdOptional} from '../conversation/EventBuilder';
 
 interface UnreadState {
   allEvents: Message[];
@@ -128,9 +128,9 @@ export class Conversation {
   public readonly name: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
-  public readonly participating_user_ids: ko.ObservableArray<QualifiedIdOptional>;
+  public readonly participating_user_ids: ko.ObservableArray<QualifiedId>;
   public readonly receiptMode: ko.Observable<RECEIPT_MODE>;
-  public readonly removed_from_conversation?: ko.PureComputed<boolean>;
+  public readonly removed_from_conversation: ko.PureComputed<boolean>;
   public readonly roles: ko.Observable<Record<string, string>>;
   public readonly selfUser: ko.Observable<User>;
   public readonly servicesCount: ko.PureComputed<number>;
@@ -146,14 +146,14 @@ export class Conversation {
   public readonly hasExternal: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE;
-  public domain?: string;
+  public domain: string;
   public isFederated: ko.PureComputed<boolean>;
 
   static get TIMESTAMP_TYPE(): typeof TIMESTAMP_TYPE {
     return TIMESTAMP_TYPE;
   }
 
-  constructor(conversation_id: string = '', domain?: string) {
+  constructor(conversation_id: string = '', domain: string = '') {
     this.id = conversation_id;
 
     this.domain = domain;
@@ -220,7 +220,7 @@ export class Conversation {
       const connectedUserId = connectionEntity?.userId;
       // TODO(Federation): Check for domain once backend supports federated connections
       if (connectedUserId && this.participating_user_ids().every(user => user.id !== connectedUserId)) {
-        this.participating_user_ids.push({domain: null, id: connectedUserId});
+        this.participating_user_ids.push({domain: '', id: connectedUserId});
       }
     });
 
@@ -294,7 +294,7 @@ export class Conversation {
         amplify.publish(WebAppEvents.CONVERSATION.INJECT_LEGAL_HOLD_MESSAGE, {
           conversationEntity: this,
           legalHoldStatus,
-          userId: this.selfUser().id,
+          userId: this.selfUser().qualifiedId,
         });
       }
     });
@@ -471,6 +471,10 @@ export class Conversation {
     }, 100);
 
     this._initSubscriptions();
+  }
+
+  get qualifiedId(): QualifiedId {
+    return {domain: this.domain, id: this.id};
   }
 
   private hasInitializedUsers() {
@@ -747,8 +751,7 @@ export class Conversation {
       const isCallActivation = messageEntity.isCall() && messageEntity.isActivation();
       const isMemberJoin = messageEntity.isMember() && (messageEntity as MemberMessage).isMemberJoin();
       const wasSelfUserAdded =
-        isMemberJoin &&
-        (messageEntity as MemberMessage).isUserAffected({domain: this.selfUser().domain, id: this.selfUser().id});
+        isMemberJoin && (messageEntity as MemberMessage).isUserAffected(this.selfUser().qualifiedId);
 
       return isCallActivation || wasSelfUserAdded;
     });
@@ -786,7 +789,7 @@ export class Conversation {
     return undefined;
   }
 
-  updateTimestampServer(time: number, is_backend_timestamp: boolean = false): void {
+  updateTimestampServer(time: number | string, is_backend_timestamp: boolean = false): void {
     if (is_backend_timestamp) {
       const timestamp = new Date(time).getTime();
 

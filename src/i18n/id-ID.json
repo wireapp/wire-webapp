@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Buka blokir",
   "modalUserUnblockHeadline": "Buka blokir?",
   "modalUserUnblockMessage": "{{user}} akan dapat menghubungi Anda dan menambahkan Anda ke percakapan grup lagi.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Pengguna Terhapus",
   "notificationAssetAdd": "Membagikan gambar",
   "notificationConnectionAccepted": "Menerima permintaan koneksi Anda",

@@ -389,10 +389,9 @@ export class MessageListViewModel {
     messageEntity.is_resetting_session(true);
     try {
       await this.messageRepository.resetSession(
-        messageEntity.from,
+        {domain: messageEntity.domain, id: messageEntity.from},
         messageEntity.client_id,
-        this.conversation().id,
-        messageEntity.domain,
+        this.conversation(),
       );
       resetProgress();
     } catch (error) {
@@ -595,7 +594,7 @@ export class MessageListViewModel {
     if (userId) {
       (async () => {
         try {
-          const userEntity = await this.userRepository.getUserById(userId, domain);
+          const userEntity = await this.userRepository.getUserById({domain, id: userId});
           this.showUserDetails(userEntity);
         } catch (error) {
           if (error.type !== UserError.TYPE.USER_NOT_FOUND) {

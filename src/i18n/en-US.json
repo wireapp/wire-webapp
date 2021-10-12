@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Unblock",
   "modalUserUnblockHeadline": "Unblock?",
   "modalUserUnblockMessage": "{{user}} will be able to contact you and add you to group conversations again.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Deleted User",
   "notificationAssetAdd": "Shared a picture",
   "notificationConnectionAccepted": "Accepted your connection request",

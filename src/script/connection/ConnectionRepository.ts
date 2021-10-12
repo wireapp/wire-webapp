@@ -173,13 +173,14 @@ export class ConnectionRepository {
    * Create a connection request.
    *
    * @param userEntity User to connect to
-   * @returns Promise that resolves when the connection request was successfully created
+   * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  public async createConnection(userEntity: User): Promise<void> {
+  public async createConnection(userEntity: User): Promise<boolean> {
     try {
       const response = await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
+      return true;
     } catch (error) {
       if (error.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT) {
         const replaceLinkLegalHold = replaceLink(
@@ -195,6 +196,7 @@ export class ConnectionRepository {
         });
       }
       this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
+      return false;
     }
   }
 
@@ -265,7 +267,7 @@ export class ConnectionRepository {
   private async attachConnectionToUser(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
     this.addConnectionEntity(connectionEntity);
     // TODO(Federation): Update code once connections are implemented on the backend
-    const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
+    const userEntity = await this.userRepository.getUserById({domain: '', id: connectionEntity.userId});
     return userEntity.connection(connectionEntity);
   }
 
@@ -326,7 +328,7 @@ export class ConnectionRepository {
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
       // TODO(Federation): Update code once connections are implemented on the backend
-      const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
+      const userEntity = await this.userRepository.getUserById({domain: '', id: connectionEntity.userId});
       const messageEntity = new MemberMessage();
       messageEntity.user(userEntity);
 

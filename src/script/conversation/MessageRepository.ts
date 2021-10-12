@@ -40,7 +40,7 @@ import {
   DataTransfer,
 } from '@wireapp/protocol-messaging';
 import {Account} from '@wireapp/core';
-import {ReactionType} from '@wireapp/core/src/main/conversation/';
+import {ReactionType, MessageSendingCallbacks} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
@@ -63,7 +63,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {AssetAddEvent, EventBuilder, QualifiedIdOptional} from '../conversation/EventBuilder';
+import {AssetAddEvent, EventBuilder} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
@@ -110,7 +110,7 @@ import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicate
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 
-type ConversationEvent = {conversation: string; id: string};
+type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
@@ -255,7 +255,7 @@ export class MessageRepository {
    */
   async sendFederatedMessage(conversation: Conversation, message: string): Promise<void> {
     const userIds: string[] | QualifiedId[] = conversation.domain
-      ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
+      ? conversation.allUserEntities.map(user => user.qualifiedId)
       : conversation.allUserEntities.map(user => user.id);
 
     const crudEngine = this.cryptography_repository.storageRepository.storageService['engine'];
@@ -268,7 +268,7 @@ export class MessageRepository {
       .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
       .build();
 
-    const injectOptimisticEvent = (genericMessage: GenericMessage) => {
+    const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
       const senderId = this.clientState.currentClient().id;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
@@ -277,8 +277,8 @@ export class MessageRepository {
         .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
     };
 
-    const updateOptimisticEvent = (genericMessage: GenericMessage) => {
-      this.updateMessageAsSent(conversation, genericMessage.messageId /* TODO fix date*/);
+    const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
+      this.updateMessageAsSent(conversation, genericMessage.messageId, sentTime);
     };
 
     await account.service!.conversation.send({
@@ -513,7 +513,7 @@ export class MessageRepository {
     if (conversationEntity.messageTimer()) {
       genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
     }
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId);
     const payload = await this.sendGenericMessageToConversation(eventInfoEntity);
     const {uploaded: assetData} = conversationEntity.messageTimer()
       ? genericMessage.ephemeral.asset
@@ -782,7 +782,7 @@ export class MessageRepository {
     }
 
     const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId);
     eventInfoEntity.setTimestamp(injectedEvent.time);
     const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
     this.trackContributed(conversationEntity, genericMessage);
@@ -806,24 +806,19 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(
-    user_id: string,
-    client_id: string,
-    conversation_id: string,
-    domain: string | null,
-  ): Promise<ClientMismatch> {
-    this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
+  async resetSession(userId: QualifiedId, client_id: string, conversationId: QualifiedId): Promise<ClientMismatch> {
+    this.logger.info(`Resetting session with client '${client_id}' of user '${userId.id}'.`);
 
     try {
-      const session_id = await this.cryptography_repository.deleteSession(user_id, client_id, domain);
+      const session_id = await this.cryptography_repository.deleteSession(userId, client_id);
       if (session_id) {
-        this.logger.info(`Deleted session with client '${client_id}' of user '${user_id}'.`);
+        this.logger.info(`Deleted session with client '${client_id}' of user '${userId.id}'.`);
       } else {
         this.logger.warn('No local session found to delete.');
       }
-      return await this.sendSessionReset(user_id, client_id, conversation_id);
+      return await this.sendSessionReset(userId, client_id, conversationId);
     } catch (error) {
-      const logMessage = `Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`;
+      const logMessage = `Failed to reset session for client '${client_id}' of user '${userId.id}': ${error.message}`;
       this.logger.warn(logMessage, error);
       throw error;
     }
@@ -841,7 +836,11 @@ export class MessageRepository {
    * @param conversationId Conversation ID
    * @returns Resolves after sending the session reset
    */
-  private async sendSessionReset(userId: string, clientId: string, conversationId: string): Promise<ClientMismatch> {
+  private async sendSessionReset(
+    userId: QualifiedId,
+    clientId: string,
+    conversationId: QualifiedId,
+  ): Promise<ClientMismatch> {
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: createRandomUuid(),
@@ -849,7 +848,7 @@ export class MessageRepository {
 
     const options = {
       precondition: true,
-      recipients: {[userId]: [clientId]},
+      recipients: {[userId.id]: [clientId]},
     };
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
 
@@ -913,9 +912,9 @@ export class MessageRepository {
 
     this.messageSender.queueMessage(() => {
       // TODO(Federation): Apply logic for 'sendFederatedMessage'. The 'createRecipients' logic will be done inside of '@wireapp/core'.
-      return this.createRecipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
+      return this.createRecipients(conversationEntity, true, [messageEntity.from]).then(recipients => {
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
         return this.sendGenericMessage(eventInfoEntity, true);
       });
     });
@@ -1028,9 +1027,9 @@ export class MessageRepository {
       });
       await this.messageSender.queueMessage(() => {
         const userIds = Array.isArray(precondition) ? precondition : undefined;
-        return this.createRecipients(conversationId, false, userIds).then(recipients => {
+        return this.createRecipients(conversationEntity, false, userIds).then(recipients => {
           const options = {precondition, recipients};
-          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
+          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
           this.sendGenericMessage(eventInfoEntity, true);
         });
       });
@@ -1065,7 +1064,10 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+      const eventInfoEntity = new EventInfoEntity(
+        genericMessage,
+        this.conversationState.self_conversation()?.qualifiedId,
+      );
       await this.sendGenericMessageToConversation(eventInfoEntity);
       return await this.deleteMessageById(conversationEntity, messageEntity.id);
     } catch (error) {
@@ -1093,7 +1095,10 @@ export class MessageRepository {
         messageId: createRandomUuid(),
       });
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+      const eventInfoEntity = new EventInfoEntity(
+        genericMessage,
+        this.conversationState.self_conversation()?.qualifiedId,
+      );
       this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
         this.logger.info(`Cleared conversation '${conversationEntity.id}' on '${new Date(timestamp).toISOString()}'`);
       });
@@ -1125,9 +1130,9 @@ export class MessageRepository {
     });
     this.messageSender.queueMessage(async () => {
       try {
-        const recipients = await this.createRecipients(conversationEntity.id, true, [messageEntity.from]);
+        const recipients = await this.createRecipients(conversationEntity, true, [messageEntity.from]);
         const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
+        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
         await this.sendGenericMessage(eventInfoEntity, false);
       } catch (error) {
         messageEntity.waitingButtonId(undefined);
@@ -1223,11 +1228,11 @@ export class MessageRepository {
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
   async createRecipients(
-    conversation_id: string,
+    conversationId: QualifiedId,
     skip_own_clients = false,
     user_ids: string[] = null,
   ): Promise<UserClients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id, null);
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversationId);
     const recipients: UserClients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
@@ -1295,7 +1300,7 @@ export class MessageRepository {
     if (ensureUser) {
       return messagePromise.then(message => {
         if (message.from && !message.user().id) {
-          return this.userRepository.getUserById(message.from, message.user().domain).then(userEntity => {
+          return this.userRepository.getUserById({domain: message.user().domain, id: message.from}).then(userEntity => {
             message.user(userEntity);
             return message as ContentMessage;
           });
@@ -1324,11 +1329,10 @@ export class MessageRepository {
       // Since this is a bare API client user we use `.deleted`
       const isDeleted = user.deleted === true;
       if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(
-          this.teamState.team().id,
-          user.id,
-          this.userState.self().domain,
-        );
+        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, {
+          domain: this.userState.self().domain,
+          id: user.id,
+        });
       }
     }
   }
@@ -1350,10 +1354,10 @@ export class MessageRepository {
       const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
       await this.conversationRepositoryProvider().injectLegalHoldMessage({
         beforeTimestamp: true,
-        conversationId,
+        conversationId: conversationId,
         legalHoldStatus: updatedLocalLegalHoldStatus,
         timestamp: numericTimestamp,
-        userId: this.userState.self().id,
+        userId: this.userState.self().qualifiedId,
       });
     }
 
@@ -1362,7 +1366,7 @@ export class MessageRepository {
 
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
-    userIds: QualifiedIdOptional[],
+    userIds: QualifiedId[],
     checkLegalHold: boolean,
   ): Promise<void> {
     const messageType = eventInfoEntity.getType();
@@ -1401,7 +1405,7 @@ export class MessageRepository {
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
     consentType: string,
-    userIds: QualifiedIdOptional[],
+    userIds: QualifiedId[],
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
@@ -1430,9 +1434,7 @@ export class MessageRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds = conversationEntity
-        .getUsersWithUnverifiedClients()
-        .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.qualifiedId);
 
       return this.userRepository
         .getUsersById(userIds)
@@ -1529,12 +1531,12 @@ export class MessageRepository {
     }
     const sender = this.clientState.currentClient().id;
     try {
-      await this.conversation_service.postEncryptedMessage(conversationEntity.id, {recipients: {}, sender});
+      await this.conversation_service.postEncryptedMessage(conversationEntity, {recipients: {}, sender});
     } catch (axiosError) {
       const error = axiosError.response?.data || axiosError;
       if (error.missing) {
         const remoteUserClients = error.missing as UserClients;
-        const localUserClients = await this.createRecipients(conversationEntity.id);
+        const localUserClients = await this.createRecipients(conversationEntity);
         const selfId = this.userState.self().id;
 
         const deletedUserClients = Object.entries(localUserClients).reduce<UserClients>(
@@ -1553,7 +1555,9 @@ export class MessageRepository {
 
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(clients.map(clientId => this.userRepository.removeClientFromUser(userId, clientId, null))),
+            Promise.all(
+              clients.map(clientId => this.userRepository.removeClientFromUser({domain: '', id: userId}, clientId)),
+            ),
           ),
         );
 
@@ -1576,14 +1580,18 @@ export class MessageRepository {
           await Promise.all(
             Object.entries(usersMap).map(([domain, userClientsMap]) =>
               Object.entries(userClientsMap).map(([userId, clients]) =>
-                Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, domain))),
+                Promise.all(
+                  clients.map(client => this.userRepository.addClientToUser({domain, id: userId}, client, false)),
+                ),
               ),
             ),
           );
         } else {
           await Promise.all(
             Object.entries(usersMap).map(([userId, clients]) =>
-              Promise.all(clients.map(client => this.userRepository.addClientToUser(userId, client, false, null))),
+              Promise.all(
+                clients.map(client => this.userRepository.addClientToUser({domain: '', id: userId}, client, false)),
+              ),
             ),
           );
         }
@@ -1612,7 +1620,10 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+    const eventInfoEntity = new EventInfoEntity(
+      genericMessage,
+      this.conversationState.self_conversation()?.qualifiedId,
+    );
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
@@ -1639,7 +1650,10 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+    const eventInfoEntity = new EventInfoEntity(
+      genericMessage,
+      this.conversationState.self_conversation()?.qualifiedId,
+    );
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       this.logger.info(`Sent countly sync message with ID ${countlyId}`);
@@ -1656,7 +1670,7 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: string) {
+  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: QualifiedId) {
     return this.messageSender.queueMessage(() => {
       const options = eventInfoEntity.options;
       const recipientsPromise = options.recipients
@@ -1749,12 +1763,16 @@ export class MessageRepository {
       .map(clientId => Object.keys(clientId).length)
       .reduce((totalClients, clients) => totalClients + clients, 0);
 
-    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${conversationId}'`;
+    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${JSON.stringify(
+      conversationId,
+    )}'`;
     this.logger.info(logMessage, payload);
 
     if (numberOfUsers > numberOfClients) {
       this.logger.warn(
-        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`,
+        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${JSON.stringify(
+          conversationId,
+        )}'`,
       );
     }
 
@@ -1818,7 +1836,9 @@ export class MessageRepository {
       }));
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
-        `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
+        `Updated '${messageType}' message (${messageId}) for conversation '${JSON.stringify(
+          conversationId,
+        )}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
       );
       if (payloadWithMissingClients) {

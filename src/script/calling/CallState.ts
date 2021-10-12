@@ -24,7 +24,6 @@ import {STATE as CALL_STATE} from '@wireapp/avs';
 import {CallViewTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
-import type {Participant} from './Participant';
 
 export enum MuteState {
   NOT_MUTED,
@@ -49,10 +48,6 @@ export class CallState {
   public readonly activeCallViewTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly isChoosingScreen: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
-  public requestedVideoStreams: {call: Call; participants: Participant[]} = {
-    call: undefined,
-    participants: [],
-  };
 
   constructor() {
     this.isMuted = ko.pureComputed(() => this.muteState() !== MuteState.NOT_MUTED);

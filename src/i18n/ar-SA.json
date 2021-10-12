@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "إلغاء حظر",
   "modalUserUnblockHeadline": "إلغاء الحظر؟",
   "modalUserUnblockMessage": "سيستطيع {{user}} أن يتواصل معك وأن يضيفك إلى محادثات جماعية من جديد.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "مستخدم محذوف",
   "notificationAssetAdd": "شارك صورة",
   "notificationConnectionAccepted": "قبل طلب الاتصال الخاص بك",

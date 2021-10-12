@@ -20,7 +20,7 @@
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
-import {chunk, partition} from 'Util/ArrayUtil';
+import {chunk, getDifference, partition} from 'Util/ArrayUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
@@ -183,7 +183,12 @@ export class Call {
       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
 
     // Set the new active speakers.
-    this.activeSpeakers(activeSpeakers);
+    const isSameSpeakers =
+      this.activeSpeakers().length === activeSpeakers.length &&
+      getDifference(this.activeSpeakers(), activeSpeakers).length === 0;
+    if (!isSameSpeakers) {
+      this.activeSpeakers(activeSpeakers);
+    }
   }
 
   getActiveSpeakers = () => this.activeSpeakers();

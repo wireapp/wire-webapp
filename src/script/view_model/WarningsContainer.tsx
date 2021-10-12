@@ -59,11 +59,6 @@ const WarningsContainer: React.FC = () => {
     afterRender(() => window.dispatchEvent(new Event('resize')));
   }, [warnings]);
 
-  useEffect(() => {
-    amplify.subscribe(WebAppEvents.WARNING.SHOW, showWarning);
-    amplify.subscribe(WebAppEvents.WARNING.DISMISS, dismissWarning);
-  }, []);
-
   const lifeCycleRefresh = WebAppEvents.LIFECYCLE.REFRESH;
   const brandName = Config.getConfig().BRAND_NAME;
   const URL = Config.getConfig().URL;
@@ -74,7 +69,11 @@ const WarningsContainer: React.FC = () => {
    */
   const closeWarning = (): void => {
     const warningToClose = visibleWarning;
-    dismissWarning(warningToClose);
+
+    if (warnings.includes(warningToClose)) {
+      setWarnings(warnings.filter(warning => warning !== warningToClose));
+      logger.info(`Dismissed warning of type '${type}'`);
+    }
 
     switch (warningToClose) {
       case TYPE.REQUEST_MICROPHONE: {
@@ -104,28 +103,38 @@ const WarningsContainer: React.FC = () => {
     }
   };
 
-  const dismissWarning = (type = visibleWarning) => {
-    if (warnings.includes(type)) {
-      setWarnings(warnings.filter(warning => warning !== type));
-      logger.info(`Dismissed warning of type '${type}'`);
-    }
-  };
+  useEffect(() => {
+    const hideWarning = (type = visibleWarning) => {
+      if (warnings.includes(type)) {
+        setWarnings(warnings.filter(warning => warning !== type));
+        logger.info(`Dismissed warning of type '${type}'`);
+      }
+    };
 
-  const showWarning = (type: string, info: {name: string}) => {
-    const connectivityTypes = [TYPE.CONNECTIVITY_RECONNECT, TYPE.NO_INTERNET];
-    const isConnectivityWarning = connectivityTypes.includes(type);
-    const visibleWarningIsLifecycleUpdate = visibleWarning === TYPE.LIFECYCLE_UPDATE;
-    if (isConnectivityWarning && !visibleWarningIsLifecycleUpdate) {
-      dismissWarning(visibleWarning);
-    }
+    const showWarning = (type: string, info: {name: string}) => {
+      const connectivityTypes = [TYPE.CONNECTIVITY_RECONNECT, TYPE.NO_INTERNET];
+      const isConnectivityWarning = connectivityTypes.includes(type);
+      const visibleWarningIsLifecycleUpdate = visibleWarning === TYPE.LIFECYCLE_UPDATE;
+      if (isConnectivityWarning && !visibleWarningIsLifecycleUpdate) {
+        hideWarning(visibleWarning);
+      }
 
-    logger.warn(`Showing warning of type '${type}'`);
-    if (info) {
-      setName(info.name);
-    }
-    // warnings.push(type);
-    setWarnings([...warnings, type]);
-  };
+      logger.warn(`Showing warning of type '${type}'`);
+      if (info) {
+        setName(info.name);
+      }
+
+      setWarnings(warnings => [...warnings, type]);
+    };
+
+    amplify.subscribe(WebAppEvents.WARNING.SHOW, showWarning);
+    amplify.subscribe(WebAppEvents.WARNING.DISMISS, hideWarning);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.WARNING.SHOW, showWarning);
+      amplify.unsubscribe(WebAppEvents.WARNING.DISMISS, hideWarning);
+    };
+  });
 
   if (warnings.length === 0) {
     return null;

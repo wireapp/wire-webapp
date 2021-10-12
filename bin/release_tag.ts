@@ -17,13 +17,8 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client';
-import {ClientType} from '@wireapp/api-client/src/client/';
-import {GIPHY_RATING} from '@wireapp/api-client/src/giphy/';
-import {Account} from '@wireapp/core';
 import {execSync} from 'child_process';
 import logdown from 'logdown';
-import axios from 'axios';
 import path from 'path';
 import readline from 'readline';
 
@@ -121,99 +116,6 @@ const ask = (questionToAsk: string): Promise<string> => {
   });
 };
 
-const sendRandomGif = async (account: Account, conversationId: string, query: string): Promise<void> => {
-  const giphySearchResult = await account.service.giphy.getRandomGif(query, GIPHY_RATING.ALL_AGES_AND_PEOPLE);
-  if (!giphySearchResult.data) {
-    logger.warn(`No gif found for search query "${query}" :(`);
-    return;
-  }
-
-  const {
-    id,
-    images: {
-      downsized_large: {url: imageURL, height: imageHeight, width: imageWidth},
-    },
-  } = giphySearchResult.data;
-  const {data: fileBuffer} = await axios.get<Buffer>(imageURL, {responseType: 'arraybuffer'});
-
-  const payload = account.service.conversation.messageBuilder
-    .createText({
-      conversationId,
-      text: `${query} • via giphy.com`,
-    })
-    .build();
-  await account.service.conversation.send({payloadBundle: payload});
-
-  const fileMetaDataPayload = account.service.conversation.messageBuilder.createFileMetadata({
-    conversationId,
-    metaData: {
-      length: fileBuffer.length,
-      name: `${id}.gif`,
-      type: 'image/gif',
-    },
-  });
-  await account.service.conversation.send({payloadBundle: fileMetaDataPayload});
-
-  try {
-    const filePayload = await account.service.conversation.messageBuilder.createImage({
-      conversationId,
-      image: {data: fileBuffer, height: Number(imageHeight), type: 'image/gif', width: Number(imageWidth)},
-      messageId: fileMetaDataPayload.id,
-    });
-    await account.service.conversation.send({payloadBundle: filePayload});
-  } catch (error) {
-    logger.warn(`Error while sending asset: "${error.stack}"`);
-    const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort({
-      conversationId,
-      originalMessageId: fileMetaDataPayload.id,
-      reason: 0,
-    });
-    await account.service.conversation.send({payloadBundle: fileAbortPayload});
-  }
-};
-
-const announceRelease = async (tagName: string, commitId: string): Promise<void> => {
-  const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_CONVERSATION, WIRE_RELEASE_NOTES_CONVERSATION_ID} = process.env;
-  if (WIRE_EMAIL && WIRE_PASSWORD && (WIRE_CONVERSATION || WIRE_RELEASE_NOTES_CONVERSATION_ID)) {
-    if (isDryRun) {
-      return;
-    }
-    const apiClient = new APIClient({urls: APIClient.BACKEND.PRODUCTION});
-    const account = new Account(apiClient);
-    await account.login({
-      clientType: ClientType.TEMPORARY,
-      email: WIRE_EMAIL,
-      password: WIRE_PASSWORD,
-    });
-
-    if (stage === DeploymentStage.STAGING && WIRE_CONVERSATION) {
-      // Staging Bump
-      const message = `Released tag "${tagName}" based on commit ID "${commitId}".`;
-      const payload = account.service.conversation.messageBuilder
-        .createText({
-          conversationId: WIRE_CONVERSATION,
-          text: message,
-        })
-        .build();
-      await sendRandomGif(account, WIRE_CONVERSATION, 'in the oven');
-      await account.service.conversation.send({payloadBundle: payload});
-    } else if (stage === DeploymentStage.PRODUCTION && WIRE_RELEASE_NOTES_CONVERSATION_ID) {
-      // Production Release
-      const message = `The web team just rolled out a new version of [Wire for Web](https://app.wire.com/). You can find what has changed in our [GitHub release notes](https://github.com/wireapp/wire-webapp/releases/latest).\n\nPlease note that the rollout can take up to 30 minutes to be fully deployed on all nodes. You can check here if you get already served our latest version from today: https://app.wire.com/version`;
-      const payload = account.service.conversation.messageBuilder
-        .createText({
-          conversationId: WIRE_RELEASE_NOTES_CONVERSATION_ID,
-          text: message,
-        })
-        .build();
-      await account.service.conversation.send({payloadBundle: payload});
-    }
-    logger.info(`Sent "${stage}" announcement.`);
-  } else {
-    logger.info(`WIRE_EMAIL, WIRE_PASSWORD or WIRE_CONVERSATION missing. No announcement sent.`);
-  }
-};
-
 (async () => {
   const answer = await ask(
     `ℹ️  The commit "${commitMessage}" will be released with tag "${tagName}". Continue? [yes/no] `,
@@ -228,16 +130,9 @@ const announceRelease = async (tagName: string, commitId: string): Promise<void>
       exec(`git tag ${tagName} ${commitId}`);
     }
 
-    logger.info(`Pushing "${tagName}" to "${origin}" ...`);
     if (!isDryRun) {
+      logger.info(`Pushing "${tagName}" to "${origin}" ...`);
       exec(`git push origin && git push ${origin} ${tagName}`);
-    }
-
-    try {
-      logger.info(`Announcing release of "${tagName}" ...`);
-      await announceRelease(tagName, commitId);
-    } catch (error) {
-      logger.error(error);
     }
 
     logger.info('Done.');

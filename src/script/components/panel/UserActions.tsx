@@ -31,6 +31,7 @@ import type {MenuItem} from './PanelActions';
 
 import PanelActions from './PanelActions';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',
@@ -160,9 +161,11 @@ const UserActions: React.FC<UserActionsProps> = ({
     isNotConnectedUser &&
     canConnect && {
       click: async () => {
-        await actionsViewModel.sendConnectionRequest(user);
-        await create1to1Conversation(user, !conversation);
-        onAction(Actions.SEND_REQUEST);
+        const connectionIsSent = await actionsViewModel.sendConnectionRequest(user);
+        if (connectionIsSent) {
+          await create1to1Conversation(user, !conversation);
+          onAction(Actions.SEND_REQUEST);
+        }
       },
       icon: 'plus-icon',
       identifier: ActionIdentifier[Actions.SEND_REQUEST],
@@ -196,7 +199,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   const removeUserFromConversation: MenuItem = isNotMe &&
     conversation &&
     !conversation.removed_from_conversation() &&
-    conversation.participating_user_ids().some(userId => user.id === userId.id && user.domain == userId.domain) &&
+    conversation.participating_user_ids().some(userId => matchQualifiedIds(userId, user)) &&
     conversationRoleRepository.canRemoveParticipants(conversation) && {
       click: async () => {
         await actionsViewModel.removeFromConversation(conversation, user);

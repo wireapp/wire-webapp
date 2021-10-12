@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Engeli kaldır",
   "modalUserUnblockHeadline": "Engeli kaldır?",
   "modalUserUnblockMessage": "{{user}} sizinle tekrardan iletişim kurabilecek ve sizi grup konuşmalarına ekleyebilecek.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Silinmiş Kullanıcı",
   "notificationAssetAdd": "Bir resim paylaştı",
   "notificationConnectionAccepted": "Bağlantı isteğinizi kabul etti",

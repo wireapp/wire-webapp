@@ -261,10 +261,7 @@ export class ActionsViewModel {
             if (clearContent) {
               this.conversationRepository.clearConversation(conversationEntity, true);
             } else {
-              this.conversationRepository.removeMember(conversationEntity, {
-                domain: this.userState.self().domain,
-                id: this.userState.self().id,
-              });
+              this.conversationRepository.removeMember(conversationEntity, this.userState.self().qualifiedId);
             }
             resolve();
           },
@@ -351,10 +348,7 @@ export class ActionsViewModel {
           primaryAction: {
             action: async () => {
               try {
-                await this.conversationRepository.removeMember(conversationEntity, {
-                  domain: userEntity.domain,
-                  id: userEntity.id,
-                });
+                await this.conversationRepository.removeMember(conversationEntity, userEntity.qualifiedId);
                 resolve();
               } catch (error) {
                 reject(error);
@@ -375,9 +369,9 @@ export class ActionsViewModel {
 
   /**
    * @param userEntity User to connect to
-   * @returns Resolves when the connection request was successfully created
+   * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  readonly sendConnectionRequest = (userEntity: User): Promise<void> => {
+  readonly sendConnectionRequest = (userEntity: User): Promise<boolean> => {
     return this.connectionRepository.createConnection(userEntity);
   };
 

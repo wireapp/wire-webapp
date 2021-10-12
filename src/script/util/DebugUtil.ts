@@ -191,7 +191,7 @@ export class DebugUtil {
       notification.from === userId && notification.data && notification.data.sender === clientId;
     const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
       notification.time === dateTime.toISOString();
-    const conversation = await this.conversationRepository.getConversationById(conversationId);
+    const conversation = await this.conversationRepository.getConversationById({domain: '', id: conversationId});
     const message = await this.messageRepository.getMessageInConversationById(conversation, messageId);
     const notificationList = await this.eventRepository.notificationService.getNotifications(
       undefined,
@@ -222,8 +222,8 @@ export class DebugUtil {
   async getEventInfo(
     event: ConversationEvent,
   ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
-    const conversation = await this.conversationRepository.getConversationById(event.conversation);
-    const user = await this.userRepository.getUserById(event.from, event.qualified_from?.domain);
+    const conversation = await this.conversationRepository.getConversationById(event.qualified_conversation);
+    const user = await this.userRepository.getUserById(event.qualified_from || {domain: '', id: event.from});
 
     const debugInformation = {
       conversation,
@@ -328,7 +328,7 @@ export class DebugUtil {
   }
 
   async reprocessNotifications(notificationId?: string) {
-    const isEncryptedEvent = (event: any): event is EventRecord => {
+    const isEncryptedEvent = (event: any): event is ConversationOtrMessageAddEvent => {
       return event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     };
 

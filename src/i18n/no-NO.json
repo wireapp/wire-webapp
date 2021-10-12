@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Opphev blokkering",
   "modalUserUnblockHeadline": "Opphev blokkering?",
   "modalUserUnblockMessage": "{{user}} vil kunne kontakte deg og legge deg til i gruppesamtaler igjen.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Slettet bruker",
   "notificationAssetAdd": "Delte et bilde",
   "notificationConnectionAccepted": "Accepted your connection request",

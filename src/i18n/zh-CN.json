@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "取消屏蔽",
   "modalUserUnblockHeadline": "解除屏蔽？",
   "modalUserUnblockMessage": "{{user}} 今后能够将您加为好友以及重新加入到群聊中。",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "该用户已被删除",
   "notificationAssetAdd": "分享了一张图片",
   "notificationConnectionAccepted": "接受了您的好友邀请",

@@ -769,7 +769,7 @@
   "modalUserUnblockAction": "Avblockera",
   "modalUserUnblockHeadline": "Avblockera?",
   "modalUserUnblockMessage": "{{user}} kommer att kunna kontakta dig och lägga till dig i gruppkonversationer igen.",
-  "noActiveVideoSpeakers": "No active video speakers…",
+  "noActiveSpeakers": "No active speakers…",
   "nonexistentUser": "Raderad användare",
   "notificationAssetAdd": "Delade en bild",
   "notificationConnectionAccepted": "Accepterade din anslutningsbegäran",
