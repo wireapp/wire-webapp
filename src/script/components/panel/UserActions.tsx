@@ -177,7 +177,11 @@ const UserActions: React.FC<UserActionsProps> = ({
     isNotConnectedUser &&
     canConnect && {
       click: async () => {
-        await actionsViewModel.sendConnectionRequest(user);
+        const connectionIsSent = await actionsViewModel.sendConnectionRequest(user);
+        if (!connectionIsSent) {
+          // Sending the connection failed, there is nothing more to do
+          return;
+        }
         if (Config.getConfig().FEATURE.FEDERATION_DOMAIN) {
           /**
            * This can be generalize to any 1:1 conversation creation. Though, this is quite a big change and we will keep it for federated backends for now.

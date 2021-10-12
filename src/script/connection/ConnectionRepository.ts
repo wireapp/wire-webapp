@@ -175,9 +175,9 @@ export class ConnectionRepository {
    * Create a connection request.
    *
    * @param userEntity User to connect to
-   * @returns Promise that resolves when the connection request was successfully created
+   * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  public async createConnection(userEntity: User): Promise<void> {
+  public async createConnection(userEntity: User): Promise<boolean> {
     try {
       const config = Config.getConfig().FEATURE;
       const isFederatedBackend = config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
@@ -186,6 +186,7 @@ export class ConnectionRepository {
         : await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
+      return true;
     } catch (error) {
       if (error.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT) {
         const replaceLinkLegalHold = replaceLink(
@@ -201,6 +202,7 @@ export class ConnectionRepository {
         });
       }
       this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
+      return false;
     }
   }
 
