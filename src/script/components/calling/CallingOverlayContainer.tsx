@@ -57,8 +57,9 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
-  const {isMuted, activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
+  const {isMuted, muteState, activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
     useKoSubscribableChildren(callState, [
+      'muteState',
       'isMuted',
       'activeCallViewTab',
       'joinedCall',
@@ -175,6 +176,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
           maximizedParticipant={maximizedParticipant}
           mediaDevicesHandler={mediaDevicesHandler}
           isMuted={isMuted}
+          muteState={muteState}
           isChoosingScreen={isChoosingScreen}
           switchCameraInput={switchCameraInput}
           setMaximizedParticipant={setMaximizedParticipant}
