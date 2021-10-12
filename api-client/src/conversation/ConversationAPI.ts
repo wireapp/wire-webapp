@@ -334,12 +334,11 @@ export class ConversationAPI {
 
   /**
    * Get all local & remote conversations from a federated backend.
-   * @param ownDomain - the domain identifier on which the client is running against
    */
-  public async getConversationList(ownDomain: string): Promise<Conversation[]> {
+  public async getConversationList(): Promise<Conversation[]> {
     const allConversationIds = await this.getQualifiedConversationIds();
     const conversations = await this.getConversationsByQualifiedIds(allConversationIds);
-    return conversations.found?.filter(conversation => conversation.qualified_id?.domain !== ownDomain) || [];
+    return conversations.found || [];
   }
 
   /**
