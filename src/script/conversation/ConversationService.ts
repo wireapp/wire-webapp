@@ -57,6 +57,10 @@ import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {Config} from '../Config';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
+function isFederatedEnv() {
+  const config = Config.getConfig().FEATURE;
+  return config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+}
 export class ConversationService {
   private readonly eventService: EventService;
   private readonly logger: Logger;
@@ -97,9 +101,7 @@ export class ConversationService {
    */
   async getAllConversations(): Promise<BackendConversation[]> {
     const conversationApi = this.apiClient.conversation.api;
-    const isFederatedBackend = !!Config.getConfig().FEATURE.FEDERATION_DOMAIN;
-
-    return isFederatedBackend ? conversationApi.getConversationList() : conversationApi.getAllConversations();
+    return isFederatedEnv() ? conversationApi.getConversationList() : conversationApi.getAllConversations();
   }
 
   /**
@@ -107,9 +109,7 @@ export class ConversationService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
-    const isFederatedBackend = !!Config.getConfig().FEATURE.FEDERATION_DOMAIN;
-
-    return isFederatedBackend
+    return isFederatedEnv()
       ? this.apiClient.conversation.api.getConversation({domain, id}, true)
       : this.apiClient.conversation.api.getConversation(id);
   }
