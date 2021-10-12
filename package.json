@@ -2,7 +2,7 @@
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "7.2.91",
-    "@wireapp/core": "17.16.10",
+    "@wireapp/core": "17.17.4",
     "@wireapp/react-ui-kit": "7.54.0",
     "@wireapp/store-engine-dexie": "1.6.7",
     "@wireapp/store-engine-sqleet": "1.7.11",
@@ -138,7 +138,7 @@
     "grunt-postcss": "0.9.0",
     "grunt-shell": "3.0.1",
     "husky": "4.3.8",
-    "i18next-scanner": "3.0.0",
+    "i18next-scanner": "3.0.1",
     "intersection-observer": "0.12.0",
     "jest": "26.6.3",
     "jsdom-worker": "0.2.1",

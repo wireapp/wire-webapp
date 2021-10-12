@@ -2907,10 +2907,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@14.1.0":
-  version "14.1.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-14.1.0.tgz#b81b4ca260774729bb8d7fea6ded665fdf14c236"
-  integrity sha512-OEfg0IMy5XF790d5Wa0LsJt7V58oMInC8VnY8MiGl6S34rJhQ8kJ9JHYF2GHehYCc1WZN902bHmwaJcpQGmOjw==
+"@wireapp/api-client@15.0.0":
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-15.0.0.tgz#b438de8fbe6e6a654f16e00d4f44a186587d12d8"
+  integrity sha512-es3IiLUFeIPewIg0GyiBYK3xyeH0ETG/Zi8jYiXBeQte4vKi8wvVCXQwlu/GJrNdk2V4XozZAY3RugEjb675lw==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2964,14 +2964,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.16.10":
-  version "17.16.10"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.16.10.tgz#698509aea5737f827100dd1012fffb4cc2d3ab14"
-  integrity sha512-wZihCYspxZkXQ26Ke5jNiXM5XXaBiaSU42mOg1YiQWmliQzyi1YPgMa+Q1e1S3l+t9W54VgeE7X9LFvfmXXl2A==
+"@wireapp/core@17.17.4":
+  version "17.17.4"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.17.4.tgz#87191aff099e8ba4bb966210c9a67a73f24fd673"
+  integrity sha512-YBn5vl+tctfblmVRcOkoEnGIldQ+qT9ArnnF3BCWOAO7VUDcsjBHNfyuvxPb2rk6rKKNe7+DceRTtaKLx2lsFQ==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "14.1.0"
+    "@wireapp/api-client" "15.0.0"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.9.7"
     hash.js "1.1.7"
@@ -3139,15 +3139,10 @@ acorn-import-assertions@^1.7.6:
   resolved "https://registry.yarnpkg.com/acorn-import-assertions/-/acorn-import-assertions-1.7.6.tgz#580e3ffcae6770eebeec76c3b9723201e9d01f78"
   integrity sha512-FlVvVFA1TX6l3lp8VjDnYYq7R1nyW6x3svAt4nDgrWQ9SBaSh9CnbwgSUTasgfNfOG5HlM1ehugCvM+hjo56LA==
 
-acorn-jsx@^5.2.0:
+acorn-jsx@^5.2.0, acorn-jsx@^5.3.1:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
   integrity sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==
-
-acorn-jsx@^5.3.1:
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.1.tgz#fc8661e11b7ac1539c47dbfea2e72b3af34d267b"
-  integrity sha512-K0Ptm/47OKfQRpNQ2J/oIN/3QYiK6FwW+eJbILhsdxh2WTLdl+30o8aGdTbm5JbffpFFAg/g+zi1E+jvJha5ng==
 
 acorn-private-class-elements@^0.2.7:
   version "0.2.7"
@@ -7407,10 +7402,10 @@ husky@4.3.8:
     slash "^3.0.0"
     which-pm-runs "^1.0.0"
 
-i18next-scanner@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/i18next-scanner/-/i18next-scanner-3.0.0.tgz#16024fa7f6dc5fd73d91545bd01566f86a76529a"
-  integrity sha512-cm4Ch3VqicGZS8y+4xSvXoOsnE/iWhHZi6AZEyAgLLm3EDZ/eY21gDbLfbnwKVY6wCghzAEO9LfRNlxwTo8KMQ==
+i18next-scanner@3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/i18next-scanner/-/i18next-scanner-3.0.1.tgz#79cb8e256fe148816dc209d6a776e62ea4aea364"
+  integrity sha512-tkyPfurIz1XLDNJdGXdrXvJmKrbecjFR5DPLvW70OBqR0x2M2mHTkCFpiUjNdV9pEVf9NDQhDEXr0yzt1PQK4w==
   dependencies:
     acorn "^8.0.4"
     acorn-dynamic-import "^4.0.0"
