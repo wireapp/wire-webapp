@@ -96,11 +96,10 @@ export class ConversationService {
    * @returns Resolves with the conversation information
    */
   async getAllConversations(): Promise<BackendConversation[]> {
-    const domain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
     const conversationApi = this.apiClient.conversation.api;
-    const isFederatedBackend = Config.getConfig().FEATURE.ENABLE_FEDERATION === true && domain;
+    const isFederatedBackend = !!Config.getConfig().FEATURE.FEDERATION_DOMAIN;
 
-    return isFederatedBackend ? conversationApi.getConversationList(domain) : conversationApi.getAllConversations();
+    return isFederatedBackend ? conversationApi.getConversationList() : conversationApi.getAllConversations();
   }
 
   /**
@@ -108,7 +107,11 @@ export class ConversationService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
-    return this.apiClient.conversation.api.getConversation(id, domain);
+    const isFederatedBackend = !!Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+
+    return isFederatedBackend
+      ? this.apiClient.conversation.api.getConversation({domain, id}, true)
+      : this.apiClient.conversation.api.getConversation(id);
   }
 
   /**
