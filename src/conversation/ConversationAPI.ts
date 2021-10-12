@@ -755,7 +755,7 @@ export class ConversationAPI {
 
     const config: AxiosRequestConfig = {
       /*
-       * We need to slice the content of what protobuf has generated in order for Axios to send the correct data (see https://github.com/axios/axios/issues/4068)
+       * We need to slice the content of what protobuf has generated in order for Axios to send the correct buffer (see https://github.com/axios/axios/issues/4068)
        * FIXME: The `slice` can be removed as soon as Axios publishes a version with the dataview issue fixed.
        */
       data: ProtobufOTR.NewOtrMessage.encode(messageData).finish().slice(),
