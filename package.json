@@ -90,5 +90,5 @@
     "test:types": "tsc --noEmit",
     "watch": "webpack serve --config webpack.browser.js"
   },
-  "version": "14.2.3"
+  "version": "15.0.0"
 }
