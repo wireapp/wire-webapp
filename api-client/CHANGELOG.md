@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.2.3...@wireapp/api-client@15.0.0) (2021-10-12)
+
+
+### Bug Fixes
+
+* **api-client:** Do not filter conversations fetched from new endpoint ([#4152](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4152)) ([b8249aa](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/b8249aa728758030f2be61864d92e3368a1d3dc7))
+
+
+### BREAKING CHANGES
+
+* **api-client:** The `getConversationList` method do not take a `ownDomain` parameter anymore and will return all the conversations unfiltered
+
+
+
+
+
 ## [14.2.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.2.2...@wireapp/api-client@14.2.3) (2021-10-12)
 
 **Note:** Version bump only for package @wireapp/api-client
