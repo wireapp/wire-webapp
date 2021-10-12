@@ -37,7 +37,8 @@ export class CryptographyService {
    * @returns Resolves with a pre-key for given the client of the user
    */
   getUserPreKeyByIds(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
-    return Config.getConfig().FEATURE.FEDERATION_DOMAIN
+    const config = Config.getConfig().FEATURE;
+    return config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN
       ? this.apiClient.user.api.getClientPreKey(userId, clientId, true)
       : this.apiClient.user.api.getClientPreKey(userId.id, clientId);
   }
