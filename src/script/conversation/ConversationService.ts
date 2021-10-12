@@ -96,25 +96,23 @@ export class ConversationService {
    * @returns Resolves with the conversation information
    */
   async getAllConversations(): Promise<BackendConversation[]> {
-    const domain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
     const conversationApi = this.apiClient.conversation.api;
-    const isFederatedBackend = Config.getConfig().FEATURE.ENABLE_FEDERATION === true && domain;
+    const isFederatedBackend = !!Config.getConfig().FEATURE.FEDERATION_DOMAIN;
 
-    return isFederatedBackend ? conversationApi.getConversationList(domain) : conversationApi.getAllConversations();
+    return isFederatedBackend ? conversationApi.getConversationList() : conversationApi.getAllConversations();
   }
 
   /**
    * Get a conversation by ID.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
-  getConversationById(convId: QualifiedId): Promise<BackendConversation> {
-    const domain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+  getConversationById(conversationId: QualifiedId): Promise<BackendConversation> {
     const conversationApi = this.apiClient.conversation.api;
-    const isFederatedBackend = Config.getConfig().FEATURE.ENABLE_FEDERATION === true && domain;
+    const isFederatedBackend = !!Config.getConfig().FEATURE.FEDERATION_DOMAIN;
 
     return isFederatedBackend
-      ? conversationApi.getConversation(convId, true)
-      : conversationApi.getConversation(convId.id);
+      ? conversationApi.getConversation(conversationId, true)
+      : conversationApi.getConversation(conversationId.id);
   }
 
   /**
