@@ -61,7 +61,6 @@ function isFederatedEnv() {
   const config = Config.getConfig().FEATURE;
   return config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
 }
-
 export class ConversationService {
   private readonly eventService: EventService;
   private readonly logger: Logger;
@@ -109,12 +108,10 @@ export class ConversationService {
    * Get a conversation by ID.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
-  getConversationById(conversationId: QualifiedId): Promise<BackendConversation> {
-    const conversationApi = this.apiClient.conversation.api;
-
+  getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
     return isFederatedEnv()
-      ? conversationApi.getConversation(conversationId, true)
-      : conversationApi.getConversation(conversationId.id);
+      ? this.apiClient.conversation.api.getConversation({domain, id}, true)
+      : this.apiClient.conversation.api.getConversation(id);
   }
 
   /**
