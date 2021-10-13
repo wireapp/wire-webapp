@@ -45,11 +45,20 @@ export class ConnectionMapper {
     connectionEntity: ConnectionEntity,
     connectionData: ConnectionData,
   ): ConnectionEntity {
-    const {conversation, from, last_update, message, status, to: remoteUserId} = connectionData;
+    const {
+      conversation,
+      qualified_conversation,
+      qualified_to,
+      from,
+      last_update,
+      message,
+      status,
+      to: remoteUserId,
+    } = connectionData;
 
     connectionEntity.status(status);
-    connectionEntity.conversationId = conversation;
-    connectionEntity.userId = remoteUserId;
+    connectionEntity.conversationId = qualified_conversation || {domain: '', id: conversation};
+    connectionEntity.userId = qualified_to || {domain: '', id: remoteUserId};
     connectionEntity.from = from;
     connectionEntity.lastUpdate = last_update;
     connectionEntity.message = message;

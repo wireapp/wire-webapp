@@ -949,13 +949,9 @@ export class ConversationRepository {
       return this.createGroupConversation([userEntity]);
     }
 
-    if (!userEntity.isOnSameFederatedDomain()) {
-      return this.createGroupConversation([userEntity], `${userEntity.name()} & ${this.userState.self().name()}`);
-    }
-
     const conversationId = userEntity.connection().conversationId;
     try {
-      const conversationEntity = await this.getConversationById({domain: '', id: conversationId});
+      const conversationEntity = await this.getConversationById(conversationId);
       conversationEntity.connection(userEntity.connection());
       this.updateParticipatingUserEntities(conversationEntity);
       return conversationEntity;
@@ -1033,8 +1029,8 @@ export class ConversationRepository {
         key,
         code,
       );
-      const knownConversation = this.conversationState.findConversation({domain: '', id: conversationId});
-      if (knownConversation && knownConversation.status() === ConversationStatus.CURRENT_MEMBER) {
+      const knownConversation = this.conversationState.findConversation({domain: null, id: conversationId});
+      if (knownConversation?.status() === ConversationStatus.CURRENT_MEMBER) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
@@ -1094,7 +1090,7 @@ export class ConversationRepository {
    * @returns Resolves when connection was mapped return value
    */
   private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
-    const qualifiedId: QualifiedId = {domain: '', id: connectionEntity.conversationId};
+    const qualifiedId: QualifiedId = connectionEntity.conversationId;
     return Promise.resolve(this.conversationState.findConversation(qualifiedId))
       .then(conversationEntity => {
         if (!conversationEntity) {
@@ -1187,17 +1183,19 @@ export class ConversationRepository {
 
   private _mapGuestStatusSelf(conversationEntity: Conversation) {
     const conversationTeamId = conversationEntity.team_id;
-    const selfTeamId = this.teamState.team() && this.teamState.team().id;
+    const selfTeamId = this.teamState.team()?.id;
     const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
     conversationEntity.isGuest(isConversationGuest);
   }
 
   /**
-   * Save a conversation in the repository.
+   * Save a conversation in the repository and in the database.
+   * Will resolve with local conversation entity and do nothing if conversation already exists in state
+   *
    * @param conversationEntity Conversation to be saved in the repository
    * @returns Resolves when conversation was saved
    */
-  private saveConversation(conversationEntity: Conversation) {
+  saveConversation(conversationEntity: Conversation) {
     const localEntity = this.conversationState.findConversation(conversationEntity);
     if (!localEntity) {
       this.conversationState.conversations.push(conversationEntity);
@@ -1801,7 +1799,7 @@ export class ConversationRepository {
     );
 
     const selfConversation = this.conversationState.self_conversation();
-    const inSelfConversation = selfConversation && matchQualifiedIds(conversationId, selfConversation);
+    const inSelfConversation = selfConversation && matchQualifiedIds(conversationId, selfConversation.qualifiedId);
     if (inSelfConversation) {
       const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
 
@@ -2178,7 +2176,7 @@ export class ConversationRepository {
       .then(messageEntity => this.updateMessageUserEntities(messageEntity))
       .then((messageEntity: MemberMessage) => {
         const userEntity = messageEntity.otherUser();
-        const isOutgoingRequest = userEntity && userEntity.isOutgoingRequest();
+        const isOutgoingRequest = userEntity?.isOutgoingRequest();
         if (isOutgoingRequest) {
           messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
         }
@@ -2273,8 +2271,8 @@ export class ConversationRepository {
     eventJson: ConversationMemberJoinEvent,
   ): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
-    const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
-    const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
+    const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.qualifiedId);
+    const isPendingConnection = connectionEntity?.isIncomingRequest();
     if (isPendingConnection) {
       return Promise.resolve();
     }

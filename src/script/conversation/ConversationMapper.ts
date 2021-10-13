@@ -406,7 +406,7 @@ export class ConversationMapper {
     }
 
     if (conversationEntity.isSelf()) {
-      return conversationEntity.accessState(ACCESS_STATE.SELF);
+      return conversationEntity.accessState(ACCESS_STATE.OTHER.SELF);
     }
 
     const personalAccessState = conversationEntity.isGroup()

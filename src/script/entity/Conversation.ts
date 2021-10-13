@@ -46,6 +46,7 @@ import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 interface UnreadState {
   allEvents: Message[];
@@ -81,7 +82,7 @@ export class Conversation {
   public hasCreationMessage: boolean;
   public needsLegalHoldApproval: boolean = false;
   public readonly accessCode: ko.Observable<string>;
-  public readonly accessState: ko.Observable<string>;
+  public readonly accessState: ko.Observable<ACCESS_STATE>;
   public readonly archivedTimestamp: ko.Observable<number>;
   public readonly availabilityOfUser: ko.PureComputed<Availability.Type>;
   public readonly call: ko.Observable<Call>;
@@ -160,7 +161,7 @@ export class Conversation {
 
     this.logger = getLogger(`Conversation (${this.id})`);
 
-    this.accessState = ko.observable(ACCESS_STATE.UNKNOWN);
+    this.accessState = ko.observable(ACCESS_STATE.OTHER.UNKNOWN);
     this.accessCode = ko.observable();
     this.creator = undefined;
     this.name = ko.observable();
@@ -218,9 +219,8 @@ export class Conversation {
     this.connection = ko.observable(new ConnectionEntity());
     this.connection.subscribe(connectionEntity => {
       const connectedUserId = connectionEntity?.userId;
-      // TODO(Federation): Check for domain once backend supports federated connections
-      if (connectedUserId && this.participating_user_ids().every(user => user.id !== connectedUserId)) {
-        this.participating_user_ids.push({domain: '', id: connectedUserId});
+      if (connectedUserId && this.participating_user_ids().every(user => !matchQualifiedIds(user, connectedUserId))) {
+        this.participating_user_ids.push(connectedUserId);
       }
     });
 

@@ -18,6 +18,7 @@
  */
 
 import type {Connection, ConnectionStatus} from '@wireapp/api-client/src/connection/';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
 
 import {APIClient} from '../service/APIClientSingleton';
@@ -58,6 +59,10 @@ export class ConnectionService {
     });
   }
 
+  postFederationConnections(userId: QualifiedId) {
+    return this.apiClient.connection.api.postConnection(userId, true);
+  }
+
   /**
    * Updates a connection to another user.
    *
@@ -72,5 +77,15 @@ export class ConnectionService {
     return this.apiClient.connection.api.putConnection(userId, {
       status,
     });
+  }
+
+  putFederatedConnections(userId: QualifiedId, status: ConnectionStatus): Promise<Connection> {
+    return this.apiClient.connection.api.putConnection(
+      userId,
+      {
+        status,
+      },
+      true,
+    );
   }
 }

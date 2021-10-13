@@ -675,8 +675,7 @@ export class NotificationRepository {
     conversationEntity?: Conversation,
   ): QualifiedId | undefined {
     if (connectionEntity) {
-      // TODO(federation) add domain when connection is implemented on the backend
-      return {domain: '', id: connectionEntity.conversationId};
+      return connectionEntity.conversationId;
     }
     return conversationEntity?.qualifiedId;
   }

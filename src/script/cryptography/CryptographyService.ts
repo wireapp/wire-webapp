@@ -20,10 +20,9 @@
 import type {ClientPreKey, PreKey} from '@wireapp/api-client/src/auth/';
 import type {UserClients} from '@wireapp/api-client/src/conversation/';
 import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import {APIClient} from '../service/APIClientSingleton';
 import {container} from 'tsyringe';
 import {Config} from '../Config';
-
-import {APIClient} from '../service/APIClientSingleton';
 
 export class CryptographyService {
   constructor(private readonly apiClient = container.resolve(APIClient)) {}
