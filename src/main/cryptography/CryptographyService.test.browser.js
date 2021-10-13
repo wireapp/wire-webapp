@@ -82,17 +82,6 @@ describe('CryptographyService', () => {
     });
   });
 
-  describe('"dismantleSessionId"', () => {
-    it('gets User ID and Client ID from a Session ID.', () => {
-      const clientId = '1ceb9063fced26d3';
-      const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
-      const sessionId = CryptographyService.constructSessionId(userId, clientId);
-      const [actualUserId, actualClientId] = CryptographyService.dismantleSessionId(sessionId);
-      expect(actualClientId).toBe(clientId);
-      expect(actualUserId).toBe(userId);
-    });
-  });
-
   describe('"encrypt"', () => {
     it('generates a set of encrypted data based on PreKeys from multiple clients.', async () => {
       const firstUserID = 'bc0c99f1-49a5-4ad2-889a-62885af37088';

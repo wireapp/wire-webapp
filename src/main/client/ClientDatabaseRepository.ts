@@ -91,7 +91,7 @@ export class ClientDatabaseRepository {
     const transformedClient = this.transformClient(userId, client, false, domain);
     await this.storeEngine.update(
       ClientDatabaseRepository.STORES.CLIENTS,
-      CryptographyService.constructSessionId(userId, client.id),
+      CryptographyService.constructSessionId(userId, client.id, domain),
       transformedClient,
     );
     return transformedClient;
@@ -101,7 +101,7 @@ export class ClientDatabaseRepository {
     const transformedClient = this.transformClient(userId, client, false, domain);
     await this.storeEngine.create(
       ClientDatabaseRepository.STORES.CLIENTS,
-      CryptographyService.constructSessionId(userId, client.id),
+      CryptographyService.constructSessionId(userId, client.id, domain),
       transformedClient,
     );
     return transformedClient;
@@ -116,7 +116,7 @@ export class ClientDatabaseRepository {
     return {
       ...client,
       domain,
-      meta: {is_verified: verified, primary_key: CryptographyService.constructSessionId(userId, client.id)},
+      meta: {is_verified: verified, primary_key: CryptographyService.constructSessionId(userId, client.id, domain)},
     };
   }
 
