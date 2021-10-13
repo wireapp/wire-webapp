@@ -37,7 +37,8 @@ export class CryptographyService {
    */
   getUserPreKeyByIds(userId: QualifiedId, clientId: string): Promise<ClientPreKey> {
     const userApi = this.apiClient.user.api;
-    const isFederatedBackend = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    const config = Config.getConfig().FEATURE;
+    const isFederatedBackend = config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
 
     return isFederatedBackend
       ? userApi.getClientPreKey(userId, clientId, true)
