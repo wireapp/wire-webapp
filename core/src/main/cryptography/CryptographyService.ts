@@ -57,8 +57,9 @@ export class CryptographyService {
     });
   }
 
-  public static constructSessionId(userId: string, clientId: string): string {
-    return `${userId}@${clientId}`;
+  public static constructSessionId(userId: string, clientId: string, domain: string | null): string {
+    const baseId = `${userId}@${clientId}`;
+    return domain ? `${domain}@${baseId}` : baseId;
   }
 
   public static convertArrayRecipientsToBase64(recipients: OTRRecipients<Uint8Array>): OTRRecipients<string> {
@@ -107,8 +108,12 @@ export class CryptographyService {
     return this.cryptobox.decrypt(sessionId, messageBytes.buffer);
   }
 
-  private static dismantleSessionId(sessionId: string): string[] {
-    return sessionId.split('@');
+  private static dismantleSessionId(sessionId: string): {clientId: string; domain?: string; userId: string} {
+    // see https://regex101.com/r/c8FtCw/1
+    const regex = /((?<domain>.+)@)?(?<userId>.+)@(?<clientId>.+)$/g;
+    const match = regex.exec(sessionId);
+    const {domain, userId, clientId} = match?.groups || {};
+    return {clientId, domain, userId};
   }
 
   public async encryptQualified(
@@ -118,13 +123,17 @@ export class CryptographyService {
     const qualifiedOTRRecipients: QualifiedOTRRecipients = {};
 
     for (const [domain, preKeyBundleMap] of Object.entries(preKeyBundles)) {
-      qualifiedOTRRecipients[domain] = await this.encrypt(plainText, preKeyBundleMap);
+      qualifiedOTRRecipients[domain] = await this.encrypt(plainText, preKeyBundleMap, domain);
     }
 
     return qualifiedOTRRecipients;
   }
 
-  public async encrypt(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): Promise<OTRRecipients<Uint8Array>> {
+  public async encrypt(
+    plainText: Uint8Array,
+    preKeyBundles: UserPreKeyBundleMap,
+    domain?: string,
+  ): Promise<OTRRecipients<Uint8Array>> {
     const recipients: OTRRecipients<Uint8Array> = {};
     const bundles: Promise<SessionPayloadBundle>[] = [];
 
@@ -133,7 +142,7 @@ export class CryptographyService {
 
       for (const clientId in preKeyBundles[userId]) {
         const {key: base64PreKey} = preKeyBundles[userId][clientId];
-        const sessionId = CryptographyService.constructSessionId(userId, clientId);
+        const sessionId = CryptographyService.constructSessionId(userId, clientId, domain || null);
         bundles.push(this.encryptPayloadForSession(sessionId, plainText, base64PreKey));
       }
     }
@@ -142,7 +151,7 @@ export class CryptographyService {
 
     payloads.forEach(payload => {
       const {encryptedPayload, sessionId} = payload;
-      const [userId, clientId] = CryptographyService.dismantleSessionId(sessionId);
+      const {userId, clientId} = CryptographyService.dismantleSessionId(sessionId);
       recipients[userId][clientId] = encryptedPayload;
     });
 
@@ -189,10 +198,11 @@ export class CryptographyService {
   ): Promise<PayloadBundle> {
     const {
       from,
+      qualified_from,
       data: {sender, text: cipherText},
     } = otrMessage;
 
-    const sessionId = CryptographyService.constructSessionId(from, sender);
+    const sessionId = CryptographyService.constructSessionId(from, sender, qualified_from?.domain || null);
     const decryptedMessage = await this.decrypt(sessionId, cipherText);
     const genericMessage = GenericMessage.decode(decryptedMessage);
 

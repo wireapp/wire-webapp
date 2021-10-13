@@ -63,9 +63,18 @@ describe('CryptographyService', () => {
     it('constructs a Session ID by a given User ID and Client ID.', () => {
       const clientId = '1ceb9063fced26d3';
       const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
-      const actual = CryptographyService.constructSessionId(userId, clientId);
+      const actual = CryptographyService.constructSessionId(userId, clientId, null);
       expect(actual).toContain(clientId);
       expect(actual).toContain(userId);
+    });
+
+    it('constructs a Session ID by a given User ID and Client ID and domain.', () => {
+      const clientId = '1ceb9063fced26d3';
+      const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
+      const actual = CryptographyService.constructSessionId(userId, clientId, 'test.wire.link');
+      expect(actual).toContain(clientId);
+      expect(actual).toContain(userId);
+      expect(actual).toContain('test.wire.link');
     });
   });
 
@@ -101,13 +110,24 @@ describe('CryptographyService', () => {
   });
 
   describe('"dismantleSessionId"', () => {
-    it('gets User ID and Client ID from a Session ID.', () => {
-      const clientId = '1ceb9063fced26d3';
-      const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
-      const sessionId = CryptographyService.constructSessionId(userId, clientId);
-      const [actualUserId, actualClientId] = CryptographyService['dismantleSessionId'](sessionId);
-      expect(actualClientId).toBe(clientId);
-      expect(actualUserId).toBe(userId);
+    const clientId = '1ceb9063fced26d3';
+    const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
+    const domain = 'domain.wire.link';
+
+    it('gets User ID and Client ID from a Session ID without domain.', () => {
+      const sessionId = CryptographyService.constructSessionId(userId, clientId, null);
+      const res = CryptographyService['dismantleSessionId'](sessionId);
+      expect(res.clientId).toBe(clientId);
+      expect(res.userId).toBe(userId);
+      expect(res.domain).toBe(undefined);
+    });
+
+    it('gets User ID and Client ID from a Session ID with domain.', () => {
+      const sessionId = CryptographyService.constructSessionId(userId, clientId, domain);
+      const res = CryptographyService['dismantleSessionId'](sessionId);
+      expect(res.clientId).toBe(clientId);
+      expect(res.userId).toBe(userId);
+      expect(res.domain).toBe(domain);
     });
   });
 
