@@ -303,7 +303,8 @@ export class ConnectionRepository {
    */
   private async updateStatus(userEntity: User, newStatus: ConnectionStatus): Promise<void> {
     const currentStatus = userEntity.connection().status();
-    const isFederated = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    const config = Config.getConfig().FEATURE;
+    const isFederated = config.FEDERATION_DOMAIN && config.ENABLE_FEDERATION;
     try {
       const response = isFederated
         ? await this.connectionService.putFederatedConnections(userEntity.qualifiedId, newStatus)
