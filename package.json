@@ -2,7 +2,7 @@
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "7.2.91",
-    "@wireapp/core": "17.17.4",
+    "@wireapp/core": "17.18.0",
     "@wireapp/react-ui-kit": "7.54.0",
     "@wireapp/store-engine-dexie": "1.6.7",
     "@wireapp/store-engine-sqleet": "1.7.11",
