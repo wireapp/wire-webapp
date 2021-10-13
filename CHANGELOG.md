@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.18.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.17.4...@wireapp/core@17.18.0) (2021-10-13)
+
+
+### Features
+
+* **core:** Add domain to encrypted session ids ([#4154](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4154)) ([ca00b8a](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/ca00b8a11552be9f7b5a14fb62df7de8818e03e3))
+
+
+
+
+
 ## [17.17.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.17.3...@wireapp/core@17.17.4) (2021-10-12)
 
 **Note:** Version bump only for package @wireapp/core
