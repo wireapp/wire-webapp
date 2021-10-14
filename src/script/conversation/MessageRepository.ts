@@ -273,7 +273,7 @@ export class MessageRepository {
       .withQuote(quoteData)
       .build();
 
-    return this.sendAndInjectGenericMessageV2(textPayload, userIds, conversation);
+    return this.sendAndInjectGenericCoreMessage(textPayload, userIds, conversation);
   }
 
   private async sendFederatedEditMessage(
@@ -1111,7 +1111,7 @@ export class MessageRepository {
    * @param messageEntity Message to delete
    * @returns Resolves when message was deleted
    */
-  public async deleteMessage(conversationEntity: Conversation, messageEntity: Message): Promise<number> {
+  public async deleteMessage(conversationEntity: Conversation, messageEntity: Message): Promise<void> {
     try {
       const protoMessageHide = new MessageHide({
         conversationId: conversationEntity.id,
@@ -1127,7 +1127,7 @@ export class MessageRepository {
         this.conversationState.self_conversation()?.qualifiedId,
       );
       await this.sendGenericMessageToConversation(eventInfoEntity);
-      return await this.deleteMessageById(conversationEntity, messageEntity.id);
+      await this.deleteMessageById(conversationEntity, messageEntity.id);
     } catch (error) {
       this.logger.info(
         `Failed to send delete message with id '${messageEntity.id}' for conversation '${conversationEntity.id}'`,
