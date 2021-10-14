@@ -57,3 +57,19 @@ export class InvitationPhoneExistsError extends InvitationError {
     this.name = 'InvitationPhoneExistsError';
   }
 }
+
+export class InvitationNotFoundError extends InvitationError {
+  constructor(message: string, label = SyntheticErrorLabel.INVITATION_NOT_FOUND, code = StatusCode.NOT_FOUND) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'InvitationNotFoundError';
+  }
+}
+
+export class InvitationMultipleError extends InvitationError {
+  constructor(message: string, label = SyntheticErrorLabel.INVITATION_MULTIPLE_FOUND, code = StatusCode.CONFLICT) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, new.target.prototype);
+    this.name = 'InvitationMultipleError';
+  }
+}

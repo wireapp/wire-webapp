@@ -22,11 +22,14 @@ import type {AxiosRequestConfig} from 'axios';
 import {TeamAPI} from '../team/';
 import {HttpClient, BackendErrorLabel, BackendError} from '../../http/';
 import type {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
+import {StatusCodes as StatusCode} from 'http-status-codes';
 import {
   InvitationInvalidPhoneError,
   InvitationInvalidEmailError,
   InvitationEmailExistsError,
   InvitationPhoneExistsError,
+  InvitationNotFoundError,
+  InvitationMultipleError,
 } from './InvitationError';
 
 export class TeamInvitationAPI {
@@ -34,6 +37,7 @@ export class TeamInvitationAPI {
   public static readonly URL = {
     INFO: 'info',
     INVITATIONS: 'invitations',
+    EMAIL: 'by-email',
   };
 
   constructor(private readonly client: HttpClient) {}
@@ -89,6 +93,31 @@ export class TeamInvitationAPI {
     };
 
     await this.client.sendJSON(config);
+  }
+
+  public async headInvitation(email: string): Promise<void> {
+    const config: AxiosRequestConfig = {
+      method: 'head',
+      params: {
+        email,
+      },
+      url: `${TeamAPI.URL.TEAMS}/${TeamInvitationAPI.URL.INVITATIONS}/${TeamInvitationAPI.URL.EMAIL}`,
+    };
+
+    try {
+      await this.client.sendJSON(config);
+    } catch (error) {
+      const backendError = error as BackendError;
+      switch (backendError.code) {
+        case StatusCode.NOT_FOUND: {
+          throw new InvitationNotFoundError(backendError.message);
+        }
+        case StatusCode.CONFLICT: {
+          throw new InvitationMultipleError(backendError.message);
+        }
+      }
+      throw error;
+    }
   }
 
   public async postInvitation(teamId: string, invitation: NewTeamInvitation): Promise<TeamInvitation> {
