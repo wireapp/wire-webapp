@@ -42,6 +42,7 @@ import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
 import {ClientState} from './ClientState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {Config} from '../Config';
 
 export type QualifiedUserClientEntityMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
@@ -462,7 +463,7 @@ export class ClientRepository {
           if (backendClient) {
             const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {
               ...backendClient,
-              domain: userId.domain,
+              domain: Config.getConfig().FEATURE.ENABLE_FEDERATION ? userId.domain : undefined,
             });
 
             delete clientsFromBackend[clientId];
@@ -474,6 +475,8 @@ export class ClientRepository {
 
             // Locally known client changed on backend
             if (wasUpdated) {
+              // Clear the previous client in DB (in case the domain changes the primary key will also change, thus invalidating the previous client)
+              this.clientService.deleteClientFromDb(client.meta.primary_key);
               this.logger.info(`Updating client '${clientId}' of user '${userId}' locally`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
