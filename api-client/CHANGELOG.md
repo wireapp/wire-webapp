@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.0.0...@wireapp/api-client@15.1.0) (2021-10-14)
+
+
+### Features
+
+* **api-client:** Bind endpoint to check for pending invitations for a given email ([#4155](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4155)) ([f7506eb](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/f7506ebfa9783084048c69c34b2c976931e53e82))
+
+
+
+
+
 # [15.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@14.2.3...@wireapp/api-client@15.0.0) (2021-10-12)
 
 
