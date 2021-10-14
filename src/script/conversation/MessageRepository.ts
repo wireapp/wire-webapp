@@ -259,9 +259,7 @@ export class MessageRepository {
     message: string,
     mentions: MentionEntity[],
   ): Promise<void> {
-    const userIds: string[] | QualifiedId[] = conversation.domain
-      ? conversation.allUserEntities.map(user => user.qualifiedId)
-      : conversation.allUserEntities.map(user => user.id);
+    const userIds: QualifiedId[] = conversation.allUserEntities.map(user => user.qualifiedId);
 
     const textPayload = this.core
       .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
@@ -1063,9 +1061,6 @@ export class MessageRepository {
     messageEntity: Message,
     precondition?: string[] | boolean,
   ): Promise<void> {
-    if (conversationEntity.isFederated()) {
-      return this.deleteFederatedMessageForEveryone(conversationEntity, messageEntity, precondition);
-    }
     const conversationId = conversationEntity.id;
     const messageId = messageEntity.id;
 
@@ -1073,22 +1068,25 @@ export class MessageRepository {
       if (!messageEntity.user().isMe && !messageEntity.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-
-      const protoMessageDelete = new MessageDelete({messageId});
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
-        messageId: createRandomUuid(),
-      });
-      await this.messageSender.queueMessage(() => {
-        const userIds = Array.isArray(precondition) ? precondition : undefined;
-        return this.createRecipients(conversationEntity, false, userIds).then(recipients => {
-          const options = {precondition, recipients};
-          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
-          this.sendGenericMessage(eventInfoEntity, true);
+      if (conversationEntity.isFederated()) {
+        await this.deleteFederatedMessageForEveryone(conversationEntity, messageEntity, precondition);
+      } else {
+        const protoMessageDelete = new MessageDelete({messageId});
+        const genericMessage = new GenericMessage({
+          [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
+          messageId: createRandomUuid(),
         });
-      });
+        await this.messageSender.queueMessage(() => {
+          const userIds = Array.isArray(precondition) ? precondition : undefined;
+          return this.createRecipients(conversationEntity, false, userIds).then(recipients => {
+            const options = {precondition, recipients};
+            const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
+            this.sendGenericMessage(eventInfoEntity, true);
+          });
+        });
+      }
+
       await this.deleteMessageById(conversationEntity, messageId);
-      return;
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
