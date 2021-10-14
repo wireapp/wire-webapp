@@ -258,8 +258,11 @@ export class MessageRepository {
     conversation: Conversation,
     message: string,
     mentions: MentionEntity[],
+    quote?: QuoteEntity,
   ): Promise<void> {
     const userIds: QualifiedId[] = conversation.allUserEntities.map(user => user.qualifiedId);
+
+    const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
     const textPayload = this.core
       .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
@@ -267,6 +270,7 @@ export class MessageRepository {
         mentions.map(mention => ({length: mention.length, start: mention.startIndex, userId: mention.userId})),
       )
       .withReadConfirmation(this.expectReadReceipt(conversation))
+      .withQuote(quoteData)
       .build();
 
     return this.sendAndInjectGenericMessageV2(textPayload, userIds, conversation);
@@ -325,7 +329,7 @@ export class MessageRepository {
   ): Promise<void> {
     try {
       if (conversationEntity.isFederated()) {
-        return await this.sendFederatedMessage(conversationEntity, textMessage, mentionEntities /*TODO, quoteEntity*/);
+        return await this.sendFederatedMessage(conversationEntity, textMessage, mentionEntities, quoteEntity);
       }
       const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
       await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
