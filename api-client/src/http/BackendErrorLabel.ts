@@ -115,5 +115,7 @@ export enum SyntheticErrorLabel {
   SSO_GENERIC_ERROR = 'generic-sso-error',
   SSO_NO_SSO_CODE = 'no-sso-code-found',
   SSO_USER_CANCELLED_ERROR = 'user-cancelled-sso-error',
+  INVITATION_NOT_FOUND = 'invitation-not-found',
+  INVITATION_MULTIPLE_FOUND = 'invitation-multiple-found',
   UNKNOWN = 'unknown-error',
 }
