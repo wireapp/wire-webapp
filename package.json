@@ -67,7 +67,7 @@
     "@types/classnames": "2.3.1",
     "@types/dexie-batch": "0.4.3",
     "@types/enzyme": "3.10.9",
-    "@types/faker": "5.5.8",
+    "@types/faker": "5.5.9",
     "@types/generate-changelog": "1.8.1",
     "@types/highlight.js": "10.1.0",
     "@types/js-cookie": "2.2.7",
