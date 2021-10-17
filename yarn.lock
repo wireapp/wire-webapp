@@ -6000,6 +6000,11 @@ espree@^7.3.0, espree@^7.3.1:
     acorn-jsx "^5.3.1"
     eslint-visitor-keys "^1.3.0"
 
+esprima-next@^5.7.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/esprima-next/-/esprima-next-5.7.0.tgz#6a457fac9d33041e1ef2a55f1a6c54eb967c9fb9"
+  integrity sha512-WKOqCIqZuBXe2up72Ibhigz/mkm/XsBU9jC/eGvMLfY+GZQTBCK9zBVu73Y9VT0098XeZ1JvprpxKwf3I514Iw==
+
 esprima@^4.0.0, esprima@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/esprima/-/esprima-4.0.1.tgz#13b04cdb3e6c5d19df91ab6987a8695619b0aa71"
@@ -7410,10 +7415,10 @@ husky@4.3.8:
     slash "^3.0.0"
     which-pm-runs "^1.0.0"
 
-i18next-scanner@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/i18next-scanner/-/i18next-scanner-3.0.1.tgz#79cb8e256fe148816dc209d6a776e62ea4aea364"
-  integrity sha512-tkyPfurIz1XLDNJdGXdrXvJmKrbecjFR5DPLvW70OBqR0x2M2mHTkCFpiUjNdV9pEVf9NDQhDEXr0yzt1PQK4w==
+i18next-scanner@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/i18next-scanner/-/i18next-scanner-3.1.0.tgz#35d00d945637c1a2b90124b0fd327040ac197598"
+  integrity sha512-dHLXUJIiF1CYJNslCkJFDYJySk5fg+dzdg9O73XXqHcdZwJ2947SWusqq8HdNFB7LpkBi8oTG6TWLZPmqbAh8Q==
   dependencies:
     acorn "^8.0.4"
     acorn-dynamic-import "^4.0.0"
@@ -7426,7 +7431,7 @@ i18next-scanner@3.0.1:
     deepmerge "^4.0.0"
     ensure-array "^1.0.0"
     eol "^0.9.1"
-    esprima "^4.0.0"
+    esprima-next "^5.7.0"
     gulp-sort "^2.0.0"
     i18next "*"
     lodash "^4.0.0"
