@@ -73,7 +73,49 @@ export class ConnectionAPI {
   }
 
   /**
+   * Get the list of all the connections to other users (including users that are on federated servers)
+   *
+   * @see https://nginz-https.anta.wire.link/api/swagger-ui/#/default/post_list_connections
+   */
+  public getConnectionList(): Promise<Connection[]> {
+    let allConnections: Connection[] = [];
+
+    const getConnectionChunks = async (pagingState?: string): Promise<Connection[]> => {
+      const connectionsPerRequest = 500;
+      const config: AxiosRequestConfig = {
+        method: 'POST',
+        data: {
+          size: connectionsPerRequest,
+          paging_state: pagingState,
+        },
+        url: '/list-connections',
+      };
+
+      const {data} = await this.client.sendJSON<{
+        connections: Connection[];
+        has_more?: boolean;
+        paging_state?: string;
+      }>(config);
+
+      const {connections, has_more, paging_state} = data;
+
+      if (connections.length) {
+        allConnections = allConnections.concat(connections);
+      }
+
+      if (has_more) {
+        return getConnectionChunks(paging_state);
+      }
+
+      return allConnections;
+    };
+
+    return getConnectionChunks();
+  }
+
+  /**
    * Get all connections to other users.
+   * @deprecated use `getConnectionList` instead
    */
   public getAllConnections(): Promise<Connection[]> {
     let allConnections: Connection[] = [];
