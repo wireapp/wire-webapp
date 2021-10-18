@@ -1095,7 +1095,6 @@ export class ConversationRepository {
       .then(conversationEntity => {
         if (!conversationEntity) {
           if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
-            // TODO(Federation): Federated 1:1 connections are not yet implemented by the backend.
             return this.fetchConversationById(qualifiedId);
           }
         }

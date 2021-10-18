@@ -430,7 +430,9 @@ class App {
       await teamRepository.initTeam();
 
       const conversationEntities = await conversationRepository.getConversations();
-      const connectionEntities = await connectionRepository.getConnections();
+      const connectionEntities = await connectionRepository.getConnections(
+        Config.getConfig().FEATURE.ENABLE_FEDERATION,
+      );
       loadingView.updateProgress(25, t('initReceivedUserData'));
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
