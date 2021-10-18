@@ -17,7 +17,7 @@
  *
  */
 
-import type {AxiosRequestConfig} from 'axios';
+import type {AxiosError, AxiosRequestConfig} from 'axios';
 
 import {TeamAPI} from '../team/';
 import {HttpClient, BackendErrorLabel, BackendError} from '../../http/';
@@ -107,13 +107,13 @@ export class TeamInvitationAPI {
     try {
       await this.client.sendJSON(config);
     } catch (error) {
-      const backendError = error as BackendError;
-      switch (backendError.code) {
+      const status = (error as AxiosError).response?.status;
+      switch (status) {
         case StatusCode.NOT_FOUND: {
-          throw new InvitationNotFoundError(backendError.message);
+          throw new InvitationNotFoundError('Invitation not found');
         }
         case StatusCode.CONFLICT: {
-          throw new InvitationMultipleError(backendError.message);
+          throw new InvitationMultipleError('Multiple invitations found');
         }
       }
       throw error;
