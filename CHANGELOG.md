@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.1.1...@wireapp/api-client@15.2.0) (2021-10-18)
+
+
+### Features
+
+* **api-client:** Add federated method to get connections ([#4158](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4158)) ([70f3dd8](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/70f3dd8611c3b4ca779f055d095a99b838ad34bd))
+
+
+
+
+
 ## [15.1.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.1.0...@wireapp/api-client@15.1.1) (2021-10-18)
 
 
