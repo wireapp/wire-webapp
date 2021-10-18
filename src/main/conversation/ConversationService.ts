@@ -418,6 +418,7 @@ export class ConversationService {
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
+    callbacks?: MessageSendingCallbacks,
   ): Promise<ConfirmationMessage> {
     const content = Confirmation.create(payloadBundle.content);
 
@@ -425,6 +426,7 @@ export class ConversationService {
       [GenericMessageType.CONFIRMATION]: content,
       messageId: payloadBundle.id,
     });
+    callbacks?.onStart?.(genericMessage);
 
     await this.sendGenericMessage(
       this.apiClient.validatedClientId,
@@ -434,6 +436,7 @@ export class ConversationService {
       sendAsProtobuf,
       conversationDomain,
     );
+    callbacks?.onSuccess?.(genericMessage);
 
     return {
       ...payloadBundle,
@@ -447,6 +450,7 @@ export class ConversationService {
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
+    callbacks?: MessageSendingCallbacks,
   ): Promise<EditedTextMessage> {
     const editedMessage = MessageEdit.create({
       replacingMessageId: payloadBundle.content.originalMessageId,
@@ -457,8 +461,9 @@ export class ConversationService {
       [GenericMessageType.EDITED]: editedMessage,
       messageId: payloadBundle.id,
     });
+    callbacks?.onStart?.(genericMessage);
 
-    await this.sendGenericMessage(
+    const response = await this.sendGenericMessage(
       this.apiClient.validatedClientId,
       payloadBundle.conversation,
       genericMessage,
@@ -466,6 +471,7 @@ export class ConversationService {
       sendAsProtobuf,
       conversationDomain,
     );
+    callbacks?.onSuccess?.(genericMessage, response?.time);
 
     return {
       ...payloadBundle,
@@ -993,6 +999,7 @@ export class ConversationService {
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
+    callbacks?: MessageSendingCallbacks,
   ): Promise<DeleteMessage> {
     const messageId = MessageBuilder.createId();
 
@@ -1004,8 +1011,9 @@ export class ConversationService {
       [GenericMessageType.DELETED]: content,
       messageId,
     });
+    callbacks?.onStart?.(genericMessage);
 
-    await this.sendGenericMessage(
+    const response = await this.sendGenericMessage(
       this.apiClient.validatedClientId,
       conversationId,
       genericMessage,
@@ -1013,6 +1021,7 @@ export class ConversationService {
       sendAsProtobuf,
       conversationDomain,
     );
+    callbacks?.onSuccess?.(genericMessage, response?.time);
 
     return {
       content,
@@ -1160,11 +1169,11 @@ export class ConversationService {
       case PayloadBundleType.COMPOSITE:
         return this.sendComposite(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.CONFIRMATION:
-        return this.sendConfirmation(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        return this.sendConfirmation(payloadBundle, userIds, sendAsProtobuf, conversationDomain, callbacks);
       case PayloadBundleType.LOCATION:
         return this.sendLocation(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.MESSAGE_EDIT:
-        return this.sendEditedText(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        return this.sendEditedText(payloadBundle, userIds, sendAsProtobuf, conversationDomain, callbacks);
       case PayloadBundleType.PING:
         return this.sendKnock(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.REACTION:
