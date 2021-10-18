@@ -68,13 +68,15 @@ export interface UserActionsProps {
   conversationRoleRepository?: ConversationRoleRepository;
   isSelfActivated: boolean;
   onAction: (action: Actions) => void;
+  selfUser: User;
   user: User;
 }
 
-function createPlaceholder1to1Conversation(user: User) {
+function createPlaceholder1to1Conversation(user: User, selfUser: User) {
   const {id, domain} = user.connection().conversationId;
   const conversation = new Conversation(id, domain);
   conversation.name(user.name());
+  conversation.selfUser(selfUser);
   conversation.type(CONVERSATION_TYPE.CONNECT);
   conversation.participating_user_ids([user.qualifiedId]);
   conversation.participating_user_ets([user]);
@@ -91,6 +93,7 @@ const UserActions: React.FC<UserActionsProps> = ({
   conversation,
   onAction,
   conversationRoleRepository,
+  selfUser,
 }) => {
   const isNotMe = !user.isMe && isSelfActivated;
 
@@ -191,7 +194,7 @@ const UserActions: React.FC<UserActionsProps> = ({
            *
            * Before generalizing this, we need to account for special cases (probably with team users...). At the end of the federation feature we will probably have a pretty good idea what are the special cases
            */
-          const newConversation = createPlaceholder1to1Conversation(user);
+          const newConversation = createPlaceholder1to1Conversation(user, selfUser);
           const savedConversation = await actionsViewModel.saveConversation(newConversation);
           actionsViewModel.open1to1Conversation(savedConversation);
         } else {
@@ -263,5 +266,5 @@ export default UserActions;
 registerReactComponent('user-actions', {
   component: UserActions,
   template:
-    '<div data-bind="react: {user: ko.unwrap(user), isSelfActivated: ko.unwrap(isSelfActivated), onAction, conversationRoleRepository, conversation: ko.unwrap(conversation), actionsViewModel}"></div>',
+    '<div data-bind="react: {user: ko.unwrap(user), isSelfActivated: ko.unwrap(isSelfActivated), onAction, conversationRoleRepository, conversation: ko.unwrap(conversation), actionsViewModel, selfUser: ko.unwrap(selfUser)}"></div>',
 });
