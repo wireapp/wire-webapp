@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.1.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.1.0...@wireapp/api-client@15.1.1) (2021-10-18)
+
+
+### Bug Fixes
+
+* **api-client:** Extract error response status code ([#4157](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4157)) ([90653c9](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/90653c9a2dc1405c5e86c7b219a6d41c5f46bc35))
+
+
+
+
+
 # [15.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.0.0...@wireapp/api-client@15.1.0) (2021-10-14)
 
 
