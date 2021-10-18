@@ -28,7 +28,7 @@ import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {errors as ProteusErrors, keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
+import type {Context, PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -44,6 +44,9 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {container} from 'tsyringe';
+import {Core} from '../service/CoreSingleton';
+import {ClientType} from '@wireapp/api-client/src/client';
 
 export interface SignalingKeys {
   enckey: string;
@@ -79,7 +82,11 @@ export class CryptographyRepository {
     return '💣';
   }
 
-  constructor(cryptographyService: CryptographyService, storageRepository: StorageRepository) {
+  constructor(
+    cryptographyService: CryptographyService,
+    storageRepository: StorageRepository,
+    private readonly core = container.resolve(Core),
+  ) {
     this.cryptographyService = cryptographyService;
     this.storageRepository = storageRepository;
     this.logger = getLogger('CryptographyRepository');
@@ -88,6 +95,12 @@ export class CryptographyRepository {
 
     this.currentClient = undefined;
     this.cryptobox = undefined;
+  }
+
+  async initCore(clientType: ClientType): Promise<Context> {
+    const context = await this.core.init(clientType, undefined, this.storageRepository.storageService['engine']);
+    this.core.initClient({clientType});
+    return context;
   }
 
   /**

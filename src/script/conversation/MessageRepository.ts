@@ -39,7 +39,6 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {Account} from '@wireapp/core';
 import {ReactionType, MessageSendingCallbacks} from '@wireapp/core/src/main/conversation/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
@@ -109,6 +108,7 @@ import {UserType} from '../tracking/attribute';
 import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
+import {Core} from '../service/CoreSingleton';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -137,6 +137,7 @@ export class MessageRepository {
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly clientState = container.resolve(ClientState),
+    private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('MessageRepository');
 
@@ -258,35 +259,11 @@ export class MessageRepository {
       ? conversation.allUserEntities.map(user => user.qualifiedId)
       : conversation.allUserEntities.map(user => user.id);
 
-    const crudEngine = this.cryptography_repository.storageRepository.storageService['engine'];
-    const apiClient = this.cryptography_repository.cryptographyService['apiClient'];
-    apiClient.context!.domain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
-    const account = new Account(apiClient, () => Promise.resolve(crudEngine));
-    await account.initServices(crudEngine);
-    await account.service.client['cryptographyService'].initCryptobox();
-    const textPayload = account
+    const textPayload = this.core
       .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
       .build();
 
-    const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
-      const senderId = this.clientState.currentClient().id;
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
-      this.cryptography_repository.cryptographyMapper
-        .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
-        .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
-    };
-
-    const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
-      this.updateMessageAsSent(conversation, genericMessage.messageId, sentTime);
-    };
-
-    await account.service!.conversation.send({
-      callbacks: {onStart: injectOptimisticEvent, onSuccess: updateOptimisticEvent},
-      conversationDomain: conversation.domain,
-      payloadBundle: textPayload,
-      userIds,
-    });
+    return this.sendAndInjectGenericCoreMessage(textPayload, userIds, conversation);
   }
 
   /**
@@ -754,6 +731,32 @@ export class MessageRepository {
       ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
     ];
     return errorTypes.includes(error.type);
+  }
+
+  private async sendAndInjectGenericCoreMessage(
+    payload: any,
+    userIds: string[] | QualifiedId[],
+    conversation: Conversation,
+  ) {
+    const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
+      const senderId = this.clientState.currentClient().id;
+      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+      const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
+      this.cryptography_repository.cryptographyMapper
+        .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
+        .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
+    };
+
+    const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
+      this.updateMessageAsSent(conversation, genericMessage.messageId, sentTime);
+    };
+
+    await this.core.service!.conversation.send({
+      callbacks: {onStart: injectOptimisticEvent, onSuccess: updateOptimisticEvent},
+      conversationDomain: conversation.domain,
+      payloadBundle: payload,
+      userIds,
+    });
   }
 
   private async _sendAndInjectGenericMessage(
