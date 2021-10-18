@@ -419,11 +419,7 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
       await cryptographyRepository.initCryptobox();
-      if (Config.getConfig().FEATURE.FEDERATION_DOMAIN && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-        // We just want to initialize the core for federated backend (for now only those use the core)
-        // We can remove the condition once normal backends start using the core to send messages
-        cryptographyRepository.initCore(context.clientType);
-      }
+      cryptographyRepository.initCore(context.clientType);
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 

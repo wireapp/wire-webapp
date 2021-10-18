@@ -519,7 +519,7 @@ export class InputBarViewModel {
   readonly clickToPing = (): void => {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
-      this.messageRepository.sendKnock(this.conversationEntity()).then(() => {
+      this.messageRepository.sendPing(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
