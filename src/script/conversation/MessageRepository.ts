@@ -109,6 +109,7 @@ import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicate
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 import {Core} from '../service/CoreSingleton';
+import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -254,16 +255,56 @@ export class MessageRepository {
    * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
    * @see https://docs.wire.com/understand/federation/index.html
    */
-  async sendFederatedMessage(conversation: Conversation, message: string): Promise<void> {
-    const userIds: string[] | QualifiedId[] = conversation.domain
-      ? conversation.allUserEntities.map(user => user.qualifiedId)
-      : conversation.allUserEntities.map(user => user.id);
+  private async sendFederatedMessage(
+    conversation: Conversation,
+    message: string,
+    mentions: MentionEntity[],
+    quote?: QuoteEntity,
+  ): Promise<void> {
+    const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
     const textPayload = this.core
       .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
+      .withMentions(
+        mentions.map(mention => ({length: mention.length, start: mention.startIndex, userId: mention.userId})),
+      )
+      .withReadConfirmation(this.expectReadReceipt(conversation))
+      .withQuote(quoteData)
       .build();
 
-    return this.sendAndInjectGenericCoreMessage(textPayload, userIds, conversation);
+    return this.sendAndInjectGenericCoreMessage(textPayload, conversation);
+  }
+
+  private async sendFederatedEditMessage(
+    conversation: Conversation,
+    message: string,
+    originalMessageEntity: ContentMessage,
+    mentions: MentionEntity[],
+  ) {
+    const textPayload = this.core
+      .service!.conversation.messageBuilder.createEditedText({
+        conversationId: conversation.id,
+        newMessageText: message,
+        originalMessageId: originalMessageEntity.id,
+      })
+      .withMentions(
+        mentions.map(mention => ({length: mention.length, start: mention.startIndex, userId: mention.userId})),
+      )
+      .withReadConfirmation(this.expectReadReceipt(conversation))
+      .build();
+
+    return this.sendAndInjectGenericCoreMessage(textPayload, conversation);
+  }
+
+  private async deleteFederatedMessageForEveryone(conversation: Conversation, message: Message, precondition?: any) {
+    const userIds = conversation.allUserEntities.map(user => user.qualifiedId);
+    this.core.service!.conversation.deleteMessageEveryone(
+      conversation.id,
+      message.id,
+      userIds,
+      true,
+      conversation.domain,
+    );
   }
 
   /**
@@ -280,17 +321,19 @@ export class MessageRepository {
     textMessage: string,
     mentionEntities: MentionEntity[],
     quoteEntity?: QuoteEntity,
-  ): Promise<ConversationEvent | undefined> {
+  ): Promise<void> {
     try {
+      if (conversationEntity.isFederated()) {
+        return await this.sendFederatedMessage(conversationEntity, textMessage, mentionEntities, quoteEntity);
+      }
       const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
-      return await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
+      await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
     } catch (error) {
       if (!this.isUserCancellationError(error)) {
         this.logger.error(`Error while sending text message: ${error.message}`, error);
         throw error;
       }
     }
-    return undefined;
   }
 
   /**
@@ -307,7 +350,7 @@ export class MessageRepository {
     textMessage: string,
     originalMessageEntity: ContentMessage,
     mentionEntities: MentionEntity[],
-  ): Promise<ConversationEvent | undefined> {
+  ): Promise<void> {
     const hasDifferentText = isTextDifferent(originalMessageEntity, textMessage);
     const hasDifferentMentions = areMentionsDifferent(originalMessageEntity, mentionEntities);
     const wasEdited = hasDifferentText || hasDifferentMentions;
@@ -317,6 +360,9 @@ export class MessageRepository {
         ConversationError.TYPE.NO_MESSAGE_CHANGES,
         ConversationError.MESSAGE.NO_MESSAGE_CHANGES,
       );
+    }
+    if (conversationEntity.isFederated()) {
+      return this.sendFederatedEditMessage(conversationEntity, textMessage, originalMessageEntity, mentionEntities);
     }
 
     const messageId = createRandomUuid();
@@ -338,14 +384,13 @@ export class MessageRepository {
 
     try {
       await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
-      return await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
+      await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
     } catch (error) {
       if (!this.isUserCancellationError(error)) {
         this.logger.error(`Error while editing message: ${error.message}`, error);
         throw error;
       }
     }
-    return undefined;
   }
 
   /**
@@ -733,11 +778,9 @@ export class MessageRepository {
     return errorTypes.includes(error.type);
   }
 
-  private async sendAndInjectGenericCoreMessage(
-    payload: any,
-    userIds: string[] | QualifiedId[],
-    conversation: Conversation,
-  ) {
+  private async sendAndInjectGenericCoreMessage(payload: OtrMessage, conversation: Conversation) {
+    const users = conversation.allUserEntities;
+    const userIds = conversation.isFederated() ? users.map(user => user.qualifiedId) : users.map(user => user.id);
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
       const senderId = this.clientState.currentClient().id;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -753,7 +796,7 @@ export class MessageRepository {
 
     await this.core.service!.conversation.send({
       callbacks: {onStart: injectOptimisticEvent, onSuccess: updateOptimisticEvent},
-      conversationDomain: conversation.domain,
+      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       payloadBundle: payload,
       userIds,
     });
@@ -1014,7 +1057,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     messageEntity: Message,
     precondition?: string[] | boolean,
-  ): Promise<number> {
+  ): Promise<void> {
     const conversationId = conversationEntity.id;
     const messageId = messageEntity.id;
 
@@ -1022,26 +1065,31 @@ export class MessageRepository {
       if (!messageEntity.user().isMe && !messageEntity.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-
-      const protoMessageDelete = new MessageDelete({messageId});
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
-        messageId: createRandomUuid(),
-      });
-      await this.messageSender.queueMessage(() => {
-        const userIds = Array.isArray(precondition) ? precondition : undefined;
-        return this.createRecipients(conversationEntity, false, userIds).then(recipients => {
-          const options = {precondition, recipients};
-          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
-          this.sendGenericMessage(eventInfoEntity, true);
+      if (conversationEntity.isFederated()) {
+        await this.deleteFederatedMessageForEveryone(conversationEntity, messageEntity, precondition);
+      } else {
+        const protoMessageDelete = new MessageDelete({messageId});
+        const genericMessage = new GenericMessage({
+          [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
+          messageId: createRandomUuid(),
         });
-      });
-      return await this.deleteMessageById(conversationEntity, messageId);
+        await this.messageSender.queueMessage(() => {
+          const userIds = Array.isArray(precondition) ? precondition : undefined;
+          return this.createRecipients(conversationEntity, false, userIds).then(recipients => {
+            const options = {precondition, recipients};
+            const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
+            this.sendGenericMessage(eventInfoEntity, true);
+          });
+        });
+      }
+
+      await this.deleteMessageById(conversationEntity, messageId);
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
         this.logger.warn(`Conversation '${conversationId}' not found. Deleting message for self user only.`);
-        return this.deleteMessage(conversationEntity, messageEntity);
+        this.deleteMessage(conversationEntity, messageEntity);
+        return;
       }
       const message = `Failed to delete message '${messageId}' in conversation '${conversationId}' for everyone`;
       this.logger.info(message, error);
@@ -1056,7 +1104,7 @@ export class MessageRepository {
    * @param messageEntity Message to delete
    * @returns Resolves when message was deleted
    */
-  public async deleteMessage(conversationEntity: Conversation, messageEntity: Message): Promise<number> {
+  public async deleteMessage(conversationEntity: Conversation, messageEntity: Message): Promise<void> {
     try {
       const protoMessageHide = new MessageHide({
         conversationId: conversationEntity.id,
@@ -1072,7 +1120,7 @@ export class MessageRepository {
         this.conversationState.self_conversation()?.qualifiedId,
       );
       await this.sendGenericMessageToConversation(eventInfoEntity);
-      return await this.deleteMessageById(conversationEntity, messageEntity.id);
+      await this.deleteMessageById(conversationEntity, messageEntity.id);
     } catch (error) {
       this.logger.info(
         `Failed to send delete message with id '${messageEntity.id}' for conversation '${conversationEntity.id}'`,

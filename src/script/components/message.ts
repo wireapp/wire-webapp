@@ -216,15 +216,9 @@ class Message {
       const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
 
       const canDelete =
-        messageEntity.user().isMe &&
-        !this.conversation().removed_from_conversation() &&
-        messageEntity.isDeletable() &&
-        !this.conversation().isFederated();
+        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
 
-      const canEdit =
-        messageEntity.isEditable() &&
-        !this.conversation().removed_from_conversation() &&
-        !this.conversation().isFederated();
+      const canEdit = messageEntity.isEditable() && !this.conversation().removed_from_conversation();
 
       const hasDetails =
         !this.conversation().is1to1() &&
