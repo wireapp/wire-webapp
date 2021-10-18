@@ -109,6 +109,7 @@ import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicate
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 import {Core} from '../service/CoreSingleton';
+import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -260,8 +261,6 @@ export class MessageRepository {
     mentions: MentionEntity[],
     quote?: QuoteEntity,
   ): Promise<void> {
-    const userIds: QualifiedId[] = conversation.allUserEntities.map(user => user.qualifiedId);
-
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
     const textPayload = this.core
@@ -273,7 +272,7 @@ export class MessageRepository {
       .withQuote(quoteData)
       .build();
 
-    return this.sendAndInjectGenericCoreMessage(textPayload, userIds, conversation);
+    return this.sendAndInjectGenericCoreMessage(textPayload, conversation);
   }
 
   private async sendFederatedEditMessage(
@@ -282,10 +281,6 @@ export class MessageRepository {
     originalMessageEntity: ContentMessage,
     mentions: MentionEntity[],
   ) {
-    const userIds: string[] | QualifiedId[] = conversation.domain
-      ? conversation.allUserEntities.map(user => user.qualifiedId)
-      : conversation.allUserEntities.map(user => user.id);
-
     const textPayload = this.core
       .service!.conversation.messageBuilder.createEditedText({
         conversationId: conversation.id,
@@ -298,7 +293,7 @@ export class MessageRepository {
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .build();
 
-    return this.sendAndInjectGenericCoreMessage(textPayload, userIds, conversation);
+    return this.sendAndInjectGenericCoreMessage(textPayload, conversation);
   }
 
   private async deleteFederatedMessageForEveryone(conversation: Conversation, message: Message, precondition?: any) {
@@ -783,11 +778,9 @@ export class MessageRepository {
     return errorTypes.includes(error.type);
   }
 
-  private async sendAndInjectGenericCoreMessage(
-    payload: any,
-    userIds: string[] | QualifiedId[],
-    conversation: Conversation,
-  ) {
+  private async sendAndInjectGenericCoreMessage(payload: OtrMessage, conversation: Conversation) {
+    const users = conversation.allUserEntities;
+    const userIds = conversation.isFederated() ? users.map(user => user.qualifiedId) : users.map(user => user.id);
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
       const senderId = this.clientState.currentClient().id;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
@@ -803,7 +796,7 @@ export class MessageRepository {
 
     await this.core.service!.conversation.send({
       callbacks: {onStart: injectOptimisticEvent, onSuccess: updateOptimisticEvent},
-      conversationDomain: conversation.domain,
+      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       payloadBundle: payload,
       userIds,
     });
