@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.19.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.18.1...@wireapp/core@17.19.0) (2021-10-18)
+
+
+### Features
+
+* **core:** Add callback hooks to edit and confirmation messages ([#4156](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4156)) ([8585faa](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/8585faa16835438633c620443c9b4fbc353eb827))
+
+
+
+
+
 ## [17.18.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.18.0...@wireapp/core@17.18.1) (2021-10-14)
 
 **Note:** Version bump only for package @wireapp/core
