@@ -754,12 +754,12 @@ export class ConversationService {
       [GenericMessageType.KNOCK]: content,
       messageId: payloadBundle.id,
     });
-    callbacks?.onStart?.(genericMessage);
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
     if (expireAfterMillis > 0) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
+    callbacks?.onStart?.(genericMessage);
 
     const response = await this.sendGenericMessage(
       this.apiClient.validatedClientId,
