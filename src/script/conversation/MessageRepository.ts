@@ -27,7 +27,6 @@ import {
   Ephemeral,
   External,
   GenericMessage,
-  Knock,
   LastRead,
   LegalHoldStatus,
   MessageDelete,
@@ -223,31 +222,17 @@ export class MessageRepository {
    * @param conversationEntity Conversation to send knock in
    * @returns Resolves after sending the knock
    */
-  public async sendKnock(conversationEntity: Conversation): Promise<ConversationEvent | undefined> {
-    const protoKnock = new Knock({
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
-      hotKnock: false,
+  public async sendPing(conversation: Conversation): Promise<void> {
+    const ping = this.core.service!.conversation.messageBuilder.createPing({
+      conversationId: conversation.id,
+      ping: {
+        expectsReadConfirmation: this.expectReadReceipt(conversation),
+        hotKnock: false,
+        legalHoldStatus: conversation.legalHoldStatus(),
+      },
     });
 
-    let genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
-      messageId: createRandomUuid(),
-    });
-
-    if (conversationEntity.messageTimer()) {
-      genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
-    }
-
-    try {
-      return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
-    } catch (error) {
-      if (!this.isUserCancellationError(error)) {
-        this.logger.error(`Error while sending knock: ${error.message}`, error);
-        throw error;
-      }
-    }
-    return undefined;
+    this.sendAndInjectGenericCoreMessage(ping, conversation);
   }
 
   /**
@@ -793,6 +778,10 @@ export class MessageRepository {
     const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
       this.updateMessageAsSent(conversation, genericMessage.messageId, sentTime);
     };
+
+    const conversationService = this.core.service!.conversation;
+    // Configure ephemeral messages
+    conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
     await this.core.service!.conversation.send({
       callbacks: {onStart: injectOptimisticEvent, onSuccess: updateOptimisticEvent},
