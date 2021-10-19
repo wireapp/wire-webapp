@@ -2907,10 +2907,10 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@15.1.0":
-  version "15.1.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-15.1.0.tgz#bcdbd527aa530b2806a960d375a7c0fd746038ec"
-  integrity sha512-HNeHAGS6/Rdg0RbhRfLscHMFvLotmul6POkJpYKFLppC0mulK+MSaZ9otgho5lRhEySA9uzDiKBGrt+HYMkGgA==
+"@wireapp/api-client@15.2.0":
+  version "15.2.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-15.2.0.tgz#f933063d8a75d80c181c83ddd35f86a62c5b710b"
+  integrity sha512-FJWTwanBkQG0PxB782i4XFIV9ial9+kkRXqNH4OQP+kAyhqgh76G2OU6BQkde41+lh0y0/xPFbVW5PVDX7iS6A==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
@@ -2964,14 +2964,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.19.0":
-  version "17.19.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.19.0.tgz#82f56b391dc1f33e071acdb7234b7ac01787ac23"
-  integrity sha512-/8cvv2NiYlgA0u2LyeDbXhvW/Ya1b7yPHF/eebBAbPVc/p4caFeSuxMPr+O7QdhTXXwFRZh8/pBfZ0XX/J2eGg==
+"@wireapp/core@17.19.2":
+  version "17.19.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.19.2.tgz#813fc3991e3ef858f75b413d1f69fff02f110e7c"
+  integrity sha512-mG/6Y+X9SRugFsk9VyIssiE7knLoPjGyBskPVPPY9VrkaSCCmJYEsGkaNdW/K+uXdjm6u4e1QNTk3ptqM2IF5Q==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "15.1.0"
+    "@wireapp/api-client" "15.2.0"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.9.7"
     hash.js "1.1.7"
@@ -13772,7 +13772,7 @@ uuidjs@4.2.9:
   resolved "https://registry.yarnpkg.com/uuidjs/-/uuidjs-4.2.9.tgz#f1225bd51f9e8aee3c56ec3be0683c14dd9e05ed"
   integrity sha512-ie/yQOFIBnswUUTPQRwMphF/OeE3Pg9y0jorjOPPFtGaeVp9JSdGN5rA9odsXDFH1UfwtpriJXKTro1JTNaIXg==
 
-v8-compile-cache@^2.0.3, v8-compile-cache@^2.2.0, v8-compile-cache@^2.3.0:
+v8-compile-cache@^2.0.3, v8-compile-cache@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.3.0.tgz#2de19618c66dc247dcfb6f99338035d8245a2cee"
   integrity sha512-l8lCEmLcLYZh4nbunNZvQCJc5pv7+RCwa8q/LdUx8u7lsWvPDKmpodJAJNwkAhJC//dFY48KuIEmjtd4RViDrA==
@@ -13970,10 +13970,10 @@ webidl-conversions@^6.1.0:
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-6.1.0.tgz#9111b4d7ea80acd40f5270d666621afa78b69514"
   integrity sha512-qBIvFLGiBpLjfwmYAaHPXsn+ho5xZnGvyGvsarywGNc8VyQJUMHJ8OBKGGrPER0okBeMDaan4mNBlgBROxuI8w==
 
-webpack-cli@4.9.0:
-  version "4.9.0"
-  resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-4.9.0.tgz#dc43e6e0f80dd52e89cbf73d5294bcd7ad6eb343"
-  integrity sha512-n/jZZBMzVEl4PYIBs+auy2WI0WTQ74EnJDiyD98O2JZY6IVIHJNitkYp/uTXOviIOMfgzrNvC9foKv/8o8KSZw==
+webpack-cli@4.9.1:
+  version "4.9.1"
+  resolved "https://registry.yarnpkg.com/webpack-cli/-/webpack-cli-4.9.1.tgz#b64be825e2d1b130f285c314caa3b1ba9a4632b3"
+  integrity sha512-JYRFVuyFpzDxMDB+v/nanUdQYcZtqFPGzmlW4s+UkPMFhSpfRNmf1z4AwYcHJVdvEFAM7FFCQdNTpsBYhDLusQ==
   dependencies:
     "@discoveryjs/json-ext" "^0.5.0"
     "@webpack-cli/configtest" "^1.1.0"
@@ -13986,7 +13986,6 @@ webpack-cli@4.9.0:
     import-local "^3.0.2"
     interpret "^2.2.0"
     rechoir "^0.7.0"
-    v8-compile-cache "^2.2.0"
     webpack-merge "^5.7.3"
 
 webpack-dev-middleware@5.2.1:
