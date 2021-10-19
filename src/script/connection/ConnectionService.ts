@@ -38,8 +38,10 @@ export class ConnectionService {
    * @param userId User ID to start from
    * @returns Promise that resolves with user connections
    */
-  getConnections(): Promise<Connection[]> {
-    return this.apiClient.connection.api.getAllConnections();
+  getConnections(useFederation: boolean = false): Promise<Connection[]> {
+    return useFederation
+      ? this.apiClient.connection.api.getConnectionList()
+      : this.apiClient.connection.api.getAllConnections();
   }
 
   /**

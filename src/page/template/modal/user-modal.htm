@@ -18,7 +18,7 @@
         <!-- /ko -->
         <!-- ko ifnot: user().isBlockedLegalHold() -->   
           <user-actions
-            params="user: user, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: isActivatedAccount()"
+            params="user: user, actionsViewModel: actionsViewModel, onAction: onUserAction, isSelfActivated: isActivatedAccount(), selfUser: userState.self"
           ></user-actions>
         <!-- /ko -->
       <!-- /ko -->

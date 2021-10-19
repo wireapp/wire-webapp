@@ -99,7 +99,7 @@ export class ConnectionRepository {
 
     // Try to find existing connection
     let connectionEntity = this.getConnectionByUserId(
-      connectionData.qualified_to || {id: connectionData.to, domain: ''},
+      connectionData.qualified_to || {domain: '', id: connectionData.to},
     );
     const previousStatus = connectionEntity?.status();
 
@@ -234,9 +234,9 @@ export class ConnectionRepository {
    *
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
-  async getConnections(): Promise<ConnectionEntity[]> {
+  async getConnections(useFederation: boolean = false): Promise<ConnectionEntity[]> {
     try {
-      const connectionData = await this.connectionService.getConnections();
+      const connectionData = await this.connectionService.getConnections(useFederation);
       const newConnectionEntities = ConnectionMapper.mapConnectionsFromJson(connectionData);
       return newConnectionEntities.length
         ? await this.updateConnections(newConnectionEntities)
