@@ -81,7 +81,6 @@ import type {
   FileAssetMessage,
   FileAssetMetaDataMessage,
   HideMessage,
-  ImageAssetMessage,
   ImageAssetMessageOutgoing,
   LocationMessage,
   OtrMessage,
@@ -332,160 +331,51 @@ export class ConversationService {
       : this.messageService.sendOTRMessage(sendingClientId, recipients, conversationId, plainTextArray);
   }
 
-  private async sendButtonAction(
-    payloadBundle: ButtonActionMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<ButtonActionMessage> {
-    const genericMessage = GenericMessage.create({
+  private generateButtonActionGenericMessage(payloadBundle: ButtonActionMessage): GenericMessage {
+    return GenericMessage.create({
       [GenericMessageType.BUTTON_ACTION]: ButtonAction.create(payloadBundle.content),
       messageId: payloadBundle.id,
     });
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: 0,
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
   }
 
-  private async sendButtonActionConfirmation(
+  private generateButtonActionConfirmationGenericMessage(
     payloadBundle: ButtonActionConfirmationMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<ButtonActionConfirmationMessage> {
-    const genericMessage = GenericMessage.create({
+  ): GenericMessage {
+    return GenericMessage.create({
       [GenericMessageType.BUTTON_ACTION_CONFIRMATION]: ButtonActionConfirmation.create(payloadBundle.content),
       messageId: payloadBundle.id,
     });
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: 0,
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
   }
 
-  private async sendComposite(
-    payloadBundle: CompositeMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<CompositeMessage> {
-    const genericMessage = GenericMessage.create({
+  private generateCompositeGenericMessage(payloadBundle: CompositeMessage): GenericMessage {
+    return GenericMessage.create({
       [GenericMessageType.COMPOSITE]: Composite.create(payloadBundle.content),
       messageId: payloadBundle.id,
     });
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: 0,
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
   }
 
-  private async sendConfirmation(
-    payloadBundle: ConfirmationMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-    callbacks?: MessageSendingCallbacks,
-  ): Promise<ConfirmationMessage> {
+  private generateConfirmationGenericMessage(payloadBundle: ConfirmationMessage): GenericMessage {
     const content = Confirmation.create(payloadBundle.content);
 
-    const genericMessage = GenericMessage.create({
+    return GenericMessage.create({
       [GenericMessageType.CONFIRMATION]: content,
       messageId: payloadBundle.id,
     });
-    callbacks?.onStart?.(genericMessage);
-
-    const response = await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-    callbacks?.onSuccess?.(genericMessage, response?.time);
-
-    return {
-      ...payloadBundle,
-      messageTimer: 0,
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
   }
 
-  private async sendEditedText(
-    payloadBundle: EditedTextMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-    callbacks?: MessageSendingCallbacks,
-  ): Promise<EditedTextMessage> {
+  private generateEditedTextGenericMessage(payloadBundle: EditedTextMessage): GenericMessage {
     const editedMessage = MessageEdit.create({
       replacingMessageId: payloadBundle.content.originalMessageId,
       text: MessageToProtoMapper.mapText(payloadBundle),
     });
 
-    const genericMessage = GenericMessage.create({
+    return GenericMessage.create({
       [GenericMessageType.EDITED]: editedMessage,
       messageId: payloadBundle.id,
     });
-    callbacks?.onStart?.(genericMessage);
-
-    const response = await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-    callbacks?.onSuccess?.(genericMessage, response?.time);
-
-    return {
-      ...payloadBundle,
-      messageTimer: 0,
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
   }
 
-  private async sendFileData(
-    payloadBundle: FileAssetMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<FileAssetMessage> {
+  private generateFileDataGenericMessage(payloadBundle: FileAssetMessage): GenericMessage {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileData provided.');
     }
@@ -507,38 +397,16 @@ export class ConversationService {
 
     assetMessage.status = AssetTransferState.UPLOADED;
 
-    let genericMessage = GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.ASSET]: assetMessage,
       messageId: payloadBundle.id,
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
-    if (expireAfterMillis > 0) {
-      genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
-    }
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: this.messageTimer.getMessageTimer(payloadBundle.conversation),
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
+    return expireAfterMillis > 0 ? this.createEphemeral(genericMessage, expireAfterMillis) : genericMessage;
   }
 
-  private async sendFileMetaData(
-    payloadBundle: FileAssetMetaDataMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<FileAssetMetaDataMessage> {
+  private generateFileMetaDataGenericMessage(payloadBundle: FileAssetMetaDataMessage): GenericMessage {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileMetaData provided.');
     }
@@ -559,38 +427,16 @@ export class ConversationService {
       original,
     });
 
-    let genericMessage = GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.ASSET]: assetMessage,
       messageId: payloadBundle.id,
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
-    if (expireAfterMillis > 0) {
-      genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
-    }
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: this.messageTimer.getMessageTimer(payloadBundle.conversation),
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
+    return expireAfterMillis > 0 ? this.createEphemeral(genericMessage, expireAfterMillis) : genericMessage;
   }
 
-  private async sendFileAbort(
-    payloadBundle: FileAssetAbortMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<FileAssetAbortMessage> {
+  private generateFileAbortGenericMessage(payloadBundle: FileAssetAbortMessage): GenericMessage {
     if (!payloadBundle.content) {
       throw new Error('No content for sendFileAbort provided.');
     }
@@ -605,38 +451,19 @@ export class ConversationService {
 
     assetMessage.status = AssetTransferState.NOT_UPLOADED;
 
-    let genericMessage = GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.ASSET]: assetMessage,
       messageId: payloadBundle.id,
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
-    if (expireAfterMillis > 0) {
-      genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
-    }
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: this.messageTimer.getMessageTimer(payloadBundle.conversation),
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
+    return expireAfterMillis > 0 ? this.createEphemeral(genericMessage, expireAfterMillis) : genericMessage;
   }
 
-  private async sendImage(
-    payloadBundle: ImageAssetMessageOutgoing,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<ImageAssetMessage> {
+  private generateImageGenericMessage(payloadBundle: ImageAssetMessageOutgoing): {
+    content: AssetContent;
+    genericMessage: GenericMessage;
+  } {
     if (!payloadBundle.content) {
       throw new Error('No content for sendImage provided.');
     }
@@ -677,33 +504,13 @@ export class ConversationService {
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
-    if (expireAfterMillis > 0) {
+    if (expireAfterMillis) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      content: assetMessage as AssetContent,
-      messageTimer: this.messageTimer.getMessageTimer(payloadBundle.conversation),
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
+    return {content: assetMessage as AssetContent, genericMessage};
   }
 
-  private async sendLocation(
-    payloadBundle: LocationMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<LocationMessage> {
+  private generateLocationGenericMessage(payloadBundle: LocationMessage): GenericMessage {
     const {expectsReadConfirmation, latitude, legalHoldStatus, longitude, name, zoom} = payloadBundle.content;
 
     const locationMessage = Location.create({
@@ -715,76 +522,28 @@ export class ConversationService {
       zoom,
     });
 
-    let genericMessage = GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.LOCATION]: locationMessage,
       messageId: payloadBundle.id,
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
-    if (expireAfterMillis > 0) {
-      genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
-    }
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: this.messageTimer.getMessageTimer(payloadBundle.conversation),
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
+    return expireAfterMillis > 0 ? this.createEphemeral(genericMessage, expireAfterMillis) : genericMessage;
   }
 
-  private async sendKnock(
-    payloadBundle: PingMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-    callbacks?: MessageSendingCallbacks,
-  ): Promise<PingMessage> {
+  private generatePingGenericMessage(payloadBundle: PingMessage): GenericMessage {
     const content = Knock.create(payloadBundle.content);
 
-    let genericMessage = GenericMessage.create({
+    const genericMessage = GenericMessage.create({
       [GenericMessageType.KNOCK]: content,
       messageId: payloadBundle.id,
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
-    if (expireAfterMillis > 0) {
-      genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
-    }
-    callbacks?.onStart?.(genericMessage);
-
-    const response = await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-    callbacks?.onSuccess?.(genericMessage, response?.time);
-
-    return {
-      ...payloadBundle,
-      conversation: payloadBundle.conversation,
-      messageTimer: this.messageTimer.getMessageTimer(payloadBundle.conversation),
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
+    return expireAfterMillis > 0 ? this.createEphemeral(genericMessage, expireAfterMillis) : genericMessage;
   }
 
-  private async sendReaction(
-    payloadBundle: ReactionMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<ReactionMessage> {
+  private generateReactionGenericMessage(payloadBundle: ReactionMessage): GenericMessage {
     const {legalHoldStatus, originalMessageId, type} = payloadBundle.content;
 
     const reaction = Reaction.create({
@@ -797,114 +556,35 @@ export class ConversationService {
       [GenericMessageType.REACTION]: reaction,
       messageId: payloadBundle.id,
     });
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: 0,
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
+    return genericMessage;
   }
 
-  private async sendSessionReset(
-    payloadBundle: ResetSessionMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<ResetSessionMessage> {
-    const genericMessage = GenericMessage.create({
+  private generateSessionResetGenericMessage(payloadBundle: ResetSessionMessage): GenericMessage {
+    return GenericMessage.create({
       [GenericMessageType.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: payloadBundle.id,
     });
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: this.messageTimer.getMessageTimer(payloadBundle.conversation),
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
   }
 
-  private async sendCall(
-    payloadBundle: CallMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-  ): Promise<CallMessage> {
+  private generateCallGenericMessage(payloadBundle: CallMessage): GenericMessage {
     const callMessage = Calling.create({
       content: payloadBundle.content,
     });
 
-    const genericMessage = GenericMessage.create({
+    return GenericMessage.create({
       [GenericMessageType.CALLING]: callMessage,
       messageId: payloadBundle.id,
     });
-
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-
-    return {
-      ...payloadBundle,
-      messageTimer: 0,
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
   }
 
-  private async sendText(
-    payloadBundle: TextMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
-    callbacks?: MessageSendingCallbacks,
-  ): Promise<TextMessage> {
-    let genericMessage = GenericMessage.create({
+  private generateTextGenericMessage(payloadBundle: TextMessage): GenericMessage {
+    const genericMessage = GenericMessage.create({
       messageId: payloadBundle.id,
       [GenericMessageType.TEXT]: MessageToProtoMapper.mapText(payloadBundle),
     });
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
-    if (expireAfterMillis > 0) {
-      genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
-    }
-    callbacks?.onStart?.(genericMessage);
-
-    const response = await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      payloadBundle.conversation,
-      genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
-    );
-    callbacks?.onSuccess?.(genericMessage, response?.time);
-
-    return {
-      ...payloadBundle,
-      messageTimer: this.messageTimer.getMessageTimer(payloadBundle.conversation),
-      state: PayloadBundleState.OUTGOING_SENT,
-    };
+    return expireAfterMillis > 0 ? this.createEphemeral(genericMessage, expireAfterMillis) : genericMessage;
   }
 
   public async clearConversation(
@@ -1133,59 +813,97 @@ export class ConversationService {
    * @param [callbacks] Optional callbacks that will be called when the message starts being sent and when it has been succesfully sent. Currently only used for `sendText`.
    * @returns Sent message
    */
-  public async send({
+  public async send<T extends OtrMessage = OtrMessage>({
     payloadBundle,
     userIds,
     sendAsProtobuf,
     conversationDomain,
     callbacks,
   }: {
-    payloadBundle: OtrMessage;
+    payloadBundle: T;
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
     sendAsProtobuf?: boolean;
     conversationDomain?: string;
     callbacks?: MessageSendingCallbacks;
-  }) {
+  }): Promise<T> {
+    let genericMessage: GenericMessage;
+    let processedContent: AssetContent | undefined = undefined;
+
     switch (payloadBundle.type) {
       case PayloadBundleType.ASSET:
-        return this.sendFileData(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        genericMessage = this.generateFileDataGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.ASSET_ABORT:
-        return this.sendFileAbort(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        genericMessage = this.generateFileAbortGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.ASSET_META:
-        return this.sendFileMetaData(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        genericMessage = this.generateFileMetaDataGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.ASSET_IMAGE:
-        return this.sendImage(payloadBundle as ImageAssetMessageOutgoing, userIds, sendAsProtobuf, conversationDomain);
+        const res = this.generateImageGenericMessage(payloadBundle as ImageAssetMessageOutgoing);
+        genericMessage = res.genericMessage;
+        processedContent = res.content;
+        break;
       case PayloadBundleType.BUTTON_ACTION:
-        return this.sendButtonAction(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        genericMessage = this.generateButtonActionGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.BUTTON_ACTION_CONFIRMATION:
-        return this.sendButtonActionConfirmation(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        genericMessage = this.generateButtonActionConfirmationGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.CALL:
-        return this.sendCall(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        genericMessage = this.generateCallGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.CLIENT_ACTION: {
-        if (payloadBundle.content.clientAction === ClientAction.RESET_SESSION) {
-          return this.sendSessionReset(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        if (payloadBundle.content.clientAction !== ClientAction.RESET_SESSION) {
+          throw new Error(
+            `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`,
+          );
         }
-        throw new Error(
-          `No send method implemented for "${payloadBundle.type}" and ClientAction "${payloadBundle.content}".`,
-        );
+        genericMessage = this.generateSessionResetGenericMessage(payloadBundle);
+        break;
       }
       case PayloadBundleType.COMPOSITE:
-        return this.sendComposite(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        genericMessage = this.generateCompositeGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.CONFIRMATION:
-        return this.sendConfirmation(payloadBundle, userIds, sendAsProtobuf, conversationDomain, callbacks);
+        genericMessage = this.generateConfirmationGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.LOCATION:
-        return this.sendLocation(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        genericMessage = this.generateLocationGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.MESSAGE_EDIT:
-        return this.sendEditedText(payloadBundle, userIds, sendAsProtobuf, conversationDomain, callbacks);
+        genericMessage = this.generateEditedTextGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.PING:
-        return this.sendKnock(payloadBundle, userIds, sendAsProtobuf, conversationDomain, callbacks);
+        genericMessage = this.generatePingGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.REACTION:
-        return this.sendReaction(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        genericMessage = this.generateReactionGenericMessage(payloadBundle);
+        break;
       case PayloadBundleType.TEXT:
-        return this.sendText(payloadBundle, userIds, sendAsProtobuf, conversationDomain, callbacks);
+        genericMessage = this.generateTextGenericMessage(payloadBundle);
+        break;
       default:
         throw new Error(`No send method implemented for "${payloadBundle['type']}".`);
     }
+
+    callbacks?.onStart?.(genericMessage);
+    const response = await this.sendGenericMessage(
+      this.apiClient.validatedClientId,
+      payloadBundle.conversation,
+      genericMessage,
+      userIds,
+      sendAsProtobuf,
+      conversationDomain,
+    );
+    callbacks?.onSuccess?.(genericMessage, response?.time);
+
+    return {
+      ...payloadBundle,
+      content: processedContent || payloadBundle.content,
+      messageTimer: genericMessage.ephemeral?.expireAfterMillis || 0,
+      state: PayloadBundleState.OUTGOING_SENT,
+    };
   }
 
   public sendTypingStart(conversationId: string): Promise<void> {
