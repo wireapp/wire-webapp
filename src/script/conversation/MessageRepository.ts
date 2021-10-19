@@ -278,7 +278,7 @@ export class MessageRepository {
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .build();
 
-    return this.sendAndInjectGenericCoreMessage(textPayload, conversation);
+    return this.sendAndInjectGenericCoreMessage(textPayload, conversation, false);
   }
 
   private async deleteFederatedMessageForEveryone(conversation: Conversation, message: Message, precondition?: any) {
@@ -763,7 +763,14 @@ export class MessageRepository {
     return errorTypes.includes(error.type);
   }
 
-  private async sendAndInjectGenericCoreMessage(payload: OtrMessage, conversation: Conversation) {
+  /**
+   * Will send a generic message using @wireapp/code
+   *
+   * @param payload - the OTR message payload to send
+   * @param conversation - the conversation the message should be sent to
+   * @param syncTimestamp=true - should the message timestamp be synchronized with backend response timestamp
+   */
+  private async sendAndInjectGenericCoreMessage(payload: OtrMessage, conversation: Conversation, syncTimestamp = true) {
     const users = conversation.allUserEntities;
     const userIds = conversation.isFederated() ? users.map(user => user.qualifiedId) : users.map(user => user.id);
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
@@ -776,7 +783,7 @@ export class MessageRepository {
     };
 
     const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
-      this.updateMessageAsSent(conversation, genericMessage.messageId, sentTime);
+      this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
     };
 
     const conversationService = this.core.service!.conversation;
