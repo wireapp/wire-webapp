@@ -428,7 +428,7 @@ export class ConversationService {
     });
     callbacks?.onStart?.(genericMessage);
 
-    await this.sendGenericMessage(
+    const response = await this.sendGenericMessage(
       this.apiClient.validatedClientId,
       payloadBundle.conversation,
       genericMessage,
@@ -436,7 +436,7 @@ export class ConversationService {
       sendAsProtobuf,
       conversationDomain,
     );
-    callbacks?.onSuccess?.(genericMessage);
+    callbacks?.onSuccess?.(genericMessage, response?.time);
 
     return {
       ...payloadBundle,
@@ -746,6 +746,7 @@ export class ConversationService {
     userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
     sendAsProtobuf?: boolean,
     conversationDomain?: string,
+    callbacks?: MessageSendingCallbacks,
   ): Promise<PingMessage> {
     const content = Knock.create(payloadBundle.content);
 
@@ -753,13 +754,14 @@ export class ConversationService {
       [GenericMessageType.KNOCK]: content,
       messageId: payloadBundle.id,
     });
+    callbacks?.onStart?.(genericMessage);
 
     const expireAfterMillis = this.messageTimer.getMessageTimer(payloadBundle.conversation);
     if (expireAfterMillis > 0) {
       genericMessage = this.createEphemeral(genericMessage, expireAfterMillis);
     }
 
-    await this.sendGenericMessage(
+    const response = await this.sendGenericMessage(
       this.apiClient.validatedClientId,
       payloadBundle.conversation,
       genericMessage,
@@ -767,6 +769,7 @@ export class ConversationService {
       sendAsProtobuf,
       conversationDomain,
     );
+    callbacks?.onSuccess?.(genericMessage, response?.time);
 
     return {
       ...payloadBundle,
@@ -1175,7 +1178,7 @@ export class ConversationService {
       case PayloadBundleType.MESSAGE_EDIT:
         return this.sendEditedText(payloadBundle, userIds, sendAsProtobuf, conversationDomain, callbacks);
       case PayloadBundleType.PING:
-        return this.sendKnock(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
+        return this.sendKnock(payloadBundle, userIds, sendAsProtobuf, conversationDomain, callbacks);
       case PayloadBundleType.REACTION:
         return this.sendReaction(payloadBundle, userIds, sendAsProtobuf, conversationDomain);
       case PayloadBundleType.TEXT:

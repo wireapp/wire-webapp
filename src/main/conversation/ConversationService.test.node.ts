@@ -27,6 +27,7 @@ import {PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '.';
 import {Account} from '../Account';
 import * as PayloadHelper from '../test/PayloadHelper';
 import {MentionContent, QuoteContent} from './content';
+import {OtrMessage} from './message/OtrMessage';
 
 const createMessage = (content: string) => {
   const customTextMessage = GenericMessage.create({
@@ -86,34 +87,44 @@ describe('ConversationService', () => {
   });
 
   describe('"send"', () => {
-    it('calls callbacks when federated message sending is starting and successful', async () => {
-      account['apiClient'].context = {
-        clientType: ClientType.NONE,
-        userId: PayloadHelper.getUUID(),
-        clientId: PayloadHelper.getUUID(),
-      };
-      const conversationService = account.service!.conversation;
-      const sentTime = new Date().toISOString();
-      spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: sentTime}));
-      const callbacks = {onStart: jasmine.createSpy(), onSuccess: jasmine.createSpy()};
-      const promise = conversationService.send({
-        callbacks,
-        payloadBundle: {
-          type: PayloadBundleType.TEXT,
-          conversation: PayloadHelper.getUUID(),
-          from: PayloadHelper.getUUID(),
-          id: PayloadHelper.getUUID(),
-          timestamp: 0,
-          source: PayloadBundleSource.LOCAL,
-          state: PayloadBundleState.OUTGOING_UNSENT,
-          content: {text: 'test'},
-        },
-      });
+    const baseMessage = {
+      conversation: PayloadHelper.getUUID(),
+      from: PayloadHelper.getUUID(),
+      id: PayloadHelper.getUUID(),
+      timestamp: 0,
+      source: PayloadBundleSource.LOCAL,
+      state: PayloadBundleState.OUTGOING_UNSENT,
+    };
+    const messages: OtrMessage[] = [
+      {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}},
+      {
+        ...baseMessage,
+        type: PayloadBundleType.CONFIRMATION,
+        content: {type: 1, firstMessageId: PayloadHelper.getUUID()},
+      },
+      {...baseMessage, type: PayloadBundleType.PING, content: {hotKnock: false}},
+    ];
+    messages.forEach(payloadBundle => {
+      it(`calls callbacks when sending '${payloadBundle.type}' message is starting and successful`, async () => {
+        account['apiClient'].context = {
+          clientType: ClientType.NONE,
+          userId: PayloadHelper.getUUID(),
+          clientId: PayloadHelper.getUUID(),
+        };
+        const conversationService = account.service!.conversation;
+        const sentTime = new Date().toISOString();
+        spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: sentTime}));
+        const callbacks = {onStart: jasmine.createSpy(), onSuccess: jasmine.createSpy()};
+        const promise = conversationService.send({
+          callbacks,
+          payloadBundle,
+        });
 
-      expect(callbacks.onStart).toHaveBeenCalled();
-      expect(callbacks.onSuccess).not.toHaveBeenCalled();
-      await promise;
-      expect(callbacks.onSuccess).toHaveBeenCalledWith(jasmine.any(Object), sentTime);
+        expect(callbacks.onStart).toHaveBeenCalled();
+        expect(callbacks.onSuccess).not.toHaveBeenCalled();
+        await promise;
+        expect(callbacks.onSuccess).toHaveBeenCalledWith(jasmine.any(Object), sentTime);
+      });
     });
   });
 
