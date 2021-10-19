@@ -232,7 +232,7 @@ export class MessageRepository {
       },
     });
 
-    this.sendAndInjectGenericCoreMessage(ping, conversation);
+    this.sendAndInjectGenericCoreMessage(ping, conversation, {playPingAudio: true});
   }
 
   /**
@@ -278,7 +278,7 @@ export class MessageRepository {
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .build();
 
-    return this.sendAndInjectGenericCoreMessage(textPayload, conversation, false);
+    return this.sendAndInjectGenericCoreMessage(textPayload, conversation, {syncTimestamp: false});
   }
 
   private async deleteFederatedMessageForEveryone(conversation: Conversation, message: Message, precondition?: any) {
@@ -768,12 +768,24 @@ export class MessageRepository {
    *
    * @param payload - the OTR message payload to send
    * @param conversation - the conversation the message should be sent to
-   * @param syncTimestamp=true - should the message timestamp be synchronized with backend response timestamp
+   * @param options
+   * @param options.syncTimestamp should the message timestamp be synchronized with backend response timestamp
+   * @param options.playPingAudio should the 'ping' audio be played when message is being sent
    */
-  private async sendAndInjectGenericCoreMessage(payload: OtrMessage, conversation: Conversation, syncTimestamp = true) {
+  private async sendAndInjectGenericCoreMessage(
+    payload: OtrMessage,
+    conversation: Conversation,
+    {syncTimestamp = true, playPingAudio = false}: {playPingAudio?: boolean; syncTimestamp?: boolean} = {
+      playPingAudio: false,
+      syncTimestamp: true,
+    },
+  ) {
     const users = conversation.allUserEntities;
     const userIds = conversation.isFederated() ? users.map(user => user.qualifiedId) : users.map(user => user.id);
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
+      if (playPingAudio) {
+        amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
+      }
       const senderId = this.clientState.currentClient().id;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
