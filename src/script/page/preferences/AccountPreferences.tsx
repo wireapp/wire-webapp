@@ -35,3 +35,5 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
     </div>
   );
 };
+
+export default AccountPreferences;
