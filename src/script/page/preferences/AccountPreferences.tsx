@@ -1,8 +1,10 @@
 import React from 'react';
-import type {UserRepository} from 'src/script/user/UserRepository';
-import {UserState} from 'src/script/user/UserState';
 import {container} from 'tsyringe';
+
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+
+import type {UserRepository} from '../../user/UserRepository';
+import {UserState} from '../../user/UserState';
 import AccentColorPicker from '../AccentColorPicker';
 
 interface AccountPreferencesProps {
