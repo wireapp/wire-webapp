@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.20.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.19.2...@wireapp/core@17.20.0) (2021-10-19)
+
+
+### Features
+
+* **core:** Add sending callbacks to ping messages ([#4159](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4159)) ([6e2c6d1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/6e2c6d1fe55c9edfa9d600fd82a942708512a2b0))
+
+
+
+
+
 ## [17.19.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.19.1...@wireapp/core@17.19.2) (2021-10-18)
 
 **Note:** Version bump only for package @wireapp/core
