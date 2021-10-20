@@ -20,6 +20,9 @@
         <verified-icon class="conversation-title-bar-name--verified"></verified-icon>
       <!-- /ko -->
       <span class="conversation-title-bar-name-label" data-bind="text: conversationEntity().display_name()" data-uie-name="status-conversation-title-bar-label"></span>
+      <!-- ko if: conversationSubtitle() -->
+        <span data-bind="text: conversationSubtitle()"></span>
+      <!-- /ko -->
     </div>
 
     <div class="conversation-title-bar-icons">
