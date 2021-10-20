@@ -52,6 +52,7 @@ export class TitleBarViewModel {
   readonly supportsVideoCall: ko.PureComputed<boolean>;
   readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   readonly peopleTooltip: string;
+  readonly conversationSubtitle: ko.PureComputed<string>;
 
   constructor(
     readonly callingViewModel: CallingViewModel,
