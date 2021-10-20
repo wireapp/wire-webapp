@@ -273,6 +273,7 @@
   "conversationEditTimestamp": "Edited: {{date}}",
   "conversationFileAssetRestricted": "Receiving files is prohibited",
   "conversationGuestIndicator": "Guest",
+  "conversationFederationIndicator": "Federated",
   "conversationImageAssetRestricted": "Receiving images is prohibited",
   "conversationJoin.buttonExistentAccountOpen": "Open in {brandName}",
   "conversationJoin.existentAccountHeadline": "{name}, you have been invited to join a conversation in {brandName}",
