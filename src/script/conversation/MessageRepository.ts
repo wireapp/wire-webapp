@@ -27,6 +27,7 @@ import {
   Ephemeral,
   External,
   GenericMessage,
+  Knock,
   LastRead,
   LegalHoldStatus,
   MessageDelete,
@@ -223,16 +224,42 @@ export class MessageRepository {
    * @returns Resolves after sending the knock
    */
   public async sendPing(conversation: Conversation): Promise<void> {
-    const ping = this.core.service!.conversation.messageBuilder.createPing({
-      conversationId: conversation.id,
-      ping: {
-        expectsReadConfirmation: this.expectReadReceipt(conversation),
-        hotKnock: false,
-        legalHoldStatus: conversation.legalHoldStatus(),
-      },
+    if (conversation.isFederated()) {
+      const ping = this.core.service!.conversation.messageBuilder.createPing({
+        conversationId: conversation.id,
+        ping: {
+          expectsReadConfirmation: this.expectReadReceipt(conversation),
+          hotKnock: false,
+          legalHoldStatus: conversation.legalHoldStatus(),
+        },
+      });
+
+      this.sendAndInjectGenericCoreMessage(ping, conversation, {playPingAudio: true});
+    }
+    const protoKnock = new Knock({
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation),
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversation.legalHoldStatus(),
+      hotKnock: false,
     });
 
-    this.sendAndInjectGenericCoreMessage(ping, conversation, {playPingAudio: true});
+    let genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
+      messageId: createRandomUuid(),
+    });
+
+    if (conversation.messageTimer()) {
+      genericMessage = this.wrapInEphemeralMessage(genericMessage, conversation.messageTimer());
+    }
+
+    try {
+      await this._sendAndInjectGenericMessage(conversation, genericMessage);
+    } catch (error) {
+      if (!this.isUserCancellationError(error)) {
+        this.logger.error(`Error while sending knock: ${error.message}`, error);
+        throw error;
+      }
+    }
+    return undefined;
   }
 
   /**
