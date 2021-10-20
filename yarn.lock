@@ -2964,10 +2964,10 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.20.0":
-  version "17.20.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.20.0.tgz#ed26b22c997cb9992fbf54b2c42533364d35659a"
-  integrity sha512-Bot7Rd0IuAC0ckQZAEbgMhkfRe2WP1j0XahXURS6V/T0cb4DtZG0uZEO67fib6axkQnbZUHhL0ai0CPE5JVT4g==
+"@wireapp/core@17.20.2":
+  version "17.20.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.20.2.tgz#9d5a31dd0659540e5d8b0adb7f7666bdf5c3b12c"
+  integrity sha512-wyErqAQO+ucdX4mVeXtsBeKeAWmdC4y+brBdBNr2Za+aSxbiNrM8ieRb5xohutd6Fn4aaIjrAY7i9e2uXowr6g==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
@@ -14030,10 +14030,10 @@ webpack-sources@^3.2.0:
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-3.2.0.tgz#b16973bcf844ebcdb3afde32eda1c04d0b90f89d"
   integrity sha512-fahN08Et7P9trej8xz/Z7eRu8ltyiygEo/hnRi9KqBUs80KeDcnf96ZJo++ewWd84fEf3xSX9bp4ZS9hbw0OBw==
 
-webpack@5.58.2:
-  version "5.58.2"
-  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.58.2.tgz#6b4af12fc9bd5cbedc00dc0a2fc2b9592db16b44"
-  integrity sha512-3S6e9Vo1W2ijk4F4PPWRIu6D/uGgqaPmqw+av3W3jLDujuNkdxX5h5c+RQ6GkjVR+WwIPOfgY8av+j5j4tMqJw==
+webpack@5.59.0:
+  version "5.59.0"
+  resolved "https://registry.yarnpkg.com/webpack/-/webpack-5.59.0.tgz#a5038fc0d4d9350ee528e7e1e0282080c63efcf5"
+  integrity sha512-2HiFHKnWIb/cBfOfgssQn8XIRvntISXiz//F1q1+hKMs+uzC1zlVCJZEP7XqI1wzrDyc/ZdB4G+MYtz5biJxCA==
   dependencies:
     "@types/eslint-scope" "^3.7.0"
     "@types/estree" "^0.0.50"
