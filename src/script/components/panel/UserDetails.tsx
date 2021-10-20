@@ -95,6 +95,10 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
         </div>
       )}
 
+      {!participant.isOnSameFederatedDomain() && (
+        <Icon.Federation className="federation-icon" data-uie-name="status-federated-user" />
+      )}
+
       {user.isGuest && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
