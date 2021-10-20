@@ -952,6 +952,15 @@ export class MessageRepository {
         return;
       }
     }
+    if (conversationEntity.isFederated()) {
+      const confirmationMessage = this.core.service!.conversation.messageBuilder.createConfirmation({
+        conversationId: conversationEntity.id,
+        firstMessageId: messageEntity.id,
+        type,
+      });
+      this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity);
+      return;
+    }
 
     const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
     const protoConfirmation = new Confirmation({
