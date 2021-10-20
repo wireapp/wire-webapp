@@ -12,25 +12,12 @@ import AccentColorPicker from '../AccentColorPicker';
 import AvailabilityState from 'Components/AvailabilityState';
 import {nameFromType} from '../../user/AvailabilityMapper';
 import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import AccountInput from './accountPreferences/AccountInput';
 
 interface AccountPreferencesProps {
   userRepository: UserRepository;
   userState: UserState;
 }
-
-interface StyledInputProps {
-  label: string;
-  value: string;
-}
-
-const StyledInput: React.FC<StyledInputProps> = ({label, value}) => {
-  return (
-    <div>
-      <label>{label}</label>
-      <input value={value} />
-    </div>
-  );
-};
 
 const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   userRepository,
@@ -61,8 +48,8 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
       </div>
       <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
       <div>{'Info'}</div>
-      <StyledInput label="Displayname" value={name} />
-      <StyledInput label="Username" value={username} />
+      <AccountInput label="Displayname" value={name} />
+      <AccountInput label="Username" value={username} />
     </div>
   );
 };
