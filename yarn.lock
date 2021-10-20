@@ -2964,10 +2964,10 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@17.20.0":
-  version "17.20.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.20.0.tgz#ed26b22c997cb9992fbf54b2c42533364d35659a"
-  integrity sha512-Bot7Rd0IuAC0ckQZAEbgMhkfRe2WP1j0XahXURS6V/T0cb4DtZG0uZEO67fib6axkQnbZUHhL0ai0CPE5JVT4g==
+"@wireapp/core@17.20.2":
+  version "17.20.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-17.20.2.tgz#9d5a31dd0659540e5d8b0adb7f7666bdf5c3b12c"
+  integrity sha512-wyErqAQO+ucdX4mVeXtsBeKeAWmdC4y+brBdBNr2Za+aSxbiNrM8ieRb5xohutd6Fn4aaIjrAY7i9e2uXowr6g==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
@@ -12331,14 +12331,14 @@ signal-exit@^3.0.0, signal-exit@^3.0.2, signal-exit@^3.0.3:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.3.tgz#a1410c2edd8f077b08b4e253c8eacfcaf057461c"
   integrity sha512-VUJ49FC8U1OxwZLxIbTTrDvLnf/6TDgxZcK8wxR8zs13xpx7xbG60ndBlhNrFi2EMuFRoeDoJO7wthSLq42EjA==
 
-simple-git@2.45.1:
-  version "2.45.1"
-  resolved "https://registry.yarnpkg.com/simple-git/-/simple-git-2.45.1.tgz#27d26ae59f734ffd7e1dea16a1ee3b309d68f5ef"
-  integrity sha512-NmEoThiLTJxl26WNtZxtJTue18ReTcSrf3so5vJG/O8KY9uMxH+yAhXV/DElBJyOYZrrBbVsH8JOFxgENdc9Xg==
+simple-git@2.47.0:
+  version "2.47.0"
+  resolved "https://registry.yarnpkg.com/simple-git/-/simple-git-2.47.0.tgz#9693b471de7911901f703b4c403fc3e8774cd9be"
+  integrity sha512-+HfCpqPBEZTPWiW9fPdbiPJDslM22MLqrktfzNKyI2pWaJa6DhfNVx4Mds04KZzVv5vjC9/ksw3y5gVf8ECWDg==
   dependencies:
     "@kwsites/file-exists" "^1.1.1"
     "@kwsites/promise-deferred" "^1.1.1"
-    debug "^4.3.1"
+    debug "^4.3.2"
 
 simple-html-tokenizer@^0.1.1:
   version "0.1.1"
