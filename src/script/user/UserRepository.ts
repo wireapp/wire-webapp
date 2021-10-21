@@ -45,7 +45,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isQualifiedId, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -197,17 +197,18 @@ export class UserRepository {
    * Retrieves meta information about all the clients of given users.
    */
   getClientsByUsers(
-    userEntities: User[],
+    userEntities: User[] | QualifiedId[],
     updateClients: boolean,
   ): Promise<UserClientEntityMap | QualifiedUserClientEntityMap> {
+    const userIds = isQualifiedId(userEntities[0])
+      ? userEntities
+      : (userEntities as User[]).map(userEntity => userEntity.qualifiedId);
     // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
     // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
-    if (!!userEntities[0]?.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
+    if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
       return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
     }
 
-    const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
     return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
@@ -340,6 +341,31 @@ export class UserRepository {
     }
     return wasClientAdded;
   };
+
+  /**
+   * Will sync all the clients of the users given with the backend and add the missing ones.
+   * @param userIds - The users which clients should be updated
+   * @return true if one or many clients were added to one or many users
+   */
+  async updateMissingUsersClients(userIds: QualifiedId[]): Promise<boolean> {
+    const clients = await this.getClientsByUsers(userIds, false);
+    const addClients = async (userClients: UserClientEntityMap, domain: string): Promise<boolean> => {
+      const added = await Promise.all(
+        Object.entries(userClients).map(([userId, clients]) => {
+          return clients.map(client => this.addClientToUser({domain, id: userId}, client, true));
+        }),
+      );
+      return added.some(wasAdded => wasAdded === true);
+    };
+
+    if (isQualifiedUserClientEntityMap(clients)) {
+      Object.entries(clients).forEach(([domain, userClients]) => {
+        addClients(userClients, domain);
+      });
+    } else {
+      return addClients(clients, '');
+    }
+  }
 
   /**
    * Removes a stored client and the session connected with it.

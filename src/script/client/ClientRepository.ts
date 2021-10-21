@@ -44,8 +44,8 @@ import {ClientState} from './ClientState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {Config} from '../Config';
 
-export type QualifiedUserClientEntityMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
+export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
 
 export class ClientRepository {
   private readonly logger: Logger;
