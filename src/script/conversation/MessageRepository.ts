@@ -234,7 +234,7 @@ export class MessageRepository {
         },
       });
 
-      this.sendAndInjectGenericCoreMessage(ping, conversation, {playPingAudio: true});
+      return this.sendAndInjectGenericCoreMessage(ping, conversation, {playPingAudio: true});
     }
     const protoKnock = new Knock({
       [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation),
