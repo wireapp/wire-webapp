@@ -78,8 +78,9 @@ export class TitleBarViewModel {
     this.conversationSubtitle = ko.pureComputed(() => {
       return this.conversationEntity() &&
         this.conversationEntity().is1to1() &&
+        this.conversationEntity().firstUserEntity() &&
         !this.conversationEntity().firstUserEntity().isOnSameFederatedDomain()
-        ? this.conversationEntity().firstUserEntity().handle
+        ? this.conversationEntity().firstUserEntity()?.handle ?? ''
         : '';
     });
 
