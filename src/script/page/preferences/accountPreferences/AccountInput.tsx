@@ -22,6 +22,9 @@ const AccountInput: React.FC<StyledInputProps> = ({label, value, disabled, onCha
             event.preventDefault();
           }
         }}
+        onBlur={() => {
+          setInput(value);
+        }}
       />
     </div>
   );
