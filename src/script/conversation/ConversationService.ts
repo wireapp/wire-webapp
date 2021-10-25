@@ -284,6 +284,19 @@ export class ConversationService {
     return this.apiClient.conversation.api.deleteMember(conversationId, userId);
   }
 
+  /**
+   * Remove member from federated conversation.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
+   *
+   * @param conversationId Qualified ID of conversation to remove member from
+   * @param userId Qualified ID of member to be removed from the the conversation
+   * @returns Resolves with the server response
+   */
+  deleteQualifiedMembers(conversationId: QualifiedId, userId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
+    return this.apiClient.conversation.api.deleteQualifiedMember(conversationId, userId);
+  }
+
   putMembers(conversationId: string, userId: string, data: ConversationOtherMemberUpdateData): Promise<void> {
     return this.apiClient.conversation.api.putOtherMember(userId, conversationId, data);
   }
