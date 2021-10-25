@@ -1399,7 +1399,9 @@ export class ConversationRepository {
    * @returns Resolves when member was removed from the conversation
    */
   public async removeMember(conversationEntity: Conversation, user: QualifiedId) {
-    const response = await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
+    const response = conversationEntity.isFederated()
+      ? await this.conversation_service.deleteQualifiedMembers(conversationEntity.qualifiedId, user)
+      : await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
     const roles = conversationEntity.roles();
     delete roles[user.id];
     conversationEntity.roles(roles);
