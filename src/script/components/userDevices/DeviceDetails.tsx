@@ -25,7 +25,6 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
-import type {QualifiedId} from '@wireapp/api-client/src/user';
 
 import type {CryptographyRepository} from '../../cryptography/CryptographyRepository';
 import type {ClientEntity} from '../../client/ClientEntity';
@@ -88,12 +87,10 @@ const DeviceDetails: React.FC<DeviceDetailsProps> = ({
 
   const clickToResetSession = () => {
     const _resetProgress = () => window.setTimeout(() => setIsResettingSession(false), MotionDuration.LONG);
-    const conversationId: QualifiedId = user.isMe
-      ? conversationState.self_conversation().qualifiedId
-      : conversationState.activeConversation()?.qualifiedId;
+    const conversation = user.isMe ? conversationState.self_conversation() : conversationState.activeConversation();
     setIsResettingSession(true);
     messageRepository
-      .resetSession(user.qualifiedId, selectedClient.id, conversationId)
+      .resetSession(user.qualifiedId, selectedClient.id, conversation)
       .then(_resetProgress)
       .catch(_resetProgress);
   };

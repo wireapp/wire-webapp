@@ -887,22 +887,38 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(userId: QualifiedId, client_id: string, conversationId: QualifiedId): Promise<ClientMismatch> {
+  async resetSession(userId: QualifiedId, client_id: string, conversation: Conversation): Promise<void> {
     this.logger.info(`Resetting session with client '${client_id}' of user '${userId.id}'.`);
 
     try {
+      // We delete the stored session so that it can be recreated later on
       const session_id = await this.cryptography_repository.deleteSession(userId, client_id);
+      this.core.service!.cryptography.cryptobox.session_delete(session_id);
       if (session_id) {
         this.logger.info(`Deleted session with client '${client_id}' of user '${userId.id}'.`);
       } else {
         this.logger.warn('No local session found to delete.');
       }
-      return await this.sendSessionReset(userId, client_id, conversationId);
+      return conversation.isFederated()
+        ? await this.sendFederatedSessionReset(userId, client_id, conversation)
+        : await this.sendSessionReset(userId, client_id, conversation.qualifiedId);
     } catch (error) {
       const logMessage = `Failed to reset session for client '${client_id}' of user '${userId.id}': ${error.message}`;
       this.logger.warn(logMessage, error);
       throw error;
     }
+  }
+
+  private async sendFederatedSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
+    const sessionReset = this.core.service!.conversation.messageBuilder.createSessionReset({
+      conversationId: conversation.id,
+    });
+
+    await this.core.service!.conversation.send({
+      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+      payloadBundle: sessionReset,
+      userIds: [userId],
+    });
   }
 
   /**
@@ -917,11 +933,7 @@ export class MessageRepository {
    * @param conversationId Conversation ID
    * @returns Resolves after sending the session reset
    */
-  private async sendSessionReset(
-    userId: QualifiedId,
-    clientId: string,
-    conversationId: QualifiedId,
-  ): Promise<ClientMismatch> {
+  private async sendSessionReset(userId: QualifiedId, clientId: string, conversationId: QualifiedId): Promise<void> {
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: createRandomUuid(),
@@ -934,9 +946,8 @@ export class MessageRepository {
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
 
     try {
-      const response = await this.sendGenericMessage(eventInfoEntity, true);
+      await this.sendGenericMessage(eventInfoEntity, true);
       this.logger.info(`Sent info about session reset to client '${clientId}' of user '${userId}'`);
-      return response;
     } catch (error) {
       this.logger.error(`Sending conversation reset failed: ${error.message}`, error);
       throw error;
