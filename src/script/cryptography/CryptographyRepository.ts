@@ -231,6 +231,7 @@ export class CryptographyRepository {
 
   deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
     const sessionId = constructClientPrimaryKey(userId, clientId);
+    this.core.service!.cryptography.cryptobox.session_delete(sessionId);
     return this.cryptobox.session_delete(sessionId);
   }
 
@@ -460,7 +461,9 @@ export class CryptographyRepository {
     const cipherText = cipherTextArray.buffer;
     const sessionId = constructClientPrimaryKey(userId, eventData.sender);
 
-    const plaintext = await this.cryptobox.decrypt(sessionId, cipherText);
+    const plaintext = isFederatedEnv
+      ? await this.core.service.cryptography.cryptobox.decrypt(sessionId, cipherText)
+      : await this.cryptobox.decrypt(sessionId, cipherText);
     return GenericMessage.decode(plaintext);
   }
 
