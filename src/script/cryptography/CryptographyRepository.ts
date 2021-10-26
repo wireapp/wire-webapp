@@ -24,8 +24,8 @@ import {error as StoreEngineError} from '@wireapp/store-engine';
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
-import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
-import {errors as ProteusErrors, keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
+import type {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
+import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {Context, PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
@@ -99,20 +99,8 @@ export class CryptographyRepository {
 
   async initCore(clientType: ClientType): Promise<Context> {
     const context = await this.core.init(clientType, undefined, this.storageRepository.storageService['engine']);
-    this.core.initClient({clientType});
-    return context;
-  }
-
-  /**
-   * Initializes the repository by creating a new Cryptobox.
-   * @returns Resolves with an array of PreKeys
-   */
-  async initCryptobox(): Promise<ProteusKeys.PreKey[]> {
-    await proteusInit();
-
-    const storeEngine = this.storageRepository['storageService']['engine'];
-    this.cryptobox = new Cryptobox(storeEngine, 10);
-
+    await this.core.initClient({clientType});
+    this.cryptobox = this.core.service!.cryptography.cryptobox;
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, async preKeys => {
       const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
       this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
@@ -126,8 +114,7 @@ export class CryptographyRepository {
       const qualifiedId = {domain: domain, id: userId};
       amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, {id: clientId}, true);
     });
-
-    return this.cryptobox.load();
+    return context;
   }
 
   /**
