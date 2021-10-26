@@ -893,7 +893,6 @@ export class MessageRepository {
     try {
       // We delete the stored session so that it can be recreated later on
       const session_id = await this.cryptography_repository.deleteSession(userId, client_id);
-      this.core.service!.cryptography.cryptobox.session_delete(session_id);
       if (session_id) {
         this.logger.info(`Deleted session with client '${client_id}' of user '${userId.id}'.`);
       } else {
