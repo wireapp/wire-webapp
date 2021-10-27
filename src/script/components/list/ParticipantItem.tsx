@@ -182,7 +182,11 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 </div>
               </div>
               {showDropdown && (
-                <div className="participant-item__content__chevron" onClick={onContextMenu}>
+                <div
+                  className="participant-item__content__chevron"
+                  onClick={onContextMenu}
+                  data-uie-name="moderator-menu-chevron"
+                >
                   <Icon.Chevron />
                 </div>
               )}
