@@ -23,7 +23,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   userRepository,
   userState = container.resolve(UserState),
 }) => {
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {name, email, availability, username} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
