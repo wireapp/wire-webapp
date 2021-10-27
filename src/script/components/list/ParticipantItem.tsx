@@ -185,7 +185,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 <div
                   className="participant-item__content__chevron"
                   onClick={onContextMenu}
-                  data-uie-name="moderator-menu-chevron"
+                  data-uie-name="participant-menu-icon"
                 >
                   <Icon.Chevron />
                 </div>
