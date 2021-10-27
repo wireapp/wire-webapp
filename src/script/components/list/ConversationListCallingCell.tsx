@@ -142,7 +142,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const showJoinButton = conversation && isStillOngoing && temporaryUserStyle;
   const [showParticipants, setShowParticipants] = useState(false);
-  const isModerator = roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
+  const isModerator = roles[selfUser?.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
