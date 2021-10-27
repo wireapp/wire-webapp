@@ -320,25 +320,22 @@ export class ConversationRepository {
     accessState?: string,
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
-    const sameFederatedDomainUserIds = userEntities
-      .filter(userEntity => userEntity.isOnSameFederatedDomain())
-      .map(userEntity => userEntity.id);
-    const otherFederatedDomainUserIds = userEntities
-      .filter(userEntity => !userEntity.isOnSameFederatedDomain())
-      .map(userEntity => userEntity.qualifiedId);
+    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    const userIds = isFederated ? userEntities.map(user => user.qualifiedId) : userEntities.map(user => user.id);
+
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      qualified_users: otherFederatedDomainUserIds,
+      qualified_users: isFederated ? (userIds as QualifiedId[]) : undefined,
       receipt_mode: null,
-      users: sameFederatedDomainUserIds,
+      users: !isFederated ? (userIds as string[]) : [],
       ...options,
     };
 
     if (this.teamState.team().id) {
       payload.team = {
         managed: false,
-        teamid: this.teamState.team().id,
+        teamid: this.teamState.team().id!,
       };
 
       if (accessState) {
@@ -374,7 +371,7 @@ export class ConversationRepository {
         data: {
           last_event: '0.0',
           last_event_time: '1970-01-01T00:00:00.000Z',
-          receipt_mode: null,
+          receipt_mode: undefined,
           ...response,
         },
         from: this.userState.self().id,
@@ -386,7 +383,7 @@ export class ConversationRepository {
     } catch (error) {
       this.handleConversationCreateError(
         error,
-        sameFederatedDomainUserIds.map(id => ({domain: '', id})),
+        userEntities.map(user => user.qualifiedId),
       );
       return undefined;
     }
@@ -1277,7 +1274,11 @@ export class ConversationRepository {
     const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
-      const response = await this.conversation_service.postMembers(conversationEntity.id, userIds);
+      const response = await this.conversation_service.postMembers(
+        conversationEntity.id,
+        userIds,
+        conversationEntity.isFederated(),
+      );
       if (response) {
         this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
@@ -1398,7 +1399,9 @@ export class ConversationRepository {
    * @returns Resolves when member was removed from the conversation
    */
   public async removeMember(conversationEntity: Conversation, user: QualifiedId) {
-    const response = await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
+    const response = conversationEntity.isFederated()
+      ? await this.conversation_service.deleteQualifiedMembers(conversationEntity.qualifiedId, user)
+      : await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
     const roles = conversationEntity.roles();
     delete roles[user.id];
     conversationEntity.roles(roles);

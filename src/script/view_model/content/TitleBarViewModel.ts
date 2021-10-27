@@ -52,6 +52,7 @@ export class TitleBarViewModel {
   readonly supportsVideoCall: ko.PureComputed<boolean>;
   readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   readonly peopleTooltip: string;
+  readonly conversationSubtitle: ko.PureComputed<string>;
 
   constructor(
     readonly callingViewModel: CallingViewModel,
@@ -70,10 +71,18 @@ export class TitleBarViewModel {
     // TODO remove the titlebar for now to ensure that buttons are clickable in macOS wrappers
     window.setTimeout(() => $('.titlebar').remove(), TIME_IN_MILLIS.SECOND);
 
-    this.conversationEntity = this.conversationState.activeConversation;
+    this.conversationEntity = this.conversationState.activeConversation!;
     this.ConversationVerificationState = ConversationVerificationState;
 
     this.isActivatedAccount = this.userState.isActivatedAccount;
+    this.conversationSubtitle = ko.pureComputed(() => {
+      return this.conversationEntity() &&
+        this.conversationEntity().is1to1() &&
+        this.conversationEntity().firstUserEntity() &&
+        !this.conversationEntity().firstUserEntity().isOnSameFederatedDomain()
+        ? this.conversationEntity().firstUserEntity()?.handle ?? ''
+        : '';
+    });
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && !!this.callState.joinedCall();

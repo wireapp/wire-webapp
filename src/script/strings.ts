@@ -80,7 +80,7 @@ export const indexStrings = defineMessages({
 
 export const setAccountTypeStrings = defineMessages({
   createAccountForOrganizations: {
-    defaultMessage: 'Pro',
+    defaultMessage: 'Wire for Free',
     id: 'index.createAccountForOrganizations',
   },
   createAccountForPersonalUse: {
@@ -111,7 +111,7 @@ export const teamNameStrings = defineMessages({
     id: 'teamName.teamNamePlaceholder',
   },
   whatIsWireTeamsLink: {
-    defaultMessage: 'What is Wire Pro?',
+    defaultMessage: 'What is Wire Teams?',
     id: 'teamName.whatIsWireTeamsLink',
   },
 });

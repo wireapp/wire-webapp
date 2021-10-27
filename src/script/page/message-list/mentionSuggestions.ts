@@ -213,7 +213,10 @@ ko.components.register('mention-suggestions', {
           <!-- ko if: suggestion.isExternal() -->
             <external-icon class="mention-suggestion-list__item__guest-badge" data-uie-name="status-external"></external-icon>
           <!-- /ko -->
-          <!-- ko if: suggestion.isGuest() -->
+          <!-- ko if: !suggestion.isOnSameFederatedDomain() -->
+            <federation-icon class="mention-suggestion-list__item__guest-badge" data-uie-name="status-federated"></federation-icon>
+          <!-- /ko -->
+          <!-- ko if: suggestion.isOnSameFederatedDomain() && suggestion.isGuest() -->
             <guest-icon class="mention-suggestion-list__item__guest-badge" data-uie-name="status-guest"></guest-icon>
           <!-- /ko -->
         </div>

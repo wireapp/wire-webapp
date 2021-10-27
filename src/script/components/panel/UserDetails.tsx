@@ -52,6 +52,9 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
     amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
 
+  const isFederated = !participant.isOnSameFederatedDomain();
+  const isGuest = !isFederated && participant.isGuest();
+
   return (
     <div className="panel-participant">
       <div className="panel-participant__head">
@@ -95,7 +98,14 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
         </div>
       )}
 
-      {user.isGuest && (
+      {isFederated && (
+        <div className="panel-participant__label" data-uie-name="status-federated-user">
+          <Icon.Federation />
+          <span>{t('conversationFederationIndicator')}</span>
+        </div>
+      )}
+
+      {isGuest && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>

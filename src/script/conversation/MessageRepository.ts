@@ -27,6 +27,7 @@ import {
   Ephemeral,
   External,
   GenericMessage,
+  Knock,
   LastRead,
   LegalHoldStatus,
   MessageDelete,
@@ -223,16 +224,42 @@ export class MessageRepository {
    * @returns Resolves after sending the knock
    */
   public async sendPing(conversation: Conversation): Promise<void> {
-    const ping = this.core.service!.conversation.messageBuilder.createPing({
-      conversationId: conversation.id,
-      ping: {
-        expectsReadConfirmation: this.expectReadReceipt(conversation),
-        hotKnock: false,
-        legalHoldStatus: conversation.legalHoldStatus(),
-      },
+    if (conversation.isFederated()) {
+      const ping = this.core.service!.conversation.messageBuilder.createPing({
+        conversationId: conversation.id,
+        ping: {
+          expectsReadConfirmation: this.expectReadReceipt(conversation),
+          hotKnock: false,
+          legalHoldStatus: conversation.legalHoldStatus(),
+        },
+      });
+
+      return this.sendAndInjectGenericCoreMessage(ping, conversation, {playPingAudio: true});
+    }
+    const protoKnock = new Knock({
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversation),
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversation.legalHoldStatus(),
+      hotKnock: false,
     });
 
-    this.sendAndInjectGenericCoreMessage(ping, conversation);
+    let genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
+      messageId: createRandomUuid(),
+    });
+
+    if (conversation.messageTimer()) {
+      genericMessage = this.wrapInEphemeralMessage(genericMessage, conversation.messageTimer());
+    }
+
+    try {
+      await this._sendAndInjectGenericMessage(conversation, genericMessage);
+    } catch (error) {
+      if (!this.isUserCancellationError(error)) {
+        this.logger.error(`Error while sending knock: ${error.message}`, error);
+        throw error;
+      }
+    }
+    return undefined;
   }
 
   /**
@@ -278,7 +305,7 @@ export class MessageRepository {
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .build();
 
-    return this.sendAndInjectGenericCoreMessage(textPayload, conversation, false);
+    return this.sendAndInjectGenericCoreMessage(textPayload, conversation, {syncTimestamp: false});
   }
 
   private async deleteFederatedMessageForEveryone(conversation: Conversation, message: Message, precondition?: any) {
@@ -768,12 +795,24 @@ export class MessageRepository {
    *
    * @param payload - the OTR message payload to send
    * @param conversation - the conversation the message should be sent to
-   * @param syncTimestamp=true - should the message timestamp be synchronized with backend response timestamp
+   * @param options
+   * @param options.syncTimestamp should the message timestamp be synchronized with backend response timestamp
+   * @param options.playPingAudio should the 'ping' audio be played when message is being sent
    */
-  private async sendAndInjectGenericCoreMessage(payload: OtrMessage, conversation: Conversation, syncTimestamp = true) {
+  private async sendAndInjectGenericCoreMessage(
+    payload: OtrMessage,
+    conversation: Conversation,
+    {syncTimestamp = true, playPingAudio = false}: {playPingAudio?: boolean; syncTimestamp?: boolean} = {
+      playPingAudio: false,
+      syncTimestamp: true,
+    },
+  ) {
     const users = conversation.allUserEntities;
     const userIds = conversation.isFederated() ? users.map(user => user.qualifiedId) : users.map(user => user.id);
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
+      if (playPingAudio) {
+        amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
+      }
       const senderId = this.clientState.currentClient().id;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
@@ -848,22 +887,37 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(userId: QualifiedId, client_id: string, conversationId: QualifiedId): Promise<ClientMismatch> {
+  async resetSession(userId: QualifiedId, client_id: string, conversation: Conversation): Promise<void> {
     this.logger.info(`Resetting session with client '${client_id}' of user '${userId.id}'.`);
 
     try {
+      // We delete the stored session so that it can be recreated later on
       const session_id = await this.cryptography_repository.deleteSession(userId, client_id);
       if (session_id) {
         this.logger.info(`Deleted session with client '${client_id}' of user '${userId.id}'.`);
       } else {
         this.logger.warn('No local session found to delete.');
       }
-      return await this.sendSessionReset(userId, client_id, conversationId);
+      return conversation.isFederated()
+        ? await this.sendFederatedSessionReset(userId, client_id, conversation)
+        : await this.sendSessionReset(userId, client_id, conversation.qualifiedId);
     } catch (error) {
       const logMessage = `Failed to reset session for client '${client_id}' of user '${userId.id}': ${error.message}`;
       this.logger.warn(logMessage, error);
       throw error;
     }
+  }
+
+  private async sendFederatedSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
+    const sessionReset = this.core.service!.conversation.messageBuilder.createSessionReset({
+      conversationId: conversation.id,
+    });
+
+    await this.core.service!.conversation.send({
+      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+      payloadBundle: sessionReset,
+      userIds: [userId],
+    });
   }
 
   /**
@@ -878,11 +932,7 @@ export class MessageRepository {
    * @param conversationId Conversation ID
    * @returns Resolves after sending the session reset
    */
-  private async sendSessionReset(
-    userId: QualifiedId,
-    clientId: string,
-    conversationId: QualifiedId,
-  ): Promise<ClientMismatch> {
+  private async sendSessionReset(userId: QualifiedId, clientId: string, conversationId: QualifiedId): Promise<void> {
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
       messageId: createRandomUuid(),
@@ -895,9 +945,8 @@ export class MessageRepository {
     const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
 
     try {
-      const response = await this.sendGenericMessage(eventInfoEntity, true);
+      await this.sendGenericMessage(eventInfoEntity, true);
       this.logger.info(`Sent info about session reset to client '${clientId}' of user '${userId}'`);
-      return response;
     } catch (error) {
       this.logger.error(`Sending conversation reset failed: ${error.message}`, error);
       throw error;
@@ -939,6 +988,15 @@ export class MessageRepository {
       if (!otherUserIn1To1 || !withinThreshold) {
         return;
       }
+    }
+    if (conversationEntity.isFederated()) {
+      const confirmationMessage = this.core.service!.conversation.messageBuilder.createConfirmation({
+        conversationId: conversationEntity.id,
+        firstMessageId: messageEntity.id,
+        type,
+      });
+      this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity);
+      return;
     }
 
     const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;

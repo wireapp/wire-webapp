@@ -284,6 +284,19 @@ export class ConversationService {
     return this.apiClient.conversation.api.deleteMember(conversationId, userId);
   }
 
+  /**
+   * Remove member from federated conversation.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
+   *
+   * @param conversationId Qualified ID of conversation to remove member from
+   * @param userId Qualified ID of member to be removed from the the conversation
+   * @returns Resolves with the server response
+   */
+  deleteQualifiedMembers(conversationId: QualifiedId, userId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
+    return this.apiClient.conversation.api.deleteQualifiedMember(conversationId, userId);
+  }
+
   putMembers(conversationId: string, userId: string, data: ConversationOtherMemberUpdateData): Promise<void> {
     return this.apiClient.conversation.api.putOtherMember(userId, conversationId, data);
   }
@@ -350,11 +363,17 @@ export class ConversationService {
    * @param userIds IDs of users to be added to the conversation
    * @returns Resolves with the server response
    */
-  postMembers(conversationId: string, userIds: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.conversation.api.postMembers(
-      conversationId,
-      userIds.map(({id}) => id),
-    );
+  postMembers(
+    conversationId: string,
+    userIds: QualifiedId[],
+    useFederation: boolean,
+  ): Promise<ConversationMemberJoinEvent> {
+    return useFederation
+      ? this.apiClient.conversation.api.postMembersV2(conversationId, userIds)
+      : this.apiClient.conversation.api.postMembers(
+          conversationId,
+          userIds.map(({id}) => id),
+        );
   }
 
   //##############################################################################
