@@ -92,7 +92,14 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     participating_user_ets: userEts,
     selfUser,
     display_name: conversationName,
-  } = useKoSubscribableChildren(conversation, ['isGroup', 'participating_user_ets', 'selfUser', 'display_name']);
+    roles,
+  } = useKoSubscribableChildren(conversation, [
+    'isGroup',
+    'participating_user_ets',
+    'selfUser',
+    'display_name',
+    'roles',
+  ]);
 
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
@@ -135,14 +142,10 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const showJoinButton = conversation && isStillOngoing && temporaryUserStyle;
   const [showParticipants, setShowParticipants] = useState(false);
+  const isModerator = roles[selfUser?.id] === DefaultConversationRoleName.WIRE_ADMIN;
 
   const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
     event.preventDefault();
-
-    const isNotModerator = conversation.roles()[selfUser.id] !== DefaultConversationRoleName.WIRE_ADMIN;
-    if (isNotModerator) {
-      return;
-    }
 
     const muteParticipant = {
       click: () =>
@@ -387,7 +390,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         selfInTeam={selfUser?.inTeam()}
                         isSelfVerified={isSelfVerified}
                         external={teamState.isExternal(participant.user.id)}
-                        onContextMenu={event => getParticipantContext(event, participant)}
+                        onContextMenu={isModerator ? event => getParticipantContext(event, participant) : undefined}
+                        showDropdown={isModerator}
                       />
                     ))}
                 </div>
