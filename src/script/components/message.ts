@@ -216,15 +216,9 @@ class Message {
       const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
 
       const canDelete =
-        messageEntity.user().isMe &&
-        !this.conversation().removed_from_conversation() &&
-        messageEntity.isDeletable() &&
-        !this.conversation().isFederated();
+        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
 
-      const canEdit =
-        messageEntity.isEditable() &&
-        !this.conversation().removed_from_conversation() &&
-        !this.conversation().isFederated();
+      const canEdit = messageEntity.isEditable() && !this.conversation().removed_from_conversation();
 
       const hasDetails =
         !this.conversation().is1to1() &&
@@ -338,7 +332,10 @@ const normalTemplate: string = `
         <!-- ko if: message.user().isExternal() -->
           <external-icon class="message-header-icon-external with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('rolePartner')}" data-uie-name="sender-external"></external-icon>
         <!-- /ko -->
-        <!-- ko if: message.user().isGuest() -->
+        <!-- ko if: !message.user().isOnSameFederatedDomain() -->
+          <federation-icon class="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('conversationFederationIndicator')}" data-uie-name="sender-federated"></federation-icon>
+        <!-- /ko -->
+        <!-- ko if: message.user().isOnSameFederatedDomain() && message.user().isGuest() -->
           <guest-icon class="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('conversationGuestIndicator')}" data-uie-name="sender-guest"></guest-icon>
         <!-- /ko -->
         <!-- ko if: message.was_edited() -->

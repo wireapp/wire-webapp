@@ -385,6 +385,8 @@ jobs:
         run: |
           sed --in-place --expression="s/  tag: .*/  tag: \"${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}\"/" ./charts/webapp/values.yaml
           git add ./charts/webapp/values.yaml
+          echo "Upgrade webapp version to ${{ fromJSON(steps.release-info-file.outputs.releaseInfo).imageTag }}" > ./changelog.d/0-release-notes/webapp-upgrade
+          git add ./changelog.d/0-release-notes/webapp-upgrade
           echo "::set-output name=releaseUrl::${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/releases/tag/${{ fromJSON(steps.release-info-file.outputs.releaseInfo).releaseName }}"
 
       - name: Creating Pull Request

@@ -17,13 +17,14 @@
  *
  */
 
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import type {Conversation} from '../entity/Conversation';
 import type {User} from '../entity/User';
 
 export class ConversationFilter {
   static is1To1WithUser(conversationEntity: Conversation, userEntity: User): boolean {
     const [user] = conversationEntity.participating_user_ids();
-    return userEntity.id === user.id && userEntity.domain == user.domain;
+    return matchQualifiedIds(userEntity, user);
   }
 
   static isInTeam(conversationEntity: Conversation, userEntity: User): boolean {

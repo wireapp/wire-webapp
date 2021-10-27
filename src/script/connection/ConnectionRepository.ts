@@ -40,6 +40,8 @@ import type {ConnectionService} from './ConnectionService';
 import {ConnectionState} from './ConnectionState';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -96,7 +98,9 @@ export class ConnectionRepository {
     const connectionData = eventJson.connection;
 
     // Try to find existing connection
-    let connectionEntity = this.getConnectionByUserId(connectionData.to);
+    let connectionEntity = this.getConnectionByUserId(
+      connectionData.qualified_to || {domain: '', id: connectionData.to},
+    );
     const previousStatus = connectionEntity?.status();
 
     // Update connection status
@@ -173,13 +177,18 @@ export class ConnectionRepository {
    * Create a connection request.
    *
    * @param userEntity User to connect to
-   * @returns Promise that resolves when the connection request was successfully created
+   * @returns Promise that resolves to true if the request was successfully sent, false if not
    */
-  public async createConnection(userEntity: User): Promise<void> {
+  public async createConnection(userEntity: User): Promise<boolean> {
     try {
-      const response = await this.connectionService.postConnections(userEntity.id, userEntity.name());
+      const config = Config.getConfig().FEATURE;
+      const isFederatedBackend = config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+      const response = isFederatedBackend
+        ? await this.connectionService.postFederationConnections(userEntity.qualifiedId)
+        : await this.connectionService.postConnections(userEntity.id, userEntity.name());
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
+      return true;
     } catch (error) {
       if (error.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT) {
         const replaceLinkLegalHold = replaceLink(
@@ -195,14 +204,15 @@ export class ConnectionRepository {
         });
       }
       this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
+      return false;
     }
   }
 
   /**
    * Get a connection for a user ID.
    */
-  private getConnectionByUserId(userId: string): ConnectionEntity {
-    return this.connectionState.connectionEntities()[userId];
+  private getConnectionByUserId(userId: QualifiedId): ConnectionEntity {
+    return this.connectionState.connectionEntities()[userId.id];
   }
 
   /**
@@ -210,9 +220,11 @@ export class ConnectionRepository {
    * @param conversationId Conversation ID
    * @returns User connection entity
    */
-  getConnectionByConversationId(conversationId: string): ConnectionEntity {
+  getConnectionByConversationId(conversationId: QualifiedId): ConnectionEntity | undefined {
     const connectionEntities = Object.values(this.connectionState.connectionEntities());
-    return connectionEntities.find(connectionEntity => connectionEntity.conversationId === conversationId);
+    return connectionEntities.find(connectionEntity =>
+      matchQualifiedIds(connectionEntity.conversationId, conversationId),
+    );
   }
 
   /**
@@ -222,9 +234,9 @@ export class ConnectionRepository {
    *
    * @returns Promise that resolves when all connections have been retrieved and mapped
    */
-  async getConnections(): Promise<ConnectionEntity[]> {
+  async getConnections(useFederation: boolean = false): Promise<ConnectionEntity[]> {
     try {
-      const connectionData = await this.connectionService.getConnections();
+      const connectionData = await this.connectionService.getConnections(useFederation);
       const newConnectionEntities = ConnectionMapper.mapConnectionsFromJson(connectionData);
       return newConnectionEntities.length
         ? await this.updateConnections(newConnectionEntities)
@@ -255,7 +267,7 @@ export class ConnectionRepository {
   }
 
   addConnectionEntity(connectionEntity: ConnectionEntity): void {
-    this.connectionState.connectionEntities()[connectionEntity.userId] = connectionEntity;
+    this.connectionState.connectionEntities()[connectionEntity.userId.id] = connectionEntity;
   }
 
   /**
@@ -265,7 +277,7 @@ export class ConnectionRepository {
   private async attachConnectionToUser(connectionEntity: ConnectionEntity): Promise<ConnectionEntity> {
     this.addConnectionEntity(connectionEntity);
     // TODO(Federation): Update code once connections are implemented on the backend
-    const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
+    const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
     return userEntity.connection(connectionEntity);
   }
 
@@ -275,7 +287,7 @@ export class ConnectionRepository {
    */
   private async updateConnections(connectionEntities: ConnectionEntity[]): Promise<ConnectionEntity[]> {
     const updatedConnections = connectionEntities.reduce((allConnections, connectionEntity) => {
-      allConnections[connectionEntity.userId] = connectionEntity;
+      allConnections[connectionEntity.userId.id] = connectionEntity;
       return allConnections;
     }, this.connectionState.connectionEntities());
     this.connectionState.connectionEntities(updatedConnections);
@@ -291,8 +303,12 @@ export class ConnectionRepository {
    */
   private async updateStatus(userEntity: User, newStatus: ConnectionStatus): Promise<void> {
     const currentStatus = userEntity.connection().status();
+    const config = Config.getConfig().FEATURE;
+    const isFederated = config.FEDERATION_DOMAIN && config.ENABLE_FEDERATION;
     try {
-      const response = await this.connectionService.putConnections(userEntity.id, newStatus);
+      const response = isFederated
+        ? await this.connectionService.putFederatedConnections(userEntity.qualifiedId, newStatus)
+        : await this.connectionService.putConnections(userEntity.id, newStatus);
       const connectionEvent = {connection: response, user: {name: userEntity.name()}};
       await this.onUserConnection(connectionEvent, EventRepository.SOURCE.INJECTED);
     } catch (error) {
@@ -326,7 +342,7 @@ export class ConnectionRepository {
     const showNotification = isWebSocketEvent && !selfUserAccepted;
     if (showNotification) {
       // TODO(Federation): Update code once connections are implemented on the backend
-      const userEntity = await this.userRepository.getUserById(connectionEntity.userId, null);
+      const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
       const messageEntity = new MemberMessage();
       messageEntity.user(userEntity);
 

@@ -35,6 +35,7 @@ import {Conversation} from '../entity/Conversation';
 import {BASE_ERROR_TYPE, BaseError} from '../error/BaseError';
 import {ConversationError} from '../error/ConversationError';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
+import {matchQualifiedIds, QualifiedEntity} from 'Util/QualifiedId';
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {
@@ -228,8 +229,8 @@ export class ConversationMapper {
     const participatingUserIds =
       qualified_others ||
       (members?.others
-        ? members.others.map(other => ({domain: other.qualified_id?.domain || null, id: other.id}))
-        : others.map(userId => ({domain: null, id: userId})));
+        ? members.others.map(other => ({domain: other.qualified_id?.domain || '', id: other.id}))
+        : others.map(userId => ({domain: '', id: userId})));
 
     conversationEntity.participating_user_ids(participatingUserIds);
 
@@ -263,14 +264,13 @@ export class ConversationMapper {
 
     return remoteConversations.map(
       (remoteConversationData: ConversationBackendData & {receipt_mode: number}, index: number) => {
-        const conversationId = remoteConversationData.id;
-        const conversationDomain = remoteConversationData.qualified_id?.domain;
-        const newLocalConversation = {id: conversationId} as ConversationDatabaseData;
-        const isSameDomain = (domainA: string, domainB: string): boolean => !domainA || !domainB || domainA === domainB;
-        const localConversationData: ConversationDatabaseData =
-          localConversations.find(
-            ({domain, id}) => id === conversationId && isSameDomain(domain, conversationDomain),
-          ) || newLocalConversation;
+        const remoteConversationId: QualifiedEntity = remoteConversationData.qualified_id || {
+          domain: '',
+          id: remoteConversationData.id,
+        };
+        const localConversationData =
+          localConversations.find(conversationId => matchQualifiedIds(conversationId, remoteConversationId)) ||
+          (remoteConversationId as ConversationDatabaseData);
 
         const {access, access_role, creator, members, message_timer, qualified_id, receipt_mode, name, team, type} =
           remoteConversationData;
@@ -406,7 +406,7 @@ export class ConversationMapper {
     }
 
     if (conversationEntity.isSelf()) {
-      return conversationEntity.accessState(ACCESS_STATE.SELF);
+      return conversationEntity.accessState(ACCESS_STATE.OTHER.SELF);
     }
 
     const personalAccessState = conversationEntity.isGroup()

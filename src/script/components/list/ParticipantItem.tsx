@@ -38,7 +38,6 @@ import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
 import {Availability} from '@wireapp/protocol-messaging';
-import {Config} from '../../Config';
 import useEffectRef from 'Util/useEffectRef';
 
 export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
@@ -88,7 +87,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const hasUsernameInfo = isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  const isGuest = useKoSubscribable((participant as User).isGuest ?? ko.observable(false));
+  const isFederated = participant instanceof User && !participant.isOnSameFederatedDomain();
+  const isGuest = participant instanceof User && !isFederated && useKoSubscribable(participant.isGuest);
   const isVerified = useKoSubscribable((participant as User).is_verified ?? ko.observable(false));
   const availability = useKoSubscribable((participant as User).availability ?? ko.observable<Availability.Type>());
 
@@ -179,7 +179,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               </div>
             </div>
 
-            {isUser && !isOthersMode && isGuest && (
+            {!isOthersMode && isGuest && (
               <span
                 className="guest-icon with-tooltip with-tooltip--external"
                 data-tooltip={t('conversationGuestIndicator')}
@@ -188,12 +188,14 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               </span>
             )}
 
-            {participant instanceof User &&
-              Config.getConfig().FEATURE.ENABLE_FEDERATION &&
-              participant.hasDomain &&
-              !participant.isOnSameFederatedDomain() && (
-                <Icon.Federation className="federation-icon" data-uie-name="status-federated-user" />
-              )}
+            {isFederated && (
+              <span
+                className="federation-icon with-tooltip with-tooltip--external"
+                data-tooltip={t('conversationFederationIndicator')}
+              >
+                <Icon.Federation data-uie-name="status-federated-user" />
+              </span>
+            )}
 
             {external && (
               <span className="partner-icon with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>

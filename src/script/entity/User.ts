@@ -21,6 +21,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Availability} from '@wireapp/protocol-messaging';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
@@ -84,7 +85,7 @@ export class User {
   public serviceId?: string;
   public teamId?: string;
   /** The federated domain (when the user is on a federated server) */
-  public domain?: string;
+  public domain: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
 
   static get ACCENT_COLOR() {
@@ -113,7 +114,7 @@ export class User {
     };
   }
 
-  constructor(id: string = '', domain: string | null) {
+  constructor(id: string = '', domain: string = '') {
     this.id = id;
     this.domain = domain;
     this.isMe = false;
@@ -202,6 +203,9 @@ export class User {
     this.isExpired = ko.observable(false);
   }
 
+  get qualifiedId(): QualifiedId {
+    return {domain: this.domain, id: this.id};
+  }
   get hasDomain(): boolean {
     return !!this.domain;
   }
@@ -295,13 +299,13 @@ export class User {
     const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
     if (checkExpiration) {
       if (this.isExpired()) {
-        amplify.publish(WebAppEvents.USER.UPDATE, {domain: this.domain, id: this.id});
+        amplify.publish(WebAppEvents.USER.UPDATE, this.qualifiedId);
         return;
       }
 
       const timeout = this.expirationRemaining() + User.CONFIG.TEMPORARY_GUEST.EXPIRATION_THRESHOLD;
       this.expirationTimeoutId = window.setTimeout(
-        () => amplify.publish(WebAppEvents.USER.UPDATE, {domain: this.domain, id: this.id}),
+        () => amplify.publish(WebAppEvents.USER.UPDATE, this.qualifiedId),
         timeout,
       );
     }

@@ -407,7 +407,7 @@ class App {
       this._registerSingleInstance();
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-      await authRepository.init();
+      const context = await authRepository.init();
       await this.initiateSelfUser();
       loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository['userState'].self().name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
@@ -419,13 +419,16 @@ class App {
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
       await cryptographyRepository.initCryptobox();
+      cryptographyRepository.initCore(context.clientType);
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       await teamRepository.initTeam();
 
       const conversationEntities = await conversationRepository.getConversations();
-      const connectionEntities = await connectionRepository.getConnections();
+      const connectionEntities = await connectionRepository.getConnections(
+        Config.getConfig().FEATURE.ENABLE_FEDERATION,
+      );
       loadingView.updateProgress(25, t('initReceivedUserData'));
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
@@ -697,7 +700,7 @@ class App {
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain?: string) => {
-        mainView.content.userModal.showUser(userId, domain, () => router.navigate('/'));
+        mainView.content.userModal.showUser({domain, id: userId}, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);

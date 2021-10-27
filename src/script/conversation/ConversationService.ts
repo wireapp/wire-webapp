@@ -55,7 +55,12 @@ import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {Config} from '../Config';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
+function isFederatedEnv() {
+  const config = Config.getConfig().FEATURE;
+  return config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+}
 export class ConversationService {
   private readonly eventService: EventService;
   private readonly logger: Logger;
@@ -95,24 +100,18 @@ export class ConversationService {
    * @returns Resolves with the conversation information
    */
   async getAllConversations(): Promise<BackendConversation[]> {
-    const conversations = await this.apiClient.conversation.api.getAllConversations();
-
-    if (Config.getConfig().FEATURE.ENABLE_FEDERATION === true && Config.getConfig().FEATURE.FEDERATION_DOMAIN) {
-      const remoteConversations = await this.apiClient.conversation.api.getRemoteConversations(
-        Config.getConfig().FEATURE.FEDERATION_DOMAIN,
-      );
-      conversations.push(...remoteConversations);
-    }
-
-    return conversations;
+    const conversationApi = this.apiClient.conversation.api;
+    return isFederatedEnv() ? conversationApi.getConversationList() : conversationApi.getAllConversations();
   }
 
   /**
    * Get a conversation by ID.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
-  getConversationById(conversationId: string, domain: string | null): Promise<BackendConversation> {
-    return this.apiClient.conversation.api.getConversation(conversationId, domain);
+  getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
+    return isFederatedEnv()
+      ? this.apiClient.conversation.api.getConversation({domain, id}, true)
+      : this.apiClient.conversation.api.getConversation(id);
   }
 
   /**
@@ -285,6 +284,19 @@ export class ConversationService {
     return this.apiClient.conversation.api.deleteMember(conversationId, userId);
   }
 
+  /**
+   * Remove member from federated conversation.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
+   *
+   * @param conversationId Qualified ID of conversation to remove member from
+   * @param userId Qualified ID of member to be removed from the the conversation
+   * @returns Resolves with the server response
+   */
+  deleteQualifiedMembers(conversationId: QualifiedId, userId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
+    return this.apiClient.conversation.api.deleteQualifiedMember(conversationId, userId);
+  }
+
   putMembers(conversationId: string, userId: string, data: ConversationOtherMemberUpdateData): Promise<void> {
     return this.apiClient.conversation.api.putOtherMember(userId, conversationId, data);
   }
@@ -327,7 +339,7 @@ export class ConversationService {
    * @returns Promise that resolves when the message was sent
    */
   postEncryptedMessage(
-    conversationId: string,
+    conversationId: QualifiedId,
     payload: NewOTRMessage<string>,
     preconditionOption?: boolean | string[],
   ): Promise<ClientMismatch> {
@@ -338,7 +350,8 @@ export class ConversationService {
       payload.report_missing = reportMissing;
     }
 
-    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId, payload, ignoreMissing);
+    // TODO(federation): add domain in the postOTRMessage (?)
+    return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
   }
 
   /**
@@ -350,8 +363,17 @@ export class ConversationService {
    * @param userIds IDs of users to be added to the conversation
    * @returns Resolves with the server response
    */
-  postMembers(conversationId: string, userIds: string[]): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.conversation.api.postMembers(conversationId, userIds);
+  postMembers(
+    conversationId: string,
+    userIds: QualifiedId[],
+    useFederation: boolean,
+  ): Promise<ConversationMemberJoinEvent> {
+    return useFederation
+      ? this.apiClient.conversation.api.postMembersV2(conversationId, userIds)
+      : this.apiClient.conversation.api.postMembers(
+          conversationId,
+          userIds.map(({id}) => id),
+        );
   }
 
   //##############################################################################
@@ -362,9 +384,9 @@ export class ConversationService {
    * Deletes a conversation entity from the local database.
    * @returns Resolves when the entity was deleted
    */
-  async deleteConversationFromDb(conversationId: string, domain: string | null): Promise<string> {
-    const id = domain ? `${conversationId}@${domain}` : conversationId;
-    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, id);
+  async deleteConversationFromDb({id, domain}: QualifiedId): Promise<string> {
+    const key = domain ? `${id}@${domain}` : id;
+    const primaryKey = await this.storageService.delete(StorageSchemata.OBJECT_STORE.CONVERSATIONS, key);
     return primaryKey;
   }
 
@@ -376,7 +398,7 @@ export class ConversationService {
    * Get active conversations from database.
    * @returns Resolves with active conversations
    */
-  async getActiveConversationsFromDb(): Promise<string[]> {
+  async getActiveConversationsFromDb(): Promise<QualifiedId[]> {
     const min_date = new Date();
     min_date.setDate(min_date.getDate() - 30);
 
@@ -396,11 +418,14 @@ export class ConversationService {
     }
 
     const conversations = events.reduce((accumulated, event) => {
+      // TODO(federation): generate fully qualified ids
       accumulated[event.conversation] = (accumulated[event.conversation] || 0) + 1;
       return accumulated;
     }, {});
 
-    return Object.keys(conversations).sort((id_a, id_b) => conversations[id_b] - conversations[id_a]);
+    return Object.keys(conversations)
+      .sort((id_a, id_b) => conversations[id_b] - conversations[id_a])
+      .map(id => ({domain: '', id}));
   }
 
   /**

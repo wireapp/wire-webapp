@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,19 +17,13 @@
  *
  */
 
-export enum CALL_MESSAGE_TYPE {
-  CANCEL = 'CANCEL',
-  CONF_START = 'CONFSTART',
-  CONFKEY = 'CONFKEY',
-  GROUP_CHECK = 'GROUPCHECK',
-  GROUP_LEAVE = 'GROUPLEAVE',
-  GROUP_SETUP = 'GROUPSETUP',
-  GROUP_START = 'GROUPSTART',
-  HANGUP = 'HANGUP',
-  PROP_SYNC = 'PROPSYNC',
-  REJECT = 'REJECT',
-  REMOTE_KICK = 'REMOTEKICK',
-  REMOTE_MUTE = 'REMOTEMUTE',
-  SETUP = 'SETUP',
-  UPDATE = 'UPDATE',
+import {Account} from '@wireapp/core';
+import {container, singleton} from 'tsyringe';
+import {APIClient} from './APIClientSingleton';
+
+@singleton()
+export class Core extends Account {
+  constructor(apiClient = container.resolve(APIClient)) {
+    super(apiClient);
+  }
 }

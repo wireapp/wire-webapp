@@ -519,7 +519,7 @@ export class InputBarViewModel {
   readonly clickToPing = (): void => {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
-      this.messageRepository.sendKnock(this.conversationEntity()).then(() => {
+      this.messageRepository.sendPing(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
@@ -636,8 +636,6 @@ export class InputBarViewModel {
 
     if (this.isEditing()) {
       this.sendMessageEdit(messageText, this.editMessageEntity());
-    } else if (this.disableControls()) {
-      this.sendFederatedMessage(messageText);
     } else {
       this.sendMessage(messageText, this.replyMessageEntity());
     }
@@ -653,9 +651,7 @@ export class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            if (!this.conversationEntity()?.isFederated()) {
-              this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
-            }
+            this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
             this.updateMentions(data, keyboardEvent);
           }
           break;
@@ -835,15 +831,6 @@ export class InputBarViewModel {
               userId: replyMessageEntity.from,
             });
           });
-  };
-
-  readonly sendFederatedMessage = (messageText: string): void => {
-    if (!messageText.length) {
-      return;
-    }
-
-    this.messageRepository.sendFederatedMessage(this.conversationEntity(), messageText);
-    this.cancelMessageReply();
   };
 
   readonly sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {

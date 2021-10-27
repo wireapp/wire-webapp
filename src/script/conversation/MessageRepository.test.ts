@@ -73,7 +73,7 @@ describe('MessageRepository', () => {
     conversation.type(conversation_type);
 
     const connectionEntity = new ConnectionEntity();
-    connectionEntity.conversationId = conversation.id;
+    connectionEntity.conversationId = conversation.qualifiedId;
     connectionEntity.status(connection_status);
     conversation.connection(connectionEntity);
     conversation.legalHoldStatus(LegalHoldStatus.DISABLED);
@@ -207,7 +207,7 @@ describe('MessageRepository', () => {
         Array(128)
           .fill(undefined)
           .map((x, i) => ({
-            domain: null,
+            domain: '',
             id: i.toString(),
           })),
       );
@@ -225,7 +225,7 @@ describe('MessageRepository', () => {
           'massive external message massive external message massive external message massive external message',
       });
       const genericMessage = new GenericMessage({[GENERIC_MESSAGE_TYPE.TEXT]: text, messageId: createRandomUuid()});
-      const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: '', id: largeConversationEntity.id});
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -263,11 +263,11 @@ describe('MessageRepository', () => {
       const smallConversationEntity = generateConversation();
       smallConversationEntity.participating_user_ids([
         {
-          domain: null,
+          domain: '',
           id: '0',
         },
         {
-          domain: null,
+          domain: '',
           id: '1',
         },
       ]);
@@ -276,7 +276,7 @@ describe('MessageRepository', () => {
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: '', id: smallConversationEntity.id});
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -466,10 +466,9 @@ describe('MessageRepository', () => {
 
       for (const clientPayload of clientsPayload) {
         const wasClientAdded = await testFactory.user_repository.addClientToUser(
-          conversationPartner.id,
+          conversationPartner,
           clientPayload,
           false,
-          conversationPartner.domain,
         );
 
         expect(wasClientAdded).toBe(true);
@@ -517,11 +516,15 @@ describe('MessageRepository', () => {
       const selfUserId = 'ce1a2792-fb51-4977-a8e5-7a1dd8f2bb0b';
       const otherUserId = '6f88716b-1383-44da-9d57-45b51cc64d90';
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, '3da298fd-0ed4-4e51-863c-bfd2f5b9089b', {
-        nativePush: true,
-        precondition: false,
-        recipients: {[otherUserId]: [], [selfUserId]: []},
-      });
+      const eventInfoEntity = new EventInfoEntity(
+        genericMessage,
+        {domain: '', id: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b'},
+        {
+          nativePush: true,
+          precondition: false,
+          recipients: {[otherUserId]: [], [selfUserId]: []},
+        },
+      );
 
       const userIdsWithoutClients = MessageRepository.getOtherUsersWithoutClients(eventInfoEntity, selfUserId);
       expect(userIdsWithoutClients.length).toBe(1);

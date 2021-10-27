@@ -25,38 +25,47 @@ import {CallViewTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
 
+export enum MuteState {
+  NOT_MUTED,
+  SELF_MUTED,
+  REMOTE_MUTED,
+  REMOTE_FORCE_MUTED,
+}
+
 @singleton()
 export class CallState {
-  public readonly activeCalls: ko.ObservableArray<Call>;
-  public readonly isMuted: ko.Observable<boolean>;
+  public readonly activeCalls: ko.ObservableArray<Call> = ko.observableArray();
+  public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
+  public readonly acceptedVersionWarnings: ko.ObservableArray<string> = ko.observableArray<string>();
+  public readonly cbrEncoding: ko.Observable<number> = ko.observable(
+    Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0,
+  );
+  public readonly videoSpeakersActiveTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
+  readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
+  readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
+  public readonly isMuted: ko.PureComputed<boolean>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
-  public readonly acceptedVersionWarnings: ko.ObservableArray<string>;
-  public readonly cbrEncoding: ko.Observable<number>;
-  public readonly activeCallViewTab: ko.Observable<string>;
-  readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]>;
-  readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]>;
+  public readonly activeCallViewTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly isChoosingScreen: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
 
   constructor() {
-    this.activeCalls = ko.observableArray();
-    this.isMuted = ko.observable(false);
-    this.joinedCall = ko.pureComputed(() => {
-      return this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB);
-    });
-    this.acceptedVersionWarnings = ko.observableArray<string>();
+    this.isMuted = ko.pureComputed(() => this.muteState() !== MuteState.NOT_MUTED);
+    this.joinedCall = ko.pureComputed(() => this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
+    this.isChoosingScreen = ko.pureComputed(
+      () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
+    );
+
     this.activeCalls.subscribe(activeCalls => {
       const activeCallIds = activeCalls.map(call => call.conversationId);
       this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
-    this.cbrEncoding = ko.observable(Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0);
-    this.activeCallViewTab = ko.observable(CallViewTab.ALL);
     this.isSpeakersViewActive = ko.pureComputed(() => this.activeCallViewTab() === CallViewTab.SPEAKERS);
 
-    this.selectableScreens = ko.observable([]);
-    this.selectableWindows = ko.observable([]);
     this.isChoosingScreen = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
   }
+
+  updateMuteState = (newState: MuteState) => this.muteState(newState);
 }
