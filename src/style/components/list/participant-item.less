@@ -111,16 +111,40 @@
 
     &__content {
       display: flex;
-      min-width: 0; // this will ensure that ellipses is working
+      min-width: 0;
       height: @avatar-diameter-m;
       flex: 1 1;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 400;
+      align-items: center;
       line-height: 16px;
 
+      &__text {
+        display: flex;
+        min-width: 0; // this will ensure that ellipses is working
+        height: @avatar-diameter-m;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 16px;
+      }
+
+      &__chevron {
+        display: flex;
+        opacity: 0;
+        transition: opacity 0.25s ease-in-out;
+
+        :hover > & {
+          opacity: 1;
+        }
+
+        svg {
+          width: 8px;
+          path {
+            fill: currentColor;
+          }
+        }
+      }
       &__availability {
         .availability-state-label {
           .ellipsis;

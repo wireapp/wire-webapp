@@ -56,6 +56,7 @@ export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
   showArrow?: boolean;
+  showDropdown?: boolean;
 }
 
 const ParticipantItem: React.FC<ParticipantItemProps> = ({
@@ -74,6 +75,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   participant,
   selfInTeam,
   showArrow = false,
+  showDropdown = false,
   onContextMenu = noop,
 }) => {
   const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
@@ -141,42 +143,49 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
             </div>
 
             <div className="participant-item__content">
-              <div className="participant-item__content__name-wrapper">
-                {isUser && selfInTeam && (
-                  <AvailabilityState
-                    availability={availability}
-                    className="participant-item__content__availability participant-item__content__name"
-                    dataUieName="status-name"
-                    label={participantName}
-                  />
-                )}
+              <div className="participant-item__content__text">
+                <div className="participant-item__content__name-wrapper">
+                  {isUser && selfInTeam && (
+                    <AvailabilityState
+                      availability={availability}
+                      className="participant-item__content__availability participant-item__content__name"
+                      dataUieName="status-name"
+                      label={participantName}
+                    />
+                  )}
 
-                {(isService || !selfInTeam) && (
-                  <div className="participant-item__content__name" data-uie-name="status-name">
-                    {participantName}
-                  </div>
-                )}
-                {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
-              </div>
-              <div className="participant-item__content__info">
-                {contentInfoText && (
-                  <Fragment>
-                    <span
-                      className={cx('participant-item__content__username label-username-notext', {
-                        'label-username': hasUsernameInfo,
-                      })}
-                      data-uie-name="status-username"
-                    >
-                      {contentInfoText}
-                    </span>
-                    {hasUsernameInfo && badge && (
-                      <span className="participant-item__content__badge" data-uie-name="status-partner">
-                        {badge}
+                  {(isService || !selfInTeam) && (
+                    <div className="participant-item__content__name" data-uie-name="status-name">
+                      {participantName}
+                    </div>
+                  )}
+                  {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
+                </div>
+                <div className="participant-item__content__info">
+                  {contentInfoText && (
+                    <Fragment>
+                      <span
+                        className={cx('participant-item__content__username label-username-notext', {
+                          'label-username': hasUsernameInfo,
+                        })}
+                        data-uie-name="status-username"
+                      >
+                        {contentInfoText}
                       </span>
-                    )}
-                  </Fragment>
-                )}
+                      {hasUsernameInfo && badge && (
+                        <span className="participant-item__content__badge" data-uie-name="status-partner">
+                          {badge}
+                        </span>
+                      )}
+                    </Fragment>
+                  )}
+                </div>
               </div>
+              {showDropdown && (
+                <div className="participant-item__content__chevron" onClick={onContextMenu}>
+                  <Icon.Chevron />
+                </div>
+              )}
             </div>
 
             {!isOthersMode && isGuest && (
