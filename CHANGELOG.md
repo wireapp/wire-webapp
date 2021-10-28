@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.21.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.20.3...@wireapp/core@17.21.0) (2021-10-28)
+
+
+### Features
+
+* **core:** Allow the consumer to give a list of clients when sending a message ([#4163](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4163)) ([b437acc](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/b437accfc7151518a780734efeecd0dcbbde8c7e))
+
+
+
+
+
 ## [17.20.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.20.2...@wireapp/core@17.20.3) (2021-10-21)
 
 **Note:** Version bump only for package @wireapp/core
