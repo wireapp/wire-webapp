@@ -35,7 +35,7 @@ export function isQualifiedUserClients(obj: any): obj is QualifiedUserClients {
       const firstClientIdArray = Object.values(firstUserClientObject as object)[0];
       if (Array.isArray(firstClientIdArray)) {
         const firstClientId = firstClientIdArray[0];
-        return typeof firstClientId === 'string';
+        return typeof firstClientId === 'string' || typeof firstClientId === 'undefined';
       }
     }
   }
