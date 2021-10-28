@@ -126,7 +126,6 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
         highlighted,
         'no-interaction': noInteraction,
         'no-underline': noUnderline,
-        'show-arrow': showArrow,
       })}
       onContextMenu={onContextMenu}
     >
@@ -252,8 +251,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
                 data-uie-name="status-selected"
               />
             )}
-
-            <Icon.Disclose className="disclose-icon" />
+            {showArrow && <Icon.Disclose className="disclose-icon" />}
           </>
         )}
       </div>
