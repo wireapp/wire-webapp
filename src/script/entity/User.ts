@@ -66,11 +66,6 @@ export class User {
   public readonly isExpired: ko.Observable<boolean>;
   public readonly isExternal: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
-
-  /**
-   * isDirectGuest is true when the user is a guest but not a federated user (a federated user is, by definition, a guest)
-   */
-  public readonly isDirectGuest: ko.PureComputed<boolean>;
   public readonly isIgnored: ko.PureComputed<boolean>;
   public readonly isIncomingRequest: ko.PureComputed<boolean>;
   public readonly isOnLegalHold: ko.PureComputed<boolean>;
@@ -172,9 +167,6 @@ export class User {
 
     this.inTeam = ko.observable(false);
     this.isGuest = ko.observable(false);
-    this.isDirectGuest = ko.pureComputed(() => {
-      return this.isGuest() && this.isOnSameFederatedDomain();
-    });
     this.isTemporaryGuest = ko.observable(false);
     this.isTeamMember = ko.observable(false);
     this.teamRole = ko.observable(TEAM_ROLE.NONE);
