@@ -709,6 +709,8 @@ export class ConversationAPI {
    * sending failed are part of the response body.
    *
    * This endpoint can lead to OtrMessageAdd event being sent to the recipients.
+   *
+   * @see https://nginz-https.anta.wire.link/api/swagger-ui/#/default/post_conversations__cnv_domain___cnv__proteus_messages
    */
   public async postOTRMessageV2(
     conversationId: string,
