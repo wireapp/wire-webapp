@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.2.1...@wireapp/api-client@15.3.0) (2021-10-28)
+
+
+### Features
+
+* **core:** Allow the consumer to give a list of clients when sending a message ([#4163](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4163)) ([b437acc](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/b437accfc7151518a780734efeecd0dcbbde8c7e))
+
+
+
+
+
 ## [15.2.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.2.0...@wireapp/api-client@15.2.1) (2021-10-21)
 
 
