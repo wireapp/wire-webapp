@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.21.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.21.0...@wireapp/core@17.21.1) (2021-10-28)
+
+
+### Bug Fixes
+
+* **core:** Correctly detect QualifiedUserClients with empty clients array ([#4165](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4165)) ([0b447f1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/0b447f110cda96703fb1f460b15e7e93773e1a70))
+
+
+
+
+
 # [17.21.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.20.3...@wireapp/core@17.21.0) (2021-10-28)
 
 
