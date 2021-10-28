@@ -263,6 +263,18 @@ export class ConversationService {
     return undefined;
   }
 
+  /**
+   * Sends a message to a federated environment.
+   *
+   * @param sendingClientId - The clientId from which the message is sent
+   * @param conversationId - The conversation in which to send the message
+   * @param conversationDomain - The domain where the conversation lives
+   * @param genericMessage - The payload of the message to send
+   * @param userIds? - can be either a QualifiedId[] or QualfiedUserClients. The type has some effect on the behavior of the method.
+   *    When given a QualifiedId[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
+   *    When given a QualifiedUserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
+   * @return Resolves with the message sending status from backend
+   */
   private async sendFederatedGenericMessage(
     sendingClientId: string,
     conversationId: string,
@@ -271,7 +283,9 @@ export class ConversationService {
     userIds?: QualifiedId[] | QualifiedUserClients,
   ): Promise<MessageSendingStatus> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const preKeyBundles = await this.getQualifiedPreKeyBundle(conversationId, conversationDomain, userIds);
+    const preKeyBundles = isQualifiedUserClients(userIds)
+      ? userIds
+      : await this.getQualifiedPreKeyBundle(conversationId, conversationDomain, userIds);
 
     const recipients = await this.cryptographyService.encryptQualified(plainTextArray, preKeyBundles);
 
@@ -281,6 +295,8 @@ export class ConversationService {
       conversationDomain,
       recipients,
       plainTextArray,
+      undefined,
+      isQualifiedUserClients(userIds), // we want to check mismatch in case the consumer gave an exact list of users/devices
     );
   }
 
@@ -808,10 +824,18 @@ export class ConversationService {
   }
 
   /**
-   * @param payloadBundle Outgoing message
-   * @param userIds Only send message to specified user IDs or to certain clients of specified user IDs
-   * @param [callbacks] Optional callbacks that will be called when the message starts being sent and when it has been succesfully sent. Currently only used for `sendText`.
-   * @returns Sent message
+   * Sends a message to a conversation
+   *
+   * @param params.payloadBundle The message to send to the conversation
+   * @param params.userIds? Can be either a QualifiedId[], string[], UserClients or QualfiedUserClients. The type has some effect on the behavior of the method.
+   *    When given a QualifiedId[] or string[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
+   *    When given a QualifiedUserClients or UserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
+   *    When given a QualifiedId[] or QualifiedUserClients the method will send the message through the federated API endpoint
+   *    When given a string[] or UserClients the method will send the message through the old API endpoint
+   * @param params.sendAsProtobuf?
+   * @param params.conversationDomain? The domain the conversation lives on (if given with QualifiedId[] or QualfiedUserClients in the userIds params, will send the message to the federated endpoint)
+   * @param params.callbacks? Optional callbacks that will be called when the message starts being sent and when it has been succesfully sent.
+   * @return resolves with the sent message
    */
   public async send<T extends OtrMessage = OtrMessage>({
     payloadBundle,
