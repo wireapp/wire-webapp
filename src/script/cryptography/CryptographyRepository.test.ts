@@ -19,7 +19,7 @@
 
 import {MemoryEngine} from '@wireapp/store-engine';
 import {Cryptobox} from '@wireapp/cryptobox';
-import {keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
+import {keys as ProteusKeys} from '@wireapp/proteus';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
 import {arrayToBase64, createRandomUuid} from 'Util/util';
@@ -35,7 +35,6 @@ describe('CryptographyRepository', () => {
   const testFactory = new TestFactory();
 
   beforeAll(async () => {
-    await proteusInit();
     await testFactory.exposeCryptographyActors(false);
   });
 
@@ -123,12 +122,12 @@ describe('CryptographyRepository', () => {
       jest
         .spyOn(testFactory.cryptography_repository.cryptographyService, 'putClientPreKeys')
         .mockReturnValue(Promise.resolve());
-      const preKeys = await testFactory.cryptography_repository.initCryptobox();
       const alice = testFactory.cryptography_repository.cryptobox['identity'];
+      const prekey = testFactory.cryptography_repository.cryptobox.lastResortPreKey;
 
       expect(alice).toBeDefined();
 
-      const aliceBundle = new ProteusKeys.PreKeyBundle(alice.public_key, preKeys[0]);
+      const aliceBundle = new ProteusKeys.PreKeyBundle(alice.public_key, prekey);
 
       const bobEngine = new MemoryEngine();
       await bobEngine.init('bob');
