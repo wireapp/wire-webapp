@@ -88,6 +88,10 @@ export class MessageService {
     }
   }
 
+  private isClientMismatchError(error: any): error is ClientMismatchError {
+    return error.response?.status === HTTP_STATUS.PRECONDITION_FAILED;
+  }
+
   private checkFederatedClientsMismatch(
     messageData: ProtobufOTR.QualifiedNewOtrMessage,
     messageSendingStatus: MessageSendingStatus,
@@ -149,6 +153,7 @@ export class MessageService {
     recipients: QualifiedOTRRecipients,
     plainTextArray: Uint8Array,
     assetData?: Uint8Array,
+    reportMissing?: boolean,
   ): Promise<MessageSendingStatus> {
     const qualifiedUserEntries = Object.entries(recipients).map<ProtobufOTR.IQualifiedUserEntry>(
       ([domain, otrRecipients]) => {
@@ -190,25 +195,33 @@ export class MessageService {
      * missing clients. We have to ignore missing clients because there can be the case that there are clients that
      * don't provide PreKeys (clients from the Pre-E2EE era).
      */
-    protoMessage.ignoreAll = {};
+    if (reportMissing) {
+      protoMessage.reportAll = {};
+    } else {
+      protoMessage.ignoreAll = {};
+    }
 
-    const messageSendingStatus = await this.apiClient.conversation.api.postOTRMessageV2(
-      conversationId,
-      conversationDomain,
-      protoMessage,
-    );
-
-    const federatedClientsMismatch = this.checkFederatedClientsMismatch(protoMessage, messageSendingStatus);
-
-    if (federatedClientsMismatch) {
-      const reEncryptedMessage = await this.onFederatedClientMismatch(
+    let sendingStatus: MessageSendingStatus;
+    try {
+      sendingStatus = await this.apiClient.conversation.api.postOTRMessageV2(
+        conversationId,
+        conversationDomain,
         protoMessage,
-        federatedClientsMismatch,
-        plainTextArray,
       );
+    } catch (error) {
+      if (!this.isClientMismatchError(error)) {
+        throw error;
+      }
+      sendingStatus = error.response!.data! as unknown as MessageSendingStatus;
+    }
+
+    const mismatch = this.checkFederatedClientsMismatch(protoMessage, sendingStatus);
+
+    if (mismatch) {
+      const reEncryptedMessage = await this.encryptForMissingClients(protoMessage, mismatch, plainTextArray);
       await this.apiClient.conversation.api.postOTRMessageV2(conversationId, conversationDomain, reEncryptedMessage);
     }
-    return messageSendingStatus;
+    return sendingStatus;
   }
 
   public async sendOTRProtobufMessage(
@@ -383,7 +396,15 @@ export class MessageService {
     throw error;
   }
 
-  private async onFederatedClientMismatch(
+  /**
+   * Will re-encrypt a message when there were some missing clients in the initial send (typically when the server replies with a client mismatch error)
+   *
+   * @param {ProtobufOTR.QualifiedNewOtrMessage} messageData The initial message that was sent
+   * @param {MessageSendingStatus} messageSendingStatus Info about the missing/deleted clients
+   * @param {Uint8Array} plainTextArray The text that should be encrypted for the missing clients
+   * @return resolves with a new message payload that can be sent
+   */
+  private async encryptForMissingClients(
     messageData: ProtobufOTR.QualifiedNewOtrMessage,
     messageSendingStatus: MessageSendingStatus,
     plainTextArray: Uint8Array,

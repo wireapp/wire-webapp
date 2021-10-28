@@ -20,7 +20,13 @@
 import type {APIClient} from '@wireapp/api-client';
 import type {PreKey as SerializedPreKey} from '@wireapp/api-client/src/auth/';
 import type {RegisteredClient} from '@wireapp/api-client/src/client/';
-import type {OTRClientMap, OTRRecipients, QualifiedOTRRecipients} from '@wireapp/api-client/src/conversation/';
+import type {
+  OTRClientMap,
+  OTRRecipients,
+  QualifiedOTRRecipients,
+  QualifiedUserClients,
+  UserClients,
+} from '@wireapp/api-client/src/conversation/';
 import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import type {QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {Cryptobox} from '@wireapp/cryptobox';
@@ -32,6 +38,7 @@ import logdown from 'logdown';
 
 import {GenericMessageType, PayloadBundle, PayloadBundleSource} from '../conversation';
 import type {SessionPayloadBundle} from '../cryptography/';
+import {isUserClients} from '../util';
 import {CryptographyDatabaseRepository} from './CryptographyDatabaseRepository';
 import {GenericMessageMapper} from './GenericMessageMapper';
 
@@ -118,7 +125,7 @@ export class CryptographyService {
 
   public async encryptQualified(
     plainText: Uint8Array,
-    preKeyBundles: QualifiedUserPreKeyBundleMap,
+    preKeyBundles: QualifiedUserPreKeyBundleMap | QualifiedUserClients,
   ): Promise<QualifiedOTRRecipients> {
     const qualifiedOTRRecipients: QualifiedOTRRecipients = {};
 
@@ -131,17 +138,15 @@ export class CryptographyService {
 
   public async encrypt(
     plainText: Uint8Array,
-    preKeyBundles: UserPreKeyBundleMap,
+    users: UserPreKeyBundleMap | UserClients,
     domain?: string,
   ): Promise<OTRRecipients<Uint8Array>> {
-    const recipients: OTRRecipients<Uint8Array> = {};
     const bundles: Promise<SessionPayloadBundle>[] = [];
 
-    for (const userId in preKeyBundles) {
-      recipients[userId] = {};
-
-      for (const clientId in preKeyBundles[userId]) {
-        const {key: base64PreKey} = preKeyBundles[userId][clientId];
+    for (const userId in users) {
+      const clientIds = isUserClients(users) ? users[userId] : Object.keys(users[userId]);
+      for (const clientId of clientIds) {
+        const base64PreKey = isUserClients(users) ? undefined : users[userId][clientId].key;
         const sessionId = CryptographyService.constructSessionId(userId, clientId, domain || null);
         bundles.push(this.encryptPayloadForSession(sessionId, plainText, base64PreKey));
       }
@@ -149,27 +154,29 @@ export class CryptographyService {
 
     const payloads = await Promise.all(bundles);
 
-    payloads.forEach(payload => {
+    return payloads.reduce((recipients, payload) => {
       const {encryptedPayload, sessionId} = payload;
       const {userId, clientId} = CryptographyService.dismantleSessionId(sessionId);
+      recipients[userId] ||= {};
       recipients[userId][clientId] = encryptedPayload;
-    });
-
-    return recipients;
+      return recipients;
+    }, {} as OTRRecipients<Uint8Array>);
   }
 
   private async encryptPayloadForSession(
     sessionId: string,
     plainText: Uint8Array,
-    base64EncodedPreKey: string,
+    base64EncodedPreKey?: string,
   ): Promise<SessionPayloadBundle> {
     this.logger.log(`Encrypting payload for session ID "${sessionId}"`);
 
     let encryptedPayload: Uint8Array;
 
     try {
-      const decodedPreKeyBundle = Decoder.fromBase64(base64EncodedPreKey).asBytes;
-      const payloadAsArrayBuffer = await this.cryptobox.encrypt(sessionId, plainText, decodedPreKeyBundle.buffer);
+      const decodedPreKeyBundle = base64EncodedPreKey
+        ? Decoder.fromBase64(base64EncodedPreKey).asBytes.buffer
+        : undefined;
+      const payloadAsArrayBuffer = await this.cryptobox.encrypt(sessionId, plainText, decodedPreKeyBundle);
       encryptedPayload = new Uint8Array(payloadAsArrayBuffer);
     } catch (error) {
       this.logger.error(`Could not encrypt payload: ${(error as Error).message}`);
