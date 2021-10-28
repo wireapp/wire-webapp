@@ -451,29 +451,28 @@ export class MessageService {
         // walk through missing user ids
         for (const [missingUserId, missingClientIds] of Object.entries(missingUserIdClients)) {
           // walk through message recipients
-          for (const recipientIndex in messageData.recipients) {
+          for (const domain of messageData.recipients) {
             // check if message recipients' domain is the same as the missing user's domain
-            if (messageData.recipients[recipientIndex].domain === missingUserDomain) {
+            if (domain.domain === missingUserDomain) {
               // check if there is a recipient with same user id as the missing user's id
-              let userIndex = messageData.recipients[recipientIndex].entries?.findIndex(
-                ({user}) => bytesToUUID(user.uuid) === missingUserId,
-              );
+              let userIndex = domain.entries?.findIndex(({user}) => bytesToUUID(user.uuid) === missingUserId);
 
               if (userIndex === -1) {
                 // no recipient found, let's create it
-                userIndex = messageData.recipients[recipientIndex].entries!.push({
-                  user: {
-                    uuid: uuidToBytes(missingUserId),
-                  },
-                });
+                userIndex =
+                  domain.entries!.push({
+                    user: {
+                      uuid: uuidToBytes(missingUserId),
+                    },
+                  }) - 1;
               }
 
-              const missingUserUUID = messageData.recipients[recipientIndex].entries![userIndex!].user.uuid;
+              const missingUserUUID = domain.entries![userIndex!].user.uuid;
 
               if (bytesToUUID(missingUserUUID) === missingUserId) {
                 for (const missingClientId of missingClientIds) {
-                  messageData.recipients[recipientIndex].entries![userIndex!].clients ||= [];
-                  messageData.recipients[recipientIndex].entries![userIndex!].clients?.push({
+                  domain.entries![userIndex!].clients ||= [];
+                  domain.entries![userIndex!].clients?.push({
                     client: {
                       client: Long.fromString(missingClientId, 16),
                     },
