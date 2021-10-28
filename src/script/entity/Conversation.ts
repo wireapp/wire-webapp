@@ -96,6 +96,7 @@ export class Conversation {
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
   public readonly hasGuest: ko.PureComputed<boolean>;
+  public readonly hasDirectGuest: ko.PureComputed<boolean>;
   public readonly hasLegalHold: ko.Computed<boolean>;
   public readonly hasService: ko.PureComputed<boolean>;
   public readonly hasUnread: ko.PureComputed<boolean>;
@@ -145,6 +146,7 @@ export class Conversation {
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
   public readonly withAllTeamMembers: ko.Observable<boolean>;
   public readonly hasExternal: ko.PureComputed<boolean>;
+  public readonly hasFederatedUsers: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE;
   public domain: string;
@@ -205,12 +207,19 @@ export class Conversation {
     this.isRequest = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.CONNECT);
     this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
 
+    this.hasDirectGuest = ko.pureComputed(() => {
+      const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isDirectGuest());
+      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+    });
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
       return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
     this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
+    this.hasFederatedUsers = ko.pureComputed(() =>
+      this.participating_user_ets().some(userEntity => !userEntity.isOnSameFederatedDomain()),
+    );
     this.servicesCount = ko.pureComputed(
       () => this.participating_user_ets().filter(userEntity => userEntity.isService).length,
     );
