@@ -1,19 +1,19 @@
 import React, {useState} from 'react';
 
 interface StyledInputProps {
-  disabled?: boolean;
   label: string;
   onChange?: (value: string) => void;
+  readOnly?: boolean;
   value: string;
 }
 
-const AccountInput: React.FC<StyledInputProps> = ({label, value, disabled, onChange}) => {
+const AccountInput: React.FC<StyledInputProps> = ({label, value, readOnly, onChange}) => {
   const [input, setInput] = useState(value);
   return (
     <div>
       <label>{label}</label>
       <input
-        disabled={disabled}
+        readOnly={readOnly}
         value={input}
         onChange={event => setInput(event.target.value)}
         onKeyPress={event => {
@@ -25,6 +25,7 @@ const AccountInput: React.FC<StyledInputProps> = ({label, value, disabled, onCha
         onBlur={() => {
           setInput(value);
         }}
+        spellCheck={false}
       />
     </div>
   );

@@ -1,57 +1,146 @@
-import React from 'react';
-import {container} from 'tsyringe';
+/*
+ * Wire
+ * Copyright (C) 2021 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
-
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import AvailabilityState from 'Components/AvailabilityState';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import React, {useRef} from 'react';
+import {AppLockState} from '../../user/AppLockState';
+import {container} from 'tsyringe';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-
+import useEffectRef from 'Util/useEffectRef';
+import {ClientRepository} from '../../client/ClientRepository';
+import {User} from '../../entity/User';
+import {TeamState} from '../../team/TeamState';
+import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
+import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import {nameFromType} from '../../user/AvailabilityMapper';
+import {RichProfileRepository} from '../../user/RichProfileRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
 import AccentColorPicker from '../AccentColorPicker';
-import AvailabilityState from 'Components/AvailabilityState';
-import {nameFromType} from '../../user/AvailabilityMapper';
-import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import AccountInput from './accountPreferences/AccountInput';
+import {isTemporaryClientAndNonPersistent} from 'Util/util';
+import {loadValue} from 'Util/StorageUtil';
+import {StorageKey} from 'src/script/storage';
+import {Config} from 'src/script/Config';
+import HistoryBackupSection from './accountPreferences/HistoryBackupSection';
+import AccountSecuritySection from './accountPreferences/AccountSecuritySection';
+import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
+import PrivacySection from './accountPreferences/PrivacySection';
+import {AppLockRepository} from 'src/script/user/AppLockRepository';
+import LogoutSection from './accountPreferences/LogoutSection';
+import DataUsageSection from './accountPreferences/DataUsageSection';
 
 interface AccountPreferencesProps {
+  appLockRepository: AppLockRepository;
+  appLockState: AppLockState;
+  clientRepository: ClientRepository;
+  propertiesRepository: PropertiesRepository;
+  richProfileRepository: RichProfileRepository;
+  teamState: TeamState;
   userRepository: UserRepository;
   userState: UserState;
 }
 
 const AccountPreferences: React.FC<AccountPreferencesProps> = ({
+  clientRepository,
   userRepository,
+  propertiesRepository,
+  appLockRepository,
   userState = container.resolve(UserState),
+  teamState = container.resolve(TeamState),
+  richProfileRepository = container.resolve(RichProfileRepository),
 }) => {
+  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
+  useFadingScrollbar(scrollbarRef);
+
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
-  const {name, email, availability, username} = useKoSubscribableChildren(selfUser, [
+  const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
+  const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
     'availability',
     'username',
+    'managedBy',
   ]);
+  const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
+  const isDesktop = Runtime.isDesktopApp();
+  const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST)));
+  const brandName = Config.getConfig().BRAND_NAME;
+
+  const richFields = useEnrichedFields(selfUser, false, richProfileRepository);
+
   return (
     <div>
-      {name}
-      <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />
-      <div onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'preferences-account-availability-menu')}>
-        <AvailabilityState
-          label={
-            availability === Availability.Type.NONE
-              ? t('preferencesAccountAvailabilityUnset')
-              : nameFromType(availability)
-          }
-          availability={availability}
-          showArrow
-          dataUieName="status-availability-in-profile"
-        />
+      <div className="preferences-titlebar">{t('preferencesAccount')}</div>
+      <div ref={setScrollbarRef}>
+        {name}
+        <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />
+        {isTeam && (
+          <div
+            onClick={event => {
+              AvailabilityContextMenu.show(event.nativeEvent, 'preferences-account-availability-menu');
+            }}
+          >
+            <AvailabilityState
+              label={
+                availability === Availability.Type.NONE
+                  ? t('preferencesAccountAvailabilityUnset')
+                  : nameFromType(availability)
+              }
+              availability={availability}
+              showArrow
+              dataUieName="status-availability-in-profile"
+            />
+          </div>
+        )}
+        {canEditProfile && (
+          <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
+        )}
+        <div>{'Info'}</div>
+        <AccountInput label="Displayname" value={name} />
+        <AccountInput label="Username" value={username} />
+        <AccountInput label="Email" value={email} />
+        {richFields.map(({type, value}) => (
+          <AccountInput key={type} label={type} value={value} readOnly />
+        ))}
+        <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />
+        <PrivacySection {...{appLockRepository, propertiesRepository}} />
+        {isActivatedAccount && (
+          <>
+            {!isTemporaryAndNonPersistent.current && <HistoryBackupSection {...{brandName}} />}
+            <AccountSecuritySection {...{selfUser, userRepository}} />
+            {!isDesktop && <LogoutSection {...{clientRepository}} />}
+          </>
+        )}
       </div>
-      <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
-      <div>{'Info'}</div>
-      <AccountInput label="Displayname" value={name} />
-      <AccountInput label="Username" value={username} />
     </div>
   );
 };
 
 export default AccountPreferences;
+
+registerReactComponent('account-preferences', {
+  component: AccountPreferences,
+  template: '<div data-bind="react:{userRepository}"></div>',
+});
