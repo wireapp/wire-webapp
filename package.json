@@ -30,7 +30,7 @@
     "react-dom": "16.14.0",
     "react-intl": "5.21.0",
     "react-intl-po": "2.2.2",
-    "react-redux": "7.2.5",
+    "react-redux": "7.2.6",
     "react-router": "5.2.1",
     "react-router-dom": "5.3.0",
     "react-transition-group": "4.4.2",
