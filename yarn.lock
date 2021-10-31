@@ -1668,13 +1668,13 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@formatjs/cli@4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.3.0.tgz#1c32876e05bffeb55e9e43360018edb7a232ddce"
-  integrity sha512-Ic5DQoMVB9jX7dtoEulaRJU1FBxVQRYvx3+CqIukySG6l7E02BphfdhxNue0Nh+ZPzsQ69Wi8AKnJdifPf3FaQ==
+"@formatjs/cli@4.4.0":
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/cli/-/cli-4.4.0.tgz#e240f1a2caf31a59c148289d3a5cda6dc50f73ad"
+  integrity sha512-aBo+U8/EoBDWmksgPo3mhUunW55GFTqVA6hiudfHBPARfXX/b6JtXDi0fJGZpN2LbtYyvy4OrQlMP+c/7LGPQQ==
   dependencies:
-    "@formatjs/icu-messageformat-parser" "2.0.11"
-    "@formatjs/ts-transformer" "3.4.10"
+    "@formatjs/icu-messageformat-parser" "2.0.14"
+    "@formatjs/ts-transformer" "3.6.0"
     "@types/estree" "^0.0.50"
     "@types/fs-extra" "^9.0.1"
     "@types/json-stable-stringify" "^1.0.32"
@@ -1688,7 +1688,7 @@
     json-stable-stringify "^1.0.1"
     loud-rejection "^2.2.0"
     tslib "^2.1.0"
-    typescript "4"
+    typescript "^4.4"
 
 "@formatjs/ecma402-abstract@1.10.0":
   version "1.10.0"
@@ -1698,28 +1698,11 @@
     "@formatjs/intl-localematcher" "0.2.21"
     tslib "^2.1.0"
 
-"@formatjs/ecma402-abstract@1.9.8":
-  version "1.9.8"
-  resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-1.9.8.tgz#f3dad447fbc7f063f88e2a148b7a353161740e74"
-  integrity sha512-2U4n11bLmTij/k4ePCEFKJILPYwdMcJTdnKVBi+JMWBgu5O1N+XhCazlE6QXqVO1Agh2Doh0b/9Jf1mSmSVfhA==
-  dependencies:
-    "@formatjs/intl-localematcher" "0.2.20"
-    tslib "^2.1.0"
-
 "@formatjs/fast-memoize@1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@formatjs/fast-memoize/-/fast-memoize-1.2.0.tgz#1123bfcc5d21d761f15d8b1c32d10e1b6530355d"
   integrity sha512-fObitP9Tlc31SKrPHgkPgQpGo4+4yXfQQITTCNH8AZdEqB7Mq4nPrjpUL/tNGN3lEeJcFxDbi0haX8HM7QvQ8w==
   dependencies:
-    tslib "^2.1.0"
-
-"@formatjs/icu-messageformat-parser@2.0.11":
-  version "2.0.11"
-  resolved "https://registry.yarnpkg.com/@formatjs/icu-messageformat-parser/-/icu-messageformat-parser-2.0.11.tgz#e4ba40b9a8aefc8bccfc96be5906d3bca305b4b3"
-  integrity sha512-5mWb8U8aulYGwnDZWrr+vdgn5PilvtrqQYQ1pvpgzQes/osi85TwmL2GqTGLlKIvBKD2XNA61kAqXYY95w4LWg==
-  dependencies:
-    "@formatjs/ecma402-abstract" "1.9.8"
-    "@formatjs/icu-skeleton-parser" "1.2.12"
     tslib "^2.1.0"
 
 "@formatjs/icu-messageformat-parser@2.0.14":
@@ -1729,14 +1712,6 @@
   dependencies:
     "@formatjs/ecma402-abstract" "1.10.0"
     "@formatjs/icu-skeleton-parser" "1.3.1"
-    tslib "^2.1.0"
-
-"@formatjs/icu-skeleton-parser@1.2.12":
-  version "1.2.12"
-  resolved "https://registry.yarnpkg.com/@formatjs/icu-skeleton-parser/-/icu-skeleton-parser-1.2.12.tgz#45426eb1448c0c08c931eb9f0672283c0e4d0062"
-  integrity sha512-DTFxWmEA02ZNW6fsYjGYSADvtrqqjCYF7DSgCmMfaaE0gLP4pCdAgOPE+lkXXU+jP8iCw/YhMT2Seyk/C5lBWg==
-  dependencies:
-    "@formatjs/ecma402-abstract" "1.9.8"
     tslib "^2.1.0"
 
 "@formatjs/icu-skeleton-parser@1.3.1":
@@ -1765,13 +1740,6 @@
     "@formatjs/intl-localematcher" "0.2.21"
     tslib "^2.1.0"
 
-"@formatjs/intl-localematcher@0.2.20":
-  version "0.2.20"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.2.20.tgz#782aef53d1c1b6112ee67468dc59f9b8d1ba7b17"
-  integrity sha512-/Ro85goRZnCojzxOegANFYL0LaDIpdPjAukR7xMTjOtRx+3yyjR0ifGTOW3/Kjhmab3t6GnyHBYWZSudxEOxPA==
-  dependencies:
-    tslib "^2.1.0"
-
 "@formatjs/intl-localematcher@0.2.21":
   version "0.2.21"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.2.21.tgz#39ef33d701fe8084f3d693cd3ff7cbe03cdd3a49"
@@ -1792,14 +1760,16 @@
     intl-messageformat "9.9.4"
     tslib "^2.1.0"
 
-"@formatjs/ts-transformer@3.4.10":
-  version "3.4.10"
-  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-3.4.10.tgz#f623c5db5eaea4f6da34124f620f043d5ea3970a"
-  integrity sha512-5fu8x+8CtyrFe8zdwHvFsYLx9TEPjeJSODRS1ZJxkMVpTBHaNsPqsPkN1TuTk5x3+tSczxXmN1LGrAzUxNN3nQ==
+"@formatjs/ts-transformer@3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/ts-transformer/-/ts-transformer-3.6.0.tgz#0d24f5dc3cc1862bb4661bfc611580093b862583"
+  integrity sha512-r0J230J3TOLJolnAMbWsmzKu1NNitORzoPRGv0CPzjQSAmbTOtbrWNfYsyp+Ro8k5Gfkm9Qdg+BhxRXfyVTmtg==
   dependencies:
-    "@formatjs/icu-messageformat-parser" "2.0.11"
+    "@formatjs/icu-messageformat-parser" "2.0.14"
+    "@types/node" "14 || 16"
     chalk "^4.0.0"
     tslib "^2.1.0"
+    typescript "^4.4"
 
 "@hot-loader/react-dom@16.14.0":
   version "16.14.0"
@@ -2562,10 +2532,10 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.1.tgz#283f669ff76d7b8260df8ab7a4262cc83d988256"
   integrity sha512-fZQQafSREFyuZcdWFAExYjBiCL7AUCdgsk80iO0q4yihYYdcIiH28CcuPTGFgLOCC8RlW49GSQxdHwZP+I7CNg==
 
-"@types/node@*", "@types/node@>=13.7.0":
-  version "15.0.2"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-15.0.2.tgz#51e9c0920d1b45936ea04341aa3e2e58d339fb67"
-  integrity sha512-p68+a+KoxpoB47015IeYZYRrdqMUcpbK8re/zpFB8Ld46LHC1lPEbp3EXgkEhAYEcPvjJF6ZO+869SQ0aH1dcA==
+"@types/node@*", "@types/node@14 || 16", "@types/node@>=13.7.0":
+  version "16.11.6"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.6.tgz#6bef7a2a0ad684cf6e90fcfe31cecabd9ce0a3ae"
+  integrity sha512-ua7PgUoeQFjmWPcoo9khiPum3Pd60k4/2ZGXt18sm2Slk0W0xZTqt5Y0Ny1NyBiN1EVQ/+FaF9NcY4Qe6rwk5w==
 
 "@types/node@13.13.4":
   version "13.13.4"
@@ -13663,10 +13633,15 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@4, typescript@4.3.5:
+typescript@4.3.5:
   version "4.3.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.3.5.tgz#4d1c37cc16e893973c45a06886b7113234f119f4"
   integrity sha512-DqQgihaQ9cUrskJo9kIyW/+g0Vxsk8cDtZ52a3NGh0YNTfpUSArXSohyUGnvbPazEPLu398C0UxmKSOrPumUzA==
+
+typescript@^4.4:
+  version "4.4.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.4.tgz#2cd01a1a1f160704d3101fd5a58ff0f9fcb8030c"
+  integrity sha512-DqGhF5IKoBl8WNf8C1gu8q0xZSInh9j1kJJMqT3a94w1JzVaBU4EXOSMrz9yDqMT0xt3selp83fuFMQ0uzv6qA==
 
 typeson-registry@^1.0.0-alpha.20:
   version "1.0.0-alpha.38"
