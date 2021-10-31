@@ -306,19 +306,12 @@
   dependencies:
     "@babel/types" "^7.15.4"
 
-"@babel/helper-skip-transparent-expression-wrappers@^7.14.5":
-  version "7.14.5"
-  resolved "https://registry.yarnpkg.com/@babel/helper-skip-transparent-expression-wrappers/-/helper-skip-transparent-expression-wrappers-7.14.5.tgz#96f486ac050ca9f44b009fbe5b7d394cab3a0ee4"
-  integrity sha512-dmqZB7mrb94PZSAOYtr+ZN5qt5owZIAgqtoTuqiFbHFtxgEcmQlRJVI+bO++fciBunXtB6MK7HrzrfcAzIz2NQ==
+"@babel/helper-skip-transparent-expression-wrappers@^7.14.5", "@babel/helper-skip-transparent-expression-wrappers@^7.15.4", "@babel/helper-skip-transparent-expression-wrappers@^7.16.0":
+  version "7.16.0"
+  resolved "https://registry.yarnpkg.com/@babel/helper-skip-transparent-expression-wrappers/-/helper-skip-transparent-expression-wrappers-7.16.0.tgz#0ee3388070147c3ae051e487eca3ebb0e2e8bb09"
+  integrity sha512-+il1gTy0oHwUsBQZyJvukbB4vPMdcYBrFHa0Uc4AizLxbq6BOYC51Rv4tWocX9BLBDLZ4kc6qUFpQ6HRgL+3zw==
   dependencies:
-    "@babel/types" "^7.14.5"
-
-"@babel/helper-skip-transparent-expression-wrappers@^7.15.4":
-  version "7.15.4"
-  resolved "https://registry.yarnpkg.com/@babel/helper-skip-transparent-expression-wrappers/-/helper-skip-transparent-expression-wrappers-7.15.4.tgz#707dbdba1f4ad0fa34f9114fc8197aec7d5da2eb"
-  integrity sha512-BMRLsdh+D1/aap19TycS4eD1qELGrCBJwzaY9IE8LrpJtJb+H7rQkPIdsfgnMtLBA6DJls7X9z93Z4U8h7xw0A==
-  dependencies:
-    "@babel/types" "^7.15.4"
+    "@babel/types" "^7.16.0"
 
 "@babel/helper-split-export-declaration@^7.15.4":
   version "7.15.4"
@@ -526,13 +519,22 @@
     "@babel/helper-plugin-utils" "^7.14.5"
     "@babel/plugin-syntax-optional-catch-binding" "^7.8.3"
 
-"@babel/plugin-proposal-optional-chaining@7.14.5", "@babel/plugin-proposal-optional-chaining@^7.14.5":
+"@babel/plugin-proposal-optional-chaining@7.14.5":
   version "7.14.5"
   resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.14.5.tgz#fa83651e60a360e3f13797eef00b8d519695b603"
   integrity sha512-ycz+VOzo2UbWNI1rQXxIuMOzrDdHGrI23fRiz/Si2R4kv2XZQ1BK8ccdHwehMKBlcH/joGW/tzrUmo67gbJHlQ==
   dependencies:
     "@babel/helper-plugin-utils" "^7.14.5"
     "@babel/helper-skip-transparent-expression-wrappers" "^7.14.5"
+    "@babel/plugin-syntax-optional-chaining" "^7.8.3"
+
+"@babel/plugin-proposal-optional-chaining@7.16.0", "@babel/plugin-proposal-optional-chaining@^7.14.5":
+  version "7.16.0"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-proposal-optional-chaining/-/plugin-proposal-optional-chaining-7.16.0.tgz#56dbc3970825683608e9efb55ea82c2a2d6c8dc0"
+  integrity sha512-Y4rFpkZODfHrVo70Uaj6cC1JJOt3Pp0MdWSwIKtb8z1/lsjl9AmnB7ErRFV+QNGIfcY1Eruc2UMx5KaRnXjMyg==
+  dependencies:
+    "@babel/helper-plugin-utils" "^7.14.5"
+    "@babel/helper-skip-transparent-expression-wrappers" "^7.16.0"
     "@babel/plugin-syntax-optional-chaining" "^7.8.3"
 
 "@babel/plugin-proposal-private-methods@^7.14.5":
@@ -1156,6 +1158,14 @@
   integrity sha512-BPU+7QhqNjmWyDO0/vitH/CuhpV8ZmK1wpKva8nuyNF5MJfuRNWMc+hc14+u9xT93kvykMdncrJT19h74uB1Ig==
   dependencies:
     "@babel/helper-validator-identifier" "^7.14.9"
+    to-fast-properties "^2.0.0"
+
+"@babel/types@^7.16.0":
+  version "7.16.0"
+  resolved "https://registry.yarnpkg.com/@babel/types/-/types-7.16.0.tgz#db3b313804f96aadd0b776c4823e127ad67289ba"
+  integrity sha512-PJgg/k3SdLsGb3hhisFvtLOw5ts113klrpLuIPtCJIU+BB24fqq6lf8RWqKJEjzqXR9AEH1rIb5XTqwBHB+kQg==
+  dependencies:
+    "@babel/helper-validator-identifier" "^7.15.7"
     to-fast-properties "^2.0.0"
 
 "@bcoe/v8-coverage@^0.2.3":
