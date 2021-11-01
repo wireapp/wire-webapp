@@ -23,6 +23,7 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -463,8 +464,13 @@ export class StartUIViewModel {
         }
       }
     } catch (error) {
-      if (isBackendError(error) && error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
-        this.showFederatedDomainNotAvailable(true);
+      if (isBackendError(error)) {
+        if (error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+          return this.showFederatedDomainNotAvailable(true);
+        }
+        if (error.code === HTTP_STATUS.BAD_REQUEST && error.label === BackendErrorLabel.FEDERATION_NOT_ALLOWED) {
+          return this.logger.warn(`Error searching for contacts: ${error.message}`);
+        }
       }
       this.logger.error(`Error searching for contacts: ${error.message}`, error);
     }
