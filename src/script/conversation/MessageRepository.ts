@@ -39,9 +39,9 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {ReactionType, MessageSendingCallbacks} from '@wireapp/core/src/main/conversation/';
+import {ReactionType, MessageSendingCallbacks} from '@wireapp/core/src/main/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
+import {ClientMismatch, NewOTRMessage, QualifiedUserClients, UserClients} from '@wireapp/api-client/src/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
@@ -110,6 +110,7 @@ import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 import {Core} from '../service/CoreSingleton';
 import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import {User} from '../entity/User';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -808,7 +809,7 @@ export class MessageRepository {
     },
   ) {
     const users = conversation.allUserEntities;
-    const userIds = conversation.isFederated() ? users.map(user => user.qualifiedId) : users.map(user => user.id);
+    const userIds = conversation.isFederated() ? this.createQualifiedRecipients(users) : users.map(user => user.id);
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
       if (playPingAudio) {
         amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
@@ -1326,6 +1327,17 @@ export class MessageRepository {
         throw error;
       }
     }
+  }
+
+  private createQualifiedRecipients(users: User[]): QualifiedUserClients {
+    return users.reduce((userClients, user) => {
+      userClients[user.domain] ||= {};
+      userClients[user.domain][user.id] ||= [];
+      for (const client of user.devices()) {
+        userClients[user.domain][user.id].push(client.id);
+      }
+      return userClients;
+    }, {} as QualifiedUserClients);
   }
 
   /**
