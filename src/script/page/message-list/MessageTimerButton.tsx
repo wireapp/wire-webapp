@@ -23,22 +23,34 @@ import cx from 'classnames';
 import {t} from 'Util/LocalizerUtil';
 import {formatDuration, DurationUnit} from 'Util/TimeUtil';
 import Icon from 'Components/Icon';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {EphemeralTimings} from '../../ephemeral/EphemeralTimings';
 import {showContextMenu} from '../../ui/ContextMenu';
 import type {Conversation} from '../../entity/Conversation';
+import {container} from 'tsyringe';
+import {TeamState} from '../../team/TeamState';
 
 export interface MessageTimerButtonProps {
   conversation: Conversation;
+  teamState?: TeamState;
 }
 
-export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversation}) => {
-  const messageTimer = useKoSubscribable(conversation.messageTimer);
+export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
+  conversation,
+  teamState = container.resolve(TeamState),
+}) => {
+  const {messageTimer, hasGlobalMessageTimer, isFederated} = useKoSubscribableChildren(conversation, [
+    'messageTimer',
+    'hasGlobalMessageTimer',
+    'isFederated',
+  ]);
+  const {isSelfDeletingMessagesEnabled, isSelfDeletingMessagesEnforced} = useKoSubscribableChildren(teamState, [
+    'isSelfDeletingMessagesEnabled',
+    'isSelfDeletingMessagesEnforced',
+  ]);
   const hasMessageTimer = !!messageTimer;
-  const isFederated = useKoSubscribable(conversation.isFederated);
-  const hasGlobalMessageTimer = useKoSubscribable(conversation.hasGlobalMessageTimer);
-  const isTimerDisabled = hasGlobalMessageTimer || isFederated;
+  const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer || isFederated;
   const duration = hasMessageTimer ? formatDuration(messageTimer) : ({} as DurationUnit);
 
   // Click on ephemeral button
@@ -63,37 +75,39 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({conversat
   };
 
   return (
-    <span
-      id="conversation-input-bar-message-timer"
-      className="controls-right-button conversation-input-bar-message-timer"
-      onClick={isTimerDisabled ? undefined : onClick}
-      title={t('tooltipConversationEphemeral')}
-      data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
-      data-uie-name="do-set-ephemeral-timer"
-    >
-      {hasMessageTimer ? (
-        conversation && (
-          <div
-            className={cx(
-              'message-timer-button',
-              isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
-            )}
-            data-uie-name="message-timer-button"
-          >
-            <span className="message-timer-button-unit" data-uie-name="message-timer-button-symbol">
-              {duration.symbol}
-            </span>
-            <span className="full-screen" data-uie-name="message-timer-button-value">
-              {duration.value}
-            </span>
+    isSelfDeletingMessagesEnabled && (
+      <span
+        id="conversation-input-bar-message-timer"
+        className="controls-right-button conversation-input-bar-message-timer"
+        onClick={isTimerDisabled ? undefined : onClick}
+        title={t('tooltipConversationEphemeral')}
+        data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
+        data-uie-name="do-set-ephemeral-timer"
+      >
+        {hasMessageTimer ? (
+          conversation && (
+            <div
+              className={cx(
+                'message-timer-button',
+                isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
+              )}
+              data-uie-name="message-timer-button"
+            >
+              <span className="message-timer-button-unit" data-uie-name="message-timer-button-symbol">
+                {duration.symbol}
+              </span>
+              <span className="full-screen" data-uie-name="message-timer-button-value">
+                {duration.value}
+              </span>
+            </div>
+          )
+        ) : (
+          <div className={cx('button-icon-large', {disabled: isTimerDisabled})}>
+            <Icon.Timer data-uie-name="message-timer-icon" />
           </div>
-        )
-      ) : (
-        <div className={cx('button-icon-large', {disabled: isTimerDisabled})}>
-          <Icon.Timer data-uie-name="message-timer-icon" />
-        </div>
-      )}
-    </span>
+        )}
+      </span>
+    )
   );
 };
 
