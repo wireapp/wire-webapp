@@ -457,11 +457,11 @@ export class TeamRepository {
         text: {
           htmlMessage: isFeatureEnabled
             ? isEnforced
-              ? t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemSelfDeletingMessagesEnforced', {
+              ? t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
                   timeout: formatDuration(newTimeout).text,
                 })
-              : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemSelfDeletingMessagesEnabled')
-            : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemSelfDeletingMessagesDisabled'),
+              : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
+            : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),
           title: t('featureConfigChangeModalSelfDeletingMessagesHeadline', {brandName: Config.getConfig().BRAND_NAME}),
         },
       });
