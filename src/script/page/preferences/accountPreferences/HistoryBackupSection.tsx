@@ -23,15 +23,14 @@ import React from 'react';
 import {HistoryExportViewModel} from 'src/script/view_model/content/HistoryExportViewModel';
 import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
+import PreferencesSection from './PreferencesSection';
 
 interface HistoryBackupSectionProps {
   brandName: string;
 }
 
 const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) => (
-  <section className="preferences-section preferences-section-conversation-history">
-    <hr className="preferences-separator" />
-    <header className="preferences-header">{t('preferencesOptionsBackupHeader')}</header>
+  <PreferencesSection title={t('preferencesOptionsBackupHeader')} className="preferences-section-conversation-history">
     <div
       className="preferences-link accent-text"
       onClick={() => {
@@ -64,7 +63,7 @@ const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) 
       />
     </label>
     <div className="preferences-detail">{t('preferencesOptionsBackupImportSecondary')}</div>
-  </section>
+  </PreferencesSection>
 );
 
 export default HistoryBackupSection;

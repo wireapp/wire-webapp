@@ -32,6 +32,7 @@ import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
+import PreferencesSection from './PreferencesSection';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;
@@ -70,9 +71,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
     );
 
   return (
-    <section className="preferences-section preferences-section-account-security">
-      <hr className="preferences-separator" />
-
+    <PreferencesSection className="preferences-section-account-security">
       {manageTeamUrl && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
         <div
           className="preferences-link accent-text"
@@ -119,7 +118,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
           {t('preferencesAccountDelete')}
         </div>
       )}
-    </section>
+    </PreferencesSection>
   );
 };
 

@@ -26,6 +26,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {PropertiesRepository} from '../../../properties/PropertiesRepository';
 import {AppLockRepository} from '../../../user/AppLockRepository';
 import {formatDurationCaption} from 'Util/TimeUtil';
+import PreferencesSection from './PreferencesSection';
 
 interface PrivacySectionProps {
   appLockRepository: AppLockRepository;
@@ -48,9 +49,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
 
   const {receiptMode} = useKoSubscribableChildren(propertiesRepository, ['receiptMode']);
   return (
-    <section className="preferences-section preferences-section-privacy">
-      <hr className="preferences-separator" />
-      <header className="preferences-header">{t('preferencesAccountPrivacy')}</header>
+    <PreferencesSection className="preferences-section-privacy" title={t('preferencesAccountPrivacy')}>
       <div className="preferences-option">
         <div className="preferences-option-icon checkbox accent-text" data-uie-name="status-preference-read-receipts">
           <input
@@ -91,7 +90,7 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
           </div>
         </>
       )}
-    </section>
+    </PreferencesSection>
   );
 };
 

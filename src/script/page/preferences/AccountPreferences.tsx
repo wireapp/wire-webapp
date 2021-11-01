@@ -19,6 +19,8 @@
 
 import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
+import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+
 import AvailabilityState from 'Components/AvailabilityState';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
@@ -50,6 +52,11 @@ import PrivacySection from './accountPreferences/PrivacySection';
 import {AppLockRepository} from 'src/script/user/AppLockRepository';
 import LogoutSection from './accountPreferences/LogoutSection';
 import DataUsageSection from './accountPreferences/DataUsageSection';
+import PreferencesSection from './accountPreferences/PreferencesSection';
+import {getLogger} from 'Util/Logger';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {ModalsViewModel} from 'src/script/view_model/ModalsViewModel';
 
 interface AccountPreferencesProps {
   appLockRepository: AppLockRepository;
@@ -61,6 +68,8 @@ interface AccountPreferencesProps {
   userRepository: UserRepository;
   userState: UserState;
 }
+
+const logger = getLogger('AccountPreferences');
 
 const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   clientRepository,
@@ -90,6 +99,36 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 
   const richFields = useEnrichedFields(selfUser, false, richProfileRepository);
 
+  const changeEmail = async (enteredEmail: string): Promise<void> => {
+    try {
+      await userRepository.changeEmail(enteredEmail);
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: t('authPostedResendDetail'),
+          title: t('modalPreferencesAccountEmailHeadline'),
+        },
+      });
+    } catch (error) {
+      logger.warn('Failed to send reset email request', error);
+      if (error.code === HTTP_STATUS.BAD_REQUEST) {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalPreferencesAccountEmailInvalidMessage'),
+            title: t('modalPreferencesAccountEmailErrorHeadline'),
+          },
+        });
+      }
+      if (error.code === HTTP_STATUS.CONFLICT) {
+        amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+          text: {
+            message: t('modalPreferencesAccountEmailTakenMessage'),
+            title: t('modalPreferencesAccountEmailErrorHeadline'),
+          },
+        });
+      }
+    }
+  };
+
   return (
     <div>
       <div className="preferences-titlebar">{t('preferencesAccount')}</div>
@@ -117,13 +156,14 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
         {canEditProfile && (
           <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
         )}
-        <div>{'Info'}</div>
-        <AccountInput label="Displayname" value={name} />
-        <AccountInput label="Username" value={username} />
-        <AccountInput label="Email" value={email} />
-        {richFields.map(({type, value}) => (
-          <AccountInput key={type} label={type} value={value} readOnly />
-        ))}
+        <PreferencesSection title={t('preferencesAccountInfo')}>
+          <AccountInput label="Displayname" value={name} />
+          <AccountInput label="Username" value={username} />
+          <AccountInput label="Email" value={email} readOnly={!canEditProfile} onChange={changeEmail} />
+          {richFields.map(({type, value}) => (
+            <AccountInput key={type} label={type} value={value} readOnly />
+          ))}
+        </PreferencesSection>
         <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />
         <PrivacySection {...{appLockRepository, propertiesRepository}} />
         {isActivatedAccount && (

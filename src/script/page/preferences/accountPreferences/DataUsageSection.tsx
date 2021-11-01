@@ -26,6 +26,7 @@ import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Config} from 'src/script/Config';
 import {ConsentValue} from 'src/script/user/ConsentValue';
+import PreferencesSection from './PreferencesSection';
 
 interface DataUsageSectionProps {
   brandName: string;
@@ -51,10 +52,7 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
   const isCountlyEnabled = !!Config.getConfig().COUNTLY_API_KEY;
 
   return (
-    <section className="preferences-section preferences-section-data-usage">
-      <hr className="preferences-separator" />
-      <header className="preferences-header">{t('preferencesAccountData')}</header>
-
+    <PreferencesSection title={t('preferencesAccountData')} className="preferences-section-data-usage">
       <div className="preferences-option">
         <div
           className="preferences-option-icon checkbox accent-text"
@@ -130,7 +128,7 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
           <div className="preferences-detail">{t('preferencesAccountMarketingConsentDetail', brandName)}</div>
         </>
       )}
-    </section>
+    </PreferencesSection>
   );
 };
 
