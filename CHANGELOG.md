@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.3.0...@wireapp/api-client@15.4.0) (2021-11-01)
+
+
+### Features
+
+* **api-client:** Add federation backend error labels ([#4167](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4167)) ([9d25702](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/9d25702e50aac6c43a154b0a7f4fa86389385de3))
+
+
+
+
+
 # [15.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.2.1...@wireapp/api-client@15.3.0) (2021-10-28)
 
 
