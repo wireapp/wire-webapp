@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.22.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.21.1...@wireapp/core@17.22.0) (2021-11-01)
+
+
+### Features
+
+* **core:** Add federated client mismatch handlers ([#4166](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4166)) ([642bb54](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/642bb54c9647812dd7f5b6ee807cfcda8779aa8f))
+
+
+
+
+
 ## [17.21.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.21.0...@wireapp/core@17.21.1) (2021-10-28)
 
 
