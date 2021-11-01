@@ -93,6 +93,7 @@ import type {
 export interface MessageSendingCallbacks {
   onStart?: (message: GenericMessage) => void;
   onSuccess?: (message: GenericMessage, sentTime?: string) => void;
+  onClientMismatch?: (status: ClientMismatch | MessageSendingStatus) => Promise<boolean | undefined>;
 }
 
 export class ConversationService {
@@ -124,45 +125,57 @@ export class ConversationService {
     return genericMessage;
   }
 
+  private async getConversationQualifiedMembers(conversationId: QualifiedId): Promise<QualifiedId[]> {
+    const conversation = await this.apiClient.conversation.api.getConversation(conversationId, true);
+    /*
+     * If you are sending a message to a conversation, you have to include
+     * yourself in the list of users if you want to sync a message also to your
+     * other clients.
+     */
+    return (
+      conversation.members.others
+        .filter(member => !!member.qualified_id)
+        .map(member => member.qualified_id!)
+        // TODO(Federation): Use 'domain' from 'conversation.members.self' when backend has it implemented
+        .concat({domain: this.apiClient.context!.domain!, id: conversation.members.self.id})
+    );
+  }
+
+  /**
+   * Will generate a prekey bundle for specific users.
+   * If a QualifiedId array is given the bundle will contain all the clients from those users fetched from the server.
+   * If a QualifiedUserClients is provided then only the clients in the payload will be targeted (which could generate a ClientMismatch when sending messages)
+   *
+   * @param {QualifiedId[]|QualifiedUserClients} userIds - Targeted users.
+   * @returns {Promise<QualifiedUserPreKeyBundleMap}
+   */
   private async getQualifiedPreKeyBundle(
-    conversationId: string,
-    conversationDomain: string,
-    userIds?: QualifiedId[] | QualifiedUserClients,
+    userIds: QualifiedId[] | QualifiedUserClients,
   ): Promise<QualifiedUserPreKeyBundleMap> {
-    let members: QualifiedId[] = [];
+    type Target = {id: QualifiedId; clients?: string[]};
+    let targets: Target[] = [];
 
     if (userIds) {
       if (isQualifiedIdArray(userIds)) {
-        members = userIds;
+        targets = userIds.map(id => ({id}));
       } else {
-        members = Object.entries(userIds).reduce<QualifiedId[]>((accumulator, [domain, userClients]) => {
-          accumulator.push(...Object.keys(userClients).map(userId => ({domain, id: userId})));
+        targets = Object.entries(userIds).reduce<Target[]>((accumulator, [domain, userClients]) => {
+          for (const userId in userClients) {
+            accumulator.push({id: {id: userId, domain}, clients: userClients[userId]});
+          }
           return accumulator;
         }, []);
       }
     }
 
-    if (!members.length) {
-      const conversation = await this.apiClient.conversation.api.getConversation(
-        {id: conversationId, domain: conversationDomain},
-        true,
-      );
-      /*
-       * If you are sending a message to a conversation, you have to include
-       * yourself in the list of users if you want to sync a message also to your
-       * other clients.
-       */
-      members = conversation.members.others
-        .filter(member => !!member.qualified_id)
-        .map(member => member.qualified_id!)
-        // TODO(Federation): Use 'domain' from 'conversation.members.self' when backend has it implemented
-        .concat({domain: this.apiClient.context!.domain!, id: conversation.members.self.id});
-    }
-
     const preKeys = await Promise.all(
-      members.map(async qualifiedUserId => {
-        const prekeyBundle = await this.apiClient.user.api.getUserPreKeys(qualifiedUserId);
-        return {user: qualifiedUserId, clients: prekeyBundle.clients};
+      targets.map(async ({id: userId, clients}) => {
+        const prekeyBundle = await this.apiClient.user.api.getUserPreKeys(userId);
+        // We filter the clients that should not receive the message (if a QualifiedUserClients was given as parameter)
+        const userClients = clients
+          ? prekeyBundle.clients.filter(client => clients.includes(client.client))
+          : prekeyBundle.clients;
+        return {user: userId, clients: userClients};
       }),
     );
 
@@ -263,62 +276,71 @@ export class ConversationService {
     return undefined;
   }
 
+  private async getQualifiedRecipientsForConversation(
+    conversationId: QualifiedId,
+    userIds?: QualifiedId[] | QualifiedUserClients,
+  ): Promise<QualifiedUserClients | QualifiedUserPreKeyBundleMap> {
+    if (isQualifiedUserClients(userIds)) {
+      return userIds;
+    }
+    const recipientIds = userIds || (await this.getConversationQualifiedMembers(conversationId));
+    return this.getQualifiedPreKeyBundle(recipientIds);
+  }
+
   /**
    * Sends a message to a federated environment.
    *
-   * @param sendingClientId - The clientId from which the message is sent
-   * @param conversationId - The conversation in which to send the message
-   * @param conversationDomain - The domain where the conversation lives
-   * @param genericMessage - The payload of the message to send
-   * @param userIds? - can be either a QualifiedId[] or QualfiedUserClients. The type has some effect on the behavior of the method.
+   * @param sendingClientId The clientId from which the message is sent
+   * @param conversationId The conversation in which to send the message
+   * @param conversationDomain The domain where the conversation lives
+   * @param genericMessage The payload of the message to send
+   * @param options.userIds? can be either a QualifiedId[] or QualfiedUserClients or undefined. The type has some effect on the behavior of the method.
+   *    When given undefined the method will fetch both the members of the conversations and their devices. No ClientMismatch can happen in that case
    *    When given a QualifiedId[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
    *    When given a QualifiedUserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
+   * @param options.onClientMismatch? Will be called whenever there is a clientmismatch returned from the server. Needs to be combined with a userIds of type QualifiedUserClients
    * @return Resolves with the message sending status from backend
    */
   private async sendFederatedGenericMessage(
     sendingClientId: string,
-    conversationId: string,
-    conversationDomain: string,
+    conversationId: QualifiedId,
     genericMessage: GenericMessage,
-    userIds?: QualifiedId[] | QualifiedUserClients,
+    options: {
+      userIds?: QualifiedId[] | QualifiedUserClients;
+      onClientMismatch?: (mismatch: MessageSendingStatus) => Promise<boolean | undefined>;
+    } = {},
   ): Promise<MessageSendingStatus> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const preKeyBundles = isQualifiedUserClients(userIds)
-      ? userIds
-      : await this.getQualifiedPreKeyBundle(conversationId, conversationDomain, userIds);
+    const recipients = await this.getQualifiedRecipientsForConversation(conversationId, options.userIds);
 
-    const recipients = await this.cryptographyService.encryptQualified(plainTextArray, preKeyBundles);
-
-    return this.messageService.sendFederatedOTRMessage(
-      sendingClientId,
-      conversationId,
-      conversationDomain,
-      recipients,
-      plainTextArray,
-      undefined,
-      isQualifiedUserClients(userIds), // we want to check mismatch in case the consumer gave an exact list of users/devices
-    );
+    return this.messageService.sendFederatedOTRMessage(sendingClientId, conversationId, recipients, plainTextArray, {
+      reportMissing: isQualifiedUserClients(options.userIds), // we want to check mismatch in case the consumer gave an exact list of users/devices
+      onClientMismatch: options.onClientMismatch,
+    });
   }
 
   private async sendGenericMessage(
     sendingClientId: string,
     conversationId: string,
     genericMessage: GenericMessage,
-    userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients,
-    sendAsProtobuf?: boolean,
-    conversationDomain?: string,
+    options: {
+      domain?: string;
+      userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
+      sendAsProtobuf?: boolean;
+      onClientMismatch?: (mistmatch: ClientMismatch | MessageSendingStatus) => Promise<boolean | undefined>;
+    } = {},
   ): Promise<ClientMismatch | MessageSendingStatus | undefined> {
-    if (conversationDomain) {
+    const {domain, userIds} = options;
+    if (domain) {
       if (isStringArray(userIds) || isUserClients(userIds)) {
         throw new Error('Invalid userIds option for sending');
       }
 
       return this.sendFederatedGenericMessage(
         this.apiClient.validatedClientId,
-        conversationId,
-        conversationDomain,
+        {id: conversationId, domain},
         genericMessage,
-        userIds,
+        {userIds, onClientMismatch: options.onClientMismatch},
       );
     }
 
@@ -336,13 +358,13 @@ export class ConversationService {
         conversationId,
         encryptedAsset,
         preKeyBundles,
-        sendAsProtobuf,
+        options.sendAsProtobuf,
       );
     }
 
     const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
 
-    return sendAsProtobuf
+    return options.sendAsProtobuf
       ? this.messageService.sendOTRProtobufMessage(sendingClientId, recipients, conversationId, plainTextArray)
       : this.messageService.sendOTRMessage(sendingClientId, recipients, conversationId, plainTextArray);
   }
@@ -628,14 +650,10 @@ export class ConversationService {
 
     const {id: selfConversationId} = await this.getSelfConversation();
 
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      selfConversationId,
-      genericMessage,
-      undefined,
+    await this.sendGenericMessage(this.apiClient.validatedClientId, selfConversationId, genericMessage, {
+      domain: conversationDomain,
       sendAsProtobuf,
-      conversationDomain,
-    );
+    });
 
     return {
       content,
@@ -670,14 +688,10 @@ export class ConversationService {
 
     const {id: selfConversationId} = await this.getSelfConversation();
 
-    await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      selfConversationId,
-      genericMessage,
-      undefined,
+    await this.sendGenericMessage(this.apiClient.validatedClientId, selfConversationId, genericMessage, {
       sendAsProtobuf,
-      conversationDomain,
-    );
+      domain: conversationDomain,
+    });
 
     return {
       content,
@@ -712,14 +726,11 @@ export class ConversationService {
     });
     callbacks?.onStart?.(genericMessage);
 
-    const response = await this.sendGenericMessage(
-      this.apiClient.validatedClientId,
-      conversationId,
-      genericMessage,
+    const response = await this.sendGenericMessage(this.apiClient.validatedClientId, conversationId, genericMessage, {
       userIds,
       sendAsProtobuf,
-      conversationDomain,
-    );
+      domain: conversationDomain,
+    });
     callbacks?.onSuccess?.(genericMessage, response?.time);
 
     return {
@@ -835,6 +846,7 @@ export class ConversationService {
    * @param params.sendAsProtobuf?
    * @param params.conversationDomain? The domain the conversation lives on (if given with QualifiedId[] or QualfiedUserClients in the userIds params, will send the message to the federated endpoint)
    * @param params.callbacks? Optional callbacks that will be called when the message starts being sent and when it has been succesfully sent.
+   * @param [callbacks.onClientMismatch] Will be called when a mismatch happens. Returning `false` from the callback will stop the sending attempt
    * @return resolves with the sent message
    */
   public async send<T extends OtrMessage = OtrMessage>({
@@ -916,9 +928,7 @@ export class ConversationService {
       this.apiClient.validatedClientId,
       payloadBundle.conversation,
       genericMessage,
-      userIds,
-      sendAsProtobuf,
-      conversationDomain,
+      {userIds, sendAsProtobuf, domain: conversationDomain, onClientMismatch: callbacks?.onClientMismatch},
     );
     callbacks?.onSuccess?.(genericMessage, response?.time);
 

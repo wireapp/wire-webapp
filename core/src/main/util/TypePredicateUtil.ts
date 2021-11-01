@@ -24,8 +24,12 @@ export function isStringArray(obj: any): obj is string[] {
   return Array.isArray(obj) && typeof obj[0] === 'string';
 }
 
+export function isQualifiedId(obj: any): obj is QualifiedId {
+  return typeof obj === 'object' && typeof obj['domain'] === 'string';
+}
+
 export function isQualifiedIdArray(obj: any): obj is QualifiedId[] {
-  return Array.isArray(obj) && typeof obj[0] === 'object' && typeof obj[0]['domain'] === 'string';
+  return Array.isArray(obj) && isQualifiedId(obj[0]);
 }
 
 export function isQualifiedUserClients(obj: any): obj is QualifiedUserClients {
