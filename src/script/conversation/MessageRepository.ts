@@ -1336,7 +1336,6 @@ export class MessageRepository {
       for (const client of user.devices()) {
         userClients[user.domain][user.id].push(client.id);
       }
-      userClients[user.domain][user.id].pop();
       return userClients;
     }, {} as QualifiedUserClients);
   }
