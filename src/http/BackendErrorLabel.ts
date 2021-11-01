@@ -103,6 +103,10 @@ export enum BackendErrorLabel {
   // Service errors
   SERVICE_DISABLED = 'service-disabled',
   TOO_MANY_SERVICES = 'too-many-bots',
+
+  // Federation errors
+  FEDERATION_NOT_ALLOWED = 'federation-not-allowed',
+  FEDERATION_BACKEND_NOT_FOUND = 'srv-record-not-found',
 }
 
 export enum SyntheticErrorLabel {
