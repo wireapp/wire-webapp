@@ -128,6 +128,7 @@ import {MessageRepository} from '../conversation/MessageRepository';
 import CallingContainer from 'Components/calling/CallingOverlayContainer';
 import {TeamError} from '../error/TeamError';
 import Warnings from '../view_model/WarningsContainer';
+import {Core} from '../service/CoreSingleton';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -418,8 +419,11 @@ class App {
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
-      await cryptographyRepository.initCryptobox();
-      cryptographyRepository.initCore(context.clientType);
+      const core = container.resolve(Core);
+      await core.init(context.clientType, undefined, this.service.storage['engine']);
+      await core.initClient({clientType: context.clientType});
+      await cryptographyRepository.setCryptobox(core.service!.cryptography.cryptobox);
+
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 

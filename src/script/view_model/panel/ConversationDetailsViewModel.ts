@@ -217,7 +217,10 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.showOptionTimedMessages = ko.pureComputed(
-      () => this.isActiveGroupParticipant() && roleRepository.canToggleTimeout(this.activeConversation()),
+      () =>
+        this.teamState.isSelfDeletingMessagesEnabled() &&
+        this.isActiveGroupParticipant() &&
+        roleRepository.canToggleTimeout(this.activeConversation()),
     );
 
     this.showSectionOptions = ko.pureComputed(() => {

@@ -24,7 +24,8 @@ import type {TeamData} from '@wireapp/api-client/src/team/team/TeamData';
 import {Availability} from '@wireapp/protocol-messaging';
 import {TEAM_EVENT} from '@wireapp/api-client/src/event/TeamEvent';
 import type {FeatureList} from '@wireapp/api-client/src/team/feature/';
-import {FeatureStatus, FEATURE_KEY} from '@wireapp/api-client/src/team/feature/';
+import {FeatureStatus, FEATURE_KEY, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
+import {formatDuration} from 'Util/TimeUtil';
 import type {
   TeamConversationDeleteEvent,
   TeamDeleteEvent,
@@ -413,6 +414,7 @@ export class TeamRepository {
     if (previousConfig) {
       this.handleAudioVideoFeatureChange(previousConfig, featureConfigList);
       this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
+      this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
     }
 
@@ -430,6 +432,37 @@ export class TeamRepository {
             ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
             : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled'),
           title: t('featureConfigChangeModalFileSharingHeadline', {brandName: Config.getConfig().BRAND_NAME}),
+        },
+      });
+    }
+  };
+
+  private readonly handleSelfDeletingMessagesFeatureChange = (
+    {selfDeletingMessages: previousState}: FeatureList,
+    {selfDeletingMessages: newState}: FeatureList,
+  ) => {
+    const previousTimeout = previousState?.config?.enforcedTimeoutSeconds * 1000;
+    const newTimeout = newState?.config?.enforcedTimeoutSeconds * 1000;
+    const previousStatus = previousState?.status;
+    const newStatus = newState?.status;
+
+    const hasTimeoutChanged = previousTimeout !== newTimeout;
+    const isEnforced = newTimeout > SelfDeletingTimeout.OFF;
+    const hasStatusChanged = previousStatus !== newStatus;
+    const hasFeatureChanged = hasStatusChanged || hasTimeoutChanged;
+    const isFeatureEnabled = newStatus === FeatureStatus.ENABLED;
+
+    if (hasFeatureChanged) {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: isFeatureEnabled
+            ? isEnforced
+              ? t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemSelfDeletingMessagesEnforced', {
+                  timeout: formatDuration(newTimeout).text,
+                })
+              : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemSelfDeletingMessagesEnabled')
+            : t('featureConfigChangeModalSelfDeletingMessagesDescriptionItemSelfDeletingMessagesDisabled'),
+          title: t('featureConfigChangeModalSelfDeletingMessagesHeadline', {brandName: Config.getConfig().BRAND_NAME}),
         },
       });
     }

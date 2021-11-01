@@ -46,6 +46,8 @@ import type {Call} from '../calling/Call';
 import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
 import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
+import {container} from 'tsyringe';
+import {TeamState} from '../team/TeamState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 interface UnreadState {
@@ -68,6 +70,7 @@ enum TIMESTAMP_TYPE {
 }
 
 export class Conversation {
+  private readonly teamState: TeamState;
   public readonly archivedState: ko.Observable<boolean>;
   private readonly incomingMessages: ko.ObservableArray<Message | ContentMessage | MemberMessage>;
   private readonly isManaged: boolean;
@@ -92,10 +95,12 @@ export class Conversation {
   public creator: string;
   public readonly display_name: ko.PureComputed<string>;
   public readonly firstUserEntity: ko.PureComputed<User>;
+  public readonly enforcedTeamMessageTimer: ko.PureComputed<number>;
   public readonly globalMessageTimer: ko.Observable<number>;
   public readonly hasAdditionalMessages: ko.Observable<boolean>;
   public readonly hasGlobalMessageTimer: ko.PureComputed<boolean>;
   public readonly hasGuest: ko.PureComputed<boolean>;
+  public readonly hasDirectGuest: ko.PureComputed<boolean>;
   public readonly hasLegalHold: ko.Computed<boolean>;
   public readonly hasService: ko.PureComputed<boolean>;
   public readonly hasUnread: ko.PureComputed<boolean>;
@@ -145,6 +150,7 @@ export class Conversation {
   public readonly verification_state: ko.Observable<ConversationVerificationState>;
   public readonly withAllTeamMembers: ko.Observable<boolean>;
   public readonly hasExternal: ko.PureComputed<boolean>;
+  public readonly hasFederatedUsers: ko.PureComputed<boolean>;
   public accessModes?: CONVERSATION_ACCESS[];
   public accessRole?: CONVERSATION_ACCESS_ROLE;
   public domain: string;
@@ -154,7 +160,8 @@ export class Conversation {
     return TIMESTAMP_TYPE;
   }
 
-  constructor(conversation_id: string = '', domain: string = '') {
+  constructor(conversation_id: string = '', domain: string = '', teamState = container.resolve(TeamState)) {
+    this.teamState = teamState;
     this.id = conversation_id;
 
     this.domain = domain;
@@ -205,12 +212,19 @@ export class Conversation {
     this.isRequest = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.CONNECT);
     this.isSelf = ko.pureComputed(() => this.type() === CONVERSATION_TYPE.SELF);
 
+    this.hasDirectGuest = ko.pureComputed(() => {
+      const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isDirectGuest());
+      return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
+    });
     this.hasGuest = ko.pureComputed(() => {
       const hasGuestUser = this.participating_user_ets().some(userEntity => userEntity.isGuest());
       return hasGuestUser && this.isGroup() && this.selfUser()?.inTeam();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
     this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
+    this.hasFederatedUsers = ko.pureComputed(() =>
+      this.participating_user_ets().some(userEntity => !userEntity.isOnSameFederatedDomain()),
+    );
     this.servicesCount = ko.pureComputed(
       () => this.participating_user_ets().filter(userEntity => userEntity.isService).length,
     );
@@ -330,7 +344,22 @@ export class Conversation {
 
     this.receiptMode = ko.observable(RECEIPT_MODE.OFF);
 
-    this.messageTimer = ko.pureComputed(() => this.globalMessageTimer() || this.localMessageTimer());
+    // The team configuration for self-deleting messages has
+    // always precedence over conversation or local settings.
+    // https://wearezeta.atlassian.net/wiki/spaces/SER/pages/474873953/Tech+spec+Self-deleting+messages+feature+config
+    //
+    // E.g. If a user is participant of a foreign conversation
+    // that enforces self-deleting messages while self-deleting
+    // messages are disabled for the users team, the user will
+    // send normal messages (not self-deleting) and ignore the
+    // setting of the conversation.
+    this.messageTimer = ko.pureComputed(
+      () =>
+        this.teamState.isSelfDeletingMessagesEnabled() &&
+        (this.teamState.getEnforcedSelfDeletingMessagesTimeout() ||
+          this.globalMessageTimer() ||
+          this.localMessageTimer()),
+    );
     this.hasGlobalMessageTimer = ko.pureComputed(() => this.globalMessageTimer() > 0);
 
     this.messages_unordered = ko.observableArray();

@@ -25,10 +25,10 @@ import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
-import {errors as ProteusErrors, keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
+import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import type {Context, PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
+import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
@@ -46,7 +46,6 @@ import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
 import {container} from 'tsyringe';
 import {Core} from '../service/CoreSingleton';
-import {ClientType} from '@wireapp/api-client/src/client';
 
 export interface SignalingKeys {
   enckey: string;
@@ -97,22 +96,8 @@ export class CryptographyRepository {
     this.cryptobox = undefined;
   }
 
-  async initCore(clientType: ClientType): Promise<Context> {
-    const context = await this.core.init(clientType, undefined, this.storageRepository.storageService['engine']);
-    this.core.initClient({clientType});
-    return context;
-  }
-
-  /**
-   * Initializes the repository by creating a new Cryptobox.
-   * @returns Resolves with an array of PreKeys
-   */
-  async initCryptobox(): Promise<ProteusKeys.PreKey[]> {
-    await proteusInit();
-
-    const storeEngine = this.storageRepository['storageService']['engine'];
-    this.cryptobox = new Cryptobox(storeEngine, 10);
-
+  setCryptobox(cryptobox: Cryptobox): void {
+    this.cryptobox = cryptobox;
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, async preKeys => {
       const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
       this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
@@ -126,8 +111,6 @@ export class CryptographyRepository {
       const qualifiedId = {domain: domain, id: userId};
       amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, {id: clientId}, true);
     });
-
-    return this.cryptobox.load();
   }
 
   /**
