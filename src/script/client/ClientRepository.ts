@@ -42,6 +42,7 @@ import {ClientError} from '../error/ClientError';
 import {ClientRecord} from '../storage';
 import {ClientState} from './ClientState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {Config} from '../Config';
 
 export type QualifiedUserClientEntityMap = {[domain: string]: {[userId: string]: ClientEntity[]}};
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
@@ -287,9 +288,9 @@ export class ClientRepository {
   async deleteClient(clientId: string, password: string): Promise<ClientEntity[]> {
     const selfUser = this.selfUser();
     await this.clientService.deleteClient(clientId, password);
-    await this.deleteClientFromDb(selfUser, clientId);
+    await this.deleteClientFromDb(selfUser.qualifiedId, clientId);
     selfUser.removeClient(clientId);
-    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, {domain: selfUser.domain, id: selfUser.id}, clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, selfUser.qualifiedId, clientId);
     return this.clientState.clients();
   }
 
@@ -399,8 +400,9 @@ export class ClientRepository {
    */
   async getClientsForSelf(): Promise<ClientEntity[]> {
     this.logger.info('Retrieving all clients of the self user from database');
-    const clientRecords = await this.getClientByUserIdFromDb(this.selfUser());
-    const clientEntities = ClientMapper.mapClients(clientRecords, true, this.selfUser().domain);
+    const {domain, id} = this.selfUser();
+    const clientRecords = await this.getClientByUserIdFromDb({domain, id});
+    const clientEntities = ClientMapper.mapClients(clientRecords, true, domain);
     clientEntities.forEach(clientEntity => this.selfUser().addClient(clientEntity));
     return this.selfUser().devices();
   }
@@ -422,7 +424,8 @@ export class ClientRepository {
    */
   async updateClientsForSelf(): Promise<ClientEntity[]> {
     const clientsData = await this.clientService.getClients();
-    return this.updateClientsOfUserById(this.selfUser(), clientsData, false);
+    const {domain, id} = this.selfUser();
+    return this.updateClientsOfUserById({domain, id}, clientsData, false);
   }
 
   /**
@@ -460,7 +463,7 @@ export class ClientRepository {
           if (backendClient) {
             const {client, wasUpdated} = ClientMapper.updateClient(databaseClient, {
               ...backendClient,
-              domain: userId.domain,
+              domain: Config.getConfig().FEATURE.ENABLE_FEDERATION ? userId.domain : undefined,
             });
 
             delete clientsFromBackend[clientId];
@@ -472,6 +475,8 @@ export class ClientRepository {
 
             // Locally known client changed on backend
             if (wasUpdated) {
+              // Clear the previous client in DB (in case the domain changes the primary key will also change, thus invalidating the previous client)
+              this.clientService.deleteClientFromDb(client.meta.primary_key);
               this.logger.info(`Updating client '${clientId}' of user '${userId}' locally`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
@@ -562,8 +567,7 @@ export class ClientRepository {
    */
   private onClientAdd(eventJson: Pick<UserClientAddEvent, 'client'>): void {
     this.logger.info('Client of self user added', eventJson);
-    const qualifiedId = {domain: this.selfUser().domain, id: this.selfUser().id};
-    amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, eventJson.client, true);
+    amplify.publish(WebAppEvents.CLIENT.ADD, this.selfUser().qualifiedId, eventJson.client, true);
   }
 
   /**
@@ -596,6 +600,6 @@ export class ClientRepository {
         'legalHoldDeactivated',
       );
     }
-    amplify.publish(WebAppEvents.CLIENT.REMOVE, {domain: this.selfUser().domain, id: this.selfUser().id}, clientId);
+    amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().qualifiedId, clientId);
   }
 }

@@ -21,7 +21,7 @@ import TestPage from 'Util/test/TestPage';
 import UserInput, {UserInputProps} from 'Components/UserInput';
 import ko from 'knockout';
 import {User} from '../entity/User';
-import {KEY_CODE} from 'Util/KeyboardUtil';
+import {KEY} from 'Util/KeyboardUtil';
 
 class UserInputPage extends TestPage<UserInputProps> {
   constructor(props?: UserInputProps) {
@@ -30,7 +30,7 @@ class UserInputPage extends TestPage<UserInputProps> {
 
   getInput = () => this.get('[data-uie-name="enter-users"]');
   getSelectedUsers = () => this.get('[data-uie-name="item-selected"]');
-  pressBackSpace = () => this.keyCodeDown(this.getInput(), KEY_CODE.BACKSPACE);
+  pressBackSpace = () => this.keyDown(this.getInput(), KEY.BACKSPACE);
 }
 
 describe('UserInput', () => {

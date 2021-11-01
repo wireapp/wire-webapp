@@ -30,14 +30,14 @@ export interface Grid {
 }
 
 export function getGrid(call: Call) {
-  if (call.participants().length === 2) {
+  if (call.participants()?.length === 2) {
     return {
       grid: call.getRemoteParticipants(),
       thumbnail: call.getSelfParticipant(),
     };
   }
   return {
-    grid: call.pages()[call.currentPage()],
+    grid: call.pages()[call.currentPage()] ?? [],
     thumbnail: null,
   };
 }

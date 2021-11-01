@@ -537,13 +537,7 @@ export class TeamRepository {
       }
 
       this.teamState.team().members.remove(member => member.id === userId);
-      amplify.publish(
-        WebAppEvents.TEAM.MEMBER_LEAVE,
-        teamId,
-        userId,
-        this.userState.self().domain,
-        new Date(time).toISOString(),
-      );
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, teamId, {domain: '', id: userId}, new Date(time).toISOString());
     }
   }
 

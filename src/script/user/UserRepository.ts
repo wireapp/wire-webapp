@@ -73,7 +73,6 @@ import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
-import {QualifiedIdOptional} from '../conversation/EventBuilder';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
@@ -204,11 +203,11 @@ export class UserRepository {
     // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
     // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
     if (!!userEntities[0]?.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+      const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
       return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
     }
 
-    const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+    const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
     return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
@@ -269,10 +268,10 @@ export class UserRepository {
    */
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     // TODO(Federation): Include domain as soon as connections to federated backends are supported.
-    const userIds = connectionEntities.map(connectionEntity => ({domain: null, id: connectionEntity.userId}));
+    const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
-      const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
+      const connectionEntity = connectionEntities.find(({userId}) => matchQualifiedIds(userId, userEntity));
       userEntity.connection(connectionEntity);
     });
     return this.assignAllClients();
@@ -284,7 +283,7 @@ export class UserRepository {
    */
   private async assignAllClients(): Promise<User[]> {
     const recipients = await this.clientRepository.getAllClientsFromDb();
-    const userIds: QualifiedIdOptional[] = Object.entries(recipients).map(([userId, clientEntities]) => {
+    const userIds: QualifiedId[] = Object.entries(recipients).map(([userId, clientEntities]) => {
       return {
         domain: clientEntities[0].domain,
         id: userId,
@@ -385,6 +384,8 @@ export class UserRepository {
 
     const sortedUsers = this.userState
       .directlyConnectedUsers()
+      // TMP the `filter` can be removed when message broadcast works on federated backends
+      .filter(user => user.isOnSameFederatedDomain())
       .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
     const [members, other] = partition(sortedUsers, user => user.isTeamMember());
     const recipients = [this.userState.self(), ...members, ...other].slice(
@@ -422,7 +423,7 @@ export class UserRepository {
     } = eventJson;
 
     const fingerprint = await this.clientRepository.cryptographyRepository.getRemoteFingerprint(
-      {domain: null, id: userId},
+      {domain: '', id: userId},
       clientId,
       last_prekey,
     );
@@ -582,7 +583,7 @@ export class UserRepository {
   /**
    * Check for users locally and fetch them from the server otherwise.
    */
-  async getUsersById(userIds: QualifiedIdOptional[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: QualifiedId[] = [], offline: boolean = false): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
@@ -590,7 +591,7 @@ export class UserRepository {
     const allUsers = await Promise.all(userIds.map(userId => this.findUserById(userId) || userId));
     const [knownUserEntities, unknownUserIds] = partition(allUsers, item => item instanceof User) as [
       User[],
-      QualifiedIdOptional[],
+      QualifiedId[],
     ];
 
     if (offline || !unknownUserIds.length) {
@@ -624,7 +625,7 @@ export class UserRepository {
    * @param isMe `true` if self user
    */
   private saveUser(userEntity: User, isMe: boolean = false): User {
-    const user = this.findUserById({domain: userEntity.domain, id: userEntity.id});
+    const user = this.findUserById(userEntity.qualifiedId);
     if (!user) {
       if (isMe) {
         userEntity.isMe = true;
@@ -640,9 +641,7 @@ export class UserRepository {
    * @returns Resolves with users passed as parameter
    */
   private saveUsers(userEntities: User[]): User[] {
-    const newUsers = userEntities.filter(
-      userEntity => !this.findUserById({domain: userEntity.domain, id: userEntity.id}),
-    );
+    const newUsers = userEntities.filter(userEntity => !this.findUserById(userEntity.qualifiedId));
     this.userState.users.push(...newUsers);
     return userEntities;
   }
@@ -651,14 +650,14 @@ export class UserRepository {
    * Update a local user from the backend by ID.
    */
   updateUserById = async (userId: string | QualifiedId): Promise<void> => {
-    const localUserEntity = this.findUserById(userId) || new User('', null);
+    const localUserEntity = this.findUserById(userId) || new User('', '');
     const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);
     }
-    if (updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
-      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.id);
+    if (updatedUserEntity && updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.qualifiedId);
     }
   };
 

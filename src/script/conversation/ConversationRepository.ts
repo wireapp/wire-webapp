@@ -72,7 +72,6 @@ import {
   GroupCreationEvent,
   MessageHiddenEvent,
   OneToOneCreationEvent,
-  QualifiedIdOptional,
   ReactionEvent,
   TeamMemberLeaveEvent,
 } from '../conversation/EventBuilder';
@@ -264,7 +263,7 @@ export class ConversationRepository {
     obj: updatedEvent,
     oldObj: oldEvent,
   }: ConversationDBChange): Promise<void> => {
-    const qualifiedId = updatedEvent.qualified_conversation || {domain: null, id: updatedEvent.conversation};
+    const qualifiedId = updatedEvent.qualified_conversation || {domain: '', id: updatedEvent.conversation};
     const conversationEntity = this.conversationState.findConversation(qualifiedId);
     const replacedMessageEntity = await this.replaceMessageInConversation(
       conversationEntity,
@@ -278,7 +277,7 @@ export class ConversationRepository {
   };
 
   private readonly deleteLocalMessageEntity = ({oldObj: deletedEvent}: ConversationDBChange): void => {
-    const qualifiedId = deletedEvent.qualified_conversation || {domain: null, id: deletedEvent.conversation};
+    const qualifiedId = deletedEvent.qualified_conversation || {domain: '', id: deletedEvent.conversation};
     const conversationEntity = this.conversationState.findConversation(qualifiedId);
     if (conversationEntity) {
       conversationEntity.removeMessageById(deletedEvent.id);
@@ -321,25 +320,22 @@ export class ConversationRepository {
     accessState?: string,
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
-    const sameFederatedDomainUserIds = userEntities
-      .filter(userEntity => userEntity.isOnSameFederatedDomain())
-      .map(userEntity => userEntity.id);
-    const otherFederatedDomainUserIds = userEntities
-      .filter(userEntity => !userEntity.isOnSameFederatedDomain())
-      .map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    const userIds = isFederated ? userEntities.map(user => user.qualifiedId) : userEntities.map(user => user.id);
+
     let payload: NewConversation & {conversation_role: string} = {
       conversation_role: DefaultRole.WIRE_MEMBER,
       name: groupName,
-      qualified_users: otherFederatedDomainUserIds,
+      qualified_users: isFederated ? (userIds as QualifiedId[]) : undefined,
       receipt_mode: null,
-      users: sameFederatedDomainUserIds,
+      users: !isFederated ? (userIds as string[]) : [],
       ...options,
     };
 
     if (this.teamState.team().id) {
       payload.team = {
         managed: false,
-        teamid: this.teamState.team().id,
+        teamid: this.teamState.team().id!,
       };
 
       if (accessState) {
@@ -375,7 +371,7 @@ export class ConversationRepository {
         data: {
           last_event: '0.0',
           last_event_time: '1970-01-01T00:00:00.000Z',
-          receipt_mode: null,
+          receipt_mode: undefined,
           ...response,
         },
         from: this.userState.self().id,
@@ -387,7 +383,7 @@ export class ConversationRepository {
     } catch (error) {
       this.handleConversationCreateError(
         error,
-        sameFederatedDomainUserIds.map(id => ({domain: null, id})),
+        userEntities.map(user => user.qualifiedId),
       );
       return undefined;
     }
@@ -950,13 +946,9 @@ export class ConversationRepository {
       return this.createGroupConversation([userEntity]);
     }
 
-    if (!userEntity.isOnSameFederatedDomain()) {
-      return this.createGroupConversation([userEntity], `${userEntity.name()} & ${this.userState.self().name()}`);
-    }
-
     const conversationId = userEntity.connection().conversationId;
     try {
-      const conversationEntity = await this.getConversationById({domain: null, id: conversationId});
+      const conversationEntity = await this.getConversationById(conversationId);
       conversationEntity.connection(userEntity.connection());
       this.updateParticipatingUserEntities(conversationEntity);
       return conversationEntity;
@@ -1035,7 +1027,7 @@ export class ConversationRepository {
         code,
       );
       const knownConversation = this.conversationState.findConversation({domain: null, id: conversationId});
-      if (knownConversation && knownConversation.status() === ConversationStatus.CURRENT_MEMBER) {
+      if (knownConversation?.status() === ConversationStatus.CURRENT_MEMBER) {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
@@ -1044,7 +1036,7 @@ export class ConversationRepository {
           action: async () => {
             try {
               const response = await this.conversation_service.postConversationJoin(key, code);
-              const conversationEntity = await this.getConversationById({domain: null, id: conversationId});
+              const conversationEntity = await this.getConversationById({domain: '', id: conversationId});
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }
@@ -1095,12 +1087,11 @@ export class ConversationRepository {
    * @returns Resolves when connection was mapped return value
    */
   private readonly mapConnection = (connectionEntity: ConnectionEntity): Promise<Conversation | undefined> => {
-    const qualifiedId: QualifiedId = {domain: null, id: connectionEntity.conversationId};
+    const qualifiedId: QualifiedId = connectionEntity.conversationId;
     return Promise.resolve(this.conversationState.findConversation(qualifiedId))
       .then(conversationEntity => {
         if (!conversationEntity) {
           if (connectionEntity.isConnected() || connectionEntity.isOutgoingRequest()) {
-            // TODO(Federation): Federated 1:1 connections are not yet implemented by the backend.
             return this.fetchConversationById(qualifiedId);
           }
         }
@@ -1152,7 +1143,7 @@ export class ConversationRepository {
    * Maps user connections to the corresponding conversations.
    * @param connectionEntities Connections entities
    */
-  mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation | void>[] {
+  mapConnections(connectionEntities: ConnectionEntity[]): Promise<Conversation>[] {
     this.logger.info(`Mapping '${connectionEntities.length}' user connection(s) to conversations`, connectionEntities);
     return connectionEntities.map(connectionEntity => this.mapConnection(connectionEntity));
   }
@@ -1188,17 +1179,19 @@ export class ConversationRepository {
 
   private _mapGuestStatusSelf(conversationEntity: Conversation) {
     const conversationTeamId = conversationEntity.team_id;
-    const selfTeamId = this.teamState.team() && this.teamState.team().id;
+    const selfTeamId = this.teamState.team()?.id;
     const isConversationGuest = !!(conversationTeamId && (!selfTeamId || selfTeamId !== conversationTeamId));
     conversationEntity.isGuest(isConversationGuest);
   }
 
   /**
-   * Save a conversation in the repository.
+   * Save a conversation in the repository and in the database.
+   * Will resolve with local conversation entity and do nothing if conversation already exists in state
+   *
    * @param conversationEntity Conversation to be saved in the repository
    * @returns Resolves when conversation was saved
    */
-  private saveConversation(conversationEntity: Conversation) {
+  saveConversation(conversationEntity: Conversation) {
     const localEntity = this.conversationState.findConversation(conversationEntity);
     if (!localEntity) {
       this.conversationState.conversations.push(conversationEntity);
@@ -1278,10 +1271,14 @@ export class ConversationRepository {
    * @returns Resolves when members were added
    */
   async addMembers(conversationEntity: Conversation, userEntities: User[]) {
-    const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+    const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
 
     try {
-      const response = await this.conversation_service.postMembers(conversationEntity.id, userIds);
+      const response = await this.conversation_service.postMembers(
+        conversationEntity.id,
+        userIds,
+        conversationEntity.isFederated(),
+      );
       if (response) {
         this.eventRepository.injectEvent(response, EventRepository.SOURCE.BACKEND_RESPONSE);
       }
@@ -1290,7 +1287,7 @@ export class ConversationRepository {
     }
   }
 
-  addMissingMember(conversationEntity: Conversation, users: QualifiedIdOptional[], timestamp: number) {
+  addMissingMember(conversationEntity: Conversation, users: QualifiedId[], timestamp: number) {
     const [sender] = users;
     const event = EventBuilder.buildMemberJoin(conversationEntity, sender, users, timestamp);
     return this.eventRepository.injectEvent(event, EventRepository.SOURCE.INJECTED);
@@ -1317,7 +1314,7 @@ export class ConversationRepository {
 
         return event;
       })
-      .catch(error => this.handleAddToConversationError(error, conversationEntity, [{domain: null, id: serviceId}]));
+      .catch(error => this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]));
   }
 
   private handleAddToConversationError(
@@ -1379,7 +1376,7 @@ export class ConversationRepository {
     this._clearConversation(conversationEntity);
 
     if (leaveConversation) {
-      this.removeMember(conversationEntity, {domain: this.userState.self().domain, id: this.userState.self().id});
+      this.removeMember(conversationEntity, this.userState.self().qualifiedId);
     }
 
     if (isActiveConversation) {
@@ -1402,7 +1399,9 @@ export class ConversationRepository {
    * @returns Resolves when member was removed from the conversation
    */
   public async removeMember(conversationEntity: Conversation, user: QualifiedId) {
-    const response = await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
+    const response = conversationEntity.isFederated()
+      ? await this.conversation_service.deleteQualifiedMembers(conversationEntity.qualifiedId, user)
+      : await this.conversation_service.deleteMembers(conversationEntity.id, user.id);
     const roles = conversationEntity.roles();
     delete roles[user.id];
     conversationEntity.roles(roles);
@@ -1742,12 +1741,13 @@ export class ConversationRepository {
       return;
     }
     if (!timestamp) {
+      // TODO(federation) find with qualified id
       const conversation = conversationEntity || this.conversationState.findConversation(conversationId);
       const servertime = this.serverTimeHandler.toServerTimestamp();
       timestamp = conversation.getLatestTimestamp(servertime);
     }
     const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
-      conversationId || conversationEntity,
+      conversationId || conversationEntity?.qualifiedId,
       userId,
       timestamp,
       legalHoldStatus,
@@ -1791,12 +1791,17 @@ export class ConversationRepository {
       return Promise.reject(new Error('Conversation Repository Event Handling: Event missing'));
     }
 
-    const {conversation, qualified_conversation, type} = eventJson;
-    const conversationId = qualified_conversation || {domain: null, id: conversation};
-    this.logger.info(`Handling event '${type}' in conversation '${conversationId}' (Source: ${eventSource})`);
+    const {conversation, qualified_conversation, data: eventData, type} = eventJson;
+    // data.conversationId is always the conversationId that should be read first. If not found we can fallback to qualified_conversation or conversation
+    const conversationId: QualifiedId = eventData?.conversationId
+      ? {domain: '', id: eventData.conversationId}
+      : qualified_conversation || {domain: '', id: conversation};
+    this.logger.info(
+      `Handling event '${type}' in conversation '${conversationId.id}/${conversationId.domain}' (Source: ${eventSource})`,
+    );
 
-    const inSelfConversation =
-      conversationId === this.conversationState.self_conversation() && this.conversationState.self_conversation().id;
+    const selfConversation = this.conversationState.self_conversation();
+    const inSelfConversation = selfConversation && matchQualifiedIds(conversationId, selfConversation.qualifiedId);
     if (inSelfConversation) {
       const typesInSelfConversation = [CONVERSATION_EVENT.MEMBER_UPDATE, ClientEvent.CONVERSATION.MESSAGE_HIDDEN];
 
@@ -1880,9 +1885,7 @@ export class ConversationRepository {
     const {from: senderId, type, time} = eventJson;
 
     if (senderId) {
-      const allParticipants = conversationEntity
-        .participating_user_ids()
-        .concat({domain: this.userState.self().domain, id: this.userState.self().id});
+      const allParticipants = conversationEntity.participating_user_ids().concat(this.userState.self().qualifiedId);
       const isFromUnknownUser = allParticipants.every(participant => participant.id !== senderId);
 
       if (isFromUnknownUser) {
@@ -1903,7 +1906,7 @@ export class ConversationRepository {
         const message = `Received '${type}' event from user '${senderId}' unknown in '${conversationEntity.id}'`;
         this.logger.warn(message, eventJson);
 
-        const qualifiedSender: QualifiedIdOptional = {domain: null, id: senderId};
+        const qualifiedSender: QualifiedId = {domain: '', id: senderId};
 
         const timestamp = new Date(time).getTime() - 1;
         return this.addMissingMember(conversationEntity, [qualifiedSender], timestamp).then(() => conversationEntity);
@@ -1935,8 +1938,8 @@ export class ConversationRepository {
       from: userId,
       time: isoTimestamp,
     } = eventJson;
-    const qualifiedConversation = qualified_conversation || {domain: null, id: conversationId};
-    const qualifiedUser = qualified_from || {domain: null, id: userId};
+    const qualifiedConversation = qualified_conversation || {domain: '', id: conversationId};
+    const qualifiedUser = qualified_from || {domain: '', id: userId};
 
     await this.injectLegalHoldMessage({
       beforeTimestamp: true,
@@ -2175,7 +2178,7 @@ export class ConversationRepository {
       .then(messageEntity => this.updateMessageUserEntities(messageEntity))
       .then((messageEntity: MemberMessage) => {
         const userEntity = messageEntity.otherUser();
-        const isOutgoingRequest = userEntity && userEntity.isOutgoingRequest();
+        const isOutgoingRequest = userEntity?.isOutgoingRequest();
         if (isOutgoingRequest) {
           messageEntity.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
         }
@@ -2270,8 +2273,8 @@ export class ConversationRepository {
     eventJson: ConversationMemberJoinEvent,
   ): Promise<void | EntityObject> {
     // Ignore if we join a 1to1 conversation (accept a connection request)
-    const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.id);
-    const isPendingConnection = connectionEntity && connectionEntity.isIncomingRequest();
+    const connectionEntity = this.connectionRepository.getConnectionByConversationId(conversationEntity.qualifiedId);
+    const isPendingConnection = connectionEntity?.isIncomingRequest();
     if (isPendingConnection) {
       return Promise.resolve();
     }
@@ -2280,12 +2283,12 @@ export class ConversationRepository {
 
     if (eventData.users) {
       eventData.users.forEach(otherMember => {
-        const otherId = otherMember.qualified_id || {domain: null, id: otherMember.id};
+        const otherId = otherMember.qualified_id || {domain: '', id: otherMember.id};
         const isSelfUser = matchQualifiedIds(otherId, this.userState.self());
         const isParticipatingUser = !!conversationEntity
           .participating_user_ids()
           .find(participatingUser =>
-            matchQualifiedIds(participatingUser, otherMember.qualified_id || {domain: null, id: otherMember.id}),
+            matchQualifiedIds(participatingUser, otherMember.qualified_id || {domain: '', id: otherMember.id}),
           );
         if (!isSelfUser && !isParticipatingUser) {
           conversationEntity.participating_user_ids.push({
@@ -2299,7 +2302,7 @@ export class ConversationRepository {
         const isSelfUser = userId === this.userState.self().id;
         const isParticipatingUser = conversationEntity.participating_user_ids().some(user => user.id === userId);
         if (!isSelfUser && !isParticipatingUser) {
-          conversationEntity.participating_user_ids.push({domain: null, id: userId});
+          conversationEntity.participating_user_ids.push({domain: '', id: userId});
         }
       });
     }
@@ -2317,7 +2320,7 @@ export class ConversationRepository {
         : Promise.resolve();
 
     const qualifiedUserIds =
-      eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: null, id: userId}));
+      eventData.users?.map(user => user.qualified_id) || eventData.user_ids.map(userId => ({domain: '', id: userId}));
 
     return updateSequence
       .then(() => this.updateParticipatingUserEntities(conversationEntity, false, true))
@@ -2386,25 +2389,32 @@ export class ConversationRepository {
    * @param eventJson JSON data of 'conversation.member-update' event
    * @returns Resolves when the event was handled
    */
-  private onMemberUpdate(conversationEntity: Conversation, eventJson: Partial<ConversationMemberUpdateEvent>) {
-    const {conversation: conversationId, data: eventData, from} = eventJson;
+  private onMemberUpdate(
+    conversationEntity: Conversation,
+    eventJson: Pick<ConversationMemberUpdateEvent, 'data' | 'from'> & {conversation?: string},
+  ) {
+    const {conversation, data: eventData, from} = eventJson;
+    const conversationId = {domain: '', id: conversation || '' /* TODO(federation) add domain on the sender side */};
 
     const isConversationRoleUpdate = !!eventData.conversation_role;
     if (isConversationRoleUpdate) {
-      const {target: userId, conversation_role} = eventData;
-      const conversation = this.conversationState.conversations().find(({id}) => id === conversationId);
+      const {target, qualified_target, conversation_role} = eventData;
+      const userId = qualified_target || {domain: '', id: target};
+      const conversation = this.conversationState
+        .conversations()
+        .find(conversation => matchQualifiedIds(conversation, conversationId));
       if (conversation) {
         const roles = conversation.roles();
-        roles[userId] = conversation_role;
+        roles[userId.id] = conversation_role;
         conversation.roles(roles);
       }
       return;
     }
 
     const isBackendEvent = eventData.otr_archived_ref || eventData.otr_muted_ref;
-    const inSelfConversation =
-      !this.conversationState.self_conversation() || conversationId === this.conversationState.self_conversation().id;
-    if (!inSelfConversation && conversationId && !isBackendEvent) {
+    const selfConversation = this.conversationState.self_conversation();
+    const inSelfConversation = selfConversation && matchQualifiedIds(selfConversation, conversationId);
+    if (!inSelfConversation && conversation && !isBackendEvent) {
       throw new ConversationError(
         ConversationError.TYPE.WRONG_CONVERSATION,
         ConversationError.MESSAGE.WRONG_CONVERSATION,
@@ -2467,7 +2477,7 @@ export class ConversationRepository {
       const contentType = event.data.content_type;
       if (!isAllowedFile(fileName, contentType)) {
         // TODO(Federation): Update code once sending assets is implemented on the backend
-        const user = await this.userRepository.getUserById({domain: null, id: event.from});
+        const user = await this.userRepository.getUserById({domain: '', id: event.from});
         return this.injectFileTypeRestrictedMessage(
           conversationEntity,
           user,
@@ -2508,7 +2518,7 @@ export class ConversationRepository {
 
         const isFromSelf = from === this.userState.self().id;
         if (!isFromSelf) {
-          return this.addDeleteMessage(conversationEntity.id, eventId, time, deletedMessageEntity);
+          return this.addDeleteMessage(conversationEntity, eventId, time, deletedMessageEntity);
         }
       })
       .then(() => {
@@ -2546,7 +2556,7 @@ export class ConversationRepository {
       if (!isFromSelf) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      const conversationEntity = await this.getConversationById({domain: null, id: eventData.conversation_id});
+      const conversationEntity = await this.getConversationById({domain: '', id: eventData.conversation_id});
       return await this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
     } catch (error) {
       this.logger.info(
@@ -2810,7 +2820,7 @@ export class ConversationRepository {
       if (userIds.length) {
         // TODO(Federation): Make code federation-aware.
         return this.userRepository
-          .getUsersById(userIds.map(userId => ({domain: null, id: userId})))
+          .getUsersById(userIds.map(userId => ({domain: '', id: userId})))
           .then(userEntities => {
             messageEntity.reactions_user_ets(userEntities);
             return messageEntity;
@@ -2841,8 +2851,8 @@ export class ConversationRepository {
    * @param time ISO 8601 formatted time string
    * @param messageEntity Message to delete
    */
-  public addDeleteMessage(conversationId: string, messageId: string, time: string, messageEntity: Message) {
-    const deleteEvent = EventBuilder.buildDelete(conversationId, messageId, time, messageEntity);
+  public addDeleteMessage(conversation: Conversation, messageId: string, time: string, messageEntity: Message) {
+    const deleteEvent = EventBuilder.buildDelete(conversation, messageId, time, messageEntity);
     this.eventRepository.injectEvent(deleteEvent);
   }
 

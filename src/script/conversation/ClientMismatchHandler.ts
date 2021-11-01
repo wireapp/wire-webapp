@@ -102,7 +102,7 @@ export class ClientMismatchHandler {
       const unknownUsers = getDifference(
         knownUsers.map(user => user.id),
         missingUserIds,
-      ).map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || null, id}));
+      ).map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || '', id}));
 
       if (unknownUsers.length > 0) {
         this.conversationRepositoryProvider().addMissingMember(conversationEntity, unknownUsers, timestamp - 1);
@@ -126,14 +126,14 @@ export class ClientMismatchHandler {
       await Promise.all(
         Object.entries(usersMap).map(([userId, clients]) =>
           Promise.all(
-            clients.map(client => this.userRepository.addClientToUser({domain: null, id: userId}, client, false)),
+            clients.map(client => this.userRepository.addClientToUser({domain: '', id: userId}, client, false)),
           ),
         ),
       );
     }
 
     this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(
-      missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || null, id})),
+      missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || '', id})),
     );
 
     if (payload) {
@@ -181,7 +181,7 @@ export class ClientMismatchHandler {
 
     for (const [userId, clientIds = []] of Object.entries(recipients)) {
       for (const clientId of clientIds) {
-        await removeDeletedClient({domain: null, id: userId}, clientId);
+        await removeDeletedClient({domain: '', id: userId}, clientId);
       }
 
       if (payload?.recipients?.[userId]) {

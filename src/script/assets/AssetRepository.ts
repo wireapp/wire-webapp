@@ -64,18 +64,21 @@ export class AssetRepository {
     this.logger = getLogger('AssetRepository');
   }
 
-  async getObjectUrl(asset: AssetRemoteData): Promise<string> {
+  async getObjectUrl(asset: AssetRemoteData): Promise<string | undefined> {
     const objectUrl = getAssetUrl(asset.identifier);
     if (objectUrl) {
       return objectUrl;
     }
 
     const blob = await this.load(asset);
+    if (!blob) {
+      return undefined;
+    }
     const url = window.URL.createObjectURL(blob);
     return setAssetUrl(asset.identifier, url);
   }
 
-  public async load(asset: AssetRemoteData): Promise<void | Blob> {
+  public async load(asset: AssetRemoteData): Promise<undefined | Blob> {
     try {
       let plaintext: ArrayBuffer;
       const {buffer, mimeType} = await this.loadBuffer(asset);
@@ -98,6 +101,7 @@ export class AssetRepository {
       if (!isExpectedError) {
         throw error;
       }
+      return undefined;
     }
   }
 

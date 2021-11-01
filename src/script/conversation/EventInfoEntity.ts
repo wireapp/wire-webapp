@@ -47,11 +47,11 @@ export class EventInfoEntity {
 
   constructor(
     genericMessage: GenericMessage,
+    //TODO(federation): remove the '| string' part
     conversationId: QualifiedId | string = '',
     options?: MessageSendingOptions,
   ) {
-    // TODO(federation) change conversationId to a qualified id
-    this.conversationId = typeof conversationId === 'string' ? {domain: null, id: conversationId} : conversationId;
+    this.conversationId = typeof conversationId === 'string' ? {domain: '', id: conversationId} : conversationId;
     this.genericMessage = genericMessage;
 
     this.options = {nativePush: true, precondition: false, ...options};

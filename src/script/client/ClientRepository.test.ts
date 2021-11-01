@@ -238,7 +238,7 @@ describe('ClientRepository', () => {
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
       testFactory.client_repository.selfUser(new User(userId, null));
-      const result = testFactory.client_repository['isCurrentClient']({domain: null, id: userId}, clientId);
+      const result = testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, clientId);
 
       expect(result).toBeTruthy();
     });
@@ -247,7 +247,7 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity(false, null);
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
-      const result = testFactory.client_repository['isCurrentClient']({domain: null, id: userId}, 'ABCDE');
+      const result = testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, 'ABCDE');
 
       expect(result).toBeFalsy();
     });
@@ -256,21 +256,20 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity(false, null);
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient(clientEntity);
-      const result = testFactory.client_repository['isCurrentClient']({domain: null, id: 'ABCDE'}, clientId);
+      const result = testFactory.client_repository['isCurrentClient']({domain: '', id: 'ABCDE'}, clientId);
 
       expect(result).toBeFalsy();
     });
 
     it('throws an error if current client is not set', () => {
-      const functionCall = () => testFactory.client_repository['isCurrentClient']({domain: null, id: userId}, clientId);
+      const functionCall = () => testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, clientId);
 
       expect(functionCall).toThrowError(ClientError);
     });
 
     it('throws an error if client ID is not specified', () => {
       testFactory.client_repository['clientState'].currentClient(new ClientEntity(false, null));
-      const functionCall = () =>
-        testFactory.client_repository['isCurrentClient']({domain: null, id: userId}, undefined);
+      const functionCall = () => testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, undefined);
 
       expect(functionCall).toThrowError(ClientError);
     });

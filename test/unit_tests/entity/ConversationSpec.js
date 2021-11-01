@@ -127,7 +127,7 @@ describe('Conversation', () => {
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.participating_user_ids.push({domain: null, id: createRandomUuid()});
+      conversation_et.participating_user_ids.push({domain: '', id: createRandomUuid()});
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.isGroup()).toBeFalsy();
@@ -135,7 +135,7 @@ describe('Conversation', () => {
       expect(conversation_et.isRequest()).toBeFalsy();
       expect(conversation_et.isSelf()).toBeFalsy();
 
-      conversation_et.participating_user_ids.push({domain: null, id: createRandomUuid()});
+      conversation_et.participating_user_ids.push({domain: '', id: createRandomUuid()});
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.isGroup()).toBeTruthy();
@@ -521,8 +521,8 @@ describe('Conversation', () => {
     it('displays a fallback if no user name has been set for a group conversation', () => {
       const user = new User(createRandomUuid(), null);
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
-      conversation_et.participating_user_ids.push({domain: null, id: other_user.id});
-      conversation_et.participating_user_ids.push({domain: null, id: user.id});
+      conversation_et.participating_user_ids.push({domain: '', id: other_user.id});
+      conversation_et.participating_user_ids.push({domain: '', id: user.id});
 
       expect(conversation_et.display_name()).toBe('…');
     });
@@ -1111,7 +1111,7 @@ describe('Conversation', () => {
       new_conversation.connection(connectionEntity);
 
       expect(new_conversation.participating_user_ids().length).toBe(1);
-      expect(new_conversation.participating_user_ids()[0]).toEqual({domain: null, id: connector_user_id});
+      expect(new_conversation.participating_user_ids()[0]).toEqual({domain: '', id: connector_user_id});
     });
   });
 

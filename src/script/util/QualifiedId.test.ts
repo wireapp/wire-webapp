@@ -4,8 +4,8 @@ describe('QualifiedId util', () => {
   describe('matchQualifiedIds', () => {
     it.each([
       [
-        {domain: null, id: '1', stuff: 'extra'},
-        {domain: null, id: '1', property: 1},
+        {domain: '', id: '1', stuff: 'extra'},
+        {domain: '', id: '1', property: 1},
       ],
       [
         {domain: 'wire.com', id: '1', other: 12},
@@ -13,7 +13,7 @@ describe('QualifiedId util', () => {
       ],
       [
         {domain: 'bella.wire.link', id: '1', prop: ''},
-        {default: null, domain: 'bella.wire.link', id: '1'},
+        {default: '', domain: 'bella.wire.link', id: '1'},
       ],
     ])('match entities that have similar ids (%s, %s)', (entity1, entity2) => {
       expect(matchQualifiedIds(entity1, entity2)).toBe(true);
@@ -21,14 +21,14 @@ describe('QualifiedId util', () => {
 
     it.each([
       [
-        {domain: null, id: '1', stuff: 'extra'},
+        {domain: '', id: '1', stuff: 'extra'},
         {domain: 'wire.com', id: '1', property: 1},
       ],
       [
         {domain: 'wire.com', id: '1', other: 12},
-        {domain: null, id: '1'},
+        {domain: '', id: '1'},
       ],
-    ])('only matches ids if one domain is null (%s, %s)', (entity1, entity2) => {
+    ])('only matches ids if one domain is empty (%s, %s)', (entity1, entity2) => {
       expect(matchQualifiedIds(entity1, entity2)).toBe(true);
     });
 

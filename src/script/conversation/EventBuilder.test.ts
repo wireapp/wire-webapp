@@ -23,12 +23,8 @@ import {EventMapper} from 'src/script/conversation/EventMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {User} from 'src/script/entity/User';
 import {ClientEvent} from 'src/script/event/Client';
-import {
-  DegradedMessageEventData,
-  EventBuilder,
-  GroupCreationEventData,
-  QualifiedIdOptional,
-} from 'src/script/conversation/EventBuilder';
+import {DegradedMessageEventData, EventBuilder, GroupCreationEventData} from 'src/script/conversation/EventBuilder';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
 import {SuperType} from 'src/script/message/SuperType';
 import {EventRecord} from '../storage';
@@ -60,7 +56,7 @@ describe('EventBuilder', () => {
   });
 
   it('buildDegraded', async () => {
-    const users: QualifiedIdOptional[] = [{domain: null, id: createRandomUuid()}];
+    const users: QualifiedId[] = [{domain: '', id: createRandomUuid()}];
     const event = EventBuilder.buildDegraded(
       conversation_et,
       users,
@@ -87,10 +83,10 @@ describe('EventBuilder', () => {
 
   it('buildGroupCreation', async () => {
     conversation_et.participating_user_ids([
-      {domain: null, id: 'one'},
-      {domain: null, id: 'two'},
+      {domain: '', id: 'one'},
+      {domain: '', id: 'two'},
       {
-        domain: null,
+        domain: '',
         id: 'three',
       },
     ]);

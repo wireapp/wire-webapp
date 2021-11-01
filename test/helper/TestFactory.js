@@ -132,11 +132,9 @@ export class TestFactory {
     this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
     this.cryptography_repository.currentClient = ko.observable(currentClient);
 
-    if (mockCryptobox === true) {
-      spyOn(this.cryptography_repository, 'initCryptobox').and.returnValue(Promise.resolve());
-    } else {
+    if (!mockCryptobox) {
       const storeEngine = storageRepository.storageService['engine'];
-      this.cryptography_repository.cryptobox = new Cryptobox(storeEngine, 10);
+      this.cryptography_repository.setCryptobox(new Cryptobox(storeEngine, 10));
       await this.cryptography_repository.cryptobox.create();
     }
 

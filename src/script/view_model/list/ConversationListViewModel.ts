@@ -258,7 +258,7 @@ export class ConversationListViewModel {
     if (!call) {
       return false;
     }
-    const conversation = this.conversationState.findConversation({domain: null, id: conversationId});
+    const conversation = this.conversationState.findConversation({domain: '', id: conversationId});
     return (
       !conversation.removed_from_conversation() &&
       call.state() === CALL_STATE.INCOMING &&

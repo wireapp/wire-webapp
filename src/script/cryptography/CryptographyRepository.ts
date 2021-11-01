@@ -21,10 +21,11 @@ import ko from 'knockout';
 import type {AxiosError} from 'axios';
 import {amplify} from 'amplify';
 import {error as StoreEngineError} from '@wireapp/store-engine';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
 import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
-import {errors as ProteusErrors, keys as ProteusKeys, init as proteusInit} from '@wireapp/proteus';
+import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
@@ -43,6 +44,8 @@ import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
 import type {StorageRepository, EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
+import {container} from 'tsyringe';
+import {Core} from '../service/CoreSingleton';
 
 export interface SignalingKeys {
   enckey: string;
@@ -78,7 +81,11 @@ export class CryptographyRepository {
     return '💣';
   }
 
-  constructor(cryptographyService: CryptographyService, storageRepository: StorageRepository) {
+  constructor(
+    cryptographyService: CryptographyService,
+    storageRepository: StorageRepository,
+    private readonly core = container.resolve(Core),
+  ) {
     this.cryptographyService = cryptographyService;
     this.storageRepository = storageRepository;
     this.logger = getLogger('CryptographyRepository');
@@ -89,16 +96,8 @@ export class CryptographyRepository {
     this.cryptobox = undefined;
   }
 
-  /**
-   * Initializes the repository by creating a new Cryptobox.
-   * @returns Resolves with an array of PreKeys
-   */
-  async initCryptobox(): Promise<ProteusKeys.PreKey[]> {
-    await proteusInit();
-
-    const storeEngine = this.storageRepository['storageService']['engine'];
-    this.cryptobox = new Cryptobox(storeEngine, 10);
-
+  setCryptobox(cryptobox: Cryptobox): void {
+    this.cryptobox = cryptobox;
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, async preKeys => {
       const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
       this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
@@ -112,8 +111,6 @@ export class CryptographyRepository {
       const qualifiedId = {domain: domain, id: userId};
       amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, {id: clientId}, true);
     });
-
-    return this.cryptobox.load();
   }
 
   /**
@@ -217,6 +214,7 @@ export class CryptographyRepository {
 
   deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
     const sessionId = constructClientPrimaryKey(userId, clientId);
+    this.core.service!.cryptography.cryptobox.session_delete(sessionId);
     return this.cryptobox.session_delete(sessionId);
   }
 
@@ -266,7 +264,7 @@ export class CryptographyRepository {
    * @param event Backend event to decrypt
    * @returns Resolves with decrypted and mapped message
    */
-  async handleEncryptedEvent(event: EventRecord) {
+  async handleEncryptedEvent(event: ConversationOtrMessageAddEvent & {id?: string}) {
     const {data: eventData, from: userId, id} = event;
 
     if (!eventData) {
@@ -349,7 +347,7 @@ export class CryptographyRepository {
           messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
             // TODO(Federation): Update code once federated messages are sent with '@wireapp/core'
-            const sessionId = constructClientPrimaryKey({domain: null, id: userId}, clientId);
+            const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
 
             accumulator.push(encryptionPromise);
@@ -381,7 +379,7 @@ export class CryptographyRepository {
         for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
           if (preKeyPayload) {
             // TODO(Federation): Update code once connections are implemented on the backend
-            const sessionId = constructClientPrimaryKey({domain: null, id: userId}, clientId);
+            const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
             const encryptionPromise = this.encryptPayloadForSession(
               sessionId,
               genericMessage,
@@ -438,13 +436,17 @@ export class CryptographyRepository {
    * @returns Resolves with the decrypted message in ProtocolBuffer format
    */
   private async decryptEvent(event: EventRecord): Promise<GenericMessage> {
-    const {data: eventData, from: userId} = event;
+    const config = Config.getConfig().FEATURE;
+    const isFederatedEnv = config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+    const {data: eventData, from, qualified_from} = event;
+    const userId = isFederatedEnv ? qualified_from : {domain: '', id: from};
     const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
-    // TODO(Federation): Update code once messages from remote backends are received
-    const sessionId = constructClientPrimaryKey({domain: null, id: userId}, eventData.sender);
+    const sessionId = constructClientPrimaryKey(userId, eventData.sender);
 
-    const plaintext = await this.cryptobox.decrypt(sessionId, cipherText);
+    const plaintext = isFederatedEnv
+      ? await this.core.service.cryptography.cryptobox.decrypt(sessionId, cipherText)
+      : await this.cryptobox.decrypt(sessionId, cipherText);
     return GenericMessage.decode(plaintext);
   }
 

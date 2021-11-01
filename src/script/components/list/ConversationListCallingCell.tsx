@@ -21,6 +21,7 @@ import React, {useState} from 'react';
 import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import cx from 'classnames';
+import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation/';
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import GroupAvatar from 'Components/avatar/GroupAvatar';
@@ -41,9 +42,11 @@ import type {Multitasking} from '../../notification/NotificationRepository';
 import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate} from '../../router/routerBindings';
 import {TeamState} from '../../team/TeamState';
-import {CallState} from '../../calling/CallState';
+import {CallState, MuteState} from '../../calling/CallState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {CallActions, CallViewTab} from '../../view_model/CallingViewModel';
+import {showContextMenu, ContextMenuEntry} from '../../ui/ContextMenu';
+import type {ClientId, Participant, UserId} from '../../calling/Participant';
 
 export interface CallingCellProps {
   call: Call;
@@ -89,12 +92,23 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
     participating_user_ets: userEts,
     selfUser,
     display_name: conversationName,
-  } = useKoSubscribableChildren(conversation, ['isGroup', 'participating_user_ets', 'selfUser', 'display_name']);
+    roles,
+  } = useKoSubscribableChildren(conversation, [
+    'isGroup',
+    'participating_user_ets',
+    'selfUser',
+    'display_name',
+    'roles',
+  ]);
 
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
-  const {isMuted, activeCallViewTab} = useKoSubscribableChildren(callState, ['isMuted', 'activeCallViewTab']);
+  const {isMuted, muteState, activeCallViewTab} = useKoSubscribableChildren(callState, [
+    'isMuted',
+    'muteState',
+    'activeCallViewTab',
+  ]);
 
   const isStillOngoing = reason === CALL_REASON.STILL_ONGOING;
   const isDeclined = [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
@@ -128,6 +142,38 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
   const showJoinButton = conversation && isStillOngoing && temporaryUserStyle;
   const [showParticipants, setShowParticipants] = useState(false);
+  const isModerator = roles[selfUser?.id] === DefaultConversationRoleName.WIRE_ADMIN;
+
+  const getParticipantContext = (event: React.MouseEvent<HTMLDivElement>, participant: Participant) => {
+    event.preventDefault();
+
+    const muteParticipant = {
+      click: () =>
+        callingRepository.sendModeratorMute(conversation.id, {[participant.user.id]: [participant.clientId]}),
+      icon: 'mic-off-icon',
+      identifier: `moderator-mute-participant`,
+      isDisabled: participant.isMuted(),
+      label: t('moderatorMenuEntryMute'),
+    };
+
+    const muteOthers: ContextMenuEntry = {
+      click: () => {
+        const recipients = participants
+          .filter(p => p !== participant)
+          .reduce((acc, {user, clientId}) => {
+            acc[user.id] = [...(acc[user.id] || []), clientId];
+            return acc;
+          }, {} as Record<UserId, ClientId[]>);
+        callingRepository.sendModeratorMute(conversation.id, recipients);
+      },
+      icon: 'mic-off-icon',
+      identifier: 'moderator-mute-others',
+      label: t('moderatorMenuEntryMuteAllOthers'),
+    };
+
+    const entries: ContextMenuEntry[] = [!participant.user.isMe && muteParticipant, muteOthers].filter(Boolean);
+    showContextMenu(event.nativeEvent, entries, 'participant-moderator-menu');
+  };
 
   return (
     <>
@@ -143,6 +189,9 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
       )}
       {conversation && !isDeclined && (
         <div className="conversation-list-calling-cell-background">
+          {muteState === MuteState.REMOTE_MUTED && (
+            <div className="conversation-list-calling-cell__info-bar">{t('muteStateRemoteMute')}</div>
+          )}
           <div className="conversation-list-calling-cell conversation-list-cell">
             {!temporaryUserStyle && (
               <div className="conversation-list-cell-left" onClick={createNavigate(conversationUrl)}>
@@ -341,6 +390,8 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
                         selfInTeam={selfUser?.inTeam()}
                         isSelfVerified={isSelfVerified}
                         external={teamState.isExternal(participant.user.id)}
+                        onContextMenu={isModerator ? event => getParticipantContext(event, participant) : undefined}
+                        showDropdown={isModerator}
                       />
                     ))}
                 </div>

@@ -38,7 +38,6 @@ import AvailabilityState from 'Components/AvailabilityState';
 import ParticipantMicOnIcon from 'Components/calling/ParticipantMicOnIcon';
 import Icon from 'Components/Icon';
 import {Availability} from '@wireapp/protocol-messaging';
-import {Config} from '../../Config';
 import useEffectRef from 'Util/useEffectRef';
 
 export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
@@ -57,6 +56,7 @@ export interface ParticipantItemProps extends React.HTMLProps<HTMLDivElement> {
   participant: User | ServiceEntity;
   selfInTeam?: boolean;
   showArrow?: boolean;
+  showDropdown?: boolean;
 }
 
 const ParticipantItem: React.FC<ParticipantItemProps> = ({
@@ -75,6 +75,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   participant,
   selfInTeam,
   showArrow = false,
+  showDropdown = false,
   onContextMenu = noop,
 }) => {
   const [viewportElementRef, setViewportElementRef] = useEffectRef<HTMLDivElement>();
@@ -88,7 +89,8 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const hasUsernameInfo = isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  const isGuest = useKoSubscribable((participant as User).isGuest ?? ko.observable(false));
+  const isFederated = participant instanceof User && !participant.isOnSameFederatedDomain();
+  const isGuest = participant instanceof User && !isFederated && useKoSubscribable(participant.isGuest);
   const isVerified = useKoSubscribable((participant as User).is_verified ?? ko.observable(false));
   const availability = useKoSubscribable((participant as User).availability ?? ko.observable<Availability.Type>());
 
@@ -141,45 +143,56 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
             </div>
 
             <div className="participant-item__content">
-              <div className="participant-item__content__name-wrapper">
-                {isUser && selfInTeam && (
-                  <AvailabilityState
-                    availability={availability}
-                    className="participant-item__content__availability participant-item__content__name"
-                    dataUieName="status-name"
-                    label={participantName}
-                  />
-                )}
+              <div className="participant-item__content__text">
+                <div className="participant-item__content__name-wrapper">
+                  {isUser && selfInTeam && (
+                    <AvailabilityState
+                      availability={availability}
+                      className="participant-item__content__availability participant-item__content__name"
+                      dataUieName="status-name"
+                      label={participantName}
+                    />
+                  )}
 
-                {(isService || !selfInTeam) && (
-                  <div className="participant-item__content__name" data-uie-name="status-name">
-                    {participantName}
-                  </div>
-                )}
-                {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
-              </div>
-              <div className="participant-item__content__info">
-                {contentInfoText && (
-                  <Fragment>
-                    <span
-                      className={cx('participant-item__content__username label-username-notext', {
-                        'label-username': hasUsernameInfo,
-                      })}
-                      data-uie-name="status-username"
-                    >
-                      {contentInfoText}
-                    </span>
-                    {hasUsernameInfo && badge && (
-                      <span className="participant-item__content__badge" data-uie-name="status-partner">
-                        {badge}
+                  {(isService || !selfInTeam) && (
+                    <div className="participant-item__content__name" data-uie-name="status-name">
+                      {participantName}
+                    </div>
+                  )}
+                  {isSelf && <div className="participant-item__content__self-indicator">{selfString}</div>}
+                </div>
+                <div className="participant-item__content__info">
+                  {contentInfoText && (
+                    <Fragment>
+                      <span
+                        className={cx('participant-item__content__username label-username-notext', {
+                          'label-username': hasUsernameInfo,
+                        })}
+                        data-uie-name="status-username"
+                      >
+                        {contentInfoText}
                       </span>
-                    )}
-                  </Fragment>
-                )}
+                      {hasUsernameInfo && badge && (
+                        <span className="participant-item__content__badge" data-uie-name="status-partner">
+                          {badge}
+                        </span>
+                      )}
+                    </Fragment>
+                  )}
+                </div>
               </div>
+              {showDropdown && (
+                <div
+                  className="participant-item__content__chevron"
+                  onClick={onContextMenu}
+                  data-uie-name="participant-menu-icon"
+                >
+                  <Icon.Chevron />
+                </div>
+              )}
             </div>
 
-            {isUser && !isOthersMode && isGuest && (
+            {!isOthersMode && isGuest && (
               <span
                 className="guest-icon with-tooltip with-tooltip--external"
                 data-tooltip={t('conversationGuestIndicator')}
@@ -188,12 +201,14 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               </span>
             )}
 
-            {participant instanceof User &&
-              Config.getConfig().FEATURE.ENABLE_FEDERATION &&
-              participant.hasDomain &&
-              !participant.isOnSameFederatedDomain() && (
-                <Icon.Federation className="federation-icon" data-uie-name="status-federated-user" />
-              )}
+            {isFederated && (
+              <span
+                className="federation-icon with-tooltip with-tooltip--external"
+                data-tooltip={t('conversationFederationIndicator')}
+              >
+                <Icon.Federation data-uie-name="status-federated-user" />
+              </span>
+            )}
 
             {external && (
               <span className="partner-icon with-tooltip with-tooltip--external" data-tooltip={t('rolePartner')}>

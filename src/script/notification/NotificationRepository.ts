@@ -72,15 +72,19 @@ interface ContentViewModelState {
   state: () => string | false;
 }
 
+type NotificationData = {conversationId?: QualifiedId; messageId?: string; messageType: string};
 interface NotificationContent {
   /** Notification options */
-  options: {data: {conversationId?: QualifiedId; messageId?: string; messageType: string}; tag: string};
+  options: {data: NotificationData; tag: string};
   /** Timeout for notification */
   timeout: number;
   /** Notification title */
   title: string;
   /** Function to be triggered on click */
   trigger: Function;
+}
+interface WebappNotifications extends Notification {
+  data: NotificationData;
 }
 
 /**
@@ -93,7 +97,7 @@ export class NotificationRepository {
   private contentViewModelState: ContentViewModelState;
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  private readonly notifications: Notification[];
+  private readonly notifications: WebappNotifications[];
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly permissionRepository: PermissionRepository;
   private readonly permissionState: ko.Observable<PermissionState | PermissionStatusState | NotificationPermission>;
@@ -243,7 +247,7 @@ export class NotificationRepository {
     this.notifications.forEach(notification => {
       const {conversationId, messageId, messageType} = notification.data || {};
 
-      if (messageId) {
+      if (conversationId && messageId) {
         this.conversationRepository.isMessageRead(conversationId, messageId).then(isRead => {
           if (isRead) {
             notification.close();
@@ -671,10 +675,9 @@ export class NotificationRepository {
     conversationEntity?: Conversation,
   ): QualifiedId | undefined {
     if (connectionEntity) {
-      // TODO(federation) add domain when connection is implemented on the backend
-      return {domain: '', id: connectionEntity.conversationId};
+      return connectionEntity.conversationId;
     }
-    return conversationEntity && {domain: conversationEntity.domain, id: conversationEntity.id};
+    return conversationEntity?.qualifiedId;
   }
 
   /**
@@ -834,7 +837,10 @@ export class NotificationRepository {
      * See https://developer.mozilla.org/en-US/docs/Web/API/Notification/data
      */
     this.removeReadNotifications();
-    const notification = new window.Notification(notificationContent.title, notificationContent.options);
+    const notification: WebappNotifications = new window.Notification(
+      notificationContent.title,
+      notificationContent.options,
+    );
     const {conversationId, messageId, messageType} = notificationContent.options.data;
     let timeoutTriggerId: number;
 

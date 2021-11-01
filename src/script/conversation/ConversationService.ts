@@ -57,6 +57,10 @@ import {ConversationRecord} from '../storage/record/ConversationRecord';
 import {Config} from '../Config';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
+function isFederatedEnv() {
+  const config = Config.getConfig().FEATURE;
+  return config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+}
 export class ConversationService {
   private readonly eventService: EventService;
   private readonly logger: Logger;
@@ -96,11 +100,8 @@ export class ConversationService {
    * @returns Resolves with the conversation information
    */
   async getAllConversations(): Promise<BackendConversation[]> {
-    const domain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
     const conversationApi = this.apiClient.conversation.api;
-    const isFederatedBackend = Config.getConfig().FEATURE.ENABLE_FEDERATION === true && domain;
-
-    return isFederatedBackend ? conversationApi.getConversationList(domain) : conversationApi.getAllConversations();
+    return isFederatedEnv() ? conversationApi.getConversationList() : conversationApi.getAllConversations();
   }
 
   /**
@@ -108,7 +109,9 @@ export class ConversationService {
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
-    return this.apiClient.conversation.api.getConversation(id, domain);
+    return isFederatedEnv()
+      ? this.apiClient.conversation.api.getConversation({domain, id}, true)
+      : this.apiClient.conversation.api.getConversation(id);
   }
 
   /**
@@ -281,6 +284,19 @@ export class ConversationService {
     return this.apiClient.conversation.api.deleteMember(conversationId, userId);
   }
 
+  /**
+   * Remove member from federated conversation.
+   *
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/removeMember
+   *
+   * @param conversationId Qualified ID of conversation to remove member from
+   * @param userId Qualified ID of member to be removed from the the conversation
+   * @returns Resolves with the server response
+   */
+  deleteQualifiedMembers(conversationId: QualifiedId, userId: QualifiedId): Promise<ConversationMemberLeaveEvent> {
+    return this.apiClient.conversation.api.deleteQualifiedMember(conversationId, userId);
+  }
+
   putMembers(conversationId: string, userId: string, data: ConversationOtherMemberUpdateData): Promise<void> {
     return this.apiClient.conversation.api.putOtherMember(userId, conversationId, data);
   }
@@ -334,6 +350,7 @@ export class ConversationService {
       payload.report_missing = reportMissing;
     }
 
+    // TODO(federation): add domain in the postOTRMessage (?)
     return this.apiClient.conversation.api.postOTRMessage(payload.sender, conversationId.id, payload, ignoreMissing);
   }
 
@@ -346,11 +363,17 @@ export class ConversationService {
    * @param userIds IDs of users to be added to the conversation
    * @returns Resolves with the server response
    */
-  postMembers(conversationId: string, userIds: QualifiedId[]): Promise<ConversationMemberJoinEvent> {
-    return this.apiClient.conversation.api.postMembers(
-      conversationId,
-      userIds.map(({id}) => id),
-    );
+  postMembers(
+    conversationId: string,
+    userIds: QualifiedId[],
+    useFederation: boolean,
+  ): Promise<ConversationMemberJoinEvent> {
+    return useFederation
+      ? this.apiClient.conversation.api.postMembersV2(conversationId, userIds)
+      : this.apiClient.conversation.api.postMembers(
+          conversationId,
+          userIds.map(({id}) => id),
+        );
   }
 
   //##############################################################################
@@ -402,7 +425,7 @@ export class ConversationService {
 
     return Object.keys(conversations)
       .sort((id_a, id_b) => conversations[id_b] - conversations[id_a])
-      .map(id => ({domain: null, id}));
+      .map(id => ({domain: '', id}));
   }
 
   /**

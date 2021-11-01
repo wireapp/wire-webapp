@@ -48,12 +48,8 @@ export function constructClientPrimaryKey(userId: QualifiedId, clientId: string)
 }
 
 export function constructUserPrimaryKey({id, domain}: QualifiedId): string {
-  /**
-   * For backward compatibility: We store clients with participants from our own domain without a domain in the session ID (legacy session ID format).
-   * All other clients (from users on a different domain/remote backends) will be saved with a domain in their primary key.
-   */
-  if (Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN !== domain) {
-    return domain ? `${domain}@${id}` : id;
+  if (Config.getConfig().FEATURE.ENABLE_FEDERATION && domain) {
+    return `${domain}@${id}`;
   }
 
   return id;
