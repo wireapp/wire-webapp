@@ -108,7 +108,7 @@ export class CryptographyRepository {
 
     this.cryptobox.on(Cryptobox.TOPIC.NEW_SESSION, sessionId => {
       const {userId, clientId, domain} = ClientEntity.dismantleUserClientId(sessionId);
-      const qualifiedId = {domain: domain, id: userId};
+      const qualifiedId = {domain, id: userId};
       amplify.publish(WebAppEvents.CLIENT.ADD, qualifiedId, {id: clientId}, true);
     });
   }
@@ -347,7 +347,7 @@ export class CryptographyRepository {
           messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
             // TODO(Federation): Update code once federated messages are sent with '@wireapp/core'
-            const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
+            const sessionId = constructClientPrimaryKey(this.wrapInQualifiedId(userId), clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
 
             accumulator.push(encryptionPromise);
@@ -379,7 +379,7 @@ export class CryptographyRepository {
         for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
           if (preKeyPayload) {
             // TODO(Federation): Update code once connections are implemented on the backend
-            const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
+            const sessionId = constructClientPrimaryKey(this.wrapInQualifiedId(userId), clientId);
             const encryptionPromise = this.encryptPayloadForSession(
               sessionId,
               genericMessage,
@@ -430,6 +430,19 @@ export class CryptographyRepository {
   }
 
   /**
+   * Will wrap an userId in a qualified id with the correct domain set depending on the env the app runs in:
+   *   - In a non-federated env, domain will be an empty string
+   *   - In a federated env, the domain will be the domain of the current federated backend
+   * @param userId
+   * @returns QualifiedId
+   */
+  private wrapInQualifiedId(userId: string): QualifiedId {
+    const config = Config.getConfig().FEATURE;
+    const domain = config.ENABLE_FEDERATION ? config.FEDERATION_DOMAIN : '';
+    return {domain, id: userId};
+  }
+
+  /**
    * Decrypt an event.
    *
    * @param event Backend event to decrypt
@@ -439,7 +452,7 @@ export class CryptographyRepository {
     const config = Config.getConfig().FEATURE;
     const isFederatedEnv = config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
     const {data: eventData, from, qualified_from} = event;
-    const userId = isFederatedEnv ? qualified_from : {domain: '', id: from};
+    const userId = isFederatedEnv ? qualified_from : this.wrapInQualifiedId(from);
     const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
     const sessionId = constructClientPrimaryKey(userId, eventData.sender);
