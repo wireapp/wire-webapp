@@ -476,7 +476,7 @@ export const EventBuilder = {
   },
 
   buildUnableToDecrypt(event: EventRecord, decryptionError: Error, errorCode: number): ErrorEvent {
-    const {qualified_conversation: conversationId, conversation, data: eventData, from, time} = event;
+    const {qualified_conversation: conversationId, qualified_from, conversation, data: eventData, from, time} = event;
 
     return {
       ...buildQualifiedId(conversationId || conversation),
@@ -484,6 +484,7 @@ export const EventBuilder = {
       error_code: `${errorCode} (${eventData.sender})`,
       from,
       id: createRandomUuid(),
+      qualified_from: qualified_from || {domain: '', id: from},
       time,
       type: ClientEvent.CONVERSATION.UNABLE_TO_DECRYPT,
     };
