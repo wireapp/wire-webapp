@@ -253,9 +253,9 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.timedMessagesText = ko.pureComputed(() => {
       if (this.activeConversation()) {
-        const hasTimer = this.activeConversation().messageTimer() && this.activeConversation().hasGlobalMessageTimer();
+        const hasTimer = this.activeConversation().hasGlobalMessageTimer();
         if (hasTimer) {
-          return formatDuration(this.activeConversation().messageTimer()).text;
+          return formatDuration(this.activeConversation().globalMessageTimer()).text;
         }
       }
       return t('ephemeralUnitsNone');
