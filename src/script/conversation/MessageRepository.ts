@@ -1332,10 +1332,7 @@ export class MessageRepository {
   private createQualifiedRecipients(users: User[]): QualifiedUserClients {
     return users.reduce((userClients, user) => {
       userClients[user.domain] ||= {};
-      userClients[user.domain][user.id] ||= [];
-      for (const client of user.devices()) {
-        userClients[user.domain][user.id].push(client.id);
-      }
+      userClients[user.domain][user.id] = user.devices().map(client => client.id);
       return userClients;
     }, {} as QualifiedUserClients);
   }
