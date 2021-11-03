@@ -318,7 +318,7 @@ export class TestFactory {
     );
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
-      () => this.message_repository,
+      this.message_repository,
       this.connection_repository,
       this.event_repository,
       this.team_repository,
