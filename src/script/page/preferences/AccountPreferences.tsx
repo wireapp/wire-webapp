@@ -21,7 +21,6 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import AvailabilityState from 'Components/AvailabilityState';
-import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
 import React, {useEffect, useRef} from 'react';
 import {container} from 'tsyringe';
@@ -55,6 +54,8 @@ import EmailInput from './accountPreferences/EmailInput';
 import UsernameInput from './accountPreferences/UsernameInput';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
+import AvatarInput from './accountPreferences/AvatarInput';
+import NameInput from './accountPreferences/NameInput';
 
 interface AccountPreferencesProps {
   clientRepository: ClientRepository;
@@ -105,11 +106,11 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   }, []);
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+    <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">{t('preferencesAccount')}</div>
       <div className="preferences-content" ref={setScrollbarRef}>
         {name}
-        <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />
+        <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
         {isTeam && (
           <div
             onClick={event => {
@@ -132,7 +133,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
         )}
         <PreferencesSection title={t('preferencesAccountInfo')}>
-          <AccountInput label="Displayname" value={name} />
+          <NameInput {...{canEditProfile, name, userRepository}} />
           <UsernameInput {...{canEditProfile, userRepository, username}} domain={selfUser.domain} />
           <EmailInput {...{canEditProfile, email, userRepository}} />
           {richFields.map(({type, value}) => (
@@ -157,6 +158,8 @@ export default AccountPreferences;
 
 registerReactComponent('account-preferences', {
   component: AccountPreferences,
+  // bindings:
+  //   'clientRepository, userRepository, propertiesRepository, conversationRepository, preferenceNotificationRepository',
   template:
     '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository, preferenceNotificationRepository}"></div>',
 });

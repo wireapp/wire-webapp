@@ -182,13 +182,6 @@ export class ContentViewModel {
     this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
     this.preferencesAbout = new PreferencesAboutViewModel();
-    this.preferencesAccount = new PreferencesAccountViewModel(
-      repositories.client,
-      repositories.conversation,
-      repositories.preferenceNotification,
-      repositories.properties,
-      repositories.user,
-    );
     this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.properties, repositories.calling, {
       replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
       stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
@@ -212,7 +205,7 @@ export class ContentViewModel {
           this.titleBar.addedToView();
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
-          this.preferencesAccount.popNotification();
+          //this.preferencesAccount.popNotification();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
           this.preferencesAV.updateMediaStreamTrack(MediaType.AUDIO_VIDEO);

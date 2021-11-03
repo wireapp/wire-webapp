@@ -2,7 +2,7 @@ import Icon from 'Components/Icon';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {MotionDuration} from '../../../motion/MotionDuration';
 
-interface StyledInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   isDone?: boolean;
   label: string;
   onValueChange?: (value: string) => void;
@@ -44,15 +44,25 @@ export const useInputDone = () => {
   return {done, isDone};
 };
 
-const AccountInput: React.FC<StyledInputProps> = ({label, value, readOnly, onValueChange, isDone = false, ...rest}) => {
-  const [input, setInput] = useState(value);
+const AccountInput: React.FC<AccountInputProps> = ({
+  label,
+  value,
+  readOnly,
+  onValueChange,
+  isDone = false,
+  ...rest
+}) => {
+  const [input, setInput] = useState<string>();
+  useEffect(() => {
+    setInput(value);
+  }, [value]);
   return (
     <div>
       <label>{label}</label>
       <input
         readOnly={readOnly}
         value={input}
-        onChange={event => setInput(event.target.value)}
+        onChange={({target}) => setInput(target.value)}
         onKeyPress={event => {
           if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
             event.preventDefault();
