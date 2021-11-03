@@ -121,7 +121,7 @@ import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {extractUserClientsQualifiedIds} from './userClientsUtils';
+import {flattenUserClientsQualifiedIds} from './userClientsUtils';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -181,8 +181,8 @@ export class ConversationRepository {
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId) => {
-      const deleted = extractUserClientsQualifiedIds(mismatch.deleted);
-      const missing = extractUserClientsQualifiedIds(mismatch.missing);
+      const deleted = flattenUserClientsQualifiedIds(mismatch.deleted);
+      const missing = flattenUserClientsQualifiedIds(mismatch.missing);
       const conversation = conversationId ? await this.getConversationById(conversationId) : undefined;
       if (conversation) {
         // add/remove users from the conversation (if any)

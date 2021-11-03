@@ -75,7 +75,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {extractUserClientsQualifiedIds} from '../conversation/userClientsUtils';
+import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -350,7 +350,7 @@ export class UserRepository {
    */
   async updateMissingUsersClients(userIds: QualifiedId[]): Promise<boolean> {
     const clients = await this.getClientsByUsers(userIds, false);
-    const users = extractUserClientsQualifiedIds<ClientEntity>(clients);
+    const users = flattenUserClientsQualifiedIds<ClientEntity>(clients);
     const addedUsers = await Promise.all(
       users.map(async ({userId, clients}) => {
         return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).some(

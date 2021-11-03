@@ -45,7 +45,7 @@ function extractUserIds<T>(
  * @param userClients The UserClients (qualified or not) to flatten
  * @return An array containing the qualified user Ids and the clients info
  */
-export function extractUserClientsQualifiedIds<T = unknown>(
+export function flattenUserClientsQualifiedIds<T = unknown>(
   userClients: UserClientsContainer<T> | QualifiedUserClientsContainer<T>,
 ): {clients: T[]; userId: QualifiedId}[] {
   if (isQualifiedUserClients(userClients)) {

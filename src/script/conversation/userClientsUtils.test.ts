@@ -17,7 +17,7 @@
  *
  */
 
-import {extractUserClientsQualifiedIds} from './userClientsUtils';
+import {flattenUserClientsQualifiedIds} from './userClientsUtils';
 
 describe('userClientsUtils', () => {
   it('extracts user and client info from payload', () => {
@@ -28,6 +28,6 @@ describe('userClientsUtils', () => {
       {clients: ['client1', 'client2'], userId: {domain: 'domain2', id: 'user3'}},
     ];
 
-    expect(extractUserClientsQualifiedIds(payload)).toEqual(expected);
+    expect(flattenUserClientsQualifiedIds(payload)).toEqual(expected);
   });
 });
