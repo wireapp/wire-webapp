@@ -416,15 +416,16 @@ export class MessageService {
       // walk through deleted user ids
       for (const [deletedUserId] of Object.entries(deletedUserIdClients)) {
         // walk through message recipients
-        for (const recipientIndex in message.recipients) {
+        for (const recipients of message.recipients) {
           // check if message recipients' domain is the same as the deleted user's domain
-          if (message.recipients[recipientIndex].domain === deletedUserDomain) {
+          if (recipients.domain === deletedUserDomain) {
             // check if message recipients' id is the same as the deleted user's id
-            for (const entriesIndex in message.recipients[recipientIndex].entries || []) {
-              const uuid = message.recipients[recipientIndex].entries![entriesIndex].user?.uuid;
+            for (const recipientEntry of recipients.entries || []) {
+              const uuid = recipientEntry.user?.uuid;
               if (!!uuid && bytesToUUID(uuid) === deletedUserId) {
                 // delete this user from the message recipients
-                delete message.recipients[recipientIndex].entries![entriesIndex];
+                const deleteIndex = recipients.entries!.indexOf(recipientEntry);
+                recipients.entries!.splice(deleteIndex);
               }
             }
           }

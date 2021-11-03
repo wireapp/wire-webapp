@@ -20,7 +20,12 @@
 import UUID from 'uuidjs';
 import {StatusCodes} from 'http-status-codes';
 import {APIClient} from '@wireapp/api-client';
-import {MessageSendingStatus, QualifiedUserClients} from '@wireapp/api-client/src/conversation';
+import {
+  MessageSendingStatus,
+  OTRRecipients,
+  QualifiedOTRRecipients,
+  QualifiedUserClients,
+} from '@wireapp/api-client/src/conversation';
 import {CryptographyService} from '../../cryptography';
 import {MessageService} from './MessageService';
 
@@ -45,10 +50,29 @@ function generateQualifiedRecipients(users: TestUser[]): QualifiedUserClients {
   return payload;
 }
 
+function fakeEncrypt(_: unknown, recipients: QualifiedUserClients): Promise<QualifiedOTRRecipients> {
+  const encryptedPayload = Object.entries(recipients).reduce((acc, [domain, users]) => {
+    acc[domain] = Object.entries(users).reduce((userClients, [userId, clients]) => {
+      userClients[userId] = clients.reduce((payloads, client) => {
+        payloads[client] = new Uint8Array();
+        return payloads;
+      }, {} as any);
+      return userClients;
+    }, {} as OTRRecipients<Uint8Array>);
+    return acc;
+  }, {} as QualifiedOTRRecipients);
+  return Promise.resolve(encryptedPayload);
+}
+
 describe('MessageService', () => {
   const apiClient = new APIClient();
   const cryptographyService = new CryptographyService(apiClient, {} as any);
   const messageService = new MessageService(apiClient, cryptographyService);
+
+  beforeEach(() => {
+    spyOn(cryptographyService, 'encryptQualified').and.callFake(fakeEncrypt);
+  });
+
   describe('sendFederatedMessage', () => {
     it('sends a message', async () => {
       spyOn(apiClient.conversation.api, 'postOTRMessageV2').and.returnValue(Promise.resolve(baseMessageSendingStatus));
@@ -66,7 +90,11 @@ describe('MessageService', () => {
     describe('client mismatch', () => {
       it('handles client mismatch internally if no onClientMismatch is given', async () => {
         let spyCounter = 0;
-        const clientMismatch = {...baseMessageSendingStatus, missing: {'2.wire.test': {[user2.id]: ['client22']}}};
+        const clientMismatch = {
+          ...baseMessageSendingStatus,
+          deleted: {[user1.domain]: {[user1.id]: [user1.clients[0]]}},
+          missing: {'2.wire.test': {[user2.id]: ['client22']}},
+        };
         spyOn(apiClient.conversation.api, 'postOTRMessageV2').and.callFake(() => {
           spyCounter++;
           if (spyCounter === 1) {
@@ -80,9 +108,6 @@ describe('MessageService', () => {
           return Promise.resolve(baseMessageSendingStatus);
         });
         spyOn(apiClient.user.api, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
-        spyOn(cryptographyService, 'encryptQualified').and.returnValue(
-          Promise.resolve({'2.wire.test': {[user2.id]: {client22: new Uint8Array()}}}),
-        );
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -113,9 +138,6 @@ describe('MessageService', () => {
           return Promise.resolve(baseMessageSendingStatus);
         });
         spyOn(apiClient.user.api, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
-        spyOn(cryptographyService, 'encryptQualified').and.returnValue(
-          Promise.resolve({'2.wire.test': {[user2.id]: {client22: new Uint8Array()}}}),
-        );
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
@@ -142,9 +164,6 @@ describe('MessageService', () => {
           return Promise.reject(error);
         });
         spyOn(apiClient.user.api, 'postQualifiedMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
-        spyOn(cryptographyService, 'encryptQualified').and.returnValue(
-          Promise.resolve({'2.wire.test': {[user2.id]: {client22: new Uint8Array()}}}),
-        );
 
         const recipients = generateQualifiedRecipients([user1, user2]);
 
