@@ -49,19 +49,28 @@ export interface MetaClient extends RegisteredClient {
   };
 }
 
+type CryptographyServiceOptions = {
+  federationDomain?: string;
+};
+
 export class CryptographyService {
   private readonly logger: logdown.Logger;
 
   public cryptobox: Cryptobox;
   private readonly database: CryptographyDatabaseRepository;
 
-  constructor(readonly apiClient: APIClient, private readonly storeEngine: CRUDEngine) {
+  constructor(
+    readonly apiClient: APIClient,
+    private readonly storeEngine: CRUDEngine,
+    private readonly options?: CryptographyServiceOptions,
+  ) {
     this.cryptobox = new Cryptobox(this.storeEngine);
     this.database = new CryptographyDatabaseRepository(this.storeEngine);
     this.logger = logdown('@wireapp/core/cryptography/CryptographyService', {
       logger: console,
       markdown: false,
     });
+    this.options = options;
   }
 
   public static constructSessionId(userId: string, clientId: string, domain: string | null): string {
@@ -209,7 +218,8 @@ export class CryptographyService {
       data: {sender, text: cipherText},
     } = otrMessage;
 
-    const sessionId = CryptographyService.constructSessionId(from, sender, qualified_from?.domain || null);
+    const domain = this.options?.federationDomain ? qualified_from?.domain || this.options.federationDomain : null;
+    const sessionId = CryptographyService.constructSessionId(from, sender, domain);
     const decryptedMessage = await this.decrypt(sessionId, cipherText);
     const genericMessage = GenericMessage.decode(decryptedMessage);
 
