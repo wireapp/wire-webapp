@@ -45,7 +45,7 @@ import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
-import {isAxiosError, isBackendError, isQualifiedId, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
@@ -75,6 +75,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {extractUserClientsQualifiedIds} from '../conversation/userClientsUtils';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -349,26 +350,15 @@ export class UserRepository {
    */
   async updateMissingUsersClients(userIds: QualifiedId[]): Promise<boolean> {
     const clients = await this.getClientsByUsers(userIds, false);
-    const addClients = async (userClients: UserClientEntityMap, domain: string): Promise<boolean> => {
-      const added = await Promise.all(
-        Object.entries(userClients).map(async ([userId, clients]) => {
-          return (
-            await Promise.all(clients.map(client => this.addClientToUser({domain, id: userId}, client, true)))
-          ).some(wasAdded => wasAdded === true);
-        }),
-      );
-      return added.some(wasAdded => wasAdded === true);
-    };
-
-    if (isQualifiedUserClientEntityMap(clients)) {
-      const adds = await Promise.all(
-        Object.entries(clients).map(([domain, userClients]) => {
-          return addClients(userClients, domain);
-        }),
-      );
-      return adds.some(wasAdded => wasAdded === true);
-    }
-    return addClients(clients, '');
+    const users = extractUserClientsQualifiedIds<ClientEntity>(clients);
+    const addedUsers = await Promise.all(
+      users.map(async ({userId, clients}) => {
+        return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).some(
+          wasAdded => wasAdded === true,
+        );
+      }),
+    );
+    return addedUsers.some(wasAdded => wasAdded === true);
   }
 
   /**

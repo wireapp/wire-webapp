@@ -34,6 +34,7 @@ import {
   MessageHide,
   Reaction,
   Text,
+  Knock,
   Asset as ProtobufAsset,
   LinkPreview,
   DataTransfer,

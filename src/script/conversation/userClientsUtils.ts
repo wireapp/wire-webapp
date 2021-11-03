@@ -17,34 +17,41 @@
  *
  */
 
-import {QualifiedUserClients, UserClients} from '@wireapp/api-client/src/conversation';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
-function isQualifiedUserClients(obj: any): obj is QualifiedUserClients {
+type UserClientsContainer<T> = {[userId: string]: T[]};
+type QualifiedUserClientsContainer<T> = {[domain: string]: UserClientsContainer<T>};
+
+function isQualifiedUserClients(obj: any): obj is QualifiedUserClientsContainer<unknown> {
   if (typeof obj === 'object') {
     const firstUserClientObject = Object.values(obj)?.[0];
     if (typeof firstUserClientObject === 'object') {
-      const firstClientIdArray = Object.values(firstUserClientObject as object)[0];
-      if (Array.isArray(firstClientIdArray)) {
-        const firstClientId = firstClientIdArray[0];
-        return typeof firstClientId === 'string';
-      }
+      const firstClientIdArray = Object.values(firstUserClientObject)[0];
+      return Array.isArray(firstClientIdArray);
     }
   }
   return false;
 }
 
-function extractUserIds(userClients: UserClients, domain: string): {clients: string[]; userId: QualifiedId}[] {
+function extractUserIds<T>(
+  userClients: UserClientsContainer<T>,
+  domain: string,
+): {clients: T[]; userId: QualifiedId}[] {
   return Object.entries(userClients).map(([id, clients]) => ({clients, userId: {domain, id}}));
 }
-
-export function extractUserClientsQualifiedIds(
-  userClients: UserClients | QualifiedUserClients,
-): {clients: string[]; userId: QualifiedId}[] {
+/**
+ * Will flatten a container of users=>clients infos to an array
+ *
+ * @param userClients The UserClients (qualified or not) to flatten
+ * @return An array containing the qualified user Ids and the clients info
+ */
+export function extractUserClientsQualifiedIds<T = unknown>(
+  userClients: UserClientsContainer<T> | QualifiedUserClientsContainer<T>,
+): {clients: T[]; userId: QualifiedId}[] {
   if (isQualifiedUserClients(userClients)) {
     return Object.entries(userClients).reduce((ids, [domain, userClients]) => {
       return [...ids, ...extractUserIds(userClients, domain)];
-    }, [] as {clients: string[]; userId: QualifiedId}[]);
+    }, [] as {clients: T[]; userId: QualifiedId}[]);
   }
   return extractUserIds(userClients, '');
 }

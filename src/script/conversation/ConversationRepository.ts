@@ -121,7 +121,7 @@ import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {extractUserClientsQualifiedIds} from './clientMismatchUtils';
+import {extractUserClientsQualifiedIds} from './userClientsUtils';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
