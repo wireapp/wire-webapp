@@ -352,21 +352,19 @@ export class ClientRepository {
     const clientEntityMap: QualifiedUserClientEntityMap = {};
     const qualifiedUserClientsMap = await this.clientService.getClientsByQualifiedUserIds(userIds);
 
-    if (updateClients) {
-      await Promise.all(
-        Object.entries(qualifiedUserClientsMap).map(([domain, userClientMap]) =>
-          Promise.all(
-            Object.entries(userClientMap).map(async ([userId, clients]) => {
-              clientEntityMap[domain] ||= {};
-              clientEntityMap[domain][userId] = updateClients
-                ? await this.updateClientsOfUserById({domain, id: userId}, clients, true)
-                : // TODO(Federation): Check if `isSelfClient` is needed here
-                  ClientMapper.mapClients(clients, false, domain);
-            }),
-          ),
+    await Promise.all(
+      Object.entries(qualifiedUserClientsMap).map(([domain, userClientMap]) =>
+        Promise.all(
+          Object.entries(userClientMap).map(async ([userId, clients]) => {
+            clientEntityMap[domain] ||= {};
+            clientEntityMap[domain][userId] = updateClients
+              ? await this.updateClientsOfUserById({domain, id: userId}, clients, true)
+              : // TODO(Federation): Check if `isSelfClient` is needed here
+                ClientMapper.mapClients(clients, false, domain);
+          }),
         ),
-      );
-    }
+      ),
+    );
 
     return clientEntityMap;
   }

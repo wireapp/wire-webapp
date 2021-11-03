@@ -351,20 +351,24 @@ export class UserRepository {
     const clients = await this.getClientsByUsers(userIds, false);
     const addClients = async (userClients: UserClientEntityMap, domain: string): Promise<boolean> => {
       const added = await Promise.all(
-        Object.entries(userClients).map(([userId, clients]) => {
-          return clients.map(client => this.addClientToUser({domain, id: userId}, client, true));
+        Object.entries(userClients).map(async ([userId, clients]) => {
+          return (
+            await Promise.all(clients.map(client => this.addClientToUser({domain, id: userId}, client, true)))
+          ).some(wasAdded => wasAdded === true);
         }),
       );
       return added.some(wasAdded => wasAdded === true);
     };
 
     if (isQualifiedUserClientEntityMap(clients)) {
-      Object.entries(clients).forEach(([domain, userClients]) => {
-        addClients(userClients, domain);
-      });
-    } else {
-      return addClients(clients, '');
+      const adds = await Promise.all(
+        Object.entries(clients).map(([domain, userClients]) => {
+          return addClients(userClients, domain);
+        }),
+      );
+      return adds.some(wasAdded => wasAdded === true);
     }
+    return addClients(clients, '');
   }
 
   /**

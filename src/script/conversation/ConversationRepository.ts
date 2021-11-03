@@ -179,6 +179,7 @@ export class ConversationRepository {
   ) {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
+    // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId) => {
       const deleted = extractUserClientsQualifiedIds(mismatch.deleted);
       const missing = extractUserClientsQualifiedIds(mismatch.missing);
@@ -196,11 +197,12 @@ export class ConversationRepository {
       deleted.forEach(({userId, clients}) => {
         clients.forEach(client => this.userRepository.removeClientFromUser(userId, client));
       });
-      const deviceWasAdded = await this.userRepository.updateMissingUsersClients(missing.map(({userId}) => userId));
-      if (deviceWasAdded && conversation) {
-        // TODO trigger degradation warning if needed
-        console.debug('felix', conversation.verification_state());
-        return false;
+      if (missing.length) {
+        const deviceWasAdded = await this.userRepository.updateMissingUsersClients(missing.map(({userId}) => userId));
+        if (deviceWasAdded && conversation) {
+          // TODO trigger degradation warning if needed and return false if sending should be canceled
+          return true;
+        }
       }
       return true;
     });
