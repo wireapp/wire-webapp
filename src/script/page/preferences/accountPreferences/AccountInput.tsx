@@ -1,12 +1,14 @@
 import Icon from 'Components/Icon';
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {MotionDuration} from 'src/script/motion/MotionDuration';
+import {MotionDuration} from '../../../motion/MotionDuration';
 
-interface StyledInputProps {
+interface StyledInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   isDone?: boolean;
   label: string;
-  onChange?: (value: string) => void;
+  onValueChange?: (value: string) => void;
+  prefix?: string;
   readOnly?: boolean;
+  suffix?: string;
   value: string;
 }
 
@@ -15,7 +17,6 @@ function useIsMounted() {
 
   useEffect(() => {
     isMounted.current = true;
-
     return () => {
       isMounted.current = false;
     };
@@ -32,6 +33,7 @@ export const useInputDone = () => {
     if (isMounted()) {
       setIsDone(true);
     }
+
     setTimeout(() => {
       if (isMounted()) {
         setIsDone(false);
@@ -42,7 +44,7 @@ export const useInputDone = () => {
   return {done, isDone};
 };
 
-const AccountInput: React.FC<StyledInputProps> = ({label, value, readOnly, onChange, isDone = false}) => {
+const AccountInput: React.FC<StyledInputProps> = ({label, value, readOnly, onValueChange, isDone = false, ...rest}) => {
   const [input, setInput] = useState(value);
   return (
     <div>
@@ -53,14 +55,14 @@ const AccountInput: React.FC<StyledInputProps> = ({label, value, readOnly, onCha
         onChange={event => setInput(event.target.value)}
         onKeyPress={event => {
           if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
-            onChange?.(input);
             event.preventDefault();
+            onValueChange?.(input);
+            (event.target as HTMLInputElement).blur();
           }
         }}
-        onBlur={() => {
-          setInput(value);
-        }}
+        onBlur={() => setInput(value)}
         spellCheck={false}
+        {...rest}
       />
       {isDone ? (
         <Icon.AnimatedCheck data-uie-name="enter-username-icon-check" />

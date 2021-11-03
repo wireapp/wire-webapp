@@ -20,8 +20,8 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import React from 'react';
-import {HistoryExportViewModel} from 'src/script/view_model/content/HistoryExportViewModel';
-import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
+import {HistoryExportViewModel} from '../../../view_model/content/HistoryExportViewModel';
+import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
 import PreferencesSection from './PreferencesSection';
 

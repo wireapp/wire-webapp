@@ -29,14 +29,14 @@ import {formatDurationCaption} from 'Util/TimeUtil';
 import PreferencesSection from './PreferencesSection';
 
 interface PrivacySectionProps {
-  appLockRepository: AppLockRepository;
+  appLockRepository?: AppLockRepository;
   appLockState?: AppLockState;
   propertiesRepository: PropertiesRepository;
 }
 
 const PrivacySection: React.FC<PrivacySectionProps> = ({
   propertiesRepository,
-  appLockRepository,
+  appLockRepository = container.resolve(AppLockRepository),
   appLockState = container.resolve(AppLockState),
 }) => {
   const {isAppLockEnabled, isAppLockAvailable, isAppLockEnforced, appLockInactivityTimeoutSecs} =

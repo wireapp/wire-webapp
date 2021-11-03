@@ -63,6 +63,7 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import '../page/preferences/AccountPreferences';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -129,7 +130,7 @@ export class ContentViewModel {
     };
   }
 
-  constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
+  constructor(mainViewModel: MainViewModel, public repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);

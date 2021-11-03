@@ -20,12 +20,12 @@
 import React, {useState} from 'react';
 import {PropertiesRepository} from '../../../properties/PropertiesRepository';
 import {t} from 'Util/LocalizerUtil';
-import {PROPERTIES_TYPE} from 'src/script/properties/PropertiesType';
-import {TeamState} from 'src/script/team/TeamState';
+import {PROPERTIES_TYPE} from '../../../properties/PropertiesType';
+import {TeamState} from '../../../team/TeamState';
 import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {Config} from 'src/script/Config';
-import {ConsentValue} from 'src/script/user/ConsentValue';
+import {Config} from '../../../Config';
+import {ConsentValue} from '../../../user/ConsentValue';
 import PreferencesSection from './PreferencesSection';
 
 interface DataUsageSectionProps {
