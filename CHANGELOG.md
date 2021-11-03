@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.23.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.22.1...@wireapp/core@17.23.0) (2021-11-03)
+
+
+### Bug Fixes
+
+* **core:** Cleanly delete users when mismatch happens ([#4169](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4169)) ([b487bb5](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/b487bb535d84374fb8095dc14a978fa188fcdf1c))
+
+
+### Features
+
+* **core:** Do not resend message when a mismatch does not need to ([#4170](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4170)) ([15bcf13](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/15bcf13a4778497bac2def7953aea1e48b6e5886))
+
+
+
+
+
 ## [17.22.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.22.0...@wireapp/core@17.22.1) (2021-11-01)
 
 **Note:** Version bump only for package @wireapp/core
