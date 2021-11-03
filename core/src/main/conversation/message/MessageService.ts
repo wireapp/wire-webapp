@@ -105,14 +105,18 @@ export class MessageService {
       'redundant',
     ];
 
-    if (messageData.ignoreOnly?.userIds?.length) {
-      const allFailed: QualifiedUserClients = {
-        ...messageSendingStatus.deleted,
-        ...messageSendingStatus.failed_to_send,
-        ...messageSendingStatus.missing,
-        ...messageSendingStatus.redundant,
-      };
+    const allFailed: QualifiedUserClients = {
+      ...messageSendingStatus.deleted,
+      ...messageSendingStatus.failed_to_send,
+      ...messageSendingStatus.missing,
+      ...messageSendingStatus.redundant,
+    };
+    const hasDiffs = Object.keys(allFailed).length;
+    if (!hasDiffs) {
+      return null;
+    }
 
+    if (messageData.ignoreOnly?.userIds?.length) {
       for (const [domainFailed, userClientsFailed] of Object.entries(allFailed)) {
         for (const userIdMissing of Object.keys(userClientsFailed)) {
           const userIsIgnored = messageData.ignoreOnly.userIds.find(({domain: domainIgnore, id: userIdIgnore}) => {
@@ -207,6 +211,7 @@ export class MessageService {
     }
 
     let sendingStatus: MessageSendingStatus;
+    let sendingFailed: boolean = false;
     try {
       sendingStatus = await this.apiClient.conversation.api.postOTRMessageV2(conversationId, domain, protoMessage);
     } catch (error) {
@@ -214,13 +219,14 @@ export class MessageService {
         throw error;
       }
       sendingStatus = error.response!.data! as unknown as MessageSendingStatus;
+      sendingFailed = true;
     }
 
     const mismatch = this.checkFederatedClientsMismatch(protoMessage, sendingStatus);
 
     if (mismatch) {
       const shouldStopSending = options.onClientMismatch && !(await options.onClientMismatch(mismatch));
-      if (shouldStopSending) {
+      if (shouldStopSending || !sendingFailed) {
         return sendingStatus;
       }
       const reEncryptedMessage = await this.onFederatedMismatch(protoMessage, mismatch, plainTextArray);
