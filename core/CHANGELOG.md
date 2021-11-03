@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.24.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.23.0...@wireapp/core@17.24.0) (2021-11-03)
+
+
+### Features
+
+* **core:** Add option to set a domain on an account ([#4168](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4168)) ([3a5a2a9](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/3a5a2a943a2c7ceb65a4b494af055442be2445bb))
+
+
+
+
+
 # [17.23.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.22.1...@wireapp/core@17.23.0) (2021-11-03)
 
 
