@@ -188,7 +188,6 @@ export class TestFactory {
    * @returns {Promise<EventRepository>} The event repository.
    */
   async exposeEventActors() {
-    await this.exposeCryptographyActors();
     await this.exposeUserActors();
 
     this.web_socket_service = new WebSocketService();
@@ -205,7 +204,7 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository['userState'],
     );
-    this.event_repository.currentClient = ko.observable(new ClientEntity(true, null));
+    this.event_repository.currentClient = this.client_repository['clientState'].currentClient;
 
     return this.event_repository;
   }
