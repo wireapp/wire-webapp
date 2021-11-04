@@ -238,7 +238,7 @@ class App {
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository(new CryptographyService());
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
       new UserService(),

@@ -54,7 +54,7 @@ describe('CryptographyRepository', () => {
     };
 
     it('encrypts a generic message', () => {
-      spyOn(testFactory.cryptography_repository.cryptographyService, 'getUsersPreKeys').and.callFake(
+      spyOn(testFactory.cryptography_repository['cryptographyService'], 'getUsersPreKeys').and.callFake(
         (recipients: Record<string, string[]>) =>
           new Promise(resolve => {
             const prekey_map: Record<string, any> = {};
@@ -120,7 +120,7 @@ describe('CryptographyRepository', () => {
 
     it('detects duplicated messages', async () => {
       jest
-        .spyOn(testFactory.cryptography_repository.cryptographyService, 'putClientPreKeys')
+        .spyOn(testFactory.cryptography_repository['cryptographyService'], 'putClientPreKeys')
         .mockReturnValue(Promise.resolve());
       const alice = testFactory.cryptography_repository.cryptobox['identity'];
       const prekey = testFactory.cryptography_repository.cryptobox.lastResortPreKey;

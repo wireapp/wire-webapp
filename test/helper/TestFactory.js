@@ -129,12 +129,11 @@ export class TestFactory {
     currentClient.id = entities.clients.john_doe.permanent.id;
     this.cryptography_service = new CryptographyService();
 
-    this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
-    this.cryptography_repository.currentClient = ko.observable(currentClient);
+    this.cryptography_repository = new CryptographyRepository(this.cryptography_service);
 
     if (!mockCryptobox) {
       const storeEngine = storageRepository.storageService['engine'];
-      this.cryptography_repository.setCryptobox(new Cryptobox(storeEngine, 10));
+      this.cryptography_repository.init(new Cryptobox(storeEngine, 10), ko.observable(currentClient));
       await this.cryptography_repository.cryptobox.create();
     }
 
@@ -160,7 +159,12 @@ export class TestFactory {
     user.phone(entities.user.john_doe.phone);
 
     this.client_service = new ClientService(this.storage_service);
-    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, new ClientState());
+    this.client_repository = new ClientRepository(
+      this.client_service,
+      this.cryptography_repository,
+      this.storage_repository,
+      new ClientState(),
+    );
     this.client_repository.init(user);
 
     const currentClient = new ClientEntity(false, null);
@@ -201,7 +205,7 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository['userState'],
     );
-    this.event_repository.currentClient = ko.observable(this.cryptography_repository.currentClient());
+    this.event_repository.currentClient = ko.observable(new ClientEntity(true, null));
 
     return this.event_repository;
   }
