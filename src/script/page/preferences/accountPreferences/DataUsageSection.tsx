@@ -48,7 +48,6 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
   );
 
   const {marketingConsent} = useKoSubscribableChildren(propertiesRepository, ['marketingConsent']);
-
   const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
   const isCountlyEnabled = !!Config.getConfig().COUNTLY_API_KEY;
 
