@@ -259,19 +259,13 @@ class App {
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
     repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
 
-    repositories.conversation = new ConversationRepository(
-      this.service.conversation,
-      () => repositories.message,
-      repositories.connection,
-      repositories.event,
-      repositories.team,
-      repositories.user,
-      repositories.properties,
-      serverTimeHandler,
-    );
-
     repositories.message = new MessageRepository(
       repositories.client,
+      /*
+       * FIXME there is a cyclic dependency between message and conversation repos.
+       * MessageRepository should NOT depend upon ConversationRepository.
+       * We need to remove all usages of conversationRepository inside the messageRepository
+       */
       () => repositories.conversation,
       repositories.cryptography,
       repositories.event,
@@ -282,6 +276,17 @@ class App {
       this.service.conversation,
       new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.asset,
+    );
+
+    repositories.conversation = new ConversationRepository(
+      this.service.conversation,
+      repositories.message,
+      repositories.connection,
+      repositories.event,
+      repositories.team,
+      repositories.user,
+      repositories.properties,
+      serverTimeHandler,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message);

@@ -75,6 +75,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -197,17 +198,18 @@ export class UserRepository {
    * Retrieves meta information about all the clients of given users.
    */
   getClientsByUsers(
-    userEntities: User[],
+    userEntities: User[] | QualifiedId[],
     updateClients: boolean,
   ): Promise<UserClientEntityMap | QualifiedUserClientEntityMap> {
+    const userIds = isQualifiedId(userEntities[0])
+      ? userEntities
+      : (userEntities as User[]).map(userEntity => userEntity.qualifiedId);
     // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
     // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
-    if (!!userEntities[0]?.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
+    if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
       return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
     }
 
-    const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
     return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
@@ -340,6 +342,24 @@ export class UserRepository {
     }
     return wasClientAdded;
   };
+
+  /**
+   * Will sync all the clients of the users given with the backend and add the missing ones.
+   * @param userIds - The users which clients should be updated
+   * @return true if one or many clients were added to one or many users
+   */
+  async updateMissingUsersClients(userIds: QualifiedId[]): Promise<boolean> {
+    const clients = await this.getClientsByUsers(userIds, false);
+    const users = flattenUserClientsQualifiedIds<ClientEntity>(clients);
+    const addedUsers = await Promise.all(
+      users.map(async ({userId, clients}) => {
+        return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).some(
+          wasAdded => wasAdded === true,
+        );
+      }),
+    );
+    return addedUsers.some(wasAdded => wasAdded === true);
+  }
 
   /**
    * Removes a stored client and the session connected with it.

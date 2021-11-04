@@ -50,7 +50,7 @@ import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {PromiseQueue} from 'Util/PromiseQueue';
 import {replaceLink, t} from 'Util/LocalizerUtil';
-import {getNextItem} from 'Util/ArrayUtil';
+import {getDifference, getNextItem} from 'Util/ArrayUtil';
 import {createRandomUuid, noop} from 'Util/util';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
 import {
@@ -121,6 +121,7 @@ import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {flattenUserClientsQualifiedIds} from './userClientsUtils';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -165,7 +166,7 @@ export class ConversationRepository {
 
   constructor(
     private readonly conversation_service: ConversationService,
-    private readonly messageRepositoryProvider: () => MessageRepository,
+    private readonly messageRepository: MessageRepository,
     private readonly connectionRepository: ConnectionRepository,
     private readonly eventRepository: EventRepository,
     private readonly teamRepository: TeamRepository,
@@ -177,6 +178,34 @@ export class ConversationRepository {
     private readonly conversationState = container.resolve(ConversationState),
   ) {
     this.eventService = eventRepository.eventService;
+    // we register a client mismatch handler agains the message repository so that we can react to missing members
+    // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
+    this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId) => {
+      const deleted = flattenUserClientsQualifiedIds(mismatch.deleted);
+      const missing = flattenUserClientsQualifiedIds(mismatch.missing);
+      const conversation = conversationId ? await this.getConversationById(conversationId) : undefined;
+      if (conversation) {
+        // add/remove users from the conversation (if any)
+        const missingUserIds = missing.map(({userId}) => userId);
+        const knownUsers = conversation.participating_user_ets().map(user => user.qualifiedId);
+        const missingUsers = getDifference(knownUsers, missingUserIds, matchQualifiedIds);
+        if (missingUsers.length) {
+          await this.addMissingMember(conversation, missingUsers, new Date(mismatch.time).getTime() - 1);
+        }
+      }
+
+      deleted.forEach(({userId, clients}) => {
+        clients.forEach(client => this.userRepository.removeClientFromUser(userId, client));
+      });
+      if (missing.length) {
+        const deviceWasAdded = await this.userRepository.updateMissingUsersClients(missing.map(({userId}) => userId));
+        if (deviceWasAdded && conversation) {
+          // TODO trigger degradation warning if needed and return false if sending should be canceled
+          return true;
+        }
+      }
+      return true;
+    });
 
     this.logger = getLogger('ConversationRepository');
 
@@ -531,7 +560,7 @@ export class ConversationRepository {
         const wrongMessageTypeForConversation = groupCreationMessageIn1to1 || one2oneConnectionMessageInGroup;
 
         if (wrongMessageTypeForConversation) {
-          this.messageRepositoryProvider().deleteMessage(conversationEntity, firstMessage);
+          this.messageRepository.deleteMessage(conversationEntity, firstMessage);
           conversationEntity.hasCreationMessage = false;
         } else {
           conversationEntity.hasCreationMessage = true;
@@ -975,10 +1004,7 @@ export class ConversationRepository {
 
     try {
       const conversationEntity = await this.getConversationById(conversation_id);
-      const messageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
-        conversationEntity,
-        message_id,
-      );
+      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, message_id);
       return conversationEntity.last_read_timestamp() >= messageEntity.timestamp();
     } catch (error) {
       const messageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -1372,7 +1398,7 @@ export class ConversationRepository {
       this.leaveCall(conversationEntity.id);
     }
 
-    this.messageRepositoryProvider().updateClearedTimestamp(conversationEntity);
+    this.messageRepository.updateClearedTimestamp(conversationEntity);
     this._clearConversation(conversationEntity);
 
     if (leaveConversation) {
@@ -1949,7 +1975,7 @@ export class ConversationRepository {
       userId: qualifiedUser,
     });
 
-    await this.messageRepositoryProvider().updateAllClients(conversationEntity, true);
+    await this.messageRepository.updateAllClients(conversationEntity, true);
 
     if (messageLegalHoldStatus === conversationEntity.legalHoldStatus()) {
       return conversationEntity;
@@ -2088,11 +2114,7 @@ export class ConversationRepository {
         const isRemoteEvent = eventFromStream || eventFromWebSocket;
 
         if (isRemoteEvent) {
-          this.messageRepositoryProvider().sendConfirmationStatus(
-            conversationEntity,
-            messageEntity,
-            Confirmation.Type.DELIVERED,
-          );
+          this.messageRepository.sendConfirmationStatus(conversationEntity, messageEntity, Confirmation.Type.DELIVERED);
         }
 
         if (!eventFromStream) {
@@ -2504,7 +2526,7 @@ export class ConversationRepository {
   private onMessageDeleted(conversationEntity: Conversation, eventJson: DeleteEvent) {
     const {data: eventData, from, id: eventId, time} = eventJson;
 
-    return this.messageRepositoryProvider()
+    return this.messageRepository
       .getMessageInConversationById(conversationEntity, eventData.message_id)
       .then(deletedMessageEntity => {
         if (deletedMessageEntity.ephemeral_expires()) {
@@ -2522,7 +2544,7 @@ export class ConversationRepository {
         }
       })
       .then(() => {
-        return this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
+        return this.messageRepository.deleteMessageById(conversationEntity, eventData.message_id);
       })
       .catch(error => {
         const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
@@ -2557,7 +2579,7 @@ export class ConversationRepository {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
       const conversationEntity = await this.getConversationById({domain: '', id: eventData.conversation_id});
-      return await this.messageRepositoryProvider().deleteMessageById(conversationEntity, eventData.message_id);
+      return await this.messageRepository.deleteMessageById(conversationEntity, eventData.message_id);
     } catch (error) {
       this.logger.info(
         `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
@@ -2580,10 +2602,7 @@ export class ConversationRepository {
     const messageId = eventData.message_id;
 
     try {
-      const messageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
-        conversationEntity,
-        messageId,
-      );
+      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
       if (!messageEntity || !messageEntity.isContent()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
@@ -2614,10 +2633,7 @@ export class ConversationRepository {
   private async onButtonActionConfirmation(conversationEntity: Conversation, eventJson: ButtonActionConfirmationEvent) {
     const {messageId, buttonId} = eventJson.data;
     try {
-      const messageEntity = await this.messageRepositoryProvider().getMessageInConversationById(
-        conversationEntity,
-        messageId,
-      );
+      const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, messageId);
       if (!messageEntity || !messageEntity.isComposite()) {
         const type = messageEntity ? messageEntity.type : 'unknown';
 
@@ -2678,11 +2694,11 @@ export class ConversationRepository {
         const isPingFromSelf = messageEntity.user().isMe && messageEntity.isPing();
         const deleteForSelf = isPingFromSelf || conversationEntity.removed_from_conversation();
         if (deleteForSelf) {
-          return this.messageRepositoryProvider().deleteMessage(conversationEntity, messageEntity);
+          return this.messageRepository.deleteMessage(conversationEntity, messageEntity);
         }
 
         const userIds = conversationEntity.isGroup() ? [this.userState.self().id, messageEntity.from] : undefined;
-        return this.messageRepositoryProvider().deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
+        return this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
       });
     }
   };
