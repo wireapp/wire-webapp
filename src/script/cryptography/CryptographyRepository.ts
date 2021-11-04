@@ -42,10 +42,8 @@ import {ClientEntity} from '../client/ClientEntity';
 import {CryptographyError} from '../error/CryptographyError';
 import {UserError} from '../error/UserError';
 import type {CryptographyService} from './CryptographyService';
-import type {StorageRepository, EventRecord} from '../storage';
+import type {EventRecord} from '../storage';
 import {EventBuilder} from '../conversation/EventBuilder';
-import {container} from 'tsyringe';
-import {Core} from '../service/CoreSingleton';
 
 export interface SignalingKeys {
   enckey: string;
@@ -66,10 +64,8 @@ export interface ClientKeys {
 export class CryptographyRepository {
   cryptobox?: Cryptobox;
   cryptographyMapper: CryptographyMapper;
-  cryptographyService: CryptographyService;
-  currentClient: ko.Observable<ClientEntity>;
+  currentClient?: ko.Observable<ClientEntity>;
   logger: Logger;
-  storageRepository: StorageRepository;
 
   static get CONFIG() {
     return {
@@ -81,28 +77,26 @@ export class CryptographyRepository {
     return '💣';
   }
 
-  constructor(
-    cryptographyService: CryptographyService,
-    storageRepository: StorageRepository,
-    private readonly core = container.resolve(Core),
-  ) {
-    this.cryptographyService = cryptographyService;
-    this.storageRepository = storageRepository;
+  constructor(private readonly cryptographyService: CryptographyService) {
     this.logger = getLogger('CryptographyRepository');
-
     this.cryptographyMapper = new CryptographyMapper();
-
-    this.currentClient = undefined;
-    this.cryptobox = undefined;
   }
 
-  setCryptobox(cryptobox: Cryptobox): void {
+  /**
+   * Inits the cryptography repository with the given cryptobox and for the given client
+   *
+   * @param cryptobox The cryptobox instance for handling encryption and decryption of messages
+   * @param client The local client of the logged user
+   */
+  init(cryptobox: Cryptobox, client: ko.Observable<ClientEntity>): void {
     this.cryptobox = cryptobox;
+    this.currentClient = client;
+
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, async preKeys => {
-      const serializedPreKeys = preKeys.map(preKey => this.cryptobox.serialize_prekey(preKey));
+      const serializedPreKeys = preKeys.map(preKey => cryptobox.serialize_prekey(preKey));
       this.logger.log(`Received '${preKeys.length}' new PreKeys.`, serializedPreKeys);
 
-      await this.cryptographyService.putClientPreKeys(this.currentClient().id, serializedPreKeys);
+      await this.cryptographyService.putClientPreKeys(client().id, serializedPreKeys);
       this.logger.log(`Successfully uploaded '${serializedPreKeys.length}' PreKeys.`, serializedPreKeys);
     });
 
@@ -114,26 +108,11 @@ export class CryptographyRepository {
   }
 
   /**
-   * Generate all keys needed for client registration.
-   * @returns Resolves with an array of last resort key, pre-keys, and signaling keys
-   */
-  async generateClientKeys(): Promise<ClientKeys> {
-    try {
-      const lastResortKey = await this.cryptobox.get_serialized_last_resort_prekey();
-      const preKeys = await this.cryptobox.get_serialized_standard_prekeys();
-      const sigkeys = this.generateSignalingKeys();
-      return {lastResortKey, preKeys, signalingKeys: sigkeys};
-    } catch (error) {
-      throw new Error(`Failed to generate client keys: ${error.message}`);
-    }
-  }
-
-  /**
    * Get the fingerprint of the local identity.
    * @returns Fingerprint of local identity public key
    */
   getLocalFingerprint(): string {
-    return this.cryptobox.getIdentity().public_key.fingerprint();
+    return this.cryptobox!.getIdentity().public_key.fingerprint();
   }
 
   /**
@@ -143,7 +122,11 @@ export class CryptographyRepository {
    * @param preKey PreKey to initialize a session from
    * @returns Resolves with the remote fingerprint
    */
-  async getRemoteFingerprint(userId: QualifiedId, clientId: string, preKey?: BackendPreKey): Promise<string> {
+  async getRemoteFingerprint(
+    userId: QualifiedId,
+    clientId: string,
+    preKey?: BackendPreKey,
+  ): Promise<string | undefined> {
     const cryptoboxSession = preKey
       ? await this.createSessionFromPreKey(preKey, userId, clientId)
       : await this.loadSession(userId, clientId);
@@ -157,7 +140,7 @@ export class CryptographyRepository {
    * @param clientId Client ID
    * @returns Resolves with a map of pre-keys for the requested clients
    */
-  getUserPreKeyByIds(userId: QualifiedId, clientId: string): Promise<BackendPreKey> {
+  private getUserPreKeyByIds(userId: QualifiedId, clientId: string): Promise<BackendPreKey> {
     return this.cryptographyService
       .getUserPreKeyByIds(userId, clientId)
       .then(response => response.prekey)
@@ -192,30 +175,16 @@ export class CryptographyRepository {
   private loadSession(userId: QualifiedId, clientId: string): Promise<CryptoboxSession | void> {
     const sessionId = constructClientPrimaryKey(userId, clientId);
 
-    return this.cryptobox.session_load(sessionId).catch(() => {
+    return this.cryptobox!.session_load(sessionId).catch(() => {
       return this.getUserPreKeyByIds(userId, clientId).then(preKey => {
         return this.createSessionFromPreKey(preKey, userId, clientId);
       });
     });
   }
 
-  /**
-   * Generate the signaling keys (which are used for mobile push notifications).
-   * @note Signaling Keys are required by the backend but unimportant for the webapp
-   *   (because they are used for iOS or Android push notifications).
-   *   Thus this method returns a static Signaling Key Pair.
-   */
-  private generateSignalingKeys(): SignalingKeys {
-    return {
-      enckey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
-      mackey: 'Wuec0oJi9/q9VsgOil9Ds4uhhYwBT+CAUrvi/S9vcz0=',
-    };
-  }
-
   deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
     const sessionId = constructClientPrimaryKey(userId, clientId);
-    this.core.service!.cryptography.cryptobox.session_delete(sessionId);
-    return this.cryptobox.session_delete(sessionId);
+    return this.cryptobox!.session_delete(sessionId);
   }
 
   /**
@@ -325,7 +294,7 @@ export class CryptographyRepository {
         );
         const sessionId = constructClientPrimaryKey({domain, id: userId}, clientId);
         const preKeyArray = base64ToArray(preKey.key);
-        return await this.cryptobox.session_from_prekey(sessionId, preKeyArray.buffer);
+        return await this.cryptobox!.session_from_prekey(sessionId, preKeyArray.buffer);
       }
     } catch (error) {
       const message = `Pre-key for user '${userId}' ('${clientId}') invalid. Skipping encryption: ${error.message}`;
@@ -377,7 +346,6 @@ export class CryptographyRepository {
       if (clientPreKeyMap && Object.keys(clientPreKeyMap).length) {
         for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
           if (preKeyPayload) {
-            // TODO(Federation): Update code once connections are implemented on the backend
             const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
             const encryptionPromise = this.encryptPayloadForSession(
               sessionId,
@@ -442,9 +410,7 @@ export class CryptographyRepository {
     const cipherText = cipherTextArray.buffer;
     const sessionId = constructClientPrimaryKey(userId, eventData.sender);
 
-    const plaintext = isFederatedEnv
-      ? await this.core.service.cryptography.cryptobox.decrypt(sessionId, cipherText)
-      : await this.cryptobox.decrypt(sessionId, cipherText);
+    const plaintext = await this.cryptobox!.decrypt(sessionId, cipherText);
     return GenericMessage.decode(plaintext);
   }
 
@@ -464,7 +430,7 @@ export class CryptographyRepository {
   ): Promise<EncryptedPayload> {
     try {
       const messageArray = GenericMessage.encode(genericMessage).finish();
-      const cipherText = await this.cryptobox.encrypt(sessionId, messageArray, preKeyBundle);
+      const cipherText = await this.cryptobox!.encrypt(sessionId, messageArray, preKeyBundle);
       const cipherTextArray = arrayToBase64(cipherText);
       return {cipherText: cipherTextArray, sessionId};
     } catch (error) {

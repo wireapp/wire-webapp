@@ -237,7 +237,7 @@ class App {
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
-    repositories.cryptography = new CryptographyRepository(new CryptographyService(), repositories.storage);
+    repositories.cryptography = new CryptographyRepository(new CryptographyService());
     repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
@@ -418,14 +418,14 @@ class App {
       loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
-      callingRepository.initAvs(selfUser, clientEntity.id);
+      callingRepository.initAvs(selfUser, clientEntity().id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
 
       const core = container.resolve(Core);
       await core.init(clientType, undefined, this.service.storage['engine']);
-      await cryptographyRepository.setCryptobox(core.service!.cryptography.cryptobox);
+      await cryptographyRepository.init(core.service!.cryptography.cryptobox, clientEntity);
 
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
@@ -631,11 +631,10 @@ class App {
     return this.repository.client
       .getValidLocalClient()
       .then(clientObservable => {
-        this.repository.cryptography.currentClient = clientObservable;
         this.repository.event.currentClient = clientObservable;
         return this.repository.client.getClientsForSelf();
       })
-      .then(() => this.repository.client['clientState'].currentClient());
+      .then(() => this.repository.client['clientState'].currentClient);
   }
 
   /**
