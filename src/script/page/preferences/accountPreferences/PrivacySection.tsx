@@ -27,6 +27,7 @@ import {PropertiesRepository} from '../../../properties/PropertiesRepository';
 import {AppLockRepository} from '../../../user/AppLockRepository';
 import {formatDurationCaption} from 'Util/TimeUtil';
 import PreferencesSection from './PreferencesSection';
+import PreferencesCheckbox from './PreferencesCheckbox';
 
 interface PrivacySectionProps {
   appLockRepository?: AppLockRepository;
@@ -50,45 +51,28 @@ const PrivacySection: React.FC<PrivacySectionProps> = ({
   const {receiptMode} = useKoSubscribableChildren(propertiesRepository, ['receiptMode']);
   return (
     <PreferencesSection className="preferences-section-privacy" title={t('preferencesAccountPrivacy')}>
-      <div className="preferences-option">
-        <div className="preferences-option-icon checkbox accent-text" data-uie-name="status-preference-read-receipts">
-          <input
-            type="checkbox"
-            id="read-receipts-checkbox"
-            checked={receiptMode === RECEIPT_MODE.ON}
-            onChange={({target}) =>
-              propertiesRepository.updateProperty(
-                PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
-                target.checked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
-              )
-            }
-          />
-          <label className="preferences-options-checkbox-label" htmlFor="read-receipts-checkbox">
-            {t('preferencesAccountReadReceiptsCheckbox')}
-          </label>
-        </div>
-      </div>
-      <div className="preferences-detail" data-bind="text: t('preferencesAccountReadReceiptsDetail')"></div>
+      <PreferencesCheckbox
+        checked={receiptMode === RECEIPT_MODE.ON}
+        onChange={checked =>
+          propertiesRepository.updateProperty(
+            PropertiesRepository.CONFIG.WIRE_RECEIPT_MODE.key,
+            checked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF,
+          )
+        }
+        label={t('preferencesAccountReadReceiptsCheckbox')}
+        details={t('preferencesAccountReadReceiptsDetail')}
+        uieName="status-preference-read-receipts"
+      />
+
       {isAppLockAvailable && (
-        <>
-          <div className="preferences-option">
-            <div className="preferences-option-icon checkbox accent-text" data-uie-name="status-preference-applock">
-              <input
-                type="checkbox"
-                id="app-lock-checkbox"
-                disabled={isAppLockEnforced}
-                checked={isAppLockEnabled}
-                onChange={({target}) => appLockRepository.setEnabled(target.checked)}
-              />
-              <label className="preferences-options-checkbox-label" htmlFor="app-lock-checkbox">
-                {t('preferencesAccountAppLockCheckbox')}
-              </label>
-            </div>
-          </div>
-          <div className="preferences-detail">
-            {t('preferencesAccountAppLockDetail', formatDurationCaption(appLockInactivityTimeoutSecs * 1000))}
-          </div>
-        </>
+        <PreferencesCheckbox
+          checked={isAppLockEnabled}
+          disabled={isAppLockEnforced}
+          onChange={checked => appLockRepository.setEnabled(checked)}
+          label={t('preferencesAccountAppLockCheckbox')}
+          details={t('preferencesAccountAppLockDetail', formatDurationCaption(appLockInactivityTimeoutSecs * 1000))}
+          uieName="status-preference-applock"
+        />
       )}
     </PreferencesSection>
   );
