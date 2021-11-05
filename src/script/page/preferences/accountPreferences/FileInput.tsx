@@ -25,11 +25,11 @@ interface FileInputProps extends React.HTMLProps<HTMLInputElement> {
   onFileChange?: (files: FileList) => void;
 }
 
-const FileInput: React.FC<FileInputProps> = ({fileTypes, onFileChange, ...rest}) => {
+const FileInput: React.FC<FileInputProps> = ({fileTypes = ['*'], onFileChange, ...rest}) => {
   return (
     <input
       type="file"
-      accept={fileTypes?.join(',') ?? '*'}
+      accept={fileTypes.join(',')}
       onChange={({target}) => {
         if (target.files.length > 0) {
           onFileChange?.(target.files);

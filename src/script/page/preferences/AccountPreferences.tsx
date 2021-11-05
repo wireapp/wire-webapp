@@ -18,9 +18,7 @@
  */
 
 import {Runtime} from '@wireapp/commons';
-import {Availability} from '@wireapp/protocol-messaging';
 
-import AvailabilityState from 'Components/AvailabilityState';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
 import React, {useEffect, useRef} from 'react';
 import {container} from 'tsyringe';
@@ -30,9 +28,7 @@ import useEffectRef from 'Util/useEffectRef';
 import {ClientRepository} from '../../client/ClientRepository';
 import {User} from '../../entity/User';
 import {TeamState} from '../../team/TeamState';
-import {AvailabilityContextMenu} from '../../ui/AvailabilityContextMenu';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
-import {nameFromType} from '../../user/AvailabilityMapper';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
@@ -56,6 +52,7 @@ import {ConversationRepository} from '../../conversation/ConversationRepository'
 import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import AvatarInput from './accountPreferences/AvatarInput';
 import NameInput from './accountPreferences/NameInput';
+import AvailabilityInput from './accountPreferences/AvailabilityInput';
 
 interface AccountPreferencesProps {
   clientRepository: ClientRepository;
@@ -109,36 +106,48 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">{t('preferencesAccount')}</div>
       <div className="preferences-content" ref={setScrollbarRef}>
-        {name}
-        <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
-        {isTeam && (
+        <div
+          css={{
+            alignItems: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 16,
+            paddingBottom: 32,
+            width: 560,
+          }}
+        >
           <div
-            onClick={event => {
-              AvailabilityContextMenu.show(event.nativeEvent, 'preferences-account-availability-menu');
+            css={{
+              fontWeight: 400,
             }}
           >
-            <AvailabilityState
-              label={
-                availability === Availability.Type.NONE
-                  ? t('preferencesAccountAvailabilityUnset')
-                  : nameFromType(availability)
-              }
-              availability={availability}
-              showArrow
-              dataUieName="status-availability-in-profile"
-            />
+            {name}
           </div>
-        )}
-        {canEditProfile && (
-          <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
-        )}
+          <div>
+            <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
+          </div>
+          {isTeam && <AvailabilityInput {...{availability}} />}
+          {canEditProfile && (
+            <div>
+              <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
+            </div>
+          )}
+        </div>
         <PreferencesSection title={t('preferencesAccountInfo')}>
-          <NameInput {...{canEditProfile, name, userRepository}} />
-          <UsernameInput {...{canEditProfile, userRepository, username}} domain={selfUser.domain} />
-          <EmailInput {...{canEditProfile, email, userRepository}} />
-          {richFields.map(({type, value}) => (
-            <AccountInput key={type} label={type} value={value} readOnly />
-          ))}
+          <div
+            css={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+            }}
+          >
+            <NameInput {...{canEditProfile, name, userRepository}} />
+            <UsernameInput {...{canEditProfile, userRepository, username}} domain={selfUser.domain} />
+            <EmailInput {...{canEditProfile, email, userRepository}} />
+            {richFields.map(({type, value}) => (
+              <AccountInput key={type} label={type} value={value} readOnly />
+            ))}
+          </div>
         </PreferencesSection>
         <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />
         <PrivacySection {...{propertiesRepository}} />

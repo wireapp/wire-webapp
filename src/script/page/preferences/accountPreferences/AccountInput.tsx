@@ -1,5 +1,25 @@
+/*
+ * Wire
+ * Copyright (C) 2021 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import React, {useEffect, useState} from 'react';
 import Icon from 'Components/Icon';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import useIsMounted from 'Util/useIsMounted';
 import {MotionDuration} from '../../../motion/MotionDuration';
 
 interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -10,19 +30,6 @@ interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   readOnly?: boolean;
   suffix?: string;
   value: string;
-}
-
-function useIsMounted() {
-  const isMounted = useRef(false);
-
-  useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-
-  return useCallback(() => isMounted.current, []);
 }
 
 export const useInputDone = () => {
@@ -50,35 +57,118 @@ const AccountInput: React.FC<AccountInputProps> = ({
   readOnly,
   onValueChange,
   isDone = false,
+  prefix,
+  suffix,
   ...rest
 }) => {
   const [input, setInput] = useState<string>();
+  const [isEditing, setIsEditing] = useState(false);
   useEffect(() => {
     setInput(value);
   }, [value]);
   return (
-    <div>
-      <label>{label}</label>
-      <input
-        readOnly={readOnly}
-        value={input}
-        onChange={({target}) => setInput(target.value)}
-        onKeyPress={event => {
-          if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
-            event.preventDefault();
-            onValueChange?.(input);
-            (event.target as HTMLInputElement).blur();
-          }
+    <div
+      css={{
+        '.edit-icon': {
+          opacity: 0,
+          transition: 'opacity 0.2s ease-in-out',
+        },
+        ':hover .edit-icon': {
+          opacity: 1,
+        },
+        backgroundColor: isEditing ? 'white' : 'transparent',
+        display: 'flex',
+        flexDirection: 'column',
+        height: 56,
+        marginBottom: 8,
+
+        padding: 8,
+
+        svg: {marginLeft: 8},
+
+        width: 280,
+      }}
+    >
+      <label
+        css={{
+          color: 'var(--foreground)',
+          fontSize: '12px',
+          fontWeight: 'normal',
+          lineHeight: '1.33',
+          marginBottom: 2,
         }}
-        onBlur={() => setInput(value)}
-        spellCheck={false}
-        {...rest}
-      />
-      {isDone ? (
-        <Icon.AnimatedCheck data-uie-name="enter-username-icon-check" />
-      ) : (
-        <Icon.Edit data-uie-name="enter-username-icon" />
-      )}
+      >
+        {label}
+      </label>
+      <div
+        css={{
+          position: 'relative',
+        }}
+      >
+        <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
+          <span css={{borderBottom: readOnly || isEditing ? 'none' : '1px dotted var(--foreground)'}}>
+            <span
+              css={{
+                opacity: isEditing ? 0.4 : 1,
+              }}
+            >
+              {prefix}
+            </span>
+            <span css={{opacity: 0}}>{input}</span>
+            <span
+              css={{
+                opacity: isEditing ? 0.4 : 1,
+              }}
+            >
+              {suffix}
+            </span>
+          </span>
+          {isDone ? (
+            <Icon.AnimatedCheck css={{path: {stroke: 'var(--foreground)'}}} data-uie-name="enter-username-icon-check" />
+          ) : (
+            !readOnly &&
+            !isEditing && (
+              <Icon.Edit css={{fill: 'var(--foreground)'}} className="edit-icon" data-uie-name="enter-username-icon" />
+            )
+          )}
+        </div>
+        <div
+          css={{
+            alignItems: 'center',
+            display: 'flex',
+            lineHeight: '1.38',
+            position: 'absolute',
+          }}
+        >
+          <span css={{opacity: 0}}>{prefix}</span>
+          <input
+            css={{
+              backgroundColor: 'transparent',
+              border: 'none',
+              fontSize: '16px',
+              outline: 'none',
+              padding: 0,
+            }}
+            readOnly={readOnly}
+            value={input}
+            onChange={({target}) => setInput(target.value)}
+            onKeyPress={event => {
+              if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
+                event.preventDefault();
+                onValueChange?.(input);
+                (event.target as HTMLInputElement).blur();
+              }
+            }}
+            onBlur={() => {
+              setInput(value);
+              setIsEditing(false);
+            }}
+            onFocus={() => setIsEditing(true)}
+            spellCheck={false}
+            {...rest}
+          />
+        </div>
+      </div>
     </div>
   );
 };
