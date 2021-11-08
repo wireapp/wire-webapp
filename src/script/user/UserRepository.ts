@@ -38,6 +38,7 @@ import type {QualifiedUserClientMap} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import type {PublicClient, AddedClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
 
@@ -589,15 +590,19 @@ export class UserRepository {
     return user;
   }
 
-  async getUserByHandle(fqn: QualifiedHandle): Promise<void | APIClientUser> {
+  async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
     try {
       return await this.userService.getUserByFQN(fqn);
     } catch (error) {
       // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
-      if (!isBackendError(error) || error.code !== HTTP_STATUS.NOT_FOUND) {
+      if (
+        !isBackendError(error) ||
+        (error.code !== HTTP_STATUS.NOT_FOUND && error.label !== BackendErrorLabel.FEDERATION_NOT_ALLOWED)
+      ) {
         throw error;
       }
     }
+    return undefined;
   }
 
   /**
