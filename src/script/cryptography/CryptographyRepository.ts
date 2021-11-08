@@ -346,8 +346,7 @@ export class CryptographyRepository {
         if (clientIds && clientIds.length) {
           messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
-            // TODO(Federation): Update code once federated messages are sent with '@wireapp/core'
-            const sessionId = constructClientPrimaryKey(this.wrapInQualifiedId(userId), clientId);
+            const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
 
             accumulator.push(encryptionPromise);
@@ -430,29 +429,15 @@ export class CryptographyRepository {
   }
 
   /**
-   * Will wrap an userId in a qualified id with the correct domain set depending on the env the app runs in:
-   *   - In a non-federated env, domain will be an empty string
-   *   - In a federated env, the domain will be the domain of the current federated backend
-   * @param userId
-   * @returns QualifiedId
-   */
-  private wrapInQualifiedId(userId: string): QualifiedId {
-    const config = Config.getConfig().FEATURE;
-    const domain = config.ENABLE_FEDERATION ? config.FEDERATION_DOMAIN : '';
-    return {domain, id: userId};
-  }
-
-  /**
    * Decrypt an event.
    *
    * @param event Backend event to decrypt
    * @returns Resolves with the decrypted message in ProtocolBuffer format
    */
   private async decryptEvent(event: EventRecord): Promise<GenericMessage> {
-    const config = Config.getConfig().FEATURE;
-    const isFederatedEnv = config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+    const isFederatedEnv = Config.getConfig().FEATURE.ENABLE_FEDERATION;
     const {data: eventData, from, qualified_from} = event;
-    const userId = isFederatedEnv ? qualified_from : this.wrapInQualifiedId(from);
+    const userId = isFederatedEnv ? qualified_from : {domain: '', id: from};
     const cipherTextArray = base64ToArray(eventData.text || eventData.key);
     const cipherText = cipherTextArray.buffer;
     const sessionId = constructClientPrimaryKey(userId, eventData.sender);
