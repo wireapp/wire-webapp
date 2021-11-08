@@ -143,9 +143,10 @@ export class TeamRepository {
 
   getTeam = async (): Promise<TeamEntity> => {
     const selfTeamId = this.userState.self().teamId;
-    const teamData = selfTeamId ? await this.getTeamById() : await this.getBindingTeam();
+    const teamData = selfTeamId ? await this.getTeamById(selfTeamId) : await this.getBindingTeam();
+    const baseTeamEntity = new TeamEntity();
 
-    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
+    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, baseTeamEntity) : baseTeamEntity;
     this.teamState.team(teamEntity);
     if (selfTeamId) {
       await this.getSelfMember(selfTeamId);
@@ -299,7 +300,7 @@ export class TeamRepository {
       this.teamState.memberInviters({});
     }
     const userEntities = await this.userRepository.getUsersById(
-      memberIds.map(memberId => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: memberId})),
+      memberIds.map(memberId => ({domain: this.teamState.teamDomain(), id: memberId})),
     );
 
     if (append) {
@@ -320,7 +321,7 @@ export class TeamRepository {
 
       const memberIds = teamMembers
         .filter(({userId}) => userId !== this.userState.self().id)
-        .map(memberEntity => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN, id: memberEntity.userId}));
+        .map(memberEntity => ({domain: this.teamState.teamDomain(), id: memberEntity.userId}));
 
       const userEntities = await this.userRepository.getUsersById(memberIds);
       teamEntity.members(userEntities);
@@ -336,8 +337,8 @@ export class TeamRepository {
     }
   }
 
-  private getTeamById(): Promise<TeamData> {
-    return this.teamService.getTeamById(this.userState.self().teamId);
+  private getTeamById(teamId: string): Promise<TeamData> {
+    return this.teamService.getTeamById(teamId);
   }
 
   private getBindingTeam(): Promise<TeamData | undefined> {

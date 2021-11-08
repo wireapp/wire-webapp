@@ -413,20 +413,18 @@ class App {
       this._registerSingleInstance();
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-      const context = await authRepository.init();
-      await this.initiateSelfUser();
-      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository['userState'].self().name()));
+      const {clientType} = await authRepository.init();
+      const selfUser = await this.initiateSelfUser();
+      loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
-      const selfUser = userRepository['userState'].self();
       callingRepository.initAvs(selfUser, clientEntity.id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
 
       const core = container.resolve(Core);
-      await core.init(context.clientType, undefined, this.service.storage['engine']);
-      await core.initClient({clientType: context.clientType});
+      await core.init(clientType, undefined, this.service.storage['engine']);
       await cryptographyRepository.setCryptobox(core.service!.cryptography.cryptobox);
 
       loadingView.updateProgress(10);
