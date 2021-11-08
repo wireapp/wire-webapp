@@ -223,7 +223,7 @@ export class Conversation {
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
     this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
     this.hasFederatedUsers = ko.pureComputed(() =>
-      this.participating_user_ets().some(userEntity => !userEntity.isOnSameFederatedDomain()),
+      this.participating_user_ets().some(userEntity => userEntity.isFederated),
     );
     this.servicesCount = ko.pureComputed(
       () => this.participating_user_ets().filter(userEntity => userEntity.isService).length,

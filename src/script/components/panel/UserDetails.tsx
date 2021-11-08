@@ -52,7 +52,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
     amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
 
-  const isFederated = !participant.isOnSameFederatedDomain();
+  const isFederated = participant.isFederated;
   const isGuest = !isFederated && participant.isGuest();
 
   return (
