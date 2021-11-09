@@ -18,11 +18,10 @@
  */
 
 import type {RichInfoField} from '@wireapp/api-client/src/user/RichInfo';
-import ko from 'knockout';
 import React, {useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {noop} from 'Util/util';
 
@@ -36,17 +35,17 @@ export interface EnrichedFieldsProps {
   user: User;
 }
 
-const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
-  onFieldsLoaded = noop,
-  richProfileRepository = container.resolve(RichProfileRepository),
-  user,
-}) => {
+export const useEnrichedFields = (
+  user: User,
+  addEmail: boolean,
+  richProfileRepository: RichProfileRepository,
+  onFieldsLoaded: (richFields: RichInfoField[]) => void = noop,
+) => {
   const [fields, setFields] = useState<RichInfoField[]>([]);
-  const email: string = useKoSubscribable(user?.email || ko.observable());
-
+  const {email} = useKoSubscribableChildren(user, ['email']);
   useEffect(() => {
     let cancel = false;
-    const returnFields: RichInfoField[] = email ? [{type: t('userProfileEmail'), value: email}] : [];
+    const returnFields: RichInfoField[] = addEmail && email ? [{type: t('userProfileEmail'), value: email}] : [];
 
     if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
       if (user.domain) {
@@ -74,8 +73,16 @@ const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
     return () => {
       cancel = true;
     };
-  }, [user, email]);
+  }, [user, addEmail && email]);
+  return fields;
+};
 
+const EnrichedFields: React.FC<EnrichedFieldsProps> = ({
+  onFieldsLoaded = noop,
+  richProfileRepository = container.resolve(RichProfileRepository),
+  user,
+}) => {
+  const fields = useEnrichedFields(user, true, richProfileRepository, onFieldsLoaded);
   return (
     fields && (
       <div className="enriched-fields">

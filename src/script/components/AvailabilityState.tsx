@@ -105,8 +105,10 @@ const AvailabilityState: React.FC<AvailabilityStateProps> = ({
               height: 0,
               width: 0,
             },
-            display: 'inline-block',
+            alignItems: 'center',
+            display: 'inline-flex',
             marginLeft: 4,
+            marginTop: 4,
             paddingBottom: 4,
             ...CSS_SQUARE(16),
           }}

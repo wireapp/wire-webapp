@@ -45,7 +45,6 @@ import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
-import {PreferencesAccountViewModel} from './content/PreferencesAccountViewModel';
 import {TitleBarViewModel} from './content/TitleBarViewModel';
 import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
 import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
@@ -63,6 +62,7 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from '../conversation/ConversationState';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import '../page/preferences/AccountPreferences';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -97,7 +97,6 @@ export class ContentViewModel {
   mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
   preferencesAbout: PreferencesAboutViewModel;
-  preferencesAccount: PreferencesAccountViewModel;
   preferencesAV: PreferencesAVViewModel;
   preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
   preferencesDevices: PreferencesDevicesViewModel;
@@ -129,7 +128,7 @@ export class ContentViewModel {
     };
   }
 
-  constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
+  constructor(mainViewModel: MainViewModel, public repositories: ViewModelRepositories) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
@@ -181,13 +180,6 @@ export class ContentViewModel {
     this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
     this.preferencesAbout = new PreferencesAboutViewModel();
-    this.preferencesAccount = new PreferencesAccountViewModel(
-      repositories.client,
-      repositories.conversation,
-      repositories.preferenceNotification,
-      repositories.properties,
-      repositories.user,
-    );
     this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.properties, repositories.calling, {
       replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
       stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
@@ -209,9 +201,6 @@ export class ContentViewModel {
         case ContentViewModel.STATE.CONVERSATION:
           this.inputBar.addedToView();
           this.titleBar.addedToView();
-          break;
-        case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
-          this.preferencesAccount.popNotification();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
           this.preferencesAV.updateMediaStreamTrack(MediaType.AUDIO_VIDEO);
