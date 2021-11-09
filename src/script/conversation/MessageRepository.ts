@@ -1796,6 +1796,12 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
+    const selfConversation = this.conversationState.self_conversation();
+    if (selfConversation && selfConversation.isFederated()) {
+      // TODO(federation)
+      this.logger.warn('syncly not implemented for federated env');
+      return;
+    }
     const protoDataTransfer = new DataTransfer({
       trackingIdentifier: {
         identifier: countlyId,
@@ -1806,10 +1812,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(
-      genericMessage,
-      this.conversationState.self_conversation()?.qualifiedId,
-    );
+    const eventInfoEntity = new EventInfoEntity(genericMessage, selfConversation.qualifiedId);
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       this.logger.info(`Sent countly sync message with ID ${countlyId}`);
