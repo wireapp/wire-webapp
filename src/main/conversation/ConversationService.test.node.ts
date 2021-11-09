@@ -19,8 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client';
-import {UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
-import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {MemoryEngine} from '@wireapp/store-engine';
 import {PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '.';
 
@@ -29,31 +28,6 @@ import * as PayloadHelper from '../test/PayloadHelper';
 import {MentionContent, QuoteContent} from './content';
 import {OtrMessage} from './message/OtrMessage';
 
-const createMessage = (content: string) => {
-  const customTextMessage = GenericMessage.create({
-    messageId: PayloadHelper.getUUID(),
-    text: Text.create({content}),
-  });
-
-  return GenericMessage.encode(customTextMessage).finish();
-};
-
-const generatePreKeyBundle = (userCount: number, clientsPerUser: number): UserPreKeyBundleMap => {
-  const prekeyBundle: UserPreKeyBundleMap = {};
-  for (let userIndex = 0; userIndex < userCount; userIndex++) {
-    const userId = PayloadHelper.getUUID();
-    prekeyBundle[userId] = {};
-    for (let clientIndex = 0; clientIndex < clientsPerUser; clientIndex++) {
-      const clientId = PayloadHelper.getUUID();
-      prekeyBundle[userId][clientId] = {
-        id: -1,
-        key: '',
-      };
-    }
-  }
-  return prekeyBundle;
-};
-
 describe('ConversationService', () => {
   let account: Account;
 
@@ -61,29 +35,6 @@ describe('ConversationService', () => {
     const client = new APIClient({urls: APIClient.BACKEND.STAGING});
     account = new Account(client);
     await account.initServices(new MemoryEngine());
-  });
-
-  describe("'shouldSendAsExternal'", () => {
-    it('returns true for a big payload', () => {
-      const preKeyBundles = generatePreKeyBundle(128, 4);
-
-      const longMessage =
-        'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem';
-      const plainText = createMessage(longMessage);
-
-      const shouldSendAsExternal = account.service!.conversation['shouldSendAsExternal'](plainText, preKeyBundles);
-      expect(shouldSendAsExternal).toBe(true);
-    });
-
-    it('returns false for a small payload', async () => {
-      const preKeyBundles = generatePreKeyBundle(2, 1);
-
-      const shortMessage = PayloadHelper.getUUID();
-      const plainText = createMessage(shortMessage);
-
-      const shouldSendAsExternal = account.service!.conversation['shouldSendAsExternal'](plainText, preKeyBundles);
-      expect(shouldSendAsExternal).toBe(false);
-    });
   });
 
   describe('"send"', () => {

@@ -21,7 +21,7 @@ import type {QualifiedUserClients, UserClients} from '@wireapp/api-client/src/co
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
 export function isStringArray(obj: any): obj is string[] {
-  return Array.isArray(obj) && typeof obj[0] === 'string';
+  return Array.isArray(obj) && (obj.length === 0 || typeof obj[0] === 'string');
 }
 
 export function isQualifiedId(obj: any): obj is QualifiedId {
@@ -37,10 +37,7 @@ export function isQualifiedUserClients(obj: any): obj is QualifiedUserClients {
     const firstUserClientObject = Object.values(obj)?.[0];
     if (typeof firstUserClientObject === 'object') {
       const firstClientIdArray = Object.values(firstUserClientObject as object)[0];
-      if (Array.isArray(firstClientIdArray)) {
-        const firstClientId = firstClientIdArray[0];
-        return typeof firstClientId === 'string' || typeof firstClientId === 'undefined';
-      }
+      return isStringArray(firstClientIdArray);
     }
   }
   return false;
@@ -49,10 +46,7 @@ export function isQualifiedUserClients(obj: any): obj is QualifiedUserClients {
 export function isUserClients(obj: any): obj is UserClients {
   if (typeof obj === 'object') {
     const firstUserClientArray = Object.values(obj)?.[0];
-    if (Array.isArray(firstUserClientArray)) {
-      const firstClientId = firstUserClientArray[0];
-      return typeof firstClientId === 'string';
-    }
+    return isStringArray(firstUserClientArray);
   }
   return false;
 }
