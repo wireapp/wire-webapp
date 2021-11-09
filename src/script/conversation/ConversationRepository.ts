@@ -87,7 +87,7 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {SystemMessageType} from '../message/SystemMessageType';
 import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
@@ -121,7 +121,12 @@ import {UserFilter} from '../user/UserFilter';
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationMemberUpdateEvent} from '@wireapp/api-client/src/event';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {flattenUserClientsQualifiedIds} from './userClientsUtils';
+import {isQualifiedUserClients} from '@wireapp/core/src/main/util';
+import {
+  flattenQualifiedUserClients,
+  flattenUserClients,
+} from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
 type FetchPromise = {rejectFn: (error: ConversationError) => void; resolveFn: (conversation: Conversation) => void};
@@ -181,8 +186,13 @@ export class ConversationRepository {
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId) => {
-      const deleted = flattenUserClientsQualifiedIds(mismatch.deleted);
-      const missing = flattenUserClientsQualifiedIds(mismatch.missing);
+      const deleted = isQualifiedUserClients(mismatch.deleted)
+        ? flattenQualifiedUserClients(mismatch.deleted)
+        : flattenUserClients(mismatch.deleted);
+      const missing = isQualifiedUserClients(mismatch.missing)
+        ? flattenQualifiedUserClients(mismatch.missing)
+        : flattenUserClients(mismatch.missing);
+
       const conversation = conversationId ? await this.getConversationById(conversationId) : undefined;
       if (conversation) {
         // add/remove users from the conversation (if any)
@@ -194,17 +204,19 @@ export class ConversationRepository {
         }
       }
 
-      deleted.forEach(({userId, clients}) => {
-        clients.forEach(client => this.userRepository.removeClientFromUser(userId, client));
+      deleted.forEach(({userId, data}) => {
+        data.forEach(client => this.userRepository.removeClientFromUser(userId, client));
       });
       if (missing.length) {
+        const wasVerified = conversation?.is_verified();
         const deviceWasAdded = await this.userRepository.updateMissingUsersClients(missing.map(({userId}) => userId));
-        if (deviceWasAdded && conversation) {
-          // TODO trigger degradation warning if needed and return false if sending should be canceled
-          return true;
+        if (wasVerified && deviceWasAdded) {
+          // if the conversation is verified but some clients were missing, it means the conversation will degrade.
+          // We need to warn the user of the degradation and ask his permission to actually send the message
+          conversation.verification_state(ConversationVerificationState.DEGRADED);
         }
       }
-      return true;
+      return this.requestUserSendingPermission(conversation);
     });
 
     this.logger = getLogger('ConversationRepository');
@@ -245,6 +257,36 @@ export class ConversationRepository {
     this.leaveCall = noop;
   }
 
+  /**
+   * Will request user permission before sending a message in case the conversation is in a degraded state
+   *
+   * @param conversation The conversation to send the message in
+   * @returns Resolves to true if the message can be sent, false if the user didn't give their permission
+   */
+  requestUserSendingPermission(conversation: Conversation): Promise<boolean> {
+    if (conversation.verification_state() !== ConversationVerificationState.DEGRADED) {
+      return Promise.resolve(true);
+    }
+    const actionString = t('modalConversationNewDeviceAction');
+    const messageString = t('modalConversationNewDeviceMessage');
+    const titleString = t('modalConversationNewDeviceHeadlineMany'); // TODO get user names
+
+    return new Promise(resolve => {
+      const options: ModalOptions = {
+        close: () => resolve(false),
+        primaryAction: {
+          action: () => resolve(true),
+          text: actionString,
+        },
+        text: {
+          message: messageString,
+          title: titleString,
+        },
+      };
+
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, options, `degraded-${conversation.id}`);
+    });
+  }
   checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
   }
