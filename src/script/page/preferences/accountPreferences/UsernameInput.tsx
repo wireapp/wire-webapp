@@ -35,9 +35,11 @@ interface UsernameInputProps {
 
 const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepository, canEditProfile}) => {
   const [errorState, setErrorState] = useState<string>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [requestedName, setRequestedName] = useState<string>(null);
 
   const verifyUsername = (enteredUsername: string): void => {
+    console.log({enteredUsername});
     const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     const usernameUnchanged = enteredUsername === username;
     if (usernameTooShort || usernameUnchanged) {
@@ -65,7 +67,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
     }
   };
   return (
-    <>
+    <div>
       <AccountInput
         label="Username"
         value={username}
@@ -73,21 +75,22 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         readOnly={!canEditProfile}
         prefix="@"
         suffix={`@${domain}`}
+        setIsEditing={setIsEditing}
       />
       {canEditProfile && (
         <div
           className={cx('font-size-xs', {
             'preferences-account-username-error': errorState,
-            'preferences-account-username-hint text-foreground': !errorState,
+            'text-foreground': !errorState,
             'text-red': errorState === UserNameState.TAKEN,
           })}
         >
           {errorState === UserNameState.AVAILABLE && t('preferencesAccountUsernameAvailable')}
           {errorState === UserNameState.TAKEN && t('preferencesAccountUsernameErrorTaken')}
-          {!errorState && t('preferencesAccountUsernameHint')}
+          {!errorState && isEditing && t('preferencesAccountUsernameHint')}
         </div>
       )}
-    </>
+    </div>
   );
 };
 

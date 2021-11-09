@@ -17,12 +17,17 @@
  *
  */
 
-import React, {useState} from 'react';
-import {PropertiesRepository} from '../../../properties/PropertiesRepository';
+import React, {useEffect, useState} from 'react';
+import {amplify} from 'amplify';
+import {container} from 'tsyringe';
+import {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import {WebAppEvents} from '@wireapp/webapp-events';
+
 import {t} from 'Util/LocalizerUtil';
+
+import {PropertiesRepository} from '../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../properties/PropertiesType';
 import {TeamState} from '../../../team/TeamState';
-import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Config} from '../../../Config';
 import {ConsentValue} from '../../../user/ConsentValue';
@@ -50,6 +55,15 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
   const {marketingConsent} = useKoSubscribableChildren(propertiesRepository, ['marketingConsent']);
   const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
   const isCountlyEnabled = !!Config.getConfig().COUNTLY_API_KEY;
+
+  useEffect(() => {
+    const updateProperties = ({settings}: WebappProperties): void => {
+      setOptionPrivacy(settings.privacy.improve_wire);
+      setOptionTelemetry(settings.privacy.telemetry_sharing);
+    };
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+    return () => amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+  }, []);
 
   return (
     <PreferencesSection title={t('preferencesAccountData')} className="preferences-section-data-usage">

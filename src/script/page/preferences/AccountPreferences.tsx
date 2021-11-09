@@ -18,41 +18,47 @@
  */
 
 import {Runtime} from '@wireapp/commons';
-
-import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 import React, {useEffect, useRef} from 'react';
 import {container} from 'tsyringe';
+import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
+import {getLogger} from 'Util/Logger';
+import {loadValue} from 'Util/StorageUtil';
 import useEffectRef from 'Util/useEffectRef';
+import {isTemporaryClientAndNonPersistent} from 'Util/util';
+
+import {ClientEntity} from '../../client/ClientEntity';
 import {ClientRepository} from '../../client/ClientRepository';
+import {Config} from '../../Config';
+import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {User} from '../../entity/User';
+import {Notification, PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
+import {PropertiesRepository} from '../../properties/PropertiesRepository';
+import {StorageKey} from '../../storage';
 import {TeamState} from '../../team/TeamState';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
+import {ContentViewModel} from '../../view_model/ContentViewModel';
+import {modals, ModalsViewModel} from '../../view_model/ModalsViewModel';
 import AccentColorPicker from '../AccentColorPicker';
 import AccountInput from './accountPreferences/AccountInput';
-import {isTemporaryClientAndNonPersistent} from 'Util/util';
-import {loadValue} from 'Util/StorageUtil';
-import {StorageKey} from '../../storage';
-import {Config} from '../../Config';
-import HistoryBackupSection from './accountPreferences/HistoryBackupSection';
 import AccountSecuritySection from './accountPreferences/AccountSecuritySection';
-import {PropertiesRepository} from '../../properties/PropertiesRepository';
-import PrivacySection from './accountPreferences/PrivacySection';
-import LogoutSection from './accountPreferences/LogoutSection';
-import DataUsageSection from './accountPreferences/DataUsageSection';
-import PreferencesSection from './accountPreferences/PreferencesSection';
-import {getLogger} from 'Util/Logger';
-import EmailInput from './accountPreferences/EmailInput';
-import UsernameInput from './accountPreferences/UsernameInput';
-import {ConversationRepository} from '../../conversation/ConversationRepository';
-import {PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
-import AvatarInput from './accountPreferences/AvatarInput';
-import NameInput from './accountPreferences/NameInput';
 import AvailabilityInput from './accountPreferences/AvailabilityInput';
+import AvatarInput from './accountPreferences/AvatarInput';
+import DataUsageSection from './accountPreferences/DataUsageSection';
+import EmailInput from './accountPreferences/EmailInput';
+import HistoryBackupSection from './accountPreferences/HistoryBackupSection';
+import LogoutSection from './accountPreferences/LogoutSection';
+import NameInput from './accountPreferences/NameInput';
+import PreferencesSection from './accountPreferences/PreferencesSection';
+import PrivacySection from './accountPreferences/PrivacySection';
+import UsernameInput from './accountPreferences/UsernameInput';
 
 interface AccountPreferencesProps {
   clientRepository: ClientRepository;
@@ -71,6 +77,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   clientRepository,
   userRepository,
   propertiesRepository,
+  preferenceNotificationRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   richProfileRepository = container.resolve(RichProfileRepository),
@@ -79,27 +86,60 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   useFadingScrollbar(scrollbarRef);
 
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
-  const {isTeam} = useKoSubscribableChildren(teamState, ['isTeam']);
-  const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
+  const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
+  const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
     'name',
     'email',
     'availability',
     'username',
     'managedBy',
+    'phone',
   ]);
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
   const isDesktop = Runtime.isDesktopApp();
   const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST)));
   const brandName = Config.getConfig().BRAND_NAME;
+  const isConsentCheckEnabled = Config.getConfig().FEATURE.CHECK_CONSENT;
 
   const richFields = useEnrichedFields(selfUser, false, richProfileRepository);
+  const domain = selfUser.domain;
 
   useEffect(() => {
-    //popNotifications
+    const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
+      switch (type) {
+        case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
+          modals.showModal(
+            ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES,
+            {
+              data: aggregatedNotifications.map(notification => notification.data) as ClientEntity[],
+              preventClose: true,
+              secondaryAction: {
+                action: () => {
+                  amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
+                },
+              },
+            },
+            undefined,
+          );
+          break;
+        }
 
-    return () => {
-      //reset stuff?
+        case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
+          modals.showModal(
+            ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED,
+            {
+              data: aggregatedNotifications.pop().data as boolean,
+              preventClose: true,
+            },
+            undefined,
+          );
+          break;
+        }
+      }
     };
+    preferenceNotificationRepository
+      .getNotifications()
+      .forEach(({type, notification}) => showNotification(type, notification));
   }, []);
 
   return (
@@ -142,14 +182,17 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
             }}
           >
             <NameInput {...{canEditProfile, name, userRepository}} />
-            <UsernameInput {...{canEditProfile, userRepository, username}} domain={selfUser.domain} />
-            <EmailInput {...{canEditProfile, email, userRepository}} />
+            <UsernameInput {...{canEditProfile, userRepository, username, domain}} />
+            {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
+            {phone && <AccountInput label="Phone" value={phone} readOnly />}
+            {isTeam && <AccountInput label="Team" value={teamName} readOnly />}
+            {domain && <AccountInput label="Domain" value={domain} readOnly />}
             {richFields.map(({type, value}) => (
               <AccountInput key={type} label={type} value={value} readOnly />
             ))}
           </div>
         </PreferencesSection>
-        <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />
+        {isConsentCheckEnabled && <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />}
         <PrivacySection {...{propertiesRepository}} />
         {isActivatedAccount && (
           <>

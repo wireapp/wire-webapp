@@ -30,6 +30,7 @@ interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   readOnly?: boolean;
   suffix?: string;
   value: string;
+  setIsEditing?: (isEditing: boolean) => void;
 }
 
 export const useInputDone = () => {
@@ -59,6 +60,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
   isDone = false,
   prefix,
   suffix,
+  setIsEditing: setIsEditingExternal,
   ...rest
 }) => {
   const [input, setInput] = useState<string>();
@@ -106,7 +108,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
         }}
       >
         <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
-          <span css={{borderBottom: readOnly || isEditing ? 'none' : '1px dotted var(--foreground)'}}>
+          <span css={{borderBottom: readOnly || isEditing ? 'none' : '1px dashed var(--foreground)'}}>
             <span
               css={{
                 opacity: isEditing ? 0.4 : 1,
@@ -138,6 +140,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
             display: 'flex',
             lineHeight: '1.38',
             position: 'absolute',
+            width: '100%',
           }}
         >
           <span css={{opacity: 0}}>{prefix}</span>
@@ -147,6 +150,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
               border: 'none',
               fontSize: '16px',
               outline: 'none',
+              width: '100%',
               padding: 0,
             }}
             readOnly={readOnly}
@@ -161,9 +165,13 @@ const AccountInput: React.FC<AccountInputProps> = ({
             }}
             onBlur={() => {
               setInput(value);
+              setIsEditingExternal?.(false);
               setIsEditing(false);
             }}
-            onFocus={() => setIsEditing(true)}
+            onFocus={() => {
+              setIsEditingExternal?.(true);
+              setIsEditing(true);
+            }}
             spellCheck={false}
             {...rest}
           />
