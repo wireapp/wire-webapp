@@ -31,6 +31,9 @@ interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   suffix?: string;
   value: string;
   setIsEditing?: (isEditing: boolean) => void;
+  forceLowerCase?: boolean;
+  maxLength?: number;
+  allowedChars?: string;
 }
 
 export const useInputDone = () => {
@@ -61,6 +64,9 @@ const AccountInput: React.FC<AccountInputProps> = ({
   prefix,
   suffix,
   setIsEditing: setIsEditingExternal,
+  forceLowerCase = false,
+  maxLength,
+  allowedChars,
   ...rest
 }) => {
   const [input, setInput] = useState<string>();
@@ -68,6 +74,19 @@ const AccountInput: React.FC<AccountInputProps> = ({
   useEffect(() => {
     setInput(value);
   }, [value]);
+
+  const updateInput = (value: string) => {
+    if (allowedChars) {
+      value = value.replace(new RegExp(`[^${allowedChars}]`, 'g'), '');
+    }
+    if (forceLowerCase) {
+      value = value.toLowerCase();
+    }
+    if (maxLength) {
+      value = value.substring(0, maxLength);
+    }
+    setInput(value);
+  };
   return (
     <div
       css={{
@@ -155,7 +174,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
             }}
             readOnly={readOnly}
             value={input}
-            onChange={({target}) => setInput(target.value)}
+            onChange={({target}) => updateInput(target.value)}
             onKeyPress={event => {
               if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
                 event.preventDefault();

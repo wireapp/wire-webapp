@@ -22,10 +22,13 @@ import cx from 'classnames';
 import {UserError} from '../../../error/UserError';
 import {validateHandle} from '../../../user/UserHandleGenerator';
 import {UserRepository} from '../../../user/UserRepository';
-import {UserNameState} from '../../../view_model/content/PreferencesAccountViewModel';
 import {t} from 'Util/LocalizerUtil';
-import AccountInput from './AccountInput';
+import AccountInput, {useInputDone} from './AccountInput';
 
+enum UserNameState {
+  AVAILABLE = 'AVAILABLE',
+  TAKEN = 'TAKEN',
+}
 interface UsernameInputProps {
   canEditProfile: boolean;
   domain: string;
@@ -37,6 +40,8 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
   const [errorState, setErrorState] = useState<string>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [requestedName, setRequestedName] = useState<string>(null);
+  const [submittedName, setSubmittedName] = useState<string>(null);
+  const usernameInputDone = useInputDone();
 
   const verifyUsername = (enteredUsername: string): void => {
     console.log({enteredUsername});
@@ -66,10 +71,44 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         });
     }
   };
+
+  const changeUsername = async (newUsername: string): Promise<void> => {
+    const normalizedUsername = newUsername.toLowerCase();
+    setRequestedName(normalizedUsername);
+
+    const isUnchanged = normalizedUsername === username;
+    if (isUnchanged) {
+      usernameInputDone.done();
+      return;
+    }
+
+    const isInvalidName = normalizedUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
+    if (isInvalidName) {
+      setErrorState(null);
+      return;
+    }
+
+    setSubmittedName(normalizedUsername);
+    try {
+      await userRepository.changeUsername(normalizedUsername);
+
+      const isCurrentRequest = requestedName === submittedName;
+      if (isCurrentRequest) {
+        setErrorState(null);
+        usernameInputDone.done();
+      }
+    } catch (error) {
+      const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
+      const isCurrentRequest = requestedName === submittedName;
+      if (isUsernameTaken && isCurrentRequest) {
+        setErrorState(UserNameState.TAKEN);
+      }
+    }
+  };
   return (
     <div>
       <AccountInput
-        label="Username"
+        label={t('preferencesAccountUsername')} 
         value={username}
         onInput={({target}) => verifyUsername((target as HTMLInputElement).value)}
         readOnly={!canEditProfile}
@@ -77,6 +116,10 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         suffix={`@${domain}`}
         setIsEditing={setIsEditing}
         autoFocus={userRepository.shouldSetUsername}
+        isDone={usernameInputDone.isDone}
+        onValueChange={changeUsername}
+        maxLength={256}
+        allowedChars="a-zA-Z_"
       />
       {canEditProfile && (
         <div
@@ -86,9 +129,13 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
             'text-red': errorState === UserNameState.TAKEN,
           })}
         >
-          {errorState === UserNameState.AVAILABLE && t('preferencesAccountUsernameAvailable')}
-          {errorState === UserNameState.TAKEN && t('preferencesAccountUsernameErrorTaken')}
-          {!errorState && isEditing && t('preferencesAccountUsernameHint')}
+          {isEditing && (
+            <>
+              {errorState === UserNameState.AVAILABLE && t('preferencesAccountUsernameAvailable')}
+              {errorState === UserNameState.TAKEN && t('preferencesAccountUsernameErrorTaken')}
+              {!errorState && t('preferencesAccountUsernameHint')}
+            </>
+          )}
         </div>
       )}
     </div>

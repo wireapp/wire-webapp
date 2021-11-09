@@ -45,7 +45,6 @@ import {CollectionDetailsViewModel} from './content/CollectionDetailsViewModel';
 import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
-import {PreferencesAccountViewModel} from './content/PreferencesAccountViewModel';
 import {TitleBarViewModel} from './content/TitleBarViewModel';
 import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
 import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
@@ -98,7 +97,6 @@ export class ContentViewModel {
   mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
   preferencesAbout: PreferencesAboutViewModel;
-  preferencesAccount: PreferencesAccountViewModel;
   preferencesAV: PreferencesAVViewModel;
   preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
   preferencesDevices: PreferencesDevicesViewModel;

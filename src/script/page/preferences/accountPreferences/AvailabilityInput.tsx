@@ -37,6 +37,7 @@ const AvailabilityInput: React.FC<AvailabilityInputProps> = ({availability}) => 
       }}
     >
       <AvailabilityState
+        className="preferences-account-availability"
         label={
           availability === Availability.Type.NONE
             ? t('preferencesAccountAvailabilityUnset')

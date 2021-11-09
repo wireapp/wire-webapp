@@ -51,7 +51,7 @@ const NameInput: React.FC<NameInputProps> = ({name, userRepository, canEditProfi
     <AccountInput
       isDone={nameInputDone.isDone}
       onValueChange={changeName}
-      label="name"
+      label={t('preferencesAccountDisplayname')} 
       value={name}
       readOnly={!canEditProfile}
       data-uie-name="enter-name"

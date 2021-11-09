@@ -65,7 +65,7 @@ const EmailInput: React.FC<EmailInputProps> = ({email, canEditProfile, userRepos
 
   return (
     <AccountInput
-      label="Email"
+      label={t('preferencesAccountEmail')}
       value={email}
       readOnly={!canEditProfile}
       onValueChange={changeEmail}

@@ -86,7 +86,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  let {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+  const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
   const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
     'name',
@@ -104,7 +104,6 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 
   const richFields = useEnrichedFields(selfUser, false, richProfileRepository);
   const domain = selfUser.domain;
-  isActivatedAccount = false;
   const clickOnLeaveGuestRoom = (): void => {
     modals.showModal(
       ModalsViewModel.TYPE.CONFIRM,
@@ -211,9 +210,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               <NameInput {...{canEditProfile, name, userRepository}} />
               <UsernameInput {...{canEditProfile, userRepository, username, domain}} />
               {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
-              {phone && <AccountInput label="Phone" value={phone} readOnly />}
-              {isTeam && <AccountInput label="Team" value={teamName} readOnly />}
-              {domain && <AccountInput label="Domain" value={domain} readOnly />}
+              {phone && <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly />}
+              {isTeam && <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly />}
+              {domain && <AccountInput label={t('preferencesAccountDomain')} value={domain} readOnly />}
               {richFields.map(({type, value}) => (
                 <AccountInput key={type} label={type} value={value} readOnly />
               ))}
