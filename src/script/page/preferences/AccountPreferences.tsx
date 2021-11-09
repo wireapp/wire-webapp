@@ -78,6 +78,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   userRepository,
   propertiesRepository,
   preferenceNotificationRepository,
+  conversationRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
   richProfileRepository = container.resolve(RichProfileRepository),
@@ -85,7 +86,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
 
-  const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
+  let {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
   const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
     'name',
@@ -103,6 +104,31 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 
   const richFields = useEnrichedFields(selfUser, false, richProfileRepository);
   const domain = selfUser.domain;
+  isActivatedAccount = false;
+  const clickOnLeaveGuestRoom = (): void => {
+    modals.showModal(
+      ModalsViewModel.TYPE.CONFIRM,
+      {
+        preventClose: true,
+        primaryAction: {
+          action: async (): Promise<void> => {
+            try {
+              await conversationRepository.leaveGuestRoom();
+              clientRepository.logoutClient();
+            } catch (error) {
+              logger.warn('Error while leaving room', error);
+            }
+          },
+          text: t('modalAccountLeaveGuestRoomAction'),
+        },
+        text: {
+          message: t('modalAccountLeaveGuestRoomMessage'),
+          title: t('modalAccountLeaveGuestRoomHeadline'),
+        },
+      },
+      undefined,
+    );
+  };
 
   useEffect(() => {
     const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
@@ -166,32 +192,45 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           <div>
             <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
           </div>
-          {isTeam && <AvailabilityInput {...{availability}} />}
-          {canEditProfile && (
+          {isActivatedAccount && isTeam && <AvailabilityInput {...{availability}} />}
+          {isActivatedAccount && canEditProfile && (
             <div>
               <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
             </div>
           )}
         </div>
-        <PreferencesSection title={t('preferencesAccountInfo')}>
-          <div
-            css={{
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-            }}
-          >
-            <NameInput {...{canEditProfile, name, userRepository}} />
-            <UsernameInput {...{canEditProfile, userRepository, username, domain}} />
-            {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
-            {phone && <AccountInput label="Phone" value={phone} readOnly />}
-            {isTeam && <AccountInput label="Team" value={teamName} readOnly />}
-            {domain && <AccountInput label="Domain" value={domain} readOnly />}
-            {richFields.map(({type, value}) => (
-              <AccountInput key={type} label={type} value={value} readOnly />
-            ))}
-          </div>
-        </PreferencesSection>
+        {isActivatedAccount ? (
+          <PreferencesSection title={t('preferencesAccountInfo')}>
+            <div
+              css={{
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+              }}
+            >
+              <NameInput {...{canEditProfile, name, userRepository}} />
+              <UsernameInput {...{canEditProfile, userRepository, username, domain}} />
+              {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
+              {phone && <AccountInput label="Phone" value={phone} readOnly />}
+              {isTeam && <AccountInput label="Team" value={teamName} readOnly />}
+              {domain && <AccountInput label="Domain" value={domain} readOnly />}
+              {richFields.map(({type, value}) => (
+                <AccountInput key={type} label={type} value={value} readOnly />
+              ))}
+            </div>
+          </PreferencesSection>
+        ) : (
+          <PreferencesSection>
+            <div
+              className="preferences-link accent-text"
+              onClick={clickOnLeaveGuestRoom}
+              data-uie-name="do-leave-guest-room"
+            >
+              {t('preferencesAccountLeaveGuestRoom')}
+            </div>
+            <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
+          </PreferencesSection>
+        )}
         {isConsentCheckEnabled && <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />}
         <PrivacySection {...{propertiesRepository}} />
         {isActivatedAccount && (
@@ -210,8 +249,6 @@ export default AccountPreferences;
 
 registerReactComponent('account-preferences', {
   component: AccountPreferences,
-  // bindings:
-  //   'clientRepository, userRepository, propertiesRepository, conversationRepository, preferenceNotificationRepository',
   template:
     '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository, preferenceNotificationRepository}"></div>',
 });

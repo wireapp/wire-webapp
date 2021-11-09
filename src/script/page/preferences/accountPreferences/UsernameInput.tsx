@@ -76,6 +76,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         prefix="@"
         suffix={`@${domain}`}
         setIsEditing={setIsEditing}
+        autoFocus={userRepository.shouldSetUsername}
       />
       {canEditProfile && (
         <div
