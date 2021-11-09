@@ -1059,18 +1059,29 @@ export class MessageRepository {
    * @param reaction Reaction
    * @returns Resolves after sending the reaction
    */
-  private sendReaction(
+  private async sendReaction(
     conversationEntity: Conversation,
     messageEntity: Message,
     reaction: ReactionType,
-  ): Promise<ConversationEvent> {
+  ): Promise<void> {
+    if (conversationEntity.isFederated()) {
+      const reaction = this.core.service!.conversation.messageBuilder.createReaction({
+        conversationId: conversationEntity.id,
+        reaction: {
+          originalMessageId: messageEntity.id,
+          type: ReactionType.LIKE,
+        },
+      });
+
+      return this.sendAndInjectGenericCoreMessage(reaction, conversationEntity);
+    }
     const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
       messageId: createRandomUuid(),
     });
 
-    return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
+    await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
   }
 
   private createTextProto(
