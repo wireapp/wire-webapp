@@ -39,7 +39,7 @@ import type {ClientService} from './ClientService';
 import type {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import type {User} from '../entity/User';
 import {ClientError} from '../error/ClientError';
-import {ClientRecord} from '../storage';
+import {ClientRecord, StorageRepository} from '../storage';
 import {ClientState} from './ClientState';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {Config} from '../Config';
@@ -64,6 +64,7 @@ export class ClientRepository {
   constructor(
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
+    private readonly storageRepository: StorageRepository,
     private readonly clientState = container.resolve(ClientState),
   ) {
     this.cryptographyRepository = cryptographyRepository;
@@ -295,7 +296,7 @@ export class ClientRepository {
   }
 
   removeLocalClient(): void {
-    this.cryptographyRepository.storageRepository.deleteCryptographyStores().then(() => {
+    this.storageRepository.deleteCryptographyStores().then(() => {
       const shouldClearData = this.clientState.currentClient().isTemporary();
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, shouldClearData);
     });
