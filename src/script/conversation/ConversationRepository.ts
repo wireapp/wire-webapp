@@ -349,7 +349,7 @@ export class ConversationRepository {
     accessState?: string,
     options: Partial<NewConversation> = {},
   ): Promise<Conversation | undefined> {
-    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION && Config.getConfig().FEATURE.FEDERATION_DOMAIN;
+    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION;
     const userIds = isFederated ? userEntities.map(user => user.qualifiedId) : userEntities.map(user => user.id);
 
     let payload: NewConversation & {conversation_role: string} = {

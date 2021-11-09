@@ -1976,7 +1976,7 @@ export class MessageRepository {
       );
 
       const missedUserIds = Object.keys(errorData.missing).map(userId => ({
-        domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN,
+        domain: '',
         id: userId,
       }));
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);

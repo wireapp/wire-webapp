@@ -28,7 +28,7 @@ import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
 import {getFirstChar} from 'Util/StringUtil';
 
-import {ACCENT_ID, Config} from '../Config';
+import {ACCENT_ID} from '../Config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {ClientEntity} from '../client/ClientEntity';
@@ -87,6 +87,7 @@ export class User {
   public readonly providerName: ko.Observable<string>;
   public readonly teamRole: ko.Observable<TEAM_ROLE>;
   public readonly username: ko.Observable<string>;
+  public isFederated: boolean = false;
   public serviceId?: string;
   public teamId?: string;
   /** The federated domain (when the user is on a federated server) */
@@ -173,7 +174,7 @@ export class User {
     this.inTeam = ko.observable(false);
     this.isGuest = ko.observable(false);
     this.isDirectGuest = ko.pureComputed(() => {
-      return this.isGuest() && this.isOnSameFederatedDomain();
+      return this.isGuest() && !this.isFederated;
     });
     this.isTemporaryGuest = ko.observable(false);
     this.isTeamMember = ko.observable(false);
@@ -218,14 +219,6 @@ export class User {
     return !!this.domain;
   }
 
-  isOnSameFederatedDomain(otherDomain: string = Config.getConfig().FEATURE.FEDERATION_DOMAIN): boolean {
-    if (!Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      return true;
-    }
-
-    return this.domain == otherDomain;
-  }
-
   /**
    * Returns the fully qualified user ID.
    * @example "@handle@wire.com"
@@ -235,9 +228,7 @@ export class User {
       /** Very old user accounts don't have a handle on Wire. */
       return '';
     }
-    return this.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION
-      ? `@${this.username()}@${this.domain}`.replace(`@${Config.getConfig().FEATURE.FEDERATION_DOMAIN}`, '')
-      : `@${this.username()}`;
+    return this.isFederated ? `@${this.username()}@${this.domain}` : `@${this.username()}`;
   }
 
   subscribeToChanges(): void {

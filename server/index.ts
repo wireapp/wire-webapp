@@ -28,7 +28,6 @@ if (federation) {
   config.CLIENT.BACKEND_REST = `https://nginz-https.${federation}.wire.link`;
   config.CLIENT.BACKEND_WS = `wss://nginz-ssl.${federation}.wire.link`;
   config.CLIENT.FEATURE.ENABLE_FEDERATION = true;
-  config.CLIENT.FEATURE.FEDERATION_DOMAIN = `${federation}.wire.link`;
 }
 
 const server = new Server(config);

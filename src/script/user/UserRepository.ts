@@ -406,7 +406,7 @@ export class UserRepository {
     const sortedUsers = this.userState
       .directlyConnectedUsers()
       // TMP the `filter` can be removed when message broadcast works on federated backends
-      .filter(user => user.isOnSameFederatedDomain())
+      .filter(user => !user.isFederated)
       .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
     const [members, other] = partition(sortedUsers, user => user.isTeamMember());
     const recipients = [this.userState.self(), ...members, ...other].slice(
