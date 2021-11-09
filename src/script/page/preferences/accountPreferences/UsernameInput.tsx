@@ -44,7 +44,6 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
   const usernameInputDone = useInputDone();
 
   const verifyUsername = (enteredUsername: string): void => {
-    console.log({enteredUsername});
     const usernameTooShort = enteredUsername.length < UserRepository.CONFIG.MINIMUM_USERNAME_LENGTH;
     const usernameUnchanged = enteredUsername === username;
     if (usernameTooShort || usernameUnchanged) {

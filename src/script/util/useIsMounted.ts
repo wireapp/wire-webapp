@@ -19,6 +19,28 @@
 
 import {useCallback, useEffect, useRef} from 'react';
 
+/*
+ * Hook to check if a component is mounted.
+ * ```
+ * const MyComponent = () => {
+ *   const [response, setResponse] = useState();
+ *
+ *   const isMounted = useIsMounted();
+ *
+ *   const longRunningRequest = async () => {
+ *     const response = await fetch('api/request');
+ *     if (isMounted()) {
+ *       setResponse(response);
+ *     }
+ *   };
+ *
+ *   return (
+ *     <div onClick={longRunningRequest}>
+ *       {response || "click"} 
+ *     </div>;
+ * };
+ * ```
+ */
 export default function useIsMounted() {
   const isMounted = useRef(false);
 
