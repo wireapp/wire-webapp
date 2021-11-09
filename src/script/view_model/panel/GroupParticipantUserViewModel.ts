@@ -102,7 +102,7 @@ export class GroupParticipantUserViewModel extends BasePanelViewModel {
   };
 
   onToggleAdmin = async (): Promise<void> => {
-    if (!this.selectedParticipant().isOnSameFederatedDomain()) {
+    if (this.selectedParticipant().isFederated) {
       return;
     }
     const newRole = this.isAdmin() ? DefaultRole.WIRE_MEMBER : DefaultRole.WIRE_ADMIN;

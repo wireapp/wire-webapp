@@ -58,8 +58,7 @@ import {Config} from '../Config';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
 function isFederatedEnv() {
-  const config = Config.getConfig().FEATURE;
-  return config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+  return Config.getConfig().FEATURE.ENABLE_FEDERATION;
 }
 export class ConversationService {
   private readonly eventService: EventService;

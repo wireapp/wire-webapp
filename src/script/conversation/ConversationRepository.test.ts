@@ -308,6 +308,7 @@ describe('ConversationRepository', () => {
       const team1to1Conversation: Partial<ConversationDatabaseData> = {
         access: [CONVERSATION_ACCESS.INVITE],
         creator: '109da9ca-a495-47a8-ac70-9ffbe924b2d0',
+        domain: 'test-domain',
         id: '04ab891e-ccf1-4dba-9d74-bacec64b5b1e',
         members: {
           others: [{id: 'f718410c-3833-479d-bd80-a5df03f38414', status: 0}],
@@ -336,7 +337,7 @@ describe('ConversationRepository', () => {
 
       const teamId = team1to1Conversation.team;
       const teamMemberId = team1to1Conversation.members.others[0].id;
-      const userEntity = new User(teamMemberId, null);
+      const userEntity = new User(teamMemberId, 'test-domain');
 
       const selfUser = UserGenerator.getRandomUser();
       selfUser.teamId = teamId;

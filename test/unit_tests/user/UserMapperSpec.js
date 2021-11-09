@@ -19,14 +19,15 @@
 
 import {createRandomUuid} from 'Util/util';
 
-import {ACCENT_ID} from 'src/script/Config';
+import {ACCENT_ID, Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
 import {UserMapper} from 'src/script/user/UserMapper';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from '../../api/payloads';
 
 describe('User Mapper', () => {
-  const mapper = new UserMapper(serverTimeHandler);
+  const userState = {self: () => ({domain: 'local.test'})};
+  const mapper = new UserMapper(serverTimeHandler, userState);
 
   let self_user_payload = null;
 
@@ -43,6 +44,19 @@ describe('User Mapper', () => {
       expect(user_et.phone()).toBe('+49177123456');
       expect(user_et.isMe).toBeFalsy();
       expect(user_et.accent_id()).toBe(ACCENT_ID.YELLOW);
+    });
+
+    it.each([
+      ['local.test', false],
+      ['federated.test', true],
+    ])('can detect if a user is a federated user (%s)', (domain, expected) => {
+      spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ENABLE_FEDERATION: true}});
+      const user = mapper.mapUserFromJson({
+        id: 'id',
+        qualified_id: {domain: domain, id: 'id'},
+      });
+
+      expect(user.isFederated).toBe(expected);
     });
 
     it('returns undefined if input was undefined', () => {

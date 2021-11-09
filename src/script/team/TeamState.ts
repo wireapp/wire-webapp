@@ -50,6 +50,7 @@ export class TeamState {
   readonly teamUsers: ko.PureComputed<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly team: ko.Observable<TeamEntity>;
+  readonly teamDomain: ko.PureComputed<string>;
   readonly teamSize: ko.PureComputed<number>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
@@ -64,6 +65,7 @@ export class TeamState {
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
 
+    this.teamDomain = ko.pureComputed(() => userState.self().domain);
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.userState.self().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
     this.teamUsers = ko.pureComputed(() => {

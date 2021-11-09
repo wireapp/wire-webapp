@@ -113,7 +113,7 @@ export class TitleBarViewModel {
       return this.conversationEntity() &&
         this.conversationEntity().is1to1() &&
         this.conversationEntity().firstUserEntity() &&
-        !this.conversationEntity().firstUserEntity().isOnSameFederatedDomain()
+        this.conversationEntity().firstUserEntity().isFederated
         ? this.conversationEntity().firstUserEntity()?.handle ?? ''
         : '';
     });

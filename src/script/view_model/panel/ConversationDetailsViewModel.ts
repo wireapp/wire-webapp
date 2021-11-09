@@ -217,10 +217,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.showOptionTimedMessages = ko.pureComputed(
-      () =>
-        this.teamState.isSelfDeletingMessagesEnabled() &&
-        this.isActiveGroupParticipant() &&
-        roleRepository.canToggleTimeout(this.activeConversation()),
+      () => this.isActiveGroupParticipant() && roleRepository.canToggleTimeout(this.activeConversation()),
     );
 
     this.showSectionOptions = ko.pureComputed(() => {
@@ -253,9 +250,9 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
     this.timedMessagesText = ko.pureComputed(() => {
       if (this.activeConversation()) {
-        const hasTimer = this.activeConversation().messageTimer() && this.activeConversation().hasGlobalMessageTimer();
+        const hasTimer = this.activeConversation().hasGlobalMessageTimer();
         if (hasTimer) {
-          return formatDuration(this.activeConversation().messageTimer()).text;
+          return formatDuration(this.activeConversation().globalMessageTimer()).text;
         }
       }
       return t('ephemeralUnitsNone');
