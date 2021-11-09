@@ -18,9 +18,12 @@
  */
 
 import React from 'react';
-import {UserRepository} from '../../../user/UserRepository';
+
 import {getLogger} from 'Util/Logger';
+import {t} from 'Util/LocalizerUtil';
+
 import AccountInput, {useInputDone} from './AccountInput';
+import {UserRepository} from '../../../user/UserRepository';
 
 interface NameInputProps {
   canEditProfile: boolean;
@@ -51,7 +54,7 @@ const NameInput: React.FC<NameInputProps> = ({name, userRepository, canEditProfi
     <AccountInput
       isDone={nameInputDone.isDone}
       onValueChange={changeName}
-      label={t('preferencesAccountDisplayname')} 
+      label={t('preferencesAccountDisplayname')}
       value={name}
       readOnly={!canEditProfile}
       data-uie-name="enter-name"
