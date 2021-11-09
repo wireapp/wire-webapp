@@ -202,9 +202,6 @@ export class ContentViewModel {
           this.inputBar.addedToView();
           this.titleBar.addedToView();
           break;
-        case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
-          //this.preferencesAccount.popNotification();
-          break;
         case ContentViewModel.STATE.PREFERENCES_AV:
           this.preferencesAV.updateMediaStreamTrack(MediaType.AUDIO_VIDEO);
           break;
