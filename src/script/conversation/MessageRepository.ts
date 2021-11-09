@@ -1056,26 +1056,26 @@ export class MessageRepository {
    * Send reaction to a content message in specified conversation.
    * @param conversationEntity Conversation to send reaction in
    * @param messageEntity Message to react to
-   * @param reaction Reaction
+   * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
   private async sendReaction(
     conversationEntity: Conversation,
     messageEntity: Message,
-    reaction: ReactionType,
+    reactionType: ReactionType,
   ): Promise<void> {
     if (conversationEntity.isFederated()) {
       const reaction = this.core.service!.conversation.messageBuilder.createReaction({
         conversationId: conversationEntity.id,
         reaction: {
           originalMessageId: messageEntity.id,
-          type: ReactionType.LIKE,
+          type: reactionType,
         },
       });
 
       return this.sendAndInjectGenericCoreMessage(reaction, conversationEntity);
     }
-    const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
+    const protoReaction = new Reaction({emoji: reactionType, messageId: messageEntity.id});
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
       messageId: createRandomUuid(),
