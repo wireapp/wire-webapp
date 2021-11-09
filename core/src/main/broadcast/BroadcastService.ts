@@ -59,10 +59,8 @@ export class BroadcastService {
     sendAsProtobuf?: boolean,
   ): Promise<ClientMismatch> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
-
-    return sendAsProtobuf
-      ? this.messageService.sendOTRProtobufMessage(this.apiClient.validatedClientId, recipients, null, plainTextArray)
-      : this.messageService.sendOTRMessage(this.apiClient.validatedClientId, recipients, null, plainTextArray);
+    return this.messageService.sendMessage(this.apiClient.validatedClientId, preKeyBundles, plainTextArray, {
+      sendAsProtobuf,
+    });
   }
 }

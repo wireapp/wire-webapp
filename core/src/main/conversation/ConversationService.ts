@@ -50,7 +50,6 @@ import {
   MessageHide,
   Reaction,
 } from '@wireapp/protocol-messaging';
-import {Encoder} from 'bazinga64';
 
 import {
   AssetService,
@@ -62,7 +61,7 @@ import {
   PayloadBundleType,
 } from '../conversation/';
 import type {AssetContent, ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
-import type {CryptographyService, EncryptedAsset} from '../cryptography/';
+import type {CryptographyService} from '../cryptography/';
 import * as AssetCryptography from '../cryptography/AssetCryptography.node';
 import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../util/TypePredicateUtil';
 import {MessageBuilder} from './message/MessageBuilder';
@@ -103,12 +102,12 @@ export class ConversationService {
 
   constructor(
     private readonly apiClient: APIClient,
-    private readonly cryptographyService: CryptographyService,
+    cryptographyService: CryptographyService,
     private readonly assetService: AssetService,
   ) {
     this.messageTimer = new MessageTimer();
     this.messageBuilder = new MessageBuilder(this.apiClient, this.assetService);
-    this.messageService = new MessageService(this.apiClient, this.cryptographyService);
+    this.messageService = new MessageService(this.apiClient, cryptographyService);
   }
 
   private createEphemeral(originalGenericMessage: GenericMessage, expireAfterMillis: number): GenericMessage {
@@ -227,55 +226,6 @@ export class ConversationService {
     return this.apiClient.conversation.api.getConversation(userId);
   }
 
-  private async sendExternalGenericMessage(
-    sendingClientId: string,
-    conversationId: string,
-    asset: EncryptedAsset,
-    preKeyBundles: UserPreKeyBundleMap,
-    sendAsProtobuf?: boolean,
-  ): Promise<ClientMismatch | undefined> {
-    if (preKeyBundles.none) {
-      const {cipherText, keyBytes, sha256} = asset;
-      const messageId = MessageBuilder.createId();
-
-      const externalMessage = {
-        otrKey: new Uint8Array(keyBytes),
-        sha256: new Uint8Array(sha256),
-      };
-
-      const base64CipherText = Encoder.toBase64(cipherText).asString;
-
-      const genericMessage = GenericMessage.create({
-        [GenericMessageType.EXTERNAL]: externalMessage,
-        messageId,
-      });
-
-      const plainTextArray = GenericMessage.encode(genericMessage).finish();
-
-      const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
-
-      if (sendAsProtobuf) {
-        return this.messageService.sendOTRProtobufMessage(
-          sendingClientId,
-          recipients,
-          conversationId,
-          plainTextArray,
-          cipherText,
-        );
-      }
-      return this.messageService.sendOTRMessage(
-        sendingClientId,
-        recipients,
-        conversationId,
-        plainTextArray,
-        base64CipherText,
-      );
-
-      // todo: add federated sending here
-    }
-    return undefined;
-  }
-
   private async getQualifiedRecipientsForConversation(
     conversationId: QualifiedId,
     userIds?: QualifiedId[] | QualifiedUserClients,
@@ -287,13 +237,24 @@ export class ConversationService {
     return this.getQualifiedPreKeyBundle(recipientIds);
   }
 
+  private async getRecipientsForConversation(
+    conversationId: string,
+    userIds?: string[] | UserClients,
+  ): Promise<UserClients | UserPreKeyBundleMap> {
+    if (isUserClients(userIds)) {
+      return userIds;
+    }
+    return this.getPreKeyBundleMap(conversationId, userIds);
+  }
+
   /**
-   * Sends a message to a federated environment.
+   * Sends a message to a conversation
    *
    * @param sendingClientId The clientId from which the message is sent
    * @param conversationId The conversation in which to send the message
-   * @param conversationDomain The domain where the conversation lives
    * @param genericMessage The payload of the message to send
+   * @param options.domain? The federated domain the server runs on. Should only be set for federation enabled envs
+   * @param options.sendAsProtobuf? Will send the message as a protobuf payload
    * @param options.userIds? can be either a QualifiedId[] or QualfiedUserClients or undefined. The type has some effect on the behavior of the method.
    *    When given undefined the method will fetch both the members of the conversations and their devices. No ClientMismatch can happen in that case
    *    When given a QualifiedId[] the method will fetch the freshest list of devices for those users (since they are not given by the consumer). As a consequence no ClientMismatch error will trigger and we will ignore missing clients when sending
@@ -301,24 +262,6 @@ export class ConversationService {
    * @param options.onClientMismatch? Will be called whenever there is a clientmismatch returned from the server. Needs to be combined with a userIds of type QualifiedUserClients
    * @return Resolves with the message sending status from backend
    */
-  private async sendFederatedGenericMessage(
-    sendingClientId: string,
-    conversationId: QualifiedId,
-    genericMessage: GenericMessage,
-    options: {
-      userIds?: QualifiedId[] | QualifiedUserClients;
-      onClientMismatch?: (mismatch: MessageSendingStatus) => Promise<boolean | undefined>;
-    } = {},
-  ): Promise<MessageSendingStatus> {
-    const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const recipients = await this.getQualifiedRecipientsForConversation(conversationId, options.userIds);
-
-    return this.messageService.sendFederatedOTRMessage(sendingClientId, conversationId, recipients, plainTextArray, {
-      reportMissing: isQualifiedUserClients(options.userIds), // we want to check mismatch in case the consumer gave an exact list of users/devices
-      onClientMismatch: options.onClientMismatch,
-    });
-  }
-
   private async sendGenericMessage(
     sendingClientId: string,
     conversationId: string,
@@ -331,42 +274,29 @@ export class ConversationService {
     } = {},
   ): Promise<ClientMismatch | MessageSendingStatus | undefined> {
     const {domain, userIds} = options;
+    const plainText = GenericMessage.encode(genericMessage).finish();
     if (domain) {
       if (isStringArray(userIds) || isUserClients(userIds)) {
-        throw new Error('Invalid userIds option for sending');
+        throw new Error('Invalid userIds option for sending to federated backend');
       }
-
-      return this.sendFederatedGenericMessage(
-        this.apiClient.validatedClientId,
-        {id: conversationId, domain},
-        genericMessage,
-        {userIds, onClientMismatch: options.onClientMismatch},
-      );
+      const recipients = await this.getQualifiedRecipientsForConversation({id: conversationId, domain}, userIds);
+      return this.messageService.sendFederatedMessage(sendingClientId, recipients, plainText, {
+        conversationId: {id: conversationId, domain},
+        reportMissing: isQualifiedUserClients(options.userIds), // we want to check mismatch in case the consumer gave an exact list of users/devices
+        onClientMismatch: options.onClientMismatch,
+      });
     }
 
-    if (isQualifiedIdArray(userIds) || isQualifiedUserClients(userIds)) {
+    if (!isStringArray(userIds) && !isUserClients(userIds)) {
       throw new Error('Invalid userIds option for sending');
     }
-
-    const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    const preKeyBundles = await this.getPreKeyBundleMap(conversationId, userIds);
-
-    if (this.shouldSendAsExternal(plainTextArray, preKeyBundles)) {
-      const encryptedAsset = await AssetCryptography.encryptAsset({plainText: plainTextArray});
-      return this.sendExternalGenericMessage(
-        this.apiClient.validatedClientId,
-        conversationId,
-        encryptedAsset,
-        preKeyBundles,
-        options.sendAsProtobuf,
-      );
-    }
-
-    const recipients = await this.cryptographyService.encrypt(plainTextArray, preKeyBundles);
-
-    return options.sendAsProtobuf
-      ? this.messageService.sendOTRProtobufMessage(sendingClientId, recipients, conversationId, plainTextArray)
-      : this.messageService.sendOTRMessage(sendingClientId, recipients, conversationId, plainTextArray);
+    const recipients = await this.getRecipientsForConversation(conversationId, userIds);
+    return this.messageService.sendMessage(sendingClientId, recipients, plainText, {
+      conversationId,
+      sendAsProtobuf: options.sendAsProtobuf,
+      reportMissing: isUserClients(options.userIds), // we want to check mismatch in case the consumer gave an exact list of users/devices
+      onClientMismatch: options.onClientMismatch,
+    });
   }
 
   private generateButtonActionGenericMessage(payloadBundle: ButtonActionMessage): GenericMessage {
@@ -744,20 +674,6 @@ export class ConversationService {
       timestamp: Date.now(),
       type: PayloadBundleType.MESSAGE_DELETE,
     };
-  }
-
-  private shouldSendAsExternal(plainText: Uint8Array, preKeyBundles: UserPreKeyBundleMap): boolean {
-    const EXTERNAL_MESSAGE_THRESHOLD_BYTES = 200 * 1024;
-
-    let clientCount = 0;
-    for (const user in preKeyBundles) {
-      clientCount += Object.keys(preKeyBundles[user]).length;
-    }
-
-    const messageInBytes = new Uint8Array(plainText).length;
-    const estimatedPayloadInBytes = clientCount * messageInBytes;
-
-    return estimatedPayloadInBytes > EXTERNAL_MESSAGE_THRESHOLD_BYTES;
   }
 
   public leaveConversation(conversationId: string): Promise<ConversationMemberLeaveEvent> {
