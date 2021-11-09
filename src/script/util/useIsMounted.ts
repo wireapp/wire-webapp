@@ -36,7 +36,7 @@ import {useCallback, useEffect, useRef} from 'react';
  *
  *   return (
  *     <div onClick={longRunningRequest}>
- *       {response || "click"} 
+ *       {response || "click"}
  *     </div>;
  * };
  * ```

@@ -208,7 +208,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               }}
             >
               <NameInput {...{canEditProfile, name, userRepository}} />
-              <UsernameInput {...{canEditProfile, userRepository, username, domain}} />
+              <UsernameInput {...{canEditProfile, domain, userRepository, username}} />
               {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
               {phone && <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly />}
               {isTeam && <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly />}

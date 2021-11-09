@@ -107,7 +107,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
   return (
     <div>
       <AccountInput
-        label={t('preferencesAccountUsername')} 
+        label={t('preferencesAccountUsername')}
         value={username}
         onInput={({target}) => verifyUsername((target as HTMLInputElement).value)}
         readOnly={!canEditProfile}

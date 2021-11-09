@@ -23,17 +23,17 @@ import useIsMounted from 'Util/useIsMounted';
 import {MotionDuration} from '../../../motion/MotionDuration';
 
 interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  allowedChars?: string;
+  forceLowerCase?: boolean;
   isDone?: boolean;
   label: string;
+  maxLength?: number;
   onValueChange?: (value: string) => void;
   prefix?: string;
   readOnly?: boolean;
+  setIsEditing?: (isEditing: boolean) => void;
   suffix?: string;
   value: string;
-  setIsEditing?: (isEditing: boolean) => void;
-  forceLowerCase?: boolean;
-  maxLength?: number;
-  allowedChars?: string;
 }
 
 export const useInputDone = () => {
@@ -169,8 +169,8 @@ const AccountInput: React.FC<AccountInputProps> = ({
               border: 'none',
               fontSize: '16px',
               outline: 'none',
-              width: '100%',
               padding: 0,
+              width: '100%',
             }}
             readOnly={readOnly}
             value={input}
