@@ -210,7 +210,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               <NameInput {...{canEditProfile, name, userRepository}} />
               <UsernameInput {...{canEditProfile, domain, userRepository, username}} />
               {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
-              {phone && <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly />}
+              {phone && (
+                <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly data-uie-name="enter-phone" />
+              )}
               {isTeam && (
                 <AccountInput
                   label={t('preferencesAccountTeam')}
@@ -219,7 +221,14 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
                   data-uie-name="status-team"
                 />
               )}
-              {domain && <AccountInput label={t('preferencesAccountDomain')} value={domain} readOnly />}
+              {domain && (
+                <AccountInput
+                  label={t('preferencesAccountDomain')}
+                  value={domain}
+                  readOnly
+                  data-uie-name="status-domain"
+                />
+              )}
               {richFields.map(({type, value}) => (
                 <AccountInput key={type} label={type} value={value} readOnly />
               ))}
