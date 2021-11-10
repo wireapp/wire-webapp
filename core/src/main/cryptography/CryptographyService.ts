@@ -150,7 +150,7 @@ export class CryptographyService {
     users: UserPreKeyBundleMap | UserClients,
     domain?: string,
   ): Promise<OTRRecipients<Uint8Array>> {
-    const bundles: Promise<SessionPayloadBundle>[] = [];
+    const bundles: Promise<SessionPayloadBundle | undefined>[] = [];
 
     for (const userId in users) {
       const clientIds = isUserClients(users) ? users[userId] : Object.keys(users[userId]);
@@ -164,6 +164,9 @@ export class CryptographyService {
     const payloads = await Promise.all(bundles);
 
     return payloads.reduce((recipients, payload) => {
+      if (!payload) {
+        return recipients;
+      }
       const {encryptedPayload, sessionId} = payload;
       const {userId, clientId} = CryptographyService.dismantleSessionId(sessionId);
       recipients[userId] ||= {};
@@ -176,7 +179,7 @@ export class CryptographyService {
     sessionId: string,
     plainText: Uint8Array,
     base64EncodedPreKey?: string,
-  ): Promise<SessionPayloadBundle> {
+  ): Promise<SessionPayloadBundle | undefined> {
     this.logger.log(`Encrypting payload for session ID "${sessionId}"`);
 
     let encryptedPayload: Uint8Array;
@@ -188,6 +191,11 @@ export class CryptographyService {
       const payloadAsArrayBuffer = await this.cryptobox.encrypt(sessionId, plainText, decodedPreKeyBundle);
       encryptedPayload = new Uint8Array(payloadAsArrayBuffer);
     } catch (error) {
+      const notFoundErrorCode = 2;
+      if ((error as any).code === notFoundErrorCode) {
+        // If the session is not in the database, we just return undefined. Later on there will be a mismatch and the session will be created
+        return undefined;
+      }
       this.logger.error(`Could not encrypt payload: ${(error as Error).message}`);
       encryptedPayload = new Uint8Array(Buffer.from('💣', 'utf-8'));
     }
