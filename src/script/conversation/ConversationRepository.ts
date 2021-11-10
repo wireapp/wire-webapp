@@ -87,7 +87,7 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ConversationLabelRepository} from './ConversationLabelRepository';
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
+import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {SystemMessageType} from '../message/SystemMessageType';
 import {SuperType} from '../message/SuperType';
 import {MessageCategory} from '../message/MessageCategory';
@@ -216,7 +216,7 @@ export class ConversationRepository {
           conversation.verification_state(ConversationVerificationState.DEGRADED);
         }
       }
-      return this.requestUserSendingPermission(conversation);
+      return this.messageRepository.requestUserSendingPermission(conversation);
     });
 
     this.logger = getLogger('ConversationRepository');
@@ -257,36 +257,6 @@ export class ConversationRepository {
     this.leaveCall = noop;
   }
 
-  /**
-   * Will request user permission before sending a message in case the conversation is in a degraded state
-   *
-   * @param conversation The conversation to send the message in
-   * @returns Resolves to true if the message can be sent, false if the user didn't give their permission
-   */
-  requestUserSendingPermission(conversation: Conversation): Promise<boolean> {
-    if (conversation.verification_state() !== ConversationVerificationState.DEGRADED) {
-      return Promise.resolve(true);
-    }
-    const actionString = t('modalConversationNewDeviceAction');
-    const messageString = t('modalConversationNewDeviceMessage');
-    const titleString = t('modalConversationNewDeviceHeadlineMany'); // TODO get user names
-
-    return new Promise(resolve => {
-      const options: ModalOptions = {
-        close: () => resolve(false),
-        primaryAction: {
-          action: () => resolve(true),
-          text: actionString,
-        },
-        text: {
-          message: messageString,
-          title: titleString,
-        },
-      };
-
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, options, `degraded-${conversation.id}`);
-    });
-  }
   checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
   }
