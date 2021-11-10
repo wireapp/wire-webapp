@@ -70,6 +70,7 @@ const EmailInput: React.FC<EmailInputProps> = ({email, canEditProfile, userRepos
       readOnly={!canEditProfile}
       onValueChange={changeEmail}
       isDone={emailInputDone.isDone}
+      data-uie-name="enter-email"
     />
   );
 };
