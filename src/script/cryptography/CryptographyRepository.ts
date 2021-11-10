@@ -66,6 +66,7 @@ export class CryptographyRepository {
   cryptographyMapper: CryptographyMapper;
   currentClient?: ko.Observable<ClientEntity>;
   logger: Logger;
+  private federatedDomain: string = '';
 
   static get CONFIG() {
     return {
@@ -91,6 +92,7 @@ export class CryptographyRepository {
   init(cryptobox: Cryptobox, client: ko.Observable<ClientEntity>): void {
     this.cryptobox = cryptobox;
     this.currentClient = client;
+    this.federatedDomain = Config.getConfig().FEATURE.ENABLE_FEDERATION ? client().domain : '';
 
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, async preKeys => {
       const serializedPreKeys = preKeys.map(preKey => cryptobox.serialize_prekey(preKey));
@@ -315,7 +317,7 @@ export class CryptographyRepository {
         if (clientIds && clientIds.length) {
           messagePayload.recipients[userId] ||= {};
           clientIds.forEach(clientId => {
-            const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
+            const sessionId = constructClientPrimaryKey({domain: this.federatedDomain, id: userId}, clientId);
             const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
 
             accumulator.push(encryptionPromise);
@@ -346,7 +348,7 @@ export class CryptographyRepository {
       if (clientPreKeyMap && Object.keys(clientPreKeyMap).length) {
         for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
           if (preKeyPayload) {
-            const sessionId = constructClientPrimaryKey({domain: '', id: userId}, clientId);
+            const sessionId = constructClientPrimaryKey({domain: this.federatedDomain, id: userId}, clientId);
             const encryptionPromise = this.encryptPayloadForSession(
               sessionId,
               genericMessage,
