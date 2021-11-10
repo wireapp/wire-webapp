@@ -24,6 +24,7 @@ import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 import * as bazinga64 from 'bazinga64';
 import * as crypto from 'crypto';
 import {promisify} from 'util';
+import {SessionPayloadBundle} from '.';
 
 import * as CryptographyHelper from '../test/CryptographyHelper';
 import {decryptAsset, encryptAsset} from './AssetCryptography.node';
@@ -220,11 +221,11 @@ describe('CryptographyService', () => {
       const text = new Uint8Array([72, 101, 108, 108, 111, 32, 66, 111, 98, 33]); // "Hello Bob!"
       const encodedPreKey =
         'pQABAQACoQBYIHOFFWPnWlr4sulxUWYoP0A6rsJiBO/Ec3Y914t67CIAA6EAoQBYIPFH5CK/a0YwKEx4n/+U/IPRN+mJXVv++MCs5Z4dLmz4BPY=';
-      const {sessionId, encryptedPayload} = await cryptographyService['encryptPayloadForSession'](
+      const {sessionId, encryptedPayload} = (await cryptographyService['encryptPayloadForSession'](
         sessionWithBobId,
         text,
         encodedPreKey,
-      );
+      )) as SessionPayloadBundle;
       expect(Buffer.from(encryptedPayload).toString('utf8')).not.toBe('💣');
       expect(sessionId).toBe(sessionWithBobId);
     });
@@ -233,11 +234,11 @@ describe('CryptographyService', () => {
       const sessionWithBobId = 'bob-user-id@bob-client-id';
       const encodedPreKey =
         'pQABAQACoQBYIHOFFWPnWlr4sulxUWYoP0A6rsJiBO/Ec3Y914t67CIAA6EAoQBYIPFH5CK/a0YwKEx4n/+U/IPRN+mJXVv++MCs5Z4dLmz4BPY=';
-      const {sessionId, encryptedPayload} = await cryptographyService['encryptPayloadForSession'](
+      const {sessionId, encryptedPayload} = (await cryptographyService['encryptPayloadForSession'](
         sessionWithBobId,
         undefined as any,
         encodedPreKey,
-      );
+      )) as SessionPayloadBundle;
       expect(Buffer.from(encryptedPayload).toString()).toBe('💣');
       expect(sessionId).toBe(sessionWithBobId);
     });
