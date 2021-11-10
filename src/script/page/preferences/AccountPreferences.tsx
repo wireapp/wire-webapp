@@ -211,7 +211,14 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               <UsernameInput {...{canEditProfile, domain, userRepository, username}} />
               {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
               {phone && <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly />}
-              {isTeam && <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly />}
+              {isTeam && (
+                <AccountInput
+                  label={t('preferencesAccountTeam')}
+                  value={teamName}
+                  readOnly
+                  data-uie-name="status-team"
+                />
+              )}
               {domain && <AccountInput label={t('preferencesAccountDomain')} value={domain} readOnly />}
               {richFields.map(({type, value}) => (
                 <AccountInput key={type} label={type} value={value} readOnly />
