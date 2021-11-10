@@ -163,37 +163,40 @@ const AccountInput: React.FC<AccountInputProps> = ({
           }}
         >
           <span css={{opacity: 0}}>{prefix}</span>
-          <input
-            css={{
-              backgroundColor: 'transparent',
-              border: 'none',
-              fontSize: '16px',
-              outline: 'none',
-              padding: 0,
-              width: '100%',
-            }}
-            readOnly={readOnly}
-            value={input}
-            onChange={({target}) => updateInput(target.value)}
-            onKeyPress={event => {
-              if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
-                event.preventDefault();
-                onValueChange?.(input);
-                (event.target as HTMLInputElement).blur();
-              }
-            }}
-            onBlur={() => {
-              setInput(value);
-              setIsEditingExternal?.(false);
-              setIsEditing(false);
-            }}
-            onFocus={() => {
-              setIsEditingExternal?.(true);
-              setIsEditing(true);
-            }}
-            spellCheck={false}
-            {...rest}
-          />
+          {readOnly ? (
+            <span {...rest}>{value}</span>
+          ) : (
+            <input
+              css={{
+                backgroundColor: 'transparent',
+                border: 'none',
+                fontSize: '16px',
+                outline: 'none',
+                padding: 0,
+                width: '100%',
+              }}
+              value={input}
+              onChange={({target}) => updateInput(target.value)}
+              onKeyPress={event => {
+                if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
+                  event.preventDefault();
+                  onValueChange?.(input);
+                  (event.target as HTMLInputElement).blur();
+                }
+              }}
+              onBlur={() => {
+                setInput(value);
+                setIsEditingExternal?.(false);
+                setIsEditing(false);
+              }}
+              onFocus={() => {
+                setIsEditingExternal?.(true);
+                setIsEditing(true);
+              }}
+              spellCheck={false}
+              {...rest}
+            />
+          )}
         </div>
       </div>
     </div>
