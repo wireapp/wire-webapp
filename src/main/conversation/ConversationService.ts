@@ -92,7 +92,17 @@ import type {
 export interface MessageSendingCallbacks {
   onStart?: (message: GenericMessage) => Promise<boolean | undefined>;
   onSuccess?: (message: GenericMessage, sentTime?: string) => void;
-  onClientMismatch?: (status: ClientMismatch | MessageSendingStatus) => Promise<boolean | undefined>;
+  /**
+   * Called whenever there is a clientmismatch returned from the server. Will also indicate the sending status of the message (if it was already sent or not)
+   *
+   * @param status The mismatch info
+   * @param wasSent Indicate whether the message was already sent or if it can still be canceled
+   * @return
+   */
+  onClientMismatch?: (
+    status: ClientMismatch | MessageSendingStatus,
+    wasSent: boolean,
+  ) => undefined | Promise<boolean | undefined>;
 }
 
 export class ConversationService {
@@ -270,9 +280,9 @@ export class ConversationService {
       domain?: string;
       userIds?: string[] | QualifiedId[] | UserClients | QualifiedUserClients;
       sendAsProtobuf?: boolean;
-      onClientMismatch?: (mistmatch: ClientMismatch | MessageSendingStatus) => Promise<boolean | undefined>;
+      onClientMismatch?: MessageSendingCallbacks['onClientMismatch'];
     } = {},
-  ): Promise<ClientMismatch | MessageSendingStatus | undefined> {
+  ): Promise<ClientMismatch | MessageSendingStatus> {
     const {domain, userIds} = options;
     const plainText = GenericMessage.encode(genericMessage).finish();
     if (domain) {
@@ -283,7 +293,7 @@ export class ConversationService {
       return this.messageService.sendFederatedMessage(sendingClientId, recipients, plainText, {
         conversationId: {id: conversationId, domain},
         reportMissing: isQualifiedUserClients(options.userIds), // we want to check mismatch in case the consumer gave an exact list of users/devices
-        onClientMismatch: options.onClientMismatch,
+        onClientMismatch: mismatch => options.onClientMismatch?.(mismatch, false),
       });
     }
 
@@ -295,7 +305,7 @@ export class ConversationService {
       conversationId,
       sendAsProtobuf: options.sendAsProtobuf,
       reportMissing: isUserClients(options.userIds), // we want to check mismatch in case the consumer gave an exact list of users/devices
-      onClientMismatch: options.onClientMismatch,
+      onClientMismatch: mistmatch => options.onClientMismatch?.(mistmatch, false),
     });
   }
 
@@ -763,7 +773,7 @@ export class ConversationService {
    * @param params.conversationDomain? The domain the conversation lives on (if given with QualifiedId[] or QualfiedUserClients in the userIds params, will send the message to the federated endpoint)
    * @param params.callbacks? Optional callbacks that will be called when the message starts being sent and when it has been succesfully sent.
    * @param callbacks.onStart Will be called before a message is actually sent. Returning 'false' will prevent the message from being sent
-   * @param callbacks.onClientMismatch Will be called when a mismatch happens. Returning `false` from the callback will stop the sending attempt
+   * @param callbacks.onClientMismatch? Will be called when a mismatch happens. Returning `false` from the callback will stop the sending attempt
    * @return resolves with the sent message
    */
   public async send<T extends OtrMessage = OtrMessage>({
@@ -849,9 +859,18 @@ export class ConversationService {
       this.apiClient.validatedClientId,
       payloadBundle.conversation,
       genericMessage,
-      {userIds, sendAsProtobuf, domain: conversationDomain, onClientMismatch: callbacks?.onClientMismatch},
+      {
+        userIds,
+        sendAsProtobuf,
+        domain: conversationDomain,
+        onClientMismatch: callbacks?.onClientMismatch,
+      },
     );
-    callbacks?.onSuccess?.(genericMessage, response?.time);
+    if (!this.isClearFromMismatch(response)) {
+      // We warn the consumer that there is a mismatch that did not prevent message sending
+      callbacks?.onClientMismatch?.(response, true);
+    }
+    callbacks?.onSuccess?.(genericMessage, response.time);
 
     return {
       ...payloadBundle,
@@ -911,5 +930,13 @@ export class ConversationService {
     return this.apiClient.conversation.api.putOtherMember(userId, conversationId, {
       conversation_role: conversationRole,
     });
+  }
+
+  private isClearFromMismatch(mismatch: ClientMismatch | MessageSendingStatus): boolean {
+    const hasMissing = Object.keys(mismatch.missing || {}).length > 0;
+    const hasDeleted = Object.keys(mismatch.deleted || {}).length > 0;
+    const hasRedundant = Object.keys(mismatch.redundant || {}).length > 0;
+    const hasFailed = Object.keys((mismatch as MessageSendingStatus).failed_to_send || {}).length > 0;
+    return !hasMissing && !hasDeleted && !hasRedundant && !hasFailed;
   }
 }

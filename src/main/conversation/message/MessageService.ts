@@ -67,7 +67,7 @@ export class MessageService {
       conversationId?: string;
       reportMissing?: boolean;
       sendAsProtobuf?: boolean;
-      onClientMismatch?: (mismatch: ClientMismatch) => Promise<boolean | undefined>;
+      onClientMismatch?: (mismatch: ClientMismatch) => undefined | Promise<boolean | undefined>;
     } = {},
   ): Promise<ClientMismatch> {
     let plainTextPayload = plainText;
@@ -91,6 +91,10 @@ export class MessageService {
         throw error;
       }
       const mismatch = error.response!.data as ClientMismatch;
+      const shouldStopSending = options.onClientMismatch && (await options.onClientMismatch(mismatch)) === false;
+      if (shouldStopSending) {
+        return mismatch;
+      }
       const reEncryptedMessage = await this.reencryptAfterMismatch(mismatch, encryptedPayload, plainText);
       return send(reEncryptedMessage);
     }
@@ -116,7 +120,7 @@ export class MessageService {
       assetData?: Uint8Array;
       conversationId?: QualifiedId;
       reportMissing?: boolean;
-      onClientMismatch?: (mismatch: MessageSendingStatus) => Promise<boolean | undefined>;
+      onClientMismatch?: (mismatch: MessageSendingStatus) => undefined | Promise<boolean | undefined>;
     },
   ): Promise<MessageSendingStatus> {
     const send = (payload: QualifiedOTRRecipients) => {
@@ -130,7 +134,7 @@ export class MessageService {
         throw error;
       }
       const mismatch = error.response!.data as MessageSendingStatus;
-      const shouldStopSending = options.onClientMismatch && !(await options.onClientMismatch(mismatch));
+      const shouldStopSending = options.onClientMismatch && (await options.onClientMismatch(mismatch)) === false;
       if (shouldStopSending) {
         return mismatch;
       }
@@ -142,12 +146,7 @@ export class MessageService {
   private async sendFederatedOtrMessage(
     sendingClientId: string,
     recipients: QualifiedOTRRecipients,
-    options: {
-      assetData?: Uint8Array;
-      conversationId?: QualifiedId;
-      reportMissing?: boolean;
-      onClientMismatch?: (mismatch: MessageSendingStatus) => Promise<boolean | undefined>;
-    },
+    options: {assetData?: Uint8Array; conversationId?: QualifiedId; reportMissing?: boolean},
   ): Promise<MessageSendingStatus> {
     const qualifiedUserEntries = Object.entries(recipients).map<ProtobufOTR.IQualifiedUserEntry>(
       ([domain, otrRecipients]) => {
