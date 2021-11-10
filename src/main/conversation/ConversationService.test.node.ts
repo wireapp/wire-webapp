@@ -77,6 +77,25 @@ describe('ConversationService', () => {
         expect(callbacks.onSuccess).toHaveBeenCalledWith(jasmine.any(Object), sentTime);
       });
     });
+
+    it(`cancels message sending if onStart returns false`, async () => {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
+        userId: PayloadHelper.getUUID(),
+        clientId: PayloadHelper.getUUID(),
+      };
+      const conversationService = account.service!.conversation;
+      spyOn<any>(conversationService, 'sendGenericMessage');
+      const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
+      const callbacks = {onStart: () => Promise.resolve(false), onSuccess: jasmine.createSpy()};
+      await conversationService.send({
+        callbacks,
+        payloadBundle: message,
+      });
+
+      expect(callbacks.onSuccess).not.toHaveBeenCalled();
+      expect(conversationService['sendGenericMessage']).not.toHaveBeenCalled();
+    });
   });
 
   describe('"createText"', () => {

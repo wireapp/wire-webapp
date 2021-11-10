@@ -90,7 +90,7 @@ import type {
 } from './message/OtrMessage';
 
 export interface MessageSendingCallbacks {
-  onStart?: (message: GenericMessage) => void;
+  onStart?: (message: GenericMessage) => Promise<boolean | undefined>;
   onSuccess?: (message: GenericMessage, sentTime?: string) => void;
   onClientMismatch?: (status: ClientMismatch | MessageSendingStatus) => Promise<boolean | undefined>;
 }
@@ -762,7 +762,8 @@ export class ConversationService {
    * @param params.sendAsProtobuf?
    * @param params.conversationDomain? The domain the conversation lives on (if given with QualifiedId[] or QualfiedUserClients in the userIds params, will send the message to the federated endpoint)
    * @param params.callbacks? Optional callbacks that will be called when the message starts being sent and when it has been succesfully sent.
-   * @param [callbacks.onClientMismatch] Will be called when a mismatch happens. Returning `false` from the callback will stop the sending attempt
+   * @param callbacks.onStart Will be called before a message is actually sent. Returning 'false' will prevent the message from being sent
+   * @param callbacks.onClientMismatch Will be called when a mismatch happens. Returning `false` from the callback will stop the sending attempt
    * @return resolves with the sent message
    */
   public async send<T extends OtrMessage = OtrMessage>({
@@ -839,7 +840,11 @@ export class ConversationService {
         throw new Error(`No send method implemented for "${payloadBundle['type']}".`);
     }
 
-    callbacks?.onStart?.(genericMessage);
+    if ((await callbacks?.onStart?.(genericMessage)) === false) {
+      // If the onStart call returns false, it means the consumer wants to cancel the message sending
+      return payloadBundle;
+    }
+
     const response = await this.sendGenericMessage(
       this.apiClient.validatedClientId,
       payloadBundle.conversation,
