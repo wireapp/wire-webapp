@@ -90,7 +90,7 @@ import type {
 } from './message/OtrMessage';
 
 export interface MessageSendingCallbacks {
-  onStart?: (message: GenericMessage) => Promise<boolean | undefined>;
+  onStart?: (message: GenericMessage) => undefined | Promise<boolean | undefined>;
   onSuccess?: (message: GenericMessage, sentTime?: string) => void;
   /**
    * Called whenever there is a clientmismatch returned from the server. Will also indicate the sending status of the message (if it was already sent or not)
