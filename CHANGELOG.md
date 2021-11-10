@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.25.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.24.2...@wireapp/core@17.25.0) (2021-11-10)
+
+
+### Features
+
+* **core:** Add a mechanism to cancel message sending ([#4172](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4172)) ([ad0f27c](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/ad0f27c2d827c3e062a5774ac17379179c64413d))
+
+
+
+
+
 ## [17.24.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.24.1...@wireapp/core@17.24.2) (2021-11-10)
 
 
