@@ -24,6 +24,7 @@ import {MotionDuration} from '../../../motion/MotionDuration';
 
 interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;
+  'data-uie-name'?: string;
   forceLowerCase?: boolean;
   isDone?: boolean;
   label: string;
@@ -87,6 +88,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
     }
     setInput(value);
   };
+  const iconUiePrefix = rest['data-uie-name'] ?? 'account-input';
   return (
     <div
       css={{
@@ -145,11 +147,18 @@ const AccountInput: React.FC<AccountInputProps> = ({
             </span>
           </span>
           {isDone ? (
-            <Icon.AnimatedCheck css={{path: {stroke: 'var(--foreground)'}}} data-uie-name="enter-username-icon-check" />
+            <Icon.AnimatedCheck
+              css={{path: {stroke: 'var(--foreground)'}}}
+              data-uie-name={`${iconUiePrefix}-icon-check`}
+            />
           ) : (
             !readOnly &&
             !isEditing && (
-              <Icon.Edit css={{fill: 'var(--foreground)'}} className="edit-icon" data-uie-name="enter-username-icon" />
+              <Icon.Edit
+                css={{fill: 'var(--foreground)'}}
+                className="edit-icon"
+                data-uie-name={`${iconUiePrefix}-icon`}
+              />
             )
           )}
         </div>
