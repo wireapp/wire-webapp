@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.26.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.25.0...@wireapp/core@17.26.0) (2021-11-10)
+
+
+### Features
+
+* **core:** Add mismatch hook for non-federated messages ([#4175](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4175)) ([3b24631](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/3b2463146871e523f69f86a60a02ca980ef67321))
+
+
+
+
+
 # [17.25.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.24.2...@wireapp/core@17.25.0) (2021-11-10)
 
 
