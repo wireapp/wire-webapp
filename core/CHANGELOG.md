@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.24.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.24.1...@wireapp/core@17.24.2) (2021-11-10)
+
+
+### Bug Fixes
+
+* **core:** Gracefully handle missing sessions when encrypting ([#4176](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4176)) ([7de01a2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/7de01a2608b29499d9a89c1c2b7e783f1e7e4dcf))
+
+
+
+
+
 ## [17.24.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.24.0...@wireapp/core@17.24.1) (2021-11-09)
 
 **Note:** Version bump only for package @wireapp/core
