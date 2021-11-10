@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.26.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.26.0...@wireapp/core@17.26.1) (2021-11-10)
+
+
+### Bug Fixes
+
+* **core:** More permissive types for onStart callback ([3c6b342](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/3c6b3426f5bb0d37f2dfd5c492faeea295a9e2b2))
+
+
+
+
+
 # [17.26.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.25.0...@wireapp/core@17.26.0) (2021-11-10)
 
 
