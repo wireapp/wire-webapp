@@ -302,5 +302,97 @@ describe('MessageService', () => {
         true,
       );
     });
+
+    describe('client mismatch', () => {
+      const baseClientMismatch: ClientMismatch = {
+        deleted: {},
+        missing: {},
+        redundant: {},
+        time: new Date().toISOString(),
+      };
+
+      it('handles client mismatch internally if no onClientMismatch is given', async () => {
+        let spyCounter = 0;
+        const clientMismatch = {
+          ...baseClientMismatch,
+          deleted: {[user1.id]: [user1.clients[0]]},
+          missing: {[user2.id]: ['client22']},
+        };
+        spyOn(apiClient.conversation.api, 'postOTRMessage').and.callFake(() => {
+          spyCounter++;
+          if (spyCounter === 1) {
+            const error = new Error();
+            (error as any).response = {
+              status: StatusCodes.PRECONDITION_FAILED,
+              data: clientMismatch,
+            };
+            return Promise.reject(error);
+          }
+          return Promise.resolve(baseClientMismatch);
+        });
+        spyOn(apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+
+        const recipients = generateRecipients([user1, user2]);
+
+        await messageService.sendMessage('senderclientid', recipients, new Uint8Array(), {
+          reportMissing: true,
+          conversationId: 'convid',
+        });
+        expect(apiClient.conversation.api.postOTRMessage).toHaveBeenCalledTimes(2);
+      });
+
+      it('continues message sending if onClientMismatch returns true', async () => {
+        const onClientMismatch = jasmine.createSpy().and.returnValue(Promise.resolve(true));
+        const clientMismatch = {...baseClientMismatch, missing: {[user2.id]: ['client22']}};
+        let spyCounter = 0;
+        spyOn(apiClient.conversation.api, 'postOTRMessage').and.callFake(() => {
+          spyCounter++;
+          if (spyCounter === 1) {
+            const error = new Error();
+            (error as any).response = {
+              status: StatusCodes.PRECONDITION_FAILED,
+              data: clientMismatch,
+            };
+            return Promise.reject(error);
+          }
+          return Promise.resolve(baseClientMismatch);
+        });
+        spyOn(apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+
+        const recipients = generateRecipients([user1, user2]);
+
+        await messageService.sendMessage('senderclientid', recipients, new Uint8Array(), {
+          reportMissing: true,
+          onClientMismatch,
+          conversationId: 'convid',
+        });
+        expect(apiClient.conversation.api.postOTRMessage).toHaveBeenCalledTimes(2);
+        expect(onClientMismatch).toHaveBeenCalledWith(clientMismatch);
+      });
+
+      it('stops message sending if onClientMismatch returns false', async () => {
+        const onClientMismatch = jasmine.createSpy().and.returnValue(Promise.resolve(false));
+        const clientMismatch = {...baseMessageSendingStatus, missing: {[user2.id]: ['client22']}};
+        spyOn(apiClient.conversation.api, 'postOTRMessage').and.callFake(() => {
+          const error = new Error();
+          (error as any).response = {
+            status: StatusCodes.PRECONDITION_FAILED,
+            data: clientMismatch,
+          };
+          return Promise.reject(error);
+        });
+        spyOn(apiClient.user.api, 'postMultiPreKeyBundles').and.returnValue(Promise.resolve({}));
+
+        const recipients = generateRecipients([user1, user2]);
+
+        await messageService.sendMessage('senderclientid', recipients, new Uint8Array(), {
+          reportMissing: true,
+          onClientMismatch,
+          conversationId: 'convid',
+        });
+        expect(apiClient.conversation.api.postOTRMessage).toHaveBeenCalledTimes(1);
+        expect(onClientMismatch).toHaveBeenCalledWith(clientMismatch);
+      });
+    });
   });
 });
