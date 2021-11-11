@@ -27,7 +27,6 @@ import {
   Ephemeral,
   External,
   GenericMessage,
-  Knock,
   LastRead,
   LegalHoldStatus,
   MessageDelete,
@@ -35,13 +34,20 @@ import {
   MessageHide,
   Reaction,
   Text,
+  Knock,
   Asset as ProtobufAsset,
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {ReactionType, MessageSendingCallbacks} from '@wireapp/core/src/main/conversation/';
+import {ReactionType, MessageSendingCallbacks} from '@wireapp/core/src/main/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
+import {
+  ClientMismatch,
+  NewOTRMessage,
+  QualifiedUserClients,
+  MessageSendingStatus,
+  UserClients,
+} from '@wireapp/api-client/src/conversation';
 import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
@@ -110,17 +116,23 @@ import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 import {Core} from '../service/CoreSingleton';
 import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import {User} from '../entity/User';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
+type ClientMismatchHandlerFn = (
+  mismatch: ClientMismatch | MessageSendingStatus,
+  conversationId?: QualifiedId,
+) => Promise<boolean>;
 export class MessageRepository {
   private readonly logger: Logger;
   private readonly eventService: EventService;
   private readonly event_mapper: EventMapper;
   public readonly clientMismatchHandler: ClientMismatchHandler;
   private isBlockingNotificationHandling: boolean;
+  private onClientMismatch?: ClientMismatchHandlerFn;
 
   constructor(
     private readonly clientRepository: ClientRepository,
@@ -159,6 +171,15 @@ export class MessageRepository {
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
     amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancelAssetUpload);
+  }
+
+  /**
+   * Will set a handler when sending message reports a client mismatch
+   * @param onClientMismatch - The function to be called when there is a mismatch. If this function resolves to 'false' then the sending will be cancelled
+   * @return void
+   */
+  public setClientMismatchHandler(onClientMismatch: ClientMismatchHandlerFn) {
+    this.onClientMismatch = onClientMismatch;
   }
 
   /**
@@ -808,7 +829,14 @@ export class MessageRepository {
     },
   ) {
     const users = conversation.allUserEntities;
-    const userIds = conversation.isFederated() ? users.map(user => user.qualifiedId) : users.map(user => user.id);
+    const userIds = conversation.isFederated()
+      ? this.createQualifiedRecipients(users)
+      : await this.createRecipients(
+          conversation.qualifiedId,
+          false,
+          users.map(user => user.id),
+        );
+
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
       if (playPingAudio) {
         amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
@@ -830,7 +858,11 @@ export class MessageRepository {
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
     await this.core.service!.conversation.send({
-      callbacks: {onStart: injectOptimisticEvent, onSuccess: updateOptimisticEvent},
+      callbacks: {
+        onClientMismatch: mismatch => this.onClientMismatch(mismatch, conversation.qualifiedId),
+        onStart: injectOptimisticEvent,
+        onSuccess: updateOptimisticEvent,
+      },
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       payloadBundle: payload,
       userIds,
@@ -1024,21 +1056,32 @@ export class MessageRepository {
    * Send reaction to a content message in specified conversation.
    * @param conversationEntity Conversation to send reaction in
    * @param messageEntity Message to react to
-   * @param reaction Reaction
+   * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
-  private sendReaction(
+  private async sendReaction(
     conversationEntity: Conversation,
     messageEntity: Message,
-    reaction: ReactionType,
-  ): Promise<ConversationEvent> {
-    const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
+    reactionType: ReactionType,
+  ): Promise<void> {
+    if (conversationEntity.isFederated()) {
+      const reaction = this.core.service!.conversation.messageBuilder.createReaction({
+        conversationId: conversationEntity.id,
+        reaction: {
+          originalMessageId: messageEntity.id,
+          type: reactionType,
+        },
+      });
+
+      return this.sendAndInjectGenericCoreMessage(reaction, conversationEntity);
+    }
+    const protoReaction = new Reaction({emoji: reactionType, messageId: messageEntity.id});
     const genericMessage = new GenericMessage({
       [GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
       messageId: createRandomUuid(),
     });
 
-    return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
+    await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
   }
 
   private createTextProto(
@@ -1328,6 +1371,14 @@ export class MessageRepository {
     }
   }
 
+  private createQualifiedRecipients(users: User[]): QualifiedUserClients {
+    return users.reduce((userClients, user) => {
+      userClients[user.domain] ||= {};
+      userClients[user.domain][user.id] = user.devices().map(client => client.id);
+      return userClients;
+    }, {} as QualifiedUserClients);
+  }
+
   /**
    * Create a user client map for a given conversation.
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
@@ -1335,7 +1386,7 @@ export class MessageRepository {
   async createRecipients(
     conversationId: QualifiedId,
     skip_own_clients = false,
-    user_ids: string[] = null,
+    user_ids?: string[],
   ): Promise<UserClients> {
     const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversationId);
     const recipients: UserClients = {};
@@ -1936,7 +1987,7 @@ export class MessageRepository {
       );
 
       const missedUserIds = Object.keys(errorData.missing).map(userId => ({
-        domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN,
+        domain: '',
         id: userId,
       }));
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);

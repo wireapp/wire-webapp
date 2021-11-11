@@ -24,6 +24,7 @@ import {
   ConversationEvent,
   ConversationOtrMessageAddEvent,
 } from '@wireapp/api-client/src/event/';
+import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {Notification} from '@wireapp/api-client/src/notification/';
 import {MemberLeaveReason} from '@wireapp/api-client/src/conversation/data/';
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
@@ -54,6 +55,8 @@ import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {CallState} from '../calling/CallState';
 import {MessageCategory} from '../message/MessageCategory';
+import {isQualifiedId} from '@wireapp/core/src/main/util';
+import {constructClientPrimaryKey} from './StorageUtil';
 
 function downloadText(text: string, filename: string = 'default.txt'): number {
   const url = `data:text/plain;charset=utf-8,${encodeURIComponent(text)}`;
@@ -109,8 +112,9 @@ export class DebugUtil {
   }
 
   /** Used by QA test automation. */
-  async breakSession(userId: string, clientId: string): Promise<void> {
-    const sessionId = `${userId}@${clientId}`;
+  async breakSession(userId: string | QualifiedId, clientId: string): Promise<void> {
+    const qualifiedId = isQualifiedId(userId) ? userId : {domain: '', id: userId};
+    const sessionId = constructClientPrimaryKey(qualifiedId, clientId);
     const cryptobox = this.cryptographyRepository.cryptobox;
     const cryptoboxSession = await cryptobox.session_load(sessionId);
     cryptoboxSession.session.session_states = {};

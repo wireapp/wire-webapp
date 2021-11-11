@@ -331,7 +331,11 @@ export class InputBarViewModel {
 
     this.hasLocalEphemeralTimer = ko.pureComputed(() => {
       const conversationEntity = this.conversationEntity();
-      return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
+      return (
+        teamState.isSelfDeletingMessagesEnabled() &&
+        conversationEntity.localMessageTimer() &&
+        !conversationEntity.hasGlobalMessageTimer()
+      );
     });
 
     // TODO(Federation): For Federation playground builds we disable every other activity than sending plain text messages

@@ -389,7 +389,7 @@ export class MessageListViewModel {
     messageEntity.is_resetting_session(true);
     try {
       await this.messageRepository.resetSession(
-        {domain: messageEntity.domain, id: messageEntity.from},
+        {domain: messageEntity.fromDomain, id: messageEntity.from},
         messageEntity.client_id,
         this.conversation(),
       );

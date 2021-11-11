@@ -38,6 +38,7 @@ import type {QualifiedUserClientMap} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import type {PublicClient, AddedClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
 
@@ -75,6 +76,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -197,17 +199,18 @@ export class UserRepository {
    * Retrieves meta information about all the clients of given users.
    */
   getClientsByUsers(
-    userEntities: User[],
+    userEntities: User[] | QualifiedId[],
     updateClients: boolean,
   ): Promise<UserClientEntityMap | QualifiedUserClientEntityMap> {
+    const userIds = isQualifiedId(userEntities[0])
+      ? userEntities
+      : (userEntities as User[]).map(userEntity => userEntity.qualifiedId);
     // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
     // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
-    if (!!userEntities[0]?.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
+    if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
       return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
     }
 
-    const userIds = userEntities.map(userEntity => userEntity.qualifiedId);
     return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
@@ -342,6 +345,24 @@ export class UserRepository {
   };
 
   /**
+   * Will sync all the clients of the users given with the backend and add the missing ones.
+   * @param userIds - The users which clients should be updated
+   * @return true if one or many clients were added to one or many users
+   */
+  async updateMissingUsersClients(userIds: QualifiedId[]): Promise<boolean> {
+    const clients = await this.getClientsByUsers(userIds, false);
+    const users = flattenUserClientsQualifiedIds<ClientEntity>(clients);
+    const addedUsers = await Promise.all(
+      users.map(async ({userId, clients}) => {
+        return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).some(
+          wasAdded => wasAdded === true,
+        );
+      }),
+    );
+    return addedUsers.some(wasAdded => wasAdded === true);
+  }
+
+  /**
    * Removes a stored client and the session connected with it.
    * @deprecated
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
@@ -385,7 +406,7 @@ export class UserRepository {
     const sortedUsers = this.userState
       .directlyConnectedUsers()
       // TMP the `filter` can be removed when message broadcast works on federated backends
-      .filter(user => user.isOnSameFederatedDomain())
+      .filter(user => !user.isFederated)
       .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
     const [members, other] = partition(sortedUsers, user => user.isTeamMember());
     const recipients = [this.userState.self(), ...members, ...other].slice(
@@ -569,15 +590,19 @@ export class UserRepository {
     return user;
   }
 
-  async getUserByHandle(fqn: QualifiedHandle): Promise<void | APIClientUser> {
+  async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
     try {
       return await this.userService.getUserByFQN(fqn);
     } catch (error) {
       // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
-      if (!isBackendError(error) || error.code !== HTTP_STATUS.NOT_FOUND) {
+      if (
+        !isBackendError(error) ||
+        (error.code !== HTTP_STATUS.NOT_FOUND && error.label !== BackendErrorLabel.FEDERATION_NOT_ALLOWED)
+      ) {
         throw error;
       }
     }
+    return undefined;
   }
 
   /**

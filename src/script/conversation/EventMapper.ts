@@ -324,6 +324,7 @@ export class EventMapper {
       category,
       data,
       from,
+      qualified_from,
       id,
       primary_key,
       time,
@@ -337,6 +338,7 @@ export class EventMapper {
     messageEntity.category = category;
     messageEntity.conversation_id = conversationEntity.id;
     messageEntity.from = from;
+    messageEntity.fromDomain = qualified_from?.domain;
     messageEntity.fromClientId = from_client_id;
     messageEntity.id = id;
     messageEntity.primary_key = primary_key;

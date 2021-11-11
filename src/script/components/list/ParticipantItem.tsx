@@ -89,7 +89,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
   const hasUsernameInfo = isUser && !hideInfo && !hasCustomInfo && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
-  const isFederated = participant instanceof User && !participant.isOnSameFederatedDomain();
+  const isFederated = participant instanceof User && participant.isFederated;
   const isGuest = participant instanceof User && !isFederated && useKoSubscribable(participant.isGuest);
   const isVerified = useKoSubscribable((participant as User).is_verified ?? ko.observable(false));
   const availability = useKoSubscribable((participant as User).availability ?? ko.observable<Availability.Type>());

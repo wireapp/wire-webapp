@@ -30,7 +30,6 @@ import type {CryptographyRepository} from '../cryptography/CryptographyRepositor
 import type {UserRepository} from '../user/UserRepository';
 import type {EventInfoEntity} from './EventInfoEntity';
 import type {Conversation} from '../entity/Conversation';
-import {Config} from '../Config';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export class ClientMismatchHandler {
@@ -102,7 +101,7 @@ export class ClientMismatchHandler {
       const unknownUsers = getDifference(
         knownUsers.map(user => user.id),
         missingUserIds,
-      ).map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || '', id}));
+      ).map(id => ({domain: '', id}));
 
       if (unknownUsers.length > 0) {
         this.conversationRepositoryProvider().addMissingMember(conversationEntity, unknownUsers, timestamp - 1);
@@ -133,7 +132,7 @@ export class ClientMismatchHandler {
     }
 
     this.conversationRepositoryProvider().verificationStateHandler.onClientsAdded(
-      missingUserIds.map(id => ({domain: Config.getConfig().FEATURE.FEDERATION_DOMAIN || '', id})),
+      missingUserIds.map(id => ({domain: '', id})),
     );
 
     if (payload) {

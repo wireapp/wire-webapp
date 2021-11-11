@@ -186,7 +186,7 @@ const UserActions: React.FC<UserActionsProps> = ({
           return;
         }
         const config = Config.getConfig().FEATURE;
-        if (config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN) {
+        if (config.ENABLE_FEDERATION) {
           /**
            * This can be generalize to any 1:1 conversation creation. Though, this is quite a big change and we will keep it for federated backends for now.
            * The idea is to create a local conversation once a connection request is sent instead of requesting the conversation against the backend.

@@ -181,8 +181,7 @@ export class ConnectionRepository {
    */
   public async createConnection(userEntity: User): Promise<boolean> {
     try {
-      const config = Config.getConfig().FEATURE;
-      const isFederatedBackend = config.ENABLE_FEDERATION && config.FEDERATION_DOMAIN;
+      const isFederatedBackend = Config.getConfig().FEATURE.ENABLE_FEDERATION;
       const response = isFederatedBackend
         ? await this.connectionService.postFederationConnections(userEntity.qualifiedId)
         : await this.connectionService.postConnections(userEntity.id, userEntity.name());
@@ -303,8 +302,7 @@ export class ConnectionRepository {
    */
   private async updateStatus(userEntity: User, newStatus: ConnectionStatus): Promise<void> {
     const currentStatus = userEntity.connection().status();
-    const config = Config.getConfig().FEATURE;
-    const isFederated = config.FEDERATION_DOMAIN && config.ENABLE_FEDERATION;
+    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION;
     try {
       const response = isFederated
         ? await this.connectionService.putFederatedConnections(userEntity.qualifiedId, newStatus)

@@ -37,7 +37,7 @@ export class TeamEntity {
     this.creator = undefined;
     this.icon = '';
     this.iconKey = undefined;
-    this.members = ko.observableArray([]);
+    this.members = ko.observableArray<User>([]);
     this.id = id;
     this.name = ko.observable('');
   }

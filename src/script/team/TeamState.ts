@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
-import {FeatureList, FeatureStatus} from '@wireapp/api-client/src/team/feature/';
+import {FeatureList, FeatureStatus, SelfDeletingTimeout} from '@wireapp/api-client/src/team/feature/';
 
 import {sortUsersByPriority} from 'Util/StringUtil';
 
@@ -40,6 +40,9 @@ export class TeamState {
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
+  public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
+  public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
+  public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SelfDeletingTimeout>;
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
   public readonly isAppLockEnforced: ko.PureComputed<boolean>;
   public readonly appLockInactivityTimeoutSecs: ko.PureComputed<number>;
@@ -47,6 +50,7 @@ export class TeamState {
   readonly teamUsers: ko.PureComputed<User[]>;
   readonly isTeam: ko.PureComputed<boolean>;
   readonly team: ko.Observable<TeamEntity>;
+  readonly teamDomain: ko.PureComputed<string>;
   readonly teamSize: ko.PureComputed<number>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
@@ -61,6 +65,7 @@ export class TeamState {
     this.memberInviters = ko.observable({});
     this.teamFeatures = ko.observable();
 
+    this.teamDomain = ko.pureComputed(() => userState.self().domain);
     this.teamName = ko.pureComputed(() => (this.isTeam() ? this.team().name() : this.userState.self().name()));
     this.teamSize = ko.pureComputed(() => (this.isTeam() ? this.teamMembers().length + 1 : 0));
     this.teamUsers = ko.pureComputed(() => {
@@ -84,6 +89,17 @@ export class TeamState {
       const status = this.teamFeatures()?.fileSharing?.status;
       return status ? status === FeatureStatus.ENABLED : true;
     });
+
+    this.isSelfDeletingMessagesEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.selfDeletingMessages?.status === FeatureStatus.ENABLED,
+    );
+    this.getEnforcedSelfDeletingMessagesTimeout = ko.pureComputed(
+      () =>
+        (this.teamFeatures()?.selfDeletingMessages?.config?.enforcedTimeoutSeconds || SelfDeletingTimeout.OFF) * 1000,
+    );
+    this.isSelfDeletingMessagesEnforced = ko.pureComputed(
+      () => this.getEnforcedSelfDeletingMessagesTimeout() > SelfDeletingTimeout.OFF,
+    );
 
     this.isVideoCallingEnabled = ko.pureComputed(
       // TODO connect to video calling feature config
