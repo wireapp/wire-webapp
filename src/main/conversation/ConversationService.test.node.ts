@@ -96,6 +96,24 @@ describe('ConversationService', () => {
       expect(callbacks.onSuccess).not.toHaveBeenCalled();
       expect(conversationService['sendGenericMessage']).not.toHaveBeenCalled();
     });
+
+    it(`does not call onSuccess when message was canceled`, async () => {
+      account['apiClient'].context = {
+        clientType: ClientType.NONE,
+        userId: PayloadHelper.getUUID(),
+        clientId: PayloadHelper.getUUID(),
+      };
+      const conversationService = account.service!.conversation;
+      spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: '', errored: true}));
+      const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
+      const callbacks = {onSuccess: jasmine.createSpy()};
+      await conversationService.send({
+        callbacks,
+        payloadBundle: message,
+      });
+
+      expect(callbacks.onSuccess).not.toHaveBeenCalled();
+    });
   });
 
   describe('"createText"', () => {
