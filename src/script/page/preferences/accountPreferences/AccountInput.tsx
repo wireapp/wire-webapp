@@ -28,6 +28,7 @@ interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   forceLowerCase?: boolean;
   isDone?: boolean;
   label: string;
+  labelUie?: string;
   maxLength?: number;
   onValueChange?: (value: string) => void;
   prefix?: string;
@@ -35,6 +36,7 @@ interface AccountInputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   setIsEditing?: (isEditing: boolean) => void;
   suffix?: string;
   value: string;
+  valueUie?: string;
 }
 
 export const useInputDone = () => {
@@ -68,6 +70,8 @@ const AccountInput: React.FC<AccountInputProps> = ({
   forceLowerCase = false,
   maxLength,
   allowedChars,
+  labelUie,
+  valueUie,
   ...rest
 }) => {
   const [input, setInput] = useState<string>();
@@ -120,6 +124,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
           lineHeight: '1.33',
           marginBottom: 2,
         }}
+        data-uie-name={labelUie}
       >
         {label}
       </label>
@@ -173,7 +178,9 @@ const AccountInput: React.FC<AccountInputProps> = ({
         >
           <span css={{opacity: 0}}>{prefix}</span>
           {readOnly ? (
-            <span {...rest}>{value}</span>
+            <span data-uie-name={valueUie} data-uie-value={value} {...rest}>
+              {value}
+            </span>
           ) : (
             <input
               css={{
