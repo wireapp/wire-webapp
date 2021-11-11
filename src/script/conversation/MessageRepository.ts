@@ -794,9 +794,18 @@ export class MessageRepository {
     if (conversation.verification_state() !== ConversationVerificationState.DEGRADED) {
       return Promise.resolve(true);
     }
+
+    const users = conversation.getUsersWithUnverifiedClients();
+    const userNames = joinNames(users, Declension.NOMINATIVE);
+    const titleSubstitutions = capitalizeFirstChar(userNames);
+
     const actionString = t('modalConversationNewDeviceAction');
     const messageString = t('modalConversationNewDeviceMessage');
-    const titleString = t('modalConversationNewDeviceHeadlineMany'); // TODO get user names
+    const baseTitle =
+      users.length > 1
+        ? t('modalConversationNewDeviceHeadlineMany', titleSubstitutions)
+        : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
+    const titleString = users[0].isMe ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions) : baseTitle;
 
     return new Promise(resolve => {
       const options: ModalOptions = {
