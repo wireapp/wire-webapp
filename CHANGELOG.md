@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.27.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.27.0...@wireapp/core@17.27.1) (2021-11-11)
+
+
+### Bug Fixes
+
+* **core:** Allow sending regular messages to empty userIds ([d918bf7](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/d918bf722c9b4761224d48630aefbdf16660c352))
+
+
+
+
+
 # [17.27.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.26.1...@wireapp/core@17.27.0) (2021-11-11)
 
 
