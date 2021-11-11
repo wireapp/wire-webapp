@@ -135,7 +135,7 @@ describe('MessageService', () => {
       });
 
       it('continues message sending if onClientMismatch returns true', async () => {
-        const onClientMismatch = jasmine.createSpy().and.returnValue(Promise.resolve(true));
+        const onClientMismatch = jasmine.createSpy('onClientMismatch').and.returnValue(true);
         const clientMismatch = {...baseMessageSendingStatus, missing: {'2.wire.test': {[user2.id]: ['client22']}}};
         let spyCounter = 0;
         spyOn(apiClient.conversation.api, 'postOTRMessageV2').and.callFake(() => {
@@ -164,7 +164,7 @@ describe('MessageService', () => {
       });
 
       it('stops message sending if onClientMismatch returns false', async () => {
-        const onClientMismatch = jasmine.createSpy().and.returnValue(Promise.resolve(false));
+        const onClientMismatch = jasmine.createSpy('onClientMismatch').and.returnValue(false);
         const clientMismatch = {...baseMessageSendingStatus, missing: {'2.wire.test': {[user2.id]: ['client22']}}};
         spyOn(apiClient.conversation.api, 'postOTRMessageV2').and.callFake(() => {
           const error = new Error();
