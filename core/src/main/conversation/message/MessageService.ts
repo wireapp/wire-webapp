@@ -69,7 +69,7 @@ export class MessageService {
       sendAsProtobuf?: boolean;
       onClientMismatch?: (mismatch: ClientMismatch) => void | boolean | Promise<boolean>;
     } = {},
-  ): Promise<ClientMismatch> {
+  ): Promise<ClientMismatch & {errored?: boolean}> {
     let plainTextPayload = plainText;
     let cipherText: Uint8Array;
     if (this.shouldSendAsExternal(plainText, recipients)) {
@@ -93,7 +93,7 @@ export class MessageService {
       const mismatch = error.response!.data as ClientMismatch;
       const shouldStopSending = options.onClientMismatch && (await options.onClientMismatch(mismatch)) === false;
       if (shouldStopSending) {
-        return mismatch;
+        return {...mismatch, errored: true};
       }
       const reEncryptedMessage = await this.reencryptAfterMismatch(mismatch, encryptedPayload, plainText);
       return send(reEncryptedMessage);
@@ -122,7 +122,7 @@ export class MessageService {
       reportMissing?: boolean;
       onClientMismatch?: (mismatch: MessageSendingStatus) => void | boolean | Promise<boolean>;
     },
-  ): Promise<MessageSendingStatus> {
+  ): Promise<MessageSendingStatus & {errored?: boolean}> {
     const send = (payload: QualifiedOTRRecipients) => {
       return this.sendFederatedOtrMessage(sendingClientId, payload, options);
     };
@@ -136,7 +136,7 @@ export class MessageService {
       const mismatch = error.response!.data as MessageSendingStatus;
       const shouldStopSending = options.onClientMismatch && (await options.onClientMismatch(mismatch)) === false;
       if (shouldStopSending) {
-        return mismatch;
+        return {...mismatch, errored: true};
       }
       const reEncryptedPayload = await this.reencryptAfterFederatedMismatch(mismatch, encryptedPayload, plainText);
       return send(reEncryptedPayload);

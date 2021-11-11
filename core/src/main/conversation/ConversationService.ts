@@ -282,7 +282,7 @@ export class ConversationService {
       sendAsProtobuf?: boolean;
       onClientMismatch?: MessageSendingCallbacks['onClientMismatch'];
     } = {},
-  ): Promise<ClientMismatch | MessageSendingStatus> {
+  ) {
     const {domain, userIds} = options;
     const plainText = GenericMessage.encode(genericMessage).finish();
     if (domain) {
@@ -866,11 +866,14 @@ export class ConversationService {
         onClientMismatch: callbacks?.onClientMismatch,
       },
     );
-    if (!this.isClearFromMismatch(response)) {
-      // We warn the consumer that there is a mismatch that did not prevent message sending
-      callbacks?.onClientMismatch?.(response, true);
+
+    if (!response.errored) {
+      callbacks?.onSuccess?.(genericMessage, response.time);
+      if (!this.isClearFromMismatch(response)) {
+        // We warn the consumer that there is a mismatch that did not prevent message sending
+        callbacks?.onClientMismatch?.(response, true);
+      }
     }
-    callbacks?.onSuccess?.(genericMessage, response.time);
 
     return {
       ...payloadBundle,
