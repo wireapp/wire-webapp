@@ -99,7 +99,7 @@ const AccountInput: React.FC<AccountInputProps> = ({
         ':hover .edit-icon': {
           opacity: 1,
         },
-        backgroundColor: isEditing ? 'white' : 'transparent',
+        backgroundColor: isEditing ? 'var(--preference-account-input-bg)' : 'transparent',
         display: 'flex',
         flexDirection: 'column',
         height: 56,
