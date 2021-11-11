@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.27.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.26.1...@wireapp/core@17.27.0) (2021-11-11)
+
+
+### Features
+
+* **core:** Do not call onSuccess when message sending errored ([#4178](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4178)) ([28579aa](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/28579aaa111dad2ed67729efed30ad3da7d68b9d))
+
+
+
+
+
 ## [17.26.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.26.0...@wireapp/core@17.26.1) (2021-11-10)
 
 
