@@ -18,9 +18,7 @@
  */
 
 import {Runtime} from '@wireapp/commons';
-import {WebAppEvents} from '@wireapp/webapp-events';
-import {amplify} from 'amplify';
-import React, {useEffect, useRef} from 'react';
+import React, {useRef} from 'react';
 import {container} from 'tsyringe';
 import {useEnrichedFields} from 'Components/panel/EnrichedFields';
 
@@ -31,12 +29,10 @@ import {loadValue} from 'Util/StorageUtil';
 import useEffectRef from 'Util/useEffectRef';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
-import {ClientEntity} from '../../client/ClientEntity';
 import {ClientRepository} from '../../client/ClientRepository';
 import {Config} from '../../Config';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {User} from '../../entity/User';
-import {Notification, PreferenceNotificationRepository} from '../../notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {StorageKey} from '../../storage';
 import {TeamState} from '../../team/TeamState';
@@ -44,7 +40,6 @@ import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
-import {ContentViewModel} from '../../view_model/ContentViewModel';
 import {modals, ModalsViewModel} from '../../view_model/ModalsViewModel';
 import AccentColorPicker from '../AccentColorPicker';
 import AccountInput from './accountPreferences/AccountInput';
@@ -63,7 +58,6 @@ import UsernameInput from './accountPreferences/UsernameInput';
 interface AccountPreferencesProps {
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
-  preferenceNotificationRepository: PreferenceNotificationRepository;
   propertiesRepository: PropertiesRepository;
   richProfileRepository?: RichProfileRepository;
   teamState?: TeamState;
@@ -77,7 +71,6 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   clientRepository,
   userRepository,
   propertiesRepository,
-  preferenceNotificationRepository,
   conversationRepository,
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
@@ -128,44 +121,6 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
       undefined,
     );
   };
-
-  useEffect(() => {
-    const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
-      switch (type) {
-        case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
-          modals.showModal(
-            ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES,
-            {
-              data: aggregatedNotifications.map(notification => notification.data) as ClientEntity[],
-              preventClose: true,
-              secondaryAction: {
-                action: () => {
-                  amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
-                },
-              },
-            },
-            undefined,
-          );
-          break;
-        }
-
-        case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
-          modals.showModal(
-            ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED,
-            {
-              data: aggregatedNotifications.pop().data as boolean,
-              preventClose: true,
-            },
-            undefined,
-          );
-          break;
-        }
-      }
-    };
-    preferenceNotificationRepository
-      .getNotifications()
-      .forEach(({type, notification}) => showNotification(type, notification));
-  }, []);
 
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
@@ -265,5 +220,5 @@ export default AccountPreferences;
 registerReactComponent('account-preferences', {
   component: AccountPreferences,
   template:
-    '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository, preferenceNotificationRepository}"></div>',
+    '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository}"></div>',
 });
