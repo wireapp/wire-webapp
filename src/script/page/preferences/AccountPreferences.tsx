@@ -190,7 +190,14 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
                 />
               )}
               {richFields.map(({type, value}) => (
-                <AccountInput key={type} label={type} value={value} readOnly />
+                <AccountInput
+                  key={type}
+                  labelUie="item-enriched-key"
+                  valueUie="item-enriched-value"
+                  label={type}
+                  value={value}
+                  readOnly
+                />
               ))}
             </div>
           </PreferencesSection>
