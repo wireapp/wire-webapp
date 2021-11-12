@@ -92,8 +92,10 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   const canEditProfile = managedBy === User.CONFIG.MANAGED_BY.WIRE;
   const isDesktop = Runtime.isDesktopApp();
   const isTemporaryAndNonPersistent = useRef(isTemporaryClientAndNonPersistent(loadValue(StorageKey.AUTH.PERSIST)));
-  const brandName = Config.getConfig().BRAND_NAME;
-  const isConsentCheckEnabled = Config.getConfig().FEATURE.CHECK_CONSENT;
+  const config = Config.getConfig();
+  const brandName = config.BRAND_NAME;
+  const isFederated = config.FEATURE.ENABLE_FEDERATION;
+  const isConsentCheckEnabled = config.FEATURE.CHECK_CONSENT;
 
   const richFields = useEnrichedFields(selfUser, false, richProfileRepository);
   const domain = selfUser.domain;
@@ -163,7 +165,10 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
               }}
             >
               <NameInput {...{canEditProfile, name, userRepository}} />
-              <UsernameInput {...{canEditProfile, domain, userRepository, username}} />
+              <UsernameInput
+                {...{canEditProfile, userRepository, username}}
+                domain={isFederated ? domain : undefined}
+              />
               {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
               {phone && (
                 <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly data-uie-name="enter-phone" />
@@ -176,7 +181,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
                   data-uie-name="status-team"
                 />
               )}
-              {domain && (
+              {isFederated && (
                 <AccountInput
                   label={t('preferencesAccountDomain')}
                   value={domain}
