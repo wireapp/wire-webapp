@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.4.0...@wireapp/api-client@15.5.0) (2021-11-12)
+
+
+### Features
+
+* **api-client:** Add lead endpoint bindings ([#4179](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4179)) ([8beec86](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/8beec86dd283ca2a746f8110d441522b95d5062e))
+
+
+
+
+
 # [15.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.3.0...@wireapp/api-client@15.4.0) (2021-11-01)
 
 
