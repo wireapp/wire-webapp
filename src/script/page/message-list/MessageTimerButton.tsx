@@ -114,6 +114,6 @@ export const MessageTimerButton: React.FC<MessageTimerButtonProps> = ({
 export default MessageTimerButton;
 
 registerReactComponent('message-timer-button', {
-  bindings: 'conversation: ko.unwrap(conversation)',
   component: MessageTimerButton,
+  template: '<span data-bind="react: {conversation: ko.unwrap(conversation)}"></span>',
 });
