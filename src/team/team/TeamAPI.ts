@@ -24,6 +24,7 @@ import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '
 import {RequestCancellationError} from '../../user';
 import type {TeamSizeData} from './TeamSizeData';
 import type {UpdateTeamData} from './UpdateTeamData';
+import {LeadData} from './LeadData';
 
 export class TeamAPI {
   constructor(private readonly client: HttpClient) {}
@@ -31,6 +32,9 @@ export class TeamAPI {
   public static readonly URL = {
     SIZE: 'size',
     TEAMS: '/teams',
+    CONSENT: '/consent',
+    MARKETO: 'marketo',
+    LEAD: 'lead',
   };
 
   public async postTeam(team: NewTeamData): Promise<void> {
@@ -110,5 +114,27 @@ export class TeamAPI {
       cancel: () => cancelSource.cancel(SyntheticErrorLabel.REQUEST_CANCELLED),
       response: handleRequest(),
     };
+  }
+
+  public async postLead(email: string): Promise<any> {
+    const config: AxiosRequestConfig = {
+      data: {email},
+      method: 'post',
+      url: `${TeamAPI.URL.CONSENT}/${TeamAPI.URL.MARKETO}/${TeamAPI.URL.LEAD}`,
+    };
+
+    const response = await this.client.sendJSON<any>(config);
+    return response.data;
+  }
+
+  public async putLead(data: LeadData): Promise<any> {
+    const config: AxiosRequestConfig = {
+      data,
+      method: 'put',
+      url: `${TeamAPI.URL.CONSENT}/${TeamAPI.URL.MARKETO}/${TeamAPI.URL.LEAD}`,
+    };
+
+    const response = await this.client.sendJSON<any>(config);
+    return response.data;
   }
 }
