@@ -63,6 +63,9 @@ import {ConversationState} from '../conversation/ConversationState';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import '../page/preferences/AccountPreferences';
+import {PreferenceNotificationRepository, Notification} from '../notification/PreferenceNotificationRepository';
+import {modals} from '../view_model/ModalsViewModel';
+import {ClientEntity} from '../client/ClientEntity';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -201,6 +204,9 @@ export class ContentViewModel {
         case ContentViewModel.STATE.CONVERSATION:
           this.inputBar.addedToView();
           this.titleBar.addedToView();
+          break;
+        case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
+          this.popNotification();
           break;
         case ContentViewModel.STATE.PREFERENCES_AV:
           this.preferencesAV.updateMediaStreamTrack(MediaType.AUDIO_VIDEO);
@@ -437,5 +443,43 @@ export class ContentViewModel {
   private readonly showContent = (newContentState: string) => {
     this.state(newContentState);
     return this._shiftContent(this.getElementOfContent(newContentState));
+  };
+
+  private readonly popNotification = (): void => {
+    const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
+      switch (type) {
+        case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
+          modals.showModal(
+            ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES,
+            {
+              data: aggregatedNotifications.map(notification => notification.data) as ClientEntity[],
+              preventClose: true,
+              secondaryAction: {
+                action: () => {
+                  amplify.publish(WebAppEvents.CONTENT.SWITCH, ContentViewModel.STATE.PREFERENCES_DEVICES);
+                },
+              },
+            },
+            undefined,
+          );
+          break;
+        }
+
+        case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.READ_RECEIPTS_CHANGED: {
+          modals.showModal(
+            ModalsViewModel.TYPE.ACCOUNT_READ_RECEIPTS_CHANGED,
+            {
+              data: aggregatedNotifications.pop().data as boolean,
+              preventClose: true,
+            },
+            undefined,
+          );
+          break;
+        }
+      }
+    };
+    this.repositories.preferenceNotification
+      .getNotifications()
+      .forEach(({type, notification}) => showNotification(type, notification));
   };
 }
