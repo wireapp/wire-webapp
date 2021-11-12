@@ -31,7 +31,7 @@ enum UserNameState {
 }
 interface UsernameInputProps {
   canEditProfile: boolean;
-  domain: string;
+  domain?: string;
   username: string;
   userRepository: UserRepository;
 }
@@ -112,7 +112,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         onInput={({target}) => verifyUsername((target as HTMLInputElement).value)}
         readOnly={!canEditProfile}
         prefix="@"
-        suffix={`@${domain}`}
+        suffix={domain && `@${domain}`}
         setIsEditing={setIsEditing}
         autoFocus={userRepository.shouldSetUsername}
         isDone={usernameInputDone.isDone}
