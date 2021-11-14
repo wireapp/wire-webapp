@@ -118,7 +118,7 @@
     "eslint-plugin-no-unsanitized": "3.2.0",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-react": "7.27.0",
-    "eslint-plugin-react-hooks": "4.2.0",
+    "eslint-plugin-react-hooks": "4.3.0",
     "eslint-plugin-sort-keys-fix": "1.1.2",
     "eslint-plugin-typescript-sort-keys": "1.8.0",
     "eslint-plugin-unused-imports": "1.1.5",
