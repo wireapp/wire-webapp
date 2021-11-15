@@ -1797,7 +1797,7 @@ export class MessageRepository {
    */
   public async sendCountlySync(countlyId: string) {
     const selfConversation = this.conversationState.self_conversation();
-    if (selfConversation && selfConversation.isFederated()) {
+    if (selfConversation?.isFederated()) {
       // TODO(federation)
       this.logger.warn('syncly not implemented for federated env');
       return;
