@@ -27,6 +27,7 @@ import {
   Ephemeral,
   External,
   GenericMessage,
+  Knock,
   LastRead,
   LegalHoldStatus,
   MessageDelete,
@@ -34,7 +35,6 @@ import {
   MessageHide,
   Reaction,
   Text,
-  Knock,
   Asset as ProtobufAsset,
   LinkPreview,
   DataTransfer,
@@ -812,6 +812,49 @@ export class MessageRepository {
   }
 
   /**
+   * Will request user permission before sending a message in case the conversation is in a degraded state
+   *
+   * @param conversation The conversation to send the message in
+   * @returns Resolves to true if the message can be sent, false if the user didn't give their permission
+   */
+  requestUserSendingPermission(conversation: Conversation): Promise<boolean> {
+    if (conversation.verification_state() !== ConversationVerificationState.DEGRADED) {
+      return Promise.resolve(true);
+    }
+
+    const users = conversation.getUsersWithUnverifiedClients();
+    const userNames = joinNames(users, Declension.NOMINATIVE);
+    const titleSubstitutions = capitalizeFirstChar(userNames);
+
+    const actionString = t('modalConversationNewDeviceAction');
+    const messageString = t('modalConversationNewDeviceMessage');
+    const baseTitle =
+      users.length > 1
+        ? t('modalConversationNewDeviceHeadlineMany', titleSubstitutions)
+        : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
+    const titleString = users[0].isMe ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions) : baseTitle;
+
+    return new Promise(resolve => {
+      const options: ModalOptions = {
+        close: () => resolve(false),
+        primaryAction: {
+          action: () => {
+            conversation.verification_state(ConversationVerificationState.UNVERIFIED);
+            resolve(true);
+          },
+          text: actionString,
+        },
+        text: {
+          message: messageString,
+          title: titleString,
+        },
+      };
+
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, options, `degraded-${conversation.id}`);
+    });
+  }
+
+  /**
    * Will send a generic message using @wireapp/code
    *
    * @param payload - the OTR message payload to send
@@ -847,6 +890,8 @@ export class MessageRepository {
       this.cryptography_repository.cryptographyMapper
         .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
         .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
+
+      return this.requestUserSendingPermission(conversation);
     };
 
     const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
