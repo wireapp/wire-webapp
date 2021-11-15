@@ -208,13 +208,16 @@ ko.components.register('user-list', {
       remoteTeamMembers(nonExternalMembers);
     }
 
+    const debouncedFilter = ko
+      .pureComputed(filter)
+      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 300}});
     // Filter all list items if a filter is provided
     const filteredUserEntities = ko.pureComputed(() => {
       const connectedUsers = this.conversationState.connectedUsers();
       let resultUsers = userEntities();
-      const normalizedQuery = SearchRepository.normalizeQuery(filter());
+      const normalizedQuery = SearchRepository.normalizeQuery(debouncedFilter());
       if (normalizedQuery) {
-        const trimmedQuery = filter().trim();
+        const trimmedQuery = debouncedFilter().trim();
         const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
         if (!skipSearch) {
           const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
