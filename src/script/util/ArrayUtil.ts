@@ -39,7 +39,7 @@ export function chunk<T>(array: T[] | Float32Array, size: number) {
  */
 export const getDifference = <T>(array1: T[] = [], array2: T[] = [], matcher?: (t1: T, t2: T) => boolean): T[] => {
   if (matcher) {
-    return array2.filter(el1 => array1.find(el2 => !matcher(el1, el2)));
+    return array2.filter(el1 => !array1.some(el2 => matcher(el1, el2)));
   }
   return array2.filter(element => !array1.includes(element));
 };
