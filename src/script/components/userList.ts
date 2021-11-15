@@ -35,6 +35,7 @@ import 'Components/list/ParticipantItem';
 import {UserState} from '../user/UserState';
 import {ConversationState} from '../conversation/ConversationState';
 import {TeamState} from '../team/TeamState';
+import {debounce} from 'underscore';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',
@@ -196,7 +197,7 @@ ko.components.register('user-list', {
      * Try to load additional members from the backend.
      * This is needed for large teams (>= 2000 members)
      */
-    async function fetchMembersFromBackend(query: string, isHandle: boolean, ignoreMembers: User[]) {
+    const fetchMembersFromBackend = debounce(async (query: string, isHandle: boolean, ignoreMembers: User[]) => {
       const resultUsers = await searchRepository.searchByName(query, isHandle);
       const selfTeamId = userState.self().teamId;
       const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
@@ -206,47 +207,45 @@ ko.components.register('user-list', {
       // We shouldn't show any members that have the 'external' role and are not already locally known.
       const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
       remoteTeamMembers(nonExternalMembers);
-    }
+    }, 300);
 
     // Filter all list items if a filter is provided
-    const filteredUserEntities = ko
-      .pureComputed(() => {
-        const connectedUsers = this.conversationState.connectedUsers();
-        let resultUsers = userEntities();
-        const normalizedQuery = SearchRepository.normalizeQuery(filter());
-        if (normalizedQuery) {
-          const trimmedQuery = filter().trim();
-          const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
-          if (!skipSearch) {
-            const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
-            const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
-            resultUsers = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
-          }
-          resultUsers = resultUsers.filter(
-            user =>
-              user.isMe ||
-              connectedUsers.includes(user) ||
-              teamRepository.isSelfConnectedTo(user.id) ||
-              user.username() === normalizedQuery,
-          );
-          if (!skipSearch && this.selfInTeam) {
-            fetchMembersFromBackend(trimmedQuery, isHandle, resultUsers);
-          }
-        } else {
-          resultUsers = userEntities().filter(
-            user => user.isMe || connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
-          );
+    const filteredUserEntities = ko.pureComputed(() => {
+      const connectedUsers = this.conversationState.connectedUsers();
+      let resultUsers = userEntities();
+      const normalizedQuery = SearchRepository.normalizeQuery(filter());
+      if (normalizedQuery) {
+        const trimmedQuery = filter().trim();
+        const isHandle = trimmedQuery.startsWith('@') && validateHandle(normalizedQuery);
+        if (!skipSearch) {
+          const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
+          const properties = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
+          resultUsers = searchRepository.searchUserInSet(normalizedQuery, userEntities(), properties);
         }
-
-        if (!selfFirst) {
-          return resultUsers;
+        resultUsers = resultUsers.filter(
+          user =>
+            user.isMe ||
+            connectedUsers.includes(user) ||
+            teamRepository.isSelfConnectedTo(user.id) ||
+            user.username() === normalizedQuery,
+        );
+        if (!skipSearch && this.selfInTeam) {
+          fetchMembersFromBackend(trimmedQuery, isHandle, resultUsers);
         }
+      } else {
+        resultUsers = userEntities().filter(
+          user => user.isMe || connectedUsers.includes(user) || teamRepository.isSelfConnectedTo(user.id),
+        );
+      }
 
-        // make sure the self user is the first one in the list
-        const [selfUser, otherUsers] = partition(resultUsers, user => user.isMe);
-        return selfUser.concat(otherUsers);
-      })
-      .extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 300}});
+      if (!selfFirst) {
+        return resultUsers;
+      }
+
+      // make sure the self user is the first one in the list
+      const [selfUser, otherUsers] = partition(resultUsers, user => user.isMe);
+      return selfUser.concat(otherUsers);
+    });
 
     this.foundUserEntities = ko.pureComputed(() => {
       if (!remoteTeamMembers().length) {
