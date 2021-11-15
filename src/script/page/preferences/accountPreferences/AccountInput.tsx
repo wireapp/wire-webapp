@@ -134,7 +134,10 @@ const AccountInput: React.FC<AccountInputProps> = ({
         }}
       >
         <div css={{alignItems: 'center', display: 'flex', lineHeight: '1.38', position: 'absolute'}}>
-          <span css={{borderBottom: readOnly || isEditing ? 'none' : '1px dashed var(--foreground)'}}>
+          <span
+            css={{borderBottom: readOnly || isEditing ? 'none' : '1px dashed var(--foreground)'}}
+            data-uie-name={`${iconUiePrefix}-display`}
+          >
             <span
               css={{
                 opacity: isEditing ? 0.4 : 1,
