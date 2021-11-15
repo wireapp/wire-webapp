@@ -297,7 +297,7 @@ export class ConversationService {
       });
     }
 
-    if (userIds && !isStringArray(userIds) && !isUserClients(userIds)) {
+    if (isQualifiedIdArray(userIds) || isQualifiedUserClients(userIds)) {
       throw new Error('Invalid userIds option for sending');
     }
     const recipients = await this.getRecipientsForConversation(conversationId, userIds);
