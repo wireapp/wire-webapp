@@ -169,8 +169,7 @@ export class SearchRepository {
     isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
   ): Promise<User[]> {
-    const domain = query.includes('@') ? query.substr(query.lastIndexOf('@') + 1) : undefined;
-    const name = domain ? query.substr(0, query.indexOf('@')) : query;
+    const [name, domain] = query.replace(/^@/, '').split('@');
 
     const matchedUserIdsFromDirectorySearch: QualifiedId[] = await this.searchService
       .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS, domain)
