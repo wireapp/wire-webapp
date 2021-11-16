@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.5.0...@wireapp/api-client@15.6.0) (2021-11-16)
+
+
+### Features
+
+* **api-client:** Add domain parameter when searching for contacts ([#4180](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4180)) ([58340a6](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/58340a68adebe8c85107f8766d473153fb311184))
+
+
+
+
+
 # [15.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.4.0...@wireapp/api-client@15.5.0) (2021-11-12)
 
 
