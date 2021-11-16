@@ -170,7 +170,10 @@ export class SearchRepository {
     isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
   ): Promise<User[]> {
-    const [name, domain] = Config.getConfig().FEATURE.ENABLE_FEDERATION ? query.replace(/^@/, '').split('@') : [query];
+    const [rawName, rawDomain] = Config.getConfig().FEATURE.ENABLE_FEDERATION
+      ? query.replace(/^@/, '').split('@')
+      : [query];
+    const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
     const matchedUserIdsFromDirectorySearch: QualifiedId[] = await this.searchService
       .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS, domain)
