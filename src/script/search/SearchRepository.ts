@@ -27,6 +27,7 @@ import type {UserRepository} from '../user/UserRepository';
 import type {User} from '../entity/User';
 import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {Config} from '../Config';
 
 export class SearchRepository {
   logger: Logger;
@@ -169,7 +170,7 @@ export class SearchRepository {
     isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
   ): Promise<User[]> {
-    const [name, domain] = query.replace(/^@/, '').split('@');
+    const [name, domain] = Config.getConfig().FEATURE.ENABLE_FEDERATION ? query.replace(/^@/, '').split('@') : [query];
 
     const matchedUserIdsFromDirectorySearch: QualifiedId[] = await this.searchService
       .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS, domain)
