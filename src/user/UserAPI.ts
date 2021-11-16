@@ -271,10 +271,15 @@ export class UserAPI {
   /**
    * Search for users.
    * @param query The search query
+   * @param domain The domain where the user should be hosted
    * @param limit Number of results to return
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/search
    */
-  public async getSearchContacts(query: string, limit?: number): Promise<RequestCancelable<SearchResult>> {
+  public async getSearchContacts(
+    query: string,
+    limit?: number,
+    domain?: string,
+  ): Promise<RequestCancelable<SearchResult>> {
     const cancelSource = Axios.CancelToken.source();
     const config: AxiosRequestConfig = {
       cancelToken: cancelSource.token,
@@ -285,6 +290,9 @@ export class UserAPI {
       url: `${UserAPI.URL.SEARCH}/${UserAPI.URL.CONTACTS}`,
     };
 
+    if (domain) {
+      config.params.domain = domain;
+    }
     if (limit) {
       config.params.size = limit;
     }
