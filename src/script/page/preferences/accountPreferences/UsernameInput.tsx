@@ -117,7 +117,7 @@ const UsernameInput: React.FC<UsernameInputProps> = ({username, domain, userRepo
         autoFocus={userRepository.shouldSetUsername}
         isDone={usernameInputDone.isDone}
         onValueChange={changeUsername}
-        maxLength={256}
+        maxLength={256 - (domain?.length ?? 0)}
         allowedChars="0-9a-zA-Z_"
         data-uie-name="enter-username"
       />
