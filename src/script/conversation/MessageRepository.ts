@@ -22,7 +22,6 @@ import {
   Asset,
   ButtonAction,
   Cleared,
-  ClientAction,
   Confirmation,
   Ephemeral,
   External,
@@ -948,26 +947,12 @@ export class MessageRepository {
       } else {
         this.logger.warn('No local session found to delete.');
       }
-      return conversation.isFederated()
-        ? await this.sendFederatedSessionReset(userId, client_id, conversation)
-        : await this.sendSessionReset(userId, client_id, conversation.qualifiedId);
+      return await this.sendSessionReset(userId, client_id, conversation);
     } catch (error) {
       const logMessage = `Failed to reset session for client '${client_id}' of user '${userId.id}': ${error.message}`;
       this.logger.warn(logMessage, error);
       throw error;
     }
-  }
-
-  private async sendFederatedSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
-    const sessionReset = this.core.service!.conversation.messageBuilder.createSessionReset({
-      conversationId: conversation.id,
-    });
-
-    await this.core.service!.conversation.send({
-      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
-      payloadBundle: sessionReset,
-      userIds: [userId],
-    });
   }
 
   /**
@@ -979,28 +964,19 @@ export class MessageRepository {
    *
    * @param userId User ID
    * @param clientId Client ID
-   * @param conversationId Conversation ID
+   * @param conversation The conversation to send the message in
    * @returns Resolves after sending the session reset
    */
-  private async sendSessionReset(userId: QualifiedId, clientId: string, conversationId: QualifiedId): Promise<void> {
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
-      messageId: createRandomUuid(),
+  private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
+    const sessionReset = this.core.service!.conversation.messageBuilder.createSessionReset({
+      conversationId: conversation.id,
     });
 
-    const options = {
-      precondition: true,
-      recipients: {[userId.id]: [clientId]},
-    };
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-
-    try {
-      await this.sendGenericMessage(eventInfoEntity, true);
-      this.logger.info(`Sent info about session reset to client '${clientId}' of user '${userId}'`);
-    } catch (error) {
-      this.logger.error(`Sending conversation reset failed: ${error.message}`, error);
-      throw error;
-    }
+    await this.core.service!.conversation.send({
+      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+      payloadBundle: sessionReset,
+      userIds: [userId],
+    });
   }
 
   /**
