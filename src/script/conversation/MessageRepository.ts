@@ -32,7 +32,6 @@ import {
   MessageDelete,
   MessageEdit,
   MessageHide,
-  Reaction,
   Text,
   Asset as ProtobufAsset,
   LinkPreview,
@@ -1082,24 +1081,15 @@ export class MessageRepository {
     messageEntity: Message,
     reactionType: ReactionType,
   ): Promise<void> {
-    if (conversationEntity.isFederated()) {
-      const reaction = this.core.service!.conversation.messageBuilder.createReaction({
-        conversationId: conversationEntity.id,
-        reaction: {
-          originalMessageId: messageEntity.id,
-          type: reactionType,
-        },
-      });
-
-      return this.sendAndInjectGenericCoreMessage(reaction, conversationEntity);
-    }
-    const protoReaction = new Reaction({emoji: reactionType, messageId: messageEntity.id});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
-      messageId: createRandomUuid(),
+    const reaction = this.core.service!.conversation.messageBuilder.createReaction({
+      conversationId: conversationEntity.id,
+      reaction: {
+        originalMessageId: messageEntity.id,
+        type: reactionType,
+      },
     });
 
-    await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
+    return this.sendAndInjectGenericCoreMessage(reaction, conversationEntity);
   }
 
   private createTextProto(
