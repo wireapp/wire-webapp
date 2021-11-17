@@ -418,7 +418,6 @@ export class TeamRepository {
       this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
     }
-
     this.saveFeatureConfig(featureConfigList);
   };
 
