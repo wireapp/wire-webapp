@@ -218,46 +218,7 @@ export class MessageRepository {
   };
 
   /**
-   * Send text message in specified conversation.
-   *
-   * @param conversationEntity Conversation that should receive the message
-   * @param textMessage Plain text message
-   * @param mentionEntities Mentions as part of the message
-   * @param quoteEntity Quote as part of the message
-   * @returns Resolves after sending the message
-   */
-  public async sendText(
-    conversationEntity: Conversation,
-    textMessage: string,
-    mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
-  ): Promise<GenericMessage> {
-    const messageId = createRandomUuid();
-
-    const protoText = this.createTextProto(
-      messageId,
-      textMessage,
-      mentionEntities,
-      quoteEntity,
-      undefined,
-      this.expectReadReceipt(conversationEntity),
-      conversationEntity.legalHoldStatus(),
-    );
-    let genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
-      messageId,
-    });
-
-    if (conversationEntity.messageTimer()) {
-      genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
-    }
-
-    await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
-    return genericMessage;
-  }
-
-  /**
-   * Send knock in specified conversation.
+   * Send ping in specified conversation.
    * @param conversationEntity Conversation to send knock in
    * @returns Resolves after sending the knock
    */
@@ -279,16 +240,30 @@ export class MessageRepository {
    * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
    * @see https://docs.wire.com/understand/federation/index.html
    */
-  private async sendFederatedMessage(
-    conversation: Conversation,
-    message: string,
-    mentions: MentionEntity[],
-    quote?: QuoteEntity,
-  ) {
+  private async sendText({
+    conversation,
+    message,
+    mentions = [],
+    linkPreviews = [],
+    quote,
+  }: {
+    conversation: Conversation;
+    linkPreviews?: LinkPreview[];
+    mentions?: MentionEntity[];
+    message: string;
+    quote?: QuoteEntity;
+  }): Promise<void> {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
-    const textPayload = this.messageBuilder
-      .createText({conversationId: conversation.id, text: message})
+    if (linkPreviews) {
+      const previews = linkPreviews.map(linkPreview => ({
+        imageUploaded: linkPreview.image,
+        url: linkPreview.url,
+        urlOffset: linkPreview.urlOffset,
+      }));
+    }
+    const textPayload = this.core
+      .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
       .withMentions(
         mentions.map(mention => ({
           length: mention.length,
@@ -297,11 +272,12 @@ export class MessageRepository {
           userId: mention.userId,
         })),
       )
+      .withLinkPreviews(linkPreviews)
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .withQuote(quoteData)
       .build();
 
-    return this.sendAndInjectGenericCoreMessage(textPayload, conversation);
+    this.sendAndInjectGenericCoreMessage(textPayload, conversation);
   }
 
   private async sendFederatedEditMessage(
@@ -339,18 +315,21 @@ export class MessageRepository {
     textMessage: string,
     mentionEntities: MentionEntity[],
     quoteEntity?: QuoteEntity,
-  ): Promise<OtrMessage | void> {
-    try {
-      if (conversationEntity.isFederated()) {
-        return await this.sendFederatedMessage(conversationEntity, textMessage, mentionEntities, quoteEntity);
-      }
-      const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
-      await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
-    } catch (error) {
-      if (!this.isUserCancellationError(error)) {
-        this.logger.error(`Error while sending text message: ${error.message}`, error);
-        throw error;
-      }
+  ): Promise<void> {
+    const textPayload = {
+      conversation: conversationEntity,
+      mentions: mentionEntities,
+      message: textMessage,
+      quote: quoteEntity,
+    };
+    this.sendText(textPayload);
+
+    const linkPreview = await this.link_repository.getLinkPreviewFromString(textMessage);
+    if (linkPreview) {
+      this.sendText({
+        ...textPayload,
+        linkPreviews: [linkPreview],
+      });
     }
   }
 
@@ -432,7 +411,7 @@ export class MessageRepository {
 
     const blob = await loadUrlBlob(url);
     const textMessage = t('extensionsGiphyMessage', tag, {}, true);
-    this.sendText(conversationEntity, textMessage, null, quoteEntity);
+    this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
     return this.uploadImages(conversationEntity, [blob]);
   }
 
