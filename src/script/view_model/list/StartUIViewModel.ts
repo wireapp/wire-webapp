@@ -422,7 +422,7 @@ export class StartUIViewModel {
     const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
     // If the user typed a domain, we will just ignore it when searchng for the user locally
-    const domainFreeQuery = normalizedQuery.replace(/@.*/, '');
+    const [domainFreeQuery] = normalizedQuery.split('@');
     const contactResults = this.searchRepository.searchUserInSet(domainFreeQuery, localSearchSources, searchFields);
     const connectedUsers = this.conversationState.connectedUsers();
     const filteredResults = contactResults.filter(
