@@ -37,7 +37,6 @@ import {ModalsViewModel} from './ModalsViewModel';
 import {PreferencesAVViewModel} from './content/PreferencesAVViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';
-import {PreferencesOptionsViewModel} from './content/PreferencesOptionsViewModel';
 import {ConversationError} from '../error/ConversationError';
 import {CollectionViewModel} from './content/CollectionViewModel';
 import {ConnectRequestsViewModel} from './content/ConnectRequestsViewModel';
@@ -63,6 +62,7 @@ import {ConversationState} from '../conversation/ConversationState';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import '../page/preferences/AccountPreferences';
+import '../page/preferences/OptionPreferences';
 import {PreferenceNotificationRepository, Notification} from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
 import {ClientEntity} from '../client/ClientEntity';
@@ -103,7 +103,6 @@ export class ContentViewModel {
   preferencesAV: PreferencesAVViewModel;
   preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
   preferencesDevices: PreferencesDevicesViewModel;
-  preferencesOptions: PreferencesOptionsViewModel;
   previousConversation: Conversation | null = null;
   previousState: string | null = null;
   serviceModal: ServiceModalViewModel;
@@ -194,7 +193,6 @@ export class ContentViewModel {
       repositories.message,
     );
     this.preferencesDevices = new PreferencesDevicesViewModel(mainViewModel, this, repositories.cryptography);
-    this.preferencesOptions = new PreferencesOptionsViewModel(repositories.properties);
 
     this.historyExport = new HistoryExportViewModel(repositories.backup);
     this.historyImport = new HistoryImportViewModel(repositories.backup);
