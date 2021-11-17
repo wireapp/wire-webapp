@@ -63,6 +63,7 @@ import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventSource} from '../event/EventSource';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {Config} from '../Config';
+import {AppLockRepository} from '../user/AppLockRepository';
 
 export interface AccountInfo {
   accentID: number;
@@ -88,6 +89,7 @@ export class TeamRepository {
     assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
+    private readonly appLockRepository = container.resolve(AppLockRepository),
   ) {
     this.logger = getLogger('TeamRepository');
 
@@ -127,7 +129,9 @@ export class TeamRepository {
     if (this.userState.self().teamId) {
       await this.updateTeamMembers(team);
     }
-    this.teamState.teamFeatures(await this.teamService.getAllTeamFeatures());
+    const featureConfigList = await this.teamService.getAllTeamFeatures();
+    this.teamState.teamFeatures(featureConfigList);
+    this.handleAppLockChange(featureConfigList);
     this.scheduleFetchTeamInfo();
   };
 
@@ -418,8 +422,14 @@ export class TeamRepository {
       this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
     }
-
+    this.handleAppLockChange(featureConfigList);
     this.saveFeatureConfig(featureConfigList);
+  };
+
+  private readonly handleAppLockChange = (featureConfigList: FeatureList) => {
+    if (featureConfigList.appLock?.status !== FeatureStatus.ENABLED) {
+      this.appLockRepository.setEnabled(false);
+    }
   };
 
   private readonly handleFileSharingFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
