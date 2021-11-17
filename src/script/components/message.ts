@@ -333,7 +333,7 @@ const normalTemplate: string = `
           <external-icon class="message-header-icon-external with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('rolePartner')}" data-uie-name="sender-external"></external-icon>
         <!-- /ko -->
         <!-- ko if: message.user().isFederated -->
-          <federation-icon class="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('conversationFederationIndicator')}" data-uie-name="sender-federated"></federation-icon>
+          <federation-icon class="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': message.user().handle}" data-uie-name="sender-federated"></federation-icon>
         <!-- /ko -->
         <!-- ko if: message.user().isDirectGuest() -->
           <guest-icon class="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('conversationGuestIndicator')}" data-uie-name="sender-guest"></guest-icon>
