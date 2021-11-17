@@ -96,7 +96,7 @@
             <!-- /ko -->
 
             <!-- ko ifnot: input().length -->
-              <message-timer-button params="conversation: conversationEntity, disabled: disableControls" data-bind="css: {'disabled': disableControls}"></message-timer-button>
+            <message-timer-button params="conversation: conversationEntity"></message-timer-button>
 
             <!-- ko if: isFileSharingSendingEnabled() -->
               <label id="conversation-input-bar-photo" class="controls-right-button button-icon-large" data-bind="css: {'disabled': disableControls}">
