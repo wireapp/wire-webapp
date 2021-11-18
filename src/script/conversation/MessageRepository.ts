@@ -974,7 +974,7 @@ export class MessageRepository {
     await this.core.service!.conversation.send({
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       payloadBundle: sessionReset,
-      userIds: [userId],
+      userIds: conversation.isFederated() ? [userId] : [userId.id],
     });
   }
 
