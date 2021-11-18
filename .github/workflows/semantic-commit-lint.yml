@@ -1,25 +1,25 @@
-name: "Semantic Commit Linting of PR titles"
+name: 'Semantic Commit Linting of PR titles'
 
 on:
   pull_request:
-    types: [ opened, edited, synchronize ]
+    types: [opened, edited, synchronize]
 
 jobs:
   semantic-commit-pr-title-lint:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      CUSTOM_PR_LABEL: "Fix PR Title 🤦‍♂️"
+      CUSTOM_PR_LABEL: 'Fix PR Title 🤦‍♂️'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          
+
       - name: Set environment variables
-        run: | 
+        run: |
           echo "HEAD=${{github.head_ref}}" >> $GITHUB_ENV
-          
+
       # Please look up the latest version from
       # https://github.com/amannn/action-semantic-pull-request/releases
       - name: Run Semantic Commint Linter
@@ -35,16 +35,17 @@ jobs:
             docs
             feat
             fix
+            runfix
             other
             perf
             refactor
             revert
             style
             test
-          # For work-in-progress PRs you can typically use draft pull requests 
-          # from Github. However, private repositories on the free plan don't have 
-          # this option and therefore this action allows you to opt-in to using the 
-          # special "[WIP]" prefix to indicate this state. This will avoid the 
+          # For work-in-progress PRs you can typically use draft pull requests
+          # from Github. However, private repositories on the free plan don't have
+          # this option and therefore this action allows you to opt-in to using the
+          # special "[WIP]" prefix to indicate this state. This will avoid the
           # validation of the PR title and the pull request checks remain pending.
           # Note that a second check will be reported if this is enabled.
           wip: true
