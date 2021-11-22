@@ -98,7 +98,11 @@ const SetAccountType = ({}: Props) => {
                 </Link>
               </Column>
               <Column>
-                <Link href={`${Config.getConfig().URL.TEAMS_BASE}/register/email`} data-uie-name="go-register-team">
+                <Link
+                  href={`${Config.getConfig().URL.TEAMS_BASE}/register/email`}
+                  target="_blank"
+                  data-uie-name="go-register-team"
+                >
                   <RoundIconButton style={{marginBottom: 12}} size={72}>
                     <TeamIcon height={31} width={31} />
                   </RoundIconButton>
