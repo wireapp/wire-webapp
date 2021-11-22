@@ -109,6 +109,7 @@ import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
 import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
 import {Core} from '../service/CoreSingleton';
@@ -835,16 +836,25 @@ export class MessageRepository {
    * @param options
    * @param options.syncTimestamp should the message timestamp be synchronized with backend response timestamp
    * @param options.playPingAudio should the 'ping' audio be played when message is being sent
+   * @param options.nativePush use nativePush for sending to mobile devices
+   * @param options.recipients can be used to target specific users of the conversation. Will send to all the conversation participants if not defined
    */
   private async sendAndInjectGenericCoreMessage(
     payload: OtrMessage,
     conversation: Conversation,
-    {syncTimestamp = true, playPingAudio = false}: {playPingAudio?: boolean; syncTimestamp?: boolean} = {
+    {
+      syncTimestamp = true,
+      playPingAudio = false,
+      nativePush = true,
+      recipients,
+    }: {nativePush?: boolean; playPingAudio?: boolean; recipients?: QualifiedId[]; syncTimestamp?: boolean} = {
       playPingAudio: false,
       syncTimestamp: true,
     },
   ) {
-    const users = conversation.allUserEntities;
+    const users = conversation.allUserEntities.filter(
+      user => !recipients || recipients.some(userId => matchQualifiedIds(user, userId)),
+    );
     const userIds = conversation.isFederated()
       ? this.createQualifiedRecipients(users)
       : await this.createRecipients(
@@ -882,7 +892,9 @@ export class MessageRepository {
         onSuccess: updateOptimisticEvent,
       },
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+      nativePush,
       payloadBundle: payload,
+      reportMissing: recipients,
       userIds,
     });
   }
@@ -1016,34 +1028,17 @@ export class MessageRepository {
         return;
       }
     }
-    if (conversationEntity.isFederated()) {
-      const confirmationMessage = this.messageBuilder.createConfirmation({
-        conversationId: conversationEntity.id,
-        firstMessageId: messageEntity.id,
-        type,
-      });
-      this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity);
-      return;
-    }
-
     const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
-    const protoConfirmation = new Confirmation({
+    const confirmationMessage = this.messageBuilder.createConfirmation({
+      conversationId: conversationEntity.id,
       firstMessageId: messageEntity.id,
       moreMessageIds,
       type,
     });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CONFIRMATION]: protoConfirmation,
-      messageId: createRandomUuid(),
-    });
 
-    this.messageSender.queueMessage(() => {
-      // TODO(Federation): Apply logic for 'sendFederatedMessage'. The 'createRecipients' logic will be done inside of '@wireapp/core'.
-      return this.createRecipients(conversationEntity, true, [messageEntity.from]).then(recipients => {
-        const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
-        return this.sendGenericMessage(eventInfoEntity, true);
-      });
+    this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, {
+      nativePush: false,
+      recipients: [messageEntity.from],
     });
   }
 
