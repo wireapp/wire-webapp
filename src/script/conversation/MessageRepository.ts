@@ -165,6 +165,14 @@ export class MessageRepository {
     this.initSubscriptions();
   }
 
+  private get conversationService() {
+    return this.core.service!.conversation;
+  }
+
+  private get messageBuilder() {
+    return this.conversationService.messageBuilder;
+  }
+
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
     amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancelAssetUpload);
@@ -242,7 +250,7 @@ export class MessageRepository {
    * @returns Resolves after sending the knock
    */
   public async sendPing(conversation: Conversation): Promise<void> {
-    const ping = this.core.service!.conversation.messageBuilder.createPing({
+    const ping = this.messageBuilder.createPing({
       conversationId: conversation.id,
       ping: {
         expectsReadConfirmation: this.expectReadReceipt(conversation),
@@ -302,13 +310,7 @@ export class MessageRepository {
 
   private async deleteFederatedMessageForEveryone(conversation: Conversation, message: Message, precondition?: any) {
     const userIds = conversation.allUserEntities.map(user => user.qualifiedId);
-    this.core.service!.conversation.deleteMessageEveryone(
-      conversation.id,
-      message.id,
-      userIds,
-      true,
-      conversation.domain,
-    );
+    this.conversationService.deleteMessageEveryone(conversation.id, message.id, userIds, true, conversation.domain);
   }
 
   /**
@@ -869,11 +871,11 @@ export class MessageRepository {
       this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
     };
 
-    const conversationService = this.core.service!.conversation;
+    const conversationService = this.conversationService;
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    await this.core.service!.conversation.send({
+    await this.conversationService.send({
       callbacks: {
         onClientMismatch: mismatch => this.onClientMismatch(mismatch, conversation.qualifiedId),
         onStart: injectOptimisticEvent,
@@ -967,11 +969,11 @@ export class MessageRepository {
    * @returns Resolves after sending the session reset
    */
   private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
-    const sessionReset = this.core.service!.conversation.messageBuilder.createSessionReset({
+    const sessionReset = this.messageBuilder.createSessionReset({
       conversationId: conversation.id,
     });
 
-    await this.core.service!.conversation.send({
+    await this.conversationService.send({
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       payloadBundle: sessionReset,
       userIds: conversation.isFederated() ? [userId] : [userId.id],
@@ -1015,7 +1017,7 @@ export class MessageRepository {
       }
     }
     if (conversationEntity.isFederated()) {
-      const confirmationMessage = this.core.service!.conversation.messageBuilder.createConfirmation({
+      const confirmationMessage = this.messageBuilder.createConfirmation({
         conversationId: conversationEntity.id,
         firstMessageId: messageEntity.id,
         type,
@@ -1057,7 +1059,7 @@ export class MessageRepository {
     messageEntity: Message,
     reactionType: ReactionType,
   ): Promise<void> {
-    const reaction = this.core.service!.conversation.messageBuilder.createReaction({
+    const reaction = this.messageBuilder.createReaction({
       conversationId: conversationEntity.id,
       reaction: {
         originalMessageId: messageEntity.id,
