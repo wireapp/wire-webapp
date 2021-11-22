@@ -58,6 +58,9 @@ describe('when visiting the set account type page', () => {
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: false,
         },
+        URL: {
+          TEAMS_BASE: undefined,
+        },
       });
     });
 
@@ -82,6 +85,9 @@ describe('when visiting the set account type page', () => {
       spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}>(Config, 'getConfig').and.returnValue({
         FEATURE: {
           ENABLE_ACCOUNT_REGISTRATION: true,
+        },
+        URL: {
+          TEAMS_BASE: undefined,
         },
       });
     });
