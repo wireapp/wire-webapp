@@ -894,7 +894,7 @@ export class MessageRepository {
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       nativePush,
       payloadBundle: payload,
-      reportMissing: recipients,
+      targettedMessage: !!recipients,
       userIds,
     });
   }
@@ -1038,7 +1038,7 @@ export class MessageRepository {
 
     this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, {
       nativePush: false,
-      recipients: [messageEntity.from],
+      recipients: [{domain: messageEntity.fromDomain, id: messageEntity.from}],
     });
   }
 
