@@ -36,7 +36,7 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {ReactionType, MessageSendingCallbacks} from '@wireapp/core/src/main/conversation';
+import {ReactionType, MessageSendingCallbacks, MessageTargetMode} from '@wireapp/core/src/main/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   ClientMismatch,
@@ -276,8 +276,8 @@ export class MessageRepository {
   ): Promise<void> {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
-    const textPayload = this.core
-      .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
+    const textPayload = this.messageBuilder
+      .createText({conversationId: conversation.id, text: message})
       .withMentions(
         mentions.map(mention => ({length: mention.length, start: mention.startIndex, userId: mention.userId})),
       )
@@ -294,8 +294,8 @@ export class MessageRepository {
     originalMessageEntity: ContentMessage,
     mentions: MentionEntity[],
   ) {
-    const textPayload = this.core
-      .service!.conversation.messageBuilder.createEditedText({
+    const textPayload = this.messageBuilder
+      .createEditedText({
         conversationId: conversation.id,
         newMessageText: message,
         originalMessageId: originalMessageEntity.id,
@@ -894,7 +894,7 @@ export class MessageRepository {
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       nativePush,
       payloadBundle: payload,
-      targettedMessage: !!recipients,
+      targetMode: recipients ? MessageTargetMode.USERS : MessageTargetMode.NONE,
       userIds,
     });
   }
