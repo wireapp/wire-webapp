@@ -233,6 +233,7 @@ export class MessageService {
     if (isStringArray(options.reportMissing)) {
       message.report_missing = options.reportMissing;
     } else {
+      // By default we want ignore missing to be false (and have mismatch errors in case some clients are missing)
       ignoreMissing = typeof options.reportMissing === 'boolean' ? !options.reportMissing : false;
     }
 
@@ -362,6 +363,7 @@ export class MessageService {
       const encoder = new TextEncoder();
       protoMessage.reportMissing = options.reportMissing.map(userId => ({uuid: encoder.encode(userId)}));
     } else {
+      // By default we want ignore missing to be false (and have mismatch errors in case some clients are missing)
       ignoreMissing = typeof options.reportMissing === 'boolean' ? !options.reportMissing : false;
     }
 
