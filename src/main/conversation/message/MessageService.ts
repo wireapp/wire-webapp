@@ -229,7 +229,7 @@ export class MessageService {
       native_push: options.nativePush,
     };
 
-    const ignoreMissing = options.reportMissing === true ? false : undefined;
+    const ignoreMissing = options.reportMissing === true ? false : true;
     if (isStringArray(options.reportMissing)) {
       message.report_missing = options.reportMissing;
     }
@@ -355,7 +355,7 @@ export class MessageService {
       },
     });
 
-    const ignoreMissing = options.reportMissing === true ? false : undefined;
+    const ignoreMissing = options.reportMissing === true ? false : true;
     if (isStringArray(options.reportMissing)) {
       const encoder = new TextEncoder();
       protoMessage.reportMissing = options.reportMissing.map(userId => ({uuid: encoder.encode(userId)}));
