@@ -229,9 +229,11 @@ export class MessageService {
       native_push: options.nativePush,
     };
 
-    const ignoreMissing = options.reportMissing === true ? false : true;
+    let ignoreMissing;
     if (isStringArray(options.reportMissing)) {
       message.report_missing = options.reportMissing;
+    } else {
+      ignoreMissing = typeof options.reportMissing === 'boolean' ? !options.reportMissing : false;
     }
 
     return !options.conversationId
@@ -355,10 +357,12 @@ export class MessageService {
       },
     });
 
-    const ignoreMissing = options.reportMissing === true ? false : true;
+    let ignoreMissing;
     if (isStringArray(options.reportMissing)) {
       const encoder = new TextEncoder();
       protoMessage.reportMissing = options.reportMissing.map(userId => ({uuid: encoder.encode(userId)}));
+    } else {
+      ignoreMissing = typeof options.reportMissing === 'boolean' ? !options.reportMissing : false;
     }
 
     if (options.assetData) {
