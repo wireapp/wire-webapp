@@ -839,6 +839,7 @@ export class MessageRepository {
    * @param options.playPingAudio should the 'ping' audio be played when message is being sent
    * @param options.nativePush use nativePush for sending to mobile devices
    * @param options.recipients can be used to target specific users of the conversation. Will send to all the conversation participants if not defined
+   * @param options.skipSelf do not forward this message to self user (will not encrypt and send to all self clients)
    */
   private async sendAndInjectGenericCoreMessage(
     payload: OtrMessage,
@@ -849,10 +850,12 @@ export class MessageRepository {
       nativePush = true,
       targetMode,
       recipients,
+      skipSelf,
     }: {
       nativePush?: boolean;
       playPingAudio?: boolean;
       recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
+      skipSelf?: boolean;
       syncTimestamp?: boolean;
       targetMode?: MessageTargetMode;
     } = {
@@ -860,7 +863,7 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ) {
-    const userIds = await this.generateRecipients(conversation, recipients);
+    const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
 
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
       if (playPingAudio) {
@@ -1364,14 +1367,18 @@ export class MessageRepository {
   private async generateRecipients(
     conversation: Conversation,
     recipients: QualifiedId[] | QualifiedUserClients | UserClients,
+    skipSelf?: boolean,
   ): Promise<QualifiedUserClients | UserClients> {
     if (isQualifiedUserClients(recipients) || isUserClients(recipients)) {
       // If we get a userId>client pairs, we just return those, no need to create recipients
       return recipients;
     }
-    const users = conversation.allUserEntities.filter(
-      user => !recipients || recipients.some(userId => matchQualifiedIds(user, userId)),
-    );
+    const users = conversation.allUserEntities
+      // if users are given by the caller, we filter to only keep those users
+      .filter(user => !recipients || recipients.some(userId => matchQualifiedIds(user, userId)))
+      // we filter the self user if skipSelf is true
+      .filter(user => !skipSelf || !user.isMe);
+
     return conversation.isFederated()
       ? this.createQualifiedRecipients(users)
       : this.createRecipients(
@@ -1839,7 +1846,8 @@ export class MessageRepository {
 
     return this.sendAndInjectGenericCoreMessage(message, conversation, {
       ...options,
-      targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : undefined,
+      skipSelf: true, // We never want to forward calling messages to the self user
+      targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
   }
 
