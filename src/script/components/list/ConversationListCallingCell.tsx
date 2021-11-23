@@ -149,7 +149,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
 
     const muteParticipant = {
       click: () =>
-        callingRepository.sendModeratorMute(conversation.id, {[participant.user.id]: [participant.clientId]}),
+        callingRepository.sendModeratorMute(conversation.qualifiedId, {[participant.user.id]: [participant.clientId]}),
       icon: 'mic-off-icon',
       identifier: `moderator-mute-participant`,
       isDisabled: participant.isMuted(),
@@ -164,7 +164,7 @@ const ConversationListCallingCell: React.FC<CallingCellProps> = ({
             acc[user.id] = [...(acc[user.id] || []), clientId];
             return acc;
           }, {} as Record<UserId, ClientId[]>);
-        callingRepository.sendModeratorMute(conversation.id, recipients);
+        callingRepository.sendModeratorMute(conversation.qualifiedId, recipients);
       },
       icon: 'mic-off-icon',
       identifier: 'moderator-mute-others',

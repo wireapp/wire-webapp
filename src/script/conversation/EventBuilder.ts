@@ -55,7 +55,7 @@ export interface ConversationEvent<T> extends BaseEvent {
 
 export interface CallingEvent {
   content: CallEntity;
-  conversation: string;
+  conversation: QualifiedId;
   from: string;
   sender: string;
   time?: string;
@@ -244,7 +244,7 @@ export const EventBuilder = {
   ): CallingEvent {
     return {
       content: callMessage,
-      conversation: conversationEntity.id,
+      conversation: conversationEntity.qualifiedId,
       from: userId,
       sender: clientId,
       type: ClientEvent.CALL.E_CALL,
