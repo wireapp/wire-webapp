@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.28.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.28.1...@wireapp/core@17.28.2) (2021-11-23)
+
+
+### Bug Fixes
+
+* **core:** Force ignore_missing param to be set when sending target regular message ([cfed987](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/cfed987606344ef43d380a820750e2d052037c9b))
+
+
+
+
+
 ## [17.28.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.28.0...@wireapp/core@17.28.1) (2021-11-23)
 
 
