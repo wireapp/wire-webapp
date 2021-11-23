@@ -41,6 +41,7 @@ import {MessageBuilder} from './MessageBuilder';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {GenericMessageType} from '..';
 import {flattenUserClients, flattenQualifiedUserClients} from './UserClientsUtil';
+import {isQualifiedIdArray, isStringArray} from '../../util';
 
 type ClientMismatchError = AxiosError<ClientMismatch | MessageSendingStatus>;
 
@@ -65,8 +66,9 @@ export class MessageService {
     plainText: Uint8Array,
     options: {
       conversationId?: string;
-      reportMissing?: boolean;
+      reportMissing?: boolean | string[];
       sendAsProtobuf?: boolean;
+      nativePush?: boolean;
       onClientMismatch?: (mismatch: ClientMismatch) => void | boolean | Promise<boolean>;
     } = {},
   ): Promise<ClientMismatch & {errored?: boolean}> {
@@ -119,7 +121,8 @@ export class MessageService {
     options: {
       assetData?: Uint8Array;
       conversationId?: QualifiedId;
-      reportMissing?: boolean;
+      reportMissing?: boolean | QualifiedId[];
+      nativePush?: boolean;
       onClientMismatch?: (mismatch: MessageSendingStatus) => void | boolean | Promise<boolean>;
     },
   ): Promise<MessageSendingStatus & {errored?: boolean}> {
@@ -146,7 +149,12 @@ export class MessageService {
   private async sendFederatedOtrMessage(
     sendingClientId: string,
     recipients: QualifiedOTRRecipients,
-    options: {assetData?: Uint8Array; conversationId?: QualifiedId; reportMissing?: boolean},
+    options: {
+      assetData?: Uint8Array;
+      conversationId?: QualifiedId;
+      reportMissing?: boolean | QualifiedId[];
+      nativePush?: boolean;
+    },
   ): Promise<MessageSendingStatus> {
     const qualifiedUserEntries = Object.entries(recipients).map<ProtobufOTR.IQualifiedUserEntry>(
       ([domain, otrRecipients]) => {
@@ -177,6 +185,7 @@ export class MessageService {
       sender: {
         client: Long.fromString(sendingClientId, 16),
       },
+      nativePush: options.nativePush,
     });
 
     if (options.assetData) {
@@ -184,9 +193,13 @@ export class MessageService {
     }
 
     if (options.reportMissing) {
-      protoMessage.reportAll = {};
+      if (isQualifiedIdArray(options.reportMissing)) {
+        protoMessage.reportOnly = {userIds: options.reportMissing};
+      } else {
+        protoMessage.reportAll = true;
+      }
     } else {
-      protoMessage.ignoreAll = {};
+      protoMessage.ignoreAll = true;
     }
 
     if (!options.conversationId) {
@@ -202,22 +215,28 @@ export class MessageService {
   private async sendOTRMessage(
     sendingClientId: string,
     recipients: OTRRecipients<Uint8Array>,
-    options: {conversationId?: string; assetData?: Uint8Array; reportMissing?: boolean},
+    options: {
+      conversationId?: string;
+      assetData?: Uint8Array;
+      reportMissing?: boolean | string[];
+      nativePush?: boolean;
+    },
   ): Promise<ClientMismatch> {
     const message: NewOTRMessage<string> = {
       data: options.assetData ? Encoder.toBase64(options.assetData).asString : undefined,
       recipients: CryptographyService.convertArrayRecipientsToBase64(recipients),
       sender: sendingClientId,
+      native_push: options.nativePush,
     };
 
+    const ignoreMissing = options.reportMissing === true ? false : undefined;
+    if (isStringArray(options.reportMissing)) {
+      message.report_missing = options.reportMissing;
+    }
+
     return !options.conversationId
-      ? this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, message, !options.reportMissing)
-      : this.apiClient.conversation.api.postOTRMessage(
-          sendingClientId,
-          options.conversationId,
-          message,
-          !options.reportMissing,
-        );
+      ? this.apiClient.broadcast.api.postBroadcastMessage(sendingClientId, message, ignoreMissing)
+      : this.apiClient.conversation.api.postOTRMessage(sendingClientId, options.conversationId, message, ignoreMissing);
   }
 
   private async generateExternalPayload(plainText: Uint8Array): Promise<{text: Uint8Array; cipherText: Uint8Array}> {
@@ -309,7 +328,7 @@ export class MessageService {
   private async sendOTRProtobufMessage(
     sendingClientId: string,
     recipients: OTRRecipients<Uint8Array>,
-    options: {conversationId?: string; assetData?: Uint8Array; reportMissing?: boolean},
+    options: {conversationId?: string; assetData?: Uint8Array; reportMissing?: boolean | string[]},
   ): Promise<ClientMismatch> {
     const userEntries: ProtobufOTR.IUserEntry[] = Object.entries(recipients).map(([userId, otrClientMap]) => {
       const clients: ProtobufOTR.IClientEntry[] = Object.entries(otrClientMap).map(([clientId, payload]) => {
@@ -336,17 +355,23 @@ export class MessageService {
       },
     });
 
+    const ignoreMissing = options.reportMissing === true ? false : undefined;
+    if (isStringArray(options.reportMissing)) {
+      const encoder = new TextEncoder();
+      protoMessage.reportMissing = options.reportMissing.map(userId => ({uuid: encoder.encode(userId)}));
+    }
+
     if (options.assetData) {
       protoMessage.blob = options.assetData;
     }
 
     return !options.conversationId
-      ? this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, protoMessage, !options.reportMissing)
+      ? this.apiClient.broadcast.api.postBroadcastProtobufMessage(sendingClientId, protoMessage, ignoreMissing)
       : this.apiClient.conversation.api.postOTRProtobufMessage(
           sendingClientId,
           options.conversationId,
           protoMessage,
-          !options.reportMissing,
+          ignoreMissing,
         );
   }
 }
