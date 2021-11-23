@@ -870,6 +870,7 @@ export class MessageRepository {
       const senderId = this.clientState.currentClient().id;
       const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
       const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
+      this.trackContributed(conversation, genericMessage);
       this.cryptography_repository.cryptographyMapper
         .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
         .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
