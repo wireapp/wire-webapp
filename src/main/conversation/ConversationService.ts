@@ -370,20 +370,19 @@ export class ConversationService {
   }
 
   private extractUserIds(userIds?: string[] | UserClients): string[] | undefined {
-    if (!userIds || isStringArray(userIds)) {
-      return userIds;
+    if (isUserClients(userIds)) {
+      return Object.keys(userIds);
     }
-    return Object.keys(userIds);
+    return userIds;
   }
 
   private extractQualifiedUserIds(userIds?: QualifiedId[] | QualifiedUserClients): QualifiedId[] | undefined {
-    if (!userIds || isQualifiedIdArray(userIds)) {
-      return userIds;
+    if (isQualifiedUserClients(userIds)) {
+      return Object.entries(userIds).reduce<QualifiedId[]>((ids, [domain, userClients]) => {
+        return ids.concat(Object.keys(userClients).map(userId => ({domain, id: userId})));
+      }, []);
     }
-
-    return Object.entries(userIds).reduce<QualifiedId[]>((ids, [domain, userClients]) => {
-      return ids.concat(Object.keys(userClients).map(userId => ({domain, id: userId})));
-    }, []);
+    return userIds;
   }
 
   private generateButtonActionGenericMessage(payloadBundle: ButtonActionMessage): GenericMessage {
