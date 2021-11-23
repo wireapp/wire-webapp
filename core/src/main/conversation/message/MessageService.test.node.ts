@@ -220,7 +220,7 @@ describe('MessageService', () => {
         clientId,
         conversationId,
         jasmine.any(Object),
-        undefined,
+        false,
       );
     });
 
@@ -238,7 +238,7 @@ describe('MessageService', () => {
         clientId,
         conversationId,
         jasmine.any(Object),
-        undefined,
+        false,
       );
     });
 
@@ -247,11 +247,7 @@ describe('MessageService', () => {
       spyOn(apiClient.broadcast.api, 'postBroadcastMessage').and.returnValue(Promise.resolve({} as ClientMismatch));
 
       await messageService.sendMessage(clientId, generateRecipients(generateUsers(3, 3)), createMessage(message));
-      expect(apiClient.broadcast.api.postBroadcastMessage).toHaveBeenCalledWith(
-        clientId,
-        jasmine.any(Object),
-        undefined,
-      );
+      expect(apiClient.broadcast.api.postBroadcastMessage).toHaveBeenCalledWith(clientId, jasmine.any(Object), false);
     });
 
     it('should broadcast protobuf message if no conversationId is given', async () => {
@@ -267,7 +263,7 @@ describe('MessageService', () => {
       expect(apiClient.broadcast.api.postBroadcastProtobufMessage).toHaveBeenCalledWith(
         clientId,
         jasmine.any(Object),
-        undefined,
+        false,
       );
     });
 
@@ -282,7 +278,7 @@ describe('MessageService', () => {
         clientId,
         conversationId,
         jasmine.objectContaining({data: undefined}),
-        undefined,
+        false,
       );
     });
 
@@ -303,7 +299,7 @@ describe('MessageService', () => {
         clientId,
         conversationId,
         jasmine.objectContaining({data: jasmine.any(String)}),
-        undefined,
+        false,
       );
     });
 
