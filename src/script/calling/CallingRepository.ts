@@ -959,7 +959,7 @@ export class CallingRepository {
   private readonly sendMessage = (
     _context: number,
     conversationId: ConversationId,
-    userId: UserId,
+    _userId: UserId,
     _clientId: ClientId,
     targets: string | null,
     _unused: null,
@@ -969,29 +969,20 @@ export class CallingRepository {
     if (call?.blockMessages) {
       return 0;
     }
-    const {type, resp} = JSON.parse(payload);
-    const needsVerification = [CALL_MESSAGE_TYPE.SETUP, CALL_MESSAGE_TYPE.GROUP_START].includes(type);
-    const validationPromise = needsVerification
-      ? this.verificationPromise(conversationId, userId, resp)
-      : Promise.resolve();
-    validationPromise
-      .then(() => {
-        let options: MessageSendingOptions;
+    let options: MessageSendingOptions;
 
-        if (typeof targets === 'string') {
-          const parsedTargets: SendMessageTarget = JSON.parse(targets);
-          const recipients = this.mapTargets(parsedTargets);
-          options = {
-            nativePush: true,
-            precondition: true,
-            recipients,
-          };
-        }
+    if (typeof targets === 'string') {
+      const parsedTargets: SendMessageTarget = JSON.parse(targets);
+      // TODO(federation): get domain from avs and generate QualifiedUserClients (instead of just UserClients)
+      const recipients = this.mapTargets(parsedTargets);
+      options = {
+        nativePush: true,
+        precondition: true,
+        recipients,
+      };
+    }
 
-        return this.sendCallingMessage(conversationId, payload, options);
-      })
-      .catch(() => this.abortCall(conversationId));
-
+    this.sendCallingMessage(conversationId, payload, options).catch(() => this.abortCall(conversationId));
     return 0;
   };
 
@@ -999,18 +990,14 @@ export class CallingRepository {
     conversationId: ConversationId,
     payload: string | Object,
     options?: MessageSendingOptions,
-  ): Promise<ClientMismatch> => {
+  ): Promise<void> => {
     const qualifiedConversationId: QualifiedId = {
       domain: '',
       id: conversationId /*TODO(federation): get conversation domain*/,
     };
-    const protoCalling = new Calling({content: typeof payload === 'string' ? payload : JSON.stringify(payload)});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-      messageId: createRandomUuid(),
-    });
-    const eventInfoEntity = new EventInfoEntity(genericMessage, qualifiedConversationId, options);
-    return this.messageRepository.sendCallingMessage(eventInfoEntity, qualifiedConversationId);
+    const conversation = this.conversationState.findConversation(qualifiedConversationId);
+    const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
+    return this.messageRepository.sendCallingMessage(conversation, content, options);
   };
 
   readonly sendModeratorMute = (conversationId: ConversationId, recipients: Record<UserId, ClientId[]>) => {

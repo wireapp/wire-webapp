@@ -115,6 +115,7 @@ import {Config} from '../Config';
 import {Core} from '../service/CoreSingleton';
 import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {User} from '../entity/User';
+import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -838,6 +839,8 @@ export class MessageRepository {
    * @param options.playPingAudio should the 'ping' audio be played when message is being sent
    * @param options.nativePush use nativePush for sending to mobile devices
    * @param options.recipients can be used to target specific users of the conversation. Will send to all the conversation participants if not defined
+   * @param options.skipSelf do not forward this message to self user (will not encrypt and send to all self clients)
+   * @param options.skipInjection do not inject message in the event repository (will skip all the event handling pipeline)
    */
   private async sendAndInjectGenericCoreMessage(
     payload: OtrMessage,
@@ -846,34 +849,38 @@ export class MessageRepository {
       syncTimestamp = true,
       playPingAudio = false,
       nativePush = true,
+      targetMode,
       recipients,
-    }: {nativePush?: boolean; playPingAudio?: boolean; recipients?: QualifiedId[]; syncTimestamp?: boolean} = {
+      skipSelf,
+      skipInjection,
+    }: {
+      nativePush?: boolean;
+      playPingAudio?: boolean;
+      recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
+      skipInjection?: boolean;
+      skipSelf?: boolean;
+      syncTimestamp?: boolean;
+      targetMode?: MessageTargetMode;
+    } = {
       playPingAudio: false,
       syncTimestamp: true,
     },
   ) {
-    const users = conversation.allUserEntities.filter(
-      user => !recipients || recipients.some(userId => matchQualifiedIds(user, userId)),
-    );
-    const userIds = conversation.isFederated()
-      ? this.createQualifiedRecipients(users)
-      : await this.createRecipients(
-          conversation.qualifiedId,
-          false,
-          users.map(user => user.id),
-        );
+    const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
 
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
       if (playPingAudio) {
         amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
       }
-      const senderId = this.clientState.currentClient().id;
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
-      this.trackContributed(conversation, genericMessage);
-      this.cryptography_repository.cryptographyMapper
-        .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
-        .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
+      if (!skipInjection) {
+        const senderId = this.clientState.currentClient().id;
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+        const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
+        this.trackContributed(conversation, genericMessage);
+        this.cryptography_repository.cryptographyMapper
+          .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
+          .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
+      }
 
       return this.requestUserSendingPermission(conversation);
     };
@@ -895,7 +902,7 @@ export class MessageRepository {
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       nativePush,
       payloadBundle: payload,
-      targetMode: recipients ? MessageTargetMode.USERS : MessageTargetMode.NONE,
+      targetMode,
       userIds,
     });
   }
@@ -1040,6 +1047,7 @@ export class MessageRepository {
     this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, {
       nativePush: false,
       recipients: [{domain: messageEntity.fromDomain, id: messageEntity.from}],
+      targetMode: MessageTargetMode.USERS,
     });
   }
 
@@ -1361,10 +1369,30 @@ export class MessageRepository {
     }, {} as QualifiedUserClients);
   }
 
-  /**
-   * Create a user client map for a given conversation.
-   * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
-   */
+  private async generateRecipients(
+    conversation: Conversation,
+    recipients: QualifiedId[] | QualifiedUserClients | UserClients,
+    skipSelf?: boolean,
+  ): Promise<QualifiedUserClients | UserClients> {
+    if (isQualifiedUserClients(recipients) || isUserClients(recipients)) {
+      // If we get a userId>client pairs, we just return those, no need to create recipients
+      return recipients;
+    }
+    const users = conversation.allUserEntities
+      // if users are given by the caller, we filter to only keep those users
+      .filter(user => !recipients || recipients.some(userId => matchQualifiedIds(user, userId)))
+      // we filter the self user if skipSelf is true
+      .filter(user => !skipSelf || !user.isMe);
+
+    return conversation.isFederated()
+      ? this.createQualifiedRecipients(users)
+      : this.createRecipients(
+          conversation.qualifiedId,
+          false,
+          users.map(user => user.id),
+        );
+  }
+
   async createRecipients(
     conversationId: QualifiedId,
     skip_own_clients = false,
@@ -1811,16 +1839,21 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: QualifiedId) {
-    return this.messageSender.queueMessage(() => {
-      const options = eventInfoEntity.options;
-      const recipientsPromise = options.recipients
-        ? Promise.resolve(eventInfoEntity)
-        : this.createRecipients(conversationId, false).then(recipients => {
-            eventInfoEntity.updateOptions({recipients});
-            return eventInfoEntity;
-          });
-      return recipientsPromise.then(infoEntity => this.sendGenericMessage(infoEntity, true));
+  public sendCallingMessage(
+    conversation: Conversation,
+    payload: string,
+    options: {nativePush?: boolean; recipients?: UserClients | QualifiedUserClients},
+  ) {
+    const message = this.core.service!.conversation.messageBuilder.createCall({
+      content: payload,
+      conversationId: conversation.id,
+    });
+
+    return this.sendAndInjectGenericCoreMessage(message, conversation, {
+      ...options,
+      skipInjection: true,
+      skipSelf: true, // We never want to forward calling messages to the self user
+      targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
   }
 
