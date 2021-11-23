@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.28.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.28.0...@wireapp/core@17.28.1) (2021-11-23)
+
+
+### Bug Fixes
+
+* **core:** Improve types ([9a6d7d2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/9a6d7d267b563da2c73bc991f18cc06e60e42986))
+
+
+
+
+
 # [17.28.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.27.4...@wireapp/core@17.28.0) (2021-11-23)
 
 
