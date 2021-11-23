@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.28.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.27.4...@wireapp/core@17.28.0) (2021-11-23)
+
+
+### Features
+
+* **core:** Add ability to send targeted message to specific users ([#4181](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4181)) ([9154556](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/91545560ecad09ef124497d803110e739ab95500))
+
+
+
+
+
 ## [17.27.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.27.3...@wireapp/core@17.27.4) (2021-11-16)
 
 **Note:** Version bump only for package @wireapp/core
