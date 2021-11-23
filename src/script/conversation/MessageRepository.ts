@@ -840,6 +840,7 @@ export class MessageRepository {
    * @param options.nativePush use nativePush for sending to mobile devices
    * @param options.recipients can be used to target specific users of the conversation. Will send to all the conversation participants if not defined
    * @param options.skipSelf do not forward this message to self user (will not encrypt and send to all self clients)
+   * @param options.skipInjection do not inject message in the event repository (will skip all the event handling pipeline)
    */
   private async sendAndInjectGenericCoreMessage(
     payload: OtrMessage,
@@ -851,10 +852,12 @@ export class MessageRepository {
       targetMode,
       recipients,
       skipSelf,
+      skipInjection,
     }: {
       nativePush?: boolean;
       playPingAudio?: boolean;
       recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
+      skipInjection?: boolean;
       skipSelf?: boolean;
       syncTimestamp?: boolean;
       targetMode?: MessageTargetMode;
@@ -869,13 +872,15 @@ export class MessageRepository {
       if (playPingAudio) {
         amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
       }
-      const senderId = this.clientState.currentClient().id;
-      const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-      const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
-      this.trackContributed(conversation, genericMessage);
-      this.cryptography_repository.cryptographyMapper
-        .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
-        .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
+      if (!skipInjection) {
+        const senderId = this.clientState.currentClient().id;
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+        const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
+        this.trackContributed(conversation, genericMessage);
+        this.cryptography_repository.cryptographyMapper
+          .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
+          .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
+      }
 
       return this.requestUserSendingPermission(conversation);
     };
@@ -1846,6 +1851,7 @@ export class MessageRepository {
 
     return this.sendAndInjectGenericCoreMessage(message, conversation, {
       ...options,
+      skipInjection: true,
       skipSelf: true, // We never want to forward calling messages to the self user
       targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
