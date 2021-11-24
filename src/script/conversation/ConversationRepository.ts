@@ -185,7 +185,7 @@ export class ConversationRepository {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
-    this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId) => {
+    this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId, silent) => {
       const deleted = isQualifiedUserClients(mismatch.deleted)
         ? flattenQualifiedUserClients(mismatch.deleted)
         : flattenUserClients(mismatch.deleted);
@@ -216,7 +216,7 @@ export class ConversationRepository {
           conversation.verification_state(ConversationVerificationState.DEGRADED);
         }
       }
-      return this.messageRepository.requestUserSendingPermission(conversation);
+      return silent ? false : this.messageRepository.requestUserSendingPermission(conversation);
     });
 
     this.logger = getLogger('ConversationRepository');
