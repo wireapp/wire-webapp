@@ -71,7 +71,6 @@ import * as trackingHelpers from '../tracking/Helpers';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
@@ -82,6 +81,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
 import {TeamState} from '../team/TeamState';
 import Warnings from '../view_model/WarningsContainer';
+import {ConversationError} from '../error/ConversationError';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -651,14 +651,16 @@ export class CallingRepository {
   //##############################################################################
 
   readonly toggleState = (withVideo: boolean): void => {
-    const conversationEntity: Conversation | undefined = this.conversationState.activeConversation();
+    const conversationEntity = this.conversationState.activeConversation();
     if (conversationEntity) {
       const isActiveCall = this.findCall(conversationEntity.id);
       const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
       const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-      return isActiveCall
-        ? this.leaveCall(conversationEntity.id)
-        : this.startCall(conversationEntity.id, isGroupCall, callType) && undefined;
+      return (
+        (isActiveCall
+          ? this.leaveCall(conversationEntity.id)
+          : this.startCall(conversationEntity.id, isGroupCall, callType)) && undefined
+      );
     }
   };
 
@@ -969,7 +971,7 @@ export class CallingRepository {
     if (call?.blockMessages) {
       return 0;
     }
-    let options: MessageSendingOptions;
+    let options: MessageSendingOptions | undefined = undefined;
 
     if (typeof targets === 'string') {
       const parsedTargets: SendMessageTarget = JSON.parse(targets);
@@ -997,7 +999,15 @@ export class CallingRepository {
     };
     const conversation = this.conversationState.findConversation(qualifiedConversationId);
     const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
-    return this.messageRepository.sendCallingMessage(conversation, content, options);
+    return this.messageRepository.sendCallingMessage(conversation, content, options).catch(error => {
+      if (
+        error instanceof ConversationError &&
+        error.type === ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
+      ) {
+        // If the user has cancelled message sending because of a degradation warning, we abort the call
+        this.abortCall(conversationId);
+      }
+    });
   };
 
   readonly sendModeratorMute = (conversationId: ConversationId, recipients: Record<UserId, ClientId[]>) => {

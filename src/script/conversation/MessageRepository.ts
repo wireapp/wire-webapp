@@ -36,7 +36,12 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {ReactionType, MessageSendingCallbacks, MessageTargetMode} from '@wireapp/core/src/main/conversation';
+import {
+  ReactionType,
+  MessageSendingCallbacks,
+  MessageTargetMode,
+  PayloadBundleState,
+} from '@wireapp/core/src/main/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   ClientMismatch,
@@ -893,9 +898,9 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    await this.conversationService.send({
+    const payloadBundle = await this.conversationService.send({
       callbacks: {
-        onClientMismatch: mismatch => this.onClientMismatch(mismatch, conversation.qualifiedId),
+        onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation.qualifiedId),
         onStart: injectOptimisticEvent,
         onSuccess: updateOptimisticEvent,
       },
@@ -905,6 +910,14 @@ export class MessageRepository {
       targetMode,
       userIds,
     });
+
+    if (payloadBundle.state === PayloadBundleState.CANCELLED) {
+      // Means message sending was cancelled because the conversation degraded and user chose not to send the message
+      throw new ConversationError(
+        ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+        ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
+      );
+    }
   }
 
   private async _sendAndInjectGenericMessage(
