@@ -2709,7 +2709,9 @@ export class ConversationRepository {
           return this.messageRepository.deleteMessage(conversationEntity, messageEntity);
         }
 
-        const userIds = conversationEntity.isGroup() ? [this.userState.self().id, messageEntity.from] : undefined;
+        const userIds = conversationEntity.isGroup()
+          ? [this.userState.self().qualifiedId, {domain: messageEntity.fromDomain, id: messageEntity.from}]
+          : undefined;
         return this.messageRepository.deleteMessageForEveryone(conversationEntity, messageEntity, userIds);
       });
     }
