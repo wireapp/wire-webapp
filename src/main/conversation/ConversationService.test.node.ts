@@ -214,13 +214,14 @@ describe('ConversationService', () => {
       spyOn<any>(conversationService, 'sendGenericMessage');
       const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
       const callbacks = {onStart: () => Promise.resolve(false), onSuccess: jasmine.createSpy()};
-      await conversationService.send({
+      const payloadBundle = await conversationService.send({
         callbacks,
         payloadBundle: message,
       });
 
       expect(callbacks.onSuccess).not.toHaveBeenCalled();
       expect(conversationService['sendGenericMessage']).not.toHaveBeenCalled();
+      expect(payloadBundle.state).toBe(PayloadBundleState.CANCELLED);
     });
 
     it(`does not call onSuccess when message was canceled`, async () => {
@@ -228,12 +229,13 @@ describe('ConversationService', () => {
       spyOn<any>(conversationService, 'sendGenericMessage').and.returnValue(Promise.resolve({time: '', errored: true}));
       const message: OtrMessage = {...baseMessage, type: PayloadBundleType.TEXT, content: {text: 'test'}};
       const callbacks = {onSuccess: jasmine.createSpy()};
-      await conversationService.send({
+      const payloadBundle = await conversationService.send({
         callbacks,
         payloadBundle: message,
       });
 
       expect(callbacks.onSuccess).not.toHaveBeenCalled();
+      expect(payloadBundle.state).toBe(PayloadBundleState.CANCELLED);
     });
   });
 
