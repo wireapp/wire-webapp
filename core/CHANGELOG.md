@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.29.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.28.2...@wireapp/core@17.29.0) (2021-11-24)
+
+
+### Features
+
+* **core:** Add cancelled flag when message sending was cancelled ([#4182](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4182)) ([ab11f01](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/ab11f01fab0c1b3413c120382e28b9d6259709df))
+
+
+
+
+
 ## [17.28.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.28.1...@wireapp/core@17.28.2) (2021-11-23)
 
 
