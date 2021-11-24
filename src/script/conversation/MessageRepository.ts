@@ -36,12 +36,7 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {
-  ReactionType,
-  MessageSendingCallbacks,
-  MessageTargetMode,
-  PayloadBundleState,
-} from '@wireapp/core/src/main/conversation';
+import {ReactionType, MessageSendingCallbacks, MessageTargetMode} from '@wireapp/core/src/main/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   ClientMismatch,
@@ -256,7 +251,7 @@ export class MessageRepository {
    * @param conversationEntity Conversation to send knock in
    * @returns Resolves after sending the knock
    */
-  public async sendPing(conversation: Conversation): Promise<void> {
+  public async sendPing(conversation: Conversation) {
     const ping = this.messageBuilder.createPing({
       conversationId: conversation.id,
       ping: {
@@ -279,7 +274,7 @@ export class MessageRepository {
     message: string,
     mentions: MentionEntity[],
     quote?: QuoteEntity,
-  ): Promise<void> {
+  ) {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
     const textPayload = this.messageBuilder
@@ -334,7 +329,7 @@ export class MessageRepository {
     textMessage: string,
     mentionEntities: MentionEntity[],
     quoteEntity?: QuoteEntity,
-  ): Promise<void> {
+  ): Promise<OtrMessage | void> {
     try {
       if (conversationEntity.isFederated()) {
         return await this.sendFederatedMessage(conversationEntity, textMessage, mentionEntities, quoteEntity);
@@ -363,7 +358,7 @@ export class MessageRepository {
     textMessage: string,
     originalMessageEntity: ContentMessage,
     mentionEntities: MentionEntity[],
-  ): Promise<void> {
+  ): Promise<OtrMessage | void> {
     const hasDifferentText = isTextDifferent(originalMessageEntity, textMessage);
     const hasDifferentMentions = areMentionsDifferent(originalMessageEntity, mentionEntities);
     const wasEdited = hasDifferentText || hasDifferentMentions;
@@ -898,7 +893,7 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const payloadBundle = await this.conversationService.send({
+    return this.conversationService.send({
       callbacks: {
         onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation.qualifiedId),
         onStart: injectOptimisticEvent,
@@ -910,14 +905,6 @@ export class MessageRepository {
       targetMode,
       userIds,
     });
-
-    if (payloadBundle.state === PayloadBundleState.CANCELLED) {
-      // Means message sending was cancelled because the conversation degraded and user chose not to send the message
-      throw new ConversationError(
-        ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-        ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-      );
-    }
   }
 
   private async _sendAndInjectGenericMessage(
@@ -1071,11 +1058,7 @@ export class MessageRepository {
    * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
-  private async sendReaction(
-    conversationEntity: Conversation,
-    messageEntity: Message,
-    reactionType: ReactionType,
-  ): Promise<void> {
+  private async sendReaction(conversationEntity: Conversation, messageEntity: Message, reactionType: ReactionType) {
     const reaction = this.messageBuilder.createReaction({
       conversationId: conversationEntity.id,
       reaction: {
