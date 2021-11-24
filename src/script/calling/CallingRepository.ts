@@ -712,9 +712,7 @@ export class CallingRepository {
         this.removeCall(call);
       }
       return call;
-    } catch (_error) {
-      console.error(_error);
-    }
+    } catch (_error) {}
   }
 
   private serializeQualifiedId(id: QualifiedId): string {
