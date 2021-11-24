@@ -81,7 +81,7 @@ import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
 import {TeamState} from '../team/TeamState';
 import Warnings from '../view_model/WarningsContainer';
-import {ConversationError} from '../error/ConversationError';
+import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -988,7 +988,7 @@ export class CallingRepository {
     return 0;
   };
 
-  private readonly sendCallingMessage = (
+  private readonly sendCallingMessage = async (
     conversationId: ConversationId,
     payload: string | Object,
     options?: MessageSendingOptions,
@@ -999,15 +999,11 @@ export class CallingRepository {
     };
     const conversation = this.conversationState.findConversation(qualifiedConversationId);
     const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
-    return this.messageRepository.sendCallingMessage(conversation, content, options).catch(error => {
-      if (
-        error instanceof ConversationError &&
-        error.type === ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION
-      ) {
-        // If the user has cancelled message sending because of a degradation warning, we abort the call
-        this.abortCall(conversationId);
-      }
-    });
+    const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
+    if (message.state === PayloadBundleState.CANCELLED) {
+      // If the user has cancelled message sending because of a degradation warning, we abort the call
+      this.abortCall(conversationId);
+    }
   };
 
   readonly sendModeratorMute = (conversationId: ConversationId, recipients: Record<UserId, ClientId[]>) => {
