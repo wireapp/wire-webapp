@@ -560,7 +560,11 @@ export class CallingRepository {
    * Handle incoming calling events from backend.
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
-    const {content, conversation: conversationId, from: userId, sender: clientId, time} = event;
+    const {content, conversation, qualified_conversation, from: userId, sender: clientId, time} = event;
+    const conversationId =
+      Config.getConfig().FEATURE.ENABLE_FEDERATION && qualified_conversation
+        ? qualified_conversation
+        : {domain: '', id: conversation};
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
@@ -714,7 +718,7 @@ export class CallingRepository {
   }
 
   private serializeQualifiedId(id: QualifiedId): string {
-    if (id.domain) {
+    if (id.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
       return `${id.id}@${id.domain}`;
     }
     return id.id;
