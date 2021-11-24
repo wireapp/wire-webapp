@@ -36,7 +36,12 @@ import {
   LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {ReactionType, MessageSendingCallbacks, MessageTargetMode} from '@wireapp/core/src/main/conversation';
+import {
+  ReactionType,
+  MessageSendingCallbacks,
+  MessageTargetMode,
+  PayloadBundleState,
+} from '@wireapp/core/src/main/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   ClientMismatch,
@@ -124,7 +129,9 @@ export type ContributedSegmentations = Record<string, number | string | boolean 
 type ClientMismatchHandlerFn = (
   mismatch: ClientMismatch | MessageSendingStatus,
   conversationId?: QualifiedId,
+  silent?: boolean,
 ) => Promise<boolean>;
+
 export class MessageRepository {
   private readonly logger: Logger;
   private readonly eventService: EventService;
@@ -853,10 +860,12 @@ export class MessageRepository {
       recipients,
       skipSelf,
       skipInjection,
+      silentDegradationWarning,
     }: {
       nativePush?: boolean;
       playPingAudio?: boolean;
       recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
+      silentDegradationWarning?: boolean;
       skipInjection?: boolean;
       skipSelf?: boolean;
       syncTimestamp?: boolean;
@@ -882,7 +891,7 @@ export class MessageRepository {
           .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
       }
 
-      return this.requestUserSendingPermission(conversation);
+      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation);
     };
 
     const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
@@ -895,7 +904,8 @@ export class MessageRepository {
 
     return this.conversationService.send({
       callbacks: {
-        onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation.qualifiedId),
+        onClientMismatch: mismatch =>
+          this.onClientMismatch?.(mismatch, conversation.qualifiedId, silentDegradationWarning),
         onStart: injectOptimisticEvent,
         onSuccess: updateOptimisticEvent,
       },
@@ -1015,12 +1025,12 @@ export class MessageRepository {
    * @param type The type of confirmation to send
    * @param moreMessageEntities More messages to send a read receipt for
    */
-  sendConfirmationStatus(
+  async sendConfirmationStatus(
     conversationEntity: Conversation,
     messageEntity: Message,
     type: Confirmation.Type,
     moreMessageEntities: Message[] = [],
-  ): void {
+  ) {
     const typeToConfirm = (EventTypeHandling.CONFIRM as string[]).includes(messageEntity.type);
 
     if (messageEntity.user().isMe || !typeToConfirm) {
@@ -1044,11 +1054,23 @@ export class MessageRepository {
       type,
     });
 
-    this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, {
+    const sendingOptions = {
       nativePush: false,
       recipients: [{domain: messageEntity.fromDomain, id: messageEntity.from}],
+      // We first try to send the message targetting the sending user.
+      // In case there is a mismatch, the app will update local clients but will not send the message and will not show the degradation warning
+      silentDegradationWarning: true,
+
       targetMode: MessageTargetMode.USERS,
-    });
+    };
+    const res = await this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, sendingOptions);
+    if (res.state === PayloadBundleState.CANCELLED) {
+      this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, {
+        ...sendingOptions,
+        // If the message was auto cancelled because of a mismatch, we will force sending the message only to the clients we know of (ignoring unverified clients)
+        targetMode: MessageTargetMode.USERS_CLIENTS,
+      });
+    }
   }
 
   /**
