@@ -34,6 +34,7 @@ export enum PayloadBundleState {
   INCOMING = 'PayloadBundleState.INCOMING',
   OUTGOING_SENT = 'PayloadBundleState.OUTGOING_SENT',
   OUTGOING_UNSENT = 'PayloadBundleState.OUTGOING_UNSENT',
+  CANCELLED = 'PayloadBundleState.CANCELLED',
 }
 
 export interface BasePayloadBundle {
