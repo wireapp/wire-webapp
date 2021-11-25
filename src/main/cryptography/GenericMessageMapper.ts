@@ -18,7 +18,6 @@
  */
 
 import type {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
-import type {GenericMessage} from '@wireapp/protocol-messaging';
 import logdown from 'logdown';
 import {
   GenericMessageType,
@@ -39,33 +38,12 @@ import type {
   ReactionContent,
   TextContent,
 } from '../conversation/content';
-import type {ButtonActionMessage} from '../conversation/message/OtrMessage';
 
 export class GenericMessageMapper {
   private static readonly logger = logdown('@wireapp/core/cryptography/GenericMessageMapper', {
     logger: console,
     markdown: false,
   });
-
-  private static mapButtonActionMessage(
-    genericMessage: GenericMessage,
-    event: ConversationOtrMessageAddEvent,
-    source: PayloadBundleSource,
-  ): ButtonActionMessage {
-    const {buttonAction, messageId} = genericMessage;
-    return {
-      content: buttonAction!,
-      conversation: event.conversation,
-      from: event.from,
-      fromClientId: event.data.sender,
-      id: messageId,
-      messageTimer: 0,
-      source,
-      state: PayloadBundleState.INCOMING,
-      timestamp: new Date(event.time).getTime(),
-      type: PayloadBundleType.BUTTON_ACTION,
-    };
-  }
 
   // TODO: Turn "any" into a specific type (or collection of types) and make the return type more specific based on the
   // "genericMessage" input parameter.
@@ -74,6 +52,18 @@ export class GenericMessageMapper {
     event: ConversationOtrMessageAddEvent,
     source: PayloadBundleSource,
   ): PayloadBundle {
+    const baseMessage: Omit<PayloadBundle, 'content' | 'type'> = {
+      conversation: event.conversation,
+      qualifiedConversation: event.qualified_conversation,
+      qualifiedFrom: event.qualified_from,
+      fromClientId: event.data.sender,
+      from: event.from,
+      state: PayloadBundleState.INCOMING,
+      timestamp: new Date(event.time).getTime(),
+      id: genericMessage.messageId,
+      messageTimer: 0,
+      source,
+    };
     switch (genericMessage.content) {
       case GenericMessageType.TEXT: {
         const {
@@ -104,32 +94,22 @@ export class GenericMessageMapper {
         }
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.TEXT,
         };
       }
       case GenericMessageType.BUTTON_ACTION: {
-        return GenericMessageMapper.mapButtonActionMessage(genericMessage, event, source);
+        return {
+          ...baseMessage,
+          content: genericMessage.buttonAction!,
+          type: PayloadBundleType.BUTTON_ACTION,
+        };
       }
       case GenericMessageType.CALLING: {
         return {
+          ...baseMessage,
           content: genericMessage.calling.content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.CALL,
         };
       }
@@ -139,15 +119,8 @@ export class GenericMessageMapper {
         const content: ConfirmationContent = {firstMessageId, moreMessageIds, type};
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.CONFIRMATION,
         };
       }
@@ -155,15 +128,8 @@ export class GenericMessageMapper {
         const content: ClearedContent = genericMessage[GenericMessageType.CLEARED];
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.CONVERSATION_CLEAR,
         };
       }
@@ -173,15 +139,8 @@ export class GenericMessageMapper {
         const content: DeletedContent = {messageId: originalMessageId};
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.MESSAGE_DELETE,
         };
       }
@@ -218,15 +177,8 @@ export class GenericMessageMapper {
         }
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.MESSAGE_EDIT,
         };
       }
@@ -239,15 +191,8 @@ export class GenericMessageMapper {
         };
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.MESSAGE_HIDE,
         };
       }
@@ -256,15 +201,8 @@ export class GenericMessageMapper {
         const content: KnockContent = {expectsReadConfirmation, hotKnock: false, legalHoldStatus};
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.PING,
         };
       }
@@ -282,15 +220,8 @@ export class GenericMessageMapper {
         };
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.LOCATION,
         };
       }
@@ -310,15 +241,8 @@ export class GenericMessageMapper {
         };
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: isImage ? PayloadBundleType.ASSET_IMAGE : PayloadBundleType.ASSET,
         };
       }
@@ -332,30 +256,16 @@ export class GenericMessageMapper {
         };
 
         return {
+          ...baseMessage,
           content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.REACTION,
         };
       }
       default: {
         this.logger.warn(`Unhandled event type "${genericMessage.content}": ${JSON.stringify(genericMessage)}`);
         return {
+          ...baseMessage,
           content: genericMessage.content,
-          conversation: event.conversation,
-          from: event.from,
-          fromClientId: event.data.sender,
-          id: genericMessage.messageId,
-          messageTimer: 0,
-          source,
-          state: PayloadBundleState.INCOMING,
-          timestamp: new Date(event.time).getTime(),
           type: PayloadBundleType.UNKNOWN,
         };
       }
