@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.30.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.29.0...@wireapp/core@17.30.0) (2021-11-25)
+
+
+### Features
+
+* **core:** Add qualified conversation and qualified from in message payloads ([#4183](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4183)) ([85b934d](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/85b934d74b1e58026af62df7e174283454a36ca9))
+
+
+
+
+
 # [17.29.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.28.2...@wireapp/core@17.29.0) (2021-11-24)
 
 
