@@ -18,13 +18,16 @@
  */
 
 import React, {useEffect, useMemo, useState} from 'react';
-import {User} from '../../entity/User';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {clamp} from 'Util/NumberUtil';
 import useEffectRef from 'Util/useEffectRef';
+
+import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import MentionSuggestionsItem from './MentionSuggestions/MentionSuggestionsItem';
+import {User} from '../../entity/User';
+
 
 type MentionSuggestionListProps = {
   onSelectionValidated: (data: User, element: HTMLInputElement) => void;
