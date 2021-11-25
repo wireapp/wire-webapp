@@ -1059,7 +1059,7 @@ export class MessageRepository {
       recipients: [{domain: messageEntity.fromDomain, id: messageEntity.from}],
       // We first try to send the message targetting the sending user.
       // In case there is a mismatch, the app will update local clients but will not send the message and will not show the degradation warning
-      silentDegradationWarning: true,
+      silentDegradationWarning: conversationEntity.verification_state() !== ConversationVerificationState.UNVERIFIED,
 
       targetMode: MessageTargetMode.USERS,
     };
