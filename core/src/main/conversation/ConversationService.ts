@@ -130,7 +130,13 @@ interface MessageSendingOptions {
 }
 
 export interface MessageSendingCallbacks {
+  /**
+   * Will be called before a message is actually sent. Returning 'false' will prevent the message from being sent
+   * @param message The message being sent
+   * @return true or undefined if the message should be sent, false if the message sending should be cancelled
+   */
   onStart?: (message: GenericMessage) => void | boolean | Promise<boolean>;
+
   onSuccess?: (message: GenericMessage, sentTime?: string) => void;
   /**
    * Called whenever there is a clientmismatch returned from the server. Will also indicate the sending status of the message (if it was already sent or not)
@@ -845,8 +851,6 @@ export class ConversationService {
    *    When given a QualifiedUserClients or UserClients the method will only send to the clients listed in the userIds. This could lead to ClientMismatch (since the given list of devices might not be the freshest one and new clients could have been created)
    *    When given a QualifiedId[] or QualifiedUserClients the method will send the message through the federated API endpoint
    *    When given a string[] or UserClients the method will send the message through the old API endpoint
-   * @param callbacks.onStart Will be called before a message is actually sent. Returning 'false' will prevent the message from being sent
-   * @param callbacks.onClientMismatch? Will be called when a mismatch happens. Returning `false` from the callback will stop the sending attempt
    * @return resolves with the sent message
    */
   public async send<T extends OtrMessage = OtrMessage>({
