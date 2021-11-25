@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.31.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.30.0...@wireapp/core@17.31.0) (2021-11-25)
+
+
+### Features
+
+* **core:** Add more qualifiedIds when mapping messages ([#4184](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4184)) ([c81741b](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/c81741b6d0159fba14a32089b9f4ba520d6f6623))
+
+
+
+
+
 # [17.30.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.29.0...@wireapp/core@17.30.0) (2021-11-25)
 
 
