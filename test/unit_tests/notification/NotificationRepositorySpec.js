@@ -97,7 +97,7 @@ describe('NotificationRepository', () => {
         options: {
           body: '',
           data: {
-            conversationId: conversation_et.id,
+            conversationId: {domain: conversation_et.domain, id: conversation_et.id},
           },
           icon: '/image/logo/notification.png',
           silent: true,
@@ -202,7 +202,7 @@ describe('NotificationRepository', () => {
           notification_content.options.data.messageType = _message.type;
 
           if (_expected_title) {
-            notification_content.options.data.conversationId = _conversation.id;
+            notification_content.options.data.conversationId = {domain: _conversation.domain, id: _conversation.id};
             notification_content.options.tag = _conversation.id;
             notification_content.title = _expected_title;
           }

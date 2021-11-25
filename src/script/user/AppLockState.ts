@@ -36,8 +36,13 @@ export class AppLockState {
   public readonly isAppLockEnabled: ko.PureComputed<boolean>;
   public readonly hasPassphrase: ko.Observable<boolean>;
   public readonly isActivatedInPreferences: ko.Observable<boolean>;
+  public readonly isAppLockDisabledOnTeam: ko.PureComputed<boolean>;
 
   constructor(teamState = container.resolve(TeamState)) {
+    this.isAppLockDisabledOnTeam = ko.pureComputed(
+      () => teamState.isTeam() && teamState.teamFeatures()?.appLock?.status !== FeatureStatus.ENABLED,
+    );
+
     this.isAppLockAvailable = ko.pureComputed(() =>
       teamState.isTeam() ? teamState.teamFeatures()?.appLock?.status === FeatureStatus.ENABLED : defaultEnabled,
     );

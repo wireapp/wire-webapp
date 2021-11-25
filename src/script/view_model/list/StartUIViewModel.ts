@@ -23,6 +23,7 @@ import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
@@ -141,8 +142,8 @@ export class StartUIViewModel {
     this.peopleTabActive = ko.pureComputed(() => this.state() === StartUIViewModel.STATE.ADD_PEOPLE);
 
     this.submittedSearch = false;
-    this.federationDomain = Config.getConfig().FEATURE.FEDERATION_DOMAIN;
     this.enableFederation = Config.getConfig().FEATURE.ENABLE_FEDERATION;
+    this.federationDomain = this.enableFederation && this.selfUser().domain;
 
     this.search = debounce((query: string): Promise<void> | void => {
       this.clearSearchResults();
@@ -204,7 +205,7 @@ export class StartUIViewModel {
     this.showFederatedDomainNotAvailable = ko.observable(false);
 
     this.searchOnFederatedDomain = ko.pureComputed(() => {
-      if (Config.getConfig().FEATURE.FEDERATION_DOMAIN && isValidFederationUsername(this.searchInput())) {
+      if (Config.getConfig().FEATURE.ENABLE_FEDERATION && isValidFederationUsername(this.searchInput())) {
         const [_, _username, domain] = this.searchInput().split('@');
         return domain;
       }
@@ -293,10 +294,10 @@ export class StartUIViewModel {
 
   readonly clickOnOther = (participantEntity: User | ServiceEntity): Promise<void> | void => {
     if (isUser(participantEntity)) {
-      if (participantEntity.isOutgoingRequest() || !participantEntity.isOnSameFederatedDomain()) {
+      if (participantEntity.isOutgoingRequest()) {
         return this.clickOnContact(participantEntity);
       }
-      return this.mainViewModel.content.userModal.showUser(participantEntity.id, participantEntity.domain);
+      return this.mainViewModel.content.userModal.showUser(participantEntity);
     }
 
     return this.mainViewModel.content.serviceModal.showService(participantEntity);
@@ -420,7 +421,9 @@ export class StartUIViewModel {
     const SEARCHABLE_FIELDS = SearchRepository.CONFIG.SEARCHABLE_FIELDS;
     const searchFields = isHandle ? [SEARCHABLE_FIELDS.USERNAME] : undefined;
 
-    const contactResults = this.searchRepository.searchUserInSet(normalizedQuery, localSearchSources, searchFields);
+    // If the user typed a domain, we will just ignore it when searchng for the user locally
+    const [domainFreeQuery] = normalizedQuery.split('@');
+    const contactResults = this.searchRepository.searchUserInSet(domainFreeQuery, localSearchSources, searchFields);
     const connectedUsers = this.conversationState.connectedUsers();
     const filteredResults = contactResults.filter(
       user =>
@@ -463,8 +466,13 @@ export class StartUIViewModel {
         }
       }
     } catch (error) {
-      if (isBackendError(error) && error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
-        this.showFederatedDomainNotAvailable(true);
+      if (isBackendError(error)) {
+        if (error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+          return this.showFederatedDomainNotAvailable(true);
+        }
+        if (error.code === HTTP_STATUS.BAD_REQUEST && error.label === BackendErrorLabel.FEDERATION_NOT_ALLOWED) {
+          return this.logger.warn(`Error searching for contacts: ${error.message}`);
+        }
       }
       this.logger.error(`Error searching for contacts: ${error.message}`, error);
     }

@@ -137,7 +137,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
               }}
             />
             <div data-uie-name="no-active-speakers" css={{color: '#fff', fontSize: 11, fontWeight: 500}}>
-              {t('noActiveVideoSpeakers')}
+              {t('noActiveSpeakers')}
             </div>
           </div>
         )}

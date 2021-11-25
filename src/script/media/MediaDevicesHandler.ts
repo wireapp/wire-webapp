@@ -39,7 +39,7 @@ declare global {
 export type CurrentAvailableDeviceId = Record<DeviceTypes, ko.PureComputed<string>>;
 export type DeviceSupport = Record<DeviceTypes, ko.PureComputed<boolean>>;
 
-enum DeviceTypes {
+export enum DeviceTypes {
   AUDIO_INPUT = 'audioInput',
   AUDIO_OUTPUT = 'audioOutput',
   SCREEN_INPUT = 'screenInput',

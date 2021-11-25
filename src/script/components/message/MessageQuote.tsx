@@ -99,7 +99,7 @@ const Quote: React.FC<QuoteProps> = ({
         })
         .catch(error => {
           if (error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-            return error(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
+            return setError(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
           }
           throw error;
         });

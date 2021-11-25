@@ -19,7 +19,8 @@
 
 import axios, {AxiosError} from 'axios';
 import {Runtime} from '@wireapp/commons';
-import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data';
+import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
 import type {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation/';
 import {
@@ -55,7 +56,6 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {Config} from '../Config';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {ConversationRepository} from '../conversation/ConversationRepository';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
@@ -63,7 +63,7 @@ import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoE
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
 import {Call, ConversationId} from './Call';
-import {CallState} from './CallState';
+import {CallState, MuteState} from './CallState';
 import {ClientId, Participant, UserId} from './Participant';
 import {EventName} from '../tracking/EventName';
 import {Segmentation} from '../tracking/Segmentation';
@@ -71,7 +71,6 @@ import * as trackingHelpers from '../tracking/Helpers';
 import type {MediaStreamHandler} from '../media/MediaStreamHandler';
 import type {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
-import type {Conversation} from '../entity/Conversation';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
@@ -81,6 +80,8 @@ import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
 import {ConversationState} from '../conversation/ConversationState';
 import {TeamState} from '../team/TeamState';
+import Warnings from '../view_model/WarningsContainer';
+import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -115,6 +116,7 @@ export class CallingRepository {
   private selfUser: User;
   private wCall?: Wcall;
   private wUser?: number;
+  private nextMuteState: MuteState;
   onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
@@ -173,6 +175,17 @@ export class CallingRepository {
     this.subscribeToEvents();
 
     this.onChooseScreen = (deviceId: string) => {};
+
+    ko.computed(() => {
+      const call = this.callState.joinedCall();
+      if (!call) {
+        return;
+      }
+      const isSpeakersViewActive = this.callState.isSpeakersViewActive();
+      if (isSpeakersViewActive) {
+        this.requestVideoStreams(call.conversationId, call.activeSpeakers());
+      }
+    });
   }
 
   readonly toggleCbrEncoding = (vbrEnabled: boolean): void => {
@@ -250,7 +263,7 @@ export class CallingRepository {
     /* cspell:enable */
     const tenSeconds = 10;
     wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
-    wCall.setMuteHandler(wUser, this.callState.isMuted);
+    wCall.setMuteHandler(wUser, this.updateMuteState);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
     wCall.setReqClientsHandler(wUser, this.requestClients);
@@ -259,12 +272,17 @@ export class CallingRepository {
     return wUser;
   }
 
+  private readonly updateMuteState = (isMuted: number) => {
+    this.callState.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
+  };
+
   private async pushClients(conversationId: ConversationId): Promise<void> {
+    const qualifiedConversationId: QualifiedId = {domain: '', id: conversationId};
     try {
       await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId);
     } catch (error) {
       const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients = await this.messageRepository.createRecipients(conversationId);
+      const localClients = await this.messageRepository.createRecipients(qualifiedConversationId);
 
       const makeClientList = (recipients: UserClients): ClientListEntry[] =>
         Object.entries(recipients).reduce(
@@ -299,7 +317,7 @@ export class CallingRepository {
         [GENERIC_MESSAGE_TYPE.CALLING]: new Calling({content: ''}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, qualifiedConversationId);
       eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
       await this.messageRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
 
@@ -331,9 +349,9 @@ export class CallingRepository {
       users = [...users, userId];
     }
     if (users.length === call.participants.length - 1) {
-      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
-      amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+      amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
     }
 
     switch (quality) {
@@ -379,7 +397,7 @@ export class CallingRepository {
 
   private storeCall(call: Call): void {
     this.callState.activeCalls.push(call);
-    const conversation = this.conversationState.findConversation(call.conversationId);
+    const conversation = this.conversationState.findConversation({domain: '', id: call.conversationId});
     if (conversation) {
       conversation.call(call);
     }
@@ -393,7 +411,7 @@ export class CallingRepository {
     if (index !== -1) {
       this.callState.activeCalls.splice(index, 1);
     }
-    const conversation = this.conversationState.findConversation(call.conversationId);
+    const conversation = this.conversationState.findConversation({domain: '', id: call.conversationId});
     if (conversation) {
       conversation.call(null);
     }
@@ -497,8 +515,12 @@ export class CallingRepository {
   //##############################################################################
 
   private async verificationPromise(conversationId: string, userId: string, isResponse: boolean): Promise<void> {
-    const recipients = await this.messageRepository.createRecipients(conversationId, false, [userId]);
-    const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
+    const qualifiedConversationId: QualifiedId = {
+      domain: '',
+      id: conversationId /*TODO(federation): get conversation domain*/,
+    };
+    const recipients = await this.messageRepository.createRecipients(qualifiedConversationId, false, [userId]);
+    const eventInfoEntity = new EventInfoEntity(undefined, qualifiedConversationId, {recipients});
     eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
     const consentType = isResponse
       ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
@@ -562,6 +584,17 @@ export class CallingRepository {
         }
         break;
       }
+      case CALL_MESSAGE_TYPE.REMOTE_MUTE: {
+        const call = this.findCall(conversationId);
+        if (call) {
+          this.muteCall(call, true, MuteState.REMOTE_MUTED);
+        }
+        break;
+      }
+      case CALL_MESSAGE_TYPE.REMOTE_KICK: {
+        this.leaveCall(conversationId);
+        break;
+      }
     }
 
     await validatedPromise.catch(() => this.abortCall(conversationId));
@@ -607,7 +640,7 @@ export class CallingRepository {
         const ignoreNotificationStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
         if (!activeCall || !ignoreNotificationStates.includes(activeCall.state())) {
           // we want to ignore call start events that already have an active call (whether it's ringing or connected).
-          this.injectActivateEvent(conversationId, userId, time, source);
+          this.injectActivateEvent({domain: '', id: conversationId}, userId, time, source);
         }
         break;
     }
@@ -618,14 +651,16 @@ export class CallingRepository {
   //##############################################################################
 
   readonly toggleState = (withVideo: boolean): void => {
-    const conversationEntity: Conversation | undefined = this.conversationState.activeConversation();
+    const conversationEntity = this.conversationState.activeConversation();
     if (conversationEntity) {
       const isActiveCall = this.findCall(conversationEntity.id);
       const isGroupCall = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
       const callType = withVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
-      return isActiveCall
-        ? this.leaveCall(conversationEntity.id)
-        : this.startCall(conversationEntity.id, isGroupCall, callType) && undefined;
+      return (
+        (isActiveCall
+          ? this.leaveCall(conversationEntity.id)
+          : this.startCall(conversationEntity.id, isGroupCall, callType)) && undefined
+      );
     }
   };
 
@@ -737,7 +772,7 @@ export class CallingRepository {
       await this.pushClients(call.conversationId);
 
       if (Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && call.conversationType === CONV_TYPE.CONFERENCE) {
-        this.wCall.setMute(this.wUser, 1);
+        this.setMute(true);
       }
 
       this.wCall.answer(this.wUser, call.conversationId, callType, this.callState.cbrEncoding());
@@ -755,13 +790,27 @@ export class CallingRepository {
   }
 
   changeCallPage(newPage: number, call: Call): void {
-    const nextPageParticipants = call.pages()[newPage];
-    const payload = {
-      clients: nextPageParticipants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
-      convid: call.conversationId,
-    };
-    this.wCall.requestVideoStreams(this.wUser, call.conversationId, VSTREAMS.LIST, JSON.stringify(payload));
     call.currentPage(newPage);
+    if (!this.callState.isSpeakersViewActive()) {
+      this.requestCurrentPageVideoStreams();
+    }
+  }
+
+  requestCurrentPageVideoStreams(): void {
+    const call = this.callState.joinedCall();
+    if (!call) {
+      return;
+    }
+    const currentPageParticipants = call.pages()[call.currentPage()];
+    this.requestVideoStreams(call.conversationId, currentPageParticipants);
+  }
+
+  requestVideoStreams(conversationId: string, participants: Participant[]) {
+    const payload = {
+      clients: participants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      convid: conversationId,
+    };
+    this.wCall.requestVideoStreams(this.wUser, conversationId, VSTREAMS.LIST, JSON.stringify(payload));
   }
 
   readonly leaveCall = (conversationId: ConversationId): void => {
@@ -769,11 +818,16 @@ export class CallingRepository {
     this.wCall.end(this.wUser, conversationId);
   };
 
-  muteCall(call: Call, shouldMute: boolean): void {
+  muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
     if (call.hasWorkingAudioInput === false && this.callState.isMuted()) {
       this.showNoAudioInputModal();
       return;
     }
+    this.setMute(shouldMute, reason);
+  }
+
+  setMute(shouldMute: boolean, reason: MuteState = MuteState.SELF_MUTED): void {
+    this.nextMuteState = reason;
     this.wCall.setMute(this.wUser, shouldMute ? 1 : 0);
   }
 
@@ -880,13 +934,13 @@ export class CallingRepository {
     return recipients;
   }
 
-  private injectActivateEvent(conversationId: ConversationId, userId: UserId, time: string, source: string): void {
+  private injectActivateEvent(conversationId: QualifiedId, userId: UserId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
     this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }
 
   private injectDeactivateEvent(
-    conversationId: ConversationId,
+    conversationId: QualifiedId,
     userId: UserId,
     duration: number,
     reason: REASON,
@@ -907,7 +961,7 @@ export class CallingRepository {
   private readonly sendMessage = (
     _context: number,
     conversationId: ConversationId,
-    userId: UserId,
+    _userId: UserId,
     _clientId: ClientId,
     targets: string | null,
     _unused: null,
@@ -917,44 +971,63 @@ export class CallingRepository {
     if (call?.blockMessages) {
       return 0;
     }
-    const {type, resp} = JSON.parse(payload);
-    const needsVerification = [CALL_MESSAGE_TYPE.SETUP, CALL_MESSAGE_TYPE.GROUP_START].includes(type);
-    const validationPromise = needsVerification
-      ? this.verificationPromise(conversationId, userId, resp)
-      : Promise.resolve();
-    validationPromise
-      .then(() => {
-        let options: MessageSendingOptions;
+    let options: MessageSendingOptions | undefined = undefined;
 
-        if (typeof targets === 'string') {
-          const parsedTargets: SendMessageTarget = JSON.parse(targets);
-          const recipients = this.mapTargets(parsedTargets);
-          options = {
-            nativePush: true,
-            precondition: true,
-            recipients,
-          };
-        }
+    if (typeof targets === 'string') {
+      const parsedTargets: SendMessageTarget = JSON.parse(targets);
+      // TODO(federation): get domain from avs and generate QualifiedUserClients (instead of just UserClients)
+      const recipients = this.mapTargets(parsedTargets);
+      options = {
+        nativePush: true,
+        precondition: true,
+        recipients,
+      };
+    }
 
-        return this.sendCallingMessage(conversationId, payload, options);
-      })
-      .catch(() => this.abortCall(conversationId));
-
+    this.sendCallingMessage(conversationId, payload, options).catch(() => this.abortCall(conversationId));
     return 0;
   };
 
-  private readonly sendCallingMessage = (
+  private readonly sendCallingMessage = async (
     conversationId: ConversationId,
     payload: string | Object,
     options?: MessageSendingOptions,
-  ): Promise<ClientMismatch> => {
-    const protoCalling = new Calling({content: typeof payload === 'string' ? payload : JSON.stringify(payload)});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CALLING]: protoCalling,
-      messageId: createRandomUuid(),
-    });
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-    return this.messageRepository.sendCallingMessage(eventInfoEntity, conversationId);
+  ): Promise<void> => {
+    const qualifiedConversationId: QualifiedId = {
+      domain: '',
+      id: conversationId /*TODO(federation): get conversation domain*/,
+    };
+    const conversation = this.conversationState.findConversation(qualifiedConversationId);
+    const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
+    const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
+    if (message.state === PayloadBundleState.CANCELLED) {
+      // If the user has cancelled message sending because of a degradation warning, we abort the call
+      this.abortCall(conversationId);
+    }
+  };
+
+  readonly sendModeratorMute = (conversationId: ConversationId, recipients: Record<UserId, ClientId[]>) => {
+    this.sendCallingMessage(
+      conversationId,
+      {type: CALL_MESSAGE_TYPE.REMOTE_MUTE},
+      {
+        nativePush: true,
+        precondition: true,
+        recipients,
+      },
+    );
+  };
+
+  readonly sendModeratorKick = (conversationId: ConversationId, recipients: Record<UserId, ClientId[]>) => {
+    this.sendCallingMessage(
+      conversationId,
+      {type: CALL_MESSAGE_TYPE.REMOTE_KICK},
+      {
+        nativePush: true,
+        precondition: true,
+        recipients,
+      },
+    );
   };
 
   private readonly sendSFTRequest = (
@@ -990,7 +1063,7 @@ export class CallingRepository {
   };
 
   private readonly callClosed = (reason: REASON, conversationId: ConversationId) => {
-    amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CALL_QUALITY_POOR);
+    amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CALL_QUALITY_POOR);
     const call = this.findCall(conversationId);
     if (!call) {
       return;
@@ -1002,7 +1075,7 @@ export class CallingRepository {
     }
 
     if (reason === REASON.NOONE_JOINED || reason === REASON.EVERYONE_LEFT) {
-      const conversationEntity = this.conversationState.findConversation(conversationId);
+      const conversationEntity = this.conversationState.findConversation({domain: '', id: conversationId});
       const callingEvent = EventBuilder.buildCallingTimeoutEvent(
         reason,
         conversationEntity,
@@ -1044,7 +1117,7 @@ export class CallingRepository {
 
     if (!stillActiveState.includes(reason)) {
       this.injectDeactivateEvent(
-        call.conversationId,
+        {domain: '' /*TODO(federation): get conversation domain*/, id: call.conversationId},
         call.initiator,
         call.startedAt() ? Date.now() - call.startedAt() : 0,
         reason,
@@ -1069,7 +1142,7 @@ export class CallingRepository {
     shouldRing: number,
     conversationType: CONV_TYPE,
   ) => {
-    const conversationEntity = this.conversationState.findConversation(conversationId);
+    const conversationEntity = this.conversationState.findConversation({domain: '', id: conversationId});
     if (!conversationEntity) {
       return;
     }
@@ -1304,7 +1377,7 @@ export class CallingRepository {
     }
 
     const [stream] = streams;
-    if (stream.getVideoTracks().length > 0) {
+    if (stream.getVideoTracks().length > 0 && participant.videoStream() !== stream) {
       participant.videoStream(stream);
     }
   };
@@ -1373,7 +1446,7 @@ export class CallingRepository {
     call: Call,
     customSegmentations: Record<string, any> = {},
   ) => {
-    const conversationEntity = this.conversationState.findConversation(call.conversationId);
+    const conversationEntity = this.conversationState.findConversation({domain: '', id: call.conversationId});
     const participants = conversationEntity.participating_user_ets();
     const selfUserTeamId = call.getSelfParticipant().user.id;
     const guests = participants.filter(user => user.isGuest()).length;

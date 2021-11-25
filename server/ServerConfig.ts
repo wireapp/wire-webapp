@@ -24,7 +24,6 @@ export interface ServerConfig {
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
       ENFORCE_CONSTANT_BITRATE: boolean;
-      FEDERATION_DOMAIN: string;
       PERSIST_TEMPORARY_CLIENTS: boolean;
       SHOW_LOADING_INFORMATION: boolean;
     };
@@ -52,6 +51,7 @@ export interface ServerConfig {
       };
       TEAMS_BASE: string;
       TEAMS_CREATE: string;
+      TERMS_BILLING: string;
       TERMS_OF_USE_PERSONAL: string;
       TERMS_OF_USE_TEAMS: string;
       WEBSITE_BASE: string;

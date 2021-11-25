@@ -27,8 +27,9 @@ import type {ConversationRepository} from '../../conversation/ConversationReposi
 import {EventRecord} from '../../storage/record/EventRecord';
 import type {UserRepository} from '../../user/UserRepository';
 import {ClientEvent} from '../Client';
-import {QualifiedIdOptional} from '../../conversation/EventBuilder';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 interface MemberJoinEvent {
   user_ids: string[];
@@ -40,7 +41,7 @@ interface MemberJoinEvent {
 }
 
 interface One2OneCreationEvent {
-  userIds: QualifiedIdOptional[];
+  userIds: QualifiedId[];
 }
 type HandledEvents = MemberJoinEvent | One2OneCreationEvent;
 
@@ -75,16 +76,15 @@ export class ServiceMiddleware {
   private async _processMemberJoinEvent(event: EventRecord<MemberJoinEvent>) {
     this.logger.info(`Preprocessing event of type ${event.type}`);
 
-    const {conversation: conversationId, data: eventData} = event;
+    const {conversation: conversationId, qualified_conversation, data: eventData} = event;
+    const qualifiedConversation = qualified_conversation || {domain: '', id: conversationId};
     const userQualifiedIds = this.extractQualifiedUserIds(eventData);
     const selfUser = this.userState.self();
-    const containsSelfUser = userQualifiedIds.find(
-      (user: QualifiedIdOptional) => selfUser.id === user.id && selfUser.domain == user.domain,
-    );
+    const containsSelfUser = userQualifiedIds.find((user: QualifiedId) => matchQualifiedIds(user, selfUser));
 
-    const userIds: QualifiedIdOptional[] = containsSelfUser
+    const userIds: QualifiedId[] = containsSelfUser
       ? await this.conversationRepository
-          .getConversationById(conversationId)
+          .getConversationById(qualifiedConversation)
           .then(conversationEntity => conversationEntity.participating_user_ids())
       : userQualifiedIds;
 
@@ -92,10 +92,10 @@ export class ServiceMiddleware {
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
-  private extractQualifiedUserIds(data: MemberJoinEvent): QualifiedIdOptional[] {
+  private extractQualifiedUserIds(data: MemberJoinEvent): QualifiedId[] {
     const userIds = data.users
-      ? data.users.map(user => user.qualified_id || {domain: null, id: user.id})
-      : data.user_ids.map(id => ({domain: null, id}));
+      ? data.users.map(user => user.qualified_id || {domain: '', id: user.id})
+      : data.user_ids.map(id => ({domain: '', id}));
     return userIds;
   }
 
@@ -105,7 +105,7 @@ export class ServiceMiddleware {
     return hasService ? this._decorateWithHasServiceFlag(event) : event;
   }
 
-  private async _containsService(users: QualifiedIdOptional[]) {
+  private async _containsService(users: QualifiedId[]) {
     const userEntities = await this.userRepository.getUsersById(users);
     return userEntities.some(userEntity => userEntity.isService);
   }

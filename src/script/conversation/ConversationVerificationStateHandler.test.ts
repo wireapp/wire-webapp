@@ -72,24 +72,12 @@ describe('ConversationVerificationStateHandler', () => {
       userB.devices.push(clientB);
 
       conversationAB.selfUser(selfUserEntity);
-      conversationAB.participating_user_ids.push(
-        {
-          domain: userA.domain,
-          id: userA.id,
-        },
-        {
-          domain: userB.domain,
-          id: userB.id,
-        },
-      );
+      conversationAB.participating_user_ids.push(userA.qualifiedId, userB.qualifiedId);
       conversationAB.participating_user_ets.push(userA, userB);
       conversationAB.verification_state(ConversationVerificationState.VERIFIED);
 
       conversationB.selfUser(selfUserEntity);
-      conversationB.participating_user_ids.push({
-        domain: userB.domain,
-        id: userB.id,
-      });
+      conversationB.participating_user_ids.push(userB.qualifiedId);
       conversationB.verification_state(ConversationVerificationState.VERIFIED);
       conversationB.participating_user_ets.push(userB);
 
@@ -118,7 +106,7 @@ describe('ConversationVerificationStateHandler', () => {
       new_client_b.meta.isVerified(false);
       userB.devices.push(new_client_b);
 
-      stateHandler.onClientAdded({domain: userB.domain, id: userB.id});
+      stateHandler.onClientAdded(userB.qualifiedId);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
@@ -140,7 +128,7 @@ describe('ConversationVerificationStateHandler', () => {
       new_client_b.meta.isVerified(true);
       userB.devices.push(new_client_b);
 
-      stateHandler.onClientAdded({domain: userB.domain, id: userB.id});
+      stateHandler.onClientAdded(userB.qualifiedId);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
@@ -166,7 +154,7 @@ describe('ConversationVerificationStateHandler', () => {
       new_client.meta.isVerified(false);
       selfUserEntity.devices.push(new_client);
 
-      stateHandler.onClientAdded({domain: selfUserEntity.domain, id: selfUserEntity.id});
+      stateHandler.onClientAdded(selfUserEntity.qualifiedId);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
@@ -175,7 +163,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
 
       selfUserEntity.devices.remove(new_client);
-      stateHandler.onClientRemoved({domain: selfUserEntity.domain, id: selfUserEntity.id});
+      stateHandler.onClientRemoved(selfUserEntity.qualifiedId);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
@@ -196,7 +184,7 @@ describe('ConversationVerificationStateHandler', () => {
       new_client.meta.isVerified(false);
       selfUserEntity.devices.push(new_client);
 
-      stateHandler.onClientAdded({domain: selfUserEntity.domain, id: selfUserEntity.id});
+      stateHandler.onClientAdded(selfUserEntity.qualifiedId);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.DEGRADED);
@@ -205,7 +193,7 @@ describe('ConversationVerificationStateHandler', () => {
       expect(testFactory.event_repository.injectEvent).toHaveBeenCalledWith(degradedEvent);
 
       selfUserEntity.devices.remove(new_client);
-      stateHandler.onClientsUpdated({domain: selfUserEntity.domain, id: selfUserEntity.id});
+      stateHandler.onClientsUpdated(selfUserEntity.qualifiedId);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);
@@ -266,7 +254,7 @@ describe('ConversationVerificationStateHandler', () => {
     it('should change state to UNVERIFIED if user unverified client', () => {
       clientA.meta.isVerified(false);
 
-      stateHandler.onClientVerificationChanged({domain: userA.domain, id: userA.id});
+      stateHandler.onClientVerificationChanged(userA.qualifiedId);
 
       expect(conversationAB.verification_state()).toBe(ConversationVerificationState.UNVERIFIED);
       expect(conversationB.verification_state()).toBe(ConversationVerificationState.VERIFIED);

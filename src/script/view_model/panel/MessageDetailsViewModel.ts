@@ -34,7 +34,7 @@ import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {MemberMessage} from '../../entity/message/MemberMessage';
 import type {PanelParams} from '../PanelViewModel';
 import type {ReadReceipt} from '../../storage/record/EventRecord';
-import {QualifiedIdOptional} from '../../conversation/EventBuilder';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 
 export class MessageDetailsViewModel extends BasePanelViewModel {
   conversationRepository: ConversationRepository;
@@ -118,7 +118,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
       userA.name().localeCompare(userB.name(), undefined, {sensitivity: 'base'});
 
     this.receipts.subscribe(receipts => {
-      const userIds: QualifiedIdOptional[] = receipts.map(({userId, domain}) => ({domain, id: userId}));
+      const userIds: QualifiedId[] = receipts.map(({userId, domain}) => ({domain, id: userId}));
       userRepository.getUsersById(userIds).then((users: User[]) => this.receiptUsers(users.sort(sortUsers)));
       const receiptTimes = receipts.reduce<Record<string, string>>((times, {userId, time}) => {
         times[userId] = formatTime(time);
@@ -156,7 +156,7 @@ export class MessageDetailsViewModel extends BasePanelViewModel {
     this.likes.subscribe(likeIds => {
       // TODO(Federation): Make code federation-aware.
       userRepository
-        .getUsersById(likeIds.map(likeId => ({domain: null, id: likeId})))
+        .getUsersById(likeIds.map(likeId => ({domain: '', id: likeId})))
         .then(users => this.likeUsers(users.sort(sortUsers)));
     });
 

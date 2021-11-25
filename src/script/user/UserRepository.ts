@@ -23,7 +23,12 @@ import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/'
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {USER_EVENT} from '@wireapp/api-client/src/event';
+import {
+  UserEvent,
+  UserLegalHoldRequestEvent,
+  UserLegalHoldDisableEvent,
+  USER_EVENT,
+} from '@wireapp/api-client/src/event';
 import {
   UserAsset as APIClientUserAsset,
   UserAssetType as APIClientUserAssetType,
@@ -33,6 +38,7 @@ import type {QualifiedUserClientMap} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AccentColor} from '@wireapp/commons';
 import type {BackendError, TraceState} from '@wireapp/api-client/src/http';
+import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import type {PublicClient, AddedClient} from '@wireapp/api-client/src/client';
 import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/src/user';
 
@@ -44,7 +50,7 @@ import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUti
 
 import {AssetRepository} from '../assets/AssetRepository';
 import {ClientEntity} from '../client/ClientEntity';
-import {ClientEvent} from '../event/Client';
+import {USER} from '../event/Client';
 import {ClientMapper} from '../client/ClientMapper';
 import {Config} from '../Config';
 import {ConsentValue} from './ConsentValue';
@@ -68,9 +74,16 @@ import type {PropertiesRepository} from '../properties/PropertiesRepository';
 import type {SelfService} from '../self/SelfService';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserService} from './UserService';
-import {QualifiedIdOptional} from '../conversation/EventBuilder';
 import {fixWebsocketString} from 'Util/StringUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
 
+interface UserAvailabilityEvent {
+  data: {availability: Availability.Type};
+  from: string;
+  fromDomain: string | null;
+  type: USER.AVAILABILITY;
+}
 export class UserRepository {
   private readonly logger: Logger;
   public readonly userMapper: UserMapper;
@@ -116,20 +129,18 @@ export class UserRepository {
   /**
    * Listener for incoming user events.
    */
-  private readonly onUserEvent = (eventJson: any, source: EventSource): void => {
-    const type = eventJson.type;
-
+  private readonly onUserEvent = (eventJson: UserEvent | UserAvailabilityEvent, source: EventSource): void => {
     const logObject = {eventJson: JSON.stringify(eventJson), eventObject: eventJson};
-    this.logger.info(`»» User Event: '${type}' (Source: ${source})`, logObject);
+    this.logger.info(`»» User Event: '${eventJson.type}' (Source: ${source})`, logObject);
 
-    switch (type) {
+    switch (eventJson.type) {
       case USER_EVENT.DELETE:
         this.userDelete(eventJson);
         break;
       case USER_EVENT.UPDATE:
         this.userUpdate(eventJson, source === EventRepository.SOURCE.WEB_SOCKET);
         break;
-      case ClientEvent.USER.AVAILABILITY:
+      case USER.AVAILABILITY:
         this.onUserAvailability(eventJson);
         break;
       case USER_EVENT.LEGAL_HOLD_REQUEST: {
@@ -144,7 +155,7 @@ export class UserRepository {
 
     // Note: We initially fetch the user properties in the properties repository, so we are not interested in updates to it from the notification stream.
     if (source === EventRepository.SOURCE.WEB_SOCKET) {
-      switch (type) {
+      switch (eventJson.type) {
         case USER_EVENT.PROPERTIES_DELETE:
           this.propertyRepository.deleteProperty(eventJson.key);
           break;
@@ -164,7 +175,7 @@ export class UserRepository {
 
         await Promise.all(
           users.map(async user => {
-            const userEntity = await this.getUserById(user.id, user.domain);
+            const userEntity = await this.getUserById({domain: user.domain, id: user.id});
             userEntity.availability(user.availability);
           }),
         );
@@ -188,17 +199,18 @@ export class UserRepository {
    * Retrieves meta information about all the clients of given users.
    */
   getClientsByUsers(
-    userEntities: User[],
+    userEntities: User[] | QualifiedId[],
     updateClients: boolean,
   ): Promise<UserClientEntityMap | QualifiedUserClientEntityMap> {
+    const userIds = isQualifiedId(userEntities[0])
+      ? userEntities
+      : (userEntities as User[]).map(userEntity => userEntity.qualifiedId);
     // TODO(Federation): When detecting a domain we actually should not need to check for the federation-feature because
     // the system must be federation-aware. However, during the transition period it's safer to check for the config too.
-    if (!!userEntities[0]?.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      const userIds = userEntities.map(userEntity => ({domain: userEntity.domain, id: userEntity.id}));
+    if (Config.getConfig().FEATURE.ENABLE_FEDERATION) {
       return this.clientRepository.getClientsByQualifiedUserIds(userIds, updateClients);
     }
 
-    const userIds = userEntities.map(userEntity => userEntity.id);
     return this.clientRepository.getClientsByUserIds(userIds, updateClients);
   }
 
@@ -228,17 +240,9 @@ export class UserRepository {
   /**
    * Event to update availability of a user.
    */
-  private onUserAvailability(event: {
-    data: {availability: Availability.Type};
-    from: string;
-    fromDomain: string | null;
-  }): void {
+  private onUserAvailability({from, data, fromDomain}: UserAvailabilityEvent): void {
     if (this.userState.isTeam()) {
-      const {
-        from: userId,
-        data: {availability},
-      } = event;
-      this.getUserById(userId, event.fromDomain).then(userEntity => userEntity.availability(availability));
+      this.getUserById({domain: fromDomain, id: from}).then(userEntity => userEntity.availability(data.availability));
     }
   }
 
@@ -249,7 +253,7 @@ export class UserRepository {
     const isSelfUser = user.id === this.userState.self().id;
     const userEntity = isSelfUser
       ? this.userState.self()
-      : await this.getUserById(user.id, user.qualified_id?.domain || null);
+      : await this.getUserById({domain: user.qualified_id?.domain || null, id: user.id});
 
     if (isWebSocket && user.name) {
       user.name = fixWebsocketString(user.name);
@@ -267,10 +271,10 @@ export class UserRepository {
    */
   async updateUsersFromConnections(connectionEntities: ConnectionEntity[]): Promise<User[]> {
     // TODO(Federation): Include domain as soon as connections to federated backends are supported.
-    const userIds = connectionEntities.map(connectionEntity => ({domain: null, id: connectionEntity.userId}));
+    const userIds = connectionEntities.map(connectionEntity => connectionEntity.userId);
     const userEntities = await this.getUsersById(userIds);
     userEntities.forEach(userEntity => {
-      const connectionEntity = connectionEntities.find(({userId}) => userId === userEntity.id);
+      const connectionEntity = connectionEntities.find(({userId}) => matchQualifiedIds(userId, userEntity));
       userEntity.connection(connectionEntity);
     });
     return this.assignAllClients();
@@ -282,7 +286,7 @@ export class UserRepository {
    */
   private async assignAllClients(): Promise<User[]> {
     const recipients = await this.clientRepository.getAllClientsFromDb();
-    const userIds: QualifiedIdOptional[] = Object.entries(recipients).map(([userId, clientEntities]) => {
+    const userIds: QualifiedId[] = Object.entries(recipients).map(([userId, clientEntities]) => {
       return {
         domain: clientEntities[0].domain,
         id: userId,
@@ -315,55 +319,68 @@ export class UserRepository {
    * @returns Resolves with `true` when a client has been added
    */
   addClientToUser = async (
-    userId: string,
+    userId: QualifiedId,
     clientPayload: PublicClient | AddedClient | ClientEntity,
     publishClient: boolean = false,
-    domain: string | null,
   ): Promise<boolean> => {
-    const userEntity = await this.getUserById(userId, domain);
+    const userEntity = await this.getUserById(userId);
     const clientEntity =
       clientPayload instanceof ClientEntity
         ? clientPayload
-        : ClientMapper.mapClient(clientPayload, userEntity.isMe, domain);
+        : ClientMapper.mapClient(clientPayload, userEntity.isMe, userId.domain);
     const wasClientAdded = userEntity.addClient(clientEntity);
     if (wasClientAdded) {
       await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
       if (clientEntity.isLegalHold()) {
         amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
-        const isSelfUser = userId === this.userState.self().id;
+        const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
           amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
         }
       } else if (publishClient) {
-        amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain, id: userId}, clientEntity);
+        amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
       }
     }
     return wasClientAdded;
   };
 
   /**
+   * Will sync all the clients of the users given with the backend and add the missing ones.
+   * @param userIds - The users which clients should be updated
+   * @return true if one or many clients were added to one or many users
+   */
+  async updateMissingUsersClients(userIds: QualifiedId[]): Promise<boolean> {
+    const clients = await this.getClientsByUsers(userIds, false);
+    const users = flattenUserClientsQualifiedIds<ClientEntity>(clients);
+    const addedUsers = await Promise.all(
+      users.map(async ({userId, clients}) => {
+        return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).some(
+          wasAdded => wasAdded === true,
+        );
+      }),
+    );
+    return addedUsers.some(wasAdded => wasAdded === true);
+  }
+
+  /**
    * Removes a stored client and the session connected with it.
    * @deprecated
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
-  removeClientFromUser = async (userId: string, clientId: string, domain: string | null): Promise<void> => {
-    await this.clientRepository.removeClient(userId, clientId, domain);
-    const userEntity = await this.getUserById(userId, domain);
+  removeClientFromUser = async (userId: QualifiedId, clientId: string): Promise<void> => {
+    await this.clientRepository.removeClient(userId, clientId);
+    const userEntity = await this.getUserById(userId);
     userEntity.removeClient(clientId);
-    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, {domain, id: userId}, clientId);
+    amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
   };
 
   /**
    * Update clients for given user.
    */
-  private readonly updateClientsFromUser = (
-    userId: string,
-    clientEntities: ClientEntity[],
-    domain: string | null,
-  ): void => {
-    this.getUserById(userId, domain).then(userEntity => {
+  private readonly updateClientsFromUser = (userId: QualifiedId, clientEntities: ClientEntity[]): void => {
+    this.getUserById(userId).then(userEntity => {
       userEntity.devices(clientEntities);
-      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, {domain, id: userId});
+      amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId);
     });
   };
 
@@ -388,6 +405,8 @@ export class UserRepository {
 
     const sortedUsers = this.userState
       .directlyConnectedUsers()
+      // TMP the `filter` can be removed when message broadcast works on federated backends
+      .filter(user => !user.isFederated)
       .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
     const [members, other] = partition(sortedUsers, user => user.isTeamMember());
     const recipients = [this.userState.self(), ...members, ...other].slice(
@@ -398,7 +417,7 @@ export class UserRepository {
     amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
   };
 
-  private onLegalHoldRequestCanceled(eventJson: any): void {
+  private onLegalHoldRequestCanceled(eventJson: UserLegalHoldDisableEvent): void {
     if (this.userState.self().id === eventJson.id) {
       this.userState.self().hasPendingLegalHold(false);
       amplify.publish(LegalHoldModalViewModel.HIDE_REQUEST);
@@ -412,7 +431,7 @@ export class UserRepository {
     }
   }
 
-  private async onLegalHoldRequest(eventJson: any): Promise<void> {
+  private async onLegalHoldRequest(eventJson: UserLegalHoldRequestEvent): Promise<void> {
     if (this.userState.self().id !== eventJson.id) {
       return;
     }
@@ -425,7 +444,7 @@ export class UserRepository {
     } = eventJson;
 
     const fingerprint = await this.clientRepository.cryptographyRepository.getRemoteFingerprint(
-      userId,
+      {domain: '', id: userId},
       clientId,
       last_prekey,
     );
@@ -505,7 +524,7 @@ export class UserRepository {
       return typeof userId === 'string'
         ? knownUser.id === userId
         : // Don't check for the domain when the user query has no domain
-          knownUser.id === userId.id && (!userId.domain || knownUser.domain == userId.domain);
+          matchQualifiedIds(knownUser, userId);
     });
   }
 
@@ -551,21 +570,18 @@ export class UserRepository {
   /**
    * Check for user locally and fetch it from the server otherwise.
    */
-  async getUserById(userId: string, domain: string | null): Promise<User> {
-    const qualifier: string | QualifiedId = domain
-      ? {
-          domain,
-          id: userId,
-        }
-      : userId;
-    let user = this.findUserById(qualifier);
+  async getUserById(userId: QualifiedId): Promise<User> {
+    let user = this.findUserById(userId);
     if (!user) {
       try {
-        user = await this.fetchUserById(qualifier);
+        user = await this.fetchUserById(userId);
       } catch (error) {
         const isNotFound = error.type === UserError.TYPE.USER_NOT_FOUND;
         if (!isNotFound) {
-          this.logger.warn(`Failed to find user with ID '${userId}' and domain '${domain}': ${error.message}`, error);
+          this.logger.warn(
+            `Failed to find user with ID '${userId.id}' and domain '${userId.domain}': ${error.message}`,
+            error,
+          );
         }
         throw error;
       }
@@ -574,21 +590,25 @@ export class UserRepository {
     return user;
   }
 
-  async getUserByHandle(fqn: QualifiedHandle): Promise<void | APIClientUser> {
+  async getUserByHandle(fqn: QualifiedHandle): Promise<undefined | APIClientUser> {
     try {
       return await this.userService.getUserByFQN(fqn);
     } catch (error) {
       // When we search for a non-existent handle, the backend will return a HTTP 404, which tells us that there is no user with that handle.
-      if (!isBackendError(error) || error.code !== HTTP_STATUS.NOT_FOUND) {
+      if (
+        !isBackendError(error) ||
+        (error.code !== HTTP_STATUS.NOT_FOUND && error.label !== BackendErrorLabel.FEDERATION_NOT_ALLOWED)
+      ) {
         throw error;
       }
     }
+    return undefined;
   }
 
   /**
    * Check for users locally and fetch them from the server otherwise.
    */
-  async getUsersById(userIds: QualifiedIdOptional[] = [], offline: boolean = false): Promise<User[]> {
+  async getUsersById(userIds: QualifiedId[] = [], offline: boolean = false): Promise<User[]> {
     if (!userIds.length) {
       return [];
     }
@@ -596,7 +616,7 @@ export class UserRepository {
     const allUsers = await Promise.all(userIds.map(userId => this.findUserById(userId) || userId));
     const [knownUserEntities, unknownUserIds] = partition(allUsers, item => item instanceof User) as [
       User[],
-      QualifiedIdOptional[],
+      QualifiedId[],
     ];
 
     if (offline || !unknownUserIds.length) {
@@ -630,7 +650,7 @@ export class UserRepository {
    * @param isMe `true` if self user
    */
   private saveUser(userEntity: User, isMe: boolean = false): User {
-    const user = this.findUserById({domain: userEntity.domain, id: userEntity.id});
+    const user = this.findUserById(userEntity.qualifiedId);
     if (!user) {
       if (isMe) {
         userEntity.isMe = true;
@@ -646,9 +666,7 @@ export class UserRepository {
    * @returns Resolves with users passed as parameter
    */
   private saveUsers(userEntities: User[]): User[] {
-    const newUsers = userEntities.filter(
-      userEntity => !this.findUserById({domain: userEntity.domain, id: userEntity.id}),
-    );
+    const newUsers = userEntities.filter(userEntity => !this.findUserById(userEntity.qualifiedId));
     this.userState.users.push(...newUsers);
     return userEntities;
   }
@@ -657,22 +675,20 @@ export class UserRepository {
    * Update a local user from the backend by ID.
    */
   updateUserById = async (userId: string | QualifiedId): Promise<void> => {
-    const localUserEntity = this.findUserById(userId) || new User('', null);
+    const localUserEntity = this.findUserById(userId) || new User('', '');
     const updatedUserData = await this.userService.getUser(userId);
     const updatedUserEntity = this.userMapper.updateUserFromObject(localUserEntity, updatedUserData);
     if (this.userState.isTeam()) {
       this.mapGuestStatus([updatedUserEntity]);
     }
-    if (updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
-      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.id);
+    if (updatedUserEntity && updatedUserEntity.inTeam() && updatedUserEntity.isDeleted) {
+      amplify.publish(WebAppEvents.TEAM.MEMBER_LEAVE, updatedUserEntity.teamId, updatedUserEntity.qualifiedId);
     }
   };
 
   static findMatchingUser(userId: string | QualifiedId, userEntities: User[]): User | undefined {
     if (isQualifiedId(userId)) {
-      return userEntities.find(userEntity => {
-        return userEntity.domain == userId.domain && userEntity.id === userId.id;
-      });
+      return userEntities.find(userEntity => matchQualifiedIds(userEntity, userId));
     }
     return userEntities.find(userEntity => userEntity.id === userId);
   }

@@ -27,18 +27,22 @@ import {mapProfileAssets, mapProfileAssetsV1, updateUserEntityAssets} from '../a
 import {User} from '../entity/User';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import '../view_model/bindings/CommonBindings';
+import {container} from 'tsyringe';
+import {UserState} from './UserState';
+import {Config} from '../Config';
 
 export class UserMapper {
   private readonly logger: Logger;
-  private readonly serverTimeHandler: ServerTimeHandler;
 
   /**
    * Construct a new User Mapper.
    * @param serverTimeHandler Handles time shift between server and client
    */
-  constructor(serverTimeHandler: ServerTimeHandler) {
+  constructor(
+    private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly userState: UserState = container.resolve(UserState),
+  ) {
     this.logger = getLogger('UserMapper');
-    this.serverTimeHandler = serverTimeHandler;
   }
 
   mapUserFromJson(userData: APIClientUser | APIClientSelf): User {
@@ -98,6 +102,10 @@ export class UserMapper {
     if (userData.qualified_id) {
       userEntity.domain = userData.qualified_id.domain;
       userEntity.id = userData.qualified_id.id;
+      userEntity.isFederated =
+        this.userState.self() && Config.getConfig().FEATURE.ENABLE_FEDERATION
+          ? userData.qualified_id.domain !== this.userState.self().domain
+          : false;
     }
 
     const {

@@ -61,7 +61,7 @@ export class UserService {
   saveUserInDb(userEntity: User): Promise<User> {
     const userData = userEntity.serialize();
 
-    const primaryKey = constructUserPrimaryKey(userEntity.domain, userEntity.id);
+    const primaryKey = constructUserPrimaryKey(userEntity);
 
     return this.storageService.save(this.USER_STORE_NAME, primaryKey, userData).then(primaryKey => {
       this.logger.info(`State of user '${primaryKey}' was stored`, userData);

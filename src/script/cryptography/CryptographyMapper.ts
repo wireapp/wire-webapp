@@ -96,6 +96,7 @@ export interface AssetData {
   status?: AssetTransferState;
   token?: string;
 }
+type ConversationEvent = Omit<EventRecord, 'id'>;
 
 export class CryptographyMapper {
   private readonly logger: Logger;
@@ -117,7 +118,7 @@ export class CryptographyMapper {
    * @param event Event of `CONVERSATION_EVENT.OTR-ASSET-ADD` or `CONVERSATION_EVENT.OTR-MESSAGE-ADD`
    * @returns Resolves with the mapped event
    */
-  async mapGenericMessage(genericMessage: GenericMessage, event: EventRecord) {
+  async mapGenericMessage(genericMessage: GenericMessage, event: ConversationEvent) {
     if (!genericMessage) {
       throw new CryptographyError(
         CryptographyError.TYPE.NO_GENERIC_MESSAGE,
@@ -132,7 +133,7 @@ export class CryptographyMapper {
     return this._mapGenericMessage(genericMessage, event);
   }
 
-  async _mapGenericMessage(genericMessage: GenericMessage, event: EventRecord) {
+  async _mapGenericMessage(genericMessage: GenericMessage, event: ConversationEvent) {
     let specificContent;
 
     switch (genericMessage.content) {
@@ -384,7 +385,7 @@ export class CryptographyMapper {
     };
   }
 
-  _mapCalling(calling: Calling, eventData: EventRecord & {sender: string}) {
+  _mapCalling(calling: Calling, eventData: ConversationEvent & {sender: string}) {
     return {
       content: JSON.parse(calling.content),
       sender: eventData.sender,
@@ -438,7 +439,7 @@ export class CryptographyMapper {
     return mappedMessage;
   }
 
-  async _mapEphemeral(genericMessage: GenericMessage, event: EventRecord) {
+  async _mapEphemeral(genericMessage: GenericMessage, event: ConversationEvent) {
     const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
     (genericMessage.ephemeral as unknown as GenericMessage).messageId = genericMessage.messageId;
 
@@ -459,7 +460,7 @@ export class CryptographyMapper {
    * @param event Backend event of type 'conversation.otr-message-add'
    * @returns Resolves with generic message
    */
-  async _unwrapExternal(external: External, event: EventRecord) {
+  async _unwrapExternal(external: External, event: ConversationEvent) {
     const {otrKey, sha256} = external;
     try {
       const eventData = event.data;

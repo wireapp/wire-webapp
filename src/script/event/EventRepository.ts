@@ -21,7 +21,7 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
-import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/src/event/';
+import {CONVERSATION_EVENT, USER_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event/';
 import type {Notification, NotificationList} from '@wireapp/api-client/src/notification/';
 import {AbortHandler} from '@wireapp/api-client/src/tcp/';
 import {container} from 'tsyringe';
@@ -36,7 +36,6 @@ import {EVENT_TYPE} from './EventType';
 import {ClientEvent} from './Client';
 import {EventTypeHandling} from './EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {categoryFromEvent} from '../message/MessageCategorization';
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
@@ -54,6 +53,7 @@ import type {NotificationService} from './NotificationService';
 import {UserState} from '../user/UserState';
 import {isAxiosError} from 'Util/TypePredicateUtil';
 import {AssetData} from '../cryptography/CryptographyMapper';
+import Warnings from '../view_model/WarningsContainer';
 
 export class EventRepository {
   logger: Logger;
@@ -134,7 +134,7 @@ export class EventRepository {
     window.addEventListener('offline', () => {
       this.logger.warn('Internet connection lost');
       this.disconnectWebSocket();
-      amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
+      amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
     });
   }
 
@@ -164,16 +164,16 @@ export class EventRepository {
         try {
           this.webSocketService.lockWebsocket();
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.STREAM);
-          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+          amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECOVERY);
           await this.initializeFromStream(abortHandler);
           this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
           this.logger.info(`Done handling '${this.notificationsTotal}' notifications from the stream`);
           this.webSocketService.unlockWebsocket();
-          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
         } catch (error) {
           this.logger.warn('Error while processing notification stream', error);
         } finally {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECOVERY);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECOVERY);
         }
       },
     );
@@ -558,7 +558,7 @@ export class EventRepository {
   private async processEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
     const isEncryptedEvent = event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     if (isEncryptedEvent) {
-      event = await this.cryptographyRepository.handleEncryptedEvent(event);
+      event = await this.cryptographyRepository.handleEncryptedEvent(event as ConversationOtrMessageAddEvent);
     }
 
     for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
@@ -567,7 +567,7 @@ export class EventRepository {
 
     const shouldSaveEvent = EventTypeHandling.STORE.includes(event.type as CONVERSATION_EVENT);
     if (shouldSaveEvent) {
-      event = (await this.handleEventSaving(event)) as EventRecord;
+      event = (await this.handleEventSaving(event)) as ConversationOtrMessageAddEvent;
     }
 
     return this.handleEventDistribution(event, source);

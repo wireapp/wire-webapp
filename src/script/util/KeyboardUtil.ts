@@ -19,11 +19,6 @@
 
 import {Runtime} from '@wireapp/commons';
 
-export const KEY_CODE = {
-  BACKSPACE: 8,
-  DELETE: 46,
-};
-
 export const KEY = {
   ARROW_DOWN: Runtime.isEdge() ? 'Down' : 'ArrowDown',
   ARROW_LEFT: Runtime.isEdge() ? 'Left' : 'ArrowLeft',
@@ -73,9 +68,7 @@ export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
 
-export const isRemovalAction = (keyCode: number): boolean => {
-  return [KEY_CODE.BACKSPACE, KEY_CODE.DELETE].includes(keyCode);
-};
+export const isRemovalAction = (key: string): boolean => [KEY.BACKSPACE, KEY.DELETE].includes(key);
 
 export const insertAtCaret = (areaId: string, text: string) => {
   // http://stackoverflow.com/a/1064139
