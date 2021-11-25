@@ -17,13 +17,12 @@
  *
  */
 
-import React, {forwardRef, useEffect} from 'react';
+import React, {forwardRef} from 'react';
 import {User} from 'src/script/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import Icon from 'Components/Icon';
 import cx from 'classnames';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
-import useEffectRef from 'Util/useEffectRef';
 
 type MentionSuggestionsItemProps = {
   isSelected: boolean;
