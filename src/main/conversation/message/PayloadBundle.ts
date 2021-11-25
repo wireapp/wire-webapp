@@ -18,6 +18,7 @@
  */
 
 import type {ConversationEventData, TeamEventData, UserEventData} from '@wireapp/api-client/src/event/';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 import type {ConversationContent} from '../content';
 import type {Message} from './Message';
@@ -40,7 +41,9 @@ export enum PayloadBundleState {
 export interface BasePayloadBundle {
   content: PayloadBundleContent;
   conversation: string;
+  qualifiedConversation?: QualifiedId;
   from: string;
+  qualifiedFrom?: QualifiedId;
   fromClientId?: string;
   id: string;
   messageTimer?: number;

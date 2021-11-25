@@ -27,6 +27,8 @@ export class ConversationMapper {
     return {
       content: event.data,
       conversation: event.conversation,
+      qualifiedConversation: event.qualified_conversation,
+      qualifiedFrom: event.qualified_from,
       from: event.from,
       id: MessageBuilder.createId(),
       messageTimer: 0,
