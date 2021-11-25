@@ -1057,9 +1057,9 @@ export class MessageRepository {
     const sendingOptions = {
       nativePush: false,
       recipients: [{domain: messageEntity.fromDomain, id: messageEntity.from}],
-      // We first try to send the message targetting the sending user.
-      // In case there is a mismatch, the app will update local clients but will not send the message and will not show the degradation warning
-      silentDegradationWarning: true,
+      // When not in a verified conversation (verified or degraded) we want the regular sending flow (send and reencrypt if there are mismatches)
+      // When in a verified (or degraded) conversation we want to prevent encrypting for unverified devices, we will then silent the degradation modal and force sending to only the devices that are verified
+      silentDegradationWarning: conversationEntity.verification_state() !== ConversationVerificationState.UNVERIFIED,
 
       targetMode: MessageTargetMode.USERS,
     };
