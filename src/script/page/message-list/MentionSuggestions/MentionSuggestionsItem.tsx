@@ -57,7 +57,7 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
       data-uie-selected={isSelected}
       ref={ref}
     >
-      <Avatar participant={suggestion} avatarSize={AVATAR_SIZE.XXX_SMALL} />
+      <Avatar participant={suggestion} avatarSize={AVATAR_SIZE.XXX_SMALL} className="mention-suggestion-list__item__avatar"/>
       <div className="mention-suggestion-list__item__name" data-uie-name="status-name">
         {name}
       </div>

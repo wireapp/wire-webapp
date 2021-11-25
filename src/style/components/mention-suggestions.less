@@ -50,7 +50,7 @@
       background-color: var(--background-fade-8);
     }
 
-    participant-avatar {
+    &__avatar {
       min-width: 16px;
       margin-right: 12px;
     }
@@ -71,13 +71,11 @@
     &__guest-badge {
       min-width: 12px;
       margin-left: 12px;
+      width: 12px;
+      height: 12px;
 
-      svg {
-        width: 12px;
-        height: 12px;
-        path {
-          fill: var(--background-fade-40);
-        }
+      path {
+        fill: var(--background-fade-40);
       }
     }
   }

@@ -28,7 +28,6 @@ import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import MentionSuggestionsItem from './MentionSuggestions/MentionSuggestionsItem';
 import {User} from '../../entity/User';
 
-
 type MentionSuggestionListProps = {
   onSelectionValidated: (data: User, element: HTMLInputElement) => void;
   suggestions: User[];
