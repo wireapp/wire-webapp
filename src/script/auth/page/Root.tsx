@@ -56,7 +56,7 @@ import CustomEnvironmentRedirect from './CustomEnvironmentRedirect';
 
 interface RootProps {}
 
-const Root = ({
+const Root: React.FC<RootProps & ConnectedProps & DispatchProps> = ({
   isAuthenticated,
   language,
   isFetchingSSOSettings,
@@ -64,7 +64,7 @@ const Root = ({
   safelyRemoveCookie,
   stopPolling,
   doGetSSOSettings,
-}: RootProps & ConnectedProps & DispatchProps) => {
+}) => {
   useEffect(() => {
     startPolling();
     window.onbeforeunload = () => {
