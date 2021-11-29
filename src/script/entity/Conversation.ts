@@ -401,7 +401,9 @@ export class Conversation {
           const isPing = messageEntity.isPing();
           const isMessage = messageEntity.isContent();
           const isSelfMentioned =
-            isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserMentioned(this.selfUser().id);
+            isMessage &&
+            this.selfUser() &&
+            (messageEntity as ContentMessage).isUserMentioned(this.selfUser().qualifiedId);
           const isSelfQuoted =
             isMessage && this.selfUser() && (messageEntity as ContentMessage).isUserQuoted(this.selfUser().id);
 

@@ -22,7 +22,7 @@
           conversation: conversation,
           shouldShowAvatar: !shouldHideUserAvatar(message),
           shouldShowInvitePeople: showInvitePeople(),
-          selfId: selfUser().id,
+          selfId: selfUser().qualifiedId,
           isMarked: focusedMessage() === message.id,
           isSelfTemporaryGuest: selfUser().isTemporaryGuest(),
           isLastDeliveredMessage: isLastDeliveredMessage(message),

@@ -20,6 +20,7 @@
 import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
 import type {QuoteEntity} from '../../message/QuoteEntity';
@@ -154,7 +155,7 @@ export class ContentMessage extends Message {
    * @param userId The user id to check
    * @returns `true` if the message mentions the user, `false` otherwise.
    */
-  isUserMentioned(userId: string): boolean {
+  isUserMentioned(userId: QualifiedId): boolean {
     return this.hasAssetText()
       ? this.assets().some(assetEntity => assetEntity.isText() && assetEntity.isUserMentioned(userId))
       : false;
@@ -172,8 +173,8 @@ export class ContentMessage extends Message {
    * @param userId The user id to check
    * @returns `true` if the user was mentioned or quoted, `false` otherwise.
    */
-  isUserTargeted(userId: string): boolean {
-    return this.isUserMentioned(userId) || this.isUserQuoted(userId);
+  isUserTargeted(userId: QualifiedId): boolean {
+    return this.isUserMentioned(userId) || this.isUserQuoted(userId.id);
   }
 
   /**
