@@ -203,7 +203,7 @@ export class ListViewModel {
   };
 
   readonly answerCall = (conversationEntity: Conversation): void => {
-    const call = this.callingRepository.findCall(conversationEntity.qualifiedId);
+    const call = this.callingRepository.findCall(conversationEntity.id);
     if (!call) {
       return;
     }

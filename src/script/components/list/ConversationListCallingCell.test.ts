@@ -52,7 +52,7 @@ const createCall = (
   selfClientId = createRandomUuid(),
 ) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
-  const call = new Call('', {domain: '', id: ''}, 0, selfParticipant, CALL_TYPE.NORMAL, {
+  const call = new Call('', '', 0, selfParticipant, CALL_TYPE.NORMAL, {
     currentAvailableDeviceId: {
       audioOutput: ko.pureComputed(() => 'test'),
     },

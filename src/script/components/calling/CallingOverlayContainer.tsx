@@ -157,7 +157,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     });
   };
 
-  const conversation = joinedCall && conversationState.findConversation(joinedCall.conversationId);
+  const conversation = conversationState.findConversation({domain: '', id: joinedCall?.conversationId});
   if (!joinedCall || !conversation || conversation.removed_from_conversation()) {
     return null;
   }
@@ -166,11 +166,11 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
     <Fragment>
       {!isMinimized && !!videoGrid?.grid.length && (
         <FullscreenVideoCall
-          key={joinedCall.conversationId.id}
+          key={joinedCall.conversationId}
           videoGrid={videoGrid}
           call={joinedCall}
           activeCallViewTab={activeCallViewTab}
-          conversation={getConversationById(joinedCall.conversationId)}
+          conversation={getConversationById({domain: '', id: joinedCall.conversationId})}
           multitasking={multitasking}
           canShareScreen={callingRepository.supportsScreenSharing}
           maximizedParticipant={maximizedParticipant}

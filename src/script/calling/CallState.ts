@@ -24,8 +24,6 @@ import {STATE as CALL_STATE} from '@wireapp/avs';
 import {CallViewTab} from '../view_model/CallingViewModel';
 import {Config} from '../Config';
 import type {ElectronDesktopCapturerSource} from '../media/MediaDevicesHandler';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export enum MuteState {
   NOT_MUTED,
@@ -38,7 +36,7 @@ export enum MuteState {
 export class CallState {
   public readonly activeCalls: ko.ObservableArray<Call> = ko.observableArray();
   public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
-  public readonly acceptedVersionWarnings: ko.ObservableArray<QualifiedId> = ko.observableArray<QualifiedId>();
+  public readonly acceptedVersionWarnings: ko.ObservableArray<string> = ko.observableArray<string>();
   public readonly cbrEncoding: ko.Observable<number> = ko.observable(
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0,
   );
@@ -60,9 +58,7 @@ export class CallState {
 
     this.activeCalls.subscribe(activeCalls => {
       const activeCallIds = activeCalls.map(call => call.conversationId);
-      this.acceptedVersionWarnings.remove(
-        acceptedId => !activeCallIds.some(callId => matchQualifiedIds(acceptedId, callId)),
-      );
+      this.acceptedVersionWarnings.remove(acceptedId => !activeCallIds.includes(acceptedId));
     });
     this.isSpeakersViewActive = ko.pureComputed(() => this.activeCallViewTab() === CallViewTab.SPEAKERS);
 

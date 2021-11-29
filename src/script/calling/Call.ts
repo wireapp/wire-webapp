@@ -26,9 +26,8 @@ import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import type {Participant, UserId, ClientId} from './Participant';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Config} from '../Config';
-import {QualifiedId} from '@wireapp/api-client/src/user';
 
-export type SerializedConversationId = string;
+export type ConversationId = string;
 
 const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 9;
 
@@ -77,7 +76,7 @@ export class Call {
 
   constructor(
     public readonly initiator: UserId,
-    public readonly conversationId: QualifiedId,
+    public readonly conversationId: ConversationId,
     public readonly conversationType: CONV_TYPE,
     private readonly selfParticipant: Participant,
     callType: CALL_TYPE,

@@ -26,13 +26,12 @@ import {generateConversationUrl} from '../../router/routeGenerator';
 import {createNavigate} from '../../router/routerBindings';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 import {Conversation} from 'src/script/entity/Conversation';
-import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export interface GroupedConversationsFolderProps {
   expandedFolders: string[];
   folder: ConversationLabel;
   getOffsetTop: (folder: ConversationLabel, conversation: Conversation) => number;
-  hasJoinableCall: (conversationId: QualifiedId) => boolean;
+  hasJoinableCall: (conversationId: string) => boolean;
   isSelectedConversation: (conversationEntity: Conversation) => boolean;
   isVisibleFunc: (top: number, bottom: number) => boolean;
   listViewModel: ListViewModel;
@@ -68,7 +67,7 @@ const GroupedConversationsFolder: React.FC<GroupedConversationsFolderProps> = ({
               onClick={makeOnClick(conversation.id, conversation.domain)}
               rightClick={(_, event) => listViewModel.onContextMenu(conversation, event)}
               conversation={conversation}
-              showJoinButton={hasJoinableCall(conversation.qualifiedId)}
+              showJoinButton={hasJoinableCall(conversation.id)}
               is_selected={isSelectedConversation}
               onJoinCall={onJoinCall}
               offsetTop={getOffsetTop(folder, conversation)}
