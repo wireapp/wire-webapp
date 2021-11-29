@@ -287,7 +287,12 @@ export class MessageRepository {
     const textPayload = this.messageBuilder
       .createText({conversationId: conversation.id, text: message})
       .withMentions(
-        mentions.map(mention => ({length: mention.length, start: mention.startIndex, userId: mention.userId})),
+        mentions.map(mention => ({
+          length: mention.length,
+          qualifiedUserId: mention.userQualifiedId,
+          start: mention.startIndex,
+          userId: mention.userId,
+        })),
       )
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .withQuote(quoteData)

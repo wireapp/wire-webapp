@@ -25,6 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {isBeforeToday, formatDateNumeral, formatTimeShort} from 'Util/TimeUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {ConversationError} from '../../error/ConversationError';
 import type {Conversation} from '../../entity/Conversation';
@@ -49,7 +50,7 @@ export interface QuoteProps {
   handleClickOnMessage: (message: ContentMessage, event: React.MouseEvent) => boolean;
   messageRepository: MessageRepository;
   quote: QuoteEntity;
-  selfId: string;
+  selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
   showUserDetails: (user: User) => void;
 }
@@ -132,7 +133,7 @@ interface QuotedMessageProps {
   focusMessage: (id: string) => void;
   handleClickOnMessage: (message: ContentMessage | Text, event: React.MouseEvent) => boolean;
   quotedMessage: ContentMessage;
-  selfId: string;
+  selfId: QualifiedId;
   showDetail: (message: ContentMessage, event: React.MouseEvent) => void;
   showUserDetails: (user: User) => void;
 }
