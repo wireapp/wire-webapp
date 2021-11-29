@@ -59,7 +59,7 @@ export class IdentityProviderAPI {
     };
 
     if (force) {
-      config.params.params = {force};
+      config.params = {force};
     }
 
     await this.client.sendJSON(config);
@@ -73,7 +73,7 @@ export class IdentityProviderAPI {
     };
 
     if (replaceProviderId) {
-      config.params.params = {replaces: replaceProviderId};
+      config.params = {replaces: replaceProviderId};
     }
 
     const response = await this.client.sendXML<IdentityProvider>(config);
