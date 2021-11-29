@@ -37,6 +37,7 @@ import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
+import PreferencesCheckbox from './accountPreferences/PreferencesCheckbox';
 
 interface AccountPreferencesProps {
   clientRepository: ClientRepository;
@@ -227,72 +228,36 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
 
             <section className="preferences-section">
               <header className="preferences-header">{t('preferencesOptionsPopular')}</header>
-              <div className="preferences-option">
-                <div
-                  className="preferences-option-icon checkbox accent-text"
-                  data-uie-value={optionDarkMode}
-                  data-uie-name="status-preference-use-dark-mode"
-                >
-                  <input
-                    type="checkbox"
-                    id="use-dark-mode-checkbox"
-                    checked={optionDarkMode}
-                    onChange={newOptionDarkMode => saveOptionNewTheme(newOptionDarkMode.target.checked)}
+              <PreferencesCheckbox
+                uieName="status-preference-use-dark-mode"
+                label={t('preferencesAccountReadReceiptsCheckbox')}
+                checked={optionDarkMode}
+                onChange={newOptionDarkMode => saveOptionNewTheme(newOptionDarkMode)}
+              />
+              <PreferencesCheckbox
+                uieName="status-preference-emoji-replace"
+                label={t('preferencesOptionsEmojiReplaceCheckbox')}
+                checked={optionReplaceInlineEmoji}
+                onChange={newOptionReplaceInlineEmoji => saveOptionEmojiPreference(newOptionReplaceInlineEmoji)}
+                details={
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: t(
+                        'preferencesOptionsEmojiReplaceDetail',
+                        {},
+                        {icon: "<span class='font-size-xs icon-emoji'></span>"},
+                      ),
+                    }}
                   />
-                  <label className="preferences-options-checkbox-label" htmlFor="use-dark-mode-checkbox">
-                    {t('preferencesOptionsUseDarkMode')}
-                  </label>
-                </div>
-              </div>
-              <div className="preferences-option">
-                <div
-                  className="preferences-option-icon checkbox accent-text"
-                  data-uie-value={optionReplaceInlineEmoji}
-                  data-uie-name="status-preference-emoji-replace"
-                >
-                  <input
-                    type="checkbox"
-                    id="replace-inline-emoji-checkbox"
-                    checked={optionReplaceInlineEmoji}
-                    onChange={newOptionReplaceInlineEmoji =>
-                      saveOptionEmojiPreference(newOptionReplaceInlineEmoji.target.checked)
-                    }
-                  />
-                  <label className="preferences-options-checkbox-label" htmlFor="replace-inline-emoji-checkbox">
-                    {t('preferencesOptionsEmojiReplaceCheckbox')}
-                  </label>
-                </div>
-              </div>
-              <div
-                className="preferences-detail preferences-detail-emoji"
-                dangerouslySetInnerHTML={{
-                  __html: t(
-                    'preferencesOptionsEmojiReplaceDetail',
-                    {},
-                    {icon: "<span class='font-size-xs icon-emoji'></span>"},
-                  ),
-                }}
-              ></div>
-              <div className="preferences-option preferences-options-multiple">
-                <div
-                  className="preferences-option-icon checkbox accent-text"
-                  data-uie-value={optionSendPreviews}
-                  data-uie-name="status-preference-previews-send"
-                >
-                  <input
-                    type="checkbox"
-                    id="send-preview-checkbox"
-                    checked={optionSendPreviews}
-                    onChange={newOptionSendPreviews =>
-                      saveOptionSendPreviewsPreference(newOptionSendPreviews.target.checked)
-                    }
-                  />
-                  <label className="preferences-options-checkbox-label" htmlFor="send-preview-checkbox">
-                    {t('preferencesOptionsPreviewsSendCheckbox')}
-                  </label>
-                </div>
-              </div>
-              <div className="preferences-detail">{t('preferencesOptionsPreviewsSendDetail')}</div>
+                }
+              />
+              <PreferencesCheckbox
+                uieName="status-preference-previews-send"
+                label={t('preferencesOptionsPreviewsSendCheckbox')}
+                checked={optionSendPreviews}
+                onChange={newOptionSendPreviews => saveOptionSendPreviewsPreference(newOptionSendPreviews)}
+                details={t('preferencesOptionsPreviewsSendDetail')}
+              />
             </section>
           </>
         )}
