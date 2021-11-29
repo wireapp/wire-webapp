@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.6.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.6.0...@wireapp/api-client@15.6.1) (2021-11-29)
+
+
+### Bug Fixes
+
+* **api-client:** IDP params ([#4185](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4185)) ([c61e1ad](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/c61e1ad8ebd588d0f897830034af8e2e986d4e8d))
+
+
+
+
+
 # [15.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.5.0...@wireapp/api-client@15.6.0) (2021-11-16)
 
 
