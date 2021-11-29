@@ -814,7 +814,7 @@ describe('NotificationRepository', () => {
     it('returns the correct value for self replies', () => {
       messageEntity.addAsset(generateTextAsset());
 
-      const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId});
+      const quoteEntity = new QuoteEntity({messageId: createRandomUuid(), userId: userId.id});
       messageEntity.quote(quoteEntity);
 
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);

@@ -174,7 +174,7 @@ export class ContentMessage extends Message {
    * @returns `true` if the user was mentioned or quoted, `false` otherwise.
    */
   isUserTargeted(userId: QualifiedId): boolean {
-    return this.isUserMentioned(userId) || this.isUserQuoted(userId.id);
+    return userId && (this.isUserMentioned(userId) || this.isUserQuoted(userId.id));
   }
 
   /**

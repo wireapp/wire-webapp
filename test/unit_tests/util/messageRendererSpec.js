@@ -265,7 +265,7 @@ describe('renderMessage', () => {
 
       // eslint-disable-next-line jest/valid-title
       it(testCase, () => {
-        const result = renderMessage(text, 'self-id', mentionEntities);
+        const result = renderMessage(text, {domain: '', id: 'self-id'}, mentionEntities);
 
         expect(result).toEqual(expected);
       });
