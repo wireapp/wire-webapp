@@ -39,7 +39,7 @@ import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
 import PreferencesCheckbox from './accountPreferences/PreferencesCheckbox';
 
-interface AccountPreferencesProps {
+interface OptionPreferencesProps {
   clientRepository: ClientRepository;
   conversationRepository: ConversationRepository;
   propertiesRepository: PropertiesRepository;
@@ -49,7 +49,7 @@ interface AccountPreferencesProps {
   userState?: UserState;
 }
 
-const AccountPreferences: React.FC<AccountPreferencesProps> = ({
+const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   propertiesRepository,
   userState = container.resolve(UserState),
 }) => {
@@ -266,9 +266,9 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   );
 };
 
-export default AccountPreferences;
+export default OptionPreferences;
 
 registerReactComponent('option-preferences', {
-  component: AccountPreferences,
+  component: OptionPreferences,
   template: '<div data-bind="react:{propertiesRepository}"></div>',
 });
