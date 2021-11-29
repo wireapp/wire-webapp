@@ -754,14 +754,14 @@ describe('NotificationRepository', () => {
     let conversationEntity;
     let messageEntity;
 
-    const userId = createRandomUuid();
+    const userId = {domain: '', id: createRandomUuid()};
     const shouldNotifyInConversation = NotificationRepository.shouldNotifyInConversation;
 
     function generateTextAsset(selfMentioned = false) {
-      const mentionId = selfMentioned ? userId : createRandomUuid();
+      const mentionId = selfMentioned ? userId.id : createRandomUuid();
 
       const textEntity = new Text(createRandomUuid(), '@Gregor can you take a look?');
-      const mentionEntity = new MentionEntity(0, 7, mentionId);
+      const mentionEntity = new MentionEntity(0, 7, mentionId, userId.domain);
       textEntity.mentions([mentionEntity]);
 
       return textEntity;
