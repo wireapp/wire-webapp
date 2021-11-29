@@ -338,9 +338,7 @@ describe('NotificationRepository', () => {
     });
 
     it('filters content and ping messages when user is "busy"', () => {
-      spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
-        return {...testFactory.user_repository['userState'].self(), availability: () => Availability.Type.BUSY};
-      });
+      spyOn(testFactory.notification_repository['selfUser'](), 'availability').and.returnValue(Availability.Type.BUSY);
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
       const ignoredMessages = Object.entries(allMessageTypes)
@@ -357,9 +355,7 @@ describe('NotificationRepository', () => {
     });
 
     it('allows mentions, calls and composite when user is "busy"', () => {
-      spyOn(testFactory.notification_repository, 'selfUser').and.callFake(() => {
-        return {...testFactory.user_repository['userState'].self(), availability: () => Availability.Type.BUSY};
-      });
+      spyOn(testFactory.notification_repository['selfUser'](), 'availability').and.returnValue(Availability.Type.BUSY);
       testFactory.notification_repository.permissionState(PermissionStatusState.GRANTED);
 
       const notifiedMessages = Object.entries(allMessageTypes)
