@@ -122,7 +122,7 @@ export const renderMessage = (message: string, selfId: QualifiedId | null, menti
       const mentionKey = createMentionHash(mention);
       mentionTexts[mentionKey] = {
         domain: mention.domain,
-        isSelfMentioned: selfId && mention.targetsUser(selfId),
+        isSelfMentioned: !!selfId && mention.targetsUser(selfId),
         text: mentionText,
         userId: mention.userId,
       };
