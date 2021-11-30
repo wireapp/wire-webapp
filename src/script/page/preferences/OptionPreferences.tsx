@@ -39,6 +39,7 @@ import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
 import PreferencesCheckbox from './accountPreferences/PreferencesCheckbox';
 import PreferencesSection from './accountPreferences/PreferencesSection';
+import PreferencesRadio from './components/PreferencesRadio';
 
 interface OptionPreferencesProps {
   clientRepository: ClientRepository;
@@ -117,112 +118,56 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
       <div className="preferences-titlebar">{t('preferencesOptions')}</div>
       <div className="preferences-content" ref={setScrollbarRef}>
         <PreferencesSection title={t('preferencesOptionsAudio')} hasSeperator={false}>
-          <div className="preferences-option">
-            <div className="preferences-options-radio">
-              <input
-                type="radio"
-                id="preferences-options-audio-all"
-                name="preferences-options-audio"
-                value="all"
-                onChange={() => saveOptionAudioPreference(AudioPreference.ALL)}
-                checked={optionAudio === AudioPreference.ALL}
-              />
-              <label htmlFor="preferences-options-audio-all">
-                <span className="preferences-label">{t('preferencesOptionsAudioAll')}</span>
-                <span className="preferences-hint" style={optionAudio === AudioPreference.ALL ? {} : {display: 'none'}}>
-                  {' '}
-                  · <span>{t('preferencesOptionsAudioAllDetail')}</span>
-                </span>
-              </label>
-              <input
-                type="radio"
-                id="preferences-options-audio-some"
-                name="preferences-options-audio"
-                value="some"
-                onChange={() => saveOptionAudioPreference(AudioPreference.SOME)}
-                checked={optionAudio === AudioPreference.SOME}
-              />
-              <label htmlFor="preferences-options-audio-some">
-                <span className="preferences-label">{t('preferencesOptionsAudioSome')}</span>
-                <span
-                  className="preferences-hint"
-                  style={optionAudio === AudioPreference.SOME ? {} : {display: 'none'}}
-                >
-                  {' '}
-                  · <span>{t('preferencesOptionsAudioSomeDetail')}</span>
-                </span>
-              </label>
-              <input
-                type="radio"
-                id="preferences-options-audio-none"
-                name="preferences-options-audio"
-                value="none"
-                onChange={() => saveOptionAudioPreference(AudioPreference.NONE)}
-                checked={optionAudio === AudioPreference.NONE}
-              />
-              <label htmlFor="preferences-options-audio-none">
-                <span className="preferences-label">{t('preferencesOptionsAudioNone')}</span>
-                <span
-                  className="preferences-hint"
-                  style={optionAudio === AudioPreference.NONE ? {} : {display: 'none'}}
-                >
-                  {' '}
-                  · <span>{t('preferencesOptionsAudioNoneDetail')}</span>
-                </span>
-              </label>
-            </div>
-          </div>
+          <PreferencesRadio
+            name="preferences-options-audio"
+            selectedValue={optionAudio}
+            onChange={saveOptionAudioPreference}
+            options={[
+              {
+                detailLabel: t('preferencesOptionsAudioAllDetail'),
+                label: t('preferencesOptionsAudioAll'),
+                value: AudioPreference.ALL,
+              },
+              {
+                detailLabel: t('preferencesOptionsAudioSomeDetail'),
+                label: t('preferencesOptionsAudioSome'),
+                value: AudioPreference.SOME,
+              },
+              {
+                detailLabel: t('preferencesOptionsAudioNoneDetail'),
+                label: t('preferencesOptionsAudioNone'),
+                value: AudioPreference.NONE,
+              },
+            ]}
+          />
         </PreferencesSection>
 
         {isActivatedAccount && (
           <>
             <PreferencesSection title={t('preferencesOptionsNotifications')} hasSeperator={false}>
-              <div className="preferences-options-radio">
-                <input
-                  type="radio"
-                  id="preferences-options-notification-on"
-                  name="preferences-options-notification"
-                  value="on"
-                  onChange={() => saveOptionNotificationsPreference(NotificationPreference.ON)}
-                  checked={optionNotifications === NotificationPreference.ON}
-                />
-                <label className="accent-text" htmlFor="preferences-options-notification-on">
-                  <span className="preferences-label">{t('preferencesOptionsNotificationsOn')}</span>
-                </label>
-                <input
-                  type="radio"
-                  id="preferences-options-notification-obfuscate-message"
-                  name="preferences-options-notification"
-                  value="obfuscate-message"
-                  onChange={() => saveOptionNotificationsPreference(NotificationPreference.OBFUSCATE_MESSAGE)}
-                  checked={optionNotifications === NotificationPreference.OBFUSCATE_MESSAGE}
-                />
-                <label className="accent-text" htmlFor="preferences-options-notification-obfuscate-message">
-                  <span className="preferences-label">{t('preferencesOptionsNotificationsObfuscateMessage')}</span>
-                </label>
-                <input
-                  type="radio"
-                  id="preferences-options-notification-obfuscate"
-                  name="preferences-options-notification"
-                  value="obfuscate"
-                  onChange={() => saveOptionNotificationsPreference(NotificationPreference.OBFUSCATE)}
-                  checked={optionNotifications === NotificationPreference.OBFUSCATE}
-                />
-                <label className="accent-text" htmlFor="preferences-options-notification-obfuscate">
-                  <span className="preferences-label">{t('preferencesOptionsNotificationsObfuscate')}</span>
-                </label>
-                <input
-                  type="radio"
-                  id="preferences-options-notification-none"
-                  name="preferences-options-notification"
-                  value="none"
-                  onChange={() => saveOptionNotificationsPreference(NotificationPreference.NONE)}
-                  checked={optionNotifications === NotificationPreference.NONE}
-                />
-                <label className="accent-text" htmlFor="preferences-options-notification-none">
-                  <span className="preferences-label">{t('preferencesOptionsNotificationsNone')}</span>
-                </label>
-              </div>
+              <PreferencesRadio
+                name="preferences-options-notification"
+                selectedValue={optionNotifications}
+                onChange={saveOptionNotificationsPreference}
+                options={[
+                  {
+                    label: t('preferencesOptionsNotificationsOn'),
+                    value: NotificationPreference.ON,
+                  },
+                  {
+                    label: t('preferencesOptionsNotificationsObfuscateMessage'),
+                    value: NotificationPreference.OBFUSCATE_MESSAGE,
+                  },
+                  {
+                    label: t('preferencesOptionsNotificationsObfuscate'),
+                    value: NotificationPreference.OBFUSCATE,
+                  },
+                  {
+                    label: t('preferencesOptionsNotificationsNone'),
+                    value: NotificationPreference.NONE,
+                  },
+                ]}
+              />
             </PreferencesSection>
             <PreferencesSection title={t('preferencesOptionsPopular')} hasSeperator={false}>
               <PreferencesCheckbox
