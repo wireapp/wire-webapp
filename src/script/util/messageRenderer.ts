@@ -95,7 +95,7 @@ function modifyMarkdownLinks(markdown: string): string {
 
 markdownit.normalizeLinkText = text => text;
 
-export const renderMessage = (message: string, selfId: QualifiedId, mentionEntities: MentionEntity[] = []) => {
+export const renderMessage = (message: string, selfId: QualifiedId | null, mentionEntities: MentionEntity[] = []) => {
   const createMentionHash = (mention: MentionEntity) => `@@${window.btoa(JSON.stringify(mention)).replace(/=/g, '')}`;
   const renderMention = (mentionData: MentionText) => {
     const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
@@ -122,7 +122,7 @@ export const renderMessage = (message: string, selfId: QualifiedId, mentionEntit
       const mentionKey = createMentionHash(mention);
       mentionTexts[mentionKey] = {
         domain: mention.domain,
-        isSelfMentioned: mention.targetsUser(selfId),
+        isSelfMentioned: selfId && mention.targetsUser(selfId),
         text: mentionText,
         userId: mention.userId,
       };
