@@ -38,6 +38,7 @@ import {RichProfileRepository} from '../../user/RichProfileRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
 import PreferencesCheckbox from './accountPreferences/PreferencesCheckbox';
+import PreferencesSection from './accountPreferences/PreferencesSection';
 
 interface OptionPreferencesProps {
   clientRepository: ClientRepository;
@@ -115,8 +116,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">{t('preferencesOptions')}</div>
       <div className="preferences-content" ref={setScrollbarRef}>
-        <section className="preferences-section">
-          <header className="preferences-header">{t('preferencesOptionsAudio')}</header>
+        <PreferencesSection title={t('preferencesOptionsAudio')} hasSeperator={false}>
           <div className="preferences-option">
             <div className="preferences-options-radio">
               <input
@@ -172,12 +172,11 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
               </label>
             </div>
           </div>
-        </section>
+        </PreferencesSection>
 
         {isActivatedAccount && (
           <>
-            <section className="preferences-section">
-              <header className="preferences-header">{t('preferencesOptionsNotifications')}</header>
+            <PreferencesSection title={t('preferencesOptionsNotifications')} hasSeperator={false}>
               <div className="preferences-options-radio">
                 <input
                   type="radio"
@@ -224,10 +223,8 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                   <span className="preferences-label">{t('preferencesOptionsNotificationsNone')}</span>
                 </label>
               </div>
-            </section>
-
-            <section className="preferences-section">
-              <header className="preferences-header">{t('preferencesOptionsPopular')}</header>
+            </PreferencesSection>
+            <PreferencesSection title={t('preferencesOptionsPopular')} hasSeperator={false}>
               <PreferencesCheckbox
                 uieName="status-preference-use-dark-mode"
                 label={t('preferencesAccountReadReceiptsCheckbox')}
@@ -258,7 +255,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 onChange={newOptionSendPreviews => saveOptionSendPreviewsPreference(newOptionSendPreviews)}
                 details={t('preferencesOptionsPreviewsSendDetail')}
               />
-            </section>
+            </PreferencesSection>
           </>
         )}
       </div>
