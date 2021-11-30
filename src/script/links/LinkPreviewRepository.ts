@@ -19,27 +19,40 @@
 
 import {amplify} from 'amplify';
 import type {Data as OpenGraphResult} from 'open-graph';
-import type {Asset, LinkPreview} from '@wireapp/protocol-messaging';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
-import {AssetRetentionPolicy} from '@wireapp/api-client/src/asset/';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {base64ToBlob, createRandomUuid} from 'Util/util';
+import {base64ToArray, getContentTypeFromDataUrl} from 'Util/util';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {getFirstLinkWithOffset} from './LinkPreviewHelpers';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {isBlacklisted} from './LinkPreviewBlackList';
-import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
 import {LinkPreviewError} from '../error/LinkPreviewError';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {AssetRepository} from '../assets/AssetRepository';
+import {LinkPreviewContent} from '@wireapp/core/src/main/conversation/content';
 
 declare global {
   interface Window {
     openGraphAsync?: (url: string) => Promise<OpenGraphResult>;
   }
+}
+
+function toLinkPreviewData(openGraphData: OpenGraphResult, url: string, offset: number): LinkPreviewContent {
+  const base64Image = (openGraphData.image as {data: string}).data;
+  const mimeType = getContentTypeFromDataUrl(base64Image);
+  const bytes = base64ToArray(base64Image);
+  return {
+    image: {
+      data: bytes,
+      height: 0,
+      type: mimeType,
+      width: 0,
+    },
+    url,
+    urlOffset: offset,
+  };
 }
 
 export class LinkPreviewRepository {
@@ -66,7 +79,7 @@ export class LinkPreviewRepository {
    * @param string Input text to generate preview for
    * @returns Resolves with link preview proto message
    */
-  getLinkPreviewFromString = async (string: string): Promise<LinkPreview | void> => {
+  getLinkPreviewFromString = async (string: string): Promise<LinkPreviewContent | void> => {
     if (!this.shouldSendPreviews || !window.openGraphAsync) {
       return;
     }
@@ -94,7 +107,7 @@ export class LinkPreviewRepository {
    * @param offset starting index of the link
    * @returns Resolves with a link preview if generated
    */
-  private async getLinkPreview(url: string, offset: number = 0): Promise<LinkPreview> {
+  private async getLinkPreview(url: string, offset: number = 0): Promise<LinkPreviewContent | void> {
     if (isBlacklisted(url)) {
       throw new LinkPreviewError(LinkPreviewError.TYPE.BLACKLISTED, LinkPreviewError.MESSAGE.BLACKLISTED);
     }
@@ -103,14 +116,7 @@ export class LinkPreviewRepository {
     if (!openGraphData) {
       throw new LinkPreviewError(LinkPreviewError.TYPE.NO_DATA_AVAILABLE, LinkPreviewError.MESSAGE.NO_DATA_AVAILABLE);
     }
-
-    const linkPreview = buildFromOpenGraphData(openGraphData, url, offset);
-
-    if (!linkPreview) {
-      throw new LinkPreviewError(LinkPreviewError.TYPE.UNSUPPORTED_TYPE, LinkPreviewError.MESSAGE.UNSUPPORTED_TYPE);
-    }
-
-    return this.fetchPreviewImage(linkPreview, openGraphData.image as {data: string});
+    return toLinkPreviewData(openGraphData, url, offset);
   }
 
   /**
@@ -120,27 +126,6 @@ export class LinkPreviewRepository {
   readonly updatedSendPreference = (sendPreviewsPreference: boolean): void => {
     this.shouldSendPreviews = sendPreviewsPreference;
   };
-
-  /**
-   * Fetch and upload open graph images.
-   *
-   * @param linkPreview Link preview proto message
-   * @param openGraphImage Open graph image URL
-   * @returns Resolves with the link preview proto message
-   */
-  private async fetchPreviewImage(linkPreview: LinkPreview, openGraphImage?: {data: string}): Promise<LinkPreview> {
-    if (openGraphImage?.data) {
-      try {
-        const asset = await this.uploadPreviewImage(openGraphImage.data);
-        linkPreview.article[PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset; // deprecated
-        linkPreview[PROTO_MESSAGE_TYPE.LINK_PREVIEW_IMAGE] = asset;
-      } catch (error) {
-        this.logger.error(error);
-      }
-    }
-
-    return linkPreview;
-  }
 
   /**
    * Fetch open graph data.
@@ -162,21 +147,5 @@ export class LinkPreviewRepository {
       this.logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
       throw new LinkPreviewError(LinkPreviewError.TYPE.UNSUPPORTED_TYPE, LinkPreviewError.MESSAGE.UNSUPPORTED_TYPE);
     }
-  }
-
-  /**
-   * Upload open graph image as asset
-   *
-   * @param dataUri image data as base64 encoded data URI
-   * @returns Resolves with the uploaded asset
-   */
-  private uploadPreviewImage(dataUri: string): Promise<Asset> {
-    const blob = base64ToBlob(dataUri);
-    return this.assetRepository.uploadFile(
-      createRandomUuid(),
-      blob,
-      {expectsReadConfirmation: false, public: true, retention: AssetRetentionPolicy.PERSISTENT},
-      true,
-    );
   }
 }

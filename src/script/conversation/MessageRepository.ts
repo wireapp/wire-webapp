@@ -28,10 +28,7 @@ import {
   GenericMessage,
   LastRead,
   LegalHoldStatus,
-  MessageEdit,
-  Text,
   Asset as ProtobufAsset,
-  LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
 import {
@@ -55,6 +52,7 @@ import {
   VideoMetaData,
   ImageMetaData,
   FileMetaDataContent,
+  LinkPreviewContent,
 } from '@wireapp/core/src/main/conversation/content';
 import {container} from 'tsyringe';
 
@@ -109,7 +107,6 @@ import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {MentionEntity} from '../message/MentionEntity';
 import {FileAsset} from '../entity/message/FileAsset';
-import {Text as TextAsset} from '../entity/message/Text';
 import type {AssetRecord, EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
@@ -244,24 +241,19 @@ export class MessageRepository {
     conversation,
     message,
     mentions = [],
-    linkPreviews = [],
+    linkPreview,
     quote,
   }: {
     conversation: Conversation;
-    linkPreviews?: LinkPreview[];
+    linkPreview?: LinkPreviewContent;
     mentions?: MentionEntity[];
     message: string;
     quote?: QuoteEntity;
   }): Promise<void> {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
-    if (linkPreviews) {
-      const previews = linkPreviews.map(linkPreview => ({
-        imageUploaded: linkPreview.image,
-        url: linkPreview.url,
-        urlOffset: linkPreview.urlOffset,
-      }));
-    }
+    const preview = linkPreview && (await this.conversationService.messageBuilder.createLinkPreview(linkPreview));
+
     const textPayload = this.core
       .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
       .withMentions(
@@ -272,7 +264,7 @@ export class MessageRepository {
           userId: mention.userId,
         })),
       )
-      .withLinkPreviews(linkPreviews)
+      .withLinkPreviews(preview ? [preview] : [])
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .withQuote(quoteData)
       .build();
@@ -328,7 +320,7 @@ export class MessageRepository {
     if (linkPreview) {
       this.sendText({
         ...textPayload,
-        linkPreviews: [linkPreview],
+        linkPreview,
       });
     }
   }
@@ -358,36 +350,8 @@ export class MessageRepository {
         ConversationError.MESSAGE.NO_MESSAGE_CHANGES,
       );
     }
-    if (conversationEntity.isFederated()) {
-      return this.sendFederatedEditMessage(conversationEntity, textMessage, originalMessageEntity, mentionEntities);
-    }
-
-    const messageId = createRandomUuid();
-
-    const protoText = this.createTextProto(
-      messageId,
-      textMessage,
-      mentionEntities,
-      undefined,
-      undefined,
-      this.expectReadReceipt(conversationEntity),
-      conversationEntity.legalHoldStatus(),
-    );
-    const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.EDITED]: protoMessageEdit,
-      messageId,
-    });
-
-    try {
-      await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
-      await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
-    } catch (error) {
-      if (!this.isUserCancellationError(error)) {
-        this.logger.error(`Error while editing message: ${error.message}`, error);
-        throw error;
-      }
-    }
+    // TODO add link preview here
+    return this.sendFederatedEditMessage(conversationEntity, textMessage, originalMessageEntity, mentionEntities);
   }
 
   /**
@@ -674,72 +638,6 @@ export class MessageRepository {
     });
 
     return this._sendAndInjectGenericMessage(conversationEntity, generic_message);
-  }
-
-  /**
-   * Send link preview in specified conversation.
-   *
-   * @param conversationEntity Conversation that should receive the message
-   * @param textMessage Plain text message that possibly contains link
-   * @param genericMessage GenericMessage of containing text or edited message
-   * @param mentionEntities Mentions as part of message
-   * @param quoteEntity Link to a quoted message
-   * @returns Resolves after sending the message
-   */
-  private async sendLinkPreview(
-    conversationEntity: Conversation,
-    textMessage: string,
-    genericMessage: GenericMessage,
-    mentionEntities: MentionEntity[],
-    quoteEntity?: QuoteEntity,
-  ): Promise<ConversationEvent | undefined> {
-    const conversationId = conversationEntity.id;
-    const messageId = genericMessage.messageId;
-    let messageEntity: ContentMessage;
-    try {
-      const linkPreview = await this.link_repository.getLinkPreviewFromString(textMessage);
-      if (linkPreview) {
-        const protoText = this.createTextProto(
-          messageId,
-          textMessage,
-          mentionEntities,
-          quoteEntity,
-          [linkPreview],
-          this.expectReadReceipt(conversationEntity),
-          conversationEntity.legalHoldStatus(),
-        );
-        if (genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL]) {
-          genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
-        } else {
-          genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
-        }
-
-        messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
-      }
-
-      this.logger.debug(`No link preview for message '${messageId}' in conversation '${conversationId}' created`);
-
-      if (messageEntity) {
-        const assetEntity = messageEntity.getFirstAsset() as TextAsset;
-        const messageContentUnchanged = assetEntity.text === textMessage;
-
-        if (messageContentUnchanged) {
-          this.logger.debug(`Sending link preview for message '${messageId}' in conversation '${conversationId}'`);
-          return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
-        }
-
-        this.logger.debug(`Skipped sending link preview as message '${messageId}' in '${conversationId}' changed`);
-      }
-    } catch (error) {
-      if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-        this.logger.warn(`Failed sending link preview for message '${messageId}' in '${conversationId}'`);
-        throw error;
-      }
-
-      this.logger.warn(`Skipped link preview for unknown message '${messageId}' in '${conversationId}'`);
-    }
-
-    return undefined;
   }
 
   private isUserCancellationError(error: ConversationError): boolean {
@@ -1047,52 +945,6 @@ export class MessageRepository {
     });
 
     return this.sendAndInjectGenericCoreMessage(reaction, conversationEntity);
-  }
-
-  private createTextProto(
-    messageId: string,
-    textMessage: string,
-    mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
-    linkPreviews: LinkPreview[],
-    expectsReadConfirmation: boolean,
-    legalHoldStatus: LegalHoldStatus,
-  ): Text {
-    const protoText = new Text({content: textMessage, expectsReadConfirmation, legalHoldStatus});
-
-    if (mentionEntities && mentionEntities.length) {
-      const logMessage = `Adding '${mentionEntities.length}' mentions to message '${messageId}'`;
-      this.logger.debug(logMessage, mentionEntities);
-
-      const protoMentions = mentionEntities
-        .filter(mentionEntity => {
-          if (mentionEntity) {
-            try {
-              return mentionEntity.validate(textMessage);
-            } catch (error) {
-              const log = `Removed invalid mention when sending message '${messageId}': ${error.message}`;
-              this.logger.warn(log, mentionEntity);
-            }
-          }
-          return false;
-        })
-        .map(mentionEntity => mentionEntity.toProto());
-
-      protoText[PROTO_MESSAGE_TYPE.MENTIONS] = protoMentions;
-    }
-
-    if (quoteEntity) {
-      const protoQuote = quoteEntity.toProto();
-      this.logger.debug(`Adding quote to message '${messageId}'`, protoQuote);
-      protoText[PROTO_MESSAGE_TYPE.QUOTE] = protoQuote;
-    }
-
-    if (linkPreviews && linkPreviews.length) {
-      this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
-      protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
-    }
-
-    return protoText;
   }
 
   expectReadReceipt(conversationEntity: Conversation): boolean {
