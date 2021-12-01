@@ -39,6 +39,7 @@ import {ConversationState} from '../../conversation/ConversationState';
 import {CallState} from '../../calling/CallState';
 import {TeamState} from '../../team/TeamState';
 import {ConversationFilter} from '../../conversation/ConversationFilter';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 // Parent: ContentViewModel
 export function generateWarningBadgeKey({
@@ -120,7 +121,9 @@ export class TitleBarViewModel {
 
     this.hasCall = ko.pureComputed(() => {
       const hasEntities = this.conversationEntity() && !!this.callState.joinedCall();
-      return hasEntities ? this.conversationEntity().id === this.callState.joinedCall().conversationId : false;
+      return hasEntities
+        ? matchQualifiedIds(this.conversationEntity().qualifiedId, this.callState.joinedCall().conversationId)
+        : false;
     });
 
     this.badgeLabelCopy = ko.pureComputed(() => {
@@ -180,7 +183,7 @@ export class TitleBarViewModel {
 
   private readonly _startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
     const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-    this.callingRepository.startCall(conversationEntity.id, convType, callType);
+    this.callingRepository.startCall(conversationEntity.qualifiedId, convType, callType);
   };
 
   readonly clickOnDetails = (): void => {

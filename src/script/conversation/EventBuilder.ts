@@ -57,6 +57,7 @@ export interface CallingEvent {
   content: CallEntity;
   conversation: string;
   from: string;
+  qualified_conversation?: QualifiedId;
   sender: string;
   time?: string;
   type: CALL;
@@ -246,6 +247,7 @@ export const EventBuilder = {
       content: callMessage,
       conversation: conversationEntity.id,
       from: userId,
+      qualified_conversation: conversationEntity.qualifiedId,
       sender: clientId,
       type: ClientEvent.CALL.E_CALL,
     };
