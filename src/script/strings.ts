@@ -317,6 +317,10 @@ export const acceptNewsModalStrings = defineMessages({
 });
 
 export const unsupportedStrings = defineMessages({
+  desktopOnlyMessage: {
+    defaultMessage: 'Please use {brandName} on your desktop app instead.',
+    id: 'unsupported.desktopOnlyMessage',
+  },
   headlineBrowser: {
     defaultMessage: 'This browser is not supported.',
     id: 'unsupported.headlineBrowser',
