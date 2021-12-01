@@ -243,11 +243,13 @@ export class MessageRepository {
     mentions = [],
     linkPreview,
     quote,
+    messageId,
   }: {
     conversation: Conversation;
     linkPreview?: LinkPreviewContent;
     mentions?: MentionEntity[];
     message: string;
+    messageId?: string;
     quote?: QuoteEntity;
   }): Promise<void> {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
@@ -255,7 +257,11 @@ export class MessageRepository {
     const preview = linkPreview && (await this.conversationService.messageBuilder.createLinkPreview(linkPreview));
 
     const textPayload = this.core
-      .service!.conversation.messageBuilder.createText({conversationId: conversation.id, text: message})
+      .service!.conversation.messageBuilder.createText({
+        conversationId: conversation.id,
+        messageId,
+        text: message,
+      })
       .withMentions(
         mentions.map(mention => ({
           length: mention.length,
@@ -308,12 +314,15 @@ export class MessageRepository {
     mentionEntities: MentionEntity[],
     quoteEntity?: QuoteEntity,
   ): Promise<void> {
+    const messageId = createRandomUuid();
     const textPayload = {
       conversation: conversationEntity,
       mentions: mentionEntities,
       message: textMessage,
+      messageId,
       quote: quoteEntity,
     };
+    // We first send the raw text without any link preview
     this.sendText(textPayload);
 
     // check if the user actually wants to send link previews
@@ -323,7 +332,9 @@ export class MessageRepository {
 
     const linkPreview = await getLinkPreviewFromString(textMessage);
     if (linkPreview) {
+      // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
       this.sendText({
+        messageId, // This will make sure that we override the initial message
         ...textPayload,
         linkPreview,
       });
