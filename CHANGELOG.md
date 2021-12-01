@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [17.31.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.31.1...@wireapp/core@17.31.2) (2021-12-01)
+
+
+### Bug Fixes
+
+* **core:** Fix browser specific distribution ([#4186](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4186)) ([036325f](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/036325fb0483e994e353d019971194f0869ce199))
+
+
+
+
+
 ## [17.31.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.31.0...@wireapp/core@17.31.1) (2021-11-29)
 
 **Note:** Version bump only for package @wireapp/core
