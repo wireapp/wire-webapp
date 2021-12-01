@@ -52,7 +52,9 @@ class UnsupportedBrowserPage {
 }
 
 describe('UnsupportedBrowser', () => {
-  it('shows desktop usage only error', async () => {
+  // @SF.Channel @TSFI.UserInterface @S1
+  it('shows desktop usage only error in browser when ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY is true', async () => {
+    jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(false);
     jest
       .spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}, 'getConfig'>(Config, 'getConfig')
       .mockReturnValue({
@@ -75,7 +77,7 @@ describe('UnsupportedBrowser', () => {
     expect(unsupportedPage.getOnlyDesktopMessage().exists()).toBe(true);
   });
 
-  it('renders content when executed in desktop application', async () => {
+  it('renders content in desktop application when ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY is true', async () => {
     jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
     jest
       .spyOn<{getConfig: () => TypeUtil.RecursivePartial<Configuration>}, 'getConfig'>(Config, 'getConfig')
