@@ -59,6 +59,7 @@ import {ClientState} from '../client/ClientState';
 import {ConversationState} from './ConversationState';
 import {ConversationService} from './ConversationService';
 import {EventService} from '../event/EventService';
+import {Core} from '../service/CoreSingleton';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
@@ -77,6 +78,10 @@ describe('MessageRepository', () => {
     connectionEntity.status(connection_status);
     conversation.connection(connectionEntity);
     conversation.legalHoldStatus(LegalHoldStatus.DISABLED);
+
+    const selfUser = new User('selfid');
+    selfUser.isMe = true;
+    conversation.selfUser(selfUser);
 
     return conversation;
   };
@@ -312,6 +317,14 @@ describe('MessageRepository', () => {
   });
 
   describe('deleteMessageForEveryone', () => {
+    const core = {
+      service: {
+        conversation: {
+          deleteMessageEveryone: jest.fn(() => Promise.resolve()),
+          messageBuilder: {},
+        },
+      },
+    } as unknown as Core;
     it('should not delete other users messages', async () => {
       const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
 
@@ -344,29 +357,29 @@ describe('MessageRepository', () => {
         teamState,
         conversationState,
         clientState,
+        core,
       );
-
-      spyOn<any>(messageRepository, 'sendGenericMessage').and.returnValue(Promise.resolve());
 
       await expect(
         messageRepository.deleteMessageForEveryone(conversationEntity, message_to_delete_et),
       ).rejects.toMatchObject({
         type: ConversationError.TYPE.WRONG_USER,
       });
-      expect(messageRepository['sendGenericMessage']).not.toHaveBeenCalled();
+      expect(core.service.conversation.deleteMessageEveryone).not.toHaveBeenCalled();
     });
 
     it('should send delete and deletes message for own messages', async () => {
-      const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
+      const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
 
-      const userEntity = new User('', null);
-      userEntity.isMe = true;
+      const user = new User('user1');
 
-      const messageEntityToDelete = new Message();
-      messageEntityToDelete.id = createRandomUuid();
-      messageEntityToDelete.user(userEntity);
+      const messageToDelete = new Message();
+      messageToDelete.id = createRandomUuid();
+      messageToDelete.user(conversation.selfUser());
 
-      conversationEntity.addMessage(messageEntityToDelete);
+      conversation.participating_user_ets.push(user);
+
+      conversation.addMessage(messageToDelete);
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -374,7 +387,7 @@ describe('MessageRepository', () => {
       const clientState = new ClientState();
 
       const conversationRepository = {
-        getConversationById: jest.fn().mockImplementation(async () => conversationEntity),
+        getConversationById: jest.fn().mockImplementation(async () => conversation),
       };
 
       const eventService = {
@@ -382,7 +395,6 @@ describe('MessageRepository', () => {
       };
 
       const messageSender = new MessageSender();
-      messageSender.pauseQueue(false);
 
       const messageRepository = new MessageRepository(
         {} as ClientRepository,
@@ -400,15 +412,17 @@ describe('MessageRepository', () => {
         teamState,
         conversationState,
         clientState,
+        core,
       );
 
-      spyOn<any>(messageRepository, 'sendGenericMessage').and.returnValue(Promise.resolve());
-      spyOn(messageRepository, 'createRecipients').and.returnValue(Promise.resolve());
-      spyOn(userState, 'self').and.returnValue(userEntity);
-
-      await messageRepository.deleteMessageForEveryone(conversationEntity, messageEntityToDelete);
-      expect(messageRepository['sendGenericMessage']).toHaveBeenCalled();
-      expect(messageRepository.createRecipients).toHaveBeenCalled();
+      await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
+      expect(core.service.conversation.deleteMessageEveryone).toHaveBeenCalledWith(
+        conversation.id,
+        messageToDelete.id,
+        ['selfid', 'user1'],
+        true,
+        undefined,
+      );
       expect(eventService.deleteEvent).toHaveBeenCalledTimes(1);
     });
   });
