@@ -16,6 +16,7 @@ import PreferencesSection from './accountPreferences/PreferencesSection';
 import {Config} from '../../Config';
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
+import DeviceSelect from './avPreferences/DeviceSelect';
 
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
@@ -53,24 +54,20 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
 
   const availableDevices = useKoSubscribableChildren(devicesHandler?.availableDevices, [
     DeviceTypes.AUDIO_INPUT,
+    DeviceTypes.AUDIO_OUTPUT,
     DeviceTypes.VIDEO_INPUT,
   ]);
 
   const currentDeviceId = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
     DeviceTypes.AUDIO_INPUT,
+    DeviceTypes.AUDIO_OUTPUT,
     DeviceTypes.VIDEO_INPUT,
   ]);
-
-  const hasNoneOrOneAudioInput = availableDevices.audioInput.length < 2;
-  const hasNoneOrOneVideoInput = availableDevices.videoInput.length < 2;
-
-  const isAudioInputDisabled = hasNoneOrOneAudioInput || isRequestingAudio;
 
   const supportUrls = Config.getConfig().URL.SUPPORT;
 
   return (
     <div>
-      {' '}
       <div className="preferences-titlebar">{t('preferencesAV')}</div>
       <div className="preferences-content" ref={setScrollbarRef}>
         {deviceSupport.audioInput && (
@@ -82,29 +79,16 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
                 </a>
               </div>
             )}
-            <div
-              className={cx('preferences-option', {
-                'preferences-av-select-disabled': isAudioInputDisabled,
-              })}
-            >
-              <div className="preferences-option-icon preferences-av-select-icon">
-                <Icon.MicOn />
-              </div>
-              <div className="input-select">
-                <select
-                  className={cx('preferences-av-select', {'preferences-av-select-disabled': isAudioInputDisabled})}
-                  name="select"
-                  disabled={isAudioInputDisabled}
-                  value={currentDeviceId.audioInput}
-                  data-uie-name="enter-microphone"
-                >
-                  {(availableDevices.audioInput as MediaDeviceInfo[]).map(({deviceId, label}) => (
-                    <option value={deviceId}>{label || t('preferencesAVMicrophone')}</option>
-                  ))}
-                </select>
-                {!hasNoneOrOneAudioInput && <label className="icon-down preferences-av-label" />}
-              </div>
-            </div>
+
+            <DeviceSelect
+              uieName="enter-microphone"
+              devices={availableDevices.audioInput as MediaDeviceInfo[]}
+              value={currentDeviceId.audioInput}
+              defaultDeviceName={t('preferencesAVMicrophone')}
+              icon={Icon.MicOn}
+              isRequesting={isRequestingAudio}
+              onChange={() => {}}
+            />
             {isRequestingAudio ? (
               <div className="preferences-av-spinner">
                 <div className="icon-spinner spin accent-text"></div>
@@ -121,27 +105,14 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
 
         {deviceSupport.audioOutput && (
           <PreferencesSection title={t('preferencesAVSpeaker')}>
-            <div className="preferences-option">
-              <div className="preferences-option-icon preferences-av-select-icon">
-                <div className="icon-speaker"></div>
-              </div>
-              <div className="input-select">
-                <select
-                  className="preferences-av-select"
-                  name="select"
-                  data-bind="enabled: availableDevices.audioOutput().length >= 2,
-                               options: availableDevices.audioOutput,
-                               optionsText: function(item) {return item.label || z.string.preferencesAVSpeakers},
-                               optionsValue: 'deviceId',
-                               value: currentDeviceId.audioOutput"
-                  data-uie-name="enter-speaker"
-                ></select>
-                <label
-                  className="icon-down preferences-av-label"
-                  data-bind="visible: availableDevices.audioOutput().length >= 2"
-                ></label>
-              </div>
-            </div>
+            <DeviceSelect
+              uieName="enter-speaker"
+              onChange={() => {}}
+              devices={availableDevices.audioOutput as MediaDeviceInfo[]}
+              value={currentDeviceId.audioOutput}
+              icon={Icon.Speaker}
+              defaultDeviceName={t('preferencesAVSpeakers')}
+            />
           </PreferencesSection>
         )}
 
@@ -154,31 +125,15 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
                 </a>
               </div>
             )}
-            <div
-              className="preferences-option"
-              data-bind="css: {'preferences-av-select-disabled': hasNoneOrOneVideoInput() || isRequestingVideo()}"
-            >
-              <div className="preferences-option-icon preferences-av-select-icon">
-                <Icon.Camera />
-              </div>
-              <div className="input-select">
-                <select
-                  className="preferences-av-select"
-                  name="select"
-                  data-bind="attr: {'disabled': hasNoneOrOneVideoInput() || isRequestingVideo()},
-                               css: {'preferences-av-select-disabled': hasNoneOrOneVideoInput() || isRequestingVideo()},
-                               options: availableDevices.videoInput,
-                               optionsText: function(item) {return item.label || z.string.preferencesAVCamera},
-                               optionsValue: 'deviceId',
-                               value: currentDeviceId.videoInput"
-                  data-uie-name="enter-camera"
-                ></select>
-                <label
-                  className="icon-down preferences-av-label"
-                  data-bind="visible: !hasNoneOrOneVideoInput()"
-                ></label>
-              </div>
-            </div>
+            <DeviceSelect
+              uieName="enter-camera"
+              devices={availableDevices.videoInput as MediaDeviceInfo[]}
+              value={currentDeviceId.videoInput}
+              defaultDeviceName={t('preferencesAVCamera')}
+              icon={Icon.Camera}
+              isRequesting={isRequestingVideo}
+              onChange={() => {}}
+            />
 
             {isRequestingVideo ? (
               <div className="preferences-av-video-disabled">

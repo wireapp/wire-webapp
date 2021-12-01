@@ -23,7 +23,7 @@ import cx from 'classnames';
 interface DeviceSelectProps {
   devices: MediaDeviceInfo[];
   value: string;
-  disabled?: boolean;
+  isRequesting?: boolean;
   defaultDeviceName?: string;
   icon: React.ComponentType;
   uieName?: string;
@@ -31,7 +31,7 @@ interface DeviceSelectProps {
 }
 
 const DeviceSelect: React.FC<DeviceSelectProps> = ({
-  disabled = false,
+  isRequesting = false,
   devices,
   value,
   defaultDeviceName = '',
@@ -39,6 +39,8 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
   uieName,
   onChange,
 }) => {
+  const lessThanTwoDevices = devices.length < 2;
+  const disabled = lessThanTwoDevices || isRequesting;
   return (
     <div
       className={cx('preferences-option', {
@@ -61,7 +63,7 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
             <option value={deviceId}>{label || defaultDeviceName}</option>
           ))}
         </select>
-        {devices.length > 1 && <label className="icon-down preferences-av-label" />}
+        {!lessThanTwoDevices && <label className="icon-down preferences-av-label" />}
       </div>
     </div>
   );
