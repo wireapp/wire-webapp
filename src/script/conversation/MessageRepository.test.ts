@@ -51,7 +51,6 @@ import {MessageSender} from '../message/MessageSender';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
@@ -142,7 +141,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -251,7 +249,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -302,7 +299,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -351,7 +347,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -406,7 +401,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
