@@ -11,7 +11,7 @@ import {UserState} from '../../user/UserState';
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {DeviceTypes} from '../../media/MediaDevicesHandler';
-import InputLevel from './InputLevel';
+import InputLevel from './avPreferences/InputLevel';
 import PreferencesSection from './accountPreferences/PreferencesSection';
 import {Config} from '../../Config';
 import useEffectRef from 'Util/useEffectRef';
@@ -113,7 +113,7 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
               <InputLevel
                 className="preferences-av-meter accent-text"
                 disabled={!hasAudioTrack}
-                params="level: audioLevel, disabled: !hasAudioTrack()"
+                mediaStream={undefined}
               />
             )}
           </PreferencesSection>

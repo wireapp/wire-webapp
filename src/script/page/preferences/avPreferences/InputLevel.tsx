@@ -49,6 +49,7 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, ...rest})
   const [level, setLevel] = React.useState(0);
 
   useEffect(() => {
+    if (!mediaStream) return undefined;
     logger.info(`Initiating new audio meter for stream ID "${mediaStream.id}"`, mediaStream);
     if (!window.AudioContext?.prototype.createMediaStreamSource) {
       logger.warn('AudioContext is not supported, no volume indicator can be generated');
@@ -59,21 +60,26 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, ...rest})
     audioAnalyser.fftSize = AUDIO_METER.FFT_SIZE;
     audioAnalyser.smoothingTimeConstant = AUDIO_METER.SMOOTHING_TIME_CONSTANT;
 
-    const audioDataArray = new Float32Array(audioAnalyser.frequencyBinCount);
+    const audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
 
     const audioInterval = window.setInterval(() => {
-      audioAnalyser.getFloatFrequencyData(audioDataArray);
-      const volume = audioDataArray.reduce((acc, curr) => acc + Math.abs(Math.max(curr, -100) + 100) / 50, 0);
-
-      // Data is in the db range of -100 to -30, but can also be -Infinity. We normalize the value up to -50 to the range of 0, 1.
-
-      const averageVolume = volume / audioDataArray.length;
-
+      audioAnalyser.getByteFrequencyData(audioDataArray);
+      const volume = audioDataArray.reduce((acc, curr) => acc + curr, 0);
+      const averageVolume = volume / 128 / audioDataArray.length;
       setLevel(averageVolume - AUDIO_METER.LEVEL_ADJUSTMENT);
     }, AUDIO_METER.INTERVAL);
 
     const audioSource = audioContext.createMediaStreamSource(mediaStream);
     audioSource.connect(audioAnalyser);
+    return () => {
+      window.clearInterval(audioInterval);
+      audioContext
+        ?.close()
+        .then(() => logger.info('Closed existing AudioContext', audioContext))
+        .catch(error => logger.error(error));
+
+      audioSource?.disconnect();
+    };
   }, [mediaStream]);
 
   return (
