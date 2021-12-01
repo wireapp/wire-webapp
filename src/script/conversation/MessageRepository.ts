@@ -1875,7 +1875,6 @@ export class MessageRepository {
     return this.sendAndInjectGenericCoreMessage(message, conversation, {
       ...options,
       skipInjection: true,
-      skipSelf: true, // We never want to forward calling messages to the self user
       targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
   }
