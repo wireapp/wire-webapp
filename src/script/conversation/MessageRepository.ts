@@ -96,7 +96,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
+import {getLinkPreviewFromString} from './linkPreviews';
 import {UserRepository} from '../user/UserRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {MessageSender} from '../message/MessageSender';
@@ -121,6 +121,7 @@ import {Core} from '../service/CoreSingleton';
 import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -150,7 +151,6 @@ export class MessageRepository {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly conversation_service: ConversationService,
-    private readonly link_repository: LinkPreviewRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
@@ -316,7 +316,12 @@ export class MessageRepository {
     };
     this.sendText(textPayload);
 
-    const linkPreview = await this.link_repository.getLinkPreviewFromString(textMessage);
+    // check if the user actually wants to send link previews
+    if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
+      return;
+    }
+
+    const linkPreview = await getLinkPreviewFromString(textMessage);
     if (linkPreview) {
       this.sendText({
         ...textPayload,

@@ -23,7 +23,7 @@ import {renderMessage} from 'Util/messageRenderer';
 
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {AssetType} from '../../assets/AssetType';
-import {containsOnlyLink} from '../../links/LinkPreviewHelpers';
+import {containsOnlyLink} from '../../conversation/linkPreviews/helpers';
 import {mediaParser} from '../../media/MediaParser';
 import type {MentionEntity} from '../../message/MentionEntity';
 import {Asset} from './Asset';

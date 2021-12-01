@@ -17,7 +17,7 @@
  *
  */
 
-import {isBlacklisted} from 'src/script/links/LinkPreviewBlackList';
+import {isBlacklisted} from './blackList';
 
 describe('is_blacklisted', () => {
   it('blacklists youtu.be links', () => {

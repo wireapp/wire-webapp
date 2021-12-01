@@ -61,7 +61,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
-import type {LinkPreviewMetaDataType} from '../links/LinkPreviewMetaDataType';
+import type {LinkPreviewMetaDataType} from '../conversation/linkPreviews/metaDataType';
 import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
 import {MemberJoinEvent, MemberLeaveEvent, TeamMemberLeaveEvent} from './EventBuilder';

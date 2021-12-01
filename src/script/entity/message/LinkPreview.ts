@@ -23,7 +23,7 @@ import type {ITweet} from '@wireapp/protocol-messaging';
 import {obfuscate} from 'Util/StringUtil';
 
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
-import type {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
+import type {LinkPreviewMetaDataType} from '../../conversation/linkPreviews/metaDataType';
 
 export class LinkPreview {
   public image_resource: ko.Observable<AssetRemoteData>;

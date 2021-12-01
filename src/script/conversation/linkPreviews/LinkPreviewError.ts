@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError} from '../../error/BaseError';
 
 enum LINK_PREVIEW_ERROR_TYPE {
   BLACKLISTED = 'BLACKLISTED',
