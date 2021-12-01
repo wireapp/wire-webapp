@@ -314,16 +314,15 @@ export class MessageRepository {
     mentionEntities: MentionEntity[],
     quoteEntity?: QuoteEntity,
   ): Promise<void> {
-    const messageId = createRandomUuid();
     const textPayload = {
       conversation: conversationEntity,
       mentions: mentionEntities,
       message: textMessage,
-      messageId,
+      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       quote: quoteEntity,
     };
     // We first send the raw text without any link preview
-    this.sendText(textPayload);
+    await this.sendText(textPayload);
 
     // check if the user actually wants to send link previews
     if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
@@ -334,7 +333,6 @@ export class MessageRepository {
     if (linkPreview) {
       // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
       this.sendText({
-        messageId, // This will make sure that we override the initial message
         ...textPayload,
         linkPreview,
       });
