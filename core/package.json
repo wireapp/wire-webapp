@@ -1,6 +1,6 @@
 {
   "browser": {
-    "./src/cryptography/AssetCryptography.node": "./src/cryptography/AssetCryptography.browser.js"
+    "./src/main/cryptography/AssetCryptography.node": "./src/main/cryptography/AssetCryptography.browser.js"
   },
   "dependencies": {
     "@types/long": "4.0.1",
@@ -43,10 +43,10 @@
   },
   "description": "Wire for Web's communication core.",
   "files": [
-    "src/main",
-    "!src/main/**/!(*.d).ts",
-    "src/main/**/*.test.ts",
-    "src/main/test/**/*"
+    "src/main/**/*.d.ts",
+    "src/main/**/*.js",
+    "!src/main/**/*test*.js",
+    "!src/main/**/*test*.ts"
   ],
   "license": "GPL-3.0",
   "main": "src/main/Account",
