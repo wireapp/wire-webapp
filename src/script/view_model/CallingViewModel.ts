@@ -47,6 +47,7 @@ import {TeamState} from '../team/TeamState';
 import {Config} from '../Config';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {ROLE} from '../user/UserPermission';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export interface CallActions {
   answer: (call: Call) => void;
@@ -100,7 +101,7 @@ export class CallingViewModel {
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.activeCalls().filter(call => {
-        const conversation = this.conversationState.findConversation({domain: '', id: call.conversationId});
+        const conversation = this.conversationState.findConversation(call.conversationId);
         if (!conversation || conversation.removed_from_conversation()) {
           return false;
         }
@@ -134,7 +135,7 @@ export class CallingViewModel {
 
     const startCall = (conversationEntity: Conversation, callType: CALL_TYPE): void => {
       const convType = conversationEntity.isGroup() ? CONV_TYPE.GROUP : CONV_TYPE.ONEONONE;
-      this.callingRepository.startCall(conversationEntity.id, convType, callType).then(call => {
+      this.callingRepository.startCall(conversationEntity.qualifiedId, convType, callType).then(call => {
         if (!call) {
           return;
         }
@@ -303,8 +304,8 @@ export class CallingViewModel {
     return call.state() === CALL_STATE.MEDIA_ESTAB;
   }
 
-  getConversationById(conversationId: string): Conversation {
-    return this.conversationState.findConversation({domain: '', id: conversationId});
+  getConversationById(conversationId: QualifiedId): Conversation {
+    return this.conversationState.findConversation(conversationId);
   }
 
   hasAccessToCamera(): boolean {

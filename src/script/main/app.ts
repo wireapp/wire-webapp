@@ -904,6 +904,11 @@ $(async () => {
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
+    const enforceDesktopApplication =
+      Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+    if (enforceDesktopApplication) {
+      doRedirect(SIGN_OUT_REASON.APP_INIT);
+    }
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);

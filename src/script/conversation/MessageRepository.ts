@@ -28,9 +28,7 @@ import {
   GenericMessage,
   LastRead,
   LegalHoldStatus,
-  MessageDelete,
   MessageEdit,
-  MessageHide,
   Text,
   Asset as ProtobufAsset,
   LinkPreview,
@@ -287,7 +285,12 @@ export class MessageRepository {
     const textPayload = this.messageBuilder
       .createText({conversationId: conversation.id, text: message})
       .withMentions(
-        mentions.map(mention => ({length: mention.length, start: mention.startIndex, userId: mention.userId})),
+        mentions.map(mention => ({
+          length: mention.length,
+          qualifiedUserId: mention.userQualifiedId,
+          start: mention.startIndex,
+          userId: mention.userId,
+        })),
       )
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .withQuote(quoteData)
@@ -315,11 +318,6 @@ export class MessageRepository {
       .build();
 
     return this.sendAndInjectGenericCoreMessage(textPayload, conversation, {syncTimestamp: false});
-  }
-
-  private async deleteFederatedMessageForEveryone(conversation: Conversation, message: Message, precondition?: any) {
-    const userIds = conversation.allUserEntities.map(user => user.qualifiedId);
-    this.conversationService.deleteMessageEveryone(conversation.id, message.id, userIds, true, conversation.domain);
   }
 
   /**
@@ -1153,51 +1151,42 @@ export class MessageRepository {
   /**
    * Delete message for everyone.
    *
-   * @param conversationEntity Conversation to delete message from
-   * @param messageEntity Message to delete
-   * @param precondition Optional level that backend checks for missing clients
+   * @param conversation Conversation to delete message from
+   * @param message Message to delete
+   * @param targetedUsers target only a few users in the conversation. Will target all the participants if undefined
    * @returns Resolves when message was deleted
    */
   public async deleteMessageForEveryone(
-    conversationEntity: Conversation,
-    messageEntity: Message,
-    precondition?: string[] | boolean,
+    conversation: Conversation,
+    message: Message,
+    targetedUsers?: QualifiedId[],
   ): Promise<void> {
-    const conversationId = conversationEntity.id;
-    const messageId = messageEntity.id;
+    const conversationId = conversation.id;
+    const messageId = message.id;
 
     try {
-      if (!messageEntity.user().isMe && !messageEntity.ephemeral_expires()) {
+      if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
-      if (conversationEntity.isFederated()) {
-        await this.deleteFederatedMessageForEveryone(conversationEntity, messageEntity, precondition);
-      } else {
-        const protoMessageDelete = new MessageDelete({messageId});
-        const genericMessage = new GenericMessage({
-          [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
-          messageId: createRandomUuid(),
-        });
-        await this.messageSender.queueMessage(() => {
-          const userIds = Array.isArray(precondition) ? precondition : undefined;
-          return this.createRecipients(conversationEntity, false, userIds).then(recipients => {
-            const options = {precondition, recipients};
-            const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
-            this.sendGenericMessage(eventInfoEntity, true);
-          });
-        });
-      }
+      const userIds = targetedUsers || conversation.allUserEntities.map(user => user.qualifiedId);
+      await this.conversationService.deleteMessageEveryone(
+        conversation.id,
+        message.id,
+        conversation.isFederated() ? userIds : userIds.map(({id}) => id),
+        true,
+        conversation.isFederated() ? conversation.domain : undefined,
+      );
 
-      await this.deleteMessageById(conversationEntity, messageId);
+      await this.deleteMessageById(conversation, messageId);
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
         this.logger.warn(`Conversation '${conversationId}' not found. Deleting message for self user only.`);
-        this.deleteMessage(conversationEntity, messageEntity);
+        this.deleteMessage(conversation, message);
         return;
       }
-      const message = `Failed to delete message '${messageId}' in conversation '${conversationId}' for everyone`;
-      this.logger.info(message, error);
+      const logMessage = `Failed to delete message '${messageId}' in conversation '${conversationId}' for everyone`;
+      this.logger.info(logMessage, error);
       throw error;
     }
   }
@@ -1205,30 +1194,22 @@ export class MessageRepository {
   /**
    * Delete message on your own clients.
    *
-   * @param conversationEntity Conversation to delete message from
-   * @param messageEntity Message to delete
+   * @param conversation Conversation to delete message from
+   * @param message Message to delete
    * @returns Resolves when message was deleted
    */
-  public async deleteMessage(conversationEntity: Conversation, messageEntity: Message): Promise<void> {
+  public async deleteMessage(conversation: Conversation, message: Message): Promise<void> {
     try {
-      const protoMessageHide = new MessageHide({
-        conversationId: conversationEntity.id,
-        messageId: messageEntity.id,
-      });
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.HIDDEN]: protoMessageHide,
-        messageId: createRandomUuid(),
-      });
-
-      const eventInfoEntity = new EventInfoEntity(
-        genericMessage,
-        this.conversationState.self_conversation()?.qualifiedId,
+      await this.conversationService.deleteMessageLocal(
+        conversation.id,
+        message.id,
+        true,
+        conversation.isFederated() ? conversation.domain : undefined,
       );
-      await this.sendGenericMessageToConversation(eventInfoEntity);
-      await this.deleteMessageById(conversationEntity, messageEntity.id);
+      await this.deleteMessageById(conversation, message.id);
     } catch (error) {
       this.logger.info(
-        `Failed to send delete message with id '${messageEntity.id}' for conversation '${conversationEntity.id}'`,
+        `Failed to send delete message with id '${message.id}' for conversation '${conversation.id}'`,
         error,
       );
       throw error;
@@ -1870,7 +1851,6 @@ export class MessageRepository {
     return this.sendAndInjectGenericCoreMessage(message, conversation, {
       ...options,
       skipInjection: true,
-      skipSelf: true, // We never want to forward calling messages to the self user
       targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
   }

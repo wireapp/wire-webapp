@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {showContextMenu as showContext, ContextMenuEntry} from '../ui/ContextMenu';
@@ -91,7 +92,7 @@ interface MessageParams {
   onContentUpdated: () => void;
   onLike: (message: ContentMessage, button?: boolean) => void;
   onMessageMarked: (element: HTMLElement) => void;
-  selfId: ko.Observable<string>;
+  selfId: ko.Observable<QualifiedId>;
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
   teamState?: TeamState;
@@ -124,7 +125,7 @@ class Message {
   onLike: (message: ContentMessage, button?: boolean) => void;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   previewSubscription: ko.Subscription;
-  selfId: ko.Observable<string>;
+  selfId: ko.Observable<QualifiedId>;
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
   StatusType: typeof StatusType;

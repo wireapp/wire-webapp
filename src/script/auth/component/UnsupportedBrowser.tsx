@@ -19,7 +19,7 @@
 
 import {Container, ContainerXS, H1, H2, H3, Loading, Logo, Text} from '@wireapp/react-ui-kit';
 import React from 'react';
-import {FormattedMessage, MessageDescriptor} from 'react-intl';
+import {MessageDescriptor, useIntl} from 'react-intl';
 import {connect} from 'react-redux';
 import {Config} from '../../Config';
 import {unsupportedJoinStrings, unsupportedStrings} from '../../strings';
@@ -33,19 +33,20 @@ interface UnsupportedProps extends React.HTMLProps<HTMLDivElement> {
   subhead: MessageDescriptor;
 }
 
-const UnsupportedMessage: React.FC<UnsupportedProps> = ({headline, subhead}) => (
-  <ContainerXS verticalCenter centerText>
-    <Logo height={20} />
-    <H1 center style={{marginBottom: '48px', marginTop: '24px'}}>
-      <FormattedMessage {...headline} values={{brandName: Config.getConfig().BRAND_NAME}} />
-    </H1>
-    <Text center>
-      <FormattedMessage {...subhead} values={{brandName: Config.getConfig().BRAND_NAME}} />
-    </Text>
-  </ContainerXS>
-);
+const UnsupportedMessage: React.FC<UnsupportedProps> = ({headline, subhead}) => {
+  const {formatMessage: _} = useIntl();
+  return (
+    <ContainerXS verticalCenter centerText>
+      <Logo height={20} />
+      <H1 center css={{marginBottom: 48, marginTop: 24}}>
+        {_(headline, {brandName: Config.getConfig().BRAND_NAME})}
+      </H1>
+      <Text center>{_(subhead, {brandName: Config.getConfig().BRAND_NAME})}</Text>
+    </ContainerXS>
+  );
+};
 
-export interface Props extends React.HTMLProps<HTMLDivElement> {
+export interface UnsupportedBrowserProps extends React.HTMLProps<HTMLDivElement> {
   isTemporaryGuest?: boolean;
 }
 
@@ -56,34 +57,32 @@ export const UnsupportedBrowser = ({
   isCheckingSupport,
   isSupportedBrowser,
   isTemporaryGuest,
-}: Props & ConnectedProps) => {
+  hasToUseDesktopApplication,
+}: UnsupportedBrowserProps & ConnectedProps) => {
+  const {formatMessage: _} = useIntl();
   if (!isSupportedBrowser) {
     return (
       <WirelessContainer>
         <Container verticalCenter>
-          <H2 style={{fontWeight: 500, marginBottom: '10px', marginTop: '0'}}>
-            <FormattedMessage
-              {...(isTemporaryGuest
-                ? unsupportedJoinStrings.unsupportedJoinHeadline
-                : unsupportedStrings.headlineBrowser)}
-              values={{
-                brandName: Config.getConfig().BRAND_NAME,
-              }}
-            />
+          <H2 css={{fontWeight: 500, marginBottom: 10, marginTop: 0}} data-uie-name="element-unsupported-headline">
+            {_(isTemporaryGuest ? unsupportedJoinStrings.unsupportedJoinHeadline : unsupportedStrings.headlineBrowser, {
+              brandName: Config.getConfig().BRAND_NAME,
+            })}
           </H2>
           {isTemporaryGuest && Runtime.isMobileOS() ? (
-            <H3 style={{marginBottom: '10px'}}>
-              <FormattedMessage {...unsupportedJoinStrings.unsupportedJoinMobileSubhead} />
+            <H3 css={{marginBottom: 10}} data-uie-name="element-unsupported-mobile-guest">
+              {_(unsupportedJoinStrings.unsupportedJoinMobileSubhead)}
+            </H3>
+          ) : hasToUseDesktopApplication ? (
+            <H3 css={{marginBottom: 10}} data-uie-name="element-unsupported-desktop-only">
+              {_(unsupportedStrings.desktopOnlyMessage, {brandName: Config.getConfig().BRAND_NAME})}
             </H3>
           ) : (
-            <H3 style={{marginBottom: '10px'}}>
-              <FormattedMessage
-                {...unsupportedStrings.subheadBrowser}
-                values={{
-                  // eslint-disable-next-line react/display-name
-                  strong: (...chunks: any[]) => <strong style={{fontWeight: 800}}>{chunks}</strong>,
-                }}
-              />
+            <H3 css={{marginBottom: 10}} data-uie-name="element-unsupported-general">
+              {_(unsupportedStrings.subheadBrowser, {
+                // eslint-disable-next-line react/display-name
+                strong: (...chunks: any[]) => <strong style={{fontWeight: 800}}>{chunks}</strong>,
+              })}
             </H3>
           )}
         </Container>
@@ -93,7 +92,7 @@ export const UnsupportedBrowser = ({
 
   if (isCheckingSupport) {
     return (
-      <ContainerXS centerText verticalCenter style={{justifyContent: 'center'}}>
+      <ContainerXS centerText verticalCenter css={{justifyContent: 'center'}}>
         <Loading />
       </ContainerXS>
     );
@@ -121,6 +120,7 @@ type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasCookieSupport: RuntimeSelector.hasCookieSupport(state),
   hasIndexedDbSupport: RuntimeSelector.hasIndexedDbSupport(state),
+  hasToUseDesktopApplication: RuntimeSelector.hasToUseDesktopApplication(state),
   isCheckingSupport: RuntimeSelector.isChecking(state),
   isSupportedBrowser: RuntimeSelector.isSupportedBrowser(state),
 });
