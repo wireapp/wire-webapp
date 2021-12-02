@@ -137,7 +137,7 @@ type ClientMismatchHandlerFn = (
 type TextMessagePayload = {
   conversation: Conversation;
   linkPreview?: LinkPreviewContent;
-  mentions: MentionEntity[];
+  mentions?: MentionEntity[];
   message: string;
   messageId?: string;
   quote?: QuoteEntity;
