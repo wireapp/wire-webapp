@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.8.0...@wireapp/api-client@15.9.0) (2021-12-02)
+
+
+### Features
+
+* **api-client:** Add email unvalidated to user interface (SQSERVICES-231) ([#4191](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4191)) ([080a94e](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/080a94ea322ce58218373e157844b3278ae4d859))
+
+
+
+
+
 # [15.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.7.0...@wireapp/api-client@15.8.0) (2021-12-02)
 
 
