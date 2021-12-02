@@ -51,6 +51,7 @@ ko.bindingHandlers.react = {
       reactWrappers.set(element, ReactDOM.render(reactWrapper, fragment));
       ko.virtualElements.setDomNodeChildren(element, [fragment]);
       ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+        ReactDOM.unmountComponentAtNode(element);
         reactWrappers.delete(element);
       });
     }
@@ -63,6 +64,9 @@ ko.bindingHandlers.react = {
       return;
     }
     const reactElement = React.createElement(context.$component.reactComponent, props);
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+      ReactDOM.unmountComponentAtNode(element);
+    });
     ReactDOM.render(reactElement, element);
   },
 };
