@@ -137,7 +137,7 @@ type ClientMismatchHandlerFn = (
 type TextMessagePayload = {
   conversation: Conversation;
   linkPreview?: LinkPreviewContent;
-  mentions?: MentionEntity[];
+  mentions: MentionEntity[];
   message: string;
   messageId?: string;
   quote?: QuoteEntity;
@@ -254,19 +254,19 @@ export class MessageRepository {
       messageId,
       text: message,
     });
-    const textMessage = await this.decorateTextMessage(conversation, baseMessage, mentions, quote, linkPreview);
+    const textMessage = await this.decorateTextMessage(conversation, baseMessage, {linkPreview, mentions, quote});
 
     return this.sendAndInjectGenericCoreMessage(textMessage.build(), conversation);
   }
 
   private async sendEdit({conversation, message, messageId, originalMessageId, mentions, quote}: EditMessagePayload) {
     const baseMessage = this.messageBuilder.createEditedText({
-      messageId,
       conversationId: conversation.id,
+      messageId,
       newMessageText: message,
       originalMessageId: originalMessageId,
     });
-    const editMessage = await this.decorateTextMessage(conversation, baseMessage, mentions, quote);
+    const editMessage = await this.decorateTextMessage(conversation, baseMessage, {mentions, quote});
 
     return this.sendAndInjectGenericCoreMessage(editMessage.build(), conversation, {syncTimestamp: false});
   }
@@ -274,9 +274,15 @@ export class MessageRepository {
   private async decorateTextMessage(
     conversation: Conversation,
     textMessage: TextContentBuilder,
-    mentions: MentionEntity[],
-    quote: QuoteEntity,
-    linkPreview?: LinkPreviewContent,
+    {
+      mentions = [],
+      quote,
+      linkPreview,
+    }: {
+      linkPreview?: LinkPreviewContent;
+      mentions: MentionEntity[];
+      quote?: QuoteEntity;
+    },
   ) {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
