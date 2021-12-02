@@ -62,7 +62,7 @@ import {
 } from '../conversation/';
 import type {AssetContent, ClearedContent, DeletedContent, HiddenContent, RemoteData} from '../conversation/content/';
 import type {CryptographyService} from '../cryptography/';
-import * as AssetCryptography from '../cryptography/AssetCryptography.node';
+import {decryptAsset} from '../cryptography/AssetCryptography';
 import {isStringArray, isQualifiedIdArray, isQualifiedUserClients, isUserClients} from '../util/TypePredicateUtil';
 import {MessageBuilder} from './message/MessageBuilder';
 import {MessageService} from './message/MessageService';
@@ -811,7 +811,7 @@ export class ConversationService {
     const request = await this.apiClient.asset.api.getAssetV3(assetId, assetToken);
     const encryptedBuffer = (await request.response).buffer;
 
-    return AssetCryptography.decryptAsset({
+    return decryptAsset({
       cipherText: Buffer.from(encryptedBuffer),
       keyBytes: Buffer.from(otrKey),
       sha256: Buffer.from(sha256),

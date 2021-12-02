@@ -1,6 +1,6 @@
 {
   "browser": {
-    "./src/main/cryptography/AssetCryptography.node": "./src/main/cryptography/AssetCryptography.browser.js"
+    "./src/main/cryptography/AssetCryptography/crypto.node": "./src/main/cryptography/AssetCryptography/crypto.browser.js"
   },
   "dependencies": {
     "@types/long": "4.0.1",

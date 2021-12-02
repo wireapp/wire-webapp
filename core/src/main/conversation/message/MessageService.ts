@@ -34,7 +34,7 @@ import {
 } from '@wireapp/api-client/src/conversation';
 import {Encoder} from 'bazinga64';
 
-import {encryptAsset} from '../../cryptography/AssetCryptography.node';
+import {encryptAsset} from '../../cryptography/AssetCryptography';
 import {CryptographyService} from '../../cryptography';
 import {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
 import {MessageBuilder} from './MessageBuilder';

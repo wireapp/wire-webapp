@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,17 @@
  *
  */
 
-export * from './CryptographyService';
-export * from './AssetCryptography/EncryptedAsset';
-export * from './SessionPayloadBundle';
-export * from './MessageHashService';
+export interface Crypto {
+  digest(cipherText: Buffer | Uint8Array): Promise<Buffer>;
+
+  decrypt(cipherText: Buffer | Uint8Array, keyBytes: Buffer): Promise<Buffer>;
+
+  getRandomValues(size: number): Buffer;
+
+  encrypt(
+    plainText: Buffer | Uint8Array,
+    keyBytes: Buffer,
+    initializationVector: Buffer,
+    algorithm: string,
+  ): Promise<{key: Buffer; cipher: Buffer}>;
+}
