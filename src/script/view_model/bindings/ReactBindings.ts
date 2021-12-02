@@ -41,6 +41,11 @@ const reactWrappers = new Map<Comment, ReactWrapper>();
 
 ko.bindingHandlers.react = {
   init(element, valueAccessor, _allBindings, _viewModel, context) {
+    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+      ReactDOM.unmountComponentAtNode(element);
+      reactWrappers.delete(element);
+    });
+
     if (element.nodeType === Node.COMMENT_NODE) {
       const props = valueAccessor();
       const fragment = document.createDocumentFragment();
@@ -50,10 +55,6 @@ ko.bindingHandlers.react = {
       });
       reactWrappers.set(element, ReactDOM.render(reactWrapper, fragment));
       ko.virtualElements.setDomNodeChildren(element, [fragment]);
-      ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-        ReactDOM.unmountComponentAtNode(element);
-        reactWrappers.delete(element);
-      });
     }
     return {controlsDescendantBindings: true};
   },
@@ -64,9 +65,6 @@ ko.bindingHandlers.react = {
       return;
     }
     const reactElement = React.createElement(context.$component.reactComponent, props);
-    ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
-      ReactDOM.unmountComponentAtNode(element);
-    });
     ReactDOM.render(reactElement, element);
   },
 };
