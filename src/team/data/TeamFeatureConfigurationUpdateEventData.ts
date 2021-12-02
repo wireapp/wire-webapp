@@ -28,12 +28,14 @@ import {
   FeatureSearchVisibility,
   FeatureValidateSAMLEmails,
   FeatureSelfDeletingMessages,
+  FeatureConversationGuestLink,
 } from '../feature';
 
 export type TeamFeatureConfigurationUpdateEventData =
   | FeatureAppLock
   | FeatureDigitalSignature
   | FeatureConferenceCalling
+  | FeatureConversationGuestLink
   | FeatureVideoCalling
   | FeatureFileSharing
   | FeatureLegalhold

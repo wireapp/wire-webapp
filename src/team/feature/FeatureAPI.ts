@@ -32,6 +32,7 @@ import type {
   FeatureSelfDeletingMessages,
 } from './Feature';
 import type {FeatureList} from './FeatureList';
+import {FeatureConversationGuestLink} from '.';
 
 export class FeatureAPI {
   constructor(private readonly client: HttpClient) {}
@@ -42,6 +43,7 @@ export class FeatureAPI {
     CALLING_VIDEO: 'videoCalling',
     SELF_DELETING_MESSAGES: 'selfDeletingMessages',
     DIGITAL_SIGNATURES: 'digitalSignatures',
+    CONVERSATION_GUEST_LINKS: 'conversationGuestLinks',
     FEATURE_CONFIGS: '/feature-configs',
     FEATURES: 'features',
     FILE_SHARING: 'fileSharing',
@@ -80,6 +82,29 @@ export class FeatureAPI {
     };
 
     const response = await this.client.sendJSON<FeatureLegalhold>(config);
+    return response.data;
+  }
+  public async getConversationGuestLinkFeature(): Promise<FeatureConversationGuestLink> {
+    const config: AxiosRequestConfig = {
+      method: 'get',
+      url: `${FeatureAPI.URL.FEATURE_CONFIGS}/${FeatureAPI.URL.CONVERSATION_GUEST_LINKS}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureConversationGuestLink>(config);
+    return response.data;
+  }
+
+  public async putConversationGuestLinkFeature(
+    teamId: string,
+    conversationGuestLinkFeature: FeatureConversationGuestLink,
+  ): Promise<FeatureConversationGuestLink> {
+    const config: AxiosRequestConfig = {
+      data: conversationGuestLinkFeature,
+      method: 'put',
+      url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CONVERSATION_GUEST_LINKS}`,
+    };
+
+    const response = await this.client.sendJSON<FeatureConversationGuestLink>(config);
     return response.data;
   }
 
