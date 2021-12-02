@@ -65,15 +65,14 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
       <div className="mention-suggestion-list__item__name" data-uie-name="status-name">
         {name}
       </div>
-      {isTemporaryGuest && (
-        <>
-          <div className="mention-suggestion-list__item__remaining" data-uie-name="status-remaining">
-            {expirationRemainingText}
-          </div>
-          <div className="mention-suggestion-list__item__username" data-uie-name="status-username">
-            {suggestion.handle}
-          </div>
-        </>
+      {isTemporaryGuest ? (
+        <div className="mention-suggestion-list__item__remaining" data-uie-name="status-remaining">
+          {expirationRemainingText}
+        </div>
+      ) : (
+        <div className="mention-suggestion-list__item__username" data-uie-name="status-username">
+          {suggestion.handle}
+        </div>
       )}
       {isExternal && (
         <Icon.External className="mention-suggestion-list__item__guest-badge" data-uie-name="status-external" />
