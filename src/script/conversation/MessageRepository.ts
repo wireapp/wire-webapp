@@ -122,6 +122,7 @@ import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage
 import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -132,6 +133,16 @@ type ClientMismatchHandlerFn = (
   conversationId?: QualifiedId,
   silent?: boolean,
 ) => Promise<boolean>;
+
+type TextMessagePayload = {
+  conversation: Conversation;
+  linkPreview?: LinkPreviewContent;
+  mentions?: MentionEntity[];
+  message: string;
+  messageId?: string;
+  quote?: QuoteEntity;
+};
+type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
 
 export class MessageRepository {
   private readonly logger: Logger;
@@ -237,31 +248,41 @@ export class MessageRepository {
    * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
    * @see https://docs.wire.com/understand/federation/index.html
    */
-  private async sendText({
-    conversation,
-    message,
-    mentions = [],
-    linkPreview,
-    quote,
-    messageId,
-  }: {
-    conversation: Conversation;
-    linkPreview?: LinkPreviewContent;
-    mentions?: MentionEntity[];
-    message: string;
-    messageId?: string;
-    quote?: QuoteEntity;
-  }): Promise<void> {
+  private async sendText({conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload) {
+    const baseMessage = this.messageBuilder.createText({
+      conversationId: conversation.id,
+      messageId,
+      text: message,
+    });
+    const textMessage = await this.decorateTextMessage(conversation, baseMessage, mentions, quote, linkPreview);
+
+    return this.sendAndInjectGenericCoreMessage(textMessage.build(), conversation);
+  }
+
+  private async sendEdit({conversation, message, messageId, originalMessageId, mentions, quote}: EditMessagePayload) {
+    const baseMessage = this.messageBuilder.createEditedText({
+      messageId,
+      conversationId: conversation.id,
+      newMessageText: message,
+      originalMessageId: originalMessageId,
+    });
+    const editMessage = await this.decorateTextMessage(conversation, baseMessage, mentions, quote);
+
+    return this.sendAndInjectGenericCoreMessage(editMessage.build(), conversation, {syncTimestamp: false});
+  }
+
+  private async decorateTextMessage(
+    conversation: Conversation,
+    textMessage: TextContentBuilder,
+    mentions: MentionEntity[],
+    quote: QuoteEntity,
+    linkPreview?: LinkPreviewContent,
+  ) {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
     const preview = linkPreview && (await this.conversationService.messageBuilder.createLinkPreview(linkPreview));
 
-    const textPayload = this.core
-      .service!.conversation.messageBuilder.createText({
-        conversationId: conversation.id,
-        messageId,
-        text: message,
-      })
+    return textMessage
       .withMentions(
         mentions.map(mention => ({
           length: mention.length,
@@ -270,33 +291,9 @@ export class MessageRepository {
           userId: mention.userId,
         })),
       )
-      .withLinkPreviews(preview ? [preview] : [])
-      .withReadConfirmation(this.expectReadReceipt(conversation))
       .withQuote(quoteData)
-      .build();
-
-    this.sendAndInjectGenericCoreMessage(textPayload, conversation);
-  }
-
-  private async sendFederatedEditMessage(
-    conversation: Conversation,
-    message: string,
-    originalMessageEntity: ContentMessage,
-    mentions: MentionEntity[],
-  ) {
-    const textPayload = this.messageBuilder
-      .createEditedText({
-        conversationId: conversation.id,
-        newMessageText: message,
-        originalMessageId: originalMessageEntity.id,
-      })
-      .withMentions(
-        mentions.map(mention => ({length: mention.length, start: mention.startIndex, userId: mention.userId})),
-      )
-      .withReadConfirmation(this.expectReadReceipt(conversation))
-      .build();
-
-    return this.sendAndInjectGenericCoreMessage(textPayload, conversation, {syncTimestamp: false});
+      .withLinkPreviews(preview ? [preview] : [])
+      .withReadConfirmation(this.expectReadReceipt(conversation));
   }
 
   /**
@@ -321,41 +318,27 @@ export class MessageRepository {
       messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       quote: quoteEntity,
     };
-    // We first send the raw text without any link preview
     await this.sendText(textPayload);
-
-    // check if the user actually wants to send link previews
-    if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
-      return;
-    }
-
-    const linkPreview = await getLinkPreviewFromString(textMessage);
-    if (linkPreview) {
-      // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
-      this.sendText({
-        ...textPayload,
-        linkPreview,
-      });
-    }
+    await this.handleLinkPreview(textPayload);
   }
 
   /**
    * Send edited message in specified conversation.
    *
-   * @param conversationEntity Conversation entity
+   * @param conversation Conversation entity
    * @param textMessage Edited plain text message
-   * @param originalMessageEntity Original message entity
-   * @param mentionEntities Mentions as part of the message
+   * @param originalMessage Original message entity
+   * @param mentions Mentions as part of the message
    * @returns Resolves after sending the message
    */
   public async sendMessageEdit(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     textMessage: string,
-    originalMessageEntity: ContentMessage,
-    mentionEntities: MentionEntity[],
+    originalMessage: ContentMessage,
+    mentions: MentionEntity[],
   ): Promise<OtrMessage | void> {
-    const hasDifferentText = isTextDifferent(originalMessageEntity, textMessage);
-    const hasDifferentMentions = areMentionsDifferent(originalMessageEntity, mentionEntities);
+    const hasDifferentText = isTextDifferent(originalMessage, textMessage);
+    const hasDifferentMentions = areMentionsDifferent(originalMessage, mentions);
     const wasEdited = hasDifferentText || hasDifferentMentions;
 
     if (!wasEdited) {
@@ -364,8 +347,32 @@ export class MessageRepository {
         ConversationError.MESSAGE.NO_MESSAGE_CHANGES,
       );
     }
-    // TODO add link preview here
-    return this.sendFederatedEditMessage(conversationEntity, textMessage, originalMessageEntity, mentionEntities);
+
+    const messagePayload = {
+      conversation,
+      mentions,
+      message: textMessage,
+      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
+      originalMessageId: originalMessage.id,
+    };
+    await this.sendEdit(messagePayload);
+    await this.handleLinkPreview(messagePayload);
+  }
+
+  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
+    // check if the user actually wants to send link previews
+    if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
+      return;
+    }
+
+    const linkPreview = await getLinkPreviewFromString(textPayload.message);
+    if (linkPreview) {
+      // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
+      await this.sendText({
+        ...textPayload,
+        linkPreview,
+      });
+    }
   }
 
   /**
@@ -925,7 +932,7 @@ export class MessageRepository {
 
     const sendingOptions = {
       nativePush: false,
-      recipients: [{domain: messageEntity.fromDomain, id: messageEntity.from}],
+      recipients: [{domain: messageEntity.fromDomain || '', id: messageEntity.from}],
       // When not in a verified conversation (verified or degraded) we want the regular sending flow (send and reencrypt if there are mismatches)
       // When in a verified (or degraded) conversation we want to prevent encrypting for unverified devices, we will then silent the degradation modal and force sending to only the devices that are verified
       silentDegradationWarning: conversationEntity.verification_state() !== ConversationVerificationState.UNVERIFIED,
@@ -961,7 +968,7 @@ export class MessageRepository {
     return this.sendAndInjectGenericCoreMessage(reaction, conversationEntity);
   }
 
-  expectReadReceipt(conversationEntity: Conversation): boolean {
+  private expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
     }
