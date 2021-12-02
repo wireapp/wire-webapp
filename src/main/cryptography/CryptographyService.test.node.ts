@@ -27,7 +27,7 @@ import {promisify} from 'util';
 import {SessionPayloadBundle} from '.';
 
 import * as CryptographyHelper from '../test/CryptographyHelper';
-import {decryptAsset, encryptAsset} from './AssetCryptography.node';
+import {decryptAsset, encryptAsset} from './AssetCryptography';
 import {CryptographyService} from './CryptographyService';
 
 async function createEngine(storeName: string): Promise<CRUDEngine> {

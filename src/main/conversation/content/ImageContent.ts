@@ -18,7 +18,7 @@
  */
 
 export interface ImageContent {
-  data: Buffer;
+  data: Buffer | Uint8Array;
   height: number;
   type: string;
   width: number;

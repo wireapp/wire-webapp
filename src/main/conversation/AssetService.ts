@@ -23,7 +23,7 @@ import type {ProgressCallback} from '@wireapp/api-client/src/http';
 
 import type {FileContent, ImageContent} from '../conversation/content/';
 import type {EncryptedAssetUploaded} from '../cryptography/';
-import * as AssetCryptography from '../cryptography/AssetCryptography.node';
+import {encryptAsset} from '../cryptography/AssetCryptography';
 
 export class AssetService {
   constructor(private readonly apiClient: APIClient) {}
@@ -33,7 +33,7 @@ export class AssetService {
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
   ): Promise<EncryptedAssetUploaded> {
-    const {cipherText, keyBytes, sha256} = await AssetCryptography.encryptAsset({
+    const {cipherText, keyBytes, sha256} = await encryptAsset({
       plainText,
       algorithm: options?.algorithm,
       hash: options?.hash,
