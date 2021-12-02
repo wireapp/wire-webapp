@@ -27,14 +27,12 @@ export interface Props extends SVGIconProps {
   direction?: keyof Rotation;
 }
 
-/* eslint-disable sort-keys-fix/sort-keys-fix */
 const rotation: Rotation = {
   down: 0,
   left: 90,
   up: 180,
   right: 270,
 };
-/* eslint-enable sort-keys-fix/sort-keys-fix */
 
 export const TriangleIcon = ({direction = 'down', ...props}: Props) => (
   <SVGIcon realWidth={8} realHeight={8} {...props}>

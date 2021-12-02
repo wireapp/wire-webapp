@@ -47,6 +47,7 @@ export * from './SupportIcon';
 export * from './InfoIcon';
 export * from './InviteIcon';
 export * from './LeaveIcon';
+export * from './LinkIcon';
 export * from './ListIcon';
 export * from './LockIcon';
 export * from './MessageIcon';

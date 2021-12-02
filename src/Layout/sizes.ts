@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable sort-keys-fix/sort-keys-fix */
-
 export const WIDTH = {
   TINY: 320,
   MOBILE: 480,
