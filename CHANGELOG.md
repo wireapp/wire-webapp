@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.6.1...@wireapp/api-client@15.7.0) (2021-12-02)
+
+
+### Features
+
+* **api-client:** Add guest link feature config mapping (SQSERVICES-1047) ([#4187](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4187)) ([bcca8e3](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/bcca8e3d49fda15e3bd483f3eb28f2eb34fdac1b))
+
+
+
+
+
 ## [15.6.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.6.0...@wireapp/api-client@15.6.1) (2021-11-29)
 
 
