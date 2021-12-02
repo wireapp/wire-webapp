@@ -42,7 +42,10 @@ const reactWrappers = new Map<Comment, ReactWrapper>();
 ko.bindingHandlers.react = {
   init(element, valueAccessor, _allBindings, _viewModel, context) {
     ko.utils.domNodeDisposal.addDisposeCallback(element, () => {
+      // Allow react to clean up after the element is removed from the DOM.
+      // This is needed to prevent memory leaks, as it calls all useEffect return functions and such.
       ReactDOM.unmountComponentAtNode(element);
+
       reactWrappers.delete(element);
     });
 
