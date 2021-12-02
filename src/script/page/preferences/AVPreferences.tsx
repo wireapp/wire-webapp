@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {container} from 'tsyringe';
-import cx from 'classnames';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
@@ -26,10 +25,10 @@ type CallBacksType = {
 };
 
 interface AVPreferencesProps {
+  callbacks: CallBacksType;
+  callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
   propertiesRepository: PropertiesRepository;
-  callingRepository: CallingRepository;
-  callbacks: CallBacksType;
   userState?: UserState;
 }
 
@@ -152,13 +151,22 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
                   <div className="preferences-av-video-disabled">
                     <div
                       className="preferences-av-video-disabled__info"
-                      data-bind="html: t('preferencesAVNoCamera', brandName, {'faqLink': '<a href=\'https://support.wire.com/hc/articles/202935412\' data-uie-name=\'go-no-camera-faq\' target=\'_blank\' rel=\'noopener noreferrer\'>', '/faqLink': '</a>', 'br': '<br>'})"
+                      dangerouslySetInnerHTML={{
+                        __html: t('preferencesAVNoCamera', brandName, {
+                          '/faqLink': '</a>',
+                          br: '<br>',
+                          faqLink:
+                            "<a href='https://support.wire.com/hc/articles/202935412' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>",
+                        }),
+                      }}
                     ></div>
                     <div
                       className="preferences-av-video-disabled__try-again"
-                      data-bind="click: updateMediaStreamVideoTrack, text: z.string.preferencesAVTryAgain"
+                      onClick={updateMediaStreamVideoTrack}
                       data-uie-name="do-try-again-preferences-av"
-                    ></div>
+                    >
+                      {t('preferencesAVTryAgain')}
+                    </div>
                   </div>
                 )}
               </>
@@ -208,16 +216,11 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
         {callingRepository.supportsCalling && (
           <PreferencesSection title={t('preferencesOptionsCallLogs')}>
             <div className="preferences-option">
-              <div
-                className="preferences-link accent-text"
-                data-bind="click: saveCallLogs, text: t('preferencesOptionsCallLogsGet')"
-                data-uie-name="get-call-logs"
-              ></div>
+              <div className="preferences-link accent-text" onClick={saveCallLogs} data-uie-name="get-call-logs">
+                {t('preferencesOptionsCallLogsGet')}
+              </div>
             </div>
-            <div
-              className="preferences-detail"
-              data-bind="text: t('preferencesOptionsCallLogsDetail', brandName)"
-            ></div>
+            <div className="preferences-detail">{t('preferencesOptionsCallLogsDetail', brandName)}</div>
           </PreferencesSection>
         )}
       </div>
@@ -228,7 +231,7 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
 export default AVPreferences;
 
 registerReactComponent('av-preferences', {
+  component: AVPreferences,
   template:
     '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository}"></div>',
-  component: AVPreferences,
 });
