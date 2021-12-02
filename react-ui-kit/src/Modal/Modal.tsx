@@ -115,7 +115,6 @@ const modalActionsWrapperStyles: () => CSSObject = () => ({
     '&:hover': {
       backgroundColor: COLOR.opaque(COLOR.GRAY_DARKEN_72, 0.04),
     },
-    // eslint-disable-next-line sort-keys-fix/sort-keys-fix
     '&:active': {
       backgroundColor: COLOR.opaque(COLOR.GRAY_DARKEN_72, 0.08),
     },

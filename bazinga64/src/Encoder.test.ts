@@ -33,7 +33,6 @@ describe('toBase64', () => {
   });
 
   it('encodes array buffers', () => {
-    /* eslint-disable sort-keys-fix/sort-keys-fix */
     const json = {
       '0': 163,
       '1': 0,
@@ -151,7 +150,6 @@ describe('toBase64', () => {
       '113': 101,
       '114': 37,
     };
-    /* eslint-enable sort-keys-fix/sort-keys-fix */
 
     const arrayBufferView = bazinga64.Converter.jsonToArrayBufferView(json);
     const arrayBuffer = arrayBufferView.buffer;
