@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.55.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.54.0...@wireapp/react-ui-kit@7.55.0) (2021-12-02)
+
+
+### Features
+
+* **react-ui-kit:** Add link icon ([#4189](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/issues/4189)) ([9104140](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/commit/9104140d7671dbcd36a3fbdbafbbb860e5a2b374))
+
+
+
+
+
 # [7.54.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/react-ui-kit/compare/@wireapp/react-ui-kit@7.53.0...@wireapp/react-ui-kit@7.54.0) (2021-09-22)
 
 
