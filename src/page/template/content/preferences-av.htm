@@ -33,7 +33,7 @@
           </div>
         <!-- /ko -->
         <!-- ko if: !isRequestingAudio() -->
-          <input-level class="preferences-av-meter accent-text" params="level: audioLevel, disabled: !hasAudioTrack()"></input-level>
+          <input-level class="preferences-av-meter accent-text" params="mediaStream: audioStream(), disabled: !hasAudioTrack()"></input-level>
         <!-- /ko -->
       </section>
     <!-- /ko -->

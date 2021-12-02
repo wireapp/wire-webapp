@@ -30,9 +30,8 @@ export interface InputLevelProps extends React.HTMLProps<HTMLDivElement> {
 /** How many bullets should be displayed */
 export const MAX_AUDIO_BULLETS = 20;
 const AUDIO_METER = {
-  FFT_SIZE: 1024,
+  FFT_SIZE: 128,
   INTERVAL: 100,
-  LEVEL_ADJUSTMENT: 0.075,
   SMOOTHING_TIME_CONSTANT: 0.2,
 };
 
@@ -49,6 +48,7 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, ...rest})
   const [level, setLevel] = React.useState(0);
 
   useEffect(() => {
+    console.log({mediaStream});
     if (!mediaStream) return undefined;
     logger.info(`Initiating new audio meter for stream ID "${mediaStream.id}"`, mediaStream);
     if (!window.AudioContext?.prototype.createMediaStreamSource) {
@@ -66,7 +66,7 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, ...rest})
       audioAnalyser.getByteFrequencyData(audioDataArray);
       const volume = audioDataArray.reduce((acc, curr) => acc + curr, 0);
       const averageVolume = volume / 128 / audioDataArray.length;
-      setLevel(averageVolume - AUDIO_METER.LEVEL_ADJUSTMENT);
+      setLevel(averageVolume);
     }, AUDIO_METER.INTERVAL);
 
     const audioSource = audioContext.createMediaStreamSource(mediaStream);
@@ -101,5 +101,5 @@ export default InputLevel;
 
 registerReactComponent('input-level', {
   component: InputLevel,
-  template: '<div data-bind="react: {disabled: ko.unwrap(disabled), level: ko.unwrap(level)}"></div>',
+  template: '<div data-bind="react: {disabled: ko.unwrap(disabled), mediaStream: ko.unwrap(mediaStream)}"></div>',
 });

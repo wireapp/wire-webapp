@@ -70,6 +70,7 @@ export class PreferencesAVViewModel {
   isTemporaryGuest: ko.PureComputed<boolean>;
   logger: Logger;
   mediaStream: ko.Observable<MediaStream>;
+  audioStream: ko.Observable<MediaStream>;
   replaceActiveMediaSource: MediaSourceChanged;
   stopActiveMediaSource: WillChangeMediaSource;
   streamHandler: MediaStreamHandler;
@@ -120,6 +121,7 @@ export class PreferencesAVViewModel {
     this.streamHandler = mediaRepository.streamHandler;
 
     this.mediaStream = ko.observable(new MediaStream());
+    this.audioStream = ko.observable<MediaStream>();
     this.hasAudioTrack = ko.observable(false);
     this.hasVideoTrack = ko.observable(false);
     this.hasNoneOrOneAudioInput = ko.pureComputed(() => this.availableDevices.audioInput().length < 2);
@@ -190,7 +192,8 @@ export class PreferencesAVViewModel {
       mediaStream.getTracks().forEach(track => this.mediaStream().addTrack(track));
 
       if (this.mediaStream().getAudioTracks().length && !this.audioInterval) {
-        this.initiateAudioMeter(this.mediaStream());
+        this.audioStream(this.mediaStream());
+        //this.initiateAudioMeter(this.mediaStream());
       }
 
       await this.stopActiveMediaSource(mediaType);
