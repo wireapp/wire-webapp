@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config/compare/@wireapp/prettier-config@0.3.3...@wireapp/prettier-config@0.4.0) (2021-12-02)
+
+
+### Features
+
+* **react-ui-kit:** Add link icon ([#4189](https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config/issues/4189)) ([9104140](https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config/commit/9104140d7671dbcd36a3fbdbafbbb860e5a2b374))
+
+
+
+
+
 ## [0.3.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config/compare/@wireapp/prettier-config@0.3.2...@wireapp/prettier-config@0.3.3) (2021-09-17)
 
 

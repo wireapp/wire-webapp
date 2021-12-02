@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.11.2...@wireapp/eslint-config@1.12.0) (2021-12-02)
+
+
+### Features
+
+* **react-ui-kit:** Add link icon ([#4189](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/4189)) ([9104140](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/9104140d7671dbcd36a3fbdbafbbb860e5a2b374))
+
+
+
+
+
 ## [1.11.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.11.0...@wireapp/eslint-config@1.11.2) (2021-05-12)
 
 **Note:** Version bump only for package @wireapp/eslint-config

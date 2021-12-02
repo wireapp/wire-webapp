@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [5.10.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bazinga64/compare/bazinga64@5.9.7...bazinga64@5.10.0) (2021-12-02)
+
+
+### Features
+
+* **react-ui-kit:** Add link icon ([#4189](https://github.com/wireapp/wire-web-packages/tree/main/packages/bazinga64/issues/4189)) ([9104140](https://github.com/wireapp/wire-web-packages/tree/main/packages/bazinga64/commit/9104140d7671dbcd36a3fbdbafbbb860e5a2b374))
+
+
+
+
+
 ## [5.9.7](https://github.com/wireapp/wire-web-packages/tree/main/packages/bazinga64/compare/bazinga64@5.9.6...bazinga64@5.9.7) (2021-08-30)
 
 **Note:** Version bump only for package bazinga64
