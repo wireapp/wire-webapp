@@ -172,7 +172,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
             <PreferencesSection title={t('preferencesOptionsPopular')} hasSeperator={false}>
               <PreferencesCheckbox
                 uieName="status-preference-use-dark-mode"
-                label={t('preferencesAccountReadReceiptsCheckbox')}
+                label={t('preferencesOptionsUseDarkMode')}
                 checked={optionDarkMode}
                 onChange={newOptionDarkMode => saveOptionNewTheme(newOptionDarkMode)}
               />
