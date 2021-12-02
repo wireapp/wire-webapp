@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable typescript-sort-keys/string-enum */
-
 /**
  * @note Backend error labels are defined by the backend team and their source code.
  * @see https://github.com/wireapp/wire-server/blob/master/services/galley/src/Galley/API/Error.hs

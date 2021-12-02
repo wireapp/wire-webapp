@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable typescript-sort-keys/string-enum */
-
 export enum PaymentInterval {
   DAY = 'day',
   WEEK = 'week',
