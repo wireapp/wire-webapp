@@ -144,9 +144,8 @@ export class TeamRepository {
   getTeam = async (): Promise<TeamEntity> => {
     const selfTeamId = this.userState.self().teamId;
     const teamData = selfTeamId ? await this.getTeamById(selfTeamId) : await this.getBindingTeam();
-    const baseTeamEntity = new TeamEntity();
 
-    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, baseTeamEntity) : baseTeamEntity;
+    const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
     this.teamState.team(teamEntity);
     if (selfTeamId) {
       await this.getSelfMember(selfTeamId);
