@@ -59,6 +59,7 @@ export type FeatureAppLock = Feature<FeatureAppLockConfig>;
 export type FeatureClassifiedDomains = Feature<FeatureClassifiedDomainsConfig>;
 export type FeatureConferenceCalling = FeatureWithoutConfig;
 export type FeatureDigitalSignature = FeatureWithoutConfig;
+export type FeatureConversationGuestLink = FeatureWithoutConfig;
 export type FeatureFileSharing = FeatureWithoutConfig;
 export type FeatureLegalhold = FeatureWithoutConfig;
 export type FeatureSearchVisibility = FeatureWithoutConfig;
