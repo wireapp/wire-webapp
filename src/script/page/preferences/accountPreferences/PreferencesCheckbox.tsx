@@ -21,7 +21,7 @@ import React, {useRef} from 'react';
 
 interface PreferencesCheckboxProps {
   checked: boolean;
-  details?: string;
+  details?: string | React.ReactNode;
   disabled?: boolean;
   label: string;
   onChange: (checked: boolean) => void;
