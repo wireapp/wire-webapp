@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.10.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.9.0...@wireapp/api-client@15.10.0) (2021-12-03)
+
+
+### Features
+
+* **api-client:** Add feature `lockStatus` indicating immutable features ([#4192](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4192)) ([1886eb4](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/1886eb41972997aafa0f59a82e36149b30bf26f0))
+
+
+
+
+
 # [15.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.8.0...@wireapp/api-client@15.9.0) (2021-12-02)
 
 
