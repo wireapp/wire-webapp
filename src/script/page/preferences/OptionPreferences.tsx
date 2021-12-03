@@ -117,7 +117,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">{t('preferencesOptions')}</div>
       <div className="preferences-content" ref={setScrollbarRef}>
-        <PreferencesSection title={t('preferencesOptionsAudio')} hasSeperator={false}>
+        <PreferencesSection title={t('preferencesOptionsAudio')}>
           <PreferencesRadio
             name="preferences-options-audio"
             selectedValue={optionAudio}
@@ -144,7 +144,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
 
         {isActivatedAccount && (
           <>
-            <PreferencesSection title={t('preferencesOptionsNotifications')} hasSeperator={false}>
+            <PreferencesSection title={t('preferencesOptionsNotifications')}>
               <PreferencesRadio
                 name="preferences-options-notification"
                 selectedValue={optionNotifications}
@@ -169,7 +169,7 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
                 ]}
               />
             </PreferencesSection>
-            <PreferencesSection title={t('preferencesOptionsPopular')} hasSeperator={false}>
+            <PreferencesSection title={t('preferencesOptionsPopular')}>
               <PreferencesCheckbox
                 uieName="status-preference-use-dark-mode"
                 label={t('preferencesOptionsUseDarkMode')}

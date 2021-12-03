@@ -66,7 +66,7 @@ const DataUsageSection: React.FC<DataUsageSectionProps> = ({
   }, []);
 
   return (
-    <PreferencesSection title={t('preferencesAccountData')} className="preferences-section-data-usage">
+    <PreferencesSection hasSeparator title={t('preferencesAccountData')} className="preferences-section-data-usage">
       <PreferencesCheckbox
         checked={optionPrivacy}
         onChange={checked => {

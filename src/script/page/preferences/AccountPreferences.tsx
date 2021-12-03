@@ -156,7 +156,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
           )}
         </div>
         {isActivatedAccount ? (
-          <PreferencesSection title={t('preferencesAccountInfo')}>
+          <PreferencesSection hasSeparator title={t('preferencesAccountInfo')}>
             <div
               css={{
                 display: 'flex',
@@ -202,7 +202,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
             </div>
           </PreferencesSection>
         ) : (
-          <PreferencesSection>
+          <PreferencesSection hasSeparator>
             <div
               className="preferences-link accent-text"
               onClick={clickOnLeaveGuestRoom}
