@@ -22,12 +22,19 @@ export enum FeatureStatus {
   ENABLED = 'enabled',
 }
 
+export enum FeatureLockStatus {
+  LOCKED = 'locked',
+  UNLOCKED = 'unlocked',
+}
+
 export interface FeatureWithoutConfig {
   status: FeatureStatus;
+  lockStatus: FeatureLockStatus;
 }
 export interface Feature<T extends FeatureConfig> {
   config: T;
   status: FeatureStatus;
+  lockStatus: FeatureLockStatus;
 }
 
 export interface FeatureConfig {}

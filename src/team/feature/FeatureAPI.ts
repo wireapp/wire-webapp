@@ -32,7 +32,7 @@ import type {
   FeatureSelfDeletingMessages,
 } from './Feature';
 import type {FeatureList} from './FeatureList';
-import {FeatureConversationGuestLink} from '.';
+import {FeatureConversationGuestLink, FeatureLockedError} from '.';
 
 export class FeatureAPI {
   constructor(private readonly client: HttpClient) {}
@@ -96,7 +96,7 @@ export class FeatureAPI {
 
   public async putConversationGuestLinkFeature(
     teamId: string,
-    conversationGuestLinkFeature: FeatureConversationGuestLink,
+    conversationGuestLinkFeature: Omit<FeatureConversationGuestLink, 'lockStatus'>,
   ): Promise<FeatureConversationGuestLink> {
     const config: AxiosRequestConfig = {
       data: conversationGuestLinkFeature,
@@ -104,8 +104,17 @@ export class FeatureAPI {
       url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CONVERSATION_GUEST_LINKS}`,
     };
 
-    const response = await this.client.sendJSON<FeatureConversationGuestLink>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<FeatureConversationGuestLink>(config);
+      return response.data;
+    } catch (error) {
+      switch ((error as BackendError).label) {
+        case BackendErrorLabel.FEATURE_LOCKED: {
+          throw new FeatureLockedError((error as BackendError).message);
+        }
+      }
+      throw error;
+    }
   }
 
   public async getConferenceCallingFeature(): Promise<FeatureConferenceCalling> {
@@ -120,7 +129,7 @@ export class FeatureAPI {
 
   public async putConferenceCallingFeature(
     teamId: string,
-    conferenceCallingFeature: FeatureConferenceCalling,
+    conferenceCallingFeature: Omit<FeatureConferenceCalling, 'lockStatus'>,
   ): Promise<FeatureConferenceCalling> {
     const config: AxiosRequestConfig = {
       data: conferenceCallingFeature,
@@ -128,8 +137,17 @@ export class FeatureAPI {
       url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_CONFERENCE}`,
     };
 
-    const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
+      return response.data;
+    } catch (error) {
+      switch ((error as BackendError).label) {
+        case BackendErrorLabel.FEATURE_LOCKED: {
+          throw new FeatureLockedError((error as BackendError).message);
+        }
+      }
+      throw error;
+    }
   }
 
   public async getVideoCallingFeature(): Promise<FeatureVideoCalling> {
@@ -144,7 +162,7 @@ export class FeatureAPI {
 
   public async putVideoCallingFeature(
     teamId: string,
-    videoCallingFeature: FeatureVideoCalling,
+    videoCallingFeature: Omit<FeatureVideoCalling, 'lockStatus'>,
   ): Promise<FeatureVideoCalling> {
     const config: AxiosRequestConfig = {
       data: videoCallingFeature,
@@ -152,8 +170,17 @@ export class FeatureAPI {
       url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.CALLING_VIDEO}`,
     };
 
-    const response = await this.client.sendJSON<FeatureVideoCalling>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<FeatureVideoCalling>(config);
+      return response.data;
+    } catch (error) {
+      switch ((error as BackendError).label) {
+        case BackendErrorLabel.FEATURE_LOCKED: {
+          throw new FeatureLockedError((error as BackendError).message);
+        }
+      }
+      throw error;
+    }
   }
 
   public async getSelfDeletingMessagesFeature(): Promise<FeatureSelfDeletingMessages> {
@@ -168,7 +195,7 @@ export class FeatureAPI {
 
   public async putSelfDeletingMessagesFeature(
     teamId: string,
-    selfDeleteingMessagesFeature: FeatureSelfDeletingMessages,
+    selfDeleteingMessagesFeature: Omit<FeatureSelfDeletingMessages, 'lockStatus'>,
   ): Promise<FeatureSelfDeletingMessages> {
     const config: AxiosRequestConfig = {
       data: selfDeleteingMessagesFeature,
@@ -176,8 +203,17 @@ export class FeatureAPI {
       url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.SELF_DELETING_MESSAGES}`,
     };
 
-    const response = await this.client.sendJSON<FeatureSelfDeletingMessages>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<FeatureSelfDeletingMessages>(config);
+      return response.data;
+    } catch (error) {
+      switch ((error as BackendError).label) {
+        case BackendErrorLabel.FEATURE_LOCKED: {
+          throw new FeatureLockedError((error as BackendError).message);
+        }
+      }
+      throw error;
+    }
   }
 
   public async getFileSharingFeature(): Promise<FeatureFileSharing> {
@@ -192,7 +228,7 @@ export class FeatureAPI {
 
   public async putFileSharingFeature(
     teamId: string,
-    fileSharingFeature: FeatureFileSharing,
+    fileSharingFeature: Omit<FeatureFileSharing, 'lockStatus'>,
   ): Promise<FeatureFileSharing> {
     const config: AxiosRequestConfig = {
       data: fileSharingFeature,
@@ -200,8 +236,17 @@ export class FeatureAPI {
       url: `${FeatureAPI.URL.TEAMS}/${teamId}/${FeatureAPI.URL.FEATURES}/${FeatureAPI.URL.FILE_SHARING}`,
     };
 
-    const response = await this.client.sendJSON<FeatureFileSharing>(config);
-    return response.data;
+    try {
+      const response = await this.client.sendJSON<FeatureFileSharing>(config);
+      return response.data;
+    } catch (error) {
+      switch ((error as BackendError).label) {
+        case BackendErrorLabel.FEATURE_LOCKED: {
+          throw new FeatureLockedError((error as BackendError).message);
+        }
+      }
+      throw error;
+    }
   }
 
   public async getSSOFeature(): Promise<FeatureSSO> {
@@ -234,7 +279,10 @@ export class FeatureAPI {
     return response.data;
   }
 
-  public async putAppLockFeature(teamId: string, appLockFeature: FeatureAppLock): Promise<FeatureAppLock> {
+  public async putAppLockFeature(
+    teamId: string,
+    appLockFeature: Omit<FeatureAppLock, 'lockStatus'>,
+  ): Promise<FeatureAppLock> {
     const config: AxiosRequestConfig = {
       data: appLockFeature,
       method: 'put',
@@ -248,6 +296,9 @@ export class FeatureAPI {
       switch ((error as BackendError).label) {
         case BackendErrorLabel.APP_LOCK_INVALID_TIMEOUT: {
           throw new InvalidAppLockTimeoutError((error as BackendError).message);
+        }
+        case BackendErrorLabel.FEATURE_LOCKED: {
+          throw new FeatureLockedError((error as BackendError).message);
         }
       }
       throw error;

@@ -87,6 +87,7 @@ export enum BackendErrorLabel {
   ACCOUNT_SUSPENDED = 'suspended',
 
   // Feature errors
+  FEATURE_LOCKED = 'feature-locked',
   APP_LOCK_INVALID_TIMEOUT = 'inactivity-timeout-too-low',
 
   // Payment errors
