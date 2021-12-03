@@ -30,7 +30,11 @@ interface HistoryBackupSectionProps {
 }
 
 const HistoryBackupSection: React.FC<HistoryBackupSectionProps> = ({brandName}) => (
-  <PreferencesSection title={t('preferencesOptionsBackupHeader')} className="preferences-section-conversation-history">
+  <PreferencesSection
+    hasSeparator
+    title={t('preferencesOptionsBackupHeader')}
+    className="preferences-section-conversation-history"
+  >
     <div
       className="preferences-link accent-text"
       onClick={() => {

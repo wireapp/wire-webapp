@@ -20,11 +20,11 @@
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import VerifiedIcon from 'Components/VerifiedIcon';
-import React, {useEffect, useState} from 'react';
+import React, {useMemo} from 'react';
 import {VerificationMessage as VerificationMessageEntity} from '../../entity/message/VerificationMessage';
 import {VerificationMessageType} from '../../message/VerificationMessageType';
 
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
@@ -33,30 +33,26 @@ export interface VerificationMessageProps {
 }
 
 const VerificationMessage: React.FC<VerificationMessageProps> = ({message}) => {
-  const userIds = useKoSubscribable(message.userIds, []);
-  const userEntities = useKoSubscribable(message.userEntities);
+  const {userIds, userEntities, unsafeSenderName, verificationMessageType, isSelfClient} = useKoSubscribableChildren(
+    message,
+    ['userIds', 'userEntities', 'unsafeSenderName', 'verificationMessageType', 'isSelfClient'],
+  );
 
-  const [nameList, setNameList] = useState('');
-  useEffect(() => {
+  const nameList = useMemo(() => {
     const namesString = joinNames(userEntities, Declension.NOMINATIVE);
-    setNameList(capitalizeFirstChar(namesString));
+    return capitalizeFirstChar(namesString);
   }, [userEntities]);
-
-  const hasMultipleUsers = userIds.length > 1;
-  const unsafeSenderName = useKoSubscribable(message.unsafeSenderName);
-
-  const verificationMessageType = useKoSubscribable(message.verificationMessageType);
-  const isTypeVerified = verificationMessageType === VerificationMessageType.VERIFIED;
-  const isTypeUnverified = verificationMessageType === VerificationMessageType.UNVERIFIED;
-  const isTypeNewDevice = verificationMessageType === VerificationMessageType.NEW_DEVICE;
-  const isTypeNewMember = verificationMessageType === VerificationMessageType.NEW_MEMBER;
-
-  const isSelfClient = useKoSubscribable(message.isSelfClient);
 
   const showDevice = (): void => {
     const topic = isSelfClient ? WebAppEvents.PREFERENCES.MANAGE_DEVICES : WebAppEvents.SHORTCUT.PEOPLE;
     amplify.publish(topic);
   };
+
+  const hasMultipleUsers = userIds?.length > 1;
+  const isTypeVerified = verificationMessageType === VerificationMessageType.VERIFIED;
+  const isTypeUnverified = verificationMessageType === VerificationMessageType.UNVERIFIED;
+  const isTypeNewDevice = verificationMessageType === VerificationMessageType.NEW_DEVICE;
+  const isTypeNewMember = verificationMessageType === VerificationMessageType.NEW_MEMBER;
 
   return (
     <div className="message-header">

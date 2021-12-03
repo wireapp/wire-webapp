@@ -71,7 +71,7 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
     );
 
   return (
-    <PreferencesSection className="preferences-section-account-security">
+    <PreferencesSection hasSeparator className="preferences-section-account-security">
       {manageTeamUrl && hasAccessToFeature(FEATURES.MANAGE_TEAM, teamRole) && (
         <div
           className="preferences-link accent-text"

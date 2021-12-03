@@ -21,13 +21,20 @@ import React from 'react';
 
 interface PreferencesSectionProps extends React.HTMLProps<HTMLDivElement> {
   className?: string;
+  hasSeparator?: boolean;
   title?: string;
   uieName?: string;
 }
 
-const PreferencesSection: React.FC<PreferencesSectionProps> = ({title, className = '', uieName, children}) => (
+const PreferencesSection: React.FC<PreferencesSectionProps> = ({
+  title,
+  className = '',
+  uieName,
+  hasSeparator,
+  children,
+}) => (
   <section className={`preferences-section ${className}`} data-uie-name={uieName}>
-    <hr className="preferences-separator" />
+    {hasSeparator && <hr className="preferences-separator" />}
     {title && <header className="preferences-header">{title}</header>}
     {children}
   </section>
