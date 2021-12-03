@@ -16,6 +16,7 @@ import {Config} from '../../Config';
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import DeviceSelect from './avPreferences/DeviceSelect';
+import PreferencesCheckbox from './accountPreferences/PreferencesCheckbox';
 
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
@@ -64,6 +65,11 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
   ]);
 
   const supportUrls = Config.getConfig().URL.SUPPORT;
+  const brandName = '';
+  const updateMediaStreamVideoTrack = () => {};
+  const changeVbrEncoding = () => {};
+  const changeAgcEnabled = () => {};
+  const saveCallLogs = () => {};
 
   return (
     <div>
@@ -96,7 +102,7 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
               <InputLevel
                 className="preferences-av-meter accent-text"
                 disabled={!hasAudioTrack}
-                mediaStream={undefined}
+                mediaStream={audioMediaStream}
               />
             )}
           </PreferencesSection>
@@ -145,8 +151,9 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
                     className="preferences-av-video mirror"
                     autoPlay
                     playsInline
-                    data-bind="muteMediaElement: mediaStream(), sourceStream: mediaStream()"
-                  ></video>
+                    muted
+                    srcObject={videoMediaStream}
+                  />
                 ) : (
                   <div className="preferences-av-video-disabled">
                     <div
@@ -175,42 +182,21 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
         )}
 
         <PreferencesSection title={t('preferencesOptionsCall')}>
-          <div className="preferences-option">
-            <div
-              className="preferences-option-icon checkbox accent-text"
-              data-bind="attr: {'data-uie-value': optionVbrEncoding}"
-              data-uie-name="status-preference-vbr-encoding"
-            >
-              <input
-                type="checkbox"
-                id="vbr-encoding-checkbox"
-                data-bind="
-              attr: {'disabled': isCbrEncodingEnforced},
-              checked: optionVbrEncoding"
-              />
-              <label
-                className="preferences-options-checkbox-label"
-                htmlFor="vbr-encoding-checkbox"
-                data-bind="text: t('preferencesOptionsEnableVbrCheckbox')"
-              ></label>
-            </div>
-          </div>
-          <div className="preferences-detail" data-bind="text: t('preferencesOptionsEnableVbrDetails')"></div>
-          <div className="preferences-option">
-            <div
-              className="preferences-option-icon checkbox accent-text"
-              data-bind="attr: {'data-uie-value': optionAgcEnabled}"
-              data-uie-name="status-preference-agc"
-            >
-              <input type="checkbox" id="agc-checkbox" data-bind="checked: optionAgcEnabled" />
-              <label
-                className="preferences-options-checkbox-label"
-                htmlFor="agc-checkbox"
-                data-bind="text: t('preferencesOptionsEnableAgcCheckbox')"
-              ></label>
-            </div>
-          </div>
-          <div className="preferences-detail" data-bind="text: t('preferencesOptionsEnableAgcDetails')"></div>
+          <PreferencesCheckbox
+            uieName="status-preference-vbr-encoding"
+            label={t('preferencesOptionsEnableVbrCheckbox')}
+            checked={optionVbrEncoding}
+            disabled={isCbrEncodingEnforced}
+            details={t('preferencesOptionsEnableVbrDetails')}
+            onChange={changeVbrEncoding}
+          />
+          <PreferencesCheckbox
+            uieName="status-preference-agc"
+            label={t('preferencesOptionsEnableAgcCheckbox')}
+            checked={optionAgcEnabled}
+            details={t('preferencesOptionsEnableAgcDetails')}
+            onChange={changeAgcEnabled}
+          />
         </PreferencesSection>
 
         {callingRepository.supportsCalling && (
