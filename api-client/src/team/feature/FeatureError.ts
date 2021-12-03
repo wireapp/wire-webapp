@@ -34,3 +34,11 @@ export class InvalidAppLockTimeoutError extends FeatureError {
     this.name = 'InvalidAppLockTimeoutError';
   }
 }
+
+export class FeatureLockedError extends FeatureError {
+  constructor(message: string, label = BackendErrorLabel.FEATURE_LOCKED, code = StatusCode.CONFLICT) {
+    super(message, label, code);
+    Object.setPrototypeOf(this, FeatureLockedError.prototype);
+    this.name = 'FeatureLockedError';
+  }
+}
