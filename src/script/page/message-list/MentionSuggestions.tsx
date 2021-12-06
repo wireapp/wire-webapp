@@ -92,7 +92,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
     return () => {
       targetInput?.removeEventListener('keydown', onInput);
     };
-  }, [isVisible, suggestions.length]);
+  }, [isVisible, suggestions.length, selectedSuggestionIndex]);
 
   return isVisible ? (
     <div
@@ -125,7 +125,7 @@ const MentionSuggestionList: React.FunctionComponent<MentionSuggestionListProps>
 export default MentionSuggestionList;
 
 registerReactComponent('mention-suggestions', {
+  component: MentionSuggestionList,
   template:
     '<div data-bind="react: {suggestions: ko.unwrap(suggestions), onSelectionValidated, targetInputSelector}"></div>',
-  component: MentionSuggestionList,
 });
