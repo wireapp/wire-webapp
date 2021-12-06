@@ -48,9 +48,14 @@ import {
   MessageSendingStatus,
   UserClients,
 } from '@wireapp/api-client/src/conversation';
-import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
+import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
+import {
+  AudioMetaData,
+  VideoMetaData,
+  ImageMetaData,
+  FileMetaDataContent,
+} from '@wireapp/core/src/main/conversation/content';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -589,53 +594,28 @@ export class MessageRepository {
   /**
    * Send asset metadata message to specified conversation.
    */
-  private async sendAssetMetadata(
-    conversationEntity: Conversation,
-    file: File | Blob,
-    allowImageDetection?: boolean,
-  ): Promise<ConversationEvent | undefined> {
+  private async sendAssetMetadata(conversation: Conversation, file: File | Blob, allowImageDetection?: boolean) {
+    let metadata;
     try {
-      let metadata;
-      try {
-        metadata = await buildMetadata(file);
-      } catch (error) {
-        const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
-        this.logger.warn(logMessage, error);
-      }
-      const assetOriginal = new Asset.Original({mimeType: file.type, name: (file as File).name, size: file.size});
-
-      if (isAudio(file)) {
-        assetOriginal.audio = metadata as AudioMetaData;
-      } else if (isVideo(file)) {
-        assetOriginal.video = metadata as VideoMetaData;
-      } else if (allowImageDetection && isImage(file)) {
-        assetOriginal.image = metadata as ImageMetaData;
-      }
-
-      const protoAsset = new Asset({
-        [PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
-        [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-        [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
-      });
-
-      let genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
-        messageId: createRandomUuid(),
-      });
-
-      if (conversationEntity.messageTimer()) {
-        genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
-      }
-      return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
+      metadata = await buildMetadata(file);
     } catch (error) {
-      const log = `Failed to upload metadata for asset in conversation '${conversationEntity.id}': ${error.message}`;
-      this.logger.warn(log, error);
-
-      if (this.isUserCancellationError(error)) {
-        throw error;
-      }
+      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
+      this.logger.warn(logMessage, error);
     }
-    return undefined;
+    const meta = {length: file.size, name: (file as File).name, type: file.type} as Partial<FileMetaDataContent>;
+
+    if (isAudio(file)) {
+      meta.audio = metadata as AudioMetaData;
+    } else if (isVideo(file)) {
+      meta.video = metadata as VideoMetaData;
+    } else if (allowImageDetection && isImage(file)) {
+      meta.image = metadata as ImageMetaData;
+    }
+    const message = this.messageBuilder.createFileMetadata({
+      conversationId: conversation.id,
+      metaData: meta as FileMetaDataContent,
+    });
+    return this.sendAndInjectGenericCoreMessage(message, conversation);
   }
 
   /**
