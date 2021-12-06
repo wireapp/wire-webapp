@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [15.11.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.10.0...@wireapp/api-client@15.11.0) (2021-12-06)
+
+
+### Features
+
+* **api-client:** Add update user email endpoint (SQSERVICES-231) ([#4190](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4190)) ([232ae21](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/232ae213c0118233ae74b74e547cecd1655c881c))
+
+
+
+
+
 # [15.10.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.9.0...@wireapp/api-client@15.10.0) (2021-12-03)
 
 
