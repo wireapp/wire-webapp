@@ -29,12 +29,10 @@ export enum FeatureLockStatus {
 
 export interface FeatureWithoutConfig {
   status: FeatureStatus;
-  lockStatus: FeatureLockStatus;
+  lockStatus?: FeatureLockStatus;
 }
-export interface Feature<T extends FeatureConfig> {
+export interface Feature<T extends FeatureConfig> extends FeatureWithoutConfig {
   config: T;
-  status: FeatureStatus;
-  lockStatus: FeatureLockStatus;
 }
 
 export interface FeatureConfig {}
