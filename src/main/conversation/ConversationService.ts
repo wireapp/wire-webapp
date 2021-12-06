@@ -479,6 +479,7 @@ export class ConversationService {
       name: metaData.name,
       size: metaData.length,
       video: metaData.video,
+      image: metaData.image,
     });
 
     const assetMessage = Asset.create({
