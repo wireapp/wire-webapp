@@ -712,7 +712,9 @@ export class CallingRepository {
         this.removeCall(call);
       }
       return call;
-    } catch (_error) {}
+    } catch (error) {
+      this.logger.error('Failed starting call', error);
+    }
   }
 
   private serializeQualifiedId(id: QualifiedId): string {
@@ -805,7 +807,8 @@ export class CallingRepository {
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
-    } catch (_error) {
+    } catch (error) {
+      this.logger.error('Failed answering call', error);
       this.rejectCall(call.conversationId);
     }
   }
@@ -1077,7 +1080,8 @@ export class CallingRepository {
       try {
         const config = await this.fetchConfig(limit);
         this.wCall.configUpdate(this.wUser, 0, JSON.stringify(config));
-      } catch (_error) {
+      } catch (error) {
+        this.logger.warn('Failed fetching calling config', error);
         this.wCall.configUpdate(this.wUser, 1, '');
       }
     })();
