@@ -100,8 +100,6 @@ interface SendMessageTarget {
 
 type Clients = {clientid: string; userid: string}[];
 
-type ClientListEntry = [user: string, client: string];
-
 enum CALL_DIRECTION {
   INCOMING = 'incoming',
   OUTGOING = 'outgoing',
