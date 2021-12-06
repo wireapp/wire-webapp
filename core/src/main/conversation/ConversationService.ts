@@ -690,6 +690,44 @@ export class ConversationService {
     };
   }
 
+  /**
+   * Get a fresh list from backend of clients for all the participants of the conversation.
+   * This is a hacky way of getting all the clients for a conversation.
+   * The idea is to send an empty message to the backend to absolutely no users and let backend reply with a mismatch error.
+   * We then get the missing members in the mismatch, that is our fresh list of participants' clients.
+   *
+   * @param {string} conversationId
+   * @param {string} conversationDomain? - If given will send the message to the new qualified endpoint
+   */
+  public getAllParticipantsClients(
+    conversationId: string,
+    conversationDomain?: string,
+  ): Promise<UserClients | QualifiedUserClients> {
+    const sendingClientId = this.apiClient.validatedClientId;
+    const recipients = {};
+    const text = new Uint8Array();
+    return new Promise(async resolve => {
+      const onClientMismatch = (mismatch: ClientMismatch | MessageSendingStatus) => {
+        resolve(mismatch.missing);
+        // When the mismatch happens, we ask the messageService to cancel the sending
+        return false;
+      };
+
+      if (conversationDomain) {
+        await this.messageService.sendFederatedMessage(sendingClientId, recipients, text, {
+          conversationId: {id: conversationId, domain: conversationDomain},
+          onClientMismatch,
+          reportMissing: true,
+        });
+      } else {
+        await this.messageService.sendMessage(sendingClientId, recipients, text, {
+          conversationId,
+          onClientMismatch,
+        });
+      }
+    });
+  }
+
   public async deleteMessageLocal(
     conversationId: string,
     messageIdToHide: string,
