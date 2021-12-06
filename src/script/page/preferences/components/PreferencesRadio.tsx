@@ -28,14 +28,21 @@ interface PreferencesRadioProps {
     value: string;
   }[];
   selectedValue: string;
+  uieName?: string;
 }
 
-const PreferencesRadio: React.FC<PreferencesRadioProps> = ({name, selectedValue, options, onChange}) => {
+const PreferencesRadio: React.FC<PreferencesRadioProps> = ({
+  name,
+  selectedValue,
+  options,
+  onChange,
+  uieName = name,
+}) => {
   const {current: id} = useRef(Math.random().toString(36).substr(2));
 
   return (
     <div className="preferences-option">
-      <div className="preferences-options-radio">
+      <div className="preferences-options-radio" data-uie-name={uieName}>
         {options.map(({value, label, detailLabel}) => (
           <Fragment key={value}>
             <input
@@ -45,14 +52,12 @@ const PreferencesRadio: React.FC<PreferencesRadioProps> = ({name, selectedValue,
               value={value}
               onChange={() => onChange(value)}
               checked={selectedValue === value}
+              data-uie-name={`${uieName}-${value}`}
             />
             <label htmlFor={id + value}>
               <span className="preferences-label">{label}</span>
-              {detailLabel && (
-                <span className="preferences-hint" style={selectedValue === value ? {} : {display: 'none'}}>
-                  {' '}
-                  · <span>{detailLabel}</span>
-                </span>
+              {detailLabel && selectedValue === value && (
+                <span className="preferences-hint">{` · ${detailLabel}`}</span>
               )}
             </label>
           </Fragment>
