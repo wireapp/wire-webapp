@@ -17,7 +17,7 @@
  *
  */
 
-import type {AudioMetaData, VideoMetaData} from './AssetContent';
+import type {AudioMetaData, VideoMetaData, ImageMetaData} from './AssetContent';
 
 export interface FileContent {
   data: Buffer;
@@ -29,4 +29,5 @@ export interface FileMetaDataContent {
   name: string;
   type: string;
   video?: VideoMetaData;
+  image?: ImageMetaData;
 }
