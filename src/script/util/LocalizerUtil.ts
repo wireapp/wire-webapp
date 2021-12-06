@@ -126,7 +126,7 @@ export const setStrings = (newStrings: typeof strings): void => {
   strings = newStrings;
 };
 
-type StringIdentifer = keyof typeof en;
+export type StringIdentifer = keyof typeof en | '';
 
 export function t(
   identifier: StringIdentifer,
