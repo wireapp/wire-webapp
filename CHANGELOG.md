@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [15.11.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.11.0...@wireapp/api-client@15.11.1) (2021-12-06)
+
+
+### Bug Fixes
+
+* **api-client:** Optional feature lockStatus ([#4195](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4195)) ([26ce87c](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/26ce87c33a85aab5a2a72a9e33d31c4e4a7583e0))
+
+
+
+
+
 # [15.11.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.10.0...@wireapp/api-client@15.11.0) (2021-12-06)
 
 
