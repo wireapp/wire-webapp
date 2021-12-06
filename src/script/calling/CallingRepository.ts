@@ -17,12 +17,12 @@
  *
  */
 
-import axios, {AxiosError} from 'axios';
+import axios from 'axios';
 import {Runtime} from '@wireapp/commons';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
-import type {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation/';
+import type {UserClients} from '@wireapp/api-client/src/conversation/';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   CALL_TYPE,
@@ -40,7 +40,6 @@ import {
   WcallClient,
   WcallMember,
 } from '@wireapp/avs';
-import {Calling, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -49,7 +48,6 @@ import {container} from 'tsyringe';
 
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {createRandomUuid} from 'Util/util';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {flatten} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
@@ -83,6 +81,12 @@ import {ConversationState} from '../conversation/ConversationState';
 import {TeamState} from '../team/TeamState';
 import Warnings from '../view_model/WarningsContainer';
 import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
+import {Core} from '../service/CoreSingleton';
+import {isQualifiedUserClients} from '@wireapp/core/src/main/util';
+import {
+  flattenQualifiedUserClients,
+  flattenUserClients,
+} from '@wireapp/core/src/main/conversation/message/UserClientsUtil';
 
 interface MediaStreamQuery {
   audio?: boolean;
@@ -95,8 +99,6 @@ interface SendMessageTarget {
 }
 
 type Clients = {clientid: string; userid: string}[];
-
-type ClientListEntry = [user: string, client: string];
 
 enum CALL_DIRECTION {
   INCOMING = 'incoming',
@@ -138,6 +140,7 @@ export class CallingRepository {
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
+    private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('CallingRepository');
     this.incomingCallCallback = () => {};
@@ -278,57 +281,18 @@ export class CallingRepository {
   };
 
   private async pushClients(conversationId: QualifiedId): Promise<void> {
-    try {
-      // TODO(federation), fix direct call to API (use MessageRepo for the federated/non-federated routing?)
-      await this.apiClient.conversation.api.postOTRMessage(this.selfClientId, conversationId.id);
-    } catch (error) {
-      const mismatch: ClientMismatch = (error as AxiosError).response!.data;
-      const localClients = await this.messageRepository.createRecipients(conversationId);
+    const {id, domain} = conversationId;
+    const missing = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+    const qualifiedClients = isQualifiedUserClients(missing)
+      ? flattenQualifiedUserClients(missing)
+      : flattenUserClients(missing);
 
-      const makeClientList = (recipients: UserClients): ClientListEntry[] =>
-        Object.entries(recipients).reduce(
-          (acc, [userId, clients]) => acc.concat(clients.map(clientId => [userId, clientId])),
-          [],
-        );
-
-      const isSameEntry = ([userA, clientA]: ClientListEntry, [userB, clientB]: ClientListEntry): boolean =>
-        userA === userB && clientA === clientB;
-
-      const fromClientList = (clientList: ClientListEntry[]): UserClients =>
-        clientList.reduce<UserClients>((acc, [userId, clientId]) => {
-          const currentClients = acc[userId] || [];
-          return {...acc, [userId]: [...currentClients, clientId]};
-        }, {});
-      const localClientList = makeClientList(localClients);
-      const remoteClientList = makeClientList(mismatch.missing);
-      const missingClients = remoteClientList.filter(
-        remoteClient => !localClientList.some(localClient => isSameEntry(remoteClient, localClient)),
-      );
-      const deletedClients = localClientList.filter(
-        localClient => !remoteClientList.some(remoteClient => isSameEntry(remoteClient, localClient)),
-      );
-      const localMismatch: ClientMismatch = {
-        deleted: fromClientList(deletedClients),
-        missing: fromClientList(missingClients),
-        redundant: {},
-        time: mismatch.time,
-      };
-
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CALLING]: new Calling({content: ''}),
-        messageId: createRandomUuid(),
-      });
-      const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId);
-      eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-      await this.messageRepository.clientMismatchHandler.onClientMismatch(eventInfoEntity, localMismatch);
-
-      const clients: Clients[] = Object.entries(mismatch.missing).map(([userid, clientids]) =>
-        clientids.map(clientid => ({clientid, userid})),
-      );
-
-      const data: {clients: Clients} = {clients: flatten(clients)};
-      this.wCall.setClientsForConv(this.wUser, this.serializeQualifiedId(conversationId), JSON.stringify(data));
-    }
+    const clients: Clients = flatten(
+      qualifiedClients.map(({data, userId}) =>
+        data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
+      ),
+    );
+    this.wCall.setClientsForConv(this.wUser, this.serializeQualifiedId(conversationId), JSON.stringify({clients}));
   }
 
   private readonly updateCallQuality = (
