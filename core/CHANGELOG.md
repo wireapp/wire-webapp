@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.34.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.33.1...@wireapp/core@17.34.0) (2021-12-06)
+
+
+### Features
+
+* **core:** Add image metadata when building generic message ([#4196](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4196)) ([5da5389](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/5da53896d2456ba7e9f8a84ad8d7280941028c64))
+
+
+
+
+
 ## [17.33.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.33.0...@wireapp/core@17.33.1) (2021-12-06)
 
 **Note:** Version bump only for package @wireapp/core
