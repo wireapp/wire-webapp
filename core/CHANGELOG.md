@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [17.33.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.32.0...@wireapp/core@17.33.0) (2021-12-06)
+
+
+### Features
+
+* **core:** Add a method to get all participants/clients of a conversation ([#4193](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4193)) ([e6a1a90](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/e6a1a90a5c3115c3a2c1c1a793897605eb54da8e))
+
+
+
+
+
 # [17.32.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@17.31.7...@wireapp/core@17.32.0) (2021-12-06)
 
 
