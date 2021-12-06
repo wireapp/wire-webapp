@@ -17,6 +17,7 @@ import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import DeviceSelect from './avPreferences/DeviceSelect';
 import PreferencesCheckbox from './accountPreferences/PreferencesCheckbox';
+import SaveCallLogs from './avPreferences/SaveCallLogs';
 
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
@@ -64,8 +65,8 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
     DeviceTypes.VIDEO_INPUT,
   ]);
 
-  const supportUrls = Config.getConfig().URL.SUPPORT;
-  const brandName = '';
+  const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
+
   const updateMediaStreamVideoTrack = () => {};
   const changeVbrEncoding = () => {};
   const changeAgcEnabled = () => {};
@@ -79,7 +80,7 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
           <PreferencesSection title={t('preferencesAVMicrophone')}>
             {!hasAudioTrack && !isRequestingAudio && (
               <div className="preferences-av-detail">
-                <a rel="nofollow noopener noreferrer" target="_blank" href={supportUrls.DEVICE_ACCESS_DENIED}>
+                <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
                   {t('preferencesAVPermissionDetail')}
                 </a>
               </div>
@@ -125,7 +126,7 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
           <PreferencesSection title={t('preferencesAVCamera')}>
             {!hasVideoTrack && !isRequestingVideo && (
               <div className="preferences-av-detail">
-                <a rel="nofollow noopener noreferrer" target="_blank" href={supportUrls.DEVICE_ACCESS_DENIED}>
+                <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
                   {t('preferencesAVPermissionDetail')}
                 </a>
               </div>
@@ -199,16 +200,7 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
           />
         </PreferencesSection>
 
-        {callingRepository.supportsCalling && (
-          <PreferencesSection title={t('preferencesOptionsCallLogs')}>
-            <div className="preferences-option">
-              <div className="preferences-link accent-text" onClick={saveCallLogs} data-uie-name="get-call-logs">
-                {t('preferencesOptionsCallLogsGet')}
-              </div>
-            </div>
-            <div className="preferences-detail">{t('preferencesOptionsCallLogsDetail', brandName)}</div>
-          </PreferencesSection>
-        )}
+        {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
       </div>
     </div>
   );
