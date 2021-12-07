@@ -677,7 +677,9 @@ export class CallingRepository {
       }
       return call;
     } catch (error) {
-      this.logger.error('Failed starting call', error);
+      if (error) {
+        this.logger.error('Failed starting call', error);
+      }
     }
   }
 
@@ -772,7 +774,9 @@ export class CallingRepository {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
     } catch (error) {
-      this.logger.error('Failed answering call', error);
+      if (error) {
+        this.logger.error('Failed answering call', error);
+      }
       this.rejectCall(call.conversationId);
     }
   }
