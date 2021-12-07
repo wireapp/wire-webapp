@@ -29,13 +29,39 @@ class InputLevelTestPage extends TestPage<InputLevelProps> {
 }
 
 describe('InputLevel', () => {
+  let originalAudioContext: any;
+  beforeAll(() => {
+    originalAudioContext = window.AudioContext;
+    window.AudioContext = jest.fn().mockImplementation(() => ({
+      createAnalyser: () =>
+        ({
+          frequencyBinCount: 100,
+          getByteFrequencyData: (arr: Uint8Array) => {
+            for (let i = 0; i < arr.length; i++) {
+              arr[i] = 128;
+            }
+          },
+        } as AnalyserNode),
+      createMediaStreamSource: (stream: MediaStream) => ({connect: () => {}}),
+    }));
+
+    jest.spyOn(global, 'setInterval').mockImplementation((callback: () => void, interval: any) => {
+      callback();
+      return 0;
+    });
+  });
+
+  afterAll(() => {
+    window.AudioContext = originalAudioContext;
+  });
+
   it('represents the audio input volume in an audiometer with active audio bullets', () => {
-    const audioInputVolume = 0.5; // Input volume set to 50%
-    const expectedAudioLevel = MAX_AUDIO_BULLETS * audioInputVolume;
+    const expectedAudioLevel = (128 / 160) * MAX_AUDIO_BULLETS;
+    const mediaStream = new MediaStream();
 
     const testPage = new InputLevelTestPage({
       disabled: false,
-      level: audioInputVolume,
+      mediaStream,
     });
 
     const activeAudioLevelBullets = testPage.getActiveInputLevelBullets();

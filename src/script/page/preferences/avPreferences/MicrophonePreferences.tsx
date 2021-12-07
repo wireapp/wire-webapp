@@ -17,23 +17,34 @@
  *
  */
 
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
+
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {getLogger} from 'Util/Logger';
+
 import {Config} from '../../../Config';
 import PreferencesSection from '../accountPreferences/PreferencesSection';
 import DeviceSelect from './DeviceSelect';
 import {DeviceTypes, MediaDevicesHandler} from '../../../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../../../media/MediaStreamHandler';
 import InputLevel from './InputLevel';
+import {MediaType} from '../../../media/MediaType';
+
+const logger = getLogger('MicrophonePreferences');
 
 interface MicrophonePreferencesProps {
   devicesHandler: MediaDevicesHandler;
+  streamCallback: (stream: MediaStream) => void;
   streamHandler: MediaStreamHandler;
 }
 
-const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({devicesHandler, streamHandler}) => {
+const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
+  devicesHandler,
+  streamHandler,
+  streamCallback,
+}) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
   const {[DeviceTypes.AUDIO_INPUT]: availableDevices} = useKoSubscribableChildren(devicesHandler?.availableDevices, [
@@ -46,21 +57,32 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({devicesHan
 
   const {URL: urls} = Config.getConfig();
 
-  const requestStream = useCallback(async () => {
+  const requestStream = async () => {
     setIsRequesting(true);
-    const stream = await streamHandler.requestMediaStream(true, false, false, false);
-    setStream(stream);
-    setIsRequesting(false);
-  }, []);
+    try {
+      const stream = await streamHandler.requestMediaStream(true, false, false, false);
+      setStream(stream);
+      streamCallback(stream);
+    } catch (error) {
+      logger.warn(`Requesting MediaStream for type "${MediaType.AUDIO}" failed: ${error.message}`, error);
+      setStream(null);
+    } finally {
+      setIsRequesting(false);
+    }
+  };
 
   useEffect(() => {
     requestStream();
-    return () => {
+  }, [currentDeviceId]);
+
+  useEffect(
+    () => () => {
       if (stream) {
         streamHandler.releaseTracksFromStream(stream);
       }
-    };
-  }, [currentDeviceId, !!stream]);
+    },
+    [stream],
+  );
 
   return (
     <PreferencesSection title={t('preferencesAVMicrophone')}>

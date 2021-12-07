@@ -42,7 +42,7 @@ const AudioOutPreferences: React.FC<AudioOutPreferencesProps> = ({devicesHandler
     <PreferencesSection title={t('preferencesAVSpeakers')}>
       <DeviceSelect
         uieName="enter-speaker"
-        onChange={() => {}}
+        onChange={deviceId => devicesHandler.currentDeviceId[DeviceTypes.AUDIO_OUTPUT](deviceId)}
         devices={availableDevices as MediaDeviceInfo[]}
         value={currentDeviceId}
         icon={Icon.Speaker}

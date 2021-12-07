@@ -19,7 +19,6 @@
 
 import React, {useEffect, useRef} from 'react';
 import cx from 'classnames';
-import {registerReactComponent} from 'Util/ComponentUtil';
 import {getLogger} from 'Util/Logger';
 
 export interface InputLevelProps extends React.HTMLProps<HTMLDivElement> {
@@ -66,7 +65,7 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, className
     const audioInterval = window.setInterval(() => {
       audioAnalyser.getByteFrequencyData(audioDataArray);
       const volume = audioDataArray.reduce((acc, curr) => acc + curr, 0);
-      const averageVolume = volume / 128 / audioDataArray.length;
+      const averageVolume = volume / 160 / audioDataArray.length;
       setLevel(averageVolume);
     }, AUDIO_METER.INTERVAL);
 
@@ -100,8 +99,3 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, className
 };
 
 export default InputLevel;
-
-registerReactComponent('input-level', {
-  component: InputLevel,
-  template: '<div data-bind="react: {disabled: ko.unwrap(disabled), mediaStream: ko.unwrap(mediaStream)}"></div>',
-});

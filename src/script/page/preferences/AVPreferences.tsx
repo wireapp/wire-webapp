@@ -61,13 +61,26 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
     DeviceTypes.AUDIO_OUTPUT,
     DeviceTypes.VIDEO_INPUT,
   ]);
+
+  const getStreamCallback = (mediaType: MediaType) => (stream: MediaStream) => {
+    callingRepository.stopMediaSource(mediaType);
+    callingRepository.changeMediaSource(stream, mediaType);
+  };
+
   return (
     <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">{t('preferencesAV')}</div>
       <div className="preferences-content" ref={setScrollbarRef}>
-        {deviceSupport.audioInput && <MicrophonePreferences {...{devicesHandler, streamHandler}} />}
+        {deviceSupport.audioInput && (
+          <MicrophonePreferences
+            {...{devicesHandler, streamHandler}}
+            streamCallback={getStreamCallback(MediaType.AUDIO)}
+          />
+        )}
         {deviceSupport.audioOutput && <AudioOutPreferences {...{devicesHandler}} />}
-        {deviceSupport.videoInput && <CameraPreferences {...{devicesHandler, streamHandler}} />}
+        {deviceSupport.videoInput && (
+          <CameraPreferences {...{devicesHandler, streamHandler}} streamCallback={getStreamCallback(MediaType.VIDEO)} />
+        )}
         <CallOptions {...{constraintsHandler, propertiesRepository}} />
         {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
       </div>

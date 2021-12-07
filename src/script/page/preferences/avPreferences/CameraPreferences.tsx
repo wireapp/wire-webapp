@@ -18,10 +18,13 @@
  */
 
 import React, {useEffect, useState} from 'react';
+
 import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import useEffectRef from 'Util/useEffectRef';
+import {getLogger} from 'Util/Logger';
+
 import {Config} from '../../../Config';
 import PreferencesSection from '../accountPreferences/PreferencesSection';
 import DeviceSelect from './DeviceSelect';
@@ -29,12 +32,15 @@ import {DeviceTypes, MediaDevicesHandler} from '../../../media/MediaDevicesHandl
 import {MediaStreamHandler} from '../../../media/MediaStreamHandler';
 import {MediaType} from '../../../media/MediaType';
 
+const logger = getLogger('CameraPreferences');
+
 interface CameraPreferencesProps {
   devicesHandler: MediaDevicesHandler;
+  streamCallback: (stream: MediaStream) => void;
   streamHandler: MediaStreamHandler;
 }
 
-const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, streamHandler}) => {
+const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, streamHandler, streamCallback}) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
@@ -50,30 +56,36 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, st
 
   const requestStream = async () => {
     setIsRequesting(true);
-    const stream = await streamHandler.requestMediaStream(false, true, false, false);
-    setStream(stream);
-    setIsRequesting(false);
+    try {
+      const stream = await streamHandler.requestMediaStream(false, true, false, false);
+      setStream(stream);
+      streamCallback(stream);
+    } catch (error) {
+      logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
+      setStream(null);
+    } finally {
+      setIsRequesting(false);
+    }
   };
 
   useEffect(() => {
     requestStream();
-    return () => {
-      if (stream) {
-        streamHandler.releaseTracksFromStream(stream, MediaType.VIDEO);
-      }
-    };
-  }, [currentDeviceId, !!stream]);
+  }, [currentDeviceId]);
 
   useEffect(() => {
     if (videoElement) {
       videoElement.srcObject = stream;
     }
-    return () => {
-      if (videoElement) {
-        videoElement.srcObject = null;
-      }
-    };
   }, [videoElement, stream]);
+
+  useEffect(
+    () => () => {
+      if (stream) {
+        streamHandler.releaseTracksFromStream(stream);
+      }
+    },
+    [stream],
+  );
 
   return (
     <PreferencesSection title={t('preferencesAVCamera')}>
