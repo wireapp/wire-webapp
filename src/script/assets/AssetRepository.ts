@@ -18,10 +18,9 @@
  */
 
 import ko from 'knockout';
-import {Asset} from '@wireapp/protocol-messaging';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {AssetOptions, AssetRetentionPolicy, AssetUploadData} from '@wireapp/api-client/src/asset/';
+import {AssetOptions, AssetRetentionPolicy} from '@wireapp/api-client/src/asset/';
 import {singleton, container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -31,13 +30,13 @@ import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {AssetService} from './AssetService';
 import {Conversation} from '../entity/Conversation';
-import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
-import {encryptAesAsset, EncryptedAsset, decryptAesAsset} from './AssetCrypto';
+import {decryptAesAsset} from './AssetCrypto';
 import {AssetRemoteData} from './AssetRemoteData';
 import {getAssetUrl, setAssetUrl} from './AssetURLCache';
 import type {User} from '../entity/User';
 import {FileAsset} from '../entity/message/FileAsset';
 import {AssetTransferState} from './AssetTransferState';
+import {Core} from '../service/CoreSingleton';
 
 export interface CompressedImage {
   compressedBytes: Uint8Array;
@@ -60,7 +59,10 @@ export class AssetRepository {
   readonly uploadCancelTokens: {[messageId: string]: () => void} = {};
   logger: Logger;
 
-  constructor(private readonly assetService = container.resolve(AssetService)) {
+  constructor(
+    private readonly assetService = container.resolve(AssetService),
+    private readonly core = container.resolve(Core),
+  ) {
     this.logger = getLogger('AssetRepository');
   }
 
@@ -261,73 +263,17 @@ export class AssetRepository {
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
-  private buildProtoAsset(
-    encryptedAsset: EncryptedAsset,
-    uploadedAsset: AssetUploadData,
-    options: AssetUploadOptions,
-  ): Asset {
-    const assetRemoteData = new Asset.RemoteData({
-      assetId: uploadedAsset.key,
-      assetToken: uploadedAsset.token,
-      otrKey: new Uint8Array(encryptedAsset.keyBytes),
-      sha256: new Uint8Array(encryptedAsset.sha256),
-    });
-    const protoAsset = new Asset({
-      [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
-    });
-    return protoAsset;
-  }
+  async uploadFile(file: Blob, messageId: string, options: AssetUploadOptions) {
+    const bytes = await loadFileBuffer(file);
 
-  private attachImageData(protoAsset: Asset, imageMeta: CompressedImage, imageType: string): Asset {
-    const {compressedImage, compressedBytes} = imageMeta;
-    const imageMetaData = new Asset.ImageMetaData({
-      height: compressedImage.height,
-      width: compressedImage.width,
+    const request = await this.core.service!.asset.uploadAsset(Buffer.from(bytes), {
+      public: options.public,
+      retention: options.retention,
     });
-    const imageAsset = new Asset.Original({
-      image: imageMetaData,
-      mimeType: imageType,
-      size: compressedBytes.length,
-    });
-    protoAsset[PROTO_MESSAGE_TYPE.ASSET_ORIGINAL] = imageAsset;
-    return protoAsset;
-  }
-
-  async uploadFile(messageId: string, file: Blob, options: AssetUploadOptions, isImage: boolean): Promise<Asset> {
-    const bytes = (await loadFileBuffer(file)) as ArrayBuffer;
-    const encryptedAsset = await encryptAesAsset(bytes);
-
-    const progressObservable = ko.observable(0);
-    this.uploadProgressQueue.push({messageId, progress: progressObservable});
-
-    const request = await this.assetService.uploadFile(
-      new Uint8Array(encryptedAsset.cipherText),
-      {
-        public: options.public,
-        retention: options.retention,
-      },
-      (fraction: number) => {
-        const percentage = fraction * 100;
-        progressObservable(percentage);
-      },
-    );
     this.uploadCancelTokens[messageId] = request.cancel;
 
-    return request.response
-      .then(async uploadedAsset => {
-        const protoAsset = this.buildProtoAsset(encryptedAsset, uploadedAsset, options);
-        if (isImage === true) {
-          const imageMeta = await this.compressImageWithWorker(file);
-          return this.attachImageData(protoAsset, imageMeta, file.type);
-        }
-        return protoAsset;
-      })
-      .then(asset => {
-        this.removeFromUploadQueue(messageId);
-        return asset;
-      });
+    this.removeFromUploadQueue(messageId);
+    return request.response;
   }
 
   cancelUpload(messageId: string): void {
