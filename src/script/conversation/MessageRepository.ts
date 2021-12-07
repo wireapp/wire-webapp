@@ -200,6 +200,16 @@ export class MessageRepository {
   }
 
   /**
+   * Triggers the handler for mismatch. Can be used if a mismatch is triggered from outside the MessageRepository
+   *
+   * @param conversationId
+   * @param mismatch
+   */
+  public handleClientMismatch(conversationId: QualifiedId, mismatch: ClientMismatch | MessageSendingStatus) {
+    this.onClientMismatch?.(mismatch, conversationId, true);
+  }
+
+  /**
    * Set the notification handling state.
    *
    * @note Temporarily do not allow sending messages when handling the notification stream
