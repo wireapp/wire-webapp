@@ -485,6 +485,12 @@ export class MessageRepository {
     try {
       const uploadStarted = Date.now();
       const injectedEvent = await this.sendAssetMetadata(conversationEntity, file, asImage);
+      if (injectedEvent.state === PayloadBundleState.CANCELLED) {
+        throw new ConversationError(
+          ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+          ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
+        );
+      }
       messageId = injectedEvent.id;
       await this.sendAssetRemotedata(conversationEntity, file, messageId, asImage);
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
