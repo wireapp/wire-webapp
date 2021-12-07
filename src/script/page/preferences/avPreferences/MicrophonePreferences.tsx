@@ -1,0 +1,95 @@
+/*
+ * Wire
+ * Copyright (C) 2021 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import React, {useCallback, useEffect, useState} from 'react';
+import Icon from 'Components/Icon';
+import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {Config} from '../../../Config';
+import PreferencesSection from '../accountPreferences/PreferencesSection';
+import DeviceSelect from './DeviceSelect';
+import {DeviceTypes, MediaDevicesHandler} from '../../../media/MediaDevicesHandler';
+import {MediaStreamHandler} from '../../../media/MediaStreamHandler';
+import InputLevel from './InputLevel';
+
+interface MicrophonePreferencesProps {
+  devicesHandler: MediaDevicesHandler;
+  streamHandler: MediaStreamHandler;
+}
+
+const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({devicesHandler, streamHandler}) => {
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [stream, setStream] = useState<MediaStream>();
+  const {[DeviceTypes.AUDIO_INPUT]: availableDevices} = useKoSubscribableChildren(devicesHandler?.availableDevices, [
+    DeviceTypes.AUDIO_INPUT,
+  ]);
+
+  const {[DeviceTypes.AUDIO_INPUT]: currentDeviceId} = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
+    DeviceTypes.AUDIO_INPUT,
+  ]);
+
+  const {URL: urls} = Config.getConfig();
+
+  const requestStream = useCallback(async () => {
+    setIsRequesting(true);
+    const stream = await streamHandler.requestMediaStream(true, false, false, false);
+    setStream(stream);
+    setIsRequesting(false);
+  }, []);
+
+  useEffect(() => {
+    requestStream();
+    return () => {
+      if (stream) {
+        streamHandler.releaseTracksFromStream(stream);
+      }
+    };
+  }, [currentDeviceId, !!stream]);
+
+  return (
+    <PreferencesSection title={t('preferencesAVMicrophone')}>
+      {!stream && !isRequesting && (
+        <div className="preferences-av-detail">
+          <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
+            {t('preferencesAVPermissionDetail')}
+          </a>
+        </div>
+      )}
+
+      <DeviceSelect
+        uieName="enter-microphone"
+        devices={availableDevices as MediaDeviceInfo[]}
+        value={currentDeviceId}
+        defaultDeviceName={t('preferencesAVMicrophone')}
+        icon={Icon.MicOn}
+        isRequesting={isRequesting}
+        onChange={deviceId => devicesHandler.currentDeviceId[DeviceTypes.AUDIO_INPUT](deviceId)}
+      />
+      {isRequesting ? (
+        <div className="preferences-av-spinner">
+          <div className="icon-spinner spin accent-text"></div>
+        </div>
+      ) : (
+        <InputLevel className="preferences-av-meter accent-text" disabled={!stream} mediaStream={stream} />
+      )}
+    </PreferencesSection>
+  );
+};
+
+export default MicrophonePreferences;

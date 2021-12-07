@@ -43,7 +43,7 @@ const logger = getLogger('InputLevel');
  * @param disabled Show audio meter with disabled bullets if set to `true`
  * @param level Audio input volume as floating point number, `1.0` is 100%
  */
-const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, ...rest}) => {
+const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, className = '', ...rest}) => {
   const bullets = useRef(Array.from(Array(MAX_AUDIO_BULLETS).keys()));
   const [level, setLevel] = React.useState(0);
 
@@ -85,7 +85,7 @@ const InputLevel: React.FC<InputLevelProps> = ({disabled, mediaStream, ...rest})
   }, [mediaStream]);
 
   return (
-    <div className="input-level" {...rest}>
+    <div className={`input-level ${className}`} {...rest}>
       {bullets.current.map(bulletIndex => (
         <div
           key={bulletIndex}

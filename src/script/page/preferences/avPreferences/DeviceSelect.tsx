@@ -21,13 +21,13 @@ import React from 'react';
 import cx from 'classnames';
 
 interface DeviceSelectProps {
-  devices: MediaDeviceInfo[];
-  value: string;
-  isRequesting?: boolean;
   defaultDeviceName?: string;
+  devices: MediaDeviceInfo[];
   icon: React.ComponentType;
-  uieName?: string;
+  isRequesting?: boolean;
   onChange: (deviceId: string) => void;
+  uieName?: string;
+  value: string;
 }
 
 const DeviceSelect: React.FC<DeviceSelectProps> = ({
@@ -60,7 +60,9 @@ const DeviceSelect: React.FC<DeviceSelectProps> = ({
           onChange={({target}) => onChange(target.value)}
         >
           {devices.map(({deviceId, label}) => (
-            <option value={deviceId}>{label || defaultDeviceName}</option>
+            <option key={deviceId} value={deviceId}>
+              {label || defaultDeviceName}
+            </option>
           ))}
         </select>
         {!lessThanTwoDevices && <label className="icon-down preferences-av-label" />}

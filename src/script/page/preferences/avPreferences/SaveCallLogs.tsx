@@ -55,15 +55,14 @@ const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState
       const filename = `${sanitizedBrandName}-${truncatedId}-Calling_${getCurrentDate()}.log`;
 
       downloadBlob(blob, filename);
-      return;
+    } else {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          message: t('modalCallEmptyLogMessage'),
+          title: t('modalCallEmptyLogHeadline'),
+        },
+      });
     }
-
-    amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-      text: {
-        message: t('modalCallEmptyLogMessage'),
-        title: t('modalCallEmptyLogHeadline'),
-      },
-    });
   };
   return (
     <PreferencesSection title={t('preferencesOptionsCallLogs')}>

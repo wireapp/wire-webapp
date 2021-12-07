@@ -1,23 +1,38 @@
-import React, {useState} from 'react';
-import {container} from 'tsyringe';
+/*
+ * Wire
+ * Copyright (C) 2021 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import React from 'react';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {MediaRepository} from '../../media/MediaRepository';
 import type {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {MediaType} from '../../media/MediaType';
-import {UserState} from '../../user/UserState';
-import Icon from 'Components/Icon';
 import {t} from 'Util/LocalizerUtil';
 import {DeviceTypes} from '../../media/MediaDevicesHandler';
-import InputLevel from './avPreferences/InputLevel';
-import PreferencesSection from './accountPreferences/PreferencesSection';
-import {Config} from '../../Config';
 import useEffectRef from 'Util/useEffectRef';
 import {useFadingScrollbar} from '../../ui/fadingScrollbar';
-import DeviceSelect from './avPreferences/DeviceSelect';
-import PreferencesCheckbox from './accountPreferences/PreferencesCheckbox';
 import SaveCallLogs from './avPreferences/SaveCallLogs';
+import CallOptions from './avPreferences/CallOptions';
+import CameraPreferences from './avPreferences/CameraPreferences';
+import MicrophonePreferences from './avPreferences/MicrophonePreferences';
+import AudioOutPreferences from './avPreferences/AudioOutPreferences';
 
 type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
 type WillChangeMediaSource = (mediaType: MediaType) => boolean;
@@ -31,7 +46,6 @@ interface AVPreferencesProps {
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
   propertiesRepository: PropertiesRepository;
-  userState?: UserState;
 }
 
 const AVPreferences: React.FC<AVPreferencesProps> = ({
@@ -39,167 +53,22 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
   propertiesRepository,
   callingRepository,
   callbacks,
-  userState = container.resolve(UserState),
 }) => {
   const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
   useFadingScrollbar(scrollbarRef);
-  const [hasAudioTrack, setHasAudioTrack] = useState(false);
-  const [isRequestingAudio, setIsRequestingAudio] = useState(false);
-  const [hasVideoTrack, setHasVideoTrack] = useState(false);
-  const [isRequestingVideo, setIsRequestingVideo] = useState(false);
   const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
     DeviceTypes.AUDIO_INPUT,
     DeviceTypes.AUDIO_OUTPUT,
     DeviceTypes.VIDEO_INPUT,
   ]);
-
-  const availableDevices = useKoSubscribableChildren(devicesHandler?.availableDevices, [
-    DeviceTypes.AUDIO_INPUT,
-    DeviceTypes.AUDIO_OUTPUT,
-    DeviceTypes.VIDEO_INPUT,
-  ]);
-
-  const currentDeviceId = useKoSubscribableChildren(devicesHandler?.currentDeviceId, [
-    DeviceTypes.AUDIO_INPUT,
-    DeviceTypes.AUDIO_OUTPUT,
-    DeviceTypes.VIDEO_INPUT,
-  ]);
-
-  const {URL: urls, BRAND_NAME: brandName} = Config.getConfig();
-
-  const updateMediaStreamVideoTrack = () => {};
-  const changeVbrEncoding = () => {};
-  const changeAgcEnabled = () => {};
-  const saveCallLogs = () => {};
-
   return (
-    <div>
+    <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
       <div className="preferences-titlebar">{t('preferencesAV')}</div>
       <div className="preferences-content" ref={setScrollbarRef}>
-        {deviceSupport.audioInput && (
-          <PreferencesSection title={t('preferencesAVMicrophone')}>
-            {!hasAudioTrack && !isRequestingAudio && (
-              <div className="preferences-av-detail">
-                <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
-                  {t('preferencesAVPermissionDetail')}
-                </a>
-              </div>
-            )}
-
-            <DeviceSelect
-              uieName="enter-microphone"
-              devices={availableDevices.audioInput as MediaDeviceInfo[]}
-              value={currentDeviceId.audioInput}
-              defaultDeviceName={t('preferencesAVMicrophone')}
-              icon={Icon.MicOn}
-              isRequesting={isRequestingAudio}
-              onChange={() => {}}
-            />
-            {isRequestingAudio ? (
-              <div className="preferences-av-spinner">
-                <div className="icon-spinner spin accent-text"></div>
-              </div>
-            ) : (
-              <InputLevel
-                className="preferences-av-meter accent-text"
-                disabled={!hasAudioTrack}
-                mediaStream={audioMediaStream}
-              />
-            )}
-          </PreferencesSection>
-        )}
-
-        {deviceSupport.audioOutput && (
-          <PreferencesSection title={t('preferencesAVSpeaker')}>
-            <DeviceSelect
-              uieName="enter-speaker"
-              onChange={() => {}}
-              devices={availableDevices.audioOutput as MediaDeviceInfo[]}
-              value={currentDeviceId.audioOutput}
-              icon={Icon.Speaker}
-              defaultDeviceName={t('preferencesAVSpeakers')}
-            />
-          </PreferencesSection>
-        )}
-
-        {deviceSupport.videoInput && (
-          <PreferencesSection title={t('preferencesAVCamera')}>
-            {!hasVideoTrack && !isRequestingVideo && (
-              <div className="preferences-av-detail">
-                <a rel="nofollow noopener noreferrer" target="_blank" href={urls.SUPPORT.DEVICE_ACCESS_DENIED}>
-                  {t('preferencesAVPermissionDetail')}
-                </a>
-              </div>
-            )}
-            <DeviceSelect
-              uieName="enter-camera"
-              devices={availableDevices.videoInput as MediaDeviceInfo[]}
-              value={currentDeviceId.videoInput}
-              defaultDeviceName={t('preferencesAVCamera')}
-              icon={Icon.Camera}
-              isRequesting={isRequestingVideo}
-              onChange={() => {}}
-            />
-
-            {isRequestingVideo ? (
-              <div className="preferences-av-video-disabled">
-                <div className="icon-spinner spin accent-text"></div>
-              </div>
-            ) : (
-              <>
-                {hasVideoTrack ? (
-                  <video
-                    className="preferences-av-video mirror"
-                    autoPlay
-                    playsInline
-                    muted
-                    srcObject={videoMediaStream}
-                  />
-                ) : (
-                  <div className="preferences-av-video-disabled">
-                    <div
-                      className="preferences-av-video-disabled__info"
-                      dangerouslySetInnerHTML={{
-                        __html: t('preferencesAVNoCamera', brandName, {
-                          '/faqLink': '</a>',
-                          br: '<br>',
-                          faqLink:
-                            "<a href='https://support.wire.com/hc/articles/202935412' data-uie-name='go-no-camera-faq' target='_blank' rel='noopener noreferrer'>",
-                        }),
-                      }}
-                    ></div>
-                    <div
-                      className="preferences-av-video-disabled__try-again"
-                      onClick={updateMediaStreamVideoTrack}
-                      data-uie-name="do-try-again-preferences-av"
-                    >
-                      {t('preferencesAVTryAgain')}
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </PreferencesSection>
-        )}
-
-        <PreferencesSection title={t('preferencesOptionsCall')}>
-          <PreferencesCheckbox
-            uieName="status-preference-vbr-encoding"
-            label={t('preferencesOptionsEnableVbrCheckbox')}
-            checked={optionVbrEncoding}
-            disabled={isCbrEncodingEnforced}
-            details={t('preferencesOptionsEnableVbrDetails')}
-            onChange={changeVbrEncoding}
-          />
-          <PreferencesCheckbox
-            uieName="status-preference-agc"
-            label={t('preferencesOptionsEnableAgcCheckbox')}
-            checked={optionAgcEnabled}
-            details={t('preferencesOptionsEnableAgcDetails')}
-            onChange={changeAgcEnabled}
-          />
-        </PreferencesSection>
-
+        {deviceSupport.audioInput && <MicrophonePreferences {...{devicesHandler, streamHandler}} />}
+        {deviceSupport.audioOutput && <AudioOutPreferences {...{devicesHandler}} />}
+        {deviceSupport.videoInput && <CameraPreferences {...{devicesHandler, streamHandler}} />}
+        <CallOptions {...{constraintsHandler, propertiesRepository}} />
         {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
       </div>
     </div>
@@ -210,6 +79,5 @@ export default AVPreferences;
 
 registerReactComponent('av-preferences', {
   component: AVPreferences,
-  template:
-    '<div data-bind="react:{clientRepository, userRepository, propertiesRepository, conversationRepository}"></div>',
+  template: '<div data-bind="react: {callingRepository, mediaRepository, propertiesRepository}"></div>',
 });

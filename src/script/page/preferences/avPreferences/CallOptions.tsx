@@ -17,29 +17,66 @@
  *
  */
 
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
+
+import {t} from 'Util/LocalizerUtil';
+
+import {Config} from '../../../Config';
+import type {MediaConstraintsHandler} from '../../../media/MediaConstraintsHandler';
+import type {PropertiesRepository} from '../../../properties/PropertiesRepository';
+import {PROPERTIES_TYPE} from '../../../properties/PropertiesType';
 import PreferencesCheckbox from '../accountPreferences/PreferencesCheckbox';
 import PreferencesSection from '../accountPreferences/PreferencesSection';
 
-interface CallOptionsProps {}
+interface CallOptionsProps {
+  constraintsHandler: MediaConstraintsHandler;
+  propertiesRepository: PropertiesRepository;
+}
 
-const CallOptions: React.FC<CallOptionsProps> = () => {
+const CallOptions: React.FC<CallOptionsProps> = ({constraintsHandler, propertiesRepository}) => {
+  const {current: isCbrEncodingEnforced} = useRef(Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE);
+  const [vbrEncoding, setVbrEncoding] = useState(
+    !isCbrEncodingEnforced && propertiesRepository.properties.settings.call.enable_vbr_encoding,
+  );
+  const [agcEnabled, setAgcEnabled] = useState(constraintsHandler.getAgcPreference());
+
+  useEffect(() => {
+    const updateProperties = ({settings}: WebappProperties) => {
+      setVbrEncoding(!isCbrEncodingEnforced && settings.call.enable_vbr_encoding);
+    };
+    amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+    return () => {
+      amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+    };
+  }, []);
+
   return (
     <PreferencesSection title={t('preferencesOptionsCall')}>
       <PreferencesCheckbox
         uieName="status-preference-vbr-encoding"
         label={t('preferencesOptionsEnableVbrCheckbox')}
-        checked={optionVbrEncoding}
+        checked={vbrEncoding}
         disabled={isCbrEncodingEnforced}
         details={t('preferencesOptionsEnableVbrDetails')}
-        onChange={changeVbrEncoding}
+        onChange={checked => {
+          if (!isCbrEncodingEnforced) {
+            propertiesRepository.savePreference(PROPERTIES_TYPE.CALL.ENABLE_VBR_ENCODING, checked);
+            setVbrEncoding(checked);
+          }
+        }}
       />
       <PreferencesCheckbox
         uieName="status-preference-agc"
         label={t('preferencesOptionsEnableAgcCheckbox')}
-        checked={optionAgcEnabled}
+        checked={agcEnabled}
         details={t('preferencesOptionsEnableAgcDetails')}
-        onChange={changeAgcEnabled}
+        onChange={checked => {
+          constraintsHandler.setAgcPreference(checked);
+          setAgcEnabled(checked);
+        }}
       />
     </PreferencesSection>
   );
