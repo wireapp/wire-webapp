@@ -22,7 +22,7 @@ import {Runtime} from '@wireapp/commons';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
-import type {UserClients} from '@wireapp/api-client/src/conversation/';
+import type {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   CALL_TYPE,
@@ -293,6 +293,13 @@ export class CallingRepository {
       ),
     );
     this.wCall.setClientsForConv(this.wUser, this.serializeQualifiedId(conversationId), JSON.stringify({clients}));
+    // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
+    this.messageRepository.handleClientMismatch(conversationId, {
+      deleted: {},
+      missing,
+      redundant: {},
+      time: '',
+    } as ClientMismatch);
   }
 
   private readonly updateCallQuality = (
@@ -677,7 +684,9 @@ export class CallingRepository {
       }
       return call;
     } catch (error) {
-      this.logger.error('Failed starting call', error);
+      if (error) {
+        this.logger.error('Failed starting call', error);
+      }
     }
   }
 
@@ -772,7 +781,9 @@ export class CallingRepository {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
     } catch (error) {
-      this.logger.error('Failed answering call', error);
+      if (error) {
+        this.logger.error('Failed answering call', error);
+      }
       this.rejectCall(call.conversationId);
     }
   }
@@ -986,7 +997,7 @@ export class CallingRepository {
     conversationId: QualifiedId,
     payload: string | Object,
     options?: MessageSendingOptions,
-  ): Promise<void> => {
+  ) => {
     const conversation = this.conversationState.findConversation(conversationId);
     const content = typeof payload === 'string' ? payload : JSON.stringify(payload);
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);

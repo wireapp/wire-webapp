@@ -197,7 +197,7 @@ export class ConversationRepository {
       if (conversation) {
         // add/remove users from the conversation (if any)
         const missingUserIds = missing.map(({userId}) => userId);
-        const knownUsers = conversation.participating_user_ets().map(user => user.qualifiedId);
+        const knownUsers = conversation.allUserEntities.map(user => user.qualifiedId);
         const missingUsers = getDifference(knownUsers, missingUserIds, matchQualifiedIds);
         if (missingUsers.length) {
           await this.addMissingMember(conversation, missingUsers, new Date(mismatch.time).getTime() - 1);
