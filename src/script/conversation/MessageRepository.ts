@@ -123,6 +123,7 @@ import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
+import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -189,10 +190,6 @@ export class MessageRepository {
     return this.core.service!.conversation;
   }
 
-  private get messageBuilder() {
-    return this.conversationService.messageBuilder;
-  }
-
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
     amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancelAssetUpload);
@@ -231,8 +228,8 @@ export class MessageRepository {
    * @returns Resolves after sending the knock
    */
   public async sendPing(conversation: Conversation) {
-    const ping = this.messageBuilder.createPing({
-      conversationId: conversation.id,
+    const ping = MessageBuilder.createPing({
+      ...this.createCommonMessagePayload(conversation),
       ping: {
         expectsReadConfirmation: this.expectReadReceipt(conversation),
         hotKnock: false,
@@ -249,29 +246,29 @@ export class MessageRepository {
    * @see https://docs.wire.com/understand/federation/index.html
    */
   private async sendText({conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload) {
-    const baseMessage = this.messageBuilder.createText({
-      conversationId: conversation.id,
+    const baseMessage = MessageBuilder.createText({
+      ...this.createCommonMessagePayload(conversation),
       messageId,
       text: message,
     });
     const textMessage = await this.decorateTextMessage(conversation, baseMessage, {linkPreview, mentions, quote});
 
-    return this.sendAndInjectGenericCoreMessage(textMessage.build(), conversation);
+    return this.sendAndInjectGenericCoreMessage(textMessage, conversation);
   }
 
   private async sendEdit({conversation, message, messageId, originalMessageId, mentions, quote}: EditMessagePayload) {
-    const baseMessage = this.messageBuilder.createEditedText({
-      conversationId: conversation.id,
+    const baseMessage = MessageBuilder.createEditedText({
+      ...this.createCommonMessagePayload(conversation),
       messageId,
       newMessageText: message,
       originalMessageId: originalMessageId,
     });
     const editMessage = await this.decorateTextMessage(conversation, baseMessage, {mentions, quote});
 
-    return this.sendAndInjectGenericCoreMessage(editMessage.build(), conversation, {syncTimestamp: false});
+    return this.sendAndInjectGenericCoreMessage(editMessage, conversation, {syncTimestamp: false});
   }
 
-  private async decorateTextMessage(
+  private decorateTextMessage(
     conversation: Conversation,
     textMessage: TextContentBuilder,
     {
@@ -286,9 +283,7 @@ export class MessageRepository {
   ) {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
-    const preview = linkPreview && (await this.conversationService.messageBuilder.createLinkPreview(linkPreview));
-
-    return textMessage
+    const textPayload = textMessage
       .withMentions(
         mentions.map(mention => ({
           length: mention.length,
@@ -298,8 +293,11 @@ export class MessageRepository {
         })),
       )
       .withQuote(quoteData)
-      .withLinkPreviews(preview ? [preview] : [])
-      .withReadConfirmation(this.expectReadReceipt(conversation));
+      .withLinkPreviews(linkPreview ? [linkPreview] : [])
+      .withReadConfirmation(this.expectReadReceipt(conversation))
+      .build();
+
+    return this.sendAndInjectGenericCoreMessage(textPayload, conversation);
   }
 
   /**
@@ -581,8 +579,8 @@ export class MessageRepository {
     } else if (allowImageDetection && isImage(file)) {
       meta.image = metadata as ImageMetaData;
     }
-    const message = this.messageBuilder.createFileMetadata({
-      conversationId: conversation.id,
+    const message = MessageBuilder.createFileMetadata({
+      ...this.createCommonMessagePayload(conversation),
       metaData: meta as FileMetaDataContent,
     });
     return this.sendAndInjectGenericCoreMessage(message, conversation);
@@ -881,8 +879,8 @@ export class MessageRepository {
    * @returns Resolves after sending the session reset
    */
   private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
-    const sessionReset = this.messageBuilder.createSessionReset({
-      conversationId: conversation.id,
+    const sessionReset = MessageBuilder.createSessionReset({
+      ...this.createCommonMessagePayload(conversation),
     });
 
     await this.conversationService.send({
@@ -929,8 +927,8 @@ export class MessageRepository {
       }
     }
     const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
-    const confirmationMessage = this.messageBuilder.createConfirmation({
-      conversationId: conversationEntity.id,
+    const confirmationMessage = MessageBuilder.createConfirmation({
+      ...this.createCommonMessagePayload(conversationEntity),
       firstMessageId: messageEntity.id,
       moreMessageIds,
       type,
@@ -957,21 +955,21 @@ export class MessageRepository {
 
   /**
    * Send reaction to a content message in specified conversation.
-   * @param conversationEntity Conversation to send reaction in
+   * @param conversation Conversation to send reaction in
    * @param messageEntity Message to react to
    * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
-  private async sendReaction(conversationEntity: Conversation, messageEntity: Message, reactionType: ReactionType) {
-    const reaction = this.messageBuilder.createReaction({
-      conversationId: conversationEntity.id,
+  private async sendReaction(conversation: Conversation, messageEntity: Message, reactionType: ReactionType) {
+    const reaction = MessageBuilder.createReaction({
+      ...this.createCommonMessagePayload(conversation),
       reaction: {
         originalMessageId: messageEntity.id,
         type: reactionType,
       },
     });
 
-    return this.sendAndInjectGenericCoreMessage(reaction, conversationEntity);
+    return this.sendAndInjectGenericCoreMessage(reaction, conversation);
   }
 
   private expectReadReceipt(conversationEntity: Conversation): boolean {
@@ -1063,7 +1061,7 @@ export class MessageRepository {
     if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const protoCleared = new Cleared({
         clearedTimestamp: timestamp,
-        conversationId: conversationEntity.id,
+        ...this.createCommonMessagePayload(conversationEntity),
       });
       const genericMessage = new GenericMessage({
         [GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
@@ -1681,9 +1679,9 @@ export class MessageRepository {
     payload: string,
     options: {nativePush?: boolean; recipients?: UserClients | QualifiedUserClients},
   ) {
-    const message = this.core.service!.conversation.messageBuilder.createCall({
+    const message = MessageBuilder.createCall({
+      ...this.createCommonMessagePayload(conversation),
       content: payload,
-      conversationId: conversation.id,
     });
 
     return this.sendAndInjectGenericCoreMessage(message, conversation, {
@@ -1856,6 +1854,13 @@ export class MessageRepository {
       }
       return this.conversation_service.postEncryptedMessage(conversationId, payload, true);
     }
+  }
+
+  private createCommonMessagePayload(conversation: Conversation) {
+    return {
+      conversationId: conversation.id,
+      from: this.clientState.currentClient().id,
+    };
   }
 
   //##############################################################################
