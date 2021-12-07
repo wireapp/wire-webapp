@@ -242,11 +242,14 @@ export class CryptographyMapper {
       }
     }
 
+    const {conversation, qualified_conversation, from, qualified_from} = event;
     const genericContent = {
-      conversation: event.conversation,
-      from: event.from,
+      conversation,
+      from,
       from_client_id: event.data.sender,
       id: genericMessage.messageId,
+      qualified_conversation,
+      qualified_from,
       status: event.status,
       time: event.time,
     };
