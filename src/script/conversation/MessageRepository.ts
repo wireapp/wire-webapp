@@ -52,7 +52,7 @@ import {
   VideoMetaData,
   ImageMetaData,
   FileMetaDataContent,
-  LinkPreviewContent,
+  LinkPreviewUploadedContent,
 } from '@wireapp/core/src/main/conversation/content';
 import {container} from 'tsyringe';
 
@@ -137,7 +137,7 @@ type ClientMismatchHandlerFn = (
 
 type TextMessagePayload = {
   conversation: Conversation;
-  linkPreview?: LinkPreviewContent;
+  linkPreview?: LinkPreviewUploadedContent;
   mentions?: MentionEntity[];
   message: string;
   messageId?: string;
@@ -251,7 +251,7 @@ export class MessageRepository {
       messageId,
       text: message,
     });
-    const textMessage = await this.decorateTextMessage(conversation, baseMessage, {linkPreview, mentions, quote});
+    const textMessage = this.decorateTextMessage(conversation, baseMessage, {linkPreview, mentions, quote});
 
     return this.sendAndInjectGenericCoreMessage(textMessage, conversation);
   }
@@ -263,7 +263,7 @@ export class MessageRepository {
       newMessageText: message,
       originalMessageId: originalMessageId,
     });
-    const editMessage = await this.decorateTextMessage(conversation, baseMessage, {mentions, quote});
+    const editMessage = this.decorateTextMessage(conversation, baseMessage, {mentions, quote});
 
     return this.sendAndInjectGenericCoreMessage(editMessage, conversation, {syncTimestamp: false});
   }
@@ -276,14 +276,14 @@ export class MessageRepository {
       quote,
       linkPreview,
     }: {
-      linkPreview?: LinkPreviewContent;
+      linkPreview?: LinkPreviewUploadedContent;
       mentions: MentionEntity[];
       quote?: QuoteEntity;
     },
   ) {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
-    const textPayload = textMessage
+    return textMessage
       .withMentions(
         mentions.map(mention => ({
           length: mention.length,
@@ -296,8 +296,6 @@ export class MessageRepository {
       .withLinkPreviews(linkPreview ? [linkPreview] : [])
       .withReadConfirmation(this.expectReadReceipt(conversation))
       .build();
-
-    return this.sendAndInjectGenericCoreMessage(textPayload, conversation);
   }
 
   /**
@@ -374,7 +372,7 @@ export class MessageRepository {
       // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
       await this.sendText({
         ...textPayload,
-        linkPreview,
+        linkPreview: await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview),
       });
     }
   }

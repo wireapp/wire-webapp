@@ -25,7 +25,18 @@ import {getLogger} from 'Util/Logger';
 import {getFirstLinkWithOffset} from './helpers';
 import {isBlacklisted} from './blackList';
 import {LinkPreviewError} from './LinkPreviewError';
-import {LinkPreviewContent} from '@wireapp/core/src/main/conversation/content';
+
+type LinkPreviewContent = {
+  image: {
+    data: Uint8Array;
+    height: number;
+    type: string;
+    width: number;
+  };
+  title: string;
+  url: string;
+  urlOffset: number;
+};
 
 declare global {
   interface Window {
@@ -105,7 +116,7 @@ function toLinkPreviewData(openGraphData: OpenGraphResult, url: string, offset: 
  */
 async function fetchOpenGraphData(link: string): Promise<OpenGraphResult | undefined> {
   try {
-    const data = await window.openGraphAsync(link);
+    const data = await window.openGraphAsync?.(link);
     if (data) {
       return Object.entries(data).reduce((result, [key, value]) => {
         result[key] = Array.isArray(value) ? value[0] : value;
