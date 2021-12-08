@@ -124,6 +124,7 @@ import {Core} from '../service/CoreSingleton';
 import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
+import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
@@ -179,10 +180,6 @@ export class MessageRepository {
 
   private get conversationService() {
     return this.core.service!.conversation;
-  }
-
-  private get messageBuilder() {
-    return this.conversationService.messageBuilder;
   }
 
   private initSubscriptions(): void {
@@ -272,8 +269,9 @@ export class MessageRepository {
    * @returns Resolves after sending the knock
    */
   public async sendPing(conversation: Conversation) {
-    const ping = this.messageBuilder.createPing({
+    const ping = MessageBuilder.createPing({
       conversationId: conversation.id,
+      from: this.userState.self().id,
       ping: {
         expectsReadConfirmation: this.expectReadReceipt(conversation),
         hotKnock: false,
@@ -297,8 +295,11 @@ export class MessageRepository {
   ) {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
-    const textPayload = this.messageBuilder
-      .createText({conversationId: conversation.id, text: message})
+    const textPayload = MessageBuilder.createText({
+      conversationId: conversation.id,
+      from: this.userState.self().id,
+      text: message,
+    })
       .withMentions(
         mentions.map(mention => ({
           length: mention.length,
@@ -320,12 +321,12 @@ export class MessageRepository {
     originalMessageEntity: ContentMessage,
     mentions: MentionEntity[],
   ) {
-    const textPayload = this.messageBuilder
-      .createEditedText({
-        conversationId: conversation.id,
-        newMessageText: message,
-        originalMessageId: originalMessageEntity.id,
-      })
+    const textPayload = MessageBuilder.createEditedText({
+      conversationId: conversation.id,
+      from: this.userState.self().id,
+      newMessageText: message,
+      originalMessageId: originalMessageEntity.id,
+    })
       .withMentions(
         mentions.map(mention => ({length: mention.length, start: mention.startIndex, userId: mention.userId})),
       )
@@ -627,8 +628,9 @@ export class MessageRepository {
     } else if (allowImageDetection && isImage(file)) {
       meta.image = metadata as ImageMetaData;
     }
-    const message = this.messageBuilder.createFileMetadata({
+    const message = MessageBuilder.createFileMetadata({
       conversationId: conversation.id,
+      from: this.userState.self().id,
       metaData: meta as FileMetaDataContent,
     });
     return this.sendAndInjectGenericCoreMessage(message, conversation);
@@ -993,8 +995,9 @@ export class MessageRepository {
    * @returns Resolves after sending the session reset
    */
   private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
-    const sessionReset = this.messageBuilder.createSessionReset({
+    const sessionReset = MessageBuilder.createSessionReset({
       conversationId: conversation.id,
+      from: this.userState.self().id,
     });
 
     await this.conversationService.send({
@@ -1041,16 +1044,17 @@ export class MessageRepository {
       }
     }
     const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
-    const confirmationMessage = this.messageBuilder.createConfirmation({
+    const confirmationMessage = MessageBuilder.createConfirmation({
       conversationId: conversationEntity.id,
       firstMessageId: messageEntity.id,
+      from: this.userState.self().id,
       moreMessageIds,
       type,
     });
 
     const sendingOptions = {
       nativePush: false,
-      recipients: [{domain: messageEntity.fromDomain, id: messageEntity.from}],
+      recipients: [{domain: messageEntity.fromDomain || '', id: messageEntity.from}],
       // When not in a verified conversation (verified or degraded) we want the regular sending flow (send and reencrypt if there are mismatches)
       // When in a verified (or degraded) conversation we want to prevent encrypting for unverified devices, we will then silent the degradation modal and force sending to only the devices that are verified
       silentDegradationWarning: conversationEntity.verification_state() !== ConversationVerificationState.UNVERIFIED,
@@ -1075,8 +1079,9 @@ export class MessageRepository {
    * @returns Resolves after sending the reaction
    */
   private async sendReaction(conversationEntity: Conversation, messageEntity: Message, reactionType: ReactionType) {
-    const reaction = this.messageBuilder.createReaction({
+    const reaction = MessageBuilder.createReaction({
       conversationId: conversationEntity.id,
+      from: this.userState.self().id,
       reaction: {
         originalMessageId: messageEntity.id,
         type: reactionType,
@@ -1839,9 +1844,10 @@ export class MessageRepository {
     payload: string,
     options: {nativePush?: boolean; recipients?: UserClients | QualifiedUserClients},
   ) {
-    const message = this.core.service!.conversation.messageBuilder.createCall({
+    const message = MessageBuilder.createCall({
       content: payload,
       conversationId: conversation.id,
+      from: this.userState.self().id,
     });
 
     return this.sendAndInjectGenericCoreMessage(message, conversation, {
