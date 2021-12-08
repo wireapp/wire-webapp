@@ -771,10 +771,12 @@ export class MessageRepository {
       ...this.createCommonMessagePayload(conversation),
     });
 
+    const userClient = {[userId.id]: [clientId]};
     await this.conversationService.send({
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       payloadBundle: sessionReset,
-      userIds: conversation.isFederated() ? [userId] : [userId.id],
+      userIds: conversation.isFederated() ? {[userId.domain]: userClient} : userClient,
+      targetMode: MessageTargetMode.USERS_CLIENTS, // we target this message to the specific client of the user (no need for mismatch handling here)
     });
   }
 

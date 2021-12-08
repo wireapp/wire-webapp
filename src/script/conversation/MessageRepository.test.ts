@@ -54,11 +54,13 @@ import {ConversationState} from './ConversationState';
 import {ConversationService} from './ConversationService';
 import {EventService} from '../event/EventService';
 import {Core} from '../service/CoreSingleton';
+import {container} from 'tsyringe';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
 
   let server: sinon.SinonFakeServer;
+  let core: Core;
 
   const generateConversation = (
     conversation_type = CONVERSATION_TYPE.REGULAR,
@@ -81,6 +83,8 @@ describe('MessageRepository', () => {
   };
 
   beforeEach(() => {
+    core = container.resolve(Core);
+    core.initServices({} as any);
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
@@ -244,17 +248,14 @@ describe('MessageRepository', () => {
   });
 
   describe('deleteMessageForEveryone', () => {
-    const core = {
-      service: {
-        conversation: {
-          deleteMessageEveryone: jest.fn(() => Promise.resolve()),
-        },
-      },
-    } as unknown as Core;
+    beforeEach(() => {
+      spyOn(core.service!.conversation, 'deleteMessageEveryone');
+    });
+
     it('should not delete other users messages', async () => {
       const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
 
-      const user_et = new User('', null);
+      const user_et = new User('', '');
       user_et.isMe = false;
 
       const message_to_delete_et = new Message(createRandomUuid());
@@ -290,7 +291,7 @@ describe('MessageRepository', () => {
       ).rejects.toMatchObject({
         type: ConversationError.TYPE.WRONG_USER,
       });
-      expect(core.service.conversation.deleteMessageEveryone).not.toHaveBeenCalled();
+      expect(core.service!.conversation.deleteMessageEveryone).not.toHaveBeenCalled();
     });
 
     it('should send delete and deletes message for own messages', async () => {
@@ -340,7 +341,7 @@ describe('MessageRepository', () => {
       );
 
       await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
-      expect(core.service.conversation.deleteMessageEveryone).toHaveBeenCalledWith(
+      expect(core.service!.conversation.deleteMessageEveryone).toHaveBeenCalledWith(
         conversation.id,
         messageToDelete.id,
         ['selfid', 'user1'],
@@ -348,6 +349,49 @@ describe('MessageRepository', () => {
         undefined,
       );
       expect(eventService.deleteEvent).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('resetSession', () => {
+    let messageRepository: MessageRepository;
+    let cryptographyRepository: CryptographyRepository;
+    beforeEach(() => {
+      const userState = new UserState();
+      const teamState = new TeamState(userState);
+      const conversationState = new ConversationState(userState, teamState);
+      const clientState = new ClientState();
+      cryptographyRepository = testFactory.cryptography_repository as CryptographyRepository;
+      messageRepository = new MessageRepository(
+        {} as ClientRepository,
+        () => ({} as ConversationRepository),
+        cryptographyRepository,
+        {} as EventRepository,
+        {} as MessageSender,
+        {} as PropertiesRepository,
+        {} as ServerTimeHandler,
+        {} as UserRepository,
+        {} as ConversationService,
+        {} as LinkPreviewRepository,
+        {} as AssetRepository,
+        userState,
+        teamState,
+        conversationState,
+        clientState,
+        core,
+      );
+    });
+
+    it('resets the session with another device', async () => {
+      spyOn(core.service!.conversation, 'send');
+      console.log(cryptographyRepository);
+      spyOn(cryptographyRepository, 'deleteSession');
+      const conversation = generateConversation();
+
+      const userId = {id: 'user1', domain: 'domain1'};
+      const clientId = 'client1';
+      await messageRepository.resetSession(userId, clientId, conversation);
+      expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
+      expect(core.service!.conversation.send).toHaveBeenCalled();
     });
   });
 
