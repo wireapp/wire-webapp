@@ -448,9 +448,7 @@ export class TeamRepository {
           htmlMessage: hasGuestLinkChangedToEnabled
             ? t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
             : t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled'),
-          title: t('featureConfigChangeModalConversationGuestLinksHeadline', {
-            brandName: Config.getConfig().BRAND_NAME,
-          }),
+          title: t('featureConfigChangeModalConversationGuestLinksHeadline'),
         },
       });
     }
