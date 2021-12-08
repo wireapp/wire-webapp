@@ -218,10 +218,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     });
 
     this.showOptionTimedMessages = ko.pureComputed(
-      () =>
-        this.teamState.isGuestLinkEnabled() &&
-        this.isActiveGroupParticipant() &&
-        roleRepository.canToggleTimeout(this.activeConversation()),
+      () => this.isActiveGroupParticipant() && roleRepository.canToggleTimeout(this.activeConversation()),
     );
 
     this.isGuestLinkEnabled = ko.pureComputed(() => this.teamState.isGuestLinkEnabled());
