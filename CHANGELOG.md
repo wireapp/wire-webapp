@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@19.0.0...@wireapp/core@20.0.0) (2021-12-08)
+
+
+### Code Refactoring
+
+* **core:** Harmonize asset param name ([#4199](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4199)) ([f29c825](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/f29c825df427e9fccae164a728f0071fdf1bc3af))
+
+
+### BREAKING CHANGES
+
+* **core:** The `imageAsset` property given to the `MessageBuilder.createImage` function has been renamed `asset` to be coherent with sending files.
+Replace `MessageBuilder.createImage({..., imageAsset: asset})` with `MessageBuilder.createImage({..., asset})`
+
+
+
+
+
 # [19.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@18.0.0...@wireapp/core@19.0.0) (2021-12-08)
 
 
