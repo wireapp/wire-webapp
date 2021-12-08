@@ -343,12 +343,12 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
       type: original.mimeType,
       width: original.image.width,
     };
-    const imageAsset = await (await account.service!.asset.uploadAsset(image.data)).response;
+    const asset = await (await account.service!.asset.uploadAsset(image.data)).response;
     const imagePayload = MessageBuilder.createImage({
       conversationId,
       from: account.userId,
       image,
-      imageAsset,
+      asset,
     });
 
     messageIdCache[messageId] = imagePayload.id;

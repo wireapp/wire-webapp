@@ -176,7 +176,7 @@ const {
       conversationId: WIRE_CONVERSATION_ID,
       from: account.userId,
       image,
-      imageAsset: await (await account.service!.asset.uploadAsset(image.data)).response,
+      asset: await (await account.service!.asset.uploadAsset(image.data)).response,
     });
     await account.service!.conversation.send({payloadBundle: imagePayload, sendAsProtobuf: useProtobuf});
   }
