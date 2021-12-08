@@ -26,8 +26,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {PropertiesRepository} from '../../../properties/PropertiesRepository';
 import {AppLockRepository} from '../../../user/AppLockRepository';
 import {formatDurationCaption} from 'Util/TimeUtil';
-import PreferencesSection from './PreferencesSection';
-import PreferencesCheckbox from './PreferencesCheckbox';
+import PreferencesSection from '../components/PreferencesSection';
+import PreferencesCheckbox from '../components/PreferencesCheckbox';
 
 interface PrivacySectionProps {
   appLockRepository?: AppLockRepository;

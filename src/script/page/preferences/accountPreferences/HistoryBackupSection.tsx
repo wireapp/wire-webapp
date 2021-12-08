@@ -23,7 +23,7 @@ import React from 'react';
 import {HistoryExportViewModel} from '../../../view_model/content/HistoryExportViewModel';
 import {ContentViewModel} from '../../../view_model/ContentViewModel';
 import {t} from 'Util/LocalizerUtil';
-import PreferencesSection from './PreferencesSection';
+import PreferencesSection from '../components/PreferencesSection';
 
 interface HistoryBackupSectionProps {
   brandName: string;
