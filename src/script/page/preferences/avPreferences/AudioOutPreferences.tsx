@@ -21,7 +21,7 @@ import React from 'react';
 import Icon from 'Components/Icon';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import PreferencesSection from '../accountPreferences/PreferencesSection';
+import PreferencesSection from '../components/PreferencesSection';
 import DeviceSelect from './DeviceSelect';
 import {DeviceTypes, MediaDevicesHandler} from '../../../media/MediaDevicesHandler';
 

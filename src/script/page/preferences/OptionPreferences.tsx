@@ -37,8 +37,8 @@ import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
-import PreferencesCheckbox from './accountPreferences/PreferencesCheckbox';
-import PreferencesSection from './accountPreferences/PreferencesSection';
+import PreferencesCheckbox from './components/PreferencesCheckbox';
+import PreferencesSection from './components/PreferencesSection';
 import PreferencesRadio from './components/PreferencesRadio';
 
 interface OptionPreferencesProps {

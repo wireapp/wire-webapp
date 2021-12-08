@@ -32,7 +32,7 @@ import {container} from 'tsyringe';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
-import PreferencesSection from './PreferencesSection';
+import PreferencesSection from '../components/PreferencesSection';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;

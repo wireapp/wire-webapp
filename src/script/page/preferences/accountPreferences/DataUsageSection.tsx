@@ -31,8 +31,8 @@ import {TeamState} from '../../../team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Config} from '../../../Config';
 import {ConsentValue} from '../../../user/ConsentValue';
-import PreferencesSection from './PreferencesSection';
-import PreferencesCheckbox from './PreferencesCheckbox';
+import PreferencesSection from '../components/PreferencesSection';
+import PreferencesCheckbox from '../components/PreferencesCheckbox';
 
 interface DataUsageSectionProps {
   brandName: string;

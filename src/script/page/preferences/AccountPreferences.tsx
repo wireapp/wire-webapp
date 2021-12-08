@@ -51,7 +51,7 @@ import EmailInput from './accountPreferences/EmailInput';
 import HistoryBackupSection from './accountPreferences/HistoryBackupSection';
 import LogoutSection from './accountPreferences/LogoutSection';
 import NameInput from './accountPreferences/NameInput';
-import PreferencesSection from './accountPreferences/PreferencesSection';
+import PreferencesSection from './components/PreferencesSection';
 import PrivacySection from './accountPreferences/PrivacySection';
 import UsernameInput from './accountPreferences/UsernameInput';
 
