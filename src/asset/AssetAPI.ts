@@ -60,12 +60,12 @@ export class AssetAPI {
 
   constructor(private readonly client: HttpClient) {}
 
-  private async getAssetShared(
+  private getAssetShared(
     assetUrl: string,
     token?: string | null,
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetResponse>> {
+  ): RequestCancelable<AssetResponse> {
     if (token && !isValidToken(token)) {
       throw new TypeError(`Expected token "${token.substr(0, 5)}..." (redacted) to be base64 encoded string.`);
     }
@@ -110,12 +110,12 @@ export class AssetAPI {
     };
   }
 
-  private async postAssetShared(
+  private postAssetShared(
     assetBaseUrl: string,
     asset: Uint8Array,
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetUploadData>> {
+  ): RequestCancelable<AssetUploadData> {
     const BOUNDARY = `Frontier${unsafeAlphanumeric()}`;
 
     const metadata = JSON.stringify({
@@ -278,7 +278,7 @@ export class AssetAPI {
     token?: string | null,
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetResponse>> {
+  ) {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
@@ -292,7 +292,7 @@ export class AssetAPI {
     token?: string | null,
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetResponse>> {
+  ) {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
@@ -301,20 +301,12 @@ export class AssetAPI {
     return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
   }
 
-  postAsset(
-    asset: Uint8Array,
-    options?: AssetOptions,
-    progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetUploadData>> {
+  postAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
     const assetBaseUrl = AssetAPI.ASSET_V3_URL;
     return this.postAssetShared(assetBaseUrl, asset, options, progressCallback);
   }
 
-  postServiceAsset(
-    asset: Uint8Array,
-    options?: AssetOptions,
-    progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetUploadData>> {
+  postServiceAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
     const assetBaseUrl = AssetAPI.ASSET_SERVICE_URL;
     return this.postAssetShared(assetBaseUrl, asset, options, progressCallback);
   }

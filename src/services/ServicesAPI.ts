@@ -19,7 +19,7 @@
 
 import type {AxiosRequestConfig} from 'axios';
 
-import type {HttpClient, ProgressCallback, RequestCancelable} from '../http';
+import type {HttpClient, ProgressCallback} from '../http';
 import type {
   Client,
   Self,
@@ -30,7 +30,7 @@ import type {
   ServiceMessage,
 } from './Service';
 import type {PreKey} from '../auth';
-import {AssetOptions, AssetAPI, AssetUploadData, AssetResponse} from '../asset';
+import {AssetOptions, AssetAPI} from '../asset';
 
 export class ServicesAPI {
   private readonly assetAPI: AssetAPI;
@@ -181,11 +181,7 @@ export class ServicesAPI {
    * Upload an asset.
    * Note that resumable uploads are not currently supported for services.
    */
-  public postAsset(
-    asset: Uint8Array,
-    options?: AssetOptions,
-    progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetUploadData>> {
+  public postAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
     return this.assetAPI.postServiceAsset(asset, options, progressCallback);
   }
 
@@ -197,7 +193,7 @@ export class ServicesAPI {
     token?: string | null,
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetResponse>> {
+  ) {
     return this.assetAPI.getServiceAsset(assetId, token, forceCaching, progressCallback);
   }
 
