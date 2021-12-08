@@ -202,7 +202,7 @@ describe('AssetRepository', () => {
     } as unknown as AssetService;
     const assetRepo = new AssetRepository(assetServiceSpy);
 
-    await assetRepo.uploadFile(messageId, file, options, false);
+    await assetRepo.uploadFile(file, messageId, options);
   });
 
   it('removes finished uploads', async () => {
@@ -220,7 +220,7 @@ describe('AssetRepository', () => {
     };
     const assetRepo = new AssetRepository(assetServiceSpy as unknown as AssetService);
 
-    await assetRepo.uploadFile(messageId, file, options, false);
+    await assetRepo.uploadFile(file, messageId, options);
     expect(assetRepo.getNumberOfOngoingUploads()).toBe(0);
   });
 
@@ -236,7 +236,7 @@ describe('AssetRepository', () => {
       });
     });
 
-    await assetRepository.uploadFile(messageId, file, options, false);
+    await assetRepository.uploadFile(file, messageId, options);
 
     assetRepository.cancelUpload(messageId);
     expect(assetRepository.getNumberOfOngoingUploads()).toBe(0);
@@ -264,6 +264,6 @@ describe('AssetRepository', () => {
       });
     });
 
-    await assetRepository.uploadFile(messageId, file, options, false);
+    await assetRepository.uploadFile(file, messageId, options);
   });
 });
