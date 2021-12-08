@@ -554,9 +554,11 @@ export class MessageRepository {
     };
     const asset = await this.assetRepository.uploadFile(file, messageId, options);
 
-    const assetMessage = this.messageBuilder.createFileData({
+    const assetMessage = MessageBuilder.createFileData({
       asset: asset,
       conversationId: conversation.id,
+      file: {data: Buffer.from(await file.arrayBuffer())},
+      from: this.userState.self().id,
       originalMessageId: messageId,
     });
     return this.sendAndInjectGenericCoreMessage(assetMessage, conversation);

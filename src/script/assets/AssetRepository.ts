@@ -265,11 +265,20 @@ export class AssetRepository {
 
   async uploadFile(file: Blob, messageId: string, options: AssetUploadOptions) {
     const bytes = await loadFileBuffer(file);
+    const progressObservable = ko.observable(0);
+    this.uploadProgressQueue.push({messageId, progress: progressObservable});
 
-    const request = await this.core.service!.asset.uploadAsset(Buffer.from(bytes), {
-      public: options.public,
-      retention: options.retention,
-    });
+    const request = await this.core.service!.asset.uploadAsset(
+      Buffer.from(bytes),
+      {
+        public: options.public,
+        retention: options.retention,
+      },
+      fraction => {
+        const percentage = fraction * 100;
+        progressObservable(percentage);
+      },
+    );
     this.uploadCancelTokens[messageId] = request.cancel;
 
     this.removeFromUploadQueue(messageId);
