@@ -19,42 +19,39 @@
 
 import type {APIClient} from '@wireapp/api-client';
 import type {AssetOptions} from '@wireapp/api-client/src/asset';
-import type {ProgressCallback} from '@wireapp/api-client/src/http';
+import type {ProgressCallback, RequestCancelable} from '@wireapp/api-client/src/http';
 
-import type {FileContent, ImageContent} from '../conversation/content/';
 import type {EncryptedAssetUploaded} from '../cryptography/';
 import {encryptAsset} from '../cryptography/AssetCryptography';
 
 export class AssetService {
   constructor(private readonly apiClient: APIClient) {}
 
-  private async postAsset(
+  public async uploadAsset(
     plainText: Buffer | Uint8Array,
     options?: AssetOptions,
     progressCallback?: ProgressCallback,
-  ): Promise<EncryptedAssetUploaded> {
+  ): Promise<RequestCancelable<EncryptedAssetUploaded>> {
     const {cipherText, keyBytes, sha256} = await encryptAsset({
       plainText,
       algorithm: options?.algorithm,
       hash: options?.hash,
     });
-    const request = await this.apiClient.asset.api.postAsset(new Uint8Array(cipherText), options, progressCallback);
-    const {key, token} = await request.response;
+
+    const request = this.apiClient.asset.api.postAsset(new Uint8Array(cipherText), options, progressCallback);
 
     return {
-      cipherText,
-      key,
-      keyBytes,
-      sha256,
-      token,
+      ...request,
+      response: request.response.then(response => {
+        const {key, token} = response;
+        return {
+          cipherText,
+          key,
+          keyBytes,
+          sha256,
+          token,
+        };
+      }),
     };
-  }
-
-  public uploadImageAsset(image: ImageContent, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
-    return this.postAsset(image.data, options);
-  }
-
-  public uploadFileAsset(file: FileContent, options?: AssetOptions): Promise<EncryptedAssetUploaded> {
-    return this.postAsset(file.data, options);
   }
 }

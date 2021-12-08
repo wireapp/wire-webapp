@@ -262,7 +262,7 @@ export abstract class MessageHandler {
           conversationId,
           from: this.account.userId,
           file,
-          asset: await this.account.service!.asset.uploadFileAsset(file),
+          asset: await (await this.account.service!.asset.uploadAsset(file.data)).response,
           originalMessageId: metadataPayload.id,
         });
         await this.account.service.conversation.send({payloadBundle: filePayload, userIds});
@@ -287,7 +287,7 @@ export abstract class MessageHandler {
         conversationId,
         from: this.account.userId,
         image,
-        imageAsset: await this.account.service!.asset.uploadImageAsset(image),
+        imageAsset: await (await this.account.service!.asset.uploadAsset(image.data)).response,
       });
       await this.account.service.conversation.send({payloadBundle: imagePayload, userIds});
     }
