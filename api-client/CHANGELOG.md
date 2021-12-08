@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.11.1...@wireapp/api-client@16.0.0) (2021-12-08)
+
+
+### Features
+
+* **core:** Ability to cancel asset uploading ([#4198](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4198)) ([e111f46](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/e111f46d06bf2ec22f2002c9a2954cdf0c9e8d09))
+
+
+### BREAKING CHANGES
+
+* **core:** Uploading an asset now return a structure that allow cancelling the upload. Thus instances of `await account.service.asset.uploadAsset(...)` must be replaced by 
+```
+const {cancel, response} = await account.service.asset.uploadAsset(...);
+cancel() // This is how you cancel the upload
+await response// This will contain the uploaded asset once the upload is done
+```
+
+
+
+
+
 ## [15.11.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.11.0...@wireapp/api-client@15.11.1) (2021-12-06)
 
 
