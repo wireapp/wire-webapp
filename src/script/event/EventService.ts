@@ -23,7 +23,6 @@ import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 
-import {StatusType} from '../message/StatusType';
 import {MessageCategory} from '../message/MessageCategory';
 import {categoryFromEvent} from '../message/MessageCategorization';
 
@@ -323,30 +322,6 @@ export class EventService {
 
   addEventDeletedListener(callback: DatabaseListenerCallback): void {
     this.storageService.addDeletedListener(StorageSchemata.OBJECT_STORE.EVENTS, callback);
-  }
-
-  /**
-   * Update event as uploaded in database.
-   *
-   * @param primaryKey Primary key used to find an event in the database
-   * @param event Updated event asset data
-   */
-  async updateEventAsUploadSucceeded(primaryKey: string, event: EventRecord): Promise<void> {
-    const record = await this.storageService.load<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS, primaryKey);
-    if (!record) {
-      this.logger.warn('Did not find message to update asset (uploaded)', primaryKey);
-      return;
-    }
-    const assetData = event.data;
-    record.data.id = assetData.id;
-    record.data.key = assetData.key;
-    record.data.otr_key = assetData.otr_key;
-    record.data.sha256 = assetData.sha256;
-    record.data.status = AssetTransferState.UPLOADED;
-    record.data.token = assetData.token;
-    record.status = StatusType.SENT;
-    await this.replaceEvent(record);
-    this.logger.info('Updated asset message_et (uploaded)', primaryKey);
   }
 
   /**
