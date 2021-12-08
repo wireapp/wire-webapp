@@ -17,7 +17,6 @@
  *
  */
 
-import type {CipherOptions} from '@wireapp/api-client/src/asset';
 import {ClientAction, Confirmation} from '@wireapp/protocol-messaging';
 import UUID from 'uuidjs';
 
@@ -59,20 +58,16 @@ interface BaseOptions {
 }
 
 interface CreateImageOptions extends BaseOptions {
-  cipherOptions?: CipherOptions;
   expectsReadConfirmation?: boolean;
-  imageAsset: EncryptedAssetUploaded;
+  asset: EncryptedAssetUploaded;
   image: ImageContent;
   legalHoldStatus?: LegalHoldStatus;
 }
 
-interface CreateFileOptions {
-  cipherOptions?: CipherOptions;
-  conversationId: string;
+interface CreateFileOptions extends BaseOptions {
   expectsReadConfirmation?: boolean;
   asset: EncryptedAssetUploaded;
   file: FileContent;
-  from: string;
   legalHoldStatus?: LegalHoldStatus;
   originalMessageId: string;
 }
@@ -209,14 +204,13 @@ export class MessageBuilder {
   }
 
   public static createImage(payload: CreateImageOptions): ImageAssetMessageOutgoing {
-    const {expectsReadConfirmation, image, imageAsset, legalHoldStatus} = payload;
-
+    const {expectsReadConfirmation, image, asset, legalHoldStatus} = payload;
     return {
       ...createCommonProperties(payload),
       content: {
-        asset: imageAsset,
         expectsReadConfirmation,
         image,
+        asset,
         legalHoldStatus,
       },
       type: PayloadBundleType.ASSET_IMAGE,
