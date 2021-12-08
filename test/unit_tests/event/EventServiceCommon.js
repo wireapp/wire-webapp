@@ -339,17 +339,6 @@ const testEventServiceClass = (testedServiceName, className) => {
       });
     });
 
-    describe('updateEventAsUploadSucceeded', () => {
-      /* eslint-disable sort-keys-fix/sort-keys-fix */
-      it("doesn't do anything if initial event is not found", () => {
-        spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(undefined));
-        const updateSpy = spyOn(testFactory.storage_service, 'update');
-        return testFactory.event_service.updateEventAsUploadSucceeded(12, {}).then(() => {
-          expect(updateSpy).not.toHaveBeenCalled();
-        });
-      });
-    });
-
     describe('updateEventAsUploadFailed', () => {
       /* eslint-disable sort-keys-fix/sort-keys-fix */
       it("doesn't do anything if initial event is not found", () => {
