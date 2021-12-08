@@ -40,6 +40,7 @@ import fs from 'fs';
 import path from 'path';
 import FileType = require('file-type');
 import {DefaultConversationRoleName} from '@wireapp/api-client/src/conversation';
+import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 
 export abstract class MessageHandler {
   account: Account | undefined = undefined;
@@ -108,11 +109,11 @@ export abstract class MessageHandler {
         referenceMessageId,
       };
 
-      const buttonActionConfirmationMessage =
-        this.account.service.conversation.messageBuilder.createButtonActionConfirmationMessage({
-          conversationId,
-          content: buttonActionConfirmationContent,
-        });
+      const buttonActionConfirmationMessage = MessageBuilder.createButtonActionConfirmationMessage({
+        conversationId,
+        from: this.account.userId,
+        content: buttonActionConfirmationContent,
+      });
 
       await this.account.service.conversation.send({payloadBundle: buttonActionConfirmationMessage, userIds: [userId]});
     }
@@ -123,7 +124,7 @@ export abstract class MessageHandler {
    */
   async sendCall(conversationId: string, content: CallingContent, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
-      const callPayload = this.account.service.conversation.messageBuilder.createCall({conversationId, content});
+      const callPayload = MessageBuilder.createCall({conversationId, from: this.account.userId, content});
       await this.account.service.conversation.send({payloadBundle: callPayload, userIds});
     }
   }
@@ -138,9 +139,9 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const message = this.account.service.conversation.messageBuilder
-        .createComposite({conversationId})
-        .addText(Text.create({content: text}));
+      const message = MessageBuilder.createComposite({conversationId, from: this.account.userId}).addText(
+        Text.create({content: text}),
+      );
       buttons.forEach(button => message.addButton(button));
       await this.account.service.conversation.send({payloadBundle: message.build(), userIds});
     }
@@ -155,8 +156,9 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const confirmationPayload = this.account.service.conversation.messageBuilder.createConfirmation({
+      const confirmationPayload = MessageBuilder.createConfirmation({
         conversationId,
+        from: this.account.userId,
         firstMessageId,
         type: Confirmation.Type.DELIVERED,
       });
@@ -192,20 +194,26 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const editedPayload = this.account.service.conversation.messageBuilder
-        .createEditedText({conversationId, newMessageText, originalMessageId})
+      const editedPayload = MessageBuilder.createEditedText({
+        conversationId,
+        from: this.account.userId,
+        newMessageText,
+        originalMessageId,
+      })
         .withMentions(newMentions)
         .build();
 
       const editedMessage = await this.account.service.conversation.send({payloadBundle: editedPayload, userIds});
 
       if (newLinkPreview) {
-        const linkPreviewPayload = await this.account.service.conversation.messageBuilder.createLinkPreview(
-          newLinkPreview,
-        );
-        const editedWithPreviewPayload = this.account.service.conversation.messageBuilder
-          .createEditedText({conversationId, newMessageText, originalMessageId, messageId: editedMessage.id})
-          .withLinkPreviews([linkPreviewPayload])
+        const editedWithPreviewPayload = MessageBuilder.createEditedText({
+          from: this.account.userId,
+          conversationId,
+          newMessageText,
+          originalMessageId,
+          messageId: editedMessage.id,
+        })
+          .withLinkPreviews([await this.account.service.linkPreview.uploadLinkPreviewImage(newLinkPreview)])
           .withMentions(newMentions)
           .build();
 
@@ -242,22 +250,26 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const metadataPayload = this.account.service.conversation.messageBuilder.createFileMetadata({
+      const metadataPayload = MessageBuilder.createFileMetadata({
         conversationId,
         metaData: metadata,
+        from: this.account.userId,
       });
       await this.account.service.conversation.send({payloadBundle: metadataPayload, userIds});
 
       try {
-        const filePayload = await this.account.service.conversation.messageBuilder.createFileData({
+        const filePayload = MessageBuilder.createFileData({
           conversationId,
+          from: this.account.userId,
           file,
+          asset: await this.account.service!.asset.uploadFileAsset(file),
           originalMessageId: metadataPayload.id,
         });
         await this.account.service.conversation.send({payloadBundle: filePayload, userIds});
       } catch (error) {
-        const abortPayload = await this.account.service.conversation.messageBuilder.createFileAbort({
+        const abortPayload = await MessageBuilder.createFileAbort({
           conversationId,
+          from: this.account.userId,
           reason: Asset.NotUploaded.FAILED,
           originalMessageId: metadataPayload.id,
         });
@@ -271,7 +283,12 @@ export abstract class MessageHandler {
    */
   async sendImage(conversationId: string, image: ImageContent, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
-      const imagePayload = await this.account.service.conversation.messageBuilder.createImage({conversationId, image});
+      const imagePayload = MessageBuilder.createImage({
+        conversationId,
+        from: this.account.userId,
+        image,
+        imageAsset: await this.account.service!.asset.uploadImageAsset(image),
+      });
       await this.account.service.conversation.send({payloadBundle: imagePayload, userIds});
     }
   }
@@ -285,8 +302,9 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const locationPayload = this.account.service.conversation.messageBuilder.createLocation({
+      const locationPayload = MessageBuilder.createLocation({
         conversationId,
+        from: this.account.userId,
         location,
       });
       await this.account.service.conversation.send({payloadBundle: locationPayload, userIds});
@@ -298,7 +316,7 @@ export abstract class MessageHandler {
    */
   async sendPing(conversationId: string, userIds?: string[] | UserClients): Promise<void> {
     if (this.account?.service) {
-      const pingPayload = this.account.service.conversation.messageBuilder.createPing({conversationId});
+      const pingPayload = MessageBuilder.createPing({conversationId, from: this.account.userId});
       await this.account.service.conversation.send({payloadBundle: pingPayload, userIds});
     }
   }
@@ -313,8 +331,9 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const reactionPayload = this.account.service.conversation.messageBuilder.createReaction({
+      const reactionPayload = MessageBuilder.createReaction({
         conversationId,
+        from: this.account.userId,
         reaction: {
           originalMessageId,
           type,
@@ -331,8 +350,7 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const replyPayload = this.account.service.conversation.messageBuilder
-        .createText({conversationId, text})
+      const replyPayload = MessageBuilder.createText({conversationId, text, from: this.account.userId})
         .withQuote(quotedMessage)
         .build();
       await this.account.service.conversation.send({payloadBundle: replyPayload, userIds});
@@ -362,19 +380,19 @@ export abstract class MessageHandler {
     userIds?: string[] | UserClients,
   ): Promise<void> {
     if (this.account?.service) {
-      const payload = this.account.service.conversation.messageBuilder
-        .createText({conversationId, text})
+      const payload = MessageBuilder.createText({conversationId, text, from: this.account.userId})
         .withMentions(mentions)
         .build();
       const sentMessage = await this.account.service.conversation.send({payloadBundle: payload, userIds});
 
       if (linkPreview) {
-        const linkPreviewPayload = await this.account.service.conversation.messageBuilder.createLinkPreview(
-          linkPreview,
-        );
-        const editedWithPreviewPayload = this.account.service.conversation.messageBuilder
-          .createText({conversationId, text, messageId: sentMessage.id})
-          .withLinkPreviews([linkPreviewPayload])
+        const editedWithPreviewPayload = MessageBuilder.createText({
+          conversationId,
+          text,
+          from: this.account.userId,
+          messageId: sentMessage.id,
+        })
+          .withLinkPreviews([await this.account.service!.linkPreview.uploadLinkPreviewImage(linkPreview)])
           .withMentions(mentions)
           .build();
 

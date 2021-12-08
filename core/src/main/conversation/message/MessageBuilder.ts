@@ -17,44 +17,30 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client';
 import type {CipherOptions} from '@wireapp/api-client/src/asset';
 import {ClientAction, Confirmation} from '@wireapp/protocol-messaging';
 import UUID from 'uuidjs';
 
 import {AbortReason, PayloadBundleSource, PayloadBundleState, PayloadBundleType} from '..';
-import type {AssetService} from '../AssetService';
+import {EncryptedAssetUploaded} from '../../cryptography';
 import type {
   ButtonActionConfirmationContent,
   ButtonActionContent,
   CallingContent,
-  ClientActionContent,
-  CompositeContent,
-  ConfirmationContent,
-  EditedTextContent,
-  FileAssetAbortContent,
-  FileAssetContent,
-  FileAssetMetaDataContent,
   FileContent,
   FileMetaDataContent,
-  ImageAssetContent,
   ImageContent,
   KnockContent,
   LegalHoldStatus,
-  LinkPreviewContent,
-  LinkPreviewUploadedContent,
   LocationContent,
   ReactionContent,
-  TextContent,
 } from '../content';
 import {CompositeContentBuilder} from './CompositeContentBuilder';
 import type {
   ButtonActionConfirmationMessage,
   ButtonActionMessage,
   CallMessage,
-  CompositeMessage,
   ConfirmationMessage,
-  EditedTextMessage,
   FileAssetAbortMessage,
   FileAssetMessage,
   FileAssetMetaDataMessage,
@@ -63,18 +49,19 @@ import type {
   PingMessage,
   ReactionMessage,
   ResetSessionMessage,
-  TextMessage,
 } from './OtrMessage';
 import {TextContentBuilder} from './TextContentBuilder';
 
 interface BaseOptions {
   conversationId: string;
+  from: string;
   messageId?: string;
 }
 
 interface CreateImageOptions extends BaseOptions {
   cipherOptions?: CipherOptions;
   expectsReadConfirmation?: boolean;
+  imageAsset: EncryptedAssetUploaded;
   image: ImageContent;
   legalHoldStatus?: LegalHoldStatus;
 }
@@ -83,7 +70,9 @@ interface CreateFileOptions {
   cipherOptions?: CipherOptions;
   conversationId: string;
   expectsReadConfirmation?: boolean;
+  asset: EncryptedAssetUploaded;
   file: FileContent;
+  from: string;
   legalHoldStatus?: LegalHoldStatus;
   originalMessageId: string;
 }
@@ -102,6 +91,7 @@ interface CreateFileMetadataOptions extends BaseOptions {
 interface CreateFileAbortOptions {
   conversationId: string;
   expectsReadConfirmation?: boolean;
+  from: string;
   legalHoldStatus?: LegalHoldStatus;
   originalMessageId: string;
   reason: AbortReason;
@@ -141,348 +131,184 @@ interface CreateActionMessageOptions extends BaseOptions {
   content: ButtonActionContent;
 }
 
+function createCommonProperties<T extends BaseOptions>(
+  options: T,
+): {
+  id: string;
+  conversation: string;
+  from: string;
+  source: PayloadBundleSource;
+  state: PayloadBundleState;
+  timestamp: number;
+} {
+  return {
+    id: options.messageId || MessageBuilder.createId(),
+    conversation: options.conversationId,
+    from: options.from,
+    source: PayloadBundleSource.LOCAL,
+    state: PayloadBundleState.OUTGOING_UNSENT,
+    timestamp: Date.now(),
+  };
+}
+
 export class MessageBuilder {
-  private readonly apiClient: APIClient;
-  private readonly assetService: AssetService;
-
-  constructor(apiClient: APIClient, assetService: AssetService) {
-    this.apiClient = apiClient;
-    this.assetService = assetService;
-  }
-
-  public createEditedText({
-    conversationId,
-    messageId = MessageBuilder.createId(),
-    newMessageText,
-    originalMessageId,
-  }: CreateEditedTextOptions): TextContentBuilder {
-    const content: EditedTextContent = {
-      originalMessageId,
-      text: newMessageText,
-    };
-
-    const payloadBundle: EditedTextMessage = {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+  public static createEditedText(payload: CreateEditedTextOptions): TextContentBuilder {
+    return new TextContentBuilder({
+      ...createCommonProperties(payload),
+      content: {
+        originalMessageId: payload.originalMessageId,
+        text: payload.newMessageText,
+      },
       type: PayloadBundleType.MESSAGE_EDIT,
-    };
-
-    return new TextContentBuilder(payloadBundle);
+    });
   }
 
-  public async createFileData({
-    conversationId,
-    cipherOptions,
-    expectsReadConfirmation,
-    file,
-    legalHoldStatus,
-    originalMessageId,
-  }: CreateFileOptions): Promise<FileAssetMessage> {
-    const imageAsset = await this.assetService.uploadFileAsset(file, {...cipherOptions});
-
-    const content: FileAssetContent = {
-      asset: imageAsset,
-      expectsReadConfirmation,
-      file,
-      legalHoldStatus,
-    };
+  public static createFileData(payload: CreateFileOptions): FileAssetMessage {
+    const {asset, expectsReadConfirmation, file, legalHoldStatus, originalMessageId} = payload;
 
     return {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
+      ...createCommonProperties(payload),
+      content: {
+        asset,
+        expectsReadConfirmation,
+        file,
+        legalHoldStatus,
+      },
       id: originalMessageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
       type: PayloadBundleType.ASSET,
     };
   }
 
-  public createFileMetadata({
-    conversationId,
-    expectsReadConfirmation,
-    legalHoldStatus,
-    messageId = MessageBuilder.createId(),
-    metaData,
-  }: CreateFileMetadataOptions): FileAssetMetaDataMessage {
-    const content: FileAssetMetaDataContent = {
-      expectsReadConfirmation,
-      legalHoldStatus,
-      metaData,
-    };
+  public static createFileMetadata(payload: CreateFileMetadataOptions): FileAssetMetaDataMessage {
+    const {expectsReadConfirmation, legalHoldStatus, metaData} = payload;
 
     return {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: {
+        expectsReadConfirmation,
+        legalHoldStatus,
+        metaData,
+      },
       type: PayloadBundleType.ASSET_META,
     };
   }
 
-  public async createFileAbort({
-    conversationId,
-    expectsReadConfirmation,
-    legalHoldStatus,
-    originalMessageId,
-    reason,
-  }: CreateFileAbortOptions): Promise<FileAssetAbortMessage> {
-    const content: FileAssetAbortContent = {
-      expectsReadConfirmation,
-      legalHoldStatus,
-      reason,
-    };
+  public static createFileAbort(payload: CreateFileAbortOptions): FileAssetAbortMessage {
+    const {expectsReadConfirmation, legalHoldStatus, reason} = payload;
 
     return {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: originalMessageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: {
+        expectsReadConfirmation,
+        legalHoldStatus,
+        reason,
+      },
+      id: payload.originalMessageId,
       type: PayloadBundleType.ASSET_ABORT,
     };
   }
 
-  public async createImage({
-    conversationId,
-    cipherOptions,
-    expectsReadConfirmation,
-    image,
-    legalHoldStatus,
-    messageId = MessageBuilder.createId(),
-  }: CreateImageOptions): Promise<ImageAssetMessageOutgoing> {
-    const imageAsset = await this.assetService.uploadImageAsset(image, {...cipherOptions});
-
-    const content: ImageAssetContent = {
-      asset: imageAsset,
-      expectsReadConfirmation,
-      image,
-      legalHoldStatus,
-    };
+  public static createImage(payload: CreateImageOptions): ImageAssetMessageOutgoing {
+    const {expectsReadConfirmation, image, imageAsset, legalHoldStatus} = payload;
 
     return {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: {
+        asset: imageAsset,
+        expectsReadConfirmation,
+        image,
+        legalHoldStatus,
+      },
       type: PayloadBundleType.ASSET_IMAGE,
     };
   }
 
-  public createLocation({
-    conversationId,
-    location,
-    messageId = MessageBuilder.createId(),
-  }: CreateLocationOptions): LocationMessage {
+  public static createLocation(payload: CreateLocationOptions): LocationMessage {
     return {
-      content: location,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: payload.location,
       type: PayloadBundleType.LOCATION,
     };
   }
 
-  public createCall({content, conversationId, messageId = MessageBuilder.createId()}: CreateCallOptions): CallMessage {
+  public static createCall(payload: CreateCallOptions): CallMessage {
     return {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: payload.content,
       type: PayloadBundleType.CALL,
     };
   }
 
-  public createReaction({
-    conversationId,
-    messageId = MessageBuilder.createId(),
-    reaction,
-  }: CreateReactionOptions): ReactionMessage {
+  public static createReaction(payload: CreateReactionOptions): ReactionMessage {
     return {
-      content: reaction,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: payload.reaction,
       type: PayloadBundleType.REACTION,
     };
   }
 
-  public createText({
-    conversationId,
-    messageId = MessageBuilder.createId(),
-    text,
-  }: CreateTextOptions): TextContentBuilder {
-    const content: TextContent = {text};
-
-    const payloadBundle: TextMessage = {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+  public static createText(payload: CreateTextOptions): TextContentBuilder {
+    return new TextContentBuilder({
+      ...createCommonProperties(payload),
+      content: {text: payload.text},
       type: PayloadBundleType.TEXT,
-    };
-
-    return new TextContentBuilder(payloadBundle);
+    });
   }
 
-  public createConfirmation({
-    conversationId,
-    firstMessageId,
-    messageId = MessageBuilder.createId(),
-    moreMessageIds,
-    type,
-  }: CreateConfirmationOptions): ConfirmationMessage {
-    const content: ConfirmationContent = {firstMessageId, moreMessageIds, type};
+  public static createConfirmation(payload: CreateConfirmationOptions): ConfirmationMessage {
+    const {firstMessageId, moreMessageIds, type} = payload;
     return {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: {firstMessageId, moreMessageIds, type},
       type: PayloadBundleType.CONFIRMATION,
     };
   }
 
-  createButtonActionMessage({
-    content,
-    conversationId,
-    messageId = MessageBuilder.createId(),
-  }: CreateActionMessageOptions): ButtonActionMessage {
+  public static createButtonActionMessage(payload: CreateActionMessageOptions): ButtonActionMessage {
     return {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: payload.content,
       type: PayloadBundleType.BUTTON_ACTION,
     };
   }
 
-  createButtonActionConfirmationMessage({
-    content,
-    conversationId,
-    messageId = MessageBuilder.createId(),
-  }: CreateButtonActionConfirmationOptions): ButtonActionConfirmationMessage {
+  public static createButtonActionConfirmationMessage(
+    payload: CreateButtonActionConfirmationOptions,
+  ): ButtonActionConfirmationMessage {
     return {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: payload.content,
       type: PayloadBundleType.BUTTON_ACTION_CONFIRMATION,
     };
   }
 
-  createComposite({conversationId, messageId = MessageBuilder.createId()}: BaseOptions): CompositeContentBuilder {
-    const content: CompositeContent = {};
-
-    const payloadBundle: CompositeMessage = {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+  public static createComposite(payload: BaseOptions): CompositeContentBuilder {
+    return new CompositeContentBuilder({
+      ...createCommonProperties(payload),
+      content: {},
       type: PayloadBundleType.COMPOSITE,
-    };
-    return new CompositeContentBuilder(payloadBundle);
+    });
   }
 
-  public createPing({
-    conversationId,
-    messageId = MessageBuilder.createId(),
-    ping = {
-      hotKnock: false,
-    },
-  }: CreatePingOptions): PingMessage {
+  public static createPing(payload: CreatePingOptions): PingMessage {
     return {
-      content: ping,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: payload.ping || {hotKnock: false},
       type: PayloadBundleType.PING,
     };
   }
 
-  public createSessionReset({conversationId, messageId = MessageBuilder.createId()}: BaseOptions): ResetSessionMessage {
-    const content: ClientActionContent = {
-      clientAction: ClientAction.RESET_SESSION,
-    };
-
+  public static createSessionReset(payload: BaseOptions): ResetSessionMessage {
     return {
-      content,
-      conversation: conversationId,
-      from: this.getSelfUserId(),
-      id: messageId,
-      source: PayloadBundleSource.LOCAL,
-      state: PayloadBundleState.OUTGOING_UNSENT,
-      timestamp: Date.now(),
+      ...createCommonProperties(payload),
+      content: {
+        clientAction: ClientAction.RESET_SESSION,
+      },
       type: PayloadBundleType.CLIENT_ACTION,
     };
   }
 
-  public async createLinkPreview(linkPreview: LinkPreviewContent): Promise<LinkPreviewUploadedContent> {
-    const linkPreviewUploaded: LinkPreviewUploadedContent = {
-      ...linkPreview,
-    };
-
-    const linkPreviewImage = linkPreview.image;
-
-    if (linkPreviewImage) {
-      const imageAsset = await this.assetService.uploadImageAsset(linkPreviewImage);
-
-      delete linkPreviewUploaded.image;
-
-      linkPreviewUploaded.imageUploaded = {
-        asset: imageAsset,
-        image: linkPreviewImage,
-      };
-    }
-
-    return linkPreviewUploaded;
-  }
-
   public static createId(): string {
     return UUID.genV4().toString();
-  }
-
-  private getSelfUserId(): string {
-    return this.apiClient.context!.userId;
   }
 }

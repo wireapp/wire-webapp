@@ -32,6 +32,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import nock = require('nock');
 import {Account} from './Account';
 import {PayloadBundleSource, PayloadBundleType} from './conversation';
+import {MessageBuilder} from './conversation/message/MessageBuilder';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
@@ -142,7 +143,7 @@ describe('Account', () => {
       expect(account['apiClient'].context!.userId).toBeDefined();
 
       const text = 'FIFA World Cup';
-      const payload = account.service!.conversation.messageBuilder.createText({conversationId: '', text}).build();
+      const payload = MessageBuilder.createText({conversationId: '', from: '', text}).build();
 
       expect(payload.timestamp).toBeGreaterThan(0);
     });

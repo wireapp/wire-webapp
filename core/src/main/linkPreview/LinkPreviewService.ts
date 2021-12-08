@@ -17,16 +17,24 @@
  *
  */
 
-import type {ILinkPreview} from '@wireapp/protocol-messaging';
+import {AssetService} from '../conversation';
+import {LinkPreviewContent, LinkPreviewUploadedContent} from '../conversation/content';
 
-import type {ImageAssetContent, ImageContent, LegalHoldStatus} from '../content/';
+export class LinkPreviewService {
+  constructor(private readonly assetService: AssetService) {}
 
-export interface LinkPreviewContent extends Omit<ILinkPreview, 'image'> {
-  expectsReadConfirmation?: boolean;
-  legalHoldStatus?: LegalHoldStatus;
-  image: ImageContent;
-}
+  public async uploadLinkPreviewImage(linkPreview: LinkPreviewContent): Promise<LinkPreviewUploadedContent> {
+    const {image, ...preview} = linkPreview;
+    if (!image) {
+      return preview;
+    }
 
-export interface LinkPreviewUploadedContent extends Omit<LinkPreviewContent, 'image'> {
-  imageUploaded?: ImageAssetContent;
+    const uploadedLinkPreview: LinkPreviewUploadedContent = preview;
+    const asset = await this.assetService.uploadImageAsset(linkPreview.image);
+    uploadedLinkPreview.imageUploaded = {
+      asset,
+      image,
+    };
+    return uploadedLinkPreview;
+  }
 }

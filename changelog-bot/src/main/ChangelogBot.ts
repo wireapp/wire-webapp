@@ -26,6 +26,7 @@ import * as Changelog from 'generate-changelog';
 import logdown from 'logdown';
 
 import type {ChangelogData, LoginDataBackend} from './Interfaces';
+import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 
 const logger = logdown('@wireapp/changelog-bot/ChangelogBot', {
   logger: console,
@@ -76,9 +77,11 @@ export class ChangelogBot {
     for (const conversationId of conversationIds) {
       if (conversationId) {
         logger.log(`Sending message to conversation "${conversationId}" ...`);
-        const textPayload = account.service.conversation.messageBuilder
-          .createText({conversationId, text: this.message})
-          .build();
+        const textPayload = MessageBuilder.createText({
+          conversationId,
+          from: account.userId,
+          text: this.message,
+        }).build();
         await account.service.conversation.send({payloadBundle: textPayload});
       }
     }
