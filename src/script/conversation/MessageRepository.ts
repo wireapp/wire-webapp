@@ -82,7 +82,7 @@ import {EventMapper} from './EventMapper';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
-import {buildMetadata, isVideo, isImage, isAudio} from '../assets/AssetMetaDataBuilder';
+import {buildMetadata, isVideo, isImage, isAudio, ImageMetadata} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
@@ -450,7 +450,7 @@ export class MessageRepository {
    *
    * @param conversationEntity Conversation to post the images
    */
-  public uploadImages(conversationEntity: Conversation, images: File[] | Blob[]) {
+  public uploadImages(conversationEntity: Conversation, images: Blob[]) {
     this.uploadFiles(conversationEntity, images, true);
   }
 
@@ -461,7 +461,7 @@ export class MessageRepository {
    * @param files files
    * @param asImage whether or not the file should be treated as an image
    */
-  public uploadFiles(conversationEntity: Conversation, files: File[] | Blob[], asImage?: boolean) {
+  public uploadFiles(conversationEntity: Conversation, files: Blob[], asImage?: boolean) {
     if (this.canUploadAssetsToConversation(conversationEntity)) {
       Array.from(files).forEach(file => this.uploadFile(conversationEntity, file, asImage));
     }
@@ -487,7 +487,7 @@ export class MessageRepository {
 
   private async uploadFile(
     conversationEntity: Conversation,
-    file: File | Blob,
+    file: Blob,
     asImage: boolean = false,
   ): Promise<EventRecord | void> {
     let messageId;
@@ -554,13 +554,22 @@ export class MessageRepository {
     };
     const asset = await this.assetRepository.uploadFile(file, messageId, options);
 
-    const assetMessage = MessageBuilder.createFileData({
+    const commonPayload = {
       asset: asset,
       conversationId: conversation.id,
-      file: {data: Buffer.from(await file.arrayBuffer())},
       from: this.userState.self().id,
       originalMessageId: messageId,
-    });
+    };
+    const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
+    const assetMessage = metadata
+      ? MessageBuilder.createImage({
+          ...commonPayload,
+          image: metadata,
+        })
+      : MessageBuilder.createFileData({
+          ...commonPayload,
+          file: {data: Buffer.from(await file.arrayBuffer())},
+        });
     return this.sendAndInjectGenericCoreMessage(assetMessage, conversation);
   }
 

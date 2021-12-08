@@ -208,13 +208,13 @@ export class AssetRepository {
     }
   }
 
-  async uploadProfileImage(image: Blob | File): Promise<{
+  async uploadProfileImage(image: Blob): Promise<{
     mediumImageKey: string;
     previewImageKey: string;
   }> {
     const [{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}] = await Promise.all([
-      this.compressImageWithWorker(image),
-      this.compressImageWithWorker(image, true),
+      this.compressImage(image),
+      this.compressImage(image, true),
     ]);
 
     const options: AssetUploadOptions = {
@@ -232,10 +232,7 @@ export class AssetRepository {
     };
   }
 
-  private async compressImageWithWorker(
-    image: File | Blob,
-    useProfileImageSize: boolean = false,
-  ): Promise<CompressedImage> {
+  private async compressImage(image: Blob, useProfileImageSize: boolean = false): Promise<CompressedImage> {
     const skipCompression = image.type === 'image/gif';
     const buffer = await loadFileBuffer(image);
     let compressedBytes: ArrayBuffer;

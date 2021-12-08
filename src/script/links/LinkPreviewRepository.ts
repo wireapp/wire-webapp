@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 import type {Data as OpenGraphResult} from 'open-graph';
-import type {Asset, LinkPreview} from '@wireapp/protocol-messaging';
+import {Asset, LinkPreview} from '@wireapp/protocol-messaging';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data/';
 import {AssetRetentionPolicy} from '@wireapp/api-client/src/asset/';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -35,6 +35,7 @@ import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
 import {LinkPreviewError} from '../error/LinkPreviewError';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {AssetRepository} from '../assets/AssetRepository';
+import {EncryptedAssetUploaded} from '@wireapp/core/src/main/cryptography';
 
 declare global {
   interface Window {
@@ -164,19 +165,34 @@ export class LinkPreviewRepository {
     }
   }
 
+  private wrapInProto(asset: EncryptedAssetUploaded, options) {
+    const assetRemoteData = new Asset.RemoteData({
+      assetId: asset.key,
+      assetToken: asset.token,
+      otrKey: new Uint8Array(asset.keyBytes),
+      sha256: new Uint8Array(asset.sha256),
+    });
+    const protoAsset = new Asset({
+      [PROTO_MESSAGE_TYPE.ASSET_UPLOADED]: assetRemoteData,
+      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: options.expectsReadConfirmation,
+      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: options.legalHoldStatus,
+    });
+    return protoAsset;
+  }
   /**
    * Upload open graph image as asset
    *
    * @param dataUri image data as base64 encoded data URI
    * @returns Resolves with the uploaded asset
    */
-  private uploadPreviewImage(dataUri: string): Promise<Asset> {
+  private async uploadPreviewImage(dataUri: string) {
     const blob = base64ToBlob(dataUri);
-    return this.assetRepository.uploadFile(
-      createRandomUuid(),
-      blob,
-      {expectsReadConfirmation: false, public: true, retention: AssetRetentionPolicy.PERSISTENT},
-      true,
-    );
+    const options = {
+      expectsReadConfirmation: false,
+      public: true,
+      retention: AssetRetentionPolicy.PERSISTENT,
+    };
+    const uploadedAsset = await this.assetRepository.uploadFile(blob, createRandomUuid(), options);
+    return this.wrapInProto(uploadedAsset, options);
   }
 }
