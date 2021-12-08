@@ -37,9 +37,7 @@ describe('InputLevel', () => {
         ({
           frequencyBinCount: 100,
           getByteFrequencyData: (arr: Uint8Array) => {
-            for (let i = 0; i < arr.length; i++) {
-              arr[i] = 128;
-            }
+            arr.fill(128);
           },
         } as AnalyserNode),
       createMediaStreamSource: (stream: MediaStream) => ({connect: () => {}}),
