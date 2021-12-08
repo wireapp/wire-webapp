@@ -321,7 +321,6 @@ describe('MessageRepository', () => {
       service: {
         conversation: {
           deleteMessageEveryone: jest.fn(() => Promise.resolve()),
-          messageBuilder: {},
         },
       },
     } as unknown as Core;

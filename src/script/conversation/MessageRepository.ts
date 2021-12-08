@@ -1843,9 +1843,10 @@ export class MessageRepository {
     payload: string,
     options: {nativePush?: boolean; recipients?: UserClients | QualifiedUserClients},
   ) {
-    const message = this.core.service!.conversation.messageBuilder.createCall({
+    const message = MessageBuilder.createCall({
       content: payload,
       conversationId: conversation.id,
+      from: this.userState.self().id,
     });
 
     return this.sendAndInjectGenericCoreMessage(message, conversation, {
