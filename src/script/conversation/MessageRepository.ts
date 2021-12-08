@@ -23,7 +23,6 @@ import {
   ButtonAction,
   Cleared,
   Confirmation,
-  Ephemeral,
   External,
   GenericMessage,
   LastRead,
@@ -80,7 +79,6 @@ import * as trackingHelpers from '../tracking/Helpers';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {buildMetadata, isVideo, isImage, isAudio, ImageMetadata} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
@@ -567,29 +565,6 @@ export class MessageRepository {
   }
 
   /**
-   * Wraps generic message in ephemeral message.
-   *
-   * @param genericMessage Message to be wrapped
-   * @param millis Expire time in milliseconds
-   * @returns New proto message
-   */
-  private wrapInEphemeralMessage(genericMessage: GenericMessage, millis: number) {
-    const ephemeralExpiration = ConversationEphemeralHandler.validateTimer(millis);
-
-    const protoEphemeral = new Ephemeral({
-      [genericMessage.content]: genericMessage[genericMessage.content],
-      [PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION]: ephemeralExpiration,
-    });
-
-    genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
-      messageId: genericMessage.messageId,
-    });
-
-    return genericMessage;
-  }
-
-  /**
    * Send asset upload failed message to specified conversation.
    *
    * @param conversation Conversation that should receive the file
@@ -742,41 +717,6 @@ export class MessageRepository {
       targetMode,
       userIds,
     });
-  }
-
-  private async _sendAndInjectGenericMessage(
-    conversationEntity: Conversation,
-    genericMessage: GenericMessage,
-    syncTimestamp = true,
-  ): Promise<ConversationEvent> {
-    if (conversationEntity.removed_from_conversation()) {
-      throw new Error('Cannot send message to conversation you are not part of');
-    }
-
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const senderId = this.clientState.currentClient().id;
-    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp, senderId);
-    const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
-      genericMessage,
-      optimisticEvent as EventRecord,
-    );
-    const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = GENERIC_MESSAGE_TYPE;
-    const isPing = (message: GenericMessage) => message.content === TYPE_KNOCK;
-    const isEphemeralPing = (message: GenericMessage) =>
-      message.content === TYPE_EPHEMERAL && isPing(message.ephemeral as unknown as GenericMessage);
-    const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
-    if (shouldPlayPingAudio) {
-      amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
-    }
-
-    const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId);
-    eventInfoEntity.setTimestamp(injectedEvent.time);
-    const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
-    this.trackContributed(conversationEntity, genericMessage);
-    const backendIsoDate = syncTimestamp ? sentPayload.time : '';
-    await this.updateMessageAsSent(conversationEntity, injectedEvent.id, backendIsoDate);
-    return injectedEvent;
   }
 
   /**
