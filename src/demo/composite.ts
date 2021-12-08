@@ -27,6 +27,7 @@ import {PayloadBundleType} from '../main/conversation';
 import type {ButtonActionContent, ButtonActionConfirmationContent} from '../main/conversation/content';
 
 import 'dotenv-defaults/config';
+import {MessageBuilder} from '../main/conversation/message/MessageBuilder';
 
 const args = process.argv.slice(2);
 const conversationId = args[0] || process.env.WIRE_CONVERSATION;
@@ -66,11 +67,11 @@ const login: LoginData = {
       buttonId,
       referenceMessageId,
     };
-    const buttonActionConfirmationMessage =
-      account.service!.conversation.messageBuilder.createButtonActionConfirmationMessage({
-        conversationId: conversation,
-        content: buttonActionConfirmationContent,
-      });
+    const buttonActionConfirmationMessage = MessageBuilder.createButtonActionConfirmationMessage({
+      conversationId: conversation,
+      from: clientId,
+      content: buttonActionConfirmationContent,
+    });
     await account.service!.conversation.send({payloadBundle: buttonActionConfirmationMessage, userIds: [from]});
 
     console.info(
@@ -80,8 +81,7 @@ const login: LoginData = {
 
   if (account.service) {
     // Send poll
-    const pollMessage = account.service.conversation.messageBuilder
-      .createComposite({conversationId})
+    const pollMessage = MessageBuilder.createComposite({conversationId, from: ''})
       .addText(Text.create({content: 'Are you a robot?'}))
       .addButton('Yes')
       .addButton('No')
@@ -96,8 +96,9 @@ const login: LoginData = {
       buttonId: lastButton!.id,
       referenceMessageId: pollMessage.id,
     };
-    const buttonActionMessage = account.service.conversation.messageBuilder.createButtonActionMessage({
+    const buttonActionMessage = MessageBuilder.createButtonActionMessage({
       conversationId,
+      from: clientId,
       content: buttonActionContent,
     });
     await account.service.conversation.send({payloadBundle: buttonActionMessage});

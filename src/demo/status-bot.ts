@@ -19,7 +19,7 @@
 
 import {APIClient} from '@wireapp/api-client';
 import {ClientType} from '@wireapp/api-client/src/client/';
-import {Account} from '@wireapp/core';
+import {Account, MessageBuilder} from '@wireapp/core';
 import {MemoryEngine} from '@wireapp/store-engine';
 import * as logdown from 'logdown';
 
@@ -68,7 +68,7 @@ if (!message) {
 
   const text = message || `I am posting from ${name} v${version}. 🌞`;
   for (const conversationId of conversationIds) {
-    const payload = account.service.conversation.messageBuilder.createText({conversationId, text}).build();
+    const payload = MessageBuilder.createText({conversationId, from: apiClient.userId, text}).build();
     await account.service.conversation.send({payloadBundle: payload});
   }
 })().catch(error => logger.error(error));

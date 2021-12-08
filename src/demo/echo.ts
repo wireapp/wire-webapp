@@ -28,6 +28,8 @@ import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {CONVERSATION_TYPING} from '@wireapp/api-client/src/conversation/data/';
 import {LegalHoldStatus, Confirmation} from '@wireapp/protocol-messaging';
 import {AssetContent} from '../main/conversation/content/AssetContent';
+import {LinkPreviewUploadedContent} from '../main/conversation/content';
+import {MessageBuilder} from '../main/conversation/message/MessageBuilder';
 
 const logger = logdown('@wireapp/core/demo/echo.js', {
   logger: console,
@@ -106,8 +108,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
     );
 
     if (CONFIRM_TYPES.includes(type)) {
-      const deliveredPayload = account.service.conversation.messageBuilder.createConfirmation({
+      const deliveredPayload = MessageBuilder.createConfirmation({
         conversationId,
+        from: account.userId,
         firstMessageId: messageId,
         type: Confirmation.Type.DELIVERED,
       });
@@ -118,8 +121,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
       await account.service.conversation.send({payloadBundle: deliveredPayload});
 
       if (content.expectsReadConfirmation) {
-        const readPayload = account.service.conversation.messageBuilder.createConfirmation({
+        const readPayload = MessageBuilder.createConfirmation({
           conversationId,
+          from: account.userId,
           firstMessageId: messageId,
           type: Confirmation.Type.READ,
         });
@@ -152,7 +156,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
   };
 
   const buildLinkPreviews = async originalLinkPreviews => {
-    const newLinkPreviews = [];
+    const newLinkPreviews: LinkPreviewUploadedContent[] = [];
     for (const originalLinkPreview of originalLinkPreviews) {
       const originalLinkPreviewImage =
         originalLinkPreview.article && originalLinkPreview.article.image
@@ -169,14 +173,10 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
           type: originalLinkPreviewImage.original.mimeType,
           width: originalLinkPreviewImage.original.image.width,
         };
+        linkPreviewImage = await account.service.asset.uploadImageAsset(linkPreviewImage);
       }
 
-      const newLinkPreview = await account.service.conversation.messageBuilder.createLinkPreview({
-        ...originalLinkPreview,
-        image: linkPreviewImage,
-      });
-
-      newLinkPreviews.push(newLinkPreview);
+      newLinkPreviews.push({...originalLinkPreview, imageUploaded: linkPreviewImage});
     }
     return newLinkPreviews;
   };
@@ -203,8 +203,12 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
         return;
       }
 
-      textPayload = account.service.conversation.messageBuilder
-        .createText({conversationId, text, messageId: cachedMessageId})
+      textPayload = MessageBuilder.createText({
+        conversationId,
+        text,
+        from: account.userId,
+        messageId: cachedMessageId,
+      })
         .withLinkPreviews(newLinkPreviews)
         .withMentions(mentions)
         .withQuote(quote)
@@ -213,8 +217,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
         .build();
     } else {
       await handleIncomingMessage(data);
-      textPayload = account.service.conversation.messageBuilder
-        .createText({conversationId, text})
+      textPayload = MessageBuilder.createText({conversationId, from: account.userId, text})
         .withMentions(mentions)
         .withQuote(quote)
         .withReadConfirmation(expectsReadConfirmation)
@@ -242,8 +245,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
 
     await handleIncomingMessage(data);
 
-    const fileMetaDataPayload = account.service.conversation.messageBuilder.createFileMetadata({
+    const fileMetaDataPayload = MessageBuilder.createFileMetadata({
       conversationId,
+      from: account.userId,
       metaData: {
         length: fileBuffer.length,
         name: cacheOriginal.name,
@@ -254,17 +258,22 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
     await sendMessageResponse(data, fileMetaDataPayload);
 
     try {
-      const filePayload = await account.service.conversation.messageBuilder.createFileData({
+      const file = {data: fileBuffer};
+      const asset = await account.service!.asset.uploadFileAsset(file);
+      const filePayload = MessageBuilder.createFileData({
         conversationId,
-        file: {data: fileBuffer},
+        from: account.userId,
+        asset,
+        file,
         originalMessageId: fileMetaDataPayload.id,
       });
       messageIdCache[messageId] = filePayload.id;
       await sendMessageResponse(data, filePayload);
     } catch (error) {
       logger.warn(`Error while sending asset: "${error.stack}"`);
-      const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort({
+      const fileAbortPayload = MessageBuilder.createFileAbort({
         conversationId,
+        from: account.userId,
         reason: 0,
         originalMessageId: fileMetaDataPayload.id,
       });
@@ -294,8 +303,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
       return;
     }
 
-    const fileMetaDataPayload = await account.service.conversation.messageBuilder.createFileMetadata({
+    const fileMetaDataPayload = MessageBuilder.createFileMetadata({
       conversationId,
+      from: account.userId,
       metaData: {
         length: 0,
         name: cacheOriginal.name,
@@ -306,8 +316,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
     await handleIncomingMessage(data);
     await sendMessageResponse(data, fileMetaDataPayload);
 
-    const fileAbortPayload = await account.service.conversation.messageBuilder.createFileAbort({
+    const fileAbortPayload = MessageBuilder.createFileAbort({
       conversationId,
+      from: account.userId,
       reason: 0,
       originalMessageId: fileMetaDataPayload.id,
     });
@@ -326,14 +337,18 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
 
     const imageBuffer = await account.service.conversation.getAsset(uploaded);
 
-    const imagePayload = await account.service.conversation.messageBuilder.createImage({
+    const image = {
+      data: imageBuffer,
+      height: original.image.height,
+      type: original.mimeType,
+      width: original.image.width,
+    };
+    const imageAsset = await account.service!.asset.uploadImageAsset(image);
+    const imagePayload = MessageBuilder.createImage({
       conversationId,
-      image: {
-        data: imageBuffer,
-        height: original.image.height,
-        type: original.mimeType,
-        width: original.image.width,
-      },
+      from: account.userId,
+      image,
+      imageAsset,
     });
 
     messageIdCache[messageId] = imagePayload.id;
@@ -350,8 +365,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
 
   account.on(PayloadBundleType.LOCATION, async data => {
     const {content, conversation: conversationId} = data;
-    const locationPayload = account.service.conversation.messageBuilder.createLocation({
+    const locationPayload = MessageBuilder.createLocation({
       conversationId,
+      from: account.userId,
       location: content,
     });
 
@@ -366,8 +382,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
     } = data;
     await handleIncomingMessage(data);
 
-    const pingPayload = account.service.conversation.messageBuilder.createPing({
+    const pingPayload = MessageBuilder.createPing({
       conversationId,
+      from: account.userId,
       ping: {
         expectsReadConfirmation,
         hotKnock: false,
@@ -386,8 +403,9 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
 
     await handleIncomingMessage(data);
 
-    const reactionPayload = account.service.conversation.messageBuilder.createReaction({
+    const reactionPayload = MessageBuilder.createReaction({
       conversationId,
+      from: account.userId,
       reaction: {
         legalHoldStatus,
         originalMessageId,
@@ -454,13 +472,13 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
         logger.warn(`Link preview for edited message ID "${messageId} was received before the original message."`);
         return;
       }
-      editedPayload = account.service.conversation.messageBuilder
-        .createEditedText({
-          conversationId,
-          newMessageText: text,
-          originalMessageId: cachedOriginalMessageId,
-          messageId: cachedMessageId,
-        })
+      editedPayload = MessageBuilder.createEditedText({
+        conversationId,
+        from: account.userId,
+        newMessageText: text,
+        originalMessageId: cachedOriginalMessageId,
+        messageId: cachedMessageId,
+      })
         .withLinkPreviews(newLinkPreviews)
         .withMentions(mentions)
         .withQuote(quote)
@@ -469,8 +487,12 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
         .build();
     } else {
       await handleIncomingMessage(data);
-      editedPayload = account.service.conversation.messageBuilder
-        .createEditedText({conversationId, newMessageText: text, originalMessageId: cachedOriginalMessageId})
+      editedPayload = MessageBuilder.createEditedText({
+        conversationId,
+        from: account.userId,
+        newMessageText: text,
+        originalMessageId: cachedOriginalMessageId,
+      })
         .withMentions(mentions)
         .withQuote(quote)
         .withReadConfirmation(expectsReadConfirmation)

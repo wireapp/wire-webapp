@@ -51,6 +51,7 @@ import {SelfService} from './self/';
 import {TeamService} from './team/';
 import {UserService} from './user/';
 import {AccountService} from './account/';
+import {LinkPreviewService} from './linkPreview';
 
 enum TOPIC {
   ERROR = 'Account.TOPIC.ERROR',
@@ -116,6 +117,7 @@ export class Account extends EventEmitter {
     conversation: ConversationService;
     cryptography: CryptographyService;
     giphy: GiphyService;
+    linkPreview: LinkPreviewService;
     notification: NotificationService;
     self: SelfService;
     team: TeamService;
@@ -205,7 +207,8 @@ export class Account extends EventEmitter {
     const clientService = new ClientService(this.apiClient, storeEngine, cryptographyService);
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
-    const conversationService = new ConversationService(this.apiClient, cryptographyService, assetService);
+    const linkPreviewService = new LinkPreviewService(assetService);
+    const conversationService = new ConversationService(this.apiClient, cryptographyService);
     const notificationService = new NotificationService(this.apiClient, cryptographyService, storeEngine);
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
@@ -222,6 +225,7 @@ export class Account extends EventEmitter {
       conversation: conversationService,
       cryptography: cryptographyService,
       giphy: giphyService,
+      linkPreview: linkPreviewService,
       notification: notificationService,
       self: selfService,
       team: teamService,

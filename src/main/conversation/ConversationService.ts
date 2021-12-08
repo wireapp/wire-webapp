@@ -52,7 +52,6 @@ import {
 } from '@wireapp/protocol-messaging';
 
 import {
-  AssetService,
   AssetTransferState,
   GenericMessageType,
   MessageTimer,
@@ -153,16 +152,10 @@ export interface MessageSendingCallbacks {
 
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
-  public readonly messageBuilder: MessageBuilder;
   private readonly messageService: MessageService;
 
-  constructor(
-    private readonly apiClient: APIClient,
-    cryptographyService: CryptographyService,
-    private readonly assetService: AssetService,
-  ) {
+  constructor(private readonly apiClient: APIClient, cryptographyService: CryptographyService) {
     this.messageTimer = new MessageTimer();
-    this.messageBuilder = new MessageBuilder(this.apiClient, this.assetService);
     this.messageService = new MessageService(this.apiClient, cryptographyService);
   }
 
