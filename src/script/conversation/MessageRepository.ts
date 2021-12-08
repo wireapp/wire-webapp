@@ -488,7 +488,7 @@ export class MessageRepository {
   private async uploadFile(
     conversationEntity: Conversation,
     file: File | Blob,
-    asImage?: boolean,
+    asImage: boolean = false,
   ): Promise<EventRecord | void> {
     let messageId;
     try {
@@ -618,30 +618,24 @@ export class MessageRepository {
   /**
    * Send asset upload failed message to specified conversation.
    *
-   * @param conversationEntity Conversation that should receive the file
+   * @param conversation Conversation that should receive the file
    * @param messageId ID of the metadata message
    * @param reason Cause for the failed upload (optional)
    * @returns Resolves when the asset failure was sent
    */
   private sendAssetUploadFailed(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     messageId: string,
-    reason = ProtobufAsset.NotUploaded.FAILED,
+    reason = Asset.NotUploaded.FAILED,
   ): Promise<ConversationEvent> {
-    const wasCancelled = reason === ProtobufAsset.NotUploaded.CANCELLED;
-    const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
-    const protoAsset = new Asset({
-      [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
+    const payload = MessageBuilder.createFileAbort({
+      conversationId: conversation.id,
+      from: this.userState.self().id,
+      originalMessageId: messageId,
+      reason,
     });
 
-    const generic_message = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
-      messageId,
-    });
-
-    return this._sendAndInjectGenericMessage(conversationEntity, generic_message);
+    return this.sendAndInjectGenericCoreMessage(payload, conversation);
   }
 
   /**
