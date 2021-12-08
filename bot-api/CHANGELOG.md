@@ -3,6 +3,53 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [8.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.17.68...@wireapp/bot-api@8.0.0) (2021-12-08)
+
+
+### Features
+
+* **core:** Make message builder stateless ([#4197](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/issues/4197)) ([95a51a6](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/commit/95a51a614b20730767916885182eb185b46c4c38))
+
+
+### BREAKING CHANGES
+
+* **core:** - `MessageBuilder` has been moved from `account.services.conversation.messageBuilder` to an own stateless class.
+- All method of the `MessageBuilder` now take a required `from` parameter
+- `MessageBuilder` is not uploading files under the hood. Upload must be done in a separate function call
+
+Replace
+
+```
+const textPayload = account.service.conversation.messageBuilder.createText(...);
+```
+
+With
+
+```
+import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+//...
+const textPayload = MessageBuilder.createText(...);
+```
+
+Replace
+
+```
+const linkPreview = await account.service.conversation.messageBuilder.createLinkPreview(...);
+cons textPayload = account.service.conversation.messageBuilder.createText(...).withLinkPreview([linkPreview]);
+```
+
+With
+
+```
+cons textPayload = account.service.conversation.messageBuilder
+    .createText(...)
+    .withLinkPreview([await this.account.service.linkPreview.uploadLinkPreviewImage(newLinkPreview)]);
+```
+
+
+
+
+
 ## [7.17.68](https://github.com/wireapp/wire-web-packages/tree/main/packages/bot-api/compare/@wireapp/bot-api@7.17.67...@wireapp/bot-api@7.17.68) (2021-12-06)
 
 **Note:** Version bump only for package @wireapp/bot-api
