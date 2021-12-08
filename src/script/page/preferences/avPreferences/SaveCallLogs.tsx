@@ -27,7 +27,7 @@ import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Config} from '../../../Config';
-import PreferencesSection from '../accountPreferences/PreferencesSection';
+import PreferencesSection from '../components/PreferencesSection';
 import type {CallingRepository} from '../../../calling/CallingRepository';
 import {ModalsViewModel} from '../../../view_model/ModalsViewModel';
 import {UserState} from '../../../user/UserState';

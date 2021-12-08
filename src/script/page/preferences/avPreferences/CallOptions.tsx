@@ -28,8 +28,8 @@ import {Config} from '../../../Config';
 import type {MediaConstraintsHandler} from '../../../media/MediaConstraintsHandler';
 import type {PropertiesRepository} from '../../../properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from '../../../properties/PropertiesType';
-import PreferencesCheckbox from '../accountPreferences/PreferencesCheckbox';
-import PreferencesSection from '../accountPreferences/PreferencesSection';
+import PreferencesCheckbox from '../components/PreferencesCheckbox';
+import PreferencesSection from '../components/PreferencesSection';
 
 interface CallOptionsProps {
   constraintsHandler: MediaConstraintsHandler;

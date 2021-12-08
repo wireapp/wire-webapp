@@ -26,7 +26,7 @@ import useEffectRef from 'Util/useEffectRef';
 import {getLogger} from 'Util/Logger';
 
 import {Config} from '../../../Config';
-import PreferencesSection from '../accountPreferences/PreferencesSection';
+import PreferencesSection from '../components/PreferencesSection';
 import DeviceSelect from './DeviceSelect';
 import {DeviceTypes, MediaDevicesHandler} from '../../../media/MediaDevicesHandler';
 import {MediaStreamHandler} from '../../../media/MediaStreamHandler';
