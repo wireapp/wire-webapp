@@ -558,7 +558,7 @@ export class MessageRepository {
       asset: asset,
       conversationId: conversation.id,
       from: this.userState.self().id,
-      originalMessageId: messageId,
+      messageId,
     };
     const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
     const assetMessage = metadata
@@ -569,6 +569,7 @@ export class MessageRepository {
       : MessageBuilder.createFileData({
           ...commonPayload,
           file: {data: Buffer.from(await file.arrayBuffer())},
+          originalMessageId: messageId,
         });
     return this.sendAndInjectGenericCoreMessage(assetMessage, conversation);
   }
