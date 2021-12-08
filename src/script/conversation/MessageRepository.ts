@@ -73,7 +73,7 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {AssetAddEvent, EventBuilder} from '../conversation/EventBuilder';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
@@ -82,9 +82,8 @@ import {EventMapper} from './EventMapper';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
-import {buildMetadata, isVideo, isImage, isAudio} from '../assets/AssetMetaDataBuilder';
+import {buildMetadata, isVideo, isImage, isAudio, ImageMetadata} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
@@ -109,7 +108,7 @@ import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {MentionEntity} from '../message/MentionEntity';
 import {FileAsset} from '../entity/message/FileAsset';
-import type {AssetRecord, EventRecord} from '../storage';
+import type {EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
@@ -126,7 +125,6 @@ import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 type ConversationEvent = {conversation: string; id?: string};
-type EventJson = any;
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
 type ClientMismatchHandlerFn = (
@@ -418,7 +416,7 @@ export class MessageRepository {
    *
    * @param conversationEntity Conversation to post the images
    */
-  public uploadImages(conversationEntity: Conversation, images: File[] | Blob[]) {
+  public uploadImages(conversationEntity: Conversation, images: Blob[]) {
     this.uploadFiles(conversationEntity, images, true);
   }
 
@@ -429,7 +427,7 @@ export class MessageRepository {
    * @param files files
    * @param asImage whether or not the file should be treated as an image
    */
-  public uploadFiles(conversationEntity: Conversation, files: File[] | Blob[], asImage?: boolean) {
+  public uploadFiles(conversationEntity: Conversation, files: Blob[], asImage?: boolean) {
     if (this.canUploadAssetsToConversation(conversationEntity)) {
       Array.from(files).forEach(file => this.uploadFile(conversationEntity, file, asImage));
     }
@@ -455,8 +453,8 @@ export class MessageRepository {
 
   private async uploadFile(
     conversationEntity: Conversation,
-    file: File | Blob,
-    asImage?: boolean,
+    file: Blob,
+    asImage: boolean = false,
   ): Promise<EventRecord | void> {
     let messageId;
     try {
@@ -512,66 +510,33 @@ export class MessageRepository {
     }
   }
 
-  private async sendAssetRemotedata(
-    conversationEntity: Conversation,
-    file: Blob,
-    messageId: string,
-    asImage: boolean,
-  ): Promise<void> {
-    let genericMessage: GenericMessage;
-
-    await this.getMessageInConversationById(conversationEntity, messageId);
-    const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversationEntity);
+  private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
+    const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
-      expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
-      legalHoldStatus: conversationEntity.legalHoldStatus(),
+      expectsReadConfirmation: this.expectReadReceipt(conversation),
+      legalHoldStatus: conversation.legalHoldStatus(),
       public: true,
       retention,
     };
-    const asset = await this.assetRepository.uploadFile(messageId, file, options, asImage);
-    genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.ASSET]: asset,
-      messageId,
-    });
-    if (conversationEntity.messageTimer()) {
-      genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
-    }
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId);
-    const payload = await this.sendGenericMessageToConversation(eventInfoEntity);
-    const {uploaded: assetData} = conversationEntity.messageTimer()
-      ? genericMessage.ephemeral.asset
-      : genericMessage.asset;
-    const data: AssetRecord = {
-      key: assetData.assetId,
-      otr_key: assetData.otrKey,
-      sha256: assetData.sha256,
-      token: assetData.assetToken,
+    const asset = await this.assetRepository.uploadFile(file, messageId, options);
+
+    const commonPayload = {
+      asset: asset,
+      conversationId: conversation.id,
+      from: this.userState.self().id,
+      originalMessageId: messageId,
     };
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const assetAddEvent = EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
-    assetAddEvent.id = messageId;
-    assetAddEvent.time = payload.time;
-    return this.onAssetUploadComplete(conversationEntity, assetAddEvent);
-  }
-
-  /**
-   * An asset was uploaded.
-   *
-   * @param conversationEntity Conversation to add the event to
-   * @param event_json JSON data of 'conversation.asset-upload-complete' event
-   * @returns Resolves when the event was handled
-   */
-  private async onAssetUploadComplete(conversationEntity: Conversation, event_json: AssetAddEvent): Promise<void> {
-    try {
-      const message_et = await this.getMessageInConversationById(conversationEntity, event_json.id);
-      return await this.updateMessageAsUploadComplete(conversationEntity, message_et, event_json);
-    } catch (error) {
-      if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-        throw error;
-      }
-
-      this.logger.error(`Upload complete: Could not find message with id '${event_json.id}'`, event_json);
-    }
+    const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
+    const assetMessage = metadata
+      ? MessageBuilder.createImage({
+          ...commonPayload,
+          image: metadata,
+        })
+      : MessageBuilder.createFileData({
+          ...commonPayload,
+          file: {data: Buffer.from(await file.arrayBuffer())},
+        });
+    return this.sendAndInjectGenericCoreMessage(assetMessage, conversation);
   }
 
   /**
@@ -625,59 +590,26 @@ export class MessageRepository {
   }
 
   /**
-   * Update asset in UI and DB as completed.
-   *
-   * @param conversationEntity Conversation that contains the message
-   * @param message_et Message to update
-   * @param event_json Uploaded asset event information
-   * @returns Resolve when message was updated
-   */
-  private updateMessageAsUploadComplete(
-    conversationEntity: Conversation,
-    message_et: ContentMessage,
-    event_json: EventJson,
-  ): Promise<void> {
-    const {id, key, otr_key, sha256, token} = event_json.data;
-    const asset_et = message_et.getFirstAsset() as FileAsset;
-
-    const resource = key
-      ? AssetRemoteData.v3(key, otr_key, sha256, token)
-      : AssetRemoteData.v2(conversationEntity.id, id, otr_key, sha256);
-
-    asset_et.original_resource(resource);
-    asset_et.status(AssetTransferState.UPLOADED);
-    message_et.status(StatusType.SENT);
-
-    return this.eventService.updateEventAsUploadSucceeded(message_et.primary_key, event_json);
-  }
-
-  /**
    * Send asset upload failed message to specified conversation.
    *
-   * @param conversationEntity Conversation that should receive the file
+   * @param conversation Conversation that should receive the file
    * @param messageId ID of the metadata message
    * @param reason Cause for the failed upload (optional)
    * @returns Resolves when the asset failure was sent
    */
   private sendAssetUploadFailed(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     messageId: string,
-    reason = ProtobufAsset.NotUploaded.FAILED,
+    reason = Asset.NotUploaded.FAILED,
   ): Promise<ConversationEvent> {
-    const wasCancelled = reason === ProtobufAsset.NotUploaded.CANCELLED;
-    const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
-    const protoAsset = new Asset({
-      [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
+    const payload = MessageBuilder.createFileAbort({
+      conversationId: conversation.id,
+      from: this.userState.self().id,
+      originalMessageId: messageId,
+      reason,
     });
 
-    const generic_message = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
-      messageId,
-    });
-
-    return this._sendAndInjectGenericMessage(conversationEntity, generic_message);
+    return this.sendAndInjectGenericCoreMessage(payload, conversation);
   }
 
   private isUserCancellationError(error: ConversationError): boolean {

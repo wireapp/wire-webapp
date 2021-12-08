@@ -30,19 +30,14 @@ import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {ClientEvent} from 'src/script/event/Client';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {AssetAddEvent} from 'src/script/conversation/EventBuilder';
 import {ClientRepository} from '../client/ClientRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -94,70 +89,6 @@ describe('MessageRepository', () => {
 
   afterEach(() => {
     server.restore();
-  });
-
-  describe('asset upload', () => {
-    it('should update original asset when asset upload is complete', async () => {
-      const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
-
-      const fileAssetEntity = new FileAsset();
-      fileAssetEntity.status(AssetTransferState.UPLOADING);
-
-      const messageEntity = new ContentMessage(createRandomUuid());
-      messageEntity.assets.push(fileAssetEntity);
-      conversationEntity.addMessage(messageEntity);
-
-      const event: Partial<AssetAddEvent> = {
-        conversation: conversationEntity.id,
-        data: {
-          id: createRandomUuid(),
-          otr_key: new Uint8Array([]),
-          sha256: new Uint8Array([]),
-        },
-        from: createRandomUuid(),
-        id: messageEntity.id,
-        time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.ASSET_ADD,
-      };
-
-      const userState = new UserState();
-      const teamState = new TeamState(userState);
-      const conversationState = new ConversationState(userState, teamState);
-      const clientState = new ClientState();
-
-      const eventService = {
-        updateEventAsUploadSucceeded: jest.fn(),
-      };
-
-      const messageRepository = new MessageRepository(
-        {} as ClientRepository,
-        () => ({} as ConversationRepository),
-        {} as CryptographyRepository,
-        {
-          eventService: eventService as unknown as EventService,
-        } as EventRepository,
-        {} as MessageSender,
-        {} as PropertiesRepository,
-        {} as ServerTimeHandler,
-        {} as UserRepository,
-        {} as ConversationService,
-        {} as AssetRepository,
-        userState,
-        teamState,
-        conversationState,
-        clientState,
-      );
-
-      await messageRepository['onAssetUploadComplete'](conversationEntity, event as AssetAddEvent);
-
-      expect(eventService.updateEventAsUploadSucceeded).toHaveBeenCalled();
-
-      const firstAsset = messageEntity.assets()[0] as FileAsset;
-
-      expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
-      expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
-      expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
-    });
   });
 
   describe('sendTextWithLinkPreview', () => {
