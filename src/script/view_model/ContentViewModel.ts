@@ -34,7 +34,6 @@ import {LegalHoldModalViewModel} from './content/LegalHoldModalViewModel';
 import {GroupCreationViewModel} from './content/GroupCreationViewModel';
 import {EmojiInputViewModel} from './content/EmojiInputViewModel';
 import {ModalsViewModel} from './ModalsViewModel';
-import {PreferencesAVViewModel} from './content/PreferencesAVViewModel';
 import {ServiceModalViewModel} from './content/ServiceModalViewModel';
 import {InviteModalViewModel} from './content/InviteModalViewModel';
 import {ConversationError} from '../error/ConversationError';
@@ -49,7 +48,6 @@ import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
 import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
 import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
-import {MediaType} from '../media/MediaType';
 import {PanelViewModel} from './PanelViewModel';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import type {ConversationRepository} from '../conversation/ConversationRepository';
@@ -63,6 +61,7 @@ import {isConversationEntity} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import '../page/preferences/AccountPreferences';
 import '../page/preferences/OptionPreferences';
+import '../page/preferences/AVPreferences';
 import {PreferenceNotificationRepository, Notification} from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
 import {ClientEntity} from '../client/ClientEntity';
@@ -100,7 +99,6 @@ export class ContentViewModel {
   mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
   preferencesAbout: PreferencesAboutViewModel;
-  preferencesAV: PreferencesAVViewModel;
   preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
   preferencesDevices: PreferencesDevicesViewModel;
   previousConversation: Conversation | null = null;
@@ -182,10 +180,6 @@ export class ContentViewModel {
     this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
     this.preferencesAbout = new PreferencesAboutViewModel();
-    this.preferencesAV = new PreferencesAVViewModel(repositories.media, repositories.properties, repositories.calling, {
-      replaceActiveMediaSource: repositories.calling.changeMediaSource.bind(repositories.calling),
-      stopActiveMediaSource: repositories.calling.stopMediaSource.bind(repositories.calling),
-    });
     this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
       mainViewModel,
       repositories.client,
@@ -205,9 +199,6 @@ export class ContentViewModel {
           break;
         case ContentViewModel.STATE.PREFERENCES_ACCOUNT:
           this.popNotification();
-          break;
-        case ContentViewModel.STATE.PREFERENCES_AV:
-          this.preferencesAV.updateMediaStreamTrack(MediaType.AUDIO_VIDEO);
           break;
         case ContentViewModel.STATE.PREFERENCES_DEVICES:
           this.preferencesDevices.updateDeviceInfo();
@@ -430,11 +421,6 @@ export class ContentViewModel {
       }
 
       return this.messageList.releaseConversation(undefined);
-    }
-
-    const isStatePreferencesAv = this.previousState === ContentViewModel.STATE.PREFERENCES_AV;
-    if (isStatePreferencesAv) {
-      this.preferencesAV.releaseDevices(MediaType.AUDIO_VIDEO);
     }
   };
 
