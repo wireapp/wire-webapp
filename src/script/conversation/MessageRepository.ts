@@ -271,6 +271,7 @@ export class MessageRepository {
   public async sendPing(conversation: Conversation) {
     const ping = MessageBuilder.createPing({
       conversationId: conversation.id,
+      from: this.userState.self().id,
       ping: {
         expectsReadConfirmation: this.expectReadReceipt(conversation),
         hotKnock: false,

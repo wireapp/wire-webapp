@@ -221,14 +221,11 @@ export class AssetRepository {
       retention: AssetRetentionPolicy.ETERNAL,
     };
 
-    const previewPictureUpload = await this.assetService.uploadFile(previewImageBytes, options);
-    const uploadedPreviewPicture = await previewPictureUpload.response;
-
-    const mediumPictureUpload = await this.assetService.uploadFile(mediumImageBytes, options);
-    const mediumPicture = await mediumPictureUpload.response;
+    const previewPicture = await this.assetService.uploadFile(previewImageBytes, options).response;
+    const mediumPicture = await this.assetService.uploadFile(mediumImageBytes, options).response;
 
     return {
-      mediumImageKey: uploadedPreviewPicture.key,
+      mediumImageKey: previewPicture.key,
       previewImageKey: mediumPicture.key,
     };
   }
