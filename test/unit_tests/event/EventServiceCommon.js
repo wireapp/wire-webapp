@@ -348,32 +348,6 @@ const testEventServiceClass = (testedServiceName, className) => {
           expect(updateSpy).not.toHaveBeenCalled();
         });
       });
-
-      it('sets asset data and update event', () => {
-        const initialEvent = {
-          id: 'event-id',
-          data: {content: ''},
-        };
-        const successEvent = {
-          data: {
-            id: 'asset-id',
-            key: 'asset-key',
-            otr_key: 'otr_key',
-            sha256: 'sha',
-            token: 'asset-token',
-          },
-          time: '2016-08-04T13:27:58.993Z',
-        };
-        spyOn(testFactory.storage_service, 'load').and.returnValue(Promise.resolve(initialEvent));
-        spyOn(testFactory.storage_service, 'update').and.callFake((storeName, primaryKey, updates) => {
-          expect(updates.data).toEqual(jasmine.objectContaining(successEvent.data));
-          expect(updates.data.content).toEqual(initialEvent.data.content);
-          return Promise.resolve(undefined);
-        });
-        return testFactory.event_service.updateEventAsUploadSucceeded(12, successEvent).then(() => {
-          expect(testFactory.storage_service.update).toHaveBeenCalled();
-        });
-      });
     });
 
     describe('updateEventAsUploadFailed', () => {

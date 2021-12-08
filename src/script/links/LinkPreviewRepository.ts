@@ -34,7 +34,7 @@ import {isBlacklisted} from './LinkPreviewBlackList';
 import {buildFromOpenGraphData} from './LinkPreviewProtoBuilder';
 import {LinkPreviewError} from '../error/LinkPreviewError';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {AssetRepository} from '../assets/AssetRepository';
+import {AssetRepository, AssetUploadOptions} from '../assets/AssetRepository';
 import {EncryptedAssetUploaded} from '@wireapp/core/src/main/cryptography';
 
 declare global {
@@ -165,7 +165,7 @@ export class LinkPreviewRepository {
     }
   }
 
-  private wrapInProto(asset: EncryptedAssetUploaded, options) {
+  private wrapInProto(asset: EncryptedAssetUploaded, options: AssetUploadOptions) {
     const assetRemoteData = new Asset.RemoteData({
       assetId: asset.key,
       assetToken: asset.token,
