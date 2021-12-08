@@ -22,7 +22,7 @@ import UUID from 'uuidjs';
 import {AssetService} from './AssetService';
 
 describe('AssetService', () => {
-  describe('"uploadImageAsset"', () => {
+  describe('"uploadAsset"', () => {
     it('builds an encrypted asset payload', async () => {
       const apiClient = new APIClient();
       const assetService = new AssetService(apiClient);
@@ -33,21 +33,12 @@ describe('AssetService', () => {
         expires: '',
       };
 
-      const image = {
-        data: Buffer.from([1, 2, 3]),
-        height: 600,
-        type: 'image/png',
-        width: 600,
-      };
+      spyOn(apiClient.asset.api, 'postAsset').and.returnValue({
+        cancel: () => {},
+        response: Promise.resolve(assetServerData),
+      });
 
-      spyOn(apiClient.asset.api, 'postAsset').and.returnValue(
-        Promise.resolve({
-          cancel: () => {},
-          response: Promise.resolve(assetServerData),
-        }),
-      );
-
-      const asset = await assetService.uploadImageAsset(image);
+      const asset = await (await assetService.uploadAsset(Buffer.from([1, 2, 3]))).response;
 
       expect(asset).toEqual(
         jasmine.objectContaining({
@@ -57,6 +48,41 @@ describe('AssetService', () => {
           token: assetServerData.token,
         }),
       );
+    });
+
+    it('allows cancelling asset upload', async () => {
+      const apiClient = new APIClient();
+      const assetService = new AssetService(apiClient);
+
+      const apiUpload = {
+        cancel: jasmine.createSpy(),
+        response: Promise.resolve({} as any),
+      };
+
+      spyOn(apiClient.asset.api, 'postAsset').and.returnValue(apiUpload);
+
+      const asset = await assetService.uploadAsset(Buffer.from([1, 2, 3]));
+      asset.cancel();
+      expect(apiUpload.cancel).toHaveBeenCalled();
+    });
+
+    it('exposes upload progress', async () => {
+      const apiClient = new APIClient();
+      const assetService = new AssetService(apiClient);
+
+      const apiUpload = {
+        cancel: jasmine.createSpy(),
+        response: Promise.resolve({} as any),
+      };
+
+      spyOn(apiClient.asset.api, 'postAsset').and.callFake((_asset, _options, progressCallback) => {
+        progressCallback?.(1);
+        return apiUpload;
+      });
+
+      const onProgress = jasmine.createSpy();
+      await assetService.uploadAsset(Buffer.from([1, 2, 3]), {}, onProgress);
+      expect(onProgress).toHaveBeenCalledWith(1);
     });
   });
 });

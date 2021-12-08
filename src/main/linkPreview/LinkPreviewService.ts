@@ -30,7 +30,7 @@ export class LinkPreviewService {
     }
 
     const uploadedLinkPreview: LinkPreviewUploadedContent = preview;
-    const asset = await this.assetService.uploadImageAsset(linkPreview.image);
+    const asset = await (await this.assetService.uploadAsset(linkPreview.image.data)).response;
     uploadedLinkPreview.imageUploaded = {
       asset,
       image,

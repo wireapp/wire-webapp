@@ -173,7 +173,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
           type: originalLinkPreviewImage.original.mimeType,
           width: originalLinkPreviewImage.original.image.width,
         };
-        linkPreviewImage = await account.service.asset.uploadImageAsset(linkPreviewImage);
+        linkPreviewImage = await account.service.linkPreview.uploadLinkPreviewImage(linkPreviewImage);
       }
 
       newLinkPreviews.push({...originalLinkPreview, imageUploaded: linkPreviewImage});
@@ -259,7 +259,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
 
     try {
       const file = {data: fileBuffer};
-      const asset = await account.service!.asset.uploadFileAsset(file);
+      const asset = await (await account.service!.asset.uploadAsset(file.data)).response;
       const filePayload = MessageBuilder.createFileData({
         conversationId,
         from: account.userId,
@@ -343,7 +343,7 @@ const {WIRE_EMAIL, WIRE_PASSWORD, WIRE_BACKEND = 'staging'} = process.env;
       type: original.mimeType,
       width: original.image.width,
     };
-    const imageAsset = await account.service!.asset.uploadImageAsset(image);
+    const imageAsset = await (await account.service!.asset.uploadAsset(image.data)).response;
     const imagePayload = MessageBuilder.createImage({
       conversationId,
       from: account.userId,
