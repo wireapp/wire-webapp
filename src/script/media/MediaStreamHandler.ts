@@ -122,7 +122,7 @@ export class MediaStreamHandler {
     return shouldCheckPermissions ? checkPermissionStates(permissionTypes) : true;
   }
 
-  releaseTracksFromStream(mediaStream: MediaStream, mediaType: MediaType): void {
+  releaseTracksFromStream(mediaStream: MediaStream, mediaType?: MediaType): void {
     const mediaStreamTracks = this.getMediaTracks(mediaStream, mediaType);
 
     mediaStreamTracks.forEach((mediaStreamTrack: MediaStreamTrack) => {
