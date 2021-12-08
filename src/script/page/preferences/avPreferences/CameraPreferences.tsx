@@ -40,10 +40,6 @@ interface CameraPreferencesProps {
   streamHandler: MediaStreamHandler;
 }
 
-const useRequestStream = () => {
-  
-}
-
 const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, streamHandler, streamCallback}) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
