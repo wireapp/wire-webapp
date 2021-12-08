@@ -54,6 +54,8 @@ import {
   FileMetaDataContent,
   LinkPreviewUploadedContent,
 } from '@wireapp/core/src/main/conversation/content';
+import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
+import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -122,8 +124,6 @@ import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage
 import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
-import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 
 type ConversationEvent = {conversation: string; id?: string};
 type EventJson = any;
