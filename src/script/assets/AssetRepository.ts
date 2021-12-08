@@ -281,8 +281,9 @@ export class AssetRepository {
     );
     this.uploadCancelTokens[messageId] = request.cancel;
 
+    const response = await request.response;
     this.removeFromUploadQueue(messageId);
-    return request.response;
+    return response;
   }
 
   cancelUpload(messageId: string): void {
