@@ -37,13 +37,10 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
   {suggestion, onSuggestionClick, onMouseEnter, isSelected},
   ref,
 ) => {
-  const {name, expirationRemainingText, isTemporaryGuest, isExternal, isGuest} = useKoSubscribableChildren(suggestion, [
-    'name',
-    'expirationRemainingText',
-    'isTemporaryGuest',
-    'isExternal',
-    'isGuest',
-  ]);
+  const {name, expirationRemainingText, isTemporaryGuest, isExternal, isDirectGuest} = useKoSubscribableChildren(
+    suggestion,
+    ['name', 'expirationRemainingText', 'isTemporaryGuest', 'isExternal', 'isDirectGuest'],
+  );
   return (
     <div
       onClick={event => {
@@ -77,7 +74,12 @@ const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, Men
       {isExternal && (
         <Icon.External className="mention-suggestion-list__item__guest-badge" data-uie-name="status-external" />
       )}
-      {isGuest && <Icon.Guest className="mention-suggestion-list__item__guest-badge" data-uie-name="status-guest" />}
+      {suggestion.isFederated && (
+        <Icon.Federated className="mention-suggestion-list__item__guest-badge" data-uie-name="status-federated" />
+      )}
+      {isDirectGuest && (
+        <Icon.Guest className="mention-suggestion-list__item__guest-badge" data-uie-name="status-guest" />
+      )}
     </div>
   );
 };
