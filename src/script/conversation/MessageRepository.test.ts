@@ -30,19 +30,14 @@ import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {ClientEvent} from 'src/script/event/Client';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {AssetAddEvent} from 'src/script/conversation/EventBuilder';
 import {ClientRepository} from '../client/ClientRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -51,7 +46,6 @@ import {MessageSender} from '../message/MessageSender';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
@@ -60,11 +54,14 @@ import {ConversationState} from './ConversationState';
 import {ConversationService} from './ConversationService';
 import {EventService} from '../event/EventService';
 import {Core} from '../service/CoreSingleton';
+import {container} from 'tsyringe';
+import {ClientEntity} from '../client/ClientEntity';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
 
   let server: sinon.SinonFakeServer;
+  let core: Core;
 
   const generateConversation = (
     conversation_type = CONVERSATION_TYPE.REGULAR,
@@ -87,6 +84,8 @@ describe('MessageRepository', () => {
   };
 
   beforeEach(() => {
+    core = container.resolve(Core);
+    core.initServices({} as any);
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
@@ -95,71 +94,6 @@ describe('MessageRepository', () => {
 
   afterEach(() => {
     server.restore();
-  });
-
-  describe('asset upload', () => {
-    it('should update original asset when asset upload is complete', async () => {
-      const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
-
-      const fileAssetEntity = new FileAsset();
-      fileAssetEntity.status(AssetTransferState.UPLOADING);
-
-      const messageEntity = new ContentMessage(createRandomUuid());
-      messageEntity.assets.push(fileAssetEntity);
-      conversationEntity.addMessage(messageEntity);
-
-      const event: Partial<AssetAddEvent> = {
-        conversation: conversationEntity.id,
-        data: {
-          id: createRandomUuid(),
-          otr_key: new Uint8Array([]),
-          sha256: new Uint8Array([]),
-        },
-        from: createRandomUuid(),
-        id: messageEntity.id,
-        time: new Date().toISOString(),
-        type: ClientEvent.CONVERSATION.ASSET_ADD,
-      };
-
-      const userState = new UserState();
-      const teamState = new TeamState(userState);
-      const conversationState = new ConversationState(userState, teamState);
-      const clientState = new ClientState();
-
-      const eventService = {
-        updateEventAsUploadSucceeded: jest.fn(),
-      };
-
-      const messageRepository = new MessageRepository(
-        {} as ClientRepository,
-        () => ({} as ConversationRepository),
-        {} as CryptographyRepository,
-        {
-          eventService: eventService as unknown as EventService,
-        } as EventRepository,
-        {} as MessageSender,
-        {} as PropertiesRepository,
-        {} as ServerTimeHandler,
-        {} as UserRepository,
-        {} as ConversationService,
-        {} as LinkPreviewRepository,
-        {} as AssetRepository,
-        userState,
-        teamState,
-        conversationState,
-        clientState,
-      );
-
-      await messageRepository['onAssetUploadComplete'](conversationEntity, event as AssetAddEvent);
-
-      expect(eventService.updateEventAsUploadSucceeded).toHaveBeenCalled();
-
-      const firstAsset = messageEntity.assets()[0] as FileAsset;
-
-      expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
-      expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
-      expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
-    });
   });
 
   describe('sendTextWithLinkPreview', () => {
@@ -251,7 +185,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -302,7 +235,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -317,17 +249,14 @@ describe('MessageRepository', () => {
   });
 
   describe('deleteMessageForEveryone', () => {
-    const core = {
-      service: {
-        conversation: {
-          deleteMessageEveryone: jest.fn(() => Promise.resolve()),
-        },
-      },
-    } as unknown as Core;
+    beforeEach(() => {
+      spyOn(core.service!.conversation, 'deleteMessageEveryone');
+    });
+
     it('should not delete other users messages', async () => {
       const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
 
-      const user_et = new User('', null);
+      const user_et = new User('', '');
       user_et.isMe = false;
 
       const message_to_delete_et = new Message(createRandomUuid());
@@ -350,7 +279,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -364,7 +292,7 @@ describe('MessageRepository', () => {
       ).rejects.toMatchObject({
         type: ConversationError.TYPE.WRONG_USER,
       });
-      expect(core.service.conversation.deleteMessageEveryone).not.toHaveBeenCalled();
+      expect(core.service!.conversation.deleteMessageEveryone).not.toHaveBeenCalled();
     });
 
     it('should send delete and deletes message for own messages', async () => {
@@ -405,7 +333,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -415,7 +342,7 @@ describe('MessageRepository', () => {
       );
 
       await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
-      expect(core.service.conversation.deleteMessageEveryone).toHaveBeenCalledWith(
+      expect(core.service!.conversation.deleteMessageEveryone).toHaveBeenCalledWith(
         conversation.id,
         messageToDelete.id,
         ['selfid', 'user1'],
@@ -423,6 +350,49 @@ describe('MessageRepository', () => {
         undefined,
       );
       expect(eventService.deleteEvent).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('resetSession', () => {
+    let messageRepository: MessageRepository;
+    let cryptographyRepository: CryptographyRepository;
+    beforeEach(() => {
+      const userState = new UserState();
+      userState.self(new User('', ''));
+      const teamState = new TeamState(userState);
+      const conversationState = new ConversationState(userState, teamState);
+      const clientState = new ClientState();
+      clientState.currentClient(new ClientEntity(true, ''));
+      cryptographyRepository = testFactory.cryptography_repository as CryptographyRepository;
+      messageRepository = new MessageRepository(
+        {} as ClientRepository,
+        () => ({} as ConversationRepository),
+        cryptographyRepository,
+        {} as EventRepository,
+        {} as MessageSender,
+        {} as PropertiesRepository,
+        {} as ServerTimeHandler,
+        {} as UserRepository,
+        {} as ConversationService,
+        {} as AssetRepository,
+        userState,
+        teamState,
+        conversationState,
+        clientState,
+        core,
+      );
+    });
+
+    it('resets the session with another device', async () => {
+      spyOn(core.service!.conversation, 'send');
+      spyOn(cryptographyRepository, 'deleteSession');
+      const conversation = generateConversation();
+
+      const userId = {domain: 'domain1', id: 'user1'};
+      const clientId = 'client1';
+      await messageRepository.resetSession(userId, clientId, conversation);
+      expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
+      expect(core.service!.conversation.send).toHaveBeenCalled();
     });
   });
 

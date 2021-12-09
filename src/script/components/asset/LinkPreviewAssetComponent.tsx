@@ -30,7 +30,7 @@ import Image from '../Image';
 import AssetHeader from './AssetHeader';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {Text} from '../../entity/message/Text';
-import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
+import {LinkPreviewMetaDataType} from '../../conversation/linkPreviews/metaDataType';
 
 export interface LinkPreviewAssetProps {
   /** Does the asset have a visible header? */

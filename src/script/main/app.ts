@@ -99,7 +99,6 @@ import {SelfService} from '../self/SelfService';
 import {BroadcastService} from '../broadcast/BroadcastService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetService} from '../assets/AssetService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
@@ -273,7 +272,6 @@ class App {
       serverTimeHandler,
       repositories.user,
       this.service.conversation,
-      new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.asset,
     );
 

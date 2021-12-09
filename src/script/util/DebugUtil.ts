@@ -148,6 +148,7 @@ export class DebugUtil {
      */
     window.openGraphAsync = url => {
       return Promise.resolve({
+        description: 'an interesting article about the past',
         image: {
           data:
             'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWCAYAAAA8AXHiAAADiUlEQVR4nO3dS67cMAwEwHeWuf8dkxOMDV' +
@@ -165,6 +166,7 @@ export class DebugUtil {
             'WtBKwBKMACa+xJLG4lYA1AAdZ5sP4Df5GjbWdSI2IAAAAASUVORK5CYII=',
         },
         title: 'A link to the past',
+        type: 'article',
         url,
       });
     };
