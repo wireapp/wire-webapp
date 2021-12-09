@@ -369,11 +369,12 @@ export class UserRepository {
    * @deprecated
    * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
-  removeClientFromUser = async (userId: QualifiedId, clientId: string): Promise<void> => {
+  removeClientFromUser = async (userId: QualifiedId, clientId: string) => {
     await this.clientRepository.removeClient(userId, clientId);
     const userEntity = await this.getUserById(userId);
     userEntity.removeClient(clientId);
     amplify.publish(WebAppEvents.USER.CLIENT_REMOVED, userId, clientId);
+    return userEntity;
   };
 
   /**

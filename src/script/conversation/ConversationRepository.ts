@@ -204,9 +204,31 @@ export class ConversationRepository {
         }
       }
 
-      deleted.forEach(({userId, data}) => {
-        data.forEach(client => this.userRepository.removeClientFromUser(userId, client));
-      });
+      const removedTeamUserIds = (
+        await Promise.all(
+          deleted.map(
+            ({userId, data}) => data.map(client => this.userRepository.removeClientFromUser(userId, client))[0],
+          ),
+        )
+      )
+        .filter(user => user?.devices().length === 0)
+        .filter(user => !!user)
+        .filter(user => user.inTeam())
+        .map(user => user.id);
+
+      if (removedTeamUserIds.length) {
+        // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
+        const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
+        usersWithoutClients
+          .filter(user => user.deleted)
+          .forEach(user =>
+            this.teamMemberLeave(this.teamState.team().id, {
+              domain: this.teamState.teamDomain(),
+              id: user.id,
+            }),
+          );
+      }
+
       let hasNewLegalHoldDevices = false;
       if (missing.length) {
         const wasVerified = conversation?.is_verified();
