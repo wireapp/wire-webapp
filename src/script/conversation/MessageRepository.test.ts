@@ -454,7 +454,7 @@ describe('MessageRepository', () => {
           false,
         );
 
-        expect(wasClientAdded).toBe(true);
+        expect(wasClientAdded).toBeDefined();
       }
 
       const conversationEntity = ConversationMapper.mapConversations([conversationJsonFromDb])[0];
