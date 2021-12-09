@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.0.0...@wireapp/api-client@16.1.0) (2021-12-09)
+
+
+### Features
+
+* **api-client:** Add federated asset upload endpoint (v4) ([#4201](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4201)) ([1c09870](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/1c09870df77bff0b2b517f9f9057b8eb5b9bc395))
+
+
+
+
+
 # [16.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@15.11.1...@wireapp/api-client@16.0.0) (2021-12-08)
 
 
