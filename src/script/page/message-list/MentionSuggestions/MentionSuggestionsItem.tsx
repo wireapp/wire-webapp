@@ -33,7 +33,6 @@ type MentionSuggestionsItemProps = {
   suggestion: User;
 };
 
-
 const MentionSuggestionsItem: React.ForwardRefRenderFunction<HTMLDivElement, MentionSuggestionsItemProps> = (
   {suggestion, onSuggestionClick, onMouseEnter, isSelected},
   ref,
