@@ -124,55 +124,50 @@ export class CryptographyService {
     return this.cryptobox.decrypt(sessionId, messageBytes.buffer);
   }
 
-  private static dismantleSessionId(sessionId: string): {clientId: string; domain?: string; userId: string} {
-    // see https://regex101.com/r/c8FtCw/1
-    const regex = /((?<domain>.+)@)?(?<userId>.+)@(?<clientId>.+)$/g;
-    const match = regex.exec(sessionId);
-    const {domain, userId, clientId} = match?.groups || {};
-    return {clientId, domain, userId};
-  }
-
   public async encryptQualified(
     plainText: Uint8Array,
     preKeyBundles: QualifiedUserPreKeyBundleMap | QualifiedUserClients,
-  ): Promise<QualifiedOTRRecipients> {
+  ): Promise<{missing: QualifiedUserClients; encrypted: QualifiedOTRRecipients}> {
     const qualifiedOTRRecipients: QualifiedOTRRecipients = {};
+    const missing: QualifiedUserClients = {};
 
     for (const [domain, preKeyBundleMap] of Object.entries(preKeyBundles)) {
-      qualifiedOTRRecipients[domain] = await this.encrypt(plainText, preKeyBundleMap, domain);
+      const result = await this.encrypt(plainText, preKeyBundleMap, domain);
+      qualifiedOTRRecipients[domain] = result.encrypted;
+      missing[domain] = result.missing;
     }
 
-    return qualifiedOTRRecipients;
+    return {
+      encrypted: qualifiedOTRRecipients,
+      missing,
+    };
   }
 
   public async encrypt(
     plainText: Uint8Array,
     users: UserPreKeyBundleMap | UserClients,
     domain?: string,
-  ): Promise<OTRRecipients<Uint8Array>> {
-    const bundles: Promise<SessionPayloadBundle | undefined>[] = [];
+  ): Promise<{missing: UserClients; encrypted: OTRRecipients<Uint8Array>}> {
+    const encrypted: OTRRecipients<Uint8Array> = {};
+    const missing: UserClients = {};
 
     for (const userId in users) {
       const clientIds = isUserClients(users) ? users[userId] : Object.keys(users[userId]);
       for (const clientId of clientIds) {
         const base64PreKey = isUserClients(users) ? undefined : users[userId][clientId].key;
         const sessionId = CryptographyService.constructSessionId(userId, clientId, domain || null);
-        bundles.push(this.encryptPayloadForSession(sessionId, plainText, base64PreKey));
+        const result = await this.encryptPayloadForSession(sessionId, plainText, base64PreKey);
+        if (result) {
+          encrypted[userId] ||= {};
+          encrypted[userId][clientId] = result.encryptedPayload;
+        } else {
+          missing[userId] ||= [];
+          missing[userId].push(clientId);
+        }
       }
     }
 
-    const payloads = await Promise.all(bundles);
-
-    return payloads.reduce((recipients, payload) => {
-      if (!payload) {
-        return recipients;
-      }
-      const {encryptedPayload, sessionId} = payload;
-      const {userId, clientId} = CryptographyService.dismantleSessionId(sessionId);
-      recipients[userId] ||= {};
-      recipients[userId][clientId] = encryptedPayload;
-      return recipients;
-    }, {} as OTRRecipients<Uint8Array>);
+    return {encrypted, missing};
   }
 
   private async encryptPayloadForSession(

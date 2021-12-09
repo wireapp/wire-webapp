@@ -117,11 +117,11 @@ describe('CryptographyService', () => {
       };
 
       const text = new Uint8Array([72, 101, 108, 108, 111, 33]); // "Hello!"
-      const otrBundle = await cryptography.encrypt(text, preKeyBundleMap);
-      expect(Object.keys(otrBundle).length).toBe(2);
-      expect(Object.keys(otrBundle[firstUserID]).length).toBe(3);
-      expect(Object.keys(otrBundle[secondUserID]).length).toBe(2);
-      expect(otrBundle[firstUserID][firstClientId]).toEqual(jasmine.any(Object));
+      const {encrypted} = await cryptography.encrypt(text, preKeyBundleMap);
+      expect(Object.keys(encrypted).length).toBe(2);
+      expect(Object.keys(encrypted[firstUserID]).length).toBe(3);
+      expect(Object.keys(encrypted[secondUserID]).length).toBe(2);
+      expect(encrypted[firstUserID][firstClientId]).toEqual(jasmine.any(Object));
     });
   });
 

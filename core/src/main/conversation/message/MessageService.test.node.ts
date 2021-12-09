@@ -69,7 +69,10 @@ function generateRecipients(users: TestUser[]): UserClients {
   }, {} as UserClients);
 }
 
-function fakeEncrypt(_: unknown, recipients: QualifiedUserClients): Promise<QualifiedOTRRecipients> {
+function fakeEncrypt(
+  _: unknown,
+  recipients: QualifiedUserClients,
+): Promise<{missing: any; encrypted: QualifiedOTRRecipients}> {
   const encryptedPayload = Object.entries(recipients).reduce((acc, [domain, users]) => {
     acc[domain] = Object.entries(users).reduce((userClients, [userId, clients]) => {
       userClients[userId] = clients.reduce((payloads, client) => {
@@ -80,7 +83,7 @@ function fakeEncrypt(_: unknown, recipients: QualifiedUserClients): Promise<Qual
     }, {} as OTRRecipients<Uint8Array>);
     return acc;
   }, {} as QualifiedOTRRecipients);
-  return Promise.resolve(encryptedPayload);
+  return Promise.resolve({encrypted: encryptedPayload, missing: {}});
 }
 
 describe('MessageService', () => {

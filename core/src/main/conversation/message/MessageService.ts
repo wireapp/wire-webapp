@@ -80,7 +80,11 @@ export class MessageService {
       cipherText = externalPayload.cipherText;
     }
 
-    const encryptedPayload = await this.cryptographyService.encrypt(plainTextPayload, recipients);
+    const {encrypted, missing} = await this.cryptographyService.encrypt(plainTextPayload, recipients);
+    const encryptedPayload = Object.keys(missing).length
+      ? await this.reencryptAfterMismatch({missing, deleted: {}}, encrypted, plainText)
+      : encrypted;
+
     const send = (payload: OTRRecipients<Uint8Array>) => {
       return options.sendAsProtobuf
         ? this.sendOTRProtobufMessage(sendingClientId, payload, {...options, assetData: cipherText})
@@ -129,7 +133,11 @@ export class MessageService {
     const send = (payload: QualifiedOTRRecipients) => {
       return this.sendFederatedOtrMessage(sendingClientId, payload, options);
     };
-    const encryptedPayload = await this.cryptographyService.encryptQualified(plainText, recipients);
+    const {encrypted, missing} = await this.cryptographyService.encryptQualified(plainText, recipients);
+    const encryptedPayload = Object.keys(missing).length
+      ? await this.reencryptAfterFederatedMismatch({missing, deleted: {}}, encrypted, plainText)
+      : encrypted;
+
     try {
       return await send(encryptedPayload);
     } catch (error) {
@@ -279,7 +287,7 @@ export class MessageService {
   }
 
   private async reencryptAfterMismatch(
-    mismatch: ClientMismatch,
+    mismatch: {missing: UserClients; deleted: UserClients},
     recipients: OTRRecipients<Uint8Array>,
     plainText: Uint8Array,
   ): Promise<OTRRecipients<Uint8Array>> {
@@ -289,8 +297,8 @@ export class MessageService {
     deleted.forEach(({userId, data}) => data.forEach(clientId => delete recipients[userId.id][clientId]));
     if (missing.length) {
       const missingPreKeyBundles = await this.apiClient.user.api.postMultiPreKeyBundles(mismatch.missing);
-      const reEncrypted = await this.cryptographyService.encrypt(plainText, missingPreKeyBundles);
-      const reEncryptedPayloads = flattenUserClients<{[client: string]: Uint8Array}>(reEncrypted);
+      const {encrypted} = await this.cryptographyService.encrypt(plainText, missingPreKeyBundles);
+      const reEncryptedPayloads = flattenUserClients<{[client: string]: Uint8Array}>(encrypted);
       // add missing clients to the recipients
       reEncryptedPayloads.forEach(({data, userId}) => (recipients[userId.id] = {...recipients[userId.id], ...data}));
     }
@@ -306,7 +314,7 @@ export class MessageService {
    * @return resolves with a new message payload that can be sent
    */
   private async reencryptAfterFederatedMismatch(
-    mismatch: MessageSendingStatus,
+    mismatch: {missing: QualifiedUserClients; deleted: QualifiedUserClients},
     recipients: QualifiedOTRRecipients,
     plainText: Uint8Array,
   ): Promise<QualifiedOTRRecipients> {
@@ -319,8 +327,8 @@ export class MessageService {
 
     if (Object.keys(missing).length) {
       const missingPreKeyBundles = await this.apiClient.user.api.postQualifiedMultiPreKeyBundles(mismatch.missing);
-      const reEncrypted = await this.cryptographyService.encryptQualified(plainText, missingPreKeyBundles);
-      const reEncryptedPayloads = flattenQualifiedUserClients<{[client: string]: Uint8Array}>(reEncrypted);
+      const {encrypted} = await this.cryptographyService.encryptQualified(plainText, missingPreKeyBundles);
+      const reEncryptedPayloads = flattenQualifiedUserClients<{[client: string]: Uint8Array}>(encrypted);
       reEncryptedPayloads.forEach(
         ({data, userId}) => (recipients[userId.domain][userId.id] = {...recipients[userId.domain][userId.id], ...data}),
       );
