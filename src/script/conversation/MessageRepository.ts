@@ -23,15 +23,11 @@ import {
   ButtonAction,
   Cleared,
   Confirmation,
-  Ephemeral,
   External,
   GenericMessage,
   LastRead,
   LegalHoldStatus,
-  MessageEdit,
-  Text,
   Asset as ProtobufAsset,
-  LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
 import {
@@ -55,7 +51,10 @@ import {
   VideoMetaData,
   ImageMetaData,
   FileMetaDataContent,
+  LinkPreviewUploadedContent,
 } from '@wireapp/core/src/main/conversation/content';
+import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
+import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -80,7 +79,6 @@ import * as trackingHelpers from '../tracking/Helpers';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {buildMetadata, isVideo, isImage, isAudio, ImageMetadata} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
@@ -97,7 +95,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
+import {getLinkPreviewFromString} from './linkPreviews';
 import {UserRepository} from '../user/UserRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {MessageSender} from '../message/MessageSender';
@@ -108,7 +106,6 @@ import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {MentionEntity} from '../message/MentionEntity';
 import {FileAsset} from '../entity/message/FileAsset';
-import {Text as TextAsset} from '../entity/message/Text';
 import type {EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
@@ -123,7 +120,7 @@ import {Core} from '../service/CoreSingleton';
 import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
-import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
 type ConversationEvent = {conversation: string; id?: string};
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
@@ -133,6 +130,16 @@ type ClientMismatchHandlerFn = (
   conversationId?: QualifiedId,
   silent?: boolean,
 ) => Promise<boolean>;
+
+type TextMessagePayload = {
+  conversation: Conversation;
+  linkPreview?: LinkPreviewUploadedContent;
+  mentions?: MentionEntity[];
+  message: string;
+  messageId?: string;
+  quote?: QuoteEntity;
+};
+type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
 
 export class MessageRepository {
   private readonly logger: Logger;
@@ -152,7 +159,6 @@ export class MessageRepository {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly conversation_service: ConversationService,
-    private readonly link_repository: LinkPreviewRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
@@ -223,53 +229,13 @@ export class MessageRepository {
   };
 
   /**
-   * Send text message in specified conversation.
-   *
-   * @param conversationEntity Conversation that should receive the message
-   * @param textMessage Plain text message
-   * @param mentionEntities Mentions as part of the message
-   * @param quoteEntity Quote as part of the message
-   * @returns Resolves after sending the message
-   */
-  public async sendText(
-    conversationEntity: Conversation,
-    textMessage: string,
-    mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
-  ): Promise<GenericMessage> {
-    const messageId = createRandomUuid();
-
-    const protoText = this.createTextProto(
-      messageId,
-      textMessage,
-      mentionEntities,
-      quoteEntity,
-      undefined,
-      this.expectReadReceipt(conversationEntity),
-      conversationEntity.legalHoldStatus(),
-    );
-    let genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
-      messageId,
-    });
-
-    if (conversationEntity.messageTimer()) {
-      genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
-    }
-
-    await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
-    return genericMessage;
-  }
-
-  /**
-   * Send knock in specified conversation.
+   * Send ping in specified conversation.
    * @param conversationEntity Conversation to send knock in
    * @returns Resolves after sending the knock
    */
   public async sendPing(conversation: Conversation) {
     const ping = MessageBuilder.createPing({
-      conversationId: conversation.id,
-      from: this.userState.self().id,
+      ...this.createCommonMessagePayload(conversation),
       ping: {
         expectsReadConfirmation: this.expectReadReceipt(conversation),
         hotKnock: false,
@@ -285,19 +251,45 @@ export class MessageRepository {
    * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
    * @see https://docs.wire.com/understand/federation/index.html
    */
-  private async sendFederatedMessage(
+  private async sendText({conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload) {
+    const baseMessage = MessageBuilder.createText({
+      ...this.createCommonMessagePayload(conversation),
+      messageId,
+      text: message,
+    });
+    const textMessage = this.decorateTextMessage(conversation, baseMessage, {linkPreview, mentions, quote});
+
+    return this.sendAndInjectGenericCoreMessage(textMessage, conversation);
+  }
+
+  private async sendEdit({conversation, message, messageId, originalMessageId, mentions, quote}: EditMessagePayload) {
+    const baseMessage = MessageBuilder.createEditedText({
+      ...this.createCommonMessagePayload(conversation),
+      messageId,
+      newMessageText: message,
+      originalMessageId: originalMessageId,
+    });
+    const editMessage = this.decorateTextMessage(conversation, baseMessage, {mentions, quote});
+
+    return this.sendAndInjectGenericCoreMessage(editMessage, conversation, {syncTimestamp: false});
+  }
+
+  private decorateTextMessage(
     conversation: Conversation,
-    message: string,
-    mentions: MentionEntity[],
-    quote?: QuoteEntity,
+    textMessage: TextContentBuilder,
+    {
+      mentions = [],
+      quote,
+      linkPreview,
+    }: {
+      linkPreview?: LinkPreviewUploadedContent;
+      mentions: MentionEntity[];
+      quote?: QuoteEntity;
+    },
   ) {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
 
-    const textPayload = MessageBuilder.createText({
-      conversationId: conversation.id,
-      from: this.userState.self().id,
-      text: message,
-    })
+    return textMessage
       .withMentions(
         mentions.map(mention => ({
           length: mention.length,
@@ -306,32 +298,11 @@ export class MessageRepository {
           userId: mention.userId,
         })),
       )
-      .withReadConfirmation(this.expectReadReceipt(conversation))
       .withQuote(quoteData)
-      .build();
-
-    return this.sendAndInjectGenericCoreMessage(textPayload, conversation);
-  }
-
-  private async sendFederatedEditMessage(
-    conversation: Conversation,
-    message: string,
-    originalMessageEntity: ContentMessage,
-    mentions: MentionEntity[],
-  ) {
-    const textPayload = MessageBuilder.createEditedText({
-      conversationId: conversation.id,
-      from: this.userState.self().id,
-      newMessageText: message,
-      originalMessageId: originalMessageEntity.id,
-    })
-      .withMentions(
-        mentions.map(mention => ({length: mention.length, start: mention.startIndex, userId: mention.userId})),
-      )
+      .withLinkPreviews(linkPreview ? [linkPreview] : [])
       .withReadConfirmation(this.expectReadReceipt(conversation))
+      .withLegalHoldStatus(conversation.legalHoldStatus())
       .build();
-
-    return this.sendAndInjectGenericCoreMessage(textPayload, conversation, {syncTimestamp: false});
   }
 
   /**
@@ -348,38 +319,35 @@ export class MessageRepository {
     textMessage: string,
     mentionEntities: MentionEntity[],
     quoteEntity?: QuoteEntity,
-  ): Promise<OtrMessage | void> {
-    try {
-      if (conversationEntity.isFederated()) {
-        return await this.sendFederatedMessage(conversationEntity, textMessage, mentionEntities, quoteEntity);
-      }
-      const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
-      await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
-    } catch (error) {
-      if (!this.isUserCancellationError(error)) {
-        this.logger.error(`Error while sending text message: ${error.message}`, error);
-        throw error;
-      }
-    }
+  ): Promise<void> {
+    const textPayload = {
+      conversation: conversationEntity,
+      mentions: mentionEntities,
+      message: textMessage,
+      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
+      quote: quoteEntity,
+    };
+    await this.sendText(textPayload);
+    await this.handleLinkPreview(textPayload);
   }
 
   /**
    * Send edited message in specified conversation.
    *
-   * @param conversationEntity Conversation entity
+   * @param conversation Conversation entity
    * @param textMessage Edited plain text message
-   * @param originalMessageEntity Original message entity
-   * @param mentionEntities Mentions as part of the message
+   * @param originalMessage Original message entity
+   * @param mentions Mentions as part of the message
    * @returns Resolves after sending the message
    */
   public async sendMessageEdit(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     textMessage: string,
-    originalMessageEntity: ContentMessage,
-    mentionEntities: MentionEntity[],
+    originalMessage: ContentMessage,
+    mentions: MentionEntity[],
   ): Promise<OtrMessage | void> {
-    const hasDifferentText = isTextDifferent(originalMessageEntity, textMessage);
-    const hasDifferentMentions = areMentionsDifferent(originalMessageEntity, mentionEntities);
+    const hasDifferentText = isTextDifferent(originalMessage, textMessage);
+    const hasDifferentMentions = areMentionsDifferent(originalMessage, mentions);
     const wasEdited = hasDifferentText || hasDifferentMentions;
 
     if (!wasEdited) {
@@ -388,35 +356,31 @@ export class MessageRepository {
         ConversationError.MESSAGE.NO_MESSAGE_CHANGES,
       );
     }
-    if (conversationEntity.isFederated()) {
-      return this.sendFederatedEditMessage(conversationEntity, textMessage, originalMessageEntity, mentionEntities);
+
+    const messagePayload = {
+      conversation,
+      mentions,
+      message: textMessage,
+      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
+      originalMessageId: originalMessage.id,
+    };
+    await this.sendEdit(messagePayload);
+    await this.handleLinkPreview(messagePayload);
+  }
+
+  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
+    // check if the user actually wants to send link previews
+    if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
+      return;
     }
 
-    const messageId = createRandomUuid();
-
-    const protoText = this.createTextProto(
-      messageId,
-      textMessage,
-      mentionEntities,
-      undefined,
-      undefined,
-      this.expectReadReceipt(conversationEntity),
-      conversationEntity.legalHoldStatus(),
-    );
-    const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.EDITED]: protoMessageEdit,
-      messageId,
-    });
-
-    try {
-      await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
-      await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
-    } catch (error) {
-      if (!this.isUserCancellationError(error)) {
-        this.logger.error(`Error while editing message: ${error.message}`, error);
-        throw error;
-      }
+    const linkPreview = await getLinkPreviewFromString(textPayload.message);
+    if (linkPreview) {
+      // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
+      await this.sendText({
+        ...textPayload,
+        linkPreview: await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview),
+      });
     }
   }
 
@@ -441,7 +405,7 @@ export class MessageRepository {
 
     const blob = await loadUrlBlob(url);
     const textMessage = t('extensionsGiphyMessage', tag, {}, true);
-    this.sendText(conversationEntity, textMessage, null, quoteEntity);
+    this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
     return this.uploadImages(conversationEntity, [blob]);
   }
 
@@ -595,34 +559,10 @@ export class MessageRepository {
       meta.image = metadata as ImageMetaData;
     }
     const message = MessageBuilder.createFileMetadata({
-      conversationId: conversation.id,
-      from: this.userState.self().id,
+      ...this.createCommonMessagePayload(conversation),
       metaData: meta as FileMetaDataContent,
     });
     return this.sendAndInjectGenericCoreMessage(message, conversation);
-  }
-
-  /**
-   * Wraps generic message in ephemeral message.
-   *
-   * @param genericMessage Message to be wrapped
-   * @param millis Expire time in milliseconds
-   * @returns New proto message
-   */
-  private wrapInEphemeralMessage(genericMessage: GenericMessage, millis: number) {
-    const ephemeralExpiration = ConversationEphemeralHandler.validateTimer(millis);
-
-    const protoEphemeral = new Ephemeral({
-      [genericMessage.content]: genericMessage[genericMessage.content],
-      [PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION]: ephemeralExpiration,
-    });
-
-    genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
-      messageId: genericMessage.messageId,
-    });
-
-    return genericMessage;
   }
 
   /**
@@ -646,72 +586,6 @@ export class MessageRepository {
     });
 
     return this.sendAndInjectGenericCoreMessage(payload, conversation);
-  }
-
-  /**
-   * Send link preview in specified conversation.
-   *
-   * @param conversationEntity Conversation that should receive the message
-   * @param textMessage Plain text message that possibly contains link
-   * @param genericMessage GenericMessage of containing text or edited message
-   * @param mentionEntities Mentions as part of message
-   * @param quoteEntity Link to a quoted message
-   * @returns Resolves after sending the message
-   */
-  private async sendLinkPreview(
-    conversationEntity: Conversation,
-    textMessage: string,
-    genericMessage: GenericMessage,
-    mentionEntities: MentionEntity[],
-    quoteEntity?: QuoteEntity,
-  ): Promise<ConversationEvent | undefined> {
-    const conversationId = conversationEntity.id;
-    const messageId = genericMessage.messageId;
-    let messageEntity: ContentMessage;
-    try {
-      const linkPreview = await this.link_repository.getLinkPreviewFromString(textMessage);
-      if (linkPreview) {
-        const protoText = this.createTextProto(
-          messageId,
-          textMessage,
-          mentionEntities,
-          quoteEntity,
-          [linkPreview],
-          this.expectReadReceipt(conversationEntity),
-          conversationEntity.legalHoldStatus(),
-        );
-        if (genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL]) {
-          genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
-        } else {
-          genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
-        }
-
-        messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
-      }
-
-      this.logger.debug(`No link preview for message '${messageId}' in conversation '${conversationId}' created`);
-
-      if (messageEntity) {
-        const assetEntity = messageEntity.getFirstAsset() as TextAsset;
-        const messageContentUnchanged = assetEntity.text === textMessage;
-
-        if (messageContentUnchanged) {
-          this.logger.debug(`Sending link preview for message '${messageId}' in conversation '${conversationId}'`);
-          return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
-        }
-
-        this.logger.debug(`Skipped sending link preview as message '${messageId}' in '${conversationId}' changed`);
-      }
-    } catch (error) {
-      if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-        this.logger.warn(`Failed sending link preview for message '${messageId}' in '${conversationId}'`);
-        throw error;
-      }
-
-      this.logger.warn(`Skipped link preview for unknown message '${messageId}' in '${conversationId}'`);
-    }
-
-    return undefined;
   }
 
   private isUserCancellationError(error: ConversationError): boolean {
@@ -846,41 +720,6 @@ export class MessageRepository {
     });
   }
 
-  private async _sendAndInjectGenericMessage(
-    conversationEntity: Conversation,
-    genericMessage: GenericMessage,
-    syncTimestamp = true,
-  ): Promise<ConversationEvent> {
-    if (conversationEntity.removed_from_conversation()) {
-      throw new Error('Cannot send message to conversation you are not part of');
-    }
-
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const senderId = this.clientState.currentClient().id;
-    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp, senderId);
-    const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
-      genericMessage,
-      optimisticEvent as EventRecord,
-    );
-    const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = GENERIC_MESSAGE_TYPE;
-    const isPing = (message: GenericMessage) => message.content === TYPE_KNOCK;
-    const isEphemeralPing = (message: GenericMessage) =>
-      message.content === TYPE_EPHEMERAL && isPing(message.ephemeral as unknown as GenericMessage);
-    const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
-    if (shouldPlayPingAudio) {
-      amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
-    }
-
-    const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId);
-    eventInfoEntity.setTimestamp(injectedEvent.time);
-    const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
-    this.trackContributed(conversationEntity, genericMessage);
-    const backendIsoDate = syncTimestamp ? sentPayload.time : '';
-    await this.updateMessageAsSent(conversationEntity, injectedEvent.id, backendIsoDate);
-    return injectedEvent;
-  }
-
   /**
    * Toggle like status of message.
    *
@@ -929,8 +768,7 @@ export class MessageRepository {
    */
   private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
     const sessionReset = MessageBuilder.createSessionReset({
-      conversationId: conversation.id,
-      from: this.userState.self().id,
+      ...this.createCommonMessagePayload(conversation),
     });
 
     await this.conversationService.send({
@@ -978,9 +816,8 @@ export class MessageRepository {
     }
     const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
     const confirmationMessage = MessageBuilder.createConfirmation({
-      conversationId: conversationEntity.id,
+      ...this.createCommonMessagePayload(conversationEntity),
       firstMessageId: messageEntity.id,
-      from: this.userState.self().id,
       moreMessageIds,
       type,
     });
@@ -1006,71 +843,24 @@ export class MessageRepository {
 
   /**
    * Send reaction to a content message in specified conversation.
-   * @param conversationEntity Conversation to send reaction in
+   * @param conversation Conversation to send reaction in
    * @param messageEntity Message to react to
    * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
-  private async sendReaction(conversationEntity: Conversation, messageEntity: Message, reactionType: ReactionType) {
+  private async sendReaction(conversation: Conversation, messageEntity: Message, reactionType: ReactionType) {
     const reaction = MessageBuilder.createReaction({
-      conversationId: conversationEntity.id,
-      from: this.userState.self().id,
+      ...this.createCommonMessagePayload(conversation),
       reaction: {
         originalMessageId: messageEntity.id,
         type: reactionType,
       },
     });
 
-    return this.sendAndInjectGenericCoreMessage(reaction, conversationEntity);
+    return this.sendAndInjectGenericCoreMessage(reaction, conversation);
   }
 
-  private createTextProto(
-    messageId: string,
-    textMessage: string,
-    mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
-    linkPreviews: LinkPreview[],
-    expectsReadConfirmation: boolean,
-    legalHoldStatus: LegalHoldStatus,
-  ): Text {
-    const protoText = new Text({content: textMessage, expectsReadConfirmation, legalHoldStatus});
-
-    if (mentionEntities && mentionEntities.length) {
-      const logMessage = `Adding '${mentionEntities.length}' mentions to message '${messageId}'`;
-      this.logger.debug(logMessage, mentionEntities);
-
-      const protoMentions = mentionEntities
-        .filter(mentionEntity => {
-          if (mentionEntity) {
-            try {
-              return mentionEntity.validate(textMessage);
-            } catch (error) {
-              const log = `Removed invalid mention when sending message '${messageId}': ${error.message}`;
-              this.logger.warn(log, mentionEntity);
-            }
-          }
-          return false;
-        })
-        .map(mentionEntity => mentionEntity.toProto());
-
-      protoText[PROTO_MESSAGE_TYPE.MENTIONS] = protoMentions;
-    }
-
-    if (quoteEntity) {
-      const protoQuote = quoteEntity.toProto();
-      this.logger.debug(`Adding quote to message '${messageId}'`, protoQuote);
-      protoText[PROTO_MESSAGE_TYPE.QUOTE] = protoQuote;
-    }
-
-    if (linkPreviews && linkPreviews.length) {
-      this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
-      protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
-    }
-
-    return protoText;
-  }
-
-  expectReadReceipt(conversationEntity: Conversation): boolean {
+  private expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
     }
@@ -1159,7 +949,7 @@ export class MessageRepository {
     if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
       const protoCleared = new Cleared({
         clearedTimestamp: timestamp,
-        conversationId: conversationEntity.id,
+        ...this.createCommonMessagePayload(conversationEntity),
       });
       const genericMessage = new GenericMessage({
         [GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
@@ -1778,9 +1568,8 @@ export class MessageRepository {
     options: {nativePush?: boolean; recipients?: UserClients | QualifiedUserClients},
   ) {
     const message = MessageBuilder.createCall({
+      ...this.createCommonMessagePayload(conversation),
       content: payload,
-      conversationId: conversation.id,
-      from: this.userState.self().id,
     });
 
     return this.sendAndInjectGenericCoreMessage(message, conversation, {
@@ -1953,6 +1742,13 @@ export class MessageRepository {
       }
       return this.conversation_service.postEncryptedMessage(conversationId, payload, true);
     }
+  }
+
+  private createCommonMessagePayload(conversation: Conversation) {
+    return {
+      conversationId: conversation.id,
+      from: this.clientState.currentClient().id,
+    };
   }
 
   //##############################################################################

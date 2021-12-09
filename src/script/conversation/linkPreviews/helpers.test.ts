@@ -17,7 +17,7 @@
  *
  */
 
-import {containsOnlyLink, getFirstLinkWithOffset} from 'src/script/links/LinkPreviewHelpers';
+import {containsOnlyLink, getFirstLinkWithOffset} from './helpers';
 
 describe('containsOnlyLink', () => {
   it('should return true if text only contains a bare url', () => {
@@ -79,28 +79,28 @@ describe('getFirstLinkWithOffset', () => {
     expect(getFirstLinkWithOffset(manyTicks)).toBeUndefined();
   });
 
-  it('should return the correct link and offset for a single link without text)', () => {
-    const link_preview = getFirstLinkWithOffset('wire.com');
+  it('should return the correct link and offset for a single link without text', () => {
+    const link = getFirstLinkWithOffset('wire.com');
 
-    expect(link_preview.offset).toEqual(0);
-    expect(link_preview.url).toEqual('wire.com');
+    expect(link.offset).toEqual(0);
+    expect(link.url).toEqual('wire.com');
   });
 
-  it('should return the correct link and offset for a single link with text in front)', () => {
-    const link_preview = getFirstLinkWithOffset('Hey check wire.com');
+  it('should return the correct link and offset for a single link with text in front', () => {
+    const link = getFirstLinkWithOffset('Hey check wire.com');
 
-    expect(link_preview.offset).toEqual(10);
-    expect(link_preview.url).toEqual('wire.com');
+    expect(link.offset).toEqual(10);
+    expect(link.url).toEqual('wire.com');
   });
 
-  it('should return the correct link and offset for a single link surrounded by text)', () => {
-    const link_preview = getFirstLinkWithOffset('Hey check wire.com PLEASE!');
+  it('should return the correct link and offset for a single link surrounded by text', () => {
+    const Link = getFirstLinkWithOffset('Hey check wire.com PLEASE!');
 
-    expect(link_preview.offset).toEqual(10);
-    expect(link_preview.url).toEqual('wire.com');
+    expect(Link.offset).toEqual(10);
+    expect(Link.url).toEqual('wire.com');
   });
 
-  it('should return the correct link and offset for a single link surrounded by text)', () => {
+  it('should return the correct link and offset for multiple links', () => {
     const link_preview = getFirstLinkWithOffset('wire.com wire.com wire.com wire.com wire.com');
 
     expect(link_preview.offset).toEqual(0);
@@ -108,9 +108,9 @@ describe('getFirstLinkWithOffset', () => {
   });
 
   it('ignores mailto link', () => {
-    const link_preview = getFirstLinkWithOffset('mailto:person@wire.com wire.com');
+    const Link = getFirstLinkWithOffset('mailto:person@wire.com wire.com');
 
-    expect(link_preview.offset).toEqual(23);
-    expect(link_preview.url).toEqual('wire.com');
+    expect(Link.offset).toEqual(23);
+    expect(Link.url).toEqual('wire.com');
   });
 });

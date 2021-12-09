@@ -21,7 +21,7 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import TestPage from 'Util/test/TestPage';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
-import {LinkPreviewMetaDataType} from 'src/script/links/LinkPreviewMetaDataType';
+import {LinkPreviewMetaDataType} from 'src/script/conversation/linkPreviews/metaDataType';
 import {StatusType} from 'src/script/message/StatusType';
 import LinkPreviewAssetComponent, {LinkPreviewAssetProps} from './LinkPreviewAssetComponent';
 

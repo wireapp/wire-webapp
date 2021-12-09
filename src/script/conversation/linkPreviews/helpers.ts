@@ -38,16 +38,16 @@ export const containsOnlyLink = (text: string): boolean => {
  * @param text Text to parse
  * @returns Containing link and its offset
  */
-export const getFirstLinkWithOffset = (text: string): {offset: number; url: string} | void => {
+export const getFirstLinkWithOffset = (text: string): {offset: number; url: string} | undefined => {
   const textWithoutCode = text.trim().replace(codeBlockRegex, '');
 
   const links = linkify.match(textWithoutCode) || [];
   const [firstLink] = links.filter(link => ['http:', 'https:', ''].includes(link.schema));
 
-  if (firstLink) {
-    return {
-      offset: firstLink.index,
-      url: firstLink.raw,
-    };
-  }
+  return firstLink
+    ? {
+        offset: firstLink.index,
+        url: firstLink.raw,
+      }
+    : undefined;
 };
