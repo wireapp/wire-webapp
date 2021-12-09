@@ -110,28 +110,6 @@ describe('CryptographyService', () => {
     });
   });
 
-  describe('"dismantleSessionId"', () => {
-    const clientId = '1ceb9063fced26d3';
-    const userId = 'afbb5d60-1187-4385-9c29-7361dea79647';
-    const domain = 'domain.wire.link';
-
-    it('gets User ID and Client ID from a Session ID without domain.', () => {
-      const sessionId = CryptographyService.constructSessionId(userId, clientId, null);
-      const res = CryptographyService['dismantleSessionId'](sessionId);
-      expect(res.clientId).toBe(clientId);
-      expect(res.userId).toBe(userId);
-      expect(res.domain).toBe(undefined);
-    });
-
-    it('gets User ID and Client ID from a Session ID with domain.', () => {
-      const sessionId = CryptographyService.constructSessionId(userId, clientId, domain);
-      const res = CryptographyService['dismantleSessionId'](sessionId);
-      expect(res.clientId).toBe(clientId);
-      expect(res.userId).toBe(userId);
-      expect(res.domain).toBe(domain);
-    });
-  });
-
   describe('"encrypt"', () => {
     it('generates a set of encrypted data based on PreKeys from multiple clients.', async () => {
       const firstUserID = 'bc0c99f1-49a5-4ad2-889a-62885af37088';
@@ -166,11 +144,11 @@ describe('CryptographyService', () => {
         },
       };
       const text = new Uint8Array(Buffer.from('Hello', 'utf8'));
-      const otrBundle = await cryptographyService.encrypt(text, preKeyBundleMap);
-      expect(Object.keys(otrBundle).length).toBe(2);
-      expect(Object.keys(otrBundle[firstUserID]).length).toBe(3);
-      expect(Object.keys(otrBundle[secondUserID]).length).toBe(2);
-      expect(otrBundle[firstUserID][firstClientId]).toEqual(jasmine.any(Uint8Array));
+      const {encrypted} = await cryptographyService.encrypt(text, preKeyBundleMap);
+      expect(Object.keys(encrypted).length).toBe(2);
+      expect(Object.keys(encrypted[firstUserID]).length).toBe(3);
+      expect(Object.keys(encrypted[secondUserID]).length).toBe(2);
+      expect(encrypted[firstUserID][firstClientId]).toEqual(jasmine.any(Uint8Array));
     });
 
     it('does not generate a message counter twice when ran asynchronously multiple times for the same cryptographic session', async () => {
@@ -189,7 +167,7 @@ describe('CryptographyService', () => {
       const otrBundles = await Promise.all(
         Array.from(Array(encryptionRuns).keys()).map(() => cryptographyService.encrypt(text, preKeyBundleMap)),
       );
-      const encryptedPayloads = otrBundles.map(bundle => bundle[userId][clientId]);
+      const encryptedPayloads = otrBundles.map(({encrypted}) => encrypted[userId][clientId]);
       const messageCounters = encryptedPayloads.map(encodedCiphertext => {
         const messageBytes = encodedCiphertext;
         const messageEnvelope = Proteus.message.Envelope.deserialise(messageBytes.buffer);
