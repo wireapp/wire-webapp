@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [20.0.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.0.0...@wireapp/core@20.0.1) (2021-12-09)
+
+
+### Bug Fixes
+
+* **core:** Generate new session and reencrypt payload when sessionIds are missing ([#4200](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4200)) ([07eab82](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/07eab82ee7512bb4eba71adf20c13c5609dbc024))
+
+
+
+
+
 # [20.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@19.0.0...@wireapp/core@20.0.0) (2021-12-08)
 
 
