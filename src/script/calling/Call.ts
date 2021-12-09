@@ -23,24 +23,20 @@ import ko from 'knockout';
 import {chunk, getDifference, partition} from 'Util/ArrayUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import type {Participant, UserId, ClientId} from './Participant';
+import type {Participant, ClientId} from './Participant';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Config} from '../Config';
 import {QualifiedId} from '@wireapp/api-client/src/user';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export type SerializedConversationId = string;
 
 const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 9;
 
 interface ActiveSpeaker {
-  audio_level: number;
-  audio_level_now: number;
-  clientid: string;
-  userid: string;
-}
-
-interface ActiveSpeakers {
-  audio_levels: ActiveSpeaker[];
+  clientId: string;
+  levelNow: number;
+  userId: QualifiedId;
 }
 
 export class Call {
@@ -76,7 +72,7 @@ export class Call {
   activeAudioOutput: string;
 
   constructor(
-    public readonly initiator: UserId,
+    public readonly initiator: QualifiedId,
     public readonly conversationId: QualifiedId,
     public readonly conversationType: CONV_TYPE,
     private readonly selfParticipant: Participant,
@@ -158,10 +154,10 @@ export class Call {
     }
   }
 
-  setActiveSpeakers({audio_levels}: ActiveSpeakers): void {
+  setActiveSpeakers(audioLevels: ActiveSpeaker[]): void {
     // Make sure that every participant only has one entry in the list.
-    const uniqueAudioLevels = audio_levels.reduce((acc, curr) => {
-      if (!acc.some(({clientid, userid}) => userid === curr.userid && clientid === curr.clientid)) {
+    const uniqueAudioLevels = audioLevels.reduce((acc, curr) => {
+      if (!acc.some(({clientId, userId}) => matchQualifiedIds(userId, curr.userId) && clientId === curr.clientId)) {
         acc.push(curr);
       }
       return acc;
@@ -169,15 +165,15 @@ export class Call {
 
     // Update activeSpeaking status on the participants based on their `audio_level_now`.
     this.participants().forEach(participant => {
-      const match = uniqueAudioLevels.find(({userid, clientid}) => participant.doesMatchIds(userid, clientid));
-      const audioLevelNow = match?.audio_level_now ?? 0;
+      const match = uniqueAudioLevels.find(({userId, clientId}) => participant.doesMatchIds(userId, clientId));
+      const audioLevelNow = match?.levelNow ?? 0;
       participant.isActivelySpeaking(audioLevelNow > 0);
     });
 
     // Get the corresponding participants for the entries in ActiveSpeakers in the incoming order.
     const activeSpeakers = uniqueAudioLevels
       // Get the participants.
-      .map(({userid, clientid}) => this.getParticipant(userid, clientid))
+      .map(({userId, clientId}) => this.getParticipant(userId, clientId))
       // Limit them to 4.
       .slice(0, 4)
       // Sort them by name
@@ -199,7 +195,7 @@ export class Call {
     this.updatePages();
   }
 
-  getParticipant(userId: UserId, clientId: ClientId): Participant | undefined {
+  getParticipant(userId: QualifiedId, clientId: ClientId): Participant | undefined {
     return this.participants().find(participant => participant.doesMatchIds(userId, clientId));
   }
 

@@ -92,8 +92,21 @@ interface MediaStreamQuery {
   screen?: boolean;
 }
 
+type QualifiedWcallMember = WcallMember & {userId: QualifiedId};
+
 interface SendMessageTarget {
   clients: WcallClient[];
+}
+
+interface ActiveSpeaker {
+  audio_level: number;
+  audio_level_now: number;
+  clientid: string;
+  userid: string;
+}
+
+interface ActiveSpeakers {
+  audio_levels: ActiveSpeaker[];
 }
 
 type Clients = {clientid: string; userid: string}[];
@@ -160,7 +173,7 @@ export class CallingRepository {
         callParticipants[participant.user.id] = isVerified;
 
         if (wasVerified === true && isVerified === false) {
-          this.leaveCallOnUnverified(participant.user.id);
+          this.leaveCallOnUnverified(participant.user.qualifiedId);
           return;
         }
       }
@@ -196,7 +209,7 @@ export class CallingRepository {
     }
   };
 
-  getStats(conversationId: QualifiedId): Promise<{stats: RTCStatsReport; userid: UserId}[]> {
+  getStats(conversationId: QualifiedId): Promise<{stats: RTCStatsReport; userid: string}[]> {
     return this.wCall.getStats(this.serializeQualifiedId(conversationId));
   }
 
@@ -366,7 +379,11 @@ export class CallingRepository {
       .find((callInstance: Call) => matchQualifiedIds(callInstance.conversationId, conversationId));
   }
 
-  private findParticipant(conversationId: QualifiedId, userId: UserId, clientId: ClientId): Participant | undefined {
+  private findParticipant(
+    conversationId: QualifiedId,
+    userId: QualifiedId,
+    clientId: ClientId,
+  ): Participant | undefined {
     const call = this.findCall(conversationId);
     return call?.getParticipant(userId, clientId);
   }
@@ -454,7 +471,7 @@ export class CallingRepository {
   /**
    * Leave call when a participant is not verified anymore
    */
-  private readonly leaveCallOnUnverified = (unverifiedUserId: string): void => {
+  private readonly leaveCallOnUnverified = (unverifiedUserId: QualifiedId): void => {
     const activeCall = this.callState.joinedCall();
 
     if (!activeCall) {
@@ -659,7 +676,7 @@ export class CallingRepository {
       }
       const selfParticipant = new Participant(this.selfUser, this.selfClientId);
       const call = new Call(
-        this.selfUser.id,
+        this.selfUser.qualifiedId,
         conversationId,
         conversationType,
         selfParticipant,
@@ -946,7 +963,7 @@ export class CallingRepository {
 
   private injectDeactivateEvent(
     conversationId: QualifiedId,
-    userId: UserId,
+    userId: QualifiedId,
     duration: number,
     reason: REASON,
     time: string,
@@ -1109,7 +1126,7 @@ export class CallingRepository {
      */
     call.participants().forEach(participant => {
       if (participant.videoState() === VIDEO_STATE.SCREENSHARE && participant.startedScreenSharingAt() > 0) {
-        const isSameUser = selfParticipant.doesMatchIds(participant.user.id, participant.clientId);
+        const isSameUser = selfParticipant.doesMatchIds(participant.user.qualifiedId, participant.clientId);
         this.sendCallingEvent(EventName.CALLING.SCREEN_SHARE, call, {
           [Segmentation.SCREEN_SHARE.DIRECTION]: isSameUser ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING,
           [Segmentation.SCREEN_SHARE.DURATION]:
@@ -1160,7 +1177,7 @@ export class CallingRepository {
     const selfParticipant = new Participant(this.selfUser, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
     const call = new Call(
-      userId,
+      this.parseQualifiedId(userId),
       conversationId,
       conversationType,
       selfParticipant,
@@ -1203,25 +1220,27 @@ export class CallingRepository {
   };
 
   private readonly getCallDirection = (call: Call): CALL_DIRECTION => {
-    return call.initiator === call.getSelfParticipant().user.id ? CALL_DIRECTION.OUTGOING : CALL_DIRECTION.INCOMING;
+    return matchQualifiedIds(call.initiator, call.getSelfParticipant().user.qualifiedId)
+      ? CALL_DIRECTION.OUTGOING
+      : CALL_DIRECTION.INCOMING;
   };
 
-  private updateParticipantMutedState(call: Call, members: WcallMember[]): void {
-    members.forEach(member => call.getParticipant(member.userid, member.clientid)?.isMuted(!!member.muted));
+  private updateParticipantMutedState(call: Call, members: QualifiedWcallMember[]): void {
+    members.forEach(member => call.getParticipant(member.userId, member.clientid)?.isMuted(!!member.muted));
   }
 
-  private updateParticipantVideoState(call: Call, members: WcallMember[]): void {
-    members.forEach(member => call.getParticipant(member.userid, member.clientid)?.isSendingVideo(!!member.vrecv));
+  private updateParticipantVideoState(call: Call, members: QualifiedWcallMember[]): void {
+    members.forEach(member => call.getParticipant(member.userId, member.clientid)?.isSendingVideo(!!member.vrecv));
   }
 
-  private updateParticipantList(call: Call, members: WcallMember[]): void {
+  private updateParticipantList(call: Call, members: QualifiedWcallMember[]): void {
     const newMembers = members
-      .filter(({userid, clientid}) => !call.getParticipant(userid, clientid))
+      .filter(({userId, clientid}) => !call.getParticipant(userId, clientid))
       .map(({userid, clientid}) => new Participant(this.userRepository.findUserById(userid), clientid));
 
     const removedMembers = call
       .participants()
-      .filter(participant => !members.find(({userid, clientid}) => participant.doesMatchIds(userid, clientid)));
+      .filter(participant => !members.find(({userId, clientid}) => participant.doesMatchIds(userId, clientid)));
 
     newMembers.forEach(participant => call.participants.unshift(participant));
     removedMembers.forEach(participant => call.participants.remove(participant));
@@ -1241,7 +1260,11 @@ export class CallingRepository {
       return;
     }
 
-    const {members}: {members: WcallMember[]} = JSON.parse(membersJson);
+    const {members: serializedMembers}: {members: WcallMember[]} = JSON.parse(membersJson);
+    const members = serializedMembers.map(member => ({
+      ...member,
+      userId: this.parseQualifiedId(member.userid),
+    }));
 
     this.updateParticipantList(call, members);
     this.updateParticipantMutedState(call, members);
@@ -1330,9 +1353,15 @@ export class CallingRepository {
 
   private readonly updateActiveSpeakers = (wuser: number, convId: string, rawJson: string) => {
     const call = this.findCall(this.parseQualifiedId(convId));
-    const activeSpeakers = JSON.parse(rawJson);
+    const activeSpeakers: ActiveSpeakers = JSON.parse(rawJson);
     if (call && activeSpeakers) {
-      call.setActiveSpeakers(activeSpeakers);
+      call.setActiveSpeakers(
+        activeSpeakers.audio_levels.map(({userid, clientid, audio_level_now}) => ({
+          clientId: clientid,
+          levelNow: audio_level_now,
+          userId: this.parseQualifiedId(userid),
+        })),
+      );
     }
   };
 
@@ -1365,7 +1394,11 @@ export class CallingRepository {
     remoteClientId: ClientId,
     streams: readonly MediaStream[] | null,
   ): void => {
-    let participant = this.findParticipant(this.parseQualifiedId(conversationId), remoteUserId, remoteClientId);
+    let participant = this.findParticipant(
+      this.parseQualifiedId(conversationId),
+      this.parseQualifiedId(remoteUserId),
+      remoteClientId,
+    );
     if (!participant) {
       const call = this.findCall(this.parseQualifiedId(conversationId));
       if (call?.conversationType !== CONV_TYPE.ONEONONE) {
@@ -1395,11 +1428,12 @@ export class CallingRepository {
 
   private readonly videoStateChanged = (
     convId: SerializedConversationId,
-    userId: UserId,
+    userid: UserId,
     clientId: ClientId,
     state: VIDEO_STATE,
   ) => {
     const call = this.findCall(this.parseQualifiedId(convId));
+    const userId = this.parseQualifiedId(userid);
     if (!call) {
       return;
     }

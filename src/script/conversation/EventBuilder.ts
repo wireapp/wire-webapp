@@ -512,7 +512,7 @@ export const EventBuilder = {
 
   buildVoiceChannelDeactivate(
     conversation: QualifiedId,
-    userId: string,
+    userId: QualifiedId,
     duration: number,
     reason: AVS_REASON,
     time: string,
@@ -524,9 +524,10 @@ export const EventBuilder = {
         duration,
         reason,
       },
-      from: userId,
+      from: userId.id,
       id: createRandomUuid(),
       protocol_version: protocolVersion,
+      qualified_from: userId,
       time,
       type: ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
     };
