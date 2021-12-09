@@ -53,12 +53,10 @@ import {flatten} from 'Util/ArrayUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
 import {Config} from '../Config';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import {ConversationRepository} from '../conversation/ConversationRepository';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
-import {EventInfoEntity, MessageSendingOptions} from '../conversation/EventInfoEntity';
+import {MessageSendingOptions} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
 import {Call, SerializedConversationId} from './Call';
@@ -73,7 +71,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
-import type {MessageRepository} from '../conversation/MessageRepository';
+import {CONSENT_TYPE, MessageRepository} from '../conversation/MessageRepository';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
@@ -492,16 +490,6 @@ export class CallingRepository {
   // Inbound call events
   //##############################################################################
 
-  private async verificationPromise(conversationId: QualifiedId, userId: string, isResponse: boolean): Promise<void> {
-    const recipients = await this.messageRepository.createRecipients(conversationId, false, [userId]);
-    const eventInfoEntity = new EventInfoEntity(undefined, conversationId, {recipients});
-    eventInfoEntity.setType(GENERIC_MESSAGE_TYPE.CALLING);
-    const consentType = isResponse
-      ? ConversationRepository.CONSENT_TYPE.INCOMING_CALL
-      : ConversationRepository.CONSENT_TYPE.OUTGOING_CALL;
-    await this.messageRepository.grantMessage(eventInfoEntity, consentType, [], false);
-  }
-
   private abortCall(conversationId: QualifiedId): void {
     const call = this.findCall(conversationId);
     if (call) {
@@ -531,20 +519,18 @@ export class CallingRepository {
    * Handle incoming calling events from backend.
    */
   onCallEvent = async (event: CallingEvent, source: string): Promise<void> => {
-    const {content, conversation, qualified_conversation, from: userId, sender: clientId, time} = event;
-    const conversationId =
-      Config.getConfig().FEATURE.ENABLE_FEDERATION && qualified_conversation
-        ? qualified_conversation
-        : {domain: '', id: conversation};
+    const {content, conversation, qualified_conversation, from, qualified_from, sender: clientId, time} = event;
+    const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION && qualified_conversation && qualified_from;
+    const userId = isFederated ? qualified_from : {domain: '', id: from};
+    const conversationId = isFederated ? qualified_conversation : {domain: '', id: conversation};
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const toSecond = (timestamp: number) => Math.floor(timestamp / 1000);
     const contentStr = JSON.stringify(content);
 
-    let validatedPromise = Promise.resolve();
-
     switch (content.type) {
       case CALL_MESSAGE_TYPE.GROUP_LEAVE: {
-        const isAnotherSelfClient = userId === this.selfUser.id && clientId !== this.selfClientId;
+        const isAnotherSelfClient =
+          matchQualifiedIds(userId, this.selfUser.qualifiedId) && clientId !== this.selfClientId;
         if (isAnotherSelfClient) {
           const call = this.findCall(conversationId);
           if (call?.state() === CALL_STATE.INCOMING) {
@@ -558,7 +544,23 @@ export class CallingRepository {
       }
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
-          validatedPromise = this.verificationPromise(conversationId, userId, true);
+          const {id, domain} = conversationId;
+          const missing = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+          // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
+          const shouldContinue = await this.messageRepository.handleClientMismatch(
+            conversationId,
+            {
+              deleted: {},
+              missing,
+              redundant: {},
+              time: '',
+            } as ClientMismatch,
+            CONSENT_TYPE.INCOMING_CALL,
+          );
+
+          if (!shouldContinue) {
+            this.abortCall(conversationId);
+          }
         }
         break;
       }
@@ -575,8 +577,6 @@ export class CallingRepository {
       }
     }
 
-    await validatedPromise.catch(() => this.abortCall(conversationId));
-
     const res = this.wCall.recvMsg(
       this.wUser,
       contentStr,
@@ -584,7 +584,7 @@ export class CallingRepository {
       toSecond(currentTimestamp),
       toSecond(new Date(time).getTime()),
       this.serializeQualifiedId(conversationId),
-      userId,
+      this.serializeQualifiedId(userId),
       clientId,
     );
 
@@ -605,7 +605,7 @@ export class CallingRepository {
   private handleCallEventSaving(
     type: string,
     conversationId: QualifiedId,
-    userId: UserId,
+    userId: QualifiedId,
     time: string,
     source: string,
   ): void {
@@ -939,7 +939,7 @@ export class CallingRepository {
     return recipients;
   }
 
-  private injectActivateEvent(conversationId: QualifiedId, userId: UserId, time: string, source: string): void {
+  private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
     this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
   }

@@ -163,14 +163,6 @@ export class ConversationRepository {
     };
   }
 
-  static get CONSENT_TYPE() {
-    return {
-      INCOMING_CALL: 'incoming_call',
-      MESSAGE: 'message',
-      OUTGOING_CALL: 'outgoing_call',
-    };
-  }
-
   constructor(
     private readonly conversation_service: ConversationService,
     private readonly messageRepository: MessageRepository,
@@ -187,7 +179,7 @@ export class ConversationRepository {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
-    this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId, sentAt, silent) => {
+    this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId, sentAt, silent, consentType) => {
       const allDeleted = {...mismatch.deleted, ...mismatch.redundant} as QualifiedUserClients | UserClients;
       const deleted = isQualifiedUserClients(allDeleted)
         ? flattenQualifiedUserClients(allDeleted)
@@ -264,7 +256,9 @@ export class ConversationRepository {
           conversation.blockLegalHoldMessage = false;
         }
       }
-      return silent ? false : this.messageRepository.requestUserSendingPermission(conversation, hasNewLegalHoldDevices);
+      return silent
+        ? false
+        : this.messageRepository.requestUserSendingPermission(conversation, hasNewLegalHoldDevices, consentType);
     });
 
     this.logger = getLogger('ConversationRepository');
