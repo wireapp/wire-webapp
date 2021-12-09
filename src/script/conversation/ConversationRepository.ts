@@ -185,7 +185,7 @@ export class ConversationRepository {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
-    this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId, silent) => {
+    this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId, sentAt, silent) => {
       const deleted = isQualifiedUserClients(mismatch.deleted)
         ? flattenQualifiedUserClients(mismatch.deleted)
         : flattenUserClients(mismatch.deleted);
@@ -232,13 +232,34 @@ export class ConversationRepository {
       let hasNewLegalHoldDevices = false;
       if (missing.length) {
         const wasVerified = conversation?.is_verified();
+        const legalHoldStatus = conversation?.legalHoldStatus();
+        if (conversation) {
+          // FIXME there is an internal mechanism in the conversation that triggers the system message.
+          // This can be removed once `messageRepository.grantMessage` is not called anymore
+          conversation.blockLegalHoldMessage = true;
+        }
         const newDevices = await this.userRepository.updateMissingUsersClients(missing.map(({userId}) => userId));
         if (wasVerified && newDevices.length) {
           // if the conversation is verified but some clients were missing, it means the conversation will degrade.
           // We need to warn the user of the degradation and ask his permission to actually send the message
           conversation.verification_state(ConversationVerificationState.DEGRADED);
         }
-        hasNewLegalHoldDevices = newDevices.some(device => device.isLegalHold());
+        if (conversation) {
+          const hasChangedLegalHoldStatus = conversation.legalHoldStatus() !== legalHoldStatus;
+          hasNewLegalHoldDevices = newDevices.some(device => device.isLegalHold());
+          if (hasChangedLegalHoldStatus) {
+            this.injectLegalHoldMessage({
+              beforeTimestamp: true,
+              conversationId: conversation.qualifiedId,
+              legalHoldStatus: conversation.legalHoldStatus(),
+              timestamp: sentAt,
+              userId: this.userState.self().qualifiedId,
+            });
+          }
+          // FIXME there is an internal mechanism in the conversation that triggers the system message.
+          // This can be removed once `messageRepository.grantMessage` is not called anymore
+          conversation.blockLegalHoldMessage = false;
+        }
       }
       return silent ? false : this.messageRepository.requestUserSendingPermission(conversation, hasNewLegalHoldDevices);
     });

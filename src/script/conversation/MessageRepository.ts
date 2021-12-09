@@ -128,6 +128,7 @@ export type ContributedSegmentations = Record<string, number | string | boolean 
 type ClientMismatchHandlerFn = (
   mismatch: ClientMismatch | MessageSendingStatus,
   conversationId?: QualifiedId,
+  sentAt?: number,
   silent?: boolean,
 ) => Promise<boolean>;
 
@@ -711,10 +712,11 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
+    const sentAt = Date.now();
     return this.conversationService.send({
       callbacks: {
         onClientMismatch: mismatch =>
-          this.onClientMismatch?.(mismatch, conversation.qualifiedId, silentDegradationWarning),
+          this.onClientMismatch?.(mismatch, conversation.qualifiedId, sentAt, silentDegradationWarning),
         onStart: injectOptimisticEvent,
         onSuccess: updateOptimisticEvent,
       },
