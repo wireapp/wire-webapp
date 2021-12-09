@@ -712,7 +712,7 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    const sentAt = Date.now();
+    const sentAt = this.serverTimeHandler.toServerTimestamp();
     return this.conversationService.send({
       callbacks: {
         onClientMismatch: mismatch =>
