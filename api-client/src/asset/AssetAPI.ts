@@ -44,6 +44,7 @@ export interface CipherOptions {
 export interface AssetOptions extends CipherOptions {
   public?: boolean;
   retention?: AssetRetentionPolicy;
+  domain?: string;
 }
 
 export interface AssetResponse {
@@ -53,6 +54,7 @@ export interface AssetResponse {
 
 export class AssetAPI {
   private static readonly ASSET_V3_URL = '/assets/v3';
+  private static readonly ASSET_V4_URL = '/assets/v4';
   private static readonly ASSET_SERVICE_URL = '/bot/assets';
   private static readonly ASSET_V2_URL = '/otr/assets';
   private static readonly ASSET_V2_CONVERSATION_URL = '/conversations';
@@ -301,8 +303,16 @@ export class AssetAPI {
     return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
   }
 
+  /**
+   * Uploads an asset to the backend
+   *
+   * @param asset Raw content of the asset to upload
+   * @param options?
+   * @param progressCallback? Will be called at every progress of the upload
+   * @param domain? If given, will upload to the new federated asset endpoint
+   */
   postAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
-    const assetBaseUrl = AssetAPI.ASSET_V3_URL;
+    const assetBaseUrl = options?.domain ? `${AssetAPI.ASSET_V4_URL}/${options.domain}` : AssetAPI.ASSET_V3_URL;
     return this.postAssetShared(assetBaseUrl, asset, options, progressCallback);
   }
 
