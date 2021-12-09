@@ -208,7 +208,7 @@ export class MessageRepository {
    * @param mismatch
    */
   public handleClientMismatch(conversationId: QualifiedId, mismatch: ClientMismatch | MessageSendingStatus) {
-    this.onClientMismatch?.(mismatch, conversationId, true);
+    this.onClientMismatch?.(mismatch, conversationId, Date.now(), true);
   }
 
   /**
