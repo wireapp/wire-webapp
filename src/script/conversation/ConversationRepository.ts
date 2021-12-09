@@ -41,6 +41,8 @@ import {
   CONVERSATION_TYPE,
   NewConversation,
   Conversation as BackendConversation,
+  UserClients,
+  QualifiedUserClients,
 } from '@wireapp/api-client/src/conversation/';
 import {container} from 'tsyringe';
 import {ConversationReceiptModeUpdateData} from '@wireapp/api-client/src/conversation/data/';
@@ -186,7 +188,7 @@ export class ConversationRepository {
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId, sentAt, silent) => {
-      const allDeleted = {...mismatch.deleted, ...mismatch.redundant};
+      const allDeleted = {...mismatch.deleted, ...mismatch.redundant} as QualifiedUserClients | UserClients;
       const deleted = isQualifiedUserClients(allDeleted)
         ? flattenQualifiedUserClients(allDeleted)
         : flattenUserClients(allDeleted);
