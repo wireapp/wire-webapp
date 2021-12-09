@@ -700,7 +700,7 @@ export class MessageRepository {
           .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
       }
 
-      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation);
+      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false);
     };
 
     const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
