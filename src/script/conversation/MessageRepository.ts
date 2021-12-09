@@ -602,8 +602,14 @@ export class MessageRepository {
    * @param conversation The conversation to send the message in
    * @returns Resolves to true if the message can be sent, false if the user didn't give their permission
    */
-  requestUserSendingPermission(conversation: Conversation): Promise<boolean> {
-    if (conversation.verification_state() !== ConversationVerificationState.DEGRADED) {
+  requestUserSendingPermission(conversation: Conversation, showLegalHoldWarning: boolean): Promise<boolean> {
+    const conversationDegraded = conversation.verification_state() === ConversationVerificationState.DEGRADED;
+    if (showLegalHoldWarning) {
+      return showLegalHoldWarningModal(conversation, conversationDegraded)
+        .then(() => true)
+        .catch(() => false);
+    }
+    if (!conversationDegraded) {
       return Promise.resolve(true);
     }
 
@@ -694,7 +700,7 @@ export class MessageRepository {
           .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
       }
 
-      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation);
+      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false);
     };
 
     const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {

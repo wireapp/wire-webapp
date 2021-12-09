@@ -316,13 +316,13 @@ export class UserRepository {
    *
    * TODO(SRP): Split up method because it does not follow the single-responsibility principle
    *
-   * @returns Resolves with `true` when a client has been added
+   * @returns Resolves with the new client entity when a client has been added
    */
   addClientToUser = async (
     userId: QualifiedId,
     clientPayload: PublicClient | AddedClient | ClientEntity,
     publishClient: boolean = false,
-  ): Promise<boolean> => {
+  ): Promise<ClientEntity | undefined> => {
     const userEntity = await this.getUserById(userId);
     const clientEntity =
       clientPayload instanceof ClientEntity
@@ -332,7 +332,6 @@ export class UserRepository {
     if (wasClientAdded) {
       await this.clientRepository.saveClientInDb(userId, clientEntity.toJson());
       if (clientEntity.isLegalHold()) {
-        amplify.publish(WebAppEvents.USER.LEGAL_HOLD_ACTIVATED, userId);
         const isSelfUser = userId.id === this.userState.self().id;
         if (isSelfUser) {
           amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
@@ -340,26 +339,29 @@ export class UserRepository {
       } else if (publishClient) {
         amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
       }
+      return clientEntity;
     }
-    return wasClientAdded;
+    return undefined;
   };
 
   /**
    * Will sync all the clients of the users given with the backend and add the missing ones.
    * @param userIds - The users which clients should be updated
-   * @return true if one or many clients were added to one or many users
+   * @return resolves with all the client entities that were added
    */
-  async updateMissingUsersClients(userIds: QualifiedId[]): Promise<boolean> {
+  async updateMissingUsersClients(userIds: QualifiedId[]): Promise<ClientEntity[]> {
     const clients = await this.getClientsByUsers(userIds, false);
     const users = flattenUserClientsQualifiedIds<ClientEntity>(clients);
-    const addedUsers = await Promise.all(
-      users.map(async ({userId, clients}) => {
-        return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).some(
-          wasAdded => wasAdded === true,
-        );
-      }),
+    const addedClients = flatten(
+      await Promise.all(
+        users.map(async ({userId, clients}) => {
+          return (await Promise.all(clients.map(client => this.addClientToUser(userId, client, true)))).filter(
+            client => !!client,
+          );
+        }),
+      ),
     );
-    return addedUsers.some(wasAdded => wasAdded === true);
+    return addedClients;
   }
 
   /**
