@@ -767,16 +767,14 @@ export class MessageRepository {
    * @returns Resolves after sending the session reset
    */
   private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
-    const sessionReset = MessageBuilder.createSessionReset({
-      ...this.createCommonMessagePayload(conversation),
-    });
+    const sessionReset = MessageBuilder.createSessionReset(this.createCommonMessagePayload(conversation));
 
     const userClient = {[userId.id]: [clientId]};
     await this.conversationService.send({
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       payloadBundle: sessionReset,
-      userIds: conversation.isFederated() ? {[userId.domain]: userClient} : userClient,
-      targetMode: MessageTargetMode.USERS_CLIENTS, // we target this message to the specific client of the user (no need for mismatch handling here)
+      targetMode: MessageTargetMode.USERS_CLIENTS,
+      userIds: conversation.isFederated() ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
     });
   }
 

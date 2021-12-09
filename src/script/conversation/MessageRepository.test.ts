@@ -55,6 +55,7 @@ import {ConversationService} from './ConversationService';
 import {EventService} from '../event/EventService';
 import {Core} from '../service/CoreSingleton';
 import {container} from 'tsyringe';
+import {ClientEntity} from '../client/ClientEntity';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
@@ -357,9 +358,11 @@ describe('MessageRepository', () => {
     let cryptographyRepository: CryptographyRepository;
     beforeEach(() => {
       const userState = new UserState();
+      userState.self(new User('', ''));
       const teamState = new TeamState(userState);
       const conversationState = new ConversationState(userState, teamState);
       const clientState = new ClientState();
+      clientState.currentClient(new ClientEntity(true, ''));
       cryptographyRepository = testFactory.cryptography_repository as CryptographyRepository;
       messageRepository = new MessageRepository(
         {} as ClientRepository,
@@ -371,7 +374,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -383,11 +385,10 @@ describe('MessageRepository', () => {
 
     it('resets the session with another device', async () => {
       spyOn(core.service!.conversation, 'send');
-      console.log(cryptographyRepository);
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();
 
-      const userId = {id: 'user1', domain: 'domain1'};
+      const userId = {domain: 'domain1', id: 'user1'};
       const clientId = 'client1';
       await messageRepository.resetSession(userId, clientId, conversation);
       expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
