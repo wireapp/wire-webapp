@@ -207,16 +207,18 @@ export class ConversationRepository {
       deleted.forEach(({userId, data}) => {
         data.forEach(client => this.userRepository.removeClientFromUser(userId, client));
       });
+      let hasNewLegalHoldDevices = false;
       if (missing.length) {
         const wasVerified = conversation?.is_verified();
-        const deviceWasAdded = await this.userRepository.updateMissingUsersClients(missing.map(({userId}) => userId));
-        if (wasVerified && deviceWasAdded) {
+        const newDevices = await this.userRepository.updateMissingUsersClients(missing.map(({userId}) => userId));
+        if (wasVerified && newDevices.length) {
           // if the conversation is verified but some clients were missing, it means the conversation will degrade.
           // We need to warn the user of the degradation and ask his permission to actually send the message
           conversation.verification_state(ConversationVerificationState.DEGRADED);
         }
+        hasNewLegalHoldDevices = newDevices.some(device => device.isLegalHold());
       }
-      return silent ? false : this.messageRepository.requestUserSendingPermission(conversation);
+      return silent ? false : this.messageRepository.requestUserSendingPermission(conversation, hasNewLegalHoldDevices);
     });
 
     this.logger = getLogger('ConversationRepository');
