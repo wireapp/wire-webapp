@@ -19,30 +19,20 @@
 
 import React from 'react';
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
-import type {Call} from '../../calling/Call';
 import type {CallingRepository} from '../../calling/CallingRepository';
 import type {MediaRepository} from '../../media/MediaRepository';
 import type {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {MediaType} from '../../media/MediaType';
 import {t} from 'Util/LocalizerUtil';
 import {DeviceTypes} from '../../media/MediaDevicesHandler';
-import useEffectRef from 'Util/useEffectRef';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import SaveCallLogs from './avPreferences/SaveCallLogs';
 import CallOptions from './avPreferences/CallOptions';
 import CameraPreferences from './avPreferences/CameraPreferences';
 import MicrophonePreferences from './avPreferences/MicrophonePreferences';
 import AudioOutPreferences from './avPreferences/AudioOutPreferences';
-
-type MediaSourceChanged = (mediaStream: MediaStream, mediaType: MediaType, call?: Call) => void;
-type WillChangeMediaSource = (mediaType: MediaType) => boolean;
-type CallBacksType = {
-  replaceActiveMediaSource: MediaSourceChanged;
-  stopActiveMediaSource: WillChangeMediaSource;
-};
+import PreferencesPage from './components/PreferencesPage';
 
 interface AVPreferencesProps {
-  callbacks: CallBacksType;
   callingRepository: CallingRepository;
   mediaRepository: MediaRepository;
   propertiesRepository: PropertiesRepository;
@@ -52,10 +42,7 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
   mediaRepository: {devicesHandler, constraintsHandler, streamHandler},
   propertiesRepository,
   callingRepository,
-  callbacks,
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
   const deviceSupport = useKoSubscribableChildren(devicesHandler?.deviceSupport, [
     DeviceTypes.AUDIO_INPUT,
     DeviceTypes.AUDIO_OUTPUT,
@@ -68,23 +55,20 @@ const AVPreferences: React.FC<AVPreferencesProps> = ({
   };
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-      <div className="preferences-titlebar">{t('preferencesAV')}</div>
-      <div className="preferences-content" ref={setScrollbarRef}>
-        {deviceSupport.audioInput && (
-          <MicrophonePreferences
-            {...{devicesHandler, streamHandler}}
-            streamCallback={getStreamCallback(MediaType.AUDIO)}
-          />
-        )}
-        {deviceSupport.audioOutput && <AudioOutPreferences {...{devicesHandler}} />}
-        {deviceSupport.videoInput && (
-          <CameraPreferences {...{devicesHandler, streamHandler}} streamCallback={getStreamCallback(MediaType.VIDEO)} />
-        )}
-        <CallOptions {...{constraintsHandler, propertiesRepository}} />
-        {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
-      </div>
-    </div>
+    <PreferencesPage title={t('preferencesAV')}>
+      {deviceSupport.audioInput && (
+        <MicrophonePreferences
+          {...{devicesHandler, streamHandler}}
+          streamCallback={getStreamCallback(MediaType.AUDIO)}
+        />
+      )}
+      {deviceSupport.audioOutput && <AudioOutPreferences {...{devicesHandler}} />}
+      {deviceSupport.videoInput && (
+        <CameraPreferences {...{devicesHandler, streamHandler}} streamCallback={getStreamCallback(MediaType.VIDEO)} />
+      )}
+      <CallOptions {...{constraintsHandler, propertiesRepository}} />
+      {callingRepository.supportsCalling && <SaveCallLogs {...{callingRepository}} />}
+    </PreferencesPage>
   );
 };
 

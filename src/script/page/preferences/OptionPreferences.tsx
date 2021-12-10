@@ -27,19 +27,18 @@ import {PROPERTIES_TYPE} from '../../properties/PropertiesType';
 
 import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import useEffectRef from 'Util/useEffectRef';
 
 import {ClientRepository} from '../../client/ClientRepository';
 import {ConversationRepository} from '../../conversation/ConversationRepository';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {TeamState} from '../../team/TeamState';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
 import PreferencesCheckbox from './components/PreferencesCheckbox';
 import PreferencesSection from './components/PreferencesSection';
 import PreferencesRadio from './components/PreferencesRadio';
+import PreferencesPage from './components/PreferencesPage';
 
 interface OptionPreferencesProps {
   clientRepository: ClientRepository;
@@ -55,9 +54,6 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   propertiesRepository,
   userState = container.resolve(UserState),
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
-
   const {isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {
     properties: {settings},
@@ -114,97 +110,94 @@ const OptionPreferences: React.FC<OptionPreferencesProps> = ({
   };
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-      <div className="preferences-titlebar">{t('preferencesOptions')}</div>
-      <div className="preferences-content" ref={setScrollbarRef}>
-        <PreferencesSection title={t('preferencesOptionsAudio')}>
-          <PreferencesRadio
-            name="preferences-options-audio"
-            selectedValue={optionAudio}
-            onChange={saveOptionAudioPreference}
-            options={[
-              {
-                detailLabel: t('preferencesOptionsAudioAllDetail'),
-                label: t('preferencesOptionsAudioAll'),
-                value: AudioPreference.ALL,
-              },
-              {
-                detailLabel: t('preferencesOptionsAudioSomeDetail'),
-                label: t('preferencesOptionsAudioSome'),
-                value: AudioPreference.SOME,
-              },
-              {
-                detailLabel: t('preferencesOptionsAudioNoneDetail'),
-                label: t('preferencesOptionsAudioNone'),
-                value: AudioPreference.NONE,
-              },
-            ]}
-          />
-        </PreferencesSection>
+    <PreferencesPage title={t('preferencesOptions')}>
+      <PreferencesSection title={t('preferencesOptionsAudio')}>
+        <PreferencesRadio
+          name="preferences-options-audio"
+          selectedValue={optionAudio}
+          onChange={saveOptionAudioPreference}
+          options={[
+            {
+              detailLabel: t('preferencesOptionsAudioAllDetail'),
+              label: t('preferencesOptionsAudioAll'),
+              value: AudioPreference.ALL,
+            },
+            {
+              detailLabel: t('preferencesOptionsAudioSomeDetail'),
+              label: t('preferencesOptionsAudioSome'),
+              value: AudioPreference.SOME,
+            },
+            {
+              detailLabel: t('preferencesOptionsAudioNoneDetail'),
+              label: t('preferencesOptionsAudioNone'),
+              value: AudioPreference.NONE,
+            },
+          ]}
+        />
+      </PreferencesSection>
 
-        {isActivatedAccount && (
-          <>
-            <PreferencesSection title={t('preferencesOptionsNotifications')}>
-              <PreferencesRadio
-                name="preferences-options-notification"
-                selectedValue={optionNotifications}
-                onChange={saveOptionNotificationsPreference}
-                options={[
-                  {
-                    label: t('preferencesOptionsNotificationsOn'),
-                    value: NotificationPreference.ON,
-                  },
-                  {
-                    label: t('preferencesOptionsNotificationsObfuscateMessage'),
-                    value: NotificationPreference.OBFUSCATE_MESSAGE,
-                  },
-                  {
-                    label: t('preferencesOptionsNotificationsObfuscate'),
-                    value: NotificationPreference.OBFUSCATE,
-                  },
-                  {
-                    label: t('preferencesOptionsNotificationsNone'),
-                    value: NotificationPreference.NONE,
-                  },
-                ]}
-              />
-            </PreferencesSection>
-            <PreferencesSection title={t('preferencesOptionsPopular')}>
-              <PreferencesCheckbox
-                uieName="status-preference-use-dark-mode"
-                label={t('preferencesOptionsUseDarkMode')}
-                checked={optionDarkMode}
-                onChange={newOptionDarkMode => saveOptionNewTheme(newOptionDarkMode)}
-              />
-              <PreferencesCheckbox
-                uieName="status-preference-emoji-replace"
-                label={t('preferencesOptionsEmojiReplaceCheckbox')}
-                checked={optionReplaceInlineEmoji}
-                onChange={newOptionReplaceInlineEmoji => saveOptionEmojiPreference(newOptionReplaceInlineEmoji)}
-                details={
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: t(
-                        'preferencesOptionsEmojiReplaceDetail',
-                        {},
-                        {icon: "<span class='font-size-xs icon-emoji'></span>"},
-                      ),
-                    }}
-                  />
-                }
-              />
-              <PreferencesCheckbox
-                uieName="status-preference-previews-send"
-                label={t('preferencesOptionsPreviewsSendCheckbox')}
-                checked={optionSendPreviews}
-                onChange={newOptionSendPreviews => saveOptionSendPreviewsPreference(newOptionSendPreviews)}
-                details={t('preferencesOptionsPreviewsSendDetail')}
-              />
-            </PreferencesSection>
-          </>
-        )}
-      </div>
-    </div>
+      {isActivatedAccount && (
+        <>
+          <PreferencesSection title={t('preferencesOptionsNotifications')}>
+            <PreferencesRadio
+              name="preferences-options-notification"
+              selectedValue={optionNotifications}
+              onChange={saveOptionNotificationsPreference}
+              options={[
+                {
+                  label: t('preferencesOptionsNotificationsOn'),
+                  value: NotificationPreference.ON,
+                },
+                {
+                  label: t('preferencesOptionsNotificationsObfuscateMessage'),
+                  value: NotificationPreference.OBFUSCATE_MESSAGE,
+                },
+                {
+                  label: t('preferencesOptionsNotificationsObfuscate'),
+                  value: NotificationPreference.OBFUSCATE,
+                },
+                {
+                  label: t('preferencesOptionsNotificationsNone'),
+                  value: NotificationPreference.NONE,
+                },
+              ]}
+            />
+          </PreferencesSection>
+          <PreferencesSection title={t('preferencesOptionsPopular')}>
+            <PreferencesCheckbox
+              uieName="status-preference-use-dark-mode"
+              label={t('preferencesOptionsUseDarkMode')}
+              checked={optionDarkMode}
+              onChange={newOptionDarkMode => saveOptionNewTheme(newOptionDarkMode)}
+            />
+            <PreferencesCheckbox
+              uieName="status-preference-emoji-replace"
+              label={t('preferencesOptionsEmojiReplaceCheckbox')}
+              checked={optionReplaceInlineEmoji}
+              onChange={newOptionReplaceInlineEmoji => saveOptionEmojiPreference(newOptionReplaceInlineEmoji)}
+              details={
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: t(
+                      'preferencesOptionsEmojiReplaceDetail',
+                      {},
+                      {icon: "<span class='font-size-xs icon-emoji'></span>"},
+                    ),
+                  }}
+                />
+              }
+            />
+            <PreferencesCheckbox
+              uieName="status-preference-previews-send"
+              label={t('preferencesOptionsPreviewsSendCheckbox')}
+              checked={optionSendPreviews}
+              onChange={newOptionSendPreviews => saveOptionSendPreviewsPreference(newOptionSendPreviews)}
+              details={t('preferencesOptionsPreviewsSendDetail')}
+            />
+          </PreferencesSection>
+        </>
+      )}
+    </PreferencesPage>
   );
 };
 

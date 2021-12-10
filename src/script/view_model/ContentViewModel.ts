@@ -44,7 +44,6 @@ import {GiphyViewModel} from './content/GiphyViewModel';
 import {HistoryImportViewModel} from './content/HistoryImportViewModel';
 import {HistoryExportViewModel} from './content/HistoryExportViewModel';
 import {TitleBarViewModel} from './content/TitleBarViewModel';
-import {PreferencesAboutViewModel} from './content/PreferencesAboutViewModel';
 import {PreferencesDevicesViewModel} from './content/PreferencesDevicesViewModel';
 import {PreferencesDeviceDetailsViewModel} from './content/PreferencesDeviceDetailsViewModel';
 import {InputBarViewModel} from './content/InputBarViewModel';
@@ -62,6 +61,7 @@ import {matchQualifiedIds} from 'Util/QualifiedId';
 import '../page/preferences/AccountPreferences';
 import '../page/preferences/OptionPreferences';
 import '../page/preferences/AVPreferences';
+import '../page/preferences/AboutPreferences';
 import {PreferenceNotificationRepository, Notification} from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
 import {ClientEntity} from '../client/ClientEntity';
@@ -98,7 +98,6 @@ export class ContentViewModel {
   logger: Logger;
   mainViewModel: MainViewModel;
   messageList: MessageListViewModel;
-  preferencesAbout: PreferencesAboutViewModel;
   preferencesDeviceDetails: PreferencesDeviceDetailsViewModel;
   preferencesDevices: PreferencesDevicesViewModel;
   previousConversation: Conversation | null = null;
@@ -179,7 +178,6 @@ export class ContentViewModel {
     );
     this.titleBar = new TitleBarViewModel(mainViewModel.calling, mainViewModel.panel, this, repositories.calling);
 
-    this.preferencesAbout = new PreferencesAboutViewModel();
     this.preferencesDeviceDetails = new PreferencesDeviceDetailsViewModel(
       mainViewModel,
       repositories.client,

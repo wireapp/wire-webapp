@@ -26,7 +26,6 @@ import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentU
 import {t} from 'Util/LocalizerUtil';
 import {getLogger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
-import useEffectRef from 'Util/useEffectRef';
 import {isTemporaryClientAndNonPersistent} from 'Util/util';
 
 import {ClientRepository} from '../../client/ClientRepository';
@@ -36,7 +35,6 @@ import {User} from '../../entity/User';
 import {PropertiesRepository} from '../../properties/PropertiesRepository';
 import {StorageKey} from '../../storage';
 import {TeamState} from '../../team/TeamState';
-import {useFadingScrollbar} from '../../ui/fadingScrollbar';
 import {RichProfileRepository} from '../../user/RichProfileRepository';
 import type {UserRepository} from '../../user/UserRepository';
 import {UserState} from '../../user/UserState';
@@ -54,6 +52,7 @@ import NameInput from './accountPreferences/NameInput';
 import PreferencesSection from './components/PreferencesSection';
 import PrivacySection from './accountPreferences/PrivacySection';
 import UsernameInput from './accountPreferences/UsernameInput';
+import PreferencesPage from './components/PreferencesPage';
 
 interface AccountPreferencesProps {
   clientRepository: ClientRepository;
@@ -76,9 +75,6 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   teamState = container.resolve(TeamState),
   richProfileRepository = container.resolve(RichProfileRepository),
 }) => {
-  const [scrollbarRef, setScrollbarRef] = useEffectRef<HTMLDivElement>();
-  useFadingScrollbar(scrollbarRef);
-
   const {self: selfUser, isActivatedAccount} = useKoSubscribableChildren(userState, ['self', 'isActivatedAccount']);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
   const {name, email, availability, username, managedBy, phone} = useKoSubscribableChildren(selfUser, [
@@ -125,105 +121,94 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
   };
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column', height: '100vh'}}>
-      <div className="preferences-titlebar">{t('preferencesAccount')}</div>
-      <div className="preferences-content" ref={setScrollbarRef}>
+    <PreferencesPage title={t('preferencesAccount')}>
+      <div
+        css={{
+          alignItems: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+          paddingBottom: 32,
+          width: 560,
+        }}
+      >
         <div
           css={{
-            alignItems: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-            paddingBottom: 32,
-            width: 560,
+            fontWeight: 400,
           }}
         >
-          <div
-            css={{
-              fontWeight: 400,
-            }}
-          >
-            {name}
-          </div>
-          <div>
-            <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
-          </div>
-          {isActivatedAccount && isTeam && <AvailabilityInput {...{availability}} />}
-          {isActivatedAccount && canEditProfile && (
-            <div>
-              <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
-            </div>
-          )}
+          {name}
         </div>
-        {isActivatedAccount ? (
-          <PreferencesSection hasSeparator title={t('preferencesAccountInfo')}>
-            <div
-              css={{
-                display: 'flex',
-                flexDirection: 'row',
-                flexWrap: 'wrap',
-              }}
-            >
-              <NameInput {...{canEditProfile, name, userRepository}} />
-              <UsernameInput
-                {...{canEditProfile, userRepository, username}}
-                domain={isFederated ? domain : undefined}
-              />
-              {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
-              {phone && (
-                <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly data-uie-name="enter-phone" />
-              )}
-              {isTeam && (
-                <AccountInput
-                  label={t('preferencesAccountTeam')}
-                  value={teamName}
-                  readOnly
-                  data-uie-name="status-team"
-                />
-              )}
-              {isFederated && (
-                <AccountInput
-                  label={t('preferencesAccountDomain')}
-                  value={domain}
-                  readOnly
-                  data-uie-name="status-domain"
-                />
-              )}
-              {richFields.map(({type, value}) => (
-                <AccountInput
-                  key={type}
-                  labelUie="item-enriched-key"
-                  valueUie="item-enriched-value"
-                  label={type}
-                  value={value}
-                  readOnly
-                />
-              ))}
-            </div>
-          </PreferencesSection>
-        ) : (
-          <PreferencesSection hasSeparator>
-            <div
-              className="preferences-link accent-text"
-              onClick={clickOnLeaveGuestRoom}
-              data-uie-name="do-leave-guest-room"
-            >
-              {t('preferencesAccountLeaveGuestRoom')}
-            </div>
-            <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
-          </PreferencesSection>
-        )}
-        {isConsentCheckEnabled && <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />}
-        <PrivacySection {...{propertiesRepository}} />
-        {isActivatedAccount && (
-          <>
-            {!isTemporaryAndNonPersistent.current && <HistoryBackupSection {...{brandName}} />}
-            <AccountSecuritySection {...{selfUser, userRepository}} />
-            {!isDesktop && <LogoutSection {...{clientRepository}} />}
-          </>
+        <div>
+          <AvatarInput {...{isActivatedAccount, selfUser, userRepository}} />
+        </div>
+        {isActivatedAccount && isTeam && <AvailabilityInput {...{availability}} />}
+        {isActivatedAccount && canEditProfile && (
+          <div>
+            <AccentColorPicker user={selfUser} doSetAccentColor={id => userRepository.changeAccentColor(id)} />
+          </div>
         )}
       </div>
-    </div>
+      {isActivatedAccount ? (
+        <PreferencesSection hasSeparator title={t('preferencesAccountInfo')}>
+          <div
+            css={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+            }}
+          >
+            <NameInput {...{canEditProfile, name, userRepository}} />
+            <UsernameInput {...{canEditProfile, userRepository, username}} domain={isFederated ? domain : undefined} />
+            {email && <EmailInput {...{canEditProfile, email, userRepository}} />}
+            {phone && (
+              <AccountInput label={t('preferencesAccountPhone')} value={phone} readOnly data-uie-name="enter-phone" />
+            )}
+            {isTeam && (
+              <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly data-uie-name="status-team" />
+            )}
+            {isFederated && (
+              <AccountInput
+                label={t('preferencesAccountDomain')}
+                value={domain}
+                readOnly
+                data-uie-name="status-domain"
+              />
+            )}
+            {richFields.map(({type, value}) => (
+              <AccountInput
+                key={type}
+                labelUie="item-enriched-key"
+                valueUie="item-enriched-value"
+                label={type}
+                value={value}
+                readOnly
+              />
+            ))}
+          </div>
+        </PreferencesSection>
+      ) : (
+        <PreferencesSection hasSeparator>
+          <div
+            className="preferences-link accent-text"
+            onClick={clickOnLeaveGuestRoom}
+            data-uie-name="do-leave-guest-room"
+          >
+            {t('preferencesAccountLeaveGuestRoom')}
+          </div>
+          <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
+        </PreferencesSection>
+      )}
+      {isConsentCheckEnabled && <DataUsageSection {...{brandName, isActivatedAccount, propertiesRepository}} />}
+      <PrivacySection {...{propertiesRepository}} />
+      {isActivatedAccount && (
+        <>
+          {!isTemporaryAndNonPersistent.current && <HistoryBackupSection {...{brandName}} />}
+          <AccountSecuritySection {...{selfUser, userRepository}} />
+          {!isDesktop && <LogoutSection {...{clientRepository}} />}
+        </>
+      )}
+    </PreferencesPage>
   );
 };
 

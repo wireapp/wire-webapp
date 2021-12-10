@@ -33,6 +33,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import PreferencesSection from '../components/PreferencesSection';
+import PreferencesLink from '../components/PreferencesLink';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;
@@ -83,15 +84,9 @@ const AccountSecuritySection: React.FC<AccountSecuritySectionProps> = ({
       )}
 
       {createTeamUrl && !isMacOsWrapper && (
-        <a
-          className="preferences-link accent-text"
-          href={createTeamUrl}
-          rel="nofollow noopener noreferrer"
-          target="_blank"
-          data-uie-name="do-create-team"
-        >
+        <PreferencesLink href={createTeamUrl} uie="do-create-team">
           {t('preferencesAccountCreateTeam')}
-        </a>
+        </PreferencesLink>
       )}
       {isAppLockActivated && (
         <div
