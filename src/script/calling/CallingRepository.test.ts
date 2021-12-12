@@ -85,7 +85,7 @@ describe('CallingRepository', () => {
   describe('startCall', () => {
     it('warns the user that there is an ongoing call before starting a new one', done => {
       const activeCall = new Call(
-        selfUser.id,
+        selfUser.qualifiedId,
         createConversationId(),
         CONV_TYPE.ONEONONE,
         new Participant(new User(), ''),
@@ -126,17 +126,18 @@ describe('CallingRepository', () => {
   describe('joinedCall', () => {
     it('only exposes the current active call', () => {
       const selfParticipant = createSelfParticipant();
-      const incomingCall = new Call('', createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
+      const userId = {domain: '', id: ''};
+      const incomingCall = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
       incomingCall.state(CALL_STATE.INCOMING);
 
-      const activeCall = new Call('', createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
+      const activeCall = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
 
-      const declinedCall = new Call('', createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
+      const declinedCall = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
       declinedCall.state(CALL_STATE.INCOMING);
@@ -151,7 +152,8 @@ describe('CallingRepository', () => {
   describe('getCallMediaStream', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
-      const call = new Call('', createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
+      const userId = {domain: '', id: ''};
+      const call = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
       const source = new RTCAudioSource();
@@ -173,9 +175,16 @@ describe('CallingRepository', () => {
 
     it('asks only once for mediastream when queried multiple times', () => {
       const selfParticipant = createSelfParticipant();
-      const call = new Call('', createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const call = new Call(
+        {domain: '', id: ''},
+        createConversationId(),
+        undefined,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+      );
       const source = new RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
@@ -201,7 +210,7 @@ describe('CallingRepository', () => {
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
 
-      const call = new Call('', createConversationId(), 0, selfParticipant, CALL_TYPE.NORMAL, {
+      const call = new Call({domain: '', id: ''}, createConversationId(), 0, selfParticipant, CALL_TYPE.NORMAL, {
         currentAvailableDeviceId: mediaDevices,
       } as MediaDevicesHandler);
       spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);

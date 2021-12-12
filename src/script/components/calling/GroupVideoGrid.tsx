@@ -29,6 +29,7 @@ import type {Participant} from '../../calling/Participant';
 import GroupVideoGridTile from './GroupVideoGridTile';
 import ParticipantMicOnIcon from './ParticipantMicOnIcon';
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 export interface GroupVideoGripProps {
   grid: Grid;
@@ -81,7 +82,7 @@ const GroupVideoGrid: React.FunctionComponent<GroupVideoGripProps> = ({
 
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(calculateRowsAndColumns(grid?.grid.length));
 
-  const doubleClickedOnVideo = (userId: string, clientId: string) => {
+  const doubleClickedOnVideo = (userId: QualifiedId, clientId: string) => {
     if (typeof setMaximizedParticipant !== 'function') {
       return;
     }
