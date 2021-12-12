@@ -46,7 +46,7 @@ describe('EventBuilder', () => {
   });
 
   it('buildAllVerified', async () => {
-    const event = EventBuilder.buildAllVerified(conversation_et, 0);
+    const event = EventBuilder.buildAllVerified(conversation_et);
     const messageEntity = (await event_mapper.mapJsonEvent(event as any, conversation_et)) as VerificationMessage;
     expect(messageEntity).toBeDefined();
     expect(messageEntity.super_type).toBe(SuperType.VERIFICATION);
@@ -61,7 +61,6 @@ describe('EventBuilder', () => {
       conversation_et,
       users,
       VerificationMessageType.NEW_DEVICE,
-      0,
     ) as EventRecord<DegradedMessageEventData>;
     const messageEntity = (await event_mapper.mapJsonEvent(event, conversation_et)) as VerificationMessage;
     expect(messageEntity).toBeDefined();
