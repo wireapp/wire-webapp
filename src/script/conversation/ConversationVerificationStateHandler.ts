@@ -135,13 +135,6 @@ export class ConversationVerificationStateHandler {
     if (this.willChangeToVerified(conversationEntity)) {
       const allVerifiedEvent = EventBuilder.buildAllVerified(conversationEntity);
       this.eventRepository.injectEvent(allVerifiedEvent as EventRecord);
-
-      amplify.publish(
-        WebAppEvents.CONVERSATION.VERIFICATION_STATE_CHANGED,
-        conversationEntity.participating_user_ids(),
-        true,
-      );
-
       return true;
     }
 
