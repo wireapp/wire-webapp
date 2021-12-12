@@ -2870,17 +2870,17 @@
   resolved "https://registry.yarnpkg.com/@wireapp/antiscroll-2/-/antiscroll-2-1.0.2.tgz#71a78d294ee0c88f42d50477ab61fa39272f5bca"
   integrity sha512-9KeB3yh9k01PjpuuRQsve4yY3+OVS2/hp9j+N13Is5wYCZRkUzZVCs8w9CyA/C6J5o9ukH0EzT7uurysWuhn/A==
 
-"@wireapp/api-client@16.0.0":
-  version "16.0.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-16.0.0.tgz#1baca8637b5f113aadc26ce25e9653e7b772b8d3"
-  integrity sha512-fRTatqBj6hZIeeATOt6VwOI9fpGW0jmb+IL/re9rFArxSNSSMDH1feQfQpnfJyB6FFZV7xb8Z215N6uR54BwIg==
+"@wireapp/api-client@16.1.0":
+  version "16.1.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/api-client/-/api-client-16.1.0.tgz#ea4ab8453253c1f30789ac216e59811a011122a4"
+  integrity sha512-Hr3apMyww0Pv383aQEOmKpgmrOlWiHvJ/mqqgXi4hIy9bNu6j+FosQdppKdwLF5TU05mjCAg3KMQpOyQK/tpwQ==
   dependencies:
     "@types/node" "~14"
     "@types/spark-md5" "3.0.2"
     "@types/tough-cookie" "4.0.1"
     "@wireapp/commons" "4.2.13"
     "@wireapp/priority-queue" "1.6.37"
-    "@wireapp/protocol-messaging" "1.35.0"
+    "@wireapp/protocol-messaging" "1.36.0"
     axios "0.21.4"
     axios-retry "3.1.9"
     http-status-codes "2.1.4"
@@ -2927,14 +2927,14 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@20.0.1":
-  version "20.0.1"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-20.0.1.tgz#2a02905efcd4befb67d920621d97d07d7c129d2a"
-  integrity sha512-91soyt4UJI0ZcSNi63pNpdac4xpUvPyPFku/iEjQ/iXwJ6WeHL6G6FABBaW5rNVUJ16Udh8sn+w3wid2i+/ZGg==
+"@wireapp/core@20.0.2":
+  version "20.0.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-20.0.2.tgz#9721386ef3b28d70c8b230983dc0e400c41eb8e3"
+  integrity sha512-JfOxhXqmFqYiUvEPplTiimFDRZlYJHrNWXiy9DlwGcqvV+T8gCVglaYojhs/vwMqNTxz0XwIoIXohMw6O8ucDA==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
-    "@wireapp/api-client" "16.0.0"
+    "@wireapp/api-client" "16.1.0"
     "@wireapp/cryptobox" "12.7.1"
     bazinga64 "5.10.0"
     hash.js "1.1.7"
@@ -2995,10 +2995,10 @@
     "@wireapp/cbor" "4.7.2"
     libsodium-wrappers-sumo "0.7.9"
 
-"@wireapp/protocol-messaging@1.35.0":
-  version "1.35.0"
-  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.35.0.tgz#2d45f67bdd00f31383f93b23dcf636b4278ca673"
-  integrity sha512-RsgREb74npIOMKac2Q5oUgLT6noqKY7Tze+TdWJ3dX/gxp5Oid4mOcaCm5jKJb94K7MxhBo/E+jE6FzZiWWYQg==
+"@wireapp/protocol-messaging@1.36.0":
+  version "1.36.0"
+  resolved "https://registry.yarnpkg.com/@wireapp/protocol-messaging/-/protocol-messaging-1.36.0.tgz#3d4bd0bca3df9d4193ac9851d02129a274408dfb"
+  integrity sha512-g/znuDIHWerJh9vS86bkWmBRDgMqLfKq3nPGgvpDm+0tRMyhRKW4y6wB5j4DLlEY2nLyl6WsH+uP/BLV55vObQ==
   dependencies:
     protobufjs "6.10.2"
 
