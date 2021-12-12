@@ -214,7 +214,7 @@ export const EventBuilder = {
     };
   },
 
-  buildAllVerified(conversationEntity: Conversation, currentTimestamp: number): AllVerifiedEvent {
+  buildAllVerified(conversationEntity: Conversation): AllVerifiedEvent {
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
@@ -222,7 +222,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      time: new Date(conversationEntity.getLastKnownTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -275,7 +275,6 @@ export const EventBuilder = {
     conversationEntity: Conversation,
     userIds: QualifiedId[],
     type: VerificationMessageType,
-    currentTimestamp: number,
   ): DegradedMessageEvent {
     return {
       ...buildQualifiedId(conversationEntity),
@@ -285,7 +284,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: conversationEntity.getNextIsoDate(currentTimestamp),
+      time: new Date(conversationEntity.getLastKnownTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
