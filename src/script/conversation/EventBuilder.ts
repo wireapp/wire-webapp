@@ -222,7 +222,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: new Date(conversationEntity.getLastKnownTimestamp()).toISOString(),
+      time: new Date(conversationEntity.getLastKnownTimestamp() + 1).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -284,7 +284,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: new Date(conversationEntity.getLastKnownTimestamp()).toISOString(),
+      time: new Date(conversationEntity.getLastKnownTimestamp() + 1).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },

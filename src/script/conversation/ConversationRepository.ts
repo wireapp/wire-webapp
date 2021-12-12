@@ -1810,10 +1810,8 @@ export class ConversationRepository {
       return;
     }
     if (!timestamp) {
-      // TODO(federation) find with qualified id
       const conversation = conversationEntity || this.conversationState.findConversation(conversationId);
-      const servertime = this.serverTimeHandler.toServerTimestamp();
-      timestamp = conversation.getLatestTimestamp(servertime);
+      timestamp = conversation.getLastKnownTimestamp();
     }
     const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
       conversationId || conversationEntity?.qualifiedId,
