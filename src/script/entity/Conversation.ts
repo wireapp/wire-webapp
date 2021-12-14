@@ -688,7 +688,7 @@ export class Conversation {
     if (sentMessages.length === 0) {
       return this.getLastKnownTimestamp();
     }
-    return sentMessages[sentMessages.length - 1].timestamp() + 1;
+    return sentMessages.at(-1).timestamp() + 1;
   }
 
   getLatestTimestamp(currentTimestamp: number): number {
