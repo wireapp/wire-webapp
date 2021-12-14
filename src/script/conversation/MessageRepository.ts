@@ -220,7 +220,7 @@ export class MessageRepository {
     mismatch: ClientMismatch | MessageSendingStatus,
     consentType?: CONSENT_TYPE,
   ) {
-    return this.onClientMismatch?.(mismatch, conversationId, Date.now(), true, consentType);
+    return this.onClientMismatch?.(mismatch, conversationId, Date.now(), false, consentType);
   }
 
   /**
