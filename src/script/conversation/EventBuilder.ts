@@ -378,7 +378,7 @@ export const EventBuilder = {
   buildLegalHoldMessage(
     conversationId: QualifiedId,
     userId: QualifiedId,
-    timestamp: number | string,
+    timestamp: number,
     legalHoldStatus: LegalHoldStatus,
     beforeMessage?: boolean,
   ): LegalHoldMessageEvent {
@@ -391,7 +391,7 @@ export const EventBuilder = {
       id: createRandomUuid(),
       qualified_conversation: conversationId,
       qualified_from: userId,
-      time: new Date(new Date(timestamp).getTime() + (beforeMessage ? -1 : 1)).toISOString(),
+      time: new Date(timestamp + (beforeMessage ? -1 : 1)).toISOString(),
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
   },

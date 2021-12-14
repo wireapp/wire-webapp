@@ -1803,7 +1803,7 @@ export class ConversationRepository {
     conversationEntity?: Conversation;
     conversationId: QualifiedId;
     legalHoldStatus: LegalHoldStatus;
-    timestamp: string | number;
+    timestamp?: number;
     userId: QualifiedId;
   }) => {
     if (typeof legalHoldStatus === 'undefined') {
@@ -2005,6 +2005,7 @@ export class ConversationRepository {
       from: userId,
       time: isoTimestamp,
     } = eventJson;
+    const timestamp = new Date(isoTimestamp).getTime();
     const qualifiedConversation = qualified_conversation || {domain: '', id: conversationId};
     const qualifiedUser = qualified_from || {domain: '', id: userId};
 
@@ -2012,7 +2013,7 @@ export class ConversationRepository {
       beforeTimestamp: true,
       conversationId: qualifiedConversation,
       legalHoldStatus: messageLegalHoldStatus,
-      timestamp: isoTimestamp,
+      timestamp,
       userId: qualifiedUser,
     });
 
@@ -2025,7 +2026,7 @@ export class ConversationRepository {
     await this.injectLegalHoldMessage({
       conversationId: qualifiedConversation,
       legalHoldStatus: conversationEntity.legalHoldStatus(),
-      timestamp: isoTimestamp,
+      timestamp,
       userId: qualifiedUser,
     });
 
