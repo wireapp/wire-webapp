@@ -27,7 +27,7 @@ import {isBlacklisted} from './blackList';
 import {LinkPreviewError} from './LinkPreviewError';
 
 type LinkPreviewContent = {
-  image: {
+  image?: {
     data: Uint8Array;
     height: number;
     type: string;
@@ -92,16 +92,17 @@ async function getLinkPreview(url: string, offset: number = 0): Promise<LinkPrev
 }
 
 function toLinkPreviewData(openGraphData: OpenGraphResult, url: string, offset: number): LinkPreviewContent {
-  const base64Image = (openGraphData.image as {data: string}).data;
-  const mimeType = getContentTypeFromDataUrl(base64Image);
-  const bytes = base64ToArray(base64Image);
+  const base64Image = (openGraphData.image as {data: string})?.data;
+  const image = base64Image
+    ? {
+        data: base64ToArray(base64Image),
+        height: 0,
+        type: getContentTypeFromDataUrl(base64Image),
+        width: 0,
+      }
+    : undefined;
   return {
-    image: {
-      data: bytes,
-      height: 0,
-      type: mimeType,
-      width: 0,
-    },
+    image,
     title: Array.isArray(openGraphData.title) ? openGraphData.title[0] : openGraphData.title,
     url,
     urlOffset: offset,

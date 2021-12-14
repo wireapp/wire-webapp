@@ -53,6 +53,7 @@ import {
   ImageMetaData,
   FileMetaDataContent,
   LinkPreviewUploadedContent,
+  LinkPreviewContent,
 } from '@wireapp/core/src/main/conversation/content';
 import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
 import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
@@ -392,7 +393,9 @@ export class MessageRepository {
       // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
       await this.sendText({
         ...textPayload,
-        linkPreview: await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview),
+        linkPreview: linkPreview.image
+          ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
+          : linkPreview,
       });
     }
   }
