@@ -41,6 +41,7 @@ export class MessageToProtoMapper {
           author: linkPreview.tweet.author,
           username: linkPreview.tweet.username,
         });
+        linkPreviewMessage.metaData = 'tweet';
       }
 
       if (linkPreview.imageUploaded) {
