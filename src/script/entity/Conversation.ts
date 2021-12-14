@@ -681,10 +681,7 @@ export class Conversation {
   }
 
   /**
-   * Return the timestamp of the very last message in the converation excluding messages being current sent.
-   * It include all message types (system messages and content messages)
-   *
-   * @returns {any}
+   * Return the next timestamp that can be used to inject a message right after the last message that is not a message currently being sent
    */
   getNextTimestamp(): number {
     const sentMessages = this.messages().filter(message => message?.status() !== StatusType.SENDING);
