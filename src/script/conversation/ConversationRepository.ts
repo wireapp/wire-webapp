@@ -179,87 +179,97 @@ export class ConversationRepository {
     this.eventService = eventRepository.eventService;
     // we register a client mismatch handler agains the message repository so that we can react to missing members
     // FIXME this should be temporary. In the near future we want the core to handle clients/mismatch/verification. So the webapp won't need this logic at all
-    this.messageRepository.setClientMismatchHandler(async (mismatch, conversationId, sentAt, silent, consentType) => {
-      const allDeleted = {...mismatch.deleted, ...mismatch.redundant} as QualifiedUserClients | UserClients;
-      const deleted = isQualifiedUserClients(allDeleted)
-        ? flattenQualifiedUserClients(allDeleted)
-        : flattenUserClients(allDeleted);
-      const missing = isQualifiedUserClients(mismatch.missing)
-        ? flattenQualifiedUserClients(mismatch.missing)
-        : flattenUserClients(mismatch.missing);
+    this.messageRepository.setClientMismatchHandler(
+      async (
+        {deleted = {}, missing = {}, redundant = {}, time = new Date().toISOString()},
+        conversationId,
+        sentAt,
+        silent,
+        consentType,
+      ) => {
+        const allDeleted = {...deleted, ...redundant} as QualifiedUserClients | UserClients;
+        const deletedClients = isQualifiedUserClients(allDeleted)
+          ? flattenQualifiedUserClients(allDeleted)
+          : flattenUserClients(allDeleted);
+        const missingClients = isQualifiedUserClients(missing)
+          ? flattenQualifiedUserClients(missing)
+          : flattenUserClients(missing);
 
-      const conversation = conversationId ? await this.getConversationById(conversationId) : undefined;
-      if (conversation) {
-        // add/remove users from the conversation (if any)
-        const missingUserIds = missing.map(({userId}) => userId);
-        const knownUsers = conversation.allUserEntities.map(user => user.qualifiedId);
-        const missingUsers = getDifference(knownUsers, missingUserIds, matchQualifiedIds);
-        if (missingUsers.length) {
-          await this.addMissingMember(conversation, missingUsers, new Date(mismatch.time).getTime() - 1);
-        }
-      }
-
-      const removedTeamUserIds = (
-        await Promise.all(
-          deleted.map(
-            ({userId, data}) => data.map(client => this.userRepository.removeClientFromUser(userId, client))[0],
-          ),
-        )
-      )
-        .filter(user => user?.devices().length === 0)
-        .filter(user => !!user)
-        .filter(user => user.inTeam())
-        .map(user => user.id);
-
-      if (removedTeamUserIds.length) {
-        // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
-        const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
-        usersWithoutClients
-          .filter(user => user.deleted)
-          .forEach(user =>
-            this.teamMemberLeave(this.teamState.team().id, {
-              domain: this.teamState.teamDomain(),
-              id: user.id,
-            }),
-          );
-      }
-
-      let hasNewLegalHoldDevices = false;
-      if (missing.length) {
-        const wasVerified = conversation?.is_verified();
-        const legalHoldStatus = conversation?.legalHoldStatus();
+        const conversation = conversationId ? await this.getConversationById(conversationId) : undefined;
         if (conversation) {
-          // FIXME there is an internal mechanism in the conversation that triggers the system message.
-          // This can be removed once `messageRepository.grantMessage` is not called anymore
-          conversation.blockLegalHoldMessage = true;
-        }
-        const newDevices = await this.userRepository.updateMissingUsersClients(missing.map(({userId}) => userId));
-        if (wasVerified && newDevices.length) {
-          // if the conversation is verified but some clients were missing, it means the conversation will degrade.
-          // We need to warn the user of the degradation and ask his permission to actually send the message
-          conversation.verification_state(ConversationVerificationState.DEGRADED);
-        }
-        if (conversation) {
-          const hasChangedLegalHoldStatus = conversation.legalHoldStatus() !== legalHoldStatus;
-          hasNewLegalHoldDevices = newDevices.some(device => device.isLegalHold());
-          if (hasChangedLegalHoldStatus) {
-            this.injectLegalHoldMessage({
-              beforeTimestamp: true,
-              conversationId: conversation.qualifiedId,
-              legalHoldStatus: conversation.legalHoldStatus(),
-              timestamp: sentAt,
-              userId: this.userState.self().qualifiedId,
-            });
+          // add/remove users from the conversation (if any)
+          const missingUserIds = missingClients.map(({userId}) => userId);
+          const knownUsers = conversation.allUserEntities.map(user => user.qualifiedId);
+          const missingUsers = getDifference(knownUsers, missingUserIds, matchQualifiedIds);
+          if (missingUsers.length) {
+            await this.addMissingMember(conversation, missingUsers, new Date(time).getTime() - 1);
           }
-          // FIXME there is an internal mechanism in the conversation that triggers the system message.
-          // This can be removed once `messageRepository.grantMessage` is not called anymore
-          conversation.blockLegalHoldMessage = false;
         }
-      }
-      return silent
-        ? false
-        : this.messageRepository.requestUserSendingPermission(conversation, hasNewLegalHoldDevices, consentType);
-    });
+
+        const removedTeamUserIds = (
+          await Promise.all(
+            deletedClients.map(
+              ({userId, data}) => data.map(client => this.userRepository.removeClientFromUser(userId, client))[0],
+            ),
+          )
+        )
+          .filter(user => user?.devices().length === 0)
+          .filter(user => !!user)
+          .filter(user => user.inTeam())
+          .map(user => user.id);
+
+        if (removedTeamUserIds.length) {
+          // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
+          const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
+          usersWithoutClients
+            .filter(user => user.deleted)
+            .forEach(user =>
+              this.teamMemberLeave(this.teamState.team().id, {
+                domain: this.teamState.teamDomain(),
+                id: user.id,
+              }),
+            );
+        }
+
+        let hasNewLegalHoldDevices = false;
+        if (missingClients.length) {
+          const wasVerified = conversation?.is_verified();
+          const legalHoldStatus = conversation?.legalHoldStatus();
+          if (conversation) {
+            // FIXME there is an internal mechanism in the conversation that triggers the system message.
+            // This can be removed once `messageRepository.grantMessage` is not called anymore
+            conversation.blockLegalHoldMessage = true;
+          }
+          const newDevices = await this.userRepository.updateMissingUsersClients(
+            missingClients.map(({userId}) => userId),
+          );
+          if (wasVerified && newDevices.length) {
+            // if the conversation is verified but some clients were missing, it means the conversation will degrade.
+            // We need to warn the user of the degradation and ask his permission to actually send the message
+            conversation.verification_state(ConversationVerificationState.DEGRADED);
+          }
+          if (conversation) {
+            const hasChangedLegalHoldStatus = conversation.legalHoldStatus() !== legalHoldStatus;
+            hasNewLegalHoldDevices = newDevices.some(device => device.isLegalHold());
+            if (hasChangedLegalHoldStatus) {
+              this.injectLegalHoldMessage({
+                beforeTimestamp: true,
+                conversationId: conversation.qualifiedId,
+                legalHoldStatus: conversation.legalHoldStatus(),
+                timestamp: sentAt,
+                userId: this.userState.self().qualifiedId,
+              });
+            }
+            // FIXME there is an internal mechanism in the conversation that triggers the system message.
+            // This can be removed once `messageRepository.grantMessage` is not called anymore
+            conversation.blockLegalHoldMessage = false;
+          }
+        }
+        return silent
+          ? false
+          : this.messageRepository.requestUserSendingPermission(conversation, hasNewLegalHoldDevices, consentType);
+      },
+    );
 
     this.logger = getLogger('ConversationRepository');
 

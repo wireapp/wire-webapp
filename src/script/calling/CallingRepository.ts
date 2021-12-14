@@ -305,12 +305,7 @@ export class CallingRepository {
     );
     this.wCall.setClientsForConv(this.wUser, this.serializeQualifiedId(conversationId), JSON.stringify({clients}));
     // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
-    this.messageRepository.handleClientMismatch(conversationId, {
-      deleted: {},
-      missing,
-      redundant: {},
-      time: '',
-    } as ClientMismatch);
+    this.messageRepository.handleClientMismatch(conversationId, {missing} as ClientMismatch);
   }
 
   private readonly updateCallQuality = (
@@ -566,12 +561,7 @@ export class CallingRepository {
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
           const shouldContinue = await this.messageRepository.handleClientMismatch(
             conversationId,
-            {
-              deleted: {},
-              missing,
-              redundant: {},
-              time: '',
-            } as ClientMismatch,
+            {missing} as ClientMismatch,
             CONSENT_TYPE.INCOMING_CALL,
           );
 
