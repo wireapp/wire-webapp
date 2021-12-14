@@ -634,27 +634,17 @@ export class MessageRepository {
     const userNames = joinNames(users, Declension.NOMINATIVE);
     const titleSubstitutions = capitalizeFirstChar(userNames);
 
-    let actionString = t('modalConversationNewDeviceAction');
-    let messageString = t('modalConversationNewDeviceMessage');
-    switch (consentType) {
-      case CONSENT_TYPE.INCOMING_CALL: {
-        actionString = t('modalConversationNewDeviceIncomingCallAction');
-        messageString = t('modalConversationNewDeviceIncomingCallMessage');
-        break;
-      }
-
-      case CONSENT_TYPE.OUTGOING_CALL: {
-        actionString = t('modalConversationNewDeviceOutgoingCallAction');
-        messageString = t('modalConversationNewDeviceOutgoingCallMessage');
-        break;
-      }
-
-      default: {
-        actionString = t('modalConversationNewDeviceAction');
-        messageString = t('modalConversationNewDeviceMessage');
-        break;
-      }
-    }
+    const [actionString, messageString] = {
+      [CONSENT_TYPE.INCOMING_CALL]: [
+        t('modalConversationNewDeviceIncomingCallAction'),
+        t('modalConversationNewDeviceIncomingCallMessage'),
+      ],
+      [CONSENT_TYPE.OUTGOING_CALL]: [
+        t('modalConversationNewDeviceOutgoingCallAction'),
+        t('modalConversationNewDeviceOutgoingCallMessage'),
+      ],
+      [CONSENT_TYPE.MESSAGE]: [t('modalConversationNewDeviceAction'), t('modalConversationNewDeviceMessage')],
+    }[consentType];
 
     const baseTitle =
       users.length > 1
