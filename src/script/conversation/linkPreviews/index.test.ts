@@ -103,5 +103,16 @@ describe('linkPreviews', () => {
         expect(res).not.toBeDefined();
       },
     );
+
+    it('detects tweets from url', async () => {
+      window.openGraphAsync = url =>
+        Promise.resolve({...mockOgResult, site_name: 'Twitter', title: 'Jack on Twitter', url});
+      const url = 'https://twitter.com/jack/status/20';
+      const res = await getLinkPreviewFromString(url);
+
+      expect(res?.tweet).toBeDefined();
+      expect(res?.tweet.author).toBe('Jack');
+      expect(res?.tweet.username).toBe('jack');
+    });
   });
 });

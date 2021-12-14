@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/src/event/';
-import {LinkPreview, ITweet, Mention} from '@wireapp/protocol-messaging';
+import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -61,7 +61,6 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
-import type {LinkPreviewMetaDataType} from '../conversation/linkPreviews/metaDataType';
 import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
 import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
 import {MemberJoinEvent, MemberLeaveEvent, TeamMemberLeaveEvent} from './EventBuilder';
@@ -799,14 +798,10 @@ export class EventMapper {
    */
   private _mapAssetLinkPreview(linkPreview: LinkPreview): LinkPreviewEntity | void {
     if (linkPreview) {
-      const {image, title, url} = linkPreview;
+      const {image, title, url, tweet} = linkPreview;
       const {image: article_image, title: article_title} = linkPreview.article || {};
 
-      const meta_data: LinkPreviewMetaDataType = linkPreview.metaData || (linkPreview as any).meta_data;
-
-      const linkPreviewEntity = new LinkPreviewEntity(title || article_title, url);
-      linkPreviewEntity.meta_data_type = meta_data;
-      linkPreviewEntity.meta_data = linkPreview[meta_data] as ITweet;
+      const linkPreviewEntity = new LinkPreviewEntity({title: title || article_title, tweet, url: url});
 
       const previewImage = image || article_image;
       if (previewImage && previewImage.uploaded) {

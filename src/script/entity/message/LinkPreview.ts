@@ -23,22 +23,19 @@ import type {ITweet} from '@wireapp/protocol-messaging';
 import {obfuscate} from 'Util/StringUtil';
 
 import type {AssetRemoteData} from '../../assets/AssetRemoteData';
-import type {LinkPreviewMetaDataType} from '../../conversation/linkPreviews/metaDataType';
 
 export class LinkPreview {
   public image_resource: ko.Observable<AssetRemoteData>;
   public title: string;
   public url: string;
-  public meta_data_type?: LinkPreviewMetaDataType;
-  public meta_data?: ITweet;
+  public tweet?: ITweet;
 
-  constructor(title?: string, url?: string) {
-    this.title = title || '';
-    this.url = url || '';
+  constructor({title = '', url = '', tweet}: {title?: string; tweet?: ITweet; url?: string} = {}) {
+    this.title = title;
+    this.url = url;
+    this.tweet = tweet;
 
     this.image_resource = ko.observable();
-    this.meta_data = undefined;
-    this.meta_data_type = undefined;
   }
 
   obfuscate(): void {
@@ -46,7 +43,5 @@ export class LinkPreview {
     this.url = obfuscate(this.url);
 
     this.image_resource(undefined);
-    this.meta_data = undefined;
-    this.meta_data_type = undefined;
   }
 }

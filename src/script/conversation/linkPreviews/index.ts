@@ -25,6 +25,10 @@ import {getLogger} from 'Util/Logger';
 import {getFirstLinkWithOffset} from './helpers';
 import {isBlacklisted} from './blackList';
 import {LinkPreviewError} from './LinkPreviewError';
+import {deArrayify} from 'Util/ArrayUtil';
+import {isTweetUrl} from 'Util/ValidationUtil';
+import {truncate} from 'Util/StringUtil';
+import {Config} from '../../Config';
 
 type LinkPreviewContent = {
   image?: {
@@ -33,7 +37,12 @@ type LinkPreviewContent = {
     type: string;
     width: number;
   };
+  permanantUrl: string;
   title: string;
+  tweet?: {
+    author?: string;
+    username?: string;
+  };
   url: string;
   urlOffset: number;
 };
@@ -51,14 +60,14 @@ const logger = getLogger('LinkPreviewRepository');
  * @param string Input text to generate preview for
  * @returns Resolves with link preview details
  */
-export async function getLinkPreviewFromString(string: string): Promise<LinkPreviewContent | void> {
+export async function getLinkPreviewFromString(string: string): Promise<LinkPreviewContent | undefined> {
   if (!window.openGraphAsync) {
-    return;
+    return undefined;
   }
 
   const linkData = getFirstLinkWithOffset(string);
   if (!linkData) {
-    return;
+    return undefined;
   }
 
   try {
@@ -69,6 +78,7 @@ export async function getLinkPreviewFromString(string: string): Promise<LinkPrev
       throw error;
     }
   }
+  return undefined;
 }
 
 /**
@@ -79,7 +89,7 @@ export async function getLinkPreviewFromString(string: string): Promise<LinkPrev
  * @param offset starting index of the link
  * @returns Resolves with a link preview if generated
  */
-async function getLinkPreview(url: string, offset: number = 0): Promise<LinkPreviewContent | void> {
+async function getLinkPreview(url: string, offset: number = 0): Promise<LinkPreviewContent | undefined> {
   if (isBlacklisted(url)) {
     throw new LinkPreviewError(LinkPreviewError.TYPE.BLACKLISTED, LinkPreviewError.MESSAGE.BLACKLISTED);
   }
@@ -101,9 +111,27 @@ function toLinkPreviewData(openGraphData: OpenGraphResult, url: string, offset: 
         width: 0,
       }
     : undefined;
+
+  const {site_name, title, description} = openGraphData;
+
+  const truncatedTitle = truncate(deArrayify(title), Config.getConfig().MAXIMUM_LINK_PREVIEW_CHARS);
+  const truncatedDescription = truncate(deArrayify(description), Config.getConfig().MAXIMUM_LINK_PREVIEW_CHARS);
+
+  let tweet;
+  if (deArrayify(site_name) === 'Twitter' && isTweetUrl(deArrayify(url))) {
+    const author = deArrayify(title).replace('on Twitter', '').trim();
+    const username = deArrayify(url).match(/com\/([^/]*)\//)[1];
+    tweet = {
+      author,
+      username,
+    };
+  }
+
   return {
     image,
-    title: Array.isArray(openGraphData.title) ? openGraphData.title[0] : openGraphData.title,
+    permanantUrl: deArrayify(openGraphData.url),
+    title: tweet ? truncatedDescription : truncatedTitle,
+    tweet,
     url,
     urlOffset: offset,
   };
