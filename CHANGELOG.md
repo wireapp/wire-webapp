@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.0.2...@wireapp/core@20.1.0) (2021-12-14)
+
+
+### Features
+
+* **core:** Add tweet metadata on linkPreview when needed ([dc84806](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/dc848068e155aed22415827f3dcbeb3992e9c790))
+
+
+
+
+
 ## [20.0.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.0.1...@wireapp/core@20.0.2) (2021-12-09)
 
 **Note:** Version bump only for package @wireapp/core
