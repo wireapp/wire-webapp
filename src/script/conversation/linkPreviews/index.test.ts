@@ -83,6 +83,19 @@ describe('linkPreviews', () => {
       );
     });
 
+    it('should work when preview has no image', async () => {
+      window.openGraphAsync = url => Promise.resolve({...mockOgResult, image: undefined, url});
+      const url = 'http://test.com';
+      const res = await getLinkPreviewFromString(url);
+      expect(res).toEqual(
+        expect.objectContaining({
+          image: undefined,
+          title: mockOgResult.title,
+          url,
+        }),
+      );
+    });
+
     it.each([['look at this'], ['look at this stuff http//stuff.co']])(
       'does not generate link preview if no link is detected in the text "%s"',
       async input => {
