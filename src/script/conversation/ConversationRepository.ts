@@ -1811,7 +1811,7 @@ export class ConversationRepository {
     }
     if (!timestamp) {
       const conversation = conversationEntity || this.conversationState.findConversation(conversationId);
-      timestamp = conversation.getLastKnownTimestamp();
+      timestamp = conversation.getLastKnownTimestamp() + 1;
     }
     const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
       conversationId || conversationEntity?.qualifiedId,

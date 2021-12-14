@@ -284,7 +284,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: new Date(conversationEntity.getLastKnownTimestamp() + 1).toISOString(),
+      time: new Date(conversationEntity.getLastKnownTimestamp() + 10).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
