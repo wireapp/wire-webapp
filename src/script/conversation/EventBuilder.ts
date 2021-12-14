@@ -222,7 +222,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: new Date(conversationEntity.getLastKnownTimestamp() + 1).toISOString(),
+      time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -284,7 +284,7 @@ export const EventBuilder = {
       },
       from: conversationEntity.selfUser().id,
       id: createRandomUuid(),
-      time: new Date(conversationEntity.getLastKnownTimestamp() + 10).toISOString(),
+      time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
     };
   },
@@ -391,7 +391,7 @@ export const EventBuilder = {
       id: createRandomUuid(),
       qualified_conversation: conversationId,
       qualified_from: userId,
-      time: new Date(timestamp + (beforeMessage ? -1 : 1)).toISOString(),
+      time: new Date(timestamp + (beforeMessage ? -1 : 0)).toISOString(),
       type: ClientEvent.CONVERSATION.LEGAL_HOLD_UPDATE,
     };
   },

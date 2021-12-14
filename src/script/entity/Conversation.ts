@@ -680,6 +680,20 @@ export class Conversation {
     return last_known_timestamp ?? currentTimestamp;
   }
 
+  /**
+   * Return the timestamp of the very last message in the converation excluding messages being current sent.
+   * It include all message types (system messages and content messages)
+   *
+   * @returns {any}
+   */
+  getNextTimestamp(): number {
+    const sentMessages = this.messages().filter(message => message?.status() !== StatusType.SENDING);
+    if (sentMessages.length === 0) {
+      return this.getLastKnownTimestamp();
+    }
+    return sentMessages[sentMessages.length - 1].timestamp() + 1;
+  }
+
   getLatestTimestamp(currentTimestamp: number): number {
     return Math.max(this.last_server_timestamp(), this.last_event_timestamp(), currentTimestamp);
   }
