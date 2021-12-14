@@ -35,6 +35,7 @@ import {
   MessageSendingCallbacks,
   MessageTargetMode,
   PayloadBundleState,
+  PayloadBundleType,
 } from '@wireapp/core/src/main/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
@@ -122,6 +123,12 @@ import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
+export enum CONSENT_TYPE {
+  INCOMING_CALL = 'incoming_call',
+  MESSAGE = 'message',
+  OUTGOING_CALL = 'outgoing_call',
+}
+
 type ConversationEvent = {conversation: string; id?: string};
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
@@ -130,6 +137,7 @@ type ClientMismatchHandlerFn = (
   conversationId?: QualifiedId,
   sentAt?: number,
   silent?: boolean,
+  consentType?: CONSENT_TYPE,
 ) => Promise<boolean>;
 
 type TextMessagePayload = {
@@ -207,8 +215,12 @@ export class MessageRepository {
    * @param conversationId
    * @param mismatch
    */
-  public handleClientMismatch(conversationId: QualifiedId, mismatch: ClientMismatch | MessageSendingStatus) {
-    this.onClientMismatch?.(mismatch, conversationId, Date.now(), true);
+  public handleClientMismatch(
+    conversationId: QualifiedId,
+    mismatch: ClientMismatch | MessageSendingStatus,
+    consentType?: CONSENT_TYPE,
+  ) {
+    return this.onClientMismatch?.(mismatch, conversationId, Date.now(), true, consentType);
   }
 
   /**
@@ -603,7 +615,11 @@ export class MessageRepository {
    * @param conversation The conversation to send the message in
    * @returns Resolves to true if the message can be sent, false if the user didn't give their permission
    */
-  requestUserSendingPermission(conversation: Conversation, showLegalHoldWarning: boolean): Promise<boolean> {
+  async requestUserSendingPermission(
+    conversation: Conversation,
+    showLegalHoldWarning: boolean,
+    consentType: CONSENT_TYPE,
+  ): Promise<boolean> {
     const conversationDegraded = conversation.verification_state() === ConversationVerificationState.DEGRADED;
     if (showLegalHoldWarning) {
       return showLegalHoldWarningModal(conversation, conversationDegraded)
@@ -611,15 +627,25 @@ export class MessageRepository {
         .catch(() => false);
     }
     if (!conversationDegraded) {
-      return Promise.resolve(true);
+      return true;
     }
 
     const users = conversation.getUsersWithUnverifiedClients();
     const userNames = joinNames(users, Declension.NOMINATIVE);
     const titleSubstitutions = capitalizeFirstChar(userNames);
 
-    const actionString = t('modalConversationNewDeviceAction');
-    const messageString = t('modalConversationNewDeviceMessage');
+    const [actionString, messageString] = {
+      [CONSENT_TYPE.INCOMING_CALL]: [
+        t('modalConversationNewDeviceIncomingCallAction'),
+        t('modalConversationNewDeviceIncomingCallMessage'),
+      ],
+      [CONSENT_TYPE.OUTGOING_CALL]: [
+        t('modalConversationNewDeviceOutgoingCallAction'),
+        t('modalConversationNewDeviceOutgoingCallMessage'),
+      ],
+      [CONSENT_TYPE.MESSAGE]: [t('modalConversationNewDeviceAction'), t('modalConversationNewDeviceMessage')],
+    }[consentType];
+
     const baseTitle =
       users.length > 1
         ? t('modalConversationNewDeviceHeadlineMany', titleSubstitutions)
@@ -700,8 +726,10 @@ export class MessageRepository {
           .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
           .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
       }
+      const isCallingMessage = payload.type === PayloadBundleType.CALL;
+      const consentType = isCallingMessage ? CONSENT_TYPE.OUTGOING_CALL : CONSENT_TYPE.MESSAGE;
 
-      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false);
+      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
     };
 
     const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
@@ -1282,18 +1310,13 @@ export class MessageRepository {
       this.triggerTeamMemberLeaveChecks(usersWithoutClients);
     }
 
-    const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
-    const consentType = isCallingMessage
-      ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
-      : ConversationRepository.CONSENT_TYPE.MESSAGE;
-
     let shouldShowLegalHoldWarning: boolean = false;
 
     if (checkLegalHold) {
       shouldShowLegalHoldWarning = await this.shouldShowLegalHoldWarning(eventInfoEntity);
     }
 
-    return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+    return this.grantMessage(eventInfoEntity, userIds, shouldShowLegalHoldWarning);
   }
 
   /**
@@ -1301,7 +1324,6 @@ export class MessageRepository {
    */
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
-    consentType: string,
     userIds: QualifiedId[],
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
@@ -1336,8 +1358,6 @@ export class MessageRepository {
       return this.userRepository
         .getUsersById(userIds)
         .then(userEntities => {
-          let actionString;
-          let messageString;
           let titleString;
 
           const hasMultipleUsers = userEntities.length > 1;
@@ -1357,7 +1377,7 @@ export class MessageRepository {
               const conversationId = eventInfoEntity.conversationId;
               const type = eventInfoEntity.getType();
 
-              const log = `Missing user IDs to grant '${type}' message in '${conversationId}' (${consentType})`;
+              const log = `Missing user IDs to grant '${type}' message in '${conversationId}'`;
               this.logger.error(log);
 
               const error = new Error('Failed to grant outgoing message');
@@ -1366,25 +1386,8 @@ export class MessageRepository {
             }
           }
 
-          switch (consentType) {
-            case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
-              actionString = t('modalConversationNewDeviceIncomingCallAction');
-              messageString = t('modalConversationNewDeviceIncomingCallMessage');
-              break;
-            }
-
-            case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
-              actionString = t('modalConversationNewDeviceOutgoingCallAction');
-              messageString = t('modalConversationNewDeviceOutgoingCallMessage');
-              break;
-            }
-
-            default: {
-              actionString = t('modalConversationNewDeviceAction');
-              messageString = t('modalConversationNewDeviceMessage');
-              break;
-            }
-          }
+          const actionString = t('modalConversationNewDeviceAction');
+          const messageString = t('modalConversationNewDeviceMessage');
 
           const options: ModalOptions = {
             close: () => {

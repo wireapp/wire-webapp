@@ -58,6 +58,7 @@ export interface CallingEvent {
   conversation: string;
   from: string;
   qualified_conversation?: QualifiedId;
+  qualified_from?: QualifiedId;
   sender: string;
   time?: string;
   type: CALL;
@@ -494,15 +495,16 @@ export const EventBuilder = {
 
   buildVoiceChannelActivate(
     conversation: QualifiedId,
-    userId: string,
+    userId: QualifiedId,
     time: string,
     protocolVersion: number,
   ): VoiceChannelActivateEvent {
     return {
       ...buildQualifiedId(conversation),
-      from: userId,
+      from: userId.id,
       id: createRandomUuid(),
       protocol_version: protocolVersion,
+      qualified_from: userId,
       time,
       type: ClientEvent.CONVERSATION.VOICE_CHANNEL_ACTIVATE,
     };
@@ -510,7 +512,7 @@ export const EventBuilder = {
 
   buildVoiceChannelDeactivate(
     conversation: QualifiedId,
-    userId: string,
+    userId: QualifiedId,
     duration: number,
     reason: AVS_REASON,
     time: string,
@@ -522,9 +524,10 @@ export const EventBuilder = {
         duration,
         reason,
       },
-      from: userId,
+      from: userId.id,
       id: createRandomUuid(),
       protocol_version: protocolVersion,
+      qualified_from: userId,
       time,
       type: ClientEvent.CONVERSATION.VOICE_CHANNEL_DEACTIVATE,
     };
