@@ -738,6 +738,23 @@ export class MessageRepository {
       this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
     };
 
+    /**
+     * Once a message has been sent, check the state of the members of this conversation.
+     * If, in this conversation, there are still users that have 0 devices, that could mean they have been silently removed from the team
+     * We need to ask backend if those users have been deleted and, if so, trigger the teamMemberLeave event
+     */
+    const checkMissingTeamMembers = async (): Promise<void> => {
+      const membersWithoutClients = conversation
+        .participating_user_ets()
+        .filter(user => user.devices().length === 0)
+        .map(user => user.id);
+      if (!membersWithoutClients.length) {
+        return;
+      }
+      const usersWithoutClients = await this.userRepository.getUserListFromBackend(membersWithoutClients);
+      this.triggerTeamMemberLeaveChecks(usersWithoutClients);
+    };
+
     const conversationService = this.conversationService;
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
@@ -747,7 +764,14 @@ export class MessageRepository {
         onClientMismatch: mismatch =>
           this.onClientMismatch?.(mismatch, conversation.qualifiedId, silentDegradationWarning),
         onStart: injectOptimisticEvent,
-        onSuccess: updateOptimisticEvent,
+        onSuccess: async (genericMessage, sentTime) => {
+          if (this.teamState.isTeam()) {
+            // If we are in a team, we can be in the particular case where we are in a Tier1 team (team with a lot of users)
+            // In that case, backend will not warn us when a user is removed. We need to check this ourself manually
+            await checkMissingTeamMembers();
+          }
+          updateOptimisticEvent(genericMessage, sentTime);
+        },
       },
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       nativePush,
