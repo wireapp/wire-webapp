@@ -231,10 +231,12 @@ export class ConversationRepository {
         }
 
         let shouldWarnLegalHold = false;
-        if (missing.length) {
+        if (missingClients.length) {
           const wasVerified = conversation?.is_verified();
           const legalHoldStatus = conversation?.legalHoldStatus();
-          const newDevices = await this.userRepository.updateMissingUsersClients(missing.map(({userId}) => userId));
+          const newDevices = await this.userRepository.updateMissingUsersClients(
+            missingClients.map(({userId}) => userId),
+          );
           if (wasVerified && newDevices.length) {
             // if the conversation is verified but some clients were missing, it means the conversation will degrade.
             // We need to warn the user of the degradation and ask his permission to actually send the message
