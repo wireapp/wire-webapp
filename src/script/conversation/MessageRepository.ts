@@ -618,7 +618,7 @@ export class MessageRepository {
   async requestUserSendingPermission(
     conversation: Conversation,
     showLegalHoldWarning: boolean,
-    consentType: CONSENT_TYPE,
+    consentType: CONSENT_TYPE = CONSENT_TYPE.MESSAGE,
   ): Promise<boolean> {
     const conversationDegraded = conversation.verification_state() === ConversationVerificationState.DEGRADED;
     if (showLegalHoldWarning) {
