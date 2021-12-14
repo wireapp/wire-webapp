@@ -134,7 +134,7 @@ type ConversationEvent = {conversation: string; id?: string};
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
 
 type ClientMismatchHandlerFn = (
-  mismatch: ClientMismatch | MessageSendingStatus,
+  mismatch: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
   conversationId?: QualifiedId,
   sentAt?: number,
   silent?: boolean,
@@ -218,7 +218,7 @@ export class MessageRepository {
    */
   public handleClientMismatch(
     conversationId: QualifiedId,
-    mismatch: ClientMismatch | MessageSendingStatus,
+    mismatch: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
     consentType?: CONSENT_TYPE,
   ) {
     return this.onClientMismatch?.(mismatch, conversationId, Date.now(), false, consentType);
