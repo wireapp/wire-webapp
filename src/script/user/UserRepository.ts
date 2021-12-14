@@ -336,7 +336,8 @@ export class UserRepository {
         if (isSelfUser) {
           amplify.publish(LegalHoldModalViewModel.SHOW_DETAILS);
         }
-      } else if (publishClient) {
+      }
+      if (publishClient) {
         amplify.publish(WebAppEvents.USER.CLIENT_ADDED, userId, clientEntity);
       }
       return clientEntity;

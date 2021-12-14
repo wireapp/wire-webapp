@@ -183,7 +183,6 @@ export class ConversationRepository {
       async (
         {deleted = {}, missing = {}, redundant = {}, time = new Date().toISOString()},
         conversationId,
-        sentAt,
         silent,
         consentType,
       ) => {
@@ -231,15 +230,10 @@ export class ConversationRepository {
             );
         }
 
-        let hasNewLegalHoldDevices = false;
+        let shouldWarnLegalHold = false;
         if (missingClients.length) {
           const wasVerified = conversation?.is_verified();
           const legalHoldStatus = conversation?.legalHoldStatus();
-          if (conversation) {
-            // FIXME there is an internal mechanism in the conversation that triggers the system message.
-            // This can be removed once `messageRepository.grantMessage` is not called anymore
-            conversation.blockLegalHoldMessage = true;
-          }
           const newDevices = await this.userRepository.updateMissingUsersClients(
             missingClients.map(({userId}) => userId),
           );
@@ -250,24 +244,12 @@ export class ConversationRepository {
           }
           if (conversation) {
             const hasChangedLegalHoldStatus = conversation.legalHoldStatus() !== legalHoldStatus;
-            hasNewLegalHoldDevices = newDevices.some(device => device.isLegalHold());
-            if (hasChangedLegalHoldStatus) {
-              this.injectLegalHoldMessage({
-                beforeTimestamp: true,
-                conversationId: conversation.qualifiedId,
-                legalHoldStatus: conversation.legalHoldStatus(),
-                timestamp: sentAt,
-                userId: this.userState.self().qualifiedId,
-              });
-            }
-            // FIXME there is an internal mechanism in the conversation that triggers the system message.
-            // This can be removed once `messageRepository.grantMessage` is not called anymore
-            conversation.blockLegalHoldMessage = false;
+            shouldWarnLegalHold = hasChangedLegalHoldStatus && newDevices.some(device => device.isLegalHold());
           }
         }
         return silent
           ? false
-          : this.messageRepository.requestUserSendingPermission(conversation, hasNewLegalHoldDevices, consentType);
+          : this.messageRepository.requestUserSendingPermission(conversation, shouldWarnLegalHold, consentType);
       },
     );
 
@@ -276,7 +258,6 @@ export class ConversationRepository {
     this.event_mapper = new EventMapper();
     this.verificationStateHandler = new ConversationVerificationStateHandler(
       this.eventRepository,
-      this.serverTimeHandler,
       this.userState,
       this.conversationState,
     );
@@ -1824,17 +1805,15 @@ export class ConversationRepository {
     conversationEntity?: Conversation;
     conversationId: QualifiedId;
     legalHoldStatus: LegalHoldStatus;
-    timestamp: string | number;
+    timestamp?: number;
     userId: QualifiedId;
   }) => {
     if (typeof legalHoldStatus === 'undefined') {
       return;
     }
     if (!timestamp) {
-      // TODO(federation) find with qualified id
       const conversation = conversationEntity || this.conversationState.findConversation(conversationId);
-      const servertime = this.serverTimeHandler.toServerTimestamp();
-      timestamp = conversation.getLatestTimestamp(servertime);
+      timestamp = conversation.getNextTimestamp();
     }
     const legalHoldUpdateMessage = EventBuilder.buildLegalHoldMessage(
       conversationId || conversationEntity?.qualifiedId,
@@ -2028,6 +2007,7 @@ export class ConversationRepository {
       from: userId,
       time: isoTimestamp,
     } = eventJson;
+    const timestamp = new Date(isoTimestamp).getTime();
     const qualifiedConversation = qualified_conversation || {domain: '', id: conversationId};
     const qualifiedUser = qualified_from || {domain: '', id: userId};
 
@@ -2035,7 +2015,7 @@ export class ConversationRepository {
       beforeTimestamp: true,
       conversationId: qualifiedConversation,
       legalHoldStatus: messageLegalHoldStatus,
-      timestamp: isoTimestamp,
+      timestamp,
       userId: qualifiedUser,
     });
 
@@ -2048,7 +2028,7 @@ export class ConversationRepository {
     await this.injectLegalHoldMessage({
       conversationId: qualifiedConversation,
       legalHoldStatus: conversationEntity.legalHoldStatus(),
-      timestamp: isoTimestamp,
+      timestamp,
       userId: qualifiedUser,
     });
 

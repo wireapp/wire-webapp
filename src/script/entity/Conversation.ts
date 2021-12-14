@@ -677,7 +677,18 @@ export class Conversation {
 
   getLastKnownTimestamp(currentTimestamp?: number): number {
     const last_known_timestamp = Math.max(this.last_server_timestamp(), this.last_event_timestamp());
-    return last_known_timestamp || currentTimestamp;
+    return last_known_timestamp ?? currentTimestamp;
+  }
+
+  /**
+   * Return the next timestamp that can be used to inject a message right after the last message that is not a message currently being sent
+   */
+  getNextTimestamp(): number {
+    const sentMessages = this.messages().filter(message => message?.status() !== StatusType.SENDING);
+    if (sentMessages.length === 0) {
+      return this.getLastKnownTimestamp();
+    }
+    return sentMessages[sentMessages.length - 1].timestamp() + 1;
   }
 
   getLatestTimestamp(currentTimestamp: number): number {
