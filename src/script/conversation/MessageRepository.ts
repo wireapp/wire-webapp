@@ -754,7 +754,7 @@ export class MessageRepository {
       const usersWithoutClients = await this.userRepository.getUserListFromBackend(
         conversation.isFederated() ? membersWithoutClients : membersWithoutClients.map(({id}) => id),
       );
-      this.triggerTeamMemberLeaveChecks(usersWithoutClients);
+      return this.triggerTeamMemberLeaveChecks(usersWithoutClients);
     };
 
     const conversationService = this.conversationService;
