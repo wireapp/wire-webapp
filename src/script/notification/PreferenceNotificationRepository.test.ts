@@ -26,6 +26,7 @@ import {PreferenceNotificationRepository, Notification} from 'src/script/notific
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {createRandomUuid} from 'Util/util';
 import {User} from '../entity/User';
+import {ClientEntity} from '../client/ClientEntity';
 
 describe('PreferenceNotificationRepository', () => {
   const user = new User(createRandomUuid(), null);
@@ -64,7 +65,7 @@ describe('PreferenceNotificationRepository', () => {
   it('adds new notification when new device is added for self user', () => {
     amplify.unsubscribeAll(WebAppEvents.USER.CLIENT_ADDED);
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
-    const newClientData = {};
+    const newClientData = new ClientEntity(true, '');
 
     amplify.publish(WebAppEvents.USER.CLIENT_ADDED, user.qualifiedId, newClientData);
 
@@ -78,7 +79,7 @@ describe('PreferenceNotificationRepository', () => {
   it('ignores new device notification if not from the self user', () => {
     amplify.unsubscribeAll(WebAppEvents.USER.CLIENT_ADDED);
     const preferenceNotificationRepository = new PreferenceNotificationRepository(userObservable);
-    const newClientData = {};
+    const newClientData = new ClientEntity(true, '');
 
     amplify.publish(WebAppEvents.USER.CLIENT_ADDED, {domain: '', id: createRandomUuid()}, newClientData);
 
