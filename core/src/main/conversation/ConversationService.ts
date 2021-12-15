@@ -981,7 +981,7 @@ export class ConversationService {
     if (!response.errored) {
       if (!this.isClearFromMismatch(response)) {
         // We warn the consumer that there is a mismatch that did not prevent message sending
-        callbacks?.onClientMismatch?.(response, true);
+        await callbacks?.onClientMismatch?.(response, true);
       }
       callbacks?.onSuccess?.(genericMessage, response.time);
     }
