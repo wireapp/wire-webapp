@@ -44,6 +44,7 @@ export interface CompressedImage {
 }
 
 export interface AssetUploadOptions extends AssetOptions {
+  domain?: string;
   expectsReadConfirmation: boolean;
   legalHoldStatus?: LegalHoldStatus;
 }
@@ -64,6 +65,10 @@ export class AssetRepository {
     private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('AssetRepository');
+  }
+
+  get assetCoreService() {
+    return this.core.service!.asset;
   }
 
   async getObjectUrl(asset: AssetRemoteData): Promise<string | undefined> {
@@ -208,27 +213,31 @@ export class AssetRepository {
     }
   }
 
-  async uploadProfileImage(image: Blob): Promise<{
+  async uploadProfileImage(
+    image: Blob,
+    domain?: string,
+  ): Promise<{
     mediumImageKey: string;
     previewImageKey: string;
   }> {
-    const [{compressedBytes: previewImageBytes}, {compressedBytes: mediumImageBytes}] = await Promise.all([
+    const [{compressedBytes: previewImage}, {compressedBytes: mediumImage}] = await Promise.all([
       this.compressImage(image),
       this.compressImage(image, true),
     ]);
 
     const options: AssetUploadOptions = {
+      domain,
       expectsReadConfirmation: false,
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
     };
+    const previewPicture = (await this.assetCoreService.uploadAsset(Buffer.from(previewImage), options)).response;
 
-    const previewPicture = await this.assetService.uploadFile(previewImageBytes, options).response;
-    const mediumPicture = await this.assetService.uploadFile(mediumImageBytes, options).response;
+    const mediumPicture = (await this.assetCoreService.uploadAsset(Buffer.from(mediumImage), options)).response;
 
     return {
-      mediumImageKey: previewPicture.key,
-      previewImageKey: mediumPicture.key,
+      mediumImageKey: (await previewPicture).key,
+      previewImageKey: (await mediumPicture).key,
     };
   }
 
@@ -265,9 +274,10 @@ export class AssetRepository {
     const progressObservable = ko.observable(0);
     this.uploadProgressQueue.push({messageId, progress: progressObservable});
 
-    const request = await this.core.service!.asset.uploadAsset(
+    const request = await this.assetCoreService.uploadAsset(
       Buffer.from(bytes),
       {
+        domain: options.domain,
         public: options.public,
         retention: options.retention,
       },

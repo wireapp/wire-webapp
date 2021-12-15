@@ -821,13 +821,15 @@ export class UserRepository {
    */
   async changePicture(picture: Blob): Promise<User> {
     try {
-      const {previewImageKey, mediumImageKey} = await this.assetRepository.uploadProfileImage(picture);
+      const selfUser = this.userState.self();
+      const domain = Config.getConfig().FEATURE.ENABLE_FEDERATION ? selfUser.domain : undefined;
+      const {previewImageKey, mediumImageKey} = await this.assetRepository.uploadProfileImage(picture, domain);
       const assets: APIClientUserAsset[] = [
         {key: previewImageKey, size: APIClientUserAssetType.PREVIEW, type: 'image'},
         {key: mediumImageKey, size: APIClientUserAssetType.COMPLETE, type: 'image'},
       ];
       await this.selfService.putSelf({assets, picture: []} as any);
-      return await this.userUpdate({user: {assets, id: this.userState.self().id}});
+      return await this.userUpdate({user: {assets, id: selfUser.id}});
     } catch (error) {
       throw new Error(`Error during profile image upload: ${error.message || error.code || error}`);
     }
