@@ -69,8 +69,11 @@ export class PreferenceNotificationRepository {
     });
 
     amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedId, clientEntity?: ClientEntity) => {
-      if (matchQualifiedIds(user, selfUserObservable())) {
-        this.onClientAdd(user.id, clientEntity);
+      if (clientEntity && !clientEntity.isLegalHold() && matchQualifiedIds(user, selfUserObservable())) {
+        this.notifications.push({
+          data: clientEntity,
+          type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
+        });
       }
     });
     amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedId, clientId: string) => {
@@ -92,15 +95,6 @@ export class PreferenceNotificationRepository {
     return Object.entries(groupedNotifications)
       .map(([type, notification]) => ({notification, type}))
       .sort((a, b) => prio(a) - prio(b));
-  }
-
-  onClientAdd(_userId: string, clientEntity?: ClientEntity): void {
-    if (clientEntity) {
-      this.notifications.push({
-        data: clientEntity,
-        type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
-      });
-    }
   }
 
   onClientRemove(_userId: string, clientId: string, domain: string | null): void {
