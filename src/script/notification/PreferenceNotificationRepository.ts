@@ -108,10 +108,13 @@ export class PreferenceNotificationRepository {
 
   onClientRemove(_userId: string, clientId: string, domain: string | null): void {
     this.notifications.remove(({data: clientEntity}) => {
-      const isExpectedId =
-        typeof clientEntity !== 'boolean' &&
-        clientEntity.id === clientId &&
-        (!domain || clientEntity.domain === domain);
+      if (typeof clientEntity === 'boolean') {
+        return false;
+      }
+      const isExpectedId = matchQualifiedIds(
+        {domain: clientEntity.domain, id: clientEntity.id},
+        {domain, id: clientId},
+      );
       return isExpectedId && clientEntity.type === ClientType.PERMANENT;
     });
   }
