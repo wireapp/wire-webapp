@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [20.1.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.1.1...@wireapp/core@20.1.2) (2021-12-15)
+
+
+### Bug Fixes
+
+* **core:** Await for mismatch handling before considering a message sent ([925ecbb](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/925ecbb9f9a8e5f0f123d29615a794d7c58f2f10))
+
+
+
+
+
 ## [20.1.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.1.0...@wireapp/core@20.1.1) (2021-12-14)
 
 
