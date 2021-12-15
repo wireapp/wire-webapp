@@ -747,11 +747,13 @@ export class MessageRepository {
       const membersWithoutClients = conversation
         .participating_user_ets()
         .filter(user => user.devices().length === 0)
-        .map(user => user.id);
+        .map(user => user.qualifiedId);
       if (!membersWithoutClients.length) {
         return;
       }
-      const usersWithoutClients = await this.userRepository.getUserListFromBackend(membersWithoutClients);
+      const usersWithoutClients = await this.userRepository.getUserListFromBackend(
+        conversation.isFederated() ? membersWithoutClients : membersWithoutClients.map(({id}) => id),
+      );
       this.triggerTeamMemberLeaveChecks(usersWithoutClients);
     };
 
