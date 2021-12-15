@@ -1032,11 +1032,12 @@ export class MessageRepository {
     if (conversation.removed_from_conversation()) {
       return;
     }
-    const senderId = message.from;
-    // TODO(Federation): Add check for domain with "qualified_from" in message entity
-    const conversationHasUser = conversation.participating_user_ids().find(userId => senderId === userId.id);
+    const senderId = message.qualifiedFrom;
+    const senderInConversation = conversation
+      .participating_user_ets()
+      .some(user => matchQualifiedIds(senderId, user.qualifiedId));
 
-    if (!conversationHasUser) {
+    if (!senderInConversation) {
       message.setButtonError(buttonId, t('buttonActionError'));
       message.waitingButtonId(undefined);
       return;
