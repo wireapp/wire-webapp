@@ -20,7 +20,6 @@
 import {amplify} from 'amplify';
 import {
   Asset,
-  ButtonAction,
   Cleared,
   Confirmation,
   External,
@@ -887,7 +886,7 @@ export class MessageRepository {
 
     const sendingOptions = {
       nativePush: false,
-      recipients: [{domain: messageEntity.fromDomain || '', id: messageEntity.from}],
+      recipients: [messageEntity.qualifiedFrom],
       // When not in a verified conversation (verified or degraded) we want the regular sending flow (send and reencrypt if there are mismatches)
       // When in a verified (or degraded) conversation we want to prevent encrypting for unverified devices, we will then silent the degradation modal and force sending to only the devices that are verified
       silentDegradationWarning: conversationEntity.verification_state() !== ConversationVerificationState.UNVERIFIED,
@@ -1029,40 +1028,39 @@ export class MessageRepository {
     }
   }
 
-  sendButtonAction(conversationEntity: Conversation, messageEntity: CompositeMessage, buttonId: string): void {
-    if (conversationEntity.removed_from_conversation()) {
+  sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {
+    if (conversation.removed_from_conversation()) {
+      return;
+    }
+    const senderId = message.qualifiedFrom;
+    const senderInConversation = conversation
+      .participating_user_ets()
+      .some(user => matchQualifiedIds(senderId, user.qualifiedId));
+
+    if (!senderInConversation) {
+      message.setButtonError(buttonId, t('buttonActionError'));
+      message.waitingButtonId(undefined);
       return;
     }
 
-    const senderId = messageEntity.from;
-    // TODO(Federation): Add check for domain with "qualified_from" in message entity
-    const conversationHasUser = conversationEntity.participating_user_ids().find(userId => senderId === userId.id);
-
-    if (!conversationHasUser) {
-      messageEntity.setButtonError(buttonId, t('buttonActionError'));
-      messageEntity.waitingButtonId(undefined);
-      return;
+    const buttonMessage = MessageBuilder.createButtonActionMessage({
+      ...this.createCommonMessagePayload(conversation),
+      content: {
+        buttonId,
+        referenceMessageId: message.id,
+      },
+    });
+    try {
+      this.sendAndInjectGenericCoreMessage(buttonMessage, conversation, {
+        nativePush: false,
+        recipients: [message.qualifiedFrom],
+        skipInjection: true,
+        targetMode: MessageTargetMode.USERS,
+      });
+    } catch (error) {
+      message.waitingButtonId(undefined);
+      return message.setButtonError(buttonId, t('buttonActionError'));
     }
-
-    const protoButtonAction = new ButtonAction({
-      buttonId,
-      referenceMessageId: messageEntity.id,
-    });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.BUTTON_ACTION]: protoButtonAction,
-      messageId: createRandomUuid(),
-    });
-    this.messageSender.queueMessage(async () => {
-      try {
-        const recipients = await this.createRecipients(conversationEntity, true, [messageEntity.from]);
-        const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.qualifiedId, options);
-        await this.sendGenericMessage(eventInfoEntity, false);
-      } catch (error) {
-        messageEntity.waitingButtonId(undefined);
-        return messageEntity.setButtonError(buttonId, t('buttonActionError'));
-      }
-    });
   }
 
   /**
