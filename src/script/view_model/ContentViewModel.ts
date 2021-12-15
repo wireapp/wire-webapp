@@ -62,9 +62,12 @@ import '../page/preferences/AccountPreferences';
 import '../page/preferences/OptionPreferences';
 import '../page/preferences/AVPreferences';
 import '../page/preferences/AboutPreferences';
-import {PreferenceNotificationRepository, Notification} from '../notification/PreferenceNotificationRepository';
+import {
+  PreferenceNotificationRepository,
+  Notification,
+  ClientNotificationData,
+} from '../notification/PreferenceNotificationRepository';
 import {modals} from '../view_model/ModalsViewModel';
-import {ClientEntity} from '../client/ClientEntity';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;
@@ -434,7 +437,7 @@ export class ContentViewModel {
           modals.showModal(
             ModalsViewModel.TYPE.ACCOUNT_NEW_DEVICES,
             {
-              data: aggregatedNotifications.map(notification => notification.data) as ClientEntity[],
+              data: aggregatedNotifications.map(notification => notification.data) as ClientNotificationData[],
               preventClose: true,
               secondaryAction: {
                 action: () => {
