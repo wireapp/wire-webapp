@@ -20,7 +20,6 @@
 import {amplify} from 'amplify';
 import {
   Asset,
-  Cleared,
   Confirmation,
   External,
   GenericMessage,
@@ -1005,26 +1004,17 @@ export class MessageRepository {
   /**
    * Update cleared of conversation using timestamp.
    */
-  public updateClearedTimestamp(conversationEntity: Conversation): void {
-    const timestamp = conversationEntity.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
+  public updateClearedTimestamp(conversation: Conversation): void {
+    const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
 
-    if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
-      const protoCleared = new Cleared({
-        clearedTimestamp: timestamp,
-        ...this.createCommonMessagePayload(conversationEntity),
-      });
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
-        messageId: createRandomUuid(),
-      });
-
-      const eventInfoEntity = new EventInfoEntity(
-        genericMessage,
-        this.conversationState.self_conversation()?.qualifiedId,
+    if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
+      this.conversationService.clearConversation(
+        conversation.id,
+        timestamp,
+        undefined,
+        false,
+        conversation.isFederated() ? conversation.domain : undefined,
       );
-      this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
-        this.logger.info(`Cleared conversation '${conversationEntity.id}' on '${new Date(timestamp).toISOString()}'`);
-      });
     }
   }
 
