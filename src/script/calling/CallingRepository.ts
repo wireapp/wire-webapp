@@ -92,7 +92,7 @@ interface MediaStreamQuery {
   screen?: boolean;
 }
 
-type QualifiedWcallMember = WcallMember & {userId: QualifiedId};
+type QualifiedWcallMember = Omit<WcallMember, 'userid'> & {userId: QualifiedId};
 
 interface SendMessageTarget {
   clients: WcallClient[];
@@ -1226,7 +1226,7 @@ export class CallingRepository {
   private updateParticipantList(call: Call, members: QualifiedWcallMember[]): void {
     const newMembers = members
       .filter(({userId, clientid}) => !call.getParticipant(userId, clientid))
-      .map(({userid, clientid}) => new Participant(this.userRepository.findUserById(userid), clientid));
+      .map(({userId, clientid}) => new Participant(this.userRepository.findUserById(userId), clientid));
 
     const removedMembers = call
       .participants()
