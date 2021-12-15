@@ -715,7 +715,7 @@ export class MessageRepository {
   ) {
     const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
 
-    const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = genericMessage => {
+    const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = async genericMessage => {
       if (playPingAudio) {
         amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
       }
@@ -724,7 +724,7 @@ export class MessageRepository {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
         this.trackContributed(conversation, genericMessage);
-        this.cryptography_repository.cryptographyMapper
+        await this.cryptography_repository.cryptographyMapper
           .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
           .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
       }
