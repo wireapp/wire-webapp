@@ -524,6 +524,7 @@ export class MessageRepository {
   private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
     const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
+      domain: conversation.isFederated() ? conversation.domain : undefined,
       expectsReadConfirmation: this.expectReadReceipt(conversation),
       legalHoldStatus: conversation.legalHoldStatus(),
       public: true,
