@@ -27,6 +27,26 @@ import {encryptAsset} from '../cryptography/AssetCryptography';
 export class AssetService {
   constructor(private readonly apiClient: APIClient) {}
 
+  /**
+   * Uploads a raw asset to the backend without encrypting it
+   *
+   * @param plainText The raw content of the asset to upload
+   * @param options?
+   * @param progressCallback?
+   * @return cancellable request that resolves with the uploaded image
+   */
+  public uploadRawAsset(asset: Buffer | Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
+    return this.apiClient.asset.api.postAsset(new Uint8Array(asset), options, progressCallback);
+  }
+
+  /**
+   * Will encrypt and upload an asset to the backend
+   *
+   * @param plainText The raw content of the asset to upload
+   * @param options?
+   * @param progressCallback?
+   * @return cancellable request that resolves with the uploaded image and decryption keys
+   */
   public async uploadAsset(
     plainText: Buffer | Uint8Array,
     options?: AssetOptions,
@@ -38,7 +58,7 @@ export class AssetService {
       hash: options?.hash,
     });
 
-    const request = this.apiClient.asset.api.postAsset(new Uint8Array(cipherText), options, progressCallback);
+    const request = this.uploadRawAsset(cipherText, options, progressCallback);
 
     return {
       ...request,
