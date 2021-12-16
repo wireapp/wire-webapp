@@ -24,6 +24,7 @@ export enum UserAssetType {
 
 export interface UserAsset {
   key: string;
+  domain?: string;
   size: UserAssetType;
   type: 'image';
 }

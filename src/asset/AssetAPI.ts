@@ -44,6 +44,7 @@ export interface CipherOptions {
 export interface AssetOptions extends CipherOptions {
   public?: boolean;
   retention?: AssetRetentionPolicy;
+  /** If given, will upload an asset that can be shared in a federated env */
   domain?: string;
 }
 
@@ -54,7 +55,6 @@ export interface AssetResponse {
 
 export class AssetAPI {
   private static readonly ASSET_V3_URL = '/assets/v3';
-  private static readonly ASSET_V4_URL = '/assets/v4';
   private static readonly ASSET_SERVICE_URL = '/bot/assets';
   private static readonly ASSET_V2_URL = '/otr/assets';
   private static readonly ASSET_V2_CONVERSATION_URL = '/conversations';
@@ -123,6 +123,7 @@ export class AssetAPI {
     const metadata = JSON.stringify({
       public: options?.public ?? true,
       retention: options?.retention || AssetRetentionPolicy.PERSISTENT,
+      domain: options?.domain,
     });
 
     const body =
@@ -309,11 +310,9 @@ export class AssetAPI {
    * @param asset Raw content of the asset to upload
    * @param options?
    * @param progressCallback? Will be called at every progress of the upload
-   * @param domain? If given, will upload to the new federated asset endpoint
    */
   postAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
-    const assetBaseUrl = options?.domain ? `${AssetAPI.ASSET_V4_URL}/${options.domain}` : AssetAPI.ASSET_V3_URL;
-    return this.postAssetShared(assetBaseUrl, asset, options, progressCallback);
+    return this.postAssetShared(AssetAPI.ASSET_V3_URL, asset, options, progressCallback);
   }
 
   postServiceAsset(asset: Uint8Array, options?: AssetOptions, progressCallback?: ProgressCallback) {
