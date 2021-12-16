@@ -50,7 +50,6 @@ import {container} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {Declension, joinNames, t} from 'Util/LocalizerUtil';
-import {getDifference} from 'Util/ArrayUtil';
 import {createRandomUuid, loadUrlBlob} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {capitalizeFirstChar} from 'Util/StringUtil';
@@ -78,7 +77,6 @@ import {StatusType} from '../message/StatusType';
 import {showLegalHoldWarningModal} from '../legal-hold/LegalHoldWarning';
 import {ConversationError} from '../error/ConversationError';
 import {Segmentation} from '../tracking/Segmentation';
-import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
@@ -99,7 +97,6 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
-import {isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {Core} from '../service/CoreSingleton';
 import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
@@ -149,7 +146,6 @@ export class MessageRepository {
     private readonly propertyRepository: PropertiesRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
-    private readonly conversation_service: ConversationService,
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
@@ -1112,9 +1108,16 @@ export class MessageRepository {
     }, {} as QualifiedUserClients);
   }
 
+  private createRecipients(users: User[]): UserClients {
+    return users.reduce((userClients, user) => {
+      userClients[user.id] = user.devices().map(client => client.id);
+      return userClients;
+    }, {} as UserClients);
+  }
+
   private async generateRecipients(
     conversation: Conversation,
-    recipients: QualifiedId[] | QualifiedUserClients | UserClients,
+    recipients?: QualifiedId[] | QualifiedUserClients | UserClients,
     skipSelf?: boolean,
   ): Promise<QualifiedUserClients | UserClients> {
     if (isQualifiedUserClients(recipients) || isUserClients(recipients)) {
@@ -1127,32 +1130,7 @@ export class MessageRepository {
       // we filter the self user if skipSelf is true
       .filter(user => !skipSelf || !user.isMe);
 
-    return conversation.isFederated()
-      ? this.createQualifiedRecipients(users)
-      : this.createRecipients(
-          conversation.qualifiedId,
-          false,
-          users.map(user => user.id),
-        );
-  }
-
-  async createRecipients(
-    conversationId: QualifiedId,
-    skip_own_clients = false,
-    user_ids?: string[],
-  ): Promise<UserClients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversationId);
-    const recipients: UserClients = {};
-    for (const userEntity of userEntities) {
-      if (!(skip_own_clients && userEntity.isMe)) {
-        if (user_ids && !user_ids.includes(userEntity.id)) {
-          continue;
-        }
-
-        recipients[userEntity.id] = userEntity.devices().map(client_et => client_et.id);
-      }
-    }
-    return recipients;
+    return conversation.isFederated() ? this.createQualifiedRecipients(users) : this.createRecipients(users);
   }
 
   /**
@@ -1223,80 +1201,14 @@ export class MessageRepository {
     }
   }
 
-  public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean): Promise<void> {
+  public async updateAllClients(conversation: Conversation, blockSystemMessage: boolean): Promise<void> {
     if (blockSystemMessage) {
-      conversationEntity.blockLegalHoldMessage = true;
+      conversation.blockLegalHoldMessage = true;
     }
-    const sender = this.clientState.currentClient().id;
-    try {
-      await this.conversation_service.postEncryptedMessage(conversationEntity, {recipients: {}, sender});
-    } catch (axiosError) {
-      const error = axiosError.response?.data || axiosError;
-      if (error.missing) {
-        const remoteUserClients = error.missing as UserClients;
-        const localUserClients = await this.createRecipients(conversationEntity);
-        const selfId = this.userState.self().id;
-
-        const deletedUserClients = Object.entries(localUserClients).reduce<UserClients>(
-          (deleted, [userId, clients]) => {
-            if (userId === selfId) {
-              return deleted;
-            }
-            const deletedClients = getDifference(remoteUserClients[userId], clients);
-            if (deletedClients.length) {
-              deleted[userId] = deletedClients;
-            }
-            return deleted;
-          },
-          {},
-        );
-
-        await Promise.all(
-          Object.entries(deletedUserClients).map(([userId, clients]) =>
-            Promise.all(
-              clients.map(clientId => this.userRepository.removeClientFromUser({domain: '', id: userId}, clientId)),
-            ),
-          ),
-        );
-
-        const missingUserIds = Object.entries(remoteUserClients).reduce<string[]>((missing, [userId, clients]) => {
-          if (userId !== selfId) {
-            const missingClients = getDifference(localUserClients[userId] || ([] as string[]), clients);
-            if (missingClients.length) {
-              missing.push(userId);
-            }
-          }
-          return missing;
-        }, []);
-
-        const missingUserEntities = missingUserIds.map(missingUserId =>
-          this.userRepository.findUserById(missingUserId),
-        );
-
-        const usersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
-        if (isQualifiedUserClientEntityMap(usersMap)) {
-          await Promise.all(
-            Object.entries(usersMap).map(([domain, userClientsMap]) =>
-              Object.entries(userClientsMap).map(([userId, clients]) =>
-                Promise.all(
-                  clients.map(client => this.userRepository.addClientToUser({domain, id: userId}, client, false)),
-                ),
-              ),
-            ),
-          );
-        } else {
-          await Promise.all(
-            Object.entries(usersMap).map(([userId, clients]) =>
-              Promise.all(
-                clients.map(client => this.userRepository.addClientToUser({domain: '', id: userId}, client, false)),
-              ),
-            ),
-          );
-        }
-      }
-    }
+    const missing = await this.conversationService.getAllParticipantsClients(conversation.id, conversation.domain);
+    this.handleClientMismatch(conversation.qualifiedId, {missing} as ClientMismatch);
     if (blockSystemMessage) {
-      conversationEntity.blockLegalHoldMessage = false;
+      conversation.blockLegalHoldMessage = false;
     }
   }
 
