@@ -231,14 +231,13 @@ export class AssetRepository {
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
     };
-    const previewPicture = (await this.assetCoreService.uploadRawAsset(previewImage, options)).response;
 
-    const mediumPicture = (await this.assetCoreService.uploadRawAsset(mediumImage, options)).response;
+    const [previewImageKey, mediumImageKey] = await Promise.all([
+      this.assetCoreService.uploadRawAsset(previewImage, options).response,
+      this.assetCoreService.uploadRawAsset(mediumImage, options).response,
+    ]);
 
-    return {
-      mediumImageKey: await previewPicture,
-      previewImageKey: await mediumPicture,
-    };
+    return {mediumImageKey, previewImageKey};
   }
 
   private async compressImage(image: Blob, useProfileImageSize: boolean = false): Promise<CompressedImage> {
