@@ -18,16 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-import {
-  Asset,
-  Confirmation,
-  External,
-  GenericMessage,
-  LastRead,
-  LegalHoldStatus,
-  Asset as ProtobufAsset,
-  DataTransfer,
-} from '@wireapp/protocol-messaging';
+import {Asset, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {
   ReactionType,
   MessageSendingCallbacks,
@@ -38,7 +29,6 @@ import {
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {
   ClientMismatch,
-  NewOTRMessage,
   QualifiedUserClients,
   MessageSendingStatus,
   UserClients,
@@ -59,14 +49,13 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
+import {Declension, joinNames, t} from 'Util/LocalizerUtil';
 import {getDifference} from 'Util/ArrayUtil';
-import {arrayToBase64, createRandomUuid, loadUrlBlob} from 'Util/util';
+import {createRandomUuid, loadUrlBlob} from 'Util/util';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 
-import {encryptAesAsset} from '../assets/AssetCrypto';
 import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
@@ -86,13 +75,11 @@ import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
 import {StatusType} from '../message/StatusType';
-import {BackendClientError} from '../error/BackendClientError';
 import {showLegalHoldWarningModal} from '../legal-hold/LegalHoldWarning';
 import {ConversationError} from '../error/ConversationError';
 import {Segmentation} from '../tracking/Segmentation';
 import {ConversationService} from './ConversationService';
 import {AssetRepository} from '../assets/AssetRepository';
-import {ClientRepository} from '../client/ClientRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {getLinkPreviewFromString} from './linkPreviews';
@@ -112,10 +99,8 @@ import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
-import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
+import {isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {BackendErrorLabel} from '@wireapp/api-client/src/http';
-import {Config} from '../Config';
 import {Core} from '../service/CoreSingleton';
 import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
 import {User} from '../entity/User';
@@ -157,7 +142,6 @@ export class MessageRepository {
   private onClientMismatch?: ClientMismatchHandlerFn;
 
   constructor(
-    private readonly clientRepository: ClientRepository,
     private readonly conversationRepositoryProvider: () => ConversationRepository,
     private readonly cryptography_repository: CryptographyRepository,
     private readonly eventRepository: EventRepository,
@@ -514,7 +498,7 @@ export class MessageRepository {
         }
 
         asset_et.status(reason);
-        asset_et.upload_failed_reason(ProtobufAsset.NotUploaded.FAILED);
+        asset_et.upload_failed_reason(Asset.NotUploaded.FAILED);
       }
 
       return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
@@ -1011,13 +995,7 @@ export class MessageRepository {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
 
     if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
-      this.conversationService.clearConversation(
-        conversation.id,
-        timestamp,
-        undefined,
-        false,
-        conversation.isFederated() ? conversation.domain : undefined,
-      );
+      this.conversationService.clearConversation(conversation.id, timestamp);
     }
   }
 
@@ -1078,24 +1056,12 @@ export class MessageRepository {
     return deleteCount;
   }
 
-  private sendGenericMessageToConversation(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
-    return this.messageSender.queueMessage(async () => {
-      const recipients = await this.createRecipients(eventInfoEntity.conversationId);
-      eventInfoEntity.updateOptions({recipients});
-      return this.sendGenericMessage(eventInfoEntity, true);
-    });
-  }
-
   /**
    * Cancel asset upload.
    * @param messageId Id of the message which upload has been cancelled
    */
   private readonly cancelAssetUpload = (messageId: string) => {
-    this.sendAssetUploadFailed(
-      this.conversationState.activeConversation(),
-      messageId,
-      ProtobufAsset.NotUploaded.CANCELLED,
-    );
+    this.sendAssetUploadFailed(this.conversationState.activeConversation(), messageId, Asset.NotUploaded.CANCELLED);
   };
 
   /**
@@ -1189,29 +1155,6 @@ export class MessageRepository {
     return recipients;
   }
 
-  private async sendGenericMessage(eventInfoEntity: EventInfoEntity, checkLegalHold: boolean): Promise<ClientMismatch> {
-    try {
-      await this.grantOutgoingMessage(eventInfoEntity, undefined, checkLegalHold);
-      const sendAsExternal = await this.shouldSendAsExternal(eventInfoEntity);
-      if (sendAsExternal) {
-        return await this.sendExternalGenericMessage(eventInfoEntity);
-      }
-
-      const {genericMessage, options} = eventInfoEntity;
-      const payload = await this.cryptography_repository.encryptGenericMessage(options.recipients, genericMessage);
-      payload.native_push = options.nativePush;
-      return await this.sendEncryptedMessage(eventInfoEntity, payload);
-    } catch (error) {
-      const isRequestTooLarge = isBackendError(error) && error.code === HTTP_STATUS.REQUEST_TOO_LONG;
-
-      if (isRequestTooLarge) {
-        return this.sendExternalGenericMessage(eventInfoEntity);
-      }
-
-      throw error;
-    }
-  }
-
   /**
    * Get Message with given ID from the database.
    *
@@ -1278,169 +1221,6 @@ export class MessageRepository {
         });
       }
     }
-  }
-
-  private async shouldShowLegalHoldWarning(eventInfoEntity: EventInfoEntity): Promise<boolean> {
-    const messageType = eventInfoEntity.getType();
-    const isMessageEdit = messageType === GENERIC_MESSAGE_TYPE.EDITED;
-    const conversationEntity = this.conversationState.findConversation(eventInfoEntity.conversationId);
-    const localLegalHoldStatus = conversationEntity.legalHoldStatus();
-    await this.updateAllClients(conversationEntity, !isMessageEdit);
-    const updatedLocalLegalHoldStatus = conversationEntity.legalHoldStatus();
-
-    const {genericMessage} = eventInfoEntity;
-    (genericMessage as any)[messageType][PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS] = updatedLocalLegalHoldStatus;
-
-    const haveNewClientsChangeLegalHoldStatus = localLegalHoldStatus !== updatedLocalLegalHoldStatus;
-
-    if (!isMessageEdit && haveNewClientsChangeLegalHoldStatus) {
-      const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
-      await this.conversationRepositoryProvider().injectLegalHoldMessage({
-        beforeTimestamp: true,
-        conversationId: conversationId,
-        legalHoldStatus: updatedLocalLegalHoldStatus,
-        timestamp: numericTimestamp,
-        userId: this.userState.self().qualifiedId,
-      });
-    }
-
-    return haveNewClientsChangeLegalHoldStatus && updatedLocalLegalHoldStatus === LegalHoldStatus.ENABLED;
-  }
-
-  private async grantOutgoingMessage(
-    eventInfoEntity: EventInfoEntity,
-    userIds: QualifiedId[],
-    checkLegalHold: boolean,
-  ): Promise<void> {
-    const messageType = eventInfoEntity.getType();
-    const allowedMessageTypes = ['cleared', 'clientAction', 'confirmation', 'deleted', 'lastRead'];
-
-    if (allowedMessageTypes.includes(messageType)) {
-      return;
-    }
-
-    if (this.teamState.isTeam()) {
-      const userIdsWithoutClients = MessageRepository.getOtherUsersWithoutClients(
-        eventInfoEntity,
-        this.userState.self().id,
-      );
-      const usersWithoutClients = await this.userRepository.getUserListFromBackend(userIdsWithoutClients);
-      this.triggerTeamMemberLeaveChecks(usersWithoutClients);
-    }
-
-    let shouldShowLegalHoldWarning: boolean = false;
-
-    if (checkLegalHold) {
-      shouldShowLegalHoldWarning = await this.shouldShowLegalHoldWarning(eventInfoEntity);
-    }
-
-    return this.grantMessage(eventInfoEntity, userIds, shouldShowLegalHoldWarning);
-  }
-
-  /**
-   * @deprecated Will not work with federation. Please use `sendFederatedMessage`.
-   */
-  async grantMessage(
-    eventInfoEntity: EventInfoEntity,
-    userIds: QualifiedId[],
-    shouldShowLegalHoldWarning: boolean,
-  ): Promise<void> {
-    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
-      eventInfoEntity.conversationId,
-    );
-    const legalHoldMessageTypes: string[] = [
-      GENERIC_MESSAGE_TYPE.ASSET,
-      GENERIC_MESSAGE_TYPE.EDITED,
-      GENERIC_MESSAGE_TYPE.IMAGE,
-      GENERIC_MESSAGE_TYPE.TEXT,
-    ];
-    const isLegalHoldMessageType =
-      eventInfoEntity.genericMessage && legalHoldMessageTypes.includes(eventInfoEntity.genericMessage.content);
-    const verificationState = conversationEntity.verification_state();
-    const conversationDegraded = verificationState === ConversationVerificationState.DEGRADED;
-    if (conversationEntity.needsLegalHoldApproval) {
-      conversationEntity.needsLegalHoldApproval = false;
-      await showLegalHoldWarningModal(conversationEntity, conversationDegraded);
-      return;
-    } else if (shouldShowLegalHoldWarning) {
-      conversationEntity.needsLegalHoldApproval = !this.userState.self().isOnLegalHold() && isLegalHoldMessageType;
-    }
-    if (!conversationDegraded) {
-      return;
-    }
-    return new Promise((resolve, reject) => {
-      let sendAnyway = false;
-
-      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.qualifiedId);
-
-      return this.userRepository
-        .getUsersById(userIds)
-        .then(userEntities => {
-          let titleString;
-
-          const hasMultipleUsers = userEntities.length > 1;
-          const userNames = joinNames(userEntities, Declension.NOMINATIVE);
-          const titleSubstitutions = capitalizeFirstChar(userNames);
-
-          if (hasMultipleUsers) {
-            titleString = t('modalConversationNewDeviceHeadlineMany', titleSubstitutions);
-          } else {
-            const [firstUser] = userEntities;
-
-            if (firstUser) {
-              titleString = firstUser.isMe
-                ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions)
-                : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
-            } else {
-              const conversationId = eventInfoEntity.conversationId;
-              const type = eventInfoEntity.getType();
-
-              const log = `Missing user IDs to grant '${type}' message in '${conversationId}'`;
-              this.logger.error(log);
-
-              const error = new Error('Failed to grant outgoing message');
-
-              return reject(error);
-            }
-          }
-
-          const actionString = t('modalConversationNewDeviceAction');
-          const messageString = t('modalConversationNewDeviceMessage');
-
-          const options: ModalOptions = {
-            close: () => {
-              if (!sendAnyway) {
-                reject(
-                  new ConversationError(
-                    ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-                    ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-                  ),
-                );
-              }
-            },
-            primaryAction: {
-              action: () => {
-                sendAnyway = true;
-                conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-                resolve();
-              },
-              text: actionString,
-            },
-            text: {
-              message: messageString,
-              title: titleString,
-            },
-          };
-
-          amplify.publish(
-            WebAppEvents.WARNING.MODAL,
-            ModalsViewModel.TYPE.CONFIRM,
-            options,
-            `degraded-${eventInfoEntity.conversationId}`,
-          );
-        })
-        .catch(reject);
-    });
   }
 
   public async updateAllClients(conversationEntity: Conversation, blockSystemMessage: boolean): Promise<void> {
@@ -1524,32 +1304,15 @@ export class MessageRepository {
    * Sends a message to backend that the conversation has been fully read.
    * The message will allow all the self clients to synchronize conversation read state.
    *
-   * @param conversationEntity Conversation to be marked as read
+   * @param conversation Conversation to be marked as read
    */
-  public async markAsRead(conversationEntity: Conversation) {
-    const conversationId = conversationEntity.id;
-    const timestamp = conversationEntity.last_read_timestamp();
-    const protoLastRead = new LastRead({
-      conversationId,
-      lastReadTimestamp: timestamp,
-    });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
-      messageId: createRandomUuid(),
-    });
-
-    const eventInfoEntity = new EventInfoEntity(
-      genericMessage,
-      this.conversationState.self_conversation()?.qualifiedId,
-    );
-    try {
-      await this.sendGenericMessageToConversation(eventInfoEntity);
-      amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
-      this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
-    } catch (error) {
-      const errorMessage = 'Failed to update last read timestamp';
-      this.logger.error(`${errorMessage}: ${error.message}`, error);
-    }
+  public async markAsRead(conversation: Conversation) {
+    const timestamp = conversation.last_read_timestamp();
+    this.conversationService.sendLastRead(conversation.id, timestamp);
+    // TODO notification removal can be improved.
+    // We can add the conversation ID in the payload of the event and only check unread messages for this particular conversation
+    amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
+    this.logger.info(`Marked conversation '${conversation.id}' as read on '${new Date(timestamp).toISOString()}'`);
   }
 
   /**
@@ -1558,30 +1321,8 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
-    const selfConversation = this.conversationState.self_conversation();
-    if (selfConversation?.isFederated()) {
-      // TODO(federation)
-      this.logger.warn('syncly not implemented for federated env');
-      return;
-    }
-    const protoDataTransfer = new DataTransfer({
-      trackingIdentifier: {
-        identifier: countlyId,
-      },
-    });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.DATA_TRANSFER]: protoDataTransfer,
-      messageId: createRandomUuid(),
-    });
-
-    const eventInfoEntity = new EventInfoEntity(genericMessage, selfConversation.qualifiedId);
-    try {
-      await this.sendGenericMessageToConversation(eventInfoEntity);
-      this.logger.info(`Sent countly sync message with ID ${countlyId}`);
-    } catch (error) {
-      const errorMessage = `Failed to send countly sync message with ID ${countlyId}`;
-      this.logger.error(`${errorMessage}: ${error.message}`, error);
-    }
+    await this.conversationService.sendCountlySync(countlyId);
+    this.logger.info(`Sent countly sync message with ID ${countlyId}`);
   }
 
   /**
@@ -1610,171 +1351,6 @@ export class MessageRepository {
 
       targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
-  }
-
-  /**
-   * Estimate whether message should be send as type external.
-   *
-   * @param eventInfoEntity Info about event
-   * @returns Is payload likely to be too big so that we switch to type external?
-   */
-  private async shouldSendAsExternal(eventInfoEntity: EventInfoEntity) {
-    const {conversationId, genericMessage} = eventInfoEntity;
-    const conversationEntity = await this.conversationRepositoryProvider().getConversationById(conversationId);
-    const messageInBytes = new Uint8Array(GenericMessage.encode(genericMessage).finish()).length;
-    const estimatedPayloadInBytes = conversationEntity.getNumberOfClients() * messageInBytes;
-    return estimatedPayloadInBytes > ConversationRepository.CONFIG.EXTERNAL_MESSAGE_THRESHOLD;
-  }
-
-  /**
-   * Send encrypted external message
-   *
-   * @param eventInfoEntity Event to be send
-   * @returns Resolves after sending the external message
-   */
-  private async sendExternalGenericMessage(eventInfoEntity: EventInfoEntity): Promise<ClientMismatch> {
-    const {genericMessage, options} = eventInfoEntity;
-    const messageType = eventInfoEntity.getType();
-    this.logger.info(`Sending external message of type '${messageType}'`, genericMessage);
-
-    try {
-      const encryptedAsset = await encryptAesAsset(GenericMessage.encode(genericMessage).finish());
-      const keyBytes = new Uint8Array(encryptedAsset.keyBytes);
-      const sha256 = new Uint8Array(encryptedAsset.sha256);
-
-      const externalMessage = new External({otrKey: keyBytes, sha256});
-
-      const genericMessageExternal = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.EXTERNAL]: externalMessage,
-        messageId: createRandomUuid(),
-      });
-
-      const payload = await this.cryptography_repository.encryptGenericMessage(
-        options.recipients,
-        genericMessageExternal,
-      );
-      payload.data = arrayToBase64(encryptedAsset.cipherText);
-      payload.native_push = options.nativePush;
-      return await this.sendEncryptedMessage(eventInfoEntity, payload);
-    } catch (error) {
-      this.logger.info('Failed sending external message', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Sends an OTR message to a conversation.
-   *
-   * @note Options for the precondition check on missing clients are:
-   * - `false` - all clients
-   * - `Array<string>` - only clients of listed users
-   * - `true` - force sending
-   *
-   * @param eventInfoEntity Info about message to be sent
-   * @param payload Payload
-   * @deprecated Please use `sendFederatedMessage`
-   * @returns Promise that resolves after sending the encrypted message
-   */
-  private async sendEncryptedMessage(
-    eventInfoEntity: EventInfoEntity,
-    payload: NewOTRMessage<string>,
-  ): Promise<ClientMismatch | undefined> {
-    const {conversationId, genericMessage, options} = eventInfoEntity;
-    const messageId = genericMessage.messageId;
-    let messageType = eventInfoEntity.getType();
-
-    if (messageType === GENERIC_MESSAGE_TYPE.CONFIRMATION) {
-      messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
-    }
-
-    const numberOfUsers = Object.keys(payload.recipients).length;
-    const numberOfClients = Object.values(payload.recipients)
-      .map(clientId => Object.keys(clientId).length)
-      .reduce((totalClients, clients) => totalClients + clients, 0);
-
-    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${JSON.stringify(
-      conversationId,
-    )}'`;
-    this.logger.info(logMessage, payload);
-
-    if (numberOfUsers > numberOfClients) {
-      this.logger.warn(
-        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${JSON.stringify(
-          conversationId,
-        )}'`,
-      );
-    }
-
-    try {
-      const response = await this.conversation_service.postEncryptedMessage(
-        conversationId,
-        payload,
-        options.precondition,
-      );
-      await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
-      return response;
-    } catch (axiosError) {
-      const errorData = axiosError.response?.data as ClientMismatch & {label: BackendErrorLabel};
-
-      const hasNoLegalholdConsent = errorData?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
-      const ignoredMessageTypes = [GENERIC_MESSAGE_TYPE.CONFIRMATION];
-      if (hasNoLegalholdConsent && !ignoredMessageTypes.includes(messageType as GENERIC_MESSAGE_TYPE)) {
-        const replaceLinkLegalHold = replaceLink(
-          Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
-          '',
-          'read-more-legal-hold',
-        );
-        await new Promise<void>(resolve => {
-          amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
-            primaryAction: {
-              action: () => {
-                resolve();
-              },
-            },
-            text: {
-              htmlMessage: t('legalHoldMessageSendingMissingConsentMessage', {}, replaceLinkLegalHold),
-              title: t('legalHoldMessageSendingMissingConsentTitle'),
-            },
-          });
-        });
-        throw new ConversationError(
-          ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-          ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-        );
-      }
-
-      const isUnknownClient = errorData?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
-      if (isUnknownClient) {
-        this.clientRepository.removeLocalClient();
-        return undefined;
-      }
-
-      if (!errorData?.missing) {
-        throw errorData;
-      }
-
-      const payloadWithMissingClients = await this.clientMismatchHandler.onClientMismatch(
-        eventInfoEntity,
-        errorData,
-        payload,
-      );
-
-      const missedUserIds = Object.keys(errorData.missing).map(userId => ({
-        domain: '',
-        id: userId,
-      }));
-      await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
-      this.logger.info(
-        `Updated '${messageType}' message (${messageId}) for conversation '${JSON.stringify(
-          conversationId,
-        )}'. Will ignore missing receivers.`,
-        payloadWithMissingClients,
-      );
-      if (payloadWithMissingClients) {
-        return this.conversation_service.postEncryptedMessage(conversationId, payloadWithMissingClients, true);
-      }
-      return this.conversation_service.postEncryptedMessage(conversationId, payload, true);
-    }
   }
 
   private createCommonMessagePayload(conversation: Conversation) {
