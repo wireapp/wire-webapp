@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.1.0...@wireapp/api-client@16.2.0) (2021-12-16)
+
+
+### Features
+
+* **api-client:** Adapt asset for federation ([#4202](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4202)) ([d2a91bd](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/d2a91bd49e3fb6ff6c5d4817df1588610fb93355))
+
+
+
+
+
 # [16.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.0.0...@wireapp/api-client@16.1.0) (2021-12-09)
 
 
