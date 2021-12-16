@@ -1603,7 +1603,11 @@ export class MessageRepository {
 
     return this.sendAndInjectGenericCoreMessage(message, conversation, {
       ...options,
+      // We want to show the degradation warning only when message should be sent to all participants
+      silentDegradationWarning: !!options?.recipients,
+
       skipInjection: true,
+
       targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
   }
