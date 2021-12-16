@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.1.3...@wireapp/core@20.2.0) (2021-12-16)
+
+
+### Features
+
+* **core:** Add a method to upload an unencrypted asset ([#4203](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4203)) ([7bbef28](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/7bbef28b49b877312512dc59c31d2249f876fa67))
+
+
+
+
+
 ## [20.1.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.1.2...@wireapp/core@20.1.3) (2021-12-16)
 
 **Note:** Version bump only for package @wireapp/core
