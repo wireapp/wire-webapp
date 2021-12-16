@@ -307,11 +307,9 @@ export class CallingRepository {
     // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
-    return (
-      checkMismatch ? 
-      this.messageRepository.handleClientMismatch(call.conversationId, {missing} as ClientMismatch, consentType) :
-      true
-    );
+    return checkMismatch
+      ? this.messageRepository.handleClientMismatch(call.conversationId, {missing} as ClientMismatch, consentType)
+      : true;
   }
 
   private readonly updateCallQuality = (
