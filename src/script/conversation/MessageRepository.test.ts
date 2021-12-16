@@ -38,7 +38,6 @@ import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {ClientRepository} from '../client/ClientRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {EventRepository} from '../event/EventRepository';
@@ -51,7 +50,6 @@ import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ClientState} from '../client/ClientState';
 import {ConversationState} from './ConversationState';
-import {ConversationService} from './ConversationService';
 import {EventService} from '../event/EventService';
 import {Core} from '../service/CoreSingleton';
 import {container} from 'tsyringe';
@@ -139,115 +137,6 @@ describe('MessageRepository', () => {
     });
   });
 
-  describe('shouldSendAsExternal', () => {
-    it('should return true for big payload', async () => {
-      const largeConversationEntity = generateConversation();
-      largeConversationEntity.participating_user_ids(
-        Array(128)
-          .fill(undefined)
-          .map((x, i) => ({
-            domain: '',
-            id: i.toString(),
-          })),
-      );
-
-      const text = new Text({
-        content:
-          'massive external message massive external message massive external message massive external message ' +
-          'massive external message massive external message massive external message massive external message ' +
-          'massive external message massive external message massive external message massive external message ' +
-          'massive external message massive external message massive external message massive external message ' +
-          'massive external message massive external message massive external message massive external message ' +
-          'massive external message massive external message massive external message massive external message ' +
-          'massive external message massive external message massive external message massive external message ' +
-          'massive external message massive external message massive external message massive external message ' +
-          'massive external message massive external message massive external message massive external message',
-      });
-      const genericMessage = new GenericMessage({[GENERIC_MESSAGE_TYPE.TEXT]: text, messageId: createRandomUuid()});
-      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: '', id: largeConversationEntity.id});
-
-      const userState = new UserState();
-      const teamState = new TeamState(userState);
-      const conversationState = new ConversationState(userState, teamState);
-      const clientState = new ClientState();
-
-      const conversationRepository = {
-        getConversationById: jest.fn().mockImplementation(() => largeConversationEntity),
-      };
-
-      const messageRepository = new MessageRepository(
-        {} as ClientRepository,
-        () => conversationRepository as unknown as ConversationRepository,
-        {} as CryptographyRepository,
-        {} as EventRepository,
-        {} as MessageSender,
-        {} as PropertiesRepository,
-        {} as ServerTimeHandler,
-        {} as UserRepository,
-        {} as ConversationService,
-        {} as AssetRepository,
-        userState,
-        teamState,
-        conversationState,
-        clientState,
-      );
-
-      const shouldSendAsExternal = await messageRepository['shouldSendAsExternal'](eventInfoEntity);
-      expect(conversationRepository.getConversationById).toHaveBeenCalled();
-      expect(shouldSendAsExternal).toBeTruthy();
-    });
-
-    it('should return false for small payload', async () => {
-      const smallConversationEntity = generateConversation();
-      smallConversationEntity.participating_user_ids([
-        {
-          domain: '',
-          id: '0',
-        },
-        {
-          domain: '',
-          id: '1',
-        },
-      ]);
-
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
-        messageId: createRandomUuid(),
-      });
-      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: '', id: smallConversationEntity.id});
-
-      const userState = new UserState();
-      const teamState = new TeamState(userState);
-      const conversationState = new ConversationState(userState, teamState);
-      const clientState = new ClientState();
-
-      const conversationRepository = {
-        getConversationById: jest.fn().mockImplementation(async () => smallConversationEntity),
-      };
-
-      const messageRepository = new MessageRepository(
-        {} as ClientRepository,
-        () => conversationRepository as unknown as ConversationRepository,
-        {} as CryptographyRepository,
-        {} as EventRepository,
-        {} as MessageSender,
-        {} as PropertiesRepository,
-        {} as ServerTimeHandler,
-        {} as UserRepository,
-        {} as ConversationService,
-        {} as AssetRepository,
-        userState,
-        teamState,
-        conversationState,
-        clientState,
-      );
-
-      const shouldSendAsExternal = await messageRepository['shouldSendAsExternal'](eventInfoEntity);
-      expect(conversationRepository.getConversationById).toHaveBeenCalled();
-      expect(shouldSendAsExternal).toBeFalsy();
-    });
-  });
-
   describe('deleteMessageForEveryone', () => {
     beforeEach(() => {
       spyOn(core.service!.conversation, 'deleteMessageEveryone');
@@ -270,7 +159,6 @@ describe('MessageRepository', () => {
       const clientState = new ClientState();
 
       const messageRepository = new MessageRepository(
-        {} as ClientRepository,
         () => ({} as ConversationRepository),
         {} as CryptographyRepository,
         {} as EventRepository,
@@ -278,7 +166,6 @@ describe('MessageRepository', () => {
         {} as PropertiesRepository,
         {} as ServerTimeHandler,
         {} as UserRepository,
-        {} as ConversationService,
         {} as AssetRepository,
         userState,
         teamState,
@@ -324,7 +211,6 @@ describe('MessageRepository', () => {
       const messageSender = new MessageSender();
 
       const messageRepository = new MessageRepository(
-        {} as ClientRepository,
         () => conversationRepository as unknown as ConversationRepository,
         {} as CryptographyRepository,
         {eventService: eventService as unknown as EventService} as EventRepository,
@@ -332,7 +218,6 @@ describe('MessageRepository', () => {
         {} as PropertiesRepository,
         {} as ServerTimeHandler,
         {} as UserRepository,
-        {} as ConversationService,
         {} as AssetRepository,
         userState,
         teamState,
@@ -365,7 +250,6 @@ describe('MessageRepository', () => {
       clientState.currentClient(new ClientEntity(true, ''));
       cryptographyRepository = testFactory.cryptography_repository as CryptographyRepository;
       messageRepository = new MessageRepository(
-        {} as ClientRepository,
         () => ({} as ConversationRepository),
         cryptographyRepository,
         {} as EventRepository,
@@ -373,7 +257,6 @@ describe('MessageRepository', () => {
         {} as PropertiesRepository,
         {} as ServerTimeHandler,
         {} as UserRepository,
-        {} as ConversationService,
         {} as AssetRepository,
         userState,
         teamState,

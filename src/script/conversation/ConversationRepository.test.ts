@@ -1214,18 +1214,6 @@ describe('ConversationRepository', () => {
           expect(testFactory.conversation_repository['conversationState'].conversations().length).toBe(4);
         });
     });
-
-    it('should generate a user-client-map including users with clients', () => {
-      const [, dudes] = testFactory.conversation_repository['conversationState'].conversations();
-      const user_ets = dudes.participating_user_ets();
-
-      return testFactory.message_repository.createRecipients({domain: '', id: dudes.id}).then(recipients => {
-        expect(Object.keys(recipients).length).toBe(2);
-        expect(recipients[bob.id].length).toBe(2);
-        expect(recipients[john.id].length).toBe(1);
-        expect(user_ets.length).toBe(2);
-      });
-    });
   });
 
   describe('addMissingMember', () => {
