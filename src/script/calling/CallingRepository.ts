@@ -291,8 +291,8 @@ export class CallingRepository {
     this.callState.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
-  private async pushClients(conversationId: QualifiedId): Promise<void> {
-    const {id, domain} = conversationId;
+  private async pushClients(call: Call, checkMismatch?: boolean): Promise<boolean> {
+    const {id, domain} = call.conversationId;
     const missing = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
     const qualifiedClients = isQualifiedUserClients(missing)
       ? flattenQualifiedUserClients(missing)
@@ -303,9 +303,14 @@ export class CallingRepository {
         data.map(clientid => ({clientid, userid: this.serializeQualifiedId(userId)})),
       ),
     );
-    this.wCall.setClientsForConv(this.wUser, this.serializeQualifiedId(conversationId), JSON.stringify({clients}));
+    this.wCall.setClientsForConv(this.wUser, this.serializeQualifiedId(call.conversationId), JSON.stringify({clients}));
     // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
-    this.messageRepository.handleClientMismatch(conversationId, {missing} as ClientMismatch);
+    const consentType =
+      this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
+    return (
+      !checkMismatch ||
+      this.messageRepository.handleClientMismatch(call.conversationId, {missing} as ClientMismatch, consentType)
+    );
   }
 
   private readonly updateCallQuality = (
@@ -771,7 +776,11 @@ export class CallingRepository {
         call.getSelfParticipant().releaseVideoStream(true);
       }
       await this.warmupMediaStreams(call, true, isVideoCall);
-      await this.pushClients(call.conversationId);
+      const shouldContinueCall = await this.pushClients(call, true);
+      if (!shouldContinueCall) {
+        this.rejectCall(call.conversationId);
+        return;
+      }
 
       if (Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && call.conversationType === CONV_TYPE.CONFERENCE) {
         this.setMute(true);
@@ -1261,8 +1270,9 @@ export class CallingRepository {
     this.updateParticipantVideoState(call, members);
   };
 
-  private readonly requestClients = (wUser: number, convId: SerializedConversationId, _: number) => {
-    this.pushClients(this.parseQualifiedId(convId));
+  private readonly requestClients = async (wUser: number, convId: SerializedConversationId, _: number) => {
+    const call = this.findCall(this.parseQualifiedId(convId));
+    this.pushClients(call);
   };
 
   private readonly getCallMediaStream = async (
