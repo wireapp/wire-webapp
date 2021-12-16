@@ -488,7 +488,7 @@ export class EventRepository {
    * @param event Mapped event to be distributed
    * @param source Source of notification
    */
-  private distributeEvent(event: EventRecord, source: EventSource): void {
+  private async distributeEvent(event: EventRecord, source: EventSource): Promise<EventRecord> {
     const {conversation: conversationId, from: userId, type} = event;
 
     const hasIds = conversationId && userId;
@@ -515,6 +515,9 @@ export class EventRepository {
       default:
         amplify.publish(type, event, source);
     }
+    // Wait for the event handlers to have finished their async tasks
+    await new Promise(res => setTimeout(res, 0));
+    return event;
   }
 
   /**
@@ -580,7 +583,7 @@ export class EventRepository {
    * @param source Source of event
    * @returns The distributed event
    */
-  private handleEventDistribution(event: EventRecord, source: EventSource): EventRecord {
+  private handleEventDistribution(event: EventRecord, source: EventSource): Promise<EventRecord> {
     const eventDate = this.getIsoDateFromEvent(event);
     const isInjectedEvent = source === EventRepository.SOURCE.INJECTED;
     const canSetEventDate = !isInjectedEvent && eventDate;
@@ -601,9 +604,7 @@ export class EventRepository {
       this.validateCallEventLifetime(event);
     }
 
-    this.distributeEvent(event, source);
-
-    return event;
+    return this.distributeEvent(event, source);
   }
 
   /**

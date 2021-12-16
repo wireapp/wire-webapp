@@ -722,9 +722,11 @@ export class MessageRepository {
         const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
         const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
         this.trackContributed(conversation, genericMessage);
-        await this.cryptography_repository.cryptographyMapper
-          .mapGenericMessage(genericMessage, optimisticEvent as EventRecord)
-          .then(mappedEvent => this.eventRepository.injectEvent(mappedEvent));
+        const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
+          genericMessage,
+          optimisticEvent as EventRecord,
+        );
+        await this.eventRepository.injectEvent(mappedEvent);
       }
       const isCallingMessage = payload.type === PayloadBundleType.CALL;
       const consentType = isCallingMessage ? CONSENT_TYPE.OUTGOING_CALL : CONSENT_TYPE.MESSAGE;
