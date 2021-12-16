@@ -308,8 +308,9 @@ export class CallingRepository {
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
     return (
-      !checkMismatch ||
-      this.messageRepository.handleClientMismatch(call.conversationId, {missing} as ClientMismatch, consentType)
+      checkMismatch ? 
+      this.messageRepository.handleClientMismatch(call.conversationId, {missing} as ClientMismatch, consentType) :
+      true
     );
   }
 
