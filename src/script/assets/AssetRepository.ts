@@ -217,8 +217,8 @@ export class AssetRepository {
     image: Blob,
     domain?: string,
   ): Promise<{
-    mediumImageKey: string;
-    previewImageKey: string;
+    mediumImageKey: {domain?: string; key: string};
+    previewImageKey: {domain?: string; key: string};
   }> {
     const [{compressedBytes: previewImage}, {compressedBytes: mediumImage}] = await Promise.all([
       this.compressImage(image),
@@ -231,13 +231,13 @@ export class AssetRepository {
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
     };
-    const previewPicture = (await this.assetCoreService.uploadAsset(Buffer.from(previewImage), options)).response;
+    const previewPicture = (await this.assetCoreService.uploadRawAsset(previewImage, options)).response;
 
-    const mediumPicture = (await this.assetCoreService.uploadAsset(Buffer.from(mediumImage), options)).response;
+    const mediumPicture = (await this.assetCoreService.uploadRawAsset(mediumImage, options)).response;
 
     return {
-      mediumImageKey: (await previewPicture).key,
-      previewImageKey: (await mediumPicture).key,
+      mediumImageKey: await previewPicture,
+      previewImageKey: await mediumPicture,
     };
   }
 
