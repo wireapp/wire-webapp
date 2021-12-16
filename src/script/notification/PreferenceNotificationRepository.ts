@@ -20,17 +20,25 @@
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {groupBy} from 'underscore';
-import {USER_EVENT, UserEvent} from '@wireapp/api-client/src/event/';
+import {USER_EVENT, UserEvent} from '@wireapp/api-client/src/event';
+import type {QualifiedId} from '@wireapp/api-client/src/user';
+import {ClientType} from '@wireapp/api-client/src/client';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
 import type {ClientEntity} from '../client/ClientEntity';
 import type {User} from '../entity/User';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
-import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
+export type ClientNotificationData = {
+  domain?: string;
+  id: string;
+  model: string;
+  time: string;
+  type: ClientType;
+};
 export interface Notification {
-  data: ClientEntity | boolean;
+  data: ClientNotificationData | boolean;
   type: string;
 }
 
@@ -70,8 +78,9 @@ export class PreferenceNotificationRepository {
 
     amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedId, clientEntity?: ClientEntity) => {
       if (clientEntity && !clientEntity.isLegalHold() && matchQualifiedIds(user, selfUserObservable())) {
+        const {id, domain, type, time, model} = clientEntity;
         this.notifications.push({
-          data: clientEntity,
+          data: {domain, id, model, time, type},
           type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
         });
       }
@@ -99,11 +108,14 @@ export class PreferenceNotificationRepository {
 
   onClientRemove(_userId: string, clientId: string, domain: string | null): void {
     this.notifications.remove(({data: clientEntity}) => {
-      const isExpectedId =
-        typeof clientEntity !== 'boolean' &&
-        clientEntity.id === clientId &&
-        (!domain || clientEntity.domain === domain);
-      return isExpectedId && (clientEntity as ClientEntity).isPermanent();
+      if (typeof clientEntity === 'boolean') {
+        return false;
+      }
+      const isExpectedId = matchQualifiedIds(
+        {domain: clientEntity.domain, id: clientEntity.id},
+        {domain, id: clientId},
+      );
+      return isExpectedId && clientEntity.type === ClientType.PERMANENT;
     });
   }
 
