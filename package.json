@@ -2,7 +2,7 @@
   "dependencies": {
     "@wireapp/antiscroll-2": "1.0.2",
     "@wireapp/avs": "8.0.5",
-    "@wireapp/core": "20.1.2",
+    "@wireapp/core": "20.2.0",
     "@wireapp/react-ui-kit": "7.55.0",
     "@wireapp/store-engine-dexie": "1.6.7",
     "@wireapp/store-engine-sqleet": "1.7.12",
@@ -43,7 +43,7 @@
     "switch-path": "1.2.0",
     "tsyringe": "4.3.0",
     "uint32": "0.2.1",
-    "underscore": "1.13.1",
+    "underscore": "1.13.2",
     "use-react-router": "1.0.7",
     "uuidjs": "4.2.9",
     "webrtc-adapter": "6.4.8"
