@@ -882,6 +882,20 @@ export class CallingRepository {
     }
   }
 
+  public async refreshVideoInput(): Promise<MediaStream> {
+    const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
+    this.stopMediaSource(MediaType.VIDEO);
+    this.changeMediaSource(stream, MediaType.VIDEO);
+    return stream;
+  }
+
+  public async refreshAudioInput(): Promise<MediaStream> {
+    const stream = await this.mediaStreamHandler.requestMediaStream(true, false, false, false);
+    this.stopMediaSource(MediaType.AUDIO);
+    this.changeMediaSource(stream, MediaType.AUDIO);
+    return stream;
+  }
+
   /**
    * @returns `true` if a media stream has been stopped.
    */

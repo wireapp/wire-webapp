@@ -36,11 +36,11 @@ const logger = getLogger('CameraPreferences');
 
 interface CameraPreferencesProps {
   devicesHandler: MediaDevicesHandler;
-  streamCallback: (stream: MediaStream) => void;
+  refreshStream: () => Promise<MediaStream>;
   streamHandler: MediaStreamHandler;
 }
 
-const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, streamHandler, streamCallback}) => {
+const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, streamHandler, refreshStream}) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
   const [videoElement, setVideoElement] = useEffectRef<HTMLVideoElement>();
@@ -57,9 +57,7 @@ const CameraPreferences: React.FC<CameraPreferencesProps> = ({devicesHandler, st
   const requestStream = async () => {
     setIsRequesting(true);
     try {
-      const stream = await streamHandler.requestMediaStream(false, true, false, false);
-      setStream(stream);
-      streamCallback(stream);
+      setStream(await refreshStream());
     } catch (error) {
       logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
       setStream(null);
