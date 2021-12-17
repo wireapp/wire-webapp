@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.3.0...@wireapp/core@20.4.0) (2021-12-17)
+
+
+### Features
+
+* **core:** Allow broadcasting to a limited set of users ([99dca26](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/99dca265bc38e84b6279ca5ac9a928e6ef7e3239))
+
+
+
+
+
 # [20.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.2.0...@wireapp/core@20.3.0) (2021-12-17)
 
 
