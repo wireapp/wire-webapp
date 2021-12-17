@@ -115,6 +115,7 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
 
   const switchCameraInput = (call: Call, deviceId: string) => {
     mediaDevicesHandler.currentDeviceId.videoInput(deviceId);
+    callingRepository.refreshVideoInput();
   };
 
   const toggleCamera = (call: Call) => {

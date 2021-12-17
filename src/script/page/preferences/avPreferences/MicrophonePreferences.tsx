@@ -36,14 +36,14 @@ const logger = getLogger('MicrophonePreferences');
 
 interface MicrophonePreferencesProps {
   devicesHandler: MediaDevicesHandler;
-  streamCallback: (stream: MediaStream) => void;
+  refreshStream: () => Promise<MediaStream>;
   streamHandler: MediaStreamHandler;
 }
 
 const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
   devicesHandler,
   streamHandler,
-  streamCallback,
+  refreshStream,
 }) => {
   const [isRequesting, setIsRequesting] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
@@ -60,9 +60,7 @@ const MicrophonePreferences: React.FC<MicrophonePreferencesProps> = ({
   const requestStream = async () => {
     setIsRequesting(true);
     try {
-      const stream = await streamHandler.requestMediaStream(true, false, false, false);
-      setStream(stream);
-      streamCallback(stream);
+      setStream(await refreshStream());
     } catch (error) {
       logger.warn(`Requesting MediaStream for type "${MediaType.AUDIO}" failed: ${error.message}`, error);
       setStream(null);
