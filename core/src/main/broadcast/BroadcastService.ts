@@ -18,7 +18,7 @@
  */
 
 import type {APIClient} from '@wireapp/api-client';
-import {ClientMismatch} from '@wireapp/api-client/src/conversation';
+import {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation';
 import type {UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
@@ -55,12 +55,13 @@ export class BroadcastService {
 
   public async broadcastGenericMessage(
     genericMessage: GenericMessage,
-    preKeyBundles: UserPreKeyBundleMap,
+    recipients: UserPreKeyBundleMap | UserClients,
     sendAsProtobuf?: boolean,
   ): Promise<ClientMismatch> {
     const plainTextArray = GenericMessage.encode(genericMessage).finish();
-    return this.messageService.sendMessage(this.apiClient.validatedClientId, preKeyBundles, plainTextArray, {
+    return this.messageService.sendMessage(this.apiClient.validatedClientId, recipients, plainTextArray, {
       sendAsProtobuf,
+      reportMissing: Object.keys(recipients),
     });
   }
 }
