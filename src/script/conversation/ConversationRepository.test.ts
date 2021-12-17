@@ -175,15 +175,8 @@ describe('ConversationRepository', () => {
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
 
-      spyOn(testFactory.conversation_repository['conversation_service'], 'postEncryptedMessage').and.callFake(() => {
-        const missingClientsError: any = new Error('Fake missing client error');
-        missingClientsError.deleted = {};
-        missingClientsError.missing = {
-          [conversationPartner.id]: ['1e66e04948938c2c', '53761bec3f10a6d9', 'a9c8c385737b14fe'],
-        };
-        missingClientsError.redundant = {};
-        missingClientsError.time = new Date().toISOString();
-        return Promise.reject(missingClientsError);
+      spyOn(testFactory.conversation_repository['messageRepository'], 'updateAllClients').and.callFake(conversation => {
+        spyOn(conversation, 'legalHoldStatus').and.returnValue(LegalHoldStatus.ENABLED);
       });
 
       spyOn(testFactory.client_service, 'getClientsByUserId').and.returnValue(
