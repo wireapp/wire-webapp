@@ -77,6 +77,7 @@ import type {UserService} from './UserService';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
+import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -109,6 +110,7 @@ export class UserRepository {
     serverTimeHandler: ServerTimeHandler,
     private readonly propertyRepository: PropertiesRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly broadcastRepository = container.resolve(BroadcastRepository),
   ) {
     this.logger = getLogger('UserRepository');
 
@@ -418,7 +420,7 @@ export class UserRepository {
       UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
     );
 
-    amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
+    this.broadcastRepository.broadcastGenericMessage(genericMessage, recipients);
   };
 
   private onLegalHoldRequestCanceled(eventJson: UserLegalHoldDisableEvent): void {

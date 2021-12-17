@@ -50,7 +50,6 @@ import {UserRepository} from '../user/UserRepository';
 import {serverTimeHandler} from '../time/serverTimeHandler';
 import {CallingRepository} from '../calling/CallingRepository';
 import {BackupRepository} from '../backup/BackupRepository';
-import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 import {NotificationRepository} from '../notification/NotificationRepository';
 import {IntegrationRepository} from '../integration/IntegrationRepository';
 import {IntegrationService} from '../integration/IntegrationService';
@@ -96,7 +95,6 @@ import {ContentViewModel} from '../view_model/ContentViewModel';
 import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
 import {SelfService} from '../self/SelfService';
-import {BroadcastService} from '../broadcast/BroadcastService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
 import {AssetService} from '../assets/AssetService';
@@ -299,13 +297,6 @@ class App {
       readReceiptMiddleware.processEvent.bind(readReceiptMiddleware),
     ]);
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
-    repositories.broadcast = new BroadcastRepository(
-      new BroadcastService(),
-      repositories.client,
-      repositories.message,
-      repositories.cryptography,
-      sendingMessageQueue,
-    );
     repositories.calling = new CallingRepository(
       repositories.message,
       repositories.event,
