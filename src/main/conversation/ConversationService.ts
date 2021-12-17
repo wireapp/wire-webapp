@@ -28,10 +28,10 @@ import {
   QualifiedUserClients,
   UserClients,
   ClientMismatch,
-} from '@wireapp/api-client/src/conversation/';
-import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data/';
-import type {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event/';
-import type {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+} from '@wireapp/api-client/src/conversation';
+import {CONVERSATION_TYPING, ConversationMemberUpdateData} from '@wireapp/api-client/src/conversation/data';
+import type {ConversationMemberLeaveEvent} from '@wireapp/api-client/src/event';
+import type {QualifiedId, QualifiedUserPreKeyBundleMap, UserPreKeyBundleMap} from '@wireapp/api-client/src/user';
 import {
   Asset,
   ButtonAction,
@@ -41,9 +41,11 @@ import {
   ClientAction,
   Composite,
   Confirmation,
+  DataTransfer,
   Ephemeral,
   GenericMessage,
   Knock,
+  LastRead,
   Location,
   MessageDelete,
   MessageEdit,
@@ -153,6 +155,7 @@ export interface MessageSendingCallbacks {
 export class ConversationService {
   public readonly messageTimer: MessageTimer;
   private readonly messageService: MessageService;
+  private selfConversationId?: QualifiedId;
 
   constructor(private readonly apiClient: APIClient, cryptographyService: CryptographyService) {
     this.messageTimer = new MessageTimer();
@@ -270,9 +273,13 @@ export class ConversationService {
     }, {});
   }
 
-  private getSelfConversation(): Promise<Conversation> {
-    const {userId} = this.apiClient.context!;
-    return this.apiClient.conversation.api.getConversation(userId);
+  private async getSelfConversationId(): Promise<QualifiedId> {
+    if (!this.selfConversationId) {
+      const {userId} = this.apiClient.context!;
+      const {qualified_id, id} = await this.apiClient.conversation.api.getConversation(userId);
+      this.selfConversationId = qualified_id || {id, domain: ''};
+    }
+    return this.selfConversationId;
   }
 
   private async getQualifiedRecipientsForConversation(
@@ -646,7 +653,6 @@ export class ConversationService {
     timestamp: number | Date = new Date(),
     messageId: string = MessageBuilder.createId(),
     sendAsProtobuf?: boolean,
-    conversationDomain?: string,
   ): Promise<ClearConversationMessage> {
     if (timestamp instanceof Date) {
       timestamp = timestamp.getTime();
@@ -664,10 +670,10 @@ export class ConversationService {
       messageId,
     });
 
-    const {id: selfConversationId} = await this.getSelfConversation();
+    const {id: selfConversationId, domain} = await this.getSelfConversationId();
 
     await this.sendGenericMessage(this.apiClient.validatedClientId, selfConversationId, genericMessage, {
-      conversationDomain,
+      conversationDomain: domain,
       sendAsProtobuf,
     });
 
@@ -682,6 +688,60 @@ export class ConversationService {
       timestamp: Date.now(),
       type: PayloadBundleType.CONVERSATION_CLEAR,
     };
+  }
+
+  /**
+   * Sends a LastRead message to the current user's self conversation.
+   * This will allow all the user's devices to compute which messages are unread
+   *
+   * @param conversationId The conversation which has been read
+   * @param lastReadTimestamp The timestamp at which the conversation was read
+   * @param sendAsProtobuf?
+   * @return Resolves when the message has been sent
+   */
+  public async sendLastRead(conversationId: string, lastReadTimestamp: number, sendAsProtobuf?: boolean) {
+    const lastRead = new LastRead({
+      conversationId,
+      lastReadTimestamp,
+    });
+
+    const genericMessage = GenericMessage.create({
+      [GenericMessageType.LAST_READ]: lastRead,
+      messageId: MessageBuilder.createId(),
+    });
+
+    const {id: selfConversationId, domain: selfConversationDomain} = await this.getSelfConversationId();
+
+    return this.sendGenericMessage(this.apiClient.validatedClientId, selfConversationId, genericMessage, {
+      conversationDomain: selfConversationDomain,
+      sendAsProtobuf,
+    });
+  }
+
+  /**
+   * Syncs all self user's devices with the countly id
+   *
+   * @param countlyId The countly id of the current device
+   * @param sendAsProtobuf?
+   * @return Resolves when the message has been sent
+   */
+  public async sendCountlySync(countlyId: string, sendAsProtobuf?: boolean) {
+    const {id: selfConversationId, domain: selfConversationDomain} = await this.getSelfConversationId();
+
+    const dataTransfer = new DataTransfer({
+      trackingIdentifier: {
+        identifier: countlyId,
+      },
+    });
+    const genericMessage = new GenericMessage({
+      [GenericMessageType.DATA_TRANSFER]: dataTransfer,
+      messageId: MessageBuilder.createId(),
+    });
+
+    return this.sendGenericMessage(this.apiClient.validatedClientId, selfConversationId, genericMessage, {
+      conversationDomain: selfConversationDomain,
+      sendAsProtobuf,
+    });
   }
 
   /**
@@ -740,7 +800,7 @@ export class ConversationService {
       messageId,
     });
 
-    const {id: selfConversationId} = await this.getSelfConversation();
+    const {id: selfConversationId} = await this.getSelfConversationId();
 
     await this.sendGenericMessage(this.apiClient.validatedClientId, selfConversationId, genericMessage, {
       sendAsProtobuf,
