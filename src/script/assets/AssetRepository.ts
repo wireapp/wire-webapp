@@ -268,7 +268,15 @@ export class AssetRepository {
     return isEternal ? AssetRetentionPolicy.ETERNAL : AssetRetentionPolicy.PERSISTENT;
   }
 
-  async uploadFile(file: Blob, messageId: string, options: AssetUploadOptions) {
+  /**
+   * Uploads a file to the backend
+   *
+   * @param file The raw content of the file to upload
+   * @param messageId The message the file is associated with
+   * @param options
+   * @param onCancel? Will be called if the upload has been canceled
+   */
+  async uploadFile(file: Blob, messageId: string, options: AssetUploadOptions, onCancel?: () => void) {
     const bytes = await loadFileBuffer(file);
     const progressObservable = ko.observable(0);
     this.uploadProgressQueue.push({messageId, progress: progressObservable});
@@ -285,7 +293,10 @@ export class AssetRepository {
         progressObservable(percentage);
       },
     );
-    this.uploadCancelTokens[messageId] = request.cancel;
+    this.uploadCancelTokens[messageId] = () => {
+      request.cancel();
+      onCancel?.();
+    };
 
     const response = await request.response;
     this.removeFromUploadQueue(messageId);
