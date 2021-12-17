@@ -21,9 +21,6 @@ import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {createRandomUuid} from 'Util/util';
-import {TestFactory} from '../../../test/helper/TestFactory';
-import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
-import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {User} from 'src/script/entity/User';
@@ -34,7 +31,7 @@ import {ConversationRepository} from './ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {MessageSender} from '../message/MessageSender';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
-import {ServerTimeHandler} from '../time/serverTimeHandler';
+import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
@@ -46,6 +43,8 @@ import {container} from 'tsyringe';
 import {ClientEntity} from '../client/ClientEntity';
 import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
+
+const selfUser = new User('selfid', '');
 
 type MessageRepositoryDependencies = {
   assetRepository: AssetRepository;
@@ -64,12 +63,14 @@ type MessageRepositoryDependencies = {
 };
 function buildMessageRepository(): [MessageRepository, MessageRepositoryDependencies] {
   const userState = new UserState();
+  userState.self(selfUser);
   const teamState = new TeamState(userState);
   const conversationState = new ConversationState(userState, teamState);
   const clientState = new ClientState();
   clientState.currentClient(new ClientEntity(true, ''));
   const core = container.resolve(Core);
   core.initServices({} as any);
+  /* eslint-disable sort-keys */
   const dependencies = {
     assetRepository: {} as AssetRepository,
     clientState,
@@ -79,19 +80,18 @@ function buildMessageRepository(): [MessageRepository, MessageRepositoryDependen
     core,
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any, {} as any),
     messageSender: {} as MessageSender,
-    propertiesRepository: {} as PropertiesRepository,
-    serverTimeHandler: {} as ServerTimeHandler,
+    propertiesRepository: new PropertiesRepository({} as any, {} as any),
+    serverTimeHandler: serverTimeHandler,
     teamState,
     userRepository: {} as UserRepository,
     userState,
   };
+  /* eslint-enable sort-keys */
   const deps = Object.values(dependencies) as ConstructorParameters<typeof MessageRepository>;
   return [new MessageRepository(...deps), dependencies];
 }
 
 describe('MessageRepository', () => {
-  const testFactory = new TestFactory();
-
   const generateConversation = (
     conversation_type = CONVERSATION_TYPE.REGULAR,
     connection_status = ConnectionStatus.ACCEPTED,
@@ -105,53 +105,31 @@ describe('MessageRepository', () => {
     conversation.connection(connectionEntity);
     conversation.legalHoldStatus(LegalHoldStatus.DISABLED);
 
-    const selfUser = new User('selfid');
-    selfUser.isMe = true;
     conversation.selfUser(selfUser);
 
     return conversation;
   };
 
   describe('sendTextWithLinkPreview', () => {
-    it.skip('sends ephemeral message (within the range [1 second, 1 year])', async () => {
+    it('sends a text message', async () => {
+      const [messageRepository, {eventRepository, core, propertiesRepository}] = buildMessageRepository();
+      spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
+      spyOn(core.service!.conversation, 'send').and.returnValue(Promise.resolve());
+      spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve());
+
       const conversation = generateConversation();
-      testFactory.conversation_repository['conversationState'].conversations([conversation]);
-
-      const inBoundValues = [1000, 5000, 12341234, 31536000000];
-      const outOfBoundValues = [1, 999, 31536000001, 31557600000];
-      const expectedValues = inBoundValues
-        .map(val => val.toString())
-        .concat(['1000', '1000', '31536000000', '31536000000']);
-
-      spyOn(testFactory.message_repository, 'getMessageInConversationById').and.returnValue(
-        Promise.resolve(new Message()),
-      );
-      spyOn(testFactory.conversation_service, 'postEncryptedMessage').and.returnValue(Promise.resolve({}));
-      spyOn(ConversationMapper, 'mapConversations').and.returnValue(Promise.resolve(conversation));
-      spyOn<any>(testFactory.conversation_repository, 'fetchConversationById').and.returnValue(
-        Promise.resolve(conversation),
-      );
-      spyOn(testFactory.cryptography_repository, 'encryptGenericMessage').and.callFake(
-        (conversationId, genericMessage) => {
-          const {content, ephemeral} = genericMessage;
-
-          expect(content).toBe(GENERIC_MESSAGE_TYPE.EPHEMERAL);
-          expect(ephemeral.content).toBe(GENERIC_MESSAGE_TYPE.TEXT);
-          expect(ephemeral.expireAfterMillis.toString()).toBe(expectedValues.shift());
-          return Promise.resolve({
-            recipients: {},
-          });
-        },
-      );
-
-      const sentPromises = inBoundValues.concat(outOfBoundValues).map(expiration => {
-        conversation.localMessageTimer(expiration);
-        conversation.selfUser(new User(createRandomUuid(), null));
-        const messageText = 'hello there';
-        return testFactory.message_repository.sendTextWithLinkPreview(conversation, messageText, []);
+      await messageRepository.sendTextWithLinkPreview(conversation, 'hello there', []);
+      expect(core.service!.conversation.send).toHaveBeenCalledWith({
+        callbacks: expect.any(Object),
+        conversationDomain: undefined,
+        nativePush: true,
+        payloadBundle: expect.objectContaining({
+          content: expect.objectContaining({text: 'hello there'}),
+          conversation: conversation.id,
+        }),
+        targetMode: undefined,
+        userIds: expect.any(Object),
       });
-      const sentMessages = await Promise.all(sentPromises);
-      expect(testFactory.conversation_service.postEncryptedMessage).toHaveBeenCalledTimes(sentMessages.length * 2);
     });
   });
 
