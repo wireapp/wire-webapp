@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.2.0...@wireapp/core@20.3.0) (2021-12-17)
+
+
+### Features
+
+* **core:** Add lastRead and Countly message to the core ([#4204](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4204)) ([64a2336](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/64a2336f9de1f7ada34bd88652c624e28ac8169d))
+
+
+
+
+
 # [20.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.1.3...@wireapp/core@20.2.0) (2021-12-16)
 
 
