@@ -45,6 +45,7 @@ import {EventRepository} from '../event/EventRepository';
 import {EventService} from '../event/EventService';
 
 const selfUser = new User('selfid', '');
+selfUser.isMe = true;
 
 type MessageRepositoryDependencies = {
   assetRepository: AssetRepository;
