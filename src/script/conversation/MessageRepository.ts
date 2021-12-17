@@ -64,7 +64,6 @@ import {EventBuilder} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
-import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
@@ -1173,19 +1172,6 @@ export class MessageRepository {
       });
     }
     return messagePromise as Promise<ContentMessage>;
-  }
-
-  static getOtherUsersWithoutClients(eventInfoEntity: EventInfoEntity, selfUserId: string): string[] {
-    const allRecipientsBesideSelf = Object.keys(eventInfoEntity.options.recipients).filter(id => id !== selfUserId);
-    const userIdsWithoutClients = [];
-    for (const userId of allRecipientsBesideSelf) {
-      const clientIdsOfUser = eventInfoEntity.options.recipients[userId];
-      const noRemainingClients = clientIdsOfUser.length === 0;
-      if (noRemainingClients) {
-        userIdsWithoutClients.push(userId);
-      }
-    }
-    return userIdsWithoutClients;
   }
 
   async triggerTeamMemberLeaveChecks(users: APIClientUser[]): Promise<void> {

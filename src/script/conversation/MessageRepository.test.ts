@@ -18,20 +18,12 @@
  */
 
 import {ConnectionStatus} from '@wireapp/api-client/src/connection/';
-import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE, CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
-import {GenericMessage, LegalHoldStatus, Text} from '@wireapp/protocol-messaging';
-import {PublicClient, ClientClassification} from '@wireapp/api-client/src/client/';
-import * as sinon from 'sinon';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
+import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {createRandomUuid} from 'Util/util';
 import {TestFactory} from '../../../test/helper/TestFactory';
-import {UserGenerator} from '../../../test/helper/UserGenerator';
 import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
-import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
-import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
-import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
-import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
+import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
 import {User} from 'src/script/entity/User';
@@ -40,7 +32,6 @@ import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
-import {EventRepository} from '../event/EventRepository';
 import {MessageSender} from '../message/MessageSender';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
@@ -50,16 +41,56 @@ import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ClientState} from '../client/ClientState';
 import {ConversationState} from './ConversationState';
-import {EventService} from '../event/EventService';
 import {Core} from '../service/CoreSingleton';
 import {container} from 'tsyringe';
 import {ClientEntity} from '../client/ClientEntity';
+import {EventRepository} from '../event/EventRepository';
+import {EventService} from '../event/EventService';
+
+type MessageRepositoryDependencies = {
+  assetRepository: AssetRepository;
+  clientState: ClientState;
+  conversationRepository: () => ConversationRepository;
+  conversationState: ConversationState;
+  core: Core;
+  cryptographyRepository: CryptographyRepository;
+  eventRepository: EventRepository;
+  messageSender: MessageSender;
+  propertiesRepository: PropertiesRepository;
+  serverTimeHandler: ServerTimeHandler;
+  teamState: TeamState;
+  userRepository: UserRepository;
+  userState: UserState;
+};
+function buildMessageRepository(): [MessageRepository, MessageRepositoryDependencies] {
+  const userState = new UserState();
+  const teamState = new TeamState(userState);
+  const conversationState = new ConversationState(userState, teamState);
+  const clientState = new ClientState();
+  clientState.currentClient(new ClientEntity(true, ''));
+  const core = container.resolve(Core);
+  core.initServices({} as any);
+  const dependencies = {
+    assetRepository: {} as AssetRepository,
+    clientState,
+    conversationRepository: () => ({} as ConversationRepository),
+    conversationState,
+    cryptographyRepository: new CryptographyRepository({} as any),
+    core,
+    eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any, {} as any),
+    messageSender: {} as MessageSender,
+    propertiesRepository: {} as PropertiesRepository,
+    serverTimeHandler: {} as ServerTimeHandler,
+    teamState,
+    userRepository: {} as UserRepository,
+    userState,
+  };
+  const deps = Object.values(dependencies) as ConstructorParameters<typeof MessageRepository>;
+  return [new MessageRepository(...deps), dependencies];
+}
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
-
-  let server: sinon.SinonFakeServer;
-  let core: Core;
 
   const generateConversation = (
     conversation_type = CONVERSATION_TYPE.REGULAR,
@@ -80,19 +111,6 @@ describe('MessageRepository', () => {
 
     return conversation;
   };
-
-  beforeEach(() => {
-    core = container.resolve(Core);
-    core.initServices({} as any);
-    server = sinon.fakeServer.create();
-    server.autoRespond = true;
-
-    return testFactory.exposeConversationActors();
-  });
-
-  afterEach(() => {
-    server.restore();
-  });
 
   describe('sendTextWithLinkPreview', () => {
     it.skip('sends ephemeral message (within the range [1 second, 1 year])', async () => {
@@ -138,45 +156,18 @@ describe('MessageRepository', () => {
   });
 
   describe('deleteMessageForEveryone', () => {
-    beforeEach(() => {
-      spyOn(core.service!.conversation, 'deleteMessageEveryone');
-    });
-
     it('should not delete other users messages', async () => {
-      const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
+      const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
+      const sender = new User('', '');
+      sender.isMe = false;
+      const msgToDelete = new Message(createRandomUuid());
+      msgToDelete.user(sender);
+      conversation.addMessage(msgToDelete);
 
-      const user_et = new User('', '');
-      user_et.isMe = false;
+      const [messageRepository, {core}] = buildMessageRepository();
+      spyOn(core.service!.conversation, 'deleteMessageEveryone');
 
-      const message_to_delete_et = new Message(createRandomUuid());
-      message_to_delete_et.user(user_et);
-
-      conversationEntity.addMessage(message_to_delete_et);
-
-      const userState = new UserState();
-      const teamState = new TeamState(userState);
-      const conversationState = new ConversationState(userState, teamState);
-      const clientState = new ClientState();
-
-      const messageRepository = new MessageRepository(
-        () => ({} as ConversationRepository),
-        {} as CryptographyRepository,
-        {} as EventRepository,
-        {} as MessageSender,
-        {} as PropertiesRepository,
-        {} as ServerTimeHandler,
-        {} as UserRepository,
-        {} as AssetRepository,
-        userState,
-        teamState,
-        conversationState,
-        clientState,
-        core,
-      );
-
-      await expect(
-        messageRepository.deleteMessageForEveryone(conversationEntity, message_to_delete_et),
-      ).rejects.toMatchObject({
+      await expect(messageRepository.deleteMessageForEveryone(conversation, msgToDelete)).rejects.toMatchObject({
         type: ConversationError.TYPE.WRONG_USER,
       });
       expect(core.service!.conversation.deleteMessageEveryone).not.toHaveBeenCalled();
@@ -185,46 +176,15 @@ describe('MessageRepository', () => {
     it('should send delete and deletes message for own messages', async () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
 
-      const user = new User('user1');
-
-      const messageToDelete = new Message();
-      messageToDelete.id = createRandomUuid();
+      const messageToDelete = new Message(createRandomUuid());
       messageToDelete.user(conversation.selfUser());
-
-      conversation.participating_user_ets.push(user);
+      conversation.participating_user_ets.push(new User('user1'));
 
       conversation.addMessage(messageToDelete);
 
-      const userState = new UserState();
-      const teamState = new TeamState(userState);
-      const conversationState = new ConversationState(userState, teamState);
-      const clientState = new ClientState();
-
-      const conversationRepository = {
-        getConversationById: jest.fn().mockImplementation(async () => conversation),
-      };
-
-      const eventService = {
-        deleteEvent: jest.fn(),
-      };
-
-      const messageSender = new MessageSender();
-
-      const messageRepository = new MessageRepository(
-        () => conversationRepository as unknown as ConversationRepository,
-        {} as CryptographyRepository,
-        {eventService: eventService as unknown as EventService} as EventRepository,
-        messageSender,
-        {} as PropertiesRepository,
-        {} as ServerTimeHandler,
-        {} as UserRepository,
-        {} as AssetRepository,
-        userState,
-        teamState,
-        conversationState,
-        clientState,
-        core,
-      );
+      const [messageRepository, {core, eventRepository}] = buildMessageRepository();
+      spyOn(core.service!.conversation, 'deleteMessageEveryone');
+      spyOn(eventRepository.eventService, 'deleteEvent').and.returnValue(Promise.resolve());
 
       await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
       expect(core.service!.conversation.deleteMessageEveryone).toHaveBeenCalledWith(
@@ -234,39 +194,13 @@ describe('MessageRepository', () => {
         true,
         undefined,
       );
-      expect(eventService.deleteEvent).toHaveBeenCalledTimes(1);
+      expect(eventRepository.eventService.deleteEvent).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('resetSession', () => {
-    let messageRepository: MessageRepository;
-    let cryptographyRepository: CryptographyRepository;
-    beforeEach(() => {
-      const userState = new UserState();
-      userState.self(new User('', ''));
-      const teamState = new TeamState(userState);
-      const conversationState = new ConversationState(userState, teamState);
-      const clientState = new ClientState();
-      clientState.currentClient(new ClientEntity(true, ''));
-      cryptographyRepository = testFactory.cryptography_repository as CryptographyRepository;
-      messageRepository = new MessageRepository(
-        () => ({} as ConversationRepository),
-        cryptographyRepository,
-        {} as EventRepository,
-        {} as MessageSender,
-        {} as PropertiesRepository,
-        {} as ServerTimeHandler,
-        {} as UserRepository,
-        {} as AssetRepository,
-        userState,
-        teamState,
-        conversationState,
-        clientState,
-        core,
-      );
-    });
-
     it('resets the session with another device', async () => {
+      const [messageRepository, {cryptographyRepository, core}] = buildMessageRepository();
       spyOn(core.service!.conversation, 'send');
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();
@@ -276,125 +210,6 @@ describe('MessageRepository', () => {
       await messageRepository.resetSession(userId, clientId, conversation);
       expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
       expect(core.service!.conversation.send).toHaveBeenCalled();
-    });
-  });
-
-  describe('updateAllClients', () => {
-    it(`updates a conversation's legal hold status when it discovers during message sending that a legal hold client got removed from a participant`, async () => {
-      const selfUser = UserGenerator.getRandomUser();
-      const conversationPartner = UserGenerator.getRandomUser();
-      testFactory.user_repository['userState'].users.push(conversationPartner);
-
-      spyOn(testFactory.user_repository['userState'], 'self').and.returnValue(selfUser);
-
-      const conversationJsonFromDb = {
-        accessModes: [CONVERSATION_ACCESS.INVITE, CONVERSATION_ACCESS.CODE],
-        accessRole: CONVERSATION_ACCESS_ROLE.NON_ACTIVATED,
-        archived_state: false,
-        archived_timestamp: 0,
-        cleared_timestamp: 0,
-        creator: conversationPartner.id,
-        ephemeral_timer: null,
-        global_message_timer: null,
-        id: createRandomUuid(),
-        is_guest: false,
-        is_managed: false,
-        last_event_timestamp: 1563965225224,
-        last_read_timestamp: 1563965225224,
-        last_server_timestamp: 1563965229043,
-        legal_hold_status: LegalHoldStatus.ENABLED,
-        message_timer: null,
-        muted_state: NOTIFICATION_STATE.MENTIONS_AND_REPLIES,
-        muted_timestamp: 0,
-        name: 'Test Group',
-        others: [conversationPartner.id],
-        receipt_mode: RECEIPT_MODE.ON,
-        status: ConversationStatus.CURRENT_MEMBER,
-        team_id: createRandomUuid(),
-        type: CONVERSATION_TYPE.REGULAR,
-        verification_state: ConversationVerificationState.UNVERIFIED,
-      } as ConversationDatabaseData;
-
-      const clientsPayload: PublicClient[] = [
-        {
-          class: ClientClassification.DESKTOP,
-          id: '1e66e04948938c2c',
-        },
-        {
-          class: ClientClassification.LEGAL_HOLD,
-          id: '53761bec3f10a6d9',
-        },
-        {
-          class: ClientClassification.DESKTOP,
-          id: 'a9c8c385737b14fe',
-        },
-      ];
-
-      for (const clientPayload of clientsPayload) {
-        const wasClientAdded = await testFactory.user_repository.addClientToUser(
-          conversationPartner,
-          clientPayload,
-          false,
-        );
-
-        expect(wasClientAdded).toBeDefined();
-      }
-
-      const conversationEntity = ConversationMapper.mapConversations([conversationJsonFromDb])[0];
-      conversationEntity.participating_user_ets.push(conversationPartner);
-      conversationEntity.selfUser(selfUser);
-
-      // Legal hold status is "on" because our conversation partner has a legal hold client
-      expect(conversationEntity.hasLegalHold()).toBe(true);
-
-      await testFactory.conversation_repository['saveConversation'](conversationEntity);
-
-      spyOn(testFactory.conversation_service, 'postEncryptedMessage').and.returnValue(
-        Promise.reject({
-          deleted: {
-            // Legal hold client got removed
-            [conversationPartner.id]: ['53761bec3f10a6d9'],
-          },
-          missing: {},
-          redundant: {},
-          time: new Date().toISOString(),
-        }),
-      );
-
-      spyOn(testFactory.client_repository, 'removeClient').and.returnValue(Promise.resolve());
-
-      // Start client discovery of conversation participants
-      await testFactory.message_repository.updateAllClients(conversationEntity, true);
-
-      expect(conversationEntity.hasLegalHold()).toBe(false);
-    });
-  });
-
-  describe('getOtherUsersWithoutClients', () => {
-    it('returns a list of user ids (excluding ourselves) for which we need to fetch client information', () => {
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.TEXT]: new Text({
-          content: 'Hello, World!',
-        }),
-        messageId: createRandomUuid(),
-      });
-
-      const selfUserId = 'ce1a2792-fb51-4977-a8e5-7a1dd8f2bb0b';
-      const otherUserId = '6f88716b-1383-44da-9d57-45b51cc64d90';
-
-      const eventInfoEntity = new EventInfoEntity(
-        genericMessage,
-        {domain: '', id: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b'},
-        {
-          nativePush: true,
-          precondition: false,
-          recipients: {[otherUserId]: [], [selfUserId]: []},
-        },
-      );
-
-      const userIdsWithoutClients = MessageRepository.getOtherUsersWithoutClients(eventInfoEntity, selfUserId);
-      expect(userIdsWithoutClients.length).toBe(1);
-      expect(userIdsWithoutClients[0]).toBe('6f88716b-1383-44da-9d57-45b51cc64d90');
     });
   });
 });
