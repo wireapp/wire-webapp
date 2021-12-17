@@ -137,7 +137,11 @@ export class AssetRepository {
   }
 
   private loadBuffer(asset: AssetRemoteData) {
-    return this.core.service!.asset.downloadAsset(asset.urlData).response;
+    const request = this.core.service!.asset.downloadAsset(asset.urlData, fraction => {
+      asset.downloadProgress(fraction * 100);
+    });
+    asset.cancelDownload = request.cancel;
+    return request.response;
   }
 
   public async download(asset: AssetRemoteData, fileName: string) {
