@@ -33,7 +33,7 @@ import {
   MessageSendingStatus,
   UserClients,
 } from '@wireapp/api-client/src/conversation';
-import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
+import {QualifiedId, RequestCancellationError} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {
   AudioMetaData,
@@ -718,25 +718,6 @@ export class MessageRepository {
       this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
     };
 
-    /**
-     * Once a message has been sent, check the state of the members of this conversation.
-     * If, in this conversation, there are still users that have 0 devices, that could mean they have been silently removed from the team
-     * We need to ask backend if those users have been deleted and, if so, trigger the teamMemberLeave event
-     */
-    const checkMissingTeamMembers = async (): Promise<void> => {
-      const membersWithoutClients = conversation
-        .participating_user_ets()
-        .filter(user => user.devices().length === 0)
-        .map(user => user.qualifiedId);
-      if (!membersWithoutClients.length) {
-        return;
-      }
-      const usersWithoutClients = await this.userRepository.getUserListFromBackend(
-        conversation.isFederated() ? membersWithoutClients : membersWithoutClients.map(({id}) => id),
-      );
-      return this.triggerTeamMemberLeaveChecks(usersWithoutClients);
-    };
-
     const conversationService = this.conversationService;
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
@@ -746,14 +727,7 @@ export class MessageRepository {
         onClientMismatch: mismatch =>
           this.onClientMismatch?.(mismatch, conversation.qualifiedId, silentDegradationWarning),
         onStart: injectOptimisticEvent,
-        onSuccess: async (genericMessage, sentTime) => {
-          if (this.teamState.isTeam()) {
-            // If we are in a team, we can be in the particular case where we are in a Tier1 team (team with a lot of users)
-            // In that case, backend will not warn us when a user is removed. We need to check this ourself manually
-            await checkMissingTeamMembers();
-          }
-          updateOptimisticEvent(genericMessage, sentTime);
-        },
+        onSuccess: updateOptimisticEvent,
       },
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       nativePush,
@@ -1172,19 +1146,6 @@ export class MessageRepository {
       });
     }
     return messagePromise as Promise<ContentMessage>;
-  }
-
-  async triggerTeamMemberLeaveChecks(users: APIClientUser[]): Promise<void> {
-    for (const user of users) {
-      // Since this is a bare API client user we use `.deleted`
-      const isDeleted = user.deleted === true;
-      if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, {
-          domain: this.userState.self().domain,
-          id: user.id,
-        });
-      }
-    }
   }
 
   public async updateAllClients(conversation: Conversation, blockSystemMessage: boolean): Promise<void> {

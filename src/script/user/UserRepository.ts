@@ -367,8 +367,6 @@ export class UserRepository {
 
   /**
    * Removes a stored client and the session connected with it.
-   * @deprecated
-   * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
    */
   removeClientFromUser = async (userId: QualifiedId, clientId: string) => {
     await this.clientRepository.removeClient(userId, clientId);
