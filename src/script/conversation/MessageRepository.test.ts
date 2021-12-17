@@ -70,23 +70,23 @@ function buildMessageRepository(): [MessageRepository, MessageRepositoryDependen
   clientState.currentClient(new ClientEntity(true, ''));
   const core = container.resolve(Core);
   core.initServices({} as any);
-  /* eslint-disable sort-keys */
+  /* eslint-disable sort-keys-fix/sort-keys-fix */
   const dependencies = {
-    assetRepository: {} as AssetRepository,
-    clientState,
     conversationRepository: () => ({} as ConversationRepository),
-    conversationState,
     cryptographyRepository: new CryptographyRepository({} as any),
-    core,
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any, {} as any),
     messageSender: {} as MessageSender,
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,
-    teamState,
     userRepository: {} as UserRepository,
+    assetRepository: {} as AssetRepository,
     userState,
+    teamState,
+    conversationState,
+    clientState,
+    core,
   };
-  /* eslint-enable sort-keys */
+  /* eslint-disable sort-keys-fix/sort-keys-fix */
   const deps = Object.values(dependencies) as ConstructorParameters<typeof MessageRepository>;
   return [new MessageRepository(...deps), dependencies];
 }
