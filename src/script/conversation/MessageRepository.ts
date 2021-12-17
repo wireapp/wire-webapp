@@ -92,7 +92,6 @@ import {MentionEntity} from '../message/MentionEntity';
 import {FileAsset} from '../entity/message/FileAsset';
 import type {EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
-import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
@@ -147,7 +146,6 @@ export class MessageRepository {
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
-    private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),

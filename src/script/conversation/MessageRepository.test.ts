@@ -35,7 +35,6 @@ import {ServerTimeHandler, serverTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
-import {TeamState} from '../team/TeamState';
 import {ClientState} from '../client/ClientState';
 import {ConversationState} from './ConversationState';
 import {Core} from '../service/CoreSingleton';
@@ -58,15 +57,13 @@ type MessageRepositoryDependencies = {
   messageSender: MessageSender;
   propertiesRepository: PropertiesRepository;
   serverTimeHandler: ServerTimeHandler;
-  teamState: TeamState;
   userRepository: UserRepository;
   userState: UserState;
 };
 function buildMessageRepository(): [MessageRepository, MessageRepositoryDependencies] {
   const userState = new UserState();
   userState.self(selfUser);
-  const teamState = new TeamState(userState);
-  const conversationState = new ConversationState(userState, teamState);
+  const conversationState = new ConversationState(userState);
   const clientState = new ClientState();
   clientState.currentClient(new ClientEntity(true, ''));
   const core = container.resolve(Core);
@@ -82,7 +79,6 @@ function buildMessageRepository(): [MessageRepository, MessageRepositoryDependen
     userRepository: {} as UserRepository,
     assetRepository: {} as AssetRepository,
     userState,
-    teamState,
     conversationState,
     clientState,
     core,
