@@ -220,7 +220,7 @@ export class MediaDevicesHandler {
       this.availableDevices[type](devices);
       const currentId = this.currentDeviceId[type];
       if (!devices.some(d => d.deviceId === currentId())) {
-        currentId(devices[0].deviceId);
+        currentId(devices[0]?.deviceId);
       }
     };
 
