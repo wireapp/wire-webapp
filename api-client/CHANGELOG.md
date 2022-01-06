@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.2.0...@wireapp/api-client@16.3.0) (2022-01-06)
+
+
+### Features
+
+* Improved error messages for domain blocked (SQSERVICES-928) ([9568e6a](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/9568e6a443d5fb5619c9ae36e03c873f63c19518))
+
+
+
+
+
 # [16.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.1.0...@wireapp/api-client@16.2.0) (2021-12-16)
 
 
