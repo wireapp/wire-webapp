@@ -461,6 +461,11 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'This phone number is not allowed',
     id: 'BackendError.LABEL.BLACKLISTED_PHONE',
   },
+  [BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION]: {
+    defaultMessage:
+      'You can’t create this account as your email domain is intentionally blocked. Please ask your team admin to invite you via email.',
+    id: 'BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION',
+  },
   [BackendError.LABEL.INVALID_CODE]: {
     defaultMessage: 'Invalid code, or maximum attempts exceeded. Please retry, or request another code.',
     id: 'BackendError.LABEL.INVALID_CODE',
