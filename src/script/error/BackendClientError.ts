@@ -38,8 +38,8 @@ export class BackendClientError extends BaseError {
       BLACKLISTED_EMAIL: BackendErrorLabel.BLACKLISTED_EMAIL,
       BLACKLISTED_PHONE: BackendErrorLabel.BLACKLISTED_PHONE,
       CLIENT_ERROR: BackendErrorLabel.CLIENT_ERROR,
-      DOMAIN_BLOCKED_FOR_REGISTRATION: 'domain-blocked-for-registration',
       // TODO: the correct should be DOMAIN_BLOCKED_FOR_REGISTRATION: BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION
+      DOMAIN_BLOCKED_FOR_REGISTRATION: 'domain-blocked-for-registration',
       INVALID_CREDENTIALS: BackendErrorLabel.INVALID_CREDENTIALS,
       INVALID_EMAIL: BackendErrorLabel.INVALID_EMAIL,
       INVALID_INVITATION_CODE: BackendErrorLabel.INVALID_INVITATION_CODE,

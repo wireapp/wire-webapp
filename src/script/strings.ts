@@ -1,3 +1,4 @@
+import {BackendClientError} from './error/BackendClientError';
 /*
  * Wire
  * Copyright (C) 2018 Wire Swiss GmbH
@@ -461,7 +462,7 @@ export const errorHandlerStrings = defineMessages({
     defaultMessage: 'This phone number is not allowed',
     id: 'BackendError.LABEL.BLACKLISTED_PHONE',
   },
-  [BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION]: {
+  [BackendClientError.LABEL.DOMAIN_BLOCKED_FOR_REGISTRATION]: {
     defaultMessage:
       'You can’t create this account as your email domain is intentionally blocked. Please ask your team admin to invite you via email.',
     id: 'BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION',
