@@ -32,14 +32,14 @@
           </div>
         <!-- /ko -->
 
-        <!-- ko if: hasAccessCode() -->
+        <!-- ko ifnot: hasAccessCode() -->
           <div class="panel__action-item" data-bind="click: requestAccessCode, css:{'disabled': requestOngoing}">
             <link-icon class="panel__action-item__icon"></link-icon>
             <div class="panel__action-item__text" data-bind="text: t('guestOptionsCreateLink')" data-uie-name="do-create-link"></div>
           </div>
         <!-- /ko -->
 
-        <!-- ko ifnot: isGuestLinkEnabled() -->
+        <!-- ko if: isGuestLinkEnabled() -->
           <div class="panel__action-item--info">
             <info-icon class="panel__action-item__icon--info"></info-icon>
             <div class="panel__action-item__text--info" data-bind="text: t('guestLinkDisabled')" data-uie-name="guest-link-disabled-info"></div>
