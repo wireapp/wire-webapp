@@ -40,6 +40,7 @@ export enum BackendErrorLabel {
   // Authentication errors
   BLACKLISTED_EMAIL = 'blacklisted-email',
   BLACKLISTED_PHONE = 'blacklisted-phone',
+  DOMAIN_BLOCKED_FOR_REGISTRATION = 'domain-blocked-for-registration',
   INVALID_CODE = 'invalid-code',
   INVALID_CREDENTIALS = 'invalid-credentials',
   INVALID_EMAIL = 'invalid-email',
