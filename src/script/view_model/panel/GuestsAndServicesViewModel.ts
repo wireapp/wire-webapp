@@ -41,6 +41,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   isTeamOnly: ko.PureComputed<boolean>;
   hasAccessCode: ko.PureComputed<boolean>;
   isGuestEnabled: ko.PureComputed<boolean>;
+  isGuestLinkEnabled: ko.PureComputed<boolean>;
   showLinkOptions: ko.PureComputed<boolean>;
   brandName: string;
 
@@ -64,6 +65,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     this.isTeamOnly = ko.pureComputed(() => this.activeConversation()?.isTeamOnly());
     this.hasAccessCode = ko.pureComputed(() => (this.isGuestRoom() ? !!this.activeConversation().accessCode() : false));
     this.isGuestEnabled = ko.pureComputed(() => !this.isTeamOnly());
+    this.isGuestLinkEnabled = ko.pureComputed(() => !this.isTeamOnly());
     this.showLinkOptions = ko.pureComputed(() => this.isGuestEnabled());
 
     this.activeConversation.subscribe(conversationEntity => this._updateCode(this.isVisible(), conversationEntity));

@@ -40,6 +40,7 @@ export class TeamState {
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
+  public readonly isGuestLinkEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
   public readonly getEnforcedSelfDeletingMessagesTimeout: ko.PureComputed<SelfDeletingTimeout>;
@@ -112,6 +113,9 @@ export class TeamState {
     this.isAppLockEnforced = ko.pureComputed(() => this.teamFeatures()?.appLock?.config?.enforceAppLock);
     this.appLockInactivityTimeoutSecs = ko.pureComputed(
       () => this.teamFeatures()?.appLock?.config?.inactivityTimeoutSecs,
+    );
+    this.isGuestLinkEnabled = ko.pureComputed(
+      () => this.teamFeatures()?.conversationGuestLinks?.status === FeatureStatus.ENABLED,
     );
   }
 

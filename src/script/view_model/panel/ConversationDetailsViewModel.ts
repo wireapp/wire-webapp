@@ -91,6 +91,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   timedMessagesText: ko.PureComputed<string>;
   addPeopleTooltip: ko.PureComputed<string>;
   isSelfGroupAdmin: ko.PureComputed<boolean>;
+  isGuestLinkEnabled: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -219,6 +220,8 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.showOptionTimedMessages = ko.pureComputed(
       () => this.isActiveGroupParticipant() && roleRepository.canToggleTimeout(this.activeConversation()),
     );
+
+    this.isGuestLinkEnabled = ko.pureComputed(() => this.teamState.isGuestLinkEnabled());
 
     this.showSectionOptions = ko.pureComputed(() => {
       return this.showOptionGuests() || this.showOptionNotificationsGroup() || this.showOptionTimedMessages();
