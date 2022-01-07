@@ -1199,7 +1199,7 @@ export class MessageRepository {
       }
 
       const {genericMessage, options} = eventInfoEntity;
-      const payload = await this.cryptography_repository.encryptGenericMessage(options.recipients, genericMessage);
+      const payload = await this.cryptography_repository.encryptGenericMessage(options.recipients as UserClients, genericMessage);
       payload.native_push = options.nativePush;
       return await this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
@@ -1651,7 +1651,7 @@ export class MessageRepository {
       });
 
       const payload = await this.cryptography_repository.encryptGenericMessage(
-        options.recipients,
+        options.recipients as UserClients,
         genericMessageExternal,
       );
       payload.data = arrayToBase64(encryptedAsset.cipherText);
