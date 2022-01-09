@@ -3423,12 +3423,12 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-maxmind@4.3.3:
-  version "4.3.3"
-  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.3.3.tgz#2332a3744cb57a25c71ec61a19369f7af35340ba"
-  integrity sha512-Btj2ZAy5lyu43Nwk+BBQ19ERpbN8f9UTqctbMdq2V+FxwVRdGn1btRHHFcPCidqQd/unJfy2cL3eT6XEDDcecg==
+maxmind@4.3.4:
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/maxmind/-/maxmind-4.3.4.tgz#252890cfc3fd8eea69fc998011c7ac5fd1ad429f"
+  integrity sha512-HO7rYLTU4YxiHDOIqMHkr/Hte5y3i9a6E93z67eHD54rmMb6CcrazkcWIFfbIBQ+QJ23TMapD38jiOBYgozE1w==
   dependencies:
-    mmdb-lib "1.3.1"
+    mmdb-lib "2.0.1"
     tiny-lru "7.0.6"
 
 media-typer@0.3.0:
@@ -3538,10 +3538,10 @@ mkdirp@1.0.4, mkdirp@1.x:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-mmdb-lib@1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/mmdb-lib/-/mmdb-lib-1.3.1.tgz#8433bfa578fb442bc93671c3e81715ef0107d6cd"
-  integrity sha512-BP/ZqBZ1+Sty+LjFSVjxql4Udk4lU06fQl1vLKCHGcMlqm6YUTqztE9BwnUW2Qi9+uPssrJR3rGW8IybbWhjUA==
+mmdb-lib@2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/mmdb-lib/-/mmdb-lib-2.0.1.tgz#0be531513a0027a9dce70b46aa0089baddfd2bdf"
+  integrity sha512-wyc188Vdaxi24nCf4S8tbdgs+0VBhOUAcNZ81gnPpd8zT54IhvW+Mvif0OZ7Et5Sm5zWaH8iyuhEj8h5MXiWmA==
 
 module-details-from-path@^1.0.3:
   version "1.0.3"
