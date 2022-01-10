@@ -447,6 +447,7 @@ export class ConversationService {
       assetToken: asset.token,
       otrKey: asset.keyBytes,
       sha256: asset.sha256,
+      assetDomain: asset.domain,
     });
 
     const assetMessage = Asset.create({
