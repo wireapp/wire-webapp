@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.4.1...@wireapp/api-client@16.5.0) (2022-01-10)
+
+
+### Features
+
+* **api-client:** Enable asset with domain in asset protobuf messages ([92ceb6a](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/92ceb6a3ed1c373545d320d5c3578a76cdbf4407))
+
+
+
+
+
 ## [16.4.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.4.0...@wireapp/api-client@16.4.1) (2022-01-10)
 
 
