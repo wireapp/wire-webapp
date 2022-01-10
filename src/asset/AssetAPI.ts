@@ -55,6 +55,7 @@ export interface AssetResponse {
 
 export class AssetAPI {
   private static readonly ASSET_V3_URL = '/assets/v3';
+  private static readonly ASSET_V4_URL = '/assets/v4';
   private static readonly ASSET_SERVICE_URL = '/bot/assets';
   private static readonly ASSET_V2_URL = '/otr/assets';
   private static readonly ASSET_V2_CONVERSATION_URL = '/conversations';
@@ -172,12 +173,12 @@ export class AssetAPI {
     };
   }
 
-  async getAssetV1(
+  getAssetV1(
     assetId: string,
     conversationId: string,
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetResponse>> {
+  ) {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
@@ -225,12 +226,12 @@ export class AssetAPI {
     };
   }
 
-  async getAssetV2(
+  getAssetV2(
     assetId: string,
     conversationId: string,
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
-  ): Promise<RequestCancelable<AssetResponse>> {
+  ) {
     if (!isValidUUID(assetId)) {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
@@ -287,6 +288,21 @@ export class AssetAPI {
     }
 
     const assetBaseUrl = `${AssetAPI.ASSET_V3_URL}/${assetId}`;
+    return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
+  }
+
+  getAssetV4(
+    assetId: string,
+    assetDomain: string,
+    token?: string | null,
+    forceCaching: boolean = false,
+    progressCallback?: ProgressCallback,
+  ) {
+    if (!isValidUUID(assetId)) {
+      throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
+    }
+
+    const assetBaseUrl = `${AssetAPI.ASSET_V4_URL}/${assetId}/${assetDomain}`;
     return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
   }
 
