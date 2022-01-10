@@ -93,8 +93,8 @@ export class AssetService {
       case 4:
         return this.apiClient.asset.api.getAssetV4(
           assetData.assetKey,
-          assetData.assetToken,
           assetData.assetDomain,
+          assetData.assetToken,
           forceCaching,
           progressCallback,
         );
