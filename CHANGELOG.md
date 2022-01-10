@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.5.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.5.0...@wireapp/api-client@16.5.1) (2022-01-10)
+
+
+### Bug Fixes
+
+* **core:** Fix url pattern for assetv4 ([31c1055](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/31c10559c8e9c79a4015c8d087ef8cba5be9143f))
+
+
+
+
+
 # [16.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.4.1...@wireapp/api-client@16.5.0) (2022-01-10)
 
 
