@@ -302,7 +302,7 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    const assetBaseUrl = `${AssetAPI.ASSET_V4_URL}/${assetId}/${assetDomain}`;
+    const assetBaseUrl = `${AssetAPI.ASSET_V4_URL}/${assetDomain}/${assetId}`;
     return this.getAssetShared(assetBaseUrl, token, forceCaching, progressCallback);
   }
 
