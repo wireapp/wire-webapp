@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.4.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.3.0...@wireapp/api-client@16.4.0) (2022-01-10)
+
+
+### Features
+
+* **core:** Add method to download v4 assets ([#4206](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4206)) ([41ab95a](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/41ab95ab1d70e2f5bee4e0b4f7d81f058a381792))
+
+
+
+
+
 # [16.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.2.0...@wireapp/api-client@16.3.0) (2022-01-06)
 
 
