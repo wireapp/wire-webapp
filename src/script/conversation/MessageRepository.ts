@@ -1012,13 +1012,7 @@ export class MessageRepository {
     const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
 
     if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
-      this.conversationService.clearConversation(
-        conversation.id,
-        timestamp,
-        undefined,
-        false,
-        conversation.isFederated() ? conversation.domain : undefined,
-      );
+      this.conversationService.clearConversation(conversation.id, timestamp);
     }
   }
 
