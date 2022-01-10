@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.4.1...@wireapp/core@20.5.0) (2022-01-10)
+
+
+### Features
+
+* **core:** Add method to download v4 assets ([#4206](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4206)) ([41ab95a](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/41ab95ab1d70e2f5bee4e0b4f7d81f058a381792))
+
+
+
+
+
 ## [20.4.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.4.0...@wireapp/core@20.4.1) (2022-01-06)
 
 **Note:** Version bump only for package @wireapp/core
