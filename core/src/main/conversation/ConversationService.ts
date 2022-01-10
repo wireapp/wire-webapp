@@ -900,7 +900,7 @@ export class ConversationService {
   }
 
   public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Buffer> {
-    const request = await this.apiClient.asset.api.getAssetV3(assetId, assetToken);
+    const request = this.apiClient.asset.api.getAssetV3(assetId, assetToken);
     const encryptedBuffer = (await request.response).buffer;
 
     return decryptAsset({
