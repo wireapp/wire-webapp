@@ -24,8 +24,82 @@ import type {ProgressCallback, RequestCancelable} from '@wireapp/api-client/src/
 import type {EncryptedAssetUploaded} from '../cryptography/';
 import {encryptAsset} from '../cryptography/AssetCryptography';
 
+export interface AssetDataV4 {
+  assetKey: string;
+  assetToken: string;
+  assetDomain: string;
+  forceCaching: boolean;
+  version: 4;
+}
+export interface AssetDataV3 {
+  assetKey: string;
+  assetToken: string;
+  forceCaching: boolean;
+  version: 3;
+}
+
+export interface AssetDataV2 {
+  assetId: string;
+  conversationId: string;
+  forceCaching: boolean;
+  version: 2;
+}
+
+export interface AssetDataV1 {
+  assetId: string;
+  conversationId: string;
+  forceCaching: boolean;
+  version: 1;
+}
+
+export type AssetUrlData = AssetDataV1 | AssetDataV2 | AssetDataV3 | AssetDataV4;
+
 export class AssetService {
   constructor(private readonly apiClient: APIClient) {}
+
+  /**
+   * Will download an asset on the server.
+   * Will route the request to the right endpoint depending on the asset version
+   *
+   * @param assetData The versioned asset data
+   * @param progressCallback?
+   * @return Resolves when the asset has been uploaded
+   */
+  public downloadAsset(assetData: AssetUrlData, progressCallback?: ProgressCallback) {
+    const {forceCaching} = assetData;
+
+    switch (assetData.version) {
+      case 1:
+        return this.apiClient.asset.api.getAssetV1(
+          assetData.assetId,
+          assetData.conversationId,
+          forceCaching,
+          progressCallback,
+        );
+      case 2:
+        return this.apiClient.asset.api.getAssetV2(
+          assetData.assetId,
+          assetData.conversationId,
+          forceCaching,
+          progressCallback,
+        );
+      case 3:
+        return this.apiClient.asset.api.getAssetV3(
+          assetData.assetKey,
+          assetData.assetToken,
+          forceCaching,
+          progressCallback,
+        );
+      case 4:
+        return this.apiClient.asset.api.getAssetV4(
+          assetData.assetKey,
+          assetData.assetToken,
+          assetData.assetDomain,
+          forceCaching,
+          progressCallback,
+        );
+    }
+  }
 
   /**
    * Uploads a raw asset to the backend without encrypting it
