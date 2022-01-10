@@ -137,9 +137,10 @@ export class AssetService {
     return {
       ...request,
       response: request.response.then(response => {
-        const {key, token} = response;
+        const {key, token, domain} = response;
         return {
           cipherText,
+          domain,
           key,
           keyBytes,
           sha256,
