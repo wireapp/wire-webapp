@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [20.5.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.5.0...@wireapp/core@20.5.1) (2022-01-10)
+
+
+### Bug Fixes
+
+* **core:** Return domain when uploading a v4 asset ([#4207](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4207)) ([70a7bbe](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/70a7bbe5ac4ab17cd6f3672a770c37a806f616ff))
+
+
+
+
+
 # [20.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.4.1...@wireapp/core@20.5.0) (2022-01-10)
 
 
