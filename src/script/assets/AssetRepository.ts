@@ -26,7 +26,6 @@ import {singleton, container} from 'tsyringe';
 import {Logger, getLogger} from 'Util/Logger';
 import {loadFileBuffer, loadImage, downloadBlob} from 'Util/util';
 import {WebWorker} from 'Util/worker';
-import {ValidationUtilError} from 'Util/ValidationUtil';
 
 import {AssetService} from './AssetService';
 import {Conversation} from '../entity/Conversation';
@@ -137,53 +136,12 @@ export class AssetRepository {
     }
   }
 
-  private async loadBuffer(asset: AssetRemoteData): Promise<{
-    buffer: ArrayBuffer;
-    mimeType: string;
-  }> {
-    try {
-      switch (asset.urlData.version) {
-        case 3: {
-          const request = await this.assetService.downloadAssetV3(
-            asset.urlData.assetKey,
-            asset.urlData.assetToken,
-            asset.urlData.forceCaching,
-            progress => asset.downloadProgress(progress * 100),
-          );
-          asset.cancelDownload = request.cancel;
-          return await request.response;
-        }
-        case 2: {
-          const request = await this.assetService.downloadAssetV2(
-            asset.urlData.assetId,
-            asset.urlData.conversationId,
-            asset.urlData.forceCaching,
-            progress => asset.downloadProgress(progress),
-          );
-          asset.cancelDownload = request.cancel;
-          return await request.response;
-        }
-        case 1: {
-          const request = await this.assetService.downloadAssetV1(
-            asset.urlData.assetId,
-            asset.urlData.conversationId,
-            asset.urlData.forceCaching,
-            progress => asset.downloadProgress(progress),
-          );
-          asset.cancelDownload = request.cancel;
-          return await request.response;
-        }
-        default:
-          throw Error('Cannot map URL data.');
-      }
-    } catch (error) {
-      const isValidationUtilError = error instanceof ValidationUtilError;
-      const message = isValidationUtilError
-        ? `Failed to validate an asset URL (loadBuffer): ${error.message}`
-        : `Failed to load asset: ${error.message || error}`;
-      this.logger.error(message);
-      throw error;
-    }
+  private loadBuffer(asset: AssetRemoteData) {
+    const request = this.core.service!.asset.downloadAsset(asset.urlData, fraction => {
+      asset.downloadProgress(fraction * 100);
+    });
+    asset.cancelDownload = request.cancel;
+    return request.response;
   }
 
   public async download(asset: AssetRemoteData, fileName: string) {

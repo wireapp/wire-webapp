@@ -78,6 +78,8 @@ export interface MappedAsset {
 export interface AssetData {
   content_length: number;
   content_type: string;
+  domain?: string;
+  id?: string;
   info: {
     height?: number;
     name?: string;
@@ -87,6 +89,8 @@ export interface AssetData {
   key?: string;
   meta?: MappedAssetMetaData;
   otr_key?: Uint8Array;
+  preview_domain?: string;
+  preview_id?: string;
   preview_key?: string;
   preview_otr_key?: Uint8Array;
   preview_sha256?: Uint8Array;

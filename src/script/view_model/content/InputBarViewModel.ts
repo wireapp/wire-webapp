@@ -110,7 +110,6 @@ export class InputBarViewModel {
   /** MIME types and file extensions are accepted */
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
-  readonly disableControls: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -338,9 +337,6 @@ export class InputBarViewModel {
         !conversationEntity.hasGlobalMessageTimer()
       );
     });
-
-    // TODO(Federation): For Federation playground builds we disable every other activity than sending plain text messages
-    this.disableControls = ko.pureComputed(() => this.conversationEntity()?.isFederated());
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {

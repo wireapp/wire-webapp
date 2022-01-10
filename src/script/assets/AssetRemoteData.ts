@@ -19,13 +19,17 @@
 
 import ko from 'knockout';
 
-export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3;
+export type AssetUrlData = AssetUrlDataVersion1 | AssetUrlDataVersion2 | AssetUrlDataVersion3 | AssetUrlDataVersion4;
 
 export interface AssetUrlDataVersion3 {
   assetKey: string;
   assetToken: string;
   forceCaching: boolean;
   version: 3;
+}
+export interface AssetUrlDataVersion4 extends Omit<AssetUrlDataVersion3, 'version'> {
+  assetDomain: string;
+  version: 4;
 }
 
 export interface AssetUrlDataVersion2 {
@@ -56,13 +60,35 @@ export class AssetRemoteData {
     this.cancelDownload = () => {};
   }
 
+  static v4(
+    assetKey: string,
+    assetDomain: string,
+    otrKey?: Uint8Array,
+    sha256?: Uint8Array,
+    assetToken?: string,
+    forceCaching: boolean = false,
+  ) {
+    return new AssetRemoteData(
+      assetKey,
+      {
+        assetDomain,
+        assetKey,
+        assetToken,
+        forceCaching,
+        version: 4,
+      },
+      otrKey,
+      sha256,
+    );
+  }
+
   static v3(
     assetKey: string,
     otrKey?: Uint8Array,
     sha256?: Uint8Array,
     assetToken?: string,
     forceCaching: boolean = false,
-  ): AssetRemoteData {
+  ) {
     return new AssetRemoteData(
       assetKey,
       {
@@ -82,7 +108,7 @@ export class AssetRemoteData {
     otrKey: Uint8Array,
     sha256: Uint8Array,
     forceCaching: boolean = false,
-  ): AssetRemoteData {
+  ) {
     return new AssetRemoteData(
       `${conversationId}${assetId}`,
       {
@@ -96,7 +122,7 @@ export class AssetRemoteData {
     );
   }
 
-  static v1(conversationId: string, assetId: string, forceCaching: boolean = false): AssetRemoteData {
+  static v1(conversationId: string, assetId: string, forceCaching: boolean = false) {
     return new AssetRemoteData(`${conversationId}${assetId}`, {
       assetId,
       conversationId,
