@@ -970,8 +970,8 @@ export class CallingRepository {
 
   private mapQualifiedTargets(targets: SendMessageTarget): QualifiedUserClients {
     const recipients = targets.clients.reduce((acc, {userid, clientid}) => {
-      let {domain, id} = this.parseQualifiedId(userid);
-      domain = domain || this.selfUser.domain;
+      const {domain: parsedDomain, id} = this.parseQualifiedId(userid);
+      const domain = parsedDomain || this.selfUser.domain;
       const domainRecipients = (acc[domain] = acc[domain] ?? {});
       domainRecipients[id] = [...(domainRecipients[id] ?? []), clientid];
       return acc;
