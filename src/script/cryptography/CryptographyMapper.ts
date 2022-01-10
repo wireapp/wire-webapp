@@ -342,6 +342,7 @@ export class CryptographyMapper {
     if (asset.hasOwnProperty('uploaded') && uploaded !== null) {
       data = {
         ...data,
+        domain: uploaded.assetDomain,
         key: uploaded.assetId,
         otr_key: new Uint8Array(uploaded.otrKey),
         sha256: new Uint8Array(uploaded.sha256),
