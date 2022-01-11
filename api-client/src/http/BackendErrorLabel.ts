@@ -105,7 +105,7 @@ export enum BackendErrorLabel {
   TOO_MANY_SERVICES = 'too-many-bots',
 
   // Federation errors
-  FEDERATION_NOT_ALLOWED = 'federation-not-allowed',
+  FEDERATION_NOT_ALLOWED = 'federation-denied',
   FEDERATION_BACKEND_NOT_FOUND = 'srv-record-not-found',
 }
 
