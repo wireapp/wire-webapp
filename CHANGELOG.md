@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.5.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.5.1...@wireapp/api-client@16.5.2) (2022-01-11)
+
+
+### Bug Fixes
+
+* **api-client:** Update federation backend error labels ([112fb61](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/112fb614b3e789b9d2710abde602a78095c90481))
+
+
+
+
+
 ## [16.5.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.5.0...@wireapp/api-client@16.5.1) (2022-01-10)
 
 
