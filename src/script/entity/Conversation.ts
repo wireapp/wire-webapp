@@ -686,9 +686,11 @@ export class Conversation {
   getNextTimestamp(): number {
     const sentMessages = this.messages().filter(message => message?.status() !== StatusType.SENDING);
     if (sentMessages.length === 0) {
-      return this.getLastKnownTimestamp();
+      return this.getLastKnownTimestamp() + 1;
     }
-    return sentMessages[sentMessages.length - 1].timestamp() + 1;
+    const lastMessageTimestamp = sentMessages[sentMessages.length - 1].timestamp();
+    // The next timestamp can never be before the last known timestamp, so we need to take the max between the last message and the last known server timestamp
+    return Math.max(lastMessageTimestamp, this.getLastKnownTimestamp()) + 1;
   }
 
   getLatestTimestamp(currentTimestamp: number): number {
