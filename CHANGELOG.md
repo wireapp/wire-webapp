@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.5.2...@wireapp/api-client@16.6.0) (2022-01-12)
+
+
+### Features
+
+* adding new utms to api interface ([#4210](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4210)) ([ed44e87](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/ed44e87f36e471d819b3a269b5a15dd837bf9f72))
+
+
+
+
+
 ## [16.5.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.5.1...@wireapp/api-client@16.5.2) (2022-01-11)
 
 
