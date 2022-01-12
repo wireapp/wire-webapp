@@ -132,7 +132,13 @@ export class UserMapper {
     const hasPicture = picture?.length;
     let mappedAssets;
     if (hasAsset) {
-      mappedAssets = mapProfileAssets(userEntity.id, userData.assets);
+      mappedAssets = mapProfileAssets(
+        userEntity.id,
+        userData.assets.map(asset => ({
+          ...asset,
+          domain: Config.getConfig().FEATURE.ENABLE_FEDERATION ? userEntity.domain : undefined,
+        })),
+      );
     } else if (hasPicture) {
       mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
     }
