@@ -116,9 +116,9 @@ export class TeamAPI {
     };
   }
 
-  public async postLead(email: string): Promise<any> {
+  public async postLead(data: LeadData): Promise<any> {
     const config: AxiosRequestConfig = {
-      data: {email},
+      data,
       method: 'post',
       url: `${TeamAPI.URL.CONSENT}/${TeamAPI.URL.MARKETO}/${TeamAPI.URL.LEAD}`,
     };
