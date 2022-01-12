@@ -23,14 +23,17 @@ import {LinkPreviewContent, LinkPreviewUploadedContent} from '../conversation/co
 export class LinkPreviewService {
   constructor(private readonly assetService: AssetService) {}
 
-  public async uploadLinkPreviewImage(linkPreview: LinkPreviewContent): Promise<LinkPreviewUploadedContent> {
+  public async uploadLinkPreviewImage(
+    linkPreview: LinkPreviewContent,
+    domain?: string,
+  ): Promise<LinkPreviewUploadedContent> {
     const {image, ...preview} = linkPreview;
     if (!image) {
       return preview;
     }
 
     const uploadedLinkPreview: LinkPreviewUploadedContent = preview;
-    const asset = await (await this.assetService.uploadAsset(linkPreview.image.data)).response;
+    const asset = await (await this.assetService.uploadAsset(linkPreview.image.data, {domain})).response;
     uploadedLinkPreview.imageUploaded = {
       asset,
       image,
