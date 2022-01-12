@@ -547,6 +547,7 @@ export class ConversationService {
     const remoteData = Asset.RemoteData.create({
       assetId: asset.key,
       assetToken: asset.token,
+      assetDomain: asset.domain,
       otrKey: asset.keyBytes,
       sha256: asset.sha256,
     });
