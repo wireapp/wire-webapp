@@ -338,7 +338,7 @@ export class MessageRepository {
       quote: quoteEntity,
     };
     await this.sendText(textPayload);
-    await this.handleLinkPreview(textPayload, conversation);
+    await this.handleLinkPreview(textPayload);
   }
 
   /**
@@ -375,10 +375,10 @@ export class MessageRepository {
       originalMessageId: originalMessage.id,
     };
     await this.sendEdit(messagePayload);
-    await this.handleLinkPreview(messagePayload, conversation);
+    await this.handleLinkPreview(messagePayload);
   }
 
-  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}, conversation: Conversation) {
+  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
     // check if the user actually wants to send link previews
     if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
       return;
@@ -390,10 +390,7 @@ export class MessageRepository {
       await this.sendText({
         ...textPayload,
         linkPreview: linkPreview.image
-          ? await this.core.service!.linkPreview.uploadLinkPreviewImage(
-              linkPreview as LinkPreviewContent,
-              conversation.isFederated() ? conversation.domain : undefined,
-            )
+          ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
           : linkPreview,
       });
     }
@@ -526,7 +523,6 @@ export class MessageRepository {
   private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
     const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
-      domain: conversation.isFederated() ? conversation.domain : undefined,
       expectsReadConfirmation: this.expectReadReceipt(conversation),
       legalHoldStatus: conversation.legalHoldStatus(),
       public: true,

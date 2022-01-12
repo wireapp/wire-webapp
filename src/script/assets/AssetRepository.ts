@@ -171,10 +171,7 @@ export class AssetRepository {
     }
   }
 
-  async uploadProfileImage(
-    image: Blob,
-    domain?: string,
-  ): Promise<{
+  async uploadProfileImage(image: Blob): Promise<{
     mediumImageKey: {domain?: string; key: string};
     previewImageKey: {domain?: string; key: string};
   }> {
@@ -184,7 +181,6 @@ export class AssetRepository {
     ]);
 
     const options: AssetUploadOptions = {
-      domain,
       expectsReadConfirmation: false,
       public: true,
       retention: AssetRetentionPolicy.ETERNAL,
