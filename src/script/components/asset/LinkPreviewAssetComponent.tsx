@@ -40,7 +40,7 @@ export interface LinkPreviewAssetProps {
 const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
   const [preview] = (message.getFirstAsset() as Text).previews();
 
-  const isTypeTweet = preview?.tweet;
+  const isTypeTweet = !!preview?.tweet;
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
   const author = isTweet ? preview.tweet?.author?.substring(0, 20) : '';
   const previewImage = preview?.image;
