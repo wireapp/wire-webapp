@@ -331,8 +331,8 @@ export class MessageRepository {
     quoteEntity?: QuoteEntity,
   ): Promise<void> {
     const textPayload = {
-      conversation: conversation,
-      mentions: mentions,
+      conversation,
+      mentions,
       message: textMessage,
       messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       quote: quoteEntity,
