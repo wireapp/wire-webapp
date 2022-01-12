@@ -826,7 +826,10 @@ export class CallingRepository {
   requestVideoStreams(conversationId: QualifiedId, participants: Participant[]) {
     const convId = this.serializeQualifiedId(conversationId);
     const payload = {
-      clients: participants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      clients: participants.map(participant => ({
+        clientid: participant.clientId,
+        userid: this.serializeQualifiedId(participant.user.qualifiedId),
+      })),
       convid: convId,
     };
     this.wCall.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
