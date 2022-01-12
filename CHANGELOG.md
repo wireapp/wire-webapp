@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [20.7.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.7.0...@wireapp/core@20.7.1) (2022-01-12)
+
+
+### Bug Fixes
+
+* **core:** Map domain for image asset messages ([d583feb](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/d583feb722a98d35c272fc862346ea7968cf0040))
+
+
+
+
+
 # [20.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.6.2...@wireapp/core@20.7.0) (2022-01-12)
 
 
