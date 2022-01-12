@@ -61,7 +61,7 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
-import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
+import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from '../entity/message/LinkPreview';
 import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
 import {MemberJoinEvent, MemberLeaveEvent, TeamMemberLeaveEvent} from './EventBuilder';
 import {AssetData} from '../cryptography/CryptographyMapper';
@@ -801,8 +801,11 @@ export class EventMapper {
       const {image, title, url, tweet} = linkPreview;
       const {image: article_image, title: article_title} = linkPreview.article || {};
 
-      const linkPreviewEntity = new LinkPreviewEntity({title: title || article_title, tweet, url: url});
-
+      const linkPreviewData: LinkPreviewData = {
+        title: title || article_title || '',
+        tweet: tweet ?? undefined,
+        url: url,
+      };
       const previewImage = image || article_image;
       if (previewImage && previewImage.uploaded) {
         const {assetId: assetKey, assetToken, assetDomain} = previewImage.uploaded;
@@ -816,11 +819,11 @@ export class EventMapper {
           const remoteData = assetDomain
             ? AssetRemoteData.v4(assetKey, assetDomain, otrKey, sha256, assetToken, true)
             : AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true);
-          linkPreviewEntity.image_resource(remoteData);
+          linkPreviewData.image = remoteData;
         }
       }
 
-      return linkPreviewEntity;
+      return new LinkPreviewEntity(linkPreviewData);
     }
   }
 

@@ -42,8 +42,8 @@ const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = fa
 
   const isTypeTweet = preview?.tweet;
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
-  const author = isTweet ? preview.tweet.author?.substring(0, 20) : '';
-  const previewImage = useKoSubscribable(preview?.image_resource);
+  const author = isTweet ? preview.tweet?.author?.substring(0, 20) : '';
+  const previewImage = preview?.image;
   const isObfuscated = useKoSubscribable(message.isObfuscated);
 
   const onClick = () => {
