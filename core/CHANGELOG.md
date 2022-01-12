@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [20.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.6.2...@wireapp/core@20.7.0) (2022-01-12)
+
+
+### Features
+
+* **core:** Enable link preview asset upload for federated env ([#4209](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4209)) ([232adaf](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/232adafa7f76a44889c661ee0750f7ea8f31df79))
+
+
+
+
+
 ## [20.6.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.6.1...@wireapp/core@20.6.2) (2022-01-11)
 
 **Note:** Version bump only for package @wireapp/core
