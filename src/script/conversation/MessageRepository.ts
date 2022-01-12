@@ -318,27 +318,27 @@ export class MessageRepository {
   /**
    * Send text message with link preview in specified conversation.
    *
-   * @param conversationEntity Conversation that should receive the message
+   * @param conversation Conversation that should receive the message
    * @param textMessage Plain text message
-   * @param mentionEntities Mentions part of the message
+   * @param mentions Mentions part of the message
    * @param quoteEntity Quoted message
    * @returns Resolves after sending the message
    */
   public async sendTextWithLinkPreview(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     textMessage: string,
-    mentionEntities: MentionEntity[],
+    mentions: MentionEntity[],
     quoteEntity?: QuoteEntity,
   ): Promise<void> {
     const textPayload = {
-      conversation: conversationEntity,
-      mentions: mentionEntities,
+      conversation: conversation,
+      mentions: mentions,
       message: textMessage,
       messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       quote: quoteEntity,
     };
     await this.sendText(textPayload);
-    await this.handleLinkPreview(textPayload);
+    await this.handleLinkPreview(textPayload, conversation);
   }
 
   /**
@@ -375,10 +375,10 @@ export class MessageRepository {
       originalMessageId: originalMessage.id,
     };
     await this.sendEdit(messagePayload);
-    await this.handleLinkPreview(messagePayload);
+    await this.handleLinkPreview(messagePayload, conversation);
   }
 
-  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
+  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}, conversation: Conversation) {
     // check if the user actually wants to send link previews
     if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
       return;
@@ -390,7 +390,10 @@ export class MessageRepository {
       await this.sendText({
         ...textPayload,
         linkPreview: linkPreview.image
-          ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
+          ? await this.core.service!.linkPreview.uploadLinkPreviewImage(
+              linkPreview as LinkPreviewContent,
+              conversation.isFederated() ? conversation.domain : undefined,
+            )
           : linkPreview,
       });
     }
