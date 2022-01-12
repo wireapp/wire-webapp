@@ -18,7 +18,7 @@
  */
 
 import type {GenericMessage, IGenericMessage} from '@wireapp/protocol-messaging';
-import type {UserClients} from '@wireapp/api-client/src/conversation/';
+import type {UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation/';
 
 import type {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {QualifiedId} from '@wireapp/api-client/src/user';
@@ -35,7 +35,7 @@ export interface MessageSendingOptions {
    *  * `true`: force sending
    */
   precondition?: string[] | boolean;
-  recipients: UserClients;
+  recipients: UserClients | QualifiedUserClients;
 }
 
 export class EventInfoEntity {

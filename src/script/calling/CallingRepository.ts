@@ -22,7 +22,7 @@ import {Runtime} from '@wireapp/commons';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
-import type {ClientMismatch, UserClients} from '@wireapp/api-client/src/conversation';
+import type {ClientMismatch, UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   CALL_TYPE,
@@ -219,7 +219,7 @@ export class CallingRepository {
     const callingInstance = await getAvsInstance();
 
     this.wCall = this.configureCallingApi(callingInstance);
-    this.wUser = this.createWUser(this.wCall, this.selfUser.id, clientId);
+    this.wUser = this.createWUser(this.wCall, this.serializeQualifiedId(this.selfUser.qualifiedId), clientId);
     return {wCall: this.wCall, wUser: this.wUser};
   }
 
@@ -882,6 +882,20 @@ export class CallingRepository {
     }
   }
 
+  public async refreshVideoInput(): Promise<MediaStream> {
+    const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
+    this.stopMediaSource(MediaType.VIDEO);
+    this.changeMediaSource(stream, MediaType.VIDEO);
+    return stream;
+  }
+
+  public async refreshAudioInput(): Promise<MediaStream> {
+    const stream = await this.mediaStreamHandler.requestMediaStream(true, false, false, false);
+    this.stopMediaSource(MediaType.AUDIO);
+    this.changeMediaSource(stream, MediaType.AUDIO);
+    return stream;
+  }
+
   /**
    * @returns `true` if a media stream has been stopped.
    */
@@ -954,6 +968,17 @@ export class CallingRepository {
     return recipients;
   }
 
+  private mapQualifiedTargets(targets: SendMessageTarget): QualifiedUserClients {
+    const recipients = targets.clients.reduce((acc, {userid, clientid}) => {
+      const {domain: parsedDomain, id} = this.parseQualifiedId(userid);
+      const domain = parsedDomain || this.selfUser.domain;
+      const domainRecipients = (acc[domain] = acc[domain] ?? {});
+      domainRecipients[id] = [...(domainRecipients[id] ?? []), clientid];
+      return acc;
+    }, {} as QualifiedUserClients);
+    return recipients;
+  }
+
   private injectActivateEvent(conversationId: QualifiedId, userId: QualifiedId, time: string, source: string): void {
     const event = EventBuilder.buildVoiceChannelActivate(conversationId, userId, time, this.avsVersion);
     this.eventRepository.injectEvent(event as unknown as EventRecord, source as EventSource);
@@ -996,7 +1021,8 @@ export class CallingRepository {
 
     if (typeof targets === 'string') {
       const parsedTargets: SendMessageTarget = JSON.parse(targets);
-      const recipients = this.mapTargets(parsedTargets);
+      const isFederated = Config.getConfig().FEATURE.ENABLE_FEDERATION;
+      const recipients = isFederated ? this.mapQualifiedTargets(parsedTargets) : this.mapTargets(parsedTargets);
       options = {
         nativePush: true,
         precondition: true,

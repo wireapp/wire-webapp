@@ -146,7 +146,6 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
   const {videoInput: currentCameraDevice} = useKoSubscribableChildren(mediaDevicesHandler.currentDeviceId, [
     DeviceTypes.VIDEO_INPUT,
   ]);
-  const switchCameraSource = (call: Call, deviceId: string) => switchCameraInput(call, deviceId);
   const minimize = () => multitasking.isMinimized(true);
   const videoInput = useKoSubscribable(mediaDevicesHandler.availableDevices.videoInput);
   const showToggleVideo =
@@ -264,7 +263,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
                     `}
                     currentDevice={currentCameraDevice}
                     devices={availableCameras}
-                    onChooseDevice={deviceId => switchCameraSource(call, deviceId)}
+                    onChooseDevice={deviceId => switchCameraInput(call, deviceId)}
                   />
                 ) : (
                   <div className="video-controls__button__label">{t('videoCallOverlayCamera')}</div>

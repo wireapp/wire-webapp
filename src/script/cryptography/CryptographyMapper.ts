@@ -78,6 +78,8 @@ export interface MappedAsset {
 export interface AssetData {
   content_length: number;
   content_type: string;
+  domain?: string;
+  id?: string;
   info: {
     height?: number;
     name?: string;
@@ -87,6 +89,8 @@ export interface AssetData {
   key?: string;
   meta?: MappedAssetMetaData;
   otr_key?: Uint8Array;
+  preview_domain?: string;
+  preview_id?: string;
   preview_key?: string;
   preview_otr_key?: Uint8Array;
   preview_sha256?: Uint8Array;
@@ -338,6 +342,7 @@ export class CryptographyMapper {
     if (asset.hasOwnProperty('uploaded') && uploaded !== null) {
       data = {
         ...data,
+        domain: uploaded.assetDomain,
         key: uploaded.assetId,
         otr_key: new Uint8Array(uploaded.otrKey),
         sha256: new Uint8Array(uploaded.sha256),

@@ -172,7 +172,6 @@ export class MessageRepository {
 
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
-    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancelAssetUpload);
   }
 
   /**
@@ -507,7 +506,9 @@ export class MessageRepository {
       public: true,
       retention,
     };
-    const asset = await this.assetRepository.uploadFile(file, messageId, options);
+    const asset = await this.assetRepository.uploadFile(file, messageId, options, () =>
+      this.cancelAssetUpload(messageId),
+    );
 
     const commonPayload = {
       asset: asset,

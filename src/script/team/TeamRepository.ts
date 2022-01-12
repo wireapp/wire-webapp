@@ -416,6 +416,7 @@ export class TeamRepository {
       this.handleFileSharingFeatureChange(previousConfig, featureConfigList);
       this.handleSelfDeletingMessagesFeatureChange(previousConfig, featureConfigList);
       this.handleConferenceCallingFeatureChange(previousConfig, featureConfigList);
+      this.handleGuestLinkFeatureChange(previousConfig, featureConfigList);
     }
     this.saveFeatureConfig(featureConfigList);
   };
@@ -431,6 +432,23 @@ export class TeamRepository {
             ? t('featureConfigChangeModalFileSharingDescriptionItemFileSharingEnabled')
             : t('featureConfigChangeModalFileSharingDescriptionItemFileSharingDisabled'),
           title: t('featureConfigChangeModalFileSharingHeadline', {brandName: Config.getConfig().BRAND_NAME}),
+        },
+      });
+    }
+  };
+
+  private readonly handleGuestLinkFeatureChange = (previousConfig: FeatureList, newConfig: FeatureList) => {
+    const hasGuestLinkChanged =
+      previousConfig?.conversationGuestLinks?.status !== newConfig?.conversationGuestLinks?.status;
+    const hasGuestLinkChangedToEnabled = newConfig?.conversationGuestLinks?.status === FeatureStatus.ENABLED;
+
+    if (hasGuestLinkChanged) {
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.ACKNOWLEDGE, {
+        text: {
+          htmlMessage: hasGuestLinkChangedToEnabled
+            ? t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksEnabled')
+            : t('featureConfigChangeModalConversationGuestLinksDescriptionItemConversationGuestLinksDisabled'),
+          title: t('featureConfigChangeModalConversationGuestLinksHeadline'),
         },
       });
     }
