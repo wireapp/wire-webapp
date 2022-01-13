@@ -94,7 +94,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
     expirationText,
     name: participantName,
   } = useKoSubscribableChildren(
-    // We need to make TS believe that this is a User, otherwise it will complain about 
+    // We need to make TS believe that this is a User, otherwise it will complain about
     // the fields in the array that don't exist on ServiceEntity
     participant as User,
     participant instanceof User ? ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name'] : ['name'],
