@@ -189,7 +189,8 @@ export class UserMapper {
       userEntity.isSingleSignOn = true;
     }
 
-    if (teamId) {
+    if (teamId && !userEntity.isFederated) {
+      // To be in the same team, the user needs to have the same teamId and to be on the same domain (not federated)
       userEntity.inTeam(true);
       userEntity.teamId = teamId;
     }
