@@ -37,7 +37,7 @@ interface SaveCallLogsProps {
   userState?: UserState;
 }
 
-const MINIMUM_CALL_LOG_LENGTH = 18;
+const MINIMUM_CALL_LOG_LENGTH = 30;
 const OBFUSCATION_TRUNCATE_TO = 4;
 
 const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState = container.resolve(UserState)}) => {
