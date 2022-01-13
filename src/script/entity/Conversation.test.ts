@@ -26,14 +26,14 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/src/conversation/';
 import 'src/script/localization/Localizer';
 import {createRandomUuid} from 'Util/util';
 
-import {Conversation} from 'src/script/entity/Conversation';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
-import {CallMessage} from 'src/script/entity/message/CallMessage';
-import {Message} from 'src/script/entity/message/Message';
-import {PingMessage} from 'src/script/entity/message/PingMessage';
-import {User} from 'src/script/entity/User';
-import {Text} from 'src/script/entity/message/Text';
-import {MemberMessage} from 'src/script/entity/message/MemberMessage';
+import {Conversation} from './Conversation';
+import {ContentMessage} from './message/ContentMessage';
+import {CallMessage} from './message/CallMessage';
+import {Message} from './message/Message';
+import {PingMessage} from './message/PingMessage';
+import {User} from './User';
+import {Text} from './message/Text';
+import {MemberMessage} from './message/MemberMessage';
 
 import {ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
@@ -44,13 +44,12 @@ import {CALL_MESSAGE_TYPE} from 'src/script/message/CallMessageType';
 import {ConnectionMapper} from 'src/script/connection/ConnectionMapper';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 import {MentionEntity} from 'src/script/message/MentionEntity';
-import {entities} from '../../api/payloads';
+import {entities} from '../../../test/api/payloads';
+import {Config} from '../Config';
 
 describe('Conversation', () => {
-  /** @type {Conversation} */
-  let conversation_et = null;
-  /** @type {User} */
-  let other_user = null;
+  let conversation_et: Conversation = null;
+  let other_user: User = null;
 
   const self_user = new User(entities.user.john_doe.id, null);
   self_user.isMe = true;
@@ -146,8 +145,7 @@ describe('Conversation', () => {
   });
 
   describe('add message', () => {
-    /** @type {Message} */
-    let initial_message_et = undefined;
+    let initial_message_et: Message = undefined;
 
     beforeEach(() => {
       initial_message_et = new Message(createRandomUuid());
@@ -284,18 +282,17 @@ describe('Conversation', () => {
   describe('addMessages', () => {
     const reference_timestamp = Date.now();
 
-    const message1 = new Message();
+    const message1 = new ContentMessage();
     message1.id = createRandomUuid();
     message1.timestamp(reference_timestamp - 10000);
     message1.user(self_user);
 
-    const message2 = new Message();
+    const message2 = new ContentMessage();
     message2.id = createRandomUuid();
     message2.timestamp(reference_timestamp - 5000);
 
     it('adds multiple messages', () => {
-      /** @type {any[]} */
-      const message_ets = [message1, message2];
+      const message_ets: ContentMessage[] = [message1, message2];
       conversation_et.addMessages(message_ets);
 
       expect(conversation_et.messages_unordered().length).toBe(2);
@@ -350,8 +347,7 @@ describe('Conversation', () => {
   });
 
   describe('getLastEditableMessage', () => {
-    /** @type {User} */
-    let self_user_et = undefined;
+    let self_user_et: User = undefined;
 
     beforeEach(() => {
       self_user_et = new User('', null);
@@ -673,6 +669,41 @@ describe('Conversation', () => {
     });
   });
 
+  describe('federation', () => {
+    beforeEach(() => {
+      spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ENABLE_FEDERATION: true}});
+    });
+
+    it('is considered a team conversation when teamId and domain are equal', () => {
+      const teamId = 'team1';
+      const conversation = new Conversation(createRandomUuid(), 'domain.test');
+      conversation.team_id = teamId;
+      const selfUser = new User(createRandomUuid(), 'domain.test');
+      selfUser.isMe = true;
+      selfUser.inTeam(true);
+      selfUser.teamId = teamId;
+      conversation.selfUser(selfUser);
+
+      expect(conversation.isFederated()).toBe(true);
+      expect(conversation.inTeam()).toBe(true);
+    });
+
+    // @SF.Federation @SF.Separation @TSFI.UserInterface @S0.2
+    it('is not considered a team conversation when teamId are equal but domains differ', () => {
+      const teamId = 'team1';
+      const conversation = new Conversation(createRandomUuid(), 'otherdomain.test');
+      conversation.team_id = teamId;
+      const selfUser = new User(createRandomUuid(), 'domain.test');
+      selfUser.isMe = true;
+      selfUser.inTeam(true);
+      selfUser.teamId = teamId;
+      conversation.selfUser(selfUser);
+
+      expect(conversation.isFederated()).toBe(true);
+      expect(conversation.inTeam()).toBe(false);
+    });
+  });
+
   describe('hasService', () => {
     it('detects conversations with services', () => {
       const userEntity = new User(createRandomUuid(), null);
@@ -769,8 +800,7 @@ describe('Conversation', () => {
   });
 
   describe('removeMessageById', () => {
-    /** @type {string} */
-    let message_id = undefined;
+    let message_id: string = undefined;
 
     beforeEach(() => {
       const message_et = new Message(createRandomUuid());
@@ -879,18 +909,12 @@ describe('Conversation', () => {
   });
 
   describe('shouldUnarchive', () => {
-    /** @type {number} */
-    let timestamp = undefined;
-    /** @type {ContentMessage} */
-    let contentMessage = undefined;
-    /** @type {PingMessage} */
-    let mutedTimestampMessage = undefined;
-    /** @type {PingMessage} */
-    let outdatedMessage = undefined;
-    /** @type {PingMessage} */
-    let pingMessage = undefined;
-    /** @type {ContentMessage} */
-    let selfMentionMessage = undefined;
+    let timestamp: number = undefined;
+    let contentMessage: ContentMessage = undefined;
+    let mutedTimestampMessage: PingMessage = undefined;
+    let outdatedMessage: PingMessage = undefined;
+    let pingMessage: PingMessage = undefined;
+    let selfMentionMessage: ContentMessage = undefined;
     const conversationEntity = new Conversation(createRandomUuid());
 
     const selfUserEntity = new User(createRandomUuid(), null);
@@ -1103,7 +1127,7 @@ describe('Conversation', () => {
         },
         name: 'Marco',
         type: 3,
-      };
+      } as any;
 
       const connectionEntity = ConnectionMapper.mapConnectionFromJson(payload_connection);
 
