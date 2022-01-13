@@ -19,7 +19,7 @@
 
 import Avatar, {AVATAR_SIZE} from 'Components/Avatar';
 import React from 'react';
-import {useKoSubscribable} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {AssetRepository} from '../../../assets/AssetRepository';
 import type {Conversation} from '../../../entity/Conversation';
 import {generateConversationUrl} from '../../../router/routeGenerator';
@@ -34,9 +34,12 @@ export interface GroupListItemProps {
 }
 
 const GroupListItem: React.FC<GroupListItemProps> = ({assetRepository, click, group, router}) => {
-  const displayName = useKoSubscribable(group.display_name);
-  const participatingUserEts = useKoSubscribable(group.participating_user_ets);
-  const is1to1 = useKoSubscribable(group.is1to1);
+  const {
+    display_name: displayName,
+    participating_user_ets: participatingUserEts,
+    is1to1,
+  } = useKoSubscribableChildren(group, ['display_name', 'participating_user_ets', 'is1to1']);
+
   return (
     <div
       key={group.id}

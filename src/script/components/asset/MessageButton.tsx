@@ -18,7 +18,7 @@
  */
 
 import React from 'react';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {noop} from 'Util/util';
 import classNames from 'classnames';
 import type {CompositeMessage} from '../../entity/message/CompositeMessage';
@@ -32,10 +32,12 @@ export interface MessageButtonProps {
 }
 
 const MessageButton: React.FC<MessageButtonProps> = ({id, label, message, onClick = noop}) => {
-  const selectedButtonId = useKoSubscribable(message.selectedButtonId);
-  const waitingButtonId = useKoSubscribable(message.waitingButtonId);
-  const errorButtonId = useKoSubscribable(message.errorButtonId);
-  const errorMessage = useKoSubscribable(message.errorMessage);
+  const {errorButtonId, errorMessage, selectedButtonId, waitingButtonId} = useKoSubscribableChildren(message, [
+    'errorButtonId',
+    'errorMessage',
+    'selectedButtonId',
+    'waitingButtonId',
+  ]);
 
   const isSelected = selectedButtonId === id;
   const isWaiting = waitingButtonId === id;

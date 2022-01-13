@@ -23,7 +23,7 @@ import cx from 'classnames';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {cleanURL} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
-import {registerReactComponent, useKoSubscribable} from 'Util/ComponentUtil';
+import {registerReactComponent, useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 import Image from '../Image';
@@ -38,13 +38,15 @@ export interface LinkPreviewAssetProps {
 }
 
 const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
-  const [preview] = (message.getFirstAsset() as Text).previews();
+  const {
+    previews: [preview],
+  } = useKoSubscribableChildren(message.getFirstAsset() as Text, ['previews']);
 
   const isTypeTweet = !!preview?.tweet;
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
   const author = isTweet ? preview.tweet?.author?.substring(0, 20) : '';
   const previewImage = preview?.image;
-  const isObfuscated = useKoSubscribable(message.isObfuscated);
+  const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
 
   const onClick = () => {
     if (!message.isExpired()) {

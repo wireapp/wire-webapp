@@ -25,7 +25,7 @@ import Icon from 'Components/Icon';
 import React, {useEffect, useMemo, useState} from 'react';
 import {TeamState} from '../../team/TeamState';
 import {container} from 'tsyringe';
-import {useKoSubscribable, useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import type {Call} from '../../calling/Call';
 import type {Participant} from '../../calling/Participant';
@@ -147,7 +147,7 @@ const FullscreenVideoCall: React.FC<FullscreenVideoCallProps> = ({
     DeviceTypes.VIDEO_INPUT,
   ]);
   const minimize = () => multitasking.isMinimized(true);
-  const videoInput = useKoSubscribable(mediaDevicesHandler.availableDevices.videoInput);
+  const {videoInput} = useKoSubscribableChildren(mediaDevicesHandler.availableDevices, [DeviceTypes.VIDEO_INPUT]);
   const showToggleVideo =
     isVideoCallingEnabled &&
     (call.initialType === CALL_TYPE.VIDEO ||
