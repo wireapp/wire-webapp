@@ -89,7 +89,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
 
   const {
     is_verified: isVerified,
-    isGuest,
+    isDirectGuest,
     availability,
     expirationText,
     name: participantName,
@@ -97,7 +97,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
     // We need to make TS believe that this is a User, otherwise it will complain about 
     // the fields in the array that don't exist on ServiceEntity
     participant as User,
-    participant instanceof User ? ['isGuest', 'is_verified', 'availability', 'expirationText', 'name'] : ['name'],
+    participant instanceof User ? ['isDirectGuest', 'is_verified', 'availability', 'expirationText', 'name'] : ['name'],
   );
 
   const isFederated = participant instanceof User && participant.isFederated;
@@ -196,7 +196,7 @@ const ParticipantItem: React.FC<ParticipantItemProps> = ({
               )}
             </div>
 
-            {!isOthersMode && isGuest && !isFederated && (
+            {!isOthersMode && isDirectGuest && (
               <span
                 className="guest-icon with-tooltip with-tooltip--external"
                 data-tooltip={t('conversationGuestIndicator')}
