@@ -131,6 +131,10 @@ export class CallingRepository {
   private wCall?: Wcall;
   private wUser?: number;
   private nextMuteState: MuteState;
+  /**
+   * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
+   */
+  private avsInitLogLength: number = 0;
   onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
@@ -225,6 +229,7 @@ export class CallingRepository {
 
   setReady(): void {
     this.isReady = true;
+    this.avsInitLogLength = this.callLog.length;
   }
 
   private configureCallingApi(wCall: Wcall): Wcall {
@@ -1644,7 +1649,11 @@ export class CallingRepository {
   // Logging
   //##############################################################################
 
-  public getCallLog(): string[] {
-    return this.callLog;
+  /**
+   * Returns the call log if it is a meaningful log.
+   * An avs log is considered meaningful if more lines have been added after the webapp was first initiated
+   */
+  public getCallLog(): string[] | undefined {
+    return this.callLog.length > this.avsInitLogLength ? this.callLog : undefined;
   }
 }
