@@ -25,7 +25,6 @@ import {container} from 'tsyringe';
 import {t} from 'Util/LocalizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {Config} from '../../../Config';
 import PreferencesSection from '../components/PreferencesSection';
 import type {CallingRepository} from '../../../calling/CallingRepository';
@@ -37,20 +36,16 @@ interface SaveCallLogsProps {
   userState?: UserState;
 }
 
-const MINIMUM_CALL_LOG_LENGTH = 30;
 const OBFUSCATION_TRUNCATE_TO = 4;
 
 const SaveCallLogs: React.FC<SaveCallLogsProps> = ({callingRepository, userState = container.resolve(UserState)}) => {
   const brandName = Config.getConfig().BRAND_NAME;
-  const {self} = useKoSubscribableChildren(userState, ['self']);
   const saveCallLogs = () => {
     const messageLog = callingRepository.getCallLog();
-    // Very short logs will not contain useful information
-    const logExceedsMinimumLength = messageLog.length > MINIMUM_CALL_LOG_LENGTH;
-    if (logExceedsMinimumLength) {
+    if (messageLog) {
       const callLog = [messageLog.join('\r\n')];
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
-      const truncatedId = self.id.substr(0, OBFUSCATION_TRUNCATE_TO);
+      const truncatedId = userState.self().id.substr(0, OBFUSCATION_TRUNCATE_TO);
       const sanitizedBrandName = brandName.replace(/[^A-Za-z0-9_]/g, '');
       const filename = `${sanitizedBrandName}-${truncatedId}-Calling_${getCurrentDate()}.log`;
 

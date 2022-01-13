@@ -131,6 +131,7 @@ export class CallingRepository {
   private wCall?: Wcall;
   private wUser?: number;
   private nextMuteState: MuteState;
+  private avsInitLogLength: number = 0;
   onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
@@ -225,6 +226,7 @@ export class CallingRepository {
 
   setReady(): void {
     this.isReady = true;
+    this.avsInitLogLength = this.callLog.length;
   }
 
   private configureCallingApi(wCall: Wcall): Wcall {
@@ -1645,6 +1647,6 @@ export class CallingRepository {
   //##############################################################################
 
   public getCallLog(): string[] {
-    return this.callLog;
+    return this.callLog.length > this.avsInitLogLength ? this.callLog : undefined;
   }
 }
