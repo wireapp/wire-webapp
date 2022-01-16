@@ -18,8 +18,9 @@
  */
 
 import React from 'react';
-import {CopyIcon} from '@wireapp/react-ui-kit';
 import {t} from 'Util/LocalizerUtil';
+import Icon from 'Components/Icon';
+import {copyText} from 'Util/ClipboardUtil';
 
 interface AccountLinkProps extends React.InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;
@@ -28,12 +29,7 @@ interface AccountLinkProps extends React.InputHTMLAttributes<HTMLInputElement> {
   isDone?: boolean;
   label: string;
   labelUie?: string;
-  maxLength?: number;
-  onValueChange?: (value: string) => void;
-  prefix?: string;
-  readOnly?: boolean;
-  setIsEditing?: (isEditing: boolean) => void;
-  suffix?: string;
+
   value: string;
   valueUie?: string;
 }
@@ -42,11 +38,10 @@ const AccountLink: React.FC<AccountLinkProps> = ({
   label,
   value,
   readOnly,
-  onValueChange,
+
   isDone = false,
   prefix,
-  suffix,
-  setIsEditing: setIsEditingExternal,
+
   forceLowerCase = false,
   maxLength,
   allowedChars,
@@ -54,6 +49,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({
   valueUie,
   ...rest
 }) => {
+  const iconUiePrefix = rest['data-uie-name'] ?? 'account-link';
   return (
     <div
       css={{
@@ -67,11 +63,8 @@ const AccountLink: React.FC<AccountLinkProps> = ({
           display: 'flex',
           flexDirection: 'column',
           marginBottom: 8,
-
           padding: 8,
-
           svg: {marginLeft: 8},
-
           width: 280,
         }}
       >
@@ -92,9 +85,25 @@ const AccountLink: React.FC<AccountLinkProps> = ({
           {value}
         </div>
       </div>
-      <button onClick={() => value}>
-        <CopyIcon height={16} width={16} color="black" /> {t('preferencesAccountCopyLink')}
-      </button>
+      <div
+        role="button"
+        onClick={() => copyText(value)}
+        css={{
+          alignItems: 'center',
+          cursor: 'pointer',
+          display: 'flex',
+          flexDirection: 'row',
+          paddingLeft: '8px',
+          paddingTop: '8px',
+        }}
+      >
+        <Icon.Copy
+          css={{fill: 'var(--background)', marginRight: '8px'}}
+          className="edit-icon"
+          data-uie-name={`${iconUiePrefix}-icon`}
+        />
+        {t('preferencesAccountCopyLink')}
+      </div>
     </div>
   );
 };
