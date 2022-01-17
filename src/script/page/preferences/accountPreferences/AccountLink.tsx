@@ -25,13 +25,10 @@ import {copyText} from 'Util/ClipboardUtil';
 interface AccountLinkProps extends React.InputHTMLAttributes<HTMLInputElement> {
   'data-uie-name'?: string;
   label: string;
-  labelUie?: string;
   value: string;
-  valueUie?: string;
 }
 
-const AccountLink: React.FC<AccountLinkProps> = ({label, value, labelUie, valueUie, ...rest}) => {
-  const iconUiePrefix = rest['data-uie-name'] ?? 'account-link';
+const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
   return (
     <div
       css={{
@@ -58,16 +55,17 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, labelUie, valueU
             lineHeight: '1.33',
             marginBottom: 2,
           }}
-          data-uie-name={labelUie}
+          data-uie-name="label-profile-link"
         >
           {label}
         </label>
 
-        <div data-uie-name={valueUie} data-uie-value={value} {...rest}>
+        <div data-uie-name="profile-link" data-uie-value={value} {...rest}>
           {value}
         </div>
       </div>
       <div
+        data-uie-name="do-copy-profile-link"
         role="button"
         onClick={() => copyText(value)}
         css={{
@@ -79,7 +77,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, labelUie, valueU
           paddingTop: '8px',
         }}
       >
-        <Icon.Copy css={{fill: 'var(--background)', marginRight: '8px'}} data-uie-name={`${iconUiePrefix}-icon`} />
+        <Icon.Copy css={{fill: 'var(--background)', marginRight: '8px'}} data-uie-name="profile-link-icon" />
         {t('preferencesAccountCopyLink')}
       </div>
     </div>

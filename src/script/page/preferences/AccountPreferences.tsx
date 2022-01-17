@@ -189,8 +189,7 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
             <AccountLink
               label={t('preferencesAccountLink')}
               value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}`}
-              readOnly
-              data-uie-name="profile-link"
+              data-uie-name="element-profile-link"
             />
           </div>
         </PreferencesSection>
