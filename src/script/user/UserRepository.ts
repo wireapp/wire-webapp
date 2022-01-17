@@ -820,11 +820,10 @@ export class UserRepository {
   async changePicture(picture: Blob): Promise<User> {
     try {
       const selfUser = this.userState.self();
-      const domain = Config.getConfig().FEATURE.ENABLE_FEDERATION ? selfUser.domain : undefined;
-      const {previewImageKey, mediumImageKey} = await this.assetRepository.uploadProfileImage(picture, domain);
+      const {previewImageKey, mediumImageKey} = await this.assetRepository.uploadProfileImage(picture);
       const assets: APIClientUserAsset[] = [
-        {domain, key: previewImageKey.key, size: APIClientUserAssetType.PREVIEW, type: 'image'},
-        {domain, key: mediumImageKey.key, size: APIClientUserAssetType.COMPLETE, type: 'image'},
+        {domain: previewImageKey.domain, key: previewImageKey.key, size: APIClientUserAssetType.PREVIEW, type: 'image'},
+        {domain: mediumImageKey.domain, key: mediumImageKey.key, size: APIClientUserAssetType.COMPLETE, type: 'image'},
       ];
       await this.selfService.putSelf({assets, picture: []} as any);
       return await this.userUpdate({user: {assets, id: selfUser.id}});

@@ -131,6 +131,10 @@ export class CallingRepository {
   private wCall?: Wcall;
   private wUser?: number;
   private nextMuteState: MuteState;
+  /**
+   * Keeps track of the size of the avs log once the webapp is initiated. This allows detecting meaningless avs logs (logs that have a length equal to the length when the webapp was initiated)
+   */
+  private avsInitLogLength: number = 0;
   onChooseScreen: (deviceId: string) => void;
 
   static get CONFIG() {
@@ -225,6 +229,7 @@ export class CallingRepository {
 
   setReady(): void {
     this.isReady = true;
+    this.avsInitLogLength = this.callLog.length;
   }
 
   private configureCallingApi(wCall: Wcall): Wcall {
@@ -826,7 +831,10 @@ export class CallingRepository {
   requestVideoStreams(conversationId: QualifiedId, participants: Participant[]) {
     const convId = this.serializeQualifiedId(conversationId);
     const payload = {
-      clients: participants.map(participant => ({clientid: participant.clientId, userid: participant.user.id})),
+      clients: participants.map(participant => ({
+        clientid: participant.clientId,
+        userid: this.serializeQualifiedId(participant.user.qualifiedId),
+      })),
       convid: convId,
     };
     this.wCall.requestVideoStreams(this.wUser, convId, VSTREAMS.LIST, JSON.stringify(payload));
@@ -1414,22 +1422,20 @@ export class CallingRepository {
   };
 
   private readonly updateParticipantVideoStream = (
-    conversationId: SerializedConversationId,
+    remoteConversationId: SerializedConversationId,
     remoteUserId: UserId,
     remoteClientId: ClientId,
     streams: readonly MediaStream[] | null,
   ): void => {
-    let participant = this.findParticipant(
-      this.parseQualifiedId(conversationId),
-      this.parseQualifiedId(remoteUserId),
-      remoteClientId,
-    );
+    const conversationId = this.parseQualifiedId(remoteConversationId);
+    const userId = this.parseQualifiedId(remoteUserId);
+    let participant = this.findParticipant(conversationId, userId, remoteClientId);
     if (!participant) {
-      const call = this.findCall(this.parseQualifiedId(conversationId));
+      const call = this.findCall(conversationId);
       if (call?.conversationType !== CONV_TYPE.ONEONONE) {
         return;
       }
-      participant = new Participant(this.userRepository.findUserById(remoteUserId), remoteClientId);
+      participant = new Participant(this.userRepository.findUserById(userId), remoteClientId);
       call.addParticipant(participant);
     }
 
@@ -1641,7 +1647,11 @@ export class CallingRepository {
   // Logging
   //##############################################################################
 
-  public getCallLog(): string[] {
-    return this.callLog;
+  /**
+   * Returns the call log if it is a meaningful log.
+   * An avs log is considered meaningful if more lines have been added after the webapp was first initiated
+   */
+  public getCallLog(): string[] | undefined {
+    return this.callLog.length > this.avsInitLogLength ? this.callLog : undefined;
   }
 }

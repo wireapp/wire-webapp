@@ -21,15 +21,16 @@ import {createRandomUuid} from 'Util/util';
 
 import {ACCENT_ID, Config} from 'src/script/Config';
 import {User} from 'src/script/entity/User';
-import {UserMapper} from 'src/script/user/UserMapper';
+import {UserMapper} from './UserMapper';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
-import {entities, payload} from '../../api/payloads';
+import {entities, payload} from 'test/api/payloads';
+import {UserAsset, UserAssetType} from '@wireapp/api-client/src/user';
 
 describe('User Mapper', () => {
-  const userState = {self: () => ({domain: 'local.test'})};
+  const userState: any = {self: () => ({domain: 'local.test'})};
   const mapper = new UserMapper(serverTimeHandler, userState);
 
-  let self_user_payload = null;
+  let self_user_payload: any = null;
 
   beforeEach(() => {
     self_user_payload = JSON.parse(JSON.stringify(payload.self.get));
@@ -53,10 +54,30 @@ describe('User Mapper', () => {
       spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ENABLE_FEDERATION: true}});
       const user = mapper.mapUserFromJson({
         id: 'id',
+        locale: '',
+        name: 'user',
         qualified_id: {domain: domain, id: 'id'},
       });
 
       expect(user.isFederated).toBe(expected);
+    });
+
+    // @SF.Federation @SF.Separation @TSFI.UserInterface @S0.2
+    it('Detects that user is not in the team if teamId is the same but domain is different', () => {
+      const teamId = 'team1';
+      spyOn(Config, 'getConfig').and.returnValue({FEATURE: {ENABLE_FEDERATION: true}});
+      spyOn(userState, 'self').and.returnValue({domain: 'domain.test', teamId: teamId});
+
+      const user = mapper.mapSelfUserFromJson({
+        id: 'id',
+        locale: '',
+        name: 'guest',
+        qualified_id: {domain: 'otherdomain.test', id: 'id'},
+        team: teamId,
+      });
+
+      expect(user.isFederated).toBe(true);
+      expect(user.inTeam()).toBe(false);
     });
 
     it('returns undefined if input was undefined', () => {
@@ -162,7 +183,7 @@ describe('User Mapper', () => {
       const expirationDate = new Date('2018-10-16T09:16:41.294Z');
       const adjustedExpirationDate = new Date('2018-10-16T09:16:59.294Z');
 
-      spyOn(mapper.serverTimeHandler, 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
+      spyOn(mapper['serverTimeHandler'], 'toLocalTimestamp').and.returnValue(adjustedExpirationDate.getTime());
       spyOn(userEntity, 'setGuestExpiration').and.callFake(timestamp => {
         expect(timestamp).toEqual(adjustedExpirationDate.getTime());
       });
@@ -170,10 +191,10 @@ describe('User Mapper', () => {
       const data = {expires_at: expirationDate.toISOString(), id: userEntity.id};
       mapper.updateUserFromObject(userEntity, data);
 
-      expect(mapper.serverTimeHandler.toLocalTimestamp).not.toHaveBeenCalledWith();
-      mapper.serverTimeHandler.timeOffset(10);
+      expect(mapper['serverTimeHandler'].toLocalTimestamp).not.toHaveBeenCalledWith();
+      mapper['serverTimeHandler'].timeOffset(10);
 
-      expect(mapper.serverTimeHandler.toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
+      expect(mapper['serverTimeHandler'].toLocalTimestamp).toHaveBeenCalledWith(expirationDate.getTime());
     });
 
     it('cannot update the user name of a wrong user', () => {
@@ -190,8 +211,8 @@ describe('User Mapper', () => {
       user_et.id = entities.user.john_doe.id;
       const data = {
         assets: [
-          {key: createRandomUuid(), size: 'preview', type: 'image'},
-          {key: createRandomUuid(), size: 'complete', type: 'image'},
+          {key: createRandomUuid(), size: UserAssetType.PREVIEW, type: 'image' as UserAsset['type']},
+          {key: createRandomUuid(), size: UserAssetType.COMPLETE, type: 'image' as UserAsset['type']},
         ],
         id: entities.user.john_doe.id,
         name: entities.user.jane_roe.name,

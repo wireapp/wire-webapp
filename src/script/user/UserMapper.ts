@@ -132,7 +132,13 @@ export class UserMapper {
     const hasPicture = picture?.length;
     let mappedAssets;
     if (hasAsset) {
-      mappedAssets = mapProfileAssets(userEntity.id, userData.assets);
+      mappedAssets = mapProfileAssets(
+        userEntity.id,
+        userData.assets.map(asset => ({
+          ...asset,
+          domain: Config.getConfig().FEATURE.ENABLE_FEDERATION ? userEntity.domain : undefined,
+        })),
+      );
     } else if (hasPicture) {
       mappedAssets = mapProfileAssetsV1(userEntity.id, userData.picture);
     }
@@ -183,7 +189,8 @@ export class UserMapper {
       userEntity.isSingleSignOn = true;
     }
 
-    if (teamId) {
+    if (teamId && !userEntity.isFederated) {
+      // To be in the same team, the user needs to have the same teamId and to be on the same domain (not federated)
       userEntity.inTeam(true);
       userEntity.teamId = teamId;
     }
