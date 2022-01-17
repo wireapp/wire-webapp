@@ -53,6 +53,7 @@ import PreferencesSection from './components/PreferencesSection';
 import PrivacySection from './accountPreferences/PrivacySection';
 import UsernameInput from './accountPreferences/UsernameInput';
 import PreferencesPage from './components/PreferencesPage';
+import AccountLink from './accountPreferences/AccountLink';
 
 interface AccountPreferencesProps {
   clientRepository: ClientRepository;
@@ -185,6 +186,11 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
                 readOnly
               />
             ))}
+            <AccountLink
+              label={t('preferencesAccountLink')}
+              value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}`}
+              data-uie-name="element-profile-link"
+            />
           </div>
         </PreferencesSection>
       ) : (
