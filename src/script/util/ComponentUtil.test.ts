@@ -20,40 +20,9 @@
 import ko from 'knockout';
 
 import {renderHook, act} from '@testing-library/react-hooks';
-import {
-  useKoSubscribable,
-  useKoSubscribableCallback,
-  useKoSubscribableChildren,
-  useKoSubscribableMap,
-} from './ComponentUtil';
+import {useKoSubscribableChildren} from './ComponentUtil';
 
 describe('ComponentUtil', () => {
-  describe('useKoSubscribableCallback', () => {
-    it('should call the callback function with the updated value', () => {
-      const observable = ko.observable(0);
-      const callback = jest.fn();
-      renderHook(() => useKoSubscribableCallback(observable, callback));
-      act(() => {
-        observable(1);
-      });
-
-      expect(callback).toHaveBeenCalledWith(1);
-    });
-  });
-  describe('useKoSubscribable', () => {
-    it('should have the current value', () => {
-      const observable = ko.observable(0);
-      const {result} = renderHook(() => useKoSubscribable(observable));
-
-      expect(result.current).toBe(0);
-      act(() => {
-        observable(1);
-      });
-
-      expect(result.current).toBe(1);
-    });
-  });
-
   describe('useKoSubscribableChildren', () => {
     it('returns a new object with updated values, when one observable changes', () => {
       const obj = {
@@ -93,62 +62,6 @@ describe('ComponentUtil', () => {
       expect(preResult).toEqual({observableA: 1, observableB: 0});
 
       expect(postResult).toEqual({observableA: 0, observableB: 1});
-    });
-  });
-
-  describe('useKoSubscribableMap', () => {
-    it('returns a new array of values when one observable changes', () => {
-      const obj = [
-        {
-          observable: ko.observable(0),
-        },
-        {
-          observable: ko.observable(0),
-        },
-      ];
-
-      const {result} = renderHook(() => useKoSubscribableMap(obj, 'observable'));
-
-      const preResult = result.current;
-      act(() => {
-        obj[0].observable(1);
-      });
-      const postResult = result.current;
-
-      expect(preResult).toEqual([0, 0]);
-
-      expect(postResult).toEqual([1, 0]);
-    });
-    it('returns a new object when the observed object changes', () => {
-      const {result, rerender} = renderHook(({obj}) => useKoSubscribableMap(obj, 'observable'), {
-        initialProps: {
-          obj: [
-            {
-              observable: ko.observable(1),
-            },
-            {
-              observable: ko.observable(0),
-            },
-          ],
-        },
-      });
-      const preResult = result.current;
-      rerender({
-        obj: [
-          {
-            observable: ko.observable(0),
-          },
-
-          {
-            observable: ko.observable(1),
-          },
-        ],
-      });
-      const postResult = result.current;
-
-      expect(preResult).toEqual([1, 0]);
-
-      expect(postResult).toEqual([0, 1]);
     });
   });
 });
