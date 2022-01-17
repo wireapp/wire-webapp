@@ -1422,22 +1422,20 @@ export class CallingRepository {
   };
 
   private readonly updateParticipantVideoStream = (
-    conversationId: SerializedConversationId,
+    remoteConversationId: SerializedConversationId,
     remoteUserId: UserId,
     remoteClientId: ClientId,
     streams: readonly MediaStream[] | null,
   ): void => {
-    let participant = this.findParticipant(
-      this.parseQualifiedId(conversationId),
-      this.parseQualifiedId(remoteUserId),
-      remoteClientId,
-    );
+    const conversationId = this.parseQualifiedId(remoteConversationId);
+    const userId = this.parseQualifiedId(remoteUserId);
+    let participant = this.findParticipant(conversationId, userId, remoteClientId);
     if (!participant) {
-      const call = this.findCall(this.parseQualifiedId(conversationId));
+      const call = this.findCall(conversationId);
       if (call?.conversationType !== CONV_TYPE.ONEONONE) {
         return;
       }
-      participant = new Participant(this.userRepository.findUserById(remoteUserId), remoteClientId);
+      participant = new Participant(this.userRepository.findUserById(userId), remoteClientId);
       call.addParticipant(participant);
     }
 

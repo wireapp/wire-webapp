@@ -17,45 +17,45 @@
  *
  */
 
-import {User} from 'src/script/entity/User';
+import {User} from './User';
 import {ACCENT_ID} from 'src/script/Config';
 import {ClientEntity} from 'src/script/client/ClientEntity';
 
 describe('User', () => {
   describe('Initials', () => {
     it('returns correct initials for user with first name and last name', () => {
-      const user_et = new User();
-      user_et.name('John Doe');
+      const user = new User();
+      user.name('John Doe');
 
-      expect(user_et.initials()).toBe('JD');
+      expect(user.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with just a first name', () => {
-      const user_et = new User();
-      user_et.name('John');
+      const user = new User();
+      user.name('John');
 
-      expect(user_et.initials()).toBe('JO');
+      expect(user.initials()).toBe('JO');
     });
 
     it('returns correct initials for user with middle name', () => {
-      const user_et = new User();
-      user_et.name('John Peter Doe');
+      const user = new User();
+      user.name('John Peter Doe');
 
-      expect(user_et.initials()).toBe('JD');
+      expect(user.initials()).toBe('JD');
     });
 
     it('returns correct initials for user with one character as name', () => {
-      const user_et = new User();
-      user_et.name('J');
+      const user = new User();
+      user.name('J');
 
-      expect(user_et.initials()).toBe('J');
+      expect(user.initials()).toBe('J');
     });
 
     it('returns correct initials for user with an emoji as name', () => {
-      const user_et = new User();
-      user_et.name('🐒');
+      const user = new User();
+      user.name('🐒');
 
-      expect(user_et.initials()).toBe('🐒');
+      expect(user.initials()).toBe('🐒');
     });
   });
 
@@ -67,12 +67,12 @@ describe('User', () => {
       const second_client = new ClientEntity(false, null);
       second_client.id = '575b7a890cdb7635';
 
-      const user_et = new User();
-      user_et.addClient(first_client);
-      user_et.addClient(second_client);
-      user_et.addClient(second_client);
+      const user = new User();
+      user.addClient(first_client);
+      user.addClient(second_client);
+      user.addClient(second_client);
 
-      expect(user_et.devices().length).toBe(2);
+      expect(user.devices().length).toBe(2);
     });
   });
 
