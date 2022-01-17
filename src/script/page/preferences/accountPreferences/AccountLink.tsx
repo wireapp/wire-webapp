@@ -23,32 +23,14 @@ import Icon from 'Components/Icon';
 import {copyText} from 'Util/ClipboardUtil';
 
 interface AccountLinkProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  allowedChars?: string;
   'data-uie-name'?: string;
-  forceLowerCase?: boolean;
-  isDone?: boolean;
   label: string;
   labelUie?: string;
-
   value: string;
   valueUie?: string;
 }
 
-const AccountLink: React.FC<AccountLinkProps> = ({
-  label,
-  value,
-  readOnly,
-
-  isDone = false,
-  prefix,
-
-  forceLowerCase = false,
-  maxLength,
-  allowedChars,
-  labelUie,
-  valueUie,
-  ...rest
-}) => {
+const AccountLink: React.FC<AccountLinkProps> = ({label, value, labelUie, valueUie, ...rest}) => {
   const iconUiePrefix = rest['data-uie-name'] ?? 'account-link';
   return (
     <div
@@ -97,11 +79,7 @@ const AccountLink: React.FC<AccountLinkProps> = ({
           paddingTop: '8px',
         }}
       >
-        <Icon.Copy
-          css={{fill: 'var(--background)', marginRight: '8px'}}
-          className="edit-icon"
-          data-uie-name={`${iconUiePrefix}-icon`}
-        />
+        <Icon.Copy css={{fill: 'var(--background)', marginRight: '8px'}} data-uie-name={`${iconUiePrefix}-icon`} />
         {t('preferencesAccountCopyLink')}
       </div>
     </div>
