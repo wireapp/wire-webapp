@@ -22,7 +22,7 @@ import {t} from 'Util/LocalizerUtil';
 import Icon from 'Components/Icon';
 import {copyText} from 'Util/ClipboardUtil';
 
-interface AccountLinkProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface AccountLinkProps {
   'data-uie-name'?: string;
   label: string;
   value: string;
@@ -73,11 +73,11 @@ const AccountLink: React.FC<AccountLinkProps> = ({label, value, ...rest}) => {
           cursor: 'pointer',
           display: 'flex',
           flexDirection: 'row',
-          paddingLeft: '8px',
-          paddingTop: '8px',
+          paddingLeft: 8,
+          paddingTop: 8,
         }}
       >
-        <Icon.Copy css={{fill: 'var(--background)', marginRight: '8px'}} data-uie-name="profile-link-icon" />
+        <Icon.Copy css={{fill: 'var(--background)', marginRight: 8}} data-uie-name="profile-link-icon" />
         {t('preferencesAccountCopyLink')}
       </div>
     </div>
