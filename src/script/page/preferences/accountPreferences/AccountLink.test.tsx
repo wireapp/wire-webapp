@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 
 import React from 'react';
 import {render, fireEvent, screen} from '@testing-library/react';
-import AccountLink from '../../../../src/script/page/preferences/accountPreferences/AccountLink';
-import * as utils from '../../../../src/script/util/ClipboardUtil';
+import AccountLink from './AccountLink';
+import * as utils from '../../../util/ClipboardUtil';
 
 test('copies correct text', async () => {
   const mockCopy: any = jest.spyOn(utils, 'copyText');
@@ -37,9 +37,13 @@ test('copies correct text', async () => {
 
 test('renders elements correctly', () => {
   render(<AccountLink label="test" value="test-value" />);
-  const label = screen.getByText(/^test$/);
-  const value = screen.getByText(/test-value/);
+  const label = screen.getByTestId('label-profile-link');
+  const value = screen.getByTestId('profile-link');
+  const button = screen.getByTestId('do-copy-profile-link');
+  const icon = screen.getByTestId('profile-link-icon');
 
   expect(label).toBeTruthy();
   expect(value).toBeTruthy();
+  expect(button).toBeTruthy();
+  expect(icon).toBeTruthy();
 });
