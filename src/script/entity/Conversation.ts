@@ -191,7 +191,11 @@ export class Conversation {
     this.isGuest = ko.observable(false);
     this.isManaged = false;
 
-    this.inTeam = ko.pureComputed(() => this.team_id && !this.isGuest());
+    this.inTeam = ko.pureComputed(() => {
+      const isSameTeam = this.selfUser()?.teamId === this.team_id;
+      const isSameDomain = !this.isFederated() || this.domain === this.selfUser().domain;
+      return this.team_id && isSameTeam && !this.isGuest() && isSameDomain;
+    });
     this.isGuestRoom = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.GUEST_ROOM);
     this.isTeamOnly = ko.pureComputed(() => this.accessState() === ACCESS_STATE.TEAM.TEAM_ONLY);
     this.withAllTeamMembers = ko.observable(false);
