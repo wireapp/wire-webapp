@@ -847,6 +847,10 @@ export class CallingRepository {
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
+    if (call.state() === CALL_STATE.INCOMING) {
+      call.muteState(shouldMute ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
+      return;
+    }
     if (call.hasWorkingAudioInput === false && call.muteState() !== MuteState.NOT_MUTED) {
       this.showNoAudioInputModal();
       return;

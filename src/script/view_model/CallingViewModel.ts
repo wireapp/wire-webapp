@@ -204,10 +204,6 @@ export class CallingViewModel {
         this.callingRepository.toggleCamera(call);
       },
       toggleMute: (call: Call, muteState: boolean) => {
-        if (call.state() === CALL_STATE.INCOMING) {
-          call.muteState(muteState ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
-          return;
-        }
         this.callingRepository.muteCall(call, muteState);
       },
       toggleScreenshare: async (call: Call): Promise<void> => {
