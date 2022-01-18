@@ -28,6 +28,7 @@ import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Config} from '../Config';
 import {QualifiedId} from '@wireapp/api-client/src/user';
 import {matchQualifiedIds} from 'Util/QualifiedId';
+import {MuteState} from './CallState';
 
 export type SerializedConversationId = string;
 
@@ -43,6 +44,7 @@ export class Call {
   public readonly reason: ko.Observable<number | undefined> = ko.observable();
   public readonly startedAt: ko.Observable<number | undefined> = ko.observable();
   public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
+  public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
@@ -78,6 +80,7 @@ export class Call {
     private readonly selfParticipant: Participant,
     callType: CALL_TYPE,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
+    isMuted: boolean = false,
   ) {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
@@ -88,6 +91,7 @@ export class Call {
       this.updateAudioStreamsSink();
     });
     this.maximizedParticipant = ko.observable(null);
+    this.muteState(isMuted ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
   }
 
   get hasWorkingAudioInput(): boolean {
