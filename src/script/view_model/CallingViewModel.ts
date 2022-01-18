@@ -41,7 +41,7 @@ import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
-import {CallState} from '../calling/CallState';
+import {CallState, MuteState} from '../calling/CallState';
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import {TeamState} from '../team/TeamState';
 import {Config} from '../Config';
@@ -204,6 +204,10 @@ export class CallingViewModel {
         this.callingRepository.toggleCamera(call);
       },
       toggleMute: (call: Call, muteState: boolean) => {
+        if (call.state() === CALL_STATE.INCOMING) {
+          call.muteState(muteState ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
+          return;
+        }
         this.callingRepository.muteCall(call, muteState);
       },
       toggleScreenshare: async (call: Call): Promise<void> => {

@@ -91,6 +91,7 @@ describe('CallingRepository', () => {
         new Participant(new User(), ''),
         0,
         {currentAvailableDeviceId: mediaDevices} as MediaDevicesHandler,
+        true,
       );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
       spyOn(callingRepository['callState'], 'activeCalls').and.returnValue([activeCall]);
@@ -127,19 +128,43 @@ describe('CallingRepository', () => {
     it('only exposes the current active call', () => {
       const selfParticipant = createSelfParticipant();
       const userId = {domain: '', id: ''};
-      const incomingCall = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const incomingCall = new Call(
+        userId,
+        createConversationId(),
+        undefined,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+        true,
+      );
       incomingCall.state(CALL_STATE.INCOMING);
 
-      const activeCall = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const activeCall = new Call(
+        userId,
+        createConversationId(),
+        undefined,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+        true,
+      );
       activeCall.state(CALL_STATE.MEDIA_ESTAB);
 
-      const declinedCall = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const declinedCall = new Call(
+        userId,
+        createConversationId(),
+        undefined,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+        true,
+      );
       declinedCall.state(CALL_STATE.INCOMING);
       declinedCall.reason(REASON.STILL_ONGOING);
 
@@ -153,9 +178,17 @@ describe('CallingRepository', () => {
     it('returns cached mediastream for self user if set', () => {
       const selfParticipant = createSelfParticipant();
       const userId = {domain: '', id: ''};
-      const call = new Call(userId, createConversationId(), undefined, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const call = new Call(
+        userId,
+        createConversationId(),
+        undefined,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+        true,
+      );
       const source = new RTCAudioSource();
       const audioTrack = source.createTrack();
       const selfMediaStream = new MediaStream([audioTrack]);
@@ -184,6 +217,7 @@ describe('CallingRepository', () => {
         {
           currentAvailableDeviceId: mediaDevices,
         } as MediaDevicesHandler,
+        true,
       );
       const source = new RTCAudioSource();
       const audioTrack = source.createTrack();
@@ -210,9 +244,17 @@ describe('CallingRepository', () => {
       spyOn(selfParticipant, 'releaseAudioStream');
       spyOn(selfParticipant, 'releaseVideoStream');
 
-      const call = new Call({domain: '', id: ''}, createConversationId(), 0, selfParticipant, CALL_TYPE.NORMAL, {
-        currentAvailableDeviceId: mediaDevices,
-      } as MediaDevicesHandler);
+      const call = new Call(
+        {domain: '', id: ''},
+        createConversationId(),
+        0,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        {
+          currentAvailableDeviceId: mediaDevices,
+        } as MediaDevicesHandler,
+        true,
+      );
       spyOn(callingRepository['callState'], 'joinedCall').and.returnValue(call);
       callingRepository.stopMediaSource(MediaType.AUDIO);
 

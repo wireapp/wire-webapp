@@ -37,7 +37,6 @@ export enum MuteState {
 @singleton()
 export class CallState {
   public readonly activeCalls: ko.ObservableArray<Call> = ko.observableArray();
-  public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
   public readonly acceptedVersionWarnings: ko.ObservableArray<QualifiedId> = ko.observableArray<QualifiedId>();
   public readonly cbrEncoding: ko.Observable<number> = ko.observable(
     Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE ? 1 : 0,
@@ -45,14 +44,12 @@ export class CallState {
   public readonly videoSpeakersActiveTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly selectableScreens: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
   readonly selectableWindows: ko.Observable<ElectronDesktopCapturerSource[]> = ko.observable([]);
-  public readonly isMuted: ko.PureComputed<boolean>;
   public readonly joinedCall: ko.PureComputed<Call | undefined>;
   public readonly activeCallViewTab: ko.Observable<string> = ko.observable(CallViewTab.ALL);
   readonly isChoosingScreen: ko.PureComputed<boolean>;
   readonly isSpeakersViewActive: ko.PureComputed<boolean>;
 
   constructor() {
-    this.isMuted = ko.pureComputed(() => this.muteState() !== MuteState.NOT_MUTED);
     this.joinedCall = ko.pureComputed(() => this.activeCalls().find(call => call.state() === CALL_STATE.MEDIA_ESTAB));
     this.isChoosingScreen = ko.pureComputed(
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
@@ -70,6 +67,4 @@ export class CallState {
       () => this.selectableScreens().length > 0 || this.selectableWindows().length > 0,
     );
   }
-
-  updateMuteState = (newState: MuteState) => this.muteState(newState);
 }

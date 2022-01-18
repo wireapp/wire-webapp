@@ -293,7 +293,9 @@ export class CallingRepository {
   }
 
   private readonly updateMuteState = (isMuted: number) => {
-    this.callState.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
+    const activeStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
+    const activeCall = this.callState.activeCalls().find(call => activeStates.includes(call.state()));
+    activeCall?.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
   private async pushClients(call: Call, checkMismatch?: boolean): Promise<boolean> {
@@ -681,6 +683,7 @@ export class CallingRepository {
         selfParticipant,
         callType,
         this.mediaDevicesHandler,
+        false,
       );
       this.storeCall(call);
       const loadPreviewPromise =
@@ -785,10 +788,7 @@ export class CallingRepository {
         this.rejectCall(call.conversationId);
         return;
       }
-
-      if (Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && call.conversationType === CONV_TYPE.CONFERENCE) {
-        this.setMute(true);
-      }
+      this.setMute(call.muteState() !== MuteState.NOT_MUTED);
 
       this.wCall.answer(
         this.wUser,
@@ -847,7 +847,7 @@ export class CallingRepository {
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
-    if (call.hasWorkingAudioInput === false && this.callState.isMuted()) {
+    if (call.hasWorkingAudioInput === false && call.muteState() !== MuteState.NOT_MUTED) {
       this.showNoAudioInputModal();
       return;
     }
@@ -1208,6 +1208,7 @@ export class CallingRepository {
     const canRing = !conversationEntity.showNotificationsNothing() && shouldRing && this.isReady;
     const selfParticipant = new Participant(this.selfUser, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+    const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
     const call = new Call(
       this.parseQualifiedId(userId),
       conversationId,
@@ -1215,6 +1216,7 @@ export class CallingRepository {
       selfParticipant,
       hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL,
       this.mediaDevicesHandler,
+      isMuted,
     );
     if (!canRing) {
       // an incoming call that should not ring is an ongoing group call

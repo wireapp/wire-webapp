@@ -46,11 +46,19 @@ describe('fullscreenVideoCall', () => {
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User('', null);
     selfUser.isMe = true;
-    const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, new Participant(selfUser, ''), 0, {
-      currentAvailableDeviceId: {
-        audioOutput: ko.pureComputed(() => 'test'),
-      },
-    } as MediaDevicesHandler);
+    const call = new Call(
+      {domain: '', id: ''},
+      {domain: '', id: ''},
+      0,
+      new Participant(selfUser, ''),
+      0,
+      {
+        currentAvailableDeviceId: {
+          audioOutput: ko.pureComputed(() => 'test'),
+        },
+      } as MediaDevicesHandler,
+      true,
+    );
     const props: Partial<FullscreenVideoCallProps> = {
       call,
       canShareScreen: false,
