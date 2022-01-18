@@ -41,7 +41,7 @@ import type {Multitasking} from '../notification/NotificationRepository';
 import type {TeamRepository} from '../team/TeamRepository';
 import {ModalsViewModel} from './ModalsViewModel';
 import {ConversationState} from '../conversation/ConversationState';
-import {CallState, MuteState} from '../calling/CallState';
+import {CallState} from '../calling/CallState';
 import {ButtonGroupTab} from 'Components/calling/ButtonGroup';
 import {TeamState} from '../team/TeamState';
 import {Config} from '../Config';
