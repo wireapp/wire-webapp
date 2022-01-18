@@ -70,7 +70,7 @@ export class UserService {
   public async setAvailability(
     teamId: string,
     type: AvailabilityType,
-    {sendAll = false, sendAsProtobuf = false}: {sendAll?: boolean; sendAsProtobuf?: boolean} = {},
+    {sendAll = false, sendAsProtobuf = false} = {},
   ): Promise<void> {
     // Get pre-key bundles for members of your own team
     const preKeyBundlesFromTeam = await this.broadcastService.getPreKeyBundlesFromTeam(teamId, false, !sendAll);
