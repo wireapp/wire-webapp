@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [21.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.7.2...@wireapp/core@21.0.0) (2022-01-18)
+
+
+### Features
+
+* **core:** Send availability status only to directly connected members ([#4213](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4213)) ([73bad2f](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/73bad2fb8f75a473b686fa9273b1c03774afd5c7))
+
+
+### BREAKING CHANGES
+
+* **core:** the setAvailability of the user service will by default now only send to directly connected users. To send to absolutely all the users in the team call `setAvailability` with the `{sendAll: true}` option
+
+
+
+
+
 ## [20.7.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.7.1...@wireapp/core@20.7.2) (2022-01-12)
 
 **Note:** Version bump only for package @wireapp/core
