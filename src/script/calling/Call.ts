@@ -80,7 +80,7 @@ export class Call {
     private readonly selfParticipant: Participant,
     callType: CALL_TYPE,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
-    isMuted: boolean,
+    isMuted: boolean = false,
   ) {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;

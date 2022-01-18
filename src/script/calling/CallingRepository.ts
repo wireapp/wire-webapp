@@ -683,7 +683,6 @@ export class CallingRepository {
         selfParticipant,
         callType,
         this.mediaDevicesHandler,
-        false,
       );
       this.storeCall(call);
       const loadPreviewPromise =
