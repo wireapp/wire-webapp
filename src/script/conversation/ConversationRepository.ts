@@ -223,10 +223,14 @@ export class ConversationRepository {
           usersWithoutClients
             .filter(user => user.deleted)
             .forEach(user =>
-              this.teamMemberLeave(this.teamState.team().id, {
-                domain: this.teamState.teamDomain(),
-                id: user.id,
-              }),
+              this.teamMemberLeave(
+                this.teamState.team().id,
+                {
+                  domain: this.teamState.teamDomain(),
+                  id: user.id,
+                },
+                new Date(time).getTime() - 1,
+              ),
             );
         }
 
