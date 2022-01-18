@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [21.0.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@21.0.0...@wireapp/core@21.0.1) (2022-01-18)
+
+
+### Bug Fixes
+
+* **core:** Improve types for setAvailability ([26da881](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/26da88113adf9eaba987ad22265df758231e5dc1))
+* **core:** Improve types for setAvailability ([dcbada4](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/dcbada4e353296e17307baeac8d4b775158a1436))
+
+
+
+
+
 # [21.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@20.7.2...@wireapp/core@21.0.0) (2022-01-18)
 
 
