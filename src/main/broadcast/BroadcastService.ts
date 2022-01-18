@@ -32,10 +32,25 @@ export class BroadcastService {
     this.messageService = new MessageService(this.apiClient, this.cryptographyService);
   }
 
-  public async getPreKeyBundlesFromTeam(teamId: string, skipOwnClients = false): Promise<UserPreKeyBundleMap> {
-    const {members: teamMembers} = await this.apiClient.teams.member.api.getAllMembers(teamId);
+  /**
+   * Will create a key bundle for all the users of the team
+   *
+   * @param teamId
+   * @param skipOwnClients=false
+   * @param onlyDirectConnections=false Will generate a bundle only for directly connected users (users the self user has conversation with). Allows avoiding broadcasting messages to too many people
+   */
+  public async getPreKeyBundlesFromTeam(
+    teamId: string,
+    skipOwnClients = false,
+    onlyDirectConnections = false,
+  ): Promise<UserPreKeyBundleMap> {
+    const teamMembers = onlyDirectConnections
+      ? (await this.apiClient.conversation.api.getConversations()).conversations
+          .map(({members}) => members.others.map(user => user.id).concat(members.self.id))
+          .flat()
+      : (await this.apiClient.teams.member.api.getAllMembers(teamId)).members.map(({user}) => user);
 
-    let members = teamMembers.map(member => ({id: member.user}));
+    let members = Array.from(new Set(teamMembers)).map(member => ({id: member}));
 
     if (skipOwnClients) {
       const selfUser = await this.apiClient.self.api.getSelf();

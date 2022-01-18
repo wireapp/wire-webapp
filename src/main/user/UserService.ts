@@ -60,9 +60,20 @@ export class UserService {
       : this.apiClient.user.api.getUsers({ids: userIds});
   }
 
-  public async setAvailability(teamId: string, type: AvailabilityType, sendAsProtobuf?: boolean): Promise<void> {
+  /**
+   * Sends a availability update to members of the same team
+   * @param teamId
+   * @param type
+   * @param options.sendAll=false will broadcast the message to all the members of the team (instead of just direct connections). Should be avoided in a big team
+   * @param options.sendAsProtobuf=false
+   */
+  public async setAvailability(
+    teamId: string,
+    type: AvailabilityType,
+    {sendAll = false, sendAsProtobuf = false}: {sendAll: boolean; sendAsProtobuf?: boolean},
+  ): Promise<void> {
     // Get pre-key bundles for members of your own team
-    const preKeyBundlesFromTeam = await this.broadcastService.getPreKeyBundlesFromTeam(teamId);
+    const preKeyBundlesFromTeam = await this.broadcastService.getPreKeyBundlesFromTeam(teamId, false, !sendAll);
 
     // Get pre-key bundles for all of your other 1:1 connections
     const connections = await this.connectionService.getConnections();
