@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [21.0.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@21.0.1...@wireapp/core@21.0.2) (2022-01-19)
+
+
+### Bug Fixes
+
+* **core:** Use Uint8Array in place of Buffer ([#4214](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4214)) ([d9c8692](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/d9c869291e60325411070b87f71d8803561bde49))
+
+
+
+
+
 ## [21.0.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@21.0.0...@wireapp/core@21.0.1) (2022-01-18)
 
 
