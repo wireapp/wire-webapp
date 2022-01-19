@@ -22,33 +22,33 @@ import {Crypto} from './interfaces';
 const cryptoLib = window.crypto;
 
 export const crypto: Crypto = {
-  async digest(cipherText: Buffer | Uint8Array): Promise<Buffer> {
+  async digest(cipherText: Uint8Array): Promise<Uint8Array> {
     const checksum = await cryptoLib.subtle.digest('SHA-256', cipherText);
-    return Buffer.from(checksum);
+    return new Uint8Array(checksum);
   },
 
-  async decrypt(cipherText: Buffer | Uint8Array, keyBytes: Buffer): Promise<Buffer> {
+  async decrypt(cipherText: Uint8Array, keyBytes: Uint8Array): Promise<Uint8Array> {
     const key = await cryptoLib.subtle.importKey('raw', keyBytes, 'AES-CBC', false, ['decrypt']);
 
     const initializationVector = cipherText.slice(0, 16);
     const assetCipherText = cipherText.slice(16);
     const decipher = await cryptoLib.subtle.decrypt({iv: initializationVector, name: 'AES-CBC'}, key, assetCipherText);
 
-    return Buffer.from(decipher);
+    return new Uint8Array(decipher);
   },
 
-  getRandomValues(size: number): Buffer {
-    return Buffer.from(cryptoLib.getRandomValues(new Uint8Array(size)));
+  getRandomValues(size: number): Uint8Array {
+    return cryptoLib.getRandomValues(new Uint8Array(size));
   },
 
   async encrypt(
-    plainText: Buffer | Uint8Array,
-    keyBytes: Buffer,
-    initializationVector: Buffer,
-  ): Promise<{key: Buffer; cipher: Buffer}> {
+    plainText: Uint8Array,
+    keyBytes: Uint8Array,
+    initializationVector: Uint8Array,
+  ): Promise<{key: Uint8Array; cipher: Uint8Array}> {
     const key = await cryptoLib.subtle.importKey('raw', keyBytes, 'AES-CBC', true, ['encrypt']);
     return {
-      key: Buffer.from(await cryptoLib.subtle.exportKey('raw', key)),
+      key: new Uint8Array(await cryptoLib.subtle.exportKey('raw', key)),
       cipher: await cryptoLib.subtle.encrypt({iv: initializationVector, name: 'AES-CBC'}, key, plainText),
     };
   },

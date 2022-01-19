@@ -18,10 +18,10 @@
  */
 
 export interface EncryptedAsset {
-  cipherText: Buffer;
-  keyBytes: Buffer;
+  cipherText: Uint8Array;
+  keyBytes: Uint8Array;
   /** The SHA-256 sum of `cipherText` */
-  sha256: Buffer;
+  sha256: Uint8Array;
 }
 
 export interface EncryptedAssetUploaded extends EncryptedAsset {

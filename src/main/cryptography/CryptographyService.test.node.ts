@@ -184,7 +184,7 @@ describe('CryptographyService', () => {
     it('encrypts and decrypts ArrayBuffer', async () => {
       const bytes = new Uint8Array(16);
       await promisify(crypto.randomFill)(bytes);
-      const byteBuffer = Buffer.from(bytes.buffer);
+      const byteBuffer = Buffer.from(bytes);
 
       const encryptedAsset = await encryptAsset({plainText: byteBuffer});
       const decryptedBuffer = await decryptAsset(encryptedAsset);

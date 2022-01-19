@@ -127,14 +127,12 @@ describe('CryptographyService', () => {
 
   describe('"encryptAsset"', () => {
     it('encrypts and decrypts ArrayBuffer', async () => {
-      const bytes = new Uint8Array(16);
-      window.crypto.getRandomValues(bytes);
-      const byteBuffer = Buffer.from(bytes.buffer);
+      const bytes = window.crypto.getRandomValues(new Uint8Array(16));
 
-      const encryptedAsset = await encryptAsset({plainText: byteBuffer});
+      const encryptedAsset = await encryptAsset({plainText: bytes});
       const decryptedBuffer = await decryptAsset(encryptedAsset);
 
-      expect(decryptedBuffer).toEqual(byteBuffer);
+      expect(decryptedBuffer).toEqual(bytes);
     });
 
     it('does not decrypt when the hash is missing', async () => {
