@@ -229,16 +229,16 @@ export class MessageRepository {
   private async findMissingClients(conversation: Conversation, remoteClients: UserClients | QualifiedUserClients) {
     const localClients = await this.generateRecipients(conversation);
 
-    const filterKnownClients = (remoteClients: UserClients, localClients: UserClients) => {
-      return Object.entries(remoteClients).reduce<UserClients>((missing, [userId, clients]) => {
-        const missingClients = getDifference(localClients[userId] || [], clients);
+    const filterKnownClients = (clients: UserClients, knownClients: UserClients) => {
+      return Object.entries(clients).reduce<UserClients>((missing, [userId, clients]) => {
+        const missingClients = getDifference(knownClients[userId] || [], clients);
         return missingClients.length ? {...missing, [userId]: missingClients} : missing;
       }, {});
     };
 
-    const filterKnownQualifiedClients = (remoteClients: QualifiedUserClients, localClients: QualifiedUserClients) => {
-      return Object.entries(remoteClients).reduce<QualifiedUserClients>((missing, [domain, userClients]) => {
-        const missingUserClients = filterKnownClients(userClients, localClients[domain]);
+    const filterKnownQualifiedClients = (clients: QualifiedUserClients, knownClients: QualifiedUserClients) => {
+      return Object.entries(clients).reduce<QualifiedUserClients>((missing, [domain, userClients]) => {
+        const missingUserClients = filterKnownClients(userClients, knownClients[domain]);
         return Object.keys(missingUserClients).length ? {...missing, [domain]: missingUserClients} : missing;
       }, {});
     };
