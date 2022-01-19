@@ -21,7 +21,7 @@ import {CipherOptions} from '@wireapp/api-client/src/asset';
 import type {EncryptedAsset} from './EncryptedAsset';
 import {crypto} from './crypto.node';
 
-const isEqual = (a: Buffer, b: Buffer): boolean => {
+const isEqual = (a: Uint8Array, b: Uint8Array): boolean => {
   const arrayA = new Uint32Array(a);
   const arrayB = new Uint32Array(b);
 
@@ -32,14 +32,14 @@ const isEqual = (a: Buffer, b: Buffer): boolean => {
 };
 
 interface EncryptOptions extends CipherOptions {
-  plainText: Buffer | Uint8Array;
+  plainText: Uint8Array;
 }
 
 export const decryptAsset = async ({
   cipherText,
   keyBytes,
   sha256: referenceSha256,
-}: EncryptedAsset): Promise<Buffer> => {
+}: EncryptedAsset): Promise<Uint8Array> => {
   const computedSha256 = await crypto.digest(cipherText);
 
   if (!isEqual(computedSha256, referenceSha256)) {
@@ -62,7 +62,7 @@ export const encryptAsset = async ({plainText, algorithm = 'AES-256-CBC'}: Encry
   const sha256 = await crypto.digest(ivCipherText);
 
   return {
-    cipherText: Buffer.from(ivCipherText.buffer),
+    cipherText: ivCipherText,
     keyBytes: key,
     sha256,
   };

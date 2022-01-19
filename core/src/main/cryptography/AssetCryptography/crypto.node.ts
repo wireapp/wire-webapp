@@ -21,11 +21,11 @@ import {Crypto} from './interfaces';
 import * as cryptoLib from 'crypto';
 
 export const crypto: Crypto = {
-  async digest(cipherText: Buffer | Uint8Array): Promise<Buffer> {
+  async digest(cipherText: Uint8Array): Promise<Uint8Array> {
     return cryptoLib.createHash('SHA256').update(cipherText).digest();
   },
 
-  async decrypt(cipherText: Buffer | Uint8Array, keyBytes: Buffer): Promise<Buffer> {
+  async decrypt(cipherText: Uint8Array, keyBytes: Uint8Array): Promise<Uint8Array> {
     const initializationVector = cipherText.slice(0, 16);
     const assetCipherText = cipherText.slice(16);
 
@@ -36,16 +36,16 @@ export const crypto: Crypto = {
     return Buffer.concat([decipherUpdated, decipherFinal]);
   },
 
-  getRandomValues(size: number): Buffer {
+  getRandomValues(size: number): Uint8Array {
     return cryptoLib.randomBytes(size);
   },
 
   async encrypt(
-    plainText: Buffer | Uint8Array,
-    keyBytes: Buffer,
-    initializationVector: Buffer,
+    plainText: Uint8Array,
+    keyBytes: Uint8Array,
+    initializationVector: Uint8Array,
     algorithm: string,
-  ): Promise<{key: Buffer; cipher: Buffer}> {
+  ): Promise<{key: Uint8Array; cipher: Uint8Array}> {
     const cipher = cryptoLib.createCipheriv(algorithm, keyBytes, initializationVector);
     const cipherUpdated = cipher.update(plainText);
     const cipherFinal = cipher.final();

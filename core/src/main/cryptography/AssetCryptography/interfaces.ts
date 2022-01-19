@@ -18,16 +18,16 @@
  */
 
 export interface Crypto {
-  digest(cipherText: Buffer | Uint8Array): Promise<Buffer>;
+  digest(cipherText: Uint8Array): Promise<Uint8Array>;
 
-  decrypt(cipherText: Buffer | Uint8Array, keyBytes: Buffer): Promise<Buffer>;
+  decrypt(cipherText: Uint8Array, keyBytes: Uint8Array): Promise<Uint8Array>;
 
-  getRandomValues(size: number): Buffer;
+  getRandomValues(size: number): Uint8Array;
 
   encrypt(
-    plainText: Buffer | Uint8Array,
-    keyBytes: Buffer,
-    initializationVector: Buffer,
+    plainText: Uint8Array,
+    keyBytes: Uint8Array,
+    initializationVector: Uint8Array,
     algorithm: string,
-  ): Promise<{key: Buffer; cipher: Buffer}>;
+  ): Promise<{key: Uint8Array; cipher: Uint8Array}>;
 }

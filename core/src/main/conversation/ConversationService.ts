@@ -901,14 +901,14 @@ export class ConversationService {
     return this.apiClient.conversation.api.getConversationsByIds(conversationIds);
   }
 
-  public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Buffer> {
+  public async getAsset({assetId, assetToken, otrKey, sha256}: RemoteData): Promise<Uint8Array> {
     const request = this.apiClient.asset.api.getAssetV3(assetId, assetToken);
     const encryptedBuffer = (await request.response).buffer;
 
     return decryptAsset({
-      cipherText: Buffer.from(encryptedBuffer),
-      keyBytes: Buffer.from(otrKey),
-      sha256: Buffer.from(sha256),
+      cipherText: new Uint8Array(encryptedBuffer),
+      keyBytes: otrKey,
+      sha256: sha256,
     });
   }
 
