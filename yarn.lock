@@ -2937,10 +2937,10 @@
     tough-cookie "4.0.0"
     ws "7.5.3"
 
-"@wireapp/avs@8.0.7":
-  version "8.0.7"
-  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-8.0.7.tgz#dad1efa927b56d68ecbcad28d3b1308c9a3f04fa"
-  integrity sha512-PtTUpZHmd/UMwygBwLb8dPsHhR3TQF0x3U/fOiuMSA2tsbMEJ7gm86lmNIuT8+wqHsLCbTTOSK9duQVU4SQURA==
+"@wireapp/avs@8.0.9":
+  version "8.0.9"
+  resolved "https://registry.yarnpkg.com/@wireapp/avs/-/avs-8.0.9.tgz#b1ff5fbbd78c0e2ce98e6de20b85a474b54a1b79"
+  integrity sha512-SLx0WNQIzxOquKvA6/V8/wR2c9P1ojJHddPHyQxJRvbVOJ7J/K901w5ROraLUD6xKtmaoacDKhYTIsHoK6IAFQ==
 
 "@wireapp/cbor@4.7.2":
   version "4.7.2"
@@ -2974,10 +2974,10 @@
     logdown "3.3.1"
     rimraf "3.0.2"
 
-"@wireapp/core@20.7.2":
-  version "20.7.2"
-  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-20.7.2.tgz#8aaf94959b4727a4198c162fbdca707d8f2e456b"
-  integrity sha512-ZlgN4oWdgHTVwSkPP3GAnC0DhdXPXD/jqseEAb0FEckXmTPFfYZoSUgcZbPS9gKPYWrCuOKQyFBa6LoW64MCKw==
+"@wireapp/core@21.0.2":
+  version "21.0.2"
+  resolved "https://registry.yarnpkg.com/@wireapp/core/-/core-21.0.2.tgz#ba4e74456b43281a5c4b3faaa146e9e3c61c8a4e"
+  integrity sha512-8L4rwbY8pjTRTWPbTsaXWBH+CohO6y8BfmhVe3zPVg0NlRykH1SWAeBlLSCkEbJfWptDJSREYvxgN1t+SKOVew==
   dependencies:
     "@types/long" "4.0.1"
     "@types/node" "~14"
@@ -12396,10 +12396,10 @@ slice-ansi@^4.0.0:
     astral-regex "^2.0.0"
     is-fullwidth-code-point "^3.0.0"
 
-snabbdom@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/snabbdom/-/snabbdom-3.2.0.tgz#8ea6b2517739a7d9ca82df3f181d052adf1ca5ad"
-  integrity sha512-UWyfm8WbaFmbmYLC33pe5fawBfExhynkMDoZqQ8ehlHDwkxrgIOpWhKf5PaacLUW1n+Uwu5N5HND6mESU7cMlw==
+snabbdom@3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/snabbdom/-/snabbdom-3.3.1.tgz#a2fb9a1c85cc19d6dc11c4c5e4c78cbbbaafff1f"
+  integrity sha512-FR9u20dCkktPd+qbedqwYNjMXzYhizhqlKTQzYZimLNeCJY0/5qgs0DtLVSmzIEL1bN3Dyb9sQpiHGCxUjyLnQ==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"

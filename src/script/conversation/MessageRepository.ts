@@ -209,15 +209,43 @@ export class MessageRepository {
   /**
    * Triggers the handler for mismatch. Can be used if a mismatch is triggered from outside the MessageRepository
    *
-   * @param conversationId
+   * @param conversation
    * @param mismatch
    */
-  public handleClientMismatch(
-    conversationId: QualifiedId,
-    mismatch: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
+  public async updateMissingClients(
+    conversation: Conversation,
+    allClients: UserClients | QualifiedUserClients,
     consentType?: CONSENT_TYPE,
   ) {
-    return this.onClientMismatch?.(mismatch, conversationId, false, consentType);
+    const missing = await this.findMissingClients(conversation, allClients);
+    return this.onClientMismatch?.({missing} as ClientMismatch, conversation.qualifiedId, false, consentType);
+  }
+
+  /**
+   * Will generate a UserClients that contains only the users and clients that we do no know of locally
+   * @param conversation
+   * @param remoteClients
+   */
+  private async findMissingClients(conversation: Conversation, remoteClients: UserClients | QualifiedUserClients) {
+    const localClients = await this.generateRecipients(conversation);
+
+    const filterKnownClients = (clients: UserClients, knownClients: UserClients) => {
+      return Object.entries(clients).reduce<UserClients>((missing, [userId, clients]) => {
+        const missingClients = getDifference(knownClients[userId] || [], clients);
+        return missingClients.length ? {...missing, [userId]: missingClients} : missing;
+      }, {});
+    };
+
+    const filterKnownQualifiedClients = (clients: QualifiedUserClients, knownClients: QualifiedUserClients) => {
+      return Object.entries(clients).reduce<QualifiedUserClients>((missing, [domain, userClients]) => {
+        const missingUserClients = filterKnownClients(userClients, knownClients[domain]);
+        return Object.keys(missingUserClients).length ? {...missing, [domain]: missingUserClients} : missing;
+      }, {});
+    };
+
+    return isQualifiedUserClients(remoteClients)
+      ? filterKnownQualifiedClients(remoteClients, localClients as QualifiedUserClients)
+      : filterKnownClients(remoteClients, localClients as UserClients);
   }
 
   /**
@@ -1142,7 +1170,7 @@ export class MessageRepository {
 
   private async generateRecipients(
     conversation: Conversation,
-    recipients: QualifiedId[] | QualifiedUserClients | UserClients,
+    recipients?: QualifiedId[] | QualifiedUserClients | UserClients,
     skipSelf?: boolean,
   ): Promise<QualifiedUserClients | UserClients> {
     if (isQualifiedUserClients(recipients) || isUserClients(recipients)) {
