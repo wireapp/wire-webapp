@@ -209,6 +209,7 @@ export class Call {
 
   removeParticipant(participant: Participant): void {
     this.participants.remove(participant);
+    this.activeSpeakers.remove(participant);
     this.updatePages();
   }
 
