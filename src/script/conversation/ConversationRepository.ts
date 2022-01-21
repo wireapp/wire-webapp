@@ -2749,7 +2749,7 @@ export class ConversationRepository {
   }
 
   /**
-   * Convert multiple JSON events into entities and add them to a given conversation.
+   * Convert multiple JSON events into entities and validate them
    *
    * @param events Event data
    * @param conversationEntity Conversation entity the events will be added to
@@ -2763,7 +2763,7 @@ export class ConversationRepository {
   }
 
   /**
-   * Convert multiple JSON events into entities and add them to a given conversation.
+   * Convert multiple JSON events into entities, validate and add them to a given conversation.
    *
    * @param events Event data
    * @param conversationEntity Conversation entity the events will be added to
