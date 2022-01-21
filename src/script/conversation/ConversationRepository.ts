@@ -327,6 +327,8 @@ export class ConversationRepository {
         this.deleteConversationFromRepository(conversationEntity);
       }
     });
+
+    this.cleanupEphemeralMessages();
   }
 
   //##############################################################################
@@ -2751,13 +2753,25 @@ export class ConversationRepository {
    *
    * @param events Event data
    * @param conversationEntity Conversation entity the events will be added to
+   * @returns Resolves with an array of mapped messages
+   */
+  private async validateMessages(events: EventRecord[], conversationEntity: Conversation) {
+    const mappedEvents = await this.event_mapper.mapJsonEvents(events, conversationEntity);
+    const updatedEvents = (await this.updateMessagesUserEntities(mappedEvents)) as ContentMessage[];
+    const validatedMessages = (await this.ephemeralHandler.validateMessages(updatedEvents)) as ContentMessage[];
+    return validatedMessages;
+  }
+
+  /**
+   * Convert multiple JSON events into entities and add them to a given conversation.
+   *
+   * @param events Event data
+   * @param conversationEntity Conversation entity the events will be added to
    * @param prepend Should existing messages be prepended
    * @returns Resolves with an array of mapped messages
    */
   private async addEventsToConversation(events: EventRecord[], conversationEntity: Conversation, prepend = true) {
-    const mappedEvents = await this.event_mapper.mapJsonEvents(events, conversationEntity);
-    const updatedEvents = (await this.updateMessagesUserEntities(mappedEvents)) as ContentMessage[];
-    const validatedMessages = (await this.ephemeralHandler.validateMessages(updatedEvents)) as ContentMessage[];
+    const validatedMessages = await this.validateMessages(events, conversationEntity);
     if (prepend && conversationEntity.messages().length) {
       conversationEntity.prependMessages(validatedMessages);
     } else {
@@ -2886,5 +2900,12 @@ export class ConversationRepository {
     }
 
     return false;
+  }
+
+  public async cleanupEphemeralMessages(): Promise<void> {
+    this.conversationState.conversations().forEach(async conversationEntity => {
+      const messages = (await this.eventService.loadEphemeralEvents(conversationEntity.id)) as EventRecord[];
+      this.validateMessages(messages, conversationEntity);
+    });
   }
 }

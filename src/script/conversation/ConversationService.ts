@@ -480,7 +480,7 @@ export class ConversationService {
     const category_min = MessageCategory.TEXT;
     const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
 
-    return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max).then(events => {
+    return this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max, false).then(events => {
       return events.filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
     });
   }

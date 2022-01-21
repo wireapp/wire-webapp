@@ -87,6 +87,34 @@ export class EventService {
     }
   }
 
+  async loadEphemeralEvents(conversationId: string): Promise<EventRecord[]> {
+    if (!conversationId) {
+      this.logger.error(`Cannot get ephemeral events in conversation '${conversationId}' without ID`);
+      throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
+    }
+
+    try {
+      if (this.storageService.db) {
+        const events = await this.storageService.db
+          .table(StorageSchemata.OBJECT_STORE.EVENTS)
+          .where('conversation')
+          .equals(conversationId)
+          .and(record => !!record.ephemeral_expires)
+          .toArray();
+        return events;
+      }
+
+      const records = (await this.storageService.getAll(StorageSchemata.OBJECT_STORE.EVENTS)) as EventRecord[];
+      return records
+        .filter(record => record.conversation === conversationId && !!record.ephemeral_expires)
+        .sort(compareEventsById);
+    } catch (error) {
+      const logMessage = `Failed to get ephemeral events for conversation '${conversationId}': ${error.message}`;
+      this.logger.error(logMessage, error);
+      throw error;
+    }
+  }
+
   /**
    * Load event from database.
    *
@@ -128,17 +156,36 @@ export class EventService {
    * @param conversationId ID of conversation to add users to
    * @param categoryMin Minimum message category
    * @param categoryMax Maximum message category
+   * @param loadExired Will not return exipred messages if set to `false`
    */
   async loadEventsWithCategory(
     conversationId: string,
     categoryMin: MessageCategory,
     categoryMax = MessageCategory.LIKED,
+    loadExired = true,
   ): Promise<DBEvents> {
+    const filterExpired = (record: EventRecord) => {
+      if (loadExired) {
+        return true;
+      }
+
+      if (record.ephemeral_expires === true) {
+        return false;
+      }
+
+      if (typeof record.ephemeral_expires !== 'undefined') {
+        return +record.ephemeral_expires - Date.now() > 0;
+      }
+
+      return true;
+    };
+
     if (this.storageService.db) {
       const events = await this.storageService.db
         .table(StorageSchemata.OBJECT_STORE.EVENTS)
         .where('[conversation+category]')
         .between([conversationId, categoryMin], [conversationId, categoryMax], true, true)
+        .and(filterExpired)
         .sortBy('time');
       return events;
     }
@@ -149,6 +196,7 @@ export class EventService {
         record =>
           record.conversation === conversationId && record.category >= categoryMin && record.category <= categoryMax,
       )
+      .filter(filterExpired)
       .sort(compareEventsByTime);
   }
 
