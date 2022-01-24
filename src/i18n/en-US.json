@@ -867,6 +867,8 @@
   "preferencesAccountDelete": "Delete account",
   "preferencesAccountDisplayname": "Displayname",
   "preferencesAccountDomain": "Domain",
+  "preferencesAccountLink": "Profile link",
+  "preferencesAccountCopyLink": "Copy profile link",
   "preferencesAccountEmail": "Email",
   "preferencesAccountEmailPlaceholder": "Your email address",
   "preferencesAccountInfo": "Info",

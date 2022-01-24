@@ -28,13 +28,13 @@
     "@types/fs-extra": "9.0.13",
     "@types/geolite2": "2.0.0",
     "@types/hbs": "4.0.1",
-    "@types/node": "12.20.41",
+    "@types/node": "12.20.42",
     "jest": "26.6.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-jest": "26.5.6",
     "ts-node": "10.4.0",
-    "typescript": "4.5.4"
+    "typescript": "4.5.5"
   },
   "scripts": {
     "build": "yarn clean && tsc -P tsconfig.json && yarn copy-assets && yarn create-commit-sha",

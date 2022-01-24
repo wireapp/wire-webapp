@@ -327,6 +327,7 @@ export class CryptographyMapper {
 
       data = {
         ...data,
+        preview_domain: remote.assetDomain,
         preview_key: remote.assetId,
         preview_otr_key: new Uint8Array(remote.otrKey),
         preview_sha256: new Uint8Array(remote.sha256),

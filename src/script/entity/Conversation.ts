@@ -509,7 +509,7 @@ export class Conversation {
   }
 
   get qualifiedId(): QualifiedId {
-    return {domain: this.domain, id: this.id};
+    return {domain: this.isFederated() ? this.domain : '', id: this.id};
   }
 
   private hasInitializedUsers() {

@@ -194,14 +194,20 @@ export class ConversationRepository {
       if (removedTeamUserIds.length) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
         const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
-        usersWithoutClients
-          .filter(user => user.deleted)
-          .forEach(user =>
-            this.teamMemberLeave(this.teamState.team().id, {
-              domain: this.teamState.teamDomain(),
-              id: user.id,
-            }),
-          );
+        await Promise.all(
+          usersWithoutClients
+            .filter(user => user.deleted)
+            .map(user =>
+              this.teamMemberLeave(
+                this.teamState.team().id,
+                {
+                  domain: this.teamState.teamDomain(),
+                  id: user.id,
+                },
+                new Date(mismatch.time).getTime() - 1,
+              ),
+            ),
+        );
       }
 
       let shouldWarnLegalHold = false;
@@ -1537,18 +1543,19 @@ export class ConversationRepository {
     isoDate = this.serverTimeHandler.toServerTimestamp(),
   ) => {
     const userEntity = await this.userRepository.getUserById(userId);
-    this.conversationState
+    const eventInjections = this.conversationState
       .conversations()
       .filter(conversationEntity => {
         const conversationInTeam = conversationEntity.team_id === teamId;
         const userIsParticipant = UserFilter.isParticipant(conversationEntity, userId);
         return conversationInTeam && userIsParticipant && !conversationEntity.removed_from_conversation();
       })
-      .forEach(conversationEntity => {
+      .map(conversationEntity => {
         const leaveEvent = EventBuilder.buildTeamMemberLeave(conversationEntity, userEntity, isoDate);
-        this.eventRepository.injectEvent(leaveEvent);
+        return this.eventRepository.injectEvent(leaveEvent);
       });
     userEntity.isDeleted = true;
+    return Promise.all(eventInjections);
   };
 
   /**

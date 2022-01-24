@@ -27,7 +27,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 
 import {Call} from '../../calling/Call';
 import {CallingRepository} from '../../calling/CallingRepository';
-import {CallState} from '../../calling/CallState';
+import {CallState, MuteState} from '../../calling/CallState';
 import {Participant} from '../../calling/Participant';
 import {useVideoGrid} from '../../calling/videoGridHandler';
 import {ConversationState} from '../../conversation/ConversationState';
@@ -57,20 +57,22 @@ const CallingContainer: React.FC<CallingContainerProps> = ({
   conversationState = container.resolve(ConversationState),
 }) => {
   const {isMinimized} = useKoSubscribableChildren(multitasking, ['isMinimized']);
-  const {isMuted, muteState, activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
+  const {activeCallViewTab, joinedCall, selectableScreens, selectableWindows, isChoosingScreen} =
     useKoSubscribableChildren(callState, [
-      'muteState',
-      'isMuted',
       'activeCallViewTab',
       'joinedCall',
       'selectableScreens',
       'selectableWindows',
       'isChoosingScreen',
     ]);
-  const {maximizedParticipant, state: currentCallState} = useKoSubscribableChildren(joinedCall, [
-    'maximizedParticipant',
-    'state',
-  ]);
+
+  const {
+    maximizedParticipant,
+    state: currentCallState,
+    muteState,
+  } = useKoSubscribableChildren(joinedCall, ['maximizedParticipant', 'state', 'muteState']);
+
+  const isMuted = muteState !== MuteState.NOT_MUTED;
 
   useEffect(() => {
     if (currentCallState === CALL_STATE.MEDIA_ESTAB && joinedCall.initialType === CALL_TYPE.VIDEO) {

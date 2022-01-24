@@ -22,7 +22,7 @@ import {Runtime} from '@wireapp/commons';
 import type {WebappProperties} from '@wireapp/api-client/src/user/data';
 import type {QualifiedId} from '@wireapp/api-client/src/user';
 import type {CallConfigData} from '@wireapp/api-client/src/account/CallConfigData';
-import type {ClientMismatch, UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation';
+import type {UserClients, QualifiedUserClients} from '@wireapp/api-client/src/conversation';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {
   CALL_TYPE,
@@ -293,15 +293,17 @@ export class CallingRepository {
   }
 
   private readonly updateMuteState = (isMuted: number) => {
-    this.callState.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
+    const activeStates = [CALL_STATE.MEDIA_ESTAB, CALL_STATE.ANSWERED, CALL_STATE.OUTGOING];
+    const activeCall = this.callState.activeCalls().find(call => activeStates.includes(call.state()));
+    activeCall?.muteState(isMuted ? this.nextMuteState : MuteState.NOT_MUTED);
   };
 
-  private async pushClients(call: Call, checkMismatch?: boolean): Promise<boolean> {
+  private async pushClients(call: Call, checkMismatch?: boolean) {
     const {id, domain} = call.conversationId;
-    const missing = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
-    const qualifiedClients = isQualifiedUserClients(missing)
-      ? flattenQualifiedUserClients(missing)
-      : flattenUserClients(missing);
+    const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+    const qualifiedClients = isQualifiedUserClients(allClients)
+      ? flattenQualifiedUserClients(allClients)
+      : flattenUserClients(allClients);
 
     const clients: Clients = flatten(
       qualifiedClients.map(({data, userId}) =>
@@ -313,7 +315,11 @@ export class CallingRepository {
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
     return checkMismatch
-      ? this.messageRepository.handleClientMismatch(call.conversationId, {missing} as ClientMismatch, consentType)
+      ? this.messageRepository.updateMissingClients(
+          this.conversationState.findConversation(call.conversationId),
+          allClients,
+          consentType,
+        )
       : true;
   }
 
@@ -566,11 +572,11 @@ export class CallingRepository {
       case CALL_MESSAGE_TYPE.CONFKEY: {
         if (source !== EventRepository.SOURCE.STREAM) {
           const {id, domain} = conversationId;
-          const missing = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
+          const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
-          const shouldContinue = await this.messageRepository.handleClientMismatch(
-            conversationId,
-            {missing} as ClientMismatch,
+          const shouldContinue = await this.messageRepository.updateMissingClients(
+            this.conversationState.findConversation(conversationId),
+            allClients,
             CONSENT_TYPE.INCOMING_CALL,
           );
 
@@ -785,10 +791,7 @@ export class CallingRepository {
         this.rejectCall(call.conversationId);
         return;
       }
-
-      if (Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && call.conversationType === CONV_TYPE.CONFERENCE) {
-        this.setMute(true);
-      }
+      this.setMute(call.muteState() !== MuteState.NOT_MUTED);
 
       this.wCall.answer(
         this.wUser,
@@ -847,7 +850,11 @@ export class CallingRepository {
   };
 
   muteCall(call: Call, shouldMute: boolean, reason?: MuteState): void {
-    if (call.hasWorkingAudioInput === false && this.callState.isMuted()) {
+    if (call.state() === CALL_STATE.INCOMING) {
+      call.muteState(shouldMute ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
+      return;
+    }
+    if (call.hasWorkingAudioInput === false && call.muteState() !== MuteState.NOT_MUTED) {
       this.showNoAudioInputModal();
       return;
     }
@@ -1208,6 +1215,7 @@ export class CallingRepository {
     const canRing = !conversationEntity.showNotificationsNothing() && shouldRing && this.isReady;
     const selfParticipant = new Participant(this.selfUser, this.selfClientId);
     const isVideoCall = hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL;
+    const isMuted = Config.getConfig().FEATURE.CONFERENCE_AUTO_MUTE && conversationType === CONV_TYPE.CONFERENCE;
     const call = new Call(
       this.parseQualifiedId(userId),
       conversationId,
@@ -1215,6 +1223,7 @@ export class CallingRepository {
       selfParticipant,
       hasVideo ? CALL_TYPE.VIDEO : CALL_TYPE.NORMAL,
       this.mediaDevicesHandler,
+      isMuted,
     );
     if (!canRing) {
       // an incoming call that should not ring is an ongoing group call
