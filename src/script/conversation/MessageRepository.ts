@@ -101,6 +101,7 @@ import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage
 import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {getDifference} from 'Util/ArrayUtil';
 
 export enum CONSENT_TYPE {
   INCOMING_CALL = 'incoming_call',
@@ -1179,7 +1180,7 @@ export class MessageRepository {
       conversation.blockLegalHoldMessage = true;
     }
     const missing = await this.conversationService.getAllParticipantsClients(conversation.id, conversation.domain);
-    this.handleClientMismatch(conversation.qualifiedId, {missing} as ClientMismatch);
+    this.onClientMismatch?.({missing} as ClientMismatch, conversation.qualifiedId);
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = false;
     }
