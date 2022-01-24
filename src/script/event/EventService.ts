@@ -156,23 +156,13 @@ export class EventService {
    * @param conversationId ID of conversation to add users to
    * @param categoryMin Minimum message category
    * @param categoryMax Maximum message category
-   * @param loadExired Will not return exipred messages if set to `false`
    */
   async loadEventsWithCategory(
     conversationId: string,
     categoryMin: MessageCategory,
     categoryMax = MessageCategory.LIKED,
-    loadExired = true,
   ): Promise<DBEvents> {
     const filterExpired = (record: EventRecord) => {
-      if (loadExired) {
-        return true;
-      }
-
-      if (record.ephemeral_expires === true) {
-        return false;
-      }
-
       if (typeof record.ephemeral_expires !== 'undefined') {
         return +record.ephemeral_expires - Date.now() > 0;
       }
