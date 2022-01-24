@@ -101,7 +101,6 @@ import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage
 import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
-import {getDifference} from 'Util/ArrayUtil';
 
 export enum CONSENT_TYPE {
   INCOMING_CALL = 'incoming_call',
@@ -190,40 +189,12 @@ export class MessageRepository {
    * @param conversation
    * @param mismatch
    */
-  public async updateMissingClients(
+  public async handleClientMismatch(
+    mismatch: UserClients | QualifiedUserClients,
     conversation: Conversation,
-    allClients: UserClients | QualifiedUserClients,
     consentType?: CONSENT_TYPE,
   ) {
-    const missing = await this.findMissingClients(conversation, allClients);
-    return this.onClientMismatch?.({missing} as ClientMismatch, conversation.qualifiedId, false, consentType);
-  }
-
-  /**
-   * Will generate a UserClients that contains only the users and clients that we do no know of locally
-   * @param conversation
-   * @param remoteClients
-   */
-  private async findMissingClients(conversation: Conversation, remoteClients: UserClients | QualifiedUserClients) {
-    const localClients = await this.generateRecipients(conversation);
-
-    const filterKnownClients = (clients: UserClients, knownClients: UserClients) => {
-      return Object.entries(clients).reduce<UserClients>((missing, [userId, clients]) => {
-        const missingClients = getDifference(knownClients[userId] || [], clients);
-        return missingClients.length ? {...missing, [userId]: missingClients} : missing;
-      }, {});
-    };
-
-    const filterKnownQualifiedClients = (clients: QualifiedUserClients, knownClients: QualifiedUserClients) => {
-      return Object.entries(clients).reduce<QualifiedUserClients>((missing, [domain, userClients]) => {
-        const missingUserClients = filterKnownClients(userClients, knownClients[domain]);
-        return Object.keys(missingUserClients).length ? {...missing, [domain]: missingUserClients} : missing;
-      }, {});
-    };
-
-    return isQualifiedUserClients(remoteClients)
-      ? filterKnownQualifiedClients(remoteClients, localClients as QualifiedUserClients)
-      : filterKnownClients(remoteClients, localClients as UserClients);
+    return this.onClientMismatch?.(mismatch, conversation.qualifiedId, false, consentType);
   }
 
   /**
@@ -718,7 +689,7 @@ export class MessageRepository {
       syncTimestamp: true,
     },
   ) {
-    const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
+    const userIds = this.generateRecipients(conversation, recipients, skipSelf);
 
     const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = async genericMessage => {
       if (playPingAudio) {
@@ -1115,11 +1086,11 @@ export class MessageRepository {
     }, {} as UserClients);
   }
 
-  private async generateRecipients(
+  private generateRecipients(
     conversation: Conversation,
     recipients?: QualifiedId[] | QualifiedUserClients | UserClients,
     skipSelf?: boolean,
-  ): Promise<QualifiedUserClients | UserClients> {
+  ): QualifiedUserClients | UserClients {
     if (isQualifiedUserClients(recipients) || isUserClients(recipients)) {
       // If we get a userId>client pairs, we just return those, no need to create recipients
       return recipients;

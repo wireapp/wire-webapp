@@ -315,9 +315,9 @@ export class CallingRepository {
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
     return checkMismatch
-      ? this.messageRepository.updateMissingClients(
-          this.conversationState.findConversation(call.conversationId),
+      ? this.messageRepository.handleClientMismatch(
           allClients,
+          this.conversationState.findConversation(call.conversationId),
           consentType,
         )
       : true;
