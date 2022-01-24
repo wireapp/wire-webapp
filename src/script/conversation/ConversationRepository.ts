@@ -189,11 +189,13 @@ export class ConversationRepository {
       deletedClients.forEach(({userId, clients}) =>
         clients.forEach(client => this.userRepository.removeClientFromUser(userId, client)),
       );
-      const removedTeamUserIds = emptyUsers.filter(user => user.inTeam()).map(user => user.id);
+      const removedTeamUserIds = emptyUsers.filter(user => user.inTeam()).map(user => user.qualifiedId);
 
       if (removedTeamUserIds.length) {
         // If we have found some users that were removed from the conversation, we need to check if those users were also completely removed from the team
-        const usersWithoutClients = await this.userRepository.getUserListFromBackend(removedTeamUserIds);
+        const usersWithoutClients = await this.userRepository.getUserListFromBackend(
+          conversation.isFederated() ? removedTeamUserIds : removedTeamUserIds.map(({id}) => id),
+        );
         await Promise.all(
           usersWithoutClients
             .filter(user => user.deleted)

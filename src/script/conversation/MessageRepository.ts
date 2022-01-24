@@ -216,11 +216,12 @@ export class MessageRepository {
    * @param conversation
    * @param mismatch
    */
-  public async handleClientMismatch(
-    mismatch: UserClients | QualifiedUserClients,
+  public async updateMissingClients(
+    missingClients: UserClients | QualifiedUserClients,
     conversation: Conversation,
     consentType?: CONSENT_TYPE,
   ) {
+    const mismatch = {missing: missingClients} as ClientMismatch;
     return this.onClientMismatch?.(mismatch, conversation.qualifiedId, false, consentType);
   }
 
@@ -758,7 +759,12 @@ export class MessageRepository {
         onClientMismatch: mismatch =>
           this.onClientMismatch?.(mismatch, conversation.qualifiedId, silentDegradationWarning),
         onStart: injectOptimisticEvent,
-        onSuccess: updateOptimisticEvent,
+        onSuccess: async (genericMessage, sentTime) => {
+          const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
+          // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
+          await this.onClientMismatch?.({time: preMessageTimestamp}, conversation);
+          updateOptimisticEvent(genericMessage, sentTime);
+        },
       },
       conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
       nativePush,
@@ -1420,7 +1426,7 @@ export class MessageRepository {
       conversation.blockLegalHoldMessage = true;
     }
     const missing = await this.conversationService.getAllParticipantsClients(conversation.id, conversation.domain);
-    this.handleClientMismatch({missing} as ClientMismatch, conversation.qualifiedId);
+    this.onClientMismatch?.({missing} as ClientMismatch, conversation.qualifiedId);
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = false;
     }

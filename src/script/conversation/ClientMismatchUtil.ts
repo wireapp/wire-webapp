@@ -53,7 +53,7 @@ type ClientDiff = {
  * @param users? A list a users against which to match the mismatch. (if not given will dumbly flatten the given mismatch)
  */
 export function extractClientDiff(
-  {deleted, redundant, missing}: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
+  {deleted = {}, redundant = {}, missing = {}}: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
   users?: User[],
 ): ClientDiff {
   const allDeleted = {...deleted, ...redundant} as QualifiedUserClients | UserClients;
