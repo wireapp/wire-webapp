@@ -84,5 +84,23 @@ describe('ClientMismatchUtil', () => {
         {clients: ['client1'], userId: {domain: '', id: 'user4'}},
       ]);
     });
+
+    it('only gives unknown missing clients when users are given', () => {
+      const mismatch = {
+        missing: {
+          user1: ['client1', 'client2'],
+          user2: ['client1', 'client2'],
+        },
+      };
+      const user1 = new User('user1');
+      user1.devices([new ClientEntity(false, '', 'client1'), new ClientEntity(false, '', 'client2')]);
+
+      const user2 = new User('user2');
+      user2.devices([new ClientEntity(false, '', 'client1')]);
+
+      const {missingClients} = extractClientDiff(mismatch, [user1, user2]);
+
+      expect(missingClients).toEqual([{clients: ['client2'], userId: {domain: '', id: 'user2'}}]);
+    });
   });
 });
