@@ -23,7 +23,6 @@ import {
   Confirmation,
   External,
   GenericMessage,
-  LastRead,
   LegalHoldStatus,
   Asset as ProtobufAsset,
   DataTransfer,
@@ -1551,30 +1550,15 @@ export class MessageRepository {
    *
    * @param conversationEntity Conversation to be marked as read
    */
-  public async markAsRead(conversationEntity: Conversation) {
-    const conversationId = conversationEntity.id;
-    const timestamp = conversationEntity.last_read_timestamp();
-    const protoLastRead = new LastRead({
-      conversationId,
-      lastReadTimestamp: timestamp,
-    });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.LAST_READ]: protoLastRead,
-      messageId: createRandomUuid(),
-    });
-
-    const eventInfoEntity = new EventInfoEntity(
-      genericMessage,
-      this.conversationState.self_conversation()?.qualifiedId,
-    );
-    try {
-      await this.sendGenericMessageToConversation(eventInfoEntity);
-      amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
-      this.logger.info(`Marked conversation '${conversationId}' as read on '${new Date(timestamp).toISOString()}'`);
-    } catch (error) {
-      const errorMessage = 'Failed to update last read timestamp';
-      this.logger.error(`${errorMessage}: ${error.message}`, error);
-    }
+  public async markAsRead(conversation: Conversation) {
+    const timestamp = conversation.last_read_timestamp();
+    this.conversationService.sendLastRead(conversation.id, timestamp);
+    /*
+     * FIXME notification removal can be improved.
+     * We can add the conversation ID in the payload of the event and only check unread messages for this particular conversation
+     */
+    amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
+    this.logger.info(`Marked conversation '${conversation.id}' as read on '${new Date(timestamp).toISOString()}'`);
   }
 
   /**
