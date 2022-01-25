@@ -315,9 +315,9 @@ export class CallingRepository {
     const consentType =
       this.getCallDirection(call) === CALL_DIRECTION.INCOMING ? CONSENT_TYPE.INCOMING_CALL : CONSENT_TYPE.OUTGOING_CALL;
     return checkMismatch
-      ? this.messageRepository.updateMissingClients(
-          this.conversationState.findConversation(call.conversationId),
+      ? this.messageRepository.handleClientMismatch(
           allClients,
+          this.conversationState.findConversation(call.conversationId),
           consentType,
         )
       : true;
@@ -574,9 +574,9 @@ export class CallingRepository {
           const {id, domain} = conversationId;
           const allClients = await this.core.service!.conversation.getAllParticipantsClients(id, domain);
           // We warn the message repository that a mismatch has happened outside of its lifecycle (eventually triggering a conversation degradation)
-          const shouldContinue = await this.messageRepository.updateMissingClients(
-            this.conversationState.findConversation(conversationId),
+          const shouldContinue = await this.messageRepository.handleClientMismatch(
             allClients,
+            this.conversationState.findConversation(conversationId),
             CONSENT_TYPE.INCOMING_CALL,
           );
 
