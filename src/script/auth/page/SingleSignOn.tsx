@@ -39,6 +39,7 @@ import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Runtime} from '@wireapp/commons';
 
 import {Config} from '../../Config';
 import {ssoLoginStrings} from '../../strings';
@@ -50,6 +51,7 @@ import {ROUTE} from '../route';
 import Page from './Page';
 import SingleSignOnForm from './SingleSignOnForm';
 import * as AuthSelector from '../module/selector/AuthSelector';
+import {amplify} from 'amplify';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -85,7 +87,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
         const isExpectedOrigin = event.origin === Config.getConfig().BACKEND_REST;
         if (!isExpectedOrigin) {
           onChildWindowClose();
-          ssoWindowRef.current.close();
+          closeSSOWindow();
           return reject(
             new BackendError({
               code: HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -101,13 +103,13 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
         switch (eventType) {
           case 'AUTH_SUCCESS': {
             onChildWindowClose();
-            ssoWindowRef.current.close();
+            closeSSOWindow();
             return resolve();
           }
           case 'AUTH_ERROR':
           case 'AUTH_ERROR_COOKIE': {
             onChildWindowClose();
-            ssoWindowRef.current.close();
+            closeSSOWindow();
             return reject(
               new BackendError({
                 code: HTTP_STATUS.UNAUTHORIZED,
@@ -143,6 +145,14 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
 
       setIsOverlayOpen(true);
 
+      const closeSSOWindow = () => {
+        if (Runtime.isDesktopApp()) {
+          amplify.publish('BARDIA_CLOSE_SSO');
+        } else {
+          ssoWindowRef.current?.close();
+        }
+      };
+
       if (ssoWindowRef.current) {
         timerId = window.setInterval(() => {
           if (ssoWindowRef.current && ssoWindowRef.current.closed) {
@@ -152,7 +162,7 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
         }, SSO_WINDOW_CLOSE_POLLING_INTERVAL);
 
         onParentWindowClose = () => {
-          ssoWindowRef.current.close();
+          closeSSOWindow();
           reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
         };
         window.addEventListener('unload', onParentWindowClose);
@@ -177,7 +187,15 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
     const top = parentHeight / 2 - childHeight / 2 + screenTop;
     return {left, top};
   };
-  const focusChildWindow = () => ssoWindowRef.current && ssoWindowRef.current.focus();
+
+  const focusChildWindow = () => {
+    if (Runtime.isDesktopApp()) {
+      amplify.publish('BARDIA_FOCUS_SSO');
+    } else {
+      ssoWindowRef.current?.focus();
+    }
+  };
+
   const backArrow = (
     <RouterLink to={ROUTE.INDEX} data-uie-name="go-login">
       <ArrowIcon direction="left" color={COLOR.TEXT} style={{opacity: 0.56}} />
