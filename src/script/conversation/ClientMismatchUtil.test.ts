@@ -19,9 +19,36 @@
 
 import {ClientEntity} from '../client/ClientEntity';
 import {User} from '../entity/User';
-import {extractClientDiff} from './ClientMismatchUtil';
+import {extractClientDiff, findDeletedClients} from './ClientMismatchUtil';
 
 describe('ClientMismatchUtil', () => {
+  describe('findDeletedClients', () => {
+    it('find clients that are in the local recipients but not in the reference one', () => {
+      const referenceRecipients = {
+        domain1: {
+          user1: ['client1', 'client2'],
+        },
+        domain2: {
+          user2: ['client1', 'client2'],
+        },
+      };
+      const localRecipients = {
+        domain1: {
+          user1: ['client1', 'client2', 'client3'],
+        },
+        domain2: {
+          user2: ['client1', 'client2', 'client3'],
+        },
+      };
+
+      const deletedClients = findDeletedClients(referenceRecipients, localRecipients);
+      expect(deletedClients).toEqual({
+        domain1: {user1: ['client3']},
+        domain2: {user2: ['client3']},
+      });
+    });
+  });
+
   describe('extractClientDiff', () => {
     it('extract missing and deleted clients from a mismatch when no users given', () => {
       const mismatch = {
