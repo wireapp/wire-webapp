@@ -1426,7 +1426,7 @@ export class MessageRepository {
       conversation.blockLegalHoldMessage = true;
     }
     const missing = await this.conversationService.getAllParticipantsClients(conversation.id, conversation.domain);
-    this.onClientMismatch?.({missing} as ClientMismatch, conversation.qualifiedId);
+    await this.onClientMismatch?.({missing} as ClientMismatch, conversation.qualifiedId, true);
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = false;
     }
