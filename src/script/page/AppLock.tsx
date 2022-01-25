@@ -149,8 +149,10 @@ const AppLock: React.FC<AppLockProps> = ({
   }, [state, isVisible]);
 
   const showAppLock = () => {
-    setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
-    setIsVisible(true);
+    if (isAppLockEnabled) {
+      setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+      setIsVisible(true);
+    }
   };
 
   const onUnlock = async (event: React.FormEvent) => {
