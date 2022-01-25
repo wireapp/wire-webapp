@@ -411,6 +411,9 @@ export class UserRepository {
 
     const sortedUsers = this.userState
       .directlyConnectedUsers()
+      // For the moment, we do not want to send status in federated env
+      // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
+      .filter(user => !user.isFederated)
       .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
     const [members, other] = partition(sortedUsers, user => user.isTeamMember());
     const recipients = [this.userState.self(), ...members, ...other].slice(
