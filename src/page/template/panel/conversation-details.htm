@@ -207,6 +207,13 @@
               ></read-receipt-toggle>
             </div>
           <!-- /ko -->
+          <!-- ko if: showOptionReadReceipts() -->
+            <div class="conversation-details__read-receipts">
+              <read-services-toggle
+                params="receiptMode: activeConversation().receiptMode, onReceiptModeChanged: updateConversationReceiptMode"
+              ></read-services-toggle>
+            </div>
+          <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
       <div class="conversation-details__participants">
