@@ -118,6 +118,7 @@ import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage
 import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
+import {findDeletedClients} from './ClientMismatchUtil';
 
 export enum CONSENT_TYPE {
   INCOMING_CALL = 'incoming_call',
@@ -1425,8 +1426,12 @@ export class MessageRepository {
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = true;
     }
-    const missing = await this.conversationService.getAllParticipantsClients(conversation.id, conversation.domain);
-    await this.onClientMismatch?.({missing} as ClientMismatch, conversation.qualifiedId, true);
+    const missing = await this.conversationService.getAllParticipantsClients(
+      conversation.id,
+      conversation.isFederated() ? conversation.domain : undefined,
+    );
+    const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
+    await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation.qualifiedId, true);
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = false;
     }

@@ -186,8 +186,10 @@ export class ConversationRepository {
       }
 
       // Remove clients that are not needed anymore
-      deletedClients.forEach(({userId, clients}) =>
-        clients.forEach(client => this.userRepository.removeClientFromUser(userId, client)),
+      await Promise.all(
+        deletedClients.map(({userId, clients}) =>
+          Promise.all(clients.map(client => this.userRepository.removeClientFromUser(userId, client))),
+        ),
       );
       const removedTeamUserIds = emptyUsers.filter(user => user.inTeam()).map(user => user.qualifiedId);
 

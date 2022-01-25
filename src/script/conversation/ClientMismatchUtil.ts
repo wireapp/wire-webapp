@@ -76,13 +76,15 @@ export function extractClientDiff(
     return clientDiff;
   }
 
-  const emptyUsers = users.filter(user => {
-    const userClients = user.devices().map(({id}) => id);
-    const userDeletedClients =
-      deletedClients.find(({userId}) => matchQualifiedIds(user.qualifiedId, userId))?.data || [];
-    const commonDevices = intersection(userClients, userDeletedClients);
-    return commonDevices.length === userClients.length;
-  });
+  const emptyUsers = users
+    .filter(user => !user.isMe)
+    .filter(user => {
+      const userClients = user.devices().map(({id}) => id);
+      const userDeletedClients =
+        deletedClients.find(({userId}) => matchQualifiedIds(user.qualifiedId, userId))?.data || [];
+      const commonDevices = intersection(userClients, userDeletedClients);
+      return commonDevices.length === userClients.length;
+    });
 
   const missingUserIds = missingClients
     .filter(({userId}) => !users.some(user => matchQualifiedIds(userId, user.qualifiedId)))
@@ -106,4 +108,26 @@ export function extractClientDiff(
     missingClients: unknownMissingClients.map(toClientDiff),
     missingUserIds,
   };
+}
+
+type Recipients = UserClients | QualifiedUserClients;
+
+export function findDeletedClients<T extends Recipients>(referenceRecipients: T, localRecipients: T): Recipients {
+  const filterKnownClients = (clients: UserClients, knownClients: UserClients) => {
+    return Object.entries(clients).reduce<UserClients>((missing, [userId, clients]) => {
+      const missingClients = difference(knownClients[userId] || [], clients);
+      return missingClients.length ? {...missing, [userId]: missingClients} : missing;
+    }, {});
+  };
+
+  const filterKnownQualifiedClients = (clients: QualifiedUserClients, knownClients: QualifiedUserClients) => {
+    return Object.entries(clients).reduce<QualifiedUserClients>((missing, [domain, userClients]) => {
+      const missingUserClients = filterKnownClients(userClients, knownClients[domain]);
+      return Object.keys(missingUserClients).length ? {...missing, [domain]: missingUserClients} : missing;
+    }, {});
+  };
+
+  return isQualifiedUserClients(referenceRecipients)
+    ? filterKnownQualifiedClients(referenceRecipients, localRecipients as QualifiedUserClients)
+    : filterKnownClients(referenceRecipients, localRecipients as UserClients);
 }
