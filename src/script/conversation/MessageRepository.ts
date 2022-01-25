@@ -26,7 +26,6 @@ import {
   LastRead,
   LegalHoldStatus,
   Asset as ProtobufAsset,
-  DataTransfer,
 } from '@wireapp/protocol-messaging';
 import {
   ReactionType,
@@ -1583,30 +1582,8 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
-    const selfConversation = this.conversationState.self_conversation();
-    if (selfConversation?.isFederated()) {
-      // TODO(federation)
-      this.logger.warn('syncly not implemented for federated env');
-      return;
-    }
-    const protoDataTransfer = new DataTransfer({
-      trackingIdentifier: {
-        identifier: countlyId,
-      },
-    });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.DATA_TRANSFER]: protoDataTransfer,
-      messageId: createRandomUuid(),
-    });
-
-    const eventInfoEntity = new EventInfoEntity(genericMessage, selfConversation.qualifiedId);
-    try {
-      await this.sendGenericMessageToConversation(eventInfoEntity);
-      this.logger.info(`Sent countly sync message with ID ${countlyId}`);
-    } catch (error) {
-      const errorMessage = `Failed to send countly sync message with ID ${countlyId}`;
-      this.logger.error(`${errorMessage}: ${error.message}`, error);
-    }
+    await this.conversationService.sendCountlySync(countlyId);
+    this.logger.info(`Sent countly sync message with ID ${countlyId}`);
   }
 
   /**
