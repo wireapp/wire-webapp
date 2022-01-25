@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,10 +90,11 @@ export function extractClientDiff(
 
   const unknownMissingClients = missingClients
     .map(({userId, data}) => {
-      const userDevices = users
-        .find(user => matchQualifiedIds(user.qualifiedId, userId))
-        ?.devices()
-        .map(device => device.id);
+      const userDevices =
+        users
+          .find(user => matchQualifiedIds(user.qualifiedId, userId))
+          ?.devices()
+          .map(device => device.id) ?? [];
       const unknownDevices = difference(data, userDevices);
       return {data: unknownDevices, userId};
     })
