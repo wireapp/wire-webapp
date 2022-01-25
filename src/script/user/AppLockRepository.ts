@@ -37,6 +37,9 @@ export class AppLockRepository {
     const hasPassphrase = !!this.getStoredPassphrase();
     this.appLockState.hasPassphrase(hasPassphrase);
     this.appLockState.isActivatedInPreferences(this.getStoredEnabled() === 'true');
+    if (this.appLockState.isAppLockEnforced()) {
+      this.setEnabled(true);
+    }
     if (hasPassphrase) {
       this.startPassphraseObserver();
     }
@@ -58,6 +61,7 @@ export class AppLockRepository {
 
   private readonly handleDisabledOnTeam = (isDisabled: boolean): void => {
     if (isDisabled) {
+      this.setEnabled(false);
       this.removeCode();
     }
   };
