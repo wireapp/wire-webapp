@@ -217,11 +217,11 @@ export class MessageRepository {
    * @param mismatch
    */
   public async updateMissingClients(
-    missingClients: UserClients | QualifiedUserClients,
     conversation: Conversation,
+    allClients: UserClients | QualifiedUserClients,
     consentType?: CONSENT_TYPE,
   ) {
-    const mismatch = {missing: missingClients} as ClientMismatch;
+    const mismatch = {missing: allClients} as ClientMismatch;
     return this.onClientMismatch?.(mismatch, conversation.qualifiedId, false, consentType);
   }
 
