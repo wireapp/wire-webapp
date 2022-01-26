@@ -138,7 +138,7 @@ type ClientMismatchHandlerFn = (
 ) => Promise<boolean>;
 
 /** A Quote that is meant to be sent in a message (and thus needs to have a valid hash) */
-type OutgoingQuote = QuoteEntity & {hash: Uint8Array};
+export type OutgoingQuote = QuoteEntity & {hash: Uint8Array};
 
 type TextMessagePayload = {
   conversation: Conversation;
