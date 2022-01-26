@@ -1268,7 +1268,7 @@ export class MessageRepository {
         return event && this.event_mapper.mapJsonEvent(event, conversation);
       }));
 
-    if (!message || !message.primary_key) {
+    if (!message) {
       throw new ConversationError(
         ConversationError.TYPE.MESSAGE_NOT_FOUND,
         ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
