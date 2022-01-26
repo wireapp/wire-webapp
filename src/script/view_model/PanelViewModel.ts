@@ -80,6 +80,7 @@ export class PanelViewModel {
       MESSAGE_DETAILS: 'PanelViewModel.STATE.MESSAGE_DETAILS',
       NOTIFICATIONS: 'PanelViewModel.STATE.NOTIFICATIONS',
       PARTICIPANT_DEVICES: 'PanelViewModel.STATE.DEVICES',
+      SERVICES_OPTIONS: 'PanelViewModel.STATE.SERVICES_OPTIONS',
       TIMED_MESSAGES: 'PanelViewModel.STATE.TIMED_MESSAGES',
     };
   }
@@ -94,6 +95,7 @@ export class PanelViewModel {
     [PanelViewModel.STATE.MESSAGE_DETAILS]: 'message-details',
     [PanelViewModel.STATE.NOTIFICATIONS]: 'notification-settings',
     [PanelViewModel.STATE.PARTICIPANT_DEVICES]: 'participant-devices',
+    [PanelViewModel.STATE.SERVICES_OPTIONS]: 'services-options',
     [PanelViewModel.STATE.TIMED_MESSAGES]: 'timed-messages',
   };
 

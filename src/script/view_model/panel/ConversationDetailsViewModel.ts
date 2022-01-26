@@ -77,6 +77,7 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
   showActionAddParticipants: ko.PureComputed<boolean>;
   showActionMute: ko.PureComputed<boolean>;
   showOptionGuests: ko.PureComputed<boolean>;
+  showOptionServices: ko.PureComputed<boolean>;
   showOptionReadReceipts: ko.PureComputed<boolean>;
   hasReceiptsEnabled: ko.PureComputed<boolean>;
   hasAdvancedNotifications: ko.PureComputed<boolean>;
@@ -191,6 +192,14 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     this.showActionMute = ko.pureComputed(() => this.activeConversation()?.isMutable() && !this.isTeam());
 
     this.showOptionGuests = ko.pureComputed(() => {
+      return (
+        this.isActiveGroupParticipant() &&
+        this.activeConversation().team_id &&
+        roleRepository.canToggleGuests(this.activeConversation())
+      );
+    });
+
+    this.showOptionServices = ko.pureComputed(() => {
       return (
         this.isActiveGroupParticipant() &&
         this.activeConversation().team_id &&
@@ -383,6 +392,10 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
 
   clickOnGuestOptions(): void {
     this.navigateTo(PanelViewModel.STATE.GUEST_OPTIONS, {entity: this.activeConversation()});
+  }
+
+  clickOnServicesOptions(): void {
+    this.navigateTo(PanelViewModel.STATE.SERVICES_OPTIONS, {entity: this.activeConversation()});
   }
 
   clickOnTimedMessages(): void {

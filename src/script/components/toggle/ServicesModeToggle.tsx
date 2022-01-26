@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,59 +17,53 @@
  *
  */
 
-import React, {Fragment} from 'react';
-import {RECEIPT_MODE} from '@wireapp/api-client/src/conversation/data';
+import React from 'react';
+import cx from 'classnames';
 
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
-import Icon from '../Icon';
-
-export interface ServicesModeToggleProps {
-  onServicesModeChanged: (receiptMode: RECEIPT_MODE) => void;
-  receiptMode: RECEIPT_MODE;
+export interface ServicesToggleProps {
+  isChecked: boolean;
+  isDisabled?: boolean;
+  setIsChecked: (isChecked: boolean) => void;
 }
 
-const ServicesModeToggle: React.FC<ServicesModeToggleProps> = ({receiptMode, onServicesModeChanged}) => {
-  const updateValue = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newServicesMode = event.target.checked ? RECEIPT_MODE.ON : RECEIPT_MODE.OFF;
-    onServicesModeChanged(newServicesMode);
-  };
-
+const ServicesToggle: React.FC<ServicesToggleProps> = ({isChecked, isDisabled, setIsChecked}) => {
   return (
-    <Fragment>
-      <div className="panel__action-item">
-        <div className="panel__action-item__icon">
-          <Icon.Read />
+    <>
+      <div className="info-toggle__row">
+        <div>{t('guestRoomToggleName')}</div>
+        <div
+          className={cx('slider', {
+            disabled: isDisabled,
+          })}
+        >
+          <input
+            className="slider-input"
+            type="checkbox"
+            name="toggle"
+            id="toggle"
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
+            checked={isChecked}
+            data-uie-name="allow-guest-input"
+          />
+          <label
+            className="button-label"
+            htmlFor="toggle"
+            data-uie-name="do-allow-guests"
+            data-uie-value={isChecked ? 'checked' : 'unchecked'}
+          />
         </div>
-        <div className="panel__action-item__summary">
-          <div className="panel__action-item__text">{t('servicesToggleLabel')}</div>
-        </div>
-        <input
-          checked={receiptMode !== RECEIPT_MODE.OFF}
-          className="slider-input"
-          data-uie-name="toggle-services-mode-checkbox"
-          id="services-toggle-input"
-          name="preferences_device_verification_toggle"
-          onChange={updateValue}
-          type="checkbox"
-        />
-        <label
-          htmlFor="services-toggle-input"
-          data-uie-name="do-toggle-receipt-mode"
-          data-uie-receipt-status={receiptMode}
-        />
       </div>
-      <div className="panel__info-text panel__info-text--margin" data-uie-name="status-info-toggle-services-mode">
-        {t('servicesRoomToggleInfoExtended')}
-      </div>
-    </Fragment>
+    </>
   );
 };
 
-export default ServicesModeToggle;
+export default ServicesToggle;
 
-registerReactComponent('read-services-toggle', {
-  component: ServicesModeToggle,
-  template: '<div data-bind="react: {receiptMode: ko.unwrap(receiptMode), onReceiptModeChanged}"></span>',
+registerReactComponent('services-toggle', {
+  component: ServicesToggle,
+  template:
+    '<div class="services-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle }"></div>',
 });
