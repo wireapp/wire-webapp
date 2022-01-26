@@ -27,6 +27,7 @@ import ko from 'knockout';
 import {afterRender, formatBytes} from 'Util/util';
 import {allowsAllFiles, hasAllowedExtension, getFileExtensionOrName} from 'Util/FileTypeUtil';
 import {AVATAR_SIZE} from 'Components/Avatar';
+import 'Components/input/ClassifiedBar';
 import {KEY, isFunctionKey, insertAtCaret} from 'Util/KeyboardUtil';
 import {renderMessage} from 'Util/messageRenderer';
 import {t} from 'Util/LocalizerUtil';
