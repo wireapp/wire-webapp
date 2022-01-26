@@ -296,7 +296,7 @@ export class ConversationRepository {
     this.leaveCall = noop;
   }
 
-  checkMessageTimer(messageEntity: Message): void {
+  checkMessageTimer(messageEntity: ContentMessage): void {
     this.ephemeralHandler.checkMessageTimer(messageEntity, this.serverTimeHandler.getTimeOffset());
   }
 

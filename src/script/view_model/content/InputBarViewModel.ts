@@ -819,7 +819,9 @@ export class InputBarViewModel {
     });
   };
 
-  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity | undefined> => {
+  private readonly _generateQuote = (
+    replyMessageEntity: ContentMessage,
+  ): Promise<(QuoteEntity & {hash: Uint8Array}) | undefined> => {
     return !replyMessageEntity
       ? Promise.resolve(undefined)
       : this.eventRepository.eventService

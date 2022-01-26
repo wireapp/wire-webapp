@@ -152,6 +152,7 @@ type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
 
 /** A message that has already been stored in DB and has a primary key */
 type StoredMessage = Message & {primary_key: string};
+type StoredContentMessage = ContentMessage & {primary_key: string};
 
 export class MessageRepository {
   private readonly logger: Logger;
@@ -1259,7 +1260,7 @@ export class MessageRepository {
     messageId: string,
     skipConversationMessages = false,
     ensureUser = false,
-  ): Promise<StoredMessage> {
+  ): Promise<StoredContentMessage> {
     const messageEntity = !skipConversationMessages && conversation.getMessage(messageId);
     const message =
       messageEntity ||
@@ -1277,9 +1278,9 @@ export class MessageRepository {
     if (ensureUser && message.from && !message.user().id) {
       const user = await this.userRepository.getUserById({domain: message.user().domain, id: message.from});
       message.user(user);
-      return message as StoredMessage;
+      return message as StoredContentMessage;
     }
-    return message as StoredMessage;
+    return message as StoredContentMessage;
   }
 
   static getOtherUsersWithoutClients(eventInfoEntity: EventInfoEntity, selfUserId: string): string[] {

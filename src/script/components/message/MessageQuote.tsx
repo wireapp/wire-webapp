@@ -96,7 +96,7 @@ const Quote: React.FC<QuoteProps> = ({
       messageRepository
         .getMessageInConversationById(conversation, quote.messageId, true, true)
         .then(message => {
-          setQuotedMessage(message);
+          setQuotedMessage(message as ContentMessage);
         })
         .catch(error => {
           if (error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {
