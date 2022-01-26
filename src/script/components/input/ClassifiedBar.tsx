@@ -43,7 +43,11 @@ const barStyle = (highContrast: boolean): CSSObject => ({
 });
 
 const ClassifiedBar: React.FC<ClassifiedBarProps> = ({text, highContrast = false}) => {
-  return text ? <div css={barStyle(highContrast)}>{text}</div> : null;
+  return text ? (
+    <div data-uie-name="classified-label" css={barStyle(highContrast)}>
+      {text}
+    </div>
+  ) : null;
 };
 
 export default ClassifiedBar;
