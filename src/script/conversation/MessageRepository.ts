@@ -25,7 +25,6 @@ import {
   GenericMessage,
   LastRead,
   LegalHoldStatus,
-  Asset as ProtobufAsset,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
 import {
@@ -138,15 +137,21 @@ type ClientMismatchHandlerFn = (
   consentType?: CONSENT_TYPE,
 ) => Promise<boolean>;
 
+/** A Quote that is meant to be sent in a message (and thus needs to have a valid hash) */
+type OutgoingQuote = QuoteEntity & {hash: Uint8Array};
+
 type TextMessagePayload = {
   conversation: Conversation;
   linkPreview?: LinkPreviewUploadedContent;
   mentions?: MentionEntity[];
   message: string;
   messageId?: string;
-  quote?: QuoteEntity;
+  quote?: OutgoingQuote;
 };
 type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
+
+/** A message that has already been stored in DB and has a primary key */
+type StoredMessage = Message & {primary_key: string};
 
 export class MessageRepository {
   private readonly logger: Logger;
@@ -300,7 +305,14 @@ export class MessageRepository {
     return this.sendAndInjectGenericCoreMessage(textMessage, conversation);
   }
 
-  private async sendEdit({conversation, message, messageId, originalMessageId, mentions, quote}: EditMessagePayload) {
+  private async sendEdit({
+    conversation,
+    message,
+    messageId,
+    originalMessageId,
+    mentions = [],
+    quote,
+  }: EditMessagePayload) {
     const baseMessage = MessageBuilder.createEditedText({
       ...this.createCommonMessagePayload(conversation),
       messageId,
@@ -322,7 +334,7 @@ export class MessageRepository {
     }: {
       linkPreview?: LinkPreviewUploadedContent;
       mentions: MentionEntity[];
-      quote?: QuoteEntity;
+      quote?: OutgoingQuote;
     },
   ) {
     const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
@@ -356,7 +368,7 @@ export class MessageRepository {
     conversation: Conversation,
     textMessage: string,
     mentions: MentionEntity[],
-    quoteEntity?: QuoteEntity,
+    quoteEntity?: OutgoingQuote,
   ): Promise<void> {
     const textPayload = {
       conversation,
@@ -437,7 +449,7 @@ export class MessageRepository {
     conversationEntity: Conversation,
     url: string,
     tag: string | number | Record<string, string>,
-    quoteEntity: QuoteEntity,
+    quoteEntity: OutgoingQuote,
   ): Promise<void> {
     if (!tag) {
       tag = t('extensionsGiphyRandom');
@@ -483,40 +495,40 @@ export class MessageRepository {
   /**
    * Post file to a conversation using v3
    *
-   * @param conversationEntity Conversation to post the file
+   * @param conversation Conversation to post the file
    * @param file File object
    * @param asImage whether or not the file should be treated as an image
    * @returns Resolves when file was uploaded
    */
-
   private async uploadFile(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     file: Blob,
     asImage: boolean = false,
   ): Promise<EventRecord | void> {
-    let messageId;
+    const uploadStarted = Date.now();
+    const injectedEvent = await this.sendAssetMetadata(conversation, file, asImage);
+    if (injectedEvent.state === PayloadBundleState.CANCELLED) {
+      throw new ConversationError(
+        ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+        ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
+      );
+    }
     try {
-      const uploadStarted = Date.now();
-      const injectedEvent = await this.sendAssetMetadata(conversationEntity, file, asImage);
-      if (injectedEvent.state === PayloadBundleState.CANCELLED) {
-        throw new ConversationError(
-          ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
-          ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
-        );
-      }
-      messageId = injectedEvent.id;
-      await this.sendAssetRemotedata(conversationEntity, file, messageId, asImage);
+      await this.sendAssetRemotedata(conversation, file, injectedEvent.id, asImage);
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
-      this.logger.info(`Finished to upload asset for conversation'${conversationEntity.id} in ${uploadDuration}`);
+      this.logger.info(`Finished to upload asset for conversation'${conversation.id} in ${uploadDuration}`);
     } catch (error) {
       if (this.isUserCancellationError(error)) {
         throw error;
       } else if (error instanceof RequestCancellationError) {
         return;
       }
-      this.logger.error(`Failed to upload asset for conversation '${conversationEntity.id}': ${error.message}`, error);
-      const messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
-      this.sendAssetUploadFailed(conversationEntity, messageEntity.id);
+      this.logger.error(
+        `Failed to upload asset for conversation '${conversation.id}': ${(error as Error).message}`,
+        error,
+      );
+      const messageEntity = await this.getMessageInConversationById(conversation, injectedEvent.id);
+      this.sendAssetUploadFailed(conversation, messageEntity.id);
       return this.updateMessageAsUploadFailed(messageEntity);
     }
   }
@@ -528,24 +540,22 @@ export class MessageRepository {
    * @param reason Failure reason
    * @returns Resolves when the message was updated
    */
-  private async updateMessageAsUploadFailed(message_et: ContentMessage, reason = AssetTransferState.UPLOAD_FAILED) {
-    if (message_et) {
-      if (!message_et.isContent()) {
-        throw new Error(`Tried to update wrong message type as upload failed '${(message_et as any).super_type}'`);
-      }
-
-      const asset_et = message_et.getFirstAsset() as FileAsset;
-      if (asset_et) {
-        if (!asset_et.isDownloadable()) {
-          throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
-        }
-
-        asset_et.status(reason);
-        asset_et.upload_failed_reason(ProtobufAsset.NotUploaded.FAILED);
-      }
-
-      return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
+  private async updateMessageAsUploadFailed(message_et: StoredMessage, reason = AssetTransferState.UPLOAD_FAILED) {
+    if (!message_et.isContent()) {
+      throw new Error(`Tried to update wrong message type as upload failed '${(message_et as any).super_type}'`);
     }
+
+    const asset_et = message_et.getFirstAsset() as FileAsset;
+    if (asset_et) {
+      if (!asset_et.isDownloadable()) {
+        throw new Error(`Tried to update message with wrong asset type as upload failed '${asset_et.type}'`);
+      }
+
+      asset_et.status(reason);
+      asset_et.upload_failed_reason(Asset.NotUploaded.FAILED);
+    }
+
+    return this.eventService.updateEventAsUploadFailed(message_et.primary_key, reason);
   }
 
   private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
@@ -557,7 +567,7 @@ export class MessageRepository {
       retention,
     };
     const asset = await this.assetRepository.uploadFile(file, messageId, options, () =>
-      this.cancelAssetUpload(messageId),
+      this.cancelAssetUpload(conversation, messageId),
     );
 
     const commonPayload = {
@@ -588,7 +598,9 @@ export class MessageRepository {
     try {
       metadata = await buildMetadata(file);
     } catch (error) {
-      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
+      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
+        (error as Error).message
+      }`;
       this.logger.warn(logMessage, error);
     }
     const meta = {length: file.size, name: (file as File).name, type: file.type} as Partial<FileMetaDataContent>;
@@ -630,7 +642,7 @@ export class MessageRepository {
     return this.sendAndInjectGenericCoreMessage(payload, conversation);
   }
 
-  private isUserCancellationError(error: ConversationError): boolean {
+  private isUserCancellationError(error: any): boolean {
     const errorTypes: string[] = [
       ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
       ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
@@ -1112,12 +1124,8 @@ export class MessageRepository {
    * Cancel asset upload.
    * @param messageId Id of the message which upload has been cancelled
    */
-  private readonly cancelAssetUpload = (messageId: string) => {
-    this.sendAssetUploadFailed(
-      this.conversationState.activeConversation(),
-      messageId,
-      ProtobufAsset.NotUploaded.CANCELLED,
-    );
+  private readonly cancelAssetUpload = (conversation: Conversation, messageId: string) => {
+    this.sendAssetUploadFailed(conversation, messageId, Asset.NotUploaded.CANCELLED);
   };
 
   /**
@@ -1154,7 +1162,7 @@ export class MessageRepository {
         return await this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
     } catch (error) {
-      if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+      if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;
       }
     }
@@ -1240,43 +1248,38 @@ export class MessageRepository {
   /**
    * Get Message with given ID from the database.
    *
-   * @param conversationEntity Conversation message belongs to
+   * @param conversation Conversation message belongs to
    * @param messageId ID of message
    * @param skipConversationMessages Don't use message entity from conversation
    * @param ensureUser Make sure message entity has a valid user
    * @returns Resolves with the message
    */
-  getMessageInConversationById(
-    conversationEntity: Conversation,
+  async getMessageInConversationById(
+    conversation: Conversation,
     messageId: string,
     skipConversationMessages = false,
     ensureUser = false,
-  ): Promise<ContentMessage> {
-    const messageEntity = !skipConversationMessages && conversationEntity.getMessage(messageId);
-    const messagePromise = messageEntity
-      ? Promise.resolve(messageEntity)
-      : this.eventService.loadEvent(conversationEntity.id, messageId).then(event => {
-          if (event) {
-            return this.event_mapper.mapJsonEvent(event, conversationEntity);
-          }
-          throw new ConversationError(
-            ConversationError.TYPE.MESSAGE_NOT_FOUND,
-            ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
-          );
-        });
+  ): Promise<StoredMessage> {
+    const messageEntity = !skipConversationMessages && conversation.getMessage(messageId);
+    const message =
+      messageEntity ||
+      (await this.eventService.loadEvent(conversation.id, messageId).then(event => {
+        return event && this.event_mapper.mapJsonEvent(event, conversation);
+      }));
 
-    if (ensureUser) {
-      return messagePromise.then(message => {
-        if (message.from && !message.user().id) {
-          return this.userRepository.getUserById({domain: message.user().domain, id: message.from}).then(userEntity => {
-            message.user(userEntity);
-            return message as ContentMessage;
-          });
-        }
-        return message as ContentMessage;
-      });
+    if (!message || !message.primary_key) {
+      throw new ConversationError(
+        ConversationError.TYPE.MESSAGE_NOT_FOUND,
+        ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
+      );
     }
-    return messagePromise as Promise<ContentMessage>;
+
+    if (ensureUser && message.from && !message.user().id) {
+      const user = await this.userRepository.getUserById({domain: message.user().domain, id: message.from});
+      message.user(user);
+      return message as StoredMessage;
+    }
+    return message as StoredMessage;
   }
 
   static getOtherUsersWithoutClients(eventInfoEntity: EventInfoEntity, selfUserId: string): string[] {
@@ -1709,7 +1712,7 @@ export class MessageRepository {
     let messageType = eventInfoEntity.getType();
 
     if (messageType === GENERIC_MESSAGE_TYPE.CONFIRMATION) {
-      messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation.type}")`;
+      messageType += ` (type: "${eventInfoEntity.genericMessage.confirmation?.type}")`;
     }
 
     const numberOfUsers = Object.keys(payload.recipients).length;
@@ -1832,7 +1835,7 @@ export class MessageRepository {
     switch (messageContentType) {
       case 'asset': {
         const protoAsset = genericMessage.asset;
-        if (protoAsset.original) {
+        if (protoAsset?.original) {
           if (!!protoAsset.original.image) {
             actionType = 'photo';
           } else if (!!protoAsset.original.audio) {
@@ -1863,7 +1866,7 @@ export class MessageRepository {
 
       case 'text': {
         const protoText = genericMessage.text;
-        const length = protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS].length;
+        const length = protoText?.[PROTO_MESSAGE_TYPE.LINK_PREVIEWS]?.length;
         if (!length) {
           actionType = 'text';
         }
