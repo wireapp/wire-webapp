@@ -75,7 +75,7 @@ export const CallViewTabs: ButtonGroupTab[] = [
 
 declare global {
   interface HTMLAudioElement {
-    setSinkId: (sinkId: string) => Promise<void>;
+    setSinkId?: (sinkId: string) => Promise<void>;
   }
 }
 
