@@ -300,7 +300,6 @@ export class TestFactory {
     clientState.currentClient(clientEntity);
 
     this.message_repository = new MessageRepository(
-      this.client_repository,
       () => this.conversation_repository,
       this.cryptography_repository,
       this.event_repository,
@@ -308,7 +307,6 @@ export class TestFactory {
       this.propertyRepository,
       serverTimeHandler,
       this.user_repository,
-      this.conversation_service,
       this.assetRepository,
       this.user_repository['userState'],
       this.team_repository['teamState'],
