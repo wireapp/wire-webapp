@@ -880,10 +880,7 @@ export class MessageRepository {
     const sendingOptions = {
       nativePush: false,
       recipients: [messageEntity.qualifiedFrom],
-      // When not in a verified conversation (verified or degraded) we want the regular sending flow (send and reencrypt if there are mismatches)
-      // When in a verified (or degraded) conversation we want to prevent encrypting for unverified devices, we will then silent the degradation modal and force sending to only the devices that are verified
-      silentDegradationWarning: conversationEntity.verification_state() !== ConversationVerificationState.UNVERIFIED,
-
+      silentDegradationWarning: true, // We do not show the degradation popup in case of a confirmation
       targetMode: MessageTargetMode.USERS,
     };
     const res = await this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, sendingOptions);
