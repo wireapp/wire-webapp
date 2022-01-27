@@ -5733,10 +5733,10 @@ eslint-plugin-jsdoc@37.6.3:
     semver "^7.3.5"
     spdx-expression-parse "^3.0.1"
 
-eslint-plugin-no-unsanitized@3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-no-unsanitized/-/eslint-plugin-no-unsanitized-3.2.0.tgz#a74239ae51363a5edbe6920eb34fe09aab925a9c"
-  integrity sha512-92opuXbjWmXcod94EyCKhp36V1QHLM/ArAST2ssgKOojALne0eZvSPfrg4oyr0EwTXvy0RJNe/Tkm33VkDUrKQ==
+eslint-plugin-no-unsanitized@4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-no-unsanitized/-/eslint-plugin-no-unsanitized-4.0.1.tgz#e2343265467ba2270ade478cbe07bbafeaea412d"
+  integrity sha512-y/lAMWnPPC7RYuUdxlEL/XiCL8FehN9h9s3Kjqbp/Kv0i9NZs+IXSC2kS546Fa4Bumwy31HlVS/OdWX0Kxb5Xg==
 
 eslint-plugin-prettier@4.0.0:
   version "4.0.0"
