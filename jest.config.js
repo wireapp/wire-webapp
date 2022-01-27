@@ -33,7 +33,6 @@ module.exports = {
     'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react(.*)$': '<rootDir>/node_modules/react$1',
   },
-  preset: 'ts-jest/presets/js-with-ts',
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: './src/script/util/test/env/JSDomEnvironment.js',
   testEnvironmentOptions: {
