@@ -40,4 +40,5 @@ module.exports = {
   },
   testPathIgnorePatterns: ['<rootDir>/test/index.test.js', '<rootDir>/test/main.test.js', '<rootDir>/server'],
   testRegex: '(test|Spec)\\.[tj]sx?$',
+  testRunner: 'jest-jasmine2',
 };
