@@ -136,7 +136,7 @@ describe('SelfAction', () => {
       fail();
     } catch (backendError) {
       // TODO: Check for thrown error with jest error helpers (`await expect(Promise).rejects.toThrow()`)
-      // eslint-disable-next-line jest/no-try-expect
+      // eslint-disable-next-line jest/no-conditional-expect
       expect(store.getActions()).toEqual([
         SelfActionCreator.startSetPasswordState(),
         SelfActionCreator.failedSetPasswordState(error),
