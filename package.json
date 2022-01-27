@@ -124,7 +124,7 @@
     "eslint-plugin-typescript-sort-keys": "1.8.0",
     "eslint-plugin-unused-imports": "1.1.5",
     "fake-indexeddb": "3.1.7",
-    "faker": "5.5.3",
+    "faker": "6.6.6",
     "generate-changelog": "1.8.0",
     "grunt": "1.4.1",
     "grunt-aws-s3": "2.0.2",
