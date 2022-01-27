@@ -21,7 +21,7 @@ module.exports = {
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
   coverageThreshold: {
     global: {
-      statements: 45,
+      statements: 40,
     },
   },
   moduleDirectories: ['node_modules', './'],
@@ -33,7 +33,6 @@ module.exports = {
     'Util/(.*)': '<rootDir>/src/script/util/$1',
     '^react(.*)$': '<rootDir>/node_modules/react$1',
   },
-  preset: 'ts-jest/presets/js-with-ts',
   setupFilesAfterEnv: ['<rootDir>/setupTests.js'],
   testEnvironment: './src/script/util/test/env/JSDomEnvironment.js',
   testEnvironmentOptions: {
@@ -41,4 +40,5 @@ module.exports = {
   },
   testPathIgnorePatterns: ['<rootDir>/test/index.test.js', '<rootDir>/test/main.test.js', '<rootDir>/server'],
   testRegex: '(test|Spec)\\.[tj]sx?$',
+  testRunner: 'jest-jasmine2',
 };
