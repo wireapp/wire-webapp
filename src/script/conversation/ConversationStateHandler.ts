@@ -49,7 +49,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     this.conversationService = conversationService;
   }
 
-  async changeAccessState(conversationEntity: Conversation, accessState: string): Promise<void> {
+  async changeAccessState(conversationEntity: Conversation, accessState: ACCESS_STATE): Promise<void> {
     const isConversationInTeam = conversationEntity && conversationEntity.inTeam();
     if (isConversationInTeam) {
       const isStateChange = conversationEntity.accessState() !== accessState;

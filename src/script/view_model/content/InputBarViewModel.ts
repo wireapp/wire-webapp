@@ -58,6 +58,7 @@ import {Text} from '../../entity/message/Text';
 import {User} from '../../entity/User';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
+import '../../page/message-list/MentionSuggestions';
 
 interface DraftMessage {
   mentions: MentionEntity[];
@@ -109,7 +110,6 @@ export class InputBarViewModel {
   /** MIME types and file extensions are accepted */
   readonly acceptedImageTypes: string;
   readonly allowedFileTypes: string;
-  readonly disableControls: ko.PureComputed<boolean>;
 
   static get CONFIG() {
     return {
@@ -331,11 +331,12 @@ export class InputBarViewModel {
 
     this.hasLocalEphemeralTimer = ko.pureComputed(() => {
       const conversationEntity = this.conversationEntity();
-      return conversationEntity.localMessageTimer() && !conversationEntity.hasGlobalMessageTimer();
+      return (
+        teamState.isSelfDeletingMessagesEnabled() &&
+        conversationEntity.localMessageTimer() &&
+        !conversationEntity.hasGlobalMessageTimer()
+      );
     });
-
-    // TODO(Federation): For Federation playground builds we disable every other activity than sending plain text messages
-    this.disableControls = ko.pureComputed(() => this.conversationEntity()?.isFederated());
 
     this.conversationEntity.subscribe(this.loadInitialStateForConversation);
     this.draftMessage.subscribe(message => {
@@ -519,7 +520,7 @@ export class InputBarViewModel {
   readonly clickToPing = (): void => {
     if (this.conversationEntity() && !this.pingDisabled()) {
       this.pingDisabled(true);
-      this.messageRepository.sendKnock(this.conversationEntity()).then(() => {
+      this.messageRepository.sendPing(this.conversationEntity()).then(() => {
         window.setTimeout(() => this.pingDisabled(false), InputBarViewModel.CONFIG.PING_TIMEOUT);
       });
     }
@@ -636,8 +637,6 @@ export class InputBarViewModel {
 
     if (this.isEditing()) {
       this.sendMessageEdit(messageText, this.editMessageEntity());
-    } else if (this.disableControls()) {
-      this.sendFederatedMessage(messageText);
     } else {
       this.sendMessage(messageText, this.replyMessageEntity());
     }
@@ -653,9 +652,7 @@ export class InputBarViewModel {
       switch (keyboardEvent.key) {
         case KEY.ARROW_UP: {
           if (!isFunctionKey(keyboardEvent) && !this.input().length) {
-            if (!this.conversationEntity()?.isFederated()) {
-              this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
-            }
+            this.editMessage(this.conversationEntity().getLastEditableMessage() as ContentMessage);
             this.updateMentions(data, keyboardEvent);
           }
           break;
@@ -835,15 +832,6 @@ export class InputBarViewModel {
               userId: replyMessageEntity.from,
             });
           });
-  };
-
-  readonly sendFederatedMessage = (messageText: string): void => {
-    if (!messageText.length) {
-      return;
-    }
-
-    this.messageRepository.sendFederatedMessage(messageText);
-    this.cancelMessageReply();
   };
 
   readonly sendMessage = (messageText: string, replyMessageEntity: ContentMessage): void => {

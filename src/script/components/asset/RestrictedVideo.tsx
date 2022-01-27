@@ -39,7 +39,7 @@ const RestrictedVideo: React.FC<RestrictedVideoProps> = ({showMessage = true, is
         <div className="flex-center" data-uie-name="file-icon">
           <div className="video-asset__restricted__play-button icon-play" />
         </div>
-        {showMessage && <div className="video-asset__restricted--message">{t('conversationAssetRestricted')}</div>}
+        {showMessage && <div className="video-asset__restricted--message">{t('conversationVideoAssetRestricted')}</div>}
       </div>
     </div>
   );

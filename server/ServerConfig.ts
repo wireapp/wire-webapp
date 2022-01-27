@@ -19,12 +19,12 @@ export interface ServerConfig {
       ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: boolean;
       ENABLE_DEBUG: boolean;
       ENABLE_DOMAIN_DISCOVERY: boolean;
+      ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY: boolean;
       ENABLE_FEDERATION: boolean;
       ENABLE_MEDIA_EMBEDS: boolean;
       ENABLE_PHONE_LOGIN: boolean;
       ENABLE_SSO: boolean;
       ENFORCE_CONSTANT_BITRATE: boolean;
-      FEDERATION_DOMAIN: string;
       PERSIST_TEMPORARY_CLIENTS: boolean;
       SHOW_LOADING_INFORMATION: boolean;
     };
@@ -52,6 +52,7 @@ export interface ServerConfig {
       };
       TEAMS_BASE: string;
       TEAMS_CREATE: string;
+      TERMS_BILLING: string;
       TERMS_OF_USE_PERSONAL: string;
       TERMS_OF_USE_TEAMS: string;
       WEBSITE_BASE: string;

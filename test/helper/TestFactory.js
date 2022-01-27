@@ -53,7 +53,6 @@ import {ConversationService} from 'src/script/conversation/ConversationService';
 import {ConversationRepository} from 'src/script/conversation/ConversationRepository';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
 import {SelfService} from 'src/script/self/SelfService';
-import {LinkPreviewRepository} from 'src/script/links/LinkPreviewRepository';
 import {PropertiesRepository} from 'src/script/properties/PropertiesRepository';
 import {PropertiesService} from 'src/script/properties/PropertiesService';
 import {MessageSender} from 'src/script/message/MessageSender';
@@ -125,18 +124,15 @@ export class TestFactory {
    */
   async exposeCryptographyActors(mockCryptobox = true) {
     const storageRepository = await this.exposeStorageActors();
-    const currentClient = new ClientEntity(true);
+    const currentClient = new ClientEntity(true, null);
     currentClient.id = entities.clients.john_doe.permanent.id;
     this.cryptography_service = new CryptographyService();
 
-    this.cryptography_repository = new CryptographyRepository(this.cryptography_service, this.storage_repository);
-    this.cryptography_repository.currentClient = ko.observable(currentClient);
+    this.cryptography_repository = new CryptographyRepository(this.cryptography_service);
 
-    if (mockCryptobox === true) {
-      spyOn(this.cryptography_repository, 'initCryptobox').and.returnValue(Promise.resolve());
-    } else {
+    if (!mockCryptobox) {
       const storeEngine = storageRepository.storageService['engine'];
-      this.cryptography_repository.cryptobox = new Cryptobox(storeEngine, 10);
+      this.cryptography_repository.init(new Cryptobox(storeEngine, 10), ko.observable(currentClient));
       await this.cryptography_repository.cryptobox.create();
     }
 
@@ -148,7 +144,7 @@ export class TestFactory {
    */
   async exposeClientActors() {
     await this.exposeCryptographyActors();
-    const clientEntity = new ClientEntity();
+    const clientEntity = new ClientEntity(false, null);
     clientEntity.address = '192.168.0.1';
     clientEntity.class = ClientClassification.DESKTOP;
     clientEntity.id = '60aee26b7f55a99f';
@@ -162,10 +158,15 @@ export class TestFactory {
     user.phone(entities.user.john_doe.phone);
 
     this.client_service = new ClientService(this.storage_service);
-    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, new ClientState());
+    this.client_repository = new ClientRepository(
+      this.client_service,
+      this.cryptography_repository,
+      this.storage_repository,
+      new ClientState(),
+    );
     this.client_repository.init(user);
 
-    const currentClient = new ClientEntity();
+    const currentClient = new ClientEntity(false, null);
     currentClient.address = '62.96.148.44';
     currentClient.class = ClientClassification.DESKTOP;
     currentClient.cookie = 'webapp@2153234453@temporary@1470926647664';
@@ -186,7 +187,6 @@ export class TestFactory {
    * @returns {Promise<EventRepository>} The event repository.
    */
   async exposeEventActors() {
-    await this.exposeCryptographyActors();
     await this.exposeUserActors();
 
     this.web_socket_service = new WebSocketService();
@@ -203,7 +203,7 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository['userState'],
     );
-    this.event_repository.currentClient = ko.observable(this.cryptography_repository.currentClient());
+    this.event_repository.currentClient = this.client_repository['clientState'].currentClient;
 
     return this.event_repository;
   }
@@ -286,15 +286,13 @@ export class TestFactory {
 
     this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService());
 
-    const assetRepository = new AssetRepository(new AssetService());
-
     /** @type {ConversationRepository} */
     this.conversation_repository = null;
     const conversationState = new ConversationState(
       this.user_repository['userState'],
       this.team_repository['teamState'],
     );
-    const clientEntity = new ClientEntity();
+    const clientEntity = new ClientEntity(false, null);
     clientEntity.address = '192.168.0.1';
     clientEntity.class = ClientClassification.DESKTOP;
     clientEntity.id = '60aee26b7f55a99f';
@@ -311,7 +309,6 @@ export class TestFactory {
       serverTimeHandler,
       this.user_repository,
       this.conversation_service,
-      new LinkPreviewRepository(assetRepository, this.propertyRepository),
       this.assetRepository,
       this.user_repository['userState'],
       this.team_repository['teamState'],
@@ -320,7 +317,7 @@ export class TestFactory {
     );
     this.conversation_repository = new ConversationRepository(
       this.conversation_service,
-      () => this.message_repository,
+      this.message_repository,
       this.connection_repository,
       this.event_repository,
       this.team_repository,

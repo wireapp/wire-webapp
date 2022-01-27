@@ -80,7 +80,6 @@ import {WindowHandler} from '../ui/WindowHandler';
 import {Router} from '../router/Router';
 import {initRouterBindings} from '../router/routerBindings';
 
-import '../page/message-list/mentionSuggestions';
 import './globals';
 
 import {ReceiptsMiddleware} from '../event/preprocessor/ReceiptsMiddleware';
@@ -93,7 +92,6 @@ import {showInitialModal} from '../user/AvailabilityModal';
 import {URLParameter} from '../auth/URLParameter';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {ClientRepository} from '../client/ClientRepository';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
 import {ContentViewModel} from '../view_model/ContentViewModel';
 import AppLock from '../page/AppLock';
 import {CacheRepository} from '../cache/CacheRepository';
@@ -101,7 +99,6 @@ import {SelfService} from '../self/SelfService';
 import {BroadcastService} from '../broadcast/BroadcastService';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {PropertiesService} from '../properties/PropertiesService';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetService} from '../assets/AssetService';
 import {UserService} from '../user/UserService';
 import {AudioRepository} from '../audio/AudioRepository';
@@ -128,6 +125,8 @@ import type {User} from '../entity/User';
 import {MessageRepository} from '../conversation/MessageRepository';
 import CallingContainer from 'Components/calling/CallingOverlayContainer';
 import {TeamError} from '../error/TeamError';
+import Warnings from '../view_model/WarningsContainer';
+import {Core} from '../service/CoreSingleton';
 
 function doRedirect(signOutReason: SIGN_OUT_REASON) {
   let url = `/auth/${location.search}`;
@@ -236,8 +235,8 @@ class App {
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
-    repositories.cryptography = new CryptographyRepository(new CryptographyService(), repositories.storage);
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
+    repositories.cryptography = new CryptographyRepository(new CryptographyService());
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, repositories.storage);
     repositories.media = new MediaRepository(new PermissionRepository());
     repositories.user = new UserRepository(
       new UserService(),
@@ -258,19 +257,13 @@ class App {
     repositories.search = new SearchRepository(new SearchService(), repositories.user);
     repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
 
-    repositories.conversation = new ConversationRepository(
-      this.service.conversation,
-      () => repositories.message,
-      repositories.connection,
-      repositories.event,
-      repositories.team,
-      repositories.user,
-      repositories.properties,
-      serverTimeHandler,
-    );
-
     repositories.message = new MessageRepository(
       repositories.client,
+      /*
+       * FIXME there is a cyclic dependency between message and conversation repos.
+       * MessageRepository should NOT depend upon ConversationRepository.
+       * We need to remove all usages of conversationRepository inside the messageRepository
+       */
       () => repositories.conversation,
       repositories.cryptography,
       repositories.event,
@@ -279,8 +272,18 @@ class App {
       serverTimeHandler,
       repositories.user,
       this.service.conversation,
-      new LinkPreviewRepository(repositories.asset, repositories.properties),
       repositories.asset,
+    );
+
+    repositories.conversation = new ConversationRepository(
+      this.service.conversation,
+      repositories.message,
+      repositories.connection,
+      repositories.event,
+      repositories.team,
+      repositories.user,
+      repositories.properties,
+      serverTimeHandler,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message);
@@ -407,25 +410,29 @@ class App {
       this._registerSingleInstance();
       loadingView.updateProgress(2.5);
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_ACCESS_TOKEN);
-      await authRepository.init();
-      await this.initiateSelfUser();
-      loadingView.updateProgress(5, t('initReceivedSelfUser', userRepository['userState'].self().name()));
+      const {clientType} = await authRepository.init();
+      const selfUser = await this.initiateSelfUser();
+      loadingView.updateProgress(5, t('initReceivedSelfUser', selfUser.name()));
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_SELF_USER);
       const clientEntity = await this._initiateSelfUserClients();
-      const selfUser = userRepository['userState'].self();
-      callingRepository.initAvs(selfUser, clientEntity.id);
+      callingRepository.initAvs(selfUser, clientEntity().id);
       loadingView.updateProgress(7.5, t('initValidatedClient'));
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
-      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type);
+      telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity().type);
 
-      await cryptographyRepository.initCryptobox();
+      const core = container.resolve(Core);
+      await core.init(clientType, undefined, this.service.storage['engine']);
+      await cryptographyRepository.init(core.service!.cryptography.cryptobox, clientEntity);
+
       loadingView.updateProgress(10);
       telemetry.timeStep(AppInitTimingsStep.INITIALIZED_CRYPTOGRAPHY);
 
       await teamRepository.initTeam();
 
       const conversationEntities = await conversationRepository.getConversations();
-      const connectionEntities = await connectionRepository.getConnections();
+      const connectionEntities = await connectionRepository.getConnections(
+        Config.getConfig().FEATURE.ENABLE_FEDERATION,
+      );
       loadingView.updateProgress(25, t('initReceivedUserData'));
 
       telemetry.timeStep(AppInitTimingsStep.RECEIVED_USER_DATA);
@@ -463,7 +470,7 @@ class App {
 
       userRepository['userState'].self().devices(clientEntities);
       this.logger.info('App pre-loading completed');
-      await this._handleUrlParams();
+      this._handleUrlParams();
       await conversationRepository.updateConversationsOnAppInit();
       await conversationRepository.conversationLabelRepository.loadLabels();
 
@@ -621,11 +628,10 @@ class App {
     return this.repository.client
       .getValidLocalClient()
       .then(clientObservable => {
-        this.repository.cryptography.currentClient = clientObservable;
         this.repository.event.currentClient = clientObservable;
         return this.repository.client.getClientsForSelf();
       })
-      .then(() => this.repository.client['clientState'].currentClient());
+      .then(() => this.repository.client['clientState'].currentClient);
   }
 
   /**
@@ -697,7 +703,7 @@ class App {
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
       '/user/:userId(/:domain)': (userId: string, domain?: string) => {
-        mainView.content.userModal.showUser(userId, domain, () => router.navigate('/'));
+        mainView.content.userModal.showUser({domain, id: userId}, () => router.navigate('/'));
       },
     });
     initRouterBindings(router);
@@ -855,7 +861,7 @@ class App {
    * Notify about found update
    */
   readonly update = (): void => {
-    amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.LIFECYCLE_UPDATE);
+    amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.LIFECYCLE_UPDATE);
   };
 
   /**
@@ -895,6 +901,11 @@ $(async () => {
   exposeWrapperGlobals();
   const appContainer = document.getElementById('wire-main');
   if (appContainer) {
+    const enforceDesktopApplication =
+      Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();
+    if (enforceDesktopApplication) {
+      doRedirect(SIGN_OUT_REASON.APP_INIT);
+    }
     const shouldPersist = loadValue<boolean>(StorageKey.AUTH.PERSIST);
     if (shouldPersist === undefined) {
       doRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);

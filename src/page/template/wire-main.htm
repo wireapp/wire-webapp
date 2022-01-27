@@ -43,13 +43,23 @@
           #include('content/history-import.htm')
         <!-- /ko -->
         <!-- ko if: state() === State.PREFERENCES_ABOUT -->
-          #include('content/preferences-about.htm')
+          <div id="preferences-about" class="preferences-page preferences-about">
+            <about-preferences></about-preferences>
+          </div>
         <!-- /ko -->
         <!-- ko if: state() === State.PREFERENCES_ACCOUNT -->
-          #include('content/preferences-account.htm')
+          <div id="preferences-account" class="preferences-page preferences-account">
+            <account-preferences
+              params="clientRepository: repositories.client, userRepository: repositories.user, propertiesRepository: repositories.properties, conversationRepository: repositories.conversation"
+            ></account-preferences>
+          </div>
         <!-- /ko -->
         <!-- ko if: state() === State.PREFERENCES_AV -->
-          #include('content/preferences-av.htm')
+          <div id="preferences-av" class="preferences-page preferences-av">
+            <av-preferences 
+              params="mediaRepository: repositories.media, propertiesRepository: repositories.properties, callingRepository: repositories.calling"
+            ></av-preferences>
+          </div>
         <!-- /ko -->
         <!-- ko if: state() === State.PREFERENCES_DEVICE_DETAILS -->
           #include('content/preferences-device-details.htm')
@@ -58,7 +68,9 @@
           #include('content/preferences-devices.htm')
         <!-- /ko -->
         <!-- ko if: state() === State.PREFERENCES_OPTIONS -->
-          #include('content/preferences-options.htm')
+          <div id="preferences-options" class="preferences-page preferences-options">
+            <option-preferences params="propertiesRepository: repositories.properties"></option-preferences>
+          </div>
         <!-- /ko -->
         <!-- ko if: state() === State.WATERMARK -->
           <div class="watermark">
@@ -86,7 +98,7 @@
       </div>
     </div>
     #include('detail-view.htm')
-    #include('warning.htm')
+    <div id="warnings"></div>
     #include('modals.htm')
     <div id="applock"></div>
   <!-- /ko -->

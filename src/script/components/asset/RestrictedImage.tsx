@@ -36,7 +36,7 @@ const RestrictedImage: React.FC<RestrictedImageProps> = ({showMessage = true, is
         <div className="flex-center" data-uie-name="file-icon">
           <Icon.Image />
         </div>
-        {showMessage && <div className="image-restricted--message">{t('conversationAssetRestricted')}</div>}
+        {showMessage && <div className="image-restricted--message">{t('conversationImageAssetRestricted')}</div>}
       </div>
     </div>
   );

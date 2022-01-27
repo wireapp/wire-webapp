@@ -25,6 +25,7 @@ import {container} from 'tsyringe';
 import {AVATAR_SIZE} from 'Components/Avatar';
 import {t} from 'Util/LocalizerUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 import {EphemeralStatusType} from '../message/EphemeralStatusType';
 import {showContextMenu as showContext, ContextMenuEntry} from '../ui/ContextMenu';
@@ -67,6 +68,7 @@ import './message/ReadReceiptStatus';
 import './message/PingMessage';
 import './message/MessageFooterLike';
 import './message/MessageLike';
+import './message/MessageQuote';
 
 interface MessageParams {
   actionsViewModel: ActionsViewModel;
@@ -90,7 +92,7 @@ interface MessageParams {
   onContentUpdated: () => void;
   onLike: (message: ContentMessage, button?: boolean) => void;
   onMessageMarked: (element: HTMLElement) => void;
-  selfId: ko.Observable<string>;
+  selfId: ko.Observable<QualifiedId>;
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
   teamState?: TeamState;
@@ -123,7 +125,7 @@ class Message {
   onLike: (message: ContentMessage, button?: boolean) => void;
   AVATAR_SIZE: typeof AVATAR_SIZE;
   previewSubscription: ko.Subscription;
-  selfId: ko.Observable<string>;
+  selfId: ko.Observable<QualifiedId>;
   shouldShowAvatar: ko.Observable<boolean>;
   shouldShowInvitePeople: ko.Observable<boolean>;
   StatusType: typeof StatusType;
@@ -215,15 +217,9 @@ class Message {
       const isRestrictedFileShare = !teamState.isFileSharingReceivingEnabled();
 
       const canDelete =
-        messageEntity.user().isMe &&
-        !this.conversation().removed_from_conversation() &&
-        messageEntity.isDeletable() &&
-        !this.conversation().isFederated();
+        messageEntity.user().isMe && !this.conversation().removed_from_conversation() && messageEntity.isDeletable();
 
-      const canEdit =
-        messageEntity.isEditable() &&
-        !this.conversation().removed_from_conversation() &&
-        !this.conversation().isFederated();
+      const canEdit = messageEntity.isEditable() && !this.conversation().removed_from_conversation();
 
       const hasDetails =
         !this.conversation().is1to1() &&
@@ -337,7 +333,10 @@ const normalTemplate: string = `
         <!-- ko if: message.user().isExternal() -->
           <external-icon class="message-header-icon-external with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('rolePartner')}" data-uie-name="sender-external"></external-icon>
         <!-- /ko -->
-        <!-- ko if: message.user().isGuest() -->
+        <!-- ko if: message.user().isFederated -->
+          <federation-icon class="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': message.user().handle}" data-uie-name="sender-federated"></federation-icon>
+        <!-- /ko -->
+        <!-- ko if: message.user().isDirectGuest() -->
           <guest-icon class="message-header-icon-guest with-tooltip with-tooltip--external" data-bind="attr: {'data-tooltip': t('conversationGuestIndicator')}" data-uie-name="sender-guest"></guest-icon>
         <!-- /ko -->
         <!-- ko if: message.was_edited() -->

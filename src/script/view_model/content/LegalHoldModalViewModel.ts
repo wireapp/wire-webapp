@@ -21,7 +21,6 @@ import {LegalHoldMemberStatus} from '@wireapp/api-client/src/team/legalhold/';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import {UserDevicesState, makeUserDevicesHistory} from 'Components/UserDevices';
@@ -130,7 +129,7 @@ export class LegalHoldModalViewModel {
       const response = await this.teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
       if (response.status === LegalHoldMemberStatus.PENDING) {
         fingerprint = await this.cryptographyRepository.getRemoteFingerprint(
-          selfUser.id,
+          selfUser,
           response.client.id,
           response.last_prekey,
         );
@@ -183,7 +182,6 @@ export class LegalHoldModalViewModel {
       this.skipShowUsers(true);
       selfUser.hasPendingLegalHold(false);
       await this.clientRepository.updateClientsForSelf();
-      amplify.publish(WebAppEvents.USER.CLIENT_ADDED, selfUser.id);
     } catch ({code, message}) {
       switch (code) {
         case HTTP_STATUS.BAD_REQUEST: {
@@ -220,7 +218,7 @@ export class LegalHoldModalViewModel {
     this.isLoading(true);
     this.isVisible(true);
     await this.messageRepository.updateAllClients(conversation, false);
-    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation.id, conversation.domain);
+    const allUsers = await this.conversationRepository.getAllUsersInConversation(conversation);
     const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
     if (!legalHoldUsers.length) {
       this.isVisible(false);

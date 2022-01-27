@@ -54,6 +54,7 @@ describe('UserActions', () => {
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
       isSelfActivated: true,
       onAction: noop,
+      selfUser: user,
       user,
     });
 
@@ -74,6 +75,7 @@ describe('UserActions', () => {
       conversationRoleRepository: {} as ConversationRoleRepository,
       isSelfActivated: false,
       onAction: noop,
+      selfUser: user,
       user,
     });
 
@@ -93,6 +95,7 @@ describe('UserActions', () => {
       conversationRoleRepository: {} as ConversationRoleRepository,
       isSelfActivated: true,
       onAction: noop,
+      selfUser: new User('', null),
       user,
     });
 

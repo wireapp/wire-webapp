@@ -37,7 +37,7 @@ export interface UserDetailsProps {
   participant: User;
 }
 
-const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isVerified, isGroupAdmin}) => {
+const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVerified, isGroupAdmin}) => {
   const user = useKoSubscribableChildren(participant, [
     'inTeam',
     'isGuest',
@@ -49,8 +49,11 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
   ]);
 
   useEffect(() => {
-    amplify.publish(WebAppEvents.USER.UPDATE, participant.id);
+    amplify.publish(WebAppEvents.USER.UPDATE, participant.qualifiedId);
   }, [participant]);
+
+  const isFederated = participant.isFederated;
+  const isGuest = !isFederated && participant.isGuest();
 
   return (
     <div className="panel-participant">
@@ -67,7 +70,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
             {user.name}
           </div>
         )}
-        {isSelfVerified && (isVerified ?? user.is_verified) && (
+        {isSelfVerified && user.is_verified && (
           <Icon.Verified
             className="panel-participant__head__verified-icon"
             data-uie-name="status-verified-participant"
@@ -95,7 +98,14 @@ const UserDetails: React.FC<UserDetailsProps> = ({badge, participant, isSelfVeri
         </div>
       )}
 
-      {user.isGuest && (
+      {isFederated && (
+        <div className="panel-participant__label" data-uie-name="status-federated-user">
+          <Icon.Federation />
+          <span>{t('conversationFederationIndicator')}</span>
+        </div>
+      )}
+
+      {isGuest && (
         <div className="panel-participant__label" data-uie-name="status-guest">
           <Icon.Guest />
           <span>{t('conversationGuestIndicator')}</span>

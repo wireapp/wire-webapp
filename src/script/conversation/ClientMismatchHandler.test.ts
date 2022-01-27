@@ -40,7 +40,7 @@ describe('ClientMismatchHandler', () => {
       client_id: 'edc943ba4d6ef6b1',
       user_id: entities.user.jane_roe.id,
     };
-    const payload = {
+    const payload: NewOTRMessage<string> = {
       recipients: {
         [janeRoe.user_id]: {
           [janeRoe.client_id]: '💣',
@@ -53,7 +53,7 @@ describe('ClientMismatchHandler', () => {
       const knownUserId = johnDoe.user_id;
       const unknownUserId = janeRoe.user_id;
       const conversation = new Conversation(createRandomUuid());
-      conversation.participating_user_ids([knownUserId]);
+      conversation.participating_user_ids([{domain: '', id: knownUserId}]);
 
       const userRepositorySpy: Partial<UserRepository> = {
         addClientToUser: jest.fn(),
@@ -64,12 +64,10 @@ describe('ClientMismatchHandler', () => {
         }),
         getClientsByUsers: jest.fn().mockImplementation(() =>
           Promise.resolve({
-            none: {
-              [johnDoe.user_id]: [
-                {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
-                {class: ClientClassification.PHONE, id: '809fd276d6709474'},
-              ],
-            },
+            [johnDoe.user_id]: [
+              {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
+              {class: ClientClassification.PHONE, id: '809fd276d6709474'},
+            ],
           }),
         ),
       };
@@ -77,7 +75,7 @@ describe('ClientMismatchHandler', () => {
         addMissingMember: jest.fn(),
         getConversationById: jest.fn().mockImplementation(() => Promise.resolve(conversation)),
         verificationStateHandler: {
-          onClientsAdded: jest.fn(), // params `missingUserIds`
+          onClientsAdded: jest.fn(),
         } as any,
       };
       const cryptographyRepositorySpy: Partial<CryptographyRepository> = {
@@ -101,13 +99,13 @@ describe('ClientMismatchHandler', () => {
       };
 
       const timestamp = new Date(clientMismatch.time).getTime();
-      const eventInfoEntity = new EventInfoEntity(undefined, conversation.id);
+      const eventInfoEntity = new EventInfoEntity(undefined, {domain: '', id: conversation.id});
       eventInfoEntity.setTimestamp(clientMismatch.time);
 
       await clientMismatchHandler.onClientMismatch(eventInfoEntity, clientMismatch, payload);
       expect(conversationRepositorySpy.addMissingMember).toHaveBeenCalledWith(
         conversation,
-        [unknownUserId],
+        [{domain: '', id: unknownUserId}],
         timestamp - 1,
       );
     });
@@ -123,12 +121,10 @@ describe('ClientMismatchHandler', () => {
         }),
         getClientsByUsers: jest.fn().mockImplementation(() =>
           Promise.resolve({
-            none: {
-              [johnDoe.user_id]: [
-                {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
-                {class: ClientClassification.PHONE, id: '809fd276d6709474'},
-              ],
-            },
+            [johnDoe.user_id]: [
+              {class: ClientClassification.DESKTOP, id: johnDoe.client_id},
+              {class: ClientClassification.PHONE, id: '809fd276d6709474'},
+            ],
           }),
         ),
       };
@@ -154,7 +150,7 @@ describe('ClientMismatchHandler', () => {
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(message, conversation.id);
+      const eventInfoEntity = new EventInfoEntity(message, {domain: '', id: conversation.id});
 
       const clientMismatch: ClientMismatch = {
         deleted: {},
@@ -205,7 +201,7 @@ describe('ClientMismatchHandler', () => {
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(message, conversation.id);
+      const eventInfoEntity = new EventInfoEntity(message, {domain: '', id: conversation.id});
 
       const clientMismatch: ClientMismatch = {
         deleted: {
@@ -251,7 +247,7 @@ describe('ClientMismatchHandler', () => {
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(message, conversation.id);
+      const eventInfoEntity = new EventInfoEntity(message, {domain: '', id: conversation.id});
 
       const clientMismatch: ClientMismatch = {
         deleted: {},

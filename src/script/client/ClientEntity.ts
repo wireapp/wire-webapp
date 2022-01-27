@@ -49,11 +49,12 @@ export class ClientEntity {
   time?: string;
   type?: ClientType.PERMANENT | ClientType.TEMPORARY;
 
-  constructor(isSelfClient = false) {
+  constructor(isSelfClient: boolean, domain: string | null) {
     this.isSelfClient = isSelfClient;
 
     this.class = '?';
     this.id = '';
+    this.domain = domain;
 
     if (this.isSelfClient) {
       this.address = '';
@@ -73,11 +74,14 @@ export class ClientEntity {
   }
 
   /**
-   * Splits an ID into user ID & client ID.
+   * Splits an ID into user ID, client ID & domain (if any).
    */
-  static dismantleUserClientId(id: string): {clientId: string; userId: string} {
-    const [userId, clientId] = typeof id === 'string' ? id.split('@') : ([] as string[]);
-    return {clientId, userId};
+  static dismantleUserClientId(id: string): {clientId: string; domain?: string; userId: string} {
+    // see https://regex101.com/r/c8FtCw/1
+    const regex = /((?<domain>.+)@)?(?<userId>.+)@(?<clientId>.+)$/g;
+    const match = regex.exec(id);
+    const {domain, userId, clientId} = match?.groups || {};
+    return {clientId, domain, userId};
   }
 
   /**

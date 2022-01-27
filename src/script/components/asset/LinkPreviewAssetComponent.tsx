@@ -30,7 +30,6 @@ import Image from '../Image';
 import AssetHeader from './AssetHeader';
 import type {ContentMessage} from '../../entity/message/ContentMessage';
 import type {Text} from '../../entity/message/Text';
-import {LinkPreviewMetaDataType} from '../../links/LinkPreviewMetaDataType';
 
 export interface LinkPreviewAssetProps {
   /** Does the asset have a visible header? */
@@ -41,10 +40,10 @@ export interface LinkPreviewAssetProps {
 const LinkPreviewAssetComponent: React.FC<LinkPreviewAssetProps> = ({header = false, message}) => {
   const [preview] = (message.getFirstAsset() as Text).previews();
 
-  const isTypeTweet = preview?.meta_data_type === LinkPreviewMetaDataType.TWEET;
+  const isTypeTweet = !!preview?.tweet;
   const isTweet = isTypeTweet && isTweetUrl(preview?.url);
-  const author = isTweet ? preview?.meta_data?.author?.substring(0, 20) : '';
-  const previewImage = useKoSubscribable(preview?.image_resource);
+  const author = isTweet ? preview.tweet?.author?.substring(0, 20) : '';
+  const previewImage = preview?.image;
   const isObfuscated = useKoSubscribable(message.isObfuscated);
 
   const onClick = () => {

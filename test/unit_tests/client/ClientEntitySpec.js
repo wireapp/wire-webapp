@@ -35,5 +35,14 @@ describe('ClientEntity', () => {
       expect(clientId).toBe(undefined);
       expect(userId).toBe(undefined);
     });
+
+    it('returns a domain', () => {
+      const sessionId = 'wire.com@034060fe-8406-476e-b29d-f0a214c0345b@4b0a0fbf418d264c';
+      const {clientId, domain, userId} = ClientEntity.dismantleUserClientId(sessionId);
+
+      expect(clientId).toBe('4b0a0fbf418d264c');
+      expect(userId).toBe('034060fe-8406-476e-b29d-f0a214c0345b');
+      expect(domain).toBe('wire.com');
+    });
   });
 });

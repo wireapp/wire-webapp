@@ -17,8 +17,8 @@
  *
  */
 
-import {CONVERSATION_EVENT} from '@wireapp/api-client/src/event/';
-import {LinkPreview, ITweet, Mention} from '@wireapp/protocol-messaging';
+import {CONVERSATION_EVENT, ConversationEvent} from '@wireapp/api-client/src/event/';
+import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {getLogger, Logger} from 'Util/Logger';
 import {t} from 'Util/LocalizerUtil';
@@ -61,9 +61,10 @@ import type {Conversation} from '../entity/Conversation';
 import type {Message} from '../entity/message/Message';
 import type {Asset} from '../entity/message/Asset';
 import type {Text as TextAsset} from '../entity/message/Text';
-import type {LinkPreviewMetaDataType} from '../links/LinkPreviewMetaDataType';
-import {LinkPreview as LinkPreviewEntity} from '../entity/message/LinkPreview';
+import {LinkPreview as LinkPreviewEntity, LinkPreviewData} from '../entity/message/LinkPreview';
 import {CallingTimeoutMessage} from '../entity/message/CallingTimeoutMessage';
+import {MemberJoinEvent, MemberLeaveEvent, TeamMemberLeaveEvent} from './EventBuilder';
+import {AssetData} from '../cryptography/CryptographyMapper';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -153,9 +154,12 @@ export class EventMapper {
         }
       }
 
-      const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
+      const {preview_id, preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token} =
+        eventData as AssetData;
       if (preview_otr_key) {
-        const remoteDataPreview = preview_key
+        const remoteDataPreview = preview_domain
+          ? AssetRemoteData.v4(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
+          : preview_key
           ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
           : AssetRemoteData.v2(event.conversation, preview_id, preview_otr_key, preview_sha256, true);
         (asset as FileAsset).preview_resource(remoteDataPreview);
@@ -192,17 +196,17 @@ export class EventMapper {
    * @param conversationEntity Conversation entity the event belong to
    * @returns Mapped message entity
    */
-  async _mapJsonEvent(event: EventRecord, conversationEntity: Conversation) {
+  async _mapJsonEvent(event: ConversationEvent | EventRecord, conversationEntity: Conversation) {
     let messageEntity;
 
     switch (event.type) {
       case CONVERSATION_EVENT.MEMBER_JOIN: {
-        messageEntity = this._mapEventMemberJoin(event, conversationEntity);
+        messageEntity = this._mapEventMemberJoin(event as MemberJoinEvent, conversationEntity);
         break;
       }
 
       case CONVERSATION_EVENT.MEMBER_LEAVE: {
-        messageEntity = this._mapEventMemberLeave(event);
+        messageEntity = this._mapEventMemberLeave(event as MemberLeaveEvent);
         break;
       }
 
@@ -285,7 +289,7 @@ export class EventMapper {
       }
 
       case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE: {
-        messageEntity = this._mapEventTeamMemberLeave(event);
+        messageEntity = this._mapEventTeamMemberLeave(event as TeamMemberLeaveEvent);
         break;
       }
 
@@ -310,7 +314,8 @@ export class EventMapper {
       }
 
       default: {
-        this.logger.warn(`Ignored unhandled '${event.type}' event ${event.id ? `'${event.id}' ` : ''}`, event);
+        const {type, id} = event as EventRecord;
+        this.logger.warn(`Ignored unhandled '${type}' event ${id ? `'${id}' ` : ''}`, event);
         throw new ConversationError(
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
           ConversationError.MESSAGE.MESSAGE_NOT_FOUND,
@@ -318,12 +323,26 @@ export class EventMapper {
       }
     }
 
-    const {category, data, from, id, primary_key, time, type, version} = event;
+    const {
+      category,
+      data,
+      from,
+      qualified_from,
+      id,
+      primary_key,
+      time,
+      type,
+      version,
+      from_client_id,
+      ephemeral_expires,
+      ephemeral_started,
+    } = event as EventRecord;
 
     messageEntity.category = category;
     messageEntity.conversation_id = conversationEntity.id;
     messageEntity.from = from;
-    messageEntity.fromClientId = event.from_client_id;
+    messageEntity.fromDomain = qualified_from?.domain;
+    messageEntity.fromClientId = from_client_id;
     messageEntity.id = id;
     messageEntity.primary_key = primary_key;
     messageEntity.timestamp(new Date(time).getTime());
@@ -335,20 +354,21 @@ export class EventMapper {
     }
 
     if (messageEntity.isContent() || messageEntity.isPing()) {
-      messageEntity.status(event.status || StatusType.SENT);
+      messageEntity.status((event as EventRecord).status || StatusType.SENT);
     }
 
     if (messageEntity.isComposite()) {
-      messageEntity.selectedButtonId(event.selected_button_id);
-      messageEntity.waitingButtonId(event.waiting_button_id);
+      const {selected_button_id, waiting_button_id} = event as EventRecord;
+      messageEntity.selectedButtonId(selected_button_id);
+      messageEntity.waitingButtonId(waiting_button_id);
     }
     if (messageEntity.isReactable()) {
-      (messageEntity as ContentMessage).reactions(event.reactions || {});
+      (messageEntity as ContentMessage).reactions((event as EventRecord).reactions || {});
     }
 
-    if (event.ephemeral_expires) {
-      messageEntity.ephemeral_expires(event.ephemeral_expires);
-      messageEntity.ephemeral_started(Number(event.ephemeral_started) || 0);
+    if (ephemeral_expires) {
+      messageEntity.ephemeral_expires(ephemeral_expires);
+      messageEntity.ephemeral_started(Number(ephemeral_started) || 0);
     }
 
     if (isNaN(messageEntity.timestamp())) {
@@ -371,7 +391,6 @@ export class EventMapper {
    */
   private _mapEvent1to1Creation({data: eventData}: EventRecord) {
     const {has_service: hasService, userIds} = eventData;
-
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
     messageEntity.userIds(userIds);
@@ -461,9 +480,13 @@ export class EventMapper {
    * @param conversationEntity Conversation entity the event belong to
    * @returns Member message entity
    */
-  private _mapEventMemberJoin(event: EventRecord, conversationEntity: Conversation) {
+  private _mapEventMemberJoin(
+    event: MemberJoinEvent & {data: {has_service?: boolean}},
+    conversationEntity: Conversation,
+  ) {
     const {data: eventData, from: sender} = event;
-    const {has_service: hasService, user_ids: userIds} = eventData;
+    const {has_service: hasService} = eventData;
+    const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
 
     const messageEntity = new MemberMessage();
 
@@ -472,7 +495,7 @@ export class EventMapper {
 
     if (conversationEntity.isGroup()) {
       const messageFromCreator = sender === conversationEntity.creator;
-      const creatorIndex = userIds.indexOf(sender);
+      const creatorIndex = userIds.findIndex(user => user.id === sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
       if (creatorIsJoiningMember) {
@@ -496,9 +519,10 @@ export class EventMapper {
    * @param eventData Message data
    * @returns Member message entity
    */
-  private _mapEventMemberLeave({data: eventData}: EventRecord) {
+  private _mapEventMemberLeave({data: eventData}: MemberLeaveEvent) {
     const messageEntity = new MemberMessage();
-    messageEntity.userIds(eventData.user_ids);
+    const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
+    messageEntity.userIds(userIds);
     messageEntity.reason = eventData.reason;
     return messageEntity;
   }
@@ -530,16 +554,16 @@ export class EventMapper {
     const {data: eventData} = event;
     const messageEntity = new CompositeMessage();
     const assets: (Asset | FileAsset | Text | MediumImage)[] = await Promise.all(
-      eventData.items.map(async (item: {button: {id: string; text: string}; text: EventRecord}): Promise<
-        void | Button | Text
-      > => {
-        if (item.button) {
-          return new Button(item.button.id, item.button.text);
-        }
-        if (item.text) {
-          return this._mapAssetText(item.text);
-        }
-      }),
+      eventData.items.map(
+        async (item: {button: {id: string; text: string}; text: EventRecord}): Promise<void | Button | Text> => {
+          if (item.button) {
+            return new Button(item.button.id, item.button.text);
+          }
+          if (item.text) {
+            return this._mapAssetText(item.text);
+          }
+        },
+      ),
     );
     messageEntity.assets.push(...assets);
     return messageEntity;
@@ -597,7 +621,7 @@ export class EventMapper {
    * @param event Message data
    * @returns Member message entity
    */
-  private _mapEventTeamMemberLeave(event: EventRecord) {
+  private _mapEventTeamMemberLeave(event: MemberLeaveEvent) {
     const messageEntity = this._mapEventMemberLeave(event);
     const eventData = event.data;
     messageEntity.name(eventData.name || t('conversationSomeone'));
@@ -630,7 +654,6 @@ export class EventMapper {
    */
   private _mapEventVerification({data: eventData}: EventRecord) {
     const messageEntity = new VerificationMessage();
-
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
     messageEntity.verificationMessageType(eventData.type);
@@ -706,16 +729,21 @@ export class EventMapper {
     }
 
     // Remote data - full
-    const {key, otr_key, sha256, token} = eventData;
-    const remoteData = key
+    const {key, otr_key, sha256, token, domain} = eventData as AssetData;
+    const remoteData = domain
+      ? AssetRemoteData.v4(key, domain, otr_key, sha256, token)
+      : key
       ? AssetRemoteData.v3(key, otr_key, sha256, token)
       : AssetRemoteData.v2(conversationId, id, otr_key, sha256);
     assetEntity.original_resource(remoteData);
 
     // Remote data - preview
-    const {preview_id, preview_key, preview_otr_key, preview_sha256, preview_token} = eventData;
+    const {preview_id, preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token} =
+      eventData as AssetData;
     if (preview_otr_key) {
-      const remoteDataPreview = preview_key
+      const remoteDataPreview = preview_domain
+        ? AssetRemoteData.v4(preview_key, preview_domain, preview_otr_key, preview_sha256, preview_token, true)
+        : key
         ? AssetRemoteData.v3(preview_key, preview_otr_key, preview_sha256, preview_token, true)
         : AssetRemoteData.v2(conversationId, preview_id, preview_otr_key, preview_sha256, true);
       assetEntity.preview_resource(remoteDataPreview);
@@ -732,7 +760,7 @@ export class EventMapper {
    * @param event Asset data received as JSON
    * @returns Medium image asset entity
    */
-  private _mapAssetImage(event: EventRecord) {
+  private _mapAssetImage(event: EventRecord<AssetData>) {
     const {data: eventData, conversation: conversationId} = event;
     const {content_length, content_type, id: assetId, info} = eventData;
     const assetEntity = new MediumImage(assetId);
@@ -742,17 +770,19 @@ export class EventMapper {
     assetEntity.ratio = +assetEntity.height / +assetEntity.width;
 
     if (info) {
-      assetEntity.width = info.width;
-      assetEntity.height = info.height;
+      assetEntity.width = `${info.width}px`;
+      assetEntity.height = `${info.height}px`;
     }
 
-    const {key, otr_key, sha256, token} = eventData;
+    const {key, otr_key, sha256, token, domain} = eventData;
 
     if (!otr_key || !sha256) {
       return assetEntity;
     }
 
-    const remoteData = key
+    const remoteData = domain
+      ? AssetRemoteData.v4(key, domain, otr_key, sha256, token, true)
+      : key
       ? AssetRemoteData.v3(key, otr_key, sha256, token, true)
       : AssetRemoteData.v2(conversationId, assetId, otr_key, sha256, true);
 
@@ -768,18 +798,17 @@ export class EventMapper {
    */
   private _mapAssetLinkPreview(linkPreview: LinkPreview): LinkPreviewEntity | void {
     if (linkPreview) {
-      const {image, title, url} = linkPreview;
+      const {image, title, url, tweet} = linkPreview;
       const {image: article_image, title: article_title} = linkPreview.article || {};
 
-      const meta_data: LinkPreviewMetaDataType = linkPreview.metaData || (linkPreview as any).meta_data;
-
-      const linkPreviewEntity = new LinkPreviewEntity(title || article_title, url);
-      linkPreviewEntity.meta_data_type = meta_data;
-      linkPreviewEntity.meta_data = linkPreview[meta_data] as ITweet;
-
+      const linkPreviewData: LinkPreviewData = {
+        title: title || article_title || '',
+        tweet: tweet ?? undefined,
+        url: url,
+      };
       const previewImage = image || article_image;
       if (previewImage && previewImage.uploaded) {
-        const {assetId: assetKey, assetToken} = previewImage.uploaded;
+        const {assetId: assetKey, assetToken, assetDomain} = previewImage.uploaded;
 
         if (assetKey) {
           let {otrKey, sha256} = previewImage.uploaded;
@@ -787,11 +816,14 @@ export class EventMapper {
           otrKey = new Uint8Array(otrKey);
           sha256 = new Uint8Array(sha256);
 
-          linkPreviewEntity.image_resource(AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true));
+          const remoteData = assetDomain
+            ? AssetRemoteData.v4(assetKey, assetDomain, otrKey, sha256, assetToken, true)
+            : AssetRemoteData.v3(assetKey, otrKey, sha256, assetToken, true);
+          linkPreviewData.image = remoteData;
         }
       }
 
-      return linkPreviewEntity;
+      return new LinkPreviewEntity(linkPreviewData);
     }
   }
 
@@ -872,6 +904,7 @@ export class EventMapper {
   }
 }
 
+// TODO: Method is probably being used for data from backend & database. If yes, it should be split up (Single-responsibility principle).
 function addMetadata<T extends Message>(entity: T, event: EventRecord): T {
   const {data: eventData, read_receipts} = event;
   if (eventData) {

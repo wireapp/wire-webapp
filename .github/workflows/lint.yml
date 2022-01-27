@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Yarn cache
-        uses: c-hive/gha-yarn-cache@v1
+        uses: c-hive/gha-yarn-cache@v2.1.0
 
       - name: Install JS dependencies
         run: yarn --frozen-lockfile

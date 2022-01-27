@@ -19,9 +19,10 @@
 
 import type {
   NewClient,
-  QualifiedPublicClients,
   RegisteredClient,
+  QualifiedUserClientMap,
   ClientCapabilityData,
+  PublicClient,
 } from '@wireapp/api-client/src/client';
 import type {QualifiedId} from '@wireapp/api-client/src/user';
 import {container} from 'tsyringe';
@@ -32,8 +33,6 @@ import type {ClientRecord} from '../storage';
 import {StorageService} from '../storage';
 import {StorageSchemata} from '../storage/StorageSchemata';
 import {APIClient} from '../service/APIClientSingleton';
-
-export type QualifiedPublicUserMap = QualifiedPublicClients['qualified_user_map'];
 
 export class ClientService {
   private readonly logger: Logger;
@@ -115,36 +114,18 @@ export class ClientService {
   /**
    * Retrieves meta information about all the clients of a specific user.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
-   *
-   * @param userId ID of user to retrieve clients for
-   * @returns Resolves with the clients of a user
    */
-  async getClientsByUserIds(userIds: (QualifiedId | string)[]): Promise<QualifiedPublicUserMap> {
-    // Add 'none' as domain for non-federated users
-    let clients: QualifiedPublicUserMap = {none: {}};
+  async getClientsByQualifiedUserIds(userIds: QualifiedId[]): Promise<QualifiedUserClientMap> {
+    const listedClients = await this.apiClient.user.api.postListClients({qualified_users: userIds});
+    return listedClients.qualified_user_map;
+  }
 
-    const {qualifiedIds, stringIds} = userIds.reduce(
-      (result, userId) => {
-        if (typeof userId === 'string') {
-          result.stringIds.push(userId);
-        } else {
-          result.qualifiedIds.push(userId);
-        }
-        return result;
-      },
-      {qualifiedIds: [], stringIds: []},
-    );
-
-    for (const userId of stringIds) {
-      clients.none[userId] = await this.apiClient.user.api.getClients(userId);
-    }
-
-    if (qualifiedIds.length) {
-      const listedClients = await this.apiClient.user.api.postListClients({qualified_users: qualifiedIds});
-      clients = {...clients, ...listedClients.qualified_user_map};
-    }
-
-    return clients;
+  /**
+   * Retrieves meta information about all the clients of a specific user.
+   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getClients
+   */
+  async getClientsByUserId(userId: string): Promise<PublicClient[]> {
+    return this.apiClient.user.api.getClients(userId);
   }
 
   /**

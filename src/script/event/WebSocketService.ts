@@ -27,7 +27,7 @@ import {WebSocketClient, OnConnect} from '@wireapp/api-client/src/tcp/';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/src/tcp/ReconnectingWebsocket';
 
 import {APIClient} from '../service/APIClientSingleton';
-import {WarningsViewModel} from '../view_model/WarningsViewModel';
+import Warnings from '../view_model/WarningsContainer';
 
 export type OnNotificationCallback = (data: Notification) => void;
 
@@ -69,21 +69,21 @@ export class WebSocketService {
       this.logger.info(`Websocket state change: ${WEBSOCKET_STATE[state]}`);
       switch (state) {
         case WEBSOCKET_STATE.CONNECTING: {
-          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
-          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+          amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.CONNECTIVITY_RECONNECT);
           return;
         }
         case WEBSOCKET_STATE.CLOSING: {
           return;
         }
         case WEBSOCKET_STATE.CLOSED: {
-          amplify.publish(WebAppEvents.WARNING.SHOW, WarningsViewModel.TYPE.NO_INTERNET);
+          amplify.publish(WebAppEvents.WARNING.SHOW, Warnings.TYPE.NO_INTERNET);
           return;
         }
         case WEBSOCKET_STATE.OPEN: {
           amplify.publish(WebAppEvents.CONNECTION.ONLINE);
-          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.NO_INTERNET);
-          amplify.publish(WebAppEvents.WARNING.DISMISS, WarningsViewModel.TYPE.CONNECTIVITY_RECONNECT);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.NO_INTERNET);
+          amplify.publish(WebAppEvents.WARNING.DISMISS, Warnings.TYPE.CONNECTIVITY_RECONNECT);
         }
       }
     });

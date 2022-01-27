@@ -88,6 +88,23 @@ describe('ServiceMiddleware', () => {
           expect(decoratedEvent.data.has_service).not.toBeDefined();
         });
       });
+
+      it('adds meta when services are present in the event with qualified user ids', () => {
+        const event = {
+          data: {
+            users: [{qualified_id: {domain: '', id: 'not-a-service'}}, {qualified_id: {domain: '', id: 'a-service'}}],
+          },
+          type: CONVERSATION_EVENT.MEMBER_JOIN,
+        };
+
+        spyOn(serviceMiddleware['userState'], 'self').and.returnValue({id: 'self-id'});
+        const userEntities = [{}, {isService: true}];
+        spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve(userEntities));
+
+        return serviceMiddleware.processEvent(event).then(decoratedEvent => {
+          expect(decoratedEvent.data.has_service).toBe(true);
+        });
+      });
     });
 
     describe('conversation.one2one-creation events', () => {
@@ -120,6 +137,25 @@ describe('ServiceMiddleware', () => {
 
         return serviceMiddleware.processEvent(event).then(decoratedEvent => {
           expect(decoratedEvent.data.has_service).not.toBeDefined();
+        });
+      });
+
+      it('adds meta when services are present in the event with qualified user ids', () => {
+        const event = {
+          data: {
+            userIds: [
+              {domain: '', id: 'not-a-service'},
+              {domain: '', id: 'a-service'},
+            ],
+          },
+          type: ClientEvent.CONVERSATION.ONE2ONE_CREATION,
+        };
+
+        const userEntities = [{}, {isService: true}];
+        spyOn(testFactory.user_repository, 'getUsersById').and.returnValue(Promise.resolve(userEntities));
+
+        return serviceMiddleware.processEvent(event).then(decoratedEvent => {
+          expect(decoratedEvent.data.has_service).toBe(true);
         });
       });
     });

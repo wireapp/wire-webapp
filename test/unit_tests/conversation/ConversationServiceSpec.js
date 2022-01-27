@@ -208,9 +208,9 @@ describe('ConversationService', () => {
         .then(() => conversation_service.getActiveConversationsFromDb())
         .then(result => {
           expect(result.length).toBe(3);
-          expect(result[0]).toBe('34e7f58e-b834-4d84-b628-b89b295d46c1');
-          expect(result[1]).toBe('34e7f58e-b834-4d84-b628-b89b295d46c0');
-          expect(result[2]).toBe('34e7f58e-b834-4d84-b628-b89b295d46c2');
+          expect(result[0].id).toBe('34e7f58e-b834-4d84-b628-b89b295d46c1');
+          expect(result[1].id).toBe('34e7f58e-b834-4d84-b628-b89b295d46c0');
+          expect(result[2].id).toBe('34e7f58e-b834-4d84-b628-b89b295d46c2');
         });
     });
   });

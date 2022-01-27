@@ -65,6 +65,7 @@ export class Configuration {
       SCREEN_ACCESS_DENIED: 'https://support.wire.com/hc/articles/202935412',
     },
     TEAMS_BASE: 'https://teams.wire.com',
+    TEAMS_BILLING: 'https://teams.wire.com/billing',
     TEAMS_CREATE: 'https://wire.com/create-team/?pk_campaign=client&pk_kwd=desktop',
     TERMS_OF_USE_PERSONAL: 'https://wire-website-staging.zinfra.io/legal/terms/personal',
     TERMS_OF_USE_TEAMS: 'https://wire-website-staging.zinfra.io/legal/terms/teams',

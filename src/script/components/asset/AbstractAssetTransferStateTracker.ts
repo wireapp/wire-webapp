@@ -17,8 +17,6 @@
  *
  */
 
-import {amplify} from 'amplify';
-import {WebAppEvents} from '@wireapp/webapp-events';
 import {container} from 'tsyringe';
 
 import {AssetTransferState} from '../../assets/AssetTransferState';
@@ -36,10 +34,7 @@ export const useAssetTransfer = (message: ContentMessage, assetRepository = cont
   const {status} = useKoSubscribableChildren(asset, ['status']);
   const transferState = uploadProgress > -1 ? AssetTransferState.UPLOADING : status;
   return {
-    cancelUpload: () => {
-      assetRepository.cancelUpload(message.id);
-      amplify.publish(WebAppEvents.CONVERSATION.ASSET.CANCEL, message.id);
-    },
+    cancelUpload: () => assetRepository.cancelUpload(message.id),
     downloadAsset: (asset: FileAsset) => assetRepository.downloadFile(asset),
     isDownloading: transferState === AssetTransferState.DOWNLOADING,
     isUploaded: transferState === AssetTransferState.UPLOADED,

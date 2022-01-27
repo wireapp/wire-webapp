@@ -152,3 +152,12 @@ export const utf8ToUtf16BE = (str = ''): number[] => {
 };
 
 export const splitFingerprint = (fingerprint: string): string[] => fingerprint?.padStart(16, '0').match(/(..?)/g) ?? [];
+
+// When we receive strings via Websocket, it will have been converted to utf-8,
+// In order to keep Emojis and other unicode characters, we need to run the TextDecoder
+// over the numeric values of the single characters of the received string.
+export const fixWebsocketString = (originalString: string): string => {
+  const charArray = Uint8Array.from([...originalString].map(c => c.charCodeAt(0)));
+  const decoder = new TextDecoder();
+  return decoder.decode(charArray);
+};

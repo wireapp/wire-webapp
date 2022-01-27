@@ -20,31 +20,41 @@
 import {amplify} from 'amplify';
 import {
   Asset,
-  ButtonAction,
-  Cleared,
-  ClientAction,
   Confirmation,
-  Ephemeral,
   External,
   GenericMessage,
-  Knock,
   LastRead,
   LegalHoldStatus,
-  MessageDelete,
-  MessageEdit,
-  MessageHide,
-  Reaction,
-  Text,
   Asset as ProtobufAsset,
-  LinkPreview,
   DataTransfer,
 } from '@wireapp/protocol-messaging';
-import {ReactionType} from '@wireapp/core/src/main/conversation/';
+import {
+  ReactionType,
+  MessageSendingCallbacks,
+  MessageTargetMode,
+  PayloadBundleState,
+  PayloadBundleType,
+} from '@wireapp/core/src/main/conversation';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {ClientMismatch, NewOTRMessage, UserClients} from '@wireapp/api-client/src/conversation/';
-import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user/';
+import {
+  ClientMismatch,
+  NewOTRMessage,
+  QualifiedUserClients,
+  MessageSendingStatus,
+  UserClients,
+} from '@wireapp/api-client/src/conversation';
+import {QualifiedId, RequestCancellationError, User as APIClientUser} from '@wireapp/api-client/src/user';
 import {WebAppEvents} from '@wireapp/webapp-events';
-import {AudioMetaData, VideoMetaData, ImageMetaData} from '@wireapp/core/src/main/conversation/content/';
+import {
+  AudioMetaData,
+  VideoMetaData,
+  ImageMetaData,
+  FileMetaDataContent,
+  LinkPreviewUploadedContent,
+  LinkPreviewContent,
+} from '@wireapp/core/src/main/conversation/content';
+import {TextContentBuilder} from '@wireapp/core/src/main/conversation/message/TextContentBuilder';
+import {MessageBuilder} from '@wireapp/core/src/main/conversation/message/MessageBuilder';
 import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/Logger';
@@ -62,18 +72,16 @@ import {PROTO_MESSAGE_TYPE} from '../cryptography/ProtoMessageType';
 import {EventTypeHandling} from '../event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from '../event/NotificationHandlingState';
 import {EventRepository} from '../event/EventRepository';
-import {AssetAddEvent, EventBuilder} from '../conversation/EventBuilder';
+import {EventBuilder} from '../conversation/EventBuilder';
 import {Conversation} from '../entity/Conversation';
 import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
 import {EventInfoEntity} from './EventInfoEntity';
 import {EventMapper} from './EventMapper';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
 import {ClientMismatchHandler} from './ClientMismatchHandler';
-import {buildMetadata, isVideo, isImage, isAudio} from '../assets/AssetMetaDataBuilder';
+import {buildMetadata, isVideo, isImage, isAudio, ImageMetadata} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
-import {AssetRemoteData} from '../assets/AssetRemoteData';
 import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
 import {AudioType} from '../audio/AudioType';
 import {EventName} from '../tracking/EventName';
@@ -87,7 +95,7 @@ import {AssetRepository} from '../assets/AssetRepository';
 import {ClientRepository} from '../client/ClientRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
 import {ConversationRepository} from './ConversationRepository';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
+import {getLinkPreviewFromString} from './linkPreviews';
 import {UserRepository} from '../user/UserRepository';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {MessageSender} from '../message/MessageSender';
@@ -98,20 +106,47 @@ import {QuoteEntity} from '../message/QuoteEntity';
 import {CompositeMessage} from '../entity/message/CompositeMessage';
 import {MentionEntity} from '../message/MentionEntity';
 import {FileAsset} from '../entity/message/FileAsset';
-import {Text as TextAsset} from '../entity/message/Text';
-import type {AssetRecord, EventRecord} from '../storage';
+import type {EventRecord} from '../storage';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
 import {ConversationState} from './ConversationState';
 import {ClientState} from '../client/ClientState';
 import {UserType} from '../tracking/attribute';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError, isQualifiedUserClientEntityMap} from 'Util/TypePredicateUtil';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 import {BackendErrorLabel} from '@wireapp/api-client/src/http';
 import {Config} from '../Config';
+import {Core} from '../service/CoreSingleton';
+import {OtrMessage} from '@wireapp/core/src/main/conversation/message/OtrMessage';
+import {User} from '../entity/User';
+import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
+import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 
-type ConversationEvent = {conversation: string; id: string};
-type EventJson = any;
+export enum CONSENT_TYPE {
+  INCOMING_CALL = 'incoming_call',
+  MESSAGE = 'message',
+  OUTGOING_CALL = 'outgoing_call',
+}
+
+type ConversationEvent = {conversation: string; id?: string};
 export type ContributedSegmentations = Record<string, number | string | boolean | UserType>;
+
+type ClientMismatchHandlerFn = (
+  mismatch: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
+  conversationId?: QualifiedId,
+  silent?: boolean,
+  consentType?: CONSENT_TYPE,
+) => Promise<boolean>;
+
+type TextMessagePayload = {
+  conversation: Conversation;
+  linkPreview?: LinkPreviewUploadedContent;
+  mentions?: MentionEntity[];
+  message: string;
+  messageId?: string;
+  quote?: QuoteEntity;
+};
+type EditMessagePayload = TextMessagePayload & {originalMessageId: string};
 
 export class MessageRepository {
   private readonly logger: Logger;
@@ -119,6 +154,7 @@ export class MessageRepository {
   private readonly event_mapper: EventMapper;
   public readonly clientMismatchHandler: ClientMismatchHandler;
   private isBlockingNotificationHandling: boolean;
+  private onClientMismatch?: ClientMismatchHandlerFn;
 
   constructor(
     private readonly clientRepository: ClientRepository,
@@ -130,12 +166,12 @@ export class MessageRepository {
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly userRepository: UserRepository,
     private readonly conversation_service: ConversationService,
-    private readonly link_repository: LinkPreviewRepository,
     private readonly assetRepository: AssetRepository,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly clientState = container.resolve(ClientState),
+    private readonly core = container.resolve(Core),
   ) {
     this.logger = getLogger('MessageRepository');
 
@@ -153,9 +189,63 @@ export class MessageRepository {
     this.initSubscriptions();
   }
 
+  private get conversationService() {
+    return this.core.service!.conversation;
+  }
+
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
-    amplify.subscribe(WebAppEvents.CONVERSATION.ASSET.CANCEL, this.cancelAssetUpload);
+  }
+
+  /**
+   * Will set a handler when sending message reports a client mismatch
+   * @param onClientMismatch - The function to be called when there is a mismatch. If this function resolves to 'false' then the sending will be cancelled
+   * @return void
+   */
+  public setClientMismatchHandler(onClientMismatch: ClientMismatchHandlerFn) {
+    this.onClientMismatch = onClientMismatch;
+  }
+
+  /**
+   * Triggers the handler for mismatch. Can be used if a mismatch is triggered from outside the MessageRepository
+   *
+   * @param conversation
+   * @param mismatch
+   */
+  public async updateMissingClients(
+    conversation: Conversation,
+    allClients: UserClients | QualifiedUserClients,
+    consentType?: CONSENT_TYPE,
+  ) {
+    const missing = await this.findMissingClients(conversation, allClients);
+    return this.onClientMismatch?.({missing} as ClientMismatch, conversation.qualifiedId, false, consentType);
+  }
+
+  /**
+   * Will generate a UserClients that contains only the users and clients that we do no know of locally
+   * @param conversation
+   * @param remoteClients
+   */
+  private async findMissingClients(conversation: Conversation, remoteClients: UserClients | QualifiedUserClients) {
+    const localClients = await this.generateRecipients(conversation);
+
+    const filterKnownClients = (clients: UserClients, knownClients: UserClients) => {
+      return Object.entries(clients).reduce<UserClients>((missing, [userId, clients]) => {
+        const missingClients = getDifference(knownClients[userId] || [], clients);
+        return missingClients.length ? {...missing, [userId]: missingClients} : missing;
+      }, {});
+    };
+
+    const filterKnownQualifiedClients = (clients: QualifiedUserClients, knownClients: QualifiedUserClients) => {
+      return Object.entries(clients).reduce<QualifiedUserClients>((missing, [domain, userClients]) => {
+        const missingUserClients = filterKnownClients(userClients, knownClients[domain]);
+        return Object.keys(missingUserClients).length ? {...missing, [domain]: missingUserClients} : missing;
+      }, {});
+    };
+
+    return isQualifiedUserClients(remoteClients)
+      ? filterKnownQualifiedClients(remoteClients, localClients as QualifiedUserClients)
+      : filterKnownClients(remoteClients, localClients as UserClients);
   }
 
   /**
@@ -177,74 +267,21 @@ export class MessageRepository {
   };
 
   /**
-   * Send text message in specified conversation.
-   *
-   * @param conversationEntity Conversation that should receive the message
-   * @param textMessage Plain text message
-   * @param mentionEntities Mentions as part of the message
-   * @param quoteEntity Quote as part of the message
-   * @returns Resolves after sending the message
-   */
-  public async sendText(
-    conversationEntity: Conversation,
-    textMessage: string,
-    mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
-  ): Promise<GenericMessage> {
-    const messageId = createRandomUuid();
-
-    const protoText = this.createTextProto(
-      messageId,
-      textMessage,
-      mentionEntities,
-      quoteEntity,
-      undefined,
-      this.expectReadReceipt(conversationEntity),
-      conversationEntity.legalHoldStatus(),
-    );
-    let genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.TEXT]: protoText,
-      messageId,
-    });
-
-    if (conversationEntity.messageTimer()) {
-      genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
-    }
-
-    await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
-    return genericMessage;
-  }
-
-  /**
-   * Send knock in specified conversation.
+   * Send ping in specified conversation.
    * @param conversationEntity Conversation to send knock in
    * @returns Resolves after sending the knock
    */
-  public async sendKnock(conversationEntity: Conversation): Promise<ConversationEvent | undefined> {
-    const protoKnock = new Knock({
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
-      hotKnock: false,
+  public async sendPing(conversation: Conversation) {
+    const ping = MessageBuilder.createPing({
+      ...this.createCommonMessagePayload(conversation),
+      ping: {
+        expectsReadConfirmation: this.expectReadReceipt(conversation),
+        hotKnock: false,
+        legalHoldStatus: conversation.legalHoldStatus(),
+      },
     });
 
-    let genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.KNOCK]: protoKnock,
-      messageId: createRandomUuid(),
-    });
-
-    if (conversationEntity.messageTimer()) {
-      genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
-    }
-
-    try {
-      return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
-    } catch (error) {
-      if (!this.isUserCancellationError(error)) {
-        this.logger.error(`Error while sending knock: ${error.message}`, error);
-        throw error;
-      }
-    }
-    return undefined;
+    return this.sendAndInjectGenericCoreMessage(ping, conversation, {playPingAudio: true});
   }
 
   /**
@@ -252,59 +289,103 @@ export class MessageRepository {
    * @see https://github.com/wireapp/wire-docs/tree/master/src/understand/federation
    * @see https://docs.wire.com/understand/federation/index.html
    */
-  async sendFederatedMessage(message: string): Promise<void> {
-    const conversation = this.conversationState.activeConversation();
-    const userIds: string[] | QualifiedId[] = conversation.domain
-      ? conversation.allUserEntities.map(user => ({domain: user.domain, id: user.id}))
-      : conversation.allUserEntities.map(user => user.id);
+  private async sendText({conversation, message, mentions = [], linkPreview, quote, messageId}: TextMessagePayload) {
+    const baseMessage = MessageBuilder.createText({
+      ...this.createCommonMessagePayload(conversation),
+      messageId,
+      text: message,
+    });
+    const textMessage = this.decorateTextMessage(conversation, baseMessage, {linkPreview, mentions, quote});
 
-    await this.cryptography_repository.sendCoreMessage(message, conversation.id, userIds, conversation.domain);
+    return this.sendAndInjectGenericCoreMessage(textMessage, conversation);
+  }
+
+  private async sendEdit({conversation, message, messageId, originalMessageId, mentions, quote}: EditMessagePayload) {
+    const baseMessage = MessageBuilder.createEditedText({
+      ...this.createCommonMessagePayload(conversation),
+      messageId,
+      newMessageText: message,
+      originalMessageId: originalMessageId,
+    });
+    const editMessage = this.decorateTextMessage(conversation, baseMessage, {mentions, quote});
+
+    return this.sendAndInjectGenericCoreMessage(editMessage, conversation, {syncTimestamp: false});
+  }
+
+  private decorateTextMessage(
+    conversation: Conversation,
+    textMessage: TextContentBuilder,
+    {
+      mentions = [],
+      quote,
+      linkPreview,
+    }: {
+      linkPreview?: LinkPreviewUploadedContent;
+      mentions: MentionEntity[];
+      quote?: QuoteEntity;
+    },
+  ) {
+    const quoteData = quote && {quotedMessageId: quote.messageId, quotedMessageSha256: new Uint8Array(quote.hash)};
+
+    return textMessage
+      .withMentions(
+        mentions.map(mention => ({
+          length: mention.length,
+          qualifiedUserId: mention.userQualifiedId,
+          start: mention.startIndex,
+          userId: mention.userId,
+        })),
+      )
+      .withQuote(quoteData)
+      .withLinkPreviews(linkPreview ? [linkPreview] : [])
+      .withReadConfirmation(this.expectReadReceipt(conversation))
+      .withLegalHoldStatus(conversation.legalHoldStatus())
+      .build();
   }
 
   /**
    * Send text message with link preview in specified conversation.
    *
-   * @param conversationEntity Conversation that should receive the message
+   * @param conversation Conversation that should receive the message
    * @param textMessage Plain text message
-   * @param mentionEntities Mentions part of the message
+   * @param mentions Mentions part of the message
    * @param quoteEntity Quoted message
    * @returns Resolves after sending the message
    */
   public async sendTextWithLinkPreview(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     textMessage: string,
-    mentionEntities: MentionEntity[],
+    mentions: MentionEntity[],
     quoteEntity?: QuoteEntity,
-  ): Promise<ConversationEvent | undefined> {
-    try {
-      const genericMessage = await this.sendText(conversationEntity, textMessage, mentionEntities, quoteEntity);
-      return await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities, quoteEntity);
-    } catch (error) {
-      if (!this.isUserCancellationError(error)) {
-        this.logger.error(`Error while sending text message: ${error.message}`, error);
-        throw error;
-      }
-    }
-    return undefined;
+  ): Promise<void> {
+    const textPayload = {
+      conversation,
+      mentions,
+      message: textMessage,
+      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
+      quote: quoteEntity,
+    };
+    await this.sendText(textPayload);
+    await this.handleLinkPreview(textPayload);
   }
 
   /**
    * Send edited message in specified conversation.
    *
-   * @param conversationEntity Conversation entity
+   * @param conversation Conversation entity
    * @param textMessage Edited plain text message
-   * @param originalMessageEntity Original message entity
-   * @param mentionEntities Mentions as part of the message
+   * @param originalMessage Original message entity
+   * @param mentions Mentions as part of the message
    * @returns Resolves after sending the message
    */
   public async sendMessageEdit(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     textMessage: string,
-    originalMessageEntity: ContentMessage,
-    mentionEntities: MentionEntity[],
-  ): Promise<ConversationEvent | undefined> {
-    const hasDifferentText = isTextDifferent(originalMessageEntity, textMessage);
-    const hasDifferentMentions = areMentionsDifferent(originalMessageEntity, mentionEntities);
+    originalMessage: ContentMessage,
+    mentions: MentionEntity[],
+  ): Promise<OtrMessage | void> {
+    const hasDifferentText = isTextDifferent(originalMessage, textMessage);
+    const hasDifferentMentions = areMentionsDifferent(originalMessage, mentions);
     const wasEdited = hasDifferentText || hasDifferentMentions;
 
     if (!wasEdited) {
@@ -314,33 +395,33 @@ export class MessageRepository {
       );
     }
 
-    const messageId = createRandomUuid();
+    const messagePayload = {
+      conversation,
+      mentions,
+      message: textMessage,
+      messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
+      originalMessageId: originalMessage.id,
+    };
+    await this.sendEdit(messagePayload);
+    await this.handleLinkPreview(messagePayload);
+  }
 
-    const protoText = this.createTextProto(
-      messageId,
-      textMessage,
-      mentionEntities,
-      undefined,
-      undefined,
-      this.expectReadReceipt(conversationEntity),
-      conversationEntity.legalHoldStatus(),
-    );
-    const protoMessageEdit = new MessageEdit({replacingMessageId: originalMessageEntity.id, text: protoText});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.EDITED]: protoMessageEdit,
-      messageId,
-    });
-
-    try {
-      await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
-      return await this.sendLinkPreview(conversationEntity, textMessage, genericMessage, mentionEntities);
-    } catch (error) {
-      if (!this.isUserCancellationError(error)) {
-        this.logger.error(`Error while editing message: ${error.message}`, error);
-        throw error;
-      }
+  private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
+    // check if the user actually wants to send link previews
+    if (!this.propertyRepository.getPreference(PROPERTIES_TYPE.PREVIEWS.SEND)) {
+      return;
     }
-    return undefined;
+
+    const linkPreview = await getLinkPreviewFromString(textPayload.message);
+    if (linkPreview) {
+      // If we detect a link preview, then we go on and send a new message (that will override the initial message) containing the link preview
+      await this.sendText({
+        ...textPayload,
+        linkPreview: linkPreview.image
+          ? await this.core.service!.linkPreview.uploadLinkPreviewImage(linkPreview as LinkPreviewContent)
+          : linkPreview,
+      });
+    }
   }
 
   /**
@@ -364,7 +445,7 @@ export class MessageRepository {
 
     const blob = await loadUrlBlob(url);
     const textMessage = t('extensionsGiphyMessage', tag, {}, true);
-    this.sendText(conversationEntity, textMessage, null, quoteEntity);
+    this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
     return this.uploadImages(conversationEntity, [blob]);
   }
 
@@ -373,7 +454,7 @@ export class MessageRepository {
    *
    * @param conversationEntity Conversation to post the images
    */
-  public uploadImages(conversationEntity: Conversation, images: File[] | Blob[]) {
+  public uploadImages(conversationEntity: Conversation, images: Blob[]) {
     this.uploadFiles(conversationEntity, images, true);
   }
 
@@ -384,7 +465,7 @@ export class MessageRepository {
    * @param files files
    * @param asImage whether or not the file should be treated as an image
    */
-  public uploadFiles(conversationEntity: Conversation, files: File[] | Blob[], asImage?: boolean) {
+  public uploadFiles(conversationEntity: Conversation, files: Blob[], asImage?: boolean) {
     if (this.canUploadAssetsToConversation(conversationEntity)) {
       Array.from(files).forEach(file => this.uploadFile(conversationEntity, file, asImage));
     }
@@ -410,13 +491,19 @@ export class MessageRepository {
 
   private async uploadFile(
     conversationEntity: Conversation,
-    file: File | Blob,
-    asImage?: boolean,
+    file: Blob,
+    asImage: boolean = false,
   ): Promise<EventRecord | void> {
     let messageId;
     try {
       const uploadStarted = Date.now();
       const injectedEvent = await this.sendAssetMetadata(conversationEntity, file, asImage);
+      if (injectedEvent.state === PayloadBundleState.CANCELLED) {
+        throw new ConversationError(
+          ConversationError.TYPE.DEGRADED_CONVERSATION_CANCELLATION,
+          ConversationError.MESSAGE.DEGRADED_CONVERSATION_CANCELLATION,
+        );
+      }
       messageId = injectedEvent.id;
       await this.sendAssetRemotedata(conversationEntity, file, messageId, asImage);
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
@@ -461,263 +548,86 @@ export class MessageRepository {
     }
   }
 
-  private async sendAssetRemotedata(
-    conversationEntity: Conversation,
-    file: Blob,
-    messageId: string,
-    asImage: boolean,
-  ): Promise<void> {
-    let genericMessage: GenericMessage;
-
-    await this.getMessageInConversationById(conversationEntity, messageId);
-    const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversationEntity);
+  private async sendAssetRemotedata(conversation: Conversation, file: Blob, messageId: string, asImage: boolean) {
+    const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
     const options = {
-      expectsReadConfirmation: this.expectReadReceipt(conversationEntity),
-      legalHoldStatus: conversationEntity.legalHoldStatus(),
+      expectsReadConfirmation: this.expectReadReceipt(conversation),
+      legalHoldStatus: conversation.legalHoldStatus(),
       public: true,
       retention,
     };
-    const asset = await this.assetRepository.uploadFile(messageId, file, options, asImage);
-    genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.ASSET]: asset,
+    const asset = await this.assetRepository.uploadFile(file, messageId, options, () =>
+      this.cancelAssetUpload(messageId),
+    );
+
+    const commonPayload = {
+      asset: asset,
+      conversationId: conversation.id,
+      from: this.userState.self().id,
       messageId,
-    });
-    if (conversationEntity.messageTimer()) {
-      genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
-    }
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
-    const payload = await this.sendGenericMessageToConversation(eventInfoEntity);
-    const {uploaded: assetData} = conversationEntity.messageTimer()
-      ? genericMessage.ephemeral.asset
-      : genericMessage.asset;
-    const data: AssetRecord = {
-      key: assetData.assetId,
-      otr_key: assetData.otrKey,
-      sha256: assetData.sha256,
-      token: assetData.assetToken,
     };
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const assetAddEvent = EventBuilder.buildAssetAdd(conversationEntity, data, currentTimestamp);
-    assetAddEvent.id = messageId;
-    assetAddEvent.time = payload.time;
-    return this.onAssetUploadComplete(conversationEntity, assetAddEvent);
-  }
-
-  /**
-   * An asset was uploaded.
-   *
-   * @param conversationEntity Conversation to add the event to
-   * @param event_json JSON data of 'conversation.asset-upload-complete' event
-   * @returns Resolves when the event was handled
-   */
-  private async onAssetUploadComplete(conversationEntity: Conversation, event_json: AssetAddEvent): Promise<void> {
-    try {
-      const message_et = await this.getMessageInConversationById(conversationEntity, event_json.id);
-      return await this.updateMessageAsUploadComplete(conversationEntity, message_et, event_json);
-    } catch (error) {
-      if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-        throw error;
-      }
-
-      this.logger.error(`Upload complete: Could not find message with id '${event_json.id}'`, event_json);
-    }
+    const metadata = asImage ? ((await buildMetadata(file)) as ImageMetadata) : undefined;
+    const assetMessage = metadata
+      ? MessageBuilder.createImage({
+          ...commonPayload,
+          image: metadata,
+        })
+      : MessageBuilder.createFileData({
+          ...commonPayload,
+          file: {data: Buffer.from(await file.arrayBuffer())},
+          originalMessageId: messageId,
+        });
+    return this.sendAndInjectGenericCoreMessage(assetMessage, conversation);
   }
 
   /**
    * Send asset metadata message to specified conversation.
    */
-  private async sendAssetMetadata(
-    conversationEntity: Conversation,
-    file: File | Blob,
-    allowImageDetection?: boolean,
-  ): Promise<ConversationEvent | undefined> {
+  private async sendAssetMetadata(conversation: Conversation, file: File | Blob, allowImageDetection?: boolean) {
+    let metadata;
     try {
-      let metadata;
-      try {
-        metadata = await buildMetadata(file);
-      } catch (error) {
-        const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
-        this.logger.warn(logMessage, error);
-      }
-      const assetOriginal = new Asset.Original({mimeType: file.type, name: (file as File).name, size: file.size});
-
-      if (isAudio(file)) {
-        assetOriginal.audio = metadata as AudioMetaData;
-      } else if (isVideo(file)) {
-        assetOriginal.video = metadata as VideoMetaData;
-      } else if (allowImageDetection && isImage(file)) {
-        assetOriginal.image = metadata as ImageMetaData;
-      }
-
-      const protoAsset = new Asset({
-        [PROTO_MESSAGE_TYPE.ASSET_ORIGINAL]: assetOriginal,
-        [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-        [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
-      });
-
-      let genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
-        messageId: createRandomUuid(),
-      });
-
-      if (conversationEntity.messageTimer()) {
-        genericMessage = this.wrapInEphemeralMessage(genericMessage, conversationEntity.messageTimer());
-      }
-      return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
+      metadata = await buildMetadata(file);
     } catch (error) {
-      const log = `Failed to upload metadata for asset in conversation '${conversationEntity.id}': ${error.message}`;
-      this.logger.warn(log, error);
-
-      if (this.isUserCancellationError(error)) {
-        throw error;
-      }
+      const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${error.message}`;
+      this.logger.warn(logMessage, error);
     }
-    return undefined;
-  }
+    const meta = {length: file.size, name: (file as File).name, type: file.type} as Partial<FileMetaDataContent>;
 
-  /**
-   * Wraps generic message in ephemeral message.
-   *
-   * @param genericMessage Message to be wrapped
-   * @param millis Expire time in milliseconds
-   * @returns New proto message
-   */
-  private wrapInEphemeralMessage(genericMessage: GenericMessage, millis: number) {
-    const ephemeralExpiration = ConversationEphemeralHandler.validateTimer(millis);
-
-    const protoEphemeral = new Ephemeral({
-      [genericMessage.content]: genericMessage[genericMessage.content],
-      [PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION]: ephemeralExpiration,
+    if (isAudio(file)) {
+      meta.audio = metadata as AudioMetaData;
+    } else if (isVideo(file)) {
+      meta.video = metadata as VideoMetaData;
+    } else if (allowImageDetection && isImage(file)) {
+      meta.image = metadata as ImageMetaData;
+    }
+    const message = MessageBuilder.createFileMetadata({
+      ...this.createCommonMessagePayload(conversation),
+      metaData: meta as FileMetaDataContent,
     });
-
-    genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.EPHEMERAL]: protoEphemeral,
-      messageId: genericMessage.messageId,
-    });
-
-    return genericMessage;
-  }
-
-  /**
-   * Update asset in UI and DB as completed.
-   *
-   * @param conversationEntity Conversation that contains the message
-   * @param message_et Message to update
-   * @param event_json Uploaded asset event information
-   * @returns Resolve when message was updated
-   */
-  private updateMessageAsUploadComplete(
-    conversationEntity: Conversation,
-    message_et: ContentMessage,
-    event_json: EventJson,
-  ): Promise<void> {
-    const {id, key, otr_key, sha256, token} = event_json.data;
-    const asset_et = message_et.getFirstAsset() as FileAsset;
-
-    const resource = key
-      ? AssetRemoteData.v3(key, otr_key, sha256, token)
-      : AssetRemoteData.v2(conversationEntity.id, id, otr_key, sha256);
-
-    asset_et.original_resource(resource);
-    asset_et.status(AssetTransferState.UPLOADED);
-    message_et.status(StatusType.SENT);
-
-    return this.eventService.updateEventAsUploadSucceeded(message_et.primary_key, event_json);
+    return this.sendAndInjectGenericCoreMessage(message, conversation);
   }
 
   /**
    * Send asset upload failed message to specified conversation.
    *
-   * @param conversationEntity Conversation that should receive the file
+   * @param conversation Conversation that should receive the file
    * @param messageId ID of the metadata message
    * @param reason Cause for the failed upload (optional)
    * @returns Resolves when the asset failure was sent
    */
   private sendAssetUploadFailed(
-    conversationEntity: Conversation,
+    conversation: Conversation,
     messageId: string,
-    reason = ProtobufAsset.NotUploaded.FAILED,
+    reason = Asset.NotUploaded.FAILED,
   ): Promise<ConversationEvent> {
-    const wasCancelled = reason === ProtobufAsset.NotUploaded.CANCELLED;
-    const protoReason = wasCancelled ? Asset.NotUploaded.CANCELLED : Asset.NotUploaded.FAILED;
-    const protoAsset = new Asset({
-      [PROTO_MESSAGE_TYPE.ASSET_NOT_UPLOADED]: protoReason,
-      [PROTO_MESSAGE_TYPE.EXPECTS_READ_CONFIRMATION]: this.expectReadReceipt(conversationEntity),
-      [PROTO_MESSAGE_TYPE.LEGAL_HOLD_STATUS]: conversationEntity.legalHoldStatus(),
+    const payload = MessageBuilder.createFileAbort({
+      conversationId: conversation.id,
+      from: this.userState.self().id,
+      originalMessageId: messageId,
+      reason,
     });
 
-    const generic_message = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.ASSET]: protoAsset,
-      messageId,
-    });
-
-    return this._sendAndInjectGenericMessage(conversationEntity, generic_message);
-  }
-
-  /**
-   * Send link preview in specified conversation.
-   *
-   * @param conversationEntity Conversation that should receive the message
-   * @param textMessage Plain text message that possibly contains link
-   * @param genericMessage GenericMessage of containing text or edited message
-   * @param mentionEntities Mentions as part of message
-   * @param quoteEntity Link to a quoted message
-   * @returns Resolves after sending the message
-   */
-  private async sendLinkPreview(
-    conversationEntity: Conversation,
-    textMessage: string,
-    genericMessage: GenericMessage,
-    mentionEntities: MentionEntity[],
-    quoteEntity?: QuoteEntity,
-  ): Promise<ConversationEvent | undefined> {
-    const conversationId = conversationEntity.id;
-    const messageId = genericMessage.messageId;
-    let messageEntity: ContentMessage;
-    try {
-      const linkPreview = await this.link_repository.getLinkPreviewFromString(textMessage);
-      if (linkPreview) {
-        const protoText = this.createTextProto(
-          messageId,
-          textMessage,
-          mentionEntities,
-          quoteEntity,
-          [linkPreview],
-          this.expectReadReceipt(conversationEntity),
-          conversationEntity.legalHoldStatus(),
-        );
-        if (genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL]) {
-          genericMessage[GENERIC_MESSAGE_TYPE.EPHEMERAL][GENERIC_MESSAGE_TYPE.TEXT] = protoText;
-        } else {
-          genericMessage[GENERIC_MESSAGE_TYPE.TEXT] = protoText;
-        }
-
-        messageEntity = await this.getMessageInConversationById(conversationEntity, messageId);
-      }
-
-      this.logger.debug(`No link preview for message '${messageId}' in conversation '${conversationId}' created`);
-
-      if (messageEntity) {
-        const assetEntity = messageEntity.getFirstAsset() as TextAsset;
-        const messageContentUnchanged = assetEntity.text === textMessage;
-
-        if (messageContentUnchanged) {
-          this.logger.debug(`Sending link preview for message '${messageId}' in conversation '${conversationId}'`);
-          return await this._sendAndInjectGenericMessage(conversationEntity, genericMessage, false);
-        }
-
-        this.logger.debug(`Skipped sending link preview as message '${messageId}' in '${conversationId}' changed`);
-      }
-    } catch (error) {
-      if (error.type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
-        this.logger.warn(`Failed sending link preview for message '${messageId}' in '${conversationId}'`);
-        throw error;
-      }
-
-      this.logger.warn(`Skipped link preview for unknown message '${messageId}' in '${conversationId}'`);
-    }
-
-    return undefined;
+    return this.sendAndInjectGenericCoreMessage(payload, conversation);
   }
 
   private isUserCancellationError(error: ConversationError): boolean {
@@ -728,39 +638,178 @@ export class MessageRepository {
     return errorTypes.includes(error.type);
   }
 
-  private async _sendAndInjectGenericMessage(
-    conversationEntity: Conversation,
-    genericMessage: GenericMessage,
-    syncTimestamp = true,
-  ): Promise<ConversationEvent> {
-    if (conversationEntity.removed_from_conversation()) {
-      throw new Error('Cannot send message to conversation you are not part of');
+  /**
+   * Will request user permission before sending a message in case the conversation is in a degraded state
+   *
+   * @param conversation The conversation to send the message in
+   * @returns Resolves to true if the message can be sent, false if the user didn't give their permission
+   */
+  async requestUserSendingPermission(
+    conversation: Conversation,
+    showLegalHoldWarning: boolean,
+    consentType: CONSENT_TYPE = CONSENT_TYPE.MESSAGE,
+  ): Promise<boolean> {
+    const conversationDegraded = conversation.verification_state() === ConversationVerificationState.DEGRADED;
+    if (showLegalHoldWarning) {
+      return showLegalHoldWarningModal(conversation, conversationDegraded)
+        .then(() => true)
+        .catch(() => false);
+    }
+    if (!conversationDegraded) {
+      return true;
     }
 
-    const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
-    const senderId = this.clientState.currentClient().id;
-    const optimisticEvent = EventBuilder.buildMessageAdd(conversationEntity, currentTimestamp, senderId);
-    const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
-      genericMessage,
-      optimisticEvent as EventRecord,
-    );
-    const {KNOCK: TYPE_KNOCK, EPHEMERAL: TYPE_EPHEMERAL} = GENERIC_MESSAGE_TYPE;
-    const isPing = (message: GenericMessage) => message.content === TYPE_KNOCK;
-    const isEphemeralPing = (message: GenericMessage) =>
-      message.content === TYPE_EPHEMERAL && isPing(message.ephemeral as unknown as GenericMessage);
-    const shouldPlayPingAudio = isPing(genericMessage) || isEphemeralPing(genericMessage);
-    if (shouldPlayPingAudio) {
-      amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
-    }
+    const users = conversation.getUsersWithUnverifiedClients();
+    const userNames = joinNames(users, Declension.NOMINATIVE);
+    const titleSubstitutions = capitalizeFirstChar(userNames);
 
-    const injectedEvent = await this.eventRepository.injectEvent(mappedEvent);
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id);
-    eventInfoEntity.setTimestamp(injectedEvent.time);
-    const sentPayload = await this.sendGenericMessageToConversation(eventInfoEntity);
-    this.trackContributed(conversationEntity, genericMessage);
-    const backendIsoDate = syncTimestamp ? sentPayload.time : '';
-    await this.updateMessageAsSent(conversationEntity, injectedEvent, backendIsoDate);
-    return injectedEvent;
+    const [actionString, messageString] = {
+      [CONSENT_TYPE.INCOMING_CALL]: [
+        t('modalConversationNewDeviceIncomingCallAction'),
+        t('modalConversationNewDeviceIncomingCallMessage'),
+      ],
+      [CONSENT_TYPE.OUTGOING_CALL]: [
+        t('modalConversationNewDeviceOutgoingCallAction'),
+        t('modalConversationNewDeviceOutgoingCallMessage'),
+      ],
+      [CONSENT_TYPE.MESSAGE]: [t('modalConversationNewDeviceAction'), t('modalConversationNewDeviceMessage')],
+    }[consentType];
+
+    const baseTitle =
+      users.length > 1
+        ? t('modalConversationNewDeviceHeadlineMany', titleSubstitutions)
+        : t('modalConversationNewDeviceHeadlineOne', titleSubstitutions);
+    const titleString = users[0].isMe ? t('modalConversationNewDeviceHeadlineYou', titleSubstitutions) : baseTitle;
+
+    return new Promise(resolve => {
+      const options: ModalOptions = {
+        close: () => resolve(false),
+        primaryAction: {
+          action: () => {
+            conversation.verification_state(ConversationVerificationState.UNVERIFIED);
+            resolve(true);
+          },
+          text: actionString,
+        },
+        text: {
+          message: messageString,
+          title: titleString,
+        },
+      };
+
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, options, `degraded-${conversation.id}`);
+    });
+  }
+
+  /**
+   * Will send a generic message using @wireapp/code
+   *
+   * @param payload - the OTR message payload to send
+   * @param conversation - the conversation the message should be sent to
+   * @param options
+   * @param options.syncTimestamp should the message timestamp be synchronized with backend response timestamp
+   * @param options.playPingAudio should the 'ping' audio be played when message is being sent
+   * @param options.nativePush use nativePush for sending to mobile devices
+   * @param options.recipients can be used to target specific users of the conversation. Will send to all the conversation participants if not defined
+   * @param options.skipSelf do not forward this message to self user (will not encrypt and send to all self clients)
+   * @param options.skipInjection do not inject message in the event repository (will skip all the event handling pipeline)
+   */
+  private async sendAndInjectGenericCoreMessage(
+    payload: OtrMessage,
+    conversation: Conversation,
+    {
+      syncTimestamp = true,
+      playPingAudio = false,
+      nativePush = true,
+      targetMode,
+      recipients,
+      skipSelf,
+      skipInjection,
+      silentDegradationWarning,
+    }: {
+      nativePush?: boolean;
+      playPingAudio?: boolean;
+      recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
+      silentDegradationWarning?: boolean;
+      skipInjection?: boolean;
+      skipSelf?: boolean;
+      syncTimestamp?: boolean;
+      targetMode?: MessageTargetMode;
+    } = {
+      playPingAudio: false,
+      syncTimestamp: true,
+    },
+  ) {
+    const userIds = await this.generateRecipients(conversation, recipients, skipSelf);
+
+    const injectOptimisticEvent: MessageSendingCallbacks['onStart'] = async genericMessage => {
+      if (playPingAudio) {
+        amplify.publish(WebAppEvents.AUDIO.PLAY, AudioType.OUTGOING_PING);
+      }
+      if (!skipInjection) {
+        const senderId = this.clientState.currentClient().id;
+        const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
+        const optimisticEvent = EventBuilder.buildMessageAdd(conversation, currentTimestamp, senderId);
+        this.trackContributed(conversation, genericMessage);
+        const mappedEvent = await this.cryptography_repository.cryptographyMapper.mapGenericMessage(
+          genericMessage,
+          optimisticEvent as EventRecord,
+        );
+        await this.eventRepository.injectEvent(mappedEvent);
+      }
+      const isCallingMessage = payload.type === PayloadBundleType.CALL;
+      const consentType = isCallingMessage ? CONSENT_TYPE.OUTGOING_CALL : CONSENT_TYPE.MESSAGE;
+
+      return silentDegradationWarning ? true : this.requestUserSendingPermission(conversation, false, consentType);
+    };
+
+    const updateOptimisticEvent: MessageSendingCallbacks['onSuccess'] = (genericMessage, sentTime) => {
+      this.updateMessageAsSent(conversation, genericMessage.messageId, syncTimestamp ? sentTime : undefined);
+    };
+
+    /**
+     * Once a message has been sent, check the state of the members of this conversation.
+     * If, in this conversation, there are still users that have 0 devices, that could mean they have been silently removed from the team
+     * We need to ask backend if those users have been deleted and, if so, trigger the teamMemberLeave event
+     */
+    const checkMissingTeamMembers = async (): Promise<void> => {
+      const membersWithoutClients = conversation
+        .participating_user_ets()
+        .filter(user => user.devices().length === 0)
+        .map(user => user.qualifiedId);
+      if (!membersWithoutClients.length) {
+        return;
+      }
+      const usersWithoutClients = await this.userRepository.getUserListFromBackend(
+        conversation.isFederated() ? membersWithoutClients : membersWithoutClients.map(({id}) => id),
+      );
+      return this.triggerTeamMemberLeaveChecks(usersWithoutClients);
+    };
+
+    const conversationService = this.conversationService;
+    // Configure ephemeral messages
+    conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
+
+    return this.conversationService.send({
+      callbacks: {
+        onClientMismatch: mismatch =>
+          this.onClientMismatch?.(mismatch, conversation.qualifiedId, silentDegradationWarning),
+        onStart: injectOptimisticEvent,
+        onSuccess: async (genericMessage, sentTime) => {
+          if (this.teamState.isTeam()) {
+            // If we are in a team, we can be in the particular case where we are in a Tier1 team (team with a lot of users)
+            // In that case, backend will not warn us when a user is removed. We need to check this ourself manually
+            await checkMissingTeamMembers();
+          }
+          updateOptimisticEvent(genericMessage, sentTime);
+        },
+      },
+      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+      nativePush,
+      payloadBundle: payload,
+      targetMode,
+      userIds,
+    });
   }
 
   /**
@@ -778,24 +827,20 @@ export class MessageRepository {
     }
   }
 
-  async resetSession(
-    user_id: string,
-    client_id: string,
-    conversation_id: string,
-    domain: string | null,
-  ): Promise<ClientMismatch> {
-    this.logger.info(`Resetting session with client '${client_id}' of user '${user_id}'.`);
+  async resetSession(userId: QualifiedId, client_id: string, conversation: Conversation): Promise<void> {
+    this.logger.info(`Resetting session with client '${client_id}' of user '${userId.id}'.`);
 
     try {
-      const session_id = await this.cryptography_repository.deleteSession(user_id, client_id, domain);
+      // We delete the stored session so that it can be recreated later on
+      const session_id = await this.cryptography_repository.deleteSession(userId, client_id);
       if (session_id) {
-        this.logger.info(`Deleted session with client '${client_id}' of user '${user_id}'.`);
+        this.logger.info(`Deleted session with client '${client_id}' of user '${userId.id}'.`);
       } else {
         this.logger.warn('No local session found to delete.');
       }
-      return await this.sendSessionReset(user_id, client_id, conversation_id);
+      return await this.sendSessionReset(userId, client_id, conversation);
     } catch (error) {
-      const logMessage = `Failed to reset session for client '${client_id}' of user '${user_id}': ${error.message}`;
+      const logMessage = `Failed to reset session for client '${client_id}' of user '${userId.id}': ${error.message}`;
       this.logger.warn(logMessage, error);
       throw error;
     }
@@ -810,29 +855,19 @@ export class MessageRepository {
    *
    * @param userId User ID
    * @param clientId Client ID
-   * @param conversationId Conversation ID
+   * @param conversation The conversation to send the message in
    * @returns Resolves after sending the session reset
    */
-  private async sendSessionReset(userId: string, clientId: string, conversationId: string): Promise<ClientMismatch> {
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CLIENT_ACTION]: ClientAction.RESET_SESSION,
-      messageId: createRandomUuid(),
+  private async sendSessionReset(userId: QualifiedId, clientId: string, conversation: Conversation) {
+    const sessionReset = MessageBuilder.createSessionReset(this.createCommonMessagePayload(conversation));
+
+    const userClient = {[userId.id]: [clientId]};
+    await this.conversationService.send({
+      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+      payloadBundle: sessionReset,
+      targetMode: MessageTargetMode.USERS_CLIENTS,
+      userIds: conversation.isFederated() ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
     });
-
-    const options = {
-      precondition: true,
-      recipients: {[userId]: [clientId]},
-    };
-    const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-
-    try {
-      const response = await this.sendGenericMessage(eventInfoEntity, true);
-      this.logger.info(`Sent info about session reset to client '${clientId}' of user '${userId}'`);
-      return response;
-    } catch (error) {
-      this.logger.error(`Sending conversation reset failed: ${error.message}`, error);
-      throw error;
-    }
   }
 
   /**
@@ -850,12 +885,12 @@ export class MessageRepository {
    * @param type The type of confirmation to send
    * @param moreMessageEntities More messages to send a read receipt for
    */
-  sendConfirmationStatus(
+  async sendConfirmationStatus(
     conversationEntity: Conversation,
     messageEntity: Message,
     type: Confirmation.Type,
     moreMessageEntities: Message[] = [],
-  ): void {
+  ) {
     const typeToConfirm = (EventTypeHandling.CONFIRM as string[]).includes(messageEntity.type);
 
     if (messageEntity.user().isMe || !typeToConfirm) {
@@ -871,96 +906,53 @@ export class MessageRepository {
         return;
       }
     }
-
     const moreMessageIds = moreMessageEntities.length ? moreMessageEntities.map(entity => entity.id) : undefined;
-    const protoConfirmation = new Confirmation({
+    const confirmationMessage = MessageBuilder.createConfirmation({
+      ...this.createCommonMessagePayload(conversationEntity),
       firstMessageId: messageEntity.id,
       moreMessageIds,
       type,
     });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.CONFIRMATION]: protoConfirmation,
-      messageId: createRandomUuid(),
-    });
 
-    this.messageSender.queueMessage(() => {
-      // TODO(Federation): Apply logic for 'sendFederatedMessage'. The 'createRecipients' logic will be done inside of '@wireapp/core'.
-      return this.createRecipients(conversationEntity.id, true, [messageEntity.from]).then(recipients => {
-        const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
-        return this.sendGenericMessage(eventInfoEntity, true);
+    const sendingOptions = {
+      nativePush: false,
+      recipients: [messageEntity.qualifiedFrom],
+      // When not in a verified conversation (verified or degraded) we want the regular sending flow (send and reencrypt if there are mismatches)
+      // When in a verified (or degraded) conversation we want to prevent encrypting for unverified devices, we will then silent the degradation modal and force sending to only the devices that are verified
+      silentDegradationWarning: conversationEntity.verification_state() !== ConversationVerificationState.UNVERIFIED,
+
+      targetMode: MessageTargetMode.USERS,
+    };
+    const res = await this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, sendingOptions);
+    if (res.state === PayloadBundleState.CANCELLED) {
+      this.sendAndInjectGenericCoreMessage(confirmationMessage, conversationEntity, {
+        ...sendingOptions,
+        // If the message was auto cancelled because of a mismatch, we will force sending the message only to the clients we know of (ignoring unverified clients)
+        targetMode: MessageTargetMode.USERS_CLIENTS,
       });
-    });
+    }
   }
 
   /**
    * Send reaction to a content message in specified conversation.
-   * @param conversationEntity Conversation to send reaction in
+   * @param conversation Conversation to send reaction in
    * @param messageEntity Message to react to
-   * @param reaction Reaction
+   * @param reactionType Reaction
    * @returns Resolves after sending the reaction
    */
-  private sendReaction(
-    conversationEntity: Conversation,
-    messageEntity: Message,
-    reaction: ReactionType,
-  ): Promise<ConversationEvent> {
-    const protoReaction = new Reaction({emoji: reaction, messageId: messageEntity.id});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.REACTION]: protoReaction,
-      messageId: createRandomUuid(),
+  private async sendReaction(conversation: Conversation, messageEntity: Message, reactionType: ReactionType) {
+    const reaction = MessageBuilder.createReaction({
+      ...this.createCommonMessagePayload(conversation),
+      reaction: {
+        originalMessageId: messageEntity.id,
+        type: reactionType,
+      },
     });
 
-    return this._sendAndInjectGenericMessage(conversationEntity, genericMessage);
+    return this.sendAndInjectGenericCoreMessage(reaction, conversation);
   }
 
-  private createTextProto(
-    messageId: string,
-    textMessage: string,
-    mentionEntities: MentionEntity[],
-    quoteEntity: QuoteEntity,
-    linkPreviews: LinkPreview[],
-    expectsReadConfirmation: boolean,
-    legalHoldStatus: LegalHoldStatus,
-  ): Text {
-    const protoText = new Text({content: textMessage, expectsReadConfirmation, legalHoldStatus});
-
-    if (mentionEntities && mentionEntities.length) {
-      const logMessage = `Adding '${mentionEntities.length}' mentions to message '${messageId}'`;
-      this.logger.debug(logMessage, mentionEntities);
-
-      const protoMentions = mentionEntities
-        .filter(mentionEntity => {
-          if (mentionEntity) {
-            try {
-              return mentionEntity.validate(textMessage);
-            } catch (error) {
-              const log = `Removed invalid mention when sending message '${messageId}': ${error.message}`;
-              this.logger.warn(log, mentionEntity);
-            }
-          }
-          return false;
-        })
-        .map(mentionEntity => mentionEntity.toProto());
-
-      protoText[PROTO_MESSAGE_TYPE.MENTIONS] = protoMentions;
-    }
-
-    if (quoteEntity) {
-      const protoQuote = quoteEntity.toProto();
-      this.logger.debug(`Adding quote to message '${messageId}'`, protoQuote);
-      protoText[PROTO_MESSAGE_TYPE.QUOTE] = protoQuote;
-    }
-
-    if (linkPreviews && linkPreviews.length) {
-      this.logger.debug(`Adding link preview to message '${messageId}'`, linkPreviews);
-      protoText[PROTO_MESSAGE_TYPE.LINK_PREVIEWS] = linkPreviews;
-    }
-
-    return protoText;
-  }
-
-  expectReadReceipt(conversationEntity: Conversation): boolean {
+  private expectReadReceipt(conversationEntity: Conversation): boolean {
     if (conversationEntity.is1to1()) {
       return !!this.propertyRepository.receiptMode();
     }
@@ -975,46 +967,42 @@ export class MessageRepository {
   /**
    * Delete message for everyone.
    *
-   * @param conversationEntity Conversation to delete message from
-   * @param messageEntity Message to delete
-   * @param precondition Optional level that backend checks for missing clients
+   * @param conversation Conversation to delete message from
+   * @param message Message to delete
+   * @param targetedUsers target only a few users in the conversation. Will target all the participants if undefined
    * @returns Resolves when message was deleted
    */
   public async deleteMessageForEveryone(
-    conversationEntity: Conversation,
-    messageEntity: Message,
-    precondition?: string[] | boolean,
-  ): Promise<number> {
-    const conversationId = conversationEntity.id;
-    const messageId = messageEntity.id;
+    conversation: Conversation,
+    message: Message,
+    targetedUsers?: QualifiedId[],
+  ): Promise<void> {
+    const conversationId = conversation.id;
+    const messageId = message.id;
 
     try {
-      if (!messageEntity.user().isMe && !messageEntity.ephemeral_expires()) {
+      if (!message.user().isMe && !message.ephemeral_expires()) {
         throw new ConversationError(ConversationError.TYPE.WRONG_USER, ConversationError.MESSAGE.WRONG_USER);
       }
+      const userIds = targetedUsers || conversation.allUserEntities.map(user => user.qualifiedId);
+      await this.conversationService.deleteMessageEveryone(
+        conversation.id,
+        message.id,
+        conversation.isFederated() ? userIds : userIds.map(({id}) => id),
+        true,
+        conversation.isFederated() ? conversation.domain : undefined,
+      );
 
-      const protoMessageDelete = new MessageDelete({messageId});
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.DELETED]: protoMessageDelete,
-        messageId: createRandomUuid(),
-      });
-      await this.messageSender.queueMessage(() => {
-        const userIds = Array.isArray(precondition) ? precondition : undefined;
-        return this.createRecipients(conversationId, false, userIds).then(recipients => {
-          const options = {precondition, recipients};
-          const eventInfoEntity = new EventInfoEntity(genericMessage, conversationId, options);
-          this.sendGenericMessage(eventInfoEntity, true);
-        });
-      });
-      return await this.deleteMessageById(conversationEntity, messageId);
+      await this.deleteMessageById(conversation, messageId);
     } catch (error) {
       const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
         this.logger.warn(`Conversation '${conversationId}' not found. Deleting message for self user only.`);
-        return this.deleteMessage(conversationEntity, messageEntity);
+        this.deleteMessage(conversation, message);
+        return;
       }
-      const message = `Failed to delete message '${messageId}' in conversation '${conversationId}' for everyone`;
-      this.logger.info(message, error);
+      const logMessage = `Failed to delete message '${messageId}' in conversation '${conversationId}' for everyone`;
+      this.logger.info(logMessage, error);
       throw error;
     }
   }
@@ -1022,27 +1010,22 @@ export class MessageRepository {
   /**
    * Delete message on your own clients.
    *
-   * @param conversationEntity Conversation to delete message from
-   * @param messageEntity Message to delete
+   * @param conversation Conversation to delete message from
+   * @param message Message to delete
    * @returns Resolves when message was deleted
    */
-  public async deleteMessage(conversationEntity: Conversation, messageEntity: Message): Promise<number> {
+  public async deleteMessage(conversation: Conversation, message: Message): Promise<void> {
     try {
-      const protoMessageHide = new MessageHide({
-        conversationId: conversationEntity.id,
-        messageId: messageEntity.id,
-      });
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.HIDDEN]: protoMessageHide,
-        messageId: createRandomUuid(),
-      });
-
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
-      await this.sendGenericMessageToConversation(eventInfoEntity);
-      return await this.deleteMessageById(conversationEntity, messageEntity.id);
+      await this.conversationService.deleteMessageLocal(
+        conversation.id,
+        message.id,
+        true,
+        conversation.isFederated() ? conversation.domain : undefined,
+      );
+      await this.deleteMessageById(conversation, message.id);
     } catch (error) {
       this.logger.info(
-        `Failed to send delete message with id '${messageEntity.id}' for conversation '${conversationEntity.id}'`,
+        `Failed to send delete message with id '${message.id}' for conversation '${conversation.id}'`,
         error,
       );
       throw error;
@@ -1052,59 +1035,47 @@ export class MessageRepository {
   /**
    * Update cleared of conversation using timestamp.
    */
-  public updateClearedTimestamp(conversationEntity: Conversation): void {
-    const timestamp = conversationEntity.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
+  public updateClearedTimestamp(conversation: Conversation): void {
+    const timestamp = conversation.getLastKnownTimestamp(this.serverTimeHandler.toServerTimestamp());
 
-    if (timestamp && conversationEntity.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
-      const protoCleared = new Cleared({
-        clearedTimestamp: timestamp,
-        conversationId: conversationEntity.id,
-      });
-      const genericMessage = new GenericMessage({
-        [GENERIC_MESSAGE_TYPE.CLEARED]: protoCleared,
-        messageId: createRandomUuid(),
-      });
-
-      const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
-      this.sendGenericMessageToConversation(eventInfoEntity).then(() => {
-        this.logger.info(`Cleared conversation '${conversationEntity.id}' on '${new Date(timestamp).toISOString()}'`);
-      });
+    if (timestamp && conversation.setTimestamp(timestamp, Conversation.TIMESTAMP_TYPE.CLEARED)) {
+      this.conversationService.clearConversation(conversation.id, timestamp);
     }
   }
 
-  sendButtonAction(conversationEntity: Conversation, messageEntity: CompositeMessage, buttonId: string): void {
-    if (conversationEntity.removed_from_conversation()) {
+  sendButtonAction(conversation: Conversation, message: CompositeMessage, buttonId: string): void {
+    if (conversation.removed_from_conversation()) {
+      return;
+    }
+    const senderId = message.qualifiedFrom;
+    const senderInConversation = conversation
+      .participating_user_ets()
+      .some(user => matchQualifiedIds(senderId, user.qualifiedId));
+
+    if (!senderInConversation) {
+      message.setButtonError(buttonId, t('buttonActionError'));
+      message.waitingButtonId(undefined);
       return;
     }
 
-    const senderId = messageEntity.from;
-    const conversationHasUser = conversationEntity.participating_user_ids().includes(senderId);
-
-    if (!conversationHasUser) {
-      messageEntity.setButtonError(buttonId, t('buttonActionError'));
-      messageEntity.waitingButtonId(undefined);
-      return;
+    const buttonMessage = MessageBuilder.createButtonActionMessage({
+      ...this.createCommonMessagePayload(conversation),
+      content: {
+        buttonId,
+        referenceMessageId: message.id,
+      },
+    });
+    try {
+      this.sendAndInjectGenericCoreMessage(buttonMessage, conversation, {
+        nativePush: false,
+        recipients: [message.qualifiedFrom],
+        skipInjection: true,
+        targetMode: MessageTargetMode.USERS,
+      });
+    } catch (error) {
+      message.waitingButtonId(undefined);
+      return message.setButtonError(buttonId, t('buttonActionError'));
     }
-
-    const protoButtonAction = new ButtonAction({
-      buttonId,
-      referenceMessageId: messageEntity.id,
-    });
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.BUTTON_ACTION]: protoButtonAction,
-      messageId: createRandomUuid(),
-    });
-    this.messageSender.queueMessage(async () => {
-      try {
-        const recipients = await this.createRecipients(conversationEntity.id, true, [messageEntity.from]);
-        const options = {nativePush: false, precondition: [messageEntity.from], recipients};
-        const eventInfoEntity = new EventInfoEntity(genericMessage, conversationEntity.id, options);
-        await this.sendGenericMessage(eventInfoEntity, false);
-      } catch (error) {
-        messageEntity.waitingButtonId(undefined);
-        return messageEntity.setButtonError(buttonId, t('buttonActionError'));
-      }
-    });
   }
 
   /**
@@ -1159,11 +1130,11 @@ export class MessageRepository {
    */
   private async updateMessageAsSent(
     conversationEntity: Conversation,
-    eventJson: ConversationEvent,
-    isoDate: string,
+    eventId: string,
+    isoDate?: string,
   ): Promise<Pick<Partial<EventRecord>, 'status' | 'time'> | void> {
     try {
-      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventJson.id);
+      const messageEntity = await this.getMessageInConversationById(conversationEntity, eventId);
       const updatedStatus = messageEntity.readReceipts().length ? StatusType.SEEN : StatusType.SENT;
       messageEntity.status(updatedStatus);
       const changes: Pick<Partial<EventRecord>, 'status' | 'time'> = {
@@ -1189,16 +1160,44 @@ export class MessageRepository {
     }
   }
 
-  /**
-   * Create a user client map for a given conversation.
-   * TODO(Federation): This code cannot be used with federation and will be replaced with our core.
-   */
+  private createQualifiedRecipients(users: User[]): QualifiedUserClients {
+    return users.reduce((userClients, user) => {
+      userClients[user.domain] ||= {};
+      userClients[user.domain][user.id] = user.devices().map(client => client.id);
+      return userClients;
+    }, {} as QualifiedUserClients);
+  }
+
+  private async generateRecipients(
+    conversation: Conversation,
+    recipients?: QualifiedId[] | QualifiedUserClients | UserClients,
+    skipSelf?: boolean,
+  ): Promise<QualifiedUserClients | UserClients> {
+    if (isQualifiedUserClients(recipients) || isUserClients(recipients)) {
+      // If we get a userId>client pairs, we just return those, no need to create recipients
+      return recipients;
+    }
+    const users = conversation.allUserEntities
+      // if users are given by the caller, we filter to only keep those users
+      .filter(user => !recipients || recipients.some(userId => matchQualifiedIds(user, userId)))
+      // we filter the self user if skipSelf is true
+      .filter(user => !skipSelf || !user.isMe);
+
+    return conversation.isFederated()
+      ? this.createQualifiedRecipients(users)
+      : this.createRecipients(
+          conversation.qualifiedId,
+          false,
+          users.map(user => user.id),
+        );
+  }
+
   async createRecipients(
-    conversation_id: string,
+    conversationId: QualifiedId,
     skip_own_clients = false,
-    user_ids: string[] = null,
+    user_ids?: string[],
   ): Promise<UserClients> {
-    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversation_id, null);
+    const userEntities = await this.conversationRepositoryProvider().getAllUsersInConversation(conversationId);
     const recipients: UserClients = {};
     for (const userEntity of userEntities) {
       if (!(skip_own_clients && userEntity.isMe)) {
@@ -1221,7 +1220,10 @@ export class MessageRepository {
       }
 
       const {genericMessage, options} = eventInfoEntity;
-      const payload = await this.cryptography_repository.encryptGenericMessage(options.recipients, genericMessage);
+      const payload = await this.cryptography_repository.encryptGenericMessage(
+        options.recipients as UserClients,
+        genericMessage,
+      );
       payload.native_push = options.nativePush;
       return await this.sendEncryptedMessage(eventInfoEntity, payload);
     } catch (error) {
@@ -1266,7 +1268,7 @@ export class MessageRepository {
     if (ensureUser) {
       return messagePromise.then(message => {
         if (message.from && !message.user().id) {
-          return this.userRepository.getUserById(message.from, message.user().domain).then(userEntity => {
+          return this.userRepository.getUserById({domain: message.user().domain, id: message.from}).then(userEntity => {
             message.user(userEntity);
             return message as ContentMessage;
           });
@@ -1295,11 +1297,10 @@ export class MessageRepository {
       // Since this is a bare API client user we use `.deleted`
       const isDeleted = user.deleted === true;
       if (isDeleted) {
-        await this.conversationRepositoryProvider().teamMemberLeave(
-          this.teamState.team().id,
-          user.id,
-          this.userState.self().domain,
-        );
+        await this.conversationRepositoryProvider().teamMemberLeave(this.teamState.team().id, {
+          domain: this.userState.self().domain,
+          id: user.id,
+        });
       }
     }
   }
@@ -1321,10 +1322,10 @@ export class MessageRepository {
       const {conversationId, timestamp: numericTimestamp} = eventInfoEntity;
       await this.conversationRepositoryProvider().injectLegalHoldMessage({
         beforeTimestamp: true,
-        conversationId,
+        conversationId: conversationId,
         legalHoldStatus: updatedLocalLegalHoldStatus,
         timestamp: numericTimestamp,
-        userId: this.userState.self().id,
+        userId: this.userState.self().qualifiedId,
       });
     }
 
@@ -1333,7 +1334,7 @@ export class MessageRepository {
 
   private async grantOutgoingMessage(
     eventInfoEntity: EventInfoEntity,
-    userIds: string[],
+    userIds: QualifiedId[],
     checkLegalHold: boolean,
   ): Promise<void> {
     const messageType = eventInfoEntity.getType();
@@ -1352,24 +1353,21 @@ export class MessageRepository {
       this.triggerTeamMemberLeaveChecks(usersWithoutClients);
     }
 
-    const isCallingMessage = messageType === GENERIC_MESSAGE_TYPE.CALLING;
-    const consentType = isCallingMessage
-      ? ConversationRepository.CONSENT_TYPE.OUTGOING_CALL
-      : ConversationRepository.CONSENT_TYPE.MESSAGE;
-
     let shouldShowLegalHoldWarning: boolean = false;
 
     if (checkLegalHold) {
       shouldShowLegalHoldWarning = await this.shouldShowLegalHoldWarning(eventInfoEntity);
     }
 
-    return this.grantMessage(eventInfoEntity, consentType, userIds, shouldShowLegalHoldWarning);
+    return this.grantMessage(eventInfoEntity, userIds, shouldShowLegalHoldWarning);
   }
 
+  /**
+   * @deprecated Will not work with federation. Please use `sendFederatedMessage`.
+   */
   async grantMessage(
     eventInfoEntity: EventInfoEntity,
-    consentType: string,
-    userIds: string[],
+    userIds: QualifiedId[],
     shouldShowLegalHoldWarning: boolean,
   ): Promise<void> {
     const conversationEntity = await this.conversationRepositoryProvider().getConversationById(
@@ -1398,13 +1396,11 @@ export class MessageRepository {
     return new Promise((resolve, reject) => {
       let sendAnyway = false;
 
-      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.id);
+      userIds = conversationEntity.getUsersWithUnverifiedClients().map(userEntity => userEntity.qualifiedId);
 
       return this.userRepository
         .getUsersById(userIds)
         .then(userEntities => {
-          let actionString;
-          let messageString;
           let titleString;
 
           const hasMultipleUsers = userEntities.length > 1;
@@ -1424,7 +1420,7 @@ export class MessageRepository {
               const conversationId = eventInfoEntity.conversationId;
               const type = eventInfoEntity.getType();
 
-              const log = `Missing user IDs to grant '${type}' message in '${conversationId}' (${consentType})`;
+              const log = `Missing user IDs to grant '${type}' message in '${conversationId}'`;
               this.logger.error(log);
 
               const error = new Error('Failed to grant outgoing message');
@@ -1433,25 +1429,8 @@ export class MessageRepository {
             }
           }
 
-          switch (consentType) {
-            case ConversationRepository.CONSENT_TYPE.INCOMING_CALL: {
-              actionString = t('modalConversationNewDeviceIncomingCallAction');
-              messageString = t('modalConversationNewDeviceIncomingCallMessage');
-              break;
-            }
-
-            case ConversationRepository.CONSENT_TYPE.OUTGOING_CALL: {
-              actionString = t('modalConversationNewDeviceOutgoingCallAction');
-              messageString = t('modalConversationNewDeviceOutgoingCallMessage');
-              break;
-            }
-
-            default: {
-              actionString = t('modalConversationNewDeviceAction');
-              messageString = t('modalConversationNewDeviceMessage');
-              break;
-            }
-          }
+          const actionString = t('modalConversationNewDeviceAction');
+          const messageString = t('modalConversationNewDeviceMessage');
 
           const options: ModalOptions = {
             close: () => {
@@ -1495,12 +1474,12 @@ export class MessageRepository {
     }
     const sender = this.clientState.currentClient().id;
     try {
-      await this.conversation_service.postEncryptedMessage(conversationEntity.id, {recipients: {}, sender});
+      await this.conversation_service.postEncryptedMessage(conversationEntity, {recipients: {}, sender});
     } catch (axiosError) {
       const error = axiosError.response?.data || axiosError;
       if (error.missing) {
         const remoteUserClients = error.missing as UserClients;
-        const localUserClients = await this.createRecipients(conversationEntity.id);
+        const localUserClients = await this.createRecipients(conversationEntity);
         const selfId = this.userState.self().id;
 
         const deletedUserClients = Object.entries(localUserClients).reduce<UserClients>(
@@ -1520,18 +1499,17 @@ export class MessageRepository {
         await Promise.all(
           Object.entries(deletedUserClients).map(([userId, clients]) =>
             Promise.all(
-              clients.map((clientId: string) => this.userRepository.removeClientFromUser(userId, clientId, null)),
+              clients.map(clientId => this.userRepository.removeClientFromUser({domain: '', id: userId}, clientId)),
             ),
           ),
         );
 
         const missingUserIds = Object.entries(remoteUserClients).reduce<string[]>((missing, [userId, clients]) => {
-          if (userId === selfId) {
-            return missing;
-          }
-          const missingClients = getDifference(localUserClients[userId] || ([] as string[]), clients);
-          if (missingClients.length) {
-            missing.push(userId);
+          if (userId !== selfId) {
+            const missingClients = getDifference(localUserClients[userId] || ([] as string[]), clients);
+            if (missingClients.length) {
+              missing.push(userId);
+            }
           }
           return missing;
         }, []);
@@ -1540,16 +1518,26 @@ export class MessageRepository {
           this.userRepository.findUserById(missingUserId),
         );
 
-        const qualifiedUsersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
-        await Promise.all(
-          Object.values(qualifiedUsersMap).map(userClientMap =>
-            Object.entries(userClientMap).map(([userId, clients]) => {
-              return Promise.all(
-                clients.map(client => this.userRepository.addClientToUser(userId, client, false, null)),
-              );
-            }),
-          ),
-        );
+        const usersMap = await this.userRepository.getClientsByUsers(missingUserEntities, false);
+        if (isQualifiedUserClientEntityMap(usersMap)) {
+          await Promise.all(
+            Object.entries(usersMap).map(([domain, userClientsMap]) =>
+              Object.entries(userClientsMap).map(([userId, clients]) =>
+                Promise.all(
+                  clients.map(client => this.userRepository.addClientToUser({domain, id: userId}, client, false)),
+                ),
+              ),
+            ),
+          );
+        } else {
+          await Promise.all(
+            Object.entries(usersMap).map(([userId, clients]) =>
+              Promise.all(
+                clients.map(client => this.userRepository.addClientToUser({domain: '', id: userId}, client, false)),
+              ),
+            ),
+          );
+        }
       }
     }
     if (blockSystemMessage) {
@@ -1575,7 +1563,10 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+    const eventInfoEntity = new EventInfoEntity(
+      genericMessage,
+      this.conversationState.self_conversation()?.qualifiedId,
+    );
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       amplify.publish(WebAppEvents.NOTIFICATION.REMOVE_READ);
@@ -1592,6 +1583,12 @@ export class MessageRepository {
    * @param countlyId Countly new ID
    */
   public async sendCountlySync(countlyId: string) {
+    const selfConversation = this.conversationState.self_conversation();
+    if (selfConversation?.isFederated()) {
+      // TODO(federation)
+      this.logger.warn('syncly not implemented for federated env');
+      return;
+    }
     const protoDataTransfer = new DataTransfer({
       trackingIdentifier: {
         identifier: countlyId,
@@ -1602,7 +1599,7 @@ export class MessageRepository {
       messageId: createRandomUuid(),
     });
 
-    const eventInfoEntity = new EventInfoEntity(genericMessage, this.conversationState.self_conversation().id);
+    const eventInfoEntity = new EventInfoEntity(genericMessage, selfConversation.qualifiedId);
     try {
       await this.sendGenericMessageToConversation(eventInfoEntity);
       this.logger.info(`Sent countly sync message with ID ${countlyId}`);
@@ -1619,16 +1616,24 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(eventInfoEntity: EventInfoEntity, conversationId: string) {
-    return this.messageSender.queueMessage(() => {
-      const options = eventInfoEntity.options;
-      const recipientsPromise = options.recipients
-        ? Promise.resolve(eventInfoEntity)
-        : this.createRecipients(conversationId, false).then(recipients => {
-            eventInfoEntity.updateOptions({recipients});
-            return eventInfoEntity;
-          });
-      return recipientsPromise.then(infoEntity => this.sendGenericMessage(infoEntity, true));
+  public sendCallingMessage(
+    conversation: Conversation,
+    payload: string,
+    options: {nativePush?: boolean; recipients?: UserClients | QualifiedUserClients},
+  ) {
+    const message = MessageBuilder.createCall({
+      ...this.createCommonMessagePayload(conversation),
+      content: payload,
+    });
+
+    return this.sendAndInjectGenericCoreMessage(message, conversation, {
+      ...options,
+      // We want to show the degradation warning only when message should be sent to all participants
+      silentDegradationWarning: !!options?.recipients,
+
+      skipInjection: true,
+
+      targetMode: options?.recipients ? MessageTargetMode.USERS_CLIENTS : MessageTargetMode.USERS,
     });
   }
 
@@ -1670,7 +1675,7 @@ export class MessageRepository {
       });
 
       const payload = await this.cryptography_repository.encryptGenericMessage(
-        options.recipients,
+        options.recipients as UserClients,
         genericMessageExternal,
       );
       payload.data = arrayToBase64(encryptedAsset.cipherText);
@@ -1692,6 +1697,7 @@ export class MessageRepository {
    *
    * @param eventInfoEntity Info about message to be sent
    * @param payload Payload
+   * @deprecated Please use `sendFederatedMessage`
    * @returns Promise that resolves after sending the encrypted message
    */
   private async sendEncryptedMessage(
@@ -1711,12 +1717,16 @@ export class MessageRepository {
       .map(clientId => Object.keys(clientId).length)
       .reduce((totalClients, clients) => totalClients + clients, 0);
 
-    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${conversationId}'`;
+    const logMessage = `Sending '${messageType}' message (${messageId}) to conversation '${JSON.stringify(
+      conversationId,
+    )}'`;
     this.logger.info(logMessage, payload);
 
     if (numberOfUsers > numberOfClients) {
       this.logger.warn(
-        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${conversationId}'`,
+        `Sending '${messageType}' message (${messageId}) to just '${numberOfClients}' clients but there are '${numberOfUsers}' users in conversation '${JSON.stringify(
+          conversationId,
+        )}'`,
       );
     }
 
@@ -1729,9 +1739,9 @@ export class MessageRepository {
       await this.clientMismatchHandler.onClientMismatch(eventInfoEntity, response, payload);
       return response;
     } catch (axiosError) {
-      const error = axiosError.response?.data;
+      const errorData = axiosError.response?.data as ClientMismatch & {label: BackendErrorLabel};
 
-      const hasNoLegalholdConsent = error?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
+      const hasNoLegalholdConsent = errorData?.label === BackendErrorLabel.LEGAL_HOLD_MISSING_CONSENT;
       const ignoredMessageTypes = [GENERIC_MESSAGE_TYPE.CONFIRMATION];
       if (hasNoLegalholdConsent && !ignoredMessageTypes.includes(messageType as GENERIC_MESSAGE_TYPE)) {
         const replaceLinkLegalHold = replaceLink(
@@ -1758,26 +1768,31 @@ export class MessageRepository {
         );
       }
 
-      const isUnknownClient = error?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
+      const isUnknownClient = errorData?.label === BackendClientError.LABEL.UNKNOWN_CLIENT;
       if (isUnknownClient) {
         this.clientRepository.removeLocalClient();
         return undefined;
       }
 
-      if (!error?.missing) {
-        throw error;
+      if (!errorData?.missing) {
+        throw errorData;
       }
 
       const payloadWithMissingClients = await this.clientMismatchHandler.onClientMismatch(
         eventInfoEntity,
-        error,
+        errorData,
         payload,
       );
 
-      const missedUserIds = Object.keys(error.missing);
+      const missedUserIds = Object.keys(errorData.missing).map(userId => ({
+        domain: '',
+        id: userId,
+      }));
       await this.grantOutgoingMessage(eventInfoEntity, missedUserIds, true);
       this.logger.info(
-        `Updated '${messageType}' message (${messageId}) for conversation '${conversationId}'. Will ignore missing receivers.`,
+        `Updated '${messageType}' message (${messageId}) for conversation '${JSON.stringify(
+          conversationId,
+        )}'. Will ignore missing receivers.`,
         payloadWithMissingClients,
       );
       if (payloadWithMissingClients) {
@@ -1785,6 +1800,13 @@ export class MessageRepository {
       }
       return this.conversation_service.postEncryptedMessage(conversationId, payload, true);
     }
+  }
+
+  private createCommonMessagePayload(conversation: Conversation) {
+    return {
+      conversationId: conversation.id,
+      from: this.clientState.currentClient().id,
+    };
   }
 
   //##############################################################################

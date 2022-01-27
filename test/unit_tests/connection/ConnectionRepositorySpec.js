@@ -83,13 +83,13 @@ describe('ConnectionRepository', () => {
 
     beforeEach(() => {
       firstConnectionEntity = new ConnectionEntity();
-      firstConnectionEntity.conversationId = createRandomUuid();
-      firstConnectionEntity.userId = createRandomUuid();
+      firstConnectionEntity.conversationId = {domain: '', id: createRandomUuid()};
+      firstConnectionEntity.userId = {domain: '', id: createRandomUuid()};
       connectionRepository.addConnectionEntity(firstConnectionEntity);
 
       secondConnectionEntity = new ConnectionEntity();
-      secondConnectionEntity.conversationId = createRandomUuid();
-      secondConnectionEntity.userId = createRandomUuid();
+      secondConnectionEntity.conversationId = {domain: '', id: createRandomUuid()};
+      secondConnectionEntity.userId = {domain: '', id: createRandomUuid()};
       connectionRepository.addConnectionEntity(secondConnectionEntity);
     });
 
@@ -97,7 +97,7 @@ describe('ConnectionRepository', () => {
       const connectionEntity = connectionRepository.getConnectionByConversationId(firstConnectionEntity.conversationId);
 
       expect(connectionEntity).toBe(firstConnectionEntity);
-      const otherConnectionEntity = connectionRepository.getConnectionByConversationId('');
+      const otherConnectionEntity = connectionRepository.getConnectionByConversationId({domain: '', id: ''});
 
       expect(otherConnectionEntity).not.toBeDefined();
     });
@@ -133,7 +133,7 @@ describe('ConnectionRepository', () => {
       const connectionEntities = Object.values(connectionState.connectionEntities());
       expect(connectionEntities.length).toBe(1);
       expect(connectionEntities[0].status()).toEqual(connectionRequest.status);
-      expect(connectionEntities[0].conversationId).toEqual(connectionRequest.conversation);
+      expect(connectionEntities[0].conversationId.id).toEqual(connectionRequest.conversation);
     });
   });
 });

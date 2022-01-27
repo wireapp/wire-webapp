@@ -30,19 +30,14 @@ import {GENERIC_MESSAGE_TYPE} from 'src/script/cryptography/GenericMessageType';
 import {EventInfoEntity} from 'src/script/conversation/EventInfoEntity';
 import {NOTIFICATION_STATE} from 'src/script/conversation/NotificationSetting';
 import {ConversationVerificationState} from 'src/script/conversation/ConversationVerificationState';
-import {AssetTransferState} from 'src/script/assets/AssetTransferState';
 import {ConversationDatabaseData, ConversationMapper} from 'src/script/conversation/ConversationMapper';
 import {ConversationStatus} from 'src/script/conversation/ConversationStatus';
-import {ClientEvent} from 'src/script/event/Client';
 import {Conversation} from 'src/script/entity/Conversation';
 import {ConnectionEntity} from 'src/script/connection/ConnectionEntity';
-import {FileAsset} from 'src/script/entity/message/FileAsset';
-import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import {User} from 'src/script/entity/User';
 import {Message} from 'src/script/entity/message/Message';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {MessageRepository} from 'src/script/conversation/MessageRepository';
-import {AssetAddEvent} from 'src/script/conversation/EventBuilder';
 import {ClientRepository} from '../client/ClientRepository';
 import {ConversationRepository} from './ConversationRepository';
 import {CryptographyRepository} from '../cryptography/CryptographyRepository';
@@ -51,7 +46,6 @@ import {MessageSender} from '../message/MessageSender';
 import {PropertiesRepository} from '../properties/PropertiesRepository';
 import {ServerTimeHandler} from '../time/serverTimeHandler';
 import {UserRepository} from '../user/UserRepository';
-import {LinkPreviewRepository} from '../links/LinkPreviewRepository';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
 import {TeamState} from '../team/TeamState';
@@ -59,11 +53,15 @@ import {ClientState} from '../client/ClientState';
 import {ConversationState} from './ConversationState';
 import {ConversationService} from './ConversationService';
 import {EventService} from '../event/EventService';
+import {Core} from '../service/CoreSingleton';
+import {container} from 'tsyringe';
+import {ClientEntity} from '../client/ClientEntity';
 
 describe('MessageRepository', () => {
   const testFactory = new TestFactory();
 
   let server: sinon.SinonFakeServer;
+  let core: Core;
 
   const generateConversation = (
     conversation_type = CONVERSATION_TYPE.REGULAR,
@@ -73,15 +71,21 @@ describe('MessageRepository', () => {
     conversation.type(conversation_type);
 
     const connectionEntity = new ConnectionEntity();
-    connectionEntity.conversationId = conversation.id;
+    connectionEntity.conversationId = conversation.qualifiedId;
     connectionEntity.status(connection_status);
     conversation.connection(connectionEntity);
     conversation.legalHoldStatus(LegalHoldStatus.DISABLED);
+
+    const selfUser = new User('selfid');
+    selfUser.isMe = true;
+    conversation.selfUser(selfUser);
 
     return conversation;
   };
 
   beforeEach(() => {
+    core = container.resolve(Core);
+    core.initServices({} as any);
     server = sinon.fakeServer.create();
     server.autoRespond = true;
 
@@ -90,71 +94,6 @@ describe('MessageRepository', () => {
 
   afterEach(() => {
     server.restore();
-  });
-
-  describe('asset upload', () => {
-    it('should update original asset when asset upload is complete', async () => {
-      const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
-
-      const fileAssetEntity = new FileAsset();
-      fileAssetEntity.status(AssetTransferState.UPLOADING);
-
-      const messageEntity = new ContentMessage(createRandomUuid());
-      messageEntity.assets.push(fileAssetEntity);
-      conversationEntity.addMessage(messageEntity);
-
-      const event: Partial<AssetAddEvent> = {
-        conversation: conversationEntity.id,
-        data: {
-          id: createRandomUuid(),
-          otr_key: new Uint8Array([]),
-          sha256: new Uint8Array([]),
-        },
-        from: createRandomUuid(),
-        id: messageEntity.id,
-        time: Date.now(),
-        type: ClientEvent.CONVERSATION.ASSET_ADD,
-      };
-
-      const userState = new UserState();
-      const teamState = new TeamState(userState);
-      const conversationState = new ConversationState(userState, teamState);
-      const clientState = new ClientState();
-
-      const eventService = {
-        updateEventAsUploadSucceeded: jest.fn(),
-      };
-
-      const messageRepository = new MessageRepository(
-        {} as ClientRepository,
-        () => ({} as ConversationRepository),
-        {} as CryptographyRepository,
-        {
-          eventService: eventService as unknown as EventService,
-        } as EventRepository,
-        {} as MessageSender,
-        {} as PropertiesRepository,
-        {} as ServerTimeHandler,
-        {} as UserRepository,
-        {} as ConversationService,
-        {} as LinkPreviewRepository,
-        {} as AssetRepository,
-        userState,
-        teamState,
-        conversationState,
-        clientState,
-      );
-
-      await messageRepository['onAssetUploadComplete'](conversationEntity, event as AssetAddEvent);
-
-      expect(eventService.updateEventAsUploadSucceeded).toHaveBeenCalled();
-
-      const firstAsset = messageEntity.assets()[0] as FileAsset;
-
-      expect(firstAsset.original_resource().otrKey).toBe(event.data.otr_key);
-      expect(firstAsset.original_resource().sha256).toBe(event.data.sha256);
-      expect(firstAsset.status()).toBe(AssetTransferState.UPLOADED);
-    });
   });
 
   describe('sendTextWithLinkPreview', () => {
@@ -206,7 +145,10 @@ describe('MessageRepository', () => {
       largeConversationEntity.participating_user_ids(
         Array(128)
           .fill(undefined)
-          .map((x, i) => i.toString()),
+          .map((x, i) => ({
+            domain: '',
+            id: i.toString(),
+          })),
       );
 
       const text = new Text({
@@ -222,7 +164,7 @@ describe('MessageRepository', () => {
           'massive external message massive external message massive external message massive external message',
       });
       const genericMessage = new GenericMessage({[GENERIC_MESSAGE_TYPE.TEXT]: text, messageId: createRandomUuid()});
-      const eventInfoEntity = new EventInfoEntity(genericMessage, largeConversationEntity.id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: '', id: largeConversationEntity.id});
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -243,7 +185,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -258,13 +199,22 @@ describe('MessageRepository', () => {
 
     it('should return false for small payload', async () => {
       const smallConversationEntity = generateConversation();
-      smallConversationEntity.participating_user_ids(['0', '1']);
+      smallConversationEntity.participating_user_ids([
+        {
+          domain: '',
+          id: '0',
+        },
+        {
+          domain: '',
+          id: '1',
+        },
+      ]);
 
       const genericMessage = new GenericMessage({
         [GENERIC_MESSAGE_TYPE.TEXT]: new Text({content: 'Test'}),
         messageId: createRandomUuid(),
       });
-      const eventInfoEntity = new EventInfoEntity(genericMessage, smallConversationEntity.id);
+      const eventInfoEntity = new EventInfoEntity(genericMessage, {domain: '', id: smallConversationEntity.id});
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -285,7 +235,6 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
@@ -300,10 +249,14 @@ describe('MessageRepository', () => {
   });
 
   describe('deleteMessageForEveryone', () => {
+    beforeEach(() => {
+      spyOn(core.service!.conversation, 'deleteMessageEveryone');
+    });
+
     it('should not delete other users messages', async () => {
       const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
 
-      const user_et = new User('', null);
+      const user_et = new User('', '');
       user_et.isMe = false;
 
       const message_to_delete_et = new Message(createRandomUuid());
@@ -326,35 +279,34 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
         conversationState,
         clientState,
+        core,
       );
-
-      spyOn<any>(messageRepository, 'sendGenericMessage').and.returnValue(Promise.resolve());
 
       await expect(
         messageRepository.deleteMessageForEveryone(conversationEntity, message_to_delete_et),
       ).rejects.toMatchObject({
         type: ConversationError.TYPE.WRONG_USER,
       });
-      expect(messageRepository['sendGenericMessage']).not.toHaveBeenCalled();
+      expect(core.service!.conversation.deleteMessageEveryone).not.toHaveBeenCalled();
     });
 
     it('should send delete and deletes message for own messages', async () => {
-      const conversationEntity = generateConversation(CONVERSATION_TYPE.REGULAR);
+      const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
 
-      const userEntity = new User('', null);
-      userEntity.isMe = true;
+      const user = new User('user1');
 
-      const messageEntityToDelete = new Message();
-      messageEntityToDelete.id = createRandomUuid();
-      messageEntityToDelete.user(userEntity);
+      const messageToDelete = new Message();
+      messageToDelete.id = createRandomUuid();
+      messageToDelete.user(conversation.selfUser());
 
-      conversationEntity.addMessage(messageEntityToDelete);
+      conversation.participating_user_ets.push(user);
+
+      conversation.addMessage(messageToDelete);
 
       const userState = new UserState();
       const teamState = new TeamState(userState);
@@ -362,7 +314,7 @@ describe('MessageRepository', () => {
       const clientState = new ClientState();
 
       const conversationRepository = {
-        getConversationById: jest.fn().mockImplementation(async () => conversationEntity),
+        getConversationById: jest.fn().mockImplementation(async () => conversation),
       };
 
       const eventService = {
@@ -370,7 +322,6 @@ describe('MessageRepository', () => {
       };
 
       const messageSender = new MessageSender();
-      messageSender.pauseQueue(false);
 
       const messageRepository = new MessageRepository(
         {} as ClientRepository,
@@ -382,22 +333,66 @@ describe('MessageRepository', () => {
         {} as ServerTimeHandler,
         {} as UserRepository,
         {} as ConversationService,
-        {} as LinkPreviewRepository,
         {} as AssetRepository,
         userState,
         teamState,
         conversationState,
         clientState,
+        core,
       );
 
-      spyOn<any>(messageRepository, 'sendGenericMessage').and.returnValue(Promise.resolve());
-      spyOn(messageRepository, 'createRecipients').and.returnValue(Promise.resolve());
-      spyOn(userState, 'self').and.returnValue(userEntity);
-
-      await messageRepository.deleteMessageForEveryone(conversationEntity, messageEntityToDelete);
-      expect(messageRepository['sendGenericMessage']).toHaveBeenCalled();
-      expect(messageRepository.createRecipients).toHaveBeenCalled();
+      await messageRepository.deleteMessageForEveryone(conversation, messageToDelete);
+      expect(core.service!.conversation.deleteMessageEveryone).toHaveBeenCalledWith(
+        conversation.id,
+        messageToDelete.id,
+        ['selfid', 'user1'],
+        true,
+        undefined,
+      );
       expect(eventService.deleteEvent).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('resetSession', () => {
+    let messageRepository: MessageRepository;
+    let cryptographyRepository: CryptographyRepository;
+    beforeEach(() => {
+      const userState = new UserState();
+      userState.self(new User('', ''));
+      const teamState = new TeamState(userState);
+      const conversationState = new ConversationState(userState, teamState);
+      const clientState = new ClientState();
+      clientState.currentClient(new ClientEntity(true, ''));
+      cryptographyRepository = testFactory.cryptography_repository as CryptographyRepository;
+      messageRepository = new MessageRepository(
+        {} as ClientRepository,
+        () => ({} as ConversationRepository),
+        cryptographyRepository,
+        {} as EventRepository,
+        {} as MessageSender,
+        {} as PropertiesRepository,
+        {} as ServerTimeHandler,
+        {} as UserRepository,
+        {} as ConversationService,
+        {} as AssetRepository,
+        userState,
+        teamState,
+        conversationState,
+        clientState,
+        core,
+      );
+    });
+
+    it('resets the session with another device', async () => {
+      spyOn(core.service!.conversation, 'send');
+      spyOn(cryptographyRepository, 'deleteSession');
+      const conversation = generateConversation();
+
+      const userId = {domain: 'domain1', id: 'user1'};
+      const clientId = 'client1';
+      await messageRepository.resetSession(userId, clientId, conversation);
+      expect(cryptographyRepository.deleteSession).toHaveBeenCalledWith(userId, clientId);
+      expect(core.service!.conversation.send).toHaveBeenCalled();
     });
   });
 
@@ -454,13 +449,12 @@ describe('MessageRepository', () => {
 
       for (const clientPayload of clientsPayload) {
         const wasClientAdded = await testFactory.user_repository.addClientToUser(
-          conversationPartner.id,
+          conversationPartner,
           clientPayload,
           false,
-          conversationPartner.domain,
         );
 
-        expect(wasClientAdded).toBe(true);
+        expect(wasClientAdded).toBeDefined();
       }
 
       const conversationEntity = ConversationMapper.mapConversations([conversationJsonFromDb])[0];
@@ -505,11 +499,15 @@ describe('MessageRepository', () => {
       const selfUserId = 'ce1a2792-fb51-4977-a8e5-7a1dd8f2bb0b';
       const otherUserId = '6f88716b-1383-44da-9d57-45b51cc64d90';
 
-      const eventInfoEntity = new EventInfoEntity(genericMessage, '3da298fd-0ed4-4e51-863c-bfd2f5b9089b', {
-        nativePush: true,
-        precondition: false,
-        recipients: {[otherUserId]: [], [selfUserId]: []},
-      });
+      const eventInfoEntity = new EventInfoEntity(
+        genericMessage,
+        {domain: '', id: '3da298fd-0ed4-4e51-863c-bfd2f5b9089b'},
+        {
+          nativePush: true,
+          precondition: false,
+          recipients: {[otherUserId]: [], [selfUserId]: []},
+        },
+      );
 
       const userIdsWithoutClients = MessageRepository.getOtherUsersWithoutClients(eventInfoEntity, selfUserId);
       expect(userIdsWithoutClients.length).toBe(1);

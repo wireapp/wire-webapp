@@ -21,7 +21,6 @@ import {ContentMessage} from 'src/script/entity/message/ContentMessage';
 import TestPage from 'Util/test/TestPage';
 import {LinkPreview} from 'src/script/entity/message/LinkPreview';
 import {Text} from 'src/script/entity/message/Text';
-import {LinkPreviewMetaDataType} from 'src/script/links/LinkPreviewMetaDataType';
 import {StatusType} from 'src/script/message/StatusType';
 import LinkPreviewAssetComponent, {LinkPreviewAssetProps} from './LinkPreviewAssetComponent';
 
@@ -37,7 +36,7 @@ class LinkPreviewAssetComponentTestPage extends TestPage<LinkPreviewAssetProps> 
 
 describe('LinkPreviewAssetComponent', () => {
   function mockLinkPreview(url = 'https://example.com'): ContentMessage {
-    const linkPreviewEntity = new LinkPreview('Link Preview', url);
+    const linkPreviewEntity = new LinkPreview({title: 'Link Preview', url});
     const asset = new Text();
     asset.text = url;
     asset.previews([linkPreviewEntity]);
@@ -49,12 +48,14 @@ describe('LinkPreviewAssetComponent', () => {
   }
 
   function mockTweet(): ContentMessage {
-    const linkPreviewEntity = new LinkPreview('Link Preview', 'https://twitter.com/jack/status/20');
-    linkPreviewEntity.meta_data_type = LinkPreviewMetaDataType.TWEET;
-    linkPreviewEntity.meta_data = {
-      author: 'jack',
-      username: 'jack',
-    };
+    const linkPreviewEntity = new LinkPreview({
+      title: 'Link Preview',
+      tweet: {
+        author: 'jack',
+        username: 'jack',
+      },
+      url: 'https://twitter.com/jack/status/20',
+    });
     const asset = new Text();
     asset.text = 'https://twitter.com/jack/status/20';
     asset.previews([linkPreviewEntity]);

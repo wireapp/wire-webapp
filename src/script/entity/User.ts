@@ -21,13 +21,14 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {Availability} from '@wireapp/protocol-messaging';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 import {t} from 'Util/LocalizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {clamp} from 'Util/NumberUtil';
 import {getFirstChar} from 'Util/StringUtil';
 
-import {ACCENT_ID, Config} from '../Config';
+import {ACCENT_ID} from '../Config';
 import {ROLE as TEAM_ROLE} from '../user/UserPermission';
 import {ConnectionEntity} from '../connection/ConnectionEntity';
 import type {ClientEntity} from '../client/ClientEntity';
@@ -65,6 +66,11 @@ export class User {
   public readonly isExpired: ko.Observable<boolean>;
   public readonly isExternal: ko.PureComputed<boolean>;
   public readonly isGuest: ko.Observable<boolean>;
+
+  /**
+   * isDirectGuest is true when the user is a guest but not a federated user (a federated user is, by definition, a guest)
+   */
+  public readonly isDirectGuest: ko.PureComputed<boolean>;
   public readonly isIgnored: ko.PureComputed<boolean>;
   public readonly isIncomingRequest: ko.PureComputed<boolean>;
   public readonly isOnLegalHold: ko.PureComputed<boolean>;
@@ -81,10 +87,11 @@ export class User {
   public readonly providerName: ko.Observable<string>;
   public readonly teamRole: ko.Observable<TEAM_ROLE>;
   public readonly username: ko.Observable<string>;
+  public isFederated: boolean = false;
   public serviceId?: string;
   public teamId?: string;
   /** The federated domain (when the user is on a federated server) */
-  public domain?: string;
+  public domain: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
 
   static get ACCENT_COLOR() {
@@ -113,7 +120,7 @@ export class User {
     };
   }
 
-  constructor(id: string = '', domain: string | null) {
+  constructor(id: string = '', domain: string = '') {
     this.id = id;
     this.domain = domain;
     this.isMe = false;
@@ -166,6 +173,9 @@ export class User {
 
     this.inTeam = ko.observable(false);
     this.isGuest = ko.observable(false);
+    this.isDirectGuest = ko.pureComputed(() => {
+      return this.isGuest() && !this.isFederated;
+    });
     this.isTemporaryGuest = ko.observable(false);
     this.isTeamMember = ko.observable(false);
     this.teamRole = ko.observable(TEAM_ROLE.NONE);
@@ -202,16 +212,11 @@ export class User {
     this.isExpired = ko.observable(false);
   }
 
-  get isFederatedUser(): boolean {
-    return !!this.domain;
+  get qualifiedId(): QualifiedId {
+    return {domain: this.domain, id: this.id};
   }
-
-  isOnSameFederatedDomain(otherDomain: string = Config.getConfig().FEATURE.FEDERATION_DOMAIN): boolean {
-    if (!Config.getConfig().FEATURE.ENABLE_FEDERATION) {
-      return true;
-    }
-
-    return this.domain === otherDomain;
+  get hasDomain(): boolean {
+    return !!this.domain;
   }
 
   /**
@@ -223,9 +228,7 @@ export class User {
       /** Very old user accounts don't have a handle on Wire. */
       return '';
     }
-    return this.domain && Config.getConfig().FEATURE.ENABLE_FEDERATION
-      ? `@${this.username()}@${this.domain}`.replace(`@${Config.getConfig().FEATURE.FEDERATION_DOMAIN}`, '')
-      : `@${this.username()}`;
+    return this.isFederated ? `@${this.username()}@${this.domain}` : `@${this.username()}`;
   }
 
   subscribeToChanges(): void {
@@ -295,12 +298,15 @@ export class User {
     const checkExpiration = this.isTemporaryGuest() && !this.expirationTimeoutId;
     if (checkExpiration) {
       if (this.isExpired()) {
-        amplify.publish(WebAppEvents.USER.UPDATE, this.id);
+        amplify.publish(WebAppEvents.USER.UPDATE, this.qualifiedId);
         return;
       }
 
       const timeout = this.expirationRemaining() + User.CONFIG.TEMPORARY_GUEST.EXPIRATION_THRESHOLD;
-      this.expirationTimeoutId = window.setTimeout(() => amplify.publish(WebAppEvents.USER.UPDATE, this.id), timeout);
+      this.expirationTimeoutId = window.setTimeout(
+        () => amplify.publish(WebAppEvents.USER.UPDATE, this.qualifiedId),
+        timeout,
+      );
     }
   }
 

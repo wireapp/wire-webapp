@@ -25,6 +25,9 @@ import {validateHandle} from '../user/UserHandleGenerator';
 import type {SearchService} from './SearchService';
 import type {UserRepository} from '../user/UserRepository';
 import type {User} from '../entity/User';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {Config} from '../Config';
 
 export class SearchRepository {
   logger: Logger;
@@ -167,21 +170,23 @@ export class SearchRepository {
     isHandle?: boolean,
     maxResults = SearchRepository.CONFIG.MAX_SEARCH_RESULTS,
   ): Promise<User[]> {
-    const matchedUserIdsFromDirectorySearch: string[] = await this.searchService
-      .getContacts(query, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS)
-      .then(({documents}) => documents.map(match => match.id));
+    const [rawName, rawDomain] = Config.getConfig().FEATURE.ENABLE_FEDERATION
+      ? query.replace(/^@/, '').split('@')
+      : [query];
+    const [name, domain] = validateHandle(rawName, rawDomain) ? [rawName, rawDomain] : [query];
 
-    const userIds: string[] = [...matchedUserIdsFromDirectorySearch];
+    const matchedUserIdsFromDirectorySearch: QualifiedId[] = await this.searchService
+      .getContacts(name, SearchRepository.CONFIG.MAX_DIRECTORY_RESULTS, domain)
+      .then(({documents}) => documents.map(match => ({domain: match.qualified_id?.domain || null, id: match.id})));
+
+    const userIds: QualifiedId[] = [...matchedUserIdsFromDirectorySearch];
     const userEntities = await this.userRepository.getUsersById(userIds);
-
-    const domain = query.includes('@') ? query.substr(query.lastIndexOf('@') + 1) : undefined;
-    const name = domain ? query.substr(0, query.indexOf('@')) : query;
 
     if (validateHandle(name, domain)) {
       const apiUser = await this.userRepository.getUserByHandle({domain, handle: name});
       if (apiUser) {
-        const knownUser = userEntities.find(
-          user => user.id === apiUser.id && user.domain === apiUser.qualified_id?.domain,
+        const knownUser = userEntities.find(user =>
+          matchQualifiedIds(user, apiUser.qualified_id || {domain: '', id: apiUser.id}),
         );
         if (!knownUser) {
           const matchedUser = this.userRepository.userMapper.mapUserFromJson(apiUser);

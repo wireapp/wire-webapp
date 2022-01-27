@@ -17,10 +17,14 @@
  *
  */
 
+import {Config} from '../../../Config';
 import type {RootState} from '../reducer';
+import {Runtime} from '@wireapp/commons';
 
 export const isChecking = (state: RootState) =>
   state.runtimeState.isCheckingIndexedDb || state.runtimeState.isCheckingCookie;
 export const hasIndexedDbSupport = (state: RootState) => state.runtimeState.hasIndexedDbSupport;
 export const hasCookieSupport = (state: RootState) => state.runtimeState.hasCookieSupport;
 export const isSupportedBrowser = (state: RootState) => state.runtimeState.isSupportedBrowser;
+export const hasToUseDesktopApplication = (state: RootState) =>
+  Config.getConfig().FEATURE.ENABLE_ENFORCE_DESKTOP_APPLICATION_ONLY && !Runtime.isDesktopApp();

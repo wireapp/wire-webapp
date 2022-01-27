@@ -20,32 +20,31 @@
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 import ko from 'knockout';
 
-import {chunk, partition} from 'Util/ArrayUtil';
+import {chunk, getDifference, partition} from 'Util/ArrayUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import type {Participant, UserId, ClientId} from './Participant';
+import type {Participant, ClientId} from './Participant';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {Config} from '../Config';
+import {QualifiedId} from '@wireapp/api-client/src/user';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {MuteState} from './CallState';
 
-export type ConversationId = string;
+export type SerializedConversationId = string;
 
-const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = Infinity;
+const NUMBER_OF_PARTICIPANTS_IN_ONE_PAGE = 9;
 
 interface ActiveSpeaker {
-  audio_level: number;
-  audio_level_now: number;
-  clientid: string;
-  userid: string;
-}
-
-interface ActiveSpeakers {
-  audio_levels: ActiveSpeaker[];
+  clientId: string;
+  levelNow: number;
+  userId: QualifiedId;
 }
 
 export class Call {
   public readonly reason: ko.Observable<number | undefined> = ko.observable();
   public readonly startedAt: ko.Observable<number | undefined> = ko.observable();
   public readonly state: ko.Observable<CALL_STATE> = ko.observable(CALL_STATE.UNKNOWN);
+  public readonly muteState: ko.Observable<MuteState> = ko.observable(MuteState.NOT_MUTED);
   public readonly participants: ko.ObservableArray<Participant>;
   public readonly selfClientId: ClientId;
   public readonly initialType: CALL_TYPE;
@@ -75,12 +74,13 @@ export class Call {
   activeAudioOutput: string;
 
   constructor(
-    public readonly initiator: UserId,
-    public readonly conversationId: ConversationId,
+    public readonly initiator: QualifiedId,
+    public readonly conversationId: QualifiedId,
     public readonly conversationType: CONV_TYPE,
     private readonly selfParticipant: Participant,
     callType: CALL_TYPE,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
+    isMuted: boolean = false,
   ) {
     this.initialType = callType;
     this.selfClientId = selfParticipant?.clientId;
@@ -91,6 +91,7 @@ export class Call {
       this.updateAudioStreamsSink();
     });
     this.maximizedParticipant = ko.observable(null);
+    this.muteState(isMuted ? MuteState.SELF_MUTED : MuteState.NOT_MUTED);
   }
 
   get hasWorkingAudioInput(): boolean {
@@ -157,10 +158,10 @@ export class Call {
     }
   }
 
-  setActiveSpeakers({audio_levels}: ActiveSpeakers): void {
+  setActiveSpeakers(audioLevels: ActiveSpeaker[]): void {
     // Make sure that every participant only has one entry in the list.
-    const uniqueAudioLevels = audio_levels.reduce((acc, curr) => {
-      if (!acc.some(({clientid, userid}) => userid === curr.userid && clientid === curr.clientid)) {
+    const uniqueAudioLevels = audioLevels.reduce((acc, curr) => {
+      if (!acc.some(({clientId, userId}) => matchQualifiedIds(userId, curr.userId) && clientId === curr.clientId)) {
         acc.push(curr);
       }
       return acc;
@@ -168,22 +169,27 @@ export class Call {
 
     // Update activeSpeaking status on the participants based on their `audio_level_now`.
     this.participants().forEach(participant => {
-      const match = uniqueAudioLevels.find(({userid, clientid}) => participant.doesMatchIds(userid, clientid));
-      const audioLevelNow = match?.audio_level_now ?? 0;
+      const match = uniqueAudioLevels.find(({userId, clientId}) => participant.doesMatchIds(userId, clientId));
+      const audioLevelNow = match?.levelNow ?? 0;
       participant.isActivelySpeaking(audioLevelNow > 0);
     });
 
     // Get the corresponding participants for the entries in ActiveSpeakers in the incoming order.
     const activeSpeakers = uniqueAudioLevels
       // Get the participants.
-      .map(({userid, clientid}) => this.getParticipant(userid, clientid))
+      .map(({userId, clientId}) => this.getParticipant(userId, clientId))
       // Limit them to 4.
       .slice(0, 4)
       // Sort them by name
       .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
 
     // Set the new active speakers.
-    this.activeSpeakers(activeSpeakers);
+    const isSameSpeakers =
+      this.activeSpeakers().length === activeSpeakers.length &&
+      getDifference(this.activeSpeakers(), activeSpeakers).length === 0;
+    if (!isSameSpeakers) {
+      this.activeSpeakers(activeSpeakers);
+    }
   }
 
   getActiveSpeakers = () => this.activeSpeakers();
@@ -193,7 +199,7 @@ export class Call {
     this.updatePages();
   }
 
-  getParticipant(userId: UserId, clientId: ClientId): Participant | undefined {
+  getParticipant(userId: QualifiedId, clientId: ClientId): Participant | undefined {
     return this.participants().find(participant => participant.doesMatchIds(userId, clientId));
   }
 
@@ -203,6 +209,7 @@ export class Call {
 
   removeParticipant(participant: Participant): void {
     this.participants.remove(participant);
+    this.activeSpeakers.remove(participant);
     this.updatePages();
   }
 
@@ -210,7 +217,7 @@ export class Call {
     const selfParticipant = this.getSelfParticipant();
     const remoteParticipants = this.getRemoteParticipants().sort((p1, p2) => sortUsersByPriority(p1.user, p2.user));
 
-    const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.hasActiveVideo());
+    const [withVideo, withoutVideo] = partition(remoteParticipants, participant => participant.isSendingVideo());
 
     const newPages = chunk<Participant>(
       [selfParticipant, ...withVideo, ...withoutVideo].filter(Boolean),

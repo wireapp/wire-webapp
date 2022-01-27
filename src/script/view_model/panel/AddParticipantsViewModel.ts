@@ -38,6 +38,7 @@ import {PanelViewModel} from '../PanelViewModel';
 import {UserState} from '../../user/UserState';
 import {TeamState} from '../../team/TeamState';
 import {TeamRepository} from '../../team/TeamRepository';
+import {matchQualifiedIds} from 'Util/QualifiedId';
 
 export class AddParticipantsViewModel extends BasePanelViewModel {
   private readonly userState: UserState;
@@ -134,7 +135,7 @@ export class AddParticipantsViewModel extends BasePanelViewModel {
       }
 
       return userEntities.filter(userEntity => {
-        return !activeConversation.participating_user_ids().find(id => userEntity.id === id);
+        return !activeConversation.participating_user_ids().find(userId => matchQualifiedIds(userEntity, userId));
       });
     });
 

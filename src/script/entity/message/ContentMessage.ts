@@ -20,9 +20,9 @@
 import ko from 'knockout';
 
 import {copyText} from 'Util/ClipboardUtil';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 import {t} from 'Util/LocalizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
-
 import type {QuoteEntity} from '../../message/QuoteEntity';
 import {SuperType} from '../../message/SuperType';
 import type {User} from '../User';
@@ -32,6 +32,8 @@ import type {MediumImage} from './MediumImage';
 import {Message} from './Message';
 import {Text as TextAsset} from './Text';
 import {AssetRepository} from '../../assets/AssetRepository';
+import {UserReactionMap} from '../../storage';
+import type {ReactionType} from '@wireapp/core/src/main/conversation/ReactionType';
 
 export class ContentMessage extends Message {
   private readonly isLikedProvisional: ko.Observable<boolean>;
@@ -41,11 +43,13 @@ export class ContentMessage extends Message {
   public readonly like_caption: ko.PureComputed<string>;
   public readonly other_likes: ko.PureComputed<User[]>;
   public readonly quote: ko.Observable<QuoteEntity>;
+  // TODO: Rename to `reactionsUsers`
   public readonly reactions_user_ids: ko.PureComputed<string>;
   public readonly was_edited: ko.PureComputed<boolean>;
   public replacing_message_id: null | string;
   readonly edited_timestamp: ko.Observable<number>;
-  readonly reactions: ko.Observable<{[userId: string]: string}>;
+  // TODO(Federation): Make reactions federation-aware.
+  readonly reactions: ko.Observable<UserReactionMap>;
 
   constructor(id?: string) {
     super(id);
@@ -124,9 +128,9 @@ export class ContentMessage extends Message {
     data: event_data,
     from,
   }: {
-    data: {reaction: string};
+    data: {reaction: ReactionType};
     from: string;
-  }): false | {reactions: Record<string, string>; version: number} {
+  }): false | {reactions: UserReactionMap; version: number} {
     const reaction = event_data && event_data.reaction;
     const hasUser = this.reactions()[from];
     const shouldAdd = reaction && !hasUser;
@@ -151,7 +155,7 @@ export class ContentMessage extends Message {
    * @param userId The user id to check
    * @returns `true` if the message mentions the user, `false` otherwise.
    */
-  isUserMentioned(userId: string): boolean {
+  isUserMentioned(userId: QualifiedId): boolean {
     return this.hasAssetText()
       ? this.assets().some(assetEntity => assetEntity.isText() && assetEntity.isUserMentioned(userId))
       : false;
@@ -169,8 +173,8 @@ export class ContentMessage extends Message {
    * @param userId The user id to check
    * @returns `true` if the user was mentioned or quoted, `false` otherwise.
    */
-  isUserTargeted(userId: string): boolean {
-    return this.isUserMentioned(userId) || this.isUserQuoted(userId);
+  isUserTargeted(userId: QualifiedId): boolean {
+    return userId && (this.isUserMentioned(userId) || this.isUserQuoted(userId.id));
   }
 
   /**

@@ -17,7 +17,9 @@
  *
  */
 
-import {Mention} from '@wireapp/protocol-messaging';
+import {Mention, IMention} from '@wireapp/protocol-messaging';
+import {matchQualifiedIds} from 'Util/QualifiedId';
+import {QualifiedId} from '@wireapp/api-client/src/user';
 
 import {isUUID} from 'Util/ValidationUtil';
 
@@ -51,9 +53,13 @@ export class MentionEntity {
     this.userId = userId;
   }
 
-  targetsUser(userId: string): boolean {
+  targetsUser(userId: QualifiedId): boolean {
     const isTypeUserId = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
-    return isTypeUserId && this.userId === userId;
+    return isTypeUserId && matchQualifiedIds(this.userQualifiedId, userId);
+  }
+
+  get userQualifiedId(): QualifiedId {
+    return {domain: this.domain || '', id: this.userId};
   }
 
   // Index of first char outside of mention
@@ -116,20 +122,24 @@ export class MentionEntity {
     return true;
   }
 
-  toJSON(): {length: number; startIndex: number; userId: string} {
+  toJSON() {
     return {
       length: this.length,
       startIndex: this.startIndex,
       userId: this.userId,
+      userQualifiedId: this.domain ? this.userQualifiedId : undefined,
     };
   }
 
   toProto(): Mention {
-    const protoMention = new Mention({length: this.length, start: this.startIndex});
+    const options: IMention = {length: this.length, start: this.startIndex};
     const isUserIdMention = this.type === PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID;
     if (isUserIdMention) {
-      protoMention[PROTO_MESSAGE_TYPE.MENTION_TYPE_USER_ID] = this.userId;
+      options.userId = this.userId;
+      if (this.domain) {
+        options.qualifiedUserId = this.userQualifiedId;
+      }
     }
-    return protoMention;
+    return new Mention(options);
   }
 }

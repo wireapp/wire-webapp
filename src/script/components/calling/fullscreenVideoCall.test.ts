@@ -46,7 +46,7 @@ describe('fullscreenVideoCall', () => {
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User('', null);
     selfUser.isMe = true;
-    const call = new Call('', '', 0, new Participant(selfUser, ''), 0, {
+    const call = new Call({domain: '', id: ''}, {domain: '', id: ''}, 0, new Participant(selfUser, ''), 0, {
       currentAvailableDeviceId: {
         audioOutput: ko.pureComputed(() => 'test'),
       },
@@ -119,7 +119,7 @@ describe('fullscreenVideoCall', () => {
     const setMaximizedSpy = jasmine.createSpy();
     const props = createProps();
     props.setMaximizedParticipant = setMaximizedSpy;
-    props.setVideoSpeakersActiveTab = () => {};
+    props.setActiveCallViewTab = () => {};
     props.call.addParticipant(new Participant(new User('a', null), 'a'));
     props.call.addParticipant(new Participant(new User('b', null), 'b'));
     props.call.addParticipant(new Participant(new User('c', null), 'd'));
