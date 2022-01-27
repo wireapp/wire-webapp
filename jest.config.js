@@ -21,7 +21,7 @@ module.exports = {
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
   coverageThreshold: {
     global: {
-      statements: 45,
+      statements: 40,
     },
   },
   moduleDirectories: ['node_modules', './'],
