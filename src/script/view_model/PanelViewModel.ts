@@ -28,7 +28,6 @@ import {ConversationParticipantsViewModel} from './panel/ConversationParticipant
 import {GroupParticipantServiceViewModel} from './panel/GroupParticipantServiceViewModel';
 import {GroupParticipantUserViewModel} from './panel/GroupParticipantUserViewModel';
 import {GuestsAndServicesViewModel} from './panel/GuestsAndServicesViewModel';
-import {ServicesViewModel} from './panel/ServicesViewModel';
 import {MessageDetailsViewModel} from './panel/MessageDetailsViewModel';
 import {MotionDuration} from '../motion/MotionDuration';
 import {ContentViewModel} from './ContentViewModel';
@@ -108,7 +107,7 @@ export class PanelViewModel {
       [PanelViewModel.STATE.GROUP_PARTICIPANT_SERVICE]: GroupParticipantServiceViewModel,
       [PanelViewModel.STATE.GROUP_PARTICIPANT_USER]: GroupParticipantUserViewModel,
       [PanelViewModel.STATE.GUEST_OPTIONS]: GuestsAndServicesViewModel,
-      [PanelViewModel.STATE.SERVICES_OPTIONS]: ServicesViewModel,
+      [PanelViewModel.STATE.SERVICES_OPTIONS]: GuestsAndServicesViewModel,
       [PanelViewModel.STATE.MESSAGE_DETAILS]: MessageDetailsViewModel,
     };
 

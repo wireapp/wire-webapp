@@ -152,6 +152,39 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     }
   };
 
+  toggleServiceAccessState = async (): Promise<void> => {
+    const conversationEntity = this.activeConversation();
+    if (conversationEntity.inTeam()) {
+      const newAccessState = this.isTeamOnly() ? ACCESS_STATE.TEAM.GUEST_ROOM : ACCESS_STATE.TEAM.TEAM_ONLY;
+
+      const changeAccessState = async (): Promise<void> => {
+        if (!this.requestOngoing()) {
+          this.requestOngoing(true);
+          await this.stateHandler.changeAccessState(conversationEntity, newAccessState);
+          this.requestOngoing(false);
+        }
+      };
+
+      const hasService = conversationEntity.hasService();
+
+      if (this.isTeamOnly() || !hasService) {
+        return changeAccessState();
+      }
+
+      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
+        preventClose: true,
+        primaryAction: {
+          action: changeAccessState,
+          text: t('modalConversationRemoveGuestsAction'),
+        },
+        text: {
+          message: t('modalConversationRemoveGuestsMessage'),
+          title: t('modalConversationRemoveGuestsHeadline'),
+        },
+      });
+    }
+  };
+
   async _updateCode(isVisible: boolean, conversationEntity: Conversation): Promise<void> {
     const updateCode =
       conversationEntity &&
