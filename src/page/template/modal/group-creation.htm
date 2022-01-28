@@ -39,7 +39,7 @@
         <!-- ko if: isTeam -->
           <div class="modal__info" data-bind="text: t('groupSizeInfo', maxSize)" data-uie-name="status-group-size-info"></div>
           <guest-mode-toggle class="modal-style" params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode, extendedInfo: true"></guest-mode-toggle>
-          <services-mode-toggle class="modal-style" params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode, extendedInfo: true"></services-mode-toggle>
+          <services-toggle class="modal-style" params="isChecked: isGuestRoom, onToggle: clickOnToggleGuestMode"></services-toggle>
           <info-toggle class="modal-style" params="
             dataUieName: 'read-receipts',
             info: t('readReceiptsToogleInfo'),

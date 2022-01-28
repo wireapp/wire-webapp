@@ -230,7 +230,12 @@ export class ConversationDetailsViewModel extends BasePanelViewModel {
     );
 
     this.showSectionOptions = ko.pureComputed(() => {
-      return this.showOptionGuests() || this.showOptionNotificationsGroup() || this.showOptionTimedMessages();
+      return (
+        this.showOptionGuests() ||
+        this.showOptionNotificationsGroup() ||
+        this.showOptionTimedMessages() ||
+        this.showOptionServices()
+      );
     });
 
     this.canRenameGroup = ko.pureComputed(() => roleRepository.canRenameGroup(this.activeConversation()));

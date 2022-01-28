@@ -36,6 +36,7 @@ import 'Components/CopyToClipboard';
 import 'Components/message/EphemeralTimer';
 import '../page/start-ui/GroupList';
 import 'Components/toggle/GuestModeToggle';
+import 'Components/toggle/ServicesToggle';
 import 'Components/icons';
 import 'Components/Image';
 import 'Components/toggle/InfoToggle';

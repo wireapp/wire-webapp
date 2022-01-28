@@ -33,7 +33,7 @@ const ServicesToggle: React.FC<ServicesToggleProps> = ({isChecked, isDisabled, s
   return (
     <>
       <div className="info-toggle__row">
-        <div>{t('guestRoomToggleName')}</div>
+        <div>{t('servicesRoomToggleName')}</div>
         <div
           className={cx('slider', {
             disabled: isDisabled,
@@ -46,12 +46,12 @@ const ServicesToggle: React.FC<ServicesToggleProps> = ({isChecked, isDisabled, s
             id="toggle"
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => setIsChecked(event.target.checked)}
             checked={isChecked}
-            data-uie-name="allow-guest-input"
+            data-uie-name="allow-services-input"
           />
           <label
             className="button-label"
             htmlFor="toggle"
-            data-uie-name="do-allow-guests"
+            data-uie-name="do-allow-services"
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           />
         </div>
