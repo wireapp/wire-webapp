@@ -46,7 +46,7 @@ import {FileAsset} from '../../entity/message/FileAsset';
 import {MediumImage} from '../../entity/message/MediumImage';
 import {MentionEntity} from '../../message/MentionEntity';
 import {MessageHasher} from '../../message/MessageHasher';
-import {MessageRepository} from '../../conversation/MessageRepository';
+import {MessageRepository, OutgoingQuote} from '../../conversation/MessageRepository';
 import {ModalsViewModel} from '../ModalsViewModel';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {SearchRepository} from '../../search/SearchRepository';
@@ -819,7 +819,7 @@ export class InputBarViewModel {
     });
   };
 
-  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<QuoteEntity | undefined> => {
+  private readonly _generateQuote = (replyMessageEntity: ContentMessage): Promise<OutgoingQuote | undefined> => {
     return !replyMessageEntity
       ? Promise.resolve(undefined)
       : this.eventRepository.eventService
