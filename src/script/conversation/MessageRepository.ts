@@ -119,7 +119,7 @@ export type ContributedSegmentations = Record<string, number | string | boolean 
 
 type ClientMismatchHandlerFn = (
   mismatch: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
-  conversationId?: QualifiedId,
+  conversation: Conversation,
   silent?: boolean,
   consentType?: CONSENT_TYPE,
 ) => Promise<boolean>;
@@ -201,7 +201,7 @@ export class MessageRepository {
     consentType?: CONSENT_TYPE,
   ) {
     const mismatch = {missing: allClients} as ClientMismatch;
-    return this.onClientMismatch?.(mismatch, conversation.qualifiedId, false, consentType);
+    return this.onClientMismatch?.(mismatch, conversation, false, consentType);
   }
 
   /**
@@ -733,17 +733,12 @@ export class MessageRepository {
 
     return this.conversationService.send({
       callbacks: {
-        onClientMismatch: mismatch =>
-          this.onClientMismatch?.(mismatch, conversation.qualifiedId, silentDegradationWarning),
+        onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
         onStart: injectOptimisticEvent,
         onSuccess: async (genericMessage, sentTime) => {
           const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
           // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
-          await this.onClientMismatch?.(
-            {time: preMessageTimestamp},
-            conversation.qualifiedId,
-            silentDegradationWarning,
-          );
+          await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
           updateOptimisticEvent(genericMessage, sentTime);
         },
       },
@@ -1180,7 +1175,7 @@ export class MessageRepository {
       conversation.isFederated() ? conversation.domain : undefined,
     );
     const deleted = findDeletedClients(missing, await this.generateRecipients(conversation));
-    await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation.qualifiedId, true);
+    await this.onClientMismatch?.({deleted, missing} as ClientMismatch, conversation, true);
     if (blockSystemMessage) {
       conversation.blockLegalHoldMessage = false;
     }
