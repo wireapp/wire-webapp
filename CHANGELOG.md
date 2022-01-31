@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@21.0.2...@wireapp/core@22.0.0) (2022-01-31)
+
+
+### Features
+
+* **core:** Remove the need to give a domain to use qualified Ids ([#4217](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4217)) ([8ce58ea](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/8ce58eae8dcf86f66baccab3acfca7e3ba472e3c))
+
+
+### BREAKING CHANGES
+
+* **core:** If you were using the Account with a federationDomain, you need to replace federationDomain: 'the.domain' to useQualifiedIds: true. The domain will be found automatically by the core
+
+
+
+
+
 ## [21.0.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@21.0.1...@wireapp/core@21.0.2) (2022-01-19)
 
 
