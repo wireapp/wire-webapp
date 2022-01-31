@@ -56,7 +56,6 @@ import {Config} from '../Config';
 import {ModalsViewModel} from '../view_model/ModalsViewModel';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {CallingEvent, EventBuilder} from '../conversation/EventBuilder';
-import {MessageSendingOptions} from '../conversation/EventInfoEntity';
 import {EventRepository} from '../event/EventRepository';
 import {MediaType} from '../media/MediaType';
 import {Call, SerializedConversationId} from './Call';
@@ -71,7 +70,7 @@ import type {ServerTimeHandler} from '../time/serverTimeHandler';
 import type {UserRepository} from '../user/UserRepository';
 import type {EventRecord} from '../storage';
 import type {EventSource} from '../event/EventSource';
-import {CONSENT_TYPE, MessageRepository} from '../conversation/MessageRepository';
+import {CONSENT_TYPE, MessageRepository, MessageSendingOptions} from '../conversation/MessageRepository';
 import type {MediaDevicesHandler} from '../media/MediaDevicesHandler';
 import {NoAudioInputError} from '../error/NoAudioInputError';
 import {APIClient} from '../service/APIClientSingleton';
@@ -1040,7 +1039,6 @@ export class CallingRepository {
       const recipients = isFederated ? this.mapQualifiedTargets(parsedTargets) : this.mapTargets(parsedTargets);
       options = {
         nativePush: true,
-        precondition: true,
         recipients,
       };
     }
@@ -1064,27 +1062,11 @@ export class CallingRepository {
   };
 
   readonly sendModeratorMute = (conversationId: QualifiedId, recipients: Record<UserId, ClientId[]>) => {
-    this.sendCallingMessage(
-      conversationId,
-      {type: CALL_MESSAGE_TYPE.REMOTE_MUTE},
-      {
-        nativePush: true,
-        precondition: true,
-        recipients,
-      },
-    );
+    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_MUTE}, {nativePush: true, recipients});
   };
 
   readonly sendModeratorKick = (conversationId: QualifiedId, recipients: Record<UserId, ClientId[]>) => {
-    this.sendCallingMessage(
-      conversationId,
-      {type: CALL_MESSAGE_TYPE.REMOTE_KICK},
-      {
-        nativePush: true,
-        precondition: true,
-        recipients,
-      },
-    );
+    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (

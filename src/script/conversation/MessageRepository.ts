@@ -66,7 +66,6 @@ import {Message} from '../entity/message/Message';
 import * as trackingHelpers from '../tracking/Helpers';
 import {EventMapper} from './EventMapper';
 import {ConversationVerificationState} from './ConversationVerificationState';
-import {ClientMismatchHandler} from './ClientMismatchHandler';
 import {buildMetadata, isVideo, isImage, isAudio, ImageMetadata} from '../assets/AssetMetaDataBuilder';
 import {AssetTransferState} from '../assets/AssetTransferState';
 import {ModalOptions, ModalsViewModel} from '../view_model/ModalsViewModel';
@@ -102,6 +101,12 @@ import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {findDeletedClients} from './ClientMismatchUtil';
+
+export interface MessageSendingOptions {
+  /** Send native push notification for message. Default is `true`. */
+  nativePush?: boolean;
+  recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
+}
 
 export enum CONSENT_TYPE {
   INCOMING_CALL = 'incoming_call',
@@ -140,7 +145,6 @@ export class MessageRepository {
   private readonly logger: Logger;
   private readonly eventService: EventService;
   private readonly event_mapper: EventMapper;
-  public readonly clientMismatchHandler: ClientMismatchHandler;
   private isBlockingNotificationHandling: boolean;
   private onClientMismatch?: ClientMismatchHandlerFn;
 
@@ -162,12 +166,6 @@ export class MessageRepository {
 
     this.eventService = eventRepository.eventService;
     this.event_mapper = new EventMapper();
-
-    this.clientMismatchHandler = new ClientMismatchHandler(
-      this.conversationRepositoryProvider,
-      this.cryptography_repository,
-      this.userRepository,
-    );
 
     this.isBlockingNotificationHandling = true;
 
@@ -690,10 +688,8 @@ export class MessageRepository {
       skipSelf,
       skipInjection,
       silentDegradationWarning,
-    }: {
-      nativePush?: boolean;
+    }: MessageSendingOptions & {
       playPingAudio?: boolean;
-      recipients?: QualifiedId[] | QualifiedUserClients | UserClients;
       silentDegradationWarning?: boolean;
       skipInjection?: boolean;
       skipSelf?: boolean;
@@ -1220,11 +1216,7 @@ export class MessageRepository {
    * @param conversationId id of the conversation to send call message to
    * @returns Resolves when the confirmation was sent
    */
-  public sendCallingMessage(
-    conversation: Conversation,
-    payload: string,
-    options: {nativePush?: boolean; recipients?: UserClients | QualifiedUserClients},
-  ) {
+  public sendCallingMessage(conversation: Conversation, payload: string, options: MessageSendingOptions) {
     const message = MessageBuilder.createCall({
       ...this.createCommonMessagePayload(conversation),
       content: payload,
