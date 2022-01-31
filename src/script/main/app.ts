@@ -256,7 +256,6 @@ class App {
     repositories.team = new TeamRepository(new TeamService(), repositories.user, repositories.asset);
 
     repositories.message = new MessageRepository(
-      repositories.client,
       /*
        * FIXME there is a cyclic dependency between message and conversation repos.
        * MessageRepository should NOT depend upon ConversationRepository.
@@ -269,7 +268,6 @@ class App {
       repositories.properties,
       serverTimeHandler,
       repositories.user,
-      this.service.conversation,
       repositories.asset,
     );
 
