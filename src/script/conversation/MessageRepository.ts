@@ -739,7 +739,11 @@ export class MessageRepository {
         onSuccess: async (genericMessage, sentTime) => {
           const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
           // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
-          await this.onClientMismatch?.({time: preMessageTimestamp}, conversation);
+          await this.onClientMismatch?.(
+            {time: preMessageTimestamp},
+            conversation.qualifiedId,
+            silentDegradationWarning,
+          );
           updateOptimisticEvent(genericMessage, sentTime);
         },
       },
