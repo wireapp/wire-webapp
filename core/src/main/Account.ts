@@ -98,7 +98,8 @@ export interface Account {
 export type StoreEngineProvider = (storeName: string) => Promise<CRUDEngine>;
 
 type AccountConfig = {
-  federationDomain?: string;
+  /** If set to true, will use fully qualified ids and federated endpoints */
+  useQualifiedIds?: boolean;
 };
 
 export class Account extends EventEmitter {
@@ -127,12 +128,11 @@ export class Account extends EventEmitter {
   /**
    * @param apiClient The apiClient instance to use in the core (will create a new new one if undefined)
    * @param storeEngineProvider Used to store info in the database (will create a inMemory engine if undefined)
-   * @param config.federationDomain If using a federated backend this will set the default domain for qualified ids. Do not set if using a regular backend
    */
   constructor(
     apiClient: APIClient = new APIClient(),
     storeEngineProvider?: StoreEngineProvider,
-    private readonly config?: AccountConfig,
+    private readonly config: AccountConfig = {},
   ) {
     super();
     this.apiClient = apiClient;
@@ -208,7 +208,7 @@ export class Account extends EventEmitter {
     const connectionService = new ConnectionService(this.apiClient);
     const giphyService = new GiphyService(this.apiClient);
     const linkPreviewService = new LinkPreviewService(assetService);
-    const conversationService = new ConversationService(this.apiClient, cryptographyService);
+    const conversationService = new ConversationService(this.apiClient, cryptographyService, this.config);
     const notificationService = new NotificationService(this.apiClient, cryptographyService, storeEngine);
     const selfService = new SelfService(this.apiClient);
     const teamService = new TeamService(this.apiClient);
