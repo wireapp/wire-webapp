@@ -157,7 +157,11 @@ export class ConversationService {
   private readonly messageService: MessageService;
   private selfConversationId?: QualifiedId;
 
-  constructor(private readonly apiClient: APIClient, cryptographyService: CryptographyService) {
+  constructor(
+    private readonly apiClient: APIClient,
+    cryptographyService: CryptographyService,
+    private readonly config: {useQualifiedIds?: boolean},
+  ) {
     this.messageTimer = new MessageTimer();
     this.messageService = new MessageService(this.apiClient, cryptographyService);
   }
@@ -277,7 +281,8 @@ export class ConversationService {
     if (!this.selfConversationId) {
       const {userId} = this.apiClient.context!;
       const {qualified_id, id} = await this.apiClient.conversation.api.getConversation(userId);
-      this.selfConversationId = qualified_id || {id, domain: ''};
+      const domain = this.config.useQualifiedIds ? qualified_id.domain : '';
+      this.selfConversationId = {id, domain};
     }
     return this.selfConversationId;
   }
