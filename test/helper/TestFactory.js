@@ -310,7 +310,6 @@ export class TestFactory {
       this.assetRepository,
       this.user_repository['userState'],
       this.team_repository['teamState'],
-      conversationState,
       clientState,
     );
     this.conversation_repository = new ConversationRepository(

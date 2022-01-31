@@ -38,7 +38,6 @@ import {UserRepository} from '../user/UserRepository';
 import {AssetRepository} from '../assets/AssetRepository';
 import {UserState} from '../user/UserState';
 import {ClientState} from '../client/ClientState';
-import {ConversationState} from './ConversationState';
 import {EventService} from '../event/EventService';
 import {Core} from '../service/CoreSingleton';
 import {container} from 'tsyringe';
@@ -53,7 +52,6 @@ type MessageRepositoryDependencies = {
   assetRepository: AssetRepository;
   clientState: ClientState;
   conversationRepository: () => ConversationRepository;
-  conversationState: ConversationState;
   core: Core;
   cryptographyRepository: CryptographyRepository;
   eventRepository: EventRepository;
@@ -67,7 +65,6 @@ type MessageRepositoryDependencies = {
 function buildMessageRepository(): [MessageRepository, MessageRepositoryDependencies] {
   const userState = new UserState();
   userState.self(selfUser);
-  const conversationState = new ConversationState(userState);
   const clientState = new ClientState();
   clientState.currentClient(new ClientEntity(true, ''));
   const core = container.resolve(Core);
@@ -84,7 +81,6 @@ function buildMessageRepository(): [MessageRepository, MessageRepositoryDependen
     assetRepository: {} as AssetRepository,
     userState,
     teamState: new TeamState(),
-    conversationState,
     clientState,
     core,
   };
