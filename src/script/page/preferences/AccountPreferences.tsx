@@ -168,14 +168,6 @@ const AccountPreferences: React.FC<AccountPreferencesProps> = ({
             {isTeam && (
               <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly data-uie-name="status-team" />
             )}
-            {isFederated && (
-              <AccountInput
-                label={t('preferencesAccountDomain')}
-                value={domain}
-                readOnly
-                data-uie-name="status-domain"
-              />
-            )}
             {richFields.map(({type, value}) => (
               <AccountInput
                 key={type}
