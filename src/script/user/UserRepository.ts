@@ -77,6 +77,7 @@ import type {UserService} from './UserService';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
+import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -109,6 +110,7 @@ export class UserRepository {
     serverTimeHandler: ServerTimeHandler,
     private readonly propertyRepository: PropertiesRepository,
     private readonly userState = container.resolve(UserState),
+    private readonly broadcastRepository = container.resolve(BroadcastRepository),
   ) {
     this.logger = getLogger('UserRepository');
 
@@ -409,7 +411,8 @@ export class UserRepository {
 
     const sortedUsers = this.userState
       .directlyConnectedUsers()
-      // TMP the `filter` can be removed when message broadcast works on federated backends
+      // For the moment, we do not want to send status in federated env
+      // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
       .filter(user => !user.isFederated)
       .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
     const [members, other] = partition(sortedUsers, user => user.isTeamMember());
@@ -418,7 +421,7 @@ export class UserRepository {
       UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
     );
 
-    amplify.publish(WebAppEvents.BROADCAST.SEND_MESSAGE, {genericMessage, recipients});
+    this.broadcastRepository.broadcastGenericMessage(genericMessage, recipients);
   };
 
   private onLegalHoldRequestCanceled(eventJson: UserLegalHoldDisableEvent): void {
