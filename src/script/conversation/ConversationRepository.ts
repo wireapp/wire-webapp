@@ -176,10 +176,10 @@ export class ConversationRepository {
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         mismatch,
-        conversation?.allUserEntities,
+        conversation.allUserEntities,
       );
 
-      if (conversation && missingUserIds.length) {
+      if (missingUserIds.length) {
         // add/remove users from the conversation (if any)
         await this.addMissingMember(conversation, missingUserIds, new Date(mismatch.time).getTime() - 1);
       }
