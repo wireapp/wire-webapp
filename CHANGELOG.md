@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [22.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@22.0.0...@wireapp/core@22.1.0) (2022-02-01)
+
+
+### Features
+
+* **core:** Enable mismatch hook into broadcast messages ([#4219](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4219)) ([55d8aad](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/55d8aad4519d708af7ed67a6a591d3f6ccd7f55a))
+
+
+
+
+
 # [22.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@21.0.2...@wireapp/core@22.0.0) (2022-01-31)
 
 
