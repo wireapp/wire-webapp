@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [22.1.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@22.1.0...@wireapp/core@22.1.1) (2022-02-01)
+
+
+### Bug Fixes
+
+* **core:** Do not try to encrypt for clients without prekeys ([#4220](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/issues/4220)) ([1adea26](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/commit/1adea2652de6fd7833a3f1ae99b488f2d25e9817))
+
+
+
+
+
 # [22.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/core/compare/@wireapp/core@22.0.0...@wireapp/core@22.1.0) (2022-02-01)
 
 
