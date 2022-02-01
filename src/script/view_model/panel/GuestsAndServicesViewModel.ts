@@ -126,28 +126,30 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
       const hasService = conversationEntity.hasService();
       let newAccessState: ACCESS_STATE;
 
-      if (this.isTeamOnly()) {
-        if (isTogglingGuest) {
-          if (hasService) {
-            newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
-          } else {
-            newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
-          }
-        } else if (hasService) {
-          newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
-        } else {
-          newAccessState = ACCESS_STATE.TEAM.SERVICES;
-        }
-      } else if (isTogglingGuest) {
-        if (hasService) {
-          newAccessState = ACCESS_STATE.TEAM.SERVICES;
-        } else {
-          newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
-        }
-      } else if (hasService) {
-        newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
-      } else {
+      if (
+        (this.isTeamOnly() && isTogglingGuest && hasService) ||
+        (!this.isTeamOnly() && !isTogglingGuest && !hasService)
+      ) {
         newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
+      }
+
+      if (
+        (this.isTeamOnly() && isTogglingGuest && !hasService) ||
+        (!this.isTeamOnly() && !isTogglingGuest && hasService)
+      ) {
+        newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
+      }
+      if (
+        (this.isTeamOnly() && !isTogglingGuest && hasService) ||
+        (!this.isTeamOnly() && isTogglingGuest && !hasService)
+      ) {
+        newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
+      }
+      if (
+        (this.isTeamOnly() && !isTogglingGuest && !hasService) ||
+        (!this.isTeamOnly() && isTogglingGuest && hasService)
+      ) {
+        newAccessState = ACCESS_STATE.TEAM.SERVICES;
       }
 
       const changeAccessState = async (): Promise<void> => {
