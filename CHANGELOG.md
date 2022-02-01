@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [16.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.6.1...@wireapp/api-client@16.7.0) (2022-02-01)
+
+
+### Features
+
+* **api-client:** adding access role v2 ([#4221](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4221)) ([755c90e](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/755c90e0e847205a1c701477b2fdb3b659b2ece5))
+
+
+
+
+
 ## [16.6.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.6.0...@wireapp/api-client@16.6.1) (2022-02-01)
 
 
