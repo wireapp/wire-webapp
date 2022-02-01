@@ -51,6 +51,7 @@ import type {
 import {BackendError, BackendErrorLabel, HttpClient} from '../http/';
 import type {
   ConversationAccessUpdateData,
+  ConversationAccessV2UpdateData,
   ConversationJoinData,
   ConversationMemberUpdateData,
   ConversationMessageTimerUpdateData,
@@ -826,7 +827,7 @@ export class ConversationAPI {
    */
   public async putAccess(
     conversationId: string,
-    accessData: ConversationAccessUpdateData,
+    accessData: ConversationAccessUpdateData | ConversationAccessV2UpdateData,
   ): Promise<ConversationAccessUpdateEvent> {
     const config: AxiosRequestConfig = {
       data: accessData,
