@@ -114,6 +114,7 @@ describe('CryptographyService', () => {
     it('generates a set of encrypted data based on PreKeys from multiple clients.', async () => {
       const firstUserID = 'bc0c99f1-49a5-4ad2-889a-62885af37088';
       const secondUserID = '2bde49aa-bdb5-458f-98cf-7d3552b10916';
+      const noPrekeyClient = 'ae87218e77d02d30';
 
       const firstClientId = '2b83ee08d7ac550d';
 
@@ -127,6 +128,7 @@ describe('CryptographyService', () => {
             id: 72,
             key: 'pQABARn//wKhAFggTWwHUoppQ8aXWhbH95YWnNp6uOYMxo2y4wbarWbF+EEDoQChAFggUiFoPtsiR0WFowIvl0myD+bVnFQJBYarqieI0Gly46QE9g==',
           },
+          [noPrekeyClient]: null,
           [firstClientId]: {
             id: 42,
             key: 'pQABARn//wKhAFggWcbwny0jdqlcnnn0j4QSENIVVq/KgyQ3mmdpunfvGZQDoQChAFggrsQBkQkrVZ8sWhr8wTeaC+dmctuJ3oRqfdHsymTtKmgE9g==',
@@ -149,6 +151,7 @@ describe('CryptographyService', () => {
       expect(Object.keys(encrypted[firstUserID]).length).toBe(3);
       expect(Object.keys(encrypted[secondUserID]).length).toBe(2);
       expect(encrypted[firstUserID][firstClientId]).toEqual(jasmine.any(Uint8Array));
+      expect(encrypted[firstUserID][noPrekeyClient]).not.toBeDefined();
     });
 
     it('does not generate a message counter twice when ran asynchronously multiple times for the same cryptographic session', async () => {
