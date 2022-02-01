@@ -29,13 +29,9 @@ describe('SingleInstanceHandler', () => {
       spyOn(Cookies, 'set').and.returnValue(undefined);
       const result = singleInstanceHandler.registerInstance(instanceId);
 
-      expect(Cookies.set).toHaveBeenCalledWith(
-        'app_opened',
-        {appInstanceId: instanceId},
-        {
-          sameSite: 'Lax',
-        },
-      );
+      expect(Cookies.set).toHaveBeenCalledWith('app_opened', JSON.stringify({appInstanceId: instanceId}), {
+        sameSite: 'Lax',
+      });
       expect(result).toBe(true);
     });
 
