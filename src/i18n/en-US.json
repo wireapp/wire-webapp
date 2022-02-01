@@ -701,6 +701,7 @@
   "modalConversationGuestOptionsDisableGuestMessage": "Could not remove guests. Please try again.",
   "modalConversationServicesOptionsAllowServicesMessage": "Could not allow services. Please try again.",
   "modalConversationServicesOptionsDisableServicesMessage": "Could not remove services. Please try again.",
+  "modalConversationServicesOptionsToggleServicesMessage": "Could not change services state.",
   "modalConversationGuestOptionsGetCodeMessage": "Could not get access link.",
   "modalConversationGuestOptionsRequestCodeMessage": "Could not request access link. Please try again.",
   "modalConversationGuestOptionsRevokeCodeMessage": "Could not revoke access link. Please try again.",

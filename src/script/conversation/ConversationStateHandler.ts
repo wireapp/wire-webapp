@@ -114,13 +114,13 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
               (prevAccessState === ACCESS_STATE.TEAM.GUEST_ROOM && accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES) ||
               (prevAccessState === ACCESS_STATE.TEAM.TEAM_ONLY && accessState === ACCESS_STATE.TEAM.SERVICES)
             ) {
-              messageString = t('modalConversationSerivcesOptionsAllowSerivcesMessage');
+              messageString = t('modalConversationServicesOptionsAllowServicesMessage');
             }
             if (
               (prevAccessState === ACCESS_STATE.TEAM.GUESTS_SERVICES && accessState === ACCESS_STATE.TEAM.GUEST_ROOM) ||
               (prevAccessState === ACCESS_STATE.TEAM.SERVICES && accessState === ACCESS_STATE.TEAM.TEAM_ONLY)
             ) {
-              messageString = t('modalConversationSerivcesOptionsDisableSerivcesMessage');
+              messageString = t('modalConversationServicesOptionsDisableServicesMessage');
             }
             this._showModal(messageString);
           }

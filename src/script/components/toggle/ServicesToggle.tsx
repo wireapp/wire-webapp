@@ -24,12 +24,13 @@ import {registerReactComponent} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 
 export interface ServicesToggleProps {
+  extendedInfo?: string;
   isChecked: boolean;
   isDisabled?: boolean;
   setIsChecked: (isChecked: boolean) => void;
 }
 
-const ServicesToggle: React.FC<ServicesToggleProps> = ({isChecked, isDisabled, setIsChecked}) => {
+const ServicesToggle: React.FC<ServicesToggleProps> = ({extendedInfo, isChecked, isDisabled, setIsChecked}) => {
   return (
     <>
       <div className="info-toggle__row">
@@ -56,6 +57,9 @@ const ServicesToggle: React.FC<ServicesToggleProps> = ({isChecked, isDisabled, s
           />
         </div>
       </div>
+      <div className="info-toggle__details" data-uie-name="status-guest-toggle">
+        {extendedInfo ? t('guestRoomToggleInfoExtended') : t('guestRoomToggleInfo')}
+      </div>
     </>
   );
 };
@@ -65,5 +69,5 @@ export default ServicesToggle;
 registerReactComponent('services-toggle', {
   component: ServicesToggle,
   template:
-    '<div class="services-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle }"></div>',
+    '<div class="services-toggle" data-bind="react: {isChecked: ko.unwrap(isChecked), isDisabled: ko.unwrap(isDisabled), setIsChecked: onToggle, extendedInfo }"></div>',
 });
