@@ -18,7 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-import {Availability, GenericMessage} from '@wireapp/protocol-messaging';
+import {Availability} from '@wireapp/protocol-messaging';
 import {ConsentType, Self as APIClientSelf} from '@wireapp/api-client/src/self/';
 import {container} from 'tsyringe';
 import {flatten} from 'underscore';
@@ -45,7 +45,7 @@ import type {User as APIClientUser, QualifiedHandle} from '@wireapp/api-client/s
 import {chunk, partition} from 'Util/ArrayUtil';
 import {t} from 'Util/LocalizerUtil';
 import {Logger, getLogger} from 'Util/Logger';
-import {createRandomUuid, loadUrlBlob} from 'Util/util';
+import {loadUrlBlob} from 'Util/util';
 import {isAxiosError, isBackendError, isQualifiedId} from 'Util/TypePredicateUtil';
 
 import {AssetRepository} from '../assets/AssetRepository';
@@ -56,10 +56,9 @@ import {Config} from '../Config';
 import {ConsentValue} from './ConsentValue';
 import {createSuggestions} from './UserHandleGenerator';
 import {EventRepository} from '../event/EventRepository';
-import {GENERIC_MESSAGE_TYPE} from '../cryptography/GenericMessageType';
 import {LegalHoldModalViewModel} from '../view_model/content/LegalHoldModalViewModel';
 import {mapProfileAssetsV1} from '../assets/AssetMapper';
-import {protoFromType, valueFromType} from './AvailabilityMapper';
+import {valueFromType} from './AvailabilityMapper';
 import {showAvailabilityModal} from './AvailabilityModal';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {UNSPLASH_URL} from '../externalRoute';
@@ -77,7 +76,6 @@ import type {UserService} from './UserService';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {flattenUserClientsQualifiedIds} from '../conversation/userClientsUtils';
-import {BroadcastRepository} from '../broadcast/BroadcastRepository';
 
 interface UserAvailabilityEvent {
   data: {availability: Availability.Type};
@@ -110,7 +108,6 @@ export class UserRepository {
     serverTimeHandler: ServerTimeHandler,
     private readonly propertyRepository: PropertiesRepository,
     private readonly userState = container.resolve(UserState),
-    private readonly broadcastRepository = container.resolve(BroadcastRepository),
   ) {
     this.logger = getLogger('UserRepository');
 
@@ -402,26 +399,6 @@ export class UserRepository {
     } else {
       this.logger.log(`Availability was again set to '${newAvailabilityValue}'`);
     }
-
-    const protoAvailability = new Availability({type: protoFromType(availability)});
-    const genericMessage = new GenericMessage({
-      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
-      messageId: createRandomUuid(),
-    });
-
-    const sortedUsers = this.userState
-      .directlyConnectedUsers()
-      // For the moment, we do not want to send status in federated env
-      // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
-      .filter(user => !user.isFederated)
-      .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
-    const [members, other] = partition(sortedUsers, user => user.isTeamMember());
-    const recipients = [this.userState.self(), ...members, ...other].slice(
-      0,
-      UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
-    );
-
-    this.broadcastRepository.broadcastGenericMessage(genericMessage, recipients);
   };
 
   private onLegalHoldRequestCanceled(eventJson: UserLegalHoldDisableEvent): void {
