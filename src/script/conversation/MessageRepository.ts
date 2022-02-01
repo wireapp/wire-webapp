@@ -734,23 +734,25 @@ export class MessageRepository {
     // Configure ephemeral messages
     conversationService.messageTimer.setConversationLevelTimer(conversation.id, conversation.messageTimer());
 
-    return this.conversationService.send({
-      callbacks: {
-        onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
-        onStart: injectOptimisticEvent,
-        onSuccess: async (genericMessage, sentTime) => {
-          const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
-          // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
-          await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
-          updateOptimisticEvent(genericMessage, sentTime);
+    return this.messageSender.queueMessage(() =>
+      this.conversationService.send({
+        callbacks: {
+          onClientMismatch: mismatch => this.onClientMismatch?.(mismatch, conversation, silentDegradationWarning),
+          onStart: injectOptimisticEvent,
+          onSuccess: async (genericMessage, sentTime) => {
+            const preMessageTimestamp = new Date(new Date(sentTime).getTime() - 10).toISOString();
+            // Trigger an empty mismatch to check for users that have no devices and that could have been removed from the team
+            await this.onClientMismatch?.({time: preMessageTimestamp}, conversation, silentDegradationWarning);
+            updateOptimisticEvent(genericMessage, sentTime);
+          },
         },
-      },
-      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
-      nativePush,
-      payloadBundle: payload,
-      targetMode,
-      userIds,
-    });
+        conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+        nativePush,
+        payloadBundle: payload,
+        targetMode,
+        userIds,
+      }),
+    );
   }
 
   /**
@@ -803,12 +805,14 @@ export class MessageRepository {
     const sessionReset = MessageBuilder.createSessionReset(this.createCommonMessagePayload(conversation));
 
     const userClient = {[userId.id]: [clientId]};
-    await this.conversationService.send({
-      conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
-      payloadBundle: sessionReset,
-      targetMode: MessageTargetMode.USERS_CLIENTS,
-      userIds: conversation.isFederated() ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
-    });
+    await this.messageSender.queueMessage(() =>
+      this.conversationService.send({
+        conversationDomain: conversation.isFederated() ? conversation.domain : undefined,
+        payloadBundle: sessionReset,
+        targetMode: MessageTargetMode.USERS_CLIENTS,
+        userIds: conversation.isFederated() ? {[userId.domain]: userClient} : userClient, // we target this message to the specific client of the user (no need for mismatch handling here)
+      }),
+    );
   }
 
   /**
