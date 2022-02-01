@@ -21,7 +21,7 @@ import type {PreKey} from '../auth';
 
 export interface UserPreKeyBundleMap {
   [userId: string]: {
-    [clientId: string]: PreKey;
+    [clientId: string]: PreKey | null;
   };
 }
 
