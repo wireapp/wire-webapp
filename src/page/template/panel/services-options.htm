@@ -20,7 +20,7 @@
   <div class="panel__content" data-bind="fadingscrollbar">
     <div class="services-options__content">
       <services-toggle
-        params="isChecked: isGuestEnabled(), onToggle: toggleAccessState(false), isDisabled: requestOngoing"
+        params="isChecked: isGuestEnabled(), onToggle: ()=>toggleAccessState(false), isDisabled: requestOngoing"
       ></services-toggle>
     </div>
   </div>
