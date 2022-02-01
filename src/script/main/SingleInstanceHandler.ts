@@ -61,13 +61,9 @@ export class SingleInstanceHandler {
     if (!!Cookies.get(cookieName)) {
       return false;
     }
-    Cookies.set(
-      cookieName,
-      {appInstanceId: this.instanceId},
-      {
-        sameSite: 'Lax',
-      },
-    );
+    Cookies.set(cookieName, JSON.stringify({appInstanceId: this.instanceId}), {
+      sameSite: 'Lax',
+    });
     if (this.onOtherInstanceStarted) {
       this._startSingleInstanceCheck();
     }
