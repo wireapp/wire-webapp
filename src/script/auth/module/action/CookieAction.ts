@@ -57,7 +57,7 @@ export class CookieAction {
   getCookie = (name: string, asJSON: boolean = false): ThunkAction => {
     return async (dispatch, getState, {cookieStore}) => {
       try {
-        const cookie = asJSON ? cookieStore.getJSON(name) : cookieStore.get(name);
+        const cookie = asJSON ? JSON.parse(cookieStore.get(name)) : cookieStore.get(name);
         const previousCookie: object = CookieSelector.getCookies(getState())[name];
         const isCookieModified = JSON.stringify(previousCookie) !== JSON.stringify(cookie);
         if (isCookieModified) {
