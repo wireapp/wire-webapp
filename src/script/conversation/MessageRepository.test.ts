@@ -68,13 +68,15 @@ function buildMessageRepository(): [MessageRepository, MessageRepositoryDependen
   const clientState = new ClientState();
   clientState.currentClient(new ClientEntity(true, ''));
   const core = container.resolve(Core);
+  const messageSender = new MessageSender();
+  messageSender.pauseQueue(false);
   core.initServices({} as any);
   /* eslint-disable sort-keys-fix/sort-keys-fix */
   const dependencies = {
     conversationRepository: () => ({} as ConversationRepository),
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any, {} as any),
-    messageSender: {} as MessageSender,
+    messageSender,
     propertiesRepository: new PropertiesRepository({} as any, {} as any),
     serverTimeHandler: serverTimeHandler,
     userRepository: {} as UserRepository,
@@ -220,7 +222,7 @@ describe('MessageRepository', () => {
   describe('resetSession', () => {
     it('resets the session with another device', async () => {
       const [messageRepository, {cryptographyRepository, core}] = buildMessageRepository();
-      spyOn(core.service!.conversation, 'send');
+      jest.spyOn(core.service!.conversation, 'send').mockResolvedValue({} as any);
       spyOn(cryptographyRepository, 'deleteSession');
       const conversation = generateConversation();
 
