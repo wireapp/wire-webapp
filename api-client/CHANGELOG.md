@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [16.6.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.6.0...@wireapp/api-client@16.6.1) (2022-02-01)
+
+
+### Bug Fixes
+
+* **core:** Do not try to encrypt for clients without prekeys ([#4220](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/issues/4220)) ([1adea26](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/commit/1adea2652de6fd7833a3f1ae99b488f2d25e9817))
+
+
+
+
+
 # [16.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/api-client/compare/@wireapp/api-client@16.5.2...@wireapp/api-client@16.6.0) (2022-01-12)
 
 
