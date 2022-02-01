@@ -18,8 +18,7 @@
  */
 
 import type {ClientPreKey, PreKey} from '@wireapp/api-client/src/auth/';
-import type {UserClients} from '@wireapp/api-client/src/conversation/';
-import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {APIClient} from '../service/APIClientSingleton';
 import {container} from 'tsyringe';
 import {Config} from '../Config';
@@ -39,17 +38,6 @@ export class CryptographyService {
     return Config.getConfig().FEATURE.ENABLE_FEDERATION
       ? this.apiClient.user.api.getClientPreKey(userId, clientId, true)
       : this.apiClient.user.api.getClientPreKey(userId.id, clientId);
-  }
-
-  /**
-   * Gets a pre-key for each client of a user client map.
-   * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/users/getMultiPrekeyBundles
-   *
-   * @param recipients User client map to request pre-keys for
-   * @returns Resolves with a pre-key for each client of the given map
-   */
-  getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
-    return this.apiClient.user.api.postMultiPreKeyBundles(recipients);
   }
 
   /**

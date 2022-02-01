@@ -20,10 +20,8 @@
 import ko from 'knockout';
 import type {AxiosError} from 'axios';
 import {amplify} from 'amplify';
-import {error as StoreEngineError} from '@wireapp/store-engine';
 import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/src/event';
-import type {QualifiedId, UserPreKeyBundleMap} from '@wireapp/api-client/src/user/';
-import type {UserClients, NewOTRMessage} from '@wireapp/api-client/src/conversation/';
+import type {QualifiedId} from '@wireapp/api-client/src/user/';
 import {Cryptobox, CryptoboxSession} from '@wireapp/cryptobox';
 import {errors as ProteusErrors} from '@wireapp/proteus';
 import {GenericMessage} from '@wireapp/protocol-messaging';
@@ -32,7 +30,7 @@ import type {PreKey as BackendPreKey} from '@wireapp/api-client/src/auth/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {getLogger, Logger} from 'Util/Logger';
-import {arrayToBase64, base64ToArray} from 'Util/util';
+import {base64ToArray} from 'Util/util';
 import {constructClientPrimaryKey} from 'Util/StorageUtil';
 
 import {CryptographyMapper} from './CryptographyMapper';
@@ -50,11 +48,6 @@ export interface SignalingKeys {
   mackey: string;
 }
 
-interface EncryptedPayload {
-  cipherText?: string;
-  sessionId: string;
-}
-
 export interface ClientKeys {
   lastResortKey: BackendPreKey;
   preKeys: BackendPreKey[];
@@ -66,7 +59,6 @@ export class CryptographyRepository {
   cryptographyMapper: CryptographyMapper;
   currentClient?: ko.Observable<ClientEntity>;
   logger: Logger;
-  private federatedDomain: string = '';
 
   static get CONFIG() {
     return {
@@ -92,7 +84,6 @@ export class CryptographyRepository {
   init(cryptobox: Cryptobox, client: ko.Observable<ClientEntity>): void {
     this.cryptobox = cryptobox;
     this.currentClient = client;
-    this.federatedDomain = Config.getConfig().FEATURE.ENABLE_FEDERATION ? client().domain : '';
 
     this.cryptobox.on(Cryptobox.TOPIC.NEW_PREKEYS, async preKeys => {
       const serializedPreKeys = preKeys.map(preKey => cryptobox.serialize_prekey(preKey));
@@ -157,23 +148,6 @@ export class CryptographyRepository {
       });
   }
 
-  /**
-   * Get a pre-key for each client in the user client map.
-   * @param recipients User client map to request pre-keys for
-   * @returns Resolves with a map of pre-keys for the requested clients
-   */
-  getUsersPreKeys(recipients: UserClients): Promise<UserPreKeyBundleMap> {
-    return this.cryptographyService.getUsersPreKeys(recipients).catch(error => {
-      const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
-      if (isNotFound) {
-        throw new UserError(UserError.TYPE.PRE_KEY_NOT_FOUND, UserError.MESSAGE.PRE_KEY_NOT_FOUND);
-      }
-
-      this.logger.error(`Failed to get pre-key from backend: ${error.message}`);
-      throw new UserError(UserError.TYPE.REQUEST_FAILURE, UserError.MESSAGE.REQUEST_FAILURE);
-    });
-  }
-
   private loadSession(userId: QualifiedId, clientId: string): Promise<CryptoboxSession | void> {
     const sessionId = constructClientPrimaryKey(userId, clientId);
 
@@ -187,47 +161,6 @@ export class CryptographyRepository {
   deleteSession(userId: QualifiedId, clientId: string): Promise<string> {
     const sessionId = constructClientPrimaryKey(userId, clientId);
     return this.cryptobox!.session_delete(sessionId);
-  }
-
-  /**
-   * Bundles and encrypts the generic message for all given clients.
-   *
-   * @param recipients Contains all users and their known clients
-   * @param genericMessage Proto buffer message to be encrypted
-   * @param payload Object to contain encrypted message payload
-   * @returns Resolves with the encrypted payload
-   */
-  async encryptGenericMessage(
-    recipients: UserClients,
-    genericMessage: GenericMessage,
-    payload: NewOTRMessage<string> = this.constructPayload(this.currentClient().id),
-  ) {
-    const receivingUsers = Object.keys(recipients).length;
-    const encryptLogMessage = `Encrypting message of type '${genericMessage.content}' for '${receivingUsers}' users...`;
-    this.logger.log(encryptLogMessage, recipients);
-
-    let {messagePayload, missingRecipients} = await this.buildPayload(recipients, genericMessage, payload);
-
-    if (Object.keys(missingRecipients).length) {
-      const reEncryptedMessage = await this.encryptGenericMessageForMissingRecipients(
-        missingRecipients,
-        genericMessage,
-        messagePayload,
-      );
-      messagePayload = reEncryptedMessage.messagePayload;
-      missingRecipients = reEncryptedMessage.missingRecipients;
-    }
-
-    const payloadUsers = Object.keys(messagePayload.recipients).length;
-    const successLogMessage = `Encrypted message of type '${genericMessage.content}' for '${payloadUsers}' users.`;
-    this.logger.log(successLogMessage, messagePayload.recipients);
-
-    const missingUsers = Object.keys(missingRecipients).length;
-    if (missingUsers) {
-      this.logger.warn(`Failed to encrypt message for '${missingUsers}' users`, missingRecipients);
-    }
-
-    return messagePayload;
   }
 
   /**
@@ -305,100 +238,6 @@ export class CryptographyRepository {
   }
 
   /**
-   * @deprecated Method will become obsolete with federation, use `CryptographyRepository.sendCoreMessage` instead.
-   */
-  private async buildPayload(
-    recipients: UserClients,
-    genericMessage: GenericMessage,
-    messagePayload: NewOTRMessage<string>,
-  ): Promise<{messagePayload: NewOTRMessage<string>; missingRecipients: UserClients}> {
-    const cipherPayloadPromises = Object.entries(recipients).reduce<Promise<EncryptedPayload>[]>(
-      (accumulator, [userId, clientIds]) => {
-        if (clientIds && clientIds.length) {
-          messagePayload.recipients[userId] ||= {};
-          clientIds.forEach(clientId => {
-            const sessionId = constructClientPrimaryKey({domain: this.federatedDomain, id: userId}, clientId);
-            const encryptionPromise = this.encryptPayloadForSession(sessionId, genericMessage);
-
-            accumulator.push(encryptionPromise);
-          });
-        }
-        return accumulator;
-      },
-      [],
-    );
-
-    const cipherPayload = await Promise.all(cipherPayloadPromises);
-    return this.mapCipherTextToPayload(messagePayload, cipherPayload);
-  }
-
-  /**
-   * @deprecated Method will become obsolete with federation, use `CryptographyRepository.sendCoreMessage` instead.
-   */
-  private async encryptGenericMessageForMissingRecipients(
-    missingRecipients: UserClients,
-    genericMessage: GenericMessage,
-    messagePayload: NewOTRMessage<string>,
-  ) {
-    const userPreKeyMap = await this.getUsersPreKeys(missingRecipients);
-    this.logger.info(`Fetched pre-keys for '${Object.keys(userPreKeyMap).length}' users.`, userPreKeyMap);
-    const cipherPayloadPromises = [];
-
-    for (const [userId, clientPreKeyMap] of Object.entries(userPreKeyMap)) {
-      if (clientPreKeyMap && Object.keys(clientPreKeyMap).length) {
-        for (const [clientId, preKeyPayload] of Object.entries(clientPreKeyMap)) {
-          if (preKeyPayload) {
-            const sessionId = constructClientPrimaryKey({domain: this.federatedDomain, id: userId}, clientId);
-            const encryptionPromise = this.encryptPayloadForSession(
-              sessionId,
-              genericMessage,
-              base64ToArray(preKeyPayload.key).buffer,
-            );
-            cipherPayloadPromises.push(encryptionPromise);
-          }
-        }
-      }
-    }
-
-    const cipherPayload = await Promise.all(cipherPayloadPromises);
-    return this.mapCipherTextToPayload(messagePayload, cipherPayload);
-  }
-
-  private mapCipherTextToPayload(
-    messagePayload: NewOTRMessage<string>,
-    cipherPayload: EncryptedPayload[],
-  ): {messagePayload: NewOTRMessage<string>; missingRecipients: UserClients} {
-    const missingRecipients: UserClients = {};
-
-    cipherPayload.forEach(({cipherText, sessionId}) => {
-      const {userId, clientId} = ClientEntity.dismantleUserClientId(sessionId);
-
-      if (cipherText) {
-        messagePayload.recipients[userId][clientId] = cipherText;
-      } else {
-        missingRecipients[userId] ||= [];
-        missingRecipients[userId].push(clientId);
-      }
-    });
-
-    return {messagePayload, missingRecipients};
-  }
-
-  /**
-   * Construct the payload for an encrypted message.
-   *
-   * @param sender Client ID of message sender
-   * @returns Payload to send to backend
-   */
-  private constructPayload(sender: string): NewOTRMessage<string> {
-    return {
-      native_push: true,
-      recipients: {},
-      sender: sender,
-    };
-  }
-
-  /**
    * Decrypt an event.
    *
    * @param event Backend event to decrypt
@@ -414,37 +253,6 @@ export class CryptographyRepository {
 
     const plaintext = await this.cryptobox!.decrypt(sessionId, cipherText);
     return GenericMessage.decode(plaintext);
-  }
-
-  /**
-   * Encrypt the generic message for a given session.
-   * @note We created the convention that whenever we fail to encrypt for a specific client, we send a Bomb Emoji (no joke!)
-   *
-   * @param sessionId ID of session to encrypt for
-   * @param genericMessage Protobuf message
-   * @param preKeyBundle Pre-key bundle
-   * @returns Contains session ID and encrypted message as base64 encoded string
-   */
-  private async encryptPayloadForSession(
-    sessionId: string,
-    genericMessage: GenericMessage,
-    preKeyBundle?: ArrayBuffer,
-  ): Promise<EncryptedPayload> {
-    try {
-      const messageArray = GenericMessage.encode(genericMessage).finish();
-      const cipherText = await this.cryptobox!.encrypt(sessionId, messageArray, preKeyBundle);
-      const cipherTextArray = arrayToBase64(cipherText);
-      return {cipherText: cipherTextArray, sessionId};
-    } catch (error) {
-      if (error instanceof StoreEngineError.RecordNotFoundError) {
-        this.logger.log(`Session '${sessionId}' needs to get initialized...`);
-        return {sessionId};
-      }
-
-      const message = `Failed encrypting '${genericMessage.content}' for session '${sessionId}': ${error.message}`;
-      this.logger.warn(message, error);
-      return {cipherText: CryptographyRepository.REMOTE_ENCRYPTION_FAILURE, sessionId};
-    }
   }
 
   private handleDecryptionFailure(
