@@ -35,6 +35,13 @@ export enum CONVERSATION_ACCESS_ROLE {
   TEAM = 'team',
 }
 
+export enum ACCESS_ROLE_V2 {
+  TEAM_MEMBER = 'team_member',
+  SERVICE = 'service',
+  NON_TEAM_MEMBER = 'non_team_member',
+  GUEST = 'guest',
+}
+
 export enum CONVERSATION_ACCESS {
   CODE = 'code',
   INVITE = 'invite',
@@ -55,7 +62,9 @@ export interface Conversation {
   access: CONVERSATION_ACCESS[];
 
   /** How users can join conversations */
+  /** @deprecated Use access_role_v2 instead */
   access_role: CONVERSATION_ACCESS_ROLE;
+  access_role_v2: ACCESS_ROLE_V2[];
   name?: string;
   last_event?: string;
   last_event_time?: string;
