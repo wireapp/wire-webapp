@@ -89,7 +89,7 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
   requestAccessCode = async (): Promise<void> => {
     // Handle conversations in legacy state
     if (!this.isGuestRoom()) {
-      await this.stateHandler.changeAccessState(this.activeConversation(), ACCESS_STATE.TEAM.GUEST_ROOM);
+      await this.stateHandler.changeAccessState(this.activeConversation(), ACCESS_STATE.TEAM.GUEST_ROOM, true);
     }
 
     if (!this.requestOngoing()) {
@@ -119,55 +119,46 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
     });
   };
 
-  toggleAccessState = async (): Promise<void> => {
+  toggleAccessState = async (isTogglingGuest: boolean): Promise<void> => {
     const conversationEntity = this.activeConversation();
     if (conversationEntity.inTeam()) {
-      const newAccessState = this.isTeamOnly() ? ACCESS_STATE.TEAM.GUEST_ROOM : ACCESS_STATE.TEAM.TEAM_ONLY;
-
-      const changeAccessState = async (): Promise<void> => {
-        if (!this.requestOngoing()) {
-          this.requestOngoing(true);
-          await this.stateHandler.changeAccessState(conversationEntity, newAccessState);
-          this.requestOngoing(false);
-        }
-      };
-
-      const hasGuestOrService = conversationEntity.hasGuest() || conversationEntity.hasService();
-
-      if (this.isTeamOnly() || !hasGuestOrService) {
-        return changeAccessState();
-      }
-
-      amplify.publish(WebAppEvents.WARNING.MODAL, ModalsViewModel.TYPE.CONFIRM, {
-        preventClose: true,
-        primaryAction: {
-          action: changeAccessState,
-          text: t('modalConversationRemoveGuestsAction'),
-        },
-        text: {
-          message: t('modalConversationRemoveGuestsMessage'),
-          title: t('modalConversationRemoveGuestsHeadline'),
-        },
-      });
-    }
-  };
-
-  toggleServiceAccessState = async (): Promise<void> => {
-    const conversationEntity = this.activeConversation();
-    if (conversationEntity.inTeam()) {
-      const newAccessState = this.isTeamOnly() ? ACCESS_STATE.TEAM.GUEST_ROOM : ACCESS_STATE.TEAM.TEAM_ONLY;
-
-      const changeAccessState = async (): Promise<void> => {
-        if (!this.requestOngoing()) {
-          this.requestOngoing(true);
-          await this.stateHandler.changeAccessState(conversationEntity, newAccessState);
-          this.requestOngoing(false);
-        }
-      };
-
+      const hasGuest = conversationEntity.hasGuest();
       const hasService = conversationEntity.hasService();
+      let newAccessState: ACCESS_STATE;
 
-      if (this.isTeamOnly() || !hasService) {
+      if (this.isTeamOnly()) {
+        if (isTogglingGuest) {
+          if (hasService) {
+            newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
+          } else {
+            newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
+          }
+        } else if (hasService) {
+          newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
+        } else {
+          newAccessState = ACCESS_STATE.TEAM.SERVICES;
+        }
+      } else if (isTogglingGuest) {
+        if (hasService) {
+          newAccessState = ACCESS_STATE.TEAM.SERVICES;
+        } else {
+          newAccessState = ACCESS_STATE.TEAM.TEAM_ONLY;
+        }
+      } else if (hasService) {
+        newAccessState = ACCESS_STATE.TEAM.GUEST_ROOM;
+      } else {
+        newAccessState = ACCESS_STATE.TEAM.GUESTS_SERVICES;
+      }
+
+      const changeAccessState = async (): Promise<void> => {
+        if (!this.requestOngoing()) {
+          this.requestOngoing(true);
+          await this.stateHandler.changeAccessState(conversationEntity, newAccessState, isTogglingGuest);
+          this.requestOngoing(false);
+        }
+      };
+
+      if (this.isTeamOnly() && !hasGuest && !hasService) {
         return changeAccessState();
       }
 
@@ -175,11 +166,13 @@ export class GuestsAndServicesViewModel extends BasePanelViewModel {
         preventClose: true,
         primaryAction: {
           action: changeAccessState,
-          text: t('modalConversationRemoveGuestsAction'),
+          text: t('modalConversationRemoveAction'),
         },
         text: {
-          message: t('modalConversationRemoveGuestsMessage'),
-          title: t('modalConversationRemoveGuestsHeadline'),
+          message: isTogglingGuest
+            ? t('modalConversationRemoveGuestsMessage')
+            : t('modalConversationRemoveServicesMessage'),
+          title: t('modalConversationRemoveGuestsAndServicesHeadline'),
         },
       });
     }

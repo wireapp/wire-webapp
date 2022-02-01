@@ -247,11 +247,13 @@ export class ConversationService {
   putConversationAccess(
     conversationId: string,
     accessModes: CONVERSATION_ACCESS[],
-    accessRole: CONVERSATION_ACCESS_ROLE,
+    accessRoleV2?: string[],
+    accessRole?: CONVERSATION_ACCESS_ROLE,
   ): Promise<ConversationEvent> {
-    return this.apiClient.conversation.api.putAccess(conversationId, {
+    return this.apiClient.conversation.api.putAccessV2(conversationId, {
       access: accessModes,
       access_role: accessRole,
+      access_role_v2: accessRoleV2,
     });
   }
 
