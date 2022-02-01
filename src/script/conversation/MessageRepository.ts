@@ -18,7 +18,7 @@
  */
 
 import {amplify} from 'amplify';
-import {Asset, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
+import {Asset, Confirmation, GenericMessage, Availability} from '@wireapp/protocol-messaging';
 import {
   ReactionType,
   MessageSendingCallbacks,
@@ -101,6 +101,8 @@ import {User} from '../entity/User';
 import {isQualifiedUserClients, isUserClients} from '@wireapp/core/src/main/util';
 import {PROPERTIES_TYPE} from '../properties/PropertiesType';
 import {findDeletedClients} from './ClientMismatchUtil';
+import {protoFromType} from '../user/AvailabilityMapper';
+import {partition} from 'underscore';
 
 export interface MessageSendingOptions {
   /** Send native push notification for message. Default is `true`. */
@@ -119,7 +121,7 @@ export type ContributedSegmentations = Record<string, number | string | boolean 
 
 type ClientMismatchHandlerFn = (
   mismatch: Partial<ClientMismatch> | Partial<MessageSendingStatus>,
-  conversation: Conversation,
+  conversation?: Conversation,
   silent?: boolean,
   consentType?: CONSENT_TYPE,
 ) => Promise<boolean>;
@@ -178,6 +180,7 @@ export class MessageRepository {
 
   private initSubscriptions(): void {
     amplify.subscribe(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, this.setNotificationHandlingState);
+    amplify.subscribe(WebAppEvents.USER.SET_AVAILABILITY, this.sendAvailabilityStatus);
   }
 
   /**
@@ -1034,6 +1037,34 @@ export class MessageRepository {
 
     return deleteCount;
   }
+
+  private readonly sendAvailabilityStatus = async (availability: Availability.Type) => {
+    const protoAvailability = new Availability({type: protoFromType(availability)});
+    const genericMessage = new GenericMessage({
+      [GENERIC_MESSAGE_TYPE.AVAILABILITY]: protoAvailability,
+      messageId: createRandomUuid(),
+    });
+
+    const sortedUsers = this.userState
+      .directlyConnectedUsers()
+      // For the moment, we do not want to send status in federated env
+      // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
+      .filter(user => !user.isFederated)
+      .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
+    const [members, other] = partition(sortedUsers, user => user.isTeamMember());
+    const users = [this.userState.self(), ...members, ...other].slice(
+      0,
+      UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
+    );
+
+    const recipients = users.reduce<UserClients>((recipientsIndex, userEntity) => {
+      recipientsIndex[userEntity.id] = userEntity.devices().map(clientEntity => clientEntity.id);
+      return recipientsIndex;
+    }, {});
+    this.core.service!.broadcast.broadcastGenericMessage(genericMessage, recipients, false, mismatch => {
+      this.onClientMismatch?.(mismatch);
+    });
+  };
 
   /**
    * Cancel asset upload.

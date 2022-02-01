@@ -176,10 +176,10 @@ export class ConversationRepository {
     this.messageRepository.setClientMismatchHandler(async (mismatch, conversation, silent, consentType) => {
       const {missingClients, deletedClients, emptyUsers, missingUserIds} = extractClientDiff(
         mismatch,
-        conversation.allUserEntities,
+        conversation?.allUserEntities,
       );
 
-      if (missingUserIds.length) {
+      if (conversation && missingUserIds.length) {
         // add/remove users from the conversation (if any)
         await this.addMissingMember(conversation, missingUserIds, new Date(mismatch.time).getTime() - 1);
       }
@@ -230,7 +230,7 @@ export class ConversationRepository {
           shouldWarnLegalHold = hasChangedLegalHoldStatus && newDevices.some(device => device.isLegalHold());
         }
       }
-      return silent
+      return !conversation || silent
         ? false
         : this.messageRepository.requestUserSendingPermission(conversation, shouldWarnLegalHold, consentType);
     });
