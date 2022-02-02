@@ -102,6 +102,7 @@ export class InputBarViewModel {
   readonly richTextInput: ko.PureComputed<string>;
   readonly inputPlaceholder: ko.PureComputed<string>;
   readonly showGiphyButton: ko.PureComputed<boolean>;
+  readonly classifiedDomains: ko.PureComputed<string[]>;
   readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   readonly pingTooltip: string;
   readonly hasLocalEphemeralTimer: ko.PureComputed<boolean>;
@@ -151,6 +152,7 @@ export class InputBarViewModel {
     this.replyMessageEntity = ko.observable();
 
     this.isFileSharingSendingEnabled = this.teamState.isFileSharingSendingEnabled;
+    this.classifiedDomains = this.teamState.classifiedDomains;
 
     const handleRepliedMessageDeleted = (messageId: string) => {
       if (this.replyMessageEntity()?.id === messageId) {

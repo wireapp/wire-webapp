@@ -20,39 +20,53 @@
 import React from 'react';
 import {CSSObject} from '@emotion/core';
 import {registerReactComponent} from 'Util/ComponentUtil';
+import {User} from 'src/script/entity/User';
+
+function isClassified(users: User[], classifiedDomains: string[]): boolean {
+  if (users.some(user => !classifiedDomains.includes(user.domain))) {
+    return false;
+  }
+  return true;
+}
 
 interface ClassifiedBarProps {
-  text?: string;
-  highContrast?: boolean;
+  classifiedDomains?: string[];
+  users: User[];
 }
 
 const barStyle = (highContrast: boolean): CSSObject => ({
-  display: 'flex',
-  justifyContent: 'center',
   alignItems: 'center',
-  width: '100%',
-  height: 32,
+  backgroundColor: `var(--${highContrast ? 'background' : 'app-bg-secondary'})`,
+  borderColor: 'var(--foreground)',
+  borderStyle: highContrast ? 'none' : 'solid',
+  borderWidth: '1px 0',
+  display: 'flex',
+  color: `var(--${highContrast ? 'app-bg' : 'background'})`,
   fontSize: 16,
   fontWeight: 600,
+  height: 32,
+  justifyContent: 'center',
   textTransform: 'uppercase',
-  backgroundColor: `var(--${highContrast ? 'background' : 'app-bg-secondary'})`,
-  color: `var(--${highContrast ? 'app-bg' : 'background'})`,
-  borderColor: 'var(--foreground)',
-  borderWidth: '1px 0',
-  borderStyle: highContrast ? 'none' : 'solid',
+  width: '100%',
 });
 
-const ClassifiedBar: React.FC<ClassifiedBarProps> = ({text, highContrast = false}) => {
-  return text ? (
+const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains}) => {
+  if (typeof classifiedDomains === 'undefined') {
+    return undefined;
+  }
+  const classified = isClassified(users, classifiedDomains);
+  const text = classified ? 'Security level: VS-NfD' : 'Security level: Not classified';
+  const highContrast = classified;
+  return (
     <div data-uie-name="classified-label" css={barStyle(highContrast)}>
       {text}
     </div>
-  ) : null;
+  );
 };
 
 export default ClassifiedBar;
 
 registerReactComponent('classified-bar', {
   component: ClassifiedBar,
-  template: '<div data-bind="react: {text: ko.unwrap(text), highContrast: ko.unwrap(highContrast)}"></div>',
+  template: '<div data-bind="react: {users: ko.unwrap(users), classifiedDomains: ko.unwrap(classifiedDomains)}"></div>',
 });

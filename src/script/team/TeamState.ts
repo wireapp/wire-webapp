@@ -36,6 +36,7 @@ export class TeamState {
   public readonly supportsLegalHold: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList>;
+  public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
   public readonly isConferenceCallingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingSendingEnabled: ko.PureComputed<boolean>;
   public readonly isFileSharingReceivingEnabled: ko.PureComputed<boolean>;
@@ -89,6 +90,12 @@ export class TeamState {
     this.isFileSharingReceivingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;
       return status ? status === FeatureStatus.ENABLED : true;
+    });
+
+    this.classifiedDomains = ko.pureComputed(() => {
+      return this.teamFeatures()?.classifiedDomains.status === FeatureStatus.ENABLED
+        ? this.teamFeatures().classifiedDomains.config.domains
+        : undefined;
     });
 
     this.isSelfDeletingMessagesEnabled = ko.pureComputed(
