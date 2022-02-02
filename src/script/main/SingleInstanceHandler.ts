@@ -78,7 +78,8 @@ export class SingleInstanceHandler {
    * @param forceRemoval Do not check that the instance removing it is the current instance.
    */
   deregisterInstance(forceRemoval = false): void {
-    const singleInstanceCookie = JSON.parse(Cookies.get(CONFIG.COOKIE_NAME));
+    const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
+    const singleInstanceCookie = cookieValue && JSON.parse(cookieValue);
 
     const isOwnInstanceId = singleInstanceCookie?.appInstanceId === this.instanceId;
     if (forceRemoval || isOwnInstanceId) {
@@ -106,7 +107,8 @@ export class SingleInstanceHandler {
     if (Runtime.isDesktopApp()) {
       return true;
     }
-    const singleInstanceCookie = JSON.parse(Cookies.get(CONFIG.COOKIE_NAME));
+    const cookieValue = Cookies.get(CONFIG.COOKIE_NAME);
+    const singleInstanceCookie = cookieValue && JSON.parse(cookieValue);
 
     return singleInstanceCookie?.appInstanceId === this.instanceId;
   }
