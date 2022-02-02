@@ -149,6 +149,11 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
         ssoWindowRef.current?.close();
       };
 
+      amplify.subscribe('BARDIA_SSO_WINDOW_CLOSED', () => {
+        onChildWindowClose();
+        reject(new BackendError({code: 500, label: BackendError.LABEL.SSO_USER_CANCELLED_ERROR}));
+      });
+
       if (ssoWindowRef.current) {
         timerId = window.setInterval(() => {
           if (ssoWindowRef.current && ssoWindowRef.current.closed) {
