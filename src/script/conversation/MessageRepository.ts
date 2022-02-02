@@ -331,8 +331,10 @@ export class MessageRepository {
       messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       quote: quoteEntity,
     };
-    await this.sendText(textPayload);
-    await this.handleLinkPreview(textPayload);
+    const {state} = await this.sendText(textPayload);
+    if (state !== PayloadBundleState.CANCELLED) {
+      await this.handleLinkPreview(textPayload);
+    }
   }
 
   /**
@@ -368,8 +370,10 @@ export class MessageRepository {
       messageId: createRandomUuid(), // We set the id explicitely in order to be able to override the message if we generate a link preview
       originalMessageId: originalMessage.id,
     };
-    await this.sendEdit(messagePayload);
-    await this.handleLinkPreview(messagePayload);
+    const {state} = await this.sendEdit(messagePayload);
+    if (state !== PayloadBundleState.CANCELLED) {
+      await this.handleLinkPreview(messagePayload);
+    }
   }
 
   private async handleLinkPreview(textPayload: TextMessagePayload & {messageId: string}) {
