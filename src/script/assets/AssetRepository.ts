@@ -270,10 +270,7 @@ export class AssetRepository {
   }
 
   getUploadProgress(messageId: string): ko.PureComputed<number> {
-    return ko.pureComputed(() => {
-      const uploadStatus = this.findUploadStatus(messageId);
-      return uploadStatus ? uploadStatus.progress() : -1;
-    });
+    return ko.pureComputed(() => this.findUploadStatus(messageId)?.progress() ?? -1);
   }
 
   private findUploadStatus(messageId: string): UploadStatus {

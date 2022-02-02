@@ -68,7 +68,7 @@ export const IntegrationMapper = {
       }
 
       if (name) {
-        serviceEntity.name = name;
+        serviceEntity.name(name);
       }
 
       if (providerId) {
