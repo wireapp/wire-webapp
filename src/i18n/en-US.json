@@ -219,6 +219,8 @@
   "conversationContextMenuLike": "Like",
   "conversationContextMenuReply": "Reply",
   "conversationContextMenuUnlike": "Unlike",
+  "conversationClassified": "Security level: VS-NfD",
+  "conversationNotClassified": "Security level: Not classified",
   "conversationCreateReceiptsEnabled": "Read receipts are on",
   "conversationCreateTeam": "with [showmore]all team members[/showmore]",
   "conversationCreateTeamGuest": "with [showmore]all team members and one guest[/showmore]",

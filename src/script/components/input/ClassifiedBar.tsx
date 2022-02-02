@@ -21,6 +21,7 @@ import React from 'react';
 import {CSSObject} from '@emotion/core';
 import {registerReactComponent} from 'Util/ComponentUtil';
 import {User} from 'src/script/entity/User';
+import {t} from 'Util/LocalizerUtil';
 
 function isClassified(users: User[], classifiedDomains: string[]): boolean {
   if (users.some(user => !classifiedDomains.includes(user.domain))) {
@@ -40,8 +41,8 @@ const barStyle = (highContrast: boolean): CSSObject => ({
   borderColor: 'var(--foreground)',
   borderStyle: highContrast ? 'none' : 'solid',
   borderWidth: '1px 0',
-  display: 'flex',
   color: `var(--${highContrast ? 'app-bg' : 'background'})`,
+  display: 'flex',
   fontSize: 16,
   fontWeight: 600,
   height: 32,
@@ -55,7 +56,7 @@ const ClassifiedBar: React.FC<ClassifiedBarProps> = ({users, classifiedDomains})
     return undefined;
   }
   const classified = isClassified(users, classifiedDomains);
-  const text = classified ? 'Security level: VS-NfD' : 'Security level: Not classified';
+  const text = classified ? t('conversationClassified') : t('conversationNotClassified');
   const highContrast = classified;
   return (
     <div data-uie-name="classified-label" css={barStyle(highContrast)}>

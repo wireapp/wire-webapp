@@ -20,8 +20,8 @@ describe('ClassifiedBar', () => {
     users => {
       const {getByText, queryByText} = render(ClassifiedBar({classifiedDomains, users}));
 
-      expect(getByText('Security level: VS-NfD')).not.toBe(null);
-      expect(queryByText('Security level: Not classified')).toBe(null);
+      expect(getByText('conversationClassified')).not.toBe(null);
+      expect(queryByText('conversationNotClassified')).toBe(null);
     },
   );
 
@@ -32,7 +32,7 @@ describe('ClassifiedBar', () => {
   ])('returns non-classified if a single user is from another domain', users => {
     const {queryByText, getByText} = render(ClassifiedBar({classifiedDomains, users}));
 
-    expect(queryByText('Security level: VS-NfD')).toBe(null);
-    expect(getByText('Security level: Not classified')).not.toBe(null);
+    expect(queryByText('conversationClassified')).toBe(null);
+    expect(getByText('conversationNotClassified')).not.toBe(null);
   });
 });
