@@ -44,6 +44,7 @@ import {container} from 'tsyringe';
 import {ClientEntity} from '../client/ClientEntity';
 import {TeamState} from '../team/TeamState';
 import {ContentMessage} from '../entity/message/ContentMessage';
+import {PayloadBundleState} from '@wireapp/core/src/main/conversation';
 
 const selfUser = new User('selfid', '');
 selfUser.isMe = true;
@@ -134,7 +135,9 @@ describe('MessageRepository', () => {
   describe('sendMessageEdit', () => {
     it('sends an edit message if original message exists', async () => {
       const [messageRepository, {core}] = buildMessageRepository();
-      spyOn(core.service!.conversation, 'send').and.returnValue(Promise.resolve());
+      spyOn(core.service!.conversation, 'send').and.returnValue(
+        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
+      );
 
       const originalMessage = new ContentMessage(createRandomUuid());
       originalMessage.assets.push(new Text(createRandomUuid(), 'old text'));
@@ -160,7 +163,9 @@ describe('MessageRepository', () => {
     it('sends a text message', async () => {
       const [messageRepository, {eventRepository, core, propertiesRepository}] = buildMessageRepository();
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
-      spyOn(core.service!.conversation, 'send').and.returnValue(Promise.resolve());
+      spyOn(core.service!.conversation, 'send').and.returnValue(
+        Promise.resolve({state: PayloadBundleState.OUTGOING_SENT}),
+      );
       spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve());
       const conversation = generateConversation();
       await messageRepository.sendTextWithLinkPreview(conversation, 'hello there', []);
