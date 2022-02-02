@@ -122,6 +122,7 @@ class Server {
     this.app.use(
       helmet({
         crossOriginEmbedderPolicy: false,
+        crossOriginOpenerPolicy: false,
         frameguard: {action: 'deny'},
       }),
     );
