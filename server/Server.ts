@@ -121,6 +121,7 @@ class Server {
     this.app.disable('x-powered-by');
     this.app.use(
       helmet({
+        crossOriginEmbedderPolicy: false,
         frameguard: {action: 'deny'},
       }),
     );
