@@ -39,7 +39,6 @@ import {AnyAction, Dispatch} from 'redux';
 import useReactRouter from 'use-react-router';
 import {getLogger} from 'Util/Logger';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {Runtime} from '@wireapp/commons';
 
 import {Config} from '../../Config';
 import {ssoLoginStrings} from '../../strings';
@@ -146,11 +145,8 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
       setIsOverlayOpen(true);
 
       const closeSSOWindow = () => {
-        if (Runtime.isDesktopApp()) {
-          amplify.publish('BARDIA_CLOSE_SSO');
-        } else {
-          ssoWindowRef.current?.close();
-        }
+        amplify.publish('BARDIA_CLOSE_SSO');
+        ssoWindowRef.current?.close();
       };
 
       if (ssoWindowRef.current) {
@@ -189,11 +185,8 @@ const SingleSignOn = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProp
   };
 
   const focusChildWindow = () => {
-    if (Runtime.isDesktopApp()) {
-      amplify.publish('BARDIA_FOCUS_SSO');
-    } else {
-      ssoWindowRef.current?.focus();
-    }
+    amplify.publish('BARDIA_FOCUS_SSO');
+    ssoWindowRef.current?.focus();
   };
 
   const backArrow = (
